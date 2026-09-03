@@ -16,6 +16,9 @@ async function cadastrarUsuario(dados) {
     if (usuarioExistente) {
         throw new Error('Este e-mail já está em uso. Tente fazer login.');
     }
-
     
+    //criptografando a senha
+    const salt = await bcrypt.genSalt(10); //gera um salt aleatório
+    const senhaHash = await bcrypt.hash(dados.senha, salt); //mistura a senha com o salt gerado
+
 }
