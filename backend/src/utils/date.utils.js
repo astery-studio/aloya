@@ -66,4 +66,13 @@ function calcularDiasInclusivos(dataInicio, dataFim) {
         dataInicio.getDate()
     );
 
-};
+    const fim = new Date(
+        dataFim.getFullYear(),
+        dataFim.getMonth(),
+        dataFim.getDate()
+    );
+
+    const umDiaEmMs = 24 * 60 * 60 * 1000;
+
+    return Math.floor((fim - inicio) / umDiaEmMs) + 1;
+}
