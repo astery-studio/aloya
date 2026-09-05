@@ -10,4 +10,16 @@ function criarDataValida(dataTexto) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dataTexto)) {
         return null;
     }
+
+    //corta o texto nos hifens
+    const [ano, mes, dia] = dataTexto.split('-').map(Number);
+    //Cria a data no JavaScript (os meses começam do zero, por isso é mes - 1)
+    const data = new Date(ano, mes - 1, dia);
+
+    const ehValida =
+        data.getFullYear() === ano &&
+        data.getMonth() === mes - 1 &&
+        data.getDate() === dia;
+
+    return ehValida ? data : null;
 }
