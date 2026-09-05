@@ -1,20 +1,13 @@
-function calcularIdade(dataNascimento) {
-    //Obtém a data/hora atual e instancia a data informada
-    const hoje = new Date();
-    const nascimento = new Date(dataNascimento);
+function criarDataValida(dataTexto) {
 
-    //Estimativa inicial pela diferença direta entre os anos e meses
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const mes = hoje.getMonth() - nascimento.getMonth();
-    
-
-    //Se ainda não chegou o mês de aniversário OU
-    // se estamos no mês mas o dia atual é anterior ao dia do nascimento,
-    // significa que a pessoa ainda não completou mais um ano.
-    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-        idade--;
+    //Se o que chegou não for um texto, ele já devolve nulo e cancela.
+    if (typeof dataTexto !== 'string') {
+        return null;
     }
-    return idade;
-}
 
-module.exports = { calcularIdade };
+    //Força que o texto tenha estritamente o formato "4 números - 2 números - 2 números" (YYYY-MM-DD).
+    //obs: O backend utiliza o padrão internacional ISO 8601 pois ele evita ambiguidades regionais, permite ordenação cronológica direta e é o formato nativo esperado pelo banco
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataTexto)) {
+        return null;
+    }
+}
