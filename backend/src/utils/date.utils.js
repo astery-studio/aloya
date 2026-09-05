@@ -56,3 +56,14 @@ function adicionarDias(data, quantidade) {
 
     return resultado;
 }
+
+function calcularDiasInclusivos(dataInicio, dataFim) {
+    // Recria as datas ignorando horas e minutos para garantir um cálculo de diferença exato
+    
+    const inicio = new Date(
+        dataInicio.getFullYear(),
+        dataInicio.getMonth(),
+        dataInicio.getDate()
+    );
+
+};
