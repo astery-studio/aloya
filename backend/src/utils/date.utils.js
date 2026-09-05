@@ -23,3 +23,13 @@ function criarDataValida(dataTexto) {
 
     return ehValida ? data : null;
 }
+
+function calcularIdade(dataNascimento) {
+    const hoje = new Date();
+    //converte o texto em data validada
+    const nascimento = criarDataValida(dataNascimento);
+
+    if (!nascimento) {
+        return null;
+    }
+};
