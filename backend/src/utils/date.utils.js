@@ -47,3 +47,12 @@ function calcularIdade(dataNascimento) {
 
     return idade;
 }
+
+function adicionarDias(data, quantidade) {
+    //clona a data para não modificar a variável original acidentalmente
+    const resultado = new Date(data);
+    //soma os dias e ajusta a virada de mês/ano se necessário
+    resultado.setDate(resultado.getDate() + quantidade);
+
+    return resultado;
+}
