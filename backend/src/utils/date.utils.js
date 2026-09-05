@@ -32,4 +32,18 @@ function calcularIdade(dataNascimento) {
     if (!nascimento) {
         return null;
     }
-};
+
+    // Diferença bruta de anos e meses
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const diferencaMes = hoje.getMonth() - nascimento.getMonth();
+
+    // Subtrai 1 ano se o mês do aniversário ainda não chegou, ou se estamos no mês mas o dia não chegou
+    if (
+        diferencaMes < 0 ||
+        (diferencaMes === 0 && hoje.getDate() < nascimento.getDate())
+    ) {
+        idade--;
+    }
+
+    return idade;
+}
