@@ -72,7 +72,24 @@ function calcularDiasInclusivos(dataInicio, dataFim) {
         dataFim.getDate()
     );
 
+    // Constante matemática: quantidade de milissegundos em 24 horas
     const umDiaEmMs = 24 * 60 * 60 * 1000;
 
+    // O "+ 1" garante que tanto o dia de início quanto o de fim entrem na conta (ex: dia 20 a 24 = 5 dias)
     return Math.floor((fim - inicio) / umDiaEmMs) + 1;
+}
+
+function gerarDiasMenstruacao(dataInicio, dataFim) {
+    const dias = [];
+    let dataAtual = new Date(dataInicio);
+
+    //roda enquanto a data atual não ultrapassar a data de fim do ciclo
+    while (dataAtual <= dataFim) {
+        // Guarda uma cópia exata do dia atual na lista final
+        dias.push(new Date(dataAtual));
+        // Avança para o próximo dia usando a função utilitária criada acima
+        dataAtual = adicionarDias(dataAtual, 1);
+    }
+
+    return dias;
 }
