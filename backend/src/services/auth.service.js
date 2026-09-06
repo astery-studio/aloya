@@ -103,12 +103,14 @@ function criarAuthService({
                 dados.emailResponsavelLegal
             ) {
                 emailConsentimentoPendente =
-                await parentalConsentService.criarPendente(tx, {
-                    titularMenorId: usuario.id,
+                    await parentalConsentService.criarPendente(tx, {
+                        titularMenorId: usuario.id,
+                        nomeTitular: usuario.nome,
+                        emailTitular: usuario.email,
 
-                    emailResponsavelLegal:
-                    dados.emailResponsavelLegal
-                });
+                        emailResponsavelLegal:
+                            dados.emailResponsavelLegal
+                    });
             }
 
             // Cria o registro de sessão ativa vinculando o token JWT gerado e o dispositivo opcional.
@@ -171,17 +173,22 @@ function criarAuthService({
             */
         
             consentimentoParental: dados.menorDe16
-            ? {
-                exigidoParaRedeApoio: true,
-                solicitado: solicitouConsentimento,
-                redeApoioBloqueada: true,
-                emailEnviado
+                ? {
+                    exigidoParaRedeApoio: true,
+                    solicitado: solicitouConsentimento,
+                    redeApoioBloqueada: true,
+                    emailEnviado,
+
+                    mensagemEnvio: emailConsentimentoPendente && !emailEnviado
+                        ? 'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
+                        : null
                 }
-            : {
-                exigidoParaRedeApoio: false,
-                solicitado: false,
-                redeApoioBloqueada: false,
-                emailEnviado: false
+                : {
+                    exigidoParaRedeApoio: false,
+                    solicitado: false,
+                    redeApoioBloqueada: false,
+                    emailEnviado: false,
+                    mensagemEnvio: null
                 },
 
             mensagem: `Boas-vindas ao ALOYA, ${resultado.usuario.nome}.`

@@ -119,7 +119,33 @@ function criarAuthController({
                     validacao.dados.token
                 );
 
-            return res.status(200).json(resultado);
+            return res.status(200).type('html').send(`
+                //ISSO DEVE SER TEMPORÁRIO 
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                    <head>
+                        <meta charset="UTF-8" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <title>Autorização confirmada — ALOYA</title>
+                    </head>
+
+                    <body style="margin:0;background:#F7F5F0;font-family:Arial,sans-serif;color:#222222;">
+                        <main style="max-width:560px;margin:80px auto;padding:32px;background:#FFFFFF;border-radius:12px;text-align:center;">
+                            <h1 style="margin-top:0;color:#2C4C3B;">
+                                Autorização concluída
+                            </h1>
+
+                            <p style="line-height:1.6;">
+                                ${resultado.mensagem}
+                            </p>
+
+                            <p style="color:#5C5C59;font-size:14px;">
+                                A Rede de Apoio foi liberada conforme a autorização concedida.
+                            </p>
+                        </main>
+                    </body>
+                </html>
+            `);
         } catch (erro) {
             return next(erro);
         }
