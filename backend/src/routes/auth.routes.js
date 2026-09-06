@@ -6,27 +6,33 @@ function criarAuthRoutes({
 }) {
     const router = Router();
 
-    // Rota pública para criação de conta
     router.post(
         '/register',
         authController.cadastrar
     );
 
-    // Rota autenticada para informar o e-mail do responsável posteriormente
+    // Retorna o estado atual da liberação da Rede de Apoio.
+    router.get(
+        '/parental-consent/status',
+        authMiddleware.autenticar,
+        authController.consultarStatusConsentimento
+    );
+
+    // Permite informar ou substituir o e-mail do responsável legal.
     router.post(
         '/parental-consent/request',
         authMiddleware.autenticar,
         authController.solicitarConsentimento
     );
 
-    // Rota autenticada para gerar novo token e reenviar o e-mail
+    // Reenvia o link para o e-mail já cadastrado.
     router.post(
         '/parental-consent/resend',
         authMiddleware.autenticar,
         authController.reenviarConsentimento
     );
 
-    // Rota pública porque o responsável legal não possui conta no sistema
+    // Esta rota é pública porque será aberta pelo responsável legal pelo e-mail.
     router.get(
         '/parental-consent/:token',
         authController.confirmarConsentimento
