@@ -26,4 +26,29 @@ function criarAuthValidator({ dateUtils }) {
 
         return valor;
     }
+
+    // Função principal responsável por validar todos os campos enviados no corpo da requisição de cadastro 
+    function validarCadastro(body) {
+        const erros = [];
+        const hoje = new Date();
+
+        // Limpa e normaliza o nome enviado, removendo espaços excedentes.
+        const nome = typeof body.nome === 'string'
+        ? body.nome.trim().replace(/\s+/g, ' ')
+        : '';
+
+        // Valida as restrições de comprimento e caracteres permitidos para o nome.
+        if (nome.length < 3) {
+        erros.push(
+            erro('nome', 'O nome deve ter pelo menos 3 caracteres.')
+        );
+        } else if (nome.length > 120 || !regexNome.test(nome)) {
+        erros.push(
+            erro(
+            'nome',
+            'O nome deve conter apenas letras, espaços, apóstrofos ou hífens.'
+            )
+        );
+        }
+    }
 }
