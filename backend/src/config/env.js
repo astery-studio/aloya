@@ -11,3 +11,15 @@ function obterVariavelObrigatoria(nome) {
 
     return valor;
 }
+
+// Transforma o texto do .env em número. Se estiver vazio lá, assume 12 como padrão.
+const bcryptRounds = Number(process.env.BCRYPT_ROUNDS || 12);
+
+//Impede que a criptografia de senhas fique fraca demais (insegura) ou forte demais (deixa o servidor travando)
+if (
+    !Number.isInteger(bcryptRounds) ||
+    bcryptRounds < 10 ||
+    bcryptRounds > 15
+    ) {
+    throw new Error('BCRYPT_ROUNDS deve ser um inteiro entre 10 e 15.');
+}
