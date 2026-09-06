@@ -24,4 +24,9 @@ function criarParentalConsentService({
         tokenHash
         };
     }
+
+    // Função auxiliar que monta a URL completa de confirmação.
+    function criarLink(tokenPuro) {
+        return `${baseUrl}/${encodeURIComponent(tokenPuro)}`;
+    }
 }
