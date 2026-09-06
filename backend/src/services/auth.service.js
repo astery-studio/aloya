@@ -75,7 +75,29 @@ function criarAuthService({
             // Gera o token JWT de sessão de longa duração 
             const tokenSessao =
                 tokenService.gerarTokenSessao(usuario);
-    }
+
+            const cicloInicial =
+                await cycleService.criarCicloInicial(tx, {
+                usuarioId: usuario.id,
+
+                dataInicio:
+                    dados.dataInicioUltimaMenstruacao,
+
+                dataFim:
+                    dados.dataFimUltimaMenstruacao,
+
+                duracaoCicloInformada:
+                    dados.duracaoCicloInformada,
+
+                duracaoMenstruacaoInformada:
+                    dados.duracaoMenstruacaoInformada,
+
+                duracaoLuteaInformada:
+                    dados.duracaoLuteaInformada
+                });
+            }
+        }
+
     return {
         cadastrar
     };
