@@ -55,5 +55,10 @@ function criarParentalConsentService({
             )
         }
         });
+
+        return {
+        emailResponsavelLegal,
+        linkConfirmacao: criarLink(tokenPuro)
+        };
     }
 }
