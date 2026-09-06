@@ -96,8 +96,10 @@ function criarAuthService({
                     dados.duracaoLuteaInformada
                 });
 
-            // Se o usuário for menor de 16 anos, cria um registro de consentimento parental pendente
-            if (dados.menorDe16) {
+            if (
+                dados.menorDe16 &&
+                dados.emailResponsavelLegal
+            ) {
                 emailConsentimentoPendente =
                 await parentalConsentService.criarPendente(tx, {
                     titularMenorId: usuario.id,
@@ -125,15 +127,16 @@ function criarAuthService({
             }
         );
 
-        let emailEnviado = true;
+        let emailEnviado = false;
 
         if (emailConsentimentoPendente) {
             try {
             await parentalConsentService.enviarEmail(
                 emailConsentimentoPendente
             );
+
+            emailEnviado = true;
             } catch (erroEmail) {
-            emailEnviado = false;
 
             // Registra a falha de envio no logger sem interromper o fluxo de resposta.
             logger.error({
@@ -142,6 +145,9 @@ function criarAuthService({
             });
             }
         }
+
+        const solicitouConsentimento =
+            Boolean(emailConsentimentoPendente);
 
         return {
             usuario: resultado.usuario,
@@ -162,14 +168,16 @@ function criarAuthService({
 
             consentimentoParental: dados.menorDe16
             ? {
-                necessario: true,
-                status: 'pendente',
+                exigidoParaRedeApoio: true,
+                solicitado: solicitouConsentimento,
                 redeApoioBloqueada: true,
                 emailEnviado
                 }
             : {
-                necessario: false,
-                redeApoioBloqueada: false
+                exigidoParaRedeApoio: false,
+                solicitado: false,
+                redeApoioBloqueada: false,
+                emailEnviado: false
                 },
 
             mensagem: `Boas-vindas ao ALOYA, ${resultado.usuario.nome}.`
