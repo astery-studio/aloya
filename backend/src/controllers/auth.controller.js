@@ -9,8 +9,18 @@ function criarAuthController({
         const validacao = authValidator.validarCadastro(
             req.body
         );
-        }}
 
+        // Se a validação falhar, interrompe o fluxo e retorna imediatamente um código HTTP 422 com os detalhes dos erros.
+        if (!validacao.valido) {
+            return res.status(422).json({
+            erro: {
+                codigo: 'ERRO_VALIDACAO',
+                mensagem: 'Existem campos inválidos no cadastro.',
+                detalhes: validacao.erros
+            }
+            });
+        }
+        }}
     return {
         cadastrar
     };
