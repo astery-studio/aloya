@@ -74,5 +74,16 @@ function criarParentalConsentService({
             where: { titularMenorId }
         });
 
+        // Se o registro não for localizado, interrompe a execução lançando um erro HTTP 404.
+        if (!consentimento) {
+        const erro = new Error(
+            'Consentimento parental não encontrado.'
+        );
+
+        erro.status = 404;
+        erro.codigo = 'CONSENTIMENTO_NAO_ENCONTRADO';
+
+        throw erro;
+        }
     }
 }
