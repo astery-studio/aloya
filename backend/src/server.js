@@ -29,7 +29,10 @@ app.use(
 
 app.use(
     '/auth',
-    criarAuthRoutes(container.authController)
+    criarAuthRoutes({
+        authController: container.authController,
+        authMiddleware: container.authMiddleware
+    })
 );
 
 app.use(rotaNaoEncontrada);
