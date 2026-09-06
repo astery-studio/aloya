@@ -38,13 +38,82 @@ function criarParentalConsentService({
         );
     }
 
+    // Busca somente os dados necessários da pessoa titular para aplicar as regras de consentimento.
+    async function buscarTitular(titularMenorId) {
+        const titular = await prisma.usuario.findUnique({
+            where: {
+                id: titularMenorId
+            },
+
+            select: {
+                id: true,
+                nome: true,
+                email: true,
+                dataNascimento: true
+            }
+        });
+
+        if (!titular) {
+            const erro = new Error('Usuário não encontrado.');
+
+            erro.status = 404;
+            erro.codigo = 'USUARIO_NAO_ENCONTRADO';
+
+            throw erro;
+        }
+
+        return titular;
+    }
+
+    // Impede que a pessoa titular use o próprio e-mail como e-mail de responsável legal.
+    function validarEmailResponsavel(
+        emailTitular,
+        emailResponsavelLegal
+    ) {
+        if (emailTitular === emailResponsavelLegal) {
+            const erro = new Error(
+                'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.'
+            );
+
+            erro.status = 422;
+            erro.codigo = 'EMAIL_RESPONSAVEL_IGUAL_TITULAR';
+
+            throw erro;
+        }
+    }
+
+    // Encerra solicitações pendentes caso a pessoa titular já tenha completado 16 anos.
+    async function encerrarPendenciaSeMaiorDe16(titular) {
+        const idade = dateUtils.calcularIdade(
+            titular.dataNascimento,
+            now()
+        );
+
+        if (idade === null || idade < 16) {
+            return false;
+        }
+
+        await prisma.consentimentoParental.updateMany({
+            where: {
+                titularMenorId: titular.id,
+                statusConsentimento: 'pendente'
+            },
+
+            data: {
+                statusConsentimento: 'encerrado'
+            }
+        });
+
+        return true;
+    }
+
     // Envia o email sem expor detalhes técnicos do provedor SMTP.
     async function enviarEmail(dados) {
         try {
             await emailService.enviarEmailConsentimentoParental(dados);
         } catch (_erro) {
             const erro = new Error(
-                'Não foi possível enviar o e-mail de consentimento agora. Tente novamente mais tarde.'
+                'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
             );
 
             erro.status = 502;
@@ -54,11 +123,18 @@ function criarParentalConsentService({
         }
     }
 
-    // Função utilizada no cadastro inicial quando a menor informou um e-mail de responsável.
+    // Função utilizada no cadastro inicial quando o menor informou um e-mail de responsável.
     async function criarPendente(tx, {
         titularMenorId,
+        nomeTitular,
+        emailTitular,
         emailResponsavelLegal
     }) {
+        validarEmailResponsavel(
+            emailTitular,
+            emailResponsavelLegal
+        );
+
         const { tokenPuro, tokenHash } = gerarTokenSeguro();
 
         await tx.consentimentoParental.create({
@@ -76,6 +152,7 @@ function criarParentalConsentService({
         });
 
         return {
+            nomeTitular,
             emailResponsavelLegal,
             linkConfirmacao: criarLink(tokenPuro)
         };
@@ -83,37 +160,17 @@ function criarParentalConsentService({
 
     // Verifica a situação atual de acesso à Rede de Apoio de forma dinâmica.
     async function verificarAcessoRedeApoio(titularMenorId) {
-        const usuario = await prisma.usuario.findUnique({
-            where: {
-                id: titularMenorId
-            },
+        const titular = await buscarTitular(titularMenorId);
 
-            select: {
-                dataNascimento: true
-            }
-        });
-
-        if (!usuario) {
-            const erro = new Error('Usuário não encontrado.');
-
-            erro.status = 404;
-            erro.codigo = 'USUARIO_NAO_ENCONTRADO';
-
-            throw erro;
-        }
-
-        const idade = dateUtils.calcularIdade(
-            usuario.dataNascimento,
-            now()
-        );
-
-        // Ao completar 16 anos, o acesso é liberado automaticamente.
-        if (idade !== null && idade >= 16) {
+        // Ao completar 16 anos, o acesso é liberado e pendências antigas são encerradas.
+        if (await encerrarPendenciaSeMaiorDe16(titular)) {
             return {
                 acessoLiberado: true,
                 motivo: 'MAIOR_DE_16_ANOS',
                 consentimentoNecessario: false,
-                emailResponsavelInformado: false
+                emailResponsavelInformado: false,
+                emailResponsavelLegal: null,
+                statusConsentimento: 'encerrado'
             };
         }
 
@@ -134,6 +191,7 @@ function criarParentalConsentService({
 
         return {
             acessoLiberado,
+
             motivo: acessoLiberado
                 ? 'CONSENTIMENTO_ACEITO'
                 : 'CONSENTIMENTO_NECESSARIO',
@@ -144,17 +202,20 @@ function criarParentalConsentService({
                 consentimento?.emailResponsavelLegal
             ),
 
+            // Permite que a interface exiba o e-mail já informado pelo próprio titular.
+            emailResponsavelLegal:
+                consentimento?.emailResponsavelLegal || null,
+
             statusConsentimento:
                 consentimento?.statusConsentimento || null
         };
     }
 
-    // Permite que a menor informe ou altere o e-mail do responsável posteriormente.
+    // Permite que o menor informe ou altere o e-mail do responsável posteriormente.
     async function solicitar(titularMenorId, emailResponsavelLegal) {
-        const acesso =
-            await verificarAcessoRedeApoio(titularMenorId);
+        const titular = await buscarTitular(titularMenorId);
 
-        if (acesso.acessoLiberado) {
+        if (await encerrarPendenciaSeMaiorDe16(titular)) {
             return {
                 emailEnviado: false,
                 acessoRedeApoioLiberado: true,
@@ -162,8 +223,14 @@ function criarParentalConsentService({
             };
         }
 
+        validarEmailResponsavel(
+            titular.email,
+            emailResponsavelLegal
+        );
+
         const { tokenPuro, tokenHash } = gerarTokenSeguro();
 
+        // Um novo envio ou troca de e-mail invalida automaticamente o link anterior.
         await prisma.consentimentoParental.upsert({
             where: {
                 titularMenorId
@@ -186,6 +253,7 @@ function criarParentalConsentService({
         });
 
         await enviarEmail({
+            nomeTitular: titular.nome,
             emailResponsavelLegal,
             linkConfirmacao: criarLink(tokenPuro)
         });
@@ -193,7 +261,8 @@ function criarParentalConsentService({
         return {
             emailEnviado: true,
             acessoRedeApoioLiberado: false,
-            mensagem: 'Enviamos o link de autorização ao responsável legal.'
+            statusConsentimento: 'pendente',
+            mensagem: 'Enviamos um pedido de autorização para o e-mail informado. Assim que o responsável confirmar, a Rede de Apoio será liberada.'
         };
     }
 
@@ -202,10 +271,9 @@ function criarParentalConsentService({
         titularMenorId,
         novoEmailResponsavelLegal = null
     ) {
-        const acesso =
-            await verificarAcessoRedeApoio(titularMenorId);
+        const titular = await buscarTitular(titularMenorId);
 
-        if (acesso.acessoLiberado) {
+        if (await encerrarPendenciaSeMaiorDe16(titular)) {
             const erro = new Error(
                 'O acesso à Rede de Apoio já está liberado.'
             );
@@ -223,15 +291,12 @@ function criarParentalConsentService({
                 },
 
                 select: {
-                    emailResponsavelLegal: true
+                    emailResponsavelLegal: true,
+                    statusConsentimento: true
                 }
             });
 
-        // Se não existir e-mail anterior, a interface deve obrigatoriamente enviar um novo.
-        if (
-            !consentimento &&
-            !novoEmailResponsavelLegal
-        ) {
+        if (!consentimento) {
             const erro = new Error(
                 'Informe o e-mail de um responsável legal para continuar.'
             );
@@ -242,27 +307,36 @@ function criarParentalConsentService({
             throw erro;
         }
 
+        // O reenvio só é permitido enquanto a solicitação aguarda confirmação.
+        if (consentimento.statusConsentimento !== 'pendente') {
+            const erro = new Error(
+                'Esta solicitação de consentimento não está mais aguardando confirmação.'
+            );
+
+            erro.status = 409;
+            erro.codigo = 'CONSENTIMENTO_NAO_PENDENTE';
+
+            throw erro;
+        }
+
         const emailResponsavelLegal =
             novoEmailResponsavelLegal ||
             consentimento.emailResponsavelLegal;
 
+        validarEmailResponsavel(
+            titular.email,
+            emailResponsavelLegal
+        );
+
         const { tokenPuro, tokenHash } = gerarTokenSeguro();
 
-        // Cria o consentimento se ele ainda não existir; caso exista, invalida o link anterior.
-        await prisma.consentimentoParental.upsert({
+        // Atualiza o e-mail quando necessário e invalida automaticamente o link anterior.
+        await prisma.consentimentoParental.update({
             where: {
                 titularMenorId
             },
 
-            create: {
-                titularMenorId,
-                emailResponsavelLegal,
-                linkConfirmacao: tokenHash,
-                statusConsentimento: 'pendente',
-                validadeLink: criarValidadeLink()
-            },
-
-            update: {
+            data: {
                 emailResponsavelLegal,
                 linkConfirmacao: tokenHash,
                 statusConsentimento: 'pendente',
@@ -271,6 +345,7 @@ function criarParentalConsentService({
         });
 
         await enviarEmail({
+            nomeTitular: titular.nome,
             emailResponsavelLegal,
             linkConfirmacao: criarLink(tokenPuro)
         });
@@ -278,7 +353,8 @@ function criarParentalConsentService({
         return {
             emailEnviado: true,
             acessoRedeApoioLiberado: false,
-            mensagem: 'Enviamos um novo link de autorização.'
+            statusConsentimento: 'pendente',
+            mensagem: 'Enviamos um pedido de autorização para o e-mail informado. Assim que o responsável confirmar, a Rede de Apoio será liberada.'
         };
     }
 
@@ -297,6 +373,7 @@ function criarParentalConsentService({
 
                 select: {
                     id: true,
+                    titularMenorId: true,
                     statusConsentimento: true,
                     validadeLink: true
                 }
@@ -313,12 +390,35 @@ function criarParentalConsentService({
             throw erro;
         }
 
-        // Evita erro caso o responsável abra o mesmo link após já ter consentido.
+        const titular = await buscarTitular(
+            consentimento.titularMenorId
+        );
+
+        // Caso o titular já tenha completado 16 anos, não é mais necessário consentimento.
+        if (await encerrarPendenciaSeMaiorDe16(titular)) {
+            return {
+                acessoRedeApoioLiberado: true,
+                mensagem: 'A Rede de Apoio já está liberada para esta titular.'
+            };
+        }
+
+        // Evita erro caso o responsável abra novamente um link já utilizado.
         if (consentimento.statusConsentimento === 'aceito') {
             return {
                 acessoRedeApoioLiberado: true,
-                mensagem: 'O consentimento parental já havia sido confirmado.'
+                mensagem: 'A autorização já havia sido confirmada.'
             };
+        }
+
+        if (consentimento.statusConsentimento !== 'pendente') {
+            const erro = new Error(
+                'Este link de consentimento não está mais disponível.'
+            );
+
+            erro.status = 410;
+            erro.codigo = 'LINK_CONSENTIMENTO_INDISPONIVEL';
+
+            throw erro;
         }
 
         if (consentimento.validadeLink < now()) {
@@ -344,7 +444,8 @@ function criarParentalConsentService({
 
         return {
             acessoRedeApoioLiberado: true,
-            mensagem: 'Consentimento confirmado com sucesso.'
+            nomeTitular: titular.nome,
+            mensagem: 'Autorização concluída com sucesso.'
         };
     }
 
