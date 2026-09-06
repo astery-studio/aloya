@@ -34,8 +34,44 @@ function criarAuthService({
         await passwordService.gerarHash(dados.senha);
 
         let emailConsentimentoPendente = null;
-    }
 
+        try {
+        const resultado = await prisma.$transaction(
+            async (tx) => {
+            // Cria o registro principal do usuário
+            const usuario = await tx.usuario.create({
+                data: {
+                nome: dados.nome,
+                dataNascimento: dados.dataNascimento,
+                email: dados.email,
+
+                senhaHash,
+                salt,
+
+                papel: 'principal',
+                statusConta: 'ativa',
+
+                duracaoCicloInformada:
+                    dados.duracaoCicloInformada,
+
+                duracaoMenstruacaoInformada:
+                    dados.duracaoMenstruacaoInformada,
+
+                duracaoLuteaInformada:
+                    dados.duracaoLuteaInformada || 14,
+
+                temaVisual: 'automatico'
+                },
+
+                select: {
+                id: true,
+                nome: true,
+                email: true,
+                papel: true,
+                statusConta: true
+                }
+            });
+        }
     return {
         cadastrar
     };
