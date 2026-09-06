@@ -14,9 +14,15 @@ function criarTokenService({ jwt, secret, expiresIn }) {
         }
         );
     }
+    function validarTokenSessao(token) {
+        return jwt.verify(token, secret, {
+            algorithms: ['HS256']
+        });
+    }
 
     return {
-        gerarTokenSessao
+        gerarTokenSessao,
+        validarTokenSessao
     };
 }
 
