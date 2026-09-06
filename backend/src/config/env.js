@@ -46,3 +46,10 @@ const env = {
         from: obterVariavelObrigatoria('SMTP_FROM')
     }
 };
+
+//impede que a chave-mestra do sistema seja curta e fácil de ser descoberta por hackers.
+if (Buffer.byteLength(env.jwtSecret, 'utf8') < 32) {
+    throw new Error('JWT_SECRET deve possuir pelo menos 32 caracteres.');
+}
+
+module.exports = { env };
