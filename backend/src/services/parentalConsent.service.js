@@ -103,5 +103,23 @@ function criarParentalConsentService({
             statusConsentimento: 'pendente'
         }
         });
+
+        // Dispara novamente o e-mail para o responsável legal utilizando o novo link gerado.
+        return enviarEmail({
+        emailResponsavelLegal:
+            consentimento.emailResponsavelLegal,
+
+        linkConfirmacao: criarLink(tokenPuro)
+        });
     }
+
+    return {
+        criarPendente,
+        enviarEmail,
+        reenviar
+    };
 }
+
+module.exports = {
+    criarParentalConsentService
+};
