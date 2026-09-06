@@ -20,7 +20,15 @@ function criarAuthController({
             }
             });
         }
-        }}
+
+        // Extrai e sanitiza o nome do dispositivo a partir do cabeçalho HTTP
+        const dispositivo =
+            typeof req.headers['x-device-name'] === 'string'
+            ? req.headers['x-device-name'].slice(0, 120)
+            : null;
+    }
+    }
+
     return {
         cadastrar
     };
