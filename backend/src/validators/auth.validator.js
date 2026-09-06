@@ -193,4 +193,29 @@ function criarAuthValidator({ dateUtils }) {
             );
         }
         }
+
+        // Determina se o usuário é menor de 16 anos
+        const menorDe16 = idade !== null && idade < 16;
+
+        // Normaliza o e-mail do responsável legal informado.
+        const emailResponsavelLegal =
+        typeof body.emailResponsavelLegal === 'string'
+            ? body.emailResponsavelLegal.trim().toLowerCase()
+            : null;
+
+        // O e-mail do responsável legal é opcional.
+        if (
+        emailResponsavelLegal &&
+        (
+            !regexEmail.test(emailResponsavelLegal) ||
+            emailResponsavelLegal.length > 254
+        )
+        ) {
+        erros.push(
+            erro(
+            'emailResponsavelLegal',
+            'Informe um e-mail válido para o responsável legal.'
+            )
+        );
+        }
     }}
