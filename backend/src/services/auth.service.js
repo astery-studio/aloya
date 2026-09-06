@@ -1,0 +1,39 @@
+function criarAuthService({
+    prisma,
+    passwordService,
+    tokenService,
+    cycleService,
+    parentalConsentService,
+    logger = console
+    }) {
+    async function cadastrar(dados, dispositivo) {
+        const usuarioExistente = await prisma.usuario.findUnique({
+        where: {
+            email: dados.email
+        },
+
+        select: {
+            id: true
+        }
+        });
+
+        // Se o e-mail já estiver em uso, interrompe o fluxo e lança um erro
+        if (usuarioExistente) {
+        const erro = new Error(
+            'Este e-mail já está em uso. Tente fazer login.'
+        );
+
+        erro.status = 409;
+        erro.codigo = 'EMAIL_JA_CADASTRADO';
+
+        throw erro;
+        }
+    }
+    return {
+        cadastrar
+    };
+}
+
+module.exports = {
+    criarAuthService
+};
