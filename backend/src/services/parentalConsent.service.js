@@ -85,5 +85,23 @@ function criarParentalConsentService({
 
         throw erro;
         }
+
+        // Gera um novo par de tokens seguros para substituir o antigo.
+        const { tokenPuro, tokenHash } = gerarTokenSeguro();
+
+        // Atualiza o registro existente no banco de dados com o novo hash, nova validade e status pendente.
+        await prisma.consentimentoParental.update({
+        where: { titularMenorId },
+
+        data: {
+            linkConfirmacao: tokenHash,
+
+            validadeLink: new Date(
+            now().getTime() + 60 * 60 * 1000
+            ),
+
+            statusConsentimento: 'pendente'
+        }
+        });
     }
 }
