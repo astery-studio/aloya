@@ -13,4 +13,12 @@ function criarPasswordService({ bcrypt, rounds }) {
         senhaHash
         };
     }
+
+    return {
+        gerarHash
+    };
+}
+
+module.exports = {
+    criarPasswordService
 };
