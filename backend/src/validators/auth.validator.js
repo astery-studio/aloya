@@ -218,4 +218,36 @@ function criarAuthValidator({ dateUtils }) {
             )
         );
         }
-    }}
+
+        return {
+        valido: erros.length === 0,
+        erros,
+
+        dados: {
+            nome,
+            dataNascimento,
+            email,
+            senha: body.senha,
+
+            dataInicioUltimaMenstruacao,
+            dataFimUltimaMenstruacao,
+
+            duracaoCicloInformada,
+            duracaoMenstruacaoInformada,
+            duracaoLuteaInformada,
+
+            menorDe16,
+
+            emailResponsavelLegal: emailResponsavelLegal || null
+        }
+        };
+    }
+
+    return {
+        validarCadastro
+    };
+}
+
+module.exports = {
+    criarAuthValidator
+};
