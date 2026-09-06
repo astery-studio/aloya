@@ -26,7 +26,18 @@ function criarAuthController({
             typeof req.headers['x-device-name'] === 'string'
             ? req.headers['x-device-name'].slice(0, 120)
             : null;
-    }
+
+            // Delega ao serviço de autenticação a regra de negócio para persistir a conta, criar o ciclo inicial e tratar o consentimento parental.
+        const resultado = await authService.cadastrar(
+            validacao.dados,
+            dispositivo
+        );
+
+        // Retorna uma resposta de sucesso HTTP 201 contendo os dados do usuário, token de sessão e informações do ciclo inicial.
+        return res.status(201).json(resultado);
+        } catch (erro) {
+        return next(erro);
+        }
     }
 
     return {
