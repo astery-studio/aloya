@@ -1,9 +1,16 @@
 function criarParentalConsentValidator() {
-    // Expressão regular para validar a estrutura básica de e-mail
+    // Expressão regular padrão para validação básica da estrutura de um email.
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Função que valida o e-mail informado posteriormente pelo titular
+    // Função auxiliar para estruturar objetos de erro.
+    function erro(campo, mensagem) {
+        return { campo, mensagem };
+    }
+
+    // Valida o e-mail informado posteriormente para solicitar o consentimento.
     function validarSolicitacao(body) {
+        const erros = [];
+
         const emailResponsavelLegal =
             typeof body.emailResponsavelLegal === 'string'
                 ? body.emailResponsavelLegal.trim().toLowerCase()
@@ -13,27 +20,53 @@ function criarParentalConsentValidator() {
             !regexEmail.test(emailResponsavelLegal) ||
             emailResponsavelLegal.length > 254
         ) {
-            return {
-                valido: false,
-                erros: [
-                    {
-                        campo: 'emailResponsavelLegal',
-                        mensagem: 'Informe um e-mail válido para o responsável legal.'
-                    }
-                ]
-            };
+            erros.push(
+                erro(
+                    'emailResponsavelLegal',
+                    'Informe um e-mail válido para o responsável legal.'
+                )
+            );
         }
 
         return {
-            valido: true,
+            valido: erros.length === 0,
+            erros,
+
             dados: {
                 emailResponsavelLegal
             }
         };
     }
 
+    // Valida o token que chega pela URL aberta pelo responsável legal.
+    function validarToken(token) {
+        const erros = [];
+
+        if (
+            typeof token !== 'string' ||
+            !/^[A-Za-z0-9_-]{43}$/.test(token)
+        ) {
+            erros.push(
+                erro(
+                    'token',
+                    'Link de consentimento inválido.'
+                )
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+
+            dados: {
+                token
+            }
+        };
+    }
+
     return {
-        validarSolicitacao
+        validarSolicitacao,
+        validarToken
     };
 }
 
