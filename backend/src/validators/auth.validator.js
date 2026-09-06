@@ -178,4 +178,19 @@ function criarAuthValidator({ dateUtils }) {
             )
         );
         }
+
+        // Valida se a fase lútea informada respeita o limite biológico calculado.
+        if (duracaoLuteaInformada !== null) {
+        const ciclo = duracaoCicloInformada || 28;
+        const menstruacao = duracaoMenstruacaoInformada || 5;
+
+        if (duracaoLuteaInformada > ciclo - menstruacao - 2) {
+            erros.push(
+            erro(
+                'duracaoLuteaInformada',
+                'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.'
+            )
+            );
+        }
+        }
     }}
