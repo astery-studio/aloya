@@ -87,6 +87,19 @@ function criarAuthValidator({ dateUtils }) {
         );
         }
 
+        // Impede que a titular informe o próprio e-mail como e-mail de responsável legal.
+        if (
+            emailResponsavelLegal &&
+            emailResponsavelLegal === email
+        ) {
+            erros.push(
+                erro(
+                    'emailResponsavelLegal',
+                    'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.'
+                )
+            );
+        }
+
         // Valida que a senha foi informada
         if (
         typeof body.senha !== 'string' ||
