@@ -173,6 +173,18 @@ function criarAuthService({
 
             mensagem: `Boas-vindas ao ALOYA, ${resultado.usuario.nome}.`
         };
+        } catch (erro) {
+        // Captura o erro nativo do Prisma de violação de chave única (P2002) caso haja tentativa de cadastro simultâneo com o mesmo email.
+        if (erro.code === 'P2002') {
+            const erroEmail = new Error(
+            'Este e-mail já está em uso. Tente fazer login.'
+            );
+
+            erroEmail.status = 409;
+            erroEmail.codigo = 'EMAIL_JA_CADASTRADO';
+
+            throw erroEmail;
+        }
 
         throw erro;
         }
