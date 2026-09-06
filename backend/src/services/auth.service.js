@@ -141,6 +141,39 @@ function criarAuthService({
             });
             }
         }
+
+        return {
+            usuario: resultado.usuario,
+
+            autenticacao: {
+            token: resultado.tokenSessao,
+            tipo: 'Bearer'
+            },
+
+            cicloInicial: {
+            id: resultado.cicloInicial.registroCiclo.id,
+
+            dataInicio:
+                resultado.cicloInicial.registroCiclo.dataInicio
+            },
+
+            previsao: resultado.cicloInicial.previsao,
+
+            consentimentoParental: dados.menorDe16
+            ? {
+                necessario: true,
+                status: 'pendente',
+                redeApoioBloqueada: true,
+                emailEnviado
+                }
+            : {
+                necessario: false,
+                redeApoioBloqueada: false
+                },
+
+            mensagem: `Boas-vindas ao ALOYA, ${resultado.usuario.nome}.`
+        };
+
         throw erro;
         }
 
