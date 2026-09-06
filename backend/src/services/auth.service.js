@@ -72,6 +72,10 @@ function criarAuthService({
                 }
             });
         }
+            // Gera o token JWT de sessão de longa duração 
+            const tokenSessao =
+                tokenService.gerarTokenSessao(usuario);
+    }
     return {
         cadastrar
     };
