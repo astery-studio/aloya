@@ -38,6 +38,41 @@ function criarParentalConsentValidator() {
         };
     }
 
+    // Valida o e-mail opcionalmente informado durante o reenvio.
+    function validarReenvio(body) {
+        const erros = [];
+
+        const emailResponsavelLegal =
+            typeof body.emailResponsavelLegal === 'string'
+                ? body.emailResponsavelLegal.trim().toLowerCase()
+                : null;
+
+        // Se nenhum e-mail for enviado, o sistema reutilizará o último e-mail cadastrado.
+        if (
+            emailResponsavelLegal &&
+            (
+                !regexEmail.test(emailResponsavelLegal) ||
+                emailResponsavelLegal.length > 254
+            )
+        ) {
+            erros.push(
+                erro(
+                    'emailResponsavelLegal',
+                    'Informe um e-mail válido para o responsável legal.'
+                )
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+
+            dados: {
+                emailResponsavelLegal
+            }
+        };
+    }
+
     // Valida o token que chega pela URL aberta pelo responsável legal.
     function validarToken(token) {
         const erros = [];
@@ -66,6 +101,7 @@ function criarParentalConsentValidator() {
 
     return {
         validarSolicitacao,
+        validarReenvio,
         validarToken
     };
 }
