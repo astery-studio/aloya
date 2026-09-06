@@ -2,12 +2,14 @@ const { Router } = require('express');
 
 function criarAuthRoutes({
     authController,
-    authMiddleware
+    authMiddleware,
+    cadastroRateLimit
 }) {
     const router = Router();
 
     router.post(
         '/register',
+        cadastroRateLimit,
         authController.cadastrar
     );
 

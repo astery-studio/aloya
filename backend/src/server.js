@@ -31,7 +31,8 @@ app.use(
     '/auth',
     criarAuthRoutes({
         authController: container.authController,
-        authMiddleware: container.authMiddleware
+        authMiddleware: container.authMiddleware,
+        cadastroRateLimit: container.cadastroRateLimit
     })
 );
 

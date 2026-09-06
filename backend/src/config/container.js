@@ -8,6 +8,12 @@ const { prisma } = require('./prisma');
 
 const dateUtils = require('../utils/date.utils');
 
+const rateLimit = require('express-rate-limit');
+
+const {
+    criarCadastroRateLimit
+} = require('../middlewares/rateLimit.middleware');
+
 const {
     criarPasswordService
 } = require('../services/password.service');
@@ -110,6 +116,12 @@ function criarContainer() {
             parentalConsentService
         });
 
+    const cadastroRateLimit = criarCadastroRateLimit({
+        rateLimit,
+        janelaMs: env.cadastroRateLimitJanelaMs,
+        limite: env.cadastroRateLimitMaximo
+    });
+
     const authController = criarAuthController({
         authService,
         authValidator,
@@ -120,7 +132,8 @@ function criarContainer() {
     return {
         authController,
         authMiddleware,
-        parentalConsentMiddleware
+        parentalConsentMiddleware,
+        cadastroRateLimit
     };
 }
 

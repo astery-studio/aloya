@@ -24,9 +24,36 @@ if (
     throw new Error('BCRYPT_ROUNDS deve ser um inteiro entre 10 e 15.');
 }
 
+const cadastroRateLimitJanelaMs = Number(
+    process.env.CADASTRO_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const cadastroRateLimitMaximo = Number(
+    process.env.CADASTRO_RATE_LIMIT_MAXIMO || 5
+);
+
+if (
+    !Number.isInteger(cadastroRateLimitJanelaMs) ||
+    cadastroRateLimitJanelaMs <= 0
+) {
+    throw new Error(
+        'CADASTRO_RATE_LIMIT_JANELA_MS deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(cadastroRateLimitMaximo) ||
+    cadastroRateLimitMaximo <= 0
+) {
+    throw new Error(
+        'CADASTRO_RATE_LIMIT_MAXIMO deve ser um inteiro positivo.'
+    );
+}
+
 const env = {
     port: Number(process.env.PORT || 3000), //define a porta onde a api vai rodar
-
+    cadastroRateLimitJanelaMs,
+    cadastroRateLimitMaximo,
     jwtSecret: obterVariavelObrigatoria('JWT_SECRET'), //a chave para criar a sessão do usuário
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '90d', // O token de login gerado dura 90 dias
 
