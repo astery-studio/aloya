@@ -9,4 +9,21 @@ function criarAuthValidator({ dateUtils }) {
     function erro(campo, mensagem) {
         return { campo, mensagem };
     }
+
+    // Função auxiliar para validar e converter parâmetros numéricos opcionais, garantindo que sejam inteiros estritamente positivos.
+    function inteiroPositivo(valor, campo, erros) {
+        if (valor === undefined || valor === null || valor === '') {
+        return null;
+        }
+
+        if (!Number.isInteger(valor) || valor <= 0) {
+        erros.push(
+            erro(campo, 'Informe um número inteiro positivo.')
+        );
+
+        return null;
+        }
+
+        return valor;
+    }
 }
