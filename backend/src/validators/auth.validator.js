@@ -143,5 +143,39 @@ function criarAuthValidator({ dateUtils }) {
             )
         );
         }
-    }
-}
+
+        // Valida a duração informada do ciclo utilizando a função auxiliar de inteiros positivos.
+        const duracaoCicloInformada = inteiroPositivo(
+        body.duracaoCicloInformada,
+        'duracaoCicloInformada',
+        erros
+        );
+
+        // Valida a duração informada da menstruação.
+        const duracaoMenstruacaoInformada = inteiroPositivo(
+        body.duracaoMenstruacaoInformada,
+        'duracaoMenstruacaoInformada',
+        erros
+        );
+
+        // Valida a duração informada da fase lútea.
+        const duracaoLuteaInformada = inteiroPositivo(
+        body.duracaoLuteaInformada,
+        'duracaoLuteaInformada',
+        erros
+        );
+
+        // Valida que a duração da menstruação nunca pode ser maior ou igual à duração total do ciclo.
+        if (
+        duracaoCicloInformada &&
+        duracaoMenstruacaoInformada &&
+        duracaoMenstruacaoInformada >= duracaoCicloInformada
+        ) {
+        erros.push(
+            erro(
+            'duracaoMenstruacaoInformada',
+            'A duração da menstruação deve ser menor que a duração do ciclo.'
+            )
+        );
+        }
+    }}
