@@ -65,4 +65,14 @@ function criarParentalConsentService({
     async function enviarEmail(dados) {
         return emailService.enviarEmailConsentimentoParental(dados);
     }
+
+    //futura funcionalidade de reenviar o email (obs: Todo reenvio substitui o hash anterior e atualiza a validade, invalidando automaticamente o link antigo)
+    async function reenviar(titularMenorId) {
+        // Busca no banco o registro de consentimento vinculado ao ID do menor.
+        const consentimento =
+        await prisma.consentimentoParental.findUnique({
+            where: { titularMenorId }
+        });
+
+    }
 }
