@@ -74,5 +74,17 @@ function criarAuthValidator({ dateUtils }) {
             )
         );
         }
+
+        // Normaliza o e-mail removendo espaços e convertendo para minúsculas
+        const email = typeof body.email === 'string'
+        ? body.email.trim().toLowerCase()
+        : '';
+
+        // Valida o formato e o tamanho máximo permitido para o e-mail.
+        if (!regexEmail.test(email) || email.length > 254) {
+        erros.push(
+            erro('email', 'Informe um e-mail válido.')
+        );
+        }
     }
 }
