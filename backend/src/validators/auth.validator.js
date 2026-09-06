@@ -86,5 +86,18 @@ function criarAuthValidator({ dateUtils }) {
             erro('email', 'Informe um e-mail válido.')
         );
         }
+
+        // Valida que a senha foi informada
+        if (
+        typeof body.senha !== 'string' ||
+        body.senha.length === 0
+        ) {
+        erros.push(
+            erro(
+            'senha',
+            'Informe uma senha.'
+            )
+        );
+        }
     }
 }
