@@ -1,24 +1,38 @@
 function criarEmailService({ transporter, remetente }) {
+    // Escapa caracteres especiais antes de inserir o nome da pessoa titular no HTML do e-mail.
+    function escaparHtml(texto) {
+        return String(texto)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // Função que envia o email de confirmação de consentimento parental.
     async function enviarEmailConsentimentoParental({
+        nomeTitular,
         emailResponsavelLegal,
         linkConfirmacao
     }) {
+        const nomeSeguro = escaparHtml(nomeTitular);
+
         // Dispara o envio do email.
         await transporter.sendMail({
             from: remetente,
             to: emailResponsavelLegal,
             subject: 'Autorização da Rede de Apoio — ALOYA',
+
             text: `
                 Olá!
 
-                Uma pessoa menor de 16 anos indicou este endereço como e-mail de seu responsável legal na plataforma ALOYA.
+                ${nomeTitular} indicou este endereço como e-mail de seu responsável legal na plataforma ALOYA.
 
-                A pessoa titular já pode usar normalmente as funcionalidades privadas do aplicativo. Esta autorização é opcional e serve exclusivamente para liberar o módulo Rede de Apoio.
+                A titular já pode usar normalmente todas as funcionalidades privadas do aplicativo. Esta autorização é opcional e serve exclusivamente para liberar o módulo Rede de Apoio.
 
-                A Rede de Apoio permite que a titular envie convites e compartilhe somente informações selecionadas por ela com pessoas de confiança.
+                A Rede de Apoio permite que a pessoa titular envie convites e compartilhe somente informações selecionadas por ela com pessoas de confiança.
 
-                Esta autorização não concede acesso à conta, ao diário, ao histórico de ciclos, aos sintomas ou a quaisquer outros dados privados da titular.
+                Esta autorização não concede acesso à conta, ao diário, ao histórico de ciclos, aos sintomas ou a quaisquer outros dados privados da pessoa titular.
 
                 Para autorizar o acesso à Rede de Apoio, acesse o link abaixo:
                 ${linkConfirmacao}
@@ -46,7 +60,7 @@ function criarEmailService({ transporter, remetente }) {
                     <p>Olá!</p>
 
                     <p>
-                        Uma pessoa menor de 16 anos indicou este endereço como e-mail de seu responsável legal na plataforma <strong>ALOYA</strong>.
+                        <strong>${nomeSeguro}</strong> indicou este endereço como e-mail de seu responsável legal na plataforma <strong>ALOYA</strong>.
                     </p>
 
                     <p>
