@@ -18,6 +18,20 @@ function rotaNaoEncontrada(_req, res) {
         }
         });
     }
+
+    // Caso seja um erro não tratado, registra os detalhes do erro no console para rastreio e monitoramento.
+    console.error({
+        evento: 'erro_interno',
+        tipo: erro.name
+    });
+
+    // Retorna uma resposta HTTP 500 genérica
+    return res.status(500).json({
+        erro: {
+        codigo: 'ERRO_INTERNO',
+        mensagem: 'Ocorreu um erro ao criar sua conta. Tente novamente.'
+        }
+    });
 }
 
 module.exports = {
