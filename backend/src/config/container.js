@@ -10,41 +10,53 @@ const dateUtils = require('../utils/date.utils');
 
 const {
     criarPasswordService
-    } = require('../services/password.service');
+} = require('../services/password.service');
 
-    const {
+const {
     criarTokenService
-    } = require('../services/token.service');
+} = require('../services/token.service');
 
-    const {
+const {
     criarEmailService
-    } = require('../services/email.service');
+} = require('../services/email.service');
 
-    const {
+const {
     criarParentalConsentService
-    } = require('../services/parentalConsent.service');
+} = require('../services/parentalConsent.service');
 
-    const {
+const {
     criarAuthService
-    } = require('../services/auth.service');
+} = require('../services/auth.service');
 
-    const {
+const {
     criarAuthValidator
-    } = require('../validators/auth.validator');
+} = require('../validators/auth.validator');
 
-    const {
+const {
+    criarParentalConsentValidator
+} = require('../validators/parentalConsent.validator');
+
+const {
     criarAuthController
-    } = require('../controllers/auth.controller');
+} = require('../controllers/auth.controller');
 
-    function criarContainer() {
+const {
+    criarAuthMiddleware
+} = require('../middlewares/auth.middleware');
+
+const {
+    criarParentalConsentMiddleware
+} = require('../middlewares/parentalConsent.middleware');
+
+function criarContainer() {
     const transporter = nodemailer.createTransport({
         host: env.smtp.host,
         port: env.smtp.port,
         secure: env.smtp.secure,
 
         auth: {
-        user: env.smtp.user,
-        pass: env.smtp.password
+            user: env.smtp.user,
+            pass: env.smtp.password
         }
     });
 
@@ -66,10 +78,11 @@ const {
 
     const parentalConsentService =
         criarParentalConsentService({
-        prisma,
-        emailService,
-        crypto,
-        baseUrl: env.parentalConsentBaseUrl
+            prisma,
+            emailService,
+            crypto,
+            baseUrl: env.parentalConsentBaseUrl,
+            dateUtils
         });
 
     const authService = criarAuthService({
@@ -84,13 +97,30 @@ const {
         dateUtils
     });
 
+    const parentalConsentValidator =
+        criarParentalConsentValidator();
+
+    const authMiddleware = criarAuthMiddleware({
+        tokenService,
+        prisma
+    });
+
+    const parentalConsentMiddleware =
+        criarParentalConsentMiddleware({
+            parentalConsentService
+        });
+
     const authController = criarAuthController({
         authService,
-        authValidator
+        authValidator,
+        parentalConsentService,
+        parentalConsentValidator
     });
 
     return {
-        authController
+        authController,
+        authMiddleware,
+        parentalConsentMiddleware
     };
 }
 
