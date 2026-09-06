@@ -50,5 +50,29 @@ function criarAuthValidator({ dateUtils }) {
             )
         );
         }
+
+        // Valida e formata a data de nascimento utilizando o utilitário de datas.
+        const dataNascimento =
+        dateUtils.criarDataValida(body.dataNascimento);
+
+        // Calcula a idade do usuário com base na data de nascimento informada.
+        const idade = dateUtils.calcularIdade(
+        body.dataNascimento
+        );
+
+        // Valida se a data de nascimento é real, não está no futuro e não resulta em idade negativa.
+        if (
+        !dataNascimento ||
+        dataNascimento > hoje ||
+        idade === null ||
+        idade < 0
+        ) {
+        erros.push(
+            erro(
+            'dataNascimento',
+            'Informe uma data de nascimento válida.'
+            )
+        );
+        }
     }
 }
