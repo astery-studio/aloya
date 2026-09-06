@@ -95,7 +95,19 @@ function criarAuthService({
                 duracaoLuteaInformada:
                     dados.duracaoLuteaInformada
                 });
+
+            // Se o usuário for menor de 16 anos, cria um registro de consentimento parental pendente
+            if (dados.menorDe16) {
+                emailConsentimentoPendente =
+                await parentalConsentService.criarPendente(tx, {
+                    titularMenorId: usuario.id,
+
+                    emailResponsavelLegal:
+                    dados.emailResponsavelLegal
+                });
             }
+
+        throw erro;
         }
 
     return {
