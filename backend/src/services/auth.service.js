@@ -107,6 +107,22 @@ function criarAuthService({
                 });
             }
 
+            // Cria o registro de sessão ativa vinculando o token JWT gerado e o dispositivo opcional.
+            await tx.sessao.create({
+                data: {
+                usuarioId: usuario.id,
+                tokenSessao,
+                dispositivo: dispositivo || null
+                }
+            });
+
+            return {
+                usuario,
+                tokenSessao,
+                cicloInicial
+            };
+            
+        );
         throw erro;
         }
 
