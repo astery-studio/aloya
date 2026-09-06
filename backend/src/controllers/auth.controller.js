@@ -4,12 +4,15 @@ function criarAuthController({
     parentalConsentService,
     parentalConsentValidator
 }) {
-    // Função responsável por processar a requisição HTTP de cadastro
+    // Função responsável por processar a requisição HTTP de cadastro de nova conta.
     async function cadastrar(req, res, next) {
         try {
-            const validacao =
-                authValidator.validarCadastro(req.body);
+            // Executa a validação de formato e integridade dos dados enviados no corpo da requisição.
+            const validacao = authValidator.validarCadastro(
+                req.body
+            );
 
+            // Se a validação falhar, interrompe o fluxo e retorna os detalhes dos erros.
             if (!validacao.valido) {
                 return res.status(422).json({
                     erro: {
@@ -20,11 +23,13 @@ function criarAuthController({
                 });
             }
 
+            // Extrai e sanitiza o nome do dispositivo a partir do cabeçalho HTTP.
             const dispositivo =
                 typeof req.headers['x-device-name'] === 'string'
                     ? req.headers['x-device-name'].slice(0, 120)
                     : null;
 
+            // Delega ao serviço de autenticação a criação segura da conta e o consentimento parental.
             const resultado = await authService.cadastrar(
                 validacao.dados,
                 dispositivo
@@ -36,19 +41,17 @@ function criarAuthController({
         }
     }
 
-    // Permite que o titular informe o e-mail do responsável posteriormente
+    // Permite que a titular informe o e-mail do responsável depois do cadastro.
     async function solicitarConsentimento(req, res, next) {
         try {
             const validacao =
-                parentalConsentValidator.validarSolicitacao(
-                    req.body
-                );
+                parentalConsentValidator.validarSolicitacao(req.body);
 
             if (!validacao.valido) {
                 return res.status(422).json({
                     erro: {
                         codigo: 'ERRO_VALIDACAO',
-                        mensagem: 'Existe um campo inválido.',
+                        mensagem: 'Existem campos inválidos na solicitação.',
                         detalhes: validacao.erros
                     }
                 });
@@ -66,7 +69,7 @@ function criarAuthController({
         }
     }
 
-    // Permite reenviar o e-mail ao responsável legal já informado
+    // Reenvia o link ao último e-mail de responsável informado.
     async function reenviarConsentimento(req, res, next) {
         try {
             const resultado =
@@ -80,13 +83,40 @@ function criarAuthController({
         }
     }
 
-    // Recebe o clique público do responsável legal no link do e-mail
+    // Confirma o consentimento pelo token recebido no link do e-mail.
     async function confirmarConsentimento(req, res, next) {
         try {
-            const resultado =
-                await parentalConsentService.confirmar(
+            const validacao =
+                parentalConsentValidator.validarToken(
                     req.params.token
                 );
+
+            if (!validacao.valido) {
+                return res.status(400).json({
+                    erro: {
+                        codigo: 'LINK_CONSENTIMENTO_INVALIDO',
+                        mensagem: 'O link de consentimento é inválido.'
+                    }
+                });
+            }
+
+            const resultado =
+                await parentalConsentService.confirmar(
+                    validacao.dados.token
+                );
+
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return next(erro);
+        }
+    }
+
+    // Informa à interface se a Rede de Apoio está liberada ou se deve exibir a opção de solicitar consentimento.
+    async function consultarStatusConsentimento(req, res, next) {
+        try {
+            const resultado =
+                await parentalConsentService
+                    .verificarAcessoRedeApoio(req.usuario.id);
 
             return res.status(200).json(resultado);
         } catch (erro) {
@@ -98,7 +128,8 @@ function criarAuthController({
         cadastrar,
         solicitarConsentimento,
         reenviarConsentimento,
-        confirmarConsentimento
+        confirmarConsentimento,
+        consultarStatusConsentimento
     };
 }
 
