@@ -25,26 +25,28 @@ function criarDataValida(dataTexto) {
 }
 
 function calcularIdade(dataNascimento, hoje = new Date()) {
-    // Se a data vier do Prisma, ela já será um objeto Date.
-    // Se vier do cadastro, ela será texto e precisa ser validada.
-    const nascimento = dataNascimento instanceof Date
-        ? new Date(dataNascimento)
-        : criarDataValida(dataNascimento);
+    // Caso a data venha do Prisma, normaliza a parte de ano, mês e dia.
+    const nascimento =
+        dataNascimento instanceof Date
+            ? new Date(
+                dataNascimento.getUTCFullYear(),
+                dataNascimento.getUTCMonth(),
+                dataNascimento.getUTCDate()
+            )
+            : criarDataValida(dataNascimento);
 
-    // Impede o cálculo caso a data seja inválida.
-    if (
-        !nascimento ||
-        Number.isNaN(nascimento.getTime())
-    ) {
+    if (!nascimento || Number.isNaN(nascimento.getTime())) {
         return null;
     }
 
-    // Diferença bruta de anos e meses
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const diferencaMes = hoje.getMonth() - nascimento.getMonth();
+    // Diferença bruta de anos e meses.
+    let idade =
+        hoje.getFullYear() - nascimento.getFullYear();
 
-    // Subtrai 1 ano se o mês do aniversário ainda não chegou,
-    // ou se estamos no mês mas o dia ainda não chegou.
+    const diferencaMes =
+        hoje.getMonth() - nascimento.getMonth();
+
+    // Subtrai 1 ano se o mês do aniversário ainda não chegou, ou se estamos no mês mas o dia não chegou.
     if (
         diferencaMes < 0 ||
         (
