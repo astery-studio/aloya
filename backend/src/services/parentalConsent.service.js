@@ -61,4 +61,8 @@ function criarParentalConsentService({
         linkConfirmacao: criarLink(tokenPuro)
         };
     }
+
+    async function enviarEmail(dados) {
+        return emailService.enviarEmailConsentimentoParental(dados);
+    }
 }
