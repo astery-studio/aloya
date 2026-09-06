@@ -2,7 +2,7 @@ function criarAuthService({
     prisma,
     passwordService,
     tokenService,
-    cycleService,
+    //cycleService, //adicionar isso somente na sprint do ciclo
     parentalConsentService,
     logger = console
     }) {
@@ -76,6 +76,7 @@ function criarAuthService({
             const tokenSessao =
                 tokenService.gerarTokenSessao(usuario);
 
+            /* Bloco deve ser descomentado na sprint do ciclo
             const cicloInicial =
                 await cycleService.criarCicloInicial(tx, {
                 usuarioId: usuario.id,
@@ -95,7 +96,8 @@ function criarAuthService({
                 duracaoLuteaInformada:
                     dados.duracaoLuteaInformada
                 });
-
+            */
+        
             if (
                 dados.menorDe16 &&
                 dados.emailResponsavelLegal
@@ -121,7 +123,7 @@ function criarAuthService({
             return {
                 usuario,
                 tokenSessao,
-                cicloInicial
+                //cicloInicial // deve ser descomentado na sprint do ciclo
             };
 
             }
@@ -157,15 +159,17 @@ function criarAuthService({
             tipo: 'Bearer'
             },
 
-            cicloInicial: {
-            id: resultado.cicloInicial.registroCiclo.id,
+            /* Deve ser descomentado na sprint do ciclo
+            cicloInicial: { 
+            id: resultado.cicloInicial.registroCiclo.id, 
 
             dataInicio:
                 resultado.cicloInicial.registroCiclo.dataInicio
-            },
+            }, 
 
             previsao: resultado.cicloInicial.previsao,
-
+            */
+        
             consentimentoParental: dados.menorDe16
             ? {
                 exigidoParaRedeApoio: true,

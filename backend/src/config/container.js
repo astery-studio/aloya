@@ -76,7 +76,7 @@ const {
         prisma,
         passwordService,
         tokenService,
-        cycleService,
+        //cycleService, //adicionar isso na sprint do ciclo
         parentalConsentService
     });
 
