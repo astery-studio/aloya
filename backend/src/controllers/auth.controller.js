@@ -69,12 +69,26 @@ function criarAuthController({
         }
     }
 
-    // Reenvia o link ao último e-mail de responsável informado.
+    // Reenvia o link ao último e-mail informado ou a um novo e-mail de responsável legal.
     async function reenviarConsentimento(req, res, next) {
         try {
+            const validacao =
+                parentalConsentValidator.validarReenvio(req.body);
+
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: 'Existem campos inválidos no reenvio.',
+                        detalhes: validacao.erros
+                    }
+                });
+            }
+
             const resultado =
                 await parentalConsentService.reenviar(
-                    req.usuario.id
+                    req.usuario.id,
+                    validacao.dados.emailResponsavelLegal
                 );
 
             return res.status(200).json(resultado);
