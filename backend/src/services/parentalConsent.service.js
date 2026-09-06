@@ -197,8 +197,11 @@ function criarParentalConsentService({
         };
     }
 
-    // Reenvia o link para o último e-mail de responsável legal informado.
-    async function reenviar(titularMenorId) {
+    // Reenvia o link para o último e-mail informado ou para um novo e-mail de responsável legal.
+    async function reenviar(
+        titularMenorId,
+        novoEmailResponsavelLegal = null
+    ) {
         const acesso =
             await verificarAcessoRedeApoio(titularMenorId);
 
@@ -224,25 +227,43 @@ function criarParentalConsentService({
                 }
             });
 
-        if (!consentimento) {
+        // Se não existir e-mail anterior, a interface deve obrigatoriamente enviar um novo.
+        if (
+            !consentimento &&
+            !novoEmailResponsavelLegal
+        ) {
             const erro = new Error(
-                'Nenhum e-mail de responsável legal foi informado.'
+                'Informe o e-mail de um responsável legal para continuar.'
             );
 
-            erro.status = 404;
-            erro.codigo = 'CONSENTIMENTO_NAO_ENCONTRADO';
+            erro.status = 422;
+            erro.codigo = 'EMAIL_RESPONSAVEL_NECESSARIO';
 
             throw erro;
         }
 
+        const emailResponsavelLegal =
+            novoEmailResponsavelLegal ||
+            consentimento.emailResponsavelLegal;
+
         const { tokenPuro, tokenHash } = gerarTokenSeguro();
 
-        await prisma.consentimentoParental.update({
+        // Cria o consentimento se ele ainda não existir; caso exista, invalida o link anterior.
+        await prisma.consentimentoParental.upsert({
             where: {
                 titularMenorId
             },
 
-            data: {
+            create: {
+                titularMenorId,
+                emailResponsavelLegal,
+                linkConfirmacao: tokenHash,
+                statusConsentimento: 'pendente',
+                validadeLink: criarValidadeLink()
+            },
+
+            update: {
+                emailResponsavelLegal,
                 linkConfirmacao: tokenHash,
                 statusConsentimento: 'pendente',
                 validadeLink: criarValidadeLink()
@@ -250,9 +271,7 @@ function criarParentalConsentService({
         });
 
         await enviarEmail({
-            emailResponsavelLegal:
-                consentimento.emailResponsavelLegal,
-
+            emailResponsavelLegal,
             linkConfirmacao: criarLink(tokenPuro)
         });
 
