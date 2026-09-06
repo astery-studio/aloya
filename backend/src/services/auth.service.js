@@ -123,6 +123,24 @@ function criarAuthService({
             };
             
         );
+
+        let emailEnviado = true;
+
+        if (emailConsentimentoPendente) {
+            try {
+            await parentalConsentService.enviarEmail(
+                emailConsentimentoPendente
+            );
+            } catch (erroEmail) {
+            emailEnviado = false;
+
+            // Registra a falha de envio no logger sem interromper o fluxo de resposta.
+            logger.error({
+                evento: 'falha_envio_consentimento_parental',
+                tipoErro: erroEmail.name
+            });
+            }
+        }
         throw erro;
         }
 
