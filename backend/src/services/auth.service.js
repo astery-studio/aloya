@@ -71,7 +71,7 @@ function criarAuthService({
                 statusConta: true
                 }
             });
-        }
+            
             // Gera o token JWT de sessão de longa duração 
             const tokenSessao =
                 tokenService.gerarTokenSessao(usuario);
@@ -121,7 +121,8 @@ function criarAuthService({
                 tokenSessao,
                 cicloInicial
             };
-            
+
+            }
         );
 
         let emailEnviado = true;
@@ -188,6 +189,7 @@ function criarAuthService({
 
         throw erro;
         }
+    }
 
     return {
         cadastrar
