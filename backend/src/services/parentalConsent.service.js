@@ -116,7 +116,7 @@ function criarParentalConsentService({
         );
     }
 
-    // Solicita consentimento quando a titular adiciona o e-mail posteriormente
+    // Solicita consentimento quando o titular adiciona o e-mail posteriormente
     async function solicitar(
         titularMenorId,
         emailResponsavelLegal
@@ -176,7 +176,7 @@ function criarParentalConsentService({
                 emailEnviado: true
             };
         } catch (erroEmail) {
-            // Não interrompe o uso do app; a titular poderá reenviar depois
+            // Não interrompe o uso do app; o titular poderá reenviar depois
             logger.error({
                 evento: 'falha_envio_consentimento_parental',
                 tipoErro: erroEmail.name
