@@ -28,7 +28,14 @@ function criarAuthService({
 
         throw erro;
         }
+
+        // Gera o salt individual e o hash seguro da senha através do serviço de senha
+        const { salt, senhaHash } =
+        await passwordService.gerarHash(dados.senha);
+
+        let emailConsentimentoPendente = null;
     }
+
     return {
         cadastrar
     };
