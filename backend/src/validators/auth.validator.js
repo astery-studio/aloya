@@ -99,5 +99,49 @@ function criarAuthValidator({ dateUtils }) {
             )
         );
         }
+
+        // Valida a data de início da última menstruação informada no cadastro.
+        const dataInicioUltimaMenstruacao =
+        dateUtils.criarDataValida(
+            body.dataInicioUltimaMenstruacao
+        );
+
+        // Impede que a data de início da menstruação seja inválida ou situada no futuro.
+        if (
+        !dataInicioUltimaMenstruacao ||
+        dataInicioUltimaMenstruacao > hoje
+        ) {
+        erros.push(
+            erro(
+            'dataInicioUltimaMenstruacao',
+            'Informe a data de início da sua última menstruação (não pode ser no futuro).'
+            )
+        );
+        }
+
+        // Valida opcionalmente a data de término da última menstruação, caso tenha sido cadastrada.
+        const dataFimUltimaMenstruacao =
+        body.dataFimUltimaMenstruacao
+            ? dateUtils.criarDataValida(
+                body.dataFimUltimaMenstruacao
+            )
+            : null;
+
+        // Garante que a data de término seja coerente (não anterior ao início e nem no futuro).
+        if (
+        body.dataFimUltimaMenstruacao &&
+        (
+            !dataFimUltimaMenstruacao ||
+            dataFimUltimaMenstruacao < dataInicioUltimaMenstruacao ||
+            dataFimUltimaMenstruacao > hoje
+        )
+        ) {
+        erros.push(
+            erro(
+            'dataFimUltimaMenstruacao',
+            'Informe uma data de término válida.'
+            )
+        );
+        }
     }
 }
