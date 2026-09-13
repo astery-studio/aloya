@@ -1,0 +1,560 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Papel {
+  principal
+  contato_apoio
+  principal_e_contato_apoio
+}
+
+enum StatusConta {
+  ativa
+  pendente_consentimento_parental
+  pendente_confirmacao_email
+  suspensa
+  desativada
+}
+
+enum TemaVisual {
+  claro
+  escuro
+  automatico
+}
+
+enum StatusConfirmacaoEmail {
+  pendente
+  usado
+  expirado
+  revogado
+}
+
+enum StatusConsentimento {
+  liberado
+  pendente
+  expirado
+  revogado
+}
+
+enum StatusLinkRecuperacao {
+  pendente
+  usado
+  expirado
+  revogado
+}
+
+enum StatusSincronizacao {
+  sincronizado
+  pendente
+  falha
+}
+
+enum ClassificacaoCiclo {
+  normal
+  atipico
+  irregular
+}
+
+enum NivelConfianca {
+  baixa
+  media
+  alta
+}
+
+enum FaseCiclo {
+  menstrual
+  folicular
+  ovulatoria
+  lutea
+}
+
+enum TipoAnticoncepcional {
+  pilula
+  injetavel
+  adesivo
+  anel_vaginal
+  diu_hormonal
+}
+
+enum FrequenciaUso {
+  uso_21_dias_pausa_7_dias
+  uso_24_dias_pausa_4_dias
+  uso_12_semanas_pausa_1_semana
+  uso_continuo
+  aplicacao_mensal
+  aplicacao_bimestral
+  aplicacao_trimestral
+  uso_21_dias
+  uso_28_dias
+  uso_3_semanas_pausa_1_semana
+}
+
+enum NivelIntensidadeAlerta {
+  leve
+  moderado
+  critico
+}
+
+enum StatusUso {
+  confirmado
+  pendente
+  nao_confirmado
+}
+
+enum StatusVinculoRedeApoio {
+  pendente
+  ativo
+  recusado
+  revogado
+}
+
+enum RemetenteMensagem {
+  usuario
+  suporte
+}
+
+enum StatusMensagem {
+  enviando
+  enviada
+  lida
+  falha
+}
+
+enum TipoOrigemNotificacao {
+  proximidade_ciclo
+  mudanca_fase
+  lembrete_diario
+  anticoncepcional
+  resposta_suporte
+  rede_apoio
+}
+
+enum StatusEnvioNotificacao {
+  agendada
+  enviada
+  cancelada
+  falha
+}
+
+// ============================================================
+// USUÁRIO E AUTENTICAÇÃO
+// ============================================================
+
+model Usuario {
+  id                          Int         @id @default(autoincrement())
+  nome                        String
+  dataNascimento              DateTime    @map("data_nascimento")
+  email                       String      @unique
+  emailConfirmadoEm           DateTime?   @map("email_confirmado_em")
+  senhaHash                   String      @map("senha_hash")
+  genero                      String?
+  papel                       Papel
+  statusConta                 StatusConta @default(pendente_confirmacao_email) @map("status_conta")
+
+  duracaoCicloInformada       Int?        @map("duracao_ciclo_informada")
+  duracaoMenstruacaoInformada Int?        @map("duracao_menstruacao_informada")
+  duracaoLuteaInformada       Int?        @default(14) @map("duracao_lutea_informada")
+
+  temaVisual                  TemaVisual  @default(automatico) @map("tema_visual")
+
+  criadoEm                    DateTime    @default(now()) @map("criado_em")
+  atualizadoEm                DateTime    @updatedAt @map("atualizado_em")
+
+  confirmacoesEmail           ConfirmacaoEmail[]
+  sessoes                     Sessao[]
+  recuperacoesSenha           RecuperacaoSenha[]
+  consentimentoParental       ConsentimentoParental?
+  registrosCiclo              RegistroCiclo[]
+  previsao                    Previsao?
+  registrosDiario             RegistroDiario[]
+  anticoncepcionais           Anticoncepcional[]
+  categoriasPermissao         CategoriaPermissao[]
+  preferenciaNotificacao      PreferenciaNotificacao?
+  notificacoes                Notificacao[]
+  conversaSuporte             Conversa?
+
+  vinculosComoTitular         VinculoRedeApoio[] @relation("VinculoTitular")
+  vinculosComoContato         VinculoRedeApoio[] @relation("VinculoContato")
+
+  @@map("usuarios")
+}
+
+model ConfirmacaoEmail {
+  id                Int                    @id @default(autoincrement())
+  usuarioId         Int                    @map("usuario_id")
+  usuario           Usuario                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  tokenHash         String                 @unique @map("token_hash")
+  statusConfirmacao StatusConfirmacaoEmail @default(pendente) @map("status_confirmacao")
+  validadeToken     DateTime               @map("validade_token")
+  usadoEm           DateTime?              @map("usado_em")
+
+  criadoEm          DateTime               @default(now()) @map("criado_em")
+
+  @@index([usuarioId, statusConfirmacao])
+  @@map("confirmacoes_email")
+}
+
+model ConsentimentoParental {
+  id                    Int                 @id @default(autoincrement())
+  titularMenorId        Int                 @unique @map("titular_menor_id")
+  titularMenor          Usuario             @relation(fields: [titularMenorId], references: [id], onDelete: Cascade)
+
+  emailResponsavelLegal String              @map("email_responsavel_legal")
+  tokenConfirmacaoHash  String              @unique @map("token_confirmacao_hash")
+  statusConsentimento   StatusConsentimento @default(pendente) @map("status_consentimento")
+  validadeLink          DateTime            @map("validade_link")
+  respondidoEm          DateTime?           @map("respondido_em")
+
+  criadoEm              DateTime            @default(now()) @map("criado_em")
+  atualizadoEm          DateTime            @updatedAt @map("atualizado_em")
+
+  @@index([emailResponsavelLegal])
+  @@map("consentimentos_parentais")
+}
+
+model Sessao {
+  id              Int       @id @default(autoincrement())
+  usuarioId       Int       @map("usuario_id")
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  tokenSessaoHash String    @unique @map("token_sessao_hash")
+  dispositivo     String?
+  validadeSessao  DateTime  @map("validade_sessao")
+  revogadaEm      DateTime? @map("revogada_em")
+
+  criadoEm        DateTime  @default(now()) @map("criado_em")
+  atualizadoEm    DateTime  @updatedAt @map("atualizado_em")
+
+  @@index([usuarioId])
+  @@index([validadeSessao])
+  @@map("sessoes")
+}
+
+model RecuperacaoSenha {
+  id                   Int                   @id @default(autoincrement())
+  usuarioId            Int                   @map("usuario_id")
+  usuario              Usuario               @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  tokenRecuperacaoHash String                @unique @map("token_recuperacao_hash")
+  validadeToken        DateTime              @map("validade_token")
+  statusLink           StatusLinkRecuperacao @default(pendente) @map("status_link")
+  usadoEm              DateTime?             @map("usado_em")
+
+  criadoEm             DateTime              @default(now()) @map("criado_em")
+
+  @@index([usuarioId, statusLink])
+  @@map("recuperacoes_senha")
+}
+
+// ============================================================
+// CICLO E PREVISÃO
+// ============================================================
+
+model RegistroCiclo {
+  id                 Int                @id @default(autoincrement())
+  usuarioId          Int                @map("usuario_id")
+  usuario            Usuario            @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  dataInicio         DateTime           @map("data_inicio")
+  dataFim            DateTime?          @map("data_fim")
+
+  duracaoMenstruacao Int?               @map("duracao_menstruacao")
+  duracaoCiclo       Int?               @map("duracao_ciclo")
+
+  classificacao      ClassificacaoCiclo @default(normal)
+  ehCicloInicial     Boolean            @default(false) @map("eh_ciclo_inicial")
+
+  criadoEm           DateTime           @default(now()) @map("criado_em")
+  atualizadoEm       DateTime           @updatedAt @map("atualizado_em")
+
+  diasMenstruacao    DiaMenstruacao[]
+  previsoesBaseadas  Previsao[]         @relation("PrevisaoBaseadaNoCiclo")
+
+  @@unique([usuarioId, dataInicio])
+  @@map("registros_ciclo")
+}
+
+model DiaMenstruacao {
+  id                  Int                 @id @default(autoincrement())
+  registroCicloId     Int                 @map("registro_ciclo_id")
+  registroCiclo       RegistroCiclo       @relation(fields: [registroCicloId], references: [id], onDelete: Cascade)
+
+  data                DateTime
+  statusSincronizacao StatusSincronizacao @default(sincronizado) @map("status_sincronizacao")
+
+  criadoEm            DateTime            @default(now()) @map("criado_em")
+
+  @@unique([registroCicloId, data])
+  @@map("dias_menstruacao")
+}
+
+model Previsao {
+  id                      Int            @id @default(autoincrement())
+
+  usuarioId               Int            @unique @map("usuario_id")
+  usuario                 Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  registroCicloBaseId     Int            @map("registro_ciclo_base_id")
+  registroCicloBase       RegistroCiclo  @relation("PrevisaoBaseadaNoCiclo", fields: [registroCicloBaseId], references: [id], onDelete: Cascade)
+
+  dataGeracao             DateTime       @default(now()) @map("data_geracao")
+
+  duracaoCicloPrevista    Int            @map("duracao_ciclo_prevista")
+  duracaoLuteaUsada       Int            @map("duracao_lutea_usada")
+  duracaoMenstruacaoUsada Int            @map("duracao_menstruacao_usada")
+
+  fimFaseMenstrual        DateTime       @map("fim_fase_menstrual")
+  inicioFaseFolicular     DateTime       @map("inicio_fase_folicular")
+  fimFaseFolicular        DateTime       @map("fim_fase_folicular")
+  dataEstimadaOvulacao    DateTime       @map("data_estimada_ovulacao")
+  inicioFaseLutea         DateTime       @map("inicio_fase_lutea")
+  dataFimCicloPrevisto    DateTime       @map("data_fim_ciclo_previsto")
+
+  inicioJanelaFertil      DateTime       @map("inicio_janela_fertil")
+  fimJanelaFertil         DateTime       @map("fim_janela_fertil")
+
+  nivelConfianca          NivelConfianca @map("nivel_confianca")
+  cicloAtipico            Boolean        @default(false) @map("ciclo_atipico")
+
+  atualizadoEm            DateTime       @updatedAt @map("atualizado_em")
+
+  @@index([registroCicloBaseId])
+  @@map("previsoes")
+}
+
+// ============================================================
+// DIÁRIO
+// ============================================================
+
+model RegistroDiario {
+  id                         Int        @id @default(autoincrement())
+  usuarioId                  Int        @map("usuario_id")
+  usuario                    Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  dataRegistro               DateTime   @map("data_registro")
+
+  // SQLite não possui arrays nativos. O validator deve garantir
+  // que cada campo contenha somente um array de strings.
+  sintomasFisicos            Json       @default("[]") @map("sintomas_fisicos")
+  sintomasEmocionais         Json       @default("[]") @map("sintomas_emocionais")
+  sintomasComportamentais    Json       @default("[]") @map("sintomas_comportamentais")
+
+  anotacaoLivre              String?    @map("anotacao_livre")
+  temperaturaBasalCorporal   Decimal?   @map("temperatura_basal_corporal")
+
+  ocorrenciaRelacaoSexual    Boolean?   @map("ocorrencia_relacao_sexual")
+  usoMetodoProtecao          Boolean?   @map("uso_metodo_protecao")
+
+  // Snapshot histórico: não deve ser recalculado quando a previsão mudar.
+  faseCicloAssociada         FaseCiclo? @map("fase_ciclo_associada")
+  possivelOvulacaoConfirmada Boolean    @default(false) @map("possivel_ovulacao_confirmada")
+
+  criadoEm                   DateTime   @default(now()) @map("criado_em")
+  atualizadoEm               DateTime   @updatedAt @map("atualizado_em")
+
+  @@unique([usuarioId, dataRegistro])
+  @@map("registros_diario")
+}
+
+// ============================================================
+// ANTICONCEPCIONAIS
+// ============================================================
+
+model Anticoncepcional {
+  id                     Int                    @id @default(autoincrement())
+  usuarioId              Int                    @map("usuario_id")
+  usuario                Usuario                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  nome                   String
+  tipo                   TipoAnticoncepcional
+
+  // O validator deve garantir um array de horários no formato HH:mm.
+  horariosProgramados    Json                   @default("[]") @map("horarios_programados")
+
+  frequencia             FrequenciaUso?
+  dataValidade           DateTime?              @map("data_validade")
+  nivelIntensidadeAlerta NivelIntensidadeAlerta @default(critico) @map("nivel_intensidade_alerta")
+
+  criadoEm               DateTime               @default(now()) @map("criado_em")
+  atualizadoEm           DateTime               @updatedAt @map("atualizado_em")
+
+  usos                   UsoAnticoncepcional[]
+
+  @@index([usuarioId])
+  @@map("anticoncepcionais")
+}
+
+model UsoAnticoncepcional {
+  id                     Int              @id @default(autoincrement())
+  anticoncepcionalId     Int              @map("anticoncepcional_id")
+  anticoncepcional       Anticoncepcional @relation(fields: [anticoncepcionalId], references: [id], onDelete: Cascade)
+
+  dataUsoProgramado      DateTime         @map("data_uso_programado")
+
+  // O validator deve garantir rigorosamente o formato HH:mm.
+  horarioProgramado      String           @map("horario_programado")
+  horarioRealConfirmacao DateTime?        @map("horario_real_confirmacao")
+
+  statusUso              StatusUso        @default(pendente) @map("status_uso")
+  confirmacaoForaPrazo   Boolean          @default(false) @map("confirmacao_fora_prazo")
+
+  criadoEm               DateTime         @default(now()) @map("criado_em")
+  atualizadoEm           DateTime         @updatedAt @map("atualizado_em")
+
+  @@unique([anticoncepcionalId, dataUsoProgramado, horarioProgramado])
+  @@map("usos_anticoncepcional")
+}
+
+// ============================================================
+// REDE DE APOIO
+// ============================================================
+
+model CategoriaPermissao {
+  id                    Int                @id @default(autoincrement())
+  titularId             Int                @map("titular_id")
+  titular               Usuario            @relation(fields: [titularId], references: [id], onDelete: Cascade)
+
+  nome                  String
+
+  // O validator deve garantir um array de identificadores permitidos.
+  conjuntoDadosVisiveis Json               @default("[]") @map("conjunto_dados_visiveis")
+
+  criadoEm              DateTime           @default(now()) @map("criado_em")
+  atualizadoEm          DateTime           @updatedAt @map("atualizado_em")
+
+  vinculos              VinculoRedeApoio[]
+
+  // Permite a FK composta usada pelo vínculo de apoio.
+  @@unique([id, titularId])
+  @@unique([titularId, nome])
+  @@map("categorias_permissao")
+}
+
+model VinculoRedeApoio {
+  id                    Int                    @id @default(autoincrement())
+
+  titularId             Int                    @map("titular_id")
+  titular               Usuario                @relation("VinculoTitular", fields: [titularId], references: [id], onDelete: Cascade)
+
+  contatoId             Int?                   @map("contato_id")
+  contato               Usuario?               @relation("VinculoContato", fields: [contatoId], references: [id], onDelete: SetNull)
+
+  emailConvidado        String                 @map("email_convidado")
+
+  categoriaId           Int?                   @map("categoria_id")
+  categoria             CategoriaPermissao?    @relation(fields: [categoriaId, titularId], references: [id, titularId], onDelete: Restrict)
+
+  // O validator deve garantir um array de identificadores permitidos.
+  permissoesIndividuais Json                   @default("[]") @map("permissoes_individuais")
+
+  status                StatusVinculoRedeApoio @default(pendente)
+
+  tokenConviteHash      String?                @unique @map("token_convite_hash")
+  dataEnvio             DateTime               @default(now()) @map("data_envio")
+  dataExpiracao         DateTime?              @map("data_expiracao")
+  dataResposta          DateTime?              @map("data_resposta")
+
+  criadoEm              DateTime               @default(now()) @map("criado_em")
+  atualizadoEm          DateTime               @updatedAt @map("atualizado_em")
+
+  @@index([titularId])
+  @@index([contatoId])
+  @@index([categoriaId, titularId])
+  @@index([emailConvidado, status])
+  @@map("vinculos_rede_apoio")
+}
+
+// ============================================================
+// NOTIFICAÇÕES
+// ============================================================
+
+model PreferenciaNotificacao {
+  id                       Int      @id @default(autoincrement())
+  usuarioId                Int      @unique @map("usuario_id")
+  usuario                  Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  cicloPrevisoesAtivo      Boolean  @default(true) @map("ciclo_previsoes_ativo")
+  anticoncepcionalAtivo    Boolean  @default(true) @map("anticoncepcional_ativo")
+  redeApoioAtiva           Boolean  @default(true) @map("rede_apoio_ativa")
+  suporteTecnicoAtivo      Boolean  @default(true) @map("suporte_tecnico_ativo")
+
+  lembreteDiarioAtivo      Boolean  @default(true) @map("lembrete_diario_ativo")
+
+  // O validator deve garantir rigorosamente o formato HH:mm.
+  horarioLembreteDiario    String   @default("20:00") @map("horario_lembrete_diario")
+
+  antecedenciaProximoCiclo Int      @default(2) @map("antecedencia_proximo_ciclo")
+  antecedenciaAvisoTroca   Int      @default(7) @map("antecedencia_aviso_troca")
+
+  criadoEm                 DateTime @default(now()) @map("criado_em")
+  atualizadoEm             DateTime @updatedAt @map("atualizado_em")
+
+  @@map("preferencias_notificacao")
+}
+
+model Notificacao {
+  id                  Int                     @id @default(autoincrement())
+  usuarioId           Int                     @map("usuario_id")
+  usuario             Usuario                 @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  tipoOrigem          TipoOrigemNotificacao   @map("tipo_origem")
+
+  // Referência polimórfica: a integridade deve ser validada pelo service.
+  origemId            Int?                    @map("origem_id")
+
+  dataHoraProgramada  DateTime                @map("data_hora_programada")
+  dataHoraDisparo     DateTime?               @map("data_hora_disparo")
+
+  intensidadeAlerta   NivelIntensidadeAlerta? @map("intensidade_alerta")
+  statusEnvio         StatusEnvioNotificacao  @default(agendada) @map("status_envio")
+
+  criadoEm            DateTime                @default(now()) @map("criado_em")
+
+  @@index([usuarioId, statusEnvio])
+  @@index([statusEnvio, dataHoraProgramada])
+  @@map("notificacoes")
+}
+
+// ============================================================
+// SUPORTE TÉCNICO
+// ============================================================
+
+model Conversa {
+  id           Int        @id @default(autoincrement())
+  usuarioId    Int        @unique @map("usuario_id")
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  criadoEm     DateTime   @default(now()) @map("criado_em")
+  atualizadoEm DateTime   @updatedAt @map("atualizado_em")
+
+  mensagens    Mensagem[]
+
+  @@map("conversas_suporte")
+}
+
+model Mensagem {
+  id             Int                @id @default(autoincrement())
+  conversaId     Int                @map("conversa_id")
+  conversa       Conversa           @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+
+  remetente      RemetenteMensagem
+  conteudo       String
+  statusMensagem StatusMensagem     @default(enviando) @map("status_mensagem")
+
+  criadoEm       DateTime           @default(now()) @map("criado_em")
+  atualizadoEm   DateTime           @updatedAt @map("atualizado_em")
+
+  @@index([conversaId, criadoEm])
+  @@map("mensagens_suporte")
+}
