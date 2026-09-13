@@ -5,14 +5,17 @@ function criarAuthMiddleware({
     // Middleware que garante que a requisição possui uma sessão autenticada e válida.
     async function autenticar(req, _res, next) {
         try {
-            const cabecalhoAutorizacao = req.headers.authorization;
+            const cabecalhoAutorizacao =
+                req.headers.authorization;
 
             // Exige o padrão: Authorization: Bearer <token>.
             if (
                 typeof cabecalhoAutorizacao !== 'string' ||
                 !cabecalhoAutorizacao.startsWith('Bearer ')
             ) {
-                const erro = new Error('Autenticação necessária.');
+                const erro = new Error(
+                    'Autenticação necessária.'
+                );
 
                 erro.status = 401;
                 erro.codigo = 'NAO_AUTENTICADO';
@@ -20,10 +23,13 @@ function criarAuthMiddleware({
                 throw erro;
             }
 
-            const token = cabecalhoAutorizacao.slice(7).trim();
+            const token =
+                cabecalhoAutorizacao.slice(7).trim();
 
             if (!token) {
-                const erro = new Error('Token de autenticação inválido.');
+                const erro = new Error(
+                    'Token de autenticação inválido.'
+                );
 
                 erro.status = 401;
                 erro.codigo = 'TOKEN_INVALIDO';
@@ -34,11 +40,21 @@ function criarAuthMiddleware({
             const tokenValidado =
                 tokenService.validarTokenSessao(token);
 
+            // Gera o hash para consultar a sessão sem utilizar o token puro no banco.
+            const tokenSessaoHash =
+                tokenService.gerarHashToken(token);
+
             // Confirma se o token ainda corresponde a uma sessão ativa persistida.
             const sessao = await prisma.sessao.findFirst({
                 where: {
                     usuarioId: tokenValidado.usuarioId,
-                    tokenSessao: token
+                    tokenSessaoHash,
+
+                    validadeSessao: {
+                        gt: new Date()
+                    },
+
+                    revogadaEm: null
                 },
 
                 select: {
@@ -57,7 +73,9 @@ function criarAuthMiddleware({
                 !sessao.usuario ||
                 sessao.usuario.statusConta !== 'ativa'
             ) {
-                const erro = new Error('Sua sessão não está mais ativa.');
+                const erro = new Error(
+                    'Sua sessão não está mais ativa.'
+                );
 
                 erro.status = 401;
                 erro.codigo = 'SESSAO_INVALIDA';
@@ -79,7 +97,8 @@ function criarAuthMiddleware({
             ) {
                 erro.status = 401;
                 erro.codigo = 'TOKEN_INVALIDO';
-                erro.message = 'Sua sessão expirou ou é inválida.';
+                erro.message =
+                    'Sua sessão expirou ou é inválida.';
             }
 
             return next(erro);
