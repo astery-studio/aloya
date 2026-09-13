@@ -2,13 +2,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const rateLimit = require('express-rate-limit');
 
 const { env } = require('./env');
 const { prisma } = require('./prisma');
 
 const dateUtils = require('../utils/date.utils');
-
-const rateLimit = require('express-rate-limit');
 
 const {
     criarCadastroRateLimit
@@ -73,6 +72,7 @@ function criarContainer() {
 
     const tokenService = criarTokenService({
         jwt,
+        crypto,
         secret: env.jwtSecret,
         expiresIn: env.jwtExpiresIn
     });
