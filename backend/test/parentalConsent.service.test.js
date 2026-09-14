@@ -252,3 +252,48 @@ test('marca o link como expirado e rejeita a confirmação', async () => {
         statusConsentimento: 'expirado'
     });
 });
+
+test('libera o acesso e revoga pendências aos 16 anos', async () => {
+    const revogacoes = [];
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return {
+                    ...criarTitular(),
+                    dataNascimento:
+                        new Date('2010-05-13T00:00:00.000Z')
+                };
+            }
+        },
+        consentimentoParental: {
+            async updateMany(argumentos) {
+                revogacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 16 },
+        emailService: {},
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    const resultado =
+        await service.verificarAcessoRedeApoio(1);
+
+    assert.deepEqual(revogacoes[0], {
+        where: {
+            titularMenorId: 1,
+            statusConsentimento: 'pendente'
+        },
+        data: {
+            statusConsentimento: 'revogado'
+        }
+    });
+    assert.equal(resultado.acessoLiberado, true);
+    assert.equal(resultado.motivo, 'MAIOR_DE_16_ANOS');
+    assert.equal(resultado.consentimentoNecessario, false);
+});
