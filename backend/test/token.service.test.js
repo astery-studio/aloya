@@ -130,3 +130,69 @@ test(
         });
     }
 );
+
+test(
+    'valida JWT destinado à recuperação de senha',
+    () => {
+        const {
+            tokenService,
+            chamadas
+        } = criarDependencias();
+
+        const resultado =
+            tokenService
+                .validarTokenRecuperacao(
+                    'jwt-de-recuperacao'
+                );
+
+        assert.deepEqual(resultado, {
+            usuarioId: 7
+        });
+
+        assert.deepEqual(
+            chamadas.verify,
+            [
+                {
+                    token:
+                        'jwt-de-recuperacao',
+
+                    secret:
+                        'segredo-seguro-de-testes',
+
+                    options: {
+                        algorithms: [
+                            'HS256'
+                        ]
+                    }
+                }
+            ]
+        );
+    }
+);
+
+test(
+    'rejeita JWT com finalidade diferente',
+    () => {
+        const {
+            tokenService,
+            jwt
+        } = criarDependencias();
+
+        jwt.verify = () => ({
+            sub: '7',
+            finalidade: 'sessao'
+        });
+
+        assert.throws(
+            () =>
+                tokenService
+                    .validarTokenRecuperacao(
+                        'jwt-de-sessao'
+                    ),
+            {
+                message:
+                    'Token de recuperação inválido.'
+            }
+        );
+    }
+);
