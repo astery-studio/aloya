@@ -88,3 +88,48 @@ function criarDependencias({
                 return usuarioExistente;
             }
         },
+
+        async $transaction(operacao) {
+            return operacao(tx);
+        }
+    };
+
+    const passwordService = {
+        async gerarHash(senha) {
+            chamadas.gerarHash.push(senha);
+
+            return {
+                senhaHash: 'hash-da-senha'
+            };
+        }
+    };
+
+    const tokenService = {
+        gerarTokenSessao(usuario) {
+            chamadas.gerarTokenSessao.push(
+                usuario
+            );
+
+            return {
+                token: 'token-de-sessao',
+                tokenHash: 'hash-do-token',
+
+                validadeSessao:
+                    new Date(
+                        '2026-12-31T23:59:59.000Z'
+                    )
+            };
+        }
+    };
+
+    const parentalConsentService = {
+        async criarPendente(
+            transacao,
+            dados
+        ) {
+            chamadas.criarConsentimentoPendente
+                .push({
+                    transacao,
+                    dados
+                });
+
