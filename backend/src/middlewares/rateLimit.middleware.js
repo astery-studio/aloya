@@ -29,6 +29,38 @@ function criarCadastroRateLimit({
     });
 }
 
+function criarEmailRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    // Limita solicitações e reenvios de e-mail por endereço IP.
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+
+        handler: (req, res) => {
+            // Registra somente o evento; não armazena e-mail, token ou dados sensíveis.
+            logger.warn({
+                evento: 'limite_envios_consentimento_parental',
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_ENVIOS_EMAIL',
+                    mensagem: 'Muitas solicitações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
 module.exports = {
-    criarCadastroRateLimit
+    criarCadastroRateLimit,
+    criarEmailRateLimit
 };
