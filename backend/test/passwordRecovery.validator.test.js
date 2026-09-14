@@ -34,3 +34,59 @@ test(
         });
     }
 );
+
+test(
+    'rejeita solicitação sem e-mail',
+    () => {
+        const validator =
+            criarValidator();
+
+        const resultado =
+            validator.validarSolicitacao({});
+
+        assert.equal(
+            resultado.valido,
+            false
+        );
+
+        assert.deepEqual(
+            resultado.erros,
+            [
+                {
+                    campo: 'email',
+                    mensagem:
+                        'Informe seu e-mail.'
+                }
+            ]
+        );
+    }
+);
+
+test(
+    'rejeita e-mail inválido na recuperação',
+    () => {
+        const validator =
+            criarValidator();
+
+        const resultado =
+            validator.validarSolicitacao({
+                email: 'email-invalido'
+            });
+
+        assert.equal(
+            resultado.valido,
+            false
+        );
+
+        assert.deepEqual(
+            resultado.erros,
+            [
+                {
+                    campo: 'email',
+                    mensagem:
+                        'Informe um e-mail válido.'
+                }
+            ]
+        );
+    }
+);
