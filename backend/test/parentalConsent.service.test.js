@@ -164,3 +164,49 @@ test('substitui e-mail e token ao reenviar o consentimento', async () => {
     );
     assert.equal(atualizacoes[0].data.respondidoEm, null);
 });
+
+test('libera a Rede de Apoio ao confirmar token válido', async () => {
+    const atualizacoes = [];
+    const { crypto, tokenPuro } = criarCrypto();
+    const agora = new Date('2026-09-14T12:00:00.000Z');
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'pendente',
+                    validadeLink: new Date('2026-09-14T13:00:00.000Z')
+                };
+            },
+            async update(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {},
+        now: () => agora
+    });
+
+    const resultado = await service.confirmar(tokenPuro);
+
+    assert.deepEqual(atualizacoes[0].data, {
+        statusConsentimento: 'liberado',
+        respondidoEm: agora
+    });
+    assert.equal(resultado.acessoRedeApoioLiberado, true);
+    assert.equal(
+        resultado.mensagem,
+        'Autorização concluída com sucesso.'
+    );
+});
