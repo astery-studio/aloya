@@ -552,3 +552,44 @@ test('solicita consentimento para o usuário autenticado', async () => {
         [1, 'responsavel@email.com']
     ]);
 });
+
+test('reenvia consentimento para o usuário autenticado', async () => {
+    const dados = {
+        emailResponsavelLegal: null
+    };
+    const resultado = {
+        emailEnviado: true,
+        statusConsentimento: 'pendente'
+    };
+    const {
+        controller,
+        chamadas
+    } = criarControllerConsentimento({
+        validacao: {
+            valido: true,
+            erros: [],
+            dados
+        },
+        resultado,
+        operacao: 'reenviar'
+    });
+    const req = {
+        body: {},
+        usuario: {
+            id: 1
+        }
+    };
+    const res = criarResposta();
+
+    await controller.reenviarConsentimento(
+        req,
+        res,
+        function next() {}
+    );
+
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, resultado);
+    assert.deepEqual(chamadas, [
+        [1, null]
+    ]);
+});
