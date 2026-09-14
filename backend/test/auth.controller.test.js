@@ -512,3 +512,43 @@ test('retorna 201 após cadastro bem-sucedido', async () => {
         [dados, 'Celular de teste']
     ]);
 });
+
+test('solicita consentimento para o usuário autenticado', async () => {
+    const dados = {
+        emailResponsavelLegal: 'responsavel@email.com'
+    };
+    const resultado = {
+        emailEnviado: true,
+        statusConsentimento: 'pendente'
+    };
+    const {
+        controller,
+        chamadas
+    } = criarControllerConsentimento({
+        validacao: {
+            valido: true,
+            erros: [],
+            dados
+        },
+        resultado
+    });
+    const req = {
+        body: dados,
+        usuario: {
+            id: 1
+        }
+    };
+    const res = criarResposta();
+
+    await controller.solicitarConsentimento(
+        req,
+        res,
+        function next() {}
+    );
+
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, resultado);
+    assert.deepEqual(chamadas, [
+        [1, 'responsavel@email.com']
+    ]);
+});
