@@ -97,8 +97,8 @@ function criarContainer() {
         prisma,
         passwordService,
         tokenService,
-        //cycleService, //adicionar isso somente na sprint do ciclo
-        parentalConsentService
+        parentalConsentService,
+        dateUtils
     });
 
     const authValidator = criarAuthValidator({

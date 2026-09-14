@@ -2,10 +2,62 @@ function criarAuthService({
     prisma,
     passwordService,
     tokenService,
-    //cycleService, //adicionar isso somente na sprint do ciclo
     parentalConsentService,
+    dateUtils,
     logger = console
 }) {
+    async function criarRegistroInicial(
+        tx,
+        usuarioId,
+        dados
+    ) {
+        const dataInicio =
+            dados.dataInicioUltimaMenstruacao;
+
+        const dataFim =
+            dados.dataFimUltimaMenstruacao ||
+            null;
+
+        const diasMenstruacao = dataFim
+            ? dateUtils.gerarDiasMenstruacao(
+                dataInicio,
+                dataFim
+            )
+            : [dataInicio];
+
+        const duracaoMenstruacao = dataFim
+            ? dateUtils.calcularDiasInclusivos(
+                dataInicio,
+                dataFim
+            )
+            : null;
+
+        return tx.registroCiclo.create({
+            data: {
+                usuarioId,
+                dataInicio,
+                dataFim,
+                duracaoMenstruacao,
+                duracaoCiclo: null,
+                ehCicloInicial: true,
+
+                diasMenstruacao: {
+                    create:
+                        diasMenstruacao.map(
+                            (data) => ({
+                                data
+                            })
+                        )
+                }
+            },
+
+            select: {
+                id: true,
+                dataInicio: true,
+                dataFim: true
+            }
+        });
+    }
     async function cadastrar(dados, dispositivo) {
         const usuarioExistente = await prisma.usuario.findUnique({
             where: {
@@ -74,28 +126,12 @@ function criarAuthService({
                     // Gera o token JWT de sessão e seus dados seguros para persistência.
                     const sessao =
                         tokenService.gerarTokenSessao(usuario);
-
-                    /* Bloco deve ser descomentado na sprint do ciclo
                     const cicloInicial =
-                        await cycleService.criarCicloInicial(tx, {
-                            usuarioId: usuario.id,
-
-                            dataInicio:
-                                dados.dataInicioUltimaMenstruacao,
-
-                            dataFim:
-                                dados.dataFimUltimaMenstruacao,
-
-                            duracaoCicloInformada:
-                                dados.duracaoCicloInformada,
-
-                            duracaoMenstruacaoInformada:
-                                dados.duracaoMenstruacaoInformada,
-
-                            duracaoLuteaInformada:
-                                dados.duracaoLuteaInformada
-                        });
-                    */
+                        await criarRegistroInicial(
+                            tx,
+                            usuario.id,
+                            dados
+                        );
 
                     if (
                         dados.menorDe16 &&
@@ -124,6 +160,7 @@ function criarAuthService({
 
                     return {
                         usuario,
+                        cicloInicial,
                         tokenSessao: sessao.token
                     };
                 }
@@ -158,16 +195,15 @@ function criarAuthService({
                     tipo: 'Bearer'
                 },
 
-                /* Deve ser descomentado na sprint do ciclo
                 cicloInicial: {
-                    id: resultado.cicloInicial.registroCiclo.id,
+                    id: resultado.cicloInicial.id,
 
                     dataInicio:
-                        resultado.cicloInicial.registroCiclo.dataInicio
-                },
+                        resultado.cicloInicial.dataInicio,
 
-                previsao: resultado.cicloInicial.previsao,
-                */
+                    dataFim:
+                        resultado.cicloInicial.dataFim
+                },
 
                 consentimentoParental: dados.menorDe16
                     ? {
