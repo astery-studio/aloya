@@ -133,3 +133,48 @@ test(
 
 test(
     'identifica menor de 16 anos e normaliza o e-mail do responsável',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
+                    dataNascimento: '2015-05-13',
+
+                    emailResponsavelLegal:
+                        '  RESPONSAVEL@EMAIL.COM  '
+                })
+            );
+
+        assert.equal(resultado.valido, true);
+
+        assert.equal(
+            resultado.dados.menorDe16,
+            true
+        );
+
+        assert.equal(
+            resultado.dados
+                .emailResponsavelLegal,
+            'responsavel@email.com'
+        );
+    }
+);
+
+test(
+    'permite que menor conclua o cadastro sem e-mail do responsável',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
+                    dataNascimento: '2015-05-13',
+                    emailResponsavelLegal: ''
+                })
+            );
+
+        assert.equal(resultado.valido, true);
+
+        assert.equal(
+            resultado.dados.menorDe16,
