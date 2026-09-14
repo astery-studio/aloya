@@ -448,3 +448,48 @@ test(
             }
         );
     }
+);
+
+test(
+    'mantém a conta criada quando o envio do consentimento falha',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias({
+            falharEnvioEmail: true
+        });
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos({
+                    dataNascimento:
+                        new Date(
+                            '2015-05-13T00:00:00.000Z'
+                        ),
+
+                    menorDe16: true,
+
+                    emailResponsavelLegal:
+                        'responsavel@email.com'
+                })
+            );
+
+        assert.equal(resultado.usuario.id, 1);
+
+        assert.equal(
+            resultado
+                .consentimentoParental
+                .emailEnviado,
+            false
+        );
+
+        assert.equal(
+            resultado
+                .consentimentoParental
+                .mensagemEnvio,
+            'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
+        );
+
+        assert.deepEqual(chamadas.logs, [
+            {
