@@ -23,7 +23,7 @@ function criarParentalConsentValidator() {
             erros.push(
                 erro(
                     'emailResponsavelLegal',
-                    'Informe um e-mail válido para o responsável legal.'
+                    'Informe um e-mail válido.'
                 )
             );
         }
@@ -58,7 +58,7 @@ function criarParentalConsentValidator() {
             erros.push(
                 erro(
                     'emailResponsavelLegal',
-                    'Informe um e-mail válido para o responsável legal.'
+                    'Informe um e-mail válido.'
                 )
             );
         }
