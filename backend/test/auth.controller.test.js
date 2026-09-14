@@ -593,3 +593,41 @@ test('reenvia consentimento para o usuário autenticado', async () => {
         [1, null]
     ]);
 });
+
+test('retorna 400 quando o token de consentimento é inválido', async () => {
+    const {
+        controller,
+        chamadas
+    } = criarControllerConsentimento({
+        validacao: {
+            valido: false,
+            erros: [],
+            dados: {
+                token: 'invalido'
+            }
+        },
+        resultado: null,
+        operacao: 'confirmar'
+    });
+    const req = {
+        params: {
+            token: 'invalido'
+        }
+    };
+    const res = criarResposta();
+
+    await controller.confirmarConsentimento(
+        req,
+        res,
+        function next() {}
+    );
+
+    assert.equal(res.statusCode, 400);
+    assert.deepEqual(res.body, {
+        erro: {
+            codigo: 'LINK_CONSENTIMENTO_INVALIDO',
+            mensagem: 'O link de consentimento é inválido.'
+        }
+    });
+    assert.equal(chamadas.length, 0);
+});
