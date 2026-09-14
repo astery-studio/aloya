@@ -444,3 +444,39 @@ test('rejeita token de consentimento inexistente', async () => {
         }
     );
 });
+
+test('rejeita token de consentimento revogado', async () => {
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'revogado',
+                    validadeLink: new Date('2026-09-14T13:00:00.000Z')
+                };
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.confirmar(tokenPuro),
+        {
+            status: 410,
+            codigo: 'LINK_CONSENTIMENTO_INDISPONIVEL'
+        }
+    );
+});
