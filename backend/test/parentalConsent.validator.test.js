@@ -31,3 +31,50 @@ test(
         });
     }
 );
+
+test(
+    'rejeita solicitação sem e-mail do responsável',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarSolicitacao({});
+
+        assert.equal(resultado.valido, false);
+
+        assert.deepEqual(resultado.erros, [
+            {
+                campo:
+                    'emailResponsavelLegal',
+
+                mensagem:
+                    'Informe um e-mail válido.'
+            }
+        ]);
+    }
+);
+
+test(
+    'rejeita e-mail inválido na solicitação',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarSolicitacao({
+                emailResponsavelLegal:
+                    'email-invalido'
+            });
+
+        assert.equal(resultado.valido, false);
+
+        assert.deepEqual(resultado.erros, [
+            {
+                campo:
+                    'emailResponsavelLegal',
+
+                mensagem:
+                    'Informe um e-mail válido.'
+            }
+        ]);
+    }
+);
