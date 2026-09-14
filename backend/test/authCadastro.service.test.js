@@ -268,3 +268,48 @@ test(
     'aplica 14 dias como duração lútea padrão',
     async () => {
         const {
+            authService,
+            chamadas
+        } = criarDependencias();
+
+        await authService.cadastrar(
+            criarDadosValidos({
+                duracaoLuteaInformada: null
+            })
+        );
+
+        assert.equal(
+            chamadas
+                .criarUsuario[0]
+                .data
+                .duracaoLuteaInformada,
+            14
+        );
+    }
+);
+
+test(
+    'rejeita cadastro quando o e-mail já está em uso',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias({
+            usuarioExistente: {
+                id: 99
+            }
+        });
+
+        await assert.rejects(
+            authService.cadastrar(
+                criarDadosValidos()
+            ),
+            {
+                message:
+                    'Este e-mail já está em uso. Tente fazer login.',
+
+                status: 409,
+                codigo:
+                    'EMAIL_JA_CADASTRADO'
+            }
+        );
