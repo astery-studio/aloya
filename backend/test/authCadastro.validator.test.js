@@ -313,3 +313,8 @@ test(
                 (item) =>
                     item.campo ===
                     'dataInicioUltimaMenstruacao'
+            ),
+            true
+        );
+    }
+);
