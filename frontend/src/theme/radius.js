@@ -1,9 +1,10 @@
 const radius = {
-    control: 12,
-    calendar: 16,
+    buttonAndInput: 12,
+    onboardingCalendar: 16,
+    settingsCalendar: 24,
     popup: 20,
-    sheet: 24,
-    full: 999
+    bottomSheet: 24, //modal que sobe de baixo pra cima
+    switch: 999 //é aquele interruptor
 };
 
 export {
