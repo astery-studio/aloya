@@ -9,6 +9,7 @@ function criarResposta() {
     return {
         statusCode: null,
         body: null,
+        contentType: null,
 
         status(codigo) {
             this.statusCode = codigo;
@@ -17,6 +18,18 @@ function criarResposta() {
         },
 
         json(conteudo) {
+            this.body = conteudo;
+
+            return this;
+        },
+
+        type(tipoConteudo) {
+            this.contentType = tipoConteudo;
+
+            return this;
+        },
+
+        send(conteudo) {
             this.body = conteudo;
 
             return this;
