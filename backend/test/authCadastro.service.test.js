@@ -358,3 +358,48 @@ test(
         assert.equal(
             chamadas
                 .criarConsentimentoPendente
+                .length,
+            1
+        );
+
+        assert.deepEqual(
+            chamadas
+                .criarConsentimentoPendente[0],
+            {
+                transacao: tx,
+
+                dados: {
+                    titularMenorId: 1,
+                    nomeTitular:
+                        'Carla Cristina',
+
+                    emailTitular:
+                        'carla@email.com',
+
+                    emailResponsavelLegal:
+                        'responsavel@email.com'
+                }
+            }
+        );
+
+        assert.equal(
+            chamadas
+                .enviarEmailConsentimento
+                .length,
+            1
+        );
+
+        assert.deepEqual(
+            resultado.consentimentoParental,
+            {
+                exigidoParaRedeApoio: true,
+                solicitado: true,
+                redeApoioBloqueada: true,
+                emailEnviado: true,
+                mensagemEnvio: null
+            }
+        );
+    }
+);
+
+test(
