@@ -579,3 +579,109 @@ test(
         );
     }
 );
+
+test(
+    'persiste o período menstrual inicial informado',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias();
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos({
+                    duracaoMenstruacaoInformada:
+                        7
+                })
+            );
+
+        assert.equal(
+            chamadas.criarRegistroCiclo.length,
+            1
+        );
+
+        assert.deepEqual(
+            chamadas.criarRegistroCiclo[0],
+            {
+                data: {
+                    usuarioId: 1,
+
+                    dataInicio:
+                        new Date(
+                            '2026-01-10T00:00:00.000Z'
+                        ),
+
+                    dataFim:
+                        new Date(
+                            '2026-01-14T00:00:00.000Z'
+                        ),
+
+                    duracaoMenstruacao: 5,
+                    duracaoCiclo: null,
+                    ehCicloInicial: true,
+
+                    diasMenstruacao: {
+                        create: [
+                            {
+                                data: new Date(
+                                    '2026-01-10T00:00:00.000Z'
+                                )
+                            },
+                            {
+                                data: new Date(
+                                    '2026-01-11T00:00:00.000Z'
+                                )
+                            },
+                            {
+                                data: new Date(
+                                    '2026-01-12T00:00:00.000Z'
+                                )
+                            },
+                            {
+                                data: new Date(
+                                    '2026-01-13T00:00:00.000Z'
+                                )
+                            },
+                            {
+                                data: new Date(
+                                    '2026-01-14T00:00:00.000Z'
+                                )
+                            }
+                        ]
+                    }
+                },
+
+                select: {
+                    id: true,
+                    dataInicio: true,
+                    dataFim: true
+                }
+            }
+        );
+
+        assert.equal(
+            chamadas.criarUsuario[0]
+                .data
+                .duracaoMenstruacaoInformada,
+            7
+        );
+
+        assert.deepEqual(
+            resultado.cicloInicial,
+            {
+                id: 20,
+
+                dataInicio:
+                    new Date(
+                        '2026-01-10T00:00:00.000Z'
+                    ),
+
+                dataFim:
+                    new Date(
+                        '2026-01-14T00:00:00.000Z'
+                    )
+            }
+        );
+    }
+);
