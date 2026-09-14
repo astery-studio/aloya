@@ -257,8 +257,51 @@ function criarAuthValidator({ dateUtils }) {
         };
     }
 
+    // Valida e normaliza os dados recebidos na tentativa de login.
+    function validarLogin(body) {
+        const erros = [];
+
+        const email = typeof body.email === 'string'
+            ? body.email.trim().toLowerCase()
+            : '';
+
+        if (!email) {
+            erros.push(
+                erro('email', 'Informe seu e-mail.')
+            );
+        } else if (
+            !regexEmail.test(email) ||
+            email.length > 254
+        ) {
+            erros.push(
+                erro('email', 'Informe um e-mail válido.')
+            );
+        }
+
+        const senha = typeof body.senha === 'string'
+            ? body.senha
+            : '';
+
+        if (!senha) {
+            erros.push(
+                erro('senha', 'Informe sua senha.')
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+
+            dados: {
+                email,
+                senha
+            }
+        };
+    }
+
     return {
-        validarCadastro
+        validarCadastro,
+        validarLogin
     };
 }
 
