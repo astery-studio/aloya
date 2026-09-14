@@ -10,7 +10,8 @@ const { prisma } = require('./prisma');
 const dateUtils = require('../utils/date.utils');
 
 const {
-    criarCadastroRateLimit
+    criarCadastroRateLimit,
+    criarEmailRateLimit
 } = require('../middlewares/rateLimit.middleware');
 
 const {
@@ -122,6 +123,12 @@ function criarContainer() {
         limite: env.cadastroRateLimitMaximo
     });
 
+    const emailRateLimit = criarEmailRateLimit({
+        rateLimit,
+        janelaMs: env.emailRateLimitJanelaMs,
+        limite: env.emailRateLimitMaximo
+    });
+
     const authController = criarAuthController({
         authService,
         authValidator,
@@ -133,7 +140,8 @@ function criarContainer() {
         authController,
         authMiddleware,
         parentalConsentMiddleware,
-        cadastroRateLimit
+        cadastroRateLimit,
+        emailRateLimit
     };
 }
 

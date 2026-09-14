@@ -32,6 +32,14 @@ const cadastroRateLimitMaximo = Number(
     process.env.CADASTRO_RATE_LIMIT_MAXIMO || 5
 );
 
+const emailRateLimitJanelaMs = Number(
+    process.env.EMAIL_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const emailRateLimitMaximo = Number(
+    process.env.EMAIL_RATE_LIMIT_MAXIMO || 3
+);
+
 if (
     !Number.isInteger(cadastroRateLimitJanelaMs) ||
     cadastroRateLimitJanelaMs <= 0
@@ -50,10 +58,30 @@ if (
     );
 }
 
+if (
+    !Number.isInteger(emailRateLimitJanelaMs) ||
+    emailRateLimitJanelaMs <= 0
+) {
+    throw new Error(
+        'EMAIL_RATE_LIMIT_JANELA_MS deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(emailRateLimitMaximo) ||
+    emailRateLimitMaximo <= 0
+) {
+    throw new Error(
+        'EMAIL_RATE_LIMIT_MAXIMO deve ser um inteiro positivo.'
+    );
+}
+
 const env = {
     port: Number(process.env.PORT || 3000), //define a porta onde a api vai rodar
     cadastroRateLimitJanelaMs,
     cadastroRateLimitMaximo,
+    emailRateLimitJanelaMs,
+    emailRateLimitMaximo,
     jwtSecret: obterVariavelObrigatoria('JWT_SECRET'), //a chave para criar a sessão do usuário
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '90d', // O token de login gerado dura 90 dias
 

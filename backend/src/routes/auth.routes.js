@@ -3,7 +3,8 @@ const { Router } = require('express');
 function criarAuthRoutes({
     authController,
     authMiddleware,
-    cadastroRateLimit
+    cadastroRateLimit,
+    emailRateLimit
 }) {
     const router = Router();
 
@@ -24,6 +25,7 @@ function criarAuthRoutes({
     router.post(
         '/parental-consent/request',
         authMiddleware.autenticar,
+        emailRateLimit,
         authController.solicitarConsentimento
     );
 
@@ -31,6 +33,7 @@ function criarAuthRoutes({
     router.post(
         '/parental-consent/resend',
         authMiddleware.autenticar,
+        emailRateLimit,
         authController.reenviarConsentimento
     );
 
