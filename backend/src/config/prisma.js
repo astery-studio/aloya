@@ -6,7 +6,7 @@ const {
 
 const {
     PrismaClient
-} = require('../generated/prisma/client');
+} = require('@prisma/client');
 
 function criarPrisma() {
     if (!process.env.DATABASE_URL) {
