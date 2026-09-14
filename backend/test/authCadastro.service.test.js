@@ -43,3 +43,48 @@ function criarDependencias({
         criarConsentimentoPendente: [],
         enviarEmailConsentimento: [],
         logs: []
+    };
+
+    const usuarioCriado = {
+        id: 1,
+        nome: 'Carla Cristina',
+        email: 'carla@email.com',
+        papel: 'principal',
+        statusConta: 'ativa'
+    };
+
+    const tx = {
+        usuario: {
+            async create(argumentos) {
+                chamadas.criarUsuario.push(
+                    argumentos
+                );
+
+                return usuarioCriado;
+            }
+        },
+
+        sessao: {
+            async create(argumentos) {
+                chamadas.criarSessao.push(
+                    argumentos
+                );
+
+                return {
+                    id: 10,
+                    ...argumentos.data
+                };
+            }
+        }
+    };
+
+    const prisma = {
+        usuario: {
+            async findUnique(argumentos) {
+                chamadas.buscarUsuario.push(
+                    argumentos
+                );
+
+                return usuarioExistente;
+            }
+        },
