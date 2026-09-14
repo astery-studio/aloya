@@ -39,4 +39,44 @@ const tamanhos = {
     }
 };
 
-export { estilos, tamanhos };
+const variantes = {
+    laranja: {
+        container: {
+            backgroundColor: cores.marca.primaria
+        },
+        texto: {
+            color: cores.neutras.superficieClara
+        }
+    },
+
+    verde: {
+        container: {
+            backgroundColor: cores.marca.secundaria
+        },
+        texto: {
+            color: cores.neutras.superficieClara
+        }
+    },
+
+    branco: {
+        container: {
+            backgroundColor: cores.neutras.superficieClara,
+            borderColor: cores.neutras.bordaClara,
+            borderWidth: 1.41
+        },
+        texto: {
+            color: cores.neutras.textoSecundarioClaro
+        }
+    },
+
+    preto: {
+        container: {
+            backgroundColor: cores.neutras.textoPrincipalClaro
+        },
+        texto: {
+            color: cores.neutras.superficieClara
+        }
+    }
+};
+
+export { estilos, tamanhos, variantes };
