@@ -119,3 +119,48 @@ test('solicita consentimento e envia o link ao responsável', async () => {
     assert.equal(resultado.emailEnviado, true);
     assert.equal(resultado.statusConsentimento, 'pendente');
 });
+
+test('substitui e-mail e token ao reenviar o consentimento', async () => {
+    const atualizacoes = [];
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findUnique() {
+                return {
+                    emailResponsavelLegal: 'antigo@email.com',
+                    statusConsentimento: 'pendente'
+                };
+            },
+            async update(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test/consentimento',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {
+            async enviarEmailConsentimentoParental() {}
+        },
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    await service.reenviar(1, 'novo@email.com');
+
+    assert.equal(
+        atualizacoes[0].data.emailResponsavelLegal,
+        'novo@email.com'
+    );
+    assert.equal(
+        atualizacoes[0].data.tokenConfirmacaoHash,
+        'hash-do-token'
+    );
+    assert.equal(atualizacoes[0].data.respondidoEm, null);
+});
