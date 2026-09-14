@@ -72,3 +72,22 @@ test('protege a rota de login com rate limit', () => {
         ]
     );
 });
+
+test('exige autenticação para consultar o consentimento', () => {
+    const dependencias = criarDependencias();
+    const router = criarAuthRoutes(dependencias);
+    const rota = buscarRota(
+        router,
+        '/parental-consent/status'
+    );
+
+    assert.equal(rota.methods.get, true);
+    assert.deepEqual(
+        rota.stack.map((camada) => camada.handle),
+        [
+            dependencias.authMiddleware.autenticar,
+            dependencias.authController
+                .consultarStatusConsentimento
+        ]
+    );
+});
