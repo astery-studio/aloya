@@ -32,6 +32,14 @@ const cadastroRateLimitMaximo = Number(
     process.env.CADASTRO_RATE_LIMIT_MAXIMO || 5
 );
 
+const loginRateLimitJanelaMs = Number(
+    process.env.LOGIN_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const loginRateLimitMaximo = Number(
+    process.env.LOGIN_RATE_LIMIT_MAXIMO || 5
+);
+
 const emailRateLimitJanelaMs = Number(
     process.env.EMAIL_RATE_LIMIT_JANELA_MS || 900000
 );
@@ -55,6 +63,24 @@ if (
 ) {
     throw new Error(
         'CADASTRO_RATE_LIMIT_MAXIMO deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(loginRateLimitJanelaMs) ||
+    loginRateLimitJanelaMs <= 0
+) {
+    throw new Error(
+        'LOGIN_RATE_LIMIT_JANELA_MS deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(loginRateLimitMaximo) ||
+    loginRateLimitMaximo <= 0
+) {
+    throw new Error(
+        'LOGIN_RATE_LIMIT_MAXIMO deve ser um inteiro positivo.'
     );
 }
 
