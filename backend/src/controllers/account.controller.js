@@ -1,7 +1,6 @@
-function criarAccountController({
-    accountService,
-    accountValidator
-}) {
+//Funcao factory para criar o controller de conta.
+function criarAccountController({ accountService, accountValidator }) {
+    //Função auxiliar para responder com erro de validação.
     function responderErroValidacao(
         res,
         validacao
@@ -15,9 +14,10 @@ function criarAccountController({
 
                 detalhes: validacao.erros
             }
-        });
+        })
     }
 
+    //Função para buscar as configurações da conta do usuário.
     async function buscarConfiguracoes(
         req,
         res,
@@ -28,21 +28,22 @@ function criarAccountController({
                 await accountService
                     .buscarConfiguracoes(
                         req.usuario.id
-                    );
+                    )
 
             return res.status(200).json({
                 configuracoes
-            });
+            })
         } catch (erro) {
             if (!erro.status) {
                 erro.mensagemUsuario =
-                    'Ocorreu um erro ao carregar as configurações. Tente novamente.';
+                    'Ocorreu um erro ao carregar as configurações. Tente novamente.'
             }
 
-            return next(erro);
+            return next(erro)
         }
     }
 
+    //Função para atualizar as configurações da conta do usuário.
     async function atualizarConfiguracoes(
         req,
         res,
@@ -53,13 +54,13 @@ function criarAccountController({
                 accountValidator
                     .validarAtualizacao(
                         req.body
-                    );
+                    )
 
             if (!validacao.valido) {
                 return responderErroValidacao(
                     res,
                     validacao
-                );
+                )
             }
 
             const resultado =
@@ -67,24 +68,25 @@ function criarAccountController({
                     .atualizarConfiguracoes(
                         req.usuario.id,
                         validacao.dados
-                    );
+                    )
 
             return res.status(200).json({
                 mensagem:
                     'Dados atualizados com sucesso.',
 
                 ...resultado
-            });
+            })
         } catch (erro) {
             if (!erro.status) {
                 erro.mensagemUsuario =
-                    'Ocorreu um erro ao atualizar seus dados. Tente novamente.';
+                    'Ocorreu um erro ao atualizar seus dados. Tente novamente.'
             }
 
-            return next(erro);
+            return next(erro)
         }
     }
 
+    //Função para alterar a senha do usuário.
     async function alterarSenha(
         req,
         res,
@@ -95,13 +97,13 @@ function criarAccountController({
                 accountValidator
                     .validarAlteracaoSenha(
                         req.body
-                    );
+                    )
 
             if (!validacao.valido) {
                 return responderErroValidacao(
                     res,
                     validacao
-                );
+                )
             }
 
             const resultado =
@@ -116,18 +118,18 @@ function criarAccountController({
 
                     novaSenha:
                         validacao.dados.novaSenha
-                });
+                })
 
             return res.status(200).json(
                 resultado
-            );
+            )
         } catch (erro) {
             if (!erro.status) {
                 erro.mensagemUsuario =
-                    'Ocorreu um erro ao alterar sua senha. Tente novamente.';
+                    'Ocorreu um erro ao alterar sua senha. Tente novamente.'
             }
 
-            return next(erro);
+            return next(erro)
         }
     }
 
@@ -135,9 +137,9 @@ function criarAccountController({
         buscarConfiguracoes,
         atualizarConfiguracoes,
         alterarSenha
-    };
+    }
 }
 
 module.exports = {
     criarAccountController
-};
+}
