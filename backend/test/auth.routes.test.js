@@ -57,3 +57,18 @@ test('protege a rota de cadastro com rate limit', () => {
         ]
     );
 });
+
+test('protege a rota de login com rate limit', () => {
+    const dependencias = criarDependencias();
+    const router = criarAuthRoutes(dependencias);
+    const rota = buscarRota(router, '/login');
+
+    assert.equal(rota.methods.post, true);
+    assert.deepEqual(
+        rota.stack.map((camada) => camada.handle),
+        [
+            dependencias.loginRateLimit,
+            dependencias.authController.realizarLogin
+        ]
+    );
+});
