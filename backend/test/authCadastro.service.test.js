@@ -493,3 +493,35 @@ test(
 
         assert.deepEqual(chamadas.logs, [
             {
+                evento:
+                    'falha_envio_consentimento_parental',
+
+                tipoErro: 'Error'
+            }
+        ]);
+    }
+);
+
+test(
+    'não retorna senha nem hash na resposta do cadastro',
+    async () => {
+        const {
+            authService
+        } = criarDependencias();
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos()
+            );
+
+        assert.equal(
+            'senha' in resultado.usuario,
+            false
+        );
+
+        assert.equal(
+            'senhaHash' in resultado.usuario,
+            false
+        );
+    }
+);
