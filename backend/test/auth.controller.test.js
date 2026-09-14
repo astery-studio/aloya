@@ -457,3 +457,58 @@ test('retorna 422 quando o cadastro possui dados inválidos', async () => {
         }
     });
 });
+
+test('retorna 201 após cadastro bem-sucedido', async () => {
+    const chamadas = [];
+    const dados = {
+        nome: 'Carla Cristina',
+        email: 'carla@email.com'
+    };
+    const resultado = {
+        usuario: {
+            id: 1,
+            ...dados
+        },
+        autenticacao: {
+            token: 'token-de-sessao',
+            tipo: 'Bearer'
+        }
+    };
+    const authValidator = {
+        validarCadastro() {
+            return {
+                valido: true,
+                erros: [],
+                dados
+            };
+        }
+    };
+    const authService = {
+        async cadastrar(...argumentos) {
+            chamadas.push(argumentos);
+
+            return resultado;
+        }
+    };
+    const controller = criarAuthController({
+        authService,
+        authValidator,
+        parentalConsentService: {},
+        parentalConsentValidator: {}
+    });
+    const req = {
+        body: dados,
+        headers: {
+            'x-device-name': 'Celular de teste'
+        }
+    };
+    const res = criarResposta();
+
+    await controller.cadastrar(req, res, function next() {});
+
+    assert.equal(res.statusCode, 201);
+    assert.deepEqual(res.body, resultado);
+    assert.deepEqual(chamadas, [
+        [dados, 'Celular de teste']
+    ]);
+});
