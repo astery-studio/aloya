@@ -223,3 +223,48 @@ test(
 
         assert.deepEqual(chamadas.criarSessao, [
             {
+                data: {
+                    usuarioId: 1,
+
+                    tokenSessaoHash:
+                        'hash-do-token',
+
+                    validadeSessao:
+                        new Date(
+                            '2026-12-31T23:59:59.000Z'
+                        ),
+
+                    dispositivo:
+                        'Celular de teste'
+                }
+            }
+        ]);
+
+        assert.deepEqual(
+            resultado.autenticacao,
+            {
+                token: 'token-de-sessao',
+                tipo: 'Bearer'
+            }
+        );
+
+        assert.equal(
+            resultado
+                .consentimentoParental
+                .exigidoParaRedeApoio,
+            false
+        );
+
+        assert.equal(
+            chamadas
+                .criarConsentimentoPendente
+                .length,
+            0
+        );
+    }
+);
+
+test(
+    'aplica 14 dias como duração lútea padrão',
+    async () => {
+        const {
