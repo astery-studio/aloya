@@ -78,3 +78,40 @@ test(
         ]);
     }
 );
+
+test(
+    'permite reenvio sem novo e-mail',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarReenvio({});
+
+        assert.equal(resultado.valido, true);
+        assert.deepEqual(resultado.erros, []);
+
+        assert.deepEqual(resultado.dados, {
+            emailResponsavelLegal: null
+        });
+    }
+);
+
+test(
+    'normaliza o novo e-mail informado no reenvio',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarReenvio({
+                emailResponsavelLegal:
+                    '  NOVO@EMAIL.COM  '
+            });
+
+        assert.equal(resultado.valido, true);
+
+        assert.deepEqual(resultado.dados, {
+            emailResponsavelLegal:
+                'novo@email.com'
+        });
+    }
+);
