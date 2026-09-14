@@ -268,3 +268,48 @@ test(
 
         assert.equal(
             resultado.erros.some(
+                (item) =>
+                    item.campo ===
+                        'duracaoLuteaInformada' &&
+                    item.mensagem ===
+                        'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.'
+            ),
+            true
+        );
+    }
+);
+
+test(
+    'rejeita datas futuras de nascimento e menstruação',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
+                    dataNascimento: '2999-01-01',
+
+                    dataInicioUltimaMenstruacao:
+                        '2999-01-01',
+
+                    dataFimUltimaMenstruacao:
+                        undefined
+                })
+            );
+
+        assert.equal(resultado.valido, false);
+
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo ===
+                    'dataNascimento'
+            ),
+            true
+        );
+
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo ===
+                    'dataInicioUltimaMenstruacao'
