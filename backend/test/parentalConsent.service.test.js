@@ -480,3 +480,43 @@ test('rejeita token de consentimento revogado', async () => {
         }
     );
 });
+
+test('trata confirmação repetida de forma idempotente', async () => {
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'liberado',
+                    validadeLink: new Date('2026-09-14T13:00:00.000Z')
+                };
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    const resultado =
+        await service.confirmar(tokenPuro);
+
+    assert.equal(
+        resultado.acessoRedeApoioLiberado,
+        true
+    );
+    assert.equal(
+        resultado.mensagem,
+        'A autorização já havia sido confirmada.'
+    );
+});
