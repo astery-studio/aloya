@@ -43,3 +43,48 @@ test(
             );
 
         assert.equal(resultado.valido, true);
+        assert.deepEqual(resultado.erros, []);
+
+        assert.equal(
+            resultado.dados.nome,
+            'Carla Cristina'
+        );
+
+        assert.equal(
+            resultado.dados.email,
+            'carla@email.com'
+        );
+
+        assert.equal(
+            resultado.dados.menorDe16,
+            false
+        );
+
+        assert.equal(
+            resultado.dados.emailResponsavelLegal,
+            null
+        );
+
+        assert.equal(
+            resultado.dados.dataNascimento
+                instanceof Date,
+            true
+        );
+
+        assert.equal(
+            resultado.dados
+                .dataInicioUltimaMenstruacao
+                instanceof Date,
+            true
+        );
+    }
+);
+
+test(
+    'permite cadastro sem os parâmetros opcionais do ciclo',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
