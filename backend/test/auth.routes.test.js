@@ -131,3 +131,30 @@ test('protege reenvio de consentimento e limita e-mails', () => {
         ]
     );
 });
+
+test('mantém pública somente a confirmação por token', () => {
+    const dependencias = criarDependencias();
+    const router = criarAuthRoutes(dependencias);
+    const rota = buscarRota(
+        router,
+        '/parental-consent/:token'
+    );
+
+    assert.equal(rota.methods.get, true);
+    assert.deepEqual(
+        rota.stack.map((camada) => camada.handle),
+        [
+            dependencias.authController
+                .confirmarConsentimento
+        ]
+    );
+
+    assert.equal(
+        rota.stack.some(
+            (camada) =>
+                camada.handle ===
+                dependencias.authMiddleware.autenticar
+        ),
+        false
+    );
+});
