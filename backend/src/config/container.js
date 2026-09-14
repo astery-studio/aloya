@@ -97,7 +97,7 @@ function criarContainer() {
         prisma,
         passwordService,
         tokenService,
-        //cycleService, //adicionar isso na sprint do ciclo
+        //cycleService, //adicionar isso somente na sprint do ciclo
         parentalConsentService
     });
 
@@ -148,11 +148,11 @@ function criarContainer() {
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
-        emailRateLimit
+        emailRateLimit,
+        loginRateLimit
     };
 }
 
 module.exports = {
-    criarContainer,
-    loginRateLimit
+    criarContainer
 };
