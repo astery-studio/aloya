@@ -75,3 +75,47 @@ test('cria solicitação armazenando somente o hash do token', async () => {
         `https://aloya.test/consentimento/${tokenPuro}`
     );
 });
+
+test('solicita consentimento e envia o link ao responsável', async () => {
+    const atualizacoes = [];
+    const emails = [];
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async upsert(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test/consentimento',
+        dateUtils: {
+            calcularIdade() {
+                return 11;
+            }
+        },
+        emailService: {
+            async enviarEmailConsentimentoParental(dados) {
+                emails.push(dados);
+            }
+        },
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    const resultado = await service.solicitar(
+        1,
+        'responsavel@email.com'
+    );
+
+    assert.equal(atualizacoes.length, 1);
+    assert.equal(emails.length, 1);
+    assert.equal(resultado.emailEnviado, true);
+    assert.equal(resultado.statusConsentimento, 'pendente');
+});
