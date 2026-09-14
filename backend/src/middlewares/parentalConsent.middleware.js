@@ -1,7 +1,7 @@
 function criarParentalConsentMiddleware({
     parentalConsentService
 }) {
-    // Impede o acesso à Rede de Apoio enquanto a titular menor de 16 anos não possuir consentimento válido.
+    // Impede o acesso à Rede de Apoio enquanto o titular menor de 16 anos não possuir consentimento válido.
     async function exigirAcessoRedeApoio(req, _res, next) {
         try {
             const resultado =

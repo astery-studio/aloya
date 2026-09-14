@@ -1,6 +1,6 @@
 function criarAuthValidator({ dateUtils }) {
-    // Expressão regular para validar nomes contendo letras (incluindo acentuadas), espaços, hífens ou apóstrofos
-    const regexNome = /^[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
+    // Expressão regular para validar nomes contendo letras (incluindo acentuadas), espaços ou hífens.
+    const regexNome = /^[\p{L}]+(?:[ -][\p{L}]+)*$/u;
 
     // Expressão regular padrão para validação básica da estrutura de um email.
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,7 +46,7 @@ function criarAuthValidator({ dateUtils }) {
             erros.push(
                 erro(
                     'nome',
-                    'O nome deve conter apenas letras, espaços, apóstrofos ou hífens.'
+                    'O nome deve conter apenas letras, espaços ou hífens.'
                 )
             );
         }
@@ -214,7 +214,7 @@ function criarAuthValidator({ dateUtils }) {
             erros.push(
                 erro(
                     'emailResponsavelLegal',
-                    'Informe um e-mail válido para o responsável legal.'
+                    'Informe um e-mail válido.'
                 )
             );
         }
