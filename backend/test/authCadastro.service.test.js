@@ -178,3 +178,48 @@ function criarDependencias({
 }
 
 test(
+    'cria conta ativa e sessão persistida',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias();
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos(),
+                'Celular de teste'
+            );
+
+        assert.deepEqual(chamadas.gerarHash, [
+            'senha-segura'
+        ]);
+
+        assert.equal(
+            chamadas.criarUsuario.length,
+            1
+        );
+
+        assert.deepEqual(
+            chamadas.criarUsuario[0].data,
+            {
+                nome: 'Carla Cristina',
+
+                dataNascimento:
+                    new Date(
+                        '2000-05-13T00:00:00.000Z'
+                    ),
+
+                email: 'carla@email.com',
+                senhaHash: 'hash-da-senha',
+                papel: 'principal',
+                statusConta: 'ativa',
+                duracaoCicloInformada: 28,
+                duracaoMenstruacaoInformada: 5,
+                duracaoLuteaInformada: 14,
+                temaVisual: 'automatico'
+            }
+        );
+
+        assert.deepEqual(chamadas.criarSessao, [
+            {
