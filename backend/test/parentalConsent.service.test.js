@@ -520,3 +520,34 @@ test('trata confirmação repetida de forma idempotente', async () => {
         'A autorização já havia sido confirmada.'
     );
 });
+
+test('converte falha de SMTP em erro público seguro', async () => {
+    const { crypto } = criarCrypto();
+    const service = criarParentalConsentService({
+        prisma: {},
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {
+            async enviarEmailConsentimentoParental() {
+                throw new Error(
+                    'Detalhes internos do SMTP.'
+                );
+            }
+        }
+    });
+
+    await assert.rejects(
+        service.enviarEmail({
+            nomeTitular: 'Carla Cristina',
+            emailResponsavelLegal: 'responsavel@email.com',
+            linkConfirmacao: 'https://aloya.test/token'
+        }),
+        {
+            message:
+                'Não foi possível enviar o pedido de autorização no momento. Tente novamente.',
+            status: 502,
+            codigo: 'FALHA_ENVIO_EMAIL'
+        }
+    );
+});
