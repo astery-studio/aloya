@@ -11,7 +11,8 @@ const dateUtils = require('../utils/date.utils');
 
 const {
     criarCadastroRateLimit,
-    criarEmailRateLimit
+    criarEmailRateLimit,
+    criarLoginRateLimit
 } = require('../middlewares/rateLimit.middleware');
 
 const {
@@ -123,6 +124,12 @@ function criarContainer() {
         limite: env.cadastroRateLimitMaximo
     });
 
+    const loginRateLimit = criarLoginRateLimit({
+        rateLimit,
+        janelaMs: env.loginRateLimitJanelaMs,
+        limite: env.loginRateLimitMaximo
+    });
+
     const emailRateLimit = criarEmailRateLimit({
         rateLimit,
         janelaMs: env.emailRateLimitJanelaMs,
@@ -146,5 +153,6 @@ function criarContainer() {
 }
 
 module.exports = {
-    criarContainer
+    criarContainer,
+    loginRateLimit
 };
