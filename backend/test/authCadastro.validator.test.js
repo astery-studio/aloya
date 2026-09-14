@@ -178,3 +178,48 @@ test(
 
         assert.equal(
             resultado.dados.menorDe16,
+            true
+        );
+
+        assert.equal(
+            resultado.dados
+                .emailResponsavelLegal,
+            null
+        );
+    }
+);
+
+test(
+    'rejeita o e-mail do responsável igual ao e-mail do titular',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
+                    dataNascimento: '2015-05-13',
+
+                    email:
+                        'TITULAR@EMAIL.COM',
+
+                    emailResponsavelLegal:
+                        ' titular@email.com '
+                })
+            );
+
+        assert.equal(resultado.valido, false);
+
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo ===
+                        'emailResponsavelLegal' &&
+                    item.mensagem ===
+                        'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.'
+            ),
+            true
+        );
+    }
+);
+
+test(
