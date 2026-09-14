@@ -417,3 +417,43 @@ test(
         assert.equal(res.body, null);
     }
 );
+
+test('retorna 422 quando o cadastro possui dados inválidos', async () => {
+    const erros = [
+        {
+            campo: 'email',
+            mensagem: 'Informe um e-mail válido.'
+        }
+    ];
+    const authValidator = {
+        validarCadastro() {
+            return {
+                valido: false,
+                erros,
+                dados: {}
+            };
+        }
+    };
+    const controller = criarAuthController({
+        authService: {},
+        authValidator,
+        parentalConsentService: {},
+        parentalConsentValidator: {}
+    });
+    const req = {
+        body: {},
+        headers: {}
+    };
+    const res = criarResposta();
+
+    await controller.cadastrar(req, res, function next() {});
+
+    assert.equal(res.statusCode, 422);
+    assert.deepEqual(res.body, {
+        erro: {
+            codigo: 'ERRO_VALIDACAO',
+            mensagem: 'Existem campos inválidos no cadastro.',
+            detalhes: erros
+        }
+    });
+});
