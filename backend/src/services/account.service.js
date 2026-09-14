@@ -1,10 +1,4 @@
-function criarAccountService({
-    prisma,
-    passwordService,
-    parentalConsentService,
-    dateUtils,
-    now = () => new Date()
-}) {
+function criarAccountService({ prisma, passwordService, parentalConsentService, dateUtils, now = () => new Date() }) {
     const selectConfiguracoes = {
         id: true,
         nome: true,
@@ -12,23 +6,26 @@ function criarAccountService({
         genero: true,
         dataNascimento: true,
         atualizadoEm: true
-    };
+    }
 
+    // Função auxiliar para criar um erro de conta não encontrada
     function criarErroContaNaoEncontrada() {
         const erro = new Error(
             'Conta não encontrada.'
-        );
+        )
 
         erro.status = 404;
-        erro.codigo = 'CONTA_NAO_ENCONTRADA';
+        erro.codigo = 'CONTA_NAO_ENCONTRADA'
 
-        return erro;
+        return erro
     }
 
+    // Função auxiliar para formatar a data no formato ISO (YYYY-MM-DD)
     function formatarData(data) {
-        return data.toISOString().slice(0, 10);
+        return data.toISOString().slice(0, 10)
     }
 
+    // Função auxiliar para formatar as configurações do usuário
     function formatarConfiguracoes(usuario) {
         return {
             id: usuario.id,
@@ -44,9 +41,10 @@ function criarAccountService({
 
             atualizadoEm:
                 usuario.atualizadoEm
-        };
+        }
     }
 
+    // Função auxiliar para comparar duas datas (ignorando a hora)
     function datasSaoIguais(
         dataAtual,
         novaData
@@ -58,9 +56,10 @@ function criarAccountService({
                 === novaData.getMonth()
             && dataAtual.getDate()
                 === novaData.getDate()
-        );
+        )
     }
 
+    // Função para buscar as configurações do usuário
     async function buscarConfiguracoes(usuarioId) {
         const usuario =
             await prisma.usuario.findUnique({
@@ -69,15 +68,16 @@ function criarAccountService({
                 },
 
                 select: selectConfiguracoes
-            });
+            })
 
         if (!usuario) {
-            throw criarErroContaNaoEncontrada();
+            throw criarErroContaNaoEncontrada()
         }
 
-        return formatarConfiguracoes(usuario);
+        return formatarConfiguracoes(usuario)
     }
 
+    // Função para verificar se o e-mail está disponível para atualização
     async function verificarEmailDisponivel(
         usuarioId,
         email
@@ -91,7 +91,7 @@ function criarAccountService({
                 select: {
                     id: true
                 }
-            });
+            })
 
         if (
             usuarioComEmail
@@ -99,33 +99,34 @@ function criarAccountService({
         ) {
             const erro = new Error(
                 'Este e-mail já está em uso.'
-            );
+            )
 
             erro.status = 409;
-            erro.codigo = 'EMAIL_JA_CADASTRADO';
+            erro.codigo = 'EMAIL_JA_CADASTRADO'
 
-            throw erro;
+            throw erro
         }
     }
 
+    // Função para identificar as alterações feitas nas configurações do usuário
     function identificarAlteracoes(
         usuarioAtual,
         dados
     ) {
-        const alteracoes = {};
+        const alteracoes = {}
 
         if (
             dados.nome !== undefined
             && dados.nome !== usuarioAtual.nome
         ) {
-            alteracoes.nome = dados.nome;
+            alteracoes.nome = dados.nome
         }
 
         if (
             dados.email !== undefined
             && dados.email !== usuarioAtual.email
         ) {
-            alteracoes.email = dados.email;
+            alteracoes.email = dados.email
         }
 
         if (
@@ -134,7 +135,7 @@ function criarAccountService({
                 !== usuarioAtual.genero
         ) {
             alteracoes.genero =
-                dados.identidadeGenero;
+                dados.identidadeGenero
         }
 
         if (
@@ -145,12 +146,13 @@ function criarAccountService({
             )
         ) {
             alteracoes.dataNascimento =
-                dados.dataNascimento;
+                dados.dataNascimento
         }
 
-        return alteracoes;
+        return alteracoes
     }
 
+    // Função para atualizar as configurações do usuário
     async function atualizarConfiguracoes(
         usuarioId,
         dados
@@ -162,33 +164,33 @@ function criarAccountService({
                 },
 
                 select: selectConfiguracoes
-            });
+            })
 
         if (!usuarioAtual) {
-            throw criarErroContaNaoEncontrada();
+            throw criarErroContaNaoEncontrada()
         }
 
         const alteracoes = identificarAlteracoes(
             usuarioAtual,
             dados
-        );
+        )
 
         if (Object.keys(alteracoes).length === 0) {
             const erro = new Error(
                 'Nenhuma alteração foi identificada.'
-            );
+            )
 
             erro.status = 422;
-            erro.codigo = 'NENHUMA_ALTERACAO';
+            erro.codigo = 'NENHUMA_ALTERACAO'
 
-            throw erro;
+            throw erro
         }
 
         if (alteracoes.email !== undefined) {
             await verificarEmailDisponivel(
                 usuarioId,
                 alteracoes.email
-            );
+            )
         }
 
         const momentoAtual = now();
@@ -197,7 +199,7 @@ function criarAccountService({
             dateUtils.calcularIdade(
                 usuarioAtual.dataNascimento,
                 momentoAtual
-            );
+            )
 
         const dataNascimentoAtualizada =
             alteracoes.dataNascimento
@@ -207,7 +209,7 @@ function criarAccountService({
             dateUtils.calcularIdade(
                 dataNascimentoAtualizada,
                 momentoAtual
-            );
+            )
 
         const passouASerMenorDe16 =
             alteracoes.dataNascimento !== undefined
@@ -235,12 +237,12 @@ function criarAccountService({
                                 .reativarAposCorrecaoNascimento(
                                     tx,
                                     usuarioId
-                                );
+                                )
                         }
 
-                        return usuario;
+                        return usuario
                     }
-                );
+                )
 
             return {
                 configuracoes:
@@ -250,29 +252,25 @@ function criarAccountService({
 
                 consentimentoParentalNecessario:
                     passouASerMenorDe16
-            };
+            }
         } catch (erro) {
-            /*
-             * A consulta prévia melhora a mensagem,
-             * mas o P2002 ainda deve ser tratado para
-             * impedir condição de corrida.
-             */
             if (erro.code === 'P2002') {
                 const erroEmail = new Error(
                     'Este e-mail já está em uso.'
-                );
+                )
 
                 erroEmail.status = 409;
                 erroEmail.codigo =
-                    'EMAIL_JA_CADASTRADO';
+                    'EMAIL_JA_CADASTRADO'
 
-                throw erroEmail;
+                throw erroEmail
             }
 
-            throw erro;
+            throw erro
         }
     }
 
+    // Função para alterar a senha do usuário
     async function alterarSenha({
         usuarioId,
         sessaoId,
@@ -289,52 +287,52 @@ function criarAccountService({
                     id: true,
                     senhaHash: true
                 }
-            });
+            })
 
         if (!usuario) {
-            throw criarErroContaNaoEncontrada();
+            throw criarErroContaNaoEncontrada()
         }
 
         const senhaAtualCorreta =
             await passwordService.compararSenha(
                 senhaAtual,
                 usuario.senhaHash
-            );
+            )
 
         if (!senhaAtualCorreta) {
             const erro = new Error(
                 'A senha atual está incorreta.'
-            );
+            )
 
             erro.status = 401;
-            erro.codigo = 'SENHA_ATUAL_INCORRETA';
+            erro.codigo = 'SENHA_ATUAL_INCORRETA'
 
-            throw erro;
+            throw erro
         }
 
         const novaSenhaEhIgual =
             await passwordService.compararSenha(
                 novaSenha,
                 usuario.senhaHash
-            );
+            )
 
         if (novaSenhaEhIgual) {
             const erro = new Error(
                 'A nova senha deve ser diferente da senha atual.'
-            );
+            )
 
             erro.status = 422;
-            erro.codigo = 'NOVA_SENHA_IGUAL_ATUAL';
+            erro.codigo = 'NOVA_SENHA_IGUAL_ATUAL'
 
-            throw erro;
+            throw erro
         }
 
         const { senhaHash } =
             await passwordService.gerarHash(
                 novaSenha
-            );
+            )
 
-        const momentoAtual = now();
+        const momentoAtual = now()
 
         const outrasSessoesRevogadas =
             await prisma.$transaction(
@@ -347,13 +345,9 @@ function criarAccountService({
                         data: {
                             senhaHash
                         }
-                    });
+                    })
 
-                    /*
-                     * A sessão usada para alterar a senha
-                     * permanece ativa. Todas as demais são
-                     * encerradas imediatamente.
-                     */
+                    //A sessão usada para alterar a senha permanece ativa. Todas as demais são  encerradas imediatamente.
                     const sessoes =
                         await tx.sessao.updateMany({
                             where: {
@@ -369,12 +363,9 @@ function criarAccountService({
                             data: {
                                 revogadaEm: momentoAtual
                             }
-                        });
+                        })
 
-                    /*
-                     * Um link antigo de recuperação não pode
-                     * substituir a senha recém-definida.
-                     */
+                    //Um link antigo de recuperação não pode substituir a senha recém-definida.
                     await tx.recuperacaoSenha.updateMany({
                         where: {
                             usuarioId,
@@ -384,11 +375,11 @@ function criarAccountService({
                         data: {
                             statusLink: 'revogado'
                         }
-                    });
+                    })
 
-                    return sessoes.count;
+                    return sessoes.count
                 }
-            );
+            )
 
         return {
             mensagem:
@@ -396,16 +387,16 @@ function criarAccountService({
 
             outrasSessoesEncerradas:
                 outrasSessoesRevogadas
-        };
+        }
     }
 
     return {
         buscarConfiguracoes,
         atualizarConfiguracoes,
         alterarSenha
-    };
+    }
 }
 
 module.exports = {
     criarAccountService
-};
+}
