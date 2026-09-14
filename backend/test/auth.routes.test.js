@@ -111,3 +111,23 @@ test('protege solicitação de consentimento e limita e-mails', () => {
         ]
     );
 });
+
+test('protege reenvio de consentimento e limita e-mails', () => {
+    const dependencias = criarDependencias();
+    const router = criarAuthRoutes(dependencias);
+    const rota = buscarRota(
+        router,
+        '/parental-consent/resend'
+    );
+
+    assert.equal(rota.methods.post, true);
+    assert.deepEqual(
+        rota.stack.map((camada) => camada.handle),
+        [
+            dependencias.authMiddleware.autenticar,
+            dependencias.emailRateLimit,
+            dependencias.authController
+                .reenviarConsentimento
+        ]
+    );
+});
