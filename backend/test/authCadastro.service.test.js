@@ -403,3 +403,48 @@ test(
 );
 
 test(
+    'permite cadastro do menor sem e-mail do responsável',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias();
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos({
+                    dataNascimento:
+                        new Date(
+                            '2015-05-13T00:00:00.000Z'
+                        ),
+
+                    menorDe16: true,
+                    emailResponsavelLegal: null
+                })
+            );
+
+        assert.equal(
+            chamadas
+                .criarConsentimentoPendente
+                .length,
+            0
+        );
+
+        assert.equal(
+            chamadas
+                .enviarEmailConsentimento
+                .length,
+            0
+        );
+
+        assert.deepEqual(
+            resultado.consentimentoParental,
+            {
+                exigidoParaRedeApoio: true,
+                solicitado: false,
+                redeApoioBloqueada: true,
+                emailEnviado: false,
+                mensagemEnvio: null
+            }
+        );
+    }
