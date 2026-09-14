@@ -29,7 +29,9 @@ function rotaNaoEncontrada(_req, res) {
     return res.status(500).json({
         erro: {
         codigo: 'ERRO_INTERNO',
-        mensagem: 'Ocorreu um erro ao criar sua conta. Tente novamente.'
+        mensagem:
+            erro.mensagemUsuario ||
+            'Ocorreu um erro ao criar sua conta. Tente novamente.'
         }
     });
 }
