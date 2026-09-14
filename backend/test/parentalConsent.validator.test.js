@@ -115,3 +115,49 @@ test(
         });
     }
 );
+
+test(
+    'rejeita novo e-mail inválido no reenvio',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarReenvio({
+                emailResponsavelLegal:
+                    'email-invalido'
+            });
+
+        assert.equal(resultado.valido, false);
+
+        assert.deepEqual(resultado.erros, [
+            {
+                campo:
+                    'emailResponsavelLegal',
+
+                mensagem:
+                    'Informe um e-mail válido.'
+            }
+        ]);
+    }
+);
+
+test(
+    'aceita token de consentimento no formato esperado',
+    () => {
+        const validator = criarValidator();
+
+        const tokenValido = 'a'.repeat(43);
+
+        const resultado =
+            validator.validarToken(
+                tokenValido
+            );
+
+        assert.equal(resultado.valido, true);
+        assert.deepEqual(resultado.erros, []);
+
+        assert.deepEqual(resultado.dados, {
+            token: tokenValido
+        });
+    }
+);
