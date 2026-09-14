@@ -384,3 +384,37 @@ test('rejeita reenvio sem solicitação anterior', async () => {
         }
     );
 });
+
+test('rejeita reenvio quando consentimento não está pendente', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findUnique() {
+                return {
+                    emailResponsavelLegal: 'responsavel@email.com',
+                    statusConsentimento: 'liberado'
+                };
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.reenviar(1),
+        {
+            status: 409,
+            codigo: 'CONSENTIMENTO_NAO_PENDENTE'
+        }
+    );
+});
