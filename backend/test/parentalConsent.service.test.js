@@ -323,3 +323,33 @@ test('rejeita solicitação para usuário inexistente', async () => {
         }
     );
 });
+
+test('rejeita o próprio e-mail como responsável legal', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {
+            calcularIdade() {
+                return 11;
+            }
+        },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.solicitar(1, 'carla@email.com'),
+        {
+            status: 422,
+            codigo: 'EMAIL_RESPONSAVEL_IGUAL_TITULAR'
+        }
+    );
+});
