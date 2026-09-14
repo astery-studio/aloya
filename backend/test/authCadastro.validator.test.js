@@ -223,3 +223,48 @@ test(
 );
 
 test(
+    'rejeita duração da menstruação maior ou igual à duração do ciclo',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
+                    duracaoCicloInformada: 28,
+                    duracaoMenstruacaoInformada: 28
+                })
+            );
+
+        assert.equal(resultado.valido, false);
+
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo ===
+                        'duracaoMenstruacaoInformada' &&
+                    item.mensagem ===
+                        'A duração da menstruação deve ser menor que a duração do ciclo.'
+            ),
+            true
+        );
+    }
+);
+
+test(
+    'rejeita duração da fase lútea incompatível com o ciclo',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarCadastro(
+                criarDadosValidos({
+                    duracaoCicloInformada: 20,
+                    duracaoMenstruacaoInformada: 5,
+                    duracaoLuteaInformada: 14
+                })
+            );
+
+        assert.equal(resultado.valido, false);
+
+        assert.equal(
+            resultado.erros.some(
