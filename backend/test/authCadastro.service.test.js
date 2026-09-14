@@ -685,3 +685,69 @@ test(
         );
     }
 );
+
+test(
+    'persiste somente o início quando a data final não é informada',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias();
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos({
+                    dataFimUltimaMenstruacao:
+                        null,
+
+                    duracaoMenstruacaoInformada:
+                        5
+                })
+            );
+
+        const registro =
+            chamadas.criarRegistroCiclo[0];
+
+        assert.equal(
+            registro.data.dataFim,
+            null
+        );
+
+        assert.equal(
+            registro
+                .data
+                .duracaoMenstruacao,
+            null
+        );
+
+        assert.equal(
+            registro.data.duracaoCiclo,
+            null
+        );
+
+        assert.deepEqual(
+            registro.data.diasMenstruacao,
+            {
+                create: [
+                    {
+                        data: new Date(
+                            '2026-01-10T00:00:00.000Z'
+                        )
+                    }
+                ]
+            }
+        );
+
+        assert.equal(
+            chamadas.criarUsuario[0]
+                .data
+                .duracaoMenstruacaoInformada,
+            5
+        );
+
+        assert.equal(
+            resultado.cicloInicial.dataFim,
+            null
+        );
+    }
+);
