@@ -631,3 +631,47 @@ test('retorna 400 quando o token de consentimento é inválido', async () => {
     });
     assert.equal(chamadas.length, 0);
 });
+
+test('retorna página HTML após confirmar o consentimento', async () => {
+    const token = 't'.repeat(43);
+    const {
+        controller,
+        chamadas
+    } = criarControllerConsentimento({
+        validacao: {
+            valido: true,
+            erros: [],
+            dados: {
+                token
+            }
+        },
+        resultado: {
+            mensagem: 'Autorização concluída com sucesso.'
+        },
+        operacao: 'confirmar'
+    });
+    const req = {
+        params: {
+            token
+        }
+    };
+    const res = criarResposta();
+
+    await controller.confirmarConsentimento(
+        req,
+        res,
+        function next() {}
+    );
+
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.contentType, 'html');
+    assert.equal(
+        res.body.includes(
+            'Autorização concluída com sucesso.'
+        ),
+        true
+    );
+    assert.deepEqual(chamadas, [
+        [token]
+    ]);
+});
