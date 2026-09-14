@@ -202,3 +202,30 @@ test(
         ]);
     }
 );
+
+test(
+    'rejeita token com caracteres não permitidos',
+    () => {
+        const validator = criarValidator();
+
+        const tokenInvalido =
+            `${'a'.repeat(42)}!`;
+
+        const resultado =
+            validator.validarToken(
+                tokenInvalido
+            );
+
+        assert.equal(tokenInvalido.length, 43);
+        assert.equal(resultado.valido, false);
+
+        assert.deepEqual(resultado.erros, [
+            {
+                campo: 'token',
+
+                mensagem:
+                    'Link de consentimento inválido.'
+            }
+        ]);
+    }
+);
