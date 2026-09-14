@@ -38,7 +38,7 @@ function criarAuthService({
         try {
             const resultado = await prisma.$transaction(
                 async (tx) => {
-                    // Cria o registro principal do usuário
+                    // Cria o registro principal da pessoa usuária
                     const usuario = await tx.usuario.create({
                         data: {
                             nome: dados.nome,
@@ -209,8 +209,78 @@ function criarAuthService({
         }
     }
 
+    // Autentica a pessoa usuária e cria uma nova sessão persistida.
+    async function realizarLogin(dados, dispositivo) {
+        const usuario = await prisma.usuario.findUnique({
+            where: {
+                email: dados.email
+            },
+
+            select: {
+                id: true,
+                nome: true,
+                email: true,
+                senhaHash: true,
+                papel: true,
+                statusConta: true
+            }
+        });
+
+        // A comparação ocorre mesmo sem usuário encontrado para reduzir enumeração por tempo de resposta.
+        const senhaCorresponde =
+            await passwordService.compararSenha(
+                dados.senha,
+                usuario ? usuario.senhaHash : null
+            );
+
+        // A resposta é idêntica para e-mail inexistente, senha inválida ou conta indisponível.
+        if (
+            !usuario ||
+            !senhaCorresponde ||
+            usuario.statusConta !== 'ativa'
+        ) {
+            const erro = new Error(
+                'E-mail ou senha incorretos.'
+            );
+
+            erro.status = 401;
+            erro.codigo = 'CREDENCIAIS_INVALIDAS';
+
+            throw erro;
+        }
+
+        // Gera uma nova sessão segura para a pessoa usuária autenticada.
+        const sessao =
+            tokenService.gerarTokenSessao(usuario);
+
+        // Persiste somente o hash do token, nunca o token JWT puro.
+        await prisma.sessao.create({
+            data: {
+                usuarioId: usuario.id,
+                tokenSessaoHash: sessao.tokenHash,
+                validadeSessao: sessao.validadeSessao,
+                dispositivo: dispositivo || null
+            }
+        });
+
+        return {
+            usuario: {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.email,
+                papel: usuario.papel
+            },
+
+            autenticacao: {
+                token: sessao.token,
+                tipo: 'Bearer'
+            }
+        };
+    }
+
     return {
-        cadastrar
+        cadastrar,
+        realizarLogin
     };
 }
 
