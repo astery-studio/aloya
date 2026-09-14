@@ -60,7 +60,40 @@ function criarEmailRateLimit({
     });
 }
 
+function criarLoginRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    // Limita tentativas de login por endereço IP contra tentativas de força bruta.
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+        skipSuccessfulRequests: true,
+
+        handler: (req, res) => {
+            // Registra somente o evento; não registra e-mail, senha ou token.
+            logger.warn({
+                evento: 'limite_tentativas_login',
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_TENTATIVAS_LOGIN',
+                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
 module.exports = {
     criarCadastroRateLimit,
-    criarEmailRateLimit
+    criarEmailRateLimit,
+    criarLoginRateLimit
 };
