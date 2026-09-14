@@ -1,9 +1,12 @@
+//esse service serve para validar os dados de atualizacao e alteracao de senha do usuario, verificando se o corpo da requisicao e um objeto, se os campos sao permitidos, se os valores sao validos e retornando um objeto com a validade, os erros e os dados normalizados
+
+//funcao para validar os dados de atualizacao e alteracao de senha do usuario
 function criarAccountValidator({ dateUtils }) {
     const regexNome =
-        /^[\p{L}]+(?:[ -][\p{L}]+)*$/u;
+        /^[\p{L}]+(?:[ -][\p{L}]+)*$/u
 
     const regexEmail =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     const identidadesGeneroPermitidas = new Set([
         'Prefiro não informar',
@@ -26,59 +29,65 @@ function criarAccountValidator({ dateUtils }) {
         'minhasenhasegura',
         'euamoaloya',
         'aloyaaloyaaloya'
-    ]);
+    ])
 
+    //funcao de erro para retornar o campo e a mensagem de erro
     function erro(campo, mensagem) {
         return {
             campo,
             mensagem
-        };
+        }
     }
 
+    //funcao para verificar se o corpo da requisicao e um objeto
     function ehObjeto(body) {
         return (
             body !== null
             && typeof body === 'object'
             && !Array.isArray(body)
-        );
+        )
     }
 
+    //funcao para normalizar o nome do usuario, removendo espacos extras e retornando uma string vazia se nao for uma string
     function normalizarNome(nome) {
         if (typeof nome !== 'string') {
-            return '';
+            return ''
         }
 
         return nome
             .trim()
-            .replace(/\s+/g, ' ');
+            .replace(/\s+/g, ' ')
     }
 
+    //funcao para normalizar o email do usuario, removendo espacos extras e convertendo para minusculo, retornando uma string vazia se nao for uma string
     function normalizarEmail(email) {
         if (typeof email !== 'string') {
-            return '';
+            return ''
         }
 
         return email
             .trim()
-            .toLowerCase();
+            .toLowerCase()
     }
 
+    //funcao para normalizar a identidade de genero do usuario, removendo espacos extras e retornando null se for null, retornando uma string vazia se nao for uma string
     function normalizarIdentidadeGenero(
         identidadeGenero
     ) {
         if (identidadeGenero === null) {
-            return null;
+            return null
         }
 
         if (typeof identidadeGenero !== 'string') {
-            return '';
+            return ''
         }
 
         return identidadeGenero
             .trim()
-            .replace(/\s+/g, ' ');
+            .replace(/\s+/g, ' ')
     }
 
+    //funcao para encontrar campos desconhecidos no corpo da requisicao, comparando com os campos permitidos
     function encontrarCamposDesconhecidos(
         body,
         camposPermitidos
@@ -88,9 +97,10 @@ function criarAccountValidator({ dateUtils }) {
             .filter(
                 (campo) =>
                     !camposPermitidos.includes(campo)
-            );
+            )
     }
 
+    //funcao para validar os dados de atualizacao do usuario, verificando se o corpo da requisicao e um objeto, se os campos sao permitidos, se os valores sao validos e retornando um objeto com a validade, os erros e os dados normalizados
     function validarAtualizacao(body) {
         if (!ehObjeto(body)) {
             return {
@@ -102,10 +112,10 @@ function criarAccountValidator({ dateUtils }) {
                     )
                 ],
                 dados: {}
-            };
+            }
         }
 
-        const erros = [];
+        const erros = []
 
         const camposDesconhecidos =
             encontrarCamposDesconhecidos(
@@ -116,7 +126,7 @@ function criarAccountValidator({ dateUtils }) {
                     'identidadeGenero',
                     'dataNascimento'
                 ]
-            );
+            )
 
         if (camposDesconhecidos.length > 0) {
             erros.push(
@@ -124,31 +134,32 @@ function criarAccountValidator({ dateUtils }) {
                     'dados',
                     'A requisição contém campos não permitidos.'
                 )
-            );
+            )
         }
 
         const nome = body.nome === undefined
             ? undefined
-            : normalizarNome(body.nome);
+            : normalizarNome(body.nome)
 
         const email = body.email === undefined
             ? undefined
-            : normalizarEmail(body.email);
+            : normalizarEmail(body.email)
 
         const identidadeGenero =
             body.identidadeGenero === undefined
                 ? undefined
                 : normalizarIdentidadeGenero(
                     body.identidadeGenero
-                );
+                )
 
         const dataNascimento =
             body.dataNascimento === undefined
                 ? undefined
                 : dateUtils.criarDataValida(
                     body.dataNascimento
-                );
+                )
 
+        //validacao de nome
         if (
             nome !== undefined
             && nome.length < 3
@@ -158,7 +169,7 @@ function criarAccountValidator({ dateUtils }) {
                     'nome',
                     'O nome deve ter pelo menos 3 caracteres.'
                 )
-            );
+            )
         } else if (
             nome !== undefined
             && (
@@ -171,9 +182,10 @@ function criarAccountValidator({ dateUtils }) {
                     'nome',
                     'O nome deve conter apenas letras, espaços ou hífens.'
                 )
-            );
+            )
         }
 
+        //validacao de email
         if (
             email !== undefined
             && (
@@ -186,9 +198,10 @@ function criarAccountValidator({ dateUtils }) {
                     'email',
                     'Informe um e-mail válido.'
                 )
-            );
+            )
         }
 
+        //validacao de identidade de genero
         if (
             identidadeGenero !== undefined
             && identidadeGenero !== null
@@ -201,9 +214,10 @@ function criarAccountValidator({ dateUtils }) {
                     'identidadeGenero',
                     'Informe uma identidade de gênero válida.'
                 )
-            );
+            )
         }
 
+        //validacao de data de nascimento
         if (
             body.dataNascimento !== undefined
             && (
@@ -216,7 +230,7 @@ function criarAccountValidator({ dateUtils }) {
                     'dataNascimento',
                     'Informe uma data de nascimento válida.'
                 )
-            );
+            )
         }
 
         const nenhumCampoInformado =
@@ -225,13 +239,14 @@ function criarAccountValidator({ dateUtils }) {
             && identidadeGenero === undefined
             && dataNascimento === undefined;
 
+        //verifica se nenhum campo foi informado para atualizacao
         if (nenhumCampoInformado) {
             erros.push(
                 erro(
                     'dados',
                     'Informe pelo menos um dado para atualização.'
                 )
-            );
+            )
         }
 
         return {
@@ -244,9 +259,11 @@ function criarAccountValidator({ dateUtils }) {
                 identidadeGenero,
                 dataNascimento
             }
-        };
+        }
     }
 
+
+    //funcao para validar os dados de alteracao de senha do usuario, verificando se o corpo da requisicao e um objeto, se os campos sao permitidos, se os valores sao validos e retornando um objeto com a validade, os erros e os dados normalizados
     function validarAlteracaoSenha(body) {
         if (!ehObjeto(body)) {
             return {
@@ -258,7 +275,7 @@ function criarAccountValidator({ dateUtils }) {
                     )
                 ],
                 dados: {}
-            };
+            }
         }
 
         const erros = [];
@@ -271,58 +288,58 @@ function criarAccountValidator({ dateUtils }) {
                     'novaSenha',
                     'confirmacaoNovaSenha'
                 ]
-            );
+            )
 
+        //verifica se existem campos desconhecidos no corpo da requisicao
         if (camposDesconhecidos.length > 0) {
             erros.push(
                 erro(
                     'dados',
                     'A requisição contém campos não permitidos.'
                 )
-            );
+            )
         }
 
         const senhaAtual =
             typeof body.senhaAtual === 'string'
                 ? body.senhaAtual
-                : '';
+                : ''
 
         const novaSenha =
             typeof body.novaSenha === 'string'
                 ? body.novaSenha
-                : '';
+                : ''
 
         const confirmacaoNovaSenha =
             typeof body.confirmacaoNovaSenha
                 === 'string'
                 ? body.confirmacaoNovaSenha
-                : '';
+                : ''
 
+        //verifica se a senha atual foi informada
         if (!senhaAtual) {
             erros.push(
                 erro(
                     'senhaAtual',
                     'Informe sua senha atual.'
                 )
-            );
+            )
         }
 
         const tamanhoNovaSenha =
             [...novaSenha].length;
 
+        //verifica se a nova senha tem pelo menos 15 caracteres
         if (tamanhoNovaSenha < 15) {
             erros.push(
                 erro(
                     'novaSenha',
                     'A nova senha deve ter pelo menos 15 caracteres.'
                 )
-            );
+            )
         }
 
-        /*
-         * O bcrypt considera no máximo 72 bytes.
-         * A validação evita truncamento silencioso.
-         */
+        //verifica se a nova senha ultrapassa o tamanho maximo permitido de 72 bytes
         if (
             Buffer.byteLength(novaSenha, 'utf8') > 72
         ) {
@@ -331,9 +348,10 @@ function criarAccountValidator({ dateUtils }) {
                     'novaSenha',
                     'A nova senha ultrapassa o tamanho máximo permitido.'
                 )
-            );
+            )
         }
 
+        //verifica se a nova senha esta na lista de senhas bloqueadas
         if (
             senhasBloqueadas.has(
                 novaSenha.toLocaleLowerCase('pt-BR')
@@ -344,16 +362,17 @@ function criarAccountValidator({ dateUtils }) {
                     'novaSenha',
                     'Essa senha é muito comum. Escolha uma senha diferente.'
                 )
-            );
+            )
         }
 
+        //verifica se a nova senha e a confirmacao da nova senha coincidem
         if (novaSenha !== confirmacaoNovaSenha) {
             erros.push(
                 erro(
                     'confirmacaoNovaSenha',
                     'As senhas não coincidem.'
                 )
-            );
+            )
         }
 
         return {
@@ -364,15 +383,15 @@ function criarAccountValidator({ dateUtils }) {
                 senhaAtual,
                 novaSenha
             }
-        };
+        }
     }
 
     return {
         validarAtualizacao,
         validarAlteracaoSenha
-    };
+    }
 }
 
 module.exports = {
     criarAccountValidator
-};
+}
