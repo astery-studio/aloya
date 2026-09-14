@@ -38,6 +38,7 @@ function criarDependencias({
         buscarUsuario: [],
         gerarHash: [],
         criarUsuario: [],
+        criarRegistroCiclo: [],
         gerarTokenSessao: [],
         criarSessao: [],
         criarConsentimentoPendente: [],
@@ -61,6 +62,22 @@ function criarDependencias({
                 );
 
                 return usuarioCriado;
+            }
+        },
+
+        registroCiclo: {
+            async create(argumentos) {
+                chamadas.criarRegistroCiclo.push(
+                    argumentos
+                );
+
+                return {
+                    id: 20,
+                    dataInicio:
+                        argumentos.data.dataInicio,
+                    dataFim:
+                        argumentos.data.dataFim
+                };
             }
         },
 
@@ -162,11 +179,48 @@ function criarDependencias({
         }
     };
 
+    const dateUtils = {
+        gerarDiasMenstruacao(
+            dataInicio,
+            dataFim
+        ) {
+            const dias = [];
+            const dataAtual =
+                new Date(dataInicio);
+
+            while (dataAtual <= dataFim) {
+                dias.push(new Date(dataAtual));
+
+                dataAtual.setUTCDate(
+                    dataAtual.getUTCDate() + 1
+                );
+            }
+
+            return dias;
+        },
+
+        calcularDiasInclusivos(
+            dataInicio,
+            dataFim
+        ) {
+            const diferenca =
+                dataFim.getTime() -
+                dataInicio.getTime();
+
+            return (
+                Math.floor(
+                    diferenca / 86400000
+                ) + 1
+            );
+        }
+    };
+
     const authService = criarAuthService({
         prisma,
         passwordService,
         tokenService,
         parentalConsentService,
+        dateUtils,
         logger
     });
 
