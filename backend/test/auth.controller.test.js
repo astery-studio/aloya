@@ -83,6 +83,43 @@ function criarController({
     };
 }
 
+function criarControllerConsentimento({
+    validacao,
+    resultado,
+    operacao = 'solicitar'
+}) {
+    const chamadas = [];
+    const parentalConsentService = {
+        async [operacao](...argumentos) {
+            chamadas.push(argumentos);
+
+            return resultado;
+        }
+    };
+    const parentalConsentValidator = {
+        validarSolicitacao() {
+            return validacao;
+        },
+        validarReenvio() {
+            return validacao;
+        },
+        validarToken() {
+            return validacao;
+        }
+    };
+    const controller = criarAuthController({
+        authService: {},
+        authValidator: {},
+        parentalConsentService,
+        parentalConsentValidator
+    });
+
+    return {
+        controller,
+        chamadas
+    };
+}
+
 test(
     'retorna 422 quando os dados do login são inválidos',
     async () => {
