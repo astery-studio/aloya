@@ -28,7 +28,7 @@ function criarEmailService({ transporter, remetente }) {
 
                 ${nomeTitular} indicou este endereço como e-mail de seu responsável legal na plataforma ALOYA.
 
-                A titular já pode usar normalmente todas as funcionalidades privadas do aplicativo. Esta autorização é opcional e serve exclusivamente para liberar o módulo Rede de Apoio.
+                O titular já pode usar normalmente todas as funcionalidades privadas do aplicativo. Esta autorização é opcional e serve exclusivamente para liberar o módulo Rede de Apoio.
 
                 A Rede de Apoio permite que a pessoa titular envie convites e compartilhe somente informações selecionadas por ela com pessoas de confiança.
 
@@ -64,7 +64,7 @@ function criarEmailService({ transporter, remetente }) {
                     </p>
 
                     <p>
-                        A titular já pode utilizar normalmente as funcionalidades privadas do aplicativo.
+                        O titular já pode utilizar normalmente as funcionalidades privadas do aplicativo.
                         Esta autorização é <strong>opcional</strong> e libera exclusivamente o módulo
                         <strong>Rede de Apoio</strong>.
                     </p>
