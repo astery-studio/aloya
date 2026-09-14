@@ -313,3 +313,48 @@ test(
                     'EMAIL_JA_CADASTRADO'
             }
         );
+
+        assert.equal(
+            chamadas.gerarHash.length,
+            0
+        );
+
+        assert.equal(
+            chamadas.criarUsuario.length,
+            0
+        );
+
+        assert.equal(
+            chamadas.criarSessao.length,
+            0
+        );
+    }
+);
+
+test(
+    'cria consentimento pendente quando menor informa responsável',
+    async () => {
+        const {
+            authService,
+            chamadas,
+            tx
+        } = criarDependencias();
+
+        const resultado =
+            await authService.cadastrar(
+                criarDadosValidos({
+                    dataNascimento:
+                        new Date(
+                            '2015-05-13T00:00:00.000Z'
+                        ),
+
+                    menorDe16: true,
+
+                    emailResponsavelLegal:
+                        'responsavel@email.com'
+                })
+            );
+
+        assert.equal(
+            chamadas
+                .criarConsentimentoPendente
