@@ -353,3 +353,34 @@ test('rejeita o próprio e-mail como responsável legal', async () => {
         }
     );
 });
+
+test('rejeita reenvio sem solicitação anterior', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findUnique() {
+                return null;
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.reenviar(1),
+        {
+            status: 422,
+            codigo: 'EMAIL_RESPONSAVEL_NECESSARIO'
+        }
+    );
+});
