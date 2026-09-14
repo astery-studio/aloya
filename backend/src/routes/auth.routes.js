@@ -4,7 +4,8 @@ function criarAuthRoutes({
     authController,
     authMiddleware,
     cadastroRateLimit,
-    emailRateLimit
+    emailRateLimit,
+    loginRateLimit
 }) {
     const router = Router();
 
@@ -12,6 +13,12 @@ function criarAuthRoutes({
         '/register',
         cadastroRateLimit,
         authController.cadastrar
+    );
+
+    router.post(
+        '/login',
+        loginRateLimit,
+        authController.realizarLogin
     );
 
     // Retorna o estado atual da liberação da Rede de Apoio.
