@@ -210,3 +210,45 @@ test('libera a Rede de Apoio ao confirmar token válido', async () => {
         'Autorização concluída com sucesso.'
     );
 });
+
+test('marca o link como expirado e rejeita a confirmação', async () => {
+    const atualizacoes = [];
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'pendente',
+                    validadeLink: new Date('2026-09-14T11:00:00.000Z')
+                };
+            },
+            async update(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {},
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    await assert.rejects(service.confirmar(tokenPuro), {
+        status: 410,
+        codigo: 'LINK_CONSENTIMENTO_EXPIRADO'
+    });
+
+    assert.deepEqual(atualizacoes[0].data, {
+        statusConsentimento: 'expirado'
+    });
+});
