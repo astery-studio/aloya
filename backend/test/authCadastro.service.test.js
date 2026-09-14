@@ -133,3 +133,48 @@ function criarDependencias({
                     dados
                 });
 
+            return {
+                nomeTitular: dados.nomeTitular,
+
+                emailResponsavelLegal:
+                    dados.emailResponsavelLegal,
+
+                linkConfirmacao:
+                    'https://aloya.test/consentimento'
+            };
+        },
+
+        async enviarEmail(dados) {
+            chamadas.enviarEmailConsentimento
+                .push(dados);
+
+            if (falharEnvioEmail) {
+                throw new Error(
+                    'Falha simulada no envio.'
+                );
+            }
+        }
+    };
+
+    const logger = {
+        error(conteudo) {
+            chamadas.logs.push(conteudo);
+        }
+    };
+
+    const authService = criarAuthService({
+        prisma,
+        passwordService,
+        tokenService,
+        parentalConsentService,
+        logger
+    });
+
+    return {
+        authService,
+        chamadas,
+        tx
+    };
+}
+
+test(
