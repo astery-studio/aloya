@@ -297,3 +297,29 @@ test('libera o acesso e revoga pendências aos 16 anos', async () => {
     assert.equal(resultado.motivo, 'MAIOR_DE_16_ANOS');
     assert.equal(resultado.consentimentoNecessario, false);
 });
+
+test('rejeita solicitação para usuário inexistente', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return null;
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.solicitar(99, 'responsavel@email.com'),
+        {
+            status: 404,
+            codigo: 'USUARIO_NAO_ENCONTRADO'
+        }
+    );
+});
