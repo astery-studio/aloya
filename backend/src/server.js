@@ -33,7 +33,8 @@ app.use(
         authController: container.authController,
         authMiddleware: container.authMiddleware,
         cadastroRateLimit: container.cadastroRateLimit,
-        emailRateLimit: container.emailRateLimit
+        emailRateLimit: container.emailRateLimit,
+        loginRateLimit: container.loginRateLimit
     })
 );
 
