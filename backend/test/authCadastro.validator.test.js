@@ -88,3 +88,48 @@ test(
         const resultado =
             validator.validarCadastro(
                 criarDadosValidos({
+                    dataFimUltimaMenstruacao:
+                        undefined,
+
+                    duracaoCicloInformada:
+                        undefined,
+
+                    duracaoMenstruacaoInformada:
+                        undefined,
+
+                    duracaoLuteaInformada:
+                        undefined
+                })
+            );
+
+        assert.equal(resultado.valido, true);
+        assert.deepEqual(resultado.erros, []);
+
+        assert.equal(
+            resultado.dados
+                .dataFimUltimaMenstruacao,
+            null
+        );
+
+        assert.equal(
+            resultado.dados
+                .duracaoCicloInformada,
+            null
+        );
+
+        assert.equal(
+            resultado.dados
+                .duracaoMenstruacaoInformada,
+            null
+        );
+
+        assert.equal(
+            resultado.dados
+                .duracaoLuteaInformada,
+            null
+        );
+    }
+);
+
+test(
+    'identifica menor de 16 anos e normaliza o e-mail do responsável',
