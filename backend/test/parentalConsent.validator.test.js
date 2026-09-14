@@ -161,3 +161,44 @@ test(
         });
     }
 );
+
+test(
+    'aceita caracteres seguros para URL no token',
+    () => {
+        const validator = criarValidator();
+
+        const tokenValido =
+            `${'a'.repeat(41)}-_`;
+
+        const resultado =
+            validator.validarToken(
+                tokenValido
+            );
+
+        assert.equal(tokenValido.length, 43);
+        assert.equal(resultado.valido, true);
+    }
+);
+
+test(
+    'rejeita token com tamanho incorreto',
+    () => {
+        const validator = criarValidator();
+
+        const resultado =
+            validator.validarToken(
+                'token-curto'
+            );
+
+        assert.equal(resultado.valido, false);
+
+        assert.deepEqual(resultado.erros, [
+            {
+                campo: 'token',
+
+                mensagem:
+                    'Link de consentimento inválido.'
+            }
+        ]);
+    }
+);
