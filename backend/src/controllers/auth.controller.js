@@ -41,7 +41,47 @@ function criarAuthController({
         }
     }
 
-    // Permite que a titular informe o e-mail do responsável depois do cadastro.
+    // Processa a requisição HTTP de login.
+    async function realizarLogin(req, res, next) {
+        try {
+            const validacao =
+                authValidator.validarLogin(req.body);
+
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: 'Existem campos inválidos no login.',
+                        detalhes: validacao.erros
+                    }
+                });
+            }
+
+            // Extrai e sanitiza o nome do dispositivo a partir do cabeçalho HTTP.
+            const dispositivo =
+                typeof req.headers['x-device-name'] === 'string'
+                    ? req.headers['x-device-name'].slice(0, 120)
+                    : null;
+
+            const resultado =
+                await authService.realizarLogin(
+                    validacao.dados,
+                    dispositivo
+                );
+
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            // Define uma mensagem pública sem revelar detalhes internos.
+            if (!erro.status) {
+                erro.mensagemUsuario =
+                    'Ocorreu um erro ao realizar login. Tente novamente.';
+            }
+
+            return next(erro);
+        }
+    }
+
+    // Permite que o titular informe o e-mail do responsável depois do cadastro.
     async function solicitarConsentimento(req, res, next) {
         try {
             const validacao =
@@ -166,6 +206,7 @@ function criarAuthController({
 
     return {
         cadastrar,
+        realizarLogin,
         solicitarConsentimento,
         reenviarConsentimento,
         confirmarConsentimento,
