@@ -79,14 +79,14 @@ test(
         const validator = criarValidator();
 
         const emailMuitoLongo =
-            `${'a'.repeat(243)}@email.com`;
+            `${'a'.repeat(245)}@email.com`;
 
         const resultado = validator.validarLogin({
             email: emailMuitoLongo,
             senha: 'senha-segura'
         });
 
-        assert.equal(emailMuitoLongo.length > 254, true);
+        assert.equal(emailMuitoLongo.length, 255);
         assert.equal(resultado.valido, false);
 
         assert.deepEqual(resultado.erros, [
