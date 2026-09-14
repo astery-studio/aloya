@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { cores, radius, typography } from '../../../theme';
+import { cores, fontFamilies, radius, typography } from '../../../theme';
 
 const estilos = StyleSheet.create({
     container: {
@@ -75,6 +75,50 @@ const variantes = {
         },
         texto: {
             color: cores.neutras.superficieClara
+        }
+    },
+
+    vermelho: {
+        container: {
+            backgroundColor: cores.feedback.erro
+        },
+        texto: {
+            color: cores.neutras.superficieClara
+        }
+    },
+
+    bordaLaranja: {
+        container: {
+            borderColor: cores.marca.primaria,
+            borderWidth: 1.41
+        },
+        texto: {
+            color: cores.marca.primaria,
+            fontFamily: fontFamilies.semibold,
+            fontWeight: '600'
+        }
+    },
+
+    bordaVerde: {
+        container: {
+            borderColor: cores.marca.secundaria,
+            borderWidth: 1.41
+        },
+        texto: {
+            color: cores.marca.secundaria
+        }
+    },
+
+    tracejado: {
+        container: {
+            borderColor: '#C8C4BA',
+            borderStyle: 'dashed',
+            borderWidth: 1.41
+        },
+        texto: {
+            color: cores.neutras.textoSecundarioClaro,
+            fontSize: 15,
+            lineHeight: 22.5
         }
     }
 };
