@@ -418,3 +418,29 @@ test('rejeita reenvio quando consentimento não está pendente', async () => {
         }
     );
 });
+
+test('rejeita token de consentimento inexistente', async () => {
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        consentimentoParental: {
+            async findFirst() {
+                return null;
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.confirmar(tokenPuro),
+        {
+            status: 400,
+            codigo: 'LINK_CONSENTIMENTO_INVALIDO'
+        }
+    );
+});
