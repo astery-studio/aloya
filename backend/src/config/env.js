@@ -40,6 +40,22 @@ const loginRateLimitMaximo = Number(
     process.env.LOGIN_RATE_LIMIT_MAXIMO || 5
 );
 
+const configuracoesContaRateLimitJanelaMs = Number(
+        process.env.CONFIGURACOES_CONTA_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const configuracoesContaRateLimitMaximo = Number(
+        process.env.CONFIGURACOES_CONTA_RATE_LIMIT_MAXIMO || 20
+);
+
+const alteracaoSenhaRateLimitJanelaMs = Number(
+        process.env.ALTERACAO_SENHA_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const alteracaoSenhaRateLimitMaximo = Number(
+        process.env.ALTERACAO_SENHA_RATE_LIMIT_MAXIMO || 5
+);
+
 const emailRateLimitJanelaMs = Number(
     process.env.EMAIL_RATE_LIMIT_JANELA_MS || 900000
 );
@@ -102,12 +118,65 @@ if (
     );
 }
 
+if (
+    !Number.isInteger(
+        configuracoesContaRateLimitJanelaMs
+    )
+    || configuracoesContaRateLimitJanelaMs <= 0
+) {
+    throw new Error(
+        'CONFIGURACOES_CONTA_RATE_LIMIT_JANELA_MS deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(
+        configuracoesContaRateLimitMaximo
+    )
+    || configuracoesContaRateLimitMaximo <= 0
+) {
+    throw new Error(
+        'CONFIGURACOES_CONTA_RATE_LIMIT_MAXIMO deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(
+        alteracaoSenhaRateLimitJanelaMs
+    )
+    || alteracaoSenhaRateLimitJanelaMs <= 0
+) {
+    throw new Error(
+        'ALTERACAO_SENHA_RATE_LIMIT_JANELA_MS deve ser um inteiro positivo.'
+    );
+}
+
+if (
+    !Number.isInteger(
+        alteracaoSenhaRateLimitMaximo
+    )
+    || alteracaoSenhaRateLimitMaximo <= 0
+) {
+    throw new Error(
+        'ALTERACAO_SENHA_RATE_LIMIT_MAXIMO deve ser um inteiro positivo.'
+    );
+}
+
 const env = {
-    port: Number(process.env.PORT || 3000), //define a porta onde a api vai rodar
+    port: Number(process.env.PORT || 3000),
+
     cadastroRateLimitJanelaMs,
     cadastroRateLimitMaximo,
+
     emailRateLimitJanelaMs,
     emailRateLimitMaximo,
+
+    configuracoesContaRateLimitJanelaMs,
+    configuracoesContaRateLimitMaximo,
+
+    alteracaoSenhaRateLimitJanelaMs,
+    alteracaoSenhaRateLimitMaximo,
+
     jwtSecret: obterVariavelObrigatoria('JWT_SECRET'), //a chave para criar a sessão do usuário
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '90d', // O token de login gerado dura 90 dias
 
