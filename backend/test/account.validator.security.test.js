@@ -283,3 +283,57 @@ test(
         assert.equal(resultado.valido, true)
     }
 )
+
+//A alteração de e-mail exige nova confirmação da identidade do usuário
+test(
+    'exige senha atual quando o e-mail é informado',
+    function () {
+        const validator = criarValidator()
+
+        const resultado =
+            validator.validarAtualizacao({
+                email:
+                    'novo@email.com'
+            })
+
+        assert.equal(resultado.valido, false)
+
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo
+                    === 'senhaAtual'
+            ),
+            true
+        )
+    }
+)
+
+//A senha atual é aceita apenas como confirmação e não como dado cadastral
+test(
+    'aceita alteração de e-mail com senha atual informada',
+    function () {
+        const validator = criarValidator()
+
+        const resultado =
+            validator.validarAtualizacao({
+                email:
+                    'novo@email.com',
+
+                senhaAtual:
+                    'senha atual correta'
+            })
+
+        assert.equal(resultado.valido, true)
+
+        assert.equal(
+            resultado.dados.email,
+            'novo@email.com'
+        )
+
+        assert.equal(
+            resultado.dados.senhaAtual,
+            'senha atual correta'
+        )
+    }
+)
