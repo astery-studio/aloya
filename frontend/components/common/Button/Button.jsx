@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { cores } from '../../../theme';
-import { estilos, tamanhos, variantes } from './styles';
+import { estilos, tamanhos, variantes } from './Button.styles';
 
 export default function Button({
     texto,
