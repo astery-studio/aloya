@@ -144,8 +144,7 @@ test(
             service.atualizarConfiguracoes(
                 1,
                 {
-                    email:'existente@email.com',
-                    senhaAtual: 'senha atual correta'
+                    email:'existente@email.com'
                 }
             ),
 
