@@ -187,11 +187,6 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
         }
 
         if (alteracoes.email !== undefined) {
-            await validarSenhaAlteracaoEmail(
-                usuarioId,
-                dados.senhaAtual
-            )
-
             await verificarEmailDisponivel(
                 usuarioId,
                 alteracoes.email
