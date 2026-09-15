@@ -111,7 +111,7 @@ const variantes = {
 
     tracejado: {
         container: {
-            borderColor: '#C8C4BA',
+            borderColor: cores.neutras.bordaTracejada,
             borderStyle: 'dashed',
             borderWidth: 1.41
         },
