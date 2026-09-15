@@ -165,6 +165,12 @@ test(
                 }
             }
 
+            async function updateMany() {
+                return {
+                    count: 1
+                }
+            }
+
         const service = criarService({
             prisma
         })
