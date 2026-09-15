@@ -135,7 +135,9 @@ test(
 
         const service = criarAccountService({
             prisma,
-            passwordService: {},
+            passwordService: { 
+                async compararSenha() { return true }
+            },
             parentalConsentService: {},
             dateUtils
         })
