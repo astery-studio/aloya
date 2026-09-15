@@ -39,30 +39,28 @@ test(
         function alterarSenha() {}
         function limiteConfiguracoes() {}
         function limiteSenha() {}
+        
+        criarAccountRoutes({
+            Router: function criarRouterMock() {
+                return router
+            },
 
-        try {
-            criarAccountRoutes({
-                Router: function criarRouterMock() {
-                    return router
-                },
+            accountController: {
+                buscarConfiguracoes,
+                atualizarConfiguracoes,
+                alterarSenha
+            },
 
-                accountController: {
-                    buscarConfiguracoes,
-                    atualizarConfiguracoes,
-                    alterarSenha
-                },
+            authMiddleware: {
+                autenticar
+            },
 
-                authMiddleware: {
-                    autenticar
-                },
+            configuracoesContaRateLimit:
+                limiteConfiguracoes,
 
-                configuracoesContaRateLimit:
-                    limiteConfiguracoes,
-
-                alteracaoSenhaRateLimit:
-                    limiteSenha
-            })
-        }
+            alteracaoSenhaRateLimit:
+                limiteSenha
+        })
 
         assert.equal(
             chamadas[0][0],
