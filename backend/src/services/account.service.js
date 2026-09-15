@@ -347,6 +347,22 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
                     senhaHash: true
                 }
             })
+        
+        //A sessão atual precisa ser conhecida para que ela possa ser preservada com segurança
+        if (
+            !Number.isInteger(sessaoId)
+            || sessaoId <= 0
+        ) {
+            const erro = new Error(
+                'A sessão atual é inválida.'
+            )
+
+            erro.status = 401
+            erro.codigo =
+                'SESSAO_ATUAL_INVALIDA'
+
+            throw erro
+        }
 
         if (!usuario) {
             throw criarErroContaNaoEncontrada()
