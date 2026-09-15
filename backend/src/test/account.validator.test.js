@@ -2,8 +2,8 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { criarAccountValidator } = require('../src/validators/account.validator')
-const dateUtils = require('../src/utils/date.utils')
+const { criarAccountValidator } = require('../validators/account.validator');
+const dateUtils = require('../utils/date.utils');
 
 //Funcao para criar um mock do validator de conta
 function criarValidator() {
