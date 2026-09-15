@@ -12,7 +12,9 @@ const dateUtils = require('../utils/date.utils');
 const {
     criarCadastroRateLimit,
     criarEmailRateLimit,
-    criarLoginRateLimit
+    criarLoginRateLimit,
+    criarConfiguracoesContaRateLimit,
+    criarAlteracaoSenhaRateLimit
 } = require('../middlewares/rateLimit.middleware');
 
 const {
@@ -36,6 +38,10 @@ const {
 } = require('../services/auth.service');
 
 const {
+    criarAccountService
+} = require('../services/account.service');
+
+const {
     criarAuthValidator
 } = require('../validators/auth.validator');
 
@@ -44,8 +50,16 @@ const {
 } = require('../validators/parentalConsent.validator');
 
 const {
+    criarAccountValidator
+} = require('../validators/account.validator');
+
+const {
     criarAuthController
 } = require('../controllers/auth.controller');
+
+const {
+    criarAccountController
+} = require('../controllers/account.controller');
 
 const {
     criarAuthMiddleware
@@ -101,7 +115,18 @@ function criarContainer() {
         dateUtils
     });
 
+    const accountService = criarAccountService({
+        prisma,
+        passwordService,
+        parentalConsentService,
+        dateUtils
+    });
+
     const authValidator = criarAuthValidator({
+        dateUtils
+    });
+
+    const accountValidator = criarAccountValidator({
         dateUtils
     });
 
@@ -136,11 +161,39 @@ function criarContainer() {
         limite: env.emailRateLimitMaximo
     });
 
+    const configuracoesContaRateLimit =
+    criarConfiguracoesContaRateLimit({
+        rateLimit,
+
+        janelaMs:
+            env.configuracoesContaRateLimitJanelaMs,
+
+        limite:
+            env.configuracoesContaRateLimitMaximo
+    });
+
+    const alteracaoSenhaRateLimit =
+        criarAlteracaoSenhaRateLimit({
+            rateLimit,
+
+            janelaMs:
+                env.alteracaoSenhaRateLimitJanelaMs,
+
+            limite:
+                env.alteracaoSenhaRateLimitMaximo
+        });
+
     const authController = criarAuthController({
         authService,
         authValidator,
         parentalConsentService,
         parentalConsentValidator
+    });
+
+    const accountController =
+    criarAccountController({
+        accountService,
+        accountValidator
     });
 
     return {
@@ -149,7 +202,11 @@ function criarContainer() {
         parentalConsentMiddleware,
         cadastroRateLimit,
         emailRateLimit,
-        loginRateLimit
+        loginRateLimit,
+
+        accountController,
+        configuracoesContaRateLimit,
+        alteracaoSenhaRateLimit
     };
 }
 
