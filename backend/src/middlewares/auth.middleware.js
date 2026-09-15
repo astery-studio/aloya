@@ -58,6 +58,8 @@ function criarAuthMiddleware({
                 },
 
                 select: {
+                    id: true,
+
                     usuario: {
                         select: {
                             id: true,
