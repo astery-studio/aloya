@@ -2,7 +2,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { criarAccountRoutes } = require('../src/routes/account.routes')
+const { criarAccountRoutes } = require('../routes/account.routes')
 
 //Testes para as rotas de conta
 test(
