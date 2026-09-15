@@ -108,60 +108,6 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
         }
     }
 
-    //Confirma a senha atual antes de permitir a alteração do e-mail
-    async function validarSenhaAlteracaoEmail(
-        usuarioId,
-        senhaAtual
-    ) {
-        if (
-            typeof senhaAtual !== 'string'
-            || senhaAtual.length === 0
-        ) {
-            const erro = new Error(
-                'Informe sua senha atual para alterar o e-mail.'
-            )
-
-            erro.status = 422
-            erro.codigo =
-                'SENHA_ATUAL_NECESSARIA'
-
-            throw erro
-        }
-
-        const credenciais =
-            await prisma.usuario.findUnique({
-                where: {
-                    id: usuarioId
-                },
-
-                select: {
-                    senhaHash: true
-                }
-            })
-
-        if (!credenciais) {
-            throw criarErroContaNaoEncontrada()
-        }
-
-        const senhaAtualCorreta =
-            await passwordService.compararSenha(
-                senhaAtual,
-                credenciais.senhaHash
-            )
-
-        if (!senhaAtualCorreta) {
-            const erro = new Error(
-                'A senha atual está incorreta.'
-            )
-
-            erro.status = 401
-            erro.codigo =
-                'SENHA_ATUAL_INCORRETA'
-
-            throw erro
-        }
-    }
-
     // Função para identificar as alterações feitas nas configurações do usuário
     function identificarAlteracoes(
         usuarioAtual,
