@@ -498,13 +498,37 @@ function criarParentalConsentService({
         };
     }
 
+    // Revoga o consentimento anterior quando uma correção da data de nascimento torna a titular menor de 16 anos.
+    async function reativarAposCorrecaoNascimento(
+        tx,
+        titularMenorId
+    ) {
+        await tx.consentimentoParental.updateMany({
+            where: {
+                titularMenorId,
+
+                statusConsentimento: {
+                    in: [
+                        'pendente',
+                        'liberado'
+                    ]
+                }
+            },
+
+            data: {
+                statusConsentimento: 'revogado'
+            }
+        });
+    }
+
     return {
         criarPendente,
         enviarEmail,
         solicitar,
         reenviar,
         confirmar,
-        verificarAcessoRedeApoio
+        verificarAcessoRedeApoio,
+        reativarAposCorrecaoNascimento
     };
 }
 
