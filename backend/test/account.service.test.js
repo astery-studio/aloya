@@ -171,12 +171,14 @@ test(
             })
         )
 
-        prisma.usuario.update =
+            prisma.usuario.updateMany =
             async function atualizar({ data }) {
                 senhaHashPersistida =
-                    data.senhaHash;
+                    data.senhaHash
 
-                return criarUsuario();
+                return {
+                    count: 1
+                }
             }
 
             async function updateMany() {
