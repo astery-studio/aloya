@@ -92,8 +92,93 @@ function criarLoginRateLimit({
     });
 }
 
+// Limita alterações dos dados da conta por usuário autenticado.
+function criarConfiguracoesContaRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+
+        // A rota é executada depois da autenticação.
+        // Assim, o limite é individual por conta.
+        keyGenerator: (req) =>
+            `usuario:${req.usuario.id}`,
+
+        handler: (req, res) => {
+            logger.warn({
+                evento:
+                    'limite_alteracoes_configuracoes_conta',
+
+                usuarioId: req.usuario.id,
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+
+            return res.status(429).json({
+                erro: {
+                    codigo:
+                        'LIMITE_ALTERACOES_CONTA',
+
+                    mensagem:
+                        'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
+// Limita tentativas malsucedidas de alteração de senha.
+function criarAlteracaoSenhaRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+
+        // Tentativas bem-sucedidas não ocupam o limite.
+        skipSuccessfulRequests: true,
+
+        keyGenerator: (req) =>
+            `usuario:${req.usuario.id}`,
+
+        handler: (req, res) => {
+            logger.warn({
+                evento:
+                    'limite_tentativas_alteracao_senha',
+
+                usuarioId: req.usuario.id,
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+
+            return res.status(429).json({
+                erro: {
+                    codigo:
+                        'LIMITE_ALTERACAO_SENHA',
+
+                    mensagem:
+                        'Muitas tentativas de alteração de senha. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
 module.exports = {
     criarCadastroRateLimit,
     criarEmailRateLimit,
-    criarLoginRateLimit
+    criarLoginRateLimit,
+    criarConfiguracoesContaRateLimit,
+    criarAlteracaoSenhaRateLimit
 };
