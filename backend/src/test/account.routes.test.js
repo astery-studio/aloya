@@ -40,15 +40,12 @@ test(
         function limiteConfiguracoes() {}
         function limiteSenha() {}
 
-        const express = require('express')
-        const routerOriginal = express.Router
-
-        express.Router = function criarRouterMock() {
-            return router
-        }
-
         try {
             criarAccountRoutes({
+                Router: function criarRouterMock() {
+                    return router
+                },
+
                 accountController: {
                     buscarConfiguracoes,
                     atualizarConfiguracoes,
@@ -65,8 +62,6 @@ test(
                 alteracaoSenhaRateLimit:
                     limiteSenha
             })
-        } finally {
-            express.Router = routerOriginal
         }
 
         assert.equal(
