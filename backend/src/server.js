@@ -9,6 +9,10 @@ const {
 } = require('./routes/auth.routes');
 
 const {
+    criarAccountRoutes
+} = require('./routes/account.routes');
+
+const {
     rotaNaoEncontrada,
     tratarErros
 } = require('./middlewares/error.middleware');
@@ -35,6 +39,17 @@ app.use(
         cadastroRateLimit: container.cadastroRateLimit,
         emailRateLimit: container.emailRateLimit,
         loginRateLimit: container.loginRateLimit
+    })
+);
+
+app.use(
+    '/users',
+    criarAccountRoutes({
+        Router: express.Router,
+        accountController: container.accountController,
+        authMiddleware: container.authMiddleware,
+        configuracoesContaRateLimit: container.configuracoesContaRateLimit,
+        alteracaoSenhaRateLimit: container.alteracaoSenhaRateLimit
     })
 );
 
