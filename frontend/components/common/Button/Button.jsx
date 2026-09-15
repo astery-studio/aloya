@@ -1,4 +1,4 @@
-import { Pressable, Text } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { cores } from '../../../theme';
 import { estilos, tamanhos, variantes } from './styles';
 
@@ -9,6 +9,9 @@ export default function Button({
     tamanho = 'grande',
     largura = '100%',
     desativado = false,
+    carregando = false,
+    icone: Icone,
+    posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
     estilo
 }) {
@@ -18,16 +21,64 @@ export default function Button({
     const varianteAtual =
         variantes[variante] || variantes.laranja;
 
-    const corTexto = desativado
+    const bloqueado =
+        desativado || carregando;
+
+    const corConteudo = desativado
         ? cores.neutras.textoSecundarioClaro
         : varianteAtual.texto.color;
+
+    function renderizarConteudo() {
+        if (carregando) {
+            return (
+                <ActivityIndicator
+                    color={corConteudo}
+                />
+            );
+        }
+
+        return (
+            <View style={estilos.conteudo}>
+                {Icone && posicaoIcone === 'esquerda' && (
+                    <Icone
+                        color={corConteudo}
+                        size={18}
+                    />
+                )}
+
+                <Text
+                    numberOfLines={1}
+                    style={[
+                        estilos.texto,
+                        tamanhoAtual.texto,
+                        varianteAtual.texto,
+                        desativado && {
+                            color: corConteudo
+                        }
+                    ]}
+                >
+                    {texto}
+                </Text>
+
+                {Icone && posicaoIcone === 'direita' && (
+                    <Icone
+                        color={corConteudo}
+                        size={18}
+                    />
+                )}
+            </View>
+        );
+    }
 
     return (
         <Pressable
             accessibilityLabel={rotuloAcessibilidade || texto}
             accessibilityRole="button"
-            accessibilityState={{ disabled: desativado }}
-            disabled={desativado}
+            accessibilityState={{
+                disabled: bloqueado,
+                busy: carregando
+            }}
+            disabled={bloqueado}
             onPress={aoPressionar}
             style={({ pressed }) => [
                 estilos.container,
@@ -39,17 +90,7 @@ export default function Button({
                 estilo
             ]}
         >
-            <Text
-                numberOfLines={1}
-                style={[
-                    estilos.texto,
-                    tamanhoAtual.texto,
-                    varianteAtual.texto,
-                    desativado && { color: corTexto }
-                ]}
-            >
-                {texto}
-            </Text>
+            {renderizarConteudo()}
         </Pressable>
     );
 }
