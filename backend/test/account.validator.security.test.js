@@ -2,12 +2,8 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const {
-    criarAccountValidator
-} = require('../validators/account.validator')
-
-const dateUtils =
-    require('../utils/date.utils')
+const { criarAccountValidator } = require('../validators/account.validator')
+const dateUtils = require('../utils/date.utils')
 
 //Cria o validator com as mesmas dependências utilizadas pela aplicação
 function criarValidator() {
