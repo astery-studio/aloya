@@ -235,7 +235,10 @@ test(
                 1,
                 {
                     email:
-                        'novo@email.com'
+                        'novo@email.com',
+
+                    senhaAtual:
+                        'senha atual correta'
                 }
             ),
 
