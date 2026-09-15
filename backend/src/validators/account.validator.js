@@ -211,6 +211,38 @@ function criarAccountValidator({ dateUtils }) {
             )
         }
 
+        //Exige a senha atual quando o e-mail está presente na atualização
+        if (
+            email !== undefined
+            && (
+                senhaAtual === undefined
+                || senhaAtual.length === 0
+            )
+        ) {
+            erros.push(
+                erro(
+                    'senhaAtual',
+                    'Informe sua senha atual para alterar o e-mail.'
+                )
+            )
+        }
+
+        //Impede entradas maiores que o limite efetivo do bcrypt
+        if (
+            senhaAtual !== undefined
+            && Buffer.byteLength(
+                senhaAtual,
+                'utf8'
+            ) > 72
+        ) {
+            erros.push(
+                erro(
+                    'senhaAtual',
+                    'A senha atual ultrapassa o tamanho máximo permitido.'
+                )
+            )
+        }
+
         //validacao de identidade de genero
         if (
             identidadeGenero !== undefined
