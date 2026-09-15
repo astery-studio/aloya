@@ -28,12 +28,12 @@ test(
 
         assert.equal(
             resultado.dados.nome,
-            'Aloya Teste'
+            'Carla Cristina'
         )
 
         assert.equal(
             resultado.dados.email,
-            'aloya@email.com'
+            'carla@email.com'
         )
     }
 )
