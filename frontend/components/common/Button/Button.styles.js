@@ -9,6 +9,13 @@ const estilos = StyleSheet.create({
         borderRadius: radius.buttonAndInput
     },
 
+    conteudo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8
+    },
+
     texto: {
         textAlign: 'center'
     },
@@ -27,7 +34,11 @@ const estilos = StyleSheet.create({
 const tamanhos = {
     compacto: {
         container: { height: 52 },
-        texto: typography.bodyDefault
+        texto: {
+            ...typography.bodyDefault,
+            fontFamily: fontFamilies.medium,
+            fontWeight: '500'
+        }
     },
 
     grande: {
