@@ -178,4 +178,23 @@ Prisma
 PostgreSQL
 ```
 
+## HU-004 — Gerenciar configurações da conta
+
+As operações da HU-004 permitem consultar e alterar somente:
+
+- nome;
+- e-mail;
+- identidade de gênero;
+- data de nascimento;
+- senha.
+
+Nenhuma rota aceita `usuarioId`. A conta é identificada
+exclusivamente pela sessão autenticada.
+
+### Consultar configurações
+
+```http
+GET /users/me
+Authorization: Bearer <token>
+
 ---
