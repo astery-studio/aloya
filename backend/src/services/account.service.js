@@ -412,15 +412,31 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
         const outrasSessoesRevogadas =
             await prisma.$transaction(
                 async function salvarNovaSenha(tx) {
-                    await tx.usuario.update({
-                        where: {
-                            id: usuarioId
-                        },
+                    //Atualiza somente se a senha não tiver sido alterada por outra requisição
+                    const atualizacaoSenha =
+                        await tx.usuario.updateMany({
+                            where: {
+                                id: usuarioId,
+                                senhaHash:
+                                    usuario.senhaHash
+                            },
 
-                        data: {
-                            senhaHash
-                        }
-                    })
+                            data: {
+                                senhaHash
+                            }
+                        })
+
+                    if (atualizacaoSenha.count !== 1) {
+                        const erro = new Error(
+                            'A senha foi alterada por outra sessão. Entre novamente e repita a operação.'
+                        )
+
+                        erro.status = 409
+                        erro.codigo =
+                            'SENHA_ALTERADA_CONCORRENTEMENTE'
+
+                        throw erro
+                    }
 
                     //A sessão usada para alterar a senha permanece ativa. Todas as demais são  encerradas imediatamente.
                     const sessoes =
