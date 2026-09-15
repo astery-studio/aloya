@@ -3,8 +3,8 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { criarAccountService } = require('../services/account.service')
-const dateUtils = require('../utils/date.utils')
+const { criarAccountService } = require('../src/services/account.service')
+const dateUtils = require('../src/utils/date.utils')
 
 //Funcao para criar um usuário de teste com valores padrão, podendo sobrescrever com o objeto alteracoes
 function criarUsuario(alteracoes = {}) {
