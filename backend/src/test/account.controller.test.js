@@ -1,7 +1,7 @@
 //Este teste serve para testar o controller de conta, garantindo que as funcionalidades relacionadas à conta do usuário funcionem corretamente
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { criarAccountController } = require( '../src/controllers/account.controller')
+const { criarAccountController } = require('../controllers/account.controller')
 
 //Função para criar um mock de resposta HTTP
 function criarRespostaMock() {
