@@ -159,6 +159,16 @@ function criarAccountValidator({ dateUtils }) {
                     body.dataNascimento
                 )
 
+        const senhaAtual =
+            body.senhaAtual === undefined
+                ? undefined
+                : (
+                    typeof body.senhaAtual
+                        === 'string'
+                        ? body.senhaAtual
+                        : ''
+                )
+
         //validacao de nome
         if (
             nome !== undefined
