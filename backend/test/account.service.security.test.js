@@ -223,7 +223,11 @@ test(
             }
 
         const service = criarService({
-            prisma
+            prisma,
+
+            passwordService: {
+                async compararSenha() { return true }
+            }
         })
 
         await assert.rejects(
