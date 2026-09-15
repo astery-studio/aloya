@@ -2,6 +2,7 @@ const {Router} = require('express')
 
 //Funcao para criar as rotas de conta
 function criarAccountRoutes({
+    Router,
     accountController,
     authMiddleware,
     configuracoesContaRateLimit,
