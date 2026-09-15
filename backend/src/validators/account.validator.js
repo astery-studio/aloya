@@ -257,7 +257,8 @@ function criarAccountValidator({ dateUtils }) {
                 nome,
                 email,
                 identidadeGenero,
-                dataNascimento
+                dataNascimento,
+                senhaAtual
             }
         }
     }
