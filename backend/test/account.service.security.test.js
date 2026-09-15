@@ -230,11 +230,7 @@ test(
             service.atualizarConfiguracoes(
                 1,
                 {
-                    email:
-                        'novo@email.com',
-
-                    senhaAtual:
-                        'senha atual correta'
+                    email: 'novo@email.com'
                 }
             ),
 
