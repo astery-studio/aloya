@@ -2,7 +2,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { criarConfiguracoesContaRateLimit, criarAlteracaoSenhaRateLimit } = require('../middlewares/rateLimit.middleware')
+const { criarConfiguracoesContaRateLimit, criarAlteracaoSenhaRateLimit } = require('../src/middlewares/rateLimit.middleware')
 
 //Captura as opções enviadas ao express-rate-limit
 function criarRateLimitMock() {
