@@ -13,13 +13,6 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                 estilos.areaTitulo,
                 temVoltar && estilos.areaTituloComVoltar
             ]}>
-                <Text
-                    style={estilos.titulo}
-                    numberOfLines={1}
-                    accessibilityRole="header"
-                >
-                    {titulo}
-                </Text>
 
                 {temVoltar ? (
                     <Pressable
@@ -45,6 +38,14 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                 {temVoltar ? (
                     <View style={estilos.espacamentoFinal} />
                 ) : null}
+
+                <Text
+                    style={estilos.titulo}
+                    numberOfLines={1}
+                    accessibilityRole="header"
+                >
+                    {titulo}
+                </Text>
             </View>
         </View>
     )

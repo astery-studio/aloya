@@ -1,4 +1,5 @@
 import { Text, View } from 'react-native';
+import { Header } from './components/navigation/Header/Header';
 
 function testarVoltar() {
     Alert.alert('Teste', 'Voltar funcionou.')
@@ -30,7 +31,7 @@ export default function App() {
             <Header titulo="Configurações" variante="padrao" />
 
             <Header
-                titulo="Meu perfil"
+                titulo="Configurações de Perfil"
                 variante="comVoltar"
                 onVoltar={testarVoltar}
             />
