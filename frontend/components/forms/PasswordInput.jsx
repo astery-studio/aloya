@@ -1,0 +1,36 @@
+import { useState } from 'react';
+import { Pressable } from 'react-native';
+import { Eye, EyeSlash } from 'phosphor-react-native';
+import { cores } from '../../theme';
+import TextInput from './TextInput';
+import { estilos } from './TextInput.styles';
+
+export default function PasswordInput({
+    label = 'Senha', placeholder = label, desativado = false, ...props
+}) {
+    const [visivel, definirVisivel] = useState(false);
+    const Icone = visivel ? Eye : EyeSlash;
+
+    return (
+        <TextInput
+            label={label}
+            placeholder={placeholder}
+            desativado={desativado}
+            secureTextEntry={!visivel}
+            autoCapitalize="none"
+            autoCorrect={false}
+            acaoDireita={
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={visivel ? 'Ocultar senha' : 'Mostrar senha'}
+                    disabled={desativado}
+                    onPress={() => definirVisivel(!visivel)}
+                    style={estilos.acao}
+                >
+                    <Icone size={22} color={cores.neutras.textoSecundarioClaro} />
+                </Pressable>
+            }
+            {...props}
+        />
+    );
+}
