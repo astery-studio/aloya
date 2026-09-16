@@ -175,10 +175,10 @@ function criarAlteracaoSenhaRateLimit({
     });
 }
 
-module.exports = {
+export {
     criarCadastroRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit,
     criarConfiguracoesContaRateLimit,
     criarAlteracaoSenhaRateLimit
-};
+}
