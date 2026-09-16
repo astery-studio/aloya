@@ -1,5 +1,5 @@
 // Puxa as senhas do seu arquivo oculto (.env)
-require('dotenv').config();
+import 'dotenv/config'
 
 //se faltar alguma variável crucial no .env, ela trava o servidor na hora e avisa qual faltou. (Evita que o app quebre de surpresa no meio do uso)
 function obterVariavelObrigatoria(nome) {
@@ -202,4 +202,4 @@ if (Buffer.byteLength(env.jwtSecret, 'utf8') < 32) {
     throw new Error('JWT_SECRET deve possuir pelo menos 32 caracteres.');
 }
 
-module.exports = { env };
+export { env }
