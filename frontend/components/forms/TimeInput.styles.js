@@ -10,8 +10,10 @@ const estilos = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', gap: 12,
         paddingLeft: 15, paddingRight: 16
     },
-    texto: { ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro },
-    placeholder: { color: cores.neutras.textoSecundarioClaro },
+    entrada: {
+        ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro,
+        flex: 1, padding: 0
+    },
     remover: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
     pressionado: { opacity: 0.65, transform: [{ scale: 0.98 }] },
     desativado: { opacity: 0.55 }
