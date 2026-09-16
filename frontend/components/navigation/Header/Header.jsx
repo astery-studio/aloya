@@ -39,6 +39,10 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                     <View style={estilos.espacamentoFinal} />
                 ) : null}
 
+                {temVoltar ? (
+                    <View style={estilos.espacamentoInicial} />
+                ) : null}
+
                 <Text
                     style={[
                         estilos.titulo,
