@@ -33,7 +33,11 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                         style={estilos.containerVoltar}
                     >
 
-                        <ArrowLeftIcon style={estilos.iconeVoltar} />
+                        <ArrowLeftIcon
+                            size={24}
+                            color={corIconeVoltar}
+                            weight="regular"
+                        />
 
                     </Pressable>
                 ) : null}
