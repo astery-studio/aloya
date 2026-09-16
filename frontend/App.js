@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native'
 import { Header } from './components/navigation/Header/Header';
 
 function testarVoltar() {
@@ -26,7 +26,7 @@ export default function App() {
     }
 
     return (
-        <View backgroundColor="#F7F5F0">
+        <View style={{ backgroundColor: '#F7F5F0' }}>
             <Text>ALOYA</Text>
             <Header titulo="Configurações" variante="padrao"/>
 
