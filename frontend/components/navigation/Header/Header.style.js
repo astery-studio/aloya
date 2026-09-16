@@ -22,7 +22,8 @@ const estilos = StyleSheet.create({
     areaTituloComVoltar: {
         minHeight: 80,
         alignItems: 'center',
-        paddingBottom: 32
+        paddingBottom: 32,
+        paddingRight: tema.espacamentosLayout.margemHorizontalTela + 48
     },
 
     tituloComVoltar: {
@@ -45,14 +46,6 @@ const estilos = StyleSheet.create({
         height: 48,
         alignItems: 'center',
         justifyContent: 'center'
-    },
-
-    espacamentoFinal: {
-        width: 40
-    },
-
-    espacamentoInicial: {
-        width: 88
     }
 })
 
