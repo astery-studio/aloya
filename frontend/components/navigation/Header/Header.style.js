@@ -21,7 +21,7 @@ const estilos = StyleSheet.create({
 
     areaTituloComVoltar: {
         minHeight: 80,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingBottom: 32
     },
 
