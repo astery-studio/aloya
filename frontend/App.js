@@ -1,38 +1,28 @@
-import { Alert, ScrollView, Text } from 'react-native'
-import { Header } from './components/navigation/Header/Header'
+import { Text, View } from 'react-native';
 
-function testarVoltar() {
-    Alert.alert('Teste', 'O botão Voltar funcionou.')
-}
+import {
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+    useFonts
+} from '@expo-google-fonts/dm-sans';
 
 export default function App() {
+    const [fontsLoaded] = useFonts({
+        DMSans_400Regular,
+        DMSans_500Medium,
+        DMSans_600SemiBold,
+        DMSans_700Bold
+    });
+
+    if (!fontsLoaded) {
+        return null;
+    }
+
     return (
-        <ScrollView>
-            <Text>1. Variante padrão</Text>
-            <Header
-                titulo="Configurações"
-                variante="padrao"
-            />
-
-            <Text>2. Variante com voltar</Text>
-            <Header
-                titulo="Meu perfil"
-                variante="comVoltar"
-                onVoltar={testarVoltar}
-            />
-
-            <Text>3. Título longo em tela estreita</Text>
-            <Header
-                titulo="Configurações e informações da conta"
-                variante="comVoltar"
-                onVoltar={testarVoltar}
-            />
-
-            <Text>4. Sem ação de voltar</Text>
-            <Header
-                titulo="Minha conta"
-                variante="comVoltar"
-            />
-        </ScrollView>
-    )
+        <View>
+            <Text>ALOYA</Text>
+        </View>
+    );
 }
