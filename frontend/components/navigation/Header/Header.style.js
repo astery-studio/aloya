@@ -20,14 +20,14 @@ const estilos = StyleSheet.create({
     },
 
     areaTituloComVoltar: {
-        height: 64,
         minHeight: 64,
-        alignItems: 'center',
-        paddingBottom: 16
+        alignItems: 'flex-start',
+        paddingBottom: 32
     },
 
     titulo: {
         flex: 1,
+        flexShrink: 1,
         ...tema.typography.h1,
         color: tema.cores.neutras.textoPrincipalClaro
     },
