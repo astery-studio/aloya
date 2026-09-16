@@ -1,8 +1,7 @@
 //Este arquivo registra proteções críticas que ainda precisam ser implementadas no service de conta
-const test = require('node:test')
-const assert = require('node:assert/strict')
-
-const { criarAccountService } = require('../src/services/account.service')
+import test from 'node:test.js'
+import assert from 'node:assert/strict.js'
+import { criarAccountService } from '../src/services/account.service.js'
 
 const dateUtils = require('../src/utils/date.utils')
 
