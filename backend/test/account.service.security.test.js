@@ -1,8 +1,9 @@
 //Este arquivo testa as regras críticas de segurança do service de conta
 import test from 'node:test'
 import assert from 'node:assert/strict'
+
 import { criarAccountService } from '../src/services/account.service.js'
-import dateUtils from '../src/utils/date.utils.js'
+import * as dateUtils from '../src/utils/date.utils.js'
 
 //Cria uma usuária padrão para os testes
 function criarUsuario(alteracoes = {}) {
