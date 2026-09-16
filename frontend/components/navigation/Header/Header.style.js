@@ -3,35 +3,55 @@ import { tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
     container: {
-        minHeight: 56,
+        width: '100%'
+    },
+
+    espacamentoSuperior: {
+        height: 56
+    },
+
+    areaTitulo: {
+        minHeight: 66,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         paddingHorizontal:
-            tema.espacamentosLayout.margemHorizontalTela
+            tema.espacamentosLayout.margemHorizontalTela,
+        paddingBottom: 32
     },
 
-    lateral: {
-        width: 44
-    },
-
-    botaoVoltar: {
-        width: 44,
-        height: 44,
+    areaTituloComVoltar: {
+        height: 64,
+        minHeight: 64,
         alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    seta: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontSize: 26
+        paddingBottom: 16
     },
 
     titulo: {
         flex: 1,
         color: tema.cores.neutras.textoPrincipalClaro,
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 28,
+        fontWeight: '700',
+        lineHeight: 34
+    },
+
+    containerVoltar: {
+        width: 48,
+        height: 48,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    iconeVoltar: {
+        width: 32,
+        height: 32,
+        color: tema.cores.neutras.textoPrincipalClaro,
+        fontSize: 24,
+        lineHeight: 32,
         textAlign: 'center'
+    },
+
+    espacamentoFinal: {
+        width: 40
     }
 })
 
