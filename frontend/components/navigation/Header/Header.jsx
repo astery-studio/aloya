@@ -24,16 +24,6 @@ function Header({
                     temVoltar && estilos.areaTituloComVoltar
                 ]}
             >
-                <Text
-                    style={[
-                        estilos.titulo,
-                        temVoltar && estilos.tituloComVoltar
-                    ]}
-                    accessibilityRole="header"
-                >
-                    {titulo}
-                </Text>
-
                 {temVoltar ? (
                     <Pressable
                         onPress={onVoltar}
@@ -52,6 +42,16 @@ function Header({
                         />
                     </Pressable>
                 ) : null}
+
+                <Text
+                    style={[
+                        estilos.titulo,
+                        temVoltar && estilos.tituloComVoltar
+                    ]}
+                    accessibilityRole="header"
+                >
+                    {titulo}
+                </Text>
             </View>
         </View>
     )
