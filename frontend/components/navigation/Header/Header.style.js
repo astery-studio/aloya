@@ -25,9 +25,9 @@ const estilos = StyleSheet.create({
     areaTituloComVoltar: {
         minHeight: 72,
         alignItems: 'center',
-        paddingTop: 8,
-        paddingBottom: 32,
-        paddingHorizontal: 60
+        paddingLeft: 12,
+        paddingRight: 60,
+        paddingBottom: 24
     },
 
     titulo: {
@@ -46,10 +46,6 @@ const estilos = StyleSheet.create({
     },
 
     containerVoltar: {
-        position: 'absolute',
-        left: 12,
-        top: '50%',
-        transform: [{ translateY: -36 }],
         width: 48,
         height: 48,
         alignItems: 'center',
