@@ -30,6 +30,13 @@ test(
                     'patch',
                     ...argumentos
                 ])
+            },
+
+            delete(...argumentos) {
+                chamadas.push([
+                    'delete',
+                    ...argumentos
+                ])
             }
         }
 
@@ -39,6 +46,8 @@ test(
         function alterarSenha() {}
         function limiteConfiguracoes() {}
         function limiteSenha() {}
+        function excluirConta() {}
+        function limiteExclusao() {}
         
         criarAccountRoutes({
             Router: function criarRouterMock() {
@@ -59,8 +68,15 @@ test(
                 limiteConfiguracoes,
 
             alteracaoSenhaRateLimit:
-                limiteSenha
-        })
+                limiteSenha,
+
+            accountDeletionController: {
+                excluirConta
+            },
+
+            exclusaoContaRateLimit:
+                limiteExclusao
+            })
 
         assert.equal(
             chamadas[0][0],
