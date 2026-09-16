@@ -40,8 +40,10 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                 ) : null}
 
                 <Text
-                    style={estilos.titulo}
-                    numberOfLines={1}
+                    style={[
+                        estilos.titulo,
+                        temVoltar && estilos.tituloComVoltar
+                    ]}
                     accessibilityRole="header"
                 >
                     {titulo}
