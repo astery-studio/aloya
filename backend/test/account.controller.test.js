@@ -1,7 +1,8 @@
 //Este teste serve para testar o controller de conta, garantindo que as funcionalidades relacionadas à conta do usuário funcionem corretamente
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import {criarAccountController} from '../src/controllers/account.controller.js'
+
+import { criarAccountController } from '../src/controllers/account.controller.js'
 
 //Função para criar um mock de resposta HTTP
 function criarRespostaMock() {
