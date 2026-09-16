@@ -1,10 +1,8 @@
 //Este arquivo testa as regras críticas de segurança do service de conta
-const test = require('node:test')
-const assert = require('node:assert/strict')
-
-const { criarAccountService } = require('../src/services/account.service')
-
-const dateUtils = require('../src/utils/date.utils')
+import test from 'node:test.js'
+import assert from 'node:assert/strict.js'
+import { criarAccountService } from '../src/services/account.service.js'
+import dateUtils from '../src/utils/date.utils.js'
 
 //Cria uma usuária padrão para os testes
 function criarUsuario(alteracoes = {}) {
