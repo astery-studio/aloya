@@ -1,5 +1,3 @@
-const {Router} = require('express')
-
 //Funcao para criar as rotas de conta
 function criarAccountRoutes({
     Router,
@@ -39,4 +37,4 @@ function criarAccountRoutes({
     return router
 }
 
-module.exports = {criarAccountRoutes}
+export { criarAccountRoutes }
