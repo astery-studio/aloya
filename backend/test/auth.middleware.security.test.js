@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-const { criarAuthMiddleware } = require('../src/middlewares/auth.middleware')
+import { criarAuthMiddleware } from '../src/middlewares/auth.middleware.js'
 
 //Executa o middleware e captura o valor enviado para next
 async function executarMiddleware({
