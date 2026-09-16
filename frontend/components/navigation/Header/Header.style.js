@@ -28,10 +28,8 @@ const estilos = StyleSheet.create({
 
     titulo: {
         flex: 1,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontSize: 28,
-        fontWeight: '700',
-        lineHeight: 34
+        ...tema.typography.h1,
+        color: tema.cores.neutras.textoPrincipalClaro
     },
 
     containerVoltar: {
@@ -39,15 +37,6 @@ const estilos = StyleSheet.create({
         height: 48,
         alignItems: 'center',
         justifyContent: 'center'
-    },
-
-    iconeVoltar: {
-        width: 32,
-        height: 32,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontSize: 24,
-        lineHeight: 32,
-        textAlign: 'center'
     },
 
     espacamentoFinal: {
