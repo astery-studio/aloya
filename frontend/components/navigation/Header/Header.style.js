@@ -29,7 +29,8 @@ const estilos = StyleSheet.create({
         fontFamily: fontFamilies.bold,
         fontSize: 18,
         fontWeight: '700',
-        lineHeight: 27
+        lineHeight: 27,
+        textAlign: 'center'
     },
 
     titulo: {
