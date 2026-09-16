@@ -429,6 +429,4 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
     }
 }
 
-module.exports = {
-    criarAccountService
-}
+export { criarAccountService }
