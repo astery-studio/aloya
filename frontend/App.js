@@ -26,9 +26,9 @@ export default function App() {
     }
 
     return (
-        <View>
+        <View backgroundColor="#F7F5F0">
             <Text>ALOYA</Text>
-            <Header titulo="Configurações" variante="padrao" />
+            <Header titulo="Configurações" variante="padrao"/>
 
             <Header
                 titulo="Configurações de Perfil"
