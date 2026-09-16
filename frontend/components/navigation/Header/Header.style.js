@@ -48,6 +48,10 @@ const estilos = StyleSheet.create({
 
     espacamentoFinal: {
         width: 40
+    },
+
+    espacamentoInicial: {
+        width: 88
     }
 })
 
