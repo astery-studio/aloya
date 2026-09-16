@@ -18,69 +18,27 @@ import {
     criarExclusaoContaRateLimit
 } from '../middlewares/rateLimit.middleware.js'
 
-import {
-    criarPasswordService
-} from '../services/password.service.js'
+import {criarPasswordService} from '../services/password.service.js'
+import {criarTokenService} from '../services/token.service.js'
+import {criarEmailService} from '../services/email.service.js'
+import {criarParentalConsentService} from '../services/parentalConsent.service.js'
+import {criarAuthService} from '../services/auth.service.js'
+import {criarAccountService} from '../services/account.service.js'
+import {criarAccountDeletionService} from '../services/accountDeletion.service.js'
+import {criarLogoutService} from '../services/logout.service.js'
 
-import {
-    criarTokenService
-} from '../services/token.service.js'
+import {criarAuthValidator} from '../validators/auth.validator.js'
+import {criarParentalConsentValidator} from '../validators/parentalConsent.validator.js'
+import {criarAccountValidator} from '../validators/account.validator.js'
+import {criarAccountDeletionValidator} from '../validators/accountDeletion.validator.js'
 
-import {
-    criarEmailService
-} from '../services/email.service.js'
+import {criarAuthController} from '../controllers/auth.controller.js'
+import {criarAccountController} from '../controllers/account.controller.js'
+import {criarAccountDeletionController} from '../controllers/accountDeletion.controller.js'
+import {criarLogoutController} from '../controllers/logout.controller.js'
 
-import {
-    criarParentalConsentService
-} from '../services/parentalConsent.service.js'
-
-import {
-    criarAuthService
-} from '../services/auth.service.js'
-
-import {
-    criarAccountService
-} from '../services/account.service.js'
-
-import {
-    criarAccountDeletionService
-} from '../services/accountDeletion.service.js'
-
-import {
-    criarAuthValidator
-} from '../validators/auth.validator.js'
-
-import {
-    criarParentalConsentValidator
-} from '../validators/parentalConsent.validator.js'
-
-import {
-    criarAccountValidator
-} from '../validators/account.validator.js'
-
-import {
-    criarAccountDeletionValidator
-} from '../validators/accountDeletion.validator.js'
-
-import {
-    criarAuthController
-} from '../controllers/auth.controller.js'
-
-import {
-    criarAccountController
-} from '../controllers/account.controller.js'
-
-import {
-    criarAccountDeletionController
-} from '../controllers/accountDeletion.controller.js'
-
-import {
-    criarAuthMiddleware
-} from '../middlewares/auth.middleware.js'
-
-import {
-    criarParentalConsentMiddleware
-} from '../middlewares/parentalConsent.middleware.js'
+import {criarAuthMiddleware} from '../middlewares/auth.middleware.js'
+import {criarParentalConsentMiddleware} from '../middlewares/parentalConsent.middleware.js'
 
 function criarContainer() {
     const transporter = nodemailer.createTransport({
@@ -111,14 +69,13 @@ function criarContainer() {
         remetente: env.smtp.from
     });
 
-    const parentalConsentService =
-        criarParentalConsentService({
+    const parentalConsentService = criarParentalConsentService({
             prisma,
             emailService,
             crypto,
             baseUrl: env.parentalConsentBaseUrl,
             dateUtils
-        });
+    });
 
     const authService = criarAuthService({
         prisma,
@@ -140,28 +97,24 @@ function criarContainer() {
         passwordService
     })
 
-    const authValidator = criarAuthValidator({
-        dateUtils
-    });
+    const authValidator = criarAuthValidator({dateUtils});
 
-    const accountValidator = criarAccountValidator({
-        dateUtils
-    });
+    const accountValidator = criarAccountValidator({dateUtils});
 
     const accountDeletionValidator = criarAccountDeletionValidator()
 
-    const parentalConsentValidator =
-        criarParentalConsentValidator();
+    const parentalConsentValidator = criarParentalConsentValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
         prisma
     });
 
-    const parentalConsentMiddleware =
-        criarParentalConsentMiddleware({
-            parentalConsentService
-        });
+    const logoutService = criarLogoutService({prisma})
+
+    const logoutController = criarLogoutController({logoutService})
+
+    const parentalConsentMiddleware = criarParentalConsentMiddleware({parentalConsentService});
 
     const cadastroRateLimit = criarCadastroRateLimit({
         rateLimit,
@@ -181,38 +134,24 @@ function criarContainer() {
         limite: env.emailRateLimitMaximo
     });
 
-    const configuracoesContaRateLimit =
-    criarConfiguracoesContaRateLimit({
+    const configuracoesContaRateLimit = criarConfiguracoesContaRateLimit({
         rateLimit,
-
-        janelaMs:
-            env.configuracoesContaRateLimitJanelaMs,
-
-        limite:
-            env.configuracoesContaRateLimitMaximo
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo
     });
 
-    const alteracaoSenhaRateLimit =
-        criarAlteracaoSenhaRateLimit({
+    const alteracaoSenhaRateLimit = criarAlteracaoSenhaRateLimit({
             rateLimit,
-
-            janelaMs:
-                env.alteracaoSenhaRateLimitJanelaMs,
-
-            limite:
-                env.alteracaoSenhaRateLimitMaximo
-        });
+            janelaMs: env.alteracaoSenhaRateLimitJanelaMs,
+            limite: env.alteracaoSenhaRateLimitMaximo
+    });
 
     //Reutiliza os limites configurados para tentativas com senha
     const exclusaoContaRateLimit = criarExclusaoContaRateLimit({
             rateLimit,
-
-            janelaMs:
-                env.alteracaoSenhaRateLimitJanelaMs,
-
-            limite:
-                env.alteracaoSenhaRateLimitMaximo
-        })
+            janelaMs: env.alteracaoSenhaRateLimitJanelaMs,
+            limite: env.alteracaoSenhaRateLimitMaximo
+    })
 
     const authController = criarAuthController({
         authService,
@@ -221,14 +160,12 @@ function criarContainer() {
         parentalConsentValidator
     });
 
-    const accountController =
-    criarAccountController({
+    const accountController = criarAccountController({
         accountService,
         accountValidator
     });
 
-    const accountDeletionController =
-    criarAccountDeletionController({
+    const accountDeletionController = criarAccountDeletionController({
         accountDeletionService,
         accountDeletionValidator
     })
@@ -246,7 +183,10 @@ function criarContainer() {
         alteracaoSenhaRateLimit,
 
         accountDeletionController,
-        exclusaoContaRateLimit
+        exclusaoContaRateLimit,
+
+        logoutController,
+        authMiddleware
     };
 }
 
