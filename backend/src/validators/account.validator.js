@@ -392,6 +392,4 @@ function criarAccountValidator({ dateUtils }) {
     }
 }
 
-module.exports = {
-    criarAccountValidator
-}
+export { criarAccountValidator }
