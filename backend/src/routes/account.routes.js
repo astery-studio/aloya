@@ -4,7 +4,9 @@ function criarAccountRoutes({
     accountController,
     authMiddleware,
     configuracoesContaRateLimit,
-    alteracaoSenhaRateLimit
+    alteracaoSenhaRateLimit,
+    accountDeletionController,
+    exclusaoContaRateLimit
 }) {
     const router = Router()
 
