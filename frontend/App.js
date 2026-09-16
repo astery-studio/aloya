@@ -1,5 +1,9 @@
 import { Text, View } from 'react-native';
 
+function testarVoltar() {
+    Alert.alert('Teste', 'Voltar funcionou.')
+}
+
 import {
     DMSans_400Regular,
     DMSans_500Medium,
