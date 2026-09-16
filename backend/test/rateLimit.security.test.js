@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-const { criarConfiguracoesContaRateLimit, criarAlteracaoSenhaRateLimit } = require('../src/middlewares/rateLimit.middleware')
+import { criarConfiguracoesContaRateLimit, criarAlteracaoSenhaRateLimit } from '../src/middlewares/rateLimit.middleware.js'
 
 //Captura as opções enviadas ao express-rate-limit
 function criarRateLimitMock() {
