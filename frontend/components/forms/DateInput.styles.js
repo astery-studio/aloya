@@ -12,9 +12,10 @@ const estilos = StyleSheet.create({
         borderColor: cores.marca.primaria,
         boxShadow: '0 0 0 3px rgba(200, 90, 68, 0.10)'
     },
-    texto: { ...typography.bodyDefault, color: cores.neutras.textoSecundarioClaro },
-    textoPreenchido: { color: cores.neutras.textoPrincipalClaro },
-    pressionado: { opacity: 0.65, transform: [{ scale: 0.98 }] },
+    entrada: {
+        ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro,
+        padding: 0, minWidth: 112, textAlign: 'center'
+    },
     desativado: { opacity: 0.55 }
 });
 
