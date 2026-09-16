@@ -23,6 +23,13 @@ export default function App() {
     return (
         <View>
             <Text>ALOYA</Text>
+            <Header titulo="Configurações" variante="padrao" />
+
+            <Header
+                titulo="Meu perfil"
+                variante="comVoltar"
+                onVoltar={testarVoltar}
+            />
         </View>
     );
 }
