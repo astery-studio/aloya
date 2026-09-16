@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { tema } from '../../../theme'
+import { tema, fontFamilies } from '../../../theme'
 
 const estilos = StyleSheet.create({
     container: {
@@ -20,9 +20,16 @@ const estilos = StyleSheet.create({
     },
 
     areaTituloComVoltar: {
-        minHeight: 64,
+        minHeight: 80,
         alignItems: 'flex-start',
         paddingBottom: 32
+    },
+
+    tituloComVoltar: {
+        fontFamily: fontFamilies.bold,
+        fontSize: 18,
+        fontWeight: '700',
+        lineHeight: 27
     },
 
     titulo: {
