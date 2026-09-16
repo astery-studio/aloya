@@ -173,6 +173,7 @@ function criarContainer() {
     return {
         authController,
         authMiddleware,
+        logoutController,
         parentalConsentMiddleware,
         cadastroRateLimit,
         emailRateLimit,
@@ -183,10 +184,7 @@ function criarContainer() {
         alteracaoSenhaRateLimit,
 
         accountDeletionController,
-        exclusaoContaRateLimit,
-
-        logoutController,
-        authMiddleware
+        exclusaoContaRateLimit
     };
 }
 
