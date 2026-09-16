@@ -36,6 +36,13 @@ function criarAccountRoutes({
         accountController.alterarSenha
     )
 
+    //A autenticação já foi aplicada pelo router.use no início das rotas
+    router.delete(
+        '/me',
+        exclusaoContaRateLimit,
+        accountDeletionController.excluirConta
+    )
+
     return router
 }
 
