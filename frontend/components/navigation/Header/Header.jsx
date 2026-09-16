@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from 'react-native'
-import { estilos } from './Header.style'
+import { estilos, corIconeVoltar } from './Header.style'
 import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft'
 
 function Header({ titulo, variante = 'padrao', onVoltar}) {
