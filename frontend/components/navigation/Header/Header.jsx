@@ -31,9 +31,9 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                         }}
                         style={estilos.containerVoltar}
                     >
-                        <Text style={estilos.iconeVoltar}>
-                            ←
-                        </Text>
+
+                        <ArrowLeftIcon style={estilos.iconeVoltar} />
+                        
                     </Pressable>
                 ) : null}
 
