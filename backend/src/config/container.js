@@ -14,7 +14,8 @@ import {
     criarEmailRateLimit,
     criarLoginRateLimit,
     criarConfiguracoesContaRateLimit,
-    criarAlteracaoSenhaRateLimit
+    criarAlteracaoSenhaRateLimit,
+    criarExclusaoContaRateLimit
 } from '../middlewares/rateLimit.middleware.js'
 
 import {
@@ -42,6 +43,10 @@ import {
 } from '../services/account.service.js'
 
 import {
+    criarAccountDeletionService
+} from '../services/accountDeletion.service.js'
+
+import {
     criarAuthValidator
 } from '../validators/auth.validator.js'
 
@@ -54,12 +59,20 @@ import {
 } from '../validators/account.validator.js'
 
 import {
+    criarAccountDeletionValidator
+} from '../validators/accountDeletion.validator.js'
+
+import {
     criarAuthController
 } from '../controllers/auth.controller.js'
 
 import {
     criarAccountController
 } from '../controllers/account.controller.js'
+
+import {
+    criarAccountDeletionController
+} from '../controllers/accountDeletion.controller.js'
 
 import {
     criarAuthMiddleware
@@ -122,6 +135,11 @@ function criarContainer() {
         dateUtils
     });
 
+    const accountDeletionService = criarAccountDeletionService({
+        prisma,
+        passwordService
+    })
+
     const authValidator = criarAuthValidator({
         dateUtils
     });
@@ -129,6 +147,8 @@ function criarContainer() {
     const accountValidator = criarAccountValidator({
         dateUtils
     });
+
+    const accountDeletionValidator = criarAccountDeletionValidator()
 
     const parentalConsentValidator =
         criarParentalConsentValidator();
@@ -183,6 +203,17 @@ function criarContainer() {
                 env.alteracaoSenhaRateLimitMaximo
         });
 
+    //Reutiliza os limites configurados para tentativas com senha
+    const exclusaoContaRateLimit = criarExclusaoContaRateLimit({
+            rateLimit,
+
+            janelaMs:
+                env.alteracaoSenhaRateLimitJanelaMs,
+
+            limite:
+                env.alteracaoSenhaRateLimitMaximo
+        })
+
     const authController = criarAuthController({
         authService,
         authValidator,
@@ -196,6 +227,12 @@ function criarContainer() {
         accountValidator
     });
 
+    const accountDeletionController =
+    criarAccountDeletionController({
+        accountDeletionService,
+        accountDeletionValidator
+    })
+
     return {
         authController,
         authMiddleware,
@@ -206,7 +243,10 @@ function criarContainer() {
 
         accountController,
         configuracoesContaRateLimit,
-        alteracaoSenhaRateLimit
+        alteracaoSenhaRateLimit,
+
+        accountDeletionController,
+        exclusaoContaRateLimit
     };
 }
 
