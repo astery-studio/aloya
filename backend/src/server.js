@@ -13,6 +13,10 @@ import {
 } from './routes/account.routes.js'
 
 import {
+    criarLogoutRoutes
+} from './routes/logout.routes.js'
+
+import {
     rotaNaoEncontrada,
     tratarErros
 } from './middlewares/error.middleware.js'
@@ -28,6 +32,15 @@ app.use(
     express.json({
         limit: '32kb',
         strict: true
+    })
+);
+
+app.use(
+    '/auth',
+    criarLogoutRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        logoutController: container.logoutController
     })
 );
 
