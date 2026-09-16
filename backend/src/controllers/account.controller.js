@@ -140,6 +140,4 @@ function criarAccountController({ accountService, accountValidator }) {
     }
 }
 
-module.exports = {
-    criarAccountController
-}
+export { criarAccountController }
