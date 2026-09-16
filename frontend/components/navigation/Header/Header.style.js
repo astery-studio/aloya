@@ -44,4 +44,7 @@ const estilos = StyleSheet.create({
     }
 })
 
+// Fornece ao ícone a cor definida no tema do aplicativo.
+const corIconeVoltar = tema.cores.neutras.textoPrincipalClaro
+
 export { estilos }
