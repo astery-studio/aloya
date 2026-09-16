@@ -41,6 +41,13 @@ function criarPrismaMock(usuario) {
                     ...usuario,
                     ...data
                 }
+            },
+
+            //Simula a atualização condicional da senha quando não houve concorrência
+            async updateMany() {
+                return {
+                    count: 1
+                }
             }
         },
 
