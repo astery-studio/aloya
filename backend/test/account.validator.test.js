@@ -1,6 +1,6 @@
 //Este teste serve para testar o validator de conta, garantindo que as validações relacionadas à conta do usuário funcionem corretamente.
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
 const { criarAccountValidator } = require('../src/validators/account.validator');
 const dateUtils = require('../src/utils/date.utils');

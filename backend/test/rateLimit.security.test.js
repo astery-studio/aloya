@@ -1,6 +1,6 @@
 //Este arquivo testa as configurações de proteção contra abuso das rotas de conta
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
 const { criarConfiguracoesContaRateLimit, criarAlteracaoSenhaRateLimit } = require('../src/middlewares/rateLimit.middleware')
 

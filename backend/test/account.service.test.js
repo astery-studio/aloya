@@ -1,7 +1,6 @@
 //Este teste serve para testar o serviço de conta, garantindo que as funcionalidades relacionadas à conta do usuário funcionem corretamente.
-
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
 const { criarAccountService } = require('../src/services/account.service')
 const dateUtils = require('../src/utils/date.utils')

@@ -1,6 +1,6 @@
 //Este arquivo testa as regras críticas de segurança do service de conta
-import test from 'node:test.js'
-import assert from 'node:assert/strict.js'
+import test from 'node:test'
+import assert from 'node:assert/strict'
 import { criarAccountService } from '../src/services/account.service.js'
 import dateUtils from '../src/utils/date.utils.js'
 

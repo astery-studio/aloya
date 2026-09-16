@@ -1,6 +1,6 @@
 //Este arquivo testa entradas maliciosas e limites de segurança do validator de conta
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
 const { criarAccountValidator } = require('../src/validators/account.validator')
 

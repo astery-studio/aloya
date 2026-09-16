@@ -1,6 +1,6 @@
 //Este arquivo testa se as configurações da conta só podem ser acessadas por uma sessão válida
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
 const { criarAuthMiddleware } = require('../src/middlewares/auth.middleware')
 
