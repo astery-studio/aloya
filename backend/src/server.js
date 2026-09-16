@@ -48,8 +48,12 @@ app.use(
         Router: express.Router,
         accountController: container.accountController,
         authMiddleware: container.authMiddleware,
+
         configuracoesContaRateLimit: container.configuracoesContaRateLimit,
-        alteracaoSenhaRateLimit: container.alteracaoSenhaRateLimit
+        alteracaoSenhaRateLimit: container.alteracaoSenhaRateLimit,
+
+        accountDeletionController: container.accountDeletionController,
+        exclusaoContaRateLimit: container.exclusaoContaRateLimit
     })
 );
 
