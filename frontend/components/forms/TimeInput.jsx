@@ -1,31 +1,34 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 import { Clock, Trash } from 'phosphor-react-native';
 import { cores } from '../../theme';
 import { estilos } from './TimeInput.styles';
 
+function formatarHorario(texto) {
+    const numeros = texto.replace(/\D/g, '').slice(0, 4);
+    return numeros.length > 2
+        ? `${numeros.slice(0, 2)}:${numeros.slice(2)}` : numeros;
+}
+
 export default function TimeInput({
-    valor, aoPressionar, aoRemover, podeRemover = false,
+    valor = '', onChangeText, aoRemover, podeRemover = false,
     desativado = false, estilo
 }) {
     return (
         <View style={[estilos.linha, estilo]}>
-            <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Selecionar horário"
-                accessibilityValue={{ text: valor || 'Nenhum horário selecionado' }}
-                accessibilityState={{ disabled: desativado }}
-                disabled={desativado}
-                onPress={aoPressionar}
-                style={({ pressed }) => [
-                    estilos.campo, pressed && estilos.pressionado,
-                    desativado && estilos.desativado
-                ]}
-            >
+            <View style={[estilos.campo, desativado && estilos.desativado]}>
                 <Clock size={18} color={cores.neutras.textoPrincipalClaro} />
-                <Text style={[estilos.texto, !valor && estilos.placeholder]}>
-                    {valor || 'HH:mm'}
-                </Text>
-            </Pressable>
+                <TextInput
+                    accessibilityLabel="Horário"
+                    editable={!desativado}
+                    keyboardType="number-pad"
+                    maxLength={5}
+                    placeholder="HH:mm"
+                    placeholderTextColor={cores.neutras.textoSecundarioClaro}
+                    value={valor}
+                    onChangeText={(texto) => onChangeText?.(formatarHorario(texto))}
+                    style={estilos.entrada}
+                />
+            </View>
             {podeRemover && (
                 <Pressable
                     accessibilityRole="button"
