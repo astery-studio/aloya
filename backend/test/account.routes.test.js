@@ -1,8 +1,7 @@
 //Este teste serve para testar as rotas de conta, garantindo que todas as rotas estejam protegidas por autenticação
-const test = require('node:test')
-const assert = require('node:assert/strict')
-
-const { criarAccountRoutes } = require('../src/routes/account.routes')
+import test from 'node:test.js'
+import assert from 'node:assert/strict.js'
+import { criarAccountRoutes } from '../src/routes/account.routes.js'
 
 //Testes para as rotas de conta
 test(
