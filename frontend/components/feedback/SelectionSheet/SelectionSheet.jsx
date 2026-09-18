@@ -1,49 +1,16 @@
-/**
- * Mostra opções disponíveis dentro de um BottomSheet.
- * É usado, por exemplo, para identidade de gênero.
- * Existe para reutilizar a mesma seleção em diferentes situações.
- */
-
+//Mostra opções disponíveis dentro de um BottomSheet
 import { FlatList, Text } from 'react-native'
-
 import { estilos } from './SelectionSheet.style'
 import { BottomSheet } from '../Bottomsheet/BottomSheet'
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
 import { ButtonSelection } from '../../common/Button/ButtonSelection/ButtonSelection'
 
-/**
- * Recebe uma opção.
- * Transforma seu id em texto para identificar a linha da lista.
- * Retorna a chave da opção.
- */
 function obterChave(opcao) {
     return String(opcao.id)
 }
 
-/**
- * Recebe título, opções e ações da tela.
- * Mostra a lista com o cabeçalho padrão e X.
- * Retorna o painel de seleção.
- */
-function SelectionSheet({
-    visivel,
-    titulo,
-    opcoes = [],
-    valorSelecionado,
-    onSelecionar,
-    onFechar
-}) {
-    /**
-     * Recebe uma opção da lista.
-     * Mostra o botão correspondente e seu estado selecionado.
-     * Retorna a linha da opção.
-     */
+function SelectionSheet({visivel, titulo, opcoes = [], valorSelecionado, onSelecionar, onFechar }) {
     function renderizarOpcao({ item }) {
-        /**
-         * Não recebe dados.
-         * Informa à tela qual opção foi escolhida.
-         * Não retorna valor.
-         */
         function selecionarOpcao() {
             onSelecionar(item.id)
         }
@@ -53,9 +20,7 @@ function SelectionSheet({
                 label={item.label}
                 descricao={item.descricao}
                 icone={item.icone}
-                selected={
-                    item.id === valorSelecionado
-                }
+                selected={item.id === valorSelecionado}
                 onPress={selecionarOpcao}
             />
         )
@@ -78,9 +43,7 @@ function SelectionSheet({
                     initialNumToRender={7}
                     windowSize={5}
                     style={estilos.lista}
-                    contentContainerStyle={
-                        estilos.conteudoLista
-                    }
+                    contentContainerStyle={estilos.conteudoLista}
                     ListEmptyComponent={
                         <Text style={estilos.mensagemVazia}>
                             Nenhuma opção disponível.
