@@ -1,26 +1,49 @@
-//Mostra uma lista de opções dentro de um BottomSheet
+/**
+ * Mostra opções disponíveis dentro de um BottomSheet.
+ * É usado, por exemplo, para identidade de gênero.
+ * Existe para reutilizar a mesma seleção em diferentes situações.
+ */
 
 import { FlatList, Text } from 'react-native'
+
 import { estilos } from './SelectionSheet.style'
 import { BottomSheet } from '../Bottomsheet/BottomSheet'
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
 import { ButtonSelection } from '../../common/Button/ButtonSelection/ButtonSelection'
 
+/**
+ * Recebe uma opção.
+ * Transforma seu id em texto para identificar a linha da lista.
+ * Retorna a chave da opção.
+ */
 function obterChave(opcao) {
     return String(opcao.id)
 }
 
+/**
+ * Recebe título, opções e ações da tela.
+ * Mostra a lista com o cabeçalho padrão e X.
+ * Retorna o painel de seleção.
+ */
 function SelectionSheet({
     visivel,
     titulo,
-    cabecalho = 'fechar',
     opcoes = [],
     valorSelecionado,
     onSelecionar,
     onFechar
 }) {
+    /**
+     * Recebe uma opção da lista.
+     * Mostra o botão correspondente e seu estado selecionado.
+     * Retorna a linha da opção.
+     */
     function renderizarOpcao({ item }) {
-        
+        /**
+         * Não recebe dados.
+         * Informa à tela qual opção foi escolhida.
+         * Não retorna valor.
+         */
         function selecionarOpcao() {
             onSelecionar(item.id)
         }
@@ -45,7 +68,6 @@ function SelectionSheet({
         >
             <BottomSheetLayout
                 titulo={titulo}
-                cabecalho={cabecalho}
                 onFechar={onFechar}
             >
                 <FlatList
@@ -55,11 +77,7 @@ function SelectionSheet({
                     extraData={valorSelecionado}
                     initialNumToRender={7}
                     windowSize={5}
-                    style={[
-                        estilos.lista,
-                        cabecalho === 'fechar'
-                            && estilos.listaLarga
-                    ]}
+                    style={estilos.lista}
                     contentContainerStyle={
                         estilos.conteudoLista
                     }
