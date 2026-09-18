@@ -1,9 +1,31 @@
-//Mostra um campo de texto dentro de um BottomSheet.
+//Mostra um campo para editar nome, e-mail ou data de nascimento. É usado nos painéis de edição da conta.
 
 import { Text, TextInput, View } from 'react-native'
 import { estilos } from './EditFieldSheet.style'
 import { BottomSheet } from '../Bottomsheet/BottomSheet'
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
+
+function formatarDataDigitada(texto) {
+    const numeros =
+        texto.replace(/\D/g, '').slice(0, 8)
+
+    if (numeros.length <= 2) {
+        return numeros
+    }
+
+    if (numeros.length <= 4) {
+        return (
+            `${numeros.slice(0, 2)}/`
+            + numeros.slice(2)
+        )
+    }
+
+    return (
+        `${numeros.slice(0, 2)}/`
+        + `${numeros.slice(2, 4)}/`
+        + numeros.slice(4)
+    )
+}
 
 function EditFieldSheet({
     visivel,
@@ -17,23 +39,22 @@ function EditFieldSheet({
     botaoSalvar
 }) {
     const ehEmail = tipo === 'email'
+    const ehData = tipo === 'data'
 
     function tratarMudanca(texto) {
+        if (ehData) {
+            onAlterar(formatarDataDigitada(texto))
+            return
+        }
+
         const textoSemControle = texto.replace(/[\u0000-\u001F\u007F]/g, '')
         onAlterar(textoSemControle)
-    }
-
-    function fecharSePermitido() {
-        if (!salvando) {
-            onFechar()
-        }
     }
 
     return (
         <BottomSheet
             visivel={visivel}
-            onFechar={fecharSePermitido}
-            fecharAoTocarFora={!salvando}
+            onFechar={onFechar}
         >
             <BottomSheetLayout
                 titulo={titulo}
@@ -43,24 +64,44 @@ function EditFieldSheet({
                     value={valor}
                     onChangeText={tratarMudanca}
                     editable={!salvando}
-                    maxLength={ehEmail ? 254 : 120}
+                    maxLength={
+                        ehData
+                            ? 10
+                            : ehEmail
+                                ? 254
+                                : 120
+                    }
                     keyboardType={
-                        ehEmail
-                            ? 'email-address'
-                            : 'default'
+                        ehData
+                            ? 'number-pad'
+                            : ehEmail
+                                ? 'email-address'
+                                : 'default'
                     }
                     autoCapitalize={
-                        ehEmail
+                        ehEmail || ehData
                             ? 'none'
                             : 'words'
                     }
-                    autoCorrect={!ehEmail}
-                    accessibilityLabel={
-                        ehEmail
-                            ? 'E-mail'
-                            : 'Nome'
+                    autoCorrect={
+                        !ehEmail && !ehData
                     }
-                    style={estilos.campo}
+                    placeholder={
+                        ehData
+                            ? 'DD/MM/AAAA'
+                            : undefined
+                    }
+                    accessibilityLabel={
+                        ehData
+                            ? 'Data de nascimento'
+                            : ehEmail
+                                ? 'E-mail'
+                                : 'Nome'
+                    }
+                    style={[
+                        estilos.campo,
+                        ehData && estilos.campoData
+                    ]}
                 />
 
                 {erro ? (
