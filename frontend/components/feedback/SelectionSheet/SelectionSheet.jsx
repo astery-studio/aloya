@@ -42,6 +42,7 @@ function SelectionSheet({
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
+            fecharAoTocarFora={cabecalho !== 'fechar'}
         >
             <BottomSheetLayout
                 titulo={titulo}
