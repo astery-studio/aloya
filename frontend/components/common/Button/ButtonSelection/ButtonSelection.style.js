@@ -14,8 +14,7 @@ const estilos = StyleSheet.create({
     },
 
     selecionado: {
-        backgroundColor:
-            `${tema.cores.marca.secundaria}0D`
+        backgroundColor: `${tema.cores.marca.secundaria}0D`
     },
 
     desabilitado: {
@@ -27,8 +26,7 @@ const estilos = StyleSheet.create({
     },
 
     label: {
-        color:
-            tema.cores.neutras.textoPrincipalClaro,
+        color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.regular,
         fontSize: 16,
         lineHeight: 24
@@ -41,9 +39,7 @@ const estilos = StyleSheet.create({
 
     descricao: {
         marginTop: 4,
-        color:
-            tema.cores.neutras.textoSecundarioClaro,
-        ...tema.typography.caption
+        color: tema.cores.neutras.textoSecundarioClaro, ...tema.typography.caption
     }
 })
 
