@@ -3,17 +3,25 @@ import { tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
     campo: {
+        width: '100%',
         minHeight: 56,
+        alignSelf: 'stretch',
         marginTop: 24,
-        paddingHorizontal: tema.espacamentos.medio,
-        borderWidth: 1,
+        paddingHorizontal: 16,
+        paddingVertical: 0,
+        borderRadius: 12,
+        borderWidth: 1.41,
         borderColor: tema.cores.marca.secundaria,
-        borderRadius: tema.radius.buttonAndInput,
         backgroundColor:
-            tema.cores.neutras.superficieClara,
+            tema.cores.neutras.fundoClaro,
         color:
             tema.cores.neutras.textoPrincipalClaro,
+        textAlignVertical: 'center',
         ...tema.typography.bodyDefault
+    },
+
+    campoData: {
+        textAlign: 'center'
     },
 
     erro: {
