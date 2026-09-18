@@ -1,9 +1,3 @@
-/**
- * Define o visual do cabeçalho padrão do BottomSheet.
- * É usado por BottomSheetLayout.jsx.
- * Existe para manter título, X e conteúdo alinhados em todos os painéis.
- */
-
 import { StyleSheet } from 'react-native'
 import { tema, fontFamilies } from '../../theme'
 
@@ -17,15 +11,13 @@ const estilos = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingTop: 12,
-        paddingHorizontal:
-            tema.espacamentosLayout.margemHorizontalTela
+        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela
     },
 
     titulo: {
         flex: 1,
         flexShrink: 1,
-        color:
-            tema.cores.neutras.textoPrincipalClaro,
+        color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
         fontSize: 18,
         lineHeight: 27
@@ -40,12 +32,10 @@ const estilos = StyleSheet.create({
 
     conteudo: {
         flexShrink: 1,
-        paddingHorizontal:
-            tema.espacamentosLayout.margemHorizontalTela
+        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela
     }
 })
 
-const corIconeFechar =
-    tema.cores.neutras.textoSecundarioClaro
+const corIconeFechar = tema.cores.neutras.textoSecundarioClaro
 
 export { estilos, corIconeFechar }
