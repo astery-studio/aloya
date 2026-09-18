@@ -581,9 +581,6 @@ export default function App() {
             <BottomSheet
                 visivel={mostraPainelBase}
                 onFechar={fecharPainel}
-                fecharAoTocarFora={
-                    painel === 'baseAlca'
-                }
             >
                 <BottomSheetLayout
                     titulo={
