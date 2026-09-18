@@ -1,15 +1,9 @@
 //Mostra um painel na parte inferior da tela
-
 import { useEffect, useRef, useState } from 'react'
 import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native'
 import { estilos } from './BottomSheet.style'
 
-function BottomSheet({
-    visivel,
-    onFechar,
-    children,
-    bloquearFechamento = false
-}) {
+function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }) {
     const alturaForaDaTela = useRef(
         Dimensions.get('screen').height
     ).current
@@ -18,8 +12,7 @@ function BottomSheet({
         new Animated.Value(0)
     ).current
 
-    const [modalMontado, setModalMontado] =
-        useState(visivel)
+    const [modalMontado, setModalMontado] = useState(visivel)
 
     const montadoAtual = useRef(visivel)
     const visivelAtual = useRef(visivel)
@@ -27,8 +20,6 @@ function BottomSheet({
 
     visivelAtual.current = visivel
 
-    // Interpolação converte o progresso de 0 a 1 em uma posição.
-    // Em 0, o painel está fora da tela; em 1, está no lugar.
     const posicaoPainel = useRef(
         progresso.interpolate({
             inputRange: [0, 1],
@@ -36,11 +27,6 @@ function BottomSheet({
         })
     ).current
 
-    /**
-     * Não recebe dados.
-     * Faz o painel subir depois que o Modal está pronto.
-     * Não retorna valor.
-     */
     function animarEntrada() {
         Animated.timing(progresso, {
             toValue: 1,
@@ -51,11 +37,6 @@ function BottomSheet({
         }).start()
     }
 
-    /**
-     * Não recebe dados.
-     * Faz o painel descer e desmonta o Modal ao terminar.
-     * Não retorna valor.
-     */
     function animarSaida() {
         Animated.timing(progresso, {
             toValue: 0,
@@ -71,8 +52,6 @@ function BottomSheet({
         })
     }
 
-    // useEffect reage somente à abertura ou ao fechamento.
-    // Digitar, abrir o teclado e atualizar o conteúdo não reiniciam a animação.
     useEffect(() => {
         if (visivel) {
             if (!montadoAtual.current) {
@@ -82,7 +61,6 @@ function BottomSheet({
             } else if (modalJaApareceu.current) {
                 animarEntrada()
             }
-
             return
         }
 
@@ -91,11 +69,6 @@ function BottomSheet({
         }
     }, [visivel])
 
-    /**
-     * Não recebe dados.
-     * Inicia a subida quando o Modal termina de aparecer.
-     * Não retorna valor.
-     */
     function quandoModalAparecer() {
         modalJaApareceu.current = true
 
@@ -104,11 +77,6 @@ function BottomSheet({
         }
     }
 
-    /**
-     * Não recebe dados.
-     * Atende ao botão Voltar do Android quando não está salvando.
-     * Não retorna valor.
-     */
     function solicitarFechamento() {
         if (!bloquearFechamento) {
             onFechar?.()
@@ -125,29 +93,15 @@ function BottomSheet({
         >
             <KeyboardAvoidingView
                 style={estilos.tela}
-                behavior={
-                    Platform.OS === 'ios'
-                        ? 'padding'
-                        : undefined
-                }
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
                 <Animated.View
                     pointerEvents="none"
-                    style={[
-                        estilos.fundo,
-                        { opacity: progresso }
-                    ]}
+                    style={[estilos.fundo, { opacity: progresso }]}
                 />
 
                 <Animated.View
-                    style={[
-                        estilos.painel,
-                        {
-                            transform: [
-                                { translateY: posicaoPainel }
-                            ]
-                        }
-                    ]}
+                    style={[estilos.painel, {transform: [{ translateY: posicaoPainel }]}]}
                 >
                     {children}
                 </Animated.View>
