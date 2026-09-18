@@ -1,27 +1,9 @@
-/**
- * Mostra um painel na parte inferior da tela.
- * É usado pelos painéis de seleção e edição.
- * Existe para animar somente o painel, sem deslocar o fundo da tela.
- */
+//Mostra um painel na parte inferior da tela
 
 import { useEffect, useRef, useState } from 'react'
-
-import {
-    Animated,
-    Dimensions,
-    Easing,
-    KeyboardAvoidingView,
-    Modal,
-    Platform
-} from 'react-native'
-
+import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native'
 import { estilos } from './BottomSheet.style'
 
-/**
- * Recebe visibilidade, conteúdo, ação de fechar e estado de salvamento.
- * Anima o painel para cima ou para baixo e escurece o fundo sem movê-lo.
- * Retorna o BottomSheet.
- */
 function BottomSheet({
     visivel,
     onFechar,
