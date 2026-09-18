@@ -8,9 +8,20 @@ const estilos = StyleSheet.create({
 
     cabecalhoComAlca: {
         alignItems: 'center',
-        paddingTop: 12,
         paddingHorizontal:
             tema.espacamentosLayout.margemHorizontalTela
+    },
+
+    areaAlca: {
+        width: 80,
+        height: 44
+    },
+
+    toqueAlca: {
+        width: '100%',
+        height: '100%',
+        paddingTop: 12,
+        alignItems: 'center'
     },
 
     alca: {
@@ -22,7 +33,7 @@ const estilos = StyleSheet.create({
     },
 
     tituloCentral: {
-        marginTop: 24,
+        marginTop: -4,
         color:
             tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
