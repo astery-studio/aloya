@@ -3,12 +3,11 @@ import { tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
     tela: {
-        flex: 1,
-        justifyContent: 'flex-end'
+        flex: 1
     },
 
     fundo: {
-        ...StyleSheet.absoluteFillObject,
+        flex: 1,
         backgroundColor:
             `${tema.cores.neutras.textoPrincipalClaro}66`
     },
