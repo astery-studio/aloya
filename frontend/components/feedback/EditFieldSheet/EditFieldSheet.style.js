@@ -4,7 +4,7 @@
  * Existe para manter o visual separado da lógica dos campos.
  */
 
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 import { tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
@@ -29,7 +29,13 @@ const estilos = StyleSheet.create({
         color:
             tema.cores.neutras.textoPrincipalClaro,
         textAlignVertical: 'center',
-        includeFontPadding: false
+        includeFontPadding: false,
+        ...Platform.select({
+            ios: {
+                transform: [{ translateY: -4 }]
+            },
+            default: {}
+        })
     },
 
     campoData: {
