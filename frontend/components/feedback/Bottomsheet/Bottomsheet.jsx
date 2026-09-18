@@ -1,4 +1,4 @@
-//Mostra um painel que sobe da parte inferior da tela. É usado pelos painéis de seleção e edição.
+//Mostra um painel que sobe da parte inferior da tela.
 
 import {
     KeyboardAvoidingView,
@@ -13,8 +13,7 @@ import { estilos } from './BottomSheet.style'
 function BottomSheet({
     visivel,
     onFechar,
-    children,
-    fecharAoTocarFora = true
+    children
 }) {
     return (
         <Modal
@@ -33,12 +32,7 @@ function BottomSheet({
             >
                 <Pressable
                     style={estilos.fundo}
-                    onPress={
-                        fecharAoTocarFora
-                            ? onFechar
-                            : undefined
-                    }
-                    disabled={!fecharAoTocarFora}
+                    onPress={onFechar}
                     accessibilityRole="button"
                     accessibilityLabel="Fechar painel"
                 />
