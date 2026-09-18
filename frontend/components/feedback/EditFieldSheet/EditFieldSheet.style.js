@@ -1,19 +1,33 @@
+/**
+ * Define a aparência dos campos do painel de edição.
+ * É usado por EditFieldSheet.jsx.
+ * Existe para manter o visual separado da lógica dos campos.
+ */
+
 import { StyleSheet } from 'react-native'
 import { tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
-    campo: {
-        ...tema.typography.bodyDefault,
+    caixaCampo: {
         width: '100%',
         height: 56,
         marginTop: 24,
         paddingHorizontal: 16,
-        paddingVertical: 0,
+        justifyContent: 'center',
         borderRadius: 12,
         borderWidth: 1.41,
         borderColor: tema.cores.marca.secundaria,
-        backgroundColor: tema.cores.neutras.fundoClaro,
-        color: tema.cores.neutras.textoPrincipalClaro,
+        backgroundColor:
+            tema.cores.neutras.fundoClaro
+    },
+
+    campo: {
+        ...tema.typography.bodyDefault,
+        width: '100%',
+        height: 24,
+        padding: 0,
+        color:
+            tema.cores.neutras.textoPrincipalClaro,
         textAlignVertical: 'center',
         includeFontPadding: false
     },
