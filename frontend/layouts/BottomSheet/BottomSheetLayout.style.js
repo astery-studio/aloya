@@ -1,3 +1,9 @@
+/**
+ * Define o visual do cabeçalho padrão do BottomSheet.
+ * É usado por BottomSheetLayout.jsx.
+ * Existe para manter título, X e conteúdo alinhados em todos os painéis.
+ */
+
 import { StyleSheet } from 'react-native'
 import { tema, fontFamilies } from '../../theme'
 
@@ -6,43 +12,7 @@ const estilos = StyleSheet.create({
         flexShrink: 1
     },
 
-    cabecalhoComAlca: {
-        alignItems: 'center',
-        paddingHorizontal:
-            tema.espacamentosLayout.margemHorizontalTela
-    },
-
-    areaAlca: {
-        width: 80,
-        height: 44
-    },
-
-    toqueAlca: {
-        width: '100%',
-        height: '100%',
-        paddingTop: 12,
-        alignItems: 'center'
-    },
-
-    alca: {
-        width: 40,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor:
-            tema.cores.neutras.bordaClara
-    },
-
-    tituloCentral: {
-        marginTop: -4,
-        color:
-            tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.bold,
-        fontSize: 18,
-        lineHeight: 27,
-        textAlign: 'center'
-    },
-
-    cabecalhoComFechar: {
+    cabecalho: {
         minHeight: 62,
         flexDirection: 'row',
         alignItems: 'center',
@@ -51,8 +21,9 @@ const estilos = StyleSheet.create({
             tema.espacamentosLayout.margemHorizontalTela
     },
 
-    tituloEsquerda: {
+    titulo: {
         flex: 1,
+        flexShrink: 1,
         color:
             tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
@@ -74,6 +45,7 @@ const estilos = StyleSheet.create({
     }
 })
 
-const corIconeFechar = tema.cores.neutras.textoSecundarioClaro
+const corIconeFechar =
+    tema.cores.neutras.textoSecundarioClaro
 
 export { estilos, corIconeFechar }
