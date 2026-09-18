@@ -1,13 +1,6 @@
-//Mostra um painel que sobe da parte inferior da tela.
+//Mostra um painel na parte inferior da tela.
 
-import {
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    Pressable,
-    View
-} from 'react-native'
-
+import { KeyboardAvoidingView, Modal, Platform, Pressable, View } from 'react-native'
 import { estilos } from './BottomSheet.style'
 
 function BottomSheet({
@@ -17,11 +10,12 @@ function BottomSheet({
     fecharAoTocarFora = false,
     bloquearFechamento = false
 }) {
-    const podeFecharFora = fecharAoTocarFora && !bloquearFechamento
+    const podeFecharFora =
+        fecharAoTocarFora && !bloquearFechamento
 
     function solicitarFechamento() {
         if (!bloquearFechamento) {
-            onFechar()
+            onFechar?.()
         }
     }
 
@@ -49,7 +43,7 @@ function BottomSheet({
                     }
                     disabled={!podeFecharFora}
                     accessibilityRole="button"
-                    accessibilityLabel="Fechar painel"
+                    accessibilityLabel="Área fora do painel"
                 />
 
                 <View style={estilos.painel}>

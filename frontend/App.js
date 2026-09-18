@@ -1,4 +1,11 @@
+/**
+ * Mostra as variantes dos componentes de painel no Expo.
+ * É usado temporariamente durante os testes visuais.
+ * Existe para conferir estados e interações sem chamar a API.
+ */
+
 import { useEffect, useState } from 'react'
+
 import {
     Alert,
     Button as BotaoNativo,
@@ -23,8 +30,6 @@ import { BottomSheetLayout } from './layouts/BottomSheet/BottomSheetLayout'
 import { ButtonSelection } from './components/common/Button/ButtonSelection/ButtonSelection'
 import { SelectionSheet } from './components/feedback/SelectionSheet/SelectionSheet'
 import { EditFieldSheet } from './components/feedback/EditFieldSheet/EditFieldSheet'
-
-const [dataNascimento, setDataNascimento] = useState('08/04/1999')
 
 const opcoesGenero = [
     { id: 'nao-informar', label: 'Prefiro não informar' },
@@ -51,9 +56,9 @@ const opcoesFrequencia = [
 ]
 
 /**
- * Recebe um índice da lista de teste.
- * Cria uma opção com id e texto únicos.
- * Retorna a opção para testar rolagem.
+ * Recebe o índice de uma opção de teste.
+ * Cria uma opção com chave única.
+ * Retorna uma opção para testar rolagem.
  */
 function criarOpcaoLonga(_, indice) {
     return {
@@ -64,77 +69,6 @@ function criarOpcaoLonga(_, indice) {
 
 const opcoesLongas =
     Array.from({ length: 30 }, criarOpcaoLonga)
-
-/**
- * Recebe uma data em DD/MM/AAAA.
- * Verifica dia, mês, ano, ano bissexto e data futura.
- * Retorna YYYY-MM-DD se for válida; caso contrário, retorna null.
- */
-function converterDataValida(valor) {
-    const partes =
-        /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor)
-
-    if (!partes) {
-        return null
-    }
-
-    const dia = Number(partes[1])
-    const mes = Number(partes[2])
-    const ano = Number(partes[3])
-
-    if (ano < 1 || mes < 1 || mes > 12) {
-        return null
-    }
-
-    const anoBissexto =
-        ano % 4 === 0
-        && (
-            ano % 100 !== 0
-            || ano % 400 === 0
-        )
-
-    const diasPorMes = [
-        31,
-        anoBissexto ? 29 : 28,
-        31,
-        30,
-        31,
-        30,
-        31,
-        31,
-        30,
-        31,
-        30,
-        31
-    ]
-
-    if (
-        dia < 1
-        || dia > diasPorMes[mes - 1]
-    ) {
-        return null
-    }
-
-    const hoje = new Date()
-
-    const dataFutura =
-        ano > hoje.getFullYear()
-        || (
-            ano === hoje.getFullYear()
-            && mes > hoje.getMonth() + 1
-        )
-        || (
-            ano === hoje.getFullYear()
-            && mes === hoje.getMonth() + 1
-            && dia > hoje.getDate()
-        )
-
-    if (dataFutura) {
-        return null
-    }
-
-    return `${partes[3]}-${partes[2]}-${partes[1]}`
-}
 
 const selecoesDisponiveis = {
     genero: {
@@ -169,14 +103,89 @@ const selecoesDisponiveis = {
 }
 
 /**
- * Recebe o texto, o código do teste e a função de abertura.
- * Mostra um botão nativo somente nesta tela temporária.
- * Retorna o controle que abre um caso de teste.
+ * Recebe uma data em DD/MM/AAAA.
+ * Rejeita dias impossíveis, ano bissexto incorreto e data futura.
+ * Retorna YYYY-MM-DD quando a data é válida; senão, null.
  */
-function BotaoTeste({ titulo, codigo, onAbrir }) {
+function converterDataValida(valor) {
+    const partes =
+        /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor)
+
+    if (!partes) {
+        return null
+    }
+
+    const dia = Number(partes[1])
+    const mes = Number(partes[2])
+    const ano = Number(partes[3])
+
+    if (ano < 1 || mes < 1 || mes > 12) {
+        return null
+    }
+
+    const bissexto =
+        ano % 4 === 0
+        && (
+            ano % 100 !== 0
+            || ano % 400 === 0
+        )
+
+    const diasPorMes = [
+        31,
+        bissexto ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31
+    ]
+
+    if (
+        dia < 1
+        || dia > diasPorMes[mes - 1]
+    ) {
+        return null
+    }
+
+    const hoje = new Date()
+
+    const futura =
+        ano > hoje.getFullYear()
+        || (
+            ano === hoje.getFullYear()
+            && mes > hoje.getMonth() + 1
+        )
+        || (
+            ano === hoje.getFullYear()
+            && mes === hoje.getMonth() + 1
+            && dia > hoje.getDate()
+        )
+
+    if (futura) {
+        return null
+    }
+
+    return `${partes[3]}-${partes[2]}-${partes[1]}`
+}
+
+/**
+ * Recebe texto, código e ação de abertura.
+ * Mostra um botão nativo apenas nesta tela temporária.
+ * Retorna o controle de um caso de teste.
+ */
+function BotaoTeste({
+    titulo,
+    codigo,
+    onAbrir
+}) {
     /**
      * Não recebe argumentos.
-     * Abre o caso de teste informado ao botão.
+     * Abre o caso indicado pelo código.
      * Não retorna nenhum valor.
      */
     function abrirEsteTeste() {
@@ -195,21 +204,24 @@ function BotaoTeste({ titulo, codigo, onAbrir }) {
 
 /**
  * Não recebe propriedades.
- * Mostra todos os casos de teste dos painéis.
- * Retorna a tela temporária do Expo.
+ * Mostra os casos de teste dos cinco componentes.
+ * Retorna uma tela temporária para o Expo.
  */
 export default function App() {
-    const [fontesCarregadas, erroFontes] = useFonts({
-        DMSans_400Regular,
-        DMSans_500Medium,
-        DMSans_600SemiBold,
-        DMSans_700Bold
-    })
+    const [fontesCarregadas, erroFontes] =
+        useFonts({
+            DMSans_400Regular,
+            DMSans_500Medium,
+            DMSans_600SemiBold,
+            DMSans_700Bold
+        })
 
     const [painel, setPainel] = useState(null)
     const [nome, setNome] = useState('Julia')
     const [email, setEmail] =
         useState('juliadesign2025@gmail.com')
+    const [dataNascimento, setDataNascimento] =
+        useState('08/04/1999')
     const [erroCampo, setErroCampo] = useState('')
     const [simulandoSalvar, setSimulandoSalvar] =
         useState(false)
@@ -222,8 +234,8 @@ export default function App() {
     })
 
     /**
-     * Recebe o código de um teste.
-     * Abre apenas o painel escolhido e prepara seu estado.
+     * Recebe o código do teste.
+     * Prepara o estado e abre somente aquele painel.
      * Não retorna nenhum valor.
      */
     function abrirPainel(codigo) {
@@ -242,7 +254,7 @@ export default function App() {
 
     /**
      * Não recebe argumentos.
-     * Fecha o painel atualmente aberto.
+     * Fecha o painel aberto.
      * Não retorna nenhum valor.
      */
     function fecharPainel() {
@@ -250,16 +262,15 @@ export default function App() {
     }
 
     /**
-     * Recebe o id da opção tocada.
-     * Atualiza a seleção sem fechar o painel, para permitir
-     * observar a mudança de cor.
+     * Recebe o id tocado.
+     * Atualiza a seleção sem fechar, para mostrar o destaque.
      * Não retorna nenhum valor.
      */
     function selecionarOpcao(id) {
         /**
          * Recebe as seleções anteriores.
-         * Troca apenas a seleção do painel aberto.
-         * Retorna o novo conjunto de seleções.
+         * Troca somente a seleção do painel atual.
+         * Retorna as seleções atualizadas.
          */
         function atualizarSelecoes(anteriores) {
             return {
@@ -272,12 +283,17 @@ export default function App() {
     }
 
     /**
-     * Recebe o texto do campo aberto.
-     * Atualiza nome ou e-mail somente nesta tela de teste.
+     * Recebe o texto digitado.
+     * Atualiza o campo aberto e limpa o erro anterior.
      * Não retorna nenhum valor.
      */
     function alterarCampo(texto) {
         setErroCampo('')
+
+        if (painel === 'data') {
+            setDataNascimento(texto)
+            return
+        }
 
         if (painel === 'email') {
             setEmail(texto)
@@ -289,10 +305,30 @@ export default function App() {
 
     /**
      * Não recebe argumentos.
-     * Faz uma validação local para testar mensagens de erro.
-     * Não envia nem salva dados reais.
+     * Valida o campo atual somente para testar a interface.
+     * Não envia dados nem retorna um valor.
      */
     function testarSalvar() {
+        if (painel === 'data') {
+            const dataParaApi =
+                converterDataValida(
+                    dataNascimento
+                )
+
+            if (!dataParaApi) {
+                setErroCampo(
+                    'Informe uma data de nascimento válida.'
+                )
+                return
+            }
+
+            Alert.alert(
+                'Teste',
+                'Data validada localmente.'
+            )
+            return
+        }
+
         if (painel === 'email') {
             const emailNormalizado =
                 email.trim().toLowerCase()
@@ -334,7 +370,7 @@ export default function App() {
 
     /**
      * Não recebe argumentos.
-     * Mostra que uma opção isolada recebeu o toque.
+     * Confirma que uma opção isolada recebeu o toque.
      * Não retorna nenhum valor.
      */
     function testarToqueNaOpcao() {
@@ -345,23 +381,26 @@ export default function App() {
     }
 
     /**
-     * Quando o teste "salvando" abre, espera cinco segundos.
-     * Depois libera o fechamento do painel para que o teste
-     * não fique preso na tela.
+     * Não recebe argumentos.
+     * Termina o salvamento simulado.
+     * Não retorna nenhum valor.
      */
+    function terminarSimulacao() {
+        setSimulandoSalvar(false)
+    }
+
+    // useEffect agenda o fim do teste de carregamento após 5 segundos.
     useEffect(() => {
         if (painel !== 'salvando') {
             return undefined
         }
 
-        const temporizador = setTimeout(
-            terminarSimulacao,
-            5000
-        )
+        const temporizador =
+            setTimeout(terminarSimulacao, 5000)
 
         /**
          * Não recebe argumentos.
-         * Cancela o tempo pendente se o teste mudar.
+         * Cancela o tempo pendente se o painel mudar.
          * Não retorna nenhum valor.
          */
         function limparTemporizador() {
@@ -370,15 +409,6 @@ export default function App() {
 
         return limparTemporizador
     }, [painel])
-
-    /**
-     * Não recebe argumentos.
-     * Termina o carregamento simulado após cinco segundos.
-     * Não retorna nenhum valor.
-     */
-    function terminarSimulacao() {
-        setSimulandoSalvar(false)
-    }
 
     if (erroFontes) {
         return (
@@ -397,16 +427,14 @@ export default function App() {
     const configuracaoSelecao =
         selecoesDisponiveis[painel]
 
-    const mostraPainelBase = [
-        'baseFecha',
-        'baseBloqueado',
-        'layoutAlca',
-        'layoutFechar'
-    ].includes(painel)
+    const mostraPainelBase =
+        painel === 'baseAlca'
+        || painel === 'baseX'
 
     const mostraEdicao = [
         'nome',
         'email',
+        'data',
         'erroNome',
         'salvando',
         'semBotao'
@@ -426,35 +454,21 @@ export default function App() {
                     paddingBottom: 48
                 }}
             >
-                <Text>TESTE: BottomSheet</Text>
+                <Text>BottomSheet e layout</Text>
 
                 <BotaoTeste
-                    titulo="Abre e fecha pelo fundo"
-                    codigo="baseFecha"
+                    titulo="Sem X: tocar fora fecha"
+                    codigo="baseAlca"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Fundo NÃO fecha"
-                    codigo="baseBloqueado"
+                    titulo="Com X: tocar fora NÃO fecha"
+                    codigo="baseX"
                     onAbrir={abrirPainel}
                 />
 
-                <Text>TESTE: BottomSheetLayout</Text>
-
-                <BotaoTeste
-                    titulo="Cabeçalho com alça"
-                    codigo="layoutAlca"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Cabeçalho com X"
-                    codigo="layoutFechar"
-                    onAbrir={abrirPainel}
-                />
-
-                <Text>TESTE: ButtonSelection isolado</Text>
+                <Text>ButtonSelection</Text>
 
                 <ButtonSelection
                     label="Opção normal"
@@ -469,7 +483,7 @@ export default function App() {
 
                 <ButtonSelection
                     label="Com descrição"
-                    descricao="Texto complementar da opção."
+                    descricao="Informação complementar."
                     onPress={testarToqueNaOpcao}
                 />
 
@@ -480,27 +494,35 @@ export default function App() {
                 />
 
                 <ButtonSelection
-                    label="Opção desabilitada"
+                    label="Selecionada, ícone e descrição"
+                    descricao="Todos os elementos juntos."
+                    icone={CheckIcon}
+                    selected
+                    onPress={testarToqueNaOpcao}
+                />
+
+                <ButtonSelection
+                    label="Desabilitada"
                     desabilitado
                     onPress={testarToqueNaOpcao}
                 />
 
-                <Text>TESTE: SelectionSheet</Text>
+                <Text>SelectionSheet</Text>
 
                 <BotaoTeste
-                    titulo="Gênero: alça e 7 opções"
+                    titulo="Gênero: sem X"
                     codigo="genero"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Tipo: X e 5 opções"
+                    titulo="Tipo: com X"
                     codigo="tipo"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Frequência: X e 3 opções"
+                    titulo="Frequência: com X"
                     codigo="frequencia"
                     onAbrir={abrirPainel}
                 />
@@ -517,7 +539,7 @@ export default function App() {
                     onAbrir={abrirPainel}
                 />
 
-                <Text>TESTE: EditFieldSheet</Text>
+                <Text>EditFieldSheet</Text>
 
                 <BotaoTeste
                     titulo="Editar nome"
@@ -532,13 +554,19 @@ export default function App() {
                 />
 
                 <BotaoTeste
+                    titulo="Editar data de nascimento"
+                    codigo="data"
+                    onAbrir={abrirPainel}
+                />
+
+                <BotaoTeste
                     titulo="Mostrar erro"
                     codigo="erroNome"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Carregando por 5 segundos"
+                    titulo="Salvando por 5 segundos"
                     codigo="salvando"
                     onAbrir={abrirPainel}
                 />
@@ -554,24 +582,24 @@ export default function App() {
                 visivel={mostraPainelBase}
                 onFechar={fecharPainel}
                 fecharAoTocarFora={
-                    painel !== 'baseBloqueado'
+                    painel === 'baseAlca'
                 }
             >
                 <BottomSheetLayout
                     titulo={
-                        painel === 'layoutFechar'
+                        painel === 'baseX'
                             ? 'Cabeçalho com X'
                             : 'Cabeçalho com alça'
                     }
                     cabecalho={
-                        painel === 'layoutFechar'
+                        painel === 'baseX'
                             ? 'fechar'
                             : 'alca'
                     }
                     onFechar={fecharPainel}
                 >
                     <Text>
-                        Conteúdo genérico do painel.
+                        Teste o toque fora do painel.
                     </Text>
 
                     <BotaoNativo
@@ -603,19 +631,25 @@ export default function App() {
             <EditFieldSheet
                 visivel={mostraEdicao}
                 titulo={
-                    painel === 'email'
-                        ? 'Editar E-mail'
-                        : 'Editar Nome'
+                    painel === 'data'
+                        ? 'Editar Data de Nascimento'
+                        : painel === 'email'
+                            ? 'Editar E-mail'
+                            : 'Editar Nome'
                 }
                 tipo={
-                    painel === 'email'
-                        ? 'email'
-                        : 'nome'
+                    painel === 'data'
+                        ? 'data'
+                        : painel === 'email'
+                            ? 'email'
+                            : 'nome'
                 }
                 valor={
-                    painel === 'email'
-                        ? email
-                        : nome
+                    painel === 'data'
+                        ? dataNascimento
+                        : painel === 'email'
+                            ? email
+                            : nome
                 }
                 onAlterar={alterarCampo}
                 onFechar={fecharPainel}
