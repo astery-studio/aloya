@@ -4,7 +4,8 @@
  * Existe para reaproveitar a mesma estrutura nas três edições.
  */
 
-import { Text, TextInput, View } from 'react-native'
+import { useRef } from 'react'
+import { Pressable, Text, TextInput, View } from 'react-native'
 
 import { estilos } from './EditFieldSheet.style'
 import { BottomSheet } from '../Bottomsheet/BottomSheet'
@@ -12,8 +13,8 @@ import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayou
 
 /**
  * Recebe o valor da data, inclusive quando vem da API em AAAA-MM-DD.
- * Prepara a data para aparecer no campo como DD/MM/AAAA.
- * Retorna o texto que será mostrado à pessoa.
+ * Prepara a data para aparecer como DD/MM/AAAA.
+ * Retorna o texto mostrado no campo.
  */
 function obterDataVisivel(valor) {
     const texto = String(valor ?? '')
@@ -34,7 +35,7 @@ function obterDataVisivel(valor) {
 
 /**
  * Recebe o texto digitado e o valor anterior.
- * Insere as barras depois do dia e do mês e permite apagar normalmente.
+ * Insere as barras depois do dia e do mês e permite apagar.
  * Retorna a data parcial em DD/MM/AAAA.
  */
 function formatarDataDigitada(texto, valorAnterior) {
@@ -68,7 +69,7 @@ function formatarDataDigitada(texto, valorAnterior) {
 
 /**
  * Recebe o valor atual e as ações da tela.
- * Mostra um único campo adequado a nome, e-mail ou data.
+ * Mostra o campo adequado a nome, e-mail ou data.
  * Retorna o painel de edição.
  */
 function EditFieldSheet({
@@ -82,6 +83,8 @@ function EditFieldSheet({
     salvando = false,
     botaoSalvar
 }) {
+    const campoRef = useRef(null)
+
     const ehEmail = tipo === 'email'
     const ehData = tipo === 'data'
 
@@ -90,8 +93,19 @@ function EditFieldSheet({
         : String(valor ?? '')
 
     /**
+     * Não recebe dados.
+     * Foca o campo quando a pessoa toca em qualquer parte da caixa.
+     * Não retorna valor.
+     */
+    function focarCampo() {
+        if (!salvando) {
+            campoRef.current?.focus()
+        }
+    }
+
+    /**
      * Recebe o texto digitado.
-     * Aplica a máscara de data ou remove caracteres de controle do texto.
+     * Aplica a máscara da data ou remove caracteres de controle.
      * Não retorna valor.
      */
     function tratarMudanca(texto) {
@@ -112,60 +126,68 @@ function EditFieldSheet({
     }
 
     return (
-    <BottomSheet
-        visivel={visivel}
-        onFechar={onFechar}
-        bloquearFechamento={salvando}
-    >
-        <BottomSheetLayout
-            titulo={titulo}
+        <BottomSheet
+            visivel={visivel}
             onFechar={onFechar}
             bloquearFechamento={salvando}
         >
-                <TextInput
-                    value={valorVisivel}
-                    onChangeText={tratarMudanca}
-                    editable={!salvando}
-                    multiline={false}
-                    maxLength={
-                        ehData
-                            ? 10
-                            : ehEmail
-                                ? 254
-                                : 120
-                    }
-                    keyboardType={
-                        ehData
-                            ? 'number-pad'
-                            : ehEmail
-                                ? 'email-address'
-                                : 'default'
-                    }
-                    autoCapitalize={
-                        ehEmail || ehData
-                            ? 'none'
-                            : 'words'
-                    }
-                    autoCorrect={
-                        !ehEmail && !ehData
-                    }
-                    placeholder={
-                        ehData
-                            ? 'DD/MM/AAAA'
-                            : undefined
-                    }
-                    accessibilityLabel={
-                        ehData
-                            ? 'Data de nascimento'
-                            : ehEmail
-                                ? 'E-mail'
-                                : 'Nome'
-                    }
-                    style={[
-                        estilos.campo,
-                        ehData && estilos.campoData
-                    ]}
-                />
+            <BottomSheetLayout
+                titulo={titulo}
+                onFechar={onFechar}
+                bloquearFechamento={salvando}
+            >
+                <Pressable
+                    onPress={focarCampo}
+                    style={estilos.caixaCampo}
+                    accessible={false}
+                >
+                    <TextInput
+                        ref={campoRef}
+                        value={valorVisivel}
+                        onChangeText={tratarMudanca}
+                        editable={!salvando}
+                        multiline={false}
+                        maxLength={
+                            ehData
+                                ? 10
+                                : ehEmail
+                                    ? 254
+                                    : 120
+                        }
+                        keyboardType={
+                            ehData
+                                ? 'number-pad'
+                                : ehEmail
+                                    ? 'email-address'
+                                    : 'default'
+                        }
+                        autoCapitalize={
+                            ehEmail || ehData
+                                ? 'none'
+                                : 'words'
+                        }
+                        autoCorrect={
+                            !ehEmail && !ehData
+                        }
+                        placeholder={
+                            ehData
+                                ? 'DD/MM/AAAA'
+                                : undefined
+                        }
+                        underlineColorAndroid="transparent"
+                        accessibilityLabel={
+                            ehData
+                                ? 'Data de nascimento'
+                                : ehEmail
+                                    ? 'E-mail'
+                                    : 'Nome'
+                        }
+                        style={[
+                            estilos.campo,
+                            ehData && estilos.campoData
+                        ]}
+                    />
+                </Pressable>
 
                 {erro ? (
                     <Text
