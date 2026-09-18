@@ -115,12 +115,13 @@ function EditFieldSheet({
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
-            fecharAoTocarFora
             bloquearFechamento={salvando}
         >
             <BottomSheetLayout
                 titulo={titulo}
                 cabecalho="alca"
+                onFechar={onFechar}
+                bloquearFechamento={salvando}
             >
                 <TextInput
                     value={valorVisivel}
