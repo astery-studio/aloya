@@ -1,30 +1,33 @@
-//Mostra um campo para editar nome, e-mail ou data de nascimento. É usado nos painéis de edição da conta.
+//Mostra um painel para editar nome, e-mail ou data de nascimento. É usado nas configurações da conta.
 
+import { useRef } from 'react'
 import { Text, TextInput, View } from 'react-native'
+
 import { estilos } from './EditFieldSheet.style'
 import { BottomSheet } from '../Bottomsheet/BottomSheet'
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
 
-function formatarDataDigitada(texto) {
-    const numeros =
-        texto.replace(/\D/g, '').slice(0, 8)
+function separarData(valor) {
+    const texto = String(valor ?? '')
 
-    if (numeros.length <= 2) {
-        return numeros
+    const dataDaApi =
+        /^(\d{4})-(\d{2})-(\d{2})$/.exec(texto)
+
+    if (dataDaApi) {
+        return {
+            dia: dataDaApi[3],
+            mes: dataDaApi[2],
+            ano: dataDaApi[1]
+        }
     }
 
-    if (numeros.length <= 4) {
-        return (
-            `${numeros.slice(0, 2)}/`
-            + numeros.slice(2)
-        )
-    }
+    const partes = texto.split('/')
 
-    return (
-        `${numeros.slice(0, 2)}/`
-        + `${numeros.slice(2, 4)}/`
-        + numeros.slice(4)
-    )
+    return {
+        dia: partes[0] ?? '',
+        mes: partes[1] ?? '',
+        ano: partes[2] ?? ''
+    }
 }
 
 function EditFieldSheet({
@@ -38,17 +41,47 @@ function EditFieldSheet({
     salvando = false,
     botaoSalvar
 }) {
+    const campoMes = useRef(null)
+    const campoAno = useRef(null)
+
     const ehEmail = tipo === 'email'
     const ehData = tipo === 'data'
 
-    function tratarMudanca(texto) {
-        if (ehData) {
-            onAlterar(formatarDataDigitada(texto))
-            return
-        }
+    const data = separarData(valor)
 
+    function alterarTexto(texto) {
         const textoSemControle = texto.replace(/[\u0000-\u001F\u007F]/g, '')
         onAlterar(textoSemControle)
+    }
+
+    function informarData(dia, mes, ano) {
+        onAlterar(`${dia}/${mes}/${ano}`)
+    }
+
+    function alterarDia(texto) {
+        const dia = texto.replace(/\D/g, '').slice(0, 2)
+
+        informarData(dia, data.mes, data.ano)
+
+        if (dia.length === 2) {
+            campoMes.current?.focus()
+        }
+    }
+
+    function alterarMes(texto) {
+        const mes = texto.replace(/\D/g, '').slice(0, 2)
+
+        informarData(data.dia, mes, data.ano)
+
+        if (mes.length === 2) {
+            campoAno.current?.focus()
+        }
+    }
+
+    function alterarAno(texto) {
+        const ano = texto.replace(/\D/g, '').slice(0, 4)
+
+        informarData(data.dia, data.mes, ano)
     }
 
     return (
@@ -62,49 +95,89 @@ function EditFieldSheet({
                 titulo={titulo}
                 cabecalho="alca"
             >
-                <TextInput
-                    value={valor}
-                    onChangeText={tratarMudanca}
-                    editable={!salvando}
-                    maxLength={
-                        ehData
-                            ? 10
-                            : ehEmail
-                                ? 254
-                                : 120
-                    }
-                    keyboardType={
-                        ehData
-                            ? 'number-pad'
-                            : ehEmail
+                {ehData ? (
+                    <View style={estilos.caixaData}>
+                        <TextInput
+                            value={data.dia}
+                            onChangeText={alterarDia}
+                            editable={!salvando}
+                            keyboardType="number-pad"
+                            maxLength={2}
+                            placeholder="DD"
+                            textAlign="center"
+                            style={[
+                                estilos.parteData,
+                                estilos.diaMes
+                            ]}
+                            accessibilityLabel="Dia de nascimento"
+                        />
+
+                        <Text style={estilos.barraData}>
+                            /
+                        </Text>
+
+                        <TextInput
+                            ref={campoMes}
+                            value={data.mes}
+                            onChangeText={alterarMes}
+                            editable={!salvando}
+                            keyboardType="number-pad"
+                            maxLength={2}
+                            placeholder="MM"
+                            textAlign="center"
+                            style={[
+                                estilos.parteData,
+                                estilos.diaMes
+                            ]}
+                            accessibilityLabel="Mês de nascimento"
+                        />
+
+                        <Text style={estilos.barraData}>
+                            /
+                        </Text>
+
+                        <TextInput
+                            ref={campoAno}
+                            value={data.ano}
+                            onChangeText={alterarAno}
+                            editable={!salvando}
+                            keyboardType="number-pad"
+                            maxLength={4}
+                            placeholder="AAAA"
+                            textAlign="center"
+                            style={[
+                                estilos.parteData,
+                                estilos.ano
+                            ]}
+                            accessibilityLabel="Ano de nascimento"
+                        />
+                    </View>
+                ) : (
+                    <TextInput
+                        value={String(valor ?? '')}
+                        onChangeText={alterarTexto}
+                        editable={!salvando}
+                        multiline={false}
+                        maxLength={ehEmail ? 254 : 120}
+                        keyboardType={
+                            ehEmail
                                 ? 'email-address'
                                 : 'default'
-                    }
-                    autoCapitalize={
-                        ehEmail || ehData
-                            ? 'none'
-                            : 'words'
-                    }
-                    autoCorrect={
-                        !ehEmail && !ehData
-                    }
-                    placeholder={
-                        ehData
-                            ? 'DD/MM/AAAA'
-                            : undefined
-                    }
-                    accessibilityLabel={
-                        ehData
-                            ? 'Data de nascimento'
-                            : ehEmail
+                        }
+                        autoCapitalize={
+                            ehEmail
+                                ? 'none'
+                                : 'words'
+                        }
+                        autoCorrect={!ehEmail}
+                        accessibilityLabel={
+                            ehEmail
                                 ? 'E-mail'
                                 : 'Nome'
-                    }
-                    style={[
-                        estilos.campo,
-                        ehData && estilos.campoData
-                    ]}
-                />
+                        }
+                        style={estilos.campo}
+                    />
+                )}
 
                 {erro ? (
                     <Text
