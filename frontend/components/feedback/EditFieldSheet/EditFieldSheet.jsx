@@ -1,9 +1,9 @@
 //Mostra um campo de texto dentro de um BottomSheet.
 
 import { Text, TextInput, View } from 'react-native'
-import { BottomSheet } from './BottomSheet'
-import { BottomSheetLayout } from '../../layouts/BottomSheetLayout'
 import { estilos } from './EditFieldSheet.style'
+import { BottomSheet } from '../Bottomsheet/BottomSheet'
+import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
 
 function EditFieldSheet({
     visivel,
