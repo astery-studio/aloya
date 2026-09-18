@@ -13,14 +13,24 @@ import { estilos } from './BottomSheet.style'
 function BottomSheet({
     visivel,
     onFechar,
-    children
+    children,
+    fecharAoTocarFora = false,
+    bloquearFechamento = false
 }) {
+    const podeFecharFora = fecharAoTocarFora && !bloquearFechamento
+
+    function solicitarFechamento() {
+        if (!bloquearFechamento) {
+            onFechar()
+        }
+    }
+
     return (
         <Modal
             visible={visivel}
             transparent
             animationType="slide"
-            onRequestClose={onFechar}
+            onRequestClose={solicitarFechamento}
         >
             <KeyboardAvoidingView
                 style={estilos.tela}
@@ -32,7 +42,12 @@ function BottomSheet({
             >
                 <Pressable
                     style={estilos.fundo}
-                    onPress={onFechar}
+                    onPress={
+                        podeFecharFora
+                            ? solicitarFechamento
+                            : undefined
+                    }
+                    disabled={!podeFecharFora}
                     accessibilityRole="button"
                     accessibilityLabel="Fechar painel"
                 />

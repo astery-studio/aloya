@@ -24,6 +24,8 @@ import { ButtonSelection } from './components/common/Button/ButtonSelection/Butt
 import { SelectionSheet } from './components/feedback/SelectionSheet/SelectionSheet'
 import { EditFieldSheet } from './components/feedback/EditFieldSheet/EditFieldSheet'
 
+const [dataNascimento, setDataNascimento] = useState('08/04/1999')
+
 const opcoesGenero = [
     { id: 'nao-informar', label: 'Prefiro não informar' },
     { id: 'mulher-cis', label: 'Mulher Cisgênero' },
@@ -62,6 +64,77 @@ function criarOpcaoLonga(_, indice) {
 
 const opcoesLongas =
     Array.from({ length: 30 }, criarOpcaoLonga)
+
+/**
+ * Recebe uma data em DD/MM/AAAA.
+ * Verifica dia, mês, ano, ano bissexto e data futura.
+ * Retorna YYYY-MM-DD se for válida; caso contrário, retorna null.
+ */
+function converterDataValida(valor) {
+    const partes =
+        /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor)
+
+    if (!partes) {
+        return null
+    }
+
+    const dia = Number(partes[1])
+    const mes = Number(partes[2])
+    const ano = Number(partes[3])
+
+    if (ano < 1 || mes < 1 || mes > 12) {
+        return null
+    }
+
+    const anoBissexto =
+        ano % 4 === 0
+        && (
+            ano % 100 !== 0
+            || ano % 400 === 0
+        )
+
+    const diasPorMes = [
+        31,
+        anoBissexto ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31
+    ]
+
+    if (
+        dia < 1
+        || dia > diasPorMes[mes - 1]
+    ) {
+        return null
+    }
+
+    const hoje = new Date()
+
+    const dataFutura =
+        ano > hoje.getFullYear()
+        || (
+            ano === hoje.getFullYear()
+            && mes > hoje.getMonth() + 1
+        )
+        || (
+            ano === hoje.getFullYear()
+            && mes === hoje.getMonth() + 1
+            && dia > hoje.getDate()
+        )
+
+    if (dataFutura) {
+        return null
+    }
+
+    return `${partes[3]}-${partes[2]}-${partes[1]}`
+}
 
 const selecoesDisponiveis = {
     genero: {
