@@ -1,10 +1,10 @@
 //Mostra uma lista de opções dentro de um BottomSheet
 
 import { FlatList, Text } from 'react-native'
-import { BottomSheet } from './BottomSheet'
-import { BottomSheetLayout } from '../../layouts/BottomSheetLayout'
-import { ButtonSelection } from '../common/ButtonSelection'
 import { estilos } from './SelectionSheet.style'
+import { BottomSheet } from '../Bottomsheet/BottomSheet'
+import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
+import { ButtonSelection } from '../../common/Button/ButtonSelection/ButtonSelection'
 
 function obterChave(opcao) {
     return String(opcao.id)
