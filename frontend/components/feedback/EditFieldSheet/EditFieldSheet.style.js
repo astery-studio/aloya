@@ -18,40 +18,8 @@ const estilos = StyleSheet.create({
         includeFontPadding: false
     },
 
-    caixaData: {
-        width: '100%',
-        height: 56,
-        marginTop: 24,
-        paddingHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-        borderWidth: 1.41,
-        borderColor: tema.cores.marca.secundaria,
-        backgroundColor: tema.cores.neutras.fundoClaro
-    },
-
-    parteData: {
-        ...tema.typography.bodyDefault,
-        height: 52,
-        padding: 0,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        textAlignVertical: 'center',
-        includeFontPadding: false
-    },
-
-    diaMes: {
-        width: 30
-    },
-
-    ano: {
-        width: 54
-    },
-
-    barraData: {
-        ...tema.typography.bodyDefault,
-        color: tema.cores.neutras.textoPrincipalClaro
+    campoData: {
+        textAlign: 'center'
     },
 
     erro: {
