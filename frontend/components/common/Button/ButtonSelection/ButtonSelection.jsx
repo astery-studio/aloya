@@ -1,25 +1,14 @@
 //Mostra uma opção que pode ser selecionada. É usado nas listas de SelectionSheet.
-
 import { Pressable, Text, View } from 'react-native'
 import { estilos, corIconeNormal, corIconeSelecionado } from './ButtonSelection.style'
 
-function ButtonSelection({
-    label,
-    selected = false,
-    onPress,
-    icone: Icone,
-    descricao,
-    desabilitado = false
-}) {
+function ButtonSelection({ label, selected = false, onPress, icone: Icone, descricao, desabilitado = false }) {
     return (
         <Pressable
             onPress={onPress}
             disabled={desabilitado}
             accessibilityRole="button"
-            accessibilityState={{
-                selected,
-                disabled: desabilitado
-            }}
+            accessibilityState={{ selected, disabled: desabilitado }}
             style={[
                 estilos.container,
                 selected && estilos.selecionado,
@@ -29,11 +18,7 @@ function ButtonSelection({
             {Icone ? (
                 <Icone
                     size={24}
-                    color={
-                        selected
-                            ? corIconeSelecionado
-                            : corIconeNormal
-                    }
+                    color={selected ? corIconeSelecionado : corIconeNormal}
                 />
             ) : null}
 
