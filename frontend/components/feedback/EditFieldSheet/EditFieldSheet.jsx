@@ -112,8 +112,8 @@ function EditFieldSheet({
     }
 
     return (
-        <BottomSheet
-            visivel={visivel}
+        <BottomSheetLayout
+            titulo={titulo}
             onFechar={onFechar}
             bloquearFechamento={salvando}
         >
