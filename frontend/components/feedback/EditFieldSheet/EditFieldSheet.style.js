@@ -1,9 +1,3 @@
-/**
- * Define a aparência dos campos do painel de edição.
- * É usado por EditFieldSheet.jsx.
- * Existe para manter o visual separado da lógica dos campos.
- */
-
 import { Platform, StyleSheet } from 'react-native'
 import { tema } from '../../../theme'
 
@@ -17,8 +11,7 @@ const estilos = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1.41,
         borderColor: tema.cores.marca.secundaria,
-        backgroundColor:
-            tema.cores.neutras.fundoClaro
+        backgroundColor: tema.cores.neutras.fundoClaro
     },
 
     campo: {
@@ -26,8 +19,7 @@ const estilos = StyleSheet.create({
         width: '100%',
         height: 24,
         padding: 0,
-        color:
-            tema.cores.neutras.textoPrincipalClaro,
+        color: tema.cores.neutras.textoPrincipalClaro,
         textAlignVertical: 'center',
         includeFontPadding: false,
         ...Platform.select({
