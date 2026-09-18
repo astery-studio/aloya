@@ -1,7 +1,7 @@
 /**
- * Mostra as variantes dos componentes de painel no Expo.
- * É usado temporariamente durante os testes visuais.
- * Existe para conferir estados e interações sem chamar a API.
+ * Mostra os componentes de BottomSheet para teste no Expo.
+ * É usado temporariamente no lugar da tela principal do aplicativo.
+ * Existe para conferir aparência e interações sem chamar a API.
  */
 
 import { useEffect, useState } from 'react'
@@ -57,8 +57,8 @@ const opcoesFrequencia = [
 
 /**
  * Recebe o índice de uma opção de teste.
- * Cria uma opção com chave única.
- * Retorna uma opção para testar rolagem.
+ * Cria uma opção com identificação única.
+ * Retorna uma opção para testar a rolagem.
  */
 function criarOpcaoLonga(_, indice) {
     return {
@@ -73,39 +73,34 @@ const opcoesLongas =
 const selecoesDisponiveis = {
     genero: {
         titulo: 'Identidade de Gênero',
-        cabecalho: 'alca',
         opcoes: opcoesGenero
     },
 
     tipo: {
         titulo: 'Tipo de Anticoncepcional',
-        cabecalho: 'fechar',
         opcoes: opcoesTipo
     },
 
     frequencia: {
         titulo: 'Frequência de Uso',
-        cabecalho: 'fechar',
         opcoes: opcoesFrequencia
     },
 
     vazia: {
         titulo: 'Lista vazia',
-        cabecalho: 'fechar',
         opcoes: []
     },
 
     longa: {
         titulo: 'Lista longa para rolagem',
-        cabecalho: 'fechar',
         opcoes: opcoesLongas
     }
 }
 
 /**
  * Recebe uma data em DD/MM/AAAA.
- * Rejeita dias impossíveis, ano bissexto incorreto e data futura.
- * Retorna YYYY-MM-DD quando a data é válida; senão, null.
+ * Rejeita datas impossíveis, bissextos incorretos e datas futuras.
+ * Retorna AAAA-MM-DD quando a data é válida; senão, null.
  */
 function converterDataValida(valor) {
     const partes =
@@ -175,8 +170,8 @@ function converterDataValida(valor) {
 
 /**
  * Recebe texto, código e ação de abertura.
- * Mostra um botão nativo apenas nesta tela temporária.
- * Retorna o controle de um caso de teste.
+ * Mostra um botão nativo somente nesta tela de testes.
+ * Retorna o botão de um caso de teste.
  */
 function BotaoTeste({
     titulo,
@@ -184,9 +179,9 @@ function BotaoTeste({
     onAbrir
 }) {
     /**
-     * Não recebe argumentos.
-     * Abre o caso indicado pelo código.
-     * Não retorna nenhum valor.
+     * Não recebe dados.
+     * Abre o caso de teste indicado pelo código.
+     * Não retorna valor.
      */
     function abrirEsteTeste() {
         onAbrir(codigo)
@@ -204,8 +199,8 @@ function BotaoTeste({
 
 /**
  * Não recebe propriedades.
- * Mostra os casos de teste dos cinco componentes.
- * Retorna uma tela temporária para o Expo.
+ * Mostra os estados dos componentes para conferência no Expo.
+ * Retorna a tela temporária de testes.
  */
 export default function App() {
     const [fontesCarregadas, erroFontes] =
@@ -217,26 +212,32 @@ export default function App() {
         })
 
     const [painel, setPainel] = useState(null)
+
     const [nome, setNome] = useState('Julia')
+
     const [email, setEmail] =
         useState('juliadesign2025@gmail.com')
+
     const [dataNascimento, setDataNascimento] =
         useState('08/04/1999')
-    const [erroCampo, setErroCampo] = useState('')
+
+    const [erroCampo, setErroCampo] =
+        useState('')
+
     const [simulandoSalvar, setSimulandoSalvar] =
         useState(false)
 
     const [selecoes, setSelecoes] = useState({
-        genero: 'mulher-cis',
+        genero: 'nao-informar',
         tipo: 'pilula',
         frequencia: 'mensal',
         longa: 'opcao-0'
     })
 
     /**
-     * Recebe o código do teste.
-     * Prepara o estado e abre somente aquele painel.
-     * Não retorna nenhum valor.
+     * Recebe o código de um caso de teste.
+     * Prepara erro e carregamento antes de abrir o painel.
+     * Não retorna valor.
      */
     function abrirPainel(codigo) {
         setErroCampo(
@@ -253,23 +254,23 @@ export default function App() {
     }
 
     /**
-     * Não recebe argumentos.
-     * Fecha o painel aberto.
-     * Não retorna nenhum valor.
+     * Não recebe dados.
+     * Fecha o painel que está aberto.
+     * Não retorna valor.
      */
     function fecharPainel() {
         setPainel(null)
     }
 
     /**
-     * Recebe o id tocado.
-     * Atualiza a seleção sem fechar, para mostrar o destaque.
-     * Não retorna nenhum valor.
+     * Recebe o identificador da opção tocada.
+     * Atualiza a opção selecionada no painel atual.
+     * Não retorna valor.
      */
     function selecionarOpcao(id) {
         /**
          * Recebe as seleções anteriores.
-         * Troca somente a seleção do painel atual.
+         * Troca somente a opção do painel aberto.
          * Retorna as seleções atualizadas.
          */
         function atualizarSelecoes(anteriores) {
@@ -285,7 +286,7 @@ export default function App() {
     /**
      * Recebe o texto digitado.
      * Atualiza o campo aberto e limpa o erro anterior.
-     * Não retorna nenhum valor.
+     * Não retorna valor.
      */
     function alterarCampo(texto) {
         setErroCampo('')
@@ -304,9 +305,9 @@ export default function App() {
     }
 
     /**
-     * Não recebe argumentos.
-     * Valida o campo atual somente para testar a interface.
-     * Não envia dados nem retorna um valor.
+     * Não recebe dados.
+     * Valida o campo somente para testar a interface.
+     * Não chama a API nem retorna valor.
      */
     function testarSalvar() {
         if (painel === 'data') {
@@ -369,9 +370,9 @@ export default function App() {
     }
 
     /**
-     * Não recebe argumentos.
-     * Confirma que uma opção isolada recebeu o toque.
-     * Não retorna nenhum valor.
+     * Não recebe dados.
+     * Confirma o toque em uma opção isolada.
+     * Não retorna valor.
      */
     function testarToqueNaOpcao() {
         Alert.alert(
@@ -381,15 +382,16 @@ export default function App() {
     }
 
     /**
-     * Não recebe argumentos.
-     * Termina o salvamento simulado.
-     * Não retorna nenhum valor.
+     * Não recebe dados.
+     * Encerra o estado de salvamento simulado.
+     * Não retorna valor.
      */
     function terminarSimulacao() {
         setSimulandoSalvar(false)
     }
 
-    // useEffect agenda o fim do teste de carregamento após 5 segundos.
+    // useEffect executa um efeito depois da renderização.
+    // Aqui, ele encerra o teste de salvamento após cinco segundos.
     useEffect(() => {
         if (painel !== 'salvando') {
             return undefined
@@ -399,9 +401,9 @@ export default function App() {
             setTimeout(terminarSimulacao, 5000)
 
         /**
-         * Não recebe argumentos.
-         * Cancela o tempo pendente se o painel mudar.
-         * Não retorna nenhum valor.
+         * Não recebe dados.
+         * Cancela o temporizador se o painel mudar.
+         * Não retorna valor.
          */
         function limparTemporizador() {
             clearTimeout(temporizador)
@@ -428,8 +430,8 @@ export default function App() {
         selecoesDisponiveis[painel]
 
     const mostraPainelBase =
-        painel === 'baseAlca'
-        || painel === 'baseX'
+        painel === 'basePadrao'
+        || painel === 'baseTituloLongo'
 
     const mostraEdicao = [
         'nome',
@@ -454,17 +456,17 @@ export default function App() {
                     paddingBottom: 48
                 }}
             >
-                <Text>BottomSheet e layout</Text>
+                <Text>BottomSheet padrão</Text>
 
                 <BotaoTeste
-                    titulo="Sem X: tocar fora fecha"
-                    codigo="baseAlca"
+                    titulo="Cabeçalho padrão com X"
+                    codigo="basePadrao"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Com X: tocar fora NÃO fecha"
-                    codigo="baseX"
+                    titulo="Título longo: testar quebra"
+                    codigo="baseTituloLongo"
                     onAbrir={abrirPainel}
                 />
 
@@ -510,19 +512,19 @@ export default function App() {
                 <Text>SelectionSheet</Text>
 
                 <BotaoTeste
-                    titulo="Gênero: sem X"
+                    titulo="Identidade de gênero"
                     codigo="genero"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Tipo: com X"
+                    titulo="Tipo de anticoncepcional"
                     codigo="tipo"
                     onAbrir={abrirPainel}
                 />
 
                 <BotaoTeste
-                    titulo="Frequência: com X"
+                    titulo="Frequência de uso"
                     codigo="frequencia"
                     onAbrir={abrirPainel}
                 />
@@ -560,7 +562,7 @@ export default function App() {
                 />
 
                 <BotaoTeste
-                    titulo="Mostrar erro"
+                    titulo="Mostrar erro no campo"
                     codigo="erroNome"
                     onAbrir={abrirPainel}
                 />
@@ -584,25 +586,16 @@ export default function App() {
             >
                 <BottomSheetLayout
                     titulo={
-                        painel === 'baseX'
-                            ? 'Cabeçalho com X'
-                            : 'Cabeçalho com alça'
-                    }
-                    cabecalho={
-                        painel === 'baseX'
-                            ? 'fechar'
-                            : 'alca'
+                        painel === 'baseTituloLongo'
+                            ? 'Um título muito longo para testar a quebra de linha no cabeçalho do painel'
+                            : 'Cabeçalho padrão'
                     }
                     onFechar={fecharPainel}
                 >
                     <Text>
-                        Teste o toque fora do painel.
+                        Toque fora do painel: ele deve
+                        continuar aberto. Feche pelo X.
                     </Text>
-
-                    <BotaoNativo
-                        title="Fechar por dentro"
-                        onPress={fecharPainel}
-                    />
                 </BottomSheetLayout>
             </BottomSheet>
 
@@ -610,10 +603,6 @@ export default function App() {
                 visivel={Boolean(configuracaoSelecao)}
                 titulo={
                     configuracaoSelecao?.titulo ?? ''
-                }
-                cabecalho={
-                    configuracaoSelecao?.cabecalho
-                    ?? 'fechar'
                 }
                 opcoes={
                     configuracaoSelecao?.opcoes ?? []
