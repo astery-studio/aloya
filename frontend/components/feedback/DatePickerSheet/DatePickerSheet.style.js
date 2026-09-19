@@ -141,6 +141,22 @@ const estilos = StyleSheet.create({
 
     textoOpcaoDesabilitada: {
         color: tema.cores.neutras.bordaTracejada
+    },
+
+    mensagem: {
+        marginTop: tema.espacamentos.pequeno,
+        color: tema.cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 14,
+        textAlign: 'center'
+    },
+
+    mensagemErro: {
+        marginTop: tema.espacamentos.pequeno,
+        color: tema.cores.feedback.erro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 14,
+        textAlign: 'center'
     }
 })
 
