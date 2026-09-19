@@ -1,8 +1,11 @@
+//Define a aparência do calendário e das listas de mês e ano
 import { StyleSheet } from 'react-native'
 import { fontFamilies, tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
     calendario: {
+        width: '100%',
+        alignSelf: 'center',
         paddingTop: tema.espacamentos.grande,
         paddingBottom: tema.espacamentos.medio
     },
@@ -22,9 +25,23 @@ const estilos = StyleSheet.create({
         justifyContent: 'center'
     },
 
-    tituloMes: {
+    tituloData: {
         flex: 1,
-        textAlign: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    botaoTitulo: {
+        minHeight: 44,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 4,
+        gap: 3
+    },
+
+    tituloMes: {
         color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
         fontSize: 18,
@@ -33,12 +50,13 @@ const estilos = StyleSheet.create({
     },
 
     linhaSemana: {
+        width: '100%',
         flexDirection: 'row',
         marginBottom: tema.espacamentos.pequeno
     },
 
     casaSemana: {
-        width: '14.285714%',
+        flex: 1,
         minHeight: 36,
         alignItems: 'center',
         justifyContent: 'center'
@@ -53,12 +71,16 @@ const estilos = StyleSheet.create({
     },
 
     grade: {
-        flexDirection: 'row',
-        flexWrap: 'wrap'
+        width: '100%'
+    },
+
+    linhaCalendario: {
+        width: '100%',
+        flexDirection: 'row'
     },
 
     casaDia: {
-        width: '14.285714%',
+        flex: 1,
         height: 48,
         alignItems: 'center',
         justifyContent: 'center'
@@ -90,6 +112,34 @@ const estilos = StyleSheet.create({
     },
 
     textoDiaDesabilitado: {
+        color: tema.cores.neutras.bordaTracejada
+    },
+
+    listaOpcoes: {
+        height: 288,
+        flexGrow: 0
+    },
+
+    opcaoLista: {
+        height: 48,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    textoOpcao: {
+        color: tema.cores.neutras.textoPrincipalClaro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 16,
+        lineHeight: 24,
+        includeFontPadding: false
+    },
+
+    textoOpcaoSelecionada: {
+        color: tema.cores.marca.primaria,
+        fontFamily: fontFamilies.bold
+    },
+
+    textoOpcaoDesabilitada: {
         color: tema.cores.neutras.bordaTracejada
     }
 })
