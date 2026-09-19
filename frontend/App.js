@@ -1,14 +1,12 @@
 /**
- * Mostra os componentes de BottomSheet para teste no Expo.
- * É usado temporariamente no lugar da tela principal do aplicativo.
- * Existe para conferir aparência e interações sem chamar a API.
+ * Mostra somente os testes do calendário no Expo.
+ * É usado temporariamente como entrada do aplicativo.
+ * Existe para conferir o DatePickerSheet sem API e sem outras telas.
  */
 
-import { useEffect, useState } from 'react'
-
+import { useState } from 'react'
 import {
-    Alert,
-    Button as BotaoNativo,
+    Button,
     ScrollView,
     Text,
     View
@@ -22,185 +20,42 @@ import {
     useFonts
 } from '@expo-google-fonts/dm-sans'
 
-import { CheckIcon } from 'phosphor-react-native/src/icons/Check'
-
+import { DatePickerSheet } from './components/feedback/DatePickerSheet/DatePickerSheet'
 import { tema } from './theme'
-import { BottomSheet } from './components/feedback/Bottomsheet/BottomSheet'
-import { BottomSheetLayout } from './layouts/BottomSheet/BottomSheetLayout'
-import { ButtonSelection } from './components/common/Button/ButtonSelection/ButtonSelection'
-import { SelectionSheet } from './components/feedback/SelectionSheet/SelectionSheet'
-import { EditFieldSheet } from './components/feedback/EditFieldSheet/EditFieldSheet'
 
-const opcoesGenero = [
-    { id: 'nao-informar', label: 'Prefiro não informar' },
-    { id: 'mulher-cis', label: 'Mulher Cisgênero' },
-    { id: 'homem-cis', label: 'Homem Cisgênero' },
-    { id: 'mulher-trans', label: 'Mulher Trans' },
-    { id: 'homem-trans', label: 'Homem Trans' },
-    { id: 'nao-binario', label: 'Não-binário' },
-    { id: 'outro', label: 'Outro' }
-]
-
-const opcoesTipo = [
-    { id: 'pilula', label: 'Pílula' },
-    { id: 'injetavel', label: 'Injetável' },
-    { id: 'adesivo', label: 'Adesivo' },
-    { id: 'anel', label: 'Anel Vaginal' },
-    { id: 'diu', label: 'DIU Hormonal' }
-]
-
-const opcoesFrequencia = [
-    { id: 'mensal', label: 'Mensal' },
-    { id: 'dois-meses', label: 'A cada 2 meses' },
-    { id: 'tres-meses', label: 'A cada 3 meses' }
-]
-
-/**
- * Recebe o índice de uma opção de teste.
- * Cria uma opção com identificação única.
- * Retorna uma opção para testar a rolagem.
- */
-function criarOpcaoLonga(_, indice) {
-    return {
-        id: `opcao-${indice}`,
-        label: `Opção de teste ${indice + 1}`
-    }
-}
-
-const opcoesLongas =
-    Array.from({ length: 30 }, criarOpcaoLonga)
-
-const selecoesDisponiveis = {
-    genero: {
-        titulo: 'Identidade de Gênero',
-        opcoes: opcoesGenero
-    },
-
-    tipo: {
-        titulo: 'Tipo de Anticoncepcional',
-        opcoes: opcoesTipo
-    },
-
-    frequencia: {
-        titulo: 'Frequência de Uso',
-        opcoes: opcoesFrequencia
-    },
-
-    vazia: {
-        titulo: 'Lista vazia',
-        opcoes: []
-    },
-
-    longa: {
-        titulo: 'Lista longa para rolagem',
-        opcoes: opcoesLongas
-    }
+const titulos = {
+    selecionada: 'Edição Data de Validade',
+    vazia: 'Selecionar Data',
+    bissexto: 'Edição Data de Validade',
+    nascimento: 'Editar Data de Nascimento',
+    limites: 'Selecionar Data',
+    tituloLongo:
+        'Título grande para testar a quebra de linha do calendário'
 }
 
 /**
- * Recebe uma data em DD/MM/AAAA.
- * Rejeita datas impossíveis, bissextos incorretos e datas futuras.
- * Retorna AAAA-MM-DD quando a data é válida; senão, null.
+ * Não recebe dados.
+ * Monta a data de hoje no horário local do celular.
+ * Retorna a data no formato AAAA-MM-DD.
  */
-function converterDataValida(valor) {
-    const partes =
-        /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor)
-
-    if (!partes) {
-        return null
-    }
-
-    const dia = Number(partes[1])
-    const mes = Number(partes[2])
-    const ano = Number(partes[3])
-
-    if (ano < 1 || mes < 1 || mes > 12) {
-        return null
-    }
-
-    const bissexto =
-        ano % 4 === 0
-        && (
-            ano % 100 !== 0
-            || ano % 400 === 0
-        )
-
-    const diasPorMes = [
-        31,
-        bissexto ? 29 : 28,
-        31,
-        30,
-        31,
-        30,
-        31,
-        31,
-        30,
-        31,
-        30,
-        31
-    ]
-
-    if (
-        dia < 1
-        || dia > diasPorMes[mes - 1]
-    ) {
-        return null
-    }
-
+function obterHoje() {
     const hoje = new Date()
 
-    const futura =
-        ano > hoje.getFullYear()
-        || (
-            ano === hoje.getFullYear()
-            && mes > hoje.getMonth() + 1
-        )
-        || (
-            ano === hoje.getFullYear()
-            && mes === hoje.getMonth() + 1
-            && dia > hoje.getDate()
-        )
+    const ano = hoje.getFullYear()
+    const mes = String(
+        hoje.getMonth() + 1
+    ).padStart(2, '0')
+    const dia = String(
+        hoje.getDate()
+    ).padStart(2, '0')
 
-    if (futura) {
-        return null
-    }
-
-    return `${partes[3]}-${partes[2]}-${partes[1]}`
-}
-
-/**
- * Recebe texto, código e ação de abertura.
- * Mostra um botão nativo somente nesta tela de testes.
- * Retorna o botão de um caso de teste.
- */
-function BotaoTeste({
-    titulo,
-    codigo,
-    onAbrir
-}) {
-    /**
-     * Não recebe dados.
-     * Abre o caso de teste indicado pelo código.
-     * Não retorna valor.
-     */
-    function abrirEsteTeste() {
-        onAbrir(codigo)
-    }
-
-    return (
-        <View style={{ marginBottom: 8 }}>
-            <BotaoNativo
-                title={titulo}
-                onPress={abrirEsteTeste}
-            />
-        </View>
-    )
+    return `${ano}-${mes}-${dia}`
 }
 
 /**
  * Não recebe propriedades.
- * Mostra os estados dos componentes para conferência no Expo.
- * Retorna a tela temporária de testes.
+ * Mostra os casos de teste e abre o calendário escolhido.
+ * Retorna a tela temporária do Expo.
  */
 export default function App() {
     const [fontesCarregadas, erroFontes] =
@@ -211,236 +66,123 @@ export default function App() {
             DMSans_700Bold
         })
 
-    const [painel, setPainel] = useState(null)
+    const [cenarioAberto, setCenarioAberto] =
+        useState(null)
 
-    const [nome, setNome] = useState('Julia')
-
-    const [email, setEmail] =
-        useState('juliadesign2025@gmail.com')
-
-    const [dataNascimento, setDataNascimento] =
-        useState('08/04/1999')
-
-    const [erroCampo, setErroCampo] =
-        useState('')
-
-    const [simulandoSalvar, setSimulandoSalvar] =
-        useState(false)
-
-    const [selecoes, setSelecoes] = useState({
-        genero: 'nao-informar',
-        tipo: 'pilula',
-        frequencia: 'mensal',
-        longa: 'opcao-0'
-    })
+    const [datasSelecionadas, setDatasSelecionadas] =
+        useState({
+            selecionada: '1999-04-08',
+            vazia: null,
+            bissexto: '2024-02-29',
+            nascimento: '1999-04-08',
+            limites: '2024-02-15',
+            tituloLongo: '1999-04-08'
+        })
 
     /**
-     * Recebe o código de um caso de teste.
-     * Prepara erro e carregamento antes de abrir o painel.
+     * Recebe o nome de um cenário.
+     * Abre o calendário correspondente.
      * Não retorna valor.
      */
-    function abrirPainel(codigo) {
-        setErroCampo(
-            codigo === 'erroNome'
-                ? 'Mensagem de erro para testar o layout.'
-                : ''
-        )
-
-        setSimulandoSalvar(
-            codigo === 'salvando'
-        )
-
-        setPainel(codigo)
+    function abrirCalendario(cenario) {
+        setCenarioAberto(cenario)
     }
 
     /**
      * Não recebe dados.
-     * Fecha o painel que está aberto.
+     * Fecha o calendário pelo X.
      * Não retorna valor.
      */
-    function fecharPainel() {
-        setPainel(null)
+    function fecharCalendario() {
+        setCenarioAberto(null)
     }
 
     /**
-     * Recebe o identificador da opção tocada.
-     * Atualiza a opção selecionada no painel atual.
+     * Recebe a data tocada no formato AAAA-MM-DD.
+     * Atualiza somente o cenário que está aberto.
      * Não retorna valor.
      */
-    function selecionarOpcao(id) {
+    function selecionarData(data) {
         /**
-         * Recebe as seleções anteriores.
-         * Troca somente a opção do painel aberto.
-         * Retorna as seleções atualizadas.
+         * Recebe as datas anteriores.
+         * Substitui somente a data do teste atual.
+         * Retorna as datas atualizadas.
          */
-        function atualizarSelecoes(anteriores) {
+        function atualizarDatas(anteriores) {
             return {
                 ...anteriores,
-                [painel]: id
+                [cenarioAberto]: data
             }
         }
 
-        setSelecoes(atualizarSelecoes)
+        setDatasSelecionadas(atualizarDatas)
     }
 
     /**
-     * Recebe o texto digitado.
-     * Atualiza o campo aberto e limpa o erro anterior.
-     * Não retorna valor.
+     * Recebe o nome e o texto de um cenário.
+     * Mostra o botão que abre o teste e a data escolhida.
+     * Retorna os elementos desse teste.
      */
-    function alterarCampo(texto) {
-        setErroCampo('')
-
-        if (painel === 'data') {
-            setDataNascimento(texto)
-            return
-        }
-
-        if (painel === 'email') {
-            setEmail(texto)
-            return
-        }
-
-        setNome(texto)
-    }
-
-    /**
-     * Não recebe dados.
-     * Valida o campo somente para testar a interface.
-     * Não chama a API nem retorna valor.
-     */
-    function testarSalvar() {
-        if (painel === 'data') {
-            const dataParaApi =
-                converterDataValida(
-                    dataNascimento
-                )
-
-            if (!dataParaApi) {
-                setErroCampo(
-                    'Informe uma data de nascimento válida.'
-                )
-                return
-            }
-
-            Alert.alert(
-                'Teste',
-                'Data validada localmente.'
-            )
-            return
-        }
-
-        if (painel === 'email') {
-            const emailNormalizado =
-                email.trim().toLowerCase()
-
-            const emailValido =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-                    emailNormalizado
-                )
-
-            if (!emailValido) {
-                setErroCampo(
-                    'Informe um e-mail válido.'
-                )
-                return
-            }
-
-            Alert.alert(
-                'Teste',
-                'E-mail validado localmente.'
-            )
-            return
-        }
-
-        const nomeNormalizado =
-            nome.trim().replace(/\s+/g, ' ')
-
-        if (nomeNormalizado.length < 3) {
-            setErroCampo(
-                'O nome deve ter pelo menos 3 caracteres.'
-            )
-            return
-        }
-
-        Alert.alert(
-            'Teste',
-            'Nome validado localmente.'
-        )
-    }
-
-    /**
-     * Não recebe dados.
-     * Confirma o toque em uma opção isolada.
-     * Não retorna valor.
-     */
-    function testarToqueNaOpcao() {
-        Alert.alert(
-            'Teste',
-            'A opção recebeu o toque.'
-        )
-    }
-
-    /**
-     * Não recebe dados.
-     * Encerra o estado de salvamento simulado.
-     * Não retorna valor.
-     */
-    function terminarSimulacao() {
-        setSimulandoSalvar(false)
-    }
-
-    // useEffect executa um efeito depois da renderização.
-    // Aqui, ele encerra o teste de salvamento após cinco segundos.
-    useEffect(() => {
-        if (painel !== 'salvando') {
-            return undefined
-        }
-
-        const temporizador =
-            setTimeout(terminarSimulacao, 5000)
-
+    function mostrarTeste(cenario, descricao) {
         /**
          * Não recebe dados.
-         * Cancela o temporizador se o painel mudar.
+         * Abre este cenário ao tocar no botão.
          * Não retorna valor.
          */
-        function limparTemporizador() {
-            clearTimeout(temporizador)
+        function abrirEsteTeste() {
+            abrirCalendario(cenario)
         }
 
-        return limparTemporizador
-    }, [painel])
+        return (
+            <View
+                key={cenario}
+                style={{ marginBottom: 20 }}
+            >
+                <Button
+                    title={descricao}
+                    onPress={abrirEsteTeste}
+                />
+
+                <Text
+                    style={{
+                        marginTop: 6,
+                        color:
+                            tema.cores.neutras
+                                .textoSecundarioClaro
+                    }}
+                >
+                    Selecionada: {
+                        datasSelecionadas[cenario]
+                        ?? 'nenhuma'
+                    }
+                </Text>
+            </View>
+        )
+    }
 
     if (erroFontes) {
         return (
-            <Text>
-                Não foi possível carregar as fontes.
-            </Text>
+            <View style={{ padding: 24 }}>
+                <Text>
+                    Não foi possível carregar as fontes.
+                </Text>
+            </View>
         )
     }
 
     if (!fontesCarregadas) {
         return (
-            <Text>Carregando fontes...</Text>
+            <View style={{ padding: 24 }}>
+                <Text>Carregando fontes...</Text>
+            </View>
         )
     }
 
-    const configuracaoSelecao =
-        selecoesDisponiveis[painel]
+    const ehNascimento =
+        cenarioAberto === 'nascimento'
 
-    const mostraPainelBase =
-        painel === 'basePadrao'
-        || painel === 'baseTituloLongo'
-
-    const mostraEdicao = [
-        'nome',
-        'email',
-        'data',
-        'erroNome',
-        'salvando',
-        'semBotao'
-    ].includes(painel)
+    const temLimites =
+        cenarioAberto === 'limites'
 
     return (
         <View
@@ -453,209 +195,93 @@ export default function App() {
             <ScrollView
                 contentContainerStyle={{
                     padding: 24,
+                    paddingTop: 64,
                     paddingBottom: 48
                 }}
             >
-                <Text>BottomSheet padrão</Text>
+                <Text
+                    style={{
+                        color:
+                            tema.cores.neutras
+                                .textoPrincipalClaro,
+                        fontFamily:
+                            'DMSans_700Bold',
+                        fontSize: 24,
+                        marginBottom: 8
+                    }}
+                >
+                    Teste do calendário
+                </Text>
 
-                <BotaoTeste
-                    titulo="Cabeçalho padrão com X"
-                    codigo="basePadrao"
-                    onAbrir={abrirPainel}
-                />
+                <Text
+                    style={{
+                        color:
+                            tema.cores.neutras
+                                .textoSecundarioClaro,
+                        marginBottom: 24
+                    }}
+                >
+                    Escolha um caso abaixo. Toque em
+                    um dia para selecioná-lo e no X
+                    para fechar.
+                </Text>
 
-                <BotaoTeste
-                    titulo="Título longo: testar quebra"
-                    codigo="baseTituloLongo"
-                    onAbrir={abrirPainel}
-                />
+                {mostrarTeste(
+                    'selecionada',
+                    'Data já selecionada: 08/04/1999'
+                )}
 
-                <Text>ButtonSelection</Text>
+                {mostrarTeste(
+                    'vazia',
+                    'Sem data selecionada'
+                )}
 
-                <ButtonSelection
-                    label="Opção normal"
-                    onPress={testarToqueNaOpcao}
-                />
+                {mostrarTeste(
+                    'bissexto',
+                    'Ano bissexto: fevereiro de 2024'
+                )}
 
-                <ButtonSelection
-                    label="Opção selecionada"
-                    selected
-                    onPress={testarToqueNaOpcao}
-                />
+                {mostrarTeste(
+                    'nascimento',
+                    'Nascimento: bloquear futuro'
+                )}
 
-                <ButtonSelection
-                    label="Com descrição"
-                    descricao="Informação complementar."
-                    onPress={testarToqueNaOpcao}
-                />
+                {mostrarTeste(
+                    'limites',
+                    'Permitir somente 10 a 20/02/2024'
+                )}
 
-                <ButtonSelection
-                    label="Com ícone"
-                    icone={CheckIcon}
-                    onPress={testarToqueNaOpcao}
-                />
-
-                <ButtonSelection
-                    label="Selecionada, ícone e descrição"
-                    descricao="Todos os elementos juntos."
-                    icone={CheckIcon}
-                    selected
-                    onPress={testarToqueNaOpcao}
-                />
-
-                <ButtonSelection
-                    label="Desabilitada"
-                    desabilitado
-                    onPress={testarToqueNaOpcao}
-                />
-
-                <Text>SelectionSheet</Text>
-
-                <BotaoTeste
-                    titulo="Identidade de gênero"
-                    codigo="genero"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Tipo de anticoncepcional"
-                    codigo="tipo"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Frequência de uso"
-                    codigo="frequencia"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Lista vazia"
-                    codigo="vazia"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Lista longa: 30 opções"
-                    codigo="longa"
-                    onAbrir={abrirPainel}
-                />
-
-                <Text>EditFieldSheet</Text>
-
-                <BotaoTeste
-                    titulo="Editar nome"
-                    codigo="nome"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Editar e-mail"
-                    codigo="email"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Editar data de nascimento"
-                    codigo="data"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Mostrar erro no campo"
-                    codigo="erroNome"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Salvando por 5 segundos"
-                    codigo="salvando"
-                    onAbrir={abrirPainel}
-                />
-
-                <BotaoTeste
-                    titulo="Sem botão Salvar"
-                    codigo="semBotao"
-                    onAbrir={abrirPainel}
-                />
+                {mostrarTeste(
+                    'tituloLongo',
+                    'Título grande: testar quebra'
+                )}
             </ScrollView>
 
-            <BottomSheet
-                visivel={mostraPainelBase}
-                onFechar={fecharPainel}
-            >
-                <BottomSheetLayout
-                    titulo={
-                        painel === 'baseTituloLongo'
-                            ? 'Um título muito longo para testar a quebra de linha no cabeçalho do painel'
-                            : 'Cabeçalho padrão'
-                    }
-                    onFechar={fecharPainel}
-                >
-                    <Text>
-                        Toque fora do painel: ele deve
-                        continuar aberto. Feche pelo X.
-                    </Text>
-                </BottomSheetLayout>
-            </BottomSheet>
-
-            <SelectionSheet
-                visivel={Boolean(configuracaoSelecao)}
+            <DatePickerSheet
+                visivel={cenarioAberto !== null}
                 titulo={
-                    configuracaoSelecao?.titulo ?? ''
-                }
-                opcoes={
-                    configuracaoSelecao?.opcoes ?? []
+                    titulos[cenarioAberto]
+                    ?? 'Selecionar data'
                 }
                 valorSelecionado={
-                    selecoes[painel]
+                    datasSelecionadas[
+                        cenarioAberto
+                    ] ?? null
                 }
-                onSelecionar={selecionarOpcao}
-                onFechar={fecharPainel}
-            />
-
-            <EditFieldSheet
-                visivel={mostraEdicao}
-                titulo={
-                    painel === 'data'
-                        ? 'Editar Data de Nascimento'
-                        : painel === 'email'
-                            ? 'Editar E-mail'
-                            : 'Editar Nome'
+                dataMinima={
+                    temLimites
+                        ? '2024-02-10'
+                        : null
                 }
-                tipo={
-                    painel === 'data'
-                        ? 'data'
-                        : painel === 'email'
-                            ? 'email'
-                            : 'nome'
+                dataMaxima={
+                    ehNascimento
+                        ? obterHoje()
+                        : temLimites
+                            ? '2024-02-20'
+                            : null
                 }
-                valor={
-                    painel === 'data'
-                        ? dataNascimento
-                        : painel === 'email'
-                            ? email
-                            : nome
-                }
-                onAlterar={alterarCampo}
-                onFechar={fecharPainel}
-                erro={erroCampo}
-                salvando={simulandoSalvar}
-                botaoSalvar={
-                    painel === 'semBotao'
-                        ? null
-                        : (
-                            <BotaoNativo
-                                title={
-                                    simulandoSalvar
-                                        ? 'Salvando...'
-                                        : 'Salvar'
-                                }
-                                onPress={testarSalvar}
-                                disabled={simulandoSalvar}
-                            />
-                        )
-                }
+                onSelecionar={selecionarData}
+                onFechar={fecharCalendario}
             />
         </View>
     )
