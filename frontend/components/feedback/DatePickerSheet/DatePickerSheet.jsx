@@ -1,5 +1,5 @@
 //Mostra um calendário para escolher uma única data
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FlatList, Pressable, Text, View } from 'react-native'
 
 import { CaretLeftIcon } from 'phosphor-react-native/src/icons/CaretLeft'
@@ -149,6 +149,9 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
     const [anoVisivel, setAnoVisivel] = useState(dataInicial.ano)
     const [mesVisivel, setMesVisivel] = useState(dataInicial.mes)
     const [listaAberta, setListaAberta] = useState(null)
+    const [salvando, setSalvando] = useState(false)
+    const [erroSalvar, setErroSalvar] = useState('')
+    const salvamentoEmAndamento = useRef(false)
 
     const limiteMinimoValido = lerData(dataMinima) ? dataMinima : null
     const limiteMaximoValido = lerData(dataMaxima) ? dataMaxima : null
@@ -172,6 +175,7 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
         )
 
         setListaAberta(null)
+        setErroSalvar('')
     }, [visivel])
 
     function podeMostrarMes(ano, mes) {
@@ -237,7 +241,9 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
      * Não retorna valor.
      */
     function abrirListaDeMeses() {
-        setListaAberta('mes')
+        if (!salvando) {
+            setListaAberta('mes')
+        }
     }
 
     /**
@@ -246,7 +252,9 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
      * Não retorna valor.
      */
     function abrirListaDeAnos() {
-        setListaAberta('ano')
+        if (!salvando) {
+            setListaAberta('ano')
+        }
     }
 
     function podeSelecionarDia(data) {
@@ -285,9 +293,49 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
         const habilitado =
             podeSelecionarDia(casa.data)
 
-        function selecionarEsteDia() {
-            if (habilitado) {
-                onSelecionar?.(casa.data)
+        /**
+         * Não recebe dados.
+         * Salva a data escolhida e fecha o painel somente após sucesso.
+         * Não retorna valor.
+         */
+        async function selecionarEsteDia() {
+            if (
+                !habilitado
+                || salvamentoEmAndamento.current
+            ) {
+                return
+            }
+
+            if (typeof onSelecionar !== 'function') {
+                setErroSalvar(
+                    'Não foi possível salvar a data. Tente novamente.'
+                )
+                return
+            }
+
+            salvamentoEmAndamento.current = true
+            setSalvando(true)
+            setErroSalvar('')
+
+            try {
+                const resultado =
+                    await onSelecionar(casa.data)
+
+                if (resultado === false) {
+                    setErroSalvar(
+                        'Não foi possível salvar a data. Tente novamente.'
+                    )
+                    return
+                }
+
+                onFechar?.()
+            } catch {
+                setErroSalvar(
+                    'Não foi possível salvar a data. Tente novamente.'
+                )
+            } finally {
+                salvamentoEmAndamento.current = false
+                setSalvando(false)
             }
         }
 
@@ -298,12 +346,12 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
             >
                 <Pressable
                     onPress={selecionarEsteDia}
-                    disabled={!habilitado}
+                    disabled={!habilitado || salvando}
                     accessibilityRole="button"
                     accessibilityLabel={ `Dia ${casa.dia} de ` + nomesDosMeses[mesVisivel - 1] + ` de ${anoVisivel}` }
                     accessibilityState={{
                         selected: selecionado,
-                        disabled: !habilitado
+                        disabled: !habilitado || salvando
                     }}
                     style={[
                         estilos.botaoDia,
@@ -355,7 +403,7 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
          * Não retorna valor.
          */
         function escolherMes() {
-            if (!habilitado) {
+            if (!habilitado || salvando) {
                 return
             }
 
@@ -366,14 +414,14 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
         return (
             <Pressable
                 onPress={escolherMes}
-                disabled={!habilitado}
+                disabled={!habilitado || salvando}
                 accessibilityRole="button"
                 accessibilityLabel={
                     `${nomesDosMeses[mes - 1]} de ${anoVisivel}`
                 }
                 accessibilityState={{
                     selected: mes === mesVisivel,
-                    disabled: !habilitado
+                    disabled: !habilitado || salvando
                 }}
                 style={estilos.opcaoLista}
             >
@@ -408,7 +456,7 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
          * Não retorna valor.
          */
         function escolherAno() {
-            if (!habilitado) {
+            if (!habilitado || salvando) {
                 return
             }
 
@@ -420,12 +468,12 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
         return (
             <Pressable
                 onPress={escolherAno}
-                disabled={!habilitado}
+                disabled={!habilitado || salvando}
                 accessibilityRole="button"
                 accessibilityLabel={`Ano ${ano}`}
                 accessibilityState={{
                     selected: ano === anoVisivel,
-                    disabled: !habilitado
+                    disabled: !habilitado || salvando
                 }}
                 style={estilos.opcaoLista}
             >
@@ -490,20 +538,22 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
+            bloquearFechamento={salvando}
         >
             <BottomSheetLayout
                 titulo={titulo}
                 onFechar={onFechar}
+                bloquearFechamento={salvando}
             >
                 <View style={estilos.calendario}>
                     <View style={estilos.navegacao}>
                         <Pressable
                             onPress={voltarMes}
-                            disabled={!anteriorDisponivel}
+                            disabled={!anteriorDisponivel || salvando}
                             accessibilityRole="button"
                             accessibilityLabel="Mês anterior"
                             accessibilityState={{
-                                disabled: !anteriorDisponivel
+                                disabled: !anteriorDisponivel || salvando
                             }}
                             style={estilos.botaoNavegacao}
                         >
@@ -517,6 +567,7 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
                         <View style={estilos.tituloData}>
                             <Pressable
                                 onPress={abrirListaDeMeses}
+                                disabled={salvando}
                                 accessibilityRole="button"
                                 accessibilityLabel="Escolher mês"
                                 style={estilos.botaoTitulo}
@@ -534,6 +585,7 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
 
                             <Pressable
                                 onPress={abrirListaDeAnos}
+                                disabled={salvando}
                                 accessibilityRole="button"
                                 accessibilityLabel="Escolher ano"
                                 style={estilos.botaoTitulo}
@@ -552,11 +604,11 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
 
                         <Pressable
                             onPress={avancarMes}
-                            disabled={!proximoDisponivel}
+                            disabled={!proximoDisponivel || salvando}
                             accessibilityRole="button"
                             accessibilityLabel="Próximo mês"
                             accessibilityState={{
-                                disabled: !proximoDisponivel
+                                disabled: !proximoDisponivel || salvando
                             }}
                             style={estilos.botaoNavegacao}
                         >
@@ -604,6 +656,24 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
                             </View>
                         </>
                     )}
+
+                    {salvando ? (
+                        <Text
+                            style={estilos.mensagem}
+                            accessibilityLiveRegion="polite"
+                        >
+                            Salvando data...
+                        </Text>
+                    ) : null}
+
+                    {erroSalvar ? (
+                        <Text
+                            style={estilos.mensagemErro}
+                            accessibilityLiveRegion="polite"
+                        >
+                            {erroSalvar}
+                        </Text>
+                    ) : null}
                 </View>
             </BottomSheetLayout>
         </BottomSheet>
