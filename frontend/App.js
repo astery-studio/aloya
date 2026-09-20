@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
-import { Plus } from 'phosphor-react-native';
+import { Envelope, Lock, Plus, Trash } from 'phosphor-react-native';
 import {
     DMSans_400Regular,
     DMSans_500Medium,
@@ -20,6 +20,10 @@ import EmailInput from './components/forms/EmailInput';
 import PasswordInput from './components/forms/PasswordInput';
 import DateInput from './components/forms/DateInput';
 import TimeInput from './components/forms/TimeInput';
+import RadioOption from './components/forms/RadioOption';
+import AppModal from './components/feedback/AppModal';
+import SimpleModal from './components/feedback/SimpleModal';
+import AlertModal from './components/feedback/AlertModal';
 
 const variantesBotao = [
     'laranja', 'verde', 'branco', 'preto', 'vermelho',
@@ -52,6 +56,9 @@ export default function App() {
     const [data, setData] = useState('');
     const [horarios, setHorarios] = useState([{ id: 1, valor: '' }]);
     const proximoHorarioId = useRef(2);
+    const [opcao, setOpcao] = useState('Diária');
+    const [modal, setModal] = useState(null);
+    const fecharModal = () => setModal(null);
     const avisar = (nome) => Alert.alert('Botão pressionado', nome);
 
     if (!fontsLoaded) return null;
@@ -176,6 +183,51 @@ export default function App() {
                         ...horarios, { id: proximoHorarioId.current++, valor: '' }
                     ])} />
             </Secao>
+            <Secao titulo="Opção única">
+                {['Diária', 'Mensal'].map((titulo) => (
+                    <RadioOption key={titulo} titulo={titulo}
+                        descricao={titulo === 'Diária' ? 'Uso todos os dias' : 'Uso mensal'}
+                        selecionado={opcao === titulo}
+                        aoPressionar={() => setOpcao(titulo)} />
+                ))}
+                <RadioOption titulo="Indisponível" desativado />
+            </Secao>
+            <Secao titulo="Modais">
+                <Button texto="Abrir AppModal" variante="bordaVerde"
+                    aoPressionar={() => setModal('base')} />
+                <Button texto="Abrir SimpleModal" variante="verde"
+                    aoPressionar={() => setModal('simples')} />
+                <Button texto="Abrir modal com duas ações"
+                    aoPressionar={() => setModal('duplo')} />
+                <Button texto="Abrir alerta" variante="vermelho"
+                    aoPressionar={() => setModal('alerta')} />
+            </Secao>
+            <AppModal visivel={modal === 'base'} aoFechar={fecharModal}
+                icone={Lock} titulo="Estrutura base"
+                mensagem="Ícone, título, mensagem e ações configuráveis.">
+                <ButtonPopup texto="Fechar" aoPressionar={fecharModal}
+                    estilo={{ width: '100%' }} />
+            </AppModal>
+            <SimpleModal visivel={modal === 'simples'} aoFechar={fecharModal}
+                icone={Lock} titulo="Senha redefinida com sucesso"
+                mensagem="Faça login com sua nova senha."
+                acaoPrincipal={{ texto: 'Fazer login', aoPressionar: fecharModal }} />
+            <SimpleModal visivel={modal === 'duplo'} aoFechar={fecharModal}
+                icone={Envelope} titulo="E-mail enviado"
+                mensagem="Confira sua caixa de entrada."
+                acaoPrincipal={{ texto: 'Entendi', aoPressionar: fecharModal }}
+                acaoSecundaria={{
+                    texto: 'Enviar novamente', aoPressionar: fecharModal
+                }} />
+            <AlertModal visivel={modal === 'alerta'} aoFechar={fecharModal}
+                icone={Trash} titulo="Excluir conta permanentemente?"
+                mensagem="Esta ação removerá seus dados de forma permanente."
+                destaque="Deseja continuar?">
+                <ButtonPopup texto="Excluir permanentemente" variante="vermelho"
+                    aoPressionar={fecharModal} estilo={{ width: '100%' }} />
+                <ButtonPopup texto="Cancelar" variante="branco"
+                    aoPressionar={fecharModal} estilo={{ width: '100%' }} />
+            </AlertModal>
         </ScrollView>
     );
 }
