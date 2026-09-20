@@ -23,7 +23,6 @@ import TimeInput from './components/forms/TimeInput';
 import RadioOption from './components/forms/RadioOption';
 import AppModal from './components/feedback/Modal/AppModal';
 import SimpleModal from './components/feedback/Modal/SimpleModal';
-import AlertModal from './components/feedback/Modal/AlertModal';
 
 const variantesBotao = [
     'laranja', 'verde', 'branco', 'preto', 'vermelho',
@@ -219,7 +218,7 @@ export default function App() {
                 acaoSecundaria={{
                     texto: 'Enviar novamente', aoPressionar: fecharModal
                 }} />
-            <AlertModal visivel={modal === 'alerta'} aoFechar={fecharModal}
+            <AppModal variante="alerta" visivel={modal === 'alerta'} aoFechar={fecharModal}
                 icone={Trash} titulo="Excluir conta permanentemente?"
                 mensagem="Esta ação removerá seus dados de forma permanente."
                 destaque="Deseja continuar?">
@@ -227,7 +226,7 @@ export default function App() {
                     aoPressionar={fecharModal} estilo={{ width: '100%' }} />
                 <ButtonPopup texto="Cancelar" variante="branco"
                     aoPressionar={fecharModal} estilo={{ width: '100%' }} />
-            </AlertModal>
+            </AppModal>
         </ScrollView>
     );
 }

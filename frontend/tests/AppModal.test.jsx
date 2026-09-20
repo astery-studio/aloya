@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import AppModal from '../components/feedback/Modal/AppModal';
-import AlertModal from '../components/feedback/Modal/AlertModal';
 
 function IconeTeste({ size, color }) {
     return <Text>ícone {size} {color}</Text>;
@@ -15,12 +14,12 @@ test('modal simples mostra ícone, título e mensagem', async () => {
     expect(screen.getByText('Tudo certo')).toBeTruthy();
 });
 
-test('AlertModal usa o cabeçalho vermelho criado pela base', async () => {
-    await render(<AlertModal visivel icone={IconeTeste}
+test('variante alerta usa o cabeçalho vermelho criado pela base', async () => {
+    await render(<AppModal visivel variante="alerta" icone={IconeTeste}
         titulo="Excluir conta?" mensagem="Ação permanente"
         destaque="Deseja continuar?">
         <Text>Área de ações</Text>
-    </AlertModal>);
+    </AppModal>);
     expect(screen.getByText('ícone 26 #FFFFFF')).toBeTruthy();
     expect(screen.getByText('Deseja continuar?')).toBeTruthy();
     expect(screen.getByText('Área de ações')).toBeTruthy();
