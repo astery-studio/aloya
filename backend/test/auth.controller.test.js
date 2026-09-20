@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarAuthController
-} = require('../src/controllers/auth.controller');
+} from '../src/controllers/auth.controller.js';
 
 function criarResposta() {
     return {
