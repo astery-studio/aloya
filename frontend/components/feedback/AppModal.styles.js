@@ -12,14 +12,50 @@ const estilos = StyleSheet.create({
     caixa: {
         width: '100%',
         maxWidth: 342,
+        borderRadius: radius.popup,
+        backgroundColor: cores.neutras.superficieClara,
+        overflow: 'hidden'
+    },
+    caixaSimples: shadows.popup,
+    caixaAlerta: shadows.alert,
+    caixaAcao: shadows.popup,
+    conteudo: {
+        alignItems: 'center'
+    },
+    conteudoSimples: {
         paddingTop: 32,
         paddingHorizontal: 24,
         paddingBottom: 24,
+        gap: 16
+    },
+    conteudoAlerta: {
+        paddingTop: 24,
+        paddingHorizontal: 24,
+        paddingBottom: 28,
+        gap: 20
+    },
+    conteudoAcao: {
+        paddingTop: 32,
+        paddingHorizontal: 24,
+        paddingBottom: 24,
+        gap: 16
+    },
+    cabecalhoAlerta: {
+        width: '100%',
+        paddingTop: 28,
+        paddingHorizontal: 24,
+        paddingBottom: 20,
         alignItems: 'center',
-        gap: 16,
-        borderRadius: radius.popup,
-        backgroundColor: cores.neutras.superficieClara,
-        ...shadows.popup
+        gap: 12,
+        backgroundColor: cores.feedback.erro
+    },
+    iconeAlerta: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.15)'
     },
     areaIcone: {
         width: 48,
@@ -29,6 +65,7 @@ const estilos = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#F5EDE3'
     },
+    areaIconeAcao: { backgroundColor: '#FDF4F2' },
     textos: { width: '100%', alignItems: 'center' },
     titulo: {
         color: cores.neutras.textoPrincipalClaro,
@@ -44,6 +81,15 @@ const estilos = StyleSheet.create({
         fontFamily: fontFamilies.regular,
         fontSize: 14,
         lineHeight: 21,
+        textAlign: 'center'
+    },
+    mensagemAlerta: { lineHeight: 21.7, paddingTop: 10 },
+    destaque: {
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.bold,
+        fontSize: 14,
+        fontWeight: '700',
+        lineHeight: 21.7,
         textAlign: 'center'
     },
     acoes: { width: '100%', gap: 10, paddingTop: 4 }
