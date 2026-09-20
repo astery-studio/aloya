@@ -2,9 +2,11 @@ import { Text, TextInput as EntradaNativa, View } from 'react-native';
 import { cores } from '../../theme';
 import { estilos } from './TextInput.styles';
 
+// Recebe as opções do campo, mostra a entrada e devolve o texto tratado ao formulário.
 export default function TextInput({
     label, placeholder, value, onChangeText, variante = 'padrao',
-    desativado = false, acaoDireita, estilo, ...outrasProps
+    desativado = false, acaoDireita, estilo, sanitizar = (texto) => texto,
+    ...outrasProps
 }) {
     const preenchido = Boolean(value);
     const rotuloExterno = variante === 'categoria' && label;
@@ -32,7 +34,7 @@ export default function TextInput({
                         placeholder={rotuloInterno ? undefined : placeholder}
                         placeholderTextColor={corPlaceholder}
                         value={value}
-                        onChangeText={onChangeText}
+                        onChangeText={(texto) => onChangeText?.(sanitizar(texto))}
                         style={estilos.entrada}
                         {...outrasProps}
                     />

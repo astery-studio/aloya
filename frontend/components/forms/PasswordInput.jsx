@@ -5,6 +5,7 @@ import { cores } from '../../theme';
 import TextInput from './TextInput';
 import { estilos } from './TextInput.styles';
 
+// Recebe as opções de senha, permite alternar sua visibilidade e devolve o texto.
 export default function PasswordInput({
     label = 'Senha', placeholder = label, desativado = false, ...props
 }) {
@@ -19,6 +20,7 @@ export default function PasswordInput({
             secureTextEntry={!visivel}
             autoCapitalize="none"
             autoCorrect={false}
+            autoComplete="password"
             acaoDireita={
                 <Pressable
                     accessibilityRole="button"
