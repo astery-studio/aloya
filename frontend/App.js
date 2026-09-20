@@ -1,4 +1,5 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
+import { Plus } from 'phosphor-react-native';
 import {
     DMSans_400Regular,
     DMSans_500Medium,
@@ -10,6 +11,13 @@ import {
     cores, espacamentos, espacamentosLayout, fontFamilies,
     radius, shadows, typography
 } from './theme';
+import Button from './components/common/Button/Button';
+import ButtonPopup from './components/common/ButtonPopup/ButtonPopup';
+
+const variantesBotao = [
+    'laranja', 'verde', 'branco', 'preto', 'vermelho',
+    'bordaLaranja', 'bordaVerde', 'tracejado'
+];
 
 function Secao({ titulo, children }) {
     return (
@@ -29,6 +37,7 @@ export default function App() {
         DMSans_600SemiBold,
         DMSans_700Bold
     });
+    const avisar = (nome) => Alert.alert('Botão pressionado', nome);
 
     if (!fontsLoaded) return null;
 
@@ -104,6 +113,22 @@ export default function App() {
                         borderRadius: radius.popup }}>
                         <Text style={typography.caption}>Sombra: {nome}</Text>
                     </View>
+                ))}
+            </Secao>
+            <Secao titulo="Botão base">
+                {variantesBotao.map((variante) => (
+                    <Button key={variante} texto={variante} variante={variante}
+                        aoPressionar={() => avisar(variante)} />
+                ))}
+                <Button texto="Com ícone" icone={Plus}
+                    aoPressionar={() => avisar('Com ícone')} />
+                <Button texto="Desativado" desativado />
+                <Button texto="Carregando" carregando />
+            </Secao>
+            <Secao titulo="Botões de popup">
+                {['verde', 'branco', 'preto', 'vermelho'].map((variante) => (
+                    <ButtonPopup key={variante} texto={variante} variante={variante}
+                        aoPressionar={() => avisar(`popup ${variante}`)} />
                 ))}
             </Secao>
         </ScrollView>
