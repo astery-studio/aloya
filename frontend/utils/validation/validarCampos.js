@@ -1,11 +1,5 @@
 // Valida campos de formulário antes do envio.
 
-// Recebe um e-mail, verifica o formato básico e devolve verdadeiro ou falso.
-export function emailValido(valor) {
-    if (typeof valor !== 'string' || valor.length > 254) return false;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor.trim());
-}
-
 // Recebe uma data em DD/MM/AAAA, confere o calendário e devolve verdadeiro ou falso.
 export function dataValida(valor) {
     if (typeof valor !== 'string' || !/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return false;
