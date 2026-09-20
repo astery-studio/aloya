@@ -3,26 +3,19 @@ import { estilos } from './FormField.styles';
 
 export default function FormField({
     label, campo, children, mensagemAuxiliar,
-    variante = 'anticoncepcional', estilo, estiloConteudo
+    tituloSecao = false, estilo, estiloConteudo
 }) {
-    const labelComRecuo = variante === 'conta' || variante === 'perfil';
-
     return (
         <View style={[estilos.container, estilo]}>
             {label ? (
-                <Text style={[
-                    estilos.label,
-                    labelComRecuo && estilos.labelComRecuo,
-                    variante === 'conta' && estilos.labelConta
-                ]}>
+                <Text
+                    accessibilityRole={tituloSecao ? 'header' : undefined}
+                    style={[estilos.label, tituloSecao && estilos.labelSecao]}
+                >
                     {label}
                 </Text>
             ) : null}
-            <View style={[
-                estilos.conteudo,
-                variante === 'perfil' && estilos.conteudoPerfil,
-                estiloConteudo
-            ]}>
+            <View style={[estilos.conteudo, estiloConteudo]}>
                 {campo ?? children}
             </View>
             {mensagemAuxiliar ? (
