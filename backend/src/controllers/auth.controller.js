@@ -214,6 +214,6 @@ function criarAuthController({
     };
 }
 
-module.exports = {
+export {
     criarAuthController
 };

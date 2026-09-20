@@ -92,7 +92,7 @@ function criarLoginRateLimit({
     });
 }
 
-module.exports = {
+export {
     criarCadastroRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit

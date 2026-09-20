@@ -1,4 +1,5 @@
-const { Router } = require('express');
+import express from 'express';
+const { Router } = express;
 
 function criarAuthRoutes({
     authController,
@@ -53,6 +54,6 @@ function criarAuthRoutes({
     return router;
 }
 
-module.exports = {
+export {
     criarAuthRoutes
 };

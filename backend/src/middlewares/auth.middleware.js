@@ -110,6 +110,6 @@ function criarAuthMiddleware({
     };
 }
 
-module.exports = {
+export {
     criarAuthMiddleware
 };

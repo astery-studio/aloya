@@ -36,7 +36,7 @@ function rotaNaoEncontrada(_req, res) {
     });
 }
 
-module.exports = {
+export {
     rotaNaoEncontrada,
     tratarErros
 };

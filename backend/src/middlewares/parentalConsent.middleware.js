@@ -31,6 +31,6 @@ function criarParentalConsentMiddleware({
     };
 }
 
-module.exports = {
+export {
     criarParentalConsentMiddleware
 };
