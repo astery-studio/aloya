@@ -8,24 +8,26 @@ const corSetaBotao = tema.cores.neutras.textoSecundarioClaro
 const estilos = StyleSheet.create({
     container: {
         width: '100%',
-        minHeight: 56,
+        minHeight: 57.4,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
         paddingHorizontal: 12,
         paddingVertical: 9,
         backgroundColor: tema.cores.neutras.superficieClara,
-        borderWidth: 1,
+        borderWidth: 0.7,
         borderColor: tema.cores.neutras.bordaClara,
         borderRadius: tema.radius.buttonAndInput
     },
 
     semBorda: {
+        minHeight: 56,
         borderWidth: 0,
         paddingHorizontal: 13
     },
 
     botao: {
+        minHeight: 56,
         paddingHorizontal: 14,
         paddingVertical: 11
     },
@@ -40,7 +42,7 @@ const estilos = StyleSheet.create({
         flexShrink: 0,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 12
+        borderRadius: 10
     },
 
     caixaIconeBotao: {
