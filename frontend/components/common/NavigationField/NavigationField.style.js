@@ -1,7 +1,9 @@
+//Define a aparência das três variantes do NavigationField.
 import { StyleSheet } from 'react-native'
 import { fontFamilies, tema } from '../../../theme'
 
-const corSeta = tema.cores.neutras.textoSecundarioClaro
+const corSeta = tema.cores.neutras.bordaTracejada
+const corSetaBotao = tema.cores.neutras.textoSecundarioClaro
 
 const estilos = StyleSheet.create({
     container: {
@@ -23,6 +25,11 @@ const estilos = StyleSheet.create({
         paddingHorizontal: 13
     },
 
+    botao: {
+        paddingHorizontal: 14,
+        paddingVertical: 11
+    },
+
     desabilitado: {
         opacity: 0.5
     },
@@ -36,6 +43,12 @@ const estilos = StyleSheet.create({
         borderRadius: 12
     },
 
+    caixaIconeBotao: {
+        width: 32,
+        height: 32,
+        borderRadius: 8
+    },
+
     label: {
         flex: 1,
         minWidth: 0,
@@ -47,4 +60,8 @@ const estilos = StyleSheet.create({
     }
 })
 
-export { estilos, corSeta }
+export {
+    estilos,
+    corSeta,
+    corSetaBotao
+}
