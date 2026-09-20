@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarAuthService
-} = require('../src/services/auth.service');
+} from '../src/services/auth.service.js';
 
 function criarDadosValidos(alteracoes = {}) {
     return {

@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarTokenService
-} = require('../src/services/token.service');
+} from '../src/services/token.service.js';
 
 function criarDependencias() {
     const chamadas = {

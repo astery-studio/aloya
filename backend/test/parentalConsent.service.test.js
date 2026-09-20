@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarParentalConsentService
-} = require('../src/services/parentalConsent.service');
+} from '../src/services/parentalConsent.service.js';
 
 function criarCrypto() {
     const tokenPuro = 't'.repeat(43);
