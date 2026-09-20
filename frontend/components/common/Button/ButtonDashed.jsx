@@ -1,6 +1,6 @@
 import { Plus } from 'phosphor-react-native';
 
-import Button from '../Button/Button';
+import Button from './Button';
 
 export default function ButtonDashed({
     texto,
