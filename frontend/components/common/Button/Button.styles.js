@@ -21,7 +21,8 @@ const estilos = StyleSheet.create({
     },
 
     pressionado: {
-        opacity: 0.8
+        opacity: 0.65,
+        transform: [{ scale: 0.98 }]
     },
 
     desativado: {
