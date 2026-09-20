@@ -1,4 +1,4 @@
-import ButtonPopup from '../common/ButtonPopup/ButtonPopup';
+import ButtonPopup from '../../common/Button/ButtonPopup';
 import AppModal from './AppModal';
 
 export default function SimpleModal({

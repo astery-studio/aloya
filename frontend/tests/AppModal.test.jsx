@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import AppModal from '../components/feedback/AppModal';
-import AlertModal from '../components/feedback/AlertModal';
+import AppModal from '../components/feedback/Modal/AppModal';
+import AlertModal from '../components/feedback/Modal/AlertModal';
 
 function IconeTeste({ size, color }) {
     return <Text>ícone {size} {color}</Text>;

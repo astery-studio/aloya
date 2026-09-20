@@ -13,17 +13,17 @@ import {
     radius, shadows, typography
 } from './theme';
 import Button from './components/common/Button/Button';
-import ButtonPopup from './components/common/ButtonPopup/ButtonPopup';
-import ButtonDashed from './components/common/ButtonDashed/ButtonDashed';
+import ButtonPopup from './components/common/Button/ButtonPopup';
+import ButtonDashed from './components/common/Button/ButtonDashed';
 import TextInput from './components/forms/TextInput';
 import EmailInput from './components/forms/EmailInput';
 import PasswordInput from './components/forms/PasswordInput';
 import DateInput from './components/forms/DateInput';
 import TimeInput from './components/forms/TimeInput';
 import RadioOption from './components/forms/RadioOption';
-import AppModal from './components/feedback/AppModal';
-import SimpleModal from './components/feedback/SimpleModal';
-import AlertModal from './components/feedback/AlertModal';
+import AppModal from './components/feedback/Modal/AppModal';
+import SimpleModal from './components/feedback/Modal/SimpleModal';
+import AlertModal from './components/feedback/Modal/AlertModal';
 
 const variantesBotao = [
     'laranja', 'verde', 'branco', 'preto', 'vermelho',

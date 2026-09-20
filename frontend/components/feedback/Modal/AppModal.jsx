@@ -1,5 +1,5 @@
 import { Modal, Text, View } from 'react-native';
-import { cores } from '../../theme';
+import { cores } from '../../../theme';
 import { estilos } from './AppModal.styles';
 
 export default function AppModal({

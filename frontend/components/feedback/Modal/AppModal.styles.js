@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, radius, shadows } from '../../theme';
+import { cores, fontFamilies, radius, shadows } from '../../../theme';
 
 const estilos = StyleSheet.create({
     fundo: {
