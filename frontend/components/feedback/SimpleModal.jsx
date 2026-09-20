@@ -7,6 +7,7 @@ export default function SimpleModal({
 }) {
     return (
         <AppModal
+            variante="simples"
             visivel={visivel}
             aoFechar={aoFechar}
             icone={icone}
