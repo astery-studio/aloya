@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { Plus } from 'phosphor-react-native';
 import {
@@ -14,9 +14,12 @@ import {
 } from './theme';
 import Button from './components/common/Button/Button';
 import ButtonPopup from './components/common/ButtonPopup/ButtonPopup';
+import ButtonDashed from './components/common/ButtonDashed/ButtonDashed';
 import TextInput from './components/forms/TextInput';
 import EmailInput from './components/forms/EmailInput';
 import PasswordInput from './components/forms/PasswordInput';
+import DateInput from './components/forms/DateInput';
+import TimeInput from './components/forms/TimeInput';
 
 const variantesBotao = [
     'laranja', 'verde', 'branco', 'preto', 'vermelho',
@@ -46,6 +49,9 @@ export default function App() {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [senhaPopup, setSenhaPopup] = useState('');
+    const [data, setData] = useState('');
+    const [horarios, setHorarios] = useState([{ id: 1, valor: '' }]);
+    const proximoHorarioId = useRef(2);
     const avisar = (nome) => Alert.alert('Botão pressionado', nome);
 
     if (!fontsLoaded) return null;
@@ -151,6 +157,24 @@ export default function App() {
                 <PasswordInput value={senha} onChangeText={setSenha} />
                 <PasswordInput label="Confirmar senha" variante="popup"
                     value={senhaPopup} onChangeText={setSenhaPopup} />
+            </Secao>
+            <Secao titulo="Data e horários">
+                <DateInput valor={data} onChangeText={setData} />
+                {horarios.map((horario) => (
+                    <TimeInput key={horario.id} valor={horario.valor}
+                        onChangeText={(valor) => setHorarios(horarios.map(
+                            (atual) => atual.id === horario.id
+                                ? { ...atual, valor } : atual
+                        ))}
+                        podeRemover={horarios.length > 1}
+                        aoRemover={() => setHorarios(horarios.filter(
+                            (atual) => atual.id !== horario.id
+                        ))} />
+                ))}
+                <ButtonDashed texto="Cadastrar novo horário"
+                    aoPressionar={() => setHorarios([
+                        ...horarios, { id: proximoHorarioId.current++, valor: '' }
+                    ])} />
             </Secao>
         </ScrollView>
     );
