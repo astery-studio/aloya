@@ -2,14 +2,8 @@ import { useRef } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { CalendarBlank } from 'phosphor-react-native';
 import { cores } from '../../theme';
+import { formatDate } from '../../utils/date/formatDate';
 import { estilos } from './DateInput.styles';
-
-function formatarData(texto) {
-    const numeros = texto.replace(/\D/g, '').slice(0, 8);
-    if (numeros.length > 4) return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`;
-    if (numeros.length > 2) return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
-    return numeros;
-}
 
 export default function DateInput({
     valor = '', onChangeText, aoPressionarCalendario,
@@ -40,7 +34,7 @@ export default function DateInput({
                 placeholder="DD/MM/AAAA"
                 placeholderTextColor={cores.neutras.textoSecundarioClaro}
                 value={valor}
-                onChangeText={(texto) => onChangeText?.(formatarData(texto))}
+                onChangeText={(texto) => onChangeText?.(formatDate(texto))}
                 style={estilos.entrada}
             />
         </View>

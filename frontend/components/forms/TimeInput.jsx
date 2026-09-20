@@ -1,13 +1,8 @@
 import { Pressable, TextInput, View } from 'react-native';
 import { Clock, Trash } from 'phosphor-react-native';
 import { cores } from '../../theme';
+import { formatTime } from '../../utils/formatting/formatTime';
 import { estilos } from './TimeInput.styles';
-
-function formatarHorario(texto) {
-    const numeros = texto.replace(/\D/g, '').slice(0, 4);
-    return numeros.length > 2
-        ? `${numeros.slice(0, 2)}:${numeros.slice(2)}` : numeros;
-}
 
 export default function TimeInput({
     valor = '', onChangeText, aoRemover, podeRemover = false,
@@ -25,7 +20,7 @@ export default function TimeInput({
                     placeholder="HH:MM"
                     placeholderTextColor={cores.neutras.textoSecundarioClaro}
                     value={valor}
-                    onChangeText={(texto) => onChangeText?.(formatarHorario(texto))}
+                    onChangeText={(texto) => onChangeText?.(formatTime(texto))}
                     style={estilos.entrada}
                 />
             </View>
