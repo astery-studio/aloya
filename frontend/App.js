@@ -1,5 +1,6 @@
-import { Text, View } from 'react-native';
-
+import { useRef, useState } from 'react';
+import { Alert, ScrollView, Text, View } from 'react-native';
+import { Envelope, Lock, Plus, Trash } from 'phosphor-react-native';
 import {
     DMSans_400Regular,
     DMSans_500Medium,
@@ -7,6 +8,38 @@ import {
     DMSans_700Bold,
     useFonts
 } from '@expo-google-fonts/dm-sans';
+import {
+    cores, espacamentos, espacamentosLayout, fontFamilies,
+    radius, shadows, typography
+} from './theme';
+import Button from './components/common/Button/Button';
+import ButtonPopup from './components/common/Button/ButtonPopup';
+import ButtonDashed from './components/common/Button/ButtonDashed';
+import TextInput from './components/forms/TextInput';
+import EmailInput from './components/forms/EmailInput';
+import PasswordInput from './components/forms/PasswordInput';
+import DateInput from './components/forms/DateInput';
+import TimeInput from './components/forms/TimeInput';
+import RadioOption from './components/forms/RadioOption';
+import AppModal from './components/feedback/Modal/AppModal';
+import SimpleModal from './components/feedback/Modal/SimpleModal';
+import AlertModal from './components/feedback/Modal/AlertModal';
+
+const variantesBotao = [
+    'laranja', 'verde', 'branco', 'preto', 'vermelho',
+    'bordaLaranja', 'bordaVerde', 'tracejado'
+];
+
+function Secao({ titulo, children }) {
+    return (
+        <View style={{ gap: espacamentos.medio }}>
+            <Text style={{ ...typography.h2, color: cores.neutras.textoPrincipalClaro }}>
+                {titulo}
+            </Text>
+            {children}
+        </View>
+    );
+}
 
 export default function App() {
     const [fontsLoaded] = useFonts({
@@ -15,14 +48,186 @@ export default function App() {
         DMSans_600SemiBold,
         DMSans_700Bold
     });
+    const [nome, setNome] = useState('');
+    const [categoria, setCategoria] = useState('');
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [senhaPopup, setSenhaPopup] = useState('');
+    const [data, setData] = useState('');
+    const [horarios, setHorarios] = useState([{ id: 1, valor: '' }]);
+    const proximoHorarioId = useRef(2);
+    const [opcao, setOpcao] = useState('Diária');
+    const [modal, setModal] = useState(null);
+    const fecharModal = () => setModal(null);
+    const avisar = (nome) => Alert.alert('Botão pressionado', nome);
 
-    if (!fontsLoaded) {
-        return null;
-    }
+    if (!fontsLoaded) return null;
 
     return (
-        <View>
-            <Text>ALOYA</Text>
-        </View>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{
+            gap: espacamentos.extraGrande,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
+            paddingTop: 60,
+            paddingBottom: espacamentos.maximo,
+            backgroundColor: cores.neutras.fundoClaro
+        }}>
+            <Text style={{ ...typography.h1, color: cores.neutras.textoPrincipalClaro }}>
+                Aloya — componentes
+            </Text>
+            <Secao titulo="Cores e tipografia">
+                {Object.entries(cores).flatMap(([grupo, paleta]) =>
+                    Object.entries(paleta).map(([nomeCor, cor]) => (
+                        <View key={`${grupo}.${nomeCor}`} style={{
+                            flexDirection: 'row', alignItems: 'center',
+                            gap: espacamentos.pequeno
+                        }}>
+                            <View style={{
+                                width: 24, height: 24, backgroundColor: cor,
+                                borderRadius: radius.buttonAndInput, borderWidth: 1,
+                                borderColor: cores.neutras.bordaClara
+                            }} />
+                            <Text style={typography.caption}>
+                                {grupo}.{nomeCor}: {cor}
+                            </Text>
+                        </View>
+                    ))
+                )}
+                {Object.entries(typography).map(([nomeTipo, estilo]) => (
+                    <Text key={nomeTipo} style={{
+                        ...estilo, color: cores.neutras.textoPrincipalClaro
+                    }}>
+                        {nomeTipo} — DM Sans
+                    </Text>
+                ))}
+                <Text style={typography.caption}>
+                    Fontes: {Object.keys(fontFamilies).join(', ')}
+                </Text>
+            </Secao>
+            <Secao titulo="Espaçamentos, cantos e sombras">
+                <Text style={typography.caption}>
+                    Espaçamentos: {Object.entries(espacamentos).map(
+                        ([nome, valor]) => `${nome} ${valor}`
+                    ).join(' · ')}
+                </Text>
+                <Text style={typography.caption}>
+                    Layout: {Object.entries(espacamentosLayout).map(
+                        ([nome, valor]) => `${nome} ${valor}`
+                    ).join(' · ')}
+                </Text>
+                {Object.entries(radius).map(([nome, valor]) => (
+                    <View key={nome} style={{
+                        padding: espacamentos.pequeno,
+                        backgroundColor: cores.neutras.bordaClara,
+                        borderTopLeftRadius: valor,
+                        borderTopRightRadius: valor,
+                        borderBottomLeftRadius: nome === 'settingsCalendar' ||
+                            nome === 'bottomSheet' ? 0 : valor,
+                        borderBottomRightRadius: nome === 'settingsCalendar' ||
+                            nome === 'bottomSheet' ? 0 : valor
+                    }}>
+                        <Text style={typography.caption}>{nome}: {valor}px</Text>
+                    </View>
+                ))}
+                {Object.entries(shadows).map(([nome, sombra]) => (
+                    <View key={nome} style={{ ...sombra,
+                        padding: espacamentos.medio,
+                        backgroundColor: cores.neutras.superficieClara,
+                        borderRadius: radius.popup }}>
+                        <Text style={typography.caption}>Sombra: {nome}</Text>
+                    </View>
+                ))}
+            </Secao>
+            <Secao titulo="Botão base">
+                {variantesBotao.map((variante) => (
+                    <Button key={variante} texto={variante} variante={variante}
+                        aoPressionar={() => avisar(variante)} />
+                ))}
+                <Button texto="Com ícone" icone={Plus}
+                    aoPressionar={() => avisar('Com ícone')} />
+                <Button texto="Desativado" desativado />
+                <Button texto="Carregando" carregando />
+            </Secao>
+            <Secao titulo="Botões de popup">
+                {['verde', 'branco', 'preto', 'vermelho'].map((variante) => (
+                    <ButtonPopup key={variante} texto={variante} variante={variante}
+                        aoPressionar={() => avisar(`popup ${variante}`)} />
+                ))}
+            </Secao>
+            <Secao titulo="Campos de texto">
+                <TextInput label="Nome" placeholder="Digite seu nome"
+                    value={nome} onChangeText={setNome} />
+                <TextInput label="Nome da categoria" variante="categoria"
+                    placeholder="Digite o nome da categoria"
+                    value={categoria} onChangeText={setCategoria} />
+                <TextInput label="Desativado" value="" desativado />
+                <EmailInput value={email} onChangeText={setEmail} />
+                <PasswordInput value={senha} onChangeText={setSenha} />
+                <PasswordInput label="Confirmar senha" variante="popup"
+                    value={senhaPopup} onChangeText={setSenhaPopup} />
+            </Secao>
+            <Secao titulo="Data e horários">
+                <DateInput valor={data} onChangeText={setData} />
+                {horarios.map((horario) => (
+                    <TimeInput key={horario.id} valor={horario.valor}
+                        onChangeText={(valor) => setHorarios(horarios.map(
+                            (atual) => atual.id === horario.id
+                                ? { ...atual, valor } : atual
+                        ))}
+                        podeRemover={horarios.length > 1}
+                        aoRemover={() => setHorarios(horarios.filter(
+                            (atual) => atual.id !== horario.id
+                        ))} />
+                ))}
+                <ButtonDashed texto="Cadastrar novo horário"
+                    aoPressionar={() => setHorarios([
+                        ...horarios, { id: proximoHorarioId.current++, valor: '' }
+                    ])} />
+            </Secao>
+            <Secao titulo="Opção única">
+                {['Diária', 'Mensal'].map((titulo) => (
+                    <RadioOption key={titulo} titulo={titulo}
+                        descricao={titulo === 'Diária' ? 'Uso todos os dias' : 'Uso mensal'}
+                        selecionado={opcao === titulo}
+                        aoPressionar={() => setOpcao(titulo)} />
+                ))}
+                <RadioOption titulo="Indisponível" desativado />
+            </Secao>
+            <Secao titulo="Modais">
+                <Button texto="Abrir AppModal" variante="bordaVerde"
+                    aoPressionar={() => setModal('base')} />
+                <Button texto="Abrir SimpleModal" variante="verde"
+                    aoPressionar={() => setModal('simples')} />
+                <Button texto="Abrir modal com duas ações"
+                    aoPressionar={() => setModal('duplo')} />
+                <Button texto="Abrir alerta" variante="vermelho"
+                    aoPressionar={() => setModal('alerta')} />
+            </Secao>
+            <AppModal visivel={modal === 'base'} aoFechar={fecharModal}
+                icone={Lock} titulo="Estrutura base"
+                mensagem="Ícone, título, mensagem e ações configuráveis.">
+                <ButtonPopup texto="Fechar" aoPressionar={fecharModal}
+                    estilo={{ width: '100%' }} />
+            </AppModal>
+            <SimpleModal visivel={modal === 'simples'} aoFechar={fecharModal}
+                icone={Lock} titulo="Senha redefinida com sucesso"
+                mensagem="Faça login com sua nova senha."
+                acaoPrincipal={{ texto: 'Fazer login', aoPressionar: fecharModal }} />
+            <SimpleModal visivel={modal === 'duplo'} aoFechar={fecharModal}
+                icone={Envelope} titulo="E-mail enviado"
+                mensagem="Confira sua caixa de entrada."
+                acaoPrincipal={{ texto: 'Entendi', aoPressionar: fecharModal }}
+                acaoSecundaria={{
+                    texto: 'Enviar novamente', aoPressionar: fecharModal
+                }} />
+            <AlertModal visivel={modal === 'alerta'} aoFechar={fecharModal}
+                icone={Trash} titulo="Excluir conta permanentemente?"
+                mensagem="Esta ação removerá seus dados de forma permanente."
+                destaque="Deseja continuar?">
+                <ButtonPopup texto="Excluir permanentemente" variante="vermelho"
+                    aoPressionar={fecharModal} estilo={{ width: '100%' }} />
+                <ButtonPopup texto="Cancelar" variante="branco"
+                    aoPressionar={fecharModal} estilo={{ width: '100%' }} />
+            </AlertModal>
+        </ScrollView>
     );
 }
