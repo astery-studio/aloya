@@ -153,6 +153,6 @@ function criarContainer() {
     };
 }
 
-module.exports = {
+export {
     criarContainer
 };

@@ -1,17 +1,9 @@
-const express = require('express');
-const helmet = require('helmet');
-
-const { env } = require('./config/env');
-const { criarContainer } = require('./config/container');
-
-const {
-    criarAuthRoutes
-} = require('./routes/auth.routes');
-
-const {
-    rotaNaoEncontrada,
-    tratarErros
-} = require('./middlewares/error.middleware');
+import express from 'express';
+import helmet from 'helmet';
+import { env } from './config/env.js';
+import { criarContainer } from './config/container.js';
+import { criarAuthRoutes } from './routes/auth.routes.js';
+import { rotaNaoEncontrada, tratarErros } from './middlewares/error.middleware.js';
 
 const app = express();
 const container = criarContainer();
