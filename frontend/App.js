@@ -193,6 +193,7 @@ export default function App() {
                 <NavigationField
                     label="08:00"
                     icone={ClockIcon}
+                    variante="botao"
                     onPress={tocarHorario}
                 />
             </View>

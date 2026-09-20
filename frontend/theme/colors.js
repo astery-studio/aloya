@@ -1,7 +1,8 @@
 const cores = Object.freeze({
     marca: Object.freeze({
         primaria: '#C85A44',
-        secundaria: '#2C4C3B'
+        secundaria: '#2C4C3B',
+        fundoIconeNavegacao: '#E8F0EC'
     }),
 
     neutras: Object.freeze({
