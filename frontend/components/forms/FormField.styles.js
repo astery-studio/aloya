@@ -13,14 +13,12 @@ const estilos = StyleSheet.create({
         lineHeight: 21,
         alignSelf: 'stretch'
     },
-    labelComRecuo: { paddingLeft: 4 },
-    labelConta: { lineHeight: 19.6 },
+    labelSecao: { paddingLeft: 4 },
     conteudo: {
         width: '100%',
         paddingTop: 8,
         alignItems: 'flex-start'
     },
-    conteudoPerfil: { gap: 8 },
     mensagemAuxiliar: {
         ...typography.caption,
         color: cores.neutras.textoSecundarioClaro,
