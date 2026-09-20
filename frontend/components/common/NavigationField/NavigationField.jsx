@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native'
 import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight'
 
 import { tema } from '../../../theme'
-import { estilos, corSeta } from './NavigationField.style'
+import { estilos, corSeta, corSetaBotao } from './NavigationField.style'
 
 const coresDosTons = {
     verde: tema.cores.marca.secundaria,
@@ -11,9 +11,17 @@ const coresDosTons = {
     azul: tema.cores.feedback.informacao
 }
 
+/**
+ * Recebe texto, ícone Phosphor, aparência e ação de toque.
+ * Mostra uma linha que pode abrir outra tela ou painel.
+ * Retorna o campo de navegação.
+ *
+ * variante aceita: "comBorda", "semBorda" ou "botao".
+ */
 function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', tom = 'verde', desabilitado = false }) {
     const corIcone = coresDosTons[tom] ?? coresDosTons.verde
     const semBorda = variante === 'semBorda'
+    const ehBotao = variante === 'botao'
     const estaDesabilitado = desabilitado || typeof onPress !== 'function'
 
     return (
@@ -29,6 +37,7 @@ function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', 
             style={[
                 estilos.container,
                 semBorda && estilos.semBorda,
+                ehBotao && estilos.botao,
                 estaDesabilitado && estilos.desabilitado
             ]}
         >
@@ -36,6 +45,7 @@ function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', 
                 <View
                     style={[
                         estilos.caixaIcone,
+                        ehBotao && estilos.caixaIconeBotao,
                         {
                             backgroundColor: `${corIcone}12`
                         }
@@ -58,7 +68,7 @@ function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', 
 
             <CaretRightIcon
                 size={20}
-                color={corSeta}
+                color={ehBotao ? corSetaBotao : corSeta}
                 weight="regular"
             />
         </Pressable>
