@@ -106,7 +106,7 @@ function gerarDiasMenstruacao(dataInicio, dataFim) {
     return dias;
 }
 
-module.exports = {
+export {
     criarDataValida,
     calcularIdade,
     adicionarDias,

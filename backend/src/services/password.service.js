@@ -36,6 +36,6 @@ function criarPasswordService({ bcrypt, rounds }) {
     };
 }
 
-module.exports = {
+export {
     criarPasswordService
 };

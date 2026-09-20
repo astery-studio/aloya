@@ -508,6 +508,6 @@ function criarParentalConsentService({
     };
 }
 
-module.exports = {
+export {
     criarParentalConsentService
 };

@@ -106,6 +106,6 @@ function criarParentalConsentValidator() {
     };
 }
 
-module.exports = {
+export {
     criarParentalConsentValidator
 };

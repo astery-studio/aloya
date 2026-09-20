@@ -320,6 +320,6 @@ function criarAuthService({
     };
 }
 
-module.exports = {
+export {
     criarAuthService
 };

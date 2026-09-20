@@ -115,6 +115,6 @@ function criarEmailService({ transporter, remetente }) {
     };
 }
 
-module.exports = {
+export {
     criarEmailService
 };

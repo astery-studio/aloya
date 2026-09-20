@@ -129,6 +129,6 @@ function criarTokenService({
     };
 }
 
-module.exports = {
+export {
     criarTokenService
 };

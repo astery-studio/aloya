@@ -53,6 +53,6 @@ function criarPasswordRecoveryValidator() {
     };
 }
 
-module.exports = {
+export {
     criarPasswordRecoveryValidator
 };

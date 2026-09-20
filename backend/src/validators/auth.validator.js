@@ -305,6 +305,6 @@ function criarAuthValidator({ dateUtils }) {
     };
 }
 
-module.exports = {
+export {
     criarAuthValidator
 };
