@@ -6,7 +6,7 @@ import {
     DMSans_700Bold,
     useFonts
 } from '@expo-google-fonts/dm-sans';
-import { cores, espacamentos, espacamentosLayout, typography } from './theme';
+import { cores, espacamentos, espacamentosLayout, fontFamilies, typography } from './theme';
 
 function Secao({ titulo, children }) {
     return (
@@ -40,6 +40,35 @@ export default function App() {
             <Text style={{ ...typography.h1, color: cores.neutras.textoPrincipalClaro }}>
                 Aloya — componentes
             </Text>
+            <Secao titulo="Cores e tipografia">
+                {Object.entries(cores).flatMap(([grupo, paleta]) =>
+                    Object.entries(paleta).map(([nomeCor, cor]) => (
+                        <View key={`${grupo}.${nomeCor}`} style={{
+                            flexDirection: 'row', alignItems: 'center',
+                            gap: espacamentos.pequeno
+                        }}>
+                            <View style={{
+                                width: 24, height: 24, backgroundColor: cor,
+                                borderRadius: 12, borderWidth: 1,
+                                borderColor: cores.neutras.bordaClara
+                            }} />
+                            <Text style={typography.caption}>
+                                {grupo}.{nomeCor}: {cor}
+                            </Text>
+                        </View>
+                    ))
+                )}
+                {Object.entries(typography).map(([nomeTipo, estilo]) => (
+                    <Text key={nomeTipo} style={{
+                        ...estilo, color: cores.neutras.textoPrincipalClaro
+                    }}>
+                        {nomeTipo} — DM Sans
+                    </Text>
+                ))}
+                <Text style={typography.caption}>
+                    Fontes: {Object.keys(fontFamilies).join(', ')}
+                </Text>
+            </Secao>
         </ScrollView>
     );
 }
