@@ -1,9 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarAuthValidator
-} = require('../src/validators/auth.validator');
+} from '../src/validators/auth.validator.js';
 
 function criarValidator() {
     return criarAuthValidator({

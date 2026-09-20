@@ -1,11 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarPasswordRecoveryValidator
-} = require(
-    '../src/validators/passwordRecovery.validator'
-);
+} from '../src/validators/passwordRecovery.validator.js';
 
 function criarValidator() {
     return criarPasswordRecoveryValidator();

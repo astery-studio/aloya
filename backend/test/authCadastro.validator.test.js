@@ -1,12 +1,11 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarAuthValidator
-} = require('../src/validators/auth.validator');
+} from '../src/validators/auth.validator.js';
 
-const dateUtils =
-    require('../src/utils/date.utils');
+import * as dateUtils from '../src/utils/date.utils.js';
 
 function criarDadosValidos(alteracoes = {}) {
     return {

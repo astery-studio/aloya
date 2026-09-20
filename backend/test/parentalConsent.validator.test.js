@@ -1,11 +1,9 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const {
+import {
     criarParentalConsentValidator
-} = require(
-    '../src/validators/parentalConsent.validator'
-);
+} from '../src/validators/parentalConsent.validator.js';
 
 function criarValidator() {
     return criarParentalConsentValidator();
