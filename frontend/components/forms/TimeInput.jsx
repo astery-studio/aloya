@@ -22,7 +22,7 @@ export default function TimeInput({
                     editable={!desativado}
                     keyboardType="number-pad"
                     maxLength={5}
-                    placeholder="HH:mm"
+                    placeholder="HH:MM"
                     placeholderTextColor={cores.neutras.textoSecundarioClaro}
                     value={valor}
                     onChangeText={(texto) => onChangeText?.(formatarHorario(texto))}
