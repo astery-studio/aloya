@@ -2,14 +2,8 @@
 import { Pressable, Text, View } from 'react-native'
 import { estilos, corAtiva, corInativa } from './BottomTabItem.style'
 
-function BottomTabItem({
-    icone: Icone,
-    label,
-    ativo = false,
-    onPress
-}) {
-    const corDoItem =
-        ativo ? corAtiva : corInativa
+function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
+    const corDoItem = ativo ? corAtiva : corInativa
 
     return (
         <Pressable
