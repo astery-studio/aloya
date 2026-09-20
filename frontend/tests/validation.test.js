@@ -1,0 +1,28 @@
+import {
+    campoObrigatorio, dataValida, emailValido, horarioValido
+} from '../utils/validation/validarCampos';
+
+test('campo obrigatório rejeita texto vazio ou apenas espaços', () => {
+    expect(campoObrigatorio(' Carla ')).toBe(true);
+    expect(campoObrigatorio('  ')).toBe(false);
+    expect(campoObrigatorio(null)).toBe(false);
+});
+
+test('e-mail exige formato básico e respeita o limite de tamanho', () => {
+    expect(emailValido(' pessoa@exemplo.com ')).toBe(true);
+    expect(emailValido('pessoa@')).toBe(false);
+    expect(emailValido('a'.repeat(250) + '@exemplo.com')).toBe(false);
+});
+
+test('data respeita calendário, formato e ano mínimo', () => {
+    expect(dataValida('29/02/2024')).toBe(true);
+    expect(dataValida('29/02/2025')).toBe(false);
+    expect(dataValida('31/04/2026')).toBe(false);
+    expect(dataValida('01/01/1899')).toBe(false);
+    expect(dataValida('2026-04-01')).toBe(false);
+});
+
+test('validação de horário continua disponível', () => {
+    expect(horarioValido('23:59')).toBe(true);
+    expect(horarioValido('24:00')).toBe(false);
+});

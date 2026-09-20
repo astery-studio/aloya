@@ -1,4 +1,4 @@
-// Valida campos de formulário usados nas telas de cadastro; existe para impedir o envio de valores inválidos.
+// Valida campos de formulário antes do envio.
 
 // Recebe um texto, confirma se há conteúdo visível e devolve verdadeiro ou falso.
 export function campoObrigatorio(valor) {
