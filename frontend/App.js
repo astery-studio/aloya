@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { Plus } from 'phosphor-react-native';
 import {
@@ -13,6 +14,9 @@ import {
 } from './theme';
 import Button from './components/common/Button/Button';
 import ButtonPopup from './components/common/ButtonPopup/ButtonPopup';
+import TextInput from './components/forms/TextInput';
+import EmailInput from './components/forms/EmailInput';
+import PasswordInput from './components/forms/PasswordInput';
 
 const variantesBotao = [
     'laranja', 'verde', 'branco', 'preto', 'vermelho',
@@ -37,6 +41,11 @@ export default function App() {
         DMSans_600SemiBold,
         DMSans_700Bold
     });
+    const [nome, setNome] = useState('');
+    const [categoria, setCategoria] = useState('');
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [senhaPopup, setSenhaPopup] = useState('');
     const avisar = (nome) => Alert.alert('Botão pressionado', nome);
 
     if (!fontsLoaded) return null;
@@ -130,6 +139,18 @@ export default function App() {
                     <ButtonPopup key={variante} texto={variante} variante={variante}
                         aoPressionar={() => avisar(`popup ${variante}`)} />
                 ))}
+            </Secao>
+            <Secao titulo="Campos de texto">
+                <TextInput label="Nome" placeholder="Digite seu nome"
+                    value={nome} onChangeText={setNome} />
+                <TextInput label="Nome da categoria" variante="categoria"
+                    placeholder="Digite o nome da categoria"
+                    value={categoria} onChangeText={setCategoria} />
+                <TextInput label="Desativado" value="" desativado />
+                <EmailInput value={email} onChangeText={setEmail} />
+                <PasswordInput value={senha} onChangeText={setSenha} />
+                <PasswordInput label="Confirmar senha" variante="popup"
+                    value={senhaPopup} onChangeText={setSenhaPopup} />
             </Secao>
         </ScrollView>
     );
