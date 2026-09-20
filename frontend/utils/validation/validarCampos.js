@@ -1,10 +1,5 @@
 // Valida campos de formulário antes do envio.
 
-// Recebe um texto, confirma se há conteúdo visível e devolve verdadeiro ou falso.
-export function campoObrigatorio(valor) {
-    return typeof valor === 'string' && valor.trim().length > 0;
-}
-
 // Recebe um e-mail, verifica o formato básico e devolve verdadeiro ou falso.
 export function emailValido(valor) {
     if (typeof valor !== 'string' || valor.length > 254) return false;

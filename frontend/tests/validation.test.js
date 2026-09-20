@@ -1,11 +1,10 @@
-import {
-    campoObrigatorio, dataValida, emailValido, horarioValido
-} from '../utils/validation/validarCampos';
+import { dataValida, emailValido, horarioValido } from '../utils/validation/validarCampos';
+import { isRequired } from '../utils/validation/isRequired';
 
 test('campo obrigatório rejeita texto vazio ou apenas espaços', () => {
-    expect(campoObrigatorio(' Carla ')).toBe(true);
-    expect(campoObrigatorio('  ')).toBe(false);
-    expect(campoObrigatorio(null)).toBe(false);
+    expect(isRequired(' Carla ')).toBe(true);
+    expect(isRequired('  ')).toBe(false);
+    expect(isRequired(null)).toBe(false);
 });
 
 test('e-mail exige formato básico e respeita o limite de tamanho', () => {
