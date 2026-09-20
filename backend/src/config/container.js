@@ -1,59 +1,59 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-const rateLimit = require('express-rate-limit');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import crypto from 'node:crypto';
+import nodemailer from 'nodemailer';
+import rateLimit from 'express-rate-limit';
 
-const { env } = require('./env');
-const { prisma } = require('./prisma');
+import { env } from './env.js';
+import { prisma } from './prisma.js';
 
-const dateUtils = require('../utils/date.utils');
+import * as dateUtils from '../utils/date.utils.js';
 
-const {
+import {
     criarCadastroRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit
-} = require('../middlewares/rateLimit.middleware');
+} from '../middlewares/rateLimit.middleware.js';
 
-const {
+import {
     criarPasswordService
-} = require('../services/password.service');
+} from '../services/password.service.js';
 
-const {
+import {
     criarTokenService
-} = require('../services/token.service');
+} from '../services/token.service.js';
 
-const {
+import {
     criarEmailService
-} = require('../services/email.service');
+} from '../services/email.service.js';
 
-const {
+import {
     criarParentalConsentService
-} = require('../services/parentalConsent.service');
+} from '../services/parentalConsent.service.js';
 
-const {
+import {
     criarAuthService
-} = require('../services/auth.service');
+} from '../services/auth.service.js';
 
-const {
+import {
     criarAuthValidator
-} = require('../validators/auth.validator');
+} from '../validators/auth.validator.js';
 
-const {
+import {
     criarParentalConsentValidator
-} = require('../validators/parentalConsent.validator');
+} from '../validators/parentalConsent.validator.js';
 
-const {
+import {
     criarAuthController
-} = require('../controllers/auth.controller');
+} from '../controllers/auth.controller.js';
 
-const {
+import {
     criarAuthMiddleware
-} = require('../middlewares/auth.middleware');
+} from '../middlewares/auth.middleware.js';
 
-const {
+import {
     criarParentalConsentMiddleware
-} = require('../middlewares/parentalConsent.middleware');
+} from '../middlewares/parentalConsent.middleware.js';
 
 function criarContainer() {
     const transporter = nodemailer.createTransport({
