@@ -196,21 +196,21 @@ export default function App() {
                 <NavigationField
                     label="Configurações de Perfil"
                     icone={UserIcon}
-                    paleta="configVerde"
+                    paleta="corVerde"
                     onPress={tocarPerfil}
                 />
 
                 <NavigationField
                     label="Parâmetros do Ciclo"
                     icone={ArrowsClockwiseIcon}
-                    paleta="configLaranja"
+                    paleta="corLaranja"
                     onPress={tocarCiclo}
                 />
 
                 <NavigationField
                     label="Alterar Senha"
                     icone={LockIcon}
-                    paleta="configAzul"
+                    paleta="corAzul"
                     onPress={tocarSenha}
                 />
 
@@ -218,7 +218,7 @@ export default function App() {
                     label="08:00"
                     icone={ClockIcon}
                     variante="botao"
-                    paleta="configVerde"
+                    paleta="corVerde"
                     onPress={tocarHorario}
                 />
             </View>
@@ -237,7 +237,7 @@ export default function App() {
                     label="Tela inicial"
                     icone={HouseIcon}
                     variante="semBorda"
-                    paleta="configVerde"
+                    paleta="corVerde"
                     onPress={tocarInicio}
                 />
 
@@ -245,7 +245,7 @@ export default function App() {
                     label="Notificações"
                     icone={BellIcon}
                     variante="semBorda"
-                    paleta="configLaranja"
+                    paleta="corLaranja"
                     onPress={tocarNotificacoes}
                 />
 
@@ -253,7 +253,7 @@ export default function App() {
                     label="Sobre a aplicação"
                     icone={InfoIcon}
                     variante="semBorda"
-                    paleta="configAzul"
+                    paleta="corAzul"
                     onPress={tocarSobre}
                 />
 
@@ -261,7 +261,7 @@ export default function App() {
                     label="Políticas de Privacidade"
                     icone={ShieldCheckIcon}
                     variante="semBorda"
-                    paleta="configVerde"
+                    paleta="corVerde"
                     onPress={tocarPrivacidade}
                 />
             </View>
@@ -279,7 +279,7 @@ export default function App() {
                 <NavigationField
                     label="Anticoncepcional vermelho"
                     icone={PillIcon}
-                    paleta="anticoncepcionalVermelho"
+                    paleta="corVermelho"
                     onPress={
                         tocarAnticoncepcionalVermelho
                     }
@@ -288,7 +288,7 @@ export default function App() {
                 <NavigationField
                     label="Anticoncepcional verde"
                     icone={PillIcon}
-                    paleta="anticoncepcionalVerde"
+                    paleta="corVerde2"
                     onPress={
                         tocarAnticoncepcionalVerde
                     }
@@ -308,7 +308,7 @@ export default function App() {
                 <NavigationField
                     label="Texto comprido para conferir a quebra dentro da linha sem empurrar a seta para fora da tela"
                     icone={UserIcon}
-                    paleta="configVerde"
+                    paleta="corVerde"
                     onPress={tocarPerfil}
                 />
 
@@ -320,7 +320,7 @@ export default function App() {
                 <NavigationField
                     label="Desabilitado"
                     icone={LockIcon}
-                    paleta="configAzul"
+                    paleta="corAzul"
                     desabilitado
                     onPress={tocarSenha}
                 />
