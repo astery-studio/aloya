@@ -1,7 +1,7 @@
 /**
  * Mostra somente os testes do NavigationField no Expo.
  * É usado temporariamente como entrada do aplicativo.
- * Existe para conferir aparência e toque sem navegar de verdade.
+ * Existe para conferir variantes, cores e toques sem navegar de verdade.
  */
 
 import { Alert, ScrollView, Text, View } from 'react-native'
@@ -22,6 +22,7 @@ import { BellIcon } from 'phosphor-react-native/src/icons/Bell'
 import { InfoIcon } from 'phosphor-react-native/src/icons/Info'
 import { ShieldCheckIcon } from 'phosphor-react-native/src/icons/ShieldCheck'
 import { ClockIcon } from 'phosphor-react-native/src/icons/Clock'
+import { PillIcon } from 'phosphor-react-native/src/icons/Pill'
 
 import { NavigationField } from './components/common/NavigationField/NavigationField'
 import { tema } from './theme'
@@ -40,7 +41,7 @@ function mostrarToque(label) {
 
 /**
  * Não recebe propriedades.
- * Mostra todas as variantes principais do NavigationField.
+ * Mostra todas as variantes e paletas do NavigationField.
  * Retorna a tela temporária de testes.
  */
 export default function App() {
@@ -124,6 +125,28 @@ export default function App() {
         mostrarToque('Políticas de Privacidade')
     }
 
+    /**
+     * Não recebe dados.
+     * Confirma o toque no anticoncepcional vermelho.
+     * Não retorna valor.
+     */
+    function tocarAnticoncepcionalVermelho() {
+        mostrarToque(
+            'Anticoncepcional com paleta vermelha'
+        )
+    }
+
+    /**
+     * Não recebe dados.
+     * Confirma o toque no anticoncepcional verde.
+     * Não retorna valor.
+     */
+    function tocarAnticoncepcionalVerde() {
+        mostrarToque(
+            'Anticoncepcional com paleta verde'
+        )
+    }
+
     if (erroFontes) {
         return (
             <Text>
@@ -166,27 +189,28 @@ export default function App() {
             </Text>
 
             <Text style={{ marginBottom: 12 }}>
-                Com borda
+                Configurações com borda
             </Text>
 
             <View style={{ gap: 10 }}>
                 <NavigationField
                     label="Configurações de Perfil"
                     icone={UserIcon}
+                    paleta="configVerde"
                     onPress={tocarPerfil}
                 />
 
                 <NavigationField
                     label="Parâmetros do Ciclo"
                     icone={ArrowsClockwiseIcon}
-                    tom="coral"
+                    paleta="configLaranja"
                     onPress={tocarCiclo}
                 />
 
                 <NavigationField
                     label="Alterar Senha"
                     icone={LockIcon}
-                    tom="azul"
+                    paleta="configAzul"
                     onPress={tocarSenha}
                 />
 
@@ -194,6 +218,7 @@ export default function App() {
                     label="08:00"
                     icone={ClockIcon}
                     variante="botao"
+                    paleta="configVerde"
                     onPress={tocarHorario}
                 />
             </View>
@@ -204,7 +229,7 @@ export default function App() {
                     marginBottom: 12
                 }}
             >
-                Sem borda
+                Configurações sem borda
             </Text>
 
             <View style={{ gap: 4 }}>
@@ -212,6 +237,7 @@ export default function App() {
                     label="Tela inicial"
                     icone={HouseIcon}
                     variante="semBorda"
+                    paleta="configVerde"
                     onPress={tocarInicio}
                 />
 
@@ -219,7 +245,7 @@ export default function App() {
                     label="Notificações"
                     icone={BellIcon}
                     variante="semBorda"
-                    tom="coral"
+                    paleta="configLaranja"
                     onPress={tocarNotificacoes}
                 />
 
@@ -227,7 +253,7 @@ export default function App() {
                     label="Sobre a aplicação"
                     icone={InfoIcon}
                     variante="semBorda"
-                    tom="azul"
+                    paleta="configAzul"
                     onPress={tocarSobre}
                 />
 
@@ -235,7 +261,37 @@ export default function App() {
                     label="Políticas de Privacidade"
                     icone={ShieldCheckIcon}
                     variante="semBorda"
+                    paleta="configVerde"
                     onPress={tocarPrivacidade}
+                />
+            </View>
+
+            <Text
+                style={{
+                    marginTop: 28,
+                    marginBottom: 12
+                }}
+            >
+                Paletas dos anticoncepcionais
+            </Text>
+
+            <View style={{ gap: 10 }}>
+                <NavigationField
+                    label="Anticoncepcional vermelho"
+                    icone={PillIcon}
+                    paleta="anticoncepcionalVermelho"
+                    onPress={
+                        tocarAnticoncepcionalVermelho
+                    }
+                />
+
+                <NavigationField
+                    label="Anticoncepcional verde"
+                    icone={PillIcon}
+                    paleta="anticoncepcionalVerde"
+                    onPress={
+                        tocarAnticoncepcionalVerde
+                    }
                 />
             </View>
 
@@ -252,6 +308,7 @@ export default function App() {
                 <NavigationField
                     label="Texto comprido para conferir a quebra dentro da linha sem empurrar a seta para fora da tela"
                     icone={UserIcon}
+                    paleta="configVerde"
                     onPress={tocarPerfil}
                 />
 
@@ -263,6 +320,7 @@ export default function App() {
                 <NavigationField
                     label="Desabilitado"
                     icone={LockIcon}
+                    paleta="configAzul"
                     desabilitado
                     onPress={tocarSenha}
                 />
