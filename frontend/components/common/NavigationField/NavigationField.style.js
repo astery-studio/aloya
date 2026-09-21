@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { fontFamilies, tema } from '../../../theme'
 
-const corSeta = tema.cores.neutras.bordaTracejada
+const setaConfig = tema.cores.neutras.bordaTracejada
 const corSetaBotao = tema.cores.neutras.textoSecundarioClaro
 
 const estilos = StyleSheet.create({
@@ -61,4 +61,4 @@ const estilos = StyleSheet.create({
     }
 })
 
-export {estilos, corSeta, corSetaBotao}
+export {estilos, setaConfig, corSetaBotao}
