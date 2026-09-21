@@ -5,10 +5,33 @@ import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight'
 import { tema } from '../../../theme'
 import { estilos, corSeta, corSetaBotao } from './NavigationField.style'
 
-const coresDosTons = {
-    verde: tema.cores.marca.secundaria,
-    coral: tema.cores.marca.primaria,
-    azul: tema.cores.feedback.informacao
+const paletasDosIcones = {
+    configVerde:
+        tema.cores.icones.configuracoes.verde,
+
+    configAzul:
+        tema.cores.icones.configuracoes.azul,
+
+    configLaranja:
+        tema.cores.icones.configuracoes.laranja,
+
+    anticoncepcionalVermelho:
+        tema.cores.icones.anticoncepcionais.vermelho,
+
+    anticoncepcionalVerde:
+        tema.cores.icones.anticoncepcionais.verde
+}
+
+/**
+ * Recebe o nome de uma paleta.
+ * Procura as cores exatas da caixa e do ícone.
+ * Retorna configVerde se o nome recebido não existir.
+ */
+function obterPaleta(paleta) {
+    return (
+        paletasDosIcones[paleta]
+        ?? paletasDosIcones.configVerde
+    )
 }
 
 /**
@@ -17,17 +40,33 @@ const coresDosTons = {
  * Retorna o campo de navegação.
  *
  * variante aceita: "comBorda", "semBorda" ou "botao".
+ *
+ * paleta aceita:
+ * "configVerde",
+ * "configAzul",
+ * "configLaranja",
+ * "anticoncepcionalVermelho"
+ * ou "anticoncepcionalVerde".
  */
-function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', tom = 'verde', desabilitado = false }) {
-    const corIcone = coresDosTons[tom] ?? coresDosTons.verde
-    const semBorda = variante === 'semBorda'
-    const ehBotao = variante === 'botao'
-    const estaDesabilitado = desabilitado || typeof onPress !== 'function'
+function NavigationField({
+    label,
+    icone: Icone,
+    onPress,
+    variante = 'comBorda',
+    paleta = 'configVerde',
+    desabilitado = false
+}) {
+    const coresDoIcone = obterPaleta(paleta)
 
-    const fundoIcone =
-        tom === 'verde' && !ehBotao
-            ? tema.cores.marca.fundoIconeNavegacao
-            : `${corIcone}12`
+    const semBorda =
+        variante === 'semBorda'
+
+    const ehBotao =
+        variante === 'botao'
+
+    const estaDesabilitado =
+        desabilitado
+        || typeof onPress !== 'function'
 
     return (
         <Pressable
@@ -43,22 +82,29 @@ function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', 
                 estilos.container,
                 semBorda && estilos.semBorda,
                 ehBotao && estilos.botao,
-                estaDesabilitado && estilos.desabilitado
+                estaDesabilitado
+                    && estilos.desabilitado
             ]}
         >
             {Icone ? (
                 <View
                     style={[
                         estilos.caixaIcone,
-                        ehBotao && estilos.caixaIconeBotao,
+                        ehBotao
+                            && estilos.caixaIconeBotao,
                         {
-                            backgroundColor: fundoIcone
+                            backgroundColor:
+                                coresDoIcone.caixa
                         }
                     ]}
                 >
                     <Icone
-                        size={semBorda || ehBotao ? 24 : 20}
-                        color={corIcone}
+                        size={
+                            semBorda || ehBotao
+                                ? 24
+                                : 20
+                        }
+                        color={coresDoIcone.icone}
                         weight="regular"
                     />
                 </View>
@@ -72,8 +118,16 @@ function NavigationField({ label, icone: Icone, onPress, variante = 'comBorda', 
             </Text>
 
             <CaretRightIcon
-                size={semBorda || ehBotao ? 20 : 18}
-                color={ehBotao ? corSetaBotao : corSeta}
+                size={
+                    semBorda || ehBotao
+                        ? 20
+                        : 18
+                }
+                color={
+                    ehBotao
+                        ? corSetaBotao
+                        : corSeta
+                }
                 weight="regular"
             />
         </Pressable>
