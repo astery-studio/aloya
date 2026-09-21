@@ -6,67 +6,25 @@ import { tema } from '../../../theme'
 import { estilos, corSeta, corSetaBotao } from './NavigationField.style'
 
 const paletasDosIcones = {
-    configVerde:
-        tema.cores.icones.configuracoes.verde,
-
-    configAzul:
-        tema.cores.icones.configuracoes.azul,
-
-    configLaranja:
-        tema.cores.icones.configuracoes.laranja,
-
-    anticoncepcionalVermelho:
-        tema.cores.icones.anticoncepcionais.vermelho,
-
-    anticoncepcionalVerde:
-        tema.cores.icones.anticoncepcionais.verde
+    corVerde: tema.cores.icones.configuracoes.verde,
+    corAzul: tema.cores.icones.configuracoes.azul,
+    corLaranja: tema.cores.icones.configuracoes.laranja,
+    corVermelho: tema.cores.icones.anticoncepcionais.vermelho,
+    corVerde2: tema.cores.icones.anticoncepcionais.verde
 }
 
-/**
- * Recebe o nome de uma paleta.
- * Procura as cores exatas da caixa e do ícone.
- * Retorna configVerde se o nome recebido não existir.
- */
 function obterPaleta(paleta) {
     return (
-        paletasDosIcones[paleta]
-        ?? paletasDosIcones.configVerde
+        paletasDosIcones[paleta] ?? paletasDosIcones.configVerde
     )
 }
 
-/**
- * Recebe texto, ícone Phosphor, aparência e ação de toque.
- * Mostra uma linha que pode abrir outra tela ou painel.
- * Retorna o campo de navegação.
- *
- * variante aceita: "comBorda", "semBorda" ou "botao".
- *
- * paleta aceita:
- * "configVerde",
- * "configAzul",
- * "configLaranja",
- * "anticoncepcionalVermelho"
- * ou "anticoncepcionalVerde".
- */
-function NavigationField({
-    label,
-    icone: Icone,
-    onPress,
-    variante = 'comBorda',
-    paleta = 'configVerde',
-    desabilitado = false
-}) {
+function NavigationField({label, icone: Icone, onPress, variante = 'comBorda', paleta = 'configVerde', desabilitado = false}) {
     const coresDoIcone = obterPaleta(paleta)
 
-    const semBorda =
-        variante === 'semBorda'
-
-    const ehBotao =
-        variante === 'botao'
-
-    const estaDesabilitado =
-        desabilitado
-        || typeof onPress !== 'function'
+    const semBorda = variante === 'semBorda'
+    const ehBotao = variante === 'botao'
+    const estaDesabilitado = desabilitado || typeof onPress !== 'function'
 
     return (
         <Pressable
@@ -75,35 +33,24 @@ function NavigationField({
             accessibilityRole="button"
             accessibilityLabel={label}
             accessibilityHint="Abre outra tela ou painel"
-            accessibilityState={{
-                disabled: estaDesabilitado
-            }}
+            accessibilityState={{ disabled: estaDesabilitado }}
             style={[
                 estilos.container,
                 semBorda && estilos.semBorda,
                 ehBotao && estilos.botao,
-                estaDesabilitado
-                    && estilos.desabilitado
+                estaDesabilitado && estilos.desabilitado
             ]}
         >
             {Icone ? (
                 <View
                     style={[
                         estilos.caixaIcone,
-                        ehBotao
-                            && estilos.caixaIconeBotao,
-                        {
-                            backgroundColor:
-                                coresDoIcone.caixa
-                        }
+                        ehBotao && estilos.caixaIconeBotao,
+                        { backgroundColor: coresDoIcone.caixa }
                     ]}
                 >
                     <Icone
-                        size={
-                            semBorda || ehBotao
-                                ? 24
-                                : 20
-                        }
+                        size={semBorda || ehBotao ? 24 : 20}
                         color={coresDoIcone.icone}
                         weight="regular"
                     />
@@ -118,16 +65,8 @@ function NavigationField({
             </Text>
 
             <CaretRightIcon
-                size={
-                    semBorda || ehBotao
-                        ? 20
-                        : 18
-                }
-                color={
-                    ehBotao
-                        ? corSetaBotao
-                        : corSeta
-                }
+                size={semBorda || ehBotao ? 20 : 18}
+                color={ehBotao ? corSetaBotao : corSeta}
                 weight="regular"
             />
         </Pressable>
