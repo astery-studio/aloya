@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native'
 import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight'
 
 import { tema } from '../../../theme'
-import { estilos, corSeta, corSetaBotao } from './NavigationField.style'
+import { estilos, setaConfig, corSetaBotao } from './NavigationField.style'
 
 const paletasDosIcones = {
     corVerde: tema.cores.icones.configuracoes.verde,
@@ -15,11 +15,11 @@ const paletasDosIcones = {
 
 function obterPaleta(paleta) {
     return (
-        paletasDosIcones[paleta] ?? paletasDosIcones.configVerde
+        paletasDosIcones[paleta] ?? paletasDosIcones.corVerde
     )
 }
 
-function NavigationField({label, icone: Icone, onPress, variante = 'comBorda', paleta = 'configVerde', desabilitado = false}) {
+function NavigationField({label, icone: Icone, onPress, variante = 'comBorda', paleta = 'corVerde', desabilitado = false}) {
     const coresDoIcone = obterPaleta(paleta)
 
     const semBorda = variante === 'semBorda'
@@ -66,7 +66,7 @@ function NavigationField({label, icone: Icone, onPress, variante = 'comBorda', p
 
             <CaretRightIcon
                 size={semBorda || ehBotao ? 20 : 18}
-                color={ehBotao ? corSetaBotao : corSeta}
+                color={ehBotao ? corSetaBotao : setaConfig}
                 weight="regular"
             />
         </Pressable>
