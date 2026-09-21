@@ -1,4 +1,3 @@
-//Define a aparência das três variantes do NavigationField.
 import { StyleSheet } from 'react-native'
 import { fontFamilies, tema } from '../../../theme'
 
@@ -62,8 +61,4 @@ const estilos = StyleSheet.create({
     }
 })
 
-export {
-    estilos,
-    corSeta,
-    corSetaBotao
-}
+export {estilos, corSeta, corSetaBotao}
