@@ -83,4 +83,30 @@ describe('NavigationField', () => {
             )
         ).toBeDisabled()
     })
+
+    test('não executa a ação quando está desabilitado', async () => {
+        const onPress = jest.fn()
+
+        await render(
+            <NavigationField
+                label="Campo desabilitado"
+                desabilitado
+                onPress={onPress}
+            />
+        )
+
+        const botao =
+            screen.getByRole(
+                'button',
+                {
+                    name: 'Campo desabilitado'
+                }
+            )
+
+        expect(botao).toBeDisabled()
+
+        await fireEvent.press(botao)
+
+        expect(onPress).not.toHaveBeenCalled()
+    })
 })
