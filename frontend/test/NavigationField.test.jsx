@@ -211,12 +211,14 @@ describe('NavigationField', () => {
             )
 
         expect(botao).toHaveStyle(
-            estilos.container
-        )
-
-        expect(botao).toHaveStyle(
             estilos.botao
         )
+
+        expect(botao).toHaveStyle({
+            minHeight: 56,
+            paddingHorizontal: 14,
+            paddingVertical: 11
+        })
     })
 
     test('renderiza o ícone menor na variante com borda', async () => {
