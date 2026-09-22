@@ -352,41 +352,16 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         }
     }, [onSelecionar, onFechar])
 
-    const casasDoMes =
-        useMemo(
-            () =>
-                getMonthDays(
-                    anoVisivel,
-                    mesVisivel
-                ),
-            [
-                anoVisivel,
-                mesVisivel
-            ]
-        )
+    const casasDoMes = useMemo(() => getMonthDays(anoVisivel, mesVisivel), [anoVisivel, mesVisivel])
+    const linhasDoMes = useMemo(() => {const novasLinhas = []
+        for (let indice = 0; indice < casasDoMes.length; indice += 7) {
+            novasLinhas.push(
+                casasDoMes.slice(indice, indice + 7)
+            )
+        }
 
-    const linhasDoMes =
-        useMemo(() => {
-            const novasLinhas = []
-
-            for (
-                let indice = 0;
-                indice
-                    < casasDoMes.length;
-                indice += 7
-            ) {
-                novasLinhas.push(
-                    casasDoMes.slice(
-                        indice,
-                        indice + 7
-                    )
-                )
-            }
-
-            return novasLinhas
-        }, [
-            casasDoMes
-        ])
+        return novasLinhas
+    }, [casasDoMes])
 
     const renderizarMes =
         useCallback(
