@@ -17,6 +17,19 @@ test('ícone de data foca o campo quando não há calendário', async () => {
     expect(screen.getByLabelText('Data')).toBeTruthy();
 });
 
+test('data exibe borda e halo laranja somente enquanto está focada', async () => {
+    await render(<DateInput valor="08/04/1999" onChangeText={jest.fn()} />);
+    const entrada = screen.getByLabelText('Data');
+    const campo = screen.getByTestId('campo-data');
+    await fireEvent(entrada, 'focus');
+    expect(campo).toHaveStyle({
+        borderColor: '#C85A44',
+        boxShadow: '0 0 0 3px rgba(200, 90, 68, 0.10)'
+    });
+    await fireEvent(entrada, 'blur');
+    expect(campo).toHaveStyle({ borderColor: '#E6E2D8' });
+});
+
 test('horário formata quatro dígitos como HH:MM', async () => {
     const aoMudar = jest.fn();
     await render(<TimeInput valor="" onChangeText={aoMudar} />);

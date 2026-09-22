@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { CalendarBlank } from 'phosphor-react-native';
 import { cores } from '../../theme';
@@ -7,16 +7,17 @@ import { estilos } from './DateInput.styles';
 
 export default function DateInput({
     valor = '', onChangeText, aoPressionarCalendario,
-    desativado = false, estilo, rotuloAcessibilidade = 'Data'
+    desativado = false, estilo, rotuloAcessibilidade = 'Data',
+    onFocus, onBlur, testeId = 'campo-data'
 }) {
     const entradaRef = useRef(null);
-    const preenchido = Boolean(valor);
+    const [focado, setFocado] = useState(false);
 
     return (
         <View style={[
-            estilos.campo, preenchido && estilos.preenchido,
+            estilos.campo, focado && estilos.focado,
             desativado && estilos.desativado, estilo
-        ]}>
+        ]} testID={testeId}>
             <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={aoPressionarCalendario ? 'Abrir calendário' : 'Digitar data'}
@@ -36,6 +37,14 @@ export default function DateInput({
                 placeholderTextColor={cores.neutras.textoSecundarioClaro}
                 value={valor}
                 onChangeText={(texto) => onChangeText?.(formatDate(texto))}
+                onFocus={(evento) => {
+                    setFocado(true);
+                    onFocus?.(evento);
+                }}
+                onBlur={(evento) => {
+                    setFocado(false);
+                    onBlur?.(evento);
+                }}
                 style={estilos.entrada}
             />
         </View>
