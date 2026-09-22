@@ -16,7 +16,27 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest",
+    "test:coverage": "jest --coverage --runInBand",
+    "test:performance": "jest --runInBand --testPathPatterns=performance"
   },
-  "private": true
+  "jest": {
+    "preset": "jest-expo",
+    "collectCoverageFrom": [
+      "components/**/*.{js,jsx}",
+      "layouts/**/*.{js,jsx}",
+      "utils/**/*.js",
+      "!**/*.style.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "private": true,
+  "devDependencies": {
+    "@testing-library/react-native": "^14.0.1",
+    "jest-expo": "^57.0.4",
+    "react-test-renderer": "^19.2.3"
+  }
 }
