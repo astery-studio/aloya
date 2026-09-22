@@ -1,5 +1,12 @@
 import {fireEvent, render, screen} from '@testing-library/react-native'
 
+jest.mock(
+    'phosphor-react-native/src/icons/CaretRight',
+    () => ({
+        CaretRightIcon: jest.fn(() => null)
+    })
+)
+
 import {tema} from '../theme'
 
 import {
