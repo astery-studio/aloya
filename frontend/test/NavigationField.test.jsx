@@ -66,4 +66,21 @@ describe('NavigationField', () => {
 
         expect(onPress).toHaveBeenCalledTimes(1)
     })
+
+    test('fica desabilitado quando não recebe uma ação', async () => {
+        await render(
+            <NavigationField
+                label="Sem ação"
+            />
+        )
+
+        expect(
+            screen.getByRole(
+                'button',
+                {
+                    name: 'Sem ação'
+                }
+            )
+        ).toBeDisabled()
+    })
 })
