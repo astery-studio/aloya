@@ -403,82 +403,65 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         )
     }, [anoVisivel, mesVisivel, podeMostrarMes, salvando])
 
-    const renderizarAno =
-        useCallback(
-            ({item: ano}) => {
-                const mesDisponivel =
-                    encontrarMesDisponivel(
+    const renderizarAno = useCallback(({item: ano}) => {
+        const mesDisponivel = encontrarMesDisponivel(ano)
+        const habilitado = mesDisponivel !== null
+
+        function escolherAno() {
+            if (!habilitado || salvando) {
+                return
+            }
+
+            setDataVisivel({
+                ano,
+                mes: mesDisponivel
+            })
+
+            setListaAberta(null)
+        }
+
+        return (
+            <Pressable
+                onPress={
+                    escolherAno
+                }
+                disabled={
+                    !habilitado
+                    || salvando
+                }
+                accessibilityRole="button"
+                accessibilityLabel={
+                    `Ano ${ano}`
+                }
+                accessibilityState={{
+                    selected:
                         ano
-                    )
-
-                const habilitado =
-                    mesDisponivel
-                    !== null
-
-                function escolherAno() {
-                    if (
+                        === anoVisivel,
+                    disabled:
                         !habilitado
                         || salvando
-                    ) {
-                        return
-                    }
-
-                    setDataVisivel({
-                        ano,
-                        mes: mesDisponivel
-                    })
-
-                    setListaAberta(null)
+                }}
+                style={
+                    estilos.opcaoLista
                 }
-
-                return (
-                    <Pressable
-                        onPress={
-                            escolherAno
-                        }
-                        disabled={
-                            !habilitado
-                            || salvando
-                        }
-                        accessibilityRole="button"
-                        accessibilityLabel={
-                            `Ano ${ano}`
-                        }
-                        accessibilityState={{
-                            selected:
-                                ano
-                                === anoVisivel,
-                            disabled:
-                                !habilitado
-                                || salvando
-                        }}
-                        style={
-                            estilos.opcaoLista
-                        }
-                    >
-                        <Text
-                            style={[
-                                estilos.textoOpcao,
-                                ano
-                                    === anoVisivel
-                                && estilos
-                                    .textoOpcaoSelecionada,
-                                !habilitado
-                                && estilos
-                                    .textoOpcaoDesabilitada
-                            ]}
-                        >
-                            {ano}
-                        </Text>
-                    </Pressable>
-                )
-            },
-            [
-                anoVisivel,
-                encontrarMesDisponivel,
-                salvando
-            ]
+            >
+                <Text
+                    style={[
+                        estilos.textoOpcao,
+                        ano
+                            === anoVisivel
+                        && estilos
+                            .textoOpcaoSelecionada,
+                        !habilitado
+                        && estilos
+                            .textoOpcaoDesabilitada
+                    ]}
+                >
+                    {ano}
+                </Text>
+            </Pressable>
         )
+    },[anoVisivel, encontrarMesDisponivel, salvando])
 
     const anterior =
         useMemo(
