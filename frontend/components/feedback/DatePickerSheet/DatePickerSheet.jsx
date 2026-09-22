@@ -315,70 +315,42 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         )
     }, [limiteMinimoValido, limiteMaximoValido])
 
-    const selecionarDia =
-        useCallback(
-            async (data) => {
-                if (
-                    salvamentoEmAndamento
-                        .current
-                ) {
-                    return
-                }
+    const selecionarDia = useCallback(async (data) => {
+        if (salvamentoEmAndamento.current) {
+            return
+        }
 
-                if (
-                    typeof onSelecionar
-                    !== 'function'
-                ) {
-                    setErroSalvar(
-                        mensagemDeErro
-                    )
-                    return
-                }
+        if (typeof onSelecionar !== 'function') {
+            setErroSalvar(mensagemDeErro)
+            return
+        }
 
-                salvamentoEmAndamento
-                    .current = true
+        salvamentoEmAndamento.current = true
 
-                setSalvando(true)
-                setErroSalvar('')
+        setSalvando(true)
+        setErroSalvar('')
 
-                let salvou = false
+        let salvou = false
 
-                try {
-                    const resultado =
-                        await onSelecionar(
-                            data
-                        )
+        try {
+            const resultado = await onSelecionar(data)
+            if (resultado === false) {
+                setErroSalvar(mensagemDeErro)
+                return
+            }
 
-                    if (
-                        resultado === false
-                    ) {
-                        setErroSalvar(
-                            mensagemDeErro
-                        )
-                        return
-                    }
+            salvou = true
+        } catch {
+            setErroSalvar(mensagemDeErro)
+        } finally {
+            salvamentoEmAndamento.current = false
+            setSalvando(false)
+        }
 
-                    salvou = true
-                } catch {
-                    setErroSalvar(
-                        mensagemDeErro
-                    )
-                } finally {
-                    salvamentoEmAndamento
-                        .current = false
-
-                    setSalvando(false)
-                }
-
-                if (salvou) {
-                    onFechar?.()
-                }
-            },
-            [
-                onSelecionar,
-                onFechar
-            ]
-        )
+        if (salvou) {
+            onFechar?.()
+        }
+    }, [onSelecionar, onFechar])
 
     const casasDoMes =
         useMemo(
