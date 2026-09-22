@@ -209,4 +209,23 @@ describe('NavigationField', () => {
             estilos.botao
         )
     })
+
+    test('renderiza o ícone menor na variante com borda', async () => {
+        await render(
+            <NavigationField
+                label="Ícone normal"
+                icone={IconeTeste}
+                onPress={jest.fn()}
+            />
+        )
+
+        expect(
+            IconeTeste.mock.calls[0][0]
+        ).toEqual(
+            expect.objectContaining({
+                size: 20,
+                weight: 'regular'
+            })
+        )
+    })
 })
