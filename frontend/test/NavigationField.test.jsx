@@ -183,12 +183,14 @@ describe('NavigationField', () => {
             )
 
         expect(botao).toHaveStyle(
-            estilos.container
-        )
-
-        expect(botao).toHaveStyle(
             estilos.semBorda
         )
+
+        expect(botao).toHaveStyle({
+            borderWidth: 0,
+            minHeight: 56,
+            paddingHorizontal: 13
+        })
     })
 
     test('usa os estilos da variante botão', async () => {
