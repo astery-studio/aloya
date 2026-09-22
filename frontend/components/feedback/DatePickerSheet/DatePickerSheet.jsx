@@ -392,22 +392,12 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
                 style={estilos.opcaoLista}
             >
                 <Text
-                    style={[
-                        estilos.textoOpcao,
-                        mes
-                            === mesVisivel
-                        && estilos
-                            .textoOpcaoSelecionada,
-                        !habilitado
-                        && estilos
-                            .textoOpcaoDesabilitada
+                    style={[estilos.textoOpcao,
+                        mes === mesVisivel && estilos.textoOpcaoSelecionada,
+                        !habilitado && estilos.textoOpcaoDesabilitada
                     ]}
                 >
-                    {
-                        nomesDosMeses[
-                            mes - 1
-                        ]
-                    }
+                    {nomesDosMeses[mes - 1]}
                 </Text>
             </Pressable>
         )
