@@ -386,16 +386,10 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
                 accessibilityRole="button"
                 accessibilityLabel={`${nomesDosMeses[mes - 1]} de ${anoVisivel}`}
                 accessibilityState={{
-                    selected:
-                        mes
-                        === mesVisivel,
-                    disabled:
-                        !habilitado
-                        || salvando
+                    selected: mes === mesVisivel,
+                    disabled: !habilitado || salvando
                 }}
-                style={
-                    estilos.opcaoLista
-                }
+                style={estilos.opcaoLista}
             >
                 <Text
                     style={[
