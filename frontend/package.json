@@ -18,8 +18,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "test:coverage": "jest --coverage --runInBand",
-    "test:performance": "jest --runInBand --testPathPatterns=performance"
+    "test:coverage": "jest --coverage --runInBand"
   },
   "jest": {
     "preset": "jest-expo",
