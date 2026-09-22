@@ -67,12 +67,11 @@ describe('ButtonSelection', () => {
             />
         )
 
-        expect(
+        const botao =
             screen.getByRole('button')
-        ).toHaveAccessibilityState({
-            selected: true,
-            disabled: false
-        })
+
+        expect(botao).toBeSelected()
+        expect(botao).toBeEnabled()
     })
 
     test('informa que a opção não está selecionada por padrão', async () => {
