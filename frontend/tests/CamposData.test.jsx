@@ -11,7 +11,9 @@ test('data formata oito dígitos como DD/MM/AAAA', async () => {
 
 test('ícone de data foca o campo quando não há calendário', async () => {
     await render(<DateInput valor="" onChangeText={jest.fn()} />);
-    fireEvent.press(screen.getByRole('button', { name: 'Digitar data' }));
+    const botao = screen.getByRole('button', { name: 'Digitar data' });
+    expect(botao.props.hitSlop).toBe(12);
+    fireEvent.press(botao);
     expect(screen.getByLabelText('Data')).toBeTruthy();
 });
 
