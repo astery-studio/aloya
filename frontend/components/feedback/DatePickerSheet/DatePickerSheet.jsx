@@ -244,9 +244,7 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         visivel
     ])
 
-    const podeMostrarMes =
-        useCallback(
-            (ano, mes) => {
+    const podeMostrarMes = useCallback((ano, mes) => {
                 if (
                     ano < anoMinimoPermitido || ano > anoMaximoPermitido
                 ) {
@@ -262,43 +260,21 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
                 return (
                     !antesDoMinimo && !depoisDoMaximo
                 )
-            }, [limiteMinimoValido, limiteMaximoValido]
-        )
+    }, [limiteMinimoValido, limiteMaximoValido])
 
-    const encontrarMesDisponivel =
-        useCallback(
-            (ano) => {
-                if (
-                    podeMostrarMes(
-                        ano,
-                        mesVisivel
-                    )
-                ) {
+    const encontrarMesDisponivel = useCallback((ano) => {
+                if (podeMostrarMes(ano, mesVisivel)) {
                     return mesVisivel
                 }
 
-                for (
-                    let mes = 1;
-                    mes <= 12;
-                    mes += 1
-                ) {
-                    if (
-                        podeMostrarMes(
-                            ano,
-                            mes
-                        )
-                    ) {
+                for (let mes = 1; mes <= 12; mes += 1) {
+                    if (podeMostrarMes(ano, mes)) {
                         return mes
                     }
                 }
 
                 return null
-            },
-            [
-                mesVisivel,
-                podeMostrarMes
-            ]
-        )
+    }, [mesVisivel, podeMostrarMes])
 
     const mudarMes =
         useCallback(
