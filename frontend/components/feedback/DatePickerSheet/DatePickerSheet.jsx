@@ -444,19 +444,7 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         )
     },[anoVisivel, encontrarMesDisponivel, salvando])
 
-    const anterior =
-        useMemo(
-            () =>
-                deslocarMes(
-                    anoVisivel,
-                    mesVisivel,
-                    -1
-                ),
-            [
-                anoVisivel,
-                mesVisivel
-            ]
-        )
+    const anterior = useMemo(() => deslocarMes(anoVisivel,mesVisivel,-1), [anoVisivel,mesVisivel])
 
     const proximo =
         useMemo(
