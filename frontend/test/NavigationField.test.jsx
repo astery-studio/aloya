@@ -128,4 +128,33 @@ describe('NavigationField', () => {
             2
         )
     })
+
+    test('usa os estilos da variante com borda por padrão', async () => {
+        await render(
+            <NavigationField
+                label="Com borda"
+                onPress={jest.fn()}
+            />
+        )
+
+        const botao =
+            screen.getByRole(
+                'button',
+                {
+                    name: 'Com borda'
+                }
+            )
+
+        expect(botao).toHaveStyle(
+            estilos.container
+        )
+
+        expect(botao).not.toHaveStyle(
+            estilos.semBorda
+        )
+
+        expect(botao).not.toHaveStyle(
+            estilos.botao
+        )
+    })
 })
