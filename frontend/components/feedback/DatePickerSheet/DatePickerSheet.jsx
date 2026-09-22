@@ -219,26 +219,13 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
     const [salvando, setSalvando] = useState(false)
     const [erroSalvar, setErroSalvar] = useState('')
 
-    const salvamentoEmAndamento =
-        useRef(false)
+    const salvamentoEmAndamento = useRef(false)
 
-    const anoVisivel =
-        dataVisivel.ano
+    const anoVisivel = dataVisivel.ano
+    const mesVisivel = dataVisivel.mes
 
-    const mesVisivel =
-        dataVisivel.mes
-
-    const limiteMinimoValido =
-        useMemo(
-            () => lerData(dataMinima),
-            [dataMinima]
-        )
-
-    const limiteMaximoValido =
-        useMemo(
-            () => lerData(dataMaxima),
-            [dataMaxima]
-        )
+    const limiteMinimoValido = useMemo(() => lerData(dataMinima),[dataMinima])
+    const limiteMaximoValido = useMemo(() => lerData(dataMaxima),[dataMaxima])
 
     useEffect(() => {
         if (!visivel) {
@@ -261,46 +248,21 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         useCallback(
             (ano, mes) => {
                 if (
-                    ano < anoMinimoPermitido
-                    || ano
-                        > anoMaximoPermitido
+                    ano < anoMinimoPermitido || ano > anoMaximoPermitido
                 ) {
                     return false
                 }
 
-                const inicioDoMes =
-                    obterInicioDoMes(
-                        ano,
-                        mes
-                    )
+                const inicioDoMes = obterInicioDoMes(ano, mes)
+                const fimDoMes = obterFimDoMes(ano, mes)
 
-                const fimDoMes =
-                    obterFimDoMes(
-                        ano,
-                        mes
-                    )
-
-                const antesDoMinimo =
-                    limiteMinimoValido
-                    && fimDoMes
-                        < limiteMinimoValido
-                            .texto
-
-                const depoisDoMaximo =
-                    limiteMaximoValido
-                    && inicioDoMes
-                        > limiteMaximoValido
-                            .texto
+                const antesDoMinimo = limiteMinimoValido && fimDoMes < limiteMinimoValido.texto
+                const depoisDoMaximo = limiteMaximoValido && inicioDoMes > limiteMaximoValido.texto
 
                 return (
-                    !antesDoMinimo
-                    && !depoisDoMaximo
+                    !antesDoMinimo && !depoisDoMaximo
                 )
-            },
-            [
-                limiteMinimoValido,
-                limiteMaximoValido
-            ]
+            }, [limiteMinimoValido, limiteMaximoValido]
         )
 
     const encontrarMesDisponivel =
