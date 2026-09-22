@@ -1,213 +1,170 @@
 /**
- * Mostra cenários de teste do DatePickerSheet no Expo.
- * É usado temporariamente como entrada do aplicativo.
+ * Mostra um pop-up temporário para testar sua animação.
+ * É usado somente durante o desenvolvimento no Expo.
+ * Existe para avaliar fluidez antes dos modais definitivos serem criados.
  */
 
-import {useState} from 'react'
 import {
+    Animated,
+    Easing,
+    Modal,
     Pressable,
-    ScrollView,
-    StyleSheet,
     Text,
     View
 } from 'react-native'
 
-import {StatusBar} from 'expo-status-bar'
+import {
+    useEffect,
+    useRef,
+    useState
+} from 'react'
 
 import {
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
     useFonts
-} from '@expo-google-fonts/dm-sans/useFonts'
+} from '@expo-google-fonts/dm-sans'
 
-import {
-    DMSans_400Regular
-} from '@expo-google-fonts/dm-sans/400Regular'
+import { LockIcon } from 'phosphor-react-native/src/icons/Lock'
 
-import {
-    DMSans_500Medium
-} from '@expo-google-fonts/dm-sans/500Medium'
+import { useModal } from './hooks/useModal'
+import { fontFamilies, tema } from './theme'
 
-import {
-    DMSans_600SemiBold
-} from '@expo-google-fonts/dm-sans/600SemiBold'
-
-import {
-    DMSans_700Bold
-} from '@expo-google-fonts/dm-sans/700Bold'
-
-import {
-    DatePickerSheet
-} from './components/feedback/DatePickerSheet/DatePickerSheet'
-
-import {
-    fontFamilies,
-    tema
-} from './theme'
-
-function obterDataDeHoje() {
-    const hoje = new Date()
-
-    return (
-        `${hoje.getFullYear()}-`
-        + `${String(
-            hoje.getMonth() + 1
-        ).padStart(2, '0')}-`
-        + String(
-            hoje.getDate()
-        ).padStart(2, '0')
-    )
-}
-
-function formatarData(data) {
-    const partes =
-        /^(\d{4})-(\d{2})-(\d{2})$/.exec(
-            data ?? ''
-        )
-
-    if (!partes) {
-        return 'Nenhuma data selecionada'
-    }
-
-    return (
-        `${partes[3]}/`
-        + `${partes[2]}/`
-        + partes[1]
-    )
-}
-
-const dataDeHoje =
-    obterDataDeHoje()
-
-const cenarios = [
-    {
-        id: 'completo',
-        titulo: 'Calendário completo',
-        descricao:
-            'Teste a navegação entre meses e a lista de anos.',
-        dataInicial: '2026-09-21',
-        dataMinima: null,
-        dataMaxima: null
-    },
-    {
-        id: 'nascimento',
-        titulo: 'Data de nascimento',
-        descricao:
-            'Permite selecionar datas entre 1900 e hoje.',
-        dataInicial: '2000-01-15',
-        dataMinima: '1900-01-01',
-        dataMaxima: dataDeHoje
-    },
-    {
-        id: 'intervalo',
-        titulo: 'Intervalo limitado',
-        descricao:
-            'Somente os dias 10 a 20 de setembro de 2026 ficam habilitados.',
-        dataInicial: '2026-09-15',
-        dataMinima: '2026-09-10',
-        dataMaxima: '2026-09-20'
-    }
-]
-
-const datasIniciais =
-    Object.fromEntries(
-        cenarios.map(
-            (cenario) => [
-                cenario.id,
-                cenario.dataInicial
-            ]
-        )
-    )
-
-function obterEstiloDoBotao({
-    pressed
-}) {
-    return [
-        estilos.botaoAbrir,
-        pressed
-        && estilos.botaoPressionado
-    ]
-}
-
+/**
+ * Não recebe propriedades.
+ * Mostra e anima um pop-up simples de sucesso.
+ * Retorna a tela temporária de teste.
+ */
 export default function App() {
-    const [
-        fontesCarregadas,
-        erroFontes
-    ] = useFonts({
-        DMSans_400Regular,
-        DMSans_500Medium,
-        DMSans_600SemiBold,
-        DMSans_700Bold
-    })
+    const [fontesCarregadas, erroFontes] =
+        useFonts({
+            DMSans_400Regular,
+            DMSans_500Medium,
+            DMSans_600SemiBold,
+            DMSans_700Bold
+        })
 
-    const [
-        datas,
-        setDatas
-    ] = useState(
-        datasIniciais
-    )
+    const modalSucesso = useModal()
 
-    const [
-        cenarioAtivo,
-        setCenarioAtivo
-    ] = useState(
-        'completo'
-    )
+    const [modalMontado, setModalMontado] =
+        useState(false)
 
-    const [
-        calendarioVisivel,
-        setCalendarioVisivel
-    ] = useState(false)
+    const progresso =
+        useRef(new Animated.Value(0)).current
 
-    const configuracaoAtiva =
-        cenarios.find(
-            (cenario) =>
-                cenario.id
-                === cenarioAtivo
-        ) ?? cenarios[0]
+    const modalMontadoAtual =
+        useRef(false)
 
-    function abrirCalendario(id) {
-        setCenarioAtivo(id)
-        setCalendarioVisivel(true)
+    const modalVisivelAtual =
+        useRef(false)
+
+    modalVisivelAtual.current =
+        modalSucesso.visivel
+
+    const opacidadeFundo =
+        progresso.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 1]
+        })
+
+    const escalaCartao =
+        progresso.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.94, 1]
+        })
+
+    const posicaoCartao =
+        progresso.interpolate({
+            inputRange: [0, 1],
+            outputRange: [12, 0]
+        })
+
+    /**
+     * Não recebe dados.
+     * Faz somente o cartão aparecer com movimento curto e leve.
+     * Não retorna valor.
+     */
+    function animarEntrada() {
+        progresso.stopAnimation()
+        progresso.setValue(0)
+
+        Animated.timing(progresso, {
+            toValue: 1,
+            duration: 240,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+            isInteraction: false
+        }).start()
     }
 
-    function fecharCalendario() {
-        setCalendarioVisivel(false)
-    }
+    /**
+     * Não recebe dados.
+     * Faz o cartão desaparecer antes de desmontar o Modal.
+     * Não retorna valor.
+     */
+    function animarSaida() {
+        progresso.stopAnimation()
 
-    async function selecionarData(data) {
-        /**
-         * O atraso é proposital.
-         * Ele permite testar a mensagem de salvamento
-         * e o bloqueio contra vários toques.
-         */
-        await new Promise(
-            (resolver) => {
-                setTimeout(
-                    resolver,
-                    350
-                )
+        Animated.timing(progresso, {
+            toValue: 0,
+            duration: 170,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+            isInteraction: false
+        }).start(({ finished }) => {
+            if (
+                finished
+                && !modalVisivelAtual.current
+            ) {
+                modalMontadoAtual.current = false
+                setModalMontado(false)
             }
-        )
+        })
+    }
 
-        setDatas(
-            (datasAtuais) => ({
-                ...datasAtuais,
-                [cenarioAtivo]: data
-            })
-        )
+    // useEffect reage à abertura e ao fechamento do hook.
+    // O Modal continua montado durante a animação de saída.
+    useEffect(() => {
+        if (modalSucesso.visivel) {
+            if (!modalMontadoAtual.current) {
+                modalMontadoAtual.current = true
+                setModalMontado(true)
+            } else {
+                animarEntrada()
+            }
 
-        return true
+            return
+        }
+
+        if (modalMontadoAtual.current) {
+            animarSaida()
+        }
+    }, [modalSucesso.visivel])
+
+    /**
+     * Não recebe dados.
+     * Inicia a animação depois que o Modal nativo aparece.
+     * Não retorna valor.
+     */
+    function quandoModalAparecer() {
+        if (modalVisivelAtual.current) {
+            animarEntrada()
+        }
     }
 
     if (erroFontes) {
         return (
             <View
-                style={
-                    estilos.estadoCentralizado
-                }
+                style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 24
+                }}
             >
-                <Text
-                    style={estilos.erro}
-                >
+                <Text>
                     Não foi possível carregar as fontes.
                 </Text>
             </View>
@@ -217,15 +174,13 @@ export default function App() {
     if (!fontesCarregadas) {
         return (
             <View
-                style={
-                    estilos.estadoCentralizado
-                }
+                style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
             >
-                <Text
-                    style={
-                        estilos.textoSecundario
-                    }
-                >
+                <Text>
                     Carregando fontes...
                 </Text>
             </View>
@@ -233,410 +188,215 @@ export default function App() {
     }
 
     return (
-        <View style={estilos.tela}>
-            <StatusBar style="dark" />
+        <View
+            style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 24,
+                backgroundColor:
+                    tema.cores.neutras.fundoClaro
+            }}
+        >
+            <Text
+                style={{
+                    marginBottom: 8,
+                    color:
+                        tema.cores.neutras
+                            .textoPrincipalClaro,
+                    fontFamily: fontFamilies.bold,
+                    fontSize: 24,
+                    lineHeight: 31
+                }}
+            >
+                Teste do pop-up
+            </Text>
 
-            <ScrollView
-                style={estilos.rolagem}
-                contentContainerStyle={
-                    estilos.conteudo
+            <Text
+                style={{
+                    marginBottom: 24,
+                    color:
+                        tema.cores.neutras
+                            .textoSecundarioClaro,
+                    fontFamily: fontFamilies.regular,
+                    fontSize: 16,
+                    lineHeight: 24,
+                    textAlign: 'center'
+                }}
+            >
+                Abra e feche várias vezes para
+                conferir a fluidez.
+            </Text>
+
+            <Pressable
+                onPress={modalSucesso.abrirModal}
+                accessibilityRole="button"
+                accessibilityLabel="Testar pop-up de sucesso"
+                style={{
+                    width: '100%',
+                    minHeight: 56,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 16,
+                    borderRadius:
+                        tema.radius.buttonAndInput,
+                    backgroundColor:
+                        tema.cores.marca.secundaria
+                }}
+            >
+                <Text
+                    style={{
+                        color:
+                            tema.cores.neutras
+                                .superficieClara,
+                        fontFamily: fontFamilies.bold,
+                        fontSize: 16,
+                        lineHeight: 24
+                    }}
+                >
+                    Testar pop-up
+                </Text>
+            </Pressable>
+
+            <Modal
+                visible={modalMontado}
+                transparent
+                animationType="none"
+                hardwareAccelerated
+                statusBarTranslucent
+                onShow={quandoModalAparecer}
+                onRequestClose={
+                    modalSucesso.fecharModal
                 }
             >
-                <Text style={estilos.titulo}>
-                    Teste do calendário
-                </Text>
-
-                <Text
-                    style={
-                        estilos.introducao
-                    }
-                >
-                    Abra cada cenário, navegue pelos meses e anos e escolha uma data. O atraso curto ao salvar é proposital para testar o bloqueio de toques.
-                </Text>
-
-                <View style={estilos.aviso}>
-                    <Text
-                        style={
-                            estilos.avisoTitulo
-                        }
-                    >
-                        O que conferir
-                    </Text>
-
-                    <Text
-                        style={
-                            estilos.avisoTexto
-                        }
-                    >
-                        • animação sem travamentos
-                        {'\n'}
-                        • rolagem fluida na lista de anos
-                        {'\n'}
-                        • dias fora do limite desabilitados
-                        {'\n'}
-                        • apenas um salvamento por toque
-                        {'\n'}
-                        • fechamento pelo X e pelo botão voltar
-                    </Text>
-                </View>
-
                 <View
-                    style={
-                        estilos.listaCenarios
-                    }
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingHorizontal: 24
+                    }}
                 >
-                    {cenarios.map(
-                        (cenario) => (
-                            <View
-                                key={
-                                    cenario.id
+                    <Animated.View
+                        pointerEvents="none"
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                            opacity: opacidadeFundo,
+                            backgroundColor:
+                                '#22222266'
+                        }}
+                    />
+
+                    <Animated.View
+                        accessibilityViewIsModal
+                        style={{
+                            width: '100%',
+                            maxWidth: 342,
+                            alignItems: 'center',
+                            paddingHorizontal: 24,
+                            paddingTop: 32,
+                            paddingBottom: 24,
+                            borderRadius:
+                                tema.radius.bottomSheet,
+                            opacity: progresso,
+                            backgroundColor:
+                                tema.cores.neutras
+                                    .superficieClara,
+                            transform: [
+                                {
+                                    scale:
+                                        escalaCartao
+                                },
+                                {
+                                    translateY:
+                                        posicaoCartao
                                 }
-                                style={
-                                    estilos.cartao
+                            ]
+                        }}
+                    >
+                        <View
+                            style={{
+                                width: 56,
+                                height: 56,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: 24,
+                                borderRadius: 28,
+                                backgroundColor:
+                                    tema.cores.icones
+                                        .configuracoes
+                                        .laranja.caixa
+                            }}
+                        >
+                            <LockIcon
+                                size={24}
+                                color={
+                                    tema.cores.icones
+                                        .configuracoes
+                                        .laranja.icone
                                 }
+                                weight="regular"
+                            />
+                        </View>
+
+                        <Text
+                            accessibilityRole="header"
+                            style={{
+                                marginBottom: 24,
+                                color:
+                                    tema.cores.neutras
+                                        .textoPrincipalClaro,
+                                fontFamily:
+                                    fontFamilies.bold,
+                                fontSize: 22,
+                                lineHeight: 29,
+                                textAlign: 'center'
+                            }}
+                        >
+                            Dados atualizados com sucesso
+                        </Text>
+
+                        <Pressable
+                            onPress={
+                                modalSucesso.fecharModal
+                            }
+                            accessibilityRole="button"
+                            accessibilityLabel="Fechar mensagem de sucesso"
+                            style={{
+                                width: '100%',
+                                minHeight: 56,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                paddingHorizontal: 16,
+                                borderRadius:
+                                    tema.radius
+                                        .buttonAndInput,
+                                backgroundColor:
+                                    tema.cores.marca
+                                        .secundaria
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    color:
+                                        tema.cores.neutras
+                                            .superficieClara,
+                                    fontFamily:
+                                        fontFamilies.bold,
+                                    fontSize: 16,
+                                    lineHeight: 24
+                                }}
                             >
-                                <Text
-                                    style={
-                                        estilos
-                                            .tituloCartao
-                                    }
-                                >
-                                    {
-                                        cenario
-                                            .titulo
-                                    }
-                                </Text>
-
-                                <Text
-                                    style={
-                                        estilos
-                                            .descricaoCartao
-                                    }
-                                >
-                                    {
-                                        cenario
-                                            .descricao
-                                    }
-                                </Text>
-
-                                <View
-                                    style={
-                                        estilos
-                                            .dataSelecionada
-                                    }
-                                >
-                                    <Text
-                                        style={
-                                            estilos
-                                                .rotuloData
-                                        }
-                                    >
-                                        Data selecionada
-                                    </Text>
-
-                                    <Text
-                                        style={
-                                            estilos
-                                                .valorData
-                                        }
-                                    >
-                                        {
-                                            formatarData(
-                                                datas[
-                                                    cenario
-                                                        .id
-                                                ]
-                                            )
-                                        }
-                                    </Text>
-                                </View>
-
-                                <Pressable
-                                    onPress={
-                                        () =>
-                                            abrirCalendario(
-                                                cenario.id
-                                            )
-                                    }
-                                    accessibilityRole="button"
-                                    accessibilityLabel={
-                                        `Abrir ${cenario.titulo}`
-                                    }
-                                    style={
-                                        obterEstiloDoBotao
-                                    }
-                                >
-                                    <Text
-                                        style={
-                                            estilos
-                                                .textoBotao
-                                        }
-                                    >
-                                        Abrir calendário
-                                    </Text>
-                                </Pressable>
-                            </View>
-                        )
-                    )}
+                                OK
+                            </Text>
+                        </Pressable>
+                    </Animated.View>
                 </View>
-            </ScrollView>
-
-            <DatePickerSheet
-                visivel={
-                    calendarioVisivel
-                }
-                titulo={
-                    configuracaoAtiva
-                        .titulo
-                }
-                valorSelecionado={
-                    datas[
-                        cenarioAtivo
-                    ]
-                }
-                dataMinima={
-                    configuracaoAtiva
-                        .dataMinima
-                }
-                dataMaxima={
-                    configuracaoAtiva
-                        .dataMaxima
-                }
-                onSelecionar={
-                    selecionarData
-                }
-                onFechar={
-                    fecharCalendario
-                }
-            />
+            </Modal>
         </View>
     )
 }
-
-const estilos =
-    StyleSheet.create({
-        tela: {
-            flex: 1,
-            backgroundColor:
-                tema.cores.neutras
-                    .fundoClaro
-        },
-
-        rolagem: {
-            flex: 1
-        },
-
-        conteudo: {
-            paddingTop: 64,
-            paddingHorizontal:
-                tema
-                    .espacamentosLayout
-                    .margemHorizontalTela,
-            paddingBottom:
-                tema.espacamentos
-                    .maximo
-        },
-
-        titulo: {
-            ...tema.typography.h1,
-            color:
-                tema.cores.neutras
-                    .textoPrincipalClaro
-        },
-
-        introducao: {
-            ...tema.typography
-                .bodyDefault,
-            marginTop:
-                tema.espacamentos
-                    .pequeno,
-            color:
-                tema.cores.neutras
-                    .textoSecundarioClaro
-        },
-
-        aviso: {
-            marginTop:
-                tema.espacamentos
-                    .grande,
-            padding:
-                tema.espacamentos
-                    .medio,
-            borderWidth: 1,
-            borderColor:
-                tema.cores.neutras
-                    .bordaClara,
-            borderRadius:
-                tema.radius
-                    .buttonAndInput,
-            backgroundColor:
-                tema.cores.icones
-                    .configuracoes
-                    .verde
-                    .caixa
-        },
-
-        avisoTitulo: {
-            fontFamily:
-                fontFamilies.bold,
-            fontSize: 16,
-            lineHeight: 24,
-            color:
-                tema.cores.marca
-                    .secundaria
-        },
-
-        avisoTexto: {
-            ...tema.typography.caption,
-            marginTop:
-                tema.espacamentos
-                    .minimo,
-            color:
-                tema.cores.neutras
-                    .textoSecundarioClaro
-        },
-
-        listaCenarios: {
-            gap:
-                tema.espacamentos
-                    .medio,
-            marginTop:
-                tema.espacamentos
-                    .grande
-        },
-
-        cartao: {
-            padding:
-                tema.espacamentos
-                    .medio,
-            borderWidth: 1,
-            borderColor:
-                tema.cores.neutras
-                    .bordaClara,
-            borderRadius:
-                tema.radius
-                    .onboardingCalendar,
-            backgroundColor:
-                tema.cores.neutras
-                    .superficieClara
-        },
-
-        tituloCartao: {
-            ...tema.typography
-                .bodyLarge,
-            color:
-                tema.cores.neutras
-                    .textoPrincipalClaro
-        },
-
-        descricaoCartao: {
-            ...tema.typography
-                .caption,
-            marginTop:
-                tema.espacamentos
-                    .minimo,
-            color:
-                tema.cores.neutras
-                    .textoSecundarioClaro
-        },
-
-        dataSelecionada: {
-            marginTop:
-                tema.espacamentos
-                    .medio,
-            padding:
-                tema.espacamentos
-                    .pequeno,
-            borderRadius:
-                tema.radius
-                    .buttonAndInput,
-            backgroundColor:
-                tema.cores.neutras
-                    .fundoClaro
-        },
-
-        rotuloData: {
-            ...tema.typography.micro,
-            color:
-                tema.cores.neutras
-                    .textoSecundarioClaro,
-            textTransform:
-                'uppercase'
-        },
-
-        valorData: {
-            ...tema.typography
-                .bodyDefault,
-            marginTop:
-                tema.espacamentos
-                    .minimo,
-            color:
-                tema.cores.neutras
-                    .textoPrincipalClaro
-        },
-
-        botaoAbrir: {
-            minHeight: 48,
-            alignItems:
-                'center',
-            justifyContent:
-                'center',
-            marginTop:
-                tema.espacamentos
-                    .medio,
-            paddingHorizontal:
-                tema.espacamentos
-                    .medio,
-            borderRadius:
-                tema.radius
-                    .buttonAndInput,
-            backgroundColor:
-                tema.cores.marca
-                    .secundaria
-        },
-
-        botaoPressionado: {
-            opacity: 0.8
-        },
-
-        textoBotao: {
-            fontFamily:
-                fontFamilies.bold,
-            fontSize: 16,
-            lineHeight: 24,
-            color:
-                tema.cores.neutras
-                    .superficieClara
-        },
-
-        estadoCentralizado: {
-            flex: 1,
-            alignItems:
-                'center',
-            justifyContent:
-                'center',
-            padding:
-                tema.espacamentos
-                    .grande,
-            backgroundColor:
-                tema.cores.neutras
-                    .fundoClaro
-        },
-
-        textoSecundario: {
-            ...tema.typography
-                .bodyDefault,
-            color:
-                tema.cores.neutras
-                    .textoSecundarioClaro
-        },
-
-        erro: {
-            ...tema.typography
-                .bodyDefault,
-            color:
-                tema.cores.feedback
-                    .erro,
-            textAlign: 'center'
-        }
-    })
