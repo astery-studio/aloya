@@ -22,10 +22,11 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "collectCoverageFrom": [
+        "collectCoverageFrom": [
       "components/**/*.{js,jsx}",
       "layouts/**/*.{js,jsx}",
       "utils/**/*.js",
+      "hooks/**/*.js",
       "!**/*.style.js"
     ],
     "coveragePathIgnorePatterns": [
