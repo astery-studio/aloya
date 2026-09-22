@@ -1,52 +1,29 @@
 //Mostra um calendário para escolher uma única data
-import { useEffect, useRef, useState } from 'react'
-import { FlatList, Pressable, Text, View } from 'react-native'
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {FlatList, Platform, Pressable, Text, View, VirtualizedList} from 'react-native'
 
-import { CaretLeftIcon } from 'phosphor-react-native/src/icons/CaretLeft'
-import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight'
-import { CaretDownIcon } from 'phosphor-react-native/src/icons/CaretDown'
+import {CaretLeftIcon} from 'phosphor-react-native/src/icons/CaretLeft'
+import {CaretRightIcon} from 'phosphor-react-native/src/icons/CaretRight'
+import {CaretDownIcon} from 'phosphor-react-native/src/icons/CaretDown'
 
-import { BottomSheet } from '../Bottomsheet/BottomSheet'
-import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
-import { getMonthDays } from '../../../utils/getMonthDays'
-
+import {BottomSheet} from '../Bottomsheet/BottomSheet'
+import {BottomSheetLayout} from '../../../layouts/BottomSheet/BottomSheetLayout'
+import {getMonthDays} from '../../../utils/getMonthDays'
 import {estilos,corSeta} from './DatePickerSheet.style'
 
-const nomesDosMeses = [
-    'Janeiro',
-    'Fevereiro',
-    'Março',
-    'Abril',
-    'Maio',
-    'Junho',
-    'Julho',
-    'Agosto',
-    'Setembro',
-    'Outubro',
-    'Novembro',
-    'Dezembro'
-]
+const nomesDosMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+const nomesDosDias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+const meses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
-const nomesDosDias = [
-    'Dom',
-    'Seg',
-    'Ter',
-    'Qua',
-    'Qui',
-    'Sex',
-    'Sáb'
-]
+const anoMinimoPermitido = 1900
+const anoMaximoPermitido = 2100
 
-const meses = [
-    1, 2, 3, 4, 5, 6,
-    7, 8, 9, 10, 11, 12
-]
+const intervaloDosAnos = Object.freeze({
+    anoInicial: anoMinimoPermitido,
+    quantidade: anoMaximoPermitido - anoMinimoPermitido + 1
+})
 
-const anos = []
-
-for (let ano = 1000; ano <= 9999; ano += 1) {
-    anos.push(ano)
-}
+const mensagemDeErro = 'Não foi possível salvar a data. Tente novamente.'
 
 function lerData(data) {
     if (typeof data !== 'string') {
@@ -64,71 +41,109 @@ function lerData(data) {
     const dia = Number(partes[3])
 
     if (
-        ano < 1000
-        || ano > 9999
-        || mes < 1
-        || mes > 12
+        ano < anoMinimoPermitido || ano > anoMaximoPermitido || mes < 1 || mes > 12
     ) {
         return null
     }
 
     const ultimoDia =
-        new Date(ano, mes, 0).getDate()
+        new Date(
+            ano,
+            mes,
+            0
+        ).getDate()
 
-    if (dia < 1 || dia > ultimoDia) {
+    if (
+        dia < 1 || dia > ultimoDia
+    ) {
         return null
     }
 
-    return { ano, mes, dia }
+    return {
+        ano,
+        mes,
+        dia,
+        texto: data
+    }
+}
+
+function obterDataInicial(valorSelecionado) {
+    const dataSelecionada = lerData(valorSelecionado)
+
+    if (dataSelecionada) {
+        return {
+            ano: dataSelecionada.ano,
+            mes: dataSelecionada.mes
+        }
+    }
+
+    const hoje = new Date()
+
+    return {
+        ano: hoje.getFullYear(),
+        mes: hoje.getMonth() + 1
+    }
 }
 
 function obterInicioDoMes(ano, mes) {
     return (
-        `${ano}-${String(mes).padStart(2, '0')}-01`
+        `${ano}-` + `${String(mes).padStart(2, '0')}-` + '01'
     )
 }
 
 function obterFimDoMes(ano, mes) {
     const ultimoDia =
-        new Date(ano, mes, 0).getDate()
+        new Date(
+            ano,
+            mes,
+            0
+        ).getDate()
 
     return (
-        `${ano}-${String(mes).padStart(2, '0')}-`
-        + String(ultimoDia).padStart(2, '0')
+        `${ano}-` + `${String(mes).padStart(2, '0')}-` + String(ultimoDia).padStart(2, '0')
     )
 }
 
-function deslocarMes(ano, mes, deslocamento) {
-    const total =
-        ano * 12 + (mes - 1) + deslocamento
+function deslocarMes(
+    ano,
+    mes,
+    deslocamento
+) {
+    const total = ano * 12 + (mes - 1) + deslocamento
 
     return {
-        ano: Math.floor(total / 12),
-        mes: (total % 12) + 1
+        ano: Math.floor(
+            total / 12
+        ),
+        mes: (
+            total % 12
+        ) + 1
     }
 }
 
-/**
- * Recebe um ano da lista.
- * Retorna um texto único para identificar esse item.
- */
 function obterChaveDoAno(ano) {
     return String(ano)
 }
 
-/**
- * Recebe um mês da lista.
- * Retorna um texto único para identificar esse item.
- */
 function obterChaveDoMes(mes) {
     return String(mes)
 }
 
-/**
- * Recebe a posição de um ano na lista.
- * Informa o tamanho fixo de cada item para a lista abrir no ano certo.
- * Retorna comprimento e posição do item.
- */
+function obterAno(
+    intervalo,
+    indice
+) {
+    return (
+        intervalo.anoInicial + indice
+    )
+}
+
+function obterQuantidadeDeAnos(
+    intervalo
+) {
+    return intervalo.quantidade
+}
+
 function medirAno(_, indice) {
     return {
         length: 48,
@@ -137,371 +152,594 @@ function medirAno(_, indice) {
     }
 }
 
-function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado = null, onSelecionar, onFechar, dataMinima = null, dataMaxima = null }) {
-    const hoje = new Date()
+function DiaCalendario({ casa, nomeDoMes, ano, selecionado, habilitado, salvando, onSelecionar }) {
+    function selecionarDia() {
+        onSelecionar(casa.data)
+    }
 
-    const dataInicial =
-        lerData(valorSelecionado) ?? {
-            ano: hoje.getFullYear(),
-            mes: hoje.getMonth() + 1
-        }
+    return (
+        <View style={estilos.casaDia}>
+            <Pressable
+                onPress={selecionarDia}
+                disabled={!habilitado || salvando}
+                accessibilityRole="button"
+                accessibilityLabel={`Dia ${casa.dia} de ` + `${nomeDoMes} de ${ano}`}
+                accessibilityState={{
+                    selected: selecionado,
+                    disabled: !habilitado || salvando
+                }}
+                style={[
+                    estilos.botaoDia,
+                    selecionado && estilos.botaoDiaSelecionado
+                ]}
+            >
+                <Text
+                    style={[
+                        estilos.textoDia,
+                        !habilitado && estilos.textoDiaDesabilitado,
+                        selecionado && estilos.textoDiaSelecionado
+                    ]}
+                >
+                    {casa.dia}
+                </Text>
+            </Pressable>
+        </View>
+    )
+}
 
-    const [anoVisivel, setAnoVisivel] = useState(dataInicial.ano)
-    const [mesVisivel, setMesVisivel] = useState(dataInicial.mes)
-    const [listaAberta, setListaAberta] = useState(null)
-    const [salvando, setSalvando] = useState(false)
-    const [erroSalvar, setErroSalvar] = useState('')
-    const salvamentoEmAndamento = useRef(false)
+const DiaCalendarioMemorizado = memo(DiaCalendario)
 
-    const limiteMinimoValido = lerData(dataMinima) ? dataMinima : null
-    const limiteMaximoValido = lerData(dataMaxima) ? dataMaxima : null
+function LinhaCalendario({ linha, indiceDaLinha, nomeDoMes, ano, valorSelecionado, salvando, podeSelecionarDia, onSelecionar }) {
+    return (
+        <View
+            key={`linha-${indiceDaLinha}`}
+            style={estilos.linhaCalendario}
+        >
+            {linha.map(
+                (casa, indiceDaCasa) => {
+                    if (!casa) {
+                        return (
+                            <View
+                                key={`vazio-` + `${indiceDaLinha}-` + indiceDaCasa}
+                                style={estilos.casaDia}
+                            />
+                        )
+                    }
+
+                    return (
+                        <DiaCalendarioMemorizado
+                            key={casa.data}
+                            casa={casa}
+                            nomeDoMes={nomeDoMes}
+                            ano={ano}
+                            selecionado={casa.data === valorSelecionado}
+                            habilitado={
+                                podeSelecionarDia(
+                                    casa.data
+                                )
+                            }
+                            salvando={salvando}
+                            onSelecionar={onSelecionar}
+                        />
+                    )
+                }
+            )}
+        </View>
+    )
+}
+
+const LinhaCalendarioMemorizada = memo(LinhaCalendario)
+
+function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado = null, onSelecionar, onFechar, dataMinima = null, dataMaxima = null}) {
+    const [dataVisivel, setDataVisivel] = useState(() => obterDataInicial(valorSelecionado))
+
+    const [
+        listaAberta,
+        setListaAberta
+    ] = useState(null)
+
+    const [
+        salvando,
+        setSalvando
+    ] = useState(false)
+
+    const [
+        erroSalvar,
+        setErroSalvar
+    ] = useState('')
+
+    const salvamentoEmAndamento =
+        useRef(false)
+
+    const anoVisivel =
+        dataVisivel.ano
+
+    const mesVisivel =
+        dataVisivel.mes
+
+    const limiteMinimoValido =
+        useMemo(
+            () => lerData(dataMinima),
+            [dataMinima]
+        )
+
+    const limiteMaximoValido =
+        useMemo(
+            () => lerData(dataMaxima),
+            [dataMaxima]
+        )
 
     useEffect(() => {
         if (!visivel) {
             return
         }
 
-        const dataAoAbrir =
-            lerData(valorSelecionado)
-
-        const dataDeHoje = new Date()
-
-        setAnoVisivel(
-            dataAoAbrir?.ano ?? dataDeHoje.getFullYear()
-        )
-
-        setMesVisivel(
-            dataAoAbrir?.mes ?? dataDeHoje.getMonth() + 1
+        setDataVisivel(
+            obterDataInicial(
+                valorSelecionado
+            )
         )
 
         setListaAberta(null)
         setErroSalvar('')
-    }, [visivel])
+    }, [
+        visivel
+    ])
 
-    function podeMostrarMes(ano, mes) {
-        if (ano < 1000 || ano > 9999) {
-            return false
-        }
+    const podeMostrarMes =
+        useCallback(
+            (ano, mes) => {
+                if (
+                    ano < anoMinimoPermitido
+                    || ano
+                        > anoMaximoPermitido
+                ) {
+                    return false
+                }
 
-        const antesDoMinimo = limiteMinimoValido && (obterFimDoMes(ano, mes) < limiteMinimoValido)
-        const depoisDoMaximo = limiteMaximoValido && (obterInicioDoMes(ano, mes) > limiteMaximoValido)
+                const inicioDoMes =
+                    obterInicioDoMes(
+                        ano,
+                        mes
+                    )
 
-        return !antesDoMinimo && !depoisDoMaximo
-    }
+                const fimDoMes =
+                    obterFimDoMes(
+                        ano,
+                        mes
+                    )
 
-    /**
-     * Recebe um ano.
-     * Procura um mês permitido nesse ano, dando preferência ao mês aberto.
-     * Retorna o mês encontrado ou null.
-     */
-    function encontrarMesDisponivel(ano) {
-        if (podeMostrarMes(ano, mesVisivel)) {
-            return mesVisivel
-        }
+                const antesDoMinimo =
+                    limiteMinimoValido
+                    && fimDoMes
+                        < limiteMinimoValido
+                            .texto
 
-        for (let mes = 1; mes <= 12; mes += 1) {
-            if (podeMostrarMes(ano, mes)) {
-                return mes
-            }
-        }
+                const depoisDoMaximo =
+                    limiteMaximoValido
+                    && inicioDoMes
+                        > limiteMaximoValido
+                            .texto
 
-        return null
-    }
+                return (
+                    !antesDoMinimo
+                    && !depoisDoMaximo
+                )
+            },
+            [
+                limiteMinimoValido,
+                limiteMaximoValido
+            ]
+        )
 
-    function mudarMes(direcao) {
-        const proximo =
-            deslocarMes(
+    const encontrarMesDisponivel =
+        useCallback(
+            (ano) => {
+                if (
+                    podeMostrarMes(
+                        ano,
+                        mesVisivel
+                    )
+                ) {
+                    return mesVisivel
+                }
+
+                for (
+                    let mes = 1;
+                    mes <= 12;
+                    mes += 1
+                ) {
+                    if (
+                        podeMostrarMes(
+                            ano,
+                            mes
+                        )
+                    ) {
+                        return mes
+                    }
+                }
+
+                return null
+            },
+            [
+                mesVisivel,
+                podeMostrarMes
+            ]
+        )
+
+    const mudarMes =
+        useCallback(
+            (direcao) => {
+                const proximo =
+                    deslocarMes(
+                        anoVisivel,
+                        mesVisivel,
+                        direcao
+                    )
+
+                if (
+                    !podeMostrarMes(
+                        proximo.ano,
+                        proximo.mes
+                    )
+                ) {
+                    return
+                }
+
+                setDataVisivel(
+                    proximo
+                )
+            },
+            [
                 anoVisivel,
                 mesVisivel,
-                direcao
-            )
-
-        if (!podeMostrarMes(
-            proximo.ano,
-            proximo.mes
-        )) {
-            return
-        }
-
-        setAnoVisivel(proximo.ano)
-        setMesVisivel(proximo.mes)
-    }
-
-    function voltarMes() {
-        mudarMes(-1)
-    }
-
-    function avancarMes() {
-        mudarMes(1)
-    }
-
-    /**
-     * Não recebe dados.
-     * Mostra a lista dos doze meses dentro do painel.
-     * Não retorna valor.
-     */
-    function abrirListaDeMeses() {
-        if (!salvando) {
-            setListaAberta('mes')
-        }
-    }
-
-    /**
-     * Não recebe dados.
-     * Mostra a lista de anos dentro do painel.
-     * Não retorna valor.
-     */
-    function abrirListaDeAnos() {
-        if (!salvando) {
-            setListaAberta('ano')
-        }
-    }
-
-    function podeSelecionarDia(data) {
-        return (
-            (!limiteMinimoValido || data >= limiteMinimoValido)
-            && (!limiteMaximoValido || data <= limiteMaximoValido)
+                podeMostrarMes
+            ]
         )
-    }
 
-    function renderizarNomeDoDia(nome) {
-        return (
-            <View
-                key={nome}
-                style={estilos.casaSemana}
-            >
-                <Text style={estilos.textoSemana}>
-                    {nome}
-                </Text>
-            </View>
-        )
-    }
+    const voltarMes =
+        useCallback(() => {
+            mudarMes(-1)
+        }, [
+            mudarMes
+        ])
 
-    function renderizarCasa(casa, indice) {
-        if (!casa) {
-            return (
-                <View
-                    key={`vazio-${indice}`}
-                    style={estilos.casaDia}
-                />
-            )
-        }
+    const avancarMes =
+        useCallback(() => {
+            mudarMes(1)
+        }, [
+            mudarMes
+        ])
 
-        const selecionado =
-            casa.data === valorSelecionado
-
-        const habilitado =
-            podeSelecionarDia(casa.data)
-
-        /**
-         * Não recebe dados.
-         * Salva a data escolhida e fecha o painel somente após sucesso.
-         * Não retorna valor.
-         */
-        async function selecionarEsteDia() {
-            if (
-                !habilitado
-                || salvamentoEmAndamento.current
-            ) {
-                return
+    const abrirListaDeMeses =
+        useCallback(() => {
+            if (!salvando) {
+                setListaAberta('mes')
             }
+        }, [
+            salvando
+        ])
 
-            if (typeof onSelecionar !== 'function') {
-                setErroSalvar(
-                    'Não foi possível salvar a data. Tente novamente.'
+    const abrirListaDeAnos =
+        useCallback(() => {
+            if (!salvando) {
+                setListaAberta('ano')
+            }
+        }, [
+            salvando
+        ])
+
+    const podeSelecionarDia =
+        useCallback(
+            (data) => {
+                const depoisDoMinimo =
+                    !limiteMinimoValido
+                    || data
+                        >= limiteMinimoValido
+                            .texto
+
+                const antesDoMaximo =
+                    !limiteMaximoValido
+                    || data
+                        <= limiteMaximoValido
+                            .texto
+
+                return (
+                    depoisDoMinimo
+                    && antesDoMaximo
                 )
-                return
-            }
+            },
+            [
+                limiteMinimoValido,
+                limiteMaximoValido
+            ]
+        )
 
-            salvamentoEmAndamento.current = true
-            setSalvando(true)
-            setErroSalvar('')
+    const selecionarDia =
+        useCallback(
+            async (data) => {
+                if (
+                    salvamentoEmAndamento
+                        .current
+                ) {
+                    return
+                }
 
-            try {
-                const resultado =
-                    await onSelecionar(casa.data)
-
-                if (resultado === false) {
+                if (
+                    typeof onSelecionar
+                    !== 'function'
+                ) {
                     setErroSalvar(
-                        'Não foi possível salvar a data. Tente novamente.'
+                        mensagemDeErro
                     )
                     return
                 }
 
-                onFechar?.()
-            } catch {
-                setErroSalvar(
-                    'Não foi possível salvar a data. Tente novamente.'
-                )
-            } finally {
-                salvamentoEmAndamento.current = false
-                setSalvando(false)
-            }
-        }
+                salvamentoEmAndamento
+                    .current = true
 
-        return (
-            <View
-                key={casa.data}
-                style={estilos.casaDia}
-            >
-                <Pressable
-                    onPress={selecionarEsteDia}
-                    disabled={!habilitado || salvando}
-                    accessibilityRole="button"
-                    accessibilityLabel={ `Dia ${casa.dia} de ` + nomesDosMeses[mesVisivel - 1] + ` de ${anoVisivel}` }
-                    accessibilityState={{
-                        selected: selecionado,
-                        disabled: !habilitado || salvando
-                    }}
-                    style={[
-                        estilos.botaoDia,
-                        selecionado && estilos.botaoDiaSelecionado
-                    ]}
-                >
-                    <Text
-                        style={[
-                            estilos.textoDia,
-                            !habilitado && estilos.textoDiaDesabilitado,
-                            selecionado && estilos.textoDiaSelecionado
-                        ]}
-                    >
-                        {casa.dia}
-                    </Text>
-                </Pressable>
-            </View>
-        )
-    }
+                setSalvando(true)
+                setErroSalvar('')
 
-    /**
-     * Recebe uma linha com sete posições.
-     * Mostra os dias na mesma divisão das colunas da semana.
-     * Retorna uma linha completa do calendário.
-     */
-    function renderizarLinha(linha, indice) {
-        return (
-            <View
-                key={`linha-${indice}`}
-                style={estilos.linhaCalendario}
-            >
-                {linha.map(renderizarCasa)}
-            </View>
-        )
-    }
+                let salvou = false
 
-    /**
-     * Recebe um mês da lista.
-     * Mostra o nome do mês e permite escolhê-lo.
-     * Retorna a opção desse mês.
-     */
-    function renderizarMes({ item: mes }) {
-        const habilitado =
-            podeMostrarMes(anoVisivel, mes)
+                try {
+                    const resultado =
+                        await onSelecionar(
+                            data
+                        )
 
-        /**
-         * Não recebe dados.
-         * Abre o mês escolhido e volta ao calendário.
-         * Não retorna valor.
-         */
-        function escolherMes() {
-            if (!habilitado || salvando) {
-                return
-            }
+                    if (
+                        resultado === false
+                    ) {
+                        setErroSalvar(
+                            mensagemDeErro
+                        )
+                        return
+                    }
 
-            setMesVisivel(mes)
-            setListaAberta(null)
-        }
+                    salvou = true
+                } catch {
+                    setErroSalvar(
+                        mensagemDeErro
+                    )
+                } finally {
+                    salvamentoEmAndamento
+                        .current = false
 
-        return (
-            <Pressable
-                onPress={escolherMes}
-                disabled={!habilitado || salvando}
-                accessibilityRole="button"
-                accessibilityLabel={
-                    `${nomesDosMeses[mes - 1]} de ${anoVisivel}`
+                    setSalvando(false)
                 }
-                accessibilityState={{
-                    selected: mes === mesVisivel,
-                    disabled: !habilitado || salvando
-                }}
-                style={estilos.opcaoLista}
-            >
-                <Text
-                    style={[
-                        estilos.textoOpcao,
-                        mes === mesVisivel && estilos.textoOpcaoSelecionada,
-                        !habilitado && estilos.textoOpcaoDesabilitada
-                    ]}
-                >
-                    {nomesDosMeses[mes - 1]}
-                </Text>
-            </Pressable>
+
+                if (salvou) {
+                    onFechar?.()
+                }
+            },
+            [
+                onSelecionar,
+                onFechar
+            ]
         )
-    }
 
-    /**
-     * Recebe um ano da lista.
-     * Mostra o ano e permite escolhê-lo.
-     * Retorna a opção desse ano.
-     */
-    function renderizarAno({ item: ano }) {
-        const mesDisponivel =
-            encontrarMesDisponivel(ano)
+    const casasDoMes =
+        useMemo(
+            () =>
+                getMonthDays(
+                    anoVisivel,
+                    mesVisivel
+                ),
+            [
+                anoVisivel,
+                mesVisivel
+            ]
+        )
 
-        const habilitado =
-            mesDisponivel !== null
+    const linhasDoMes =
+        useMemo(() => {
+            const novasLinhas = []
 
-        /**
-         * Não recebe dados.
-         * Abre o ano escolhido em um mês permitido.
-         * Não retorna valor.
-         */
-        function escolherAno() {
-            if (!habilitado || salvando) {
-                return
+            for (
+                let indice = 0;
+                indice
+                    < casasDoMes.length;
+                indice += 7
+            ) {
+                novasLinhas.push(
+                    casasDoMes.slice(
+                        indice,
+                        indice + 7
+                    )
+                )
             }
 
-            setAnoVisivel(ano)
-            setMesVisivel(mesDisponivel)
-            setListaAberta(null)
-        }
+            return novasLinhas
+        }, [
+            casasDoMes
+        ])
 
-        return (
-            <Pressable
-                onPress={escolherAno}
-                disabled={!habilitado || salvando}
-                accessibilityRole="button"
-                accessibilityLabel={`Ano ${ano}`}
-                accessibilityState={{
-                    selected: ano === anoVisivel,
-                    disabled: !habilitado || salvando
-                }}
-                style={estilos.opcaoLista}
-            >
-                <Text
-                    style={[
-                        estilos.textoOpcao,
-                        ano === anoVisivel && estilos.textoOpcaoSelecionada,
-                        !habilitado && estilos.textoOpcaoDesabilitada
-                    ]}
-                >
-                    {ano}
-                </Text>
-            </Pressable>
+    const renderizarMes =
+        useCallback(
+            ({item: mes}) => {
+                const habilitado =
+                    podeMostrarMes(
+                        anoVisivel,
+                        mes
+                    )
+
+                function escolherMes() {
+                    if (
+                        !habilitado
+                        || salvando
+                    ) {
+                        return
+                    }
+
+                    setDataVisivel({
+                        ano: anoVisivel,
+                        mes
+                    })
+
+                    setListaAberta(null)
+                }
+
+                return (
+                    <Pressable
+                        onPress={
+                            escolherMes
+                        }
+                        disabled={
+                            !habilitado
+                            || salvando
+                        }
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                            `${nomesDosMeses[
+                                mes - 1
+                            ]} de ${anoVisivel}`
+                        }
+                        accessibilityState={{
+                            selected:
+                                mes
+                                === mesVisivel,
+                            disabled:
+                                !habilitado
+                                || salvando
+                        }}
+                        style={
+                            estilos.opcaoLista
+                        }
+                    >
+                        <Text
+                            style={[
+                                estilos.textoOpcao,
+                                mes
+                                    === mesVisivel
+                                && estilos
+                                    .textoOpcaoSelecionada,
+                                !habilitado
+                                && estilos
+                                    .textoOpcaoDesabilitada
+                            ]}
+                        >
+                            {
+                                nomesDosMeses[
+                                    mes - 1
+                                ]
+                            }
+                        </Text>
+                    </Pressable>
+                )
+            },
+            [
+                anoVisivel,
+                mesVisivel,
+                podeMostrarMes,
+                salvando
+            ]
         )
-    }
+
+    const renderizarAno =
+        useCallback(
+            ({item: ano}) => {
+                const mesDisponivel =
+                    encontrarMesDisponivel(
+                        ano
+                    )
+
+                const habilitado =
+                    mesDisponivel
+                    !== null
+
+                function escolherAno() {
+                    if (
+                        !habilitado
+                        || salvando
+                    ) {
+                        return
+                    }
+
+                    setDataVisivel({
+                        ano,
+                        mes: mesDisponivel
+                    })
+
+                    setListaAberta(null)
+                }
+
+                return (
+                    <Pressable
+                        onPress={
+                            escolherAno
+                        }
+                        disabled={
+                            !habilitado
+                            || salvando
+                        }
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                            `Ano ${ano}`
+                        }
+                        accessibilityState={{
+                            selected:
+                                ano
+                                === anoVisivel,
+                            disabled:
+                                !habilitado
+                                || salvando
+                        }}
+                        style={
+                            estilos.opcaoLista
+                        }
+                    >
+                        <Text
+                            style={[
+                                estilos.textoOpcao,
+                                ano
+                                    === anoVisivel
+                                && estilos
+                                    .textoOpcaoSelecionada,
+                                !habilitado
+                                && estilos
+                                    .textoOpcaoDesabilitada
+                            ]}
+                        >
+                            {ano}
+                        </Text>
+                    </Pressable>
+                )
+            },
+            [
+                anoVisivel,
+                encontrarMesDisponivel,
+                salvando
+            ]
+        )
 
     const anterior =
-        deslocarMes(
-            anoVisivel,
-            mesVisivel,
-            -1
+        useMemo(
+            () =>
+                deslocarMes(
+                    anoVisivel,
+                    mesVisivel,
+                    -1
+                ),
+            [
+                anoVisivel,
+                mesVisivel
+            ]
         )
 
     const proximo =
-        deslocarMes(
-            anoVisivel,
-            mesVisivel,
-            1
+        useMemo(
+            () =>
+                deslocarMes(
+                    anoVisivel,
+                    mesVisivel,
+                    1
+                ),
+            [
+                anoVisivel,
+                mesVisivel
+            ]
         )
 
     const anteriorDisponivel =
@@ -516,46 +754,60 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
             proximo.mes
         )
 
-    const casas =
-        getMonthDays(
-            anoVisivel,
-            mesVisivel
-        )
+    const nomeDoMes =
+        nomesDosMeses[
+            mesVisivel - 1
+        ]
 
-    const linhas = []
-
-    for (
-        let indice = 0;
-        indice < casas.length;
-        indice += 7
-    ) {
-        linhas.push(
-            casas.slice(indice, indice + 7)
-        )
-    }
+    const chaveDaListaDeAnos =
+        `${anoVisivel}-`
+        + `${mesVisivel}-`
+        + String(salvando)
 
     return (
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
-            bloquearFechamento={salvando}
+            bloquearFechamento={
+                salvando
+            }
         >
             <BottomSheetLayout
                 titulo={titulo}
                 onFechar={onFechar}
-                bloquearFechamento={salvando}
+                bloquearFechamento={
+                    salvando
+                }
             >
-                <View style={estilos.calendario}>
-                    <View style={estilos.navegacao}>
+                <View
+                    style={
+                        estilos.calendario
+                    }
+                >
+                    <View
+                        style={
+                            estilos.navegacao
+                        }
+                    >
                         <Pressable
-                            onPress={voltarMes}
-                            disabled={!anteriorDisponivel || salvando}
+                            onPress={
+                                voltarMes
+                            }
+                            disabled={
+                                !anteriorDisponivel
+                                || salvando
+                            }
                             accessibilityRole="button"
                             accessibilityLabel="Mês anterior"
                             accessibilityState={{
-                                disabled: !anteriorDisponivel || salvando
+                                disabled:
+                                    !anteriorDisponivel
+                                    || salvando
                             }}
-                            style={estilos.botaoNavegacao}
+                            style={
+                                estilos
+                                    .botaoNavegacao
+                            }
                         >
                             <CaretLeftIcon
                                 size={24}
@@ -564,16 +816,32 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
                             />
                         </Pressable>
 
-                        <View style={estilos.tituloData}>
+                        <View
+                            style={
+                                estilos.tituloData
+                            }
+                        >
                             <Pressable
-                                onPress={abrirListaDeMeses}
-                                disabled={salvando}
+                                onPress={
+                                    abrirListaDeMeses
+                                }
+                                disabled={
+                                    salvando
+                                }
                                 accessibilityRole="button"
                                 accessibilityLabel="Escolher mês"
-                                style={estilos.botaoTitulo}
+                                style={
+                                    estilos
+                                        .botaoTitulo
+                                }
                             >
-                                <Text style={estilos.tituloMes}>
-                                    {nomesDosMeses[mesVisivel - 1]}
+                                <Text
+                                    style={
+                                        estilos
+                                            .tituloMes
+                                    }
+                                >
+                                    {nomeDoMes}
                                 </Text>
 
                                 <CaretDownIcon
@@ -584,13 +852,25 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
                             </Pressable>
 
                             <Pressable
-                                onPress={abrirListaDeAnos}
-                                disabled={salvando}
+                                onPress={
+                                    abrirListaDeAnos
+                                }
+                                disabled={
+                                    salvando
+                                }
                                 accessibilityRole="button"
                                 accessibilityLabel="Escolher ano"
-                                style={estilos.botaoTitulo}
+                                style={
+                                    estilos
+                                        .botaoTitulo
+                                }
                             >
-                                <Text style={estilos.tituloMes}>
+                                <Text
+                                    style={
+                                        estilos
+                                            .tituloMes
+                                    }
+                                >
                                     {anoVisivel}
                                 </Text>
 
@@ -603,14 +883,24 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
                         </View>
 
                         <Pressable
-                            onPress={avancarMes}
-                            disabled={!proximoDisponivel || salvando}
+                            onPress={
+                                avancarMes
+                            }
+                            disabled={
+                                !proximoDisponivel
+                                || salvando
+                            }
                             accessibilityRole="button"
                             accessibilityLabel="Próximo mês"
                             accessibilityState={{
-                                disabled: !proximoDisponivel || salvando
+                                disabled:
+                                    !proximoDisponivel
+                                    || salvando
                             }}
-                            style={estilos.botaoNavegacao}
+                            style={
+                                estilos
+                                    .botaoNavegacao
+                            }
                         >
                             <CaretRightIcon
                                 size={24}
@@ -620,60 +910,196 @@ function DatePickerSheet({ visivel, titulo = 'Selecionar data', valorSelecionado
                         </Pressable>
                     </View>
 
-                    {listaAberta === 'mes' ? (
-                        <FlatList
-                            data={meses}
-                            renderItem={renderizarMes}
-                            keyExtractor={obterChaveDoMes}
-                            style={estilos.listaOpcoes}
-                            initialNumToRender={12}
-                        />
-                    ) : listaAberta === 'ano' ? (
-                        <FlatList
-                            data={anos}
-                            renderItem={renderizarAno}
-                            keyExtractor={obterChaveDoAno}
-                            getItemLayout={medirAno}
-                            initialScrollIndex={
-                                anoVisivel - 1000
-                            }
-                            initialNumToRender={10}
-                            windowSize={5}
-                            style={estilos.listaOpcoes}
-                        />
-                    ) : (
-                        <>
-                            <View style={estilos.linhaSemana}>
-                                {nomesDosDias.map(
-                                    renderizarNomeDoDia
-                                )}
-                            </View>
+                    {
+                        listaAberta
+                        === 'mes'
+                        ? (
+                            <FlatList
+                                data={meses}
+                                renderItem={
+                                    renderizarMes
+                                }
+                                keyExtractor={
+                                    obterChaveDoMes
+                                }
+                                extraData={
+                                    mesVisivel
+                                }
+                                initialNumToRender={
+                                    12
+                                }
+                                style={
+                                    estilos
+                                        .listaOpcoes
+                                }
+                            />
+                        )
+                        : listaAberta
+                            === 'ano'
+                            ? (
+                                <VirtualizedList
+                                    data={
+                                        intervaloDosAnos
+                                    }
+                                    getItem={
+                                        obterAno
+                                    }
+                                    getItemCount={
+                                        obterQuantidadeDeAnos
+                                    }
+                                    renderItem={
+                                        renderizarAno
+                                    }
+                                    keyExtractor={
+                                        obterChaveDoAno
+                                    }
+                                    getItemLayout={
+                                        medirAno
+                                    }
+                                    initialScrollIndex={
+                                        anoVisivel
+                                        - anoMinimoPermitido
+                                    }
+                                    initialNumToRender={
+                                        8
+                                    }
+                                    maxToRenderPerBatch={
+                                        8
+                                    }
+                                    updateCellsBatchingPeriod={
+                                        50
+                                    }
+                                    windowSize={3}
+                                    removeClippedSubviews={
+                                        Platform.OS
+                                        === 'android'
+                                    }
+                                    extraData={
+                                        chaveDaListaDeAnos
+                                    }
+                                    style={
+                                        estilos
+                                            .listaOpcoes
+                                    }
+                                />
+                            )
+                            : (
+                                <>
+                                    <View
+                                        style={
+                                            estilos
+                                                .linhaSemana
+                                        }
+                                    >
+                                        {
+                                            nomesDosDias.map(
+                                                (
+                                                    nome
+                                                ) => (
+                                                    <View
+                                                        key={
+                                                            nome
+                                                        }
+                                                        style={
+                                                            estilos
+                                                                .casaSemana
+                                                        }
+                                                    >
+                                                        <Text
+                                                            style={
+                                                                estilos
+                                                                    .textoSemana
+                                                            }
+                                                        >
+                                                            {
+                                                                nome
+                                                            }
+                                                        </Text>
+                                                    </View>
+                                                )
+                                            )
+                                        }
+                                    </View>
 
-                            <View style={estilos.grade}>
-                                {linhas.map(
-                                    renderizarLinha
-                                )}
-                            </View>
-                        </>
-                    )}
+                                    <View
+                                        style={
+                                            estilos
+                                                .grade
+                                        }
+                                    >
+                                        {
+                                            linhasDoMes.map(
+                                                (
+                                                    linha,
+                                                    indice
+                                                ) => (
+                                                    <LinhaCalendarioMemorizada
+                                                        key={
+                                                            `linha-${indice}`
+                                                        }
+                                                        linha={
+                                                            linha
+                                                        }
+                                                        indiceDaLinha={
+                                                            indice
+                                                        }
+                                                        nomeDoMes={
+                                                            nomeDoMes
+                                                        }
+                                                        ano={
+                                                            anoVisivel
+                                                        }
+                                                        valorSelecionado={
+                                                            valorSelecionado
+                                                        }
+                                                        salvando={
+                                                            salvando
+                                                        }
+                                                        podeSelecionarDia={
+                                                            podeSelecionarDia
+                                                        }
+                                                        onSelecionar={
+                                                            selecionarDia
+                                                        }
+                                                    />
+                                                )
+                                            )
+                                        }
+                                    </View>
+                                </>
+                            )
+                    }
 
-                    {salvando ? (
-                        <Text
-                            style={estilos.mensagem}
-                            accessibilityLiveRegion="polite"
-                        >
-                            Salvando data...
-                        </Text>
-                    ) : null}
+                    {
+                        salvando
+                        ? (
+                            <Text
+                                style={
+                                    estilos.mensagem
+                                }
+                                accessibilityLiveRegion="polite"
+                            >
+                                Salvando data...
+                            </Text>
+                        )
+                        : null
+                    }
 
-                    {erroSalvar ? (
-                        <Text
-                            style={estilos.mensagemErro}
-                            accessibilityLiveRegion="polite"
-                        >
-                            {erroSalvar}
-                        </Text>
-                    ) : null}
+                    {
+                        erroSalvar
+                        ? (
+                            <Text
+                                style={
+                                    estilos
+                                        .mensagemErro
+                                }
+                                accessibilityLiveRegion="polite"
+                            >
+                                {erroSalvar}
+                            </Text>
+                        )
+                        : null
+                    }
                 </View>
             </BottomSheetLayout>
         </BottomSheet>
