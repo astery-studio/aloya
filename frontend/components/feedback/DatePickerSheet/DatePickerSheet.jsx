@@ -104,20 +104,12 @@ function obterFimDoMes(ano, mes) {
     )
 }
 
-function deslocarMes(
-    ano,
-    mes,
-    deslocamento
-) {
+function deslocarMes(ano, mes, deslocamento) {
     const total = ano * 12 + (mes - 1) + deslocamento
 
     return {
-        ano: Math.floor(
-            total / 12
-        ),
-        mes: (
-            total % 12
-        ) + 1
+        ano: Math.floor(total / 12),
+        mes: (total % 12) + 1
     }
 }
 
@@ -129,18 +121,13 @@ function obterChaveDoMes(mes) {
     return String(mes)
 }
 
-function obterAno(
-    intervalo,
-    indice
-) {
+function obterAno(intervalo, indice) {
     return (
         intervalo.anoInicial + indice
     )
 }
 
-function obterQuantidadeDeAnos(
-    intervalo
-) {
+function obterQuantidadeDeAnos(intervalo) {
     return intervalo.quantidade
 }
 
@@ -213,11 +200,7 @@ function LinhaCalendario({ linha, indiceDaLinha, nomeDoMes, ano, valorSelecionad
                             nomeDoMes={nomeDoMes}
                             ano={ano}
                             selecionado={casa.data === valorSelecionado}
-                            habilitado={
-                                podeSelecionarDia(
-                                    casa.data
-                                )
-                            }
+                            habilitado={podeSelecionarDia(casa.data)}
                             salvando={salvando}
                             onSelecionar={onSelecionar}
                         />
@@ -232,21 +215,9 @@ const LinhaCalendarioMemorizada = memo(LinhaCalendario)
 
 function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado = null, onSelecionar, onFechar, dataMinima = null, dataMaxima = null}) {
     const [dataVisivel, setDataVisivel] = useState(() => obterDataInicial(valorSelecionado))
-
-    const [
-        listaAberta,
-        setListaAberta
-    ] = useState(null)
-
-    const [
-        salvando,
-        setSalvando
-    ] = useState(false)
-
-    const [
-        erroSalvar,
-        setErroSalvar
-    ] = useState('')
+    const [listaAberta, setListaAberta] = useState(null)
+    const [salvando, setSalvando] = useState(false)
+    const [erroSalvar, setErroSalvar] = useState('')
 
     const salvamentoEmAndamento =
         useRef(false)
