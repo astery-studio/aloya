@@ -422,39 +422,20 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
 
         return (
             <Pressable
-                onPress={
-                    escolherAno
-                }
-                disabled={
-                    !habilitado
-                    || salvando
-                }
+                onPress={escolherAno}
+                disabled={!habilitado || salvando}
                 accessibilityRole="button"
-                accessibilityLabel={
-                    `Ano ${ano}`
-                }
+                accessibilityLabel={`Ano ${ano}`}
                 accessibilityState={{
-                    selected:
-                        ano
-                        === anoVisivel,
-                    disabled:
-                        !habilitado
-                        || salvando
+                    selected: ano === anoVisivel,
+                    disabled:!habilitado || salvando
                 }}
-                style={
-                    estilos.opcaoLista
-                }
+                style={estilos.opcaoLista}
             >
                 <Text
-                    style={[
-                        estilos.textoOpcao,
-                        ano
-                            === anoVisivel
-                        && estilos
-                            .textoOpcaoSelecionada,
-                        !habilitado
-                        && estilos
-                            .textoOpcaoDesabilitada
+                    style={[estilos.textoOpcao,
+                        ano === anoVisivel && estilos.textoOpcaoSelecionada,
+                        !habilitado&& estilos.textoOpcaoDesabilitada
                     ]}
                 >
                     {ano}
