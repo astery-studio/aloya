@@ -102,10 +102,8 @@ describe('ButtonSelection', () => {
         const botao =
             screen.getByRole('button')
 
-        expect(botao).toHaveAccessibilityState({
-            selected: false,
-            disabled: true
-        })
+        expect(botao).not.toBeSelected()
+        expect(botao).toBeDisabled()
 
         await fireEvent.press(botao)
 
