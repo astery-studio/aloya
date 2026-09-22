@@ -15,11 +15,16 @@ export default function Button({
     rotuloAcessibilidade,
     estilo
 }) {
-    const tamanhoAtual =
-        tamanhos[tamanho] || tamanhos.grande;
+    if (!tamanhos[tamanho]) {
+        throw new Error(`Tamanho de Button inválido: ${tamanho}`);
+    }
 
-    const varianteAtual =
-        variantes[variante] || variantes.laranja;
+    if (!variantes[variante]) {
+        throw new Error(`Variante de Button inválida: ${variante}`);
+    }
+
+    const tamanhoAtual = tamanhos[tamanho];
+    const varianteAtual = variantes[variante];
 
     const bloqueado =
         desativado || carregando;

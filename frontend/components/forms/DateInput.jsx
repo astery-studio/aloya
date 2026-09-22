@@ -20,6 +20,7 @@ export default function DateInput({
             <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={aoPressionarCalendario ? 'Abrir calendário' : 'Digitar data'}
+                hitSlop={12}
                 disabled={desativado}
                 onPress={aoPressionarCalendario || (() => entradaRef.current?.focus())}
             >

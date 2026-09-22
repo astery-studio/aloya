@@ -34,3 +34,11 @@ test('botão tracejado executa a ação', async () => {
     fireEvent.press(screen.getByRole('button', { name: 'Adicionar' }));
     expect(aoPressionar).toHaveBeenCalledTimes(1);
 });
+
+test.each([
+    ['variante', { variante: 'inexistente' }],
+    ['tamanho', { tamanho: 'inexistente' }]
+])('rejeita %s inválido', async (_, propriedade) => {
+    await expect(render(<Button texto="Teste" {...propriedade} />))
+        .rejects.toThrow(/inválid/);
+});
