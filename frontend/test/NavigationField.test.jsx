@@ -44,4 +44,26 @@ describe('NavigationField', () => {
             'Abre outra tela ou painel'
         )
     })
+
+    test('executa a ação quando o campo é pressionado', async () => {
+        const onPress = jest.fn()
+
+        await render(
+            <NavigationField
+                label="Alterar senha"
+                onPress={onPress}
+            />
+        )
+
+        await fireEvent.press(
+            screen.getByRole(
+                'button',
+                {
+                    name: 'Alterar senha'
+                }
+            )
+        )
+
+        expect(onPress).toHaveBeenCalledTimes(1)
+    })
 })
