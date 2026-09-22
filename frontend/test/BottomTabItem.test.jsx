@@ -199,11 +199,14 @@ describe('BottomTabItem', () => {
             estilos.labelAtiva
         )
 
-        expect(
-            resultado.container.findAllByProps({
-                style: estilos.pontoAtivo
-            })
-        ).toHaveLength(1)
+        const pontosAtivos =
+            resultado.container.queryAll(
+                (elemento) =>
+                    elemento.props.style
+                    === estilos.pontoAtivo
+            )
+
+        expect(pontosAtivos).toHaveLength(1)
     })
 
     test('não renderiza o ponto ativo em uma aba inativa', async () => {
