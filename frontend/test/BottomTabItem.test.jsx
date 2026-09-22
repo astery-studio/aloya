@@ -219,10 +219,13 @@ describe('BottomTabItem', () => {
                 />
             )
 
-        expect(
-            resultado.container.findAllByProps({
-                style: estilos.pontoAtivo
-            })
-        ).toHaveLength(0)
+        const pontosAtivos =
+            resultado.container.queryAll(
+                (elemento) =>
+                    elemento.props.style
+                    === estilos.pontoAtivo
+            )
+
+        expect(pontosAtivos).toHaveLength(0)
     })
 })
