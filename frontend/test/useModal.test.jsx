@@ -25,18 +25,18 @@ function ComponenteDeTeste({abertoInicialmente = false}) {
 }
 
 describe('useModal', () => {
-    test('começa fechado por padrão', () => {
-        render(<ComponenteDeTeste />)
+    test('começa fechado por padrão', async () => {
+        await render(<ComponenteDeTeste />)
 
         expect(
             screen.getByText('Modal fechado')
         ).toBeOnTheScreen()
     })
 
-    test('abre o modal', () => {
-        render(<ComponenteDeTeste />)
+    test('abre o modal', async () => {
+        await render(<ComponenteDeTeste />)
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole(
                 'button',
                 { name: 'Abrir' }
@@ -48,14 +48,14 @@ describe('useModal', () => {
         ).toBeOnTheScreen()
     })
 
-    test('fecha o modal', () => {
-        render(
+    test('fecha o modal', async () => {
+        await render(
             <ComponenteDeTeste
                 abertoInicialmente
             />
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole(
                 'button',
                 { name: 'Fechar' }
@@ -67,8 +67,8 @@ describe('useModal', () => {
         ).toBeOnTheScreen()
     })
 
-    test('pode começar aberto quando solicitado', () => {
-        render(
+    test('pode começar aberto quando solicitado', async () => {
+        await render(
             <ComponenteDeTeste
                 abertoInicialmente
             />
@@ -79,8 +79,8 @@ describe('useModal', () => {
         ).toBeOnTheScreen()
     })
 
-    test('abrir duas vezes mantém o modal aberto', () => {
-        render(<ComponenteDeTeste />)
+    test('abrir duas vezes mantém o modal aberto', async () => {
+        await render(<ComponenteDeTeste />)
 
         const botaoAbrir =
             screen.getByRole(
@@ -88,16 +88,16 @@ describe('useModal', () => {
                 { name: 'Abrir' }
             )
 
-        fireEvent.press(botaoAbrir)
-        fireEvent.press(botaoAbrir)
+        await fireEvent.press(botaoAbrir)
+        await fireEvent.press(botaoAbrir)
 
         expect(
             screen.getByText('Modal aberto')
         ).toBeOnTheScreen()
     })
 
-    test('fechar duas vezes mantém o modal fechado', () => {
-        render(<ComponenteDeTeste />)
+    test('fechar duas vezes mantém o modal fechado', async () => {
+        await render(<ComponenteDeTeste />)
 
         const botaoFechar =
             screen.getByRole(
@@ -105,8 +105,8 @@ describe('useModal', () => {
                 { name: 'Fechar' }
             )
 
-        fireEvent.press(botaoFechar)
-        fireEvent.press(botaoFechar)
+        await fireEvent.press(botaoFechar)
+        await fireEvent.press(botaoFechar)
 
         expect(
             screen.getByText('Modal fechado')
