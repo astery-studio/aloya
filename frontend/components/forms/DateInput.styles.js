@@ -8,7 +8,7 @@ const estilos = StyleSheet.create({
         backgroundColor: cores.neutras.superficieClara,
         flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10
     },
-    preenchido: {
+    focado: {
         borderColor: cores.marca.primaria,
         boxShadow: '0 0 0 3px rgba(200, 90, 68, 0.10)'
     },
