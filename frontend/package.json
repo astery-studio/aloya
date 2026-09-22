@@ -25,18 +25,20 @@
 
   "jest": {
     "preset": "jest-expo",
-        "collectCoverageFrom": [
+    "collectCoverageFrom": [
       "components/**/*.{js,jsx}",
+      "features/**/*.{js,jsx}",
+      "hooks/**/*.{js,jsx}",
       "layouts/**/*.{js,jsx}",
-      "utils/**/*.js",
-      "hooks/**/*.js",
+      "services/**/*.{js,jsx}",
+      "utils/**/*.{js,jsx}",
       "!**/*.style.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ]
   },
-  
+
   "private": true,
   "devDependencies": {
     "@testing-library/react-native": "^14.0.1",
