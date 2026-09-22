@@ -228,4 +228,118 @@ describe('NavigationField', () => {
             })
         )
     })
+
+    test.each([
+        [
+            'semBorda'
+        ],
+        [
+            'botao'
+        ]
+    ])(
+        'renderiza o ícone maior na variante %s',
+        async (variante) => {
+            await render(
+                <NavigationField
+                    label={`Variante ${variante}`}
+                    variante={variante}
+                    icone={IconeTeste}
+                    onPress={jest.fn()}
+                />
+            )
+
+            expect(
+                IconeTeste.mock.calls[0][0]
+            ).toEqual(
+                expect.objectContaining({
+                    size: 24,
+                    weight: 'regular'
+                })
+            )
+        }
+    )
+
+    test.each([
+        [
+            'corVerde',
+            tema.cores.icones.configuracoes
+                .verde.icone
+        ],
+        [
+            'corAzul',
+            tema.cores.icones.configuracoes
+                .azul.icone
+        ],
+        [
+            'corLaranja',
+            tema.cores.icones.configuracoes
+                .laranja.icone
+        ],
+        [
+            'corVermelho',
+            tema.cores.icones.anticoncepcionais
+                .vermelho.icone
+        ],
+        [
+            'corVerde2',
+            tema.cores.icones.anticoncepcionais
+                .verde.icone
+        ]
+    ])(
+        'usa a cor correta da paleta %s',
+        async (paleta, corEsperada) => {
+            await render(
+                <NavigationField
+                    label={`Paleta ${paleta}`}
+                    paleta={paleta}
+                    icone={IconeTeste}
+                    onPress={jest.fn()}
+                />
+            )
+
+            expect(
+                IconeTeste.mock.calls[0][0]
+            ).toEqual(
+                expect.objectContaining({
+                    color: corEsperada
+                })
+            )
+        }
+    )
+
+    test('usa a paleta verde quando recebe uma paleta desconhecida', async () => {
+        await render(
+            <NavigationField
+                label="Paleta desconhecida"
+                paleta="paletaInexistente"
+                icone={IconeTeste}
+                onPress={jest.fn()}
+            />
+        )
+
+        expect(
+            IconeTeste.mock.calls[0][0]
+        ).toEqual(
+            expect.objectContaining({
+                color:
+                    tema.cores.icones
+                        .configuracoes
+                        .verde
+                        .icone
+            })
+        )
+    })
+
+    test('não tenta renderizar um ícone quando ele não é informado', async () => {
+        await render(
+            <NavigationField
+                label="Sem ícone"
+                onPress={jest.fn()}
+            />
+        )
+
+        expect(
+            IconeTeste
+        ).not.toHaveBeenCalled()
+    })
 })
