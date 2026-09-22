@@ -109,4 +109,23 @@ describe('NavigationField', () => {
 
         expect(onPress).not.toHaveBeenCalled()
     })
+
+    test('permite no máximo duas linhas no label', async () => {
+        const label =
+            'Texto comprido para verificar o limite de linhas'
+
+        await render(
+            <NavigationField
+                label={label}
+                onPress={jest.fn()}
+            />
+        )
+
+        expect(
+            screen.getByText(label)
+        ).toHaveProp(
+            'numberOfLines',
+            2
+        )
+    })
 })
