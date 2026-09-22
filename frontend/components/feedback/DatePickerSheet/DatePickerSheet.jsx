@@ -363,86 +363,61 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         return novasLinhas
     }, [casasDoMes])
 
-    const renderizarMes =
-        useCallback(
-            ({item: mes}) => {
-                const habilitado =
-                    podeMostrarMes(
-                        anoVisivel,
-                        mes
-                    )
+    const renderizarMes = useCallback(({item: mes}) => {
+        const habilitado = podeMostrarMes(anoVisivel, mes)
 
-                function escolherMes() {
-                    if (
+        function escolherMes() {
+            if (!habilitado || salvando) {
+                return
+            }
+
+            setDataVisivel({
+                ano: anoVisivel,
+                mes
+            })
+
+            setListaAberta(null)
+        }
+
+        return (
+            <Pressable
+                onPress={escolherMes}
+                disabled={!habilitado || salvando}
+                accessibilityRole="button"
+                accessibilityLabel={`${nomesDosMeses[mes - 1]} de ${anoVisivel}`}
+                accessibilityState={{
+                    selected:
+                        mes
+                        === mesVisivel,
+                    disabled:
                         !habilitado
                         || salvando
-                    ) {
-                        return
-                    }
-
-                    setDataVisivel({
-                        ano: anoVisivel,
-                        mes
-                    })
-
-                    setListaAberta(null)
+                }}
+                style={
+                    estilos.opcaoLista
                 }
-
-                return (
-                    <Pressable
-                        onPress={
-                            escolherMes
-                        }
-                        disabled={
-                            !habilitado
-                            || salvando
-                        }
-                        accessibilityRole="button"
-                        accessibilityLabel={
-                            `${nomesDosMeses[
-                                mes - 1
-                            ]} de ${anoVisivel}`
-                        }
-                        accessibilityState={{
-                            selected:
-                                mes
-                                === mesVisivel,
-                            disabled:
-                                !habilitado
-                                || salvando
-                        }}
-                        style={
-                            estilos.opcaoLista
-                        }
-                    >
-                        <Text
-                            style={[
-                                estilos.textoOpcao,
-                                mes
-                                    === mesVisivel
-                                && estilos
-                                    .textoOpcaoSelecionada,
-                                !habilitado
-                                && estilos
-                                    .textoOpcaoDesabilitada
-                            ]}
-                        >
-                            {
-                                nomesDosMeses[
-                                    mes - 1
-                                ]
-                            }
-                        </Text>
-                    </Pressable>
-                )
-            },
-            [
-                anoVisivel,
-                mesVisivel,
-                podeMostrarMes,
-                salvando
-            ]
+            >
+                <Text
+                    style={[
+                        estilos.textoOpcao,
+                        mes
+                            === mesVisivel
+                        && estilos
+                            .textoOpcaoSelecionada,
+                        !habilitado
+                        && estilos
+                            .textoOpcaoDesabilitada
+                    ]}
+                >
+                    {
+                        nomesDosMeses[
+                            mes - 1
+                        ]
+                    }
+                </Text>
+            </Pressable>
         )
+    }, [anoVisivel, mesVisivel, podeMostrarMes, salvando])
 
     const renderizarAno =
         useCallback(
