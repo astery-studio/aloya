@@ -81,12 +81,11 @@ describe('ButtonSelection', () => {
             />
         )
 
-        expect(
+        const botao =
             screen.getByRole('button')
-        ).toHaveAccessibilityState({
-            selected: false,
-            disabled: false
-        })
+
+        expect(botao).not.toBeSelected()
+        expect(botao).toBeEnabled()
     })
 
     test('não executa a ação quando está desabilitada', async () => {
