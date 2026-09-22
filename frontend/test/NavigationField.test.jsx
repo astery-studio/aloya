@@ -183,4 +183,30 @@ describe('NavigationField', () => {
             estilos.semBorda
         )
     })
+
+    test('usa os estilos da variante botão', async () => {
+        await render(
+            <NavigationField
+                label="Botão"
+                variante="botao"
+                onPress={jest.fn()}
+            />
+        )
+
+        const botao =
+            screen.getByRole(
+                'button',
+                {
+                    name: 'Botão'
+                }
+            )
+
+        expect(botao).toHaveStyle(
+            estilos.container
+        )
+
+        expect(botao).toHaveStyle(
+            estilos.botao
+        )
+    })
 })
