@@ -245,124 +245,75 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
     ])
 
     const podeMostrarMes = useCallback((ano, mes) => {
-                if (
-                    ano < anoMinimoPermitido || ano > anoMaximoPermitido
-                ) {
-                    return false
-                }
+        if (
+            ano < anoMinimoPermitido || ano > anoMaximoPermitido
+        ) {
+            return false
+        }
 
-                const inicioDoMes = obterInicioDoMes(ano, mes)
-                const fimDoMes = obterFimDoMes(ano, mes)
+        const inicioDoMes = obterInicioDoMes(ano, mes)
+        const fimDoMes = obterFimDoMes(ano, mes)
 
-                const antesDoMinimo = limiteMinimoValido && fimDoMes < limiteMinimoValido.texto
-                const depoisDoMaximo = limiteMaximoValido && inicioDoMes > limiteMaximoValido.texto
+        const antesDoMinimo = limiteMinimoValido && fimDoMes < limiteMinimoValido.texto
+        const depoisDoMaximo = limiteMaximoValido && inicioDoMes > limiteMaximoValido.texto
 
-                return (
-                    !antesDoMinimo && !depoisDoMaximo
-                )
+        return (
+            !antesDoMinimo && !depoisDoMaximo
+        )
     }, [limiteMinimoValido, limiteMaximoValido])
 
     const encontrarMesDisponivel = useCallback((ano) => {
-                if (podeMostrarMes(ano, mesVisivel)) {
-                    return mesVisivel
-                }
+        if (podeMostrarMes(ano, mesVisivel)) {
+            return mesVisivel
+        }
 
-                for (let mes = 1; mes <= 12; mes += 1) {
-                    if (podeMostrarMes(ano, mes)) {
-                        return mes
-                    }
-                }
+        for (let mes = 1; mes <= 12; mes += 1) {
+            if (podeMostrarMes(ano, mes)) {
+                return mes
+            }
+        }
 
-                return null
+        return null
     }, [mesVisivel, podeMostrarMes])
 
-    const mudarMes =
-        useCallback(
-            (direcao) => {
-                const proximo =
-                    deslocarMes(
-                        anoVisivel,
-                        mesVisivel,
-                        direcao
-                    )
+    const mudarMes = useCallback((direcao) => {
+        const proximo = deslocarMes(anoVisivel, mesVisivel, direcao)
 
-                if (
-                    !podeMostrarMes(
-                        proximo.ano,
-                        proximo.mes
-                    )
-                ) {
-                    return
-                }
+        if (!podeMostrarMes(proximo.ano, proximo.mes)) {
+            return
+        }
 
-                setDataVisivel(
-                    proximo
-                )
-            },
-            [
-                anoVisivel,
-                mesVisivel,
-                podeMostrarMes
-            ]
+        setDataVisivel(proximo)
+    }, [anoVisivel, mesVisivel, podeMostrarMes])
+
+    const voltarMes = useCallback(() => {
+        mudarMes(-1)
+    }, [mudarMes])
+
+    const avancarMes = useCallback(() => {
+        mudarMes(1)
+    }, [mudarMes])
+
+    const abrirListaDeMeses = useCallback(() => {
+        if (!salvando) {
+            setListaAberta('mes')
+        }
+    }, [salvando])
+
+    const abrirListaDeAnos = useCallback(() => {
+        if (!salvando) {
+            setListaAberta('ano')
+        }
+    }, [salvando])
+
+    const podeSelecionarDia = useCallback((data) => {
+        const depoisDoMinimo = !limiteMinimoValido || data >= limiteMinimoValido.texto
+        const antesDoMaximo = !limiteMaximoValido || data <= limiteMaximoValido.texto
+
+        return (
+            depoisDoMinimo && antesDoMaximo
         )
-
-    const voltarMes =
-        useCallback(() => {
-            mudarMes(-1)
-        }, [
-            mudarMes
-        ])
-
-    const avancarMes =
-        useCallback(() => {
-            mudarMes(1)
-        }, [
-            mudarMes
-        ])
-
-    const abrirListaDeMeses =
-        useCallback(() => {
-            if (!salvando) {
-                setListaAberta('mes')
-            }
-        }, [
-            salvando
-        ])
-
-    const abrirListaDeAnos =
-        useCallback(() => {
-            if (!salvando) {
-                setListaAberta('ano')
-            }
-        }, [
-            salvando
-        ])
-
-    const podeSelecionarDia =
-        useCallback(
-            (data) => {
-                const depoisDoMinimo =
-                    !limiteMinimoValido
-                    || data
-                        >= limiteMinimoValido
-                            .texto
-
-                const antesDoMaximo =
-                    !limiteMaximoValido
-                    || data
-                        <= limiteMaximoValido
-                            .texto
-
-                return (
-                    depoisDoMinimo
-                    && antesDoMaximo
-                )
-            },
-            [
-                limiteMinimoValido,
-                limiteMaximoValido
-            ]
-        )
+    }, [limiteMinimoValido, limiteMaximoValido])
 
     const selecionarDia =
         useCallback(
