@@ -1,3 +1,6 @@
+/**
+ * Tela final do cadastro que confirma conclusão e inicia o uso do aplicativo.
+ */
 import { Text, View } from 'react-native';
 import Button from '../../../components/common/Button/Button';
 import FormLayout from '../../../layouts/FormLayout';
@@ -18,6 +21,3 @@ export default function OnboardingComplete({ aoIniciar, logo }) {
         </FormLayout>
     );
 }
-/**
- * Tela final do cadastro que confirma conclusão e inicia o uso do aplicativo.
- */

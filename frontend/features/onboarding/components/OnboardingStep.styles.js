@@ -1,3 +1,6 @@
+/**
+ * Define posicionamento do cabeçalho e conteúdo das etapas do cadastro.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, espacamentos, typography } from '../../../theme';
 
@@ -37,6 +40,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Define posicionamento do cabeçalho e conteúdo das etapas do cadastro.
- */

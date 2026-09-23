@@ -1,3 +1,6 @@
+/**
+ * Configura DurationStep para coletar a duração habitual da menstruação.
+ */
 import DurationStep from './DurationStep';
 
 export default function MenstruationLengthStep(props) {
@@ -9,6 +12,3 @@ export default function MenstruationLengthStep(props) {
         />
     );
 }
-/**
- * Configura DurationStep para coletar a duração habitual da menstruação.
- */

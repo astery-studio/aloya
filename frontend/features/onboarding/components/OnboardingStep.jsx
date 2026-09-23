@@ -1,3 +1,6 @@
+/**
+ * Estrutura compartilhada das etapas com navegação, progresso e ação principal.
+ */
 import { Pressable, Text, View } from 'react-native';
 import { ArrowLeft } from 'phosphor-react-native';
 import Button from '../../../components/common/Button/Button';
@@ -35,6 +38,3 @@ export default function OnboardingStep({
         </FormLayout>
     );
 }
-/**
- * Estrutura compartilhada das etapas com navegação, progresso e ação principal.
- */

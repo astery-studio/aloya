@@ -1,3 +1,6 @@
+/**
+ * Estrutura reutilizável das etapas que coletam durações em dias.
+ */
 import OnboardingStep from './OnboardingStep';
 
 export default function DurationStep({
@@ -14,6 +17,3 @@ export default function DurationStep({
         </OnboardingStep>
     );
 }
-/**
- * Estrutura reutilizável das etapas que coletam durações em dias.
- */
