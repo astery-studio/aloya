@@ -129,7 +129,7 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
         return exclusaoEmAndamento
     }
 
-    return {buscarPerfil, atualizarPerfil, excluirConta}
+    return {buscarPerfil, atualizarPerfil, confirmarSenhaExclusao, excluirConta}
 }
 
 export { criarAccountService }
