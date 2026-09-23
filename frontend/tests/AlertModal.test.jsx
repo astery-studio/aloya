@@ -5,7 +5,7 @@ jest.mock('phosphor-react-native/src/icons/WarningCircle', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }));
 
-import AlertModal from '../components/feedback/Modal/AlertModal';
+import AlertModal from '../components/feedback/Modal/AlertModal/AlertModal';
 
 test('não mostra o conteúdo quando está oculto', async () => {
     await render(<AlertModal visivel={false} titulo="Erro" aoFechar={jest.fn()} />);

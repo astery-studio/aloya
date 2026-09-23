@@ -33,7 +33,7 @@ import { BottomSheet } from './components/feedback/Bottomsheet/BottomSheet';
 import { DatePickerSheet } from './components/feedback/DatePickerSheet/DatePickerSheet';
 import { EditFieldSheet } from './components/feedback/EditFieldSheet/EditFieldSheet';
 import { SelectionSheet } from './components/feedback/SelectionSheet/SelectionSheet';
-import AlertModal from './components/feedback/Modal/AlertModal';
+import AlertModal from './components/feedback/Modal/AlertModal/AlertModal';
 import AppModal from './components/feedback/Modal/AppModal';
 import SimpleModal from './components/feedback/Modal/SimpleModal';
 

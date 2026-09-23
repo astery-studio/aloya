@@ -3,9 +3,9 @@ import { Text, View } from 'react-native'
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
 
-import ButtonPopup from '../../common/Button/ButtonPopup'
-import PasswordInput from '../../forms/PasswordInput'
-import AppModal from './AppModal'
+import ButtonPopup from '../../../common/Button/ButtonPopup'
+import PasswordInput from '../../../forms/PasswordInput'
+import AppModal from '../AppModal'
 import { estilos } from './AlertModal.styles'
 
 function ignorarFechamento() {}
