@@ -32,3 +32,6 @@ test('encaminha operações de autenticação aos endpoints reais', async () => 
         corpo: { token: 'jwt', senha: 'nova-senha' }
     });
 });
+/**
+ * Testes dos contratos HTTP expostos pelo serviço de autenticação.
+ */

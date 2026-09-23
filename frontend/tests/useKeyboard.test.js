@@ -31,3 +31,6 @@ test('oferece uma ação para fechar o teclado', async () => {
     result.current.fecharTeclado();
     expect(fechar).toHaveBeenCalledTimes(1);
 });
+/**
+ * Testes dos listeners, estado e cleanup do hook de teclado.
+ */

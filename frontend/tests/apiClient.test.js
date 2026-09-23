@@ -25,3 +25,6 @@ test('converte o erro da API em mensagem segura para a interface', async () => {
         mensagemUsuario: 'E-mail ou senha incorretos.'
     });
 });
+/**
+ * Testes de serialização, respostas e normalização de erros do cliente HTTP.
+ */

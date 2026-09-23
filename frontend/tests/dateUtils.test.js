@@ -22,3 +22,6 @@ test('rejeita datas inválidas e valores que não são Date', () => {
     expect(isSameDay(new Date('invalida'), new Date())).toBe(false);
     expect(isSameDay('20/09/2026', new Date())).toBe(false);
 });
+/**
+ * Testes de formatação, validação e comparação dos utilitários de data.
+ */

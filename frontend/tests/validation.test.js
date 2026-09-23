@@ -27,3 +27,6 @@ test('validação de horário continua disponível', () => {
     expect(horarioValido('23:59')).toBe(true);
     expect(horarioValido('24:00')).toBe(false);
 });
+/**
+ * Testes das regras de validação de campos do frontend.
+ */

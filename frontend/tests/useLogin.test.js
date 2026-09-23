@@ -33,3 +33,6 @@ test('expõe uma mensagem segura quando o login falha', async () => {
     await act(() => result.current.limparErro());
     expect(result.current.erro).toBeNull();
 });
+/**
+ * Testes dos estados de sucesso e falha do hook de login.
+ */

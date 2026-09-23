@@ -29,3 +29,6 @@ test('não usa armazenamento inseguro quando SecureStore está indisponível', a
     await expect(removerSeguro('sessao')).rejects.toThrow('indisponível');
     expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
 });
+/**
+ * Testes do adaptador de armazenamento seguro e de sua indisponibilidade.
+ */
