@@ -35,6 +35,7 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
     let exclusaoEmAndamento = null
     let contaExcluidaNoServidor = false
     let respostaDaExclusao = null
+    let verificacaoSenhaEmAndamento = null
 
     async function buscarPerfil() {
         const resposta = await requisicaoAutenticada({
