@@ -310,11 +310,27 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 acaoSecundaria={{texto: 'Continuar a editar', variante: 'verde', aoPressionar: () => setSaidaSemSalvarVisivel(false)}}
             />
 
-            <AlertModal visivel={erroSalvarVisivel} aoFechar={() => setErroSalvarVisivel(false)} titulo="Não foi possível salvar" mensagem={mensagemErroSalvar} />
+            <AlertModal 
+                visivel={erroSalvarVisivel} 
+                aoFechar={() => setErroSalvarVisivel(false)} 
+                titulo="Não foi possível salvar" 
+                mensagem={mensagemErroSalvar} 
+            />
 
-            <DeleteAccount visivel={exclusaoVisivel} onFechar={() => setExclusaoVisivel(false)} excluirConta={excluirConta} onContaExcluida={onContaExcluida} />
+            <DeleteAccount
+                visivel={exclusaoVisivel}
+                onFechar={() => setExclusaoVisivel(false)}
+                confirmarSenhaExclusao={confirmarSenhaExclusao}
+                excluirConta={excluirConta}
+                onContaExcluida={onContaExcluida}
+            />
 
-            <LogoutConfirmation visivel={logoutVisivel} onFechar={() => setLogoutVisivel(false)} encerrarSessao={encerrarSessao} onSessaoEncerrada={onSessaoEncerrada} />
+            <LogoutConfirmation 
+                visivel={logoutVisivel} 
+                onFechar={() => setLogoutVisivel(false)} 
+                encerrarSessao={encerrarSessao} 
+                onSessaoEncerrada={onSessaoEncerrada} 
+            />
         </>
     )
 }
