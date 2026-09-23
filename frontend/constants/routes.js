@@ -1,3 +1,6 @@
+/**
+ * Centraliza os identificadores das rotas usadas pela navegação.
+ */
 //Guarda os nomes das telas usados pela navegação.
 
 const rotas = Object.freeze({
@@ -12,6 +15,3 @@ const rotas = Object.freeze({
 })
 
 export { rotas }
-/**
- * Centraliza os identificadores das rotas usadas pela navegação.
- */

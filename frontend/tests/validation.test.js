@@ -1,3 +1,6 @@
+/**
+ * Testes das regras de validação de campos do frontend.
+ */
 import { horarioValido } from '../utils/validation/isValidTime';
 import { isRequired } from '../utils/validation/isRequired';
 import { isValidDate } from '../utils/validation/isValidDate';
@@ -27,6 +30,3 @@ test('validação de horário continua disponível', () => {
     expect(horarioValido('23:59')).toBe(true);
     expect(horarioValido('24:00')).toBe(false);
 });
-/**
- * Testes das regras de validação de campos do frontend.
- */

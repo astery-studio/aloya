@@ -1,3 +1,6 @@
+/**
+ * Testes de serialização, respostas e normalização de erros do cliente HTTP.
+ */
 import { criarApiClient } from '../services/api/apiClient';
 
 test('envia corpo JSON e retorna os dados da API', async () => {
@@ -25,6 +28,3 @@ test('converte o erro da API em mensagem segura para a interface', async () => {
         mensagemUsuario: 'E-mail ou senha incorretos.'
     });
 });
-/**
- * Testes de serialização, respostas e normalização de erros do cliente HTTP.
- */

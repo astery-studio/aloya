@@ -1,3 +1,6 @@
+/**
+ * Define famílias e estilos tipográficos baseados na fonte DM Sans.
+ */
 const fontFamilies = {
     regular: 'DMSans_400Regular',
     medium: 'DMSans_500Medium',
@@ -60,6 +63,3 @@ export {
     fontFamilies,
     typography
 };
-/**
- * Define famílias e estilos tipográficos baseados na fonte DM Sans.
- */

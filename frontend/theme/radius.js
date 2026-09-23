@@ -1,3 +1,6 @@
+/**
+ * Define os raios de borda padronizados para elementos da interface.
+ */
 const radius = {
     buttonAndInput: 12,
     onboardingCalendar: 16,
@@ -10,6 +13,3 @@ const radius = {
 export {
     radius
 };
-/**
- * Define os raios de borda padronizados para elementos da interface.
- */

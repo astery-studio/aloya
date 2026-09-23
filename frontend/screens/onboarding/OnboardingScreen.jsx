@@ -1,3 +1,6 @@
+/**
+ * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
+ */
 import { useCallback, useState } from 'react';
 import { CalendarBlank, WarningCircle } from 'phosphor-react-native';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
@@ -145,6 +148,3 @@ export default function OnboardingScreen({
         titulo={erro?.titulo} mensagem={erro?.mensagem}
         acaoPrincipal={{ texto: 'Entendi', aoPressionar: () => setErro(null) }} /></>;
 }
-/**
- * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
- */

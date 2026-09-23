@@ -1,3 +1,6 @@
+/**
+ * Layout das telas de autenticação com área segura, gradiente e tratamento do teclado.
+ */
 import {
     KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View
 } from 'react-native';
@@ -49,6 +52,3 @@ export default function AuthLayout({
         </LinearGradient>
     );
 }
-/**
- * Layout das telas de autenticação com área segura, gradiente e tratamento do teclado.
- */
