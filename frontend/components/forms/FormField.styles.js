@@ -1,3 +1,6 @@
+/**
+ * Define os estilos estruturais de rótulos e conteúdo do FormField.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, typography } from '../../theme';
 
@@ -27,6 +30,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Define os estilos estruturais de rótulos e conteúdo do FormField.
- */

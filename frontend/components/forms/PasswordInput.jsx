@@ -1,3 +1,6 @@
+/**
+ * Especializa TextInput para senhas e controla a alternância de visibilidade.
+ */
 import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { Eye, EyeSlash } from 'phosphor-react-native';
@@ -38,6 +41,3 @@ function PasswordInput({
 }
 
 export default memo(PasswordInput);
-/**
- * Especializa TextInput para senhas e controla a alternância de visibilidade.
- */

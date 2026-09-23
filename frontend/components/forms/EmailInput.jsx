@@ -1,3 +1,6 @@
+/**
+ * Especializa TextInput para entrada e sanitização de endereços de e-mail.
+ */
 import { memo } from 'react';
 import TextInput from './TextInput';
 
@@ -24,6 +27,3 @@ function EmailInput({
 }
 
 export default memo(EmailInput);
-/**
- * Especializa TextInput para entrada e sanitização de endereços de e-mail.
- */

@@ -1,3 +1,6 @@
+/**
+ * Define estilos, tamanhos e variantes visuais compartilhados pelos botões da aplicação.
+ */
 import { StyleSheet } from 'react-native';
 import {
     cores,
@@ -177,6 +180,3 @@ export {
     tamanhos,
     variantes
 };
-/**
- * Define estilos, tamanhos e variantes visuais compartilhados pelos botões da aplicação.
- */

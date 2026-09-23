@@ -1,3 +1,6 @@
+/**
+ * Campo controlado que aplica máscara de data e gerencia foco ou abertura de calendário.
+ */
 import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { CalendarBlank } from 'phosphor-react-native';
@@ -48,6 +51,3 @@ export default function DateInput({
         </Pressable>
     );
 }
-/**
- * Campo controlado que aplica máscara de data e gerencia foco ou abertura de calendário.
- */
