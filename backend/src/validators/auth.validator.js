@@ -1,3 +1,6 @@
+/**
+ * Valida e normaliza os contratos de cadastro e login antes dos serviços.
+ */
 function criarAuthValidator({ dateUtils }) {
     // Expressão regular para validar nomes contendo letras (incluindo acentuadas), espaços ou hífens.
     const regexNome = /^[\p{L}]+(?:[ -][\p{L}]+)*$/u;

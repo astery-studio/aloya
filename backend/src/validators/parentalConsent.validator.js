@@ -1,3 +1,6 @@
+/**
+ * Valida dados e tokens recebidos pelo fluxo de consentimento parental.
+ */
 function criarParentalConsentValidator() {
     // Expressão regular padrão para validação básica da estrutura de um email.
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

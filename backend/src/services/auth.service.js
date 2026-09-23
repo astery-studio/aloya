@@ -1,3 +1,6 @@
+/**
+ * Implementa cadastro e login, incluindo persistência, senha protegida e criação de sessão.
+ */
 function criarAuthService({
     prisma,
     passwordService,

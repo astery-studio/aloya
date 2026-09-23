@@ -1,3 +1,6 @@
+/**
+ * Gerencia emissão, reenvio, consulta e confirmação do consentimento parental.
+ */
 function criarParentalConsentService({
     prisma,
     emailService,

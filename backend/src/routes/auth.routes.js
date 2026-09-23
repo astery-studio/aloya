@@ -1,3 +1,6 @@
+/**
+ * Define endpoints de autenticação, conta, consentimento e recuperação de senha.
+ */
 import express from 'express';
 const { Router } = express;
 

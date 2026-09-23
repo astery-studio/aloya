@@ -1,3 +1,6 @@
+/**
+ * Controller HTTP que valida entradas e delega cadastro, login e consentimento aos serviços.
+ */
 function criarAuthController({
     authService,
     authValidator,

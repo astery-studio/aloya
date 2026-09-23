@@ -1,3 +1,6 @@
+/**
+ * Envia mensagens transacionais de consentimento e recuperação usando o transporte SMTP.
+ */
 function criarEmailService({ transporter, remetente }) {
     // Escapa caracteres especiais antes de inserir o nome da pessoa titular no HTML do e-mail.
     function escaparHtml(texto) {

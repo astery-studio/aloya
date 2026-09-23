@@ -1,3 +1,6 @@
+/**
+ * Configura limitadores de requisição e respostas seguras para excesso de tentativas.
+ */
 function criarCadastroRateLimit({
     rateLimit,
     janelaMs,

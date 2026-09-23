@@ -1,3 +1,6 @@
+/**
+ * Middleware que restringe operações conforme o estado do consentimento parental.
+ */
 function criarParentalConsentMiddleware({
     parentalConsentService
 }) {

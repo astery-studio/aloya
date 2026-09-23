@@ -1,3 +1,6 @@
+/**
+ * Encapsula geração e comparação de hashes de senha.
+ */
 function criarPasswordService({ bcrypt, rounds }) {
     // Hash válido usado apenas para reduzir a diferença de tempo quando o e-mail não existe.
     const hashFicticio =

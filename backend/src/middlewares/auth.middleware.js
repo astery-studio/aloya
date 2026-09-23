@@ -1,3 +1,6 @@
+/**
+ * Middleware que valida a sessão enviada no cabeçalho e disponibiliza o usuário autenticado.
+ */
 function criarAuthMiddleware({
     tokenService,
     prisma

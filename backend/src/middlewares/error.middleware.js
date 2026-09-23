@@ -1,3 +1,6 @@
+/**
+ * Middleware global que converte falhas conhecidas e inesperadas em respostas HTTP seguras.
+ */
 function rotaNaoEncontrada(_req, res) {
     return res.status(404).json({
         erro: {

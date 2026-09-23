@@ -1,3 +1,6 @@
+/**
+ * Concentra conversões e cálculos de datas usados pelas regras de cadastro.
+ */
 function criarDataValida(dataTexto) {
 
     //Se o que chegou não for um texto, ele já devolve nulo e cancela.
