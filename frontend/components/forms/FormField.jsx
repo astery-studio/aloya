@@ -26,3 +26,6 @@ export default function FormField({
         </View>
     );
 }
+/**
+ * Agrupa rótulo, conteúdo e mensagem auxiliar em uma estrutura de formulário.
+ */

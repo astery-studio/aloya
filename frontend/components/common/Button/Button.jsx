@@ -99,3 +99,6 @@ export default function Button({
         </Pressable>
     );
 }
+/**
+ * Componente base dos botões, responsável por variantes, estados, ícones e acessibilidade.
+ */

@@ -177,3 +177,6 @@ export {
     tamanhos,
     variantes
 };
+/**
+ * Define estilos, tamanhos e variantes visuais compartilhados pelos botões da aplicação.
+ */

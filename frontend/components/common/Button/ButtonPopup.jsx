@@ -36,3 +36,6 @@ export default function ButtonPopup({
         />
     );
 }
+/**
+ * Restringe o botão base às dimensões e variantes permitidas em modais.
+ */

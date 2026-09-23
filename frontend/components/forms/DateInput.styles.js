@@ -24,3 +24,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define a apresentação e o estado de foco do campo de data.
+ */

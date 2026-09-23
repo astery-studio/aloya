@@ -25,3 +25,6 @@ export default function ButtonDashed({
         />
     );
 }
+/**
+ * Especializa o botão base para ações de inclusão com borda tracejada e ícone.
+ */

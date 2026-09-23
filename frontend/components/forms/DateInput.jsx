@@ -48,3 +48,6 @@ export default function DateInput({
         </Pressable>
     );
 }
+/**
+ * Campo controlado que aplica máscara de data e gerencia foco ou abertura de calendário.
+ */

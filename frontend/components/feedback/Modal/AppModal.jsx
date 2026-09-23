@@ -70,3 +70,6 @@ export default function AppModal({
         </Modal>
     );
 }
+/**
+ * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
+ */

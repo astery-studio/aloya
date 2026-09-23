@@ -41,3 +41,6 @@ export default function SimpleModal({
         </AppModal>
     );
 }
+/**
+ * Compõe mensagens simples com até duas ações a partir de AppModal e ButtonPopup.
+ */

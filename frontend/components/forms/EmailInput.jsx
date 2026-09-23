@@ -24,3 +24,6 @@ function EmailInput({
 }
 
 export default memo(EmailInput);
+/**
+ * Especializa TextInput para entrada e sanitização de endereços de e-mail.
+ */
