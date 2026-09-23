@@ -47,7 +47,11 @@ export default function LoginScreen({
                 <EmailInput value={email} onChangeText={setEmail} />
                 <PasswordInput value={senha} onChangeText={setSenha} />
             </View>
-            <Pressable onPress={aoRecuperarSenha}><Text style={estilos.link}>Esqueceu a senha?</Text></Pressable>
+            {aoRecuperarSenha ? (
+                <Pressable onPress={aoRecuperarSenha}>
+                    <Text style={estilos.link}>Esqueceu a senha?</Text>
+                </Pressable>
+            ) : null}
             <Button texto="Entrar" aoPressionar={enviar} desativado={!preenchido} carregando={carregando} />
         </AuthLayout>
         <SimpleModal visivel={Boolean(erro || erroValidacao)} aoFechar={limparAviso} icone={LockKey}

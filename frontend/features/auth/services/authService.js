@@ -5,9 +5,18 @@ import { endpoints } from '../../../services/api/endpoints'
 
 
 function criarAuthService({
+    requisicao,
     requisicaoAutenticada,
     removerCredencialLocal
 }) {
+    function cadastrar(dados) {
+        return requisicao({ metodo: 'POST', caminho: endpoints.cadastro, corpo: dados });
+    }
+
+    function realizarLogin(credenciais) {
+        return requisicao({ metodo: 'POST', caminho: endpoints.login, corpo: credenciais });
+    }
+
     async function encerrarSessao() {
         const resposta = await requisicaoAutenticada({
             metodo: 'POST',
@@ -23,7 +32,7 @@ function criarAuthService({
         await removerCredencialLocal()
     }
 
-    return { encerrarSessao }
+    return { cadastrar, realizarLogin, encerrarSessao }
 }
 
 export { criarAuthService }
