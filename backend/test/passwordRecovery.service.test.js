@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { criarPasswordRecoveryService } from '../src/services/passwordRecovery.service.js';
 
-function criarService(usuario = null) {
+function criarService(usuario = null, recuperacao = null) {
     const chamadas = { transacao: [], email: [] };
     const prisma = {
         usuario: {
@@ -12,7 +12,7 @@ function criarService(usuario = null) {
         recuperacaoSenha: {
             updateMany: (args) => ({ operacao: 'revogar', args }),
             create: (args) => ({ operacao: 'criar', args }),
-            findUnique: async () => null,
+            findUnique: async () => recuperacao,
             update: (args) => ({ operacao: 'usar', args })
         },
         sessao: {
@@ -26,7 +26,9 @@ function criarService(usuario = null) {
         gerarTokenRecuperacao: () => ({
             token: 'jwt', tokenHash: 'hash',
             validadeToken: new Date('2026-09-23T12:00:00Z')
-        })
+        }),
+        validarTokenRecuperacao: () => ({ usuarioId: 7 }),
+        gerarHashToken: () => 'hash'
     };
     const emailService = {
         async enviarEmailRecuperacaoSenha(dados) {
@@ -35,7 +37,9 @@ function criarService(usuario = null) {
     };
     const service = criarPasswordRecoveryService({
         prisma, tokenService, emailService,
-        passwordService: {}, baseUrl: 'aloya://reset-password',
+        passwordService: { gerarHash: async () => ({ senhaHash: 'hash-senha' }) },
+        baseUrl: 'aloya://reset-password',
+        now: () => new Date('2026-09-23T10:00:00Z'),
         logger: { error() {} }
     });
     return { service, chamadas };
@@ -67,4 +71,23 @@ test('revoga link anterior e envia somente o novo token', async () => {
         email: 'carla@email.com',
         linkRedefinicao: 'aloya://reset-password?token=jwt'
     }]);
+});
+
+test('redefine senha, utiliza o link e revoga sessões', async () => {
+    const recuperacao = {
+        id: 9, usuarioId: 7, statusLink: 'pendente',
+        validadeToken: new Date('2026-09-23T11:00:00Z')
+    };
+    const { service, chamadas } = criarService(null, recuperacao);
+
+    const resposta = await service.redefinir({ token: 'jwt', senha: 'nova-senha' });
+
+    assert.match(resposta.mensagem, /Senha redefinida com sucesso/);
+    const operacoes = chamadas.transacao[0];
+    assert.deepEqual(
+        operacoes.map(({ operacao }) => operacao),
+        ['usuario', 'usar', 'sessoes']
+    );
+    assert.equal(operacoes[0].args.data.senhaHash, 'hash-senha');
+    assert.equal(operacoes[1].args.data.statusLink, 'usado');
 });
