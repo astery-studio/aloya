@@ -37,11 +37,17 @@ function criarPasswordRecoveryService({
         ]);
 
         void emailService.enviarEmailRecuperacaoSenha({
-                email: usuario.email,
-                linkRedefinicao: `${baseUrl}?token=${encodeURIComponent(token.token)}`
-            }).catch((erro) => {
-            logger.error({ evento: 'falha_email_recuperacao', tipo: erro.name });
+            email: usuario.email,
+            linkRedefinicao: `${baseUrl}?token=${encodeURIComponent(token.token)}`
+        }).catch((erro) => {
+            logger.error({
+                evento: 'falha_email_recuperacao',
+                tipo: erro.name,
+                codigo: erro.code,
+                comando: erro.command,
+                respostaSmtp: erro.responseCode
             });
+        });
 
         return respostaPublica;
     }
