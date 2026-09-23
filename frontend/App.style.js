@@ -1,26 +1,18 @@
-//Define somente os estilos da galeria provisória de componentes.
-//Este arquivo pode ser removido junto com o App.js provisório quando os testes visuais terminarem.
+//Define somente os estilos da galeria provisória dos componentes de configurações.
+import { StyleSheet } from 'react-native'
 
-import { StyleSheet } from 'react-native';
-
-import { fontFamilies, tema } from './theme';
+import { fontFamilies, tema } from './theme'
 
 const estilos = StyleSheet.create({
-    tela: {
-        flex: 1,
-        backgroundColor: tema.cores.neutras.fundoClaro
-    },
-
     carregamento: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
+        padding: tema.espacamentos.grande,
         backgroundColor: tema.cores.neutras.fundoClaro
     },
 
     textoCarregamento: {
-        marginTop: 12,
         color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.regular,
         fontSize: 16,
@@ -29,34 +21,11 @@ const estilos = StyleSheet.create({
     },
 
     conteudo: {
-        paddingHorizontal: 16,
-        paddingTop: 24,
-        paddingBottom: 80,
-        gap: 24
+        gap: tema.espacamentos.grande,
+        paddingBottom: tema.espacamentos.grande
     },
 
-    introducao: {
-        gap: 8,
-        padding: 20,
-        borderRadius: 16,
-        backgroundColor: tema.cores.marca.secundaria
-    },
-
-    tituloPrincipal: {
-        color: tema.cores.neutras.superficieClara,
-        fontFamily: fontFamilies.bold,
-        fontSize: 26,
-        lineHeight: 32
-    },
-
-    descricaoPrincipal: {
-        color: tema.cores.neutras.superficieClara,
-        fontFamily: fontFamilies.regular,
-        fontSize: 14,
-        lineHeight: 21
-    },
-
-    mensagemInteracao: {
+    mensagem: {
         padding: 12,
         borderRadius: 10,
         color: tema.cores.marca.secundaria,
@@ -68,116 +37,73 @@ const estilos = StyleSheet.create({
     },
 
     secao: {
-        gap: 12,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: 16,
-        backgroundColor: tema.cores.neutras.superficieClara
+        gap: tema.espacamentos.pequeno
     },
 
     tituloSecao: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.bold,
-        fontSize: 20,
-        lineHeight: 26
-    },
-
-    descricaoSecao: {
+        marginLeft: 4,
+        marginBottom: 2,
         color: tema.cores.neutras.textoSecundarioClaro,
         fontFamily: fontFamilies.regular,
-        fontSize: 13,
-        lineHeight: 19
+        fontSize: 14,
+        fontWeight: '400',
+        lineHeight: 21
     },
 
-    subtitulo: {
-        marginTop: 4,
-        color: tema.cores.neutras.textoPrincipalClaro,
+    botaoTeste: {
+        minHeight: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: tema.espacamentos.medio,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: tema.cores.marca.secundaria,
+        backgroundColor: tema.cores.neutras.superficieClara
+    },
+
+    botaoTestePressionado: {
+        opacity: 0.72
+    },
+
+    textoBotaoTeste: {
+        color: tema.cores.marca.secundaria,
         fontFamily: fontFamilies.semibold,
-        fontSize: 15,
-        lineHeight: 22
+        fontSize: 16,
+        lineHeight: 24
     },
 
-    grupo: {
-        gap: 10
-    },
-
-    linha: {
+    rodape: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10
-    },
-
-    itemFlexivel: {
-        flex: 1
-    },
-
-    exemploFormField: {
-        padding: 16,
-        borderRadius: 12,
-        backgroundColor: tema.cores.icones.configuracoes.verde.caixa
-    },
-
-    textoExemplo: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 14,
-        lineHeight: 21
-    },
-
-    previewHeader: {
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: 12,
-        backgroundColor: tema.cores.neutras.superficieClara
-    },
-
-    previewBottomItem: {
-        width: 90,
-        height: 91,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: 12,
-        backgroundColor: tema.cores.neutras.superficieClara
-    },
-
-    previewBottomBar: {
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: 12
-    },
-
-    previewLayout: {
-        height: 500,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: 12
-    },
-
-    conteudoMainLayout: {
-        flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        padding: 24
+        gap: tema.espacamentos.extraGrande
     },
 
-    resultadoStorage: {
-        padding: 12,
-        borderRadius: 10,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        backgroundColor: tema.cores.neutras.fundoClaro,
+    separadorRodape: {
+        width: 1,
+        height: 16,
+        backgroundColor: tema.cores.neutras.bordaClara
+    },
+
+    linkPerigo: {
+        color: tema.cores.feedback.erro,
         fontFamily: fontFamilies.regular,
         fontSize: 14,
-        lineHeight: 21
+        lineHeight: 21,
+        textDecorationLine: 'underline'
     },
 
-    conteudoBottomSheet: {
-        gap: 16
-    }
-});
+    linkNormal: {
+        color: tema.cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 14,
+        lineHeight: 21,
+        textDecorationLine: 'underline'
+    },
 
-export { estilos };
+    linkPressionado: {
+        opacity: 0.6
+    }
+})
+
+export { estilos }
