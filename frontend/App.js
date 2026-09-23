@@ -1,7 +1,7 @@
 //Mostra uma galeria provisória com todos os componentes disponíveis no frontend.
 //É usado somente para testes visuais no Expo e deve ser substituído pela navegação real depois da conferência.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -73,6 +73,8 @@ export default function App() {
     const [abaAtiva, setAbaAtiva] = useState('configuracoes');
 
     const [modalAtivo, setModalAtivo] = useState(null);
+    const [senhaModal, setSenhaModal] = useState('');
+    const [erroSenhaModal, setErroSenhaModal] = useState(null);
     const [painelAtivo, setPainelAtivo] = useState(null);
     const [generoSelecionado, setGeneroSelecionado] = useState('MULHER_CIS');
     const [dataSelecionada, setDataSelecionada] = useState('2000-03-15');
@@ -83,6 +85,48 @@ export default function App() {
     const [campoEditado, setCampoEditado] = useState(null);
 
     const [resultadoStorage, setResultadoStorage] = useState('Nenhuma operação executada.');
+
+    //Fecha qualquer modal e apaga imediatamente a senha temporária da memória do componente.
+    function fecharModal() {
+        setModalAtivo(null);
+        setSenhaModal('');
+        setErroSenhaModal(null);
+    }
+
+    //Recebe o tipo de demonstração, prepara a senha e abre a variante correspondente.
+    function abrirModalSenha(tipo, senhaInicial = '', erroInicial = null) {
+        setSenhaModal(senhaInicial);
+        setErroSenhaModal(erroInicial);
+        setModalAtivo(tipo);
+    }
+
+    //Recebe o texto digitado, atualiza a senha temporária e remove o erro anterior.
+    function alterarSenhaModal(valor) {
+        setSenhaModal(valor);
+        setErroSenhaModal(null);
+    }
+
+    //Simula a confirmação de senha sem enviar ou armazenar o valor digitado.
+    function confirmarSenhaModal() {
+        registrarAcao('A confirmação com senha foi acionada.');
+        fecharModal();
+    }
+
+    //O efeito executa uma tarefa quando um estado muda e limpa seu temporizador ao terminar.
+    useEffect(() => {
+        if (modalAtivo !== 'senhaCarregando') {
+            return undefined;
+        }
+
+        const temporizador = setTimeout(() => {
+            setModalAtivo(null);
+            setSenhaModal('');
+            setErroSenhaModal(null);
+            setMensagem('O carregamento de demonstração foi concluído.');
+        }, 2500);
+
+        return () => clearTimeout(temporizador);
+    }, [modalAtivo]);
 
     //Recebe uma descrição curta e mostra na galeria qual interação acabou de acontecer.
     function registrarAcao(descricao) {
@@ -163,6 +207,8 @@ export default function App() {
     }
 
     const edicaoAtual = obterEdicaoAtual();
+    const modalSenhaVisivel = ['senhaVazia', 'senhaPreenchida', 'senhaErro', 'senhaCarregando'].includes(modalAtivo);
+    const modalSenhaCarregando = modalAtivo === 'senhaCarregando';
 
     return (
         <View style={estilos.tela}>
@@ -320,6 +366,7 @@ export default function App() {
                     <View style={estilos.previewBottomBar}>
                         <BottomTabBar abaAtiva={abaAtiva} onSelecionar={setAbaAtiva} />
                     </View>
+
                     <Text style={estilos.descricaoSecao}>Aba selecionada: {abaAtiva}</Text>
                 </View>
 
@@ -338,10 +385,15 @@ export default function App() {
 
                 <View style={estilos.secao}>
                     <Text style={estilos.tituloSecao}>Modais</Text>
-                    <Text style={estilos.descricaoSecao}>Abra um modal por vez e teste as ações, o botão voltar do Android e os estados de carregamento.</Text>
+                    <Text style={estilos.descricaoSecao}>Abra um modal por vez e confira os diferentes estados do AlertModal.</Text>
 
                     <ButtonScreen texto="Abrir SimpleModal" aoPressionar={() => setModalAtivo('simples')} />
-                    <ButtonScreen texto="Abrir AlertModal" variante="vermelho" aoPressionar={() => setModalAtivo('alerta')} />
+                    <ButtonScreen texto="AlertModal padrão — uma ação" variante="vermelho" aoPressionar={() => setModalAtivo('alertaSimples')} />
+                    <ButtonScreen texto="AlertModal padrão — duas ações" variante="vermelho" aoPressionar={() => setModalAtivo('alerta')} />
+                    <ButtonScreen texto="AlertModal — senha vazia" variante="vermelho" aoPressionar={() => abrirModalSenha('senhaVazia')} />
+                    <ButtonScreen texto="AlertModal — senha preenchida" variante="vermelho" aoPressionar={() => abrirModalSenha('senhaPreenchida', 'Senha de demonstração')} />
+                    <ButtonScreen texto="AlertModal — senha incorreta" variante="vermelho" aoPressionar={() => abrirModalSenha('senhaErro', 'Senha incorreta', 'Senha atual incorreta.')} />
+                    <ButtonScreen texto="AlertModal — carregando" variante="vermelho" aoPressionar={() => abrirModalSenha('senhaCarregando', 'Senha de demonstração')} />
                     <ButtonScreen texto="Abrir AppModal de ação" variante="verde" aoPressionar={() => setModalAtivo('acao')} />
                 </View>
 
@@ -373,34 +425,53 @@ export default function App() {
 
             <SimpleModal
                 visivel={modalAtivo === 'simples'}
-                aoFechar={() => setModalAtivo(null)}
+                aoFechar={fecharModal}
                 icone={GearIcon}
                 titulo="Operação concluída"
                 mensagem="Este é o SimpleModal com duas ações."
-                acaoPrincipal={{ texto: 'Entendi', aoPressionar: () => setModalAtivo(null) }}
+                acaoPrincipal={{ texto: 'Entendi', aoPressionar: fecharModal }}
                 acaoSecundaria={{ texto: 'Ação secundária', aoPressionar: () => registrarAcao('Ação secundária do SimpleModal pressionada.') }}
             />
 
             <AlertModal
-                visivel={modalAtivo === 'alerta'}
-                aoFechar={() => setModalAtivo(null)}
+                visivel={modalAtivo === 'alertaSimples'}
+                aoFechar={fecharModal}
                 titulo="Não foi possível continuar"
-                mensagem="Este é um exemplo de erro ou situação excepcional."
-                destaque="Nenhum dado foi alterado."
-                acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: () => setModalAtivo(null) }}
-                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: () => setModalAtivo(null) }}
+                mensagem="Este alerta cria automaticamente o botão Entendi."
+            />
+
+            <AlertModal
+                visivel={modalAtivo === 'alerta'}
+                aoFechar={fecharModal}
+                titulo="Excluir conta permanentemente?"
+                mensagem="Esta ação é permanente e removerá todos os seus dados."
+                destaque="Deseja continuar?"
+                acaoPrincipal={{ texto: 'Excluir permanentemente', aoPressionar: fecharModal }}
+                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: fecharModal }}
+            />
+
+            <AlertModal
+                variante="comSenha"
+                visivel={modalSenhaVisivel}
+                aoFechar={fecharModal}
+                titulo="Confirme sua identidade"
+                mensagem="Por segurança, insira sua senha atual para continuar com a exclusão da conta."
+                senha={senhaModal}
+                aoAlterarSenha={alterarSenhaModal}
+                erroSenha={erroSenhaModal}
+                acaoPrincipal={{ texto: 'Continuar', aoPressionar: confirmarSenhaModal, carregando: modalSenhaCarregando }}
             />
 
             <AppModal
                 variante="acao"
                 visivel={modalAtivo === 'acao'}
-                aoFechar={() => setModalAtivo(null)}
+                aoFechar={fecharModal}
                 icone={WarningCircleIcon}
                 titulo="Confirme a ação"
                 mensagem="Este é o AppModal base na variante de ação."
             >
-                <ButtonPopup texto="Confirmar" variante="vermelho" aoPressionar={() => setModalAtivo(null)} estilo={{ width: '100%' }} />
-                <ButtonPopup texto="Cancelar" variante="branco" aoPressionar={() => setModalAtivo(null)} estilo={{ width: '100%' }} />
+                <ButtonPopup texto="Confirmar" variante="vermelho" aoPressionar={fecharModal} estilo={{ width: '100%' }} />
+                <ButtonPopup texto="Cancelar" variante="branco" aoPressionar={fecharModal} estilo={{ width: '100%' }} />
             </AppModal>
 
             <BottomSheet visivel={painelAtivo === 'base'} onFechar={() => setPainelAtivo(null)}>
