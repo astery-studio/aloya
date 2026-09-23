@@ -245,6 +245,17 @@ function criarAuthService({
         }
     }
 
+    async function verificarEmailDisponivel(email) {
+        const usuario = await prisma.usuario.findUnique({
+            where: { email },
+            select: { id: true }
+        });
+
+        return {
+            disponivel: !usuario
+        };
+    }
+
     // Autentica a pessoa usuária e cria uma nova sessão persistida.
     async function realizarLogin(dados, dispositivo) {
         const usuario = await prisma.usuario.findUnique({
@@ -316,7 +327,8 @@ function criarAuthService({
 
     return {
         cadastrar,
-        realizarLogin
+        realizarLogin,
+        verificarEmailDisponivel
     };
 }
 

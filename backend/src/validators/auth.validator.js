@@ -299,9 +299,30 @@ function criarAuthValidator({ dateUtils }) {
         };
     }
 
+    function validarEmail(body) {
+        const email = typeof body.email === 'string'
+            ? body.email.trim().toLowerCase()
+            : '';
+
+        const erros = [];
+
+        if (!regexEmail.test(email) || email.length > 254) {
+            erros.push(
+                erro('email', 'Informe um e-mail válido.')
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+            dados: { email }
+        };
+    }
+
     return {
         validarCadastro,
-        validarLogin
+        validarLogin,
+        validarEmail
     };
 }
 
