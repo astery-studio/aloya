@@ -1,3 +1,6 @@
+/**
+ * Valida e normaliza e-mail, token e nova senha do fluxo de recuperação.
+ */
 function criarPasswordRecoveryValidator() {
     const regexEmail =
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

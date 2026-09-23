@@ -1,3 +1,6 @@
+/**
+ * Gera, valida e resume criptograficamente tokens JWT de recuperação.
+ */
 function criarTokenService({
     jwt,
     crypto,

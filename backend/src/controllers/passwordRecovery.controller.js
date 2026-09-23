@@ -1,3 +1,6 @@
+/**
+ * Controller HTTP que valida e delega solicitação, consulta e redefinição de senha.
+ */
 function criarPasswordRecoveryController({
     passwordRecoveryService,
     passwordRecoveryValidator

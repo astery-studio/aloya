@@ -1,3 +1,6 @@
+/**
+ * Orquestra tokens de recuperação, envio de e-mail e troca segura da senha.
+ */
 function criarPasswordRecoveryService({
     prisma,
     tokenService,
