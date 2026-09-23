@@ -10,6 +10,10 @@ export default function AppModal({
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
 
+    if (!visivel) {
+        return null;
+    }
+
     const alerta = variante === 'alerta';
     const acao = variante === 'acao';
     const corDoIcone = corIcone || (acao ? cores.feedback.erro : cores.marca.primaria);
