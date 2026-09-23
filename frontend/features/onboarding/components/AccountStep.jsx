@@ -9,7 +9,7 @@ import { cores } from '../../../theme';
 import { estilos } from './AccountStep.styles';
 
 export default function AccountStep({ dados, aoAlterar, aoAvancar,
-    aoVoltar, aoEntrar }) {
+    aoVoltar, aoEntrar, carregando }) {
     const preenchido = Boolean(dados.nome.trim() && dados.email.trim()
         && dados.senha && dados.confirmacao && dados.aceitouTermos);
     const rodape = <View style={estilos.rodape}>
@@ -41,7 +41,8 @@ export default function AccountStep({ dados, aoAlterar, aoAvancar,
                 <Text style={estilos.textoTermos}>Li e concordo com os{' '}
                     <Text style={estilos.linkTermos}>Termos e Política de Privacidade</Text></Text>
             </Pressable>
-            <Button texto="Avançar" aoPressionar={aoAvancar} desativado={!preenchido} />
+            <Button texto="Avançar" aoPressionar={aoAvancar}
+                desativado={!preenchido} carregando={carregando} />
         </AuthLayout>
     );
 }

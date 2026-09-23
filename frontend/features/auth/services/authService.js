@@ -17,6 +17,14 @@ function criarAuthService({
         return requisicao({ metodo: 'POST', caminho: endpoints.login, corpo: credenciais });
     }
 
+    function verificarEmailDisponivel(email) {
+        return requisicao({
+            metodo: 'POST',
+            caminho: endpoints.disponibilidadeEmail,
+            corpo: { email }
+        });
+    }
+
     async function encerrarSessao() {
         const resposta = await requisicaoAutenticada({
             metodo: 'POST',
@@ -32,7 +40,7 @@ function criarAuthService({
         await removerCredencialLocal()
     }
 
-    return { cadastrar, realizarLogin, encerrarSessao }
+    return { cadastrar, realizarLogin, verificarEmailDisponivel, encerrarSessao }
 }
 
 export { criarAuthService }
