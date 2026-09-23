@@ -1,3 +1,4 @@
+//Define a estrutura visual compartilhada pelas telas internas de configurações.
 import { StyleSheet } from 'react-native'
 import { tema } from '../../theme'
 
@@ -20,8 +21,7 @@ const estilos = StyleSheet.create({
     rodape: {
         width: '100%',
         alignItems: 'center',
-        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-        paddingTop: tema.espacamentos.pequeno,
+        marginTop: 128.2,
         paddingBottom: tema.espacamentos.grande
     }
 })
