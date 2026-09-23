@@ -56,3 +56,14 @@ test('permite navegar para o mês anterior', async () => {
 
     expect(screen.getByLabelText('Julho de 2026')).toBeTruthy();
 });
+
+test('abre a lista e permite escolher outro mês', async () => {
+    await render(<MenstruationCalendar
+        valor={{ inicio: '2026-08-03', fim: null }} aoAlterar={jest.fn()} />);
+
+    await fireEvent.press(screen.getByLabelText('Escolher mês'));
+    expect(screen.getByLabelText('Selecionar Agosto de 2026').props.accessibilityState)
+        .toEqual({ selected: true });
+    await fireEvent.press(screen.getByLabelText('Selecionar Junho de 2026'));
+    expect(screen.getByLabelText('Junho de 2026')).toBeTruthy();
+});
