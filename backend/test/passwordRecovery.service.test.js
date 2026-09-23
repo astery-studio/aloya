@@ -91,3 +91,23 @@ test('redefine senha, utiliza o link e revoga sessões', async () => {
     assert.equal(operacoes[0].args.data.senhaHash, 'hash-senha');
     assert.equal(operacoes[1].args.data.statusLink, 'usado');
 });
+
+test('rejeita link expirado ou já utilizado', async () => {
+    const expirado = criarService(null, {
+        id: 1, usuarioId: 7, statusLink: 'pendente',
+        validadeToken: new Date('2026-09-23T09:00:00Z')
+    }).service;
+    const usado = criarService(null, {
+        id: 2, usuarioId: 7, statusLink: 'usado',
+        validadeToken: new Date('2026-09-23T11:00:00Z')
+    }).service;
+
+    await assert.rejects(
+        expirado.validarToken('jwt'),
+        { codigo: 'LINK_RECUPERACAO_INVALIDO' }
+    );
+    await assert.rejects(
+        usado.redefinir({ token: 'jwt', senha: 'nova-senha' }),
+        { codigo: 'LINK_RECUPERACAO_INVALIDO' }
+    );
+});
