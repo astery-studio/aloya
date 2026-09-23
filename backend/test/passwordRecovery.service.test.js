@@ -48,3 +48,23 @@ test('mantém resposta neutra quando o e-mail não existe', async () => {
     assert.equal(chamadas.transacao.length, 0);
     assert.equal(chamadas.email.length, 0);
 });
+
+test('revoga link anterior e envia somente o novo token', async () => {
+    const usuario = { id: 7, email: 'carla@email.com' };
+    const { service, chamadas } = criarService(usuario);
+
+    const resposta = await service.solicitar(usuario.email);
+
+    assert.match(resposta.mensagem, /Se este e-mail estiver cadastrado/);
+    assert.equal(chamadas.transacao.length, 1);
+    assert.equal(chamadas.transacao[0][0].operacao, 'revogar');
+    assert.deepEqual(
+        chamadas.transacao[0][0].args.where,
+        { usuarioId: 7, statusLink: 'pendente' }
+    );
+    assert.equal(chamadas.transacao[0][1].operacao, 'criar');
+    assert.deepEqual(chamadas.email, [{
+        email: 'carla@email.com',
+        linkRedefinicao: 'aloya://reset-password?token=jwt'
+    }]);
+});
