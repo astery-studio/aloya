@@ -19,7 +19,25 @@ function criarService(usuario = null, recuperacao = null) {
             updateMany: (args) => ({ operacao: 'sessoes', args })
         },
         async $transaction(operacoes) {
-            chamadas.transacao.push(operacoes);
+            if (Array.isArray(operacoes)) {
+                chamadas.transacao.push(operacoes);
+                return;
+            }
+
+            const executadas = [];
+            await operacoes({
+                recuperacaoSenha: { async updateMany(args) {
+                    executadas.push({ operacao: 'usar', args });
+                    return { count: 1 };
+                } },
+                usuario: { async update(args) {
+                    executadas.push({ operacao: 'usuario', args });
+                } },
+                sessao: { async updateMany(args) {
+                    executadas.push({ operacao: 'sessoes', args });
+                } }
+            });
+            chamadas.transacao.push(executadas);
         }
     };
     const tokenService = {
@@ -86,10 +104,10 @@ test('redefine senha, utiliza o link e revoga sessões', async () => {
     const operacoes = chamadas.transacao[0];
     assert.deepEqual(
         operacoes.map(({ operacao }) => operacao),
-        ['usuario', 'usar', 'sessoes']
+        ['usar', 'usuario', 'sessoes']
     );
-    assert.equal(operacoes[0].args.data.senhaHash, 'hash-senha');
-    assert.equal(operacoes[1].args.data.statusLink, 'usado');
+    assert.equal(operacoes[0].args.data.statusLink, 'usado');
+    assert.equal(operacoes[1].args.data.senhaHash, 'hash-senha');
 });
 
 test('rejeita link expirado ou já utilizado', async () => {
