@@ -1,9 +1,11 @@
 //Mostra um painel para editar nome, e-mail ou data de nascimento. É usado nas configurações da conta
 import { useRef } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
-import { estilos } from './EditFieldSheet.style'
-import { BottomSheet } from '../Bottomsheet/BottomSheet'
+
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
+import { formatDate } from '../../../utils/date/formatDate'
+import { BottomSheet } from '../Bottomsheet/BottomSheet'
+import { estilos } from './EditFieldSheet.style'
 
 function obterDataVisivel(valor) {
     const texto = String(valor ?? '')
@@ -20,35 +22,6 @@ function obterDataVisivel(valor) {
     }
 
     return texto
-}
-
-function formatarDataDigitada(texto, valorAnterior) {
-    let numeros = texto.replace(/\D/g, '').slice(0, 8)
-
-    const apagouBarraFinal =
-        valorAnterior.endsWith('/')
-        && texto === valorAnterior.slice(0, -1)
-
-    if (apagouBarraFinal) {
-        numeros = numeros.slice(0, -1)
-    }
-
-    if (numeros.length < 2) {
-        return numeros
-    }
-
-    if (numeros.length < 4) {
-        return (
-            `${numeros.slice(0, 2)}/`
-            + numeros.slice(2)
-        )
-    }
-
-    return (
-        `${numeros.slice(0, 2)}/`
-        + `${numeros.slice(2, 4)}/`
-        + numeros.slice(4)
-    )
 }
 
 function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar }) {
@@ -68,18 +41,13 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
 
     function tratarMudanca(texto) {
         if (ehData) {
-            onAlterar(
-                formatarDataDigitada(
-                    texto,
-                    valorVisivel
-                )
-            )
+            onAlterar?.(formatDate(texto))
             return
         }
 
         const textoSemControle = texto.replace(/[\u0000-\u001F\u007F]/g, '')
 
-        onAlterar(textoSemControle)
+        onAlterar?.(textoSemControle)
     }
 
     return (
