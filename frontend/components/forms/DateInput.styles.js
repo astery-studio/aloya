@@ -14,11 +14,7 @@ const estilos = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10
     },
     focado: {
-        borderColor: cores.marca.primaria,
-        boxShadow: [{
-            offsetX: 0, offsetY: 0, blurRadius: 0, spreadDistance: 3,
-            color: 'rgba(200, 90, 68, 0.10)'
-        }]
+        borderColor: cores.marca.primaria
     },
     entrada: {
         ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro,
