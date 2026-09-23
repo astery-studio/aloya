@@ -1,4 +1,6 @@
 //Testa o hook que fornece o tema visual do aplicativo.
+//Existe para garantir que os componentes recebam o tema centralizado correto.
+
 import {
     renderHook
 } from '@testing-library/react-native'
@@ -7,9 +9,9 @@ import { useTheme } from '../hooks/useTheme'
 import { tema } from '../theme'
 
 describe('useTheme', () => {
-    test('retorna o tema centralizado da aplicação', () => {
+    test('retorna o tema centralizado da aplicação', async () => {
         const { result } =
-            renderHook(
+            await renderHook(
                 () => useTheme()
             )
 
@@ -18,9 +20,9 @@ describe('useTheme', () => {
         )
     })
 
-    test('retorna o objeto principal do tema protegido contra alterações', () => {
+    test('retorna o objeto principal do tema protegido contra alterações', async () => {
         const { result } =
-            renderHook(
+            await renderHook(
                 () => useTheme()
             )
 
