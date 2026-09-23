@@ -6,7 +6,6 @@ import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle
 
 import ButtonScreen from '../../components/common/Button/ButtonScreen'
 import { EditFieldSheet } from '../../components/feedback/EditFieldSheet/EditFieldSheet'
-import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../components/feedback/Modal/SimpleModal'
 import { DeleteAccount } from '../../features/settings/account/DeleteAccount'
 import { LogoutConfirmation } from '../../features/settings/account/LogoutConfirmation'
