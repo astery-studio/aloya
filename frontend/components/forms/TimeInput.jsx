@@ -41,3 +41,6 @@ export default function TimeInput({
         </View>
     );
 }
+/**
+ * Campo controlado que mascara horários e oferece remoção opcional.
+ */

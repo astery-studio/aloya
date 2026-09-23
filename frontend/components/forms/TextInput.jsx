@@ -49,3 +49,6 @@ function TextInput({
 }
 
 export default memo(TextInput);
+/**
+ * Campo textual controlado que concentra variantes, sanitização e ação lateral.
+ */

@@ -20,3 +20,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define a disposição e os estados visuais do campo de horário.
+ */

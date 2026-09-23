@@ -32,3 +32,6 @@ export default function RadioOption({
         </Pressable>
     );
 }
+/**
+ * Representa uma opção única selecionável com estado visual e acessibilidade.
+ */

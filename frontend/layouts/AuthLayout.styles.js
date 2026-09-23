@@ -41,3 +41,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define a estrutura visual compartilhada pelas telas de autenticação.
+ */

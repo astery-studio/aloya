@@ -29,3 +29,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Centraliza os estilos e variantes dos campos textuais reutilizáveis.
+ */

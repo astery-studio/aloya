@@ -38,3 +38,6 @@ function PasswordInput({
 }
 
 export default memo(PasswordInput);
+/**
+ * Especializa TextInput para senhas e controla a alternância de visibilidade.
+ */

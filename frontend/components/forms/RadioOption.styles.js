@@ -34,3 +34,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define os estados visuais normal, selecionado, pressionado e desativado da opção.
+ */

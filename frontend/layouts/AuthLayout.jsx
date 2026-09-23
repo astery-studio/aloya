@@ -49,3 +49,6 @@ export default function AuthLayout({
         </LinearGradient>
     );
 }
+/**
+ * Layout das telas de autenticação com área segura, gradiente e tratamento do teclado.
+ */

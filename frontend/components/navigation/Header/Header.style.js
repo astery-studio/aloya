@@ -56,3 +56,6 @@ const estilos = StyleSheet.create({
 })
 
 export { estilos }
+/**
+ * Define a apresentação do cabeçalho e de suas áreas interativas.
+ */

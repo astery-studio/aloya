@@ -27,3 +27,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define os estilos estruturais de rótulos e conteúdo do FormField.
+ */
