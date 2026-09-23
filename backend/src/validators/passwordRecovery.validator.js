@@ -48,8 +48,37 @@ function criarPasswordRecoveryValidator() {
         };
     }
 
+    function validarRedefinicao(body) {
+        const erros = [];
+        const token = typeof body.token === 'string'
+            ? body.token.trim()
+            : '';
+        const senha = typeof body.senha === 'string'
+            ? body.senha
+            : '';
+
+        if (!token) {
+            erros.push(
+                erro('token', 'Este link de redefinição é inválido ou já expirou. Solicite um novo.')
+            );
+        }
+
+        if (senha.length < 8) {
+            erros.push(
+                erro('senha', 'A senha deve possuir pelo menos 8 caracteres.')
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+            dados: { token, senha }
+        };
+    }
+
     return {
-        validarSolicitacao
+        validarSolicitacao,
+        validarRedefinicao
     };
 }
 
