@@ -117,6 +117,10 @@ const env = {
         'PARENTAL_CONSENT_BASE_URL' // A base do link que será enviado no e-mail do responsável legal
     ),
 
+    passwordResetBaseUrl:
+        process.env.PASSWORD_RESET_BASE_URL ||
+        'aloya://reset-password',
+
     // Agrupa as credenciais de e-mail necessárias
     smtp: {
         host: obterVariavelObrigatoria('SMTP_HOST'),
