@@ -1,4 +1,4 @@
-//Controla a tela completa de dados pessoais e suas edições temporárias.
+//Controla a tela completa de dados pessoais e seus fluxos de conta.
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
@@ -8,6 +8,8 @@ import ButtonScreen from '../../components/common/Button/ButtonScreen'
 import { EditFieldSheet } from '../../components/feedback/EditFieldSheet/EditFieldSheet'
 import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../components/feedback/Modal/SimpleModal'
+import { DeleteAccount } from '../../features/settings/account/DeleteAccount'
+import { LogoutConfirmation } from '../../features/settings/account/LogoutConfirmation'
 import { GenderSelector } from '../../features/settings/profile/GenderSelector'
 import { ProfileSettings } from '../../features/settings/profile/ProfileSettings'
 import { SettingsLayout } from '../../layouts/SettingsLayout/SettingsLayout'
@@ -37,37 +39,40 @@ function perfilEhValido(perfil) {
 }
 
 function obterAlteracoes(dadosOriginais, dadosAtuais) {
-    const alteracoes = {}
-
-    Object.keys(dadosAtuais).forEach(campo => {
+    return Object.keys(dadosAtuais).reduce((alteracoes, campo) => {
         if (dadosAtuais[campo] !== dadosOriginais[campo]) {
             alteracoes[campo] = dadosAtuais[campo]
         }
-    })
 
-    return alteracoes
+        return alteracoes
+    }, {})
 }
 
 function formatarDataParaEdicao(dataIso) {
     const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataIso ?? '')
-
     return partes ? `${partes[3]}/${partes[2]}/${partes[1]}` : ''
 }
 
 function converterDataParaIso(dataBrasileira) {
     const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dataBrasileira ?? '')
-
     return partes ? `${partes[3]}-${partes[2]}-${partes[1]}` : null
 }
 
 function obterDataAtualIso() {
     const agora = new Date()
     const dataLocal = new Date(agora.getTime() - agora.getTimezoneOffset() * 60000)
-
     return dataLocal.toISOString().slice(0, 10)
 }
 
-function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, onExcluirConta, onSair}) {
+function obterMensagemErroSalvar(erro) {
+    if (erro?.codigo === 'EMAIL_JA_CADASTRADO') {
+        return 'Este e-mail já está sendo utilizado.'
+    }
+
+    return 'Não foi possível atualizar seus dados. Verifique sua conexão e tente novamente.'
+}
+
+function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, excluirConta, encerrarSessao, onContaExcluida, onSessaoEncerrada}) {
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil))
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil))
     const [campoEditado, setCampoEditado] = useState(null)
@@ -77,7 +82,10 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
     const [salvando, setSalvando] = useState(false)
     const [sucessoVisivel, setSucessoVisivel] = useState(false)
     const [erroSalvarVisivel, setErroSalvarVisivel] = useState(false)
+    const [mensagemErroSalvar, setMensagemErroSalvar] = useState('')
     const [saidaSemSalvarVisivel, setSaidaSemSalvarVisivel] = useState(false)
+    const [exclusaoVisivel, setExclusaoVisivel] = useState(false)
+    const [logoutVisivel, setLogoutVisivel] = useState(false)
 
     useEffect(() => {
         if (!perfilEhValido(perfil)) {
@@ -85,7 +93,6 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         }
 
         const novosDados = copiarDadosPerfil(perfil)
-
         setDadosOriginais(novosDados)
         setDadosAtuais(novosDados)
     }, [perfil?.nome, perfil?.email, perfil?.dataNascimento, perfil?.identidadeGenero])
@@ -180,7 +187,8 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
             await onSalvar(Object.freeze({...alteracoes}))
             setDadosOriginais(dadosEnviados)
             setSucessoVisivel(true)
-        } catch {
+        } catch (erro) {
+            setMensagemErroSalvar(obterMensagemErroSalvar(erro))
             setErroSalvarVisivel(true)
         } finally {
             setSalvando(false)
@@ -205,14 +213,14 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
     const rodape = (
         <View style={estilos.rodape}>
             <Pressable
-                onPress={onExcluirConta}
-                disabled={salvando || typeof onExcluirConta !== 'function'}
+                onPress={() => setExclusaoVisivel(true)}
+                disabled={salvando || typeof excluirConta !== 'function'}
                 accessibilityRole="button"
                 accessibilityLabel="Apagar conta"
-                accessibilityState={{ disabled: salvando || typeof onExcluirConta !== 'function' }}
-                style={({ pressed }) => [
+                accessibilityState={{disabled: salvando || typeof excluirConta !== 'function'}}
+                style={({pressed}) => [
                     pressed && estilos.acaoPressionada,
-                    (salvando || typeof onExcluirConta !== 'function') && estilos.acaoDesabilitada
+                    (salvando || typeof excluirConta !== 'function') && estilos.acaoDesabilitada
                 ]}
             >
                 <Text style={estilos.acaoPerigo}>Apagar conta</Text>
@@ -221,14 +229,14 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
             <View style={estilos.separadorRodape} />
 
             <Pressable
-                onPress={onSair}
-                disabled={salvando || typeof onSair !== 'function'}
+                onPress={() => setLogoutVisivel(true)}
+                disabled={salvando || typeof encerrarSessao !== 'function'}
                 accessibilityRole="button"
                 accessibilityLabel="Sair"
-                accessibilityState={{ disabled: salvando || typeof onSair !== 'function' }}
-                style={({ pressed }) => [
+                accessibilityState={{disabled: salvando || typeof encerrarSessao !== 'function'}}
+                style={({pressed}) => [
                     pressed && estilos.acaoPressionada,
-                    (salvando || typeof onSair !== 'function') && estilos.acaoDesabilitada
+                    (salvando || typeof encerrarSessao !== 'function') && estilos.acaoDesabilitada
                 ]}
             >
                 <Text style={estilos.acaoNormal}>Sair</Text>
@@ -251,10 +259,11 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         return (
             <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
                 <View style={estilos.estadoTela}>
-                    <Text accessibilityRole="alert" style={estilos.erroEstado}>Não foi possível carregar os dados do perfil.</Text>
+                    <Text accessibilityRole="header" style={estilos.tituloErro}>Ocorreu um erro</Text>
+                    <Text accessibilityRole="alert" style={estilos.mensagemErro}>Não foi possível carregar suas configurações de perfil. Tente novamente.</Text>
 
                     {typeof onRecarregar === 'function' ? (
-                        <ButtonScreen texto="Tentar novamente" variante="verde" aoPressionar={onRecarregar} />
+                        <ButtonScreen texto="Tentar Novamente" variante="preto" aoPressionar={onRecarregar} estilo={estilos.botaoErro} />
                     ) : null}
                 </View>
             </SettingsLayout>
@@ -264,25 +273,12 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
     return (
         <>
             <SettingsLayout titulo="Configurações de Perfil" onVoltar={tentarVoltar} rodape={rodape}>
-                <ProfileSettings
-                    dados={dadosAtuais}
-                    onEditarCampo={abrirEdicao}
-                    onAlterarSenha={onAlterarSenha}
-                    onSalvar={salvarAlteracoes}
-                    podeSalvar={podeSalvar}
-                    salvando={salvando}
-                />
+                <ProfileSettings dados={dadosAtuais} onEditarCampo={abrirEdicao} onAlterarSenha={onAlterarSenha} onSalvar={salvarAlteracoes} podeSalvar={podeSalvar} salvando={salvando} />
             </SettingsLayout>
 
             <EditFieldSheet
                 visivel={campoEditado !== null}
-                titulo={
-                    campoEditado === 'email'
-                        ? 'Editar E-mail'
-                        : campoEditado === 'data'
-                            ? 'Editar Data de Nascimento'
-                            : 'Editar Nome'
-                }
+                titulo={campoEditado === 'email' ? 'Editar E-mail' : campoEditado === 'data' ? 'Editar Data de Nascimento' : 'Editar Nome'}
                 tipo={campoEditado ?? 'nome'}
                 valor={valorCampo}
                 onAlterar={setValorCampo}
@@ -292,22 +288,14 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 botaoSalvar={<ButtonScreen texto="Salvar" variante="verde" aoPressionar={confirmarEdicao} />}
             />
 
-            <GenderSelector
-                visivel={generoVisivel}
-                valorSelecionado={dadosAtuais.identidadeGenero}
-                onSelecionar={selecionarGenero}
-                onFechar={() => setGeneroVisivel(false)}
-            />
+            <GenderSelector visivel={generoVisivel} valorSelecionado={dadosAtuais.identidadeGenero} onSelecionar={selecionarGenero} onFechar={() => setGeneroVisivel(false)} />
 
             <SimpleModal
                 visivel={sucessoVisivel}
                 aoFechar={() => setSucessoVisivel(false)}
                 icone={LockKeyIcon}
                 titulo="Dados atualizados com sucesso"
-                acaoPrincipal={{
-                    texto: 'OK',
-                    aoPressionar: () => setSucessoVisivel(false)
-                }}
+                acaoPrincipal={{texto: 'OK', aoPressionar: () => setSucessoVisivel(false)}}
             />
 
             <SimpleModal
@@ -318,24 +306,15 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo="Dados não salvos"
                 mensagem="Você tem atualizações não salvas. Deseja mesmo sair?"
-                acaoPrincipal={{
-                    texto: 'Sair sem salvar',
-                    variante: 'branco',
-                    aoPressionar: sairSemSalvar
-                }}
-                acaoSecundaria={{
-                    texto: 'Continuar a editar',
-                    variante: 'verde',
-                    aoPressionar: () => setSaidaSemSalvarVisivel(false)
-                }}
+                acaoPrincipal={{texto: 'Sair sem salvar', variante: 'branco', aoPressionar: sairSemSalvar}}
+                acaoSecundaria={{texto: 'Continuar a editar', variante: 'verde', aoPressionar: () => setSaidaSemSalvarVisivel(false)}}
             />
 
-            <AlertModal
-                visivel={erroSalvarVisivel}
-                aoFechar={() => setErroSalvarVisivel(false)}
-                titulo="Não foi possível salvar"
-                mensagem="Verifique sua conexão e tente novamente."
-            />
+            <AlertModal visivel={erroSalvarVisivel} aoFechar={() => setErroSalvarVisivel(false)} titulo="Não foi possível salvar" mensagem={mensagemErroSalvar} />
+
+            <DeleteAccount visivel={exclusaoVisivel} onFechar={() => setExclusaoVisivel(false)} excluirConta={excluirConta} onContaExcluida={onContaExcluida} />
+
+            <LogoutConfirmation visivel={logoutVisivel} onFechar={() => setLogoutVisivel(false)} encerrarSessao={encerrarSessao} onSessaoEncerrada={onSessaoEncerrada} />
         </>
     )
 }
