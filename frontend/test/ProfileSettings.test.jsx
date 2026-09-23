@@ -1,32 +1,64 @@
 //Confere os campos, ações e estados do conteúdo das configurações de perfil.
-import { Pressable, Text } from 'react-native'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 
 jest.mock('phosphor-react-native/src/icons/LockKey', () => ({
     LockKeyIcon: jest.fn(() => null)
 }))
 
-jest.mock('../features/settings/profile/ProfileField', () => ({
-    ProfileField: jest.fn(({label, valor, onPress, desabilitado}) => (
-        <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={desabilitado}>
-            <Text>{valor ?? 'Não informado'}</Text>
-        </Pressable>
-    ))
-}))
+jest.mock('../features/settings/profile/ProfileField', () => {
+    const React = require('react')
+    const { Pressable, Text } = require('react-native')
 
-jest.mock('../components/common/NavigationField/NavigationField', () => ({
-    NavigationField: jest.fn(({label, onPress, desabilitado}) => (
-        <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={desabilitado}>
-            <Text>{label}</Text>
-        </Pressable>
-    ))
-}))
+    return {
+        ProfileField: jest.fn(({label, valor, onPress, desabilitado}) => React.createElement(
+            Pressable,
+            {
+                accessibilityRole: 'button',
+                accessibilityLabel: label,
+                onPress,
+                disabled: desabilitado
+            },
+            React.createElement(Text, null, valor ?? 'Não informado')
+        ))
+    }
+})
 
-jest.mock('../components/common/Button/ButtonScreen', () => jest.fn(({texto, aoPressionar, desativado, carregando}) => (
-    <Pressable accessibilityRole="button" accessibilityLabel={texto} onPress={aoPressionar} disabled={desativado || carregando}>
-        <Text>{texto}</Text>
-    </Pressable>
-)))
+jest.mock('../components/common/NavigationField/NavigationField', () => {
+    const React = require('react')
+    const { Pressable, Text } = require('react-native')
+
+    return {
+        NavigationField: jest.fn(({label, onPress, desabilitado}) => React.createElement(
+            Pressable,
+            {
+                accessibilityRole: 'button',
+                accessibilityLabel: label,
+                onPress,
+                disabled: desabilitado
+            },
+            React.createElement(Text, null, label)
+        ))
+    }
+})
+
+jest.mock('../components/common/Button/ButtonScreen', () => {
+    const React = require('react')
+    const { Pressable, Text } = require('react-native')
+
+    return {
+        __esModule: true,
+        default: jest.fn(({texto, aoPressionar, desativado, carregando}) => React.createElement(
+            Pressable,
+            {
+                accessibilityRole: 'button',
+                accessibilityLabel: texto,
+                onPress: aoPressionar,
+                disabled: desativado || carregando
+            },
+            React.createElement(Text, null, texto)
+        ))
+    }
+})
 
 import ButtonScreen from '../components/common/Button/ButtonScreen'
 import { NavigationField } from '../components/common/NavigationField/NavigationField'
@@ -78,6 +110,12 @@ describe('ProfileSettings', () => {
         fireEvent.press(screen.getByRole('button', { name: 'Alterar Senha' }))
 
         expect(onAlterarSenha).toHaveBeenCalledTimes(1)
+    })
+
+    test('usa a variante verde no botão de salvar', async () => {
+        await render(<ProfileSettings dados={dados} onSalvar={jest.fn()} podeSalvar />)
+
+        expect(ButtonScreen.mock.calls[0][0].variante).toBe('verde')
     })
 
     test('desabilita o salvamento sem alterações', async () => {
