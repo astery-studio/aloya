@@ -1,6 +1,13 @@
 //Testa conteúdo, fechamento e ações do AlertModal.
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import AlertModal from '../components/feedback/Modal/AlertModal';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
+jest.mock('phosphor-react-native/src/icons/WarningCircle', () => ({
+    WarningCircleIcon: jest.fn(() => null)
+}));
+
+import AlertModal from '../components/feedback/Modal/AlertModal';
 
 test('não mostra o conteúdo quando está oculto', async () => {
     await render(<AlertModal visivel={false} titulo="Erro" aoFechar={jest.fn()} />);
