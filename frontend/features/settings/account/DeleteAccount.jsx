@@ -1,20 +1,24 @@
-//Controla a confirmação por senha e a exclusão permanente da conta autenticada.
+//Controla a verificação da senha e a exclusão permanente da conta autenticada.
 import { useEffect, useState } from 'react'
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
+
 import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../../components/feedback/Modal/SimpleModal'
 import { tema } from '../../../theme'
 
-function DeleteAccount({visivel, onFechar, excluirConta, onContaExcluida}) {
+function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
     const [etapa, setEtapa] = useState('senha')
     const [senha, setSenha] = useState('')
     const [erroSenha, setErroSenha] = useState('')
+    const [acaoComErro, setAcaoComErro] = useState(null)
     const [carregando, setCarregando] = useState(false)
 
+    //Remove a senha da memória quando o fluxo é encerrado.
     function limparFluxo() {
         setEtapa('senha')
         setSenha('')
         setErroSenha('')
+        setAcaoComErro(null)
         setCarregando(false)
     }
 
@@ -24,6 +28,7 @@ function DeleteAccount({visivel, onFechar, excluirConta, onContaExcluida}) {
         }
     }, [visivel])
 
+    //Fecha o fluxo somente quando nenhuma requisição está em andamento.
     function fechar() {
         if (carregando) {
             return
@@ -33,15 +38,33 @@ function DeleteAccount({visivel, onFechar, excluirConta, onContaExcluida}) {
         onFechar?.()
     }
 
-    function continuar() {
-        if (!senha || carregando) {
+    //Confere a senha no backend antes de mostrar a confirmação final.
+    async function continuar() {
+        if (!senha || carregando || typeof confirmarSenhaExclusao !== 'function') {
             return
         }
 
+        setCarregando(true)
         setErroSenha('')
-        setEtapa('confirmacao')
+        setAcaoComErro(null)
+
+        try {
+            await confirmarSenhaExclusao({senhaAtual: senha})
+            setEtapa('confirmacao')
+        } catch (erro) {
+            if (erro?.codigo === 'SENHA_ATUAL_INCORRETA') {
+                setErroSenha('A senha atual está incorreta.')
+                setEtapa('senha')
+            } else {
+                setAcaoComErro('validacao')
+                setEtapa('erro')
+            }
+        } finally {
+            setCarregando(false)
+        }
     }
 
+    //Confirma a exclusão e permite que o backend verifique novamente a senha.
     async function confirmarExclusao() {
         if (typeof excluirConta !== 'function' || carregando) {
             return
@@ -49,6 +72,7 @@ function DeleteAccount({visivel, onFechar, excluirConta, onContaExcluida}) {
 
         setCarregando(true)
         setErroSenha('')
+        setAcaoComErro(null)
 
         try {
             const resultado = await excluirConta({senhaAtual: senha})
@@ -57,14 +81,25 @@ function DeleteAccount({visivel, onFechar, excluirConta, onContaExcluida}) {
             onContaExcluida?.(resultado)
         } catch (erro) {
             if (erro?.codigo === 'SENHA_ATUAL_INCORRETA') {
-                setErroSenha('A senha atual está incorreta.')
+                setErroSenha('A senha foi alterada. Digite sua senha atual novamente.')
                 setEtapa('senha')
             } else {
+                setAcaoComErro('exclusao')
                 setEtapa('erro')
             }
         } finally {
             setCarregando(false)
         }
+    }
+
+    //Repete somente a operação que apresentou erro.
+    function tentarNovamente() {
+        if (acaoComErro === 'validacao') {
+            continuar()
+            return
+        }
+
+        confirmarExclusao()
     }
 
     return (
@@ -117,13 +152,13 @@ function DeleteAccount({visivel, onFechar, excluirConta, onContaExcluida}) {
                 aoFechar={fechar}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.feedback.erro}
-                fundoIcone={tema.cores.icones.anticoncepcionais.vermelho.caixa}
+                fundoIcone={tema.cores.neutras.bordaClara}
                 titulo="Algo deu errado"
-                mensagem="Não foi possível excluir sua conta. Nenhum dado foi alterado. Tente novamente."
+                mensagem="Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente."
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
-                    aoPressionar: confirmarExclusao,
+                    aoPressionar: tentarNovamente,
                     carregando
                 }}
                 acaoSecundaria={{
