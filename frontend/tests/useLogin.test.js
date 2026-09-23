@@ -29,4 +29,7 @@ test('expõe uma mensagem segura quando o login falha', async () => {
     expect(result.current).toMatchObject({ carregando: false, sucesso: false });
     expect(result.current.erro).toBe('Credenciais inválidas.');
     expect(salvarToken).not.toHaveBeenCalled();
+
+    await act(() => result.current.limparErro());
+    expect(result.current.erro).toBeNull();
 });

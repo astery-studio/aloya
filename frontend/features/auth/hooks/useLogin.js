@@ -24,7 +24,11 @@ function useLogin({ realizarLogin }) {
         }
     }
 
-    return { carregando, erro, sucesso, enviarLogin };
+    function limparErro() {
+        setErro(null);
+    }
+
+    return { carregando, erro, sucesso, enviarLogin, limparErro };
 }
 
 export { useLogin };

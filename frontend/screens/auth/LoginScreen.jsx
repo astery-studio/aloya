@@ -15,7 +15,7 @@ export default function LoginScreen({
 }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-    const { carregando, erro, enviarLogin } = useLogin({ realizarLogin });
+    const { carregando, erro, enviarLogin, limparErro } = useLogin({ realizarLogin });
     const valido = isValidEmail(email) && Boolean(senha);
 
     async function enviar() {
@@ -40,8 +40,8 @@ export default function LoginScreen({
             <Pressable onPress={aoRecuperarSenha}><Text style={estilos.link}>Esqueceu a senha?</Text></Pressable>
             <Button texto="Entrar" aoPressionar={enviar} desativado={!valido} carregando={carregando} />
         </AuthLayout>
-        <SimpleModal visivel={Boolean(erro)} icone={LockKey}
+        <SimpleModal visivel={Boolean(erro)} aoFechar={limparErro} icone={LockKey}
             titulo="Não foi possível entrar" mensagem={erro}
-            acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: enviar }} />
+            acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparErro }} />
     </>;
 }

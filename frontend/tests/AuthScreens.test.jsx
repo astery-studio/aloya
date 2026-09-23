@@ -19,6 +19,19 @@ test('login inicia desativado e envia as credenciais preenchidas', async () => {
     }));
 });
 
+test('tentar novamente fecha o erro sem repetir as credenciais', async () => {
+    const realizarLogin = jest.fn().mockRejectedValue(new Error('Credenciais inválidas.'));
+    await render(<LoginScreen realizarLogin={realizarLogin} />);
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), 'incorreta');
+    await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
+    await screen.findByText('Não foi possível entrar');
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(realizarLogin).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Não foi possível entrar')).toBeNull();
+    expect(screen.getByLabelText('Email').props.value).toBe('pessoa@email.com');
+});
+
 test('recuperação só permite envio com e-mail válido', async () => {
     const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
     await render(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);
