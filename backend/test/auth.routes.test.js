@@ -8,6 +8,7 @@ import {
 function criarDependencias() {
     function cadastrar() {}
     function realizarLogin() {}
+    function verificarEmail() {}
     function consultarStatusConsentimento() {}
     function solicitarConsentimento() {}
     function reenviarConsentimento() {}
@@ -21,6 +22,7 @@ function criarDependencias() {
         authController: {
             cadastrar,
             realizarLogin,
+            verificarEmail,
             consultarStatusConsentimento,
             solicitarConsentimento,
             reenviarConsentimento,
@@ -156,5 +158,20 @@ test('mantém pública somente a confirmação por token', () => {
                 dependencias.authMiddleware.autenticar
         ),
         false
+    );
+});
+
+test('protege a verificação de e-mail com rate limit', () => {
+    const dependencias = criarDependencias();
+    const router = criarAuthRoutes(dependencias);
+    const rota = buscarRota(router, '/email-availability');
+
+    assert.equal(rota.methods.post, true);
+    assert.deepEqual(
+        rota.stack.map((camada) => camada.handle),
+        [
+            dependencias.cadastroRateLimit,
+            dependencias.authController.verificarEmail
+        ]
     );
 });

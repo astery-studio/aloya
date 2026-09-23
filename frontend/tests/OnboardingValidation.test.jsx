@@ -23,6 +23,22 @@ test('cadastro explica quando o nome tem menos de três caracteres', async () =>
     expect(cadastrar).not.toHaveBeenCalled();
 });
 
+test('cadastro não avança quando o e-mail já existe', async () => {
+    const verificarEmailDisponivel = jest.fn().mockResolvedValue({ disponivel: false });
+    await render(<OnboardingScreen cadastrar={jest.fn()}
+        verificarEmailDisponivel={verificarEmailDisponivel} />);
+
+    await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'carla@email.com');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), 'segredo');
+    await fireEvent.changeText(screen.getByLabelText('Confirmar senha'), 'segredo');
+    await fireEvent.press(screen.getByRole('checkbox'));
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    expect(await screen.findByText('E-mail já cadastrado')).toBeTruthy();
+    expect(screen.getByLabelText('Email')).toBeTruthy();
+});
+
 test('cadastro envia a duração lútea como número, sem o evento do botão', async () => {
     const cadastrar = jest.fn().mockResolvedValue({
         autenticacao: { token: 'jwt', tipo: 'Bearer' }
