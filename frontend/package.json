@@ -4,16 +4,23 @@
   "main": "index.js",
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
+<<<<<<< HEAD
     "expo": "~57.0.24",
     "expo-font": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "jest-expo": "~57.0.5",
+=======
+    "expo": "~57.0.22",
+    "expo-font": "~57.0.4",
+    "expo-status-bar": "~57.0.1",
+>>>>>>> 59ec37659ac8f1bd1b2499ea20c917bb90159d20
     "phosphor-react-native": "^3.0.6",
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-svg": "15.15.4"
   },
   "scripts": {
+    "test": "jest --runInBand",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -22,6 +29,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --runInBand"
   },
+<<<<<<< HEAD
   "jest": {
     "preset": "jest-expo",
     "collectCoverageFrom": [
@@ -42,5 +50,15 @@
     "@testing-library/react-native": "^14.0.1",
     "jest-expo": "^57.0.4",
     "react-test-renderer": "^19.2.3"
+=======
+  "private": true,
+  "devDependencies": {
+    "@testing-library/react-native": "^14.0.1",
+    "jest": "~29.7.0",
+    "jest-expo": "~57.0.5"
+  },
+  "jest": {
+    "preset": "jest-expo"
+>>>>>>> 59ec37659ac8f1bd1b2499ea20c917bb90159d20
   }
 }
