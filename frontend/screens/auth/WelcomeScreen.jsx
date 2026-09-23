@@ -16,3 +16,6 @@ export default function WelcomeScreen({ aoCriarConta, aoEntrar, logo }) {
         </SafeAreaView>
     );
 }
+/**
+ * Tela inicial que encaminha a pessoa para criação de conta ou login.
+ */

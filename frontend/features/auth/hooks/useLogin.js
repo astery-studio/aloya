@@ -42,3 +42,6 @@ function useLogin({ realizarLogin }) {
 }
 
 export { useLogin };
+/**
+ * Hook que controla carregamento, erros, sucesso e persistência da sessão de login.
+ */

@@ -26,3 +26,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define a composição visual da tela inicial de autenticação.
+ */

@@ -60,3 +60,6 @@ export default function LoginScreen({
             acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }} />
     </>;
 }
+/**
+ * Tela de login que valida credenciais, aciona autenticação e apresenta erros.
+ */

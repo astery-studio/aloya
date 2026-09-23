@@ -46,3 +46,6 @@ export default function ForgotPasswordScreen({
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
 }
+/**
+ * Tela que solicita e permite reenviar instruções de recuperação por e-mail.
+ */

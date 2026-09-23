@@ -46,3 +46,6 @@ export default function ResetPasswordScreen({
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
 }
+/**
+ * Tela que confirma uma nova senha usando o token de recuperação recebido.
+ */

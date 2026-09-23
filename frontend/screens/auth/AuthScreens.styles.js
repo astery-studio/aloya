@@ -25,3 +25,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Centraliza estilos compartilhados pelas telas de autenticação.
+ */

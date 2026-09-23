@@ -46,3 +46,6 @@ function useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao }) {
 }
 
 export { useForgotPassword };
+/**
+ * Hook que controla solicitação e reenvio do e-mail de recuperação de senha.
+ */

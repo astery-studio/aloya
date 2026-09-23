@@ -25,3 +25,6 @@ function useKeyboard() {
 }
 
 export { useKeyboard };
+/**
+ * Hook que acompanha visibilidade e altura do teclado e remove seus listeners ao desmontar.
+ */
