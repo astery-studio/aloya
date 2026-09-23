@@ -31,7 +31,7 @@ function paraIso(data) {
 
 export default function OnboardingScreen({
     cadastrar, verificarEmailDisponivel, aoVoltar, aoEntrar, aoConcluir, logo,
-    renderizarCalendario, renderizarSeletorCiclo,
+    renderizarSeletorCiclo,
     renderizarSeletorMenstruacao, renderizarSeletorLutea
 }) {
     const [etapa, setEtapa] = useState(0);
@@ -131,7 +131,7 @@ export default function OnboardingScreen({
         aoAlterar={(dataNascimento) => alterar({ dataNascimento })} aoAvancar={avancarNascimento} />;
     if (etapa === 2) conteudo = <LastMenstruationStep {...comum}
         valor={dados.ultimaMenstruacao} aoAlterar={(ultimaMenstruacao) => alterar({ ultimaMenstruacao })}
-        aoAvancar={avancarMenstruacao} renderizarCalendario={renderizarCalendario} />;
+        aoAvancar={avancarMenstruacao} />;
     if (etapa === 3) conteudo = <CycleLengthStep {...comum} valor={dados.duracaoCiclo}
         aoAlterar={(duracaoCiclo) => alterar({ duracaoCiclo })} aoAvancar={avancar}
         aoPular={() => { alterar({ duracaoCiclo: null }); avancar(); }} renderizarSeletor={renderizarSeletorCiclo} />;
