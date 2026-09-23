@@ -1,3 +1,6 @@
+/**
+ * Reúne operações de conta e autenticação consumidas pelas telas.
+ */
 //Reúne as operações de autenticação do aplicativo.
 // Existe para que login, recuperação de senha e logout compartilhem o mesmo serviço, em vez de ficarem duplicados.
 
@@ -59,6 +62,3 @@ function criarAuthService({
 }
 
 export { criarAuthService }
-/**
- * Reúne operações de conta e autenticação consumidas pelas telas.
- */
