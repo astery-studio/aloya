@@ -69,6 +69,7 @@ function ProfileSettings({dados, onEditarCampo, onAlterarSenha, onSalvar, podeSa
 
             <ButtonScreen
                 texto="Salvar alterações"
+                variante="verde"
                 aoPressionar={onSalvar}
                 desativado={!podeSalvar || camposBloqueados}
                 carregando={salvando}
