@@ -88,13 +88,22 @@ function criarPasswordRecoveryService({
         const { senhaHash } = await passwordService.gerarHash(senha);
         const usadoEm = now();
 
-        await prisma.$transaction([
-            prisma.usuario.update({ where: { id: recuperacao.usuarioId }, data: { senhaHash } }),
-            prisma.recuperacaoSenha.update({ where: { id: recuperacao.id },
-                data: { statusLink: 'usado', usadoEm } }),
-            prisma.sessao.updateMany({ where: { usuarioId: recuperacao.usuarioId, revogadaEm: null },
-                data: { revogadaEm: usadoEm } })
-        ]);
+        await prisma.$transaction(async (tx) => {
+            const consumo = await tx.recuperacaoSenha.updateMany({
+                where: { id: recuperacao.id, statusLink: 'pendente' },
+                data: { statusLink: 'usado', usadoEm }
+            });
+
+            if (consumo.count !== 1) throw erroLinkInvalido();
+
+            await tx.usuario.update({
+                where: { id: recuperacao.usuarioId }, data: { senhaHash }
+            });
+            await tx.sessao.updateMany({
+                where: { usuarioId: recuperacao.usuarioId, revogadaEm: null },
+                data: { revogadaEm: usadoEm }
+            });
+        });
 
         return { mensagem: 'Senha redefinida com sucesso. Faça login com sua nova senha.' };
     }
