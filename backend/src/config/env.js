@@ -29,7 +29,7 @@ const cadastroRateLimitJanelaMs = Number(
 );
 
 const cadastroRateLimitMaximo = Number(
-    process.env.CADASTRO_RATE_LIMIT_MAXIMO || 5
+    process.env.CADASTRO_RATE_LIMIT_MAXIMO || 20
 );
 
 const loginRateLimitJanelaMs = Number(
