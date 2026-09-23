@@ -1,14 +1,18 @@
 //Controla a tela completa de dados pessoais e suas edições temporárias.
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
+import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
+import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
 
 import ButtonScreen from '../../components/common/Button/ButtonScreen'
-import { DatePickerSheet } from '../../components/feedback/DatePickerSheet/DatePickerSheet'
 import { EditFieldSheet } from '../../components/feedback/EditFieldSheet/EditFieldSheet'
+import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal'
+import SimpleModal from '../../components/feedback/Modal/SimpleModal'
 import { GenderSelector } from '../../features/settings/profile/GenderSelector'
 import { ProfileSettings } from '../../features/settings/profile/ProfileSettings'
 import { SettingsLayout } from '../../layouts/SettingsLayout/SettingsLayout'
 import { tema } from '../../theme'
+import { isValidDate } from '../../utils/validation/isValidDate'
 import { isValidEmail } from '../../utils/validation/isValidEmail'
 import { estilos } from './ProfileSettingsScreen.style'
 
@@ -44,6 +48,18 @@ function obterAlteracoes(dadosOriginais, dadosAtuais) {
     return alteracoes
 }
 
+function formatarDataParaEdicao(dataIso) {
+    const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataIso ?? '')
+
+    return partes ? `${partes[3]}/${partes[2]}/${partes[1]}` : ''
+}
+
+function converterDataParaIso(dataBrasileira) {
+    const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dataBrasileira ?? '')
+
+    return partes ? `${partes[3]}-${partes[2]}-${partes[1]}` : null
+}
+
 function obterDataAtualIso() {
     const agora = new Date()
     const dataLocal = new Date(agora.getTime() - agora.getTimezoneOffset() * 60000)
@@ -54,14 +70,14 @@ function obterDataAtualIso() {
 function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, onExcluirConta, onSair}) {
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil))
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil))
-    const [campoTexto, setCampoTexto] = useState(null)
+    const [campoEditado, setCampoEditado] = useState(null)
     const [valorCampo, setValorCampo] = useState('')
     const [erroCampo, setErroCampo] = useState('')
     const [generoVisivel, setGeneroVisivel] = useState(false)
-    const [dataVisivel, setDataVisivel] = useState(false)
     const [salvando, setSalvando] = useState(false)
-    const [erroSalvar, setErroSalvar] = useState('')
-    const [mensagem, setMensagem] = useState('')
+    const [sucessoVisivel, setSucessoVisivel] = useState(false)
+    const [erroSalvarVisivel, setErroSalvarVisivel] = useState(false)
+    const [saidaSemSalvarVisivel, setSaidaSemSalvarVisivel] = useState(false)
 
     useEffect(() => {
         if (!perfilEhValido(perfil)) {
@@ -72,8 +88,6 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
 
         setDadosOriginais(novosDados)
         setDadosAtuais(novosDados)
-        setErroSalvar('')
-        setMensagem('')
     }, [perfil?.nome, perfil?.email, perfil?.dataNascimento, perfil?.identidadeGenero])
 
     const alteracoes = obterAlteracoes(dadosOriginais, dadosAtuais)
@@ -85,8 +99,7 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
             return
         }
 
-        setErroSalvar('')
-        setMensagem('')
+        setErroCampo('')
 
         if (campo === 'identidadeGenero') {
             setGeneroVisivel(true)
@@ -94,62 +107,65 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         }
 
         if (campo === 'dataNascimento') {
-            setDataVisivel(true)
+            setCampoEditado('data')
+            setValorCampo(formatarDataParaEdicao(dadosAtuais.dataNascimento))
             return
         }
 
-        setCampoTexto(campo)
+        setCampoEditado(campo)
         setValorCampo(dadosAtuais[campo])
-        setErroCampo('')
     }
 
-    function fecharEdicaoTexto() {
-        setCampoTexto(null)
+    function fecharEdicao() {
+        setCampoEditado(null)
         setValorCampo('')
         setErroCampo('')
     }
 
-    function confirmarEdicaoTexto() {
+    function confirmarEdicao() {
         const valorNormalizado = valorCampo.trim()
 
-        if (campoTexto === 'nome') {
+        if (campoEditado === 'nome') {
             const nomeValido = valorNormalizado.length >= 3 && valorNormalizado.length <= 120 && regexNome.test(valorNormalizado)
 
             if (!nomeValido) {
                 setErroCampo('Informe um nome válido usando apenas letras, espaços ou hífens.')
                 return
             }
-        }
 
-        if (campoTexto === 'email' && !isValidEmail(valorNormalizado)) {
-            setErroCampo('Informe um e-mail válido.')
+            setDadosAtuais(dadosAnteriores => ({...dadosAnteriores, nome: valorNormalizado}))
+            fecharEdicao()
             return
         }
 
-        const valorFinal = campoTexto === 'email' ? valorNormalizado.toLowerCase() : valorNormalizado
+        if (campoEditado === 'email') {
+            if (!isValidEmail(valorNormalizado)) {
+                setErroCampo('Informe um e-mail válido.')
+                return
+            }
 
-        setDadosAtuais(dadosAnteriores => ({...dadosAnteriores, [campoTexto]: valorFinal}))
-        fecharEdicaoTexto()
+            setDadosAtuais(dadosAnteriores => ({...dadosAnteriores, email: valorNormalizado.toLowerCase()}))
+            fecharEdicao()
+            return
+        }
+
+        const dataIso = converterDataParaIso(valorNormalizado)
+        const dataValida = isValidDate(valorNormalizado) && dataIso !== null && dataIso <= obterDataAtualIso()
+
+        if (!dataValida) {
+            setErroCampo('Informe uma data de nascimento válida.')
+            return
+        }
+
+        setDadosAtuais(dadosAnteriores => ({...dadosAnteriores, dataNascimento: dataIso}))
+        fecharEdicao()
     }
 
-    //Recebe a identidade escolhida, atualiza o rascunho e fecha o painel.
     function selecionarGenero(identidadeGenero) {
         setDadosAtuais(dadosAnteriores => ({...dadosAnteriores, identidadeGenero}))
         setGeneroVisivel(false)
-        setErroSalvar('')
-        setMensagem('')
     }
 
-    //Recebe uma data ISO do calendário e atualiza o rascunho.
-    async function selecionarData(dataNascimento) {
-        setDadosAtuais(dadosAnteriores => ({...dadosAnteriores, dataNascimento}))
-        setErroSalvar('')
-        setMensagem('')
-
-        return true
-    }
-
-    //Envia somente os campos alterados e bloqueia envios duplicados.
     async function salvarAlteracoes() {
         if (!podeSalvar) {
             return
@@ -158,18 +174,32 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         const dadosEnviados = {...dadosAtuais}
 
         setSalvando(true)
-        setErroSalvar('')
-        setMensagem('')
+        setErroSalvarVisivel(false)
 
         try {
             await onSalvar(Object.freeze({...alteracoes}))
             setDadosOriginais(dadosEnviados)
-            setMensagem('Dados atualizados com sucesso.')
+            setSucessoVisivel(true)
         } catch {
-            setErroSalvar('Não foi possível salvar suas alterações. Tente novamente.')
+            setErroSalvarVisivel(true)
         } finally {
             setSalvando(false)
         }
+    }
+
+    function tentarVoltar() {
+        if (possuiAlteracoes) {
+            setSaidaSemSalvarVisivel(true)
+            return
+        }
+
+        onVoltar?.()
+    }
+
+    function sairSemSalvar() {
+        setDadosAtuais({...dadosOriginais})
+        setSaidaSemSalvarVisivel(false)
+        onVoltar?.()
     }
 
     const rodape = (
@@ -224,7 +254,7 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                     <Text accessibilityRole="alert" style={estilos.erroEstado}>Não foi possível carregar os dados do perfil.</Text>
 
                     {typeof onRecarregar === 'function' ? (
-                        <ButtonScreen texto="Tentar novamente" aoPressionar={onRecarregar} />
+                        <ButtonScreen texto="Tentar novamente" variante="verde" aoPressionar={onRecarregar} />
                     ) : null}
                 </View>
             </SettingsLayout>
@@ -233,32 +263,33 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
 
     return (
         <>
-            <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar} rodape={rodape}>
-                <View style={estilos.conteudo}>
-                    {erroSalvar ? <Text accessibilityRole="alert" style={estilos.erro}>{erroSalvar}</Text> : null}
-                    {mensagem ? <Text accessibilityLiveRegion="polite" style={estilos.sucesso}>{mensagem}</Text> : null}
-
-                    <ProfileSettings
-                        dados={dadosAtuais}
-                        onEditarCampo={abrirEdicao}
-                        onAlterarSenha={onAlterarSenha}
-                        onSalvar={salvarAlteracoes}
-                        podeSalvar={podeSalvar}
-                        salvando={salvando}
-                    />
-                </View>
+            <SettingsLayout titulo="Configurações de Perfil" onVoltar={tentarVoltar} rodape={rodape}>
+                <ProfileSettings
+                    dados={dadosAtuais}
+                    onEditarCampo={abrirEdicao}
+                    onAlterarSenha={onAlterarSenha}
+                    onSalvar={salvarAlteracoes}
+                    podeSalvar={podeSalvar}
+                    salvando={salvando}
+                />
             </SettingsLayout>
 
             <EditFieldSheet
-                visivel={campoTexto !== null}
-                titulo={campoTexto === 'email' ? 'Editar E-mail' : 'Editar Nome'}
-                tipo={campoTexto ?? 'nome'}
+                visivel={campoEditado !== null}
+                titulo={
+                    campoEditado === 'email'
+                        ? 'Editar E-mail'
+                        : campoEditado === 'data'
+                            ? 'Editar Data de Nascimento'
+                            : 'Editar Nome'
+                }
+                tipo={campoEditado ?? 'nome'}
                 valor={valorCampo}
                 onAlterar={setValorCampo}
-                onFechar={fecharEdicaoTexto}
+                onFechar={fecharEdicao}
                 erro={erroCampo}
                 salvando={salvando}
-                botaoSalvar={<ButtonScreen texto="Salvar" aoPressionar={confirmarEdicaoTexto} />}
+                botaoSalvar={<ButtonScreen texto="Salvar" variante="verde" aoPressionar={confirmarEdicao} />}
             />
 
             <GenderSelector
@@ -268,14 +299,42 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 onFechar={() => setGeneroVisivel(false)}
             />
 
-            <DatePickerSheet
-                visivel={dataVisivel}
-                titulo="Data de Nascimento"
-                valorSelecionado={dadosAtuais.dataNascimento}
-                dataMinima="1900-01-01"
-                dataMaxima={obterDataAtualIso()}
-                onSelecionar={selecionarData}
-                onFechar={() => setDataVisivel(false)}
+            <SimpleModal
+                visivel={sucessoVisivel}
+                aoFechar={() => setSucessoVisivel(false)}
+                icone={LockKeyIcon}
+                titulo="Dados atualizados com sucesso"
+                acaoPrincipal={{
+                    texto: 'OK',
+                    aoPressionar: () => setSucessoVisivel(false)
+                }}
+            />
+
+            <SimpleModal
+                visivel={saidaSemSalvarVisivel}
+                aoFechar={() => setSaidaSemSalvarVisivel(false)}
+                icone={WarningCircleIcon}
+                corIcone={tema.cores.marca.primaria}
+                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                titulo="Dados não salvos"
+                mensagem="Você tem atualizações não salvas. Deseja mesmo sair?"
+                acaoPrincipal={{
+                    texto: 'Sair sem salvar',
+                    variante: 'branco',
+                    aoPressionar: sairSemSalvar
+                }}
+                acaoSecundaria={{
+                    texto: 'Continuar a editar',
+                    variante: 'verde',
+                    aoPressionar: () => setSaidaSemSalvarVisivel(false)
+                }}
+            />
+
+            <AlertModal
+                visivel={erroSalvarVisivel}
+                aoFechar={() => setErroSalvarVisivel(false)}
+                titulo="Não foi possível salvar"
+                mensagem="Verifique sua conexão e tente novamente."
             />
         </>
     )
