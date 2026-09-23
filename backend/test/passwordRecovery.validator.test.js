@@ -88,3 +88,26 @@ test(
         );
     }
 );
+
+test('aceita token e nova senha válidos', () => {
+    const resultado = criarValidator().validarRedefinicao({
+        token: 'jwt-valido',
+        senha: 'nova-senha'
+    });
+
+    assert.deepEqual(resultado, {
+        valido: true,
+        erros: [],
+        dados: { token: 'jwt-valido', senha: 'nova-senha' }
+    });
+});
+
+test('rejeita token ausente e senha curta', () => {
+    const resultado = criarValidator().validarRedefinicao({ senha: '123' });
+
+    assert.equal(resultado.valido, false);
+    assert.deepEqual(
+        resultado.erros.map(({ campo }) => campo),
+        ['token', 'senha']
+    );
+});
