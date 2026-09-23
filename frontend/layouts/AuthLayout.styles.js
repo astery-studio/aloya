@@ -3,13 +3,12 @@ import { cores, espacamentos, typography } from '../theme';
 
 const estilos = StyleSheet.create({
     tela: {
-        flex: 1,
-        backgroundColor: cores.neutras.fundoClaro
+        flex: 1
     },
     flexivel: { flex: 1 },
     rolagem: {
         flexGrow: 1,
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         paddingHorizontal: espacamentos.grande,
         paddingTop: espacamentos.extraGrande,
         paddingBottom: espacamentos.grande,
@@ -19,14 +18,17 @@ const estilos = StyleSheet.create({
         width: '100%',
         gap: espacamentos.extraGrande
     },
-    cabecalho: { gap: espacamentos.pequeno },
+    voltar: { position: 'absolute', left: 24, top: 24, zIndex: 1 },
+    cabecalho: { alignItems: 'center', gap: espacamentos.pequeno },
     titulo: {
         ...typography.h1,
-        color: cores.neutras.textoPrincipalClaro
+        color: cores.neutras.textoPrincipalClaro,
+        textAlign: 'center'
     },
     descricao: {
         ...typography.bodyDefault,
-        color: cores.neutras.textoSecundarioClaro
+        color: cores.neutras.textoSecundarioClaro,
+        textAlign: 'center'
     },
     formulario: {
         width: '100%',

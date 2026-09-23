@@ -1,14 +1,19 @@
 import {
-    KeyboardAvoidingView, Platform, ScrollView, Text, View
+    KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ArrowLeft } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { cores } from '../theme';
 import { estilos } from './AuthLayout.styles';
 
 export default function AuthLayout({
-    titulo, descricao, children, rodape, testeId = 'auth-layout'
+    titulo, descricao, children, rodape, aoVoltar, testeId = 'auth-layout'
 }) {
     return (
-        <SafeAreaView style={estilos.tela} testID={testeId}>
+        <LinearGradient colors={['#F5EDE3', '#F7F5F0']}
+            locations={[0.04, 0.55]} style={estilos.tela}>
+        <SafeAreaView style={estilos.flexivel} testID={testeId}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 style={estilos.flexivel}
@@ -17,6 +22,12 @@ export default function AuthLayout({
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={estilos.rolagem}
                 >
+                    {aoVoltar ? (
+                        <Pressable accessibilityLabel="Voltar" onPress={aoVoltar}
+                            hitSlop={12} style={estilos.voltar}>
+                            <ArrowLeft size={24} color={cores.neutras.textoSecundarioClaro} />
+                        </Pressable>
+                    ) : null}
                     <View style={estilos.conteudo}>
                         <View style={estilos.cabecalho}>
                             <Text accessibilityRole="header" style={estilos.titulo}>
@@ -32,5 +43,6 @@ export default function AuthLayout({
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
+        </LinearGradient>
     );
 }
