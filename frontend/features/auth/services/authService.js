@@ -25,6 +25,20 @@ function criarAuthService({
         });
     }
 
+    function solicitarRecuperacao({ email }) {
+        return requisicao({ metodo: 'POST', caminho: endpoints.solicitarRecuperacao,
+            corpo: { email } });
+    }
+
+    function validarTokenRecuperacao(token) {
+        return requisicao({ caminho: `${endpoints.validarRecuperacao}/${encodeURIComponent(token)}` });
+    }
+
+    function redefinirSenha({ token, senha }) {
+        return requisicao({ metodo: 'POST', caminho: endpoints.redefinirSenha,
+            corpo: { token, senha } });
+    }
+
     async function encerrarSessao() {
         const resposta = await requisicaoAutenticada({
             metodo: 'POST',
@@ -40,7 +54,8 @@ function criarAuthService({
         await removerCredencialLocal()
     }
 
-    return { cadastrar, realizarLogin, verificarEmailDisponivel, encerrarSessao }
+    return { cadastrar, realizarLogin, verificarEmailDisponivel,
+        solicitarRecuperacao, validarTokenRecuperacao, redefinirSenha, encerrarSessao }
 }
 
 export { criarAuthService }
