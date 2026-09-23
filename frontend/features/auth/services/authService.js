@@ -117,7 +117,7 @@ function criarAuthService({requisicao, requisicaoAutenticada, removerCredencialL
                 caminho: endpoints.logout
             })
 
-            return resposta?.status === 204
+            return resposta === null || resposta?.status === 204
         } catch {
             return false
         }
