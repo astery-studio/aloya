@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import TextInput from './TextInput';
 
 function sanitizarEmail(texto) {
@@ -5,7 +6,7 @@ function sanitizarEmail(texto) {
 }
 
 // Recebe as opções de e-mail, remove espaços e devolve o valor ao formulário.
-export default function EmailInput({
+function EmailInput({
     label = 'Email', placeholder = 'Email', ...props
 }) {
     return (
@@ -21,3 +22,5 @@ export default function EmailInput({
         />
     );
 }
+
+export default memo(EmailInput);

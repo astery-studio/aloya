@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Text, TextInput as EntradaNativa, View } from 'react-native';
 import { cores } from '../../theme';
 import { estilos } from './TextInput.styles';
@@ -5,7 +6,7 @@ import { estilos } from './TextInput.styles';
 const manterTexto = (texto) => texto;
 
 // Recebe as opções do campo, mostra a entrada e devolve o texto tratado ao formulário.
-export default function TextInput({
+function TextInput({
     label, placeholder, value, onChangeText, variante = 'padrao',
     desativado = false, acaoDireita, estilo, sanitizar = manterTexto,
     ...outrasProps
@@ -46,3 +47,5 @@ export default function TextInput({
         </View>
     );
 }
+
+export default memo(TextInput);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CalendarBlank, WarningCircle } from 'phosphor-react-native';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
 import AccountStep from '../../features/onboarding/components/AccountStep';
@@ -35,7 +35,9 @@ export default function OnboardingScreen({
     const [dados, setDados] = useState(iniciais);
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
-    const alterar = (mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca }));
+    const alterar = useCallback(
+        (mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []
+    );
     const voltar = () => etapa === 0 ? aoVoltar?.() : setEtapa(etapa - 1);
     const avancar = () => setEtapa(etapa + 1);
 

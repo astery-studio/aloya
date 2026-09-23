@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Check } from 'phosphor-react-native';
 import Button from '../../../components/common/Button/Button';
@@ -10,6 +11,12 @@ import { estilos } from './AccountStep.styles';
 
 export default function AccountStep({ dados, aoAlterar, aoAvancar,
     aoVoltar, aoEntrar, carregando }) {
+    const alterarNome = useCallback((nome) => aoAlterar({ nome }), [aoAlterar]);
+    const alterarEmail = useCallback((email) => aoAlterar({ email }), [aoAlterar]);
+    const alterarSenha = useCallback((senha) => aoAlterar({ senha }), [aoAlterar]);
+    const alterarConfirmacao = useCallback(
+        (confirmacao) => aoAlterar({ confirmacao }), [aoAlterar]
+    );
     const preenchido = Boolean(dados.nome.trim() && dados.email.trim()
         && dados.senha && dados.confirmacao && dados.aceitouTermos);
     const rodape = <View style={estilos.rodape}>
@@ -24,11 +31,11 @@ export default function AccountStep({ dados, aoAlterar, aoAvancar,
             rodape={rodape}>
             <View style={estilos.campos}>
                 <TextInput label="Nome" placeholder="Nome" value={dados.nome}
-                    onChangeText={(nome) => aoAlterar({ nome })} />
-                <EmailInput value={dados.email} onChangeText={(email) => aoAlterar({ email })} />
-                <PasswordInput value={dados.senha} onChangeText={(senha) => aoAlterar({ senha })} />
+                    onChangeText={alterarNome} />
+                <EmailInput value={dados.email} onChangeText={alterarEmail} />
+                <PasswordInput value={dados.senha} onChangeText={alterarSenha} />
                 <PasswordInput label="Confirmar senha" value={dados.confirmacao}
-                    onChangeText={(confirmacao) => aoAlterar({ confirmacao })} />
+                    onChangeText={alterarConfirmacao} />
             </View>
             <Pressable accessibilityRole="checkbox"
                 accessibilityState={{ checked: dados.aceitouTermos }}
