@@ -48,7 +48,58 @@ function criarPasswordRecoveryService({
         return respostaPublica;
     }
 
-    return { solicitar };
+    function erroLinkInvalido() {
+        const erro = new Error(
+            'Este link de redefinição é inválido ou já expirou. Solicite um novo.'
+        );
+        erro.status = 400;
+        erro.codigo = 'LINK_RECUPERACAO_INVALIDO';
+        return erro;
+    }
+
+    async function buscarLinkValido(tokenPuro) {
+        let payload;
+        try {
+            payload = tokenService.validarTokenRecuperacao(tokenPuro);
+        } catch {
+            throw erroLinkInvalido();
+        }
+
+        const tokenHash = tokenService.gerarHashToken(tokenPuro);
+        const recuperacao = await prisma.recuperacaoSenha.findUnique({
+            where: { tokenRecuperacaoHash: tokenHash }
+        });
+
+        if (!recuperacao || recuperacao.usuarioId !== payload.usuarioId ||
+            recuperacao.statusLink !== 'pendente' || recuperacao.validadeToken < now()) {
+            throw erroLinkInvalido();
+        }
+
+        return recuperacao;
+    }
+
+    async function validarToken(token) {
+        await buscarLinkValido(token);
+        return { valido: true };
+    }
+
+    async function redefinir({ token, senha }) {
+        const recuperacao = await buscarLinkValido(token);
+        const { senhaHash } = await passwordService.gerarHash(senha);
+        const usadoEm = now();
+
+        await prisma.$transaction([
+            prisma.usuario.update({ where: { id: recuperacao.usuarioId }, data: { senhaHash } }),
+            prisma.recuperacaoSenha.update({ where: { id: recuperacao.id },
+                data: { statusLink: 'usado', usadoEm } }),
+            prisma.sessao.updateMany({ where: { usuarioId: recuperacao.usuarioId, revogadaEm: null },
+                data: { revogadaEm: usadoEm } })
+        ]);
+
+        return { mensagem: 'Senha redefinida com sucesso. Faça login com sua nova senha.' };
+    }
+
+    return { solicitar, validarToken, redefinir };
 }
 
 export { criarPasswordRecoveryService };
