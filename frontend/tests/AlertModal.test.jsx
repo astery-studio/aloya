@@ -34,7 +34,7 @@ test('cria a ação Entendi quando recebe somente aoFechar', async () => {
 
     await render(<AlertModal visivel aoFechar={aoFechar} titulo="Aviso" />);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Entendi' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Entendi' }));
 
     expect(aoFechar).toHaveBeenCalledTimes(1);
 });
@@ -53,12 +53,12 @@ test('executa as ações principal e secundária separadamente', async () => {
         />
     );
 
-    fireEvent.press(screen.getByRole('button', { name: 'Excluir' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Excluir' }));
 
     expect(principal).toHaveBeenCalledTimes(1);
     expect(secundaria).not.toHaveBeenCalled();
 
-    fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
 
     expect(secundaria).toHaveBeenCalledTimes(1);
 });
@@ -77,13 +77,20 @@ test('bloqueia ação que está carregando', async () => {
 
     const botao = screen.getByRole('button', { name: 'Confirmar' });
 
-    fireEvent.press(botao);
+    await fireEvent.press(botao);
 
     expect(aoPressionar).not.toHaveBeenCalled();
     expect(botao).toBeDisabled();
     expect(botao.props.accessibilityState.busy).toBe(true);
 });
 
-test('rejeita modal visível sem ação ou fechamento', async () => {
-    await expect(render(<AlertModal visivel titulo="Alerta inválido" />)).rejects.toThrow('AlertModal precisa de pelo menos uma ação');
+test('rejeita modal visível sem ação ou fechamento', () => {
+    expect(
+        () => AlertModal({
+            visivel: true,
+            titulo: 'Alerta inválido'
+        })
+    ).toThrow(
+        'AlertModal precisa de pelo menos uma ação'
+    );
 });
