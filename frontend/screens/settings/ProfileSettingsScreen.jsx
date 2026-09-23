@@ -68,7 +68,7 @@ function obterMensagemErroSalvar(erro) {
         return 'Este e-mail já está sendo utilizado.'
     }
 
-    return 'Não foi possível atualizar seus dados. Verifique sua conexão e tente novamente.'
+    return 'Ocorreu um erro ao salvar sua conta. Verifique sua conexão e tente novamente.'
 }
 
 function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, confirmarSenhaExclusao, excluirConta, encerrarSessao, onContaExcluida, onSessaoEncerrada}) {
@@ -309,11 +309,26 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 acaoSecundaria={{texto: 'Continuar a editar', variante: 'verde', aoPressionar: () => setSaidaSemSalvarVisivel(false)}}
             />
 
-            <AlertModal 
-                visivel={erroSalvarVisivel} 
-                aoFechar={() => setErroSalvarVisivel(false)} 
-                titulo="Não foi possível salvar" 
-                mensagem={mensagemErroSalvar} 
+            <SimpleModal
+                visivel={erroSalvarVisivel}
+                aoFechar={() => setErroSalvarVisivel(false)}
+                icone={WarningCircleIcon}
+                corIcone={tema.cores.feedback.erro}
+                fundoIcone={tema.cores.neutras.bordaClara}
+                titulo="Algo deu errado"
+                mensagem={mensagemErroSalvar}
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: salvarAlteracoes,
+                    carregando: salvando
+                }}
+                acaoSecundaria={{
+                    texto: 'Voltar',
+                    variante: 'branco',
+                    aoPressionar: () => setErroSalvarVisivel(false),
+                    desativado: salvando
+                }}
             />
 
             <DeleteAccount
