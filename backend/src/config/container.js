@@ -46,6 +46,9 @@ import {
 import {
     criarAuthController
 } from '../controllers/auth.controller.js';
+import { criarPasswordRecoveryService } from '../services/passwordRecovery.service.js';
+import { criarPasswordRecoveryValidator } from '../validators/passwordRecovery.validator.js';
+import { criarPasswordRecoveryController } from '../controllers/passwordRecovery.controller.js';
 
 import {
     criarAuthMiddleware
@@ -92,6 +95,22 @@ function criarContainer() {
             baseUrl: env.parentalConsentBaseUrl,
             dateUtils
         });
+
+    const passwordRecoveryService = criarPasswordRecoveryService({
+        prisma,
+        tokenService,
+        passwordService,
+        emailService,
+        baseUrl: env.passwordResetBaseUrl
+    });
+
+    const passwordRecoveryValidator =
+        criarPasswordRecoveryValidator();
+
+    const passwordRecoveryController = criarPasswordRecoveryController({
+        passwordRecoveryService,
+        passwordRecoveryValidator
+    });
 
     const authService = criarAuthService({
         prisma,
@@ -149,7 +168,8 @@ function criarContainer() {
         parentalConsentMiddleware,
         cadastroRateLimit,
         emailRateLimit,
-        loginRateLimit
+        loginRateLimit,
+        passwordRecoveryController
     };
 }
 
