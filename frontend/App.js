@@ -1,6 +1,6 @@
-//Mostra somente os componentes de configurações para testes visuais no Expo.
-import { useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+//Executa testes visuais da tela de configurações de perfil sem acessar uma API real.
+import { useEffect, useRef, useState } from 'react'
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { useFonts } from 'expo-font'
 
@@ -9,177 +9,248 @@ import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium'
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold'
 import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold'
 
-import { GenderSelector } from './features/settings/profile/GenderSelector'
-import { ProfileField } from './features/settings/profile/ProfileField'
-import { SettingsLayout } from './layouts/SettingsLayout/SettingsLayout'
+import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen'
 import { estilos } from './App.style'
 
-//Não recebe propriedades e retorna a galeria provisória dos componentes de configurações.
+const perfilInicial = Object.freeze({
+    id: 1,
+    nome: 'Julia',
+    email: 'juliadesign2025@gmail.com',
+    dataNascimento: '1999-04-08',
+    identidadeGenero: 'Mulher Cisgênero',
+    atualizadoEm: '2026-09-23T10:00:00.000Z'
+})
+
+//Espera o tempo informado e simula a duração de uma requisição.
+function aguardar(tempo) {
+    return new Promise(resolve => setTimeout(resolve, tempo))
+}
+
+//Recebe o texto e a ação e retorna um botão exclusivo do painel provisório.
+function BotaoPainel({texto, onPress, perigo = false, ativo = false}) {
+    return (
+        <Pressable
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={texto}
+            style={({ pressed }) => [
+                estilos.botaoPainel,
+                perigo && estilos.botaoPainelPerigo,
+                ativo && estilos.botaoPainelAtivo,
+                pressed && estilos.botaoPainelPressionado
+            ]}
+        >
+            <Text style={[
+                estilos.textoBotaoPainel,
+                perigo && estilos.textoBotaoPainelPerigo,
+                ativo && estilos.textoBotaoPainelAtivo
+            ]}>
+                {texto}
+            </Text>
+        </Pressable>
+    )
+}
+
+//Não recebe propriedades e retorna o teste visual completo da tela de perfil.
 export default function App() {
     const [fontesCarregadas, erroFontes] = useFonts({ DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold })
-    const [generoSelecionado, setGeneroSelecionado] = useState('Mulher Cisgênero')
-    const [seletorGeneroVisivel, setSeletorGeneroVisivel] = useState(false)
-    const [mostrarRodape, setMostrarRodape] = useState(true)
-    const [mensagem, setMensagem] = useState('Toque nos componentes para testar as interações.')
+    const [perfil, setPerfil] = useState(perfilInicial)
+    const [cenario, setCenario] = useState('carregado')
+    const [painelVisivel, setPainelVisivel] = useState(true)
+    const [falharProximoSalvamento, setFalharProximoSalvamento] = useState(false)
+    const [mensagemTeste, setMensagemTeste] = useState('Escolha um cenário ou feche este painel para testar a tela.')
+    const temporizadorCarregamento = useRef(null)
 
-    //Recebe uma mensagem e mostra qual interação foi executada durante o teste.
-    function registrarAcao(novaMensagem) {
-        setMensagem(novaMensagem)
+    useEffect(() => {
+        return () => {
+            if (temporizadorCarregamento.current) {
+                clearTimeout(temporizadorCarregamento.current)
+            }
+        }
+    }, [])
+
+    //Mostra uma mensagem no painel quando uma navegação ainda não foi implementada.
+    function registrarNavegacao(mensagem) {
+        setMensagemTeste(mensagem)
+        setPainelVisivel(true)
     }
 
-    //Recebe a identidade escolhida, atualiza o teste e fecha o painel.
-    function selecionarGenero(novoGenero) {
-        setGeneroSelecionado(novoGenero)
-        setSeletorGeneroVisivel(false)
-        registrarAcao(`Identidade selecionada: ${novoGenero}.`)
+    //Mostra a tela normalmente carregada.
+    function mostrarTelaCarregada() {
+        if (temporizadorCarregamento.current) {
+            clearTimeout(temporizadorCarregamento.current)
+        }
+
+        setCenario('carregado')
+        setPainelVisivel(false)
     }
 
-    //Abre o painel usado para testar a seleção de identidade de gênero.
-    function abrirSeletorGenero() {
-        setSeletorGeneroVisivel(true)
-        registrarAcao('Seletor de identidade de gênero aberto.')
+    //Mostra o carregamento por um breve período e depois apresenta o perfil.
+    function simularCarregamento() {
+        if (temporizadorCarregamento.current) {
+            clearTimeout(temporizadorCarregamento.current)
+        }
+
+        setCenario('carregando')
+        setPainelVisivel(false)
+
+        temporizadorCarregamento.current = setTimeout(() => {
+            setCenario('carregado')
+            temporizadorCarregamento.current = null
+        }, 1800)
     }
 
-    //Fecha o painel sem alterar a identidade atualmente selecionada.
-    function fecharSeletorGenero() {
-        setSeletorGeneroVisivel(false)
-        registrarAcao('Seletor fechado sem alteração.')
+    //Mostra a resposta visual usada quando não é possível carregar o perfil.
+    function simularErroCarregamento() {
+        if (temporizadorCarregamento.current) {
+            clearTimeout(temporizadorCarregamento.current)
+        }
+
+        setCenario('erro')
+        setPainelVisivel(false)
     }
 
-    //Alterna entre as variações do SettingsLayout com e sem rodapé.
-    function alternarRodape() {
-        setMostrarRodape(valorAtual => !valorAtual)
+    //Simula o botão Tentar novamente exibido no estado de erro.
+    async function recarregarPerfil() {
+        setCenario('carregando')
+        await aguardar(1200)
+        setCenario('carregado')
+    }
+
+    //Define se a próxima tentativa de salvar deve retornar um erro controlado.
+    function alternarFalhaSalvamento() {
+        setFalharProximoSalvamento(valorAtual => !valorAtual)
+    }
+
+    //Recebe apenas campos alterados e simula a atualização segura do perfil.
+    async function salvarPerfil(alteracoes) {
+        await aguardar(900)
+
+        if (falharProximoSalvamento) {
+            setFalharProximoSalvamento(false)
+            throw new Error('Erro técnico fictício que não deve aparecer para a pessoa usuária.')
+        }
+
+        setPerfil(perfilAtual => ({
+            ...perfilAtual,
+            ...alteracoes,
+            atualizadoEm: new Date().toISOString()
+        }))
+
+        return {
+            configuracoes: {
+                ...perfil,
+                ...alteracoes
+            }
+        }
     }
 
     if (erroFontes) {
         return (
-            <View style={estilos.carregamento}>
-                <Text style={estilos.textoCarregamento}>Não foi possível carregar as fontes.</Text>
+            <View style={estilos.estadoInicial}>
+                <Text style={estilos.textoEstadoInicial}>Não foi possível carregar as fontes.</Text>
             </View>
         )
     }
 
     if (!fontesCarregadas) {
         return (
-            <View style={estilos.carregamento}>
-                <Text style={estilos.textoCarregamento}>Carregando configurações...</Text>
+            <View style={estilos.estadoInicial}>
+                <Text style={estilos.textoEstadoInicial}>Carregando teste de configurações...</Text>
             </View>
         )
     }
 
-    const rodape = mostrarRodape ? (
-        <View style={estilos.rodape}>
-            <Pressable
-                onPress={() => registrarAcao('Teste do botão Apagar conta. Nenhuma conta foi excluída.')}
-                accessibilityRole="button"
-                accessibilityLabel="Testar apagar conta"
-                style={({ pressed }) => pressed && estilos.linkPressionado}
-            >
-                <Text style={estilos.linkPerigo}>Apagar conta</Text>
-            </Pressable>
-
-            <View style={estilos.separadorRodape} />
-
-            <Pressable
-                onPress={() => registrarAcao('Teste do botão Sair. Nenhuma sessão foi encerrada.')}
-                accessibilityRole="button"
-                accessibilityLabel="Testar sair"
-                style={({ pressed }) => pressed && estilos.linkPressionado}
-            >
-                <Text style={estilos.linkNormal}>Sair</Text>
-            </Pressable>
-        </View>
-    ) : null
-
     return (
-        <>
+        <View style={estilos.tela}>
             <StatusBar style="dark" />
 
-            <SettingsLayout
-                titulo="Configurações de Perfil"
-                onVoltar={() => registrarAcao('Botão Voltar pressionado.')}
-                rodape={rodape}
+            <ProfileSettingsScreen
+                perfil={perfil}
+                carregando={cenario === 'carregando'}
+                erroCarregamento={cenario === 'erro'}
+                onRecarregar={recarregarPerfil}
+                onSalvar={salvarPerfil}
+                onVoltar={() => registrarNavegacao('A navegação de voltar foi acionada.')}
+                onAlterarSenha={() => registrarNavegacao('A tela Alterar Senha será aberta aqui.')}
+                onExcluirConta={() => registrarNavegacao('O fluxo DeleteAccount será aberto aqui.')}
+                onSair={() => registrarNavegacao('O componente LogoutConfirmation será aberto aqui.')}
+            />
+
+            {!painelVisivel ? (
+                <Pressable
+                    onPress={() => setPainelVisivel(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Abrir painel de testes"
+                    style={({ pressed }) => [
+                        estilos.abrirPainel,
+                        pressed && estilos.abrirPainelPressionado
+                    ]}
+                >
+                    <Text style={estilos.textoAbrirPainel}>Teste</Text>
+                </Pressable>
+            ) : null}
+
+            <Modal
+                visible={painelVisivel}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setPainelVisivel(false)}
             >
-                <View style={estilos.conteudo}>
-                    <Text accessibilityLiveRegion="polite" style={estilos.mensagem}>{mensagem}</Text>
-
-                    <View style={estilos.secao}>
-                        <Text style={estilos.tituloSecao}>Dados Pessoais</Text>
-
-                        <ProfileField
-                            label="Nome"
-                            valor="Julia"
-                            onPress={() => registrarAcao('Campo Nome pressionado.')}
-                        />
-
-                        <ProfileField
-                            label="E-mail"
-                            valor="juliadesign2025@gmail.com"
-                            onPress={() => registrarAcao('Campo E-mail pressionado.')}
-                        />
-
-                        <ProfileField
-                            label="Data de Nascimento"
-                            valor="08/04/1999"
-                            onPress={() => registrarAcao('Campo Data de Nascimento pressionado.')}
-                        />
-
-                        <ProfileField
-                            label="Identidade de Gênero"
-                            valor={generoSelecionado}
-                            onPress={abrirSeletorGenero}
-                        />
-                    </View>
-
-                    <View style={estilos.secao}>
-                        <Text style={estilos.tituloSecao}>Estados do ProfileField</Text>
-
-                        <ProfileField
-                            label="Valor não informado"
-                            valor={null}
-                            onPress={() => registrarAcao('Campo sem valor pressionado.')}
-                        />
-
-                        <ProfileField
-                            label="Campo desabilitado"
-                            valor="Este campo não pode ser aberto"
-                            onPress={() => registrarAcao('Esta ação não deveria ser executada.')}
-                            desabilitado
-                        />
-
-                        <ProfileField
-                            label="Valor muito longo"
-                            valor="valor-extremamente-longo-usado-para-conferir-as-reticencias@example.com"
-                            onPress={() => registrarAcao('Campo com valor longo pressionado.')}
-                        />
-                    </View>
-
-                    <View style={estilos.secao}>
-                        <Text style={estilos.tituloSecao}>Variações do SettingsLayout</Text>
-
-                        <Pressable
-                            onPress={alternarRodape}
-                            accessibilityRole="button"
-                            accessibilityLabel={mostrarRodape ? 'Ocultar rodapé' : 'Mostrar rodapé'}
-                            style={({ pressed }) => [
-                                estilos.botaoTeste,
-                                pressed && estilos.botaoTestePressionado
-                            ]}
+                <View style={estilos.fundoPainel}>
+                    <View accessibilityViewIsModal style={estilos.painel}>
+                        <ScrollView
+                            contentContainerStyle={estilos.conteudoPainel}
+                            showsVerticalScrollIndicator={false}
                         >
-                            <Text style={estilos.textoBotaoTeste}>
-                                {mostrarRodape ? 'Testar sem rodapé' : 'Testar com rodapé'}
-                            </Text>
-                        </Pressable>
+                            <View style={estilos.cabecalhoPainel}>
+                                <Text style={estilos.tituloPainel}>Teste de Configurações</Text>
+                                <Text style={estilos.descricaoPainel}>Este painel é provisório e não envia dados para o backend.</Text>
+                            </View>
+
+                            <Text accessibilityLiveRegion="polite" style={estilos.mensagemPainel}>{mensagemTeste}</Text>
+
+                            <View style={estilos.grupoPainel}>
+                                <Text style={estilos.tituloGrupo}>Estados da tela</Text>
+
+                                <BotaoPainel
+                                    texto="Mostrar perfil carregado"
+                                    onPress={mostrarTelaCarregada}
+                                    ativo={cenario === 'carregado'}
+                                />
+
+                                <BotaoPainel
+                                    texto="Testar carregamento"
+                                    onPress={simularCarregamento}
+                                    ativo={cenario === 'carregando'}
+                                />
+
+                                <BotaoPainel
+                                    texto="Testar erro de carregamento"
+                                    onPress={simularErroCarregamento}
+                                    perigo={cenario === 'erro'}
+                                />
+                            </View>
+
+                            <View style={estilos.grupoPainel}>
+                                <Text style={estilos.tituloGrupo}>Salvamento</Text>
+
+                                <BotaoPainel
+                                    texto={falharProximoSalvamento ? 'Próximo salvamento falhará' : 'Fazer próximo salvamento falhar'}
+                                    onPress={alternarFalhaSalvamento}
+                                    perigo={falharProximoSalvamento}
+                                />
+
+                                <Text style={estilos.ajudaPainel}>
+                                    Ative a falha, feche o painel, edite um campo e pressione Salvar alterações.
+                                </Text>
+                            </View>
+
+                            <BotaoPainel texto="Fechar painel e testar" onPress={() => setPainelVisivel(false)} ativo />
+                        </ScrollView>
                     </View>
                 </View>
-            </SettingsLayout>
-
-            <GenderSelector
-                visivel={seletorGeneroVisivel}
-                valorSelecionado={generoSelecionado}
-                onSelecionar={selecionarGenero}
-                onFechar={fecharSeletorGenero}
-            />
-        </>
+            </Modal>
+        </View>
     )
 }
