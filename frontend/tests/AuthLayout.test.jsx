@@ -25,3 +25,6 @@ test('permite omitir descrição e rodapé', async () => {
     expect(screen.queryByText('Acesse sua conta')).toBeNull();
     expect(screen.getByText('E-mail')).toBeTruthy();
 });
+/**
+ * Testes da estrutura, retorno e conteúdo apresentados pelo AuthLayout.
+ */

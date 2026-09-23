@@ -29,3 +29,6 @@ test('FormField mostra título, conteúdo e ajuda', async () => {
     expect(screen.getByText('Nome')).toBeTruthy();
     expect(screen.getByText('Texto auxiliar')).toBeTruthy();
 });
+/**
+ * Testes de seleção acessível e estrutura do FormField.
+ */

@@ -41,3 +41,6 @@ test('última menstruação delega a interface ao calendário externo', async ()
     expect(screen.getByText('Calendário externo')).toBeTruthy();
     expect(renderizarCalendario).toHaveBeenCalledWith(expect.objectContaining({ valor: periodo }));
 });
+/**
+ * Testes de apresentação e interação dos componentes do onboarding.
+ */

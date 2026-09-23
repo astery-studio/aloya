@@ -38,3 +38,6 @@ test('rejeita variante desconhecida', async () => {
     await expect(render(<AppModal visivel variante="inexistente"
         titulo="Teste" />)).rejects.toThrow('Variante de AppModal inválida');
 });
+/**
+ * Testes das variantes, conteúdo e validação estrutural do AppModal.
+ */

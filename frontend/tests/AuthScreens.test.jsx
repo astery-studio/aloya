@@ -63,3 +63,6 @@ test('redefinição exige senhas iguais antes de confirmar', async () => {
         token: 'token', senha: 'nova-senha'
     }));
 });
+/**
+ * Testes integrados das telas e interações do fluxo de autenticação.
+ */

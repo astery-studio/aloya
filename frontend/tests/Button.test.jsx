@@ -42,3 +42,6 @@ test.each([
     await expect(render(<Button texto="Teste" {...propriedade} />))
         .rejects.toThrow(/inválid/);
 });
+/**
+ * Testes das variantes, estados e interações dos botões reutilizáveis.
+ */

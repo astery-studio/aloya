@@ -42,3 +42,6 @@ test('horário removível chama a ação de remoção', async () => {
     fireEvent.press(screen.getByRole('button', { name: 'Remover horário 08:00' }));
     expect(aoRemover).toHaveBeenCalledTimes(1);
 });
+/**
+ * Testes de máscara, foco e remoção dos campos de data e horário.
+ */

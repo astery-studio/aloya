@@ -42,3 +42,6 @@ test('modal aceita segunda ação sem disparar a primeira', async () => {
     expect(segunda).toHaveBeenCalledTimes(1);
     expect(primeira).not.toHaveBeenCalled();
 });
+/**
+ * Testes da composição e das ações oferecidas pelo SimpleModal.
+ */
