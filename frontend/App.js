@@ -12,13 +12,23 @@ import {
     View
 } from 'react-native'
 
+import { useFonts } from 'expo-font'
+
 import {
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_600SemiBold,
-    DMSans_700Bold,
-    useFonts
-} from '@expo-google-fonts/dm-sans'
+    DMSans_400Regular
+} from '@expo-google-fonts/dm-sans/400Regular'
+
+import {
+    DMSans_500Medium
+} from '@expo-google-fonts/dm-sans/500Medium'
+
+import {
+    DMSans_600SemiBold
+} from '@expo-google-fonts/dm-sans/600SemiBold'
+
+import {
+    DMSans_700Bold
+} from '@expo-google-fonts/dm-sans/700Bold'
 
 import { MainLayout } from './layouts/MainLayout/MainLayout'
 import { fontFamilies, tema } from './theme'
