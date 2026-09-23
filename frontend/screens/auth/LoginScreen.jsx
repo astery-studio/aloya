@@ -15,12 +15,22 @@ export default function LoginScreen({
 }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
+    const [erroValidacao, setErroValidacao] = useState(null);
     const { carregando, erro, enviarLogin, limparErro } = useLogin({ realizarLogin });
-    const valido = isValidEmail(email) && Boolean(senha);
+    const preenchido = Boolean(email.trim() && senha);
 
     async function enviar() {
+        if (!isValidEmail(email)) {
+            setErroValidacao('Informe um e-mail válido.');
+            return;
+        }
         const resultado = await enviarLogin({ email, senha });
         if (resultado) aoEntrar?.(resultado);
+    }
+
+    function limparAviso() {
+        setErroValidacao(null);
+        limparErro();
     }
 
     const rodape = <View style={estilos.rodape}>
@@ -38,10 +48,11 @@ export default function LoginScreen({
                 <PasswordInput value={senha} onChangeText={setSenha} />
             </View>
             <Pressable onPress={aoRecuperarSenha}><Text style={estilos.link}>Esqueceu a senha?</Text></Pressable>
-            <Button texto="Entrar" aoPressionar={enviar} desativado={!valido} carregando={carregando} />
+            <Button texto="Entrar" aoPressionar={enviar} desativado={!preenchido} carregando={carregando} />
         </AuthLayout>
-        <SimpleModal visivel={Boolean(erro)} aoFechar={limparErro} icone={LockKey}
-            titulo="Não foi possível entrar" mensagem={erro}
-            acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparErro }} />
+        <SimpleModal visivel={Boolean(erro || erroValidacao)} aoFechar={limparAviso} icone={LockKey}
+            titulo={erroValidacao ? 'E-mail inválido' : 'Não foi possível entrar'}
+            mensagem={erroValidacao || erro}
+            acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }} />
     </>;
 }

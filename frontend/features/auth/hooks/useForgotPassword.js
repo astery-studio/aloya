@@ -25,8 +25,9 @@ function useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao }) {
 
     const enviar = () => executar(solicitarRecuperacao);
     const reenviar = () => executar(reenviarRecuperacao || solicitarRecuperacao);
+    const limparErro = () => setErro(null);
 
-    return { email, setEmail, carregando, erro, resultado, enviar, reenviar };
+    return { email, setEmail, carregando, erro, resultado, enviar, reenviar, limparErro };
 }
 
 export { useForgotPassword };

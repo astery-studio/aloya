@@ -24,8 +24,10 @@ function useResetPassword({ redefinirSenha, token }) {
         }
     }
 
+    const limparErro = () => setErro(null);
+
     return { senha, setSenha, confirmacao, setConfirmacao, valido,
-        carregando, erro, sucesso, enviar };
+        carregando, erro, sucesso, enviar, limparErro };
 }
 
 export { useResetPassword };

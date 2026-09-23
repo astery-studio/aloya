@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { LockKey, WarningCircle } from 'phosphor-react-native';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
@@ -9,6 +10,21 @@ export default function ResetPasswordScreen({
     token, redefinirSenha, aoVoltar, aoEntrar
 }) {
     const fluxo = useResetPassword({ redefinirSenha, token });
+    const [erroValidacao, setErroValidacao] = useState(null);
+    const preenchido = Boolean(fluxo.senha && fluxo.confirmacao);
+
+    function enviar() {
+        if (fluxo.senha !== fluxo.confirmacao) {
+            setErroValidacao('A confirmação deve ser igual à nova senha.');
+            return;
+        }
+        fluxo.enviar();
+    }
+
+    function limparErro() {
+        setErroValidacao(null);
+        fluxo.limparErro();
+    }
 
     return <>
         <AuthLayout titulo="Nova senha!" aoVoltar={aoVoltar}
@@ -17,15 +33,16 @@ export default function ResetPasswordScreen({
                 onChangeText={fluxo.setSenha} autoComplete="new-password" />
             <PasswordInput label="Confirmar nova senha" value={fluxo.confirmacao}
                 onChangeText={fluxo.setConfirmacao} autoComplete="new-password" />
-            <Button texto="Confirmar" aoPressionar={fluxo.enviar}
-                desativado={!fluxo.valido} carregando={fluxo.carregando} />
+            <Button texto="Confirmar" aoPressionar={enviar}
+                desativado={!preenchido} carregando={fluxo.carregando} />
         </AuthLayout>
         <SimpleModal visivel={fluxo.sucesso} icone={LockKey}
             titulo="Senha redefinida com sucesso"
             mensagem="Faça login com sua nova senha."
             acaoPrincipal={{ texto: 'Entrar', aoPressionar: aoEntrar }} />
-        <SimpleModal visivel={Boolean(fluxo.erro)} icone={WarningCircle}
-            titulo="Algo deu errado" mensagem={fluxo.erro}
-            acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: fluxo.enviar }} />
+        <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
+            icone={WarningCircle} titulo={erroValidacao ? 'Senhas diferentes' : 'Algo deu errado'}
+            mensagem={erroValidacao || fluxo.erro}
+            acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
 }

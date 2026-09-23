@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { EnvelopeSimple, WarningCircle } from 'phosphor-react-native';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
@@ -10,14 +11,28 @@ export default function ForgotPasswordScreen({
     solicitarRecuperacao, reenviarRecuperacao, aoVoltar, aoConcluir
 }) {
     const fluxo = useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao });
-    const valido = isValidEmail(fluxo.email);
+    const [erroValidacao, setErroValidacao] = useState(null);
+    const preenchido = Boolean(fluxo.email.trim());
+
+    function enviar() {
+        if (!isValidEmail(fluxo.email)) {
+            setErroValidacao('Informe um e-mail válido.');
+            return;
+        }
+        fluxo.enviar();
+    }
+
+    function limparErro() {
+        setErroValidacao(null);
+        fluxo.limparErro();
+    }
 
     return <>
         <AuthLayout titulo="Esqueceu a senha?" aoVoltar={aoVoltar}
             descricao="Digite seu e-mail cadastrado e enviaremos um link para você redefinir seu acesso de forma segura.">
             <EmailInput value={fluxo.email} onChangeText={fluxo.setEmail} />
-            <Button texto="Enviar" aoPressionar={fluxo.enviar}
-                desativado={!valido} carregando={fluxo.carregando} />
+            <Button texto="Enviar" aoPressionar={enviar}
+                desativado={!preenchido} carregando={fluxo.carregando} />
         </AuthLayout>
         <SimpleModal visivel={Boolean(fluxo.resultado)} icone={EnvelopeSimple}
             titulo="E-mail enviado"
@@ -25,8 +40,9 @@ export default function ForgotPasswordScreen({
             acaoPrincipal={{ texto: 'Entendi', aoPressionar: aoConcluir }}
             acaoSecundaria={{ texto: 'Enviar Novamente', aoPressionar: fluxo.reenviar,
                 carregando: fluxo.carregando }} />
-        <SimpleModal visivel={Boolean(fluxo.erro)} icone={WarningCircle}
-            titulo="Algo deu errado" mensagem={fluxo.erro}
-            acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: fluxo.enviar }} />
+        <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
+            icone={WarningCircle} titulo={erroValidacao ? 'E-mail inválido' : 'Algo deu errado'}
+            mensagem={erroValidacao || fluxo.erro}
+            acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
 }

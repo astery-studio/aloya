@@ -6,14 +6,12 @@ import PasswordInput from '../../../components/forms/PasswordInput';
 import TextInput from '../../../components/forms/TextInput';
 import AuthLayout from '../../../layouts/AuthLayout';
 import { cores } from '../../../theme';
-import { isValidEmail } from '../../../utils/validation/isValidEmail';
 import { estilos } from './AccountStep.styles';
 
 export default function AccountStep({ dados, aoAlterar, aoAvancar,
     aoVoltar, aoEntrar }) {
-    const valido = dados.nome.trim().length >= 3 && isValidEmail(dados.email)
-        && Boolean(dados.senha) && dados.senha === dados.confirmacao
-        && dados.aceitouTermos;
+    const preenchido = Boolean(dados.nome.trim() && dados.email.trim()
+        && dados.senha && dados.confirmacao && dados.aceitouTermos);
     const rodape = <View style={estilos.rodape}>
         <View style={estilos.separador}><View style={estilos.linha} />
             <Text style={estilos.legenda}>Já tem uma conta?</Text><View style={estilos.linha} /></View>
@@ -43,7 +41,7 @@ export default function AccountStep({ dados, aoAlterar, aoAvancar,
                 <Text style={estilos.textoTermos}>Li e concordo com os{' '}
                     <Text style={estilos.linkTermos}>Termos e Política de Privacidade</Text></Text>
             </Pressable>
-            <Button texto="Avançar" aoPressionar={aoAvancar} desativado={!valido} />
+            <Button texto="Avançar" aoPressionar={aoAvancar} desativado={!preenchido} />
         </AuthLayout>
     );
 }

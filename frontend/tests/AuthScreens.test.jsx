@@ -43,6 +43,15 @@ test('recuperação só permite envio com e-mail válido', async () => {
     }));
 });
 
+test('recuperação explica o formato inválido sem enviar', async () => {
+    const solicitarRecuperacao = jest.fn();
+    await render(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'email-invalido');
+    await fireEvent.press(screen.getByRole('button', { name: 'Enviar' }));
+    expect(screen.getByText('E-mail inválido')).toBeTruthy();
+    expect(solicitarRecuperacao).not.toHaveBeenCalled();
+});
+
 test('redefinição exige senhas iguais antes de confirmar', async () => {
     const redefinirSenha = jest.fn().mockResolvedValue({ mensagem: 'ok' });
     await render(<ResetPasswordScreen token="token" redefinirSenha={redefinirSenha} />);
