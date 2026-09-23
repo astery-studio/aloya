@@ -2,21 +2,10 @@
  * Testes de apresentação e interação dos componentes do onboarding.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Text } from 'react-native';
 import BirthDateStep from '../features/onboarding/components/BirthDateStep';
 import CycleLengthStep from '../features/onboarding/components/CycleLengthStep';
 import LastMenstruationStep from '../features/onboarding/components/LastMenstruationStep';
 import OnboardingProgress from '../features/onboarding/components/OnboardingProgress';
-
-jest.mock('../components/feedback/SelectionSheet/SelectionSheet', () => {
-    const { Pressable, Text } = require('react-native');
-    return { SelectionSheet: ({ visivel, onSelecionar }) => visivel ? (
-        <Pressable accessibilityRole="button" accessibilityLabel="Selecionar 30 dias"
-            onPress={() => onSelecionar(30)}>
-            <Text>30 dias</Text>
-        </Pressable>
-    ) : null };
-});
 
 test('progresso calcula a largura pela etapa atual', async () => {
     await render(<OnboardingProgress etapaAtual={3} totalEtapas={5} />);
@@ -36,13 +25,12 @@ test('nascimento habilita avanço apenas com data válida', async () => {
     expect(aoAvancar).toHaveBeenCalledTimes(1);
 });
 
-test('duração abre o seletor e atualiza o valor escolhido', async () => {
+test('duração permite digitar o número sem alterar a unidade', async () => {
     const aoAlterar = jest.fn();
     await render(<CycleLengthStep valor={28} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
-    expect(screen.getByText('28 dias')).toBeTruthy();
-    await fireEvent.press(screen.getByLabelText('Selecionar duração em dias'));
-    await fireEvent.press(screen.getByLabelText('Selecionar 30 dias'));
+    expect(screen.getByText('Dias')).toBeTruthy();
+    fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
     expect(aoAlterar).toHaveBeenCalledWith(30);
 });
 
