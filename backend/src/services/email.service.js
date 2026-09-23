@@ -110,8 +110,34 @@ function criarEmailService({ transporter, remetente }) {
         });
     }
 
+    async function enviarEmailRecuperacaoSenha({
+        email,
+        linkRedefinicao
+    }) {
+        await transporter.sendMail({
+            from: remetente,
+            to: email,
+            subject: 'Redefinição de senha — ALOYA',
+            text: `Para criar uma nova senha, acesse: ${linkRedefinicao}\n\nEste link expira em 60 minutos. Se você não solicitou a alteração, ignore esta mensagem.`,
+            html: `
+                <main style="max-width:600px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#222;background:#F7F5F0;border-radius:12px;">
+                    <h1 style="color:#2C4C3B;">Redefina sua senha</h1>
+                    <p>Recebemos uma solicitação para redefinir sua senha no ALOYA.</p>
+                    <p style="margin:32px 0;">
+                        <a href="${linkRedefinicao}" style="padding:16px 24px;border-radius:12px;background:#2C4C3B;color:#FFF;text-decoration:none;">
+                            Criar nova senha
+                        </a>
+                    </p>
+                    <p>O link expira em 60 minutos e deixa de funcionar após o uso.</p>
+                    <p style="color:#5C5C59;">Se você não solicitou a alteração, ignore esta mensagem.</p>
+                </main>
+            `
+        });
+    }
+
     return {
-        enviarEmailConsentimentoParental
+        enviarEmailConsentimentoParental,
+        enviarEmailRecuperacaoSenha
     };
 }
 
