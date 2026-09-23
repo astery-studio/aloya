@@ -1,7 +1,6 @@
 //Organiza o cabeçalho, o conteúdo e o rodapé opcional das telas internas de configurações.
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
 import { Header } from '../../components/navigation/Header/Header'
 import { estilos } from './SettingsLayout.style'
 
@@ -22,13 +21,13 @@ function SettingsLayout({titulo, onVoltar, children, rodape, testeId = 'settings
                     showsVerticalScrollIndicator={false}
                 >
                     {children}
-                </ScrollView>
 
-                {temRodape ? (
-                    <View testID="rodape-settings-layout" style={estilos.rodape}>
-                        {rodape}
-                    </View>
-                ) : null}
+                    {temRodape ? (
+                        <View testID="rodape-settings-layout" style={estilos.rodape}>
+                            {rodape}
+                        </View>
+                    ) : null}
+                </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     )
