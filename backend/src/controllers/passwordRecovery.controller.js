@@ -35,7 +35,30 @@ function criarPasswordRecoveryController({
         }
     }
 
-    return { solicitar, validarToken };
+    async function redefinir(req, res, next) {
+        try {
+            const validacao = passwordRecoveryValidator
+                .validarRedefinicao(req.body);
+
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: 'Não foi possível redefinir a senha.',
+                        detalhes: validacao.erros
+                    }
+                });
+            }
+
+            const resultado = await passwordRecoveryService
+                .redefinir(validacao.dados);
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return next(erro);
+        }
+    }
+
+    return { solicitar, validarToken, redefinir };
 }
 
 export { criarPasswordRecoveryController };
