@@ -1,6 +1,6 @@
-//Executa testes visuais da tela de configurações de perfil sem acessar uma API real.
-import { useEffect, useRef, useState } from 'react'
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native'
+//Inicializa os serviços reais e alterna entre login e configurações de perfil.
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ActivityIndicator, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { useFonts } from 'expo-font'
 
@@ -9,155 +9,143 @@ import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium'
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold'
 import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold'
 
+import LoginScreen from './screens/auth/LoginScreen'
 import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen'
+import { criarServicosApp } from './services/createAppServices'
+import { obterToken } from './services/auth/tokenStorage'
 import { estilos } from './App.style'
 
-const perfilInicial = Object.freeze({
-    id: 1,
-    nome: 'Julia',
-    email: 'juliadesign2025@gmail.com',
-    dataNascimento: '1999-04-08',
-    identidadeGenero: 'Mulher Cisgênero',
-    atualizadoEm: '2026-09-23T10:00:00.000Z'
-})
-
-//Espera o tempo informado e simula a duração de uma requisição.
-function aguardar(tempo) {
-    return new Promise(resolve => setTimeout(resolve, tempo))
+function criarConfiguracao() {
+    try {
+        return {
+            servicos: criarServicosApp(),
+            erro: null
+        }
+    } catch {
+        return {
+            servicos: null,
+            erro: 'Não foi possível configurar a conexão segura com a API.'
+        }
+    }
 }
 
-//Recebe o texto e a ação e retorna um botão exclusivo do painel provisório.
-function BotaoPainel({texto, onPress, perigo = false, ativo = false}) {
-    return (
-        <Pressable
-            onPress={onPress}
-            accessibilityRole="button"
-            accessibilityLabel={texto}
-            style={({ pressed }) => [
-                estilos.botaoPainel,
-                perigo && estilos.botaoPainelPerigo,
-                ativo && estilos.botaoPainelAtivo,
-                pressed && estilos.botaoPainelPressionado
-            ]}
-        >
-            <Text style={[
-                estilos.textoBotaoPainel,
-                perigo && estilos.textoBotaoPainelPerigo,
-                ativo && estilos.textoBotaoPainelAtivo
-            ]}>
-                {texto}
-            </Text>
-        </Pressable>
-    )
+function sessaoEhValida(sessao) {
+    return sessao !== null && typeof sessao === 'object' && typeof sessao.token === 'string' && Boolean(sessao.token.trim())
 }
 
-//Não recebe propriedades e retorna o teste visual completo da tela de perfil.
 export default function App() {
-    const [fontesCarregadas, erroFontes] = useFonts({ DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold })
-    const [perfil, setPerfil] = useState(perfilInicial)
-    const [cenario, setCenario] = useState('carregado')
-    const [painelVisivel, setPainelVisivel] = useState(true)
-    const [falharProximoSalvamento, setFalharProximoSalvamento] = useState(false)
-    const [mensagemTeste, setMensagemTeste] = useState('Escolha um cenário ou feche este painel para testar a tela.')
-    const temporizadorCarregamento = useRef(null)
+    const [fontesCarregadas, erroFontes] = useFonts({DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold})
+    const [configuracao] = useState(criarConfiguracao)
+    const [estadoSessao, setEstadoSessao] = useState('verificando')
+    const [perfil, setPerfil] = useState(null)
+    const [carregandoPerfil, setCarregandoPerfil] = useState(false)
+    const [erroPerfil, setErroPerfil] = useState(false)
+    const requisicaoAtual = useRef(0)
+
+    const carregarPerfil = useCallback(async () => {
+        if (!configuracao.servicos) {
+            return
+        }
+
+        const identificador = requisicaoAtual.current + 1
+        requisicaoAtual.current = identificador
+
+        setCarregandoPerfil(true)
+        setErroPerfil(false)
+
+        try {
+            const perfilRecebido = await configuracao.servicos.accountService.buscarPerfil()
+
+            if (requisicaoAtual.current === identificador) {
+                setPerfil(perfilRecebido)
+            }
+        } catch (erro) {
+            if (erro?.status === 401) {
+                setPerfil(null)
+                setEstadoSessao('anonima')
+            } else if (requisicaoAtual.current === identificador) {
+                setErroPerfil(true)
+            }
+        } finally {
+            if (requisicaoAtual.current === identificador) {
+                setCarregandoPerfil(false)
+            }
+        }
+    }, [configuracao.servicos])
 
     useEffect(() => {
+        let ativo = true
+
+        async function verificarSessao() {
+            if (!configuracao.servicos) {
+                return
+            }
+
+            try {
+                const sessao = await obterToken()
+
+                if (ativo) {
+                    setEstadoSessao(sessaoEhValida(sessao) ? 'autenticada' : 'anonima')
+                }
+            } catch {
+                if (ativo) {
+                    setEstadoSessao('erro')
+                }
+            }
+        }
+
+        verificarSessao()
+
         return () => {
-            if (temporizadorCarregamento.current) {
-                clearTimeout(temporizadorCarregamento.current)
-            }
+            ativo = false
+            requisicaoAtual.current += 1
         }
-    }, [])
+    }, [configuracao.servicos])
 
-    //Mostra uma mensagem no painel quando uma navegação ainda não foi implementada.
-    function registrarNavegacao(mensagem) {
-        setMensagemTeste(mensagem)
-        setPainelVisivel(true)
-    }
-
-    //Mostra a tela normalmente carregada.
-    function mostrarTelaCarregada() {
-        if (temporizadorCarregamento.current) {
-            clearTimeout(temporizadorCarregamento.current)
+    useEffect(() => {
+        if (estadoSessao === 'autenticada') {
+            carregarPerfil()
         }
+    }, [estadoSessao, carregarPerfil])
 
-        setCenario('carregado')
-        setPainelVisivel(false)
-    }
-
-    //Mostra o carregamento por um breve período e depois apresenta o perfil.
-    function simularCarregamento() {
-        if (temporizadorCarregamento.current) {
-            clearTimeout(temporizadorCarregamento.current)
-        }
-
-        setCenario('carregando')
-        setPainelVisivel(false)
-
-        temporizadorCarregamento.current = setTimeout(() => {
-            setCenario('carregado')
-            temporizadorCarregamento.current = null
-        }, 1800)
-    }
-
-    //Mostra a resposta visual usada quando não é possível carregar o perfil.
-    function simularErroCarregamento() {
-        if (temporizadorCarregamento.current) {
-            clearTimeout(temporizadorCarregamento.current)
-        }
-
-        setCenario('erro')
-        setPainelVisivel(false)
-    }
-
-    //Simula o botão Tentar novamente exibido no estado de erro.
-    async function recarregarPerfil() {
-        setCenario('carregando')
-        await aguardar(1200)
-        setCenario('carregado')
-    }
-
-    //Define se a próxima tentativa de salvar deve retornar um erro controlado.
-    function alternarFalhaSalvamento() {
-        setFalharProximoSalvamento(valorAtual => !valorAtual)
-    }
-
-    //Recebe apenas campos alterados e simula a atualização segura do perfil.
     async function salvarPerfil(alteracoes) {
-        await aguardar(900)
-
-        if (falharProximoSalvamento) {
-            setFalharProximoSalvamento(false)
-            throw new Error('Erro técnico fictício que não deve aparecer para a pessoa usuária.')
-        }
-
-        setPerfil(perfilAtual => ({
-            ...perfilAtual,
-            ...alteracoes,
-            atualizadoEm: new Date().toISOString()
-        }))
-
-        return {
-            configuracoes: {
-                ...perfil,
-                ...alteracoes
-            }
-        }
+        const perfilAtualizado = await configuracao.servicos.accountService.atualizarPerfil(alteracoes)
+        setPerfil(perfilAtualizado)
+        return perfilAtualizado
     }
 
-    if (erroFontes) {
+    function finalizarSessao() {
+        requisicaoAtual.current += 1
+        setPerfil(null)
+        setErroPerfil(false)
+        setCarregandoPerfil(false)
+        setEstadoSessao('anonima')
+    }
+
+    if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         return (
             <View style={estilos.estadoInicial}>
-                <Text style={estilos.textoEstadoInicial}>Não foi possível carregar as fontes.</Text>
+                <Text accessibilityRole="alert" style={estilos.tituloEstado}>Ocorreu um erro</Text>
+                <Text style={estilos.textoEstado}>{configuracao.erro || 'Não foi possível acessar a sessão segura deste aparelho.'}</Text>
             </View>
         )
     }
 
-    if (!fontesCarregadas) {
+    if (!fontesCarregadas || estadoSessao === 'verificando') {
         return (
             <View style={estilos.estadoInicial}>
-                <Text style={estilos.textoEstadoInicial}>Carregando teste de configurações...</Text>
+                <ActivityIndicator size="small" />
+                <Text style={estilos.textoEstado}>Carregando...</Text>
             </View>
+        )
+    }
+
+    if (estadoSessao === 'anonima') {
+        return (
+            <>
+                <StatusBar style="dark" />
+                <LoginScreen realizarLogin={configuracao.servicos.authService.realizarLogin} aoEntrar={() => setEstadoSessao('autenticada')} />
+            </>
         )
     }
 
@@ -167,90 +155,15 @@ export default function App() {
 
             <ProfileSettingsScreen
                 perfil={perfil}
-                carregando={cenario === 'carregando'}
-                erroCarregamento={cenario === 'erro'}
-                onRecarregar={recarregarPerfil}
+                carregando={carregandoPerfil}
+                erroCarregamento={erroPerfil}
+                onRecarregar={carregarPerfil}
                 onSalvar={salvarPerfil}
-                onVoltar={() => registrarNavegacao('A navegação de voltar foi acionada.')}
-                onAlterarSenha={() => registrarNavegacao('A tela Alterar Senha será aberta aqui.')}
-                onExcluirConta={() => registrarNavegacao('O fluxo DeleteAccount será aberto aqui.')}
-                onSair={() => registrarNavegacao('O componente LogoutConfirmation será aberto aqui.')}
+                excluirConta={configuracao.servicos.accountService.excluirConta}
+                encerrarSessao={configuracao.servicos.authService.encerrarSessao}
+                onContaExcluida={finalizarSessao}
+                onSessaoEncerrada={finalizarSessao}
             />
-
-            {!painelVisivel ? (
-                <Pressable
-                    onPress={() => setPainelVisivel(true)}
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir painel de testes"
-                    style={({ pressed }) => [
-                        estilos.abrirPainel,
-                        pressed && estilos.abrirPainelPressionado
-                    ]}
-                >
-                    <Text style={estilos.textoAbrirPainel}>Teste</Text>
-                </Pressable>
-            ) : null}
-
-            <Modal
-                visible={painelVisivel}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setPainelVisivel(false)}
-            >
-                <View style={estilos.fundoPainel}>
-                    <View accessibilityViewIsModal style={estilos.painel}>
-                        <ScrollView
-                            contentContainerStyle={estilos.conteudoPainel}
-                            showsVerticalScrollIndicator={false}
-                        >
-                            <View style={estilos.cabecalhoPainel}>
-                                <Text style={estilos.tituloPainel}>Teste de Configurações</Text>
-                                <Text style={estilos.descricaoPainel}>Este painel é provisório e não envia dados para o backend.</Text>
-                            </View>
-
-                            <Text accessibilityLiveRegion="polite" style={estilos.mensagemPainel}>{mensagemTeste}</Text>
-
-                            <View style={estilos.grupoPainel}>
-                                <Text style={estilos.tituloGrupo}>Estados da tela</Text>
-
-                                <BotaoPainel
-                                    texto="Mostrar perfil carregado"
-                                    onPress={mostrarTelaCarregada}
-                                    ativo={cenario === 'carregado'}
-                                />
-
-                                <BotaoPainel
-                                    texto="Testar carregamento"
-                                    onPress={simularCarregamento}
-                                    ativo={cenario === 'carregando'}
-                                />
-
-                                <BotaoPainel
-                                    texto="Testar erro de carregamento"
-                                    onPress={simularErroCarregamento}
-                                    perigo={cenario === 'erro'}
-                                />
-                            </View>
-
-                            <View style={estilos.grupoPainel}>
-                                <Text style={estilos.tituloGrupo}>Salvamento</Text>
-
-                                <BotaoPainel
-                                    texto={falharProximoSalvamento ? 'Próximo salvamento falhará' : 'Fazer próximo salvamento falhar'}
-                                    onPress={alternarFalhaSalvamento}
-                                    perigo={falharProximoSalvamento}
-                                />
-
-                                <Text style={estilos.ajudaPainel}>
-                                    Ative a falha, feche o painel, edite um campo e pressione Salvar alterações.
-                                </Text>
-                            </View>
-
-                            <BotaoPainel texto="Fechar painel e testar" onPress={() => setPainelVisivel(false)} ativo />
-                        </ScrollView>
-                    </View>
-                </View>
-            </Modal>
         </View>
     )
 }
