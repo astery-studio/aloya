@@ -1,3 +1,6 @@
+/**
+ * Centraliza estilos compartilhados pelas telas de autenticação.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, fontFamilies, typography } from '../../theme';
 
@@ -25,6 +28,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Centraliza estilos compartilhados pelas telas de autenticação.
- */

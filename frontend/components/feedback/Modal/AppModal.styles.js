@@ -1,3 +1,6 @@
+/**
+ * Centraliza os estilos das variantes simples, alerta e ação dos modais.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, fontFamilies, radius, shadows } from '../../../theme';
 
@@ -96,6 +99,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Centraliza os estilos das variantes simples, alerta e ação dos modais.
- */

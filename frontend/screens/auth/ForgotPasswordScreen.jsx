@@ -1,3 +1,6 @@
+/**
+ * Tela que solicita e permite reenviar instruções de recuperação por e-mail.
+ */
 import { useState } from 'react';
 import { EnvelopeSimple, WarningCircle } from 'phosphor-react-native';
 import Button from '../../components/common/Button/Button';
@@ -46,6 +49,3 @@ export default function ForgotPasswordScreen({
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
 }
-/**
- * Tela que solicita e permite reenviar instruções de recuperação por e-mail.
- */

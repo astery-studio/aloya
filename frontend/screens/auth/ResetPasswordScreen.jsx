@@ -1,3 +1,6 @@
+/**
+ * Tela que confirma uma nova senha usando o token de recuperação recebido.
+ */
 import { useState } from 'react';
 import { LockKey, WarningCircle } from 'phosphor-react-native';
 import Button from '../../components/common/Button/Button';
@@ -46,6 +49,3 @@ export default function ResetPasswordScreen({
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
 }
-/**
- * Tela que confirma uma nova senha usando o token de recuperação recebido.
- */

@@ -1,3 +1,6 @@
+/**
+ * Define a composição visual da tela inicial de autenticação.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, espacamentos, fontFamilies } from '../../theme';
 
@@ -26,6 +29,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Define a composição visual da tela inicial de autenticação.
- */

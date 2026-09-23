@@ -1,3 +1,6 @@
+/**
+ * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
+ */
 import { Modal, Text, View } from 'react-native';
 import { cores } from '../../../theme';
 import { estilos } from './AppModal.styles';
@@ -70,6 +73,3 @@ export default function AppModal({
         </Modal>
     );
 }
-/**
- * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
- */

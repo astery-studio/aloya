@@ -1,3 +1,6 @@
+/**
+ * Tela inicial que encaminha a pessoa para criação de conta ou login.
+ */
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../components/common/Button/Button';
@@ -16,6 +19,3 @@ export default function WelcomeScreen({ aoCriarConta, aoEntrar, logo }) {
         </SafeAreaView>
     );
 }
-/**
- * Tela inicial que encaminha a pessoa para criação de conta ou login.
- */

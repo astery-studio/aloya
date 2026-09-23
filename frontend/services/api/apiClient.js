@@ -1,3 +1,6 @@
+/**
+ * Cliente HTTP que serializa requisições e normaliza erros retornados pela API.
+ */
 function criarApiClient({ baseUrl, fetchImpl = fetch }) {
     async function requisicao({ caminho, metodo = 'GET', corpo, token }) {
         const resposta = await fetchImpl(`${baseUrl}${caminho}`, {
@@ -25,6 +28,3 @@ function criarApiClient({ baseUrl, fetchImpl = fetch }) {
 }
 
 export { criarApiClient };
-/**
- * Cliente HTTP que serializa requisições e normaliza erros retornados pela API.
- */

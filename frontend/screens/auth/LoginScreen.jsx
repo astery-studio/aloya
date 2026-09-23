@@ -1,3 +1,6 @@
+/**
+ * Tela de login que valida credenciais, aciona autenticação e apresenta erros.
+ */
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { LockKey } from 'phosphor-react-native';
@@ -60,6 +63,3 @@ export default function LoginScreen({
             acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }} />
     </>;
 }
-/**
- * Tela de login que valida credenciais, aciona autenticação e apresenta erros.
- */
