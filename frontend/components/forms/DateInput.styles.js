@@ -2,6 +2,11 @@ import { StyleSheet } from 'react-native';
 import { cores, radius, typography } from '../../theme';
 
 const estilos = StyleSheet.create({
+    botao: {
+        width: '100%',
+        paddingTop: 8,
+        alignItems: 'flex-start'
+    },
     campo: {
         width: '100%', height: 56, borderRadius: radius.buttonAndInput,
         borderWidth: 1.41, borderColor: cores.neutras.bordaClara,
@@ -10,7 +15,10 @@ const estilos = StyleSheet.create({
     },
     focado: {
         borderColor: cores.marca.primaria,
-        boxShadow: '0 0 0 3px rgba(200, 90, 68, 0.10)'
+        boxShadow: [{
+            offsetX: 0, offsetY: 0, blurRadius: 0, spreadDistance: 3,
+            color: 'rgba(200, 90, 68, 0.10)'
+        }]
     },
     entrada: {
         ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro,

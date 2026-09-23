@@ -12,7 +12,7 @@ test('data formata oito dígitos como DD/MM/AAAA', async () => {
 test('ícone de data foca o campo quando não há calendário', async () => {
     await render(<DateInput valor="" onChangeText={jest.fn()} />);
     const botao = screen.getByRole('button', { name: 'Digitar data' });
-    expect(botao.props.hitSlop).toBe(12);
+    expect(botao).toHaveStyle({ width: '100%', paddingTop: 8 });
     fireEvent.press(botao);
     expect(screen.getByLabelText('Data')).toBeTruthy();
 });
@@ -24,7 +24,10 @@ test('data exibe borda e halo laranja somente enquanto está focada', async () =
     await fireEvent(entrada, 'focus');
     expect(campo).toHaveStyle({
         borderColor: '#C85A44',
-        boxShadow: '0 0 0 3px rgba(200, 90, 68, 0.10)'
+        boxShadow: [{
+            offsetX: 0, offsetY: 0, blurRadius: 0, spreadDistance: 3,
+            color: 'rgba(200, 90, 68, 0.10)'
+        }]
     });
     await fireEvent(entrada, 'blur');
     expect(campo).toHaveStyle({ borderColor: '#E6E2D8' });
