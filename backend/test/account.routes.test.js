@@ -1,15 +1,16 @@
-//Este teste serve para testar as rotas de conta, garantindo que todas as rotas estejam protegidas por autenticação
+//Testa se todas as rotas de configurações e conta estão protegidas e usam os middlewares corretos.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { criarAccountRoutes } from '../src/routes/account.routes.js'
 
-//Testes para as rotas de conta
+//Confirma a autenticação e a configuração exata de todas as rotas de conta.
 test(
     'protege todas as rotas com autenticação',
     function () {
         const chamadas = []
 
+        //Simula somente os métodos do Express utilizados pelas rotas de conta.
         const router = {
             use(...argumentos) {
                 chamadas.push([
@@ -21,6 +22,13 @@ test(
             get(...argumentos) {
                 chamadas.push([
                     'get',
+                    ...argumentos
+                ])
+            },
+
+            post(...argumentos) {
+                chamadas.push([
+                    'post',
                     ...argumentos
                 ])
             },
@@ -44,11 +52,12 @@ test(
         function buscarConfiguracoes() {}
         function atualizarConfiguracoes() {}
         function alterarSenha() {}
+        function confirmarSenhaExclusao() {}
+        function excluirConta() {}
         function limiteConfiguracoes() {}
         function limiteSenha() {}
-        function excluirConta() {}
         function limiteExclusao() {}
-        
+
         criarAccountRoutes({
             Router: function criarRouterMock() {
                 return router
@@ -71,33 +80,65 @@ test(
                 limiteSenha,
 
             accountDeletionController: {
+                confirmarSenhaExclusao,
                 excluirConta
             },
 
             exclusaoContaRateLimit:
                 limiteExclusao
-            })
+        })
 
-        assert.equal(
-            chamadas[0][0],
-            'use'
-        )
-
-        assert.equal(
-            chamadas[0][1],
-            autenticar
-        )
-
+        //A autenticação precisa ser registrada antes de qualquer endpoint.
         assert.deepEqual(
-            chamadas
-                .filter(
-                    (item) =>
-                        item[0] === 'patch'
-                )
-                .map((item) => item[1]),
+            chamadas[0],
             [
-                '/me',
-                '/me/password'
+                'use',
+                autenticar
+            ]
+        )
+
+        //Confere todos os endpoints, controllers e limites registrados no router.
+        assert.deepEqual(
+            chamadas,
+            [
+                [
+                    'use',
+                    autenticar
+                ],
+
+                [
+                    'get',
+                    '/me',
+                    buscarConfiguracoes
+                ],
+
+                [
+                    'patch',
+                    '/me',
+                    limiteConfiguracoes,
+                    atualizarConfiguracoes
+                ],
+
+                [
+                    'patch',
+                    '/me/password',
+                    limiteSenha,
+                    alterarSenha
+                ],
+
+                [
+                    'delete',
+                    '/me',
+                    limiteExclusao,
+                    excluirConta
+                ],
+
+                [
+                    'post',
+                    '/me/account-deletion/verify-password',
+                    limiteExclusao,
+                    confirmarSenhaExclusao
+                ]
             ]
         )
     }
