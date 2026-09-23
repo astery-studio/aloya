@@ -1,64 +1,87 @@
 /**
- * Reúne operações de conta e autenticação consumidas pelas telas.
+ * Reúne operações de conta, autenticação e encerramento seguro da sessão.
  */
-//Reúne as operações de autenticação do aplicativo.
-// Existe para que login, recuperação de senha e logout compartilhem o mesmo serviço, em vez de ficarem duplicados.
-
 import { endpoints } from '../../../services/api/endpoints'
 
+const mensagemErroConfiguracao = 'Não foi possível configurar o serviço de autenticação.'
+const mensagemErroCredencial = 'Não foi possível remover a credencial deste aparelho. Tente novamente.'
 
-function criarAuthService({
-    requisicao,
-    requisicaoAutenticada,
-    removerCredencialLocal
-}) {
+function validarDependencias({ requisicao, requisicaoAutenticada, removerCredencialLocal }) {
+    const possuiRequisicao = typeof requisicao === 'function'
+    const possuiLogout = typeof requisicaoAutenticada === 'function'
+        && typeof removerCredencialLocal === 'function'
+    const logoutIncompleto = requisicaoAutenticada !== undefined
+        || removerCredencialLocal !== undefined
+
+    if ((!possuiRequisicao && !possuiLogout) || (logoutIncompleto && !possuiLogout)) {
+        throw new Error(mensagemErroConfiguracao)
+    }
+}
+
+function criarAuthService({ requisicao, requisicaoAutenticada, removerCredencialLocal }) {
+    validarDependencias({ requisicao, requisicaoAutenticada, removerCredencialLocal })
+    let encerramentoEmAndamento = null
+
     function cadastrar(dados) {
-        return requisicao({ metodo: 'POST', caminho: endpoints.cadastro, corpo: dados });
+        return requisicao({ metodo: 'POST', caminho: endpoints.cadastro, corpo: dados })
     }
 
     function realizarLogin(credenciais) {
-        return requisicao({ metodo: 'POST', caminho: endpoints.login, corpo: credenciais });
+        return requisicao({ metodo: 'POST', caminho: endpoints.login, corpo: credenciais })
     }
 
     function verificarEmailDisponivel(email) {
-        return requisicao({
-            metodo: 'POST',
-            caminho: endpoints.disponibilidadeEmail,
-            corpo: { email }
-        });
+        return requisicao({ metodo: 'POST', caminho: endpoints.disponibilidadeEmail, corpo: { email } })
     }
 
     function solicitarRecuperacao({ email }) {
-        return requisicao({ metodo: 'POST', caminho: endpoints.solicitarRecuperacao,
-            corpo: { email } });
+        return requisicao({ metodo: 'POST', caminho: endpoints.solicitarRecuperacao, corpo: { email } })
     }
 
     function validarTokenRecuperacao(token) {
-        return requisicao({ caminho: `${endpoints.validarRecuperacao}/${encodeURIComponent(token)}` });
+        return requisicao({ caminho: `${endpoints.validarRecuperacao}/${encodeURIComponent(token)}` })
     }
 
     function redefinirSenha({ token, senha }) {
-        return requisicao({ metodo: 'POST', caminho: endpoints.redefinirSenha,
-            corpo: { token, senha } });
+        return requisicao({ metodo: 'POST', caminho: endpoints.redefinirSenha, corpo: { token, senha } })
     }
 
-    async function encerrarSessao() {
-        const resposta = await requisicaoAutenticada({
-            metodo: 'POST',
-            caminho: endpoints.logout
-        })
-
-        if (resposta.status !== 204) {
-            throw new Error(
-                'Não foi possível encerrar a sessão. Tente novamente.'
-            )
+    async function tentarEncerrarSessaoNoServidor() {
+        try {
+            const resposta = await requisicaoAutenticada({ metodo: 'POST', caminho: endpoints.logout })
+            return resposta?.status === 204
+        } catch {
+            return false
         }
-
-        await removerCredencialLocal()
     }
 
-    return { cadastrar, realizarLogin, verificarEmailDisponivel,
-        solicitarRecuperacao, validarTokenRecuperacao, redefinirSenha, encerrarSessao }
+    async function removerSessaoDoAparelho() {
+        try {
+            await removerCredencialLocal()
+        } catch {
+            throw new Error(mensagemErroCredencial)
+        }
+    }
+
+    async function executarEncerramento() {
+        const encerramentoRemoto = tentarEncerrarSessaoNoServidor()
+        await removerSessaoDoAparelho()
+        const sessaoRemotaEncerrada = await encerramentoRemoto
+        return Object.freeze({ sessaoLocalEncerrada: true, sessaoRemotaEncerrada })
+    }
+
+    function encerrarSessao() {
+        if (encerramentoEmAndamento) return encerramentoEmAndamento
+        encerramentoEmAndamento = executarEncerramento().finally(() => {
+            encerramentoEmAndamento = null
+        })
+        return encerramentoEmAndamento
+    }
+
+    return {
+        cadastrar, realizarLogin, verificarEmailDisponivel,
+        solicitarRecuperacao, validarTokenRecuperacao, redefinirSenha, encerrarSessao
+    }
 }
 
 export { criarAuthService }

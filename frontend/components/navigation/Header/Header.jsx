@@ -1,25 +1,29 @@
 import { Pressable, Text, View } from 'react-native'
-import { estilos } from './Header.style'
+import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft'
+import { estilos, corIconeVoltar } from './Header.style'
 
-function Header({ titulo, variante = 'padrao', onVoltar}) {
+function Header({
+    titulo,
+    variante = 'padrao',
+    onVoltar
+}) {
     const temVoltar = variante === 'comVoltar'
 
     return (
         <View style={estilos.container}>
-            <View style={estilos.espacamentoSuperior} />
+            <View
+                style={[
+                    estilos.espacamentoSuperior,
+                    temVoltar && estilos.espacamentoSuperiorComVoltar
+                ]}
+            />
 
-            <View style={[
-                estilos.areaTitulo,
-                temVoltar && estilos.areaTituloComVoltar
-            ]}>
-                <Text
-                    style={estilos.titulo}
-                    numberOfLines={1}
-                    accessibilityRole="header"
-                >
-                    {titulo}
-                </Text>
-
+            <View
+                style={[
+                    estilos.areaTitulo,
+                    temVoltar && estilos.areaTituloComVoltar
+                ]}
+            >
                 {temVoltar ? (
                     <Pressable
                         onPress={onVoltar}
@@ -31,15 +35,23 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                         }}
                         style={estilos.containerVoltar}
                     >
-
-                        <ArrowLeftIcon style={estilos.iconeVoltar} />
-                        
+                        <ArrowLeftIcon
+                            size={24}
+                            color={corIconeVoltar}
+                            weight="regular"
+                        />
                     </Pressable>
                 ) : null}
 
-                {temVoltar ? (
-                    <View style={estilos.espacamentoFinal} />
-                ) : null}
+                <Text
+                    style={[
+                        estilos.titulo,
+                        temVoltar && estilos.tituloComVoltar
+                    ]}
+                    accessibilityRole="header"
+                >
+                    {titulo}
+                </Text>
             </View>
         </View>
     )
