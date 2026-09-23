@@ -1,6 +1,6 @@
 //Confere o conteúdo, o cabeçalho, a rolagem e o rodapé opcional do SettingsLayout.
 import { Text } from 'react-native'
-import { render, screen } from '@testing-library/react-native'
+import { render, screen, within } from '@testing-library/react-native'
 
 jest.mock('../components/navigation/Header/Header', () => ({
     Header: jest.fn(() => null)
@@ -23,6 +23,24 @@ describe('SettingsLayout', () => {
         )
 
         expect(screen.getByText('Dados pessoais')).toBeOnTheScreen()
+    })
+
+    test('mantém o rodapé dentro da área de rolagem', async () => {
+        await render(
+            <SettingsLayout
+                titulo="Configurações de Perfil"
+                onVoltar={jest.fn()}
+                rodape={<Text>Ações da conta</Text>}
+            >
+                <Text>Conteúdo do perfil</Text>
+            </SettingsLayout>
+        )
+
+        const areaDeRolagem = screen.getByTestId('rolagem-settings-layout')
+        const rodape = within(areaDeRolagem).getByTestId('rodape-settings-layout')
+
+        expect(rodape).toBeOnTheScreen()
+        expect(rodape).toHaveStyle(estilos.rodape)
     })
 
     test('usa o cabeçalho com botão de voltar', async () => {
