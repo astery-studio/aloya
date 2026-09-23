@@ -96,6 +96,36 @@ function criarAccountDeletionService({
         }
     }
 
+    //Valida a conta, o papel e a senha sem executar nenhuma exclusão.
+    async function autorizarExclusao({usuarioId, sessaoId, papel, senhaAtual}) {
+        validarSessaoId(sessaoId)
+        validarPapel(papel)
+
+        const usuario = await buscarUsuario(usuarioId)
+
+        validarPapel(usuario.papel)
+
+        if (usuario.statusConta !== 'ativa') {
+            throw criarErro(
+                'Sua sessão não está mais ativa.',
+                401,
+                'SESSAO_INVALIDA'
+            )
+        }
+
+        await validarSenha(
+            senhaAtual,
+            usuario.senhaHash
+        )
+
+        return usuario
+    }
+
+    //Confere a senha no primeiro modal sem modificar ou excluir dados.
+    async function confirmarSenhaExclusao(dados) {
+        await autorizarExclusao(dados)
+    }
+
     //Remove vínculos que pertencem à titular ou contêm dados dela como contato
     async function removerVinculos(
         tx,
@@ -157,32 +187,13 @@ function criarAccountDeletionService({
     }
 
     //Executa a exclusão somente para a própria conta autenticada
-    async function excluirConta({
-        usuarioId,
-        sessaoId,
-        papel,
-        senhaAtual
-    }) {
-        validarSessaoId(sessaoId)
-        validarPapel(papel)
-
-        const usuario =
-            await buscarUsuario(usuarioId)
-
-        validarPapel(usuario.papel)
-
-        if (usuario.statusConta !== 'ativa') {
-            throw criarErro(
-                'Sua sessão não está mais ativa.',
-                401,
-                'SESSAO_INVALIDA'
-            )
-        }
-
-        await validarSenha(
-            senhaAtual,
-            usuario.senhaHash
-        )
+    async function excluirConta({usuarioId, sessaoId, papel, senhaAtual}) {
+        const usuario = await autorizarExclusao({
+            usuarioId,
+            sessaoId,
+            papel,
+            senhaAtual
+        })
 
         //Nenhuma exclusão acontece antes da senha ser confirmada
         await prisma.$transaction(
@@ -204,6 +215,7 @@ function criarAccountDeletionService({
                             id: true
                         }
                     })
+
 
                 if (!sessaoAtual) {
                     throw criarErro(
@@ -239,8 +251,6 @@ function criarAccountDeletionService({
                         'CONTA_ALTERADA_CONCORRENTEMENTE'
                     )
                 }
-
-                //As relações onDelete: Cascade do schema removem: sessões, tokens, consentimento, ciclo, previsão, diário, anticoncepcionais, preferências,notificações e conversa/mensagens de suporte
             }
         )
 
@@ -251,9 +261,7 @@ function criarAccountDeletionService({
         }
     }
 
-    return {
-        excluirConta
-    }
+    return {confirmarSenhaExclusao, excluirConta}
 }
 
 export { criarAccountDeletionService }

@@ -1,110 +1,84 @@
-//Este validator confere a senha informada e a confirmação explícita da exclusão
+//Valida a senha e a confirmação explícita usadas no fluxo seguro de exclusão.
 function criarAccountDeletionValidator() {
-    //Cria um erro associado ao campo correspondente
+    //Cria uma mensagem associada ao campo inválido.
     function criarErro(campo, mensagem) {
-        return {
-            campo,
-            mensagem
-        }
+        return {campo, mensagem}
     }
 
-    //Confirma que o corpo recebido é um objeto JSON
+    //Confirma que o corpo da requisição é um objeto JSON simples.
     function ehObjeto(body) {
-        return (
-            body !== null
-            && typeof body === 'object'
-            && !Array.isArray(body)
-        )
+        return body !== null && typeof body === 'object' && !Array.isArray(body)
     }
 
-    //Valida somente os dados necessários à exclusão
-    function validarExclusao(body) {
+    //Valida a senha e rejeita qualquer campo não permitido para a operação.
+    function validarSenha(body, camposPermitidos) {
         if (!ehObjeto(body)) {
             return {
                 valido: false,
-
                 erros: [
-                    criarErro(
-                        'dados',
-                        'O corpo da requisição deve ser um objeto.'
-                    )
+                    criarErro('dados', 'O corpo da requisição deve ser um objeto.')
                 ],
-
                 dados: {}
             }
         }
 
         const erros = []
+        const camposDesconhecidos = Object.keys(body).filter(campo => !camposPermitidos.includes(campo))
 
-        const camposPermitidos = [
-            'senhaAtual',
-            'confirmarExclusao'
-        ]
-
-        const camposDesconhecidos =
-            Object.keys(body).filter(
-                (campo) =>
-                    !camposPermitidos.includes(campo)
-            )
-
-        //Impede que um usuarioId, papel ou outro campo seja aceito no body
         if (camposDesconhecidos.length > 0) {
             erros.push(
-                criarErro(
-                    'dados',
-                    'A requisição contém campos não permitidos.'
-                )
+                criarErro('dados', 'A requisição contém campos não permitidos.')
             )
         }
 
         const senhaAtual = body.senhaAtual
 
-        if (
-            typeof senhaAtual !== 'string'
-            || senhaAtual.length === 0
-        ) {
+        if (typeof senhaAtual !== 'string' || senhaAtual.length === 0) {
             erros.push(
-                criarErro(
-                    'senhaAtual',
-                    'Informe sua senha atual.'
-                )
+                criarErro('senhaAtual', 'Informe sua senha atual.')
             )
-        } else if (
-            Buffer.byteLength(
-                senhaAtual,
-                'utf8'
-            ) > 72
-        ) {
-            //Bcrypt considera no máximo 72 bytes; evita entradas truncadas
+        } else if (Buffer.byteLength(senhaAtual, 'utf8') > 72) {
             erros.push(
-                criarErro(
-                    'senhaAtual',
-                    'A senha atual ultrapassa o tamanho máximo permitido.'
-                )
-            )
-        }
-
-        //Somente o booleano true representa a confirmação do modal
-        if (body.confirmarExclusao !== true) {
-            erros.push(
-                criarErro(
-                    'confirmarExclusao',
-                    'Confirme a exclusão permanente para continuar.'
-                )
+                criarErro('senhaAtual', 'A senha atual ultrapassa o tamanho máximo permitido.')
             )
         }
 
         return {
             valido: erros.length === 0,
             erros,
-
-            dados: {
-                senhaAtual
-            }
+            dados: {senhaAtual}
         }
     }
 
+    //Valida somente a senha usada antes de abrir a confirmação final.
+    function validarConfirmacaoSenha(body) {
+        return validarSenha(body, ['senhaAtual'])
+    }
+
+    //Valida a senha e o consentimento final usados para excluir a conta.
+    function validarExclusao(body) {
+        const resultado = validarSenha(body, [
+            'senhaAtual',
+            'confirmarExclusao'
+        ])
+
+        if (!ehObjeto(body)) {
+            return resultado
+        }
+
+        if (body.confirmarExclusao !== true) {
+            resultado.erros.push(
+                criarErro('confirmarExclusao', 'Confirme a exclusão permanente para continuar.')
+            )
+
+            resultado.valido = false
+        }
+
+        return resultado
+    }
+
     return {
+        validarConfirmacaoSenha,
         validarExclusao
     }
 }
