@@ -5,14 +5,14 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 
 jest.mock('../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
-jest.mock('../components/feedback/DatePickerSheet/DatePickerSheet', () => {
+jest.mock('../features/onboarding/components/MenstruationCalendar', () => {
     const { Pressable, Text } = require('react-native');
-    return { DatePickerSheet: ({ visivel, onSelecionar }) => visivel ? (
+    return { __esModule: true, default: ({ aoAlterar }) => (
         <Pressable accessibilityRole="button" accessibilityLabel="Selecionar período"
-            onPress={() => onSelecionar('2026-08-03')}>
+            onPress={() => aoAlterar({ inicio: '2026-08-03', fim: '2026-08-07' })}>
             <Text>Calendário menstrual</Text>
         </Pressable>
-    ) : null };
+    ) };
 });
 
 test('cadastro explica quando o nome tem menos de três caracteres', async () => {
@@ -67,7 +67,6 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
-    await fireEvent.press(screen.getAllByLabelText('Abrir calendário')[0]);
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
