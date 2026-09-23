@@ -55,6 +55,9 @@ export default function App() {
     const [tela, setTela] = useState('boasVindas');
     const [tokenRecuperacao, setTokenRecuperacao] = useState(null);
     const apiUrl = obterBaseUrl();
+    useEffect(() => {
+        console.info(`[Aloya] API configurada em ${apiUrl}`);
+    }, [apiUrl]);
     const auth = useMemo(() => {
         const { requisicao } = criarApiClient({ baseUrl: apiUrl });
         return criarAuthService({ requisicao });

@@ -28,3 +28,17 @@ test('converte o erro da API em mensagem segura para a interface', async () => {
         mensagemUsuario: 'E-mail ou senha incorretos.'
     });
 });
+
+test('interrompe uma requisição que ultrapassa o tempo limite', async () => {
+    const fetchImpl = jest.fn((url, opcoes) => new Promise((resolve, reject) => {
+        opcoes.signal.addEventListener('abort', () => {
+            const erro = new Error('cancelada');
+            erro.name = 'AbortError';
+            reject(erro);
+        });
+    }));
+    const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl, timeoutMs: 1 });
+    await expect(cliente.requisicao({ caminho: '/auth/login' })).rejects.toMatchObject({
+        mensagemUsuario: 'A API não respondeu dentro do tempo esperado.'
+    });
+});
