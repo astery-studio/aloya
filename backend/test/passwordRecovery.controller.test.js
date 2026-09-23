@@ -51,3 +51,26 @@ test('solicita recuperação com e-mail normalizado', async () => {
     assert.equal(res.statusCode, 200);
     assert.deepEqual(chamadas, [['solicitar', 'carla@email.com']]);
 });
+
+test('valida o token recebido pela rota', async () => {
+    const { controller, chamadas } = criarController({});
+    const res = resposta();
+
+    await controller.validarToken({ params: { token: 'jwt' } }, res, () => {});
+
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(chamadas, [['validar', 'jwt']]);
+});
+
+test('redefine a senha com dados validados', async () => {
+    const dados = { token: 'jwt', senha: 'nova-senha' };
+    const { controller, chamadas } = criarController({
+        valido: true, erros: [], dados
+    });
+    const res = resposta();
+
+    await controller.redefinir({ body: dados }, res, () => {});
+
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(chamadas, [['redefinir', dados]]);
+});
