@@ -4,15 +4,15 @@
   "main": "index.js",
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
-    "expo": "~57.0.14",
+    "expo": "~57.0.24",
     "expo-font": "~57.0.4",
     "expo-status-bar": "~57.0.1",
+    "jest-expo": "~57.0.5",
     "phosphor-react-native": "^3.0.6",
     "react": "19.2.3",
-    "react-native": "0.86.2",
+    "react-native": "0.86.3",
     "react-native-svg": "15.15.4"
   },
-
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -22,7 +22,6 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --runInBand"
   },
-
   "jest": {
     "preset": "jest-expo",
     "collectCoverageFrom": [
@@ -38,7 +37,6 @@
       "/node_modules/"
     ]
   },
-
   "private": true,
   "devDependencies": {
     "@testing-library/react-native": "^14.0.1",
