@@ -60,3 +60,6 @@ export {
     fontFamilies,
     typography
 };
+/**
+ * Define famílias e estilos tipográficos baseados na fonte DM Sans.
+ */

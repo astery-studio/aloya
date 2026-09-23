@@ -10,3 +10,6 @@ const radius = {
 export {
     radius
 };
+/**
+ * Define os raios de borda padronizados para elementos da interface.
+ */

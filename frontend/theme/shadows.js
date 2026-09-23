@@ -18,3 +18,6 @@ const shadows = {
 export {
     shadows
 };
+/**
+ * Define as sombras padronizadas de pop-ups, alertas e painéis.
+ */

@@ -12,3 +12,6 @@ const rotas = Object.freeze({
 })
 
 export { rotas }
+/**
+ * Centraliza os identificadores das rotas usadas pela navegação.
+ */

@@ -25,3 +25,6 @@ function criarApiClient({ baseUrl, fetchImpl = fetch }) {
 }
 
 export { criarApiClient };
+/**
+ * Cliente HTTP que serializa requisições e normaliza erros retornados pela API.
+ */

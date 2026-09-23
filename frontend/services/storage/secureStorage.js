@@ -22,3 +22,6 @@ async function removerSeguro(chave) {
 }
 
 export { salvarSeguro, lerSeguro, removerSeguro };
+/**
+ * Adapta o Expo SecureStore para persistir, ler e remover dados sensíveis.
+ */

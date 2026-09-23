@@ -39,3 +39,6 @@ export default function FormLayout({
         </LinearGradient>
     );
 }
+/**
+ * Layout de formulários com área segura, rolagem, ações fixas e tratamento do teclado.
+ */

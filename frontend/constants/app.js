@@ -5,3 +5,6 @@ const configuracoesApp = Object.freeze({
 })
 
 export { configuracoesApp }
+/**
+ * Centraliza metadados públicos e imutáveis do aplicativo.
+ */

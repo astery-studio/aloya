@@ -25,3 +25,6 @@ const cores = Object.freeze({
 })
 
 export { cores }
+/**
+ * Define a paleta semântica usada pelos componentes e telas.
+ */

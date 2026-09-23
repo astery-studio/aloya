@@ -28,3 +28,6 @@ async function removerToken() {
 }
 
 export { obterToken, removerToken, salvarToken };
+/**
+ * Persiste e recupera a sessão autenticada usando armazenamento seguro.
+ */

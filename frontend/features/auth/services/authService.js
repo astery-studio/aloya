@@ -59,3 +59,6 @@ function criarAuthService({
 }
 
 export { criarAuthService }
+/**
+ * Reúne operações de conta e autenticação consumidas pelas telas.
+ */

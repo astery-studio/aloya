@@ -24,3 +24,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define a estrutura visual e o alinhamento opcional do FormLayout.
+ */

@@ -4,3 +4,6 @@ const storageKeys = Object.freeze({
 });
 
 export { storageKeys };
+/**
+ * Centraliza as chaves usadas para persistência local segura.
+ */
