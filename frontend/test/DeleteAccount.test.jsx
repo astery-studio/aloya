@@ -5,6 +5,10 @@ jest.mock('phosphor-react-native/src/icons/WarningCircle', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }))
 
+jest.mock('phosphor-react-native/src/icons/Trash', () => ({
+    TrashIcon: jest.fn(() => null)
+}))
+
 jest.mock('phosphor-react-native/src/icons/LockKey', () => ({
     LockKeyIcon: jest.fn(() => null)
 }))
@@ -83,6 +87,16 @@ test('senha correta abre a confirmação antes da exclusão', async () => {
         expect(
             screen.getByText('Excluir conta permanentemente?')
         ).toBeOnTheScreen()
+
+        expect(
+            screen.getByText('Deseja continuar?')
+        ).toBeOnTheScreen()
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Cancelar'
+        })
+    ).toBeOnTheScreen()
     })
 
     expect(excluirConta).not.toHaveBeenCalled()
