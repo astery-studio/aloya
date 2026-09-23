@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { salvarToken } from '../../../services/auth/tokenStorage';
 
 function useLogin({ realizarLogin }) {
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
     const [sucesso, setSucesso] = useState(false);
+    const montado = useRef(true);
 
-    async function enviarLogin(credenciais) {
+    useEffect(() => {
+        montado.current = true;
+        return () => {
+            montado.current = false;
+        };
+    }, []);
+
+    const enviarLogin = useCallback(async (credenciais) => {
         setCarregando(true);
         setErro(null);
         setSucesso(false);
@@ -14,19 +22,21 @@ function useLogin({ realizarLogin }) {
         try {
             const resultado = await realizarLogin(credenciais);
             await salvarToken(resultado.autenticacao);
-            setSucesso(true);
+            if (montado.current) setSucesso(true);
             return resultado;
         } catch (falha) {
-            setErro(falha.mensagemUsuario || falha.message || 'Não foi possível entrar.');
+            if (montado.current) {
+                setErro(falha.mensagemUsuario || falha.message || 'Não foi possível entrar.');
+            }
             return null;
         } finally {
-            setCarregando(false);
+            if (montado.current) setCarregando(false);
         }
-    }
+    }, [realizarLogin]);
 
-    function limparErro() {
+    const limparErro = useCallback(() => {
         setErro(null);
-    }
+    }, []);
 
     return { carregando, erro, sucesso, enviarLogin, limparErro };
 }
