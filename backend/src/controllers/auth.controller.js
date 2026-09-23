@@ -81,6 +81,29 @@ function criarAuthController({
         }
     }
 
+    async function verificarEmail(req, res, next) {
+        try {
+            const validacao = authValidator.validarEmail(req.body);
+
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: 'Informe um e-mail válido.',
+                        detalhes: validacao.erros
+                    }
+                });
+            }
+
+            const resultado = await authService
+                .verificarEmailDisponivel(validacao.dados.email);
+
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return next(erro);
+        }
+    }
+
     // Permite que o titular informe o e-mail do responsável depois do cadastro.
     async function solicitarConsentimento(req, res, next) {
         try {
@@ -207,6 +230,7 @@ function criarAuthController({
     return {
         cadastrar,
         realizarLogin,
+        verificarEmail,
         solicitarConsentimento,
         reenviarConsentimento,
         confirmarConsentimento,

@@ -22,6 +22,12 @@ function criarAuthRoutes({
         authController.realizarLogin
     );
 
+    router.post(
+        '/email-availability',
+        cadastroRateLimit,
+        authController.verificarEmail
+    );
+
     // Retorna o estado atual da liberação da Rede de Apoio.
     router.get(
         '/parental-consent/status',
