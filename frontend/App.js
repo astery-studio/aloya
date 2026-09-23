@@ -163,6 +163,7 @@ export default function App() {
                 encerrarSessao={configuracao.servicos.authService.encerrarSessao}
                 onContaExcluida={finalizarSessao}
                 onSessaoEncerrada={finalizarSessao}
+                confirmarSenhaExclusao={configuracao.servicos.accountService.confirmarSenhaExclusao}
             />
         </View>
     )
