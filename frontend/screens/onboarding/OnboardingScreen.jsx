@@ -119,7 +119,7 @@ export default function OnboardingScreen({
         aoAlterar={(duracaoMenstruacao) => alterar({ duracaoMenstruacao })} aoAvancar={avancar}
         aoPular={() => { alterar({ duracaoMenstruacao: null }); avancar(); }} renderizarSeletor={renderizarSeletorMenstruacao} />;
     if (etapa === 5) conteudo = <LutealPhaseLengthStep {...comum} valor={dados.duracaoLutea}
-        aoAlterar={(duracaoLutea) => alterar({ duracaoLutea })} aoAvancar={finalizar}
+        aoAlterar={(duracaoLutea) => alterar({ duracaoLutea })} aoAvancar={() => finalizar()}
         aoPular={() => { alterar({ duracaoLutea: null }); finalizar(null); }} renderizarSeletor={renderizarSeletorLutea} />;
     if (etapa === 6) conteudo = <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />;
 
