@@ -1,6 +1,8 @@
 import ButtonPopup from '../../common/Button/ButtonPopup';
 import AppModal from './AppModal';
 
+const larguraTotal = { width: '100%' };
+
 export default function SimpleModal({
     visivel, aoFechar, icone, corIcone, fundoIcone,
     titulo, mensagem, acaoPrincipal, acaoSecundaria
@@ -23,7 +25,7 @@ export default function SimpleModal({
                     variante={acaoPrincipal.variante || 'verde'}
                     desativado={acaoPrincipal.desativado}
                     carregando={acaoPrincipal.carregando}
-                    estilo={{ width: '100%' }}
+                    estilo={larguraTotal}
                 />
             )}
             {acaoSecundaria && (
@@ -33,7 +35,7 @@ export default function SimpleModal({
                     variante={acaoSecundaria.variante || 'branco'}
                     desativado={acaoSecundaria.desativado}
                     carregando={acaoSecundaria.carregando}
-                    estilo={{ width: '100%' }}
+                    estilo={larguraTotal}
                 />
             )}
         </AppModal>
