@@ -57,6 +57,29 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
         return criarUserProfile(resposta)
     }
 
+    //Confere a senha no backend sem excluir ou modificar dados.
+    function confirmarSenhaExclusao({senhaAtual} = {}) {
+        if (typeof senhaAtual !== 'string' || senhaAtual.length === 0) {
+            const erro = new Error('Informe sua senha atual.')
+            erro.codigo = 'SENHA_ATUAL_AUSENTE'
+            throw erro
+        }
+
+        if (verificacaoSenhaEmAndamento) {
+            return verificacaoSenhaEmAndamento
+        }
+
+        verificacaoSenhaEmAndamento = requisicaoAutenticada({
+            metodo: 'POST',
+            caminho: endpoints.verificacaoSenhaExclusao,
+            corpo: {senhaAtual}
+        }).then(() => true).finally(() => {
+            verificacaoSenhaEmAndamento = null
+        })
+
+        return verificacaoSenhaEmAndamento
+    }
+
     async function executarExclusao(senhaAtual) {
         if (!contaExcluidaNoServidor) {
             respostaDaExclusao = await requisicaoAutenticada({
