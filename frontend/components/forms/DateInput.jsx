@@ -3,7 +3,7 @@
  */
 import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import { CalendarBlank } from 'phosphor-react-native';
+import { CalendarBlankIcon as CalendarBlank } from 'phosphor-react-native/src/icons/CalendarBlank';
 import { cores } from '../../theme';
 import { formatDate } from '../../utils/date/formatDate';
 import { estilos } from './DateInput.styles';

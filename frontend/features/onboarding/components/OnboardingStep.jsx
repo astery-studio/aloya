@@ -2,7 +2,7 @@
  * Estrutura compartilhada das etapas com navegação, progresso e ação principal.
  */
 import { Pressable, Text, View } from 'react-native';
-import { ArrowLeft } from 'phosphor-react-native';
+import { ArrowLeftIcon as ArrowLeft } from 'phosphor-react-native/src/icons/ArrowLeft';
 import Button from '../../../components/common/Button/Button';
 import FormLayout from '../../../layouts/FormLayout';
 import { cores } from '../../../theme';

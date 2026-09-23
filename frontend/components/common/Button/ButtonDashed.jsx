@@ -1,7 +1,7 @@
 /**
  * Especializa o botão base para ações de inclusão com borda tracejada e ícone.
  */
-import { Plus } from 'phosphor-react-native';
+import { PlusIcon as Plus } from 'phosphor-react-native/src/icons/Plus';
 
 import Button from './Button';
 

@@ -2,7 +2,8 @@
  * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
  */
 import { useCallback, useState } from 'react';
-import { CalendarBlank, WarningCircle } from 'phosphor-react-native';
+import { CalendarBlankIcon as CalendarBlank } from 'phosphor-react-native/src/icons/CalendarBlank';
+import { WarningCircleIcon as WarningCircle } from 'phosphor-react-native/src/icons/WarningCircle';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
 import AccountStep from '../../features/onboarding/components/AccountStep';
 import BirthDateStep from '../../features/onboarding/components/BirthDateStep';
