@@ -6,3 +6,6 @@ export function isValidDate(valor) {
     return ano >= 1900 && data.getFullYear() === ano
         && data.getMonth() === mes - 1 && data.getDate() === dia;
 }
+/**
+ * Valida datas DD/MM/AAAA reais com ano mínimo de 1900.
+ */

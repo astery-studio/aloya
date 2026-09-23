@@ -6,3 +6,6 @@ export function isSameDay(primeira, segunda) {
         && primeira.getMonth() === segunda.getMonth()
         && primeira.getDate() === segunda.getDate();
 }
+/**
+ * Compara duas datas pelo dia civil local, ignorando seus horários.
+ */

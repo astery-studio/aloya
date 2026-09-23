@@ -6,3 +6,6 @@ export function horarioValido(valor) {
     const [hora, minuto] = valor.split(':').map(Number);
     return hora < 24 && minuto < 60;
 }
+/**
+ * Valida horários HH:MM dentro dos limites de hora e minuto.
+ */

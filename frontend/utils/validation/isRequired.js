@@ -2,3 +2,6 @@
 export function isRequired(valor) {
     return typeof valor === 'string' && valor.trim().length > 0;
 }
+/**
+ * Valida se um texto contém conteúdo visível após remoção de espaços.
+ */

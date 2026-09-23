@@ -3,3 +3,6 @@ export function isValidEmail(valor) {
     if (typeof valor !== 'string' || valor.length > 254) return false;
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor.trim());
 }
+/**
+ * Valida o formato básico e o limite de tamanho dos e-mails aceitos.
+ */
