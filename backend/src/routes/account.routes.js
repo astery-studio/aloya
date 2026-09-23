@@ -43,6 +43,13 @@ function criarAccountRoutes({
         accountDeletionController.excluirConta
     )
 
+    //Confere a senha antes de mostrar a confirmação final de exclusão.
+    router.post(
+        '/me/account-deletion/verify-password',
+        exclusaoContaRateLimit,
+        accountDeletionController.confirmarSenhaExclusao
+    )
+
     return router
 }
 
