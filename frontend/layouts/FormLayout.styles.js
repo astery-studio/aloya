@@ -1,3 +1,6 @@
+/**
+ * Define a estrutura visual e o alinhamento opcional do FormLayout.
+ */
 import { StyleSheet } from 'react-native';
 import { espacamentos } from '../theme';
 
@@ -24,6 +27,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Define a estrutura visual e o alinhamento opcional do FormLayout.
- */

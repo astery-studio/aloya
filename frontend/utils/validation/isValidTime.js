@@ -1,3 +1,6 @@
+/**
+ * Valida horários HH:MM dentro dos limites de hora e minuto.
+ */
 // Valida campos de formulário antes do envio.
 
 // Recebe um horário em HH:MM, verifica seus limites e devolve verdadeiro ou falso.
@@ -6,6 +9,3 @@ export function horarioValido(valor) {
     const [hora, minuto] = valor.split(':').map(Number);
     return hora < 24 && minuto < 60;
 }
-/**
- * Valida horários HH:MM dentro dos limites de hora e minuto.
- */

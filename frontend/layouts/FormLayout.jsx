@@ -1,3 +1,6 @@
+/**
+ * Layout de formulários com área segura, rolagem, ações fixas e tratamento do teclado.
+ */
 import {
     KeyboardAvoidingView, Platform, ScrollView, View
 } from 'react-native';
@@ -39,6 +42,3 @@ export default function FormLayout({
         </LinearGradient>
     );
 }
-/**
- * Layout de formulários com área segura, rolagem, ações fixas e tratamento do teclado.
- */
