@@ -1,3 +1,6 @@
+/**
+ * Testes da composição e das ações oferecidas pelo SimpleModal.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import SimpleModal from '../components/feedback/Modal/SimpleModal';
@@ -42,6 +45,3 @@ test('modal aceita segunda ação sem disparar a primeira', async () => {
     expect(segunda).toHaveBeenCalledTimes(1);
     expect(primeira).not.toHaveBeenCalled();
 });
-/**
- * Testes da composição e das ações oferecidas pelo SimpleModal.
- */

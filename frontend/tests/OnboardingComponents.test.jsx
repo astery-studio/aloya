@@ -1,3 +1,6 @@
+/**
+ * Testes de apresentação e interação dos componentes do onboarding.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import BirthDateStep from '../features/onboarding/components/BirthDateStep';
@@ -41,6 +44,3 @@ test('última menstruação delega a interface ao calendário externo', async ()
     expect(screen.getByText('Calendário externo')).toBeTruthy();
     expect(renderizarCalendario).toHaveBeenCalledWith(expect.objectContaining({ valor: periodo }));
 });
-/**
- * Testes de apresentação e interação dos componentes do onboarding.
- */

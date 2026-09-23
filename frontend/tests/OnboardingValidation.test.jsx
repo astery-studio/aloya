@@ -1,3 +1,6 @@
+/**
+ * Testes das validações e transições executadas durante o onboarding.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import Button from '../components/common/Button/Button';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
@@ -69,6 +72,3 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
     }));
     expect(() => JSON.stringify(cadastrar.mock.calls[0][0])).not.toThrow();
 });
-/**
- * Testes das validações e transições executadas durante o onboarding.
- */

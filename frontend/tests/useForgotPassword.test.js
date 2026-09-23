@@ -1,3 +1,6 @@
+/**
+ * Testes dos estados e ações do hook de recuperação de senha.
+ */
 import { act, renderHook } from '@testing-library/react-native';
 import { useForgotPassword } from '../features/auth/hooks/useForgotPassword';
 
@@ -30,6 +33,3 @@ test('reenvia pelo serviço específico e expõe falhas', async () => {
     expect(result.current.erro).toBe(falha.message);
     expect(result.current.carregando).toBe(false);
 });
-/**
- * Testes dos estados e ações do hook de recuperação de senha.
- */

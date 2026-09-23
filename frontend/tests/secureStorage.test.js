@@ -1,3 +1,6 @@
+/**
+ * Testes do adaptador de armazenamento seguro e de sua indisponibilidade.
+ */
 import * as SecureStore from 'expo-secure-store';
 import { lerSeguro, removerSeguro, salvarSeguro } from '../services/storage/secureStorage';
 
@@ -29,6 +32,3 @@ test('não usa armazenamento inseguro quando SecureStore está indisponível', a
     await expect(removerSeguro('sessao')).rejects.toThrow('indisponível');
     expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
 });
-/**
- * Testes do adaptador de armazenamento seguro e de sua indisponibilidade.
- */

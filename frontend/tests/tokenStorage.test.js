@@ -1,3 +1,6 @@
+/**
+ * Testes da persistência, leitura e descarte de sessões autenticadas.
+ */
 import * as storage from '../services/storage/secureStorage';
 import { obterToken, removerToken, salvarToken } from '../services/auth/tokenStorage';
 
@@ -27,6 +30,3 @@ test('remove sessão ausente ou corrompida com segurança', async () => {
 test('rejeita token vazio', async () => {
     await expect(salvarToken({ token: ' ' })).rejects.toThrow('inválido');
 });
-/**
- * Testes da persistência, leitura e descarte de sessões autenticadas.
- */

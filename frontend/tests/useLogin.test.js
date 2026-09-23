@@ -1,3 +1,6 @@
+/**
+ * Testes dos estados de sucesso e falha do hook de login.
+ */
 import { act, renderHook } from '@testing-library/react-native';
 import { salvarToken } from '../services/auth/tokenStorage';
 import { useLogin } from '../features/auth/hooks/useLogin';
@@ -33,6 +36,3 @@ test('expõe uma mensagem segura quando o login falha', async () => {
     await act(() => result.current.limparErro());
     expect(result.current.erro).toBeNull();
 });
-/**
- * Testes dos estados de sucesso e falha do hook de login.
- */

@@ -1,3 +1,6 @@
+/**
+ * Testes da máscara progressiva aplicada às entradas de horário.
+ */
 import { formatTime } from '../utils/formatting/formatTime';
 
 test('formata horário durante a digitação', () => {
@@ -10,6 +13,3 @@ test('limita o horário a quatro dígitos e ignora valores não textuais', () =>
     expect(formatTime('203012')).toBe('20:30');
     expect(formatTime(null)).toBe('');
 });
-/**
- * Testes da máscara progressiva aplicada às entradas de horário.
- */
