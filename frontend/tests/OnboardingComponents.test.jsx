@@ -8,6 +8,16 @@ import CycleLengthStep from '../features/onboarding/components/CycleLengthStep';
 import LastMenstruationStep from '../features/onboarding/components/LastMenstruationStep';
 import OnboardingProgress from '../features/onboarding/components/OnboardingProgress';
 
+jest.mock('../components/feedback/SelectionSheet/SelectionSheet', () => {
+    const { Pressable, Text } = require('react-native');
+    return { SelectionSheet: ({ visivel, onSelecionar }) => visivel ? (
+        <Pressable accessibilityRole="button" accessibilityLabel="Selecionar 30 dias"
+            onPress={() => onSelecionar(30)}>
+            <Text>30 dias</Text>
+        </Pressable>
+    ) : null };
+});
+
 test('progresso calcula a largura pela etapa atual', async () => {
     await render(<OnboardingProgress etapaAtual={3} totalEtapas={5} />);
     const barra = screen.getByLabelText('Etapa 3 de 5');
@@ -26,13 +36,14 @@ test('nascimento habilita avanço apenas com data válida', async () => {
     expect(aoAvancar).toHaveBeenCalledTimes(1);
 });
 
-test('duração delega o campo ao SelectInput externo', async () => {
-    const renderizarSeletor = jest.fn(({ valor }) => <Text>{valor} dias</Text>);
-    await render(<CycleLengthStep valor={28} aoAlterar={jest.fn()}
-        aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()}
-        renderizarSeletor={renderizarSeletor} />);
+test('duração abre o seletor e atualiza o valor escolhido', async () => {
+    const aoAlterar = jest.fn();
+    await render(<CycleLengthStep valor={28} aoAlterar={aoAlterar}
+        aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
     expect(screen.getByText('28 dias')).toBeTruthy();
-    expect(renderizarSeletor).toHaveBeenCalledWith(expect.objectContaining({ valor: 28 }));
+    await fireEvent.press(screen.getByLabelText('Selecionar duração em dias'));
+    await fireEvent.press(screen.getByLabelText('Selecionar 30 dias'));
+    expect(aoAlterar).toHaveBeenCalledWith(30);
 });
 
 test('última menstruação seleciona o intervalo no calendário próprio', async () => {
