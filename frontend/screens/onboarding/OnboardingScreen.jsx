@@ -27,7 +27,7 @@ function paraIso(data) {
 }
 
 export default function OnboardingScreen({
-    cadastrar, aoVoltar, aoEntrar, aoConcluir, logo,
+    cadastrar, verificarEmailDisponivel, aoVoltar, aoEntrar, aoConcluir, logo,
     renderizarCalendario, renderizarSeletorCiclo,
     renderizarSeletorMenstruacao, renderizarSeletorLutea
 }) {
@@ -79,7 +79,7 @@ export default function OnboardingScreen({
         avancar();
     }
 
-    function avancarConta() {
+    async function avancarConta() {
         if (dados.nome.trim().length < 3) {
             setErro({ titulo: 'Nome inválido', mensagem: 'O nome deve ter pelo menos 3 caracteres.' });
         } else if (!/^[\p{L}]+(?:[ -][\p{L}]+)*$/u.test(dados.nome.trim())) {
@@ -89,7 +89,21 @@ export default function OnboardingScreen({
         } else if (dados.senha !== dados.confirmacao) {
             setErro({ titulo: 'Senhas diferentes', mensagem: 'A confirmação deve ser igual à senha.' });
         } else {
-            avancar();
+            setCarregando(true);
+            try {
+                const resultado = await verificarEmailDisponivel?.(dados.email);
+                if (resultado && !resultado.disponivel) {
+                    setErro({ titulo: 'E-mail já cadastrado', mensagem:
+                        'Este e-mail já possui uma conta. Tente fazer login.' });
+                    return;
+                }
+                avancar();
+            } catch (falha) {
+                setErro({ titulo: 'Algo deu errado', mensagem:
+                    falha.mensagemUsuario || 'Não foi possível verificar o e-mail.' });
+            } finally {
+                setCarregando(false);
+            }
         }
     }
 
@@ -106,7 +120,8 @@ export default function OnboardingScreen({
     const comum = { aoVoltar: voltar, carregando };
     let conteudo;
     if (etapa === 0) conteudo = <AccountStep dados={dados} aoAlterar={alterar}
-        aoAvancar={avancarConta} aoVoltar={voltar} aoEntrar={aoEntrar} />;
+        aoAvancar={avancarConta} aoVoltar={voltar} aoEntrar={aoEntrar}
+        carregando={carregando} />;
     if (etapa === 1) conteudo = <BirthDateStep {...comum} valor={dados.dataNascimento}
         aoAlterar={(dataNascimento) => alterar({ dataNascimento })} aoAvancar={avancarNascimento} />;
     if (etapa === 2) conteudo = <LastMenstruationStep {...comum}
