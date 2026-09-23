@@ -8,16 +8,6 @@ import CycleLengthStep from '../features/onboarding/components/CycleLengthStep';
 import LastMenstruationStep from '../features/onboarding/components/LastMenstruationStep';
 import OnboardingProgress from '../features/onboarding/components/OnboardingProgress';
 
-jest.mock('../components/feedback/DatePickerSheet/DatePickerSheet', () => {
-    const { Pressable, Text } = require('react-native');
-    return { DatePickerSheet: ({ visivel, onSelecionar }) => visivel ? (
-        <Pressable accessibilityRole="button" accessibilityLabel="Escolher data"
-            onPress={() => onSelecionar('2026-08-03')}>
-            <Text>Calendário aberto</Text>
-        </Pressable>
-    ) : null };
-});
-
 test('progresso calcula a largura pela etapa atual', async () => {
     await render(<OnboardingProgress etapaAtual={3} totalEtapas={5} />);
     const barra = screen.getByLabelText('Etapa 3 de 5');
@@ -45,11 +35,13 @@ test('duração delega o campo ao SelectInput externo', async () => {
     expect(renderizarSeletor).toHaveBeenCalledWith(expect.objectContaining({ valor: 28 }));
 });
 
-test('última menstruação seleciona o início pelo DatePickerSheet', async () => {
+test('última menstruação seleciona o intervalo no calendário próprio', async () => {
     const aoAlterar = jest.fn();
-    await render(<LastMenstruationStep valor={null} aoAlterar={aoAlterar}
+    await render(<LastMenstruationStep
+        valor={{ inicio: '2026-08-03', fim: null }} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} />);
-    await fireEvent.press(screen.getAllByLabelText('Abrir calendário')[0]);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Escolher data' }));
-    expect(aoAlterar).toHaveBeenCalledWith({ inicio: '2026-08-03', fim: null });
+    fireEvent.press(screen.getByLabelText('Selecionar dia 7'));
+    expect(aoAlterar).toHaveBeenCalledWith({
+        inicio: '2026-08-03', fim: '2026-08-07'
+    });
 });
