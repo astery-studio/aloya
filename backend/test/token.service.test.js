@@ -44,6 +44,9 @@ function criarDependencias() {
     };
 
     const crypto = {
+        randomUUID() {
+            return 'id-unico';
+        },
         createHash(algoritmo) {
             assert.equal(
                 algoritmo,
@@ -115,7 +118,8 @@ test(
                 options: {
                     subject: '7',
                     expiresIn: '60m',
-                    algorithm: 'HS256'
+                    algorithm: 'HS256',
+                    jwtid: 'id-unico'
                 }
             }
         ]);
