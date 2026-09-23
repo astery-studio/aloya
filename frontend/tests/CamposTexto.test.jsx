@@ -1,3 +1,6 @@
+/**
+ * Testes dos campos de texto, e-mail e senha e de suas interações.
+ */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import TextInput from '../components/forms/TextInput';
 import EmailInput from '../components/forms/EmailInput';
@@ -29,6 +32,3 @@ test('senha começa oculta e pode ser exibida', async () => {
     await waitFor(() => expect(screen.getByLabelText('Senha').props.secureTextEntry).toBe(false));
     expect(screen.getByRole('button', { name: 'Ocultar senha' })).toBeTruthy();
 });
-/**
- * Testes dos campos de texto, e-mail e senha e de suas interações.
- */

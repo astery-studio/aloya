@@ -1,3 +1,6 @@
+/**
+ * Persiste e recupera a sessão autenticada usando armazenamento seguro.
+ */
 import {
     lerSeguro, removerSeguro, salvarSeguro
 } from '../storage/secureStorage';
@@ -28,6 +31,3 @@ async function removerToken() {
 }
 
 export { obterToken, removerToken, salvarToken };
-/**
- * Persiste e recupera a sessão autenticada usando armazenamento seguro.
- */

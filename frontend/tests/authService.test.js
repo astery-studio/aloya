@@ -1,3 +1,6 @@
+/**
+ * Testes dos contratos HTTP expostos pelo serviço de autenticação.
+ */
 import { criarAuthService } from '../features/auth/services/authService';
 
 test('encaminha operações de autenticação aos endpoints reais', async () => {
@@ -32,6 +35,3 @@ test('encaminha operações de autenticação aos endpoints reais', async () => 
         corpo: { token: 'jwt', senha: 'nova-senha' }
     });
 });
-/**
- * Testes dos contratos HTTP expostos pelo serviço de autenticação.
- */

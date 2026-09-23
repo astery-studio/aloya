@@ -1,3 +1,6 @@
+/**
+ * Adapta o Expo SecureStore para persistir, ler e remover dados sensíveis.
+ */
 import * as SecureStore from 'expo-secure-store';
 
 async function exigirArmazenamentoSeguro() {
@@ -22,6 +25,3 @@ async function removerSeguro(chave) {
 }
 
 export { salvarSeguro, lerSeguro, removerSeguro };
-/**
- * Adapta o Expo SecureStore para persistir, ler e remover dados sensíveis.
- */

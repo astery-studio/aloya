@@ -1,3 +1,6 @@
+/**
+ * Testes da estrutura, retorno e conteúdo apresentados pelo AuthLayout.
+ */
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import AuthLayout from '../layouts/AuthLayout';
@@ -25,6 +28,3 @@ test('permite omitir descrição e rodapé', async () => {
     expect(screen.queryByText('Acesse sua conta')).toBeNull();
     expect(screen.getByText('E-mail')).toBeTruthy();
 });
-/**
- * Testes da estrutura, retorno e conteúdo apresentados pelo AuthLayout.
- */

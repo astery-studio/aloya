@@ -1,3 +1,6 @@
+/**
+ * Testes das variantes, estados e interações dos botões reutilizáveis.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import Button from '../components/common/Button/Button';
 import ButtonPopup from '../components/common/Button/ButtonPopup';
@@ -42,6 +45,3 @@ test.each([
     await expect(render(<Button texto="Teste" {...propriedade} />))
         .rejects.toThrow(/inválid/);
 });
-/**
- * Testes das variantes, estados e interações dos botões reutilizáveis.
- */

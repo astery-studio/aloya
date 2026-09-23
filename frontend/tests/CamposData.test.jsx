@@ -1,3 +1,6 @@
+/**
+ * Testes de máscara, foco e remoção dos campos de data e horário.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import DateInput from '../components/forms/DateInput';
 import TimeInput from '../components/forms/TimeInput';
@@ -42,6 +45,3 @@ test('horário removível chama a ação de remoção', async () => {
     fireEvent.press(screen.getByRole('button', { name: 'Remover horário 08:00' }));
     expect(aoRemover).toHaveBeenCalledTimes(1);
 });
-/**
- * Testes de máscara, foco e remoção dos campos de data e horário.
- */

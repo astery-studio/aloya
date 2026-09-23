@@ -1,3 +1,6 @@
+/**
+ * Testes integrados das telas e interações do fluxo de autenticação.
+ */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -63,6 +66,3 @@ test('redefinição exige senhas iguais antes de confirmar', async () => {
         token: 'token', senha: 'nova-senha'
     }));
 });
-/**
- * Testes integrados das telas e interações do fluxo de autenticação.
- */

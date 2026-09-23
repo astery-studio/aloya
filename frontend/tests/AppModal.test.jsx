@@ -1,3 +1,6 @@
+/**
+ * Testes das variantes, conteúdo e validação estrutural do AppModal.
+ */
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import AppModal from '../components/feedback/Modal/AppModal';
@@ -38,6 +41,3 @@ test('rejeita variante desconhecida', async () => {
     await expect(render(<AppModal visivel variante="inexistente"
         titulo="Teste" />)).rejects.toThrow('Variante de AppModal inválida');
 });
-/**
- * Testes das variantes, conteúdo e validação estrutural do AppModal.
- */
