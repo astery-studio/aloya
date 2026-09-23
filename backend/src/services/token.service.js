@@ -71,7 +71,8 @@ function criarTokenService({
             {
                 subject: String(usuario.id),
                 expiresIn: '60m',
-                algorithm: 'HS256'
+                algorithm: 'HS256',
+                jwtid: crypto.randomUUID()
             }
         );
 
