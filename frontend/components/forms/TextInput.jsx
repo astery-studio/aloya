@@ -1,3 +1,6 @@
+/**
+ * Campo textual controlado que concentra variantes, sanitização e ação lateral.
+ */
 import { memo } from 'react';
 import { Text, TextInput as EntradaNativa, View } from 'react-native';
 import { cores } from '../../theme';
@@ -49,6 +52,3 @@ function TextInput({
 }
 
 export default memo(TextInput);
-/**
- * Campo textual controlado que concentra variantes, sanitização e ação lateral.
- */

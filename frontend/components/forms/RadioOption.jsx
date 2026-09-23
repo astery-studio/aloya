@@ -1,3 +1,6 @@
+/**
+ * Representa uma opção única selecionável com estado visual e acessibilidade.
+ */
 import { Pressable, Text, View } from 'react-native';
 import { Check } from 'phosphor-react-native';
 import { cores } from '../../theme';
@@ -32,6 +35,3 @@ export default function RadioOption({
         </Pressable>
     );
 }
-/**
- * Representa uma opção única selecionável com estado visual e acessibilidade.
- */

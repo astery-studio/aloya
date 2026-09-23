@@ -1,3 +1,6 @@
+/**
+ * Define os estados visuais normal, selecionado, pressionado e desativado da opção.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, fontFamilies, radius, typography } from '../../theme';
 
@@ -34,6 +37,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Define os estados visuais normal, selecionado, pressionado e desativado da opção.
- */

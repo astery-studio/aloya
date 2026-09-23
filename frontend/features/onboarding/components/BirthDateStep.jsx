@@ -1,3 +1,6 @@
+/**
+ * Etapa que coleta a data de nascimento e habilita avanço após preenchimento.
+ */
 import DateInput from '../../../components/forms/DateInput';
 import OnboardingStep from './OnboardingStep';
 
@@ -13,6 +16,3 @@ export default function BirthDateStep({
         </OnboardingStep>
     );
 }
-/**
- * Etapa que coleta a data de nascimento e habilita avanço após preenchimento.
- */

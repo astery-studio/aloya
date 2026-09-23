@@ -1,3 +1,6 @@
+/**
+ * Campo controlado que mascara horários e oferece remoção opcional.
+ */
 import { Pressable, TextInput, View } from 'react-native';
 import { Clock, Trash } from 'phosphor-react-native';
 import { cores } from '../../theme';
@@ -41,6 +44,3 @@ export default function TimeInput({
         </View>
     );
 }
-/**
- * Campo controlado que mascara horários e oferece remoção opcional.
- */

@@ -1,3 +1,6 @@
+/**
+ * Define os estilos dos campos, termos e rodapé da etapa de conta.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, fontFamilies } from '../../../theme';
 
@@ -25,6 +28,3 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
-/**
- * Define os estilos dos campos, termos e rodapé da etapa de conta.
- */

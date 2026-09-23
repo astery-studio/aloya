@@ -1,3 +1,6 @@
+/**
+ * Etapa de criação da conta que coleta credenciais e aceite dos termos.
+ */
 import { useCallback } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Check } from 'phosphor-react-native';
@@ -53,6 +56,3 @@ export default function AccountStep({ dados, aoAlterar, aoAvancar,
         </AuthLayout>
     );
 }
-/**
- * Etapa de criação da conta que coleta credenciais e aceite dos termos.
- */
