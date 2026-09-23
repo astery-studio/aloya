@@ -1,6 +1,7 @@
 //Controla a verificação da senha e a exclusão permanente da conta autenticada.
 import { useEffect, useState } from 'react'
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
+import { TrashIcon } from 'phosphor-react-native/src/icons/Trash'
 
 import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../../components/feedback/Modal/SimpleModal'
@@ -125,14 +126,13 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
                 }}
             />
 
-            <SimpleModal
+            <AlertModal
                 visivel={visivel && etapa === 'confirmacao'}
                 aoFechar={fechar}
-                icone={WarningCircleIcon}
-                corIcone={tema.cores.feedback.erro}
-                fundoIcone={tema.cores.icones.anticoncepcionais.vermelho.caixa}
+                icone={TrashIcon}
                 titulo="Excluir conta permanentemente?"
-                mensagem="Esta ação é permanente e removerá todos os seus dados de ciclo, diário, anticoncepcionais e rede de apoio. Deseja continuar?"
+                mensagem="Esta ação é permanente e removerá todos os seus dados de ciclo, diário, anticoncepcionais e rede de apoio."
+                destaque="Deseja continuar?"
                 acaoPrincipal={{
                     texto: 'Excluir permanentemente',
                     variante: 'vermelho',
