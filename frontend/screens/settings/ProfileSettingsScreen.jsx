@@ -72,7 +72,7 @@ function obterMensagemErroSalvar(erro) {
     return 'Não foi possível atualizar seus dados. Verifique sua conexão e tente novamente.'
 }
 
-function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, excluirConta, encerrarSessao, onContaExcluida, onSessaoEncerrada}) {
+function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, confirmarSenhaExclusao, excluirConta, encerrarSessao, onContaExcluida, onSessaoEncerrada}) {
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil))
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil))
     const [campoEditado, setCampoEditado] = useState(null)
