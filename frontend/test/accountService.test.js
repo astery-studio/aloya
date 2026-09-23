@@ -35,6 +35,44 @@ describe('accountService', () => {
         expect(Object.isFrozen(perfil)).toBe(true)
     })
 
+    test('confirma a senha sem solicitar exclusão', async () => {
+        const dependencias = criarDependencias()
+        dependencias.requisicaoAutenticada.mockResolvedValue(null)
+
+        const service = criarAccountService(dependencias)
+
+        await expect(service.confirmarSenhaExclusao({
+            senhaAtual: 'senha-segura'
+        })).resolves.toBe(true)
+
+        expect(dependencias.requisicaoAutenticada).toHaveBeenCalledWith({
+            metodo: 'POST',
+            caminho: endpoints.verificacaoSenhaExclusao,
+            corpo: {
+                senhaAtual: 'senha-segura'
+            }
+        })
+
+        expect(dependencias.removerCredencialLocal).not.toHaveBeenCalled()
+    })
+
+    test('repassa o erro de senha incorreta sem excluir a conta', async () => {
+        const dependencias = criarDependencias()
+        const erro = new Error('Senha incorreta')
+        erro.codigo = 'SENHA_ATUAL_INCORRETA'
+        dependencias.requisicaoAutenticada.mockRejectedValue(erro)
+
+        const service = criarAccountService(dependencias)
+
+        await expect(service.confirmarSenhaExclusao({
+            senhaAtual: 'incorreta'
+        })).rejects.toMatchObject({
+            codigo: 'SENHA_ATUAL_INCORRETA'
+        })
+
+        expect(dependencias.removerCredencialLocal).not.toHaveBeenCalled()
+    })
+
     test('envia somente alterações permitidas', async () => {
         const dependencias = criarDependencias()
         const service = criarAccountService(dependencias)
