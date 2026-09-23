@@ -36,14 +36,12 @@ function criarPasswordRecoveryService({
             })
         ]);
 
-        try {
-            await emailService.enviarEmailRecuperacaoSenha({
+        void emailService.enviarEmailRecuperacaoSenha({
                 email: usuario.email,
                 linkRedefinicao: `${baseUrl}?token=${encodeURIComponent(token.token)}`
-            });
-        } catch (erro) {
+            }).catch((erro) => {
             logger.error({ evento: 'falha_email_recuperacao', tipo: erro.name });
-        }
+            });
 
         return respostaPublica;
     }
