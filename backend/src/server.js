@@ -23,6 +23,8 @@ app.use(
     '/auth',
     criarAuthRoutes({
         authController: container.authController,
+        passwordRecoveryController:
+            container.passwordRecoveryController,
         authMiddleware: container.authMiddleware,
         cadastroRateLimit: container.cadastroRateLimit,
         emailRateLimit: container.emailRateLimit,

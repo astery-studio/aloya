@@ -3,6 +3,7 @@ const { Router } = express;
 
 function criarAuthRoutes({
     authController,
+    passwordRecoveryController,
     authMiddleware,
     cadastroRateLimit,
     emailRateLimit,
@@ -26,6 +27,23 @@ function criarAuthRoutes({
         '/email-availability',
         cadastroRateLimit,
         authController.verificarEmail
+    );
+
+    router.post(
+        '/password-recovery/request',
+        emailRateLimit,
+        passwordRecoveryController.solicitar
+    );
+
+    router.get(
+        '/password-recovery/:token',
+        passwordRecoveryController.validarToken
+    );
+
+    router.post(
+        '/password-recovery/reset',
+        emailRateLimit,
+        passwordRecoveryController.redefinir
     );
 
     // Retorna o estado atual da liberação da Rede de Apoio.
