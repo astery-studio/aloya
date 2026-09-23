@@ -1,3 +1,6 @@
+/**
+ * Testes dos contratos de entrada do consentimento parental.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

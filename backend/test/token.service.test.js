@@ -1,3 +1,6 @@
+/**
+ * Testes de geração, finalidade, validade e leitura dos JWTs de recuperação.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

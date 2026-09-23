@@ -1,3 +1,6 @@
+/**
+ * Testes das rotas, proteções e limitadores do domínio de autenticação.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

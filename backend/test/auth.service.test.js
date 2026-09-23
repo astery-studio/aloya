@@ -1,3 +1,6 @@
+/**
+ * Testes do login, persistência da sessão e tratamento seguro de credenciais.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

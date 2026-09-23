@@ -1,3 +1,6 @@
+/**
+ * Testes das respostas HTTP do fluxo de recuperação de senha.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { criarPasswordRecoveryController } from '../src/controllers/passwordRecovery.controller.js';

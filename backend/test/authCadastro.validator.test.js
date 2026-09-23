@@ -1,3 +1,6 @@
+/**
+ * Testes das regras de entrada aplicadas ao cadastro de conta.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

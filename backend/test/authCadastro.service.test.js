@@ -1,3 +1,6 @@
+/**
+ * Testes das regras de cadastro, senha e persistência dos dados iniciais.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

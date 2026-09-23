@@ -1,3 +1,6 @@
+/**
+ * Testes das regras de entrada da recuperação e redefinição de senha.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

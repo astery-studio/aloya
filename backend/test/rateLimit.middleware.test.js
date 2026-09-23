@@ -1,3 +1,6 @@
+/**
+ * Testes de configuração, resposta e registro seguro do limitador.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

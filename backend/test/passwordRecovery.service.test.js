@@ -1,3 +1,6 @@
+/**
+ * Testes de emissão, revogação e uso único dos tokens de recuperação.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { criarPasswordRecoveryService } from '../src/services/passwordRecovery.service.js';

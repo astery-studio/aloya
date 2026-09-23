@@ -1,3 +1,6 @@
+/**
+ * Testes das regras de validação e normalização do login.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

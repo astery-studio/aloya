@@ -1,3 +1,6 @@
+/**
+ * Testes da emissão, confirmação e reenvio do consentimento parental.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

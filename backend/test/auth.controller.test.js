@@ -1,3 +1,6 @@
+/**
+ * Testes das respostas e delegações realizadas pelo controller de autenticação.
+ */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
