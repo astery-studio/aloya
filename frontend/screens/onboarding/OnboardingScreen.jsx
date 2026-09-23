@@ -31,9 +31,7 @@ function paraIso(data) {
 }
 
 export default function OnboardingScreen({
-    cadastrar, verificarEmailDisponivel, aoVoltar, aoEntrar, aoConcluir, logo,
-    renderizarSeletorCiclo,
-    renderizarSeletorMenstruacao, renderizarSeletorLutea
+    cadastrar, verificarEmailDisponivel, aoVoltar, aoEntrar, aoConcluir, logo
 }) {
     const [etapa, setEtapa] = useState(0);
     const [dados, setDados] = useState(iniciais);
@@ -135,13 +133,13 @@ export default function OnboardingScreen({
         aoAvancar={avancarMenstruacao} />;
     if (etapa === 3) conteudo = <CycleLengthStep {...comum} valor={dados.duracaoCiclo}
         aoAlterar={(duracaoCiclo) => alterar({ duracaoCiclo })} aoAvancar={avancar}
-        aoPular={() => { alterar({ duracaoCiclo: null }); avancar(); }} renderizarSeletor={renderizarSeletorCiclo} />;
+        aoPular={() => { alterar({ duracaoCiclo: null }); avancar(); }} />;
     if (etapa === 4) conteudo = <MenstruationLengthStep {...comum} valor={dados.duracaoMenstruacao}
         aoAlterar={(duracaoMenstruacao) => alterar({ duracaoMenstruacao })} aoAvancar={avancar}
-        aoPular={() => { alterar({ duracaoMenstruacao: null }); avancar(); }} renderizarSeletor={renderizarSeletorMenstruacao} />;
+        aoPular={() => { alterar({ duracaoMenstruacao: null }); avancar(); }} />;
     if (etapa === 5) conteudo = <LutealPhaseLengthStep {...comum} valor={dados.duracaoLutea}
         aoAlterar={(duracaoLutea) => alterar({ duracaoLutea })} aoAvancar={() => finalizar()}
-        aoPular={() => { alterar({ duracaoLutea: null }); finalizar(null); }} renderizarSeletor={renderizarSeletorLutea} />;
+        aoPular={() => { alterar({ duracaoLutea: null }); finalizar(null); }} />;
     if (etapa === 6) conteudo = <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />;
 
     return <>{conteudo}<SimpleModal visivel={Boolean(erro)}

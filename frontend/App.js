@@ -3,7 +3,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import {
-    ActivityIndicator, Linking, NativeModules, Pressable, Text, View
+    ActivityIndicator, Linking, NativeModules, Text, View
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -32,20 +32,6 @@ function obterBaseUrl() {
 function obterToken(url) {
     const token = url?.match(/[?&]token=([^&]+)/)?.[1];
     return token ? decodeURIComponent(token) : null;
-}
-
-function SeletorProvisorio({ valor, aoAlterar, unidade }) {
-    return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
-            <Pressable accessibilityLabel="Diminuir" onPress={() => aoAlterar(Math.max(1, valor - 1))}>
-                <Text style={{ fontSize: 32 }}>−</Text>
-            </Pressable>
-            <Text style={{ fontFamily: fontFamilies.bold, fontSize: 28 }}>{valor} {unidade}</Text>
-            <Pressable accessibilityLabel="Aumentar" onPress={() => aoAlterar(valor + 1)}>
-                <Text style={{ fontSize: 32 }}>+</Text>
-            </Pressable>
-        </View>
-    );
 }
 
 export default function App() {
@@ -92,7 +78,6 @@ export default function App() {
         );
     }
 
-    const seletor = (props) => <SeletorProvisorio {...props} />;
     let conteudo;
     if (tela === 'boasVindas') conteudo = <WelcomeScreen
         aoCriarConta={() => setTela('cadastro')} aoEntrar={() => setTela('login')} />;
@@ -109,8 +94,7 @@ export default function App() {
     if (tela === 'cadastro') conteudo = <OnboardingScreen cadastrar={auth.cadastrar}
         verificarEmailDisponivel={auth.verificarEmailDisponivel}
         aoVoltar={() => setTela('boasVindas')} aoEntrar={() => setTela('login')}
-        aoConcluir={() => setTela('autenticado')} renderizarSeletorCiclo={seletor}
-        renderizarSeletorMenstruacao={seletor} renderizarSeletorLutea={seletor} />;
+        aoConcluir={() => setTela('autenticado')} />;
     if (tela === 'autenticado') conteudo = (
         <SafeAreaView style={{ flex: 1, padding: 24, justifyContent: 'center', gap: 24,
             backgroundColor: cores.neutras.fundoClaro }}>
