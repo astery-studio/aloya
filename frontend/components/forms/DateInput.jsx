@@ -1,5 +1,5 @@
 /**
- * Campo controlado que aplica máscara de data e gerencia foco ou abertura de calendário.
+ * Campo controlado que aplica máscara de data e abre o teclado ao ser pressionado.
  */
 import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
@@ -9,20 +9,18 @@ import { formatDate } from '../../utils/date/formatDate';
 import { estilos } from './DateInput.styles';
 
 export default function DateInput({
-    valor = '', onChangeText, aoPressionarCalendario,
-    desativado = false, estilo, rotuloAcessibilidade = 'Data',
+    valor = '', onChangeText, desativado = false,
+    estilo, rotuloAcessibilidade = 'Data',
     onFocus, onBlur, testeId = 'campo-data'
 }) {
     const entradaRef = useRef(null);
     const [focado, setFocado] = useState(false);
-    const acionarCampo = aoPressionarCalendario || (() => entradaRef.current?.focus());
-
     return (
         <Pressable
             accessibilityRole="button"
-            accessibilityLabel={aoPressionarCalendario ? 'Abrir calendário' : 'Digitar data'}
+            accessibilityLabel="Digitar data"
             disabled={desativado}
-            onPress={acionarCampo}
+            onPress={() => entradaRef.current?.focus()}
             style={[estilos.botao, desativado && estilos.desativado, estilo]}
         >
             <View style={[estilos.campo, focado && estilos.focado]} testID={testeId}>

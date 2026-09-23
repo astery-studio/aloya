@@ -12,7 +12,7 @@ test('data formata oito dígitos como DD/MM/AAAA', async () => {
     expect(aoMudar).toHaveBeenCalledWith('08/04/1999');
 });
 
-test('ícone de data foca o campo quando não há calendário', async () => {
+test('qualquer toque no campo de data abre o teclado para digitação', async () => {
     await render(<DateInput valor="" onChangeText={jest.fn()} />);
     const botao = screen.getByRole('button', { name: 'Digitar data' });
     expect(botao).toHaveStyle({ width: '100%', paddingTop: 8 });

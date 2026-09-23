@@ -290,7 +290,7 @@ export default function App() {
                     <PasswordInput value={senha} onChangeText={setSenha} />
 
                     <Text style={estilos.subtitulo}>DateInput</Text>
-                    <DateInput valor={dataDigitada} onChangeText={setDataDigitada} aoPressionarCalendario={() => setPainelAtivo('data')} />
+                    <DateInput valor={dataDigitada} onChangeText={setDataDigitada} />
                     <DateInput valor="15/03/2000" desativado />
 
                     <Text style={estilos.subtitulo}>TimeInput</Text>
