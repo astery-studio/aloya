@@ -1,4 +1,7 @@
-import { useRef } from 'react';
+/**
+ * Campo controlado que aplica máscara de data e gerencia foco ou abertura de calendário.
+ */
+import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { CalendarBlank } from 'phosphor-react-native';
 import { cores } from '../../theme';
@@ -7,36 +10,44 @@ import { estilos } from './DateInput.styles';
 
 export default function DateInput({
     valor = '', onChangeText, aoPressionarCalendario,
-    desativado = false, estilo, rotuloAcessibilidade = 'Data'
+    desativado = false, estilo, rotuloAcessibilidade = 'Data',
+    onFocus, onBlur, testeId = 'campo-data'
 }) {
     const entradaRef = useRef(null);
-    const preenchido = Boolean(valor);
+    const [focado, setFocado] = useState(false);
+    const acionarCampo = aoPressionarCalendario || (() => entradaRef.current?.focus());
 
     return (
-        <View style={[
-            estilos.campo, preenchido && estilos.preenchido,
-            desativado && estilos.desativado, estilo
-        ]}>
-            <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={aoPressionarCalendario ? 'Abrir calendário' : 'Digitar data'}
-                disabled={desativado}
-                onPress={aoPressionarCalendario || (() => entradaRef.current?.focus())}
-            >
+        <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={aoPressionarCalendario ? 'Abrir calendário' : 'Digitar data'}
+            disabled={desativado}
+            onPress={acionarCampo}
+            style={[estilos.botao, desativado && estilos.desativado, estilo]}
+        >
+            <View style={[estilos.campo, focado && estilos.focado]} testID={testeId}>
                 <CalendarBlank size={20} color={cores.neutras.textoSecundarioClaro} />
-            </Pressable>
-            <TextInput
-                ref={entradaRef}
-                accessibilityLabel={rotuloAcessibilidade}
-                editable={!desativado}
-                keyboardType="number-pad"
-                maxLength={10}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor={cores.neutras.textoSecundarioClaro}
-                value={valor}
-                onChangeText={(texto) => onChangeText?.(formatDate(texto))}
-                style={estilos.entrada}
-            />
-        </View>
+                <TextInput
+                    ref={entradaRef}
+                    accessibilityLabel={rotuloAcessibilidade}
+                    editable={!desativado}
+                    keyboardType="number-pad"
+                    maxLength={10}
+                    placeholder="DD/MM/AAAA"
+                    placeholderTextColor={cores.neutras.textoSecundarioClaro}
+                    value={valor}
+                    onChangeText={(texto) => onChangeText?.(formatDate(texto))}
+                    onFocus={(evento) => {
+                        setFocado(true);
+                        onFocus?.(evento);
+                    }}
+                    onBlur={(evento) => {
+                        setFocado(false);
+                        onBlur?.(evento);
+                    }}
+                    style={estilos.entrada}
+                />
+            </View>
+        </Pressable>
     );
 }

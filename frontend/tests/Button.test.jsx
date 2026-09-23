@@ -1,3 +1,6 @@
+/**
+ * Testes das variantes, estados e interações dos botões reutilizáveis.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import Button from '../components/common/Button/Button';
 import ButtonPopup from '../components/common/Button/ButtonPopup';
@@ -33,4 +36,12 @@ test('botão tracejado executa a ação', async () => {
     await render(<ButtonDashed texto="Adicionar" aoPressionar={aoPressionar} />);
     fireEvent.press(screen.getByRole('button', { name: 'Adicionar' }));
     expect(aoPressionar).toHaveBeenCalledTimes(1);
+});
+
+test.each([
+    ['variante', { variante: 'inexistente' }],
+    ['tamanho', { tamanho: 'inexistente' }]
+])('rejeita %s inválido', async (_, propriedade) => {
+    await expect(render(<Button texto="Teste" {...propriedade} />))
+        .rejects.toThrow(/inválid/);
 });

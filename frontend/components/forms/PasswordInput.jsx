@@ -1,4 +1,7 @@
-import { useState } from 'react';
+/**
+ * Especializa TextInput para senhas e controla a alternância de visibilidade.
+ */
+import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { Eye, EyeSlash } from 'phosphor-react-native';
 import { cores } from '../../theme';
@@ -6,7 +9,7 @@ import TextInput from './TextInput';
 import { estilos } from './TextInput.styles';
 
 // Recebe as opções de senha, permite alternar sua visibilidade e devolve o texto.
-export default function PasswordInput({
+function PasswordInput({
     label = 'Senha', placeholder = label, desativado = false, ...props
 }) {
     const [visivel, definirVisivel] = useState(false);
@@ -36,3 +39,5 @@ export default function PasswordInput({
         />
     );
 }
+
+export default memo(PasswordInput);

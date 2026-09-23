@@ -1,3 +1,6 @@
+/**
+ * Testes de formatação, validação e comparação dos utilitários de data.
+ */
 import { formatDate } from '../utils/date/formatDate';
 import { isSameDay } from '../utils/date/isSameDay';
 

@@ -1,3 +1,6 @@
+/**
+ * Agrupa rótulo, conteúdo e mensagem auxiliar em uma estrutura de formulário.
+ */
 import { Text, View } from 'react-native';
 import { estilos } from './FormField.styles';
 

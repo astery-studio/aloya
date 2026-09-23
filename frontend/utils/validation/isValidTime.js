@@ -1,3 +1,6 @@
+/**
+ * Valida horários HH:MM dentro dos limites de hora e minuto.
+ */
 // Valida campos de formulário antes do envio.
 
 // Recebe um horário em HH:MM, verifica seus limites e devolve verdadeiro ou falso.

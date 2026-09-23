@@ -1,3 +1,6 @@
+/**
+ * Testes de máscara, foco e remoção dos campos de data e horário.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import DateInput from '../components/forms/DateInput';
 import TimeInput from '../components/forms/TimeInput';
@@ -11,8 +14,22 @@ test('data formata oito dígitos como DD/MM/AAAA', async () => {
 
 test('ícone de data foca o campo quando não há calendário', async () => {
     await render(<DateInput valor="" onChangeText={jest.fn()} />);
-    fireEvent.press(screen.getByRole('button', { name: 'Digitar data' }));
+    const botao = screen.getByRole('button', { name: 'Digitar data' });
+    expect(botao).toHaveStyle({ width: '100%', paddingTop: 8 });
+    fireEvent.press(botao);
     expect(screen.getByLabelText('Data')).toBeTruthy();
+});
+
+test('data exibe borda laranja somente enquanto está focada', async () => {
+    await render(<DateInput valor="08/04/1999" onChangeText={jest.fn()} />);
+    const entrada = screen.getByLabelText('Data');
+    const campo = screen.getByTestId('campo-data');
+    await fireEvent(entrada, 'focus');
+    expect(campo).toHaveStyle({
+        borderColor: '#C85A44'
+    });
+    await fireEvent(entrada, 'blur');
+    expect(campo).toHaveStyle({ borderColor: '#E6E2D8' });
 });
 
 test('horário formata quatro dígitos como HH:MM', async () => {

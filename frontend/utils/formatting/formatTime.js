@@ -1,3 +1,6 @@
+/**
+ * Formata progressivamente entradas numéricas no padrão HH:MM.
+ */
 // Aplica a máscara HH:MM enquanto a pessoa digita.
 export function formatTime(valor) {
     if (typeof valor !== 'string') return '';

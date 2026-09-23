@@ -1,3 +1,6 @@
+/**
+ * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
+ */
 import { Modal, Text, View } from 'react-native';
 import { cores } from '../../../theme';
 import { estilos } from './AppModal.styles';
@@ -8,6 +11,10 @@ export default function AppModal({
 }) {
     if (!['simples', 'alerta', 'acao'].includes(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
+    }
+
+    if (!visivel) {
+        return null;
     }
 
     const alerta = variante === 'alerta';

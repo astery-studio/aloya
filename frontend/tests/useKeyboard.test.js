@@ -1,3 +1,6 @@
+/**
+ * Testes dos listeners, estado e cleanup do hook de teclado.
+ */
 import { act, renderHook } from '@testing-library/react-native';
 import { Keyboard } from 'react-native';
 import { useKeyboard } from '../hooks/useKeyboard';

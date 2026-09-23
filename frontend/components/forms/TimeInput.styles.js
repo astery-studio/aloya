@@ -1,3 +1,6 @@
+/**
+ * Define a disposição e os estados visuais do campo de horário.
+ */
 import { StyleSheet } from 'react-native';
 import { cores, radius, typography } from '../../theme';
 

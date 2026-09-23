@@ -1,3 +1,6 @@
+/**
+ * Testes da máscara progressiva aplicada às entradas de horário.
+ */
 import { formatTime } from '../utils/formatting/formatTime';
 
 test('formata horário durante a digitação', () => {

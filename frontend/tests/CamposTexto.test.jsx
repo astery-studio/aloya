@@ -1,3 +1,6 @@
+/**
+ * Testes dos campos de texto, e-mail e senha e de suas interações.
+ */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import TextInput from '../components/forms/TextInput';
 import EmailInput from '../components/forms/EmailInput';

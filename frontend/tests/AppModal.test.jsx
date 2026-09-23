@@ -1,3 +1,6 @@
+/**
+ * Testes das variantes, conteúdo e validação estrutural do AppModal.
+ */
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import AppModal from '../components/feedback/Modal/AppModal';

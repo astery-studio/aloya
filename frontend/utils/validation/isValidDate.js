@@ -1,3 +1,6 @@
+/**
+ * Valida datas DD/MM/AAAA reais com ano mínimo de 1900.
+ */
 // Confere se DD/MM/AAAA representa um dia real a partir de 1900.
 export function isValidDate(valor) {
     if (typeof valor !== 'string' || !/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return false;

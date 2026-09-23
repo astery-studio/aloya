@@ -1,3 +1,6 @@
+/**
+ * Testes de seleção acessível e estrutura do FormField.
+ */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import RadioOption from '../components/forms/RadioOption';
