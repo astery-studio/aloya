@@ -15,9 +15,10 @@ const estilos = StyleSheet.create({
     tituloSecao: {
         marginLeft: 4,
         color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.regular,
+        fontFamily: fontFamilies.medium,
         fontSize: 14,
-        fontWeight: '400',
+        fontStyle: 'normal',
+        fontWeight: '500',
         lineHeight: 21
     },
 
