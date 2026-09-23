@@ -2,10 +2,18 @@
  * Testes das validações e transições executadas durante o onboarding.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import Button from '../components/common/Button/Button';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 
 jest.mock('../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
+jest.mock('../components/feedback/DatePickerSheet/DatePickerSheet', () => {
+    const { Pressable, Text } = require('react-native');
+    return { DatePickerSheet: ({ visivel, onSelecionar }) => visivel ? (
+        <Pressable accessibilityRole="button" accessibilityLabel="Selecionar período"
+            onPress={() => onSelecionar('2026-08-03')}>
+            <Text>Calendário menstrual</Text>
+        </Pressable>
+    ) : null };
+});
 
 test('cadastro explica quando o nome tem menos de três caracteres', async () => {
     const cadastrar = jest.fn();
@@ -47,10 +55,8 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
         autenticacao: { token: 'jwt', tipo: 'Bearer' }
     });
     const seletor = () => null;
-    const calendario = ({ aoAlterar }) => <Button texto="Selecionar período"
-        aoPressionar={() => aoAlterar({ inicio: '2026-08-03', fim: '2026-08-07' })} />;
     await render(<OnboardingScreen cadastrar={cadastrar}
-        renderizarCalendario={calendario} renderizarSeletorCiclo={seletor}
+        renderizarSeletorCiclo={seletor}
         renderizarSeletorMenstruacao={seletor} renderizarSeletorLutea={seletor} />);
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
@@ -61,6 +67,7 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getAllByLabelText('Abrir calendário')[0]);
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
