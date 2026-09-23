@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { cores, fontFamilies } from '../../../theme'
+import { cores, fontFamilies } from '../../../../theme'
 
 const estilos = StyleSheet.create({
     campoSenha: {
