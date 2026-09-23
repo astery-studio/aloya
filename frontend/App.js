@@ -2,7 +2,9 @@
  * Aplicativo provisório para testar o fluxo real de autenticação no Expo Go.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Linking, NativeModules, Pressable, Text, View } from 'react-native';
+import {
+    ActivityIndicator, Linking, NativeModules, Pressable, Text, View
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -47,7 +49,7 @@ function SeletorProvisorio({ valor, aoAlterar, unidade }) {
 }
 
 export default function App() {
-    const [fontes] = useFonts({
+    const [fontes, erroFontes] = useFonts({
         DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold
     });
     const [tela, setTela] = useState('boasVindas');
@@ -71,7 +73,21 @@ export default function App() {
         return () => inscricao.remove();
     }, []);
 
-    if (!fontes) return null;
+    if (erroFontes) {
+        return (
+            <SafeAreaView style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
+                <Text>Não foi possível carregar as fontes: {erroFontes.message}</Text>
+            </SafeAreaView>
+        );
+    }
+    if (!fontes) {
+        return (
+            <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                <ActivityIndicator color={cores.marca.primaria} size="large" />
+                <Text>Carregando o fluxo de autenticação...</Text>
+            </SafeAreaView>
+        );
+    }
 
     const seletor = (props) => <SeletorProvisorio {...props} />;
     let conteudo;
