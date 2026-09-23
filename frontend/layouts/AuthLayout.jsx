@@ -7,12 +7,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { cores } from '../theme';
 import { estilos } from './AuthLayout.styles';
 
+const coresFundo = ['#F5EDE3', '#F7F5F0'];
+const posicoesFundo = [0.04, 0.55];
+
 export default function AuthLayout({
     titulo, descricao, children, rodape, aoVoltar, testeId = 'auth-layout'
 }) {
     return (
-        <LinearGradient colors={['#F5EDE3', '#F7F5F0']}
-            locations={[0.04, 0.55]} style={estilos.tela}>
+        <LinearGradient colors={coresFundo}
+            locations={posicoesFundo} style={estilos.tela}>
         <SafeAreaView style={estilos.flexivel} testID={testeId}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}

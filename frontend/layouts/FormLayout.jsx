@@ -5,14 +5,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { estilos } from './FormLayout.styles';
 
+const coresFundo = ['#F5EDE3', '#F7F5F0'];
+const posicoesFundo = [0.04, 0.55];
+
 export default function FormLayout({
     cabecalho, children, acoes, centralizado = false,
     testeId = 'form-layout'
 }) {
     return (
         <LinearGradient
-            colors={['#F5EDE3', '#F7F5F0']}
-            locations={[0.04, 0.55]}
+            colors={coresFundo}
+            locations={posicoesFundo}
             style={estilos.fundo}
         >
             <SafeAreaView style={estilos.tela} testID={testeId}>
