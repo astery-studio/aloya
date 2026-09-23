@@ -13,3 +13,6 @@ export default function LastMenstruationStep({
         </OnboardingStep>
     );
 }
+/**
+ * Etapa que recebe o período da última menstruação por um calendário externo.
+ */

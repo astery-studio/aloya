@@ -145,3 +145,6 @@ export default function OnboardingScreen({
         titulo={erro?.titulo} mensagem={erro?.mensagem}
         acaoPrincipal={{ texto: 'Entendi', aoPressionar: () => setErro(null) }} /></>;
 }
+/**
+ * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
+ */

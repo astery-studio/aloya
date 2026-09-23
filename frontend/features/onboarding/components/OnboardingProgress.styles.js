@@ -22,3 +22,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define trilha e preenchimento visual do progresso do cadastro.
+ */

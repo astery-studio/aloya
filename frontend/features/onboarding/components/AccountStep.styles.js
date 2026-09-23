@@ -25,3 +25,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define os estilos dos campos, termos e rodapé da etapa de conta.
+ */

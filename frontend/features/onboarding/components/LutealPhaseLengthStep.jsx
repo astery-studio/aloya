@@ -9,3 +9,6 @@ export default function LutealPhaseLengthStep(props) {
         />
     );
 }
+/**
+ * Configura DurationStep para coletar a duração da fase lútea.
+ */

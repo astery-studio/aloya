@@ -18,3 +18,6 @@ export default function OnboardingComplete({ aoIniciar, logo }) {
         </FormLayout>
     );
 }
+/**
+ * Tela final do cadastro que confirma conclusão e inicia o uso do aplicativo.
+ */

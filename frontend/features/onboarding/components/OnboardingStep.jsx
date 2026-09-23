@@ -35,3 +35,6 @@ export default function OnboardingStep({
         </FormLayout>
     );
 }
+/**
+ * Estrutura compartilhada das etapas com navegação, progresso e ação principal.
+ */

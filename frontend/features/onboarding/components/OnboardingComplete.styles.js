@@ -23,3 +23,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define os estilos da mensagem final e da área reservada ao logotipo.
+ */

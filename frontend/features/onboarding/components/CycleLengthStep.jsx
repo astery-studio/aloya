@@ -9,3 +9,6 @@ export default function CycleLengthStep(props) {
         />
     );
 }
+/**
+ * Configura DurationStep para coletar a duração habitual do ciclo.
+ */

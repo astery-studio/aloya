@@ -13,3 +13,6 @@ export default function BirthDateStep({
         </OnboardingStep>
     );
 }
+/**
+ * Etapa que coleta a data de nascimento e habilita avanço após preenchimento.
+ */

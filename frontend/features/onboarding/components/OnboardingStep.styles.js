@@ -37,3 +37,6 @@ const estilos = StyleSheet.create({
 });
 
 export { estilos };
+/**
+ * Define posicionamento do cabeçalho e conteúdo das etapas do cadastro.
+ */

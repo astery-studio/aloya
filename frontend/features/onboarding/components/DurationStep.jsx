@@ -14,3 +14,6 @@ export default function DurationStep({
         </OnboardingStep>
     );
 }
+/**
+ * Estrutura reutilizável das etapas que coletam durações em dias.
+ */

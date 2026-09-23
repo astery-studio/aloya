@@ -19,3 +19,6 @@ export default function OnboardingProgress({ etapaAtual, totalEtapas = 5 }) {
         </View>
     );
 }
+/**
+ * Indicador acessível do progresso entre as etapas do cadastro.
+ */

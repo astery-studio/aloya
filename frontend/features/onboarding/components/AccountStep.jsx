@@ -53,3 +53,6 @@ export default function AccountStep({ dados, aoAlterar, aoAvancar,
         </AuthLayout>
     );
 }
+/**
+ * Etapa de criação da conta que coleta credenciais e aceite dos termos.
+ */
