@@ -46,6 +46,3 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
 }
 
 export { Header }
-/**
- * Cabeçalho navegacional com título, retorno e ações opcionais.
- */

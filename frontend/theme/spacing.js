@@ -16,6 +16,3 @@ export {
     espacamentos,
     espacamentosLayout
 }
-/**
- * Define a escala de espaçamentos reutilizada na interface.
- */

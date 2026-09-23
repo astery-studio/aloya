@@ -23,6 +23,3 @@ export {
     shadows,
     tema
 };
-/**
- * Expõe os tokens visuais por um ponto único de importação.
- */

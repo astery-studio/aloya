@@ -34,6 +34,3 @@ function criarUserProfile(respostaApi) {
 }
 
 export { criarUserProfile }
-/**
- * Normaliza respostas de perfil para o formato mínimo usado pela interface.
- */

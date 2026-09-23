@@ -16,6 +16,3 @@ const endpoints = Object.freeze({
 })
 
 export { endpoints }
-/**
- * Centraliza os caminhos HTTP consumidos pelos serviços do frontend.
- */

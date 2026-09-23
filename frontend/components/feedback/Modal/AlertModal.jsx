@@ -8,6 +8,3 @@ export default function AlertModal(props) {
 }
 
 */
-/**
- * Mantém um exemplo desativado da composição de alertas sobre a estrutura AppModal.
- */

@@ -31,6 +31,3 @@ function useResetPassword({ redefinirSenha, token }) {
 }
 
 export { useResetPassword };
-/**
- * Hook que controla os campos e a submissão da redefinição de senha.
- */

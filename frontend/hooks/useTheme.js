@@ -6,6 +6,3 @@ function useTheme() {
 }
 
 export { useTheme }
-/**
- * Hook que expõe o tema fixo compartilhado pelos componentes.
- */
