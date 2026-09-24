@@ -37,9 +37,10 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
     let respostaDaExclusao = null
     let verificacaoSenhaEmAndamento = null
 
-    async function buscarPerfil() {
+    async function buscarPerfil({signal} = {}) {
         const resposta = await requisicaoAutenticada({
-            caminho: endpoints.configuracoesConta
+            caminho: endpoints.configuracoesConta,
+            ...(signal ? {signal} : {})
         })
 
         return criarUserProfile(resposta)
@@ -57,7 +58,6 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
         return criarUserProfile(resposta)
     }
 
-    //Confere a senha no backend sem excluir ou modificar dados.
     function confirmarSenhaExclusao({senhaAtual} = {}) {
         if (typeof senhaAtual !== 'string' || senhaAtual.length === 0) {
             const erro = new Error('Informe sua senha atual.')
@@ -129,7 +129,12 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
         return exclusaoEmAndamento
     }
 
-    return {buscarPerfil, atualizarPerfil, confirmarSenhaExclusao, excluirConta}
+    return {
+        buscarPerfil,
+        atualizarPerfil,
+        confirmarSenhaExclusao,
+        excluirConta
+    }
 }
 
 export { criarAccountService }
