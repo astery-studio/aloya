@@ -11,6 +11,7 @@ import * as dateUtils from '../utils/date.utils.js';
 
 import {
     criarCadastroRateLimit,
+    criarContaLoginRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit
 } from '../middlewares/rateLimit.middleware.js';
@@ -152,6 +153,12 @@ function criarContainer() {
         limite: env.loginRateLimitMaximo
     });
 
+    const contaLoginRateLimit = criarContaLoginRateLimit({
+        rateLimit,
+        janelaMs: env.loginRateLimitJanelaMs,
+        limite: env.loginRateLimitMaximo
+    });
+
     const emailRateLimit = criarEmailRateLimit({
         rateLimit,
         janelaMs: env.emailRateLimitJanelaMs,
@@ -172,6 +179,7 @@ function criarContainer() {
         cadastroRateLimit,
         emailRateLimit,
         loginRateLimit,
+        contaLoginRateLimit,
         passwordRecoveryController
     };
 }

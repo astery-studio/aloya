@@ -95,8 +95,43 @@ function criarLoginRateLimit({
     });
 }
 
+function criarContaLoginRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: false,
+        legacyHeaders: false,
+        skipSuccessfulRequests: true,
+        keyGenerator: (req) => {
+            const email = typeof req.body?.email === 'string'
+                ? req.body.email.trim().toLowerCase()
+                : '';
+            return email || 'credencial-ausente';
+        },
+        handler: (req, res) => {
+            logger.warn({
+                evento: 'limite_tentativas_login_conta',
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_TENTATIVAS_LOGIN',
+                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
 export {
     criarCadastroRateLimit,
     criarEmailRateLimit,
-    criarLoginRateLimit
+    criarLoginRateLimit,
+    criarContaLoginRateLimit
 };

@@ -20,6 +20,7 @@ function criarDependencias() {
     function cadastroRateLimit() {}
     function emailRateLimit() {}
     function loginRateLimit() {}
+    function contaLoginRateLimit() {}
     function solicitarRecuperacao() {}
     function validarTokenRecuperacao() {}
     function redefinirSenha() {}
@@ -40,6 +41,7 @@ function criarDependencias() {
         cadastroRateLimit,
         emailRateLimit,
         loginRateLimit,
+        contaLoginRateLimit,
         passwordRecoveryController: {
             solicitar: solicitarRecuperacao,
             validarToken: validarTokenRecuperacao,
@@ -81,6 +83,7 @@ test('protege a rota de login com rate limit', () => {
         rota.stack.map((camada) => camada.handle),
         [
             dependencias.loginRateLimit,
+            dependencias.contaLoginRateLimit,
             dependencias.authController.realizarLogin
         ]
     );

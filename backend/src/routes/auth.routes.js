@@ -10,7 +10,8 @@ function criarAuthRoutes({
     authMiddleware,
     cadastroRateLimit,
     emailRateLimit,
-    loginRateLimit
+    loginRateLimit,
+    contaLoginRateLimit
 }) {
     const router = Router();
 
@@ -23,6 +24,7 @@ function criarAuthRoutes({
     router.post(
         '/login',
         loginRateLimit,
+        contaLoginRateLimit,
         authController.realizarLogin
     );
 
