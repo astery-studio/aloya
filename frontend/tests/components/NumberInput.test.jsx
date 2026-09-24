@@ -2,7 +2,7 @@
  * Testes da digitação numérica com unidade fixa.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import NumberInput from '../components/forms/NumberInput';
+import NumberInput from '../../components/forms/NumberInput';
 
 test('altera somente o número e mantém a unidade visível', async () => {
     const aoAlterar = jest.fn();

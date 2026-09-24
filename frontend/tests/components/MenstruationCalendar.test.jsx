@@ -2,7 +2,7 @@
  * Testes da seleção contínua no calendário menstrual do onboarding.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import MenstruationCalendar from '../features/onboarding/components/MenstruationCalendar';
+import MenstruationCalendar from '../../features/onboarding/MenstruationCalendar/MenstruationCalendar';
 
 test('seleciona o fim do período depois do início', async () => {
     const aoAlterar = jest.fn();

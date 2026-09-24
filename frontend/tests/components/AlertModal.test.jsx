@@ -10,7 +10,7 @@ jest.mock('phosphor-react-native/src/icons/WarningCircle', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }))
 
-import AlertModal from '../components/feedback/Modal/AlertModal/AlertModal'
+import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal'
 
 function AlertModalComSenha({aoContinuar = jest.fn(), aoFechar = jest.fn(), carregando = false, erroSenha}) {
     const [senha, definirSenha] = useState('')

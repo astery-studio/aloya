@@ -3,7 +3,7 @@
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import SimpleModal from '../components/feedback/Modal/SimpleModal';
+import SimpleModal from '../../components/feedback/Modal/SimpleModal';
 
 function IconeTeste() {
     return <Text>ícone</Text>;

@@ -2,8 +2,8 @@
  * Testes de máscara, foco e remoção dos campos de data e horário.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import DateInput from '../components/forms/DateInput';
-import TimeInput from '../components/forms/TimeInput';
+import DateInput from '../../components/forms/DateInput';
+import TimeInput from '../../components/forms/TimeInput';
 
 test('data formata oito dígitos como DD/MM/AAAA', async () => {
     const aoMudar = jest.fn();

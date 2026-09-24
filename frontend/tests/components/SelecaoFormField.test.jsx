@@ -3,8 +3,8 @@
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import RadioOption from '../components/forms/RadioOption';
-import FormField from '../components/forms/FormField';
+import RadioOption from '../../components/forms/RadioOption';
+import FormField from '../../components/forms/FormField';
 
 test('opção única comunica seleção e executa a ação', async () => {
     const aoPressionar = jest.fn();

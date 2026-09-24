@@ -2,9 +2,9 @@
  * Testes dos campos de texto, e-mail e senha e de suas interações.
  */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import TextInput from '../components/forms/TextInput';
-import EmailInput from '../components/forms/EmailInput';
-import PasswordInput from '../components/forms/PasswordInput';
+import TextInput from '../../components/forms/TextInput';
+import EmailInput from '../../components/forms/EmailInput';
+import PasswordInput from '../../components/forms/PasswordInput';
 
 test('campo de texto entrega o valor digitado', async () => {
     const aoMudar = jest.fn();
