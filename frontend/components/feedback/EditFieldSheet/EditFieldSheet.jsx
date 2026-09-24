@@ -62,6 +62,7 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                 bloquearFechamento={salvando}
             >
                 <Pressable
+                    testID="area-campo-edicao"
                     onPress={focarCampo}
                     style={estilos.caixaCampo}
                     accessible={false}

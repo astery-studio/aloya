@@ -370,6 +370,116 @@ describe('EditFieldSheet', () => {
         )
     })
 
+        test('aceita valor nulo no campo de nome', async () => {
+        await render(
+            <EditFieldSheet
+                visivel
+                titulo="Editar nome"
+                valor={null}
+                onAlterar={jest.fn()}
+            />
+        )
+
+        expect(
+            screen.getByLabelText('Nome')
+        ).toHaveProp(
+            'value',
+            ''
+        )
+    })
+
+    test('permite alteração sem callback obrigatório', async () => {
+        await render(
+            <EditFieldSheet
+                visivel
+                titulo="Editar nome"
+                valor=""
+            />
+        )
+
+        await fireEvent.changeText(
+            screen.getByLabelText('Nome'),
+            'Ana'
+        )
+
+        expect(
+            screen.getByLabelText('Nome')
+        ).toBeOnTheScreen()
+    })
+
+    test('permite alteração de data sem callback obrigatório', async () => {
+        await render(
+            <EditFieldSheet
+                visivel
+                titulo="Editar nascimento"
+                tipo="data"
+                valor=""
+            />
+        )
+
+        await fireEvent.changeText(
+            screen.getByLabelText(
+                'Data de nascimento'
+            ),
+            '21092000'
+        )
+
+        expect(
+            screen.getByLabelText(
+                'Data de nascimento'
+            )
+        ).toBeOnTheScreen()
+    })
+
+    test('permite pressionar a área do campo para focar', async () => {
+        await render(
+            <EditFieldSheet
+                visivel
+                titulo="Editar nome"
+                valor="Ana"
+                onAlterar={jest.fn()}
+            />
+        )
+
+        await fireEvent.press(
+            screen.getByTestId(
+                'area-campo-edicao'
+            )
+        )
+
+        expect(
+            screen.getByLabelText('Nome')
+        ).toHaveProp(
+            'editable',
+            true
+        )
+    })
+
+    test('não foca o campo enquanto está salvando', async () => {
+        await render(
+            <EditFieldSheet
+                visivel
+                titulo="Editar nome"
+                valor="Ana"
+                salvando
+                onAlterar={jest.fn()}
+            />
+        )
+
+        await fireEvent.press(
+            screen.getByTestId(
+                'area-campo-edicao'
+            )
+        )
+
+        expect(
+            screen.getByLabelText('Nome')
+        ).toHaveProp(
+            'editable',
+            false
+        )
+    })
+
     test('bloqueia edição e fechamento durante o salvamento', async () => {
         await render(
             <EditFieldSheet
