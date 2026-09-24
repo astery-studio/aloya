@@ -52,7 +52,7 @@ describe('SettingsLayout', () => {
         ).toBeOnTheScreen()
     })
 
-    test('protege o topo e a base da tela', async () => {
+    test('usa o espaçamento do Header no topo e protege a base da tela', async () => {
         await render(
             <SettingsLayout
                 titulo="Configurações de Perfil"
@@ -62,27 +62,16 @@ describe('SettingsLayout', () => {
             </SettingsLayout>
         )
 
-        const layout =
-            screen.getByTestId(
-                'settings-layout'
-            )
+        const layout = screen.getByTestId('settings-layout')
 
-        expect(
-            layout.props.edges
-        ).toEqual(
+        expect(layout.props.edges).toEqual(
             expect.objectContaining({
-                top: 'additive',
-                bottom: 'additive'
+                top: 'off',
+                bottom: 'additive',
+                left: 'off',
+                right: 'off'
             })
         )
-
-        expect(
-            layout.props.edges.left
-        ).toBe('off')
-
-        expect(
-            layout.props.edges.right
-        ).toBe('off')
     })
 
     test('mantém o rodapé dentro da área de rolagem', async () => {
@@ -124,7 +113,7 @@ describe('SettingsLayout', () => {
         )
     })
 
-    test('usa o cabeçalho sem compensação fixa de topo', async () => {
+    test('usa o espaçamento superior previsto pelo Header', async () => {
         const onVoltar = jest.fn()
 
         await render(
@@ -136,21 +125,14 @@ describe('SettingsLayout', () => {
             </SettingsLayout>
         )
 
-        expect(
-            Header
-        ).toHaveBeenCalledTimes(1)
+        expect(Header).toHaveBeenCalledTimes(1)
 
-        expect(
-            Header.mock.calls[0][0]
-        ).toEqual(
+        expect(Header.mock.calls[0][0]).toEqual(
             expect.objectContaining({
-                titulo:
-                    'Configurações de Perfil',
-                variante:
-                    'comVoltar',
+                titulo: 'Configurações de Perfil',
+                variante: 'comVoltar',
                 onVoltar,
-                usarEspacamentoSuperior:
-                    false
+                usarEspacamentoSuperior: true
             })
         )
     })

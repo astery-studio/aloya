@@ -18,53 +18,33 @@ import {
     estilos
 } from './SettingsLayout.style'
 
-function SettingsLayout({
-    titulo,
-    onVoltar,
-    children,
-    rodape,
-    testeId = 'settings-layout'
-}) {
-    const temRodape =
-        rodape !== undefined
-        && rodape !== null
+//Recebe o título, conteúdo e rodapé e retorna a estrutura comum das configurações.
+function SettingsLayout({titulo, onVoltar, children, rodape, testeId = 'settings-layout'}) {
+    const temRodape = rodape !== undefined && rodape !== null
 
     return (
         <SafeAreaView
             testID={testeId}
-            edges={[
-                'top',
-                'bottom'
-            ]}
+            edges={['bottom']}
             style={estilos.container}
         >
             <Header
                 titulo={titulo}
                 variante="comVoltar"
                 onVoltar={onVoltar}
-                usarEspacamentoSuperior={false}
+                usarEspacamentoSuperior
             />
 
             <KeyboardAvoidingView
                 testID="teclado-settings-layout"
-                behavior={
-                    Platform.OS === 'ios'
-                        ? 'padding'
-                        : 'height'
-                }
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={estilos.areaInterativa}
             >
                 <ScrollView
                     testID="rolagem-settings-layout"
-                    contentContainerStyle={
-                        estilos.conteudo
-                    }
+                    contentContainerStyle={estilos.conteudo}
                     keyboardShouldPersistTaps="handled"
-                    keyboardDismissMode={
-                        Platform.OS === 'ios'
-                            ? 'interactive'
-                            : 'on-drag'
-                    }
+                    keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                     contentInsetAdjustmentBehavior="never"
                     showsVerticalScrollIndicator={false}
                 >
@@ -84,6 +64,4 @@ function SettingsLayout({
     )
 }
 
-export {
-    SettingsLayout
-}
+export { SettingsLayout }
