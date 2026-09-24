@@ -320,3 +320,58 @@ test(
         );
     }
 );
+
+test(
+    'rejeita senha de cadastro com menos de oito caracteres',
+    () => {
+        const validator = criarValidator();
+        const resultado = validator.validarCadastro(
+            criarDadosValidos({ senha: '1234567' })
+        );
+
+        assert.equal(resultado.valido, false);
+        assert.deepEqual(
+            resultado.erros,
+            [{
+                campo: 'senha',
+                mensagem:
+                    'A senha deve possuir pelo menos 8 caracteres.'
+            }]
+        );
+    }
+);
+
+test(
+    'rejeita senha excessivamente longa antes de executar o bcrypt',
+    () => {
+        const resultado = criarValidator().validarCadastro(
+            criarDadosValidos({ senha: 'a'.repeat(129) })
+        );
+
+        assert.equal(resultado.valido, false);
+        assert.deepEqual(
+            resultado.erros,
+            [{
+                campo: 'senha',
+                mensagem:
+                    'A senha deve possuir no máximo 128 caracteres.'
+            }]
+        );
+    }
+);
+
+test(
+    'trata corpo ausente como cadastro inválido sem gerar erro interno',
+    () => {
+        const resultado =
+            criarValidator().validarCadastro(null);
+
+        assert.equal(resultado.valido, false);
+        assert.ok(resultado.erros.length > 0);
+        assert.ok(
+            resultado.erros.some(
+                ({ campo }) => campo === 'senha'
+            )
+        );
+    }
+);
