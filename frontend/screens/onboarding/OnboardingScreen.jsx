@@ -5,20 +5,20 @@ import { useCallback, useState } from 'react';
 import { CalendarBlankIcon as CalendarBlank } from 'phosphor-react-native/src/icons/CalendarBlank';
 import { WarningCircleIcon as WarningCircle } from 'phosphor-react-native/src/icons/WarningCircle';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
-import AccountStep from '../../features/onboarding/components/AccountStep';
-import BirthDateStep from '../../features/onboarding/components/BirthDateStep';
-import CycleLengthStep from '../../features/onboarding/components/CycleLengthStep';
-import LastMenstruationStep from '../../features/onboarding/components/LastMenstruationStep';
-import LutealPhaseLengthStep from '../../features/onboarding/components/LutealPhaseLengthStep';
-import MenstruationLengthStep from '../../features/onboarding/components/MenstruationLengthStep';
-import OnboardingComplete from '../../features/onboarding/components/OnboardingComplete';
+import AccountStep from '../../features/onboarding/AccountStep/AccountStep';
+import BirthDateStep from '../../features/onboarding/BirthDateStep/BirthDateStep';
+import CycleLengthStep from '../../features/onboarding/CycleLengthStep/CycleLengthStep';
+import LastMenstruationStep from '../../features/onboarding/LastMenstruationStep/LastMenstruationStep';
+import LutealPhaseLengthStep from '../../features/onboarding/LutealPhaseLengthStep/LutealPhaseLengthStep';
+import MenstruationLengthStep from '../../features/onboarding/MenstruationLengthStep/MenstruationLengthStep';
+import OnboardingComplete from '../../features/onboarding/OnboardingComplete/OnboardingComplete';
 import { salvarToken } from '../../services/auth/tokenStorage';
 import { isValidDate } from '../../utils/validation/isValidDate';
 import { isValidEmail } from '../../utils/validation/isValidEmail';
 
 const iniciais = {
     nome: '', email: '', senha: '', confirmacao: '', aceitouTermos: false,
-    dataNascimento: '', ultimaMenstruacao: null,
+    dataNascimento: '', emailResponsavelLegal: '', ultimaMenstruacao: null,
     duracaoCiclo: 28, duracaoMenstruacao: 5, duracaoLutea: 14
 };
 
@@ -28,6 +28,17 @@ function paraIso(data) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
     const [dia, mes, ano] = data.split('/');
     return `${ano}-${mes}-${dia}`;
+}
+
+function ehMenorDe16(dataTexto, hoje = new Date()) {
+    if (!isValidDate(dataTexto)) return false;
+    const [dia, mes, ano] = dataTexto.split('/').map(Number);
+    let idade = hoje.getFullYear() - ano;
+    const aniversarioAindaNaoChegou =
+        hoje.getMonth() + 1 < mes ||
+        (hoje.getMonth() + 1 === mes && hoje.getDate() < dia);
+    if (aniversarioAindaNaoChegou) idade -= 1;
+    return idade < 16;
 }
 
 export default function OnboardingScreen({
