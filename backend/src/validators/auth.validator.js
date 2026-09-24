@@ -32,6 +32,9 @@ function criarAuthValidator({ dateUtils }) {
 
     // Função principal responsável por validar todos os campos enviados no corpo da requisição de cadastro
     function validarCadastro(body) {
+        body = body && typeof body === 'object'
+            ? body
+            : {};
         const erros = [];
         const hoje = new Date();
 
@@ -90,13 +93,27 @@ function criarAuthValidator({ dateUtils }) {
             );
         }
 
-        // Valida que a senha foi informada
+        // Aplica a mesma regra mínima usada na redefinição de senha.
         if (
             typeof body.senha !== 'string' ||
             body.senha.length === 0
         ) {
             erros.push(
                 erro('senha', 'Informe uma senha.')
+            );
+        } else if (body.senha.length < 8) {
+            erros.push(
+                erro(
+                    'senha',
+                    'A senha deve possuir pelo menos 8 caracteres.'
+                )
+            );
+        } else if (body.senha.length > 128) {
+            erros.push(
+                erro(
+                    'senha',
+                    'A senha deve possuir no máximo 128 caracteres.'
+                )
             );
         }
 
