@@ -5,6 +5,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+    criarCadastroRateLimit,
+    criarEmailRateLimit,
     criarLoginRateLimit
 } from '../src/middlewares/rateLimit.middleware.js';
 
@@ -213,3 +215,60 @@ test(
         );
     }
 );
+
+test('limita cadastro por IP com resposta segura', () => {
+    const { rateLimit, logger, chamadas } =
+        criarDependencias();
+
+    criarCadastroRateLimit({
+        rateLimit,
+        janelaMs: 60000,
+        limite: 3,
+        logger
+    });
+
+    const res = criarResposta();
+    chamadas.configuracoes[0].handler(
+        { method: 'POST', originalUrl: '/auth/register' },
+        res
+    );
+
+    assert.equal(chamadas.configuracoes[0].windowMs, 60000);
+    assert.equal(chamadas.configuracoes[0].limit, 3);
+    assert.equal(res.statusCode, 429);
+    assert.equal(res.body.erro.codigo, 'LIMITE_TENTATIVAS');
+    assert.deepEqual(chamadas.logs, [{
+        evento: 'limite_tentativas_cadastro',
+        metodo: 'POST',
+        rota: '/auth/register'
+    }]);
+});
+
+test('limita envio de e-mail sem registrar o destinatário', () => {
+    const { rateLimit, logger, chamadas } =
+        criarDependencias();
+
+    criarEmailRateLimit({
+        rateLimit,
+        janelaMs: 120000,
+        limite: 2,
+        logger
+    });
+
+    const res = criarResposta();
+    chamadas.configuracoes[0].handler(
+        {
+            method: 'POST',
+            originalUrl: '/auth/parental-consent/request',
+            body: { emailResponsavelLegal: 'responsavel@email.com' }
+        },
+        res
+    );
+
+    assert.equal(res.statusCode, 429);
+    assert.equal(res.body.erro.codigo, 'LIMITE_ENVIOS_EMAIL');
+    assert.equal(
+        JSON.stringify(chamadas.logs).includes('responsavel@email.com'),
+        false
+    );
+});
