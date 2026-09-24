@@ -1,20 +1,22 @@
-//Inicializa os serviços reais e alterna entre login, perfil e alteração de senha.
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
-import { useFonts } from 'expo-font'
+//Inicializa os serviços reais e controla o fluxo autenticado das configurações.
+import {useCallback, useEffect, useRef, useState} from 'react'
+import {ActivityIndicator, Text, View} from 'react-native'
+import {StatusBar} from 'expo-status-bar'
+import {useFonts} from 'expo-font'
 
-import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular'
-import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium'
-import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold'
-import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold'
+import {DMSans_400Regular} from '@expo-google-fonts/dm-sans/400Regular'
+import {DMSans_500Medium} from '@expo-google-fonts/dm-sans/500Medium'
+import {DMSans_600SemiBold} from '@expo-google-fonts/dm-sans/600SemiBold'
+import {DMSans_700Bold} from '@expo-google-fonts/dm-sans/700Bold'
 
 import LoginScreen from './screens/auth/LoginScreen'
-import { ChangePasswordScreen } from './screens/settings/ChangePasswordScreen'
-import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen'
-import { criarServicosApp } from './services/createAppServices'
-import { obterToken } from './services/auth/tokenStorage'
-import { estilos } from './App.style'
+import {ChangePasswordScreen} from './screens/settings/ChangePasswordScreen'
+import {ProfileSettingsScreen} from './screens/settings/ProfileSettingsScreen'
+import {SettingsScreen} from './screens/settings/SettingsScreen'
+import {criarServicosApp} from './services/createAppServices'
+import {obterToken} from './services/auth/tokenStorage'
+import {rotas} from './constants/routes'
+import {estilos} from './App.style'
 
 //Cria os serviços da aplicação e devolve uma mensagem segura quando a configuração falha.
 function criarConfiguracao() {
@@ -41,7 +43,7 @@ export default function App() {
     const [fontesCarregadas, erroFontes] = useFonts({DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold})
     const [configuracao] = useState(criarConfiguracao)
     const [estadoSessao, setEstadoSessao] = useState('verificando')
-    const [telaInterna, setTelaInterna] = useState('perfil')
+    const [telaInterna, setTelaInterna] = useState(rotas.configuracoes)
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
@@ -80,7 +82,7 @@ export default function App() {
 
             if (erro?.status === 401) {
                 setPerfil(null)
-                setTelaInterna('perfil')
+                setTelaInterna(rotas.configuracoes)
                 setEstadoSessao('anonima')
             } else if (requisicaoAtual.current === identificador) {
                 setErroPerfil(true)
@@ -105,14 +107,17 @@ export default function App() {
             try {
                 const sessao = await obterToken()
 
-                if (ativo) {
-                    const sessaoAutenticada = sessaoEhValida(sessao)
+                if (!ativo) {
+                    return
+                }
 
-                    setEstadoSessao(sessaoAutenticada ? 'autenticada' : 'anonima')
+                const sessaoAutenticada = sessaoEhValida(sessao)
 
-                    if (sessaoAutenticada) {
-                        carregarPerfil()
-                    }
+                setEstadoSessao(sessaoAutenticada ? 'autenticada' : 'anonima')
+                setTelaInterna(rotas.configuracoes)
+
+                if (sessaoAutenticada) {
+                    carregarPerfil()
                 }
             } catch {
                 if (ativo) {
@@ -140,11 +145,32 @@ export default function App() {
         return perfilAtualizado
     }
 
-    //Abre a área autenticada somente depois que o login e o armazenamento seguro terminam.
+    //Abre a área autenticada somente depois que login e armazenamento seguro terminam.
     function concluirLogin() {
-        setTelaInterna('perfil')
+        setPerfil(null)
+        setErroPerfil(false)
+        setTelaInterna(rotas.configuracoes)
         setEstadoSessao('autenticada')
         carregarPerfil()
+    }
+
+    //Abre o perfil sem iniciar outra busca quando os dados já estão sendo carregados.
+    function abrirPerfil() {
+        setTelaInterna(rotas.perfil)
+
+        if (!perfil && !carregandoPerfil && !erroPerfil) {
+            carregarPerfil()
+        }
+    }
+
+    //Volta ao menu principal de configurações sem apagar os dados já carregados.
+    function abrirConfiguracoes() {
+        setTelaInterna(rotas.configuracoes)
+    }
+
+    //Abre a tela de alteração de senha a partir das configurações do perfil.
+    function abrirAlteracaoSenha() {
+        setTelaInterna(rotas.alterarSenha)
     }
 
     //Limpa os dados visuais e volta ao login quando a sessão termina ou expira.
@@ -156,7 +182,7 @@ export default function App() {
         setPerfil(null)
         setErroPerfil(false)
         setCarregandoPerfil(false)
-        setTelaInterna('perfil')
+        setTelaInterna(rotas.configuracoes)
         setEstadoSessao('anonima')
     }
 
@@ -191,15 +217,25 @@ export default function App() {
         )
     }
 
-    if (telaInterna === 'alterarSenha') {
+    if (telaInterna === rotas.configuracoes) {
+        return (
+            <View style={estilos.tela}>
+                <StatusBar style="dark" />
+
+                <SettingsScreen onAbrirPerfil={abrirPerfil} />
+            </View>
+        )
+    }
+
+    if (telaInterna === rotas.alterarSenha) {
         return (
             <View style={estilos.tela}>
                 <StatusBar style="dark" />
 
                 <ChangePasswordScreen
                     alterarSenha={configuracao.servicos.accountService.alterarSenha}
-                    onVoltar={() => setTelaInterna('perfil')}
-                    onConcluido={() => setTelaInterna('perfil')}
+                    onVoltar={() => setTelaInterna(rotas.perfil)}
+                    onConcluido={() => setTelaInterna(rotas.perfil)}
                     onSessaoExpirada={finalizarSessao}
                 />
             </View>
@@ -216,7 +252,8 @@ export default function App() {
                 erroCarregamento={erroPerfil}
                 onRecarregar={carregarPerfil}
                 onSalvar={salvarPerfil}
-                onAlterarSenha={() => setTelaInterna('alterarSenha')}
+                onVoltar={abrirConfiguracoes}
+                onAlterarSenha={abrirAlteracaoSenha}
                 excluirConta={configuracao.servicos.accountService.excluirConta}
                 encerrarSessao={configuracao.servicos.authService.encerrarSessao}
                 onContaExcluida={finalizarSessao}
