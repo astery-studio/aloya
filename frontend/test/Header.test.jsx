@@ -1,13 +1,10 @@
 import {fireEvent, render, screen} from '@testing-library/react-native'
 
-jest.mock(
-    'phosphor-react-native/src/icons/ArrowLeft',
-    () => ({
-        ArrowLeftIcon: jest.fn(() => null)
-    })
-)
+jest.mock('../components/icons/AppIcons', () => ({
+    ArrowLeftIcon: jest.fn(() => null)
+}))
 
-import {ArrowLeftIcon} from 'phosphor-react-native/src/icons/ArrowLeft'
+import {ArrowLeftIcon} from '../components/icons/AppIcons'
 import {estilos,corIconeVoltar} from '../components/navigation/Header/Header.style'
 import {Header} from '../components/navigation/Header/Header'
 

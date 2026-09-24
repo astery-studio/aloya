@@ -1,24 +1,8 @@
-import {
-    Pressable,
-    Text,
-    View
-} from 'react-native'
+import {Pressable, Text, View} from 'react-native'
+import { ArrowLeftIcon } from '../../icons/AppIcons'
+import {estilos, corIconeVoltar} from './Header.style'
 
-import {
-    ArrowLeftIcon
-} from 'phosphor-react-native/src/icons/ArrowLeft'
-
-import {
-    estilos,
-    corIconeVoltar
-} from './Header.style'
-
-function Header({
-    titulo,
-    variante = 'padrao',
-    onVoltar,
-    usarEspacamentoSuperior = true
-}) {
+function Header({titulo, variante = 'padrao', onVoltar, usarEspacamentoSuperior = true}) {
     const temVoltar =
         variante === 'comVoltar'
 
