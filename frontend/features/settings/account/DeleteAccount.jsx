@@ -1,19 +1,17 @@
 //Controla a verificação da senha e a exclusão permanente da conta autenticada.
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { TrashIcon, WarningCircleIcon } from '../../../components/icons/AppIcons'
-
 import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../../components/feedback/Modal/SimpleModal'
 import { tema } from '../../../theme'
 
-function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
+function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
     const [etapa, setEtapa] = useState('senha')
     const [senha, setSenha] = useState('')
     const [erroSenha, setErroSenha] = useState('')
     const [acaoComErro, setAcaoComErro] = useState(null)
     const [carregando, setCarregando] = useState(false)
 
-    //Remove a senha da memória quando o fluxo é encerrado.
     function limparFluxo() {
         setEtapa('senha')
         setSenha('')
@@ -22,13 +20,6 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
         setCarregando(false)
     }
 
-    useEffect(() => {
-        if (!visivel) {
-            limparFluxo()
-        }
-    }, [visivel])
-
-    //Fecha o fluxo somente quando nenhuma requisição está em andamento.
     function fechar() {
         if (carregando) {
             return
@@ -38,7 +29,6 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
         onFechar?.()
     }
 
-    //Confere a senha no backend antes de mostrar a confirmação final.
     async function continuar() {
         if (!senha || carregando || typeof confirmarSenhaExclusao !== 'function') {
             return
@@ -64,7 +54,6 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
         }
     }
 
-    //Confirma a exclusão e permite que o backend verifique novamente a senha.
     async function confirmarExclusao() {
         if (typeof excluirConta !== 'function' || carregando) {
             return
@@ -92,7 +81,6 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
         }
     }
 
-    //Repete somente a operação que apresentou erro.
     function tentarNovamente() {
         if (acaoComErro === 'validacao') {
             continuar()
@@ -106,7 +94,7 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
         <>
             <AlertModal
                 variante="comSenha"
-                visivel={visivel && etapa === 'senha'}
+                visivel={etapa === 'senha'}
                 aoFechar={fechar}
                 titulo="Confirme sua identidade"
                 mensagem="Por segurança, insira sua senha atual para continuar com a exclusão da conta."
@@ -126,7 +114,7 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
             />
 
             <AlertModal
-                visivel={visivel && etapa === 'confirmacao'}
+                visivel={etapa === 'confirmacao'}
                 aoFechar={fechar}
                 icone={TrashIcon}
                 titulo="Excluir conta permanentemente?"
@@ -147,17 +135,13 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
             />
 
             <SimpleModal
-                visivel={visivel && etapa === 'erro'}
+                visivel={etapa === 'erro'}
                 aoFechar={fechar}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.feedback.erro}
                 fundoIcone={tema.cores.neutras.bordaClara}
                 titulo="Algo deu errado"
-                mensagem={
-                    acaoComErro === 'exclusao'
-                        ? 'Ocorreu um erro ao apagar sua conta.'
-                        : 'Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente.'
-                }
+                mensagem={acaoComErro === 'exclusao' ? 'Ocorreu um erro ao apagar sua conta.' : 'Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente.'}
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
@@ -172,6 +156,21 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
                 }}
             />
         </>
+    )
+}
+
+function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
+    if (!visivel) {
+        return null
+    }
+
+    return (
+        <FluxoDeleteAccount
+            onFechar={onFechar}
+            confirmarSenhaExclusao={confirmarSenhaExclusao}
+            excluirConta={excluirConta}
+            onContaExcluida={onContaExcluida}
+        />
     )
 }
 
