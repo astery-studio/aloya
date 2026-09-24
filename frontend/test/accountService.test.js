@@ -619,4 +619,87 @@ describe('accountService', () => {
             dependencias.removerCredencialLocal
         ).toHaveBeenCalledTimes(2)
     })
+
+    test('altera a senha somente da conta autenticada', async () => {
+        const dependencias = criarDependencias()
+        const resposta = {
+            mensagem: 'Senha atualizada com sucesso.',
+            outrasSessoesEncerradas: 2
+        }
+
+        dependencias.requisicaoAutenticada.mockResolvedValue(resposta)
+
+        const service = criarAccountService(dependencias)
+        const resultado = await service.alterarSenha({
+            senhaAtual: 'Senha atual segura!',
+            novaSenha: 'Nova frase segura 2026!',
+            confirmacaoNovaSenha: 'Nova frase segura 2026!'
+        })
+
+        expect(dependencias.requisicaoAutenticada).toHaveBeenCalledWith({
+            metodo: 'PATCH',
+            caminho: endpoints.alteracaoSenha,
+            corpo: {
+                senhaAtual: 'Senha atual segura!',
+                novaSenha: 'Nova frase segura 2026!',
+                confirmacaoNovaSenha: 'Nova frase segura 2026!'
+            }
+        })
+
+        expect(resultado).toBe(resposta)
+    })
+
+    test('rejeita campos proibidos na alteração de senha', () => {
+        const dependencias = criarDependencias()
+        const service = criarAccountService(dependencias)
+
+        expect(() => service.alterarSenha({
+            senhaAtual: 'Senha atual segura!',
+            novaSenha: 'Nova frase segura 2026!',
+            confirmacaoNovaSenha: 'Nova frase segura 2026!',
+            usuarioId: 999
+        })).toThrow('Os dados da alteração de senha são inválidos.')
+
+        expect(dependencias.requisicaoAutenticada).not.toHaveBeenCalled()
+    })
+
+    test('rejeita alteração de senha com campos ausentes', () => {
+        const dependencias = criarDependencias()
+        const service = criarAccountService(dependencias)
+
+        expect(() => service.alterarSenha({
+            senhaAtual: 'Senha atual segura!',
+            novaSenha: 'Nova frase segura 2026!'
+        })).toThrow('Os dados da alteração de senha são inválidos.')
+
+        expect(dependencias.requisicaoAutenticada).not.toHaveBeenCalled()
+    })
+
+    test('impede duas alterações de senha simultâneas', async () => {
+        let concluir
+        const dependencias = criarDependencias()
+
+        dependencias.requisicaoAutenticada.mockImplementation(() => new Promise(resolve => {
+            concluir = resolve
+        }))
+
+        const service = criarAccountService(dependencias)
+        const dados = {
+            senhaAtual: 'Senha atual segura!',
+            novaSenha: 'Nova frase segura 2026!',
+            confirmacaoNovaSenha: 'Nova frase segura 2026!'
+        }
+
+        const primeira = service.alterarSenha(dados)
+        const segunda = service.alterarSenha(dados)
+
+        expect(primeira).toBe(segunda)
+        expect(dependencias.requisicaoAutenticada).toHaveBeenCalledTimes(1)
+
+        concluir({
+            mensagem: 'Senha atualizada com sucesso.'
+        })
+
+        await primeira
+    })
 })
