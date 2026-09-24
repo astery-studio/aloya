@@ -2,7 +2,7 @@
  * Define a disposição e os estados visuais do campo de horário.
  */
 import { StyleSheet } from 'react-native';
-import { cores, radius, typography } from '../../theme';
+import { cores, radius, typography } from '../../../theme';
 
 const estilos = StyleSheet.create({
     linha: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 12 },

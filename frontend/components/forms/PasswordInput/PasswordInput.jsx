@@ -5,9 +5,9 @@ import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { EyeIcon as Eye } from 'phosphor-react-native/src/icons/Eye';
 import { EyeSlashIcon as EyeSlash } from 'phosphor-react-native/src/icons/EyeSlash';
-import { cores } from '../../theme';
-import TextInput from './TextInput';
-import { estilos } from './TextInput.styles';
+import { cores } from '../../../theme';
+import TextInput from '../TextInput/TextInput';
+import { estilos } from '../TextInput/TextInput.styles';
 
 // Recebe as opções de senha, permite alternar sua visibilidade e devolve o texto.
 function PasswordInput({

@@ -2,7 +2,7 @@
  * Define a apresentação e o estado de foco do campo de data.
  */
 import { StyleSheet } from 'react-native';
-import { cores, radius, typography } from '../../theme';
+import { cores, radius, typography } from '../../../theme';
 
 const estilos = StyleSheet.create({
     botao: {

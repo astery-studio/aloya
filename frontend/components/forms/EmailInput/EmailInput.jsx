@@ -2,7 +2,7 @@
  * Especializa TextInput para entrada e sanitização de endereços de e-mail.
  */
 import { memo } from 'react';
-import TextInput from './TextInput';
+import TextInput from '../TextInput/TextInput';
 
 function sanitizarEmail(texto) {
     return texto.trim().replace(/[\r\n\t]/g, '');

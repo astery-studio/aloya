@@ -2,7 +2,7 @@
  * Aparência do campo numérico com unidade fixa.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, radius } from '../../theme';
+import { cores, fontFamilies, radius } from '../../../theme';
 
 const texto = {
     color: cores.neutras.textoPrincipalClaro,

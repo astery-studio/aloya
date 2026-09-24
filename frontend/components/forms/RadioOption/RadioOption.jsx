@@ -3,7 +3,7 @@
  */
 import { Pressable, Text, View } from 'react-native';
 import { CheckIcon as Check } from 'phosphor-react-native/src/icons/Check';
-import { cores } from '../../theme';
+import { cores } from '../../../theme';
 import { estilos } from './RadioOption.styles';
 
 export default function RadioOption({
