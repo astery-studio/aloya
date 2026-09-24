@@ -42,3 +42,54 @@ test('interrompe uma requisição que ultrapassa o tempo limite', async () => {
         mensagemUsuario: 'A API não respondeu dentro do tempo esperado.'
     });
 });
+
+test('envia token sem serializar corpo ausente e aceita resposta vazia', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({ ok: true, status: 204 });
+    const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl });
+
+    await expect(cliente.requisicao({
+        caminho: '/sessao', token: 'jwt'
+    })).resolves.toBeNull();
+    expect(fetchImpl).toHaveBeenCalledWith('http://api/sessao', expect.objectContaining({
+        method: 'GET', headers: expect.objectContaining({ Authorization: 'Bearer jwt' })
+    }));
+    expect(fetchImpl.mock.calls[0][1]).not.toHaveProperty('body');
+});
+
+test('normaliza falha de rede sem vazar o erro técnico', async () => {
+    const fetchImpl = jest.fn().mockRejectedValue(new Error('detalhe de conexão'));
+    const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl });
+
+    await expect(cliente.requisicao({ caminho: '/auth' })).rejects.toMatchObject({
+        mensagemUsuario: 'Não foi possível conectar ao servidor.'
+    });
+});
+
+test('usa mensagem genérica quando a API não fornece detalhes', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({
+        ok: false, status: 500, json: async () => ({})
+    });
+    const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl });
+
+    await expect(cliente.requisicao({ caminho: '/auth' })).rejects.toMatchObject({
+        status: 500,
+        mensagemUsuario: 'Não foi possível concluir a solicitação.',
+        codigo: undefined,
+        detalhes: undefined
+    });
+});
+
+test('usa o fetch global quando uma implementação não é informada', async () => {
+    const fetchOriginal = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({
+        ok: true, status: 200, json: async () => ({ ativo: true })
+    });
+    try {
+        const cliente = criarApiClient({ baseUrl: 'http://api' });
+        await expect(cliente.requisicao({ caminho: '/status' }))
+            .resolves.toEqual({ ativo: true });
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+    } finally {
+        global.fetch = fetchOriginal;
+    }
+});
