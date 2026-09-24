@@ -1,7 +1,7 @@
 //Confere os campos, ações e estados do conteúdo das configurações de perfil.
 import { fireEvent, render, screen } from '@testing-library/react-native'
 
-jest.mock('phosphor-react-native/src/icons/LockKey', () => ({
+jest.mock('../components/icons/AppIcons', () => ({
     LockKeyIcon: jest.fn(() => null)
 }))
 

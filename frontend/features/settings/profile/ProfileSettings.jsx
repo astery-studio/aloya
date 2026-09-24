@@ -1,6 +1,6 @@
 //Reúne os campos e ações exibidos no conteúdo das configurações de perfil.
 import { Text, View } from 'react-native'
-import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
+import { LockKeyIcon } from '../../../components/icons/AppIcons'
 import ButtonScreen from '../../../components/common/Button/ButtonScreen'
 import { NavigationField } from '../../../components/common/NavigationField/NavigationField'
 import { ProfileField } from './ProfileField'
