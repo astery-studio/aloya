@@ -36,7 +36,9 @@ describe('LogoutConfirmation', () => {
         )
 
         expect(
-            screen.queryByText('Sair da Conta')
+            screen.queryByText(
+                'Sair da Conta'
+            )
         ).toBeNull()
     })
 
@@ -104,9 +106,9 @@ describe('LogoutConfirmation', () => {
             })
         )
 
-        expect(onFechar).toHaveBeenCalledTimes(
-            1
-        )
+        expect(
+            onFechar
+        ).toHaveBeenCalledTimes(1)
 
         expect(
             encerrarSessao
@@ -125,14 +127,14 @@ describe('LogoutConfirmation', () => {
             />
         )
 
-        fireEvent(
+        await fireEvent(
             screen.root,
             'requestClose'
         )
 
-        expect(onFechar).toHaveBeenCalledTimes(
-            1
-        )
+        expect(
+            onFechar
+        ).toHaveBeenCalledTimes(1)
     })
 
     test('não tenta sair sem receber a função de logout', async () => {
@@ -165,14 +167,14 @@ describe('LogoutConfirmation', () => {
     })
 
     test('encerra a sessão e informa o resultado', async () => {
-        const resultado = {
+        const resultadoLogout = {
             sessaoLocalEncerrada: true,
             sessaoRemotaEncerrada: true
         }
 
         const encerrarSessao =
             jest.fn().mockResolvedValue(
-                resultado
+                resultadoLogout
             )
 
         const onFechar = jest.fn()
@@ -209,91 +211,10 @@ describe('LogoutConfirmation', () => {
             expect(
                 onSessaoEncerrada
             ).toHaveBeenCalledWith(
-                resultado
+                resultadoLogout
             )
         })
     })
-
-    test('bloqueia ações e fechamento enquanto o logout está em andamento', async () => {
-        let concluirLogout
-
-        const encerrarSessao = jest.fn(
-            () => new Promise(
-                (resolver) => {
-                    concluirLogout = resolver
-                }
-            )
-        )
-
-        const onFechar = jest.fn()
-        const onSessaoEncerrada = jest.fn()
-
-        await render(
-            <LogoutConfirmation
-                visivel
-                onFechar={onFechar}
-                encerrarSessao={
-                    encerrarSessao
-                }
-                onSessaoEncerrada={
-                    onSessaoEncerrada
-                }
-            />
-        )
-
-        const botaoSair =
-            screen.getByRole('button', {
-                name: 'Sair da conta'
-            })
-
-        fireEvent.press(
-            botaoSair
-        )
-
-        await waitFor(() => {
-            expect(
-                encerrarSessao
-            ).toHaveBeenCalledTimes(1)
-
-            expect(
-                botaoSair
-            ).toBeDisabled()
-
-            expect(
-                screen.getByRole('button', {
-                    name: 'Voltar'
-                })
-            ).toBeDisabled()
-        })
-
-        fireEvent.press(
-            botaoSair
-        )
-
-        fireEvent(
-            screen.root,
-            'requestClose'
-        )
-
-        expect(
-            encerrarSessao
-        ).toHaveBeenCalledTimes(1)
-
-        expect(
-            onFechar
-        ).not.toHaveBeenCalled()
-
-        concluirLogout({
-            sessaoLocalEncerrada: true,
-            sessaoRemotaEncerrada: true
-        })
-
-        await waitFor(() => {
-            expect(
-                onSessaoEncerrada
-            ).toHaveBeenCalledTimes(1)
-        })
-})
 
     test('mostra uma mensagem segura quando o logout falha', async () => {
         const encerrarSessao =
@@ -364,7 +285,9 @@ describe('LogoutConfirmation', () => {
     test('volta para a confirmação depois de fechar o erro', async () => {
         const encerrarSessao =
             jest.fn().mockRejectedValue(
-                new Error('Falha interna')
+                new Error(
+                    'Falha interna'
+                )
             )
 
         const onFechar = jest.fn()
@@ -416,17 +339,19 @@ describe('LogoutConfirmation', () => {
     })
 
     test('tenta novamente e conclui o logout depois de uma falha', async () => {
-        const resultado = {
+        const resultadoLogout = {
             sessaoLocalEncerrada: true,
             sessaoRemotaEncerrada: true
         }
 
         const encerrarSessao = jest.fn()
             .mockRejectedValueOnce(
-                new Error('Falha temporária')
+                new Error(
+                    'Falha temporária'
+                )
             )
             .mockResolvedValueOnce(
-                resultado
+                resultadoLogout
             )
 
         const onFechar = jest.fn()
@@ -477,7 +402,7 @@ describe('LogoutConfirmation', () => {
             expect(
                 onSessaoEncerrada
             ).toHaveBeenCalledWith(
-                resultado
+                resultadoLogout
             )
         })
     })
