@@ -38,7 +38,8 @@ describe('criarUserProfile', () => {
             identidadeGenero: 'MULHER_CIS',
             dataNascimento: '2000-02-29',
             atualizadoEm:
-                '2026-09-22T20:00:00.000Z'
+                '2026-09-22T20:00:00.000Z',
+            consentimentoParentalNecessario: false
         })
 
         expect(perfil).not.toHaveProperty(
@@ -64,6 +65,65 @@ describe('criarUserProfile', () => {
             Object.isFrozen(perfil)
         ).toBe(true)
     })
+
+    test('preserva a exigência de consentimento parental', () => {
+        const resposta = {
+            ...criarResposta(),
+            consentimentoParentalNecessario: true
+        }
+
+        const perfil =
+            criarUserProfile(resposta)
+
+        expect(
+            perfil.consentimentoParentalNecessario
+        ).toBe(true)
+    })
+
+    test('preserva a ausência da exigência de consentimento parental', () => {
+        const resposta = {
+            ...criarResposta(),
+            consentimentoParentalNecessario: false
+        }
+
+        const perfil =
+            criarUserProfile(resposta)
+
+        expect(
+            perfil.consentimentoParentalNecessario
+        ).toBe(false)
+    })
+
+    test('considera que o consentimento não é necessário quando o campo não é enviado', () => {
+        const perfil =
+            criarUserProfile(
+                criarResposta()
+            )
+
+        expect(
+            perfil.consentimentoParentalNecessario
+        ).toBe(false)
+    })
+
+    test.each([
+        null,
+        'true',
+        1,
+        {},
+        []
+    ])(
+        'rejeita indicador de consentimento inválido %p',
+        (consentimentoParentalNecessario) => {
+            expect(
+                () => criarUserProfile({
+                    ...criarResposta(),
+                    consentimentoParentalNecessario
+                })
+            ).toThrow(
+                'Não foi possível carregar os dados do perfil.'
+            )
+        }
+    )
 
     test('aceita identidade de gênero nula', () => {
         const perfil =
