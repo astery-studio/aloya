@@ -41,25 +41,37 @@ export default function App() {
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
     const requisicaoAtual = useRef(0)
+    const controladorPerfilAtual = useRef(null)
 
     const carregarPerfil = useCallback(async () => {
         if (!configuracao.servicos) {
             return
         }
 
+        controladorPerfilAtual.current?.abort()
+
+        const controlador = new AbortController()
         const identificador = requisicaoAtual.current + 1
+
+        controladorPerfilAtual.current = controlador
         requisicaoAtual.current = identificador
 
         setCarregandoPerfil(true)
         setErroPerfil(false)
 
         try {
-            const perfilRecebido = await configuracao.servicos.accountService.buscarPerfil()
+            const perfilRecebido = await configuracao.servicos.accountService.buscarPerfil({
+                signal: controlador.signal
+            })
 
             if (requisicaoAtual.current === identificador) {
                 setPerfil(perfilRecebido)
             }
         } catch (erro) {
+            if (erro?.name === 'AbortError') {
+                return
+            }
+
             if (erro?.status === 401) {
                 setPerfil(null)
                 setEstadoSessao('anonima')
@@ -68,6 +80,7 @@ export default function App() {
             }
         } finally {
             if (requisicaoAtual.current === identificador) {
+                controladorPerfilAtual.current = null
                 setCarregandoPerfil(false)
             }
         }
@@ -99,6 +112,8 @@ export default function App() {
         return () => {
             ativo = false
             requisicaoAtual.current += 1
+            controladorPerfilAtual.current?.abort()
+            controladorPerfilAtual.current = null
         }
     }, [configuracao.servicos])
 
@@ -116,6 +131,8 @@ export default function App() {
 
     function finalizarSessao() {
         requisicaoAtual.current += 1
+        controladorPerfilAtual.current?.abort()
+        controladorPerfilAtual.current = null
         setPerfil(null)
         setErroPerfil(false)
         setCarregandoPerfil(false)
