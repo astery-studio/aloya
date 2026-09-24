@@ -3,6 +3,7 @@
  */
 import { formatDate } from '../../utils/date/formatDate';
 import { isSameDay } from '../../utils/date/isSameDay';
+import { getMonthDays } from '../../utils/getMonthDays';
 
 test('formata a digitação de uma data sem perder dígitos parciais', () => {
     expect(formatDate('08')).toBe('08');
@@ -24,4 +25,11 @@ test('compara o dia local mesmo com horários diferentes', () => {
 test('rejeita datas inválidas e valores que não são Date', () => {
     expect(isSameDay(new Date('invalida'), new Date())).toBe(false);
     expect(isSameDay('20/09/2026', new Date())).toBe(false);
+});
+
+test.each([
+    [999, 1], [10000, 1], [2026.5, 1],
+    [2026, 0], [2026, 13], [2026, 1.5]
+])('rejeita ano ou mês fora do calendário', (ano, mes) => {
+    expect(getMonthDays(ano, mes)).toEqual([]);
 });
