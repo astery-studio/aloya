@@ -6,9 +6,9 @@ import assert from 'node:assert/strict';
 
 import {
     criarAuthValidator
-} from '../src/validators/auth.validator.js';
+} from '../../src/validators/auth.validator.js';
 
-import * as dateUtils from '../src/utils/date.utils.js';
+import * as dateUtils from '../../src/utils/date.utils.js';
 
 function criarDadosValidos(alteracoes = {}) {
     return {

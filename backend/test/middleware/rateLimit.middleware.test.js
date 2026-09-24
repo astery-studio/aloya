@@ -8,7 +8,7 @@ import {
     criarCadastroRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit
-} from '../src/middlewares/rateLimit.middleware.js';
+} from '../../src/middlewares/rateLimit.middleware.js';
 
 function criarDependencias() {
     const chamadas = {

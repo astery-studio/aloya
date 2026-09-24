@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarAuthRoutes
-} from '../src/routes/auth.routes.js';
+} from '../../src/routes/auth.routes.js';
 
 function criarDependencias() {
     function cadastrar() {}

@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarAuthController
-} from '../src/controllers/auth.controller.js';
+} from '../../src/controllers/auth.controller.js';
 
 function criarResposta() {
     return {

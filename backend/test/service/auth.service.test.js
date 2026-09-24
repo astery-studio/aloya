@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarAuthService
-} from '../src/services/auth.service.js';
+} from '../../src/services/auth.service.js';
 
 function criarUsuarioValido(alteracoes = {}) {
     return {

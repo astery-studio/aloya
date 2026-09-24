@@ -3,7 +3,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { criarPasswordRecoveryService } from '../src/services/passwordRecovery.service.js';
+import { criarPasswordRecoveryService } from '../../src/services/passwordRecovery.service.js';
 
 function criarService(usuario = null, recuperacao = null) {
     const chamadas = { transacao: [], email: [] };

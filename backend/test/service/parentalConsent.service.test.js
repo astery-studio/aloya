@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarParentalConsentService
-} from '../src/services/parentalConsent.service.js';
+} from '../../src/services/parentalConsent.service.js';
 
 function criarCrypto() {
     const tokenPuro = 't'.repeat(43);

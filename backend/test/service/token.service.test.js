@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarTokenService
-} from '../src/services/token.service.js';
+} from '../../src/services/token.service.js';
 
 function criarDependencias() {
     const chamadas = {

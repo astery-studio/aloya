@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarParentalConsentValidator
-} from '../src/validators/parentalConsent.validator.js';
+} from '../../src/validators/parentalConsent.validator.js';
 
 function criarValidator() {
     return criarParentalConsentValidator();

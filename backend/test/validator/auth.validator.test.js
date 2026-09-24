@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarAuthValidator
-} from '../src/validators/auth.validator.js';
+} from '../../src/validators/auth.validator.js';
 
 function criarValidator() {
     return criarAuthValidator({
