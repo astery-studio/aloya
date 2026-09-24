@@ -6,7 +6,7 @@ import {
 } from '@testing-library/react-native'
 
 jest.mock(
-    'phosphor-react-native/src/icons/NotePencil',
+    '../components/icons/AppIcons',
     () => ({
         NotePencilIcon:
             jest.fn(() => null)
@@ -15,7 +15,7 @@ jest.mock(
 
 import {
     NotePencilIcon
-} from 'phosphor-react-native/src/icons/NotePencil'
+} from '../components/icons/AppIcons'
 
 import {
     ProfileField

@@ -1,6 +1,6 @@
 //Mostra uma informação do perfil e permite abrir sua edição.
 import { Pressable, Text, View } from 'react-native'
-import { NotePencilIcon } from 'phosphor-react-native/src/icons/NotePencil'
+import {NotePencilIcon} from '../../../components/icons/AppIcons'
 import { estilos, corIconeEditar } from './ProfileField.style'
 
 function obterValorVisivel(valor) {
