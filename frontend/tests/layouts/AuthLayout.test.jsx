@@ -3,7 +3,7 @@
  */
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import AuthLayout from '../layouts/AuthLayout';
+import AuthLayout from '../../layouts/AuthLayout';
 
 test('organiza título, descrição, formulário e rodapé', async () => {
     await render(
