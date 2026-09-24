@@ -1,8 +1,8 @@
 /**
  * Compõe mensagens simples com até duas ações a partir de AppModal e ButtonPopup.
  */
-import ButtonPopup from '../../common/Button/ButtonPopup';
-import AppModal from './AppModal';
+import ButtonPopup from '../../../common/Button/ButtonPopup/ButtonPopup';
+import AppModal from '../AppModal';
 
 const larguraTotal = { width: '100%' };
 
