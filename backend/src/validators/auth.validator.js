@@ -279,6 +279,7 @@ function criarAuthValidator({ dateUtils }) {
 
     // Valida e normaliza os dados recebidos na tentativa de login.
     function validarLogin(body) {
+        body = body && typeof body === 'object' ? body : {};
         const erros = [];
 
         const email = typeof body.email === 'string'
@@ -305,6 +306,10 @@ function criarAuthValidator({ dateUtils }) {
         if (!senha) {
             erros.push(
                 erro('senha', 'Informe sua senha.')
+            );
+        } else if (senha.length > 128) {
+            erros.push(
+                erro('senha', 'A senha deve possuir no máximo 128 caracteres.')
             );
         }
 

@@ -13,6 +13,7 @@ function criarPasswordRecoveryValidator() {
     }
 
     function validarSolicitacao(body) {
+        body = body && typeof body === 'object' ? body : {};
         const erros = [];
 
         const email =
@@ -52,6 +53,7 @@ function criarPasswordRecoveryValidator() {
     }
 
     function validarRedefinicao(body) {
+        body = body && typeof body === 'object' ? body : {};
         const erros = [];
         const token = typeof body.token === 'string'
             ? body.token.trim()
@@ -69,6 +71,10 @@ function criarPasswordRecoveryValidator() {
         if (senha.length < 8) {
             erros.push(
                 erro('senha', 'A senha deve possuir pelo menos 8 caracteres.')
+            );
+        } else if (senha.length > 128) {
+            erros.push(
+                erro('senha', 'A senha deve possuir no máximo 128 caracteres.')
             );
         }
 

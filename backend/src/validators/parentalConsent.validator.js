@@ -12,6 +12,7 @@ function criarParentalConsentValidator() {
 
     // Valida o e-mail informado posteriormente para solicitar o consentimento.
     function validarSolicitacao(body) {
+        body = body && typeof body === 'object' ? body : {};
         const erros = [];
 
         const emailResponsavelLegal =
@@ -43,6 +44,7 @@ function criarParentalConsentValidator() {
 
     // Valida o e-mail opcionalmente informado durante o reenvio.
     function validarReenvio(body) {
+        body = body && typeof body === 'object' ? body : {};
         const erros = [];
 
         const emailResponsavelLegal =
