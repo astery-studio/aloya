@@ -2,7 +2,7 @@
  * Centraliza os estilos e variantes dos campos textuais reutilizáveis.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, radius, typography } from '../../theme';
+import { cores, fontFamilies, radius, typography } from '../../../theme';
 
 const estilos = StyleSheet.create({
     container: {
@@ -26,9 +26,17 @@ const estilos = StyleSheet.create({
     categoria: { height: 56, borderWidth: 0.705 },
     popup: { height: 52, backgroundColor: '#FAFAF8' },
     desativado: { opacity: 0.55 },
+    containerErro: { borderColor: cores.feedback.erro },
+    erro: {
+        color: cores.feedback.erro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 12,
+        lineHeight: 18
+    },
     acao: { padding: 8, marginRight: -8 },
     rotuloExterno: { ...typography.caption, color: cores.neutras.textoSecundarioClaro },
-    grupo: { width: '100%', gap: 8 }
+    grupo: { gap: 8 },
+    grupoCampo: { width: '100%', gap: 6 }
 });
 
 export { estilos };

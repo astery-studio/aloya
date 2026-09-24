@@ -3,7 +3,7 @@
  */
 import { memo } from 'react';
 import { Text, TextInput as EntradaNativa, View } from 'react-native';
-import { cores } from '../../theme';
+import { cores } from '../../../theme';
 import { estilos } from './TextInput.styles';
 
 const manterTexto = (texto) => texto;
@@ -11,7 +11,7 @@ const manterTexto = (texto) => texto;
 // Recebe as opções do campo, mostra a entrada e devolve o texto tratado ao formulário.
 function TextInput({
     label, placeholder, value, onChangeText, variante = 'padrao',
-    desativado = false, acaoDireita, estilo, sanitizar = manterTexto,
+    desativado = false, acaoDireita, estilo, erro, sanitizar = manterTexto,
     ...outrasProps
 }) {
     const preenchido = Boolean(value);
@@ -22,7 +22,7 @@ function TextInput({
             : cores.neutras.textoSecundarioClaro;
 
     return (
-        <View style={rotuloExterno && estilos.grupo}>
+        <View style={[estilos.grupoCampo, rotuloExterno && estilos.grupo]}>
             {rotuloExterno && <Text style={estilos.rotuloExterno}>{label}</Text>}
             <View style={[
                 estilos.container,
@@ -30,6 +30,7 @@ function TextInput({
                 variante === 'categoria' && estilos.categoria,
                 variante === 'popup' && estilos.popup,
                 desativado && estilos.desativado,
+                erro && estilos.containerErro,
                 estilo
             ]}>
                 <View style={estilos.conteudo}>
@@ -47,6 +48,11 @@ function TextInput({
                 </View>
                 {acaoDireita}
             </View>
+            {erro ? (
+                <Text accessibilityRole="alert" style={estilos.erro}>
+                    {erro}
+                </Text>
+            ) : null}
         </View>
     );
 }
