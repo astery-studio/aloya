@@ -1,4 +1,4 @@
-//Reúne as operações autenticadas de perfil e exclusão da própria conta.
+//Reúne as operações autenticadas de perfil, senha e exclusão da própria conta.
 import { criarUserProfile } from '../../profile/models/userProfile'
 import { endpoints } from '../../../services/api/endpoints'
 
@@ -8,6 +8,32 @@ const camposPermitidos = Object.freeze([
     'dataNascimento',
     'identidadeGenero'
 ])
+
+const camposPermitidosAlteracaoSenha = Object.freeze([
+    'senhaAtual',
+    'novaSenha',
+    'confirmacaoNovaSenha'
+])
+
+function filtrarDadosAlteracaoSenha(dados) {
+    if (dados === null || typeof dados !== 'object' || Array.isArray(dados)) {
+        throw new Error('Os dados da alteração de senha são inválidos.')
+    }
+
+    const camposRecebidos = Object.keys(dados)
+    const possuiCampoProibido = camposRecebidos.some(campo => !camposPermitidosAlteracaoSenha.includes(campo))
+    const camposSaoTexto = camposPermitidosAlteracaoSenha.every(campo => typeof dados[campo] === 'string')
+
+    if (possuiCampoProibido || camposRecebidos.length !== camposPermitidosAlteracaoSenha.length || !camposSaoTexto) {
+        throw new Error('Os dados da alteração de senha são inválidos.')
+    }
+
+    return {
+        senhaAtual: dados.senhaAtual,
+        novaSenha: dados.novaSenha,
+        confirmacaoNovaSenha: dados.confirmacaoNovaSenha
+    }
+}
 
 function filtrarAlteracoes(alteracoes) {
     if (alteracoes === null || typeof alteracoes !== 'object' || Array.isArray(alteracoes)) {
@@ -36,6 +62,7 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
     let contaExcluidaNoServidor = false
     let respostaDaExclusao = null
     let verificacaoSenhaEmAndamento = null
+    let alteracaoSenhaEmAndamento = null
 
     async function buscarPerfil({signal} = {}) {
         const resposta = await requisicaoAutenticada({
@@ -56,6 +83,24 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
         })
 
         return criarUserProfile(resposta)
+    }
+
+    function alterarSenha(dados) {
+        const dadosSeguros = filtrarDadosAlteracaoSenha(dados)
+
+        if (alteracaoSenhaEmAndamento) {
+            return alteracaoSenhaEmAndamento
+        }
+
+        alteracaoSenhaEmAndamento = requisicaoAutenticada({
+            metodo: 'PATCH',
+            caminho: endpoints.alteracaoSenha,
+            corpo: dadosSeguros
+        }).finally(() => {
+            alteracaoSenhaEmAndamento = null
+        })
+
+        return alteracaoSenhaEmAndamento
     }
 
     function confirmarSenhaExclusao({senhaAtual} = {}) {
@@ -132,6 +177,7 @@ function criarAccountService({requisicaoAutenticada, removerCredencialLocal}) {
     return {
         buscarPerfil,
         atualizarPerfil,
+        alterarSenha,
         confirmarSenhaExclusao,
         excluirConta
     }
