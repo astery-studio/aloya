@@ -1,7 +1,6 @@
 //Controla a verificação da senha e a exclusão permanente da conta autenticada.
 import { useEffect, useState } from 'react'
-import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
-import { TrashIcon } from 'phosphor-react-native/src/icons/Trash'
+import { TrashIcon, WarningCircleIcon } from '../../../components/icons/AppIcons'
 
 import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../../components/feedback/Modal/SimpleModal'
