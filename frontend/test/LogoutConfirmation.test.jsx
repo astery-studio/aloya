@@ -14,13 +14,10 @@ jest.mock(
     })
 )
 
-jest.mock(
-    'phosphor-react-native/src/icons/LockKey',
-    () => ({
-        LockKeyIcon:
-            jest.fn(() => null)
-    })
-)
+jest.mock('../components/icons/AppIcons', () => ({
+    LockKeyIcon: jest.fn(() => null),
+    WarningCircleIcon: jest.fn(() => null)
+}))
 
 import { LogoutConfirmation } from '../features/settings/account/LogoutConfirmation'
 
