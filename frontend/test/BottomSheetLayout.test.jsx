@@ -2,13 +2,13 @@ import {Text} from 'react-native'
 import {fireEvent,render,screen} from '@testing-library/react-native'
 
 jest.mock(
-    'phosphor-react-native/src/icons/X',
+    '../components/icons/AppIcons',
     () => ({
         XIcon: jest.fn(() => null)
     })
 )
 
-import {XIcon} from 'phosphor-react-native/src/icons/X'
+import {XIcon} from '../components/icons/AppIcons'
 import {estilos, corIconeFechar} from '../layouts/BottomSheet/BottomSheetLayout.style'
 import {BottomSheetLayout} from '../layouts/BottomSheet/BottomSheetLayout'
 

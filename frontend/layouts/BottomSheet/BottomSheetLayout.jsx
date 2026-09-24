@@ -1,6 +1,6 @@
 //Organiza o cabeçalho e o conteúdo dos painéis inferiores. É usado por SelectionSheet e EditFieldSheet
 import { Pressable, Text, View } from 'react-native'
-import { XIcon } from 'phosphor-react-native/src/icons/X'
+import { XIcon } from '../../components/icons/AppIcons'
 import { estilos, corIconeFechar } from './BottomSheetLayout.style'
 
 function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, children }) {
