@@ -71,6 +71,14 @@ function obterMensagemErroSalvar(erro) {
     return 'Ocorreu um erro ao salvar sua conta. Verifique sua conexão e tente novamente.'
 }
 
+function obterMensagemSucesso(perfilAtualizado) {
+    if (perfilAtualizado?.consentimentoParentalNecessario === true) {
+        return 'Para usar a Rede de Apoio, solicite a autorização do seu responsável legal.'
+    }
+
+    return undefined
+}
+
 function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, confirmarSenhaExclusao, excluirConta, encerrarSessao, onContaExcluida, onSessaoEncerrada}) {
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil))
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil))
@@ -80,6 +88,7 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
     const [generoVisivel, setGeneroVisivel] = useState(false)
     const [salvando, setSalvando] = useState(false)
     const [sucessoVisivel, setSucessoVisivel] = useState(false)
+    const [mensagemSucesso, setMensagemSucesso] = useState(undefined)
     const [erroSalvarVisivel, setErroSalvarVisivel] = useState(false)
     const [mensagemErroSalvar, setMensagemErroSalvar] = useState('')
     const [saidaSemSalvarVisivel, setSaidaSemSalvarVisivel] = useState(false)
@@ -172,6 +181,11 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         setGeneroVisivel(false)
     }
 
+    function fecharSucesso() {
+        setSucessoVisivel(false)
+        setMensagemSucesso(undefined)
+    }
+
     async function salvarAlteracoes() {
         if (!podeSalvar) {
             return
@@ -183,8 +197,17 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         setErroSalvarVisivel(false)
 
         try {
-            await onSalvar(Object.freeze({...alteracoes}))
+            const perfilAtualizado =
+                await onSalvar(
+                    Object.freeze({...alteracoes})
+                )
+
             setDadosOriginais(dadosEnviados)
+            setMensagemSucesso(
+                obterMensagemSucesso(
+                    perfilAtualizado
+                )
+            )
             setSucessoVisivel(true)
         } catch (erro) {
             setMensagemErroSalvar(obterMensagemErroSalvar(erro))
@@ -291,10 +314,11 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
 
             <SimpleModal
                 visivel={sucessoVisivel}
-                aoFechar={() => setSucessoVisivel(false)}
+                aoFechar={fecharSucesso}
                 icone={LockKeyIcon}
                 titulo="Dados atualizados com sucesso"
-                acaoPrincipal={{texto: 'OK', aoPressionar: () => setSucessoVisivel(false)}}
+                mensagem={mensagemSucesso}
+                acaoPrincipal={{texto: 'OK', aoPressionar: fecharSucesso}}
             />
 
             <SimpleModal
@@ -339,11 +363,11 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 onContaExcluida={onContaExcluida}
             />
 
-            <LogoutConfirmation 
-                visivel={logoutVisivel} 
-                onFechar={() => setLogoutVisivel(false)} 
-                encerrarSessao={encerrarSessao} 
-                onSessaoEncerrada={onSessaoEncerrada} 
+            <LogoutConfirmation
+                visivel={logoutVisivel}
+                onFechar={() => setLogoutVisivel(false)}
+                encerrarSessao={encerrarSessao}
+                onSessaoEncerrada={onSessaoEncerrada}
             />
         </>
     )
