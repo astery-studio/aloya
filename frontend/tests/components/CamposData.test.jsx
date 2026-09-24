@@ -45,3 +45,27 @@ test('horário removível chama a ação de remoção', async () => {
     fireEvent.press(screen.getByRole('button', { name: 'Remover horário 08:00' }));
     expect(aoRemover).toHaveBeenCalledTimes(1);
 });
+
+test('data encaminha eventos opcionais de foco e saída', async () => {
+    const onFocus = jest.fn();
+    const onBlur = jest.fn();
+    await render(<DateInput valor="" onFocus={onFocus} onBlur={onBlur}
+        rotuloAcessibilidade="Nascimento" />);
+    const entrada = screen.getByLabelText('Nascimento');
+    await fireEvent(entrada, 'focus');
+    await fireEvent(entrada, 'blur');
+    expect(entrada.props.editable).toBe(true);
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
+});
+
+test('data desativada bloqueia a edição', async () => {
+    await render(<DateInput desativado />);
+    expect(screen.getByLabelText('Data').props.editable).toBe(false);
+});
+
+test('horário vazio e desativado mantém remoção bloqueada', async () => {
+    await render(<TimeInput podeRemover desativado />);
+    expect(screen.getByLabelText('Horário').props.editable).toBe(false);
+    expect(screen.getByRole('button', { name: 'Remover horário' })).toBeDisabled();
+});

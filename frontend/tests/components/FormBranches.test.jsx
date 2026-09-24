@@ -14,6 +14,11 @@ test('ButtonPopup rejeita variante fora do contrato', () => {
     })).toThrow('Variante de ButtonPopup inválida: inexistente');
 });
 
+test('ButtonPopup usa variante padrão quando ela é omitida', async () => {
+    await render(<ButtonPopup texto="Continuar" />);
+    expect(screen.getByRole('button', { name: 'Continuar' })).toBeTruthy();
+});
+
 test('FormField aceita conteúdo, título e mensagem auxiliar', async () => {
     await render(
         <FormField label="Dados" tituloSecao mensagemAuxiliar="Obrigatório">
