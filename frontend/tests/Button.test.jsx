@@ -31,6 +31,29 @@ test.each(['verde', 'branco', 'preto', 'vermelho'])(
     }
 );
 
+test('botão de popup usa a variante verde por padrão', async () => {
+    await render(<ButtonPopup texto="Continuar" />);
+
+    const botao = screen.getByRole('button', {
+        name: 'Continuar'
+    });
+
+    expect(botao).toBeEnabled();
+});
+
+test('botão de popup rejeita uma variante inválida', async () => {
+    await expect(
+        render(
+            <ButtonPopup
+                texto="Continuar"
+                variante="inexistente"
+            />
+        )
+    ).rejects.toThrow(
+        'Variante de ButtonPopup inválida: inexistente'
+    );
+});
+
 test('botão tracejado executa a ação', async () => {
     const aoPressionar = jest.fn();
     await render(<ButtonDashed texto="Adicionar" aoPressionar={aoPressionar} />);
