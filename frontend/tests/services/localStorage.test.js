@@ -56,4 +56,38 @@ describe('localStorage', () => {
 
         await expect(salvarDadoLocal('preferencia', true)).rejects.toThrow('Não foi possível salvar a informação neste aparelho.');
     });
+
+    test.each([null, 123, {}])('rejeita chave que não é texto', async (chave) => {
+        await expect(salvarDadoLocal(chave, true)).rejects.toThrow(
+            'A chave do armazenamento local precisa ser um texto.'
+        );
+    });
+
+    test.each([
+        () => 'valor',
+        Symbol('valor')
+    ])('rejeita tipos que não podem ser serializados', async (valor) => {
+        await expect(salvarDadoLocal('preferencia', valor)).rejects.toThrow(
+            'O valor informado não pode ser salvo'
+        );
+    });
+
+    test('rejeita valor acima do limite permitido', async () => {
+        await expect(salvarDadoLocal('preferencia', 'a'.repeat(100001)))
+            .rejects.toThrow('maior que o limite');
+    });
+
+    test('não expõe falha ao ler JSON corrompido', async () => {
+        AsyncStorage.getItem.mockResolvedValueOnce('{invalido');
+        await expect(obterDadoLocal('preferencia')).rejects.toThrow(
+            'Não foi possível ler a informação salva neste aparelho.'
+        );
+    });
+
+    test('não expõe falha técnica ao remover', async () => {
+        AsyncStorage.removeItem.mockRejectedValueOnce(new Error('interno'));
+        await expect(removerDadoLocal('preferencia')).rejects.toThrow(
+            'Não foi possível remover a informação deste aparelho.'
+        );
+    });
 });
