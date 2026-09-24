@@ -1,10 +1,10 @@
 /**
  * Testes das regras de validação de campos do frontend.
  */
-import { horarioValido } from '../utils/validation/isValidTime';
-import { isRequired } from '../utils/validation/isRequired';
-import { isValidDate } from '../utils/validation/isValidDate';
-import { isValidEmail } from '../utils/validation/isValidEmail';
+import { horarioValido } from '../../utils/validation/isValidTime';
+import { isRequired } from '../../utils/validation/isRequired';
+import { isValidDate } from '../../utils/validation/isValidDate';
+import { isValidEmail } from '../../utils/validation/isValidEmail';
 
 test('campo obrigatório rejeita texto vazio ou apenas espaços', () => {
     expect(isRequired(' Carla ')).toBe(true);
