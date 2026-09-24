@@ -1,39 +1,64 @@
-import { Pressable, Text, View } from 'react-native'
-import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft'
-import { estilos, corIconeVoltar } from './Header.style'
+import {
+    Pressable,
+    Text,
+    View
+} from 'react-native'
+
+import {
+    ArrowLeftIcon
+} from 'phosphor-react-native/src/icons/ArrowLeft'
+
+import {
+    estilos,
+    corIconeVoltar
+} from './Header.style'
 
 function Header({
     titulo,
     variante = 'padrao',
-    onVoltar
+    onVoltar,
+    usarEspacamentoSuperior = true
 }) {
-    const temVoltar = variante === 'comVoltar'
+    const temVoltar =
+        variante === 'comVoltar'
 
     return (
         <View style={estilos.container}>
-            <View
-                style={[
-                    estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar
-                ]}
-            />
+            {usarEspacamentoSuperior ? (
+                <View
+                    testID="espacamento-superior-header"
+                    style={[
+                        estilos.espacamentoSuperior,
+                        temVoltar
+                            && estilos.espacamentoSuperiorComVoltar
+                    ]}
+                />
+            ) : null}
 
             <View
                 style={[
                     estilos.areaTitulo,
-                    temVoltar && estilos.areaTituloComVoltar
+                    temVoltar
+                        && estilos.areaTituloComVoltar
                 ]}
             >
                 {temVoltar ? (
                     <Pressable
                         onPress={onVoltar}
-                        disabled={typeof onVoltar !== 'function'}
+                        disabled={
+                            typeof onVoltar
+                            !== 'function'
+                        }
                         accessibilityRole="button"
                         accessibilityLabel="Voltar"
                         accessibilityState={{
-                            disabled: typeof onVoltar !== 'function'
+                            disabled:
+                                typeof onVoltar
+                                !== 'function'
                         }}
-                        style={estilos.containerVoltar}
+                        style={
+                            estilos.containerVoltar
+                        }
                     >
                         <ArrowLeftIcon
                             size={24}
@@ -46,7 +71,8 @@ function Header({
                 <Text
                     style={[
                         estilos.titulo,
-                        temVoltar && estilos.tituloComVoltar
+                        temVoltar
+                            && estilos.tituloComVoltar
                     ]}
                     accessibilityRole="header"
                 >
@@ -57,4 +83,6 @@ function Header({
     )
 }
 
-export { Header }
+export {
+    Header
+}
