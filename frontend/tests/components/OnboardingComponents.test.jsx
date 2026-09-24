@@ -14,6 +14,18 @@ test('progresso calcula a largura pela etapa atual', async () => {
     expect(screen.getByTestId('progresso-preenchido')).toHaveStyle({ width: '60%' });
 });
 
+test.each([
+    [-1, 5, 'Etapa 0 de 5', '0%'],
+    [8, 5, 'Etapa 5 de 5', '100%'],
+    [1, 0, 'Etapa 0 de 0', '0%']
+])('progresso limita valores fora da faixa', async (
+    etapaAtual, totalEtapas, rotulo, largura
+) => {
+    await render(<OnboardingProgress etapaAtual={etapaAtual} totalEtapas={totalEtapas} />);
+    expect(screen.getByLabelText(rotulo)).toBeTruthy();
+    expect(screen.getByTestId('progresso-preenchido')).toHaveStyle({ width: largura });
+});
+
 test('nascimento habilita avanço apenas com data válida', async () => {
     const aoAvancar = jest.fn();
     const { rerender } = await render(<BirthDateStep valor=""
@@ -23,6 +35,20 @@ test('nascimento habilita avanço apenas com data válida', async () => {
         aoAlterar={jest.fn()} aoVoltar={jest.fn()} aoAvancar={aoAvancar} />);
     fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     expect(aoAvancar).toHaveBeenCalledTimes(1);
+});
+
+test('nascimento oferece e-mail opcional para menor de 16 anos', async () => {
+    const aoAlterarEmailResponsavel = jest.fn();
+    await render(<BirthDateStep valor="04/01/2012" menorDe16
+        emailResponsavelLegal="responsavel@email.com"
+        erroEmailResponsavel="E-mail inválido"
+        aoAlterarEmailResponsavel={aoAlterarEmailResponsavel}
+        aoAlterar={jest.fn()} aoVoltar={jest.fn()} aoAvancar={jest.fn()} />);
+
+    const email = screen.getByLabelText('E-mail do responsável legal (opcional)');
+    await fireEvent.changeText(email, 'novo@email.com');
+    expect(aoAlterarEmailResponsavel).toHaveBeenCalledWith('novo@email.com');
+    expect(screen.getByRole('alert')).toHaveTextContent('E-mail inválido');
 });
 
 test('duração permite digitar o número sem alterar a unidade', async () => {
