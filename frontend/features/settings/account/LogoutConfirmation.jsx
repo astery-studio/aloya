@@ -1,6 +1,6 @@
 //Confirma o logout e encerra a sessão no servidor e no armazenamento seguro.
 import { useState } from 'react'
-import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
+import { WarningCircleIcon } from '../../../components/icons/AppIcons'
 import ButtonPopup from '../../../components/common/Button/ButtonPopup'
 import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal'
 import AppModal from '../../../components/feedback/Modal/AppModal'
