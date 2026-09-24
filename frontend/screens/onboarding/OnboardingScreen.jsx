@@ -48,6 +48,7 @@ export default function OnboardingScreen({
     const [dados, setDados] = useState(iniciais);
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
+    const [errosCampos, setErrosCampos] = useState({});
     const alterar = useCallback(
         (mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []
     );
@@ -71,7 +72,10 @@ export default function OnboardingScreen({
                 dataFimUltimaMenstruacao: paraIso(dados.ultimaMenstruacao.fim),
                 duracaoCicloInformada: dados.duracaoCiclo,
                 duracaoMenstruacaoInformada: dados.duracaoMenstruacao,
-                duracaoLuteaInformada: duracaoLutea
+                duracaoLuteaInformada: duracaoLutea,
+                ...(dados.emailResponsavelLegal.trim()
+                    ? { emailResponsavelLegal: dados.emailResponsavelLegal.trim() }
+                    : {})
             });
             await salvarToken(resultado.autenticacao);
             setEtapa(6);
@@ -95,21 +99,35 @@ export default function OnboardingScreen({
     }
 
     async function avancarConta() {
+        setErrosCampos({});
         if (dados.nome.trim().length < 3) {
+            setErrosCampos({ nome: 'O nome deve ter pelo menos 3 caracteres.' });
             setErro({ titulo: 'Nome inválido', mensagem: 'O nome deve ter pelo menos 3 caracteres.' });
         } else if (!/^[\p{L}]+(?:[ -][\p{L}]+)*$/u.test(dados.nome.trim())) {
+            setErrosCampos({ nome: 'Use apenas letras, espaços ou hífens.' });
             setErro({ titulo: 'Nome inválido', mensagem: 'Use apenas letras, espaços ou hífens.' });
         } else if (!isValidEmail(dados.email)) {
+            setErrosCampos({ email: 'Informe um e-mail válido.' });
             setErro({ titulo: 'E-mail inválido', mensagem: 'Informe um e-mail válido.' });
+        } else if (dados.senha.length < 8) {
+            setErrosCampos({ senha: 'A senha deve possuir pelo menos 8 caracteres.' });
+            setErro({ titulo: 'Senha inválida', mensagem:
+                'A senha deve possuir pelo menos 8 caracteres.' });
+        } else if (dados.senha.length > 128) {
+            setErrosCampos({ senha: 'A senha deve possuir no máximo 128 caracteres.' });
+            setErro({ titulo: 'Senha inválida', mensagem:
+                'A senha deve possuir no máximo 128 caracteres.' });
         } else if (dados.senha !== dados.confirmacao) {
-            setErro({ titulo: 'Senhas diferentes', mensagem: 'A confirmação deve ser igual à senha.' });
+            setErrosCampos({ confirmacao: 'As senhas não coincidem.' });
+            setErro({ titulo: 'Senhas diferentes', mensagem: 'As senhas não coincidem.' });
         } else {
             setCarregando(true);
             try {
                 const resultado = await verificarEmailDisponivel?.(dados.email);
                 if (resultado && !resultado.disponivel) {
+                    setErrosCampos({ email: 'Este e-mail já está em uso. Tente fazer login.' });
                     setErro({ titulo: 'E-mail já cadastrado', mensagem:
-                        'Este e-mail já possui uma conta. Tente fazer login.' });
+                        'Este e-mail já está em uso. Tente fazer login.' });
                     return;
                 }
                 avancar();
@@ -129,6 +147,22 @@ export default function OnboardingScreen({
             setErro({ titulo: 'Data inválida', mensagem: 'Informe uma data de nascimento válida.' });
             return;
         }
+        if (ehMenorDe16(dados.dataNascimento) && dados.emailResponsavelLegal) {
+            if (!isValidEmail(dados.emailResponsavelLegal)) {
+                setErrosCampos({ emailResponsavelLegal: 'Informe um e-mail válido.' });
+                setErro({ titulo: 'E-mail inválido', mensagem: 'Informe um e-mail válido.' });
+                return;
+            }
+            if (dados.emailResponsavelLegal.trim().toLowerCase()
+                === dados.email.trim().toLowerCase()) {
+                const mensagem =
+                    'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.';
+                setErrosCampos({ emailResponsavelLegal: mensagem });
+                setErro({ titulo: 'E-mail inválido', mensagem });
+                return;
+            }
+        }
+        setErrosCampos({});
         avancar();
     }
 
@@ -136,9 +170,14 @@ export default function OnboardingScreen({
     let conteudo;
     if (etapa === 0) conteudo = <AccountStep dados={dados} aoAlterar={alterar}
         aoAvancar={avancarConta} aoVoltar={voltar} aoEntrar={aoEntrar}
-        carregando={carregando} />;
+        carregando={carregando} erros={errosCampos} />;
     if (etapa === 1) conteudo = <BirthDateStep {...comum} valor={dados.dataNascimento}
-        aoAlterar={(dataNascimento) => alterar({ dataNascimento })} aoAvancar={avancarNascimento} />;
+        aoAlterar={(dataNascimento) => alterar({ dataNascimento })}
+        menorDe16={ehMenorDe16(dados.dataNascimento)}
+        emailResponsavelLegal={dados.emailResponsavelLegal}
+        aoAlterarEmailResponsavel={(emailResponsavelLegal) => alterar({ emailResponsavelLegal })}
+        erroEmailResponsavel={errosCampos.emailResponsavelLegal}
+        aoAvancar={avancarNascimento} />;
     if (etapa === 2) conteudo = <LastMenstruationStep {...comum}
         valor={dados.ultimaMenstruacao} aoAlterar={(ultimaMenstruacao) => alterar({ ultimaMenstruacao })}
         aoAvancar={avancarMenstruacao} />;
