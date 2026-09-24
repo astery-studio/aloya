@@ -19,17 +19,6 @@ const estilos = StyleSheet.create({
         textAlign: 'center'
     },
 
-    iconeErro: {
-        width: 56,
-        height: 56,
-        marginBottom: tema.espacamentos.medio,
-        borderRadius: 28,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor:
-            tema.cores.neutras.bordaClara
-    },
-
     tituloErro: {
         color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,

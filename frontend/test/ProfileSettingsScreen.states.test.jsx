@@ -152,13 +152,6 @@ describe('ProfileSettingsScreen - estados da tela', () => {
         )
 
         expect(
-            screen.getByRole('image', {
-                name:
-                    'Erro ao carregar perfil'
-            })
-        ).toBeOnTheScreen()
-
-        expect(
             screen.getByRole('header', {
                 name: 'Ocorreu um erro'
             })
