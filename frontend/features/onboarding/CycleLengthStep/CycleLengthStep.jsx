@@ -1,7 +1,7 @@
 /**
  * Configura DurationStep para coletar a duração habitual do ciclo.
  */
-import DurationStep from './DurationStep';
+import DurationStep from '../DurationStep/DurationStep';
 
 export default function CycleLengthStep(props) {
     return (

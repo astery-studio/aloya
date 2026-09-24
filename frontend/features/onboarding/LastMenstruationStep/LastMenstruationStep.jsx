@@ -1,8 +1,8 @@
 /**
  * Etapa que recebe o período da última menstruação em um calendário inline.
  */
-import MenstruationCalendar from './MenstruationCalendar';
-import OnboardingStep from './OnboardingStep';
+import MenstruationCalendar from '../MenstruationCalendar/MenstruationCalendar';
+import OnboardingStep from '../OnboardingStep/OnboardingStep';
 
 export default function LastMenstruationStep({
     valor, aoAlterar, aoVoltar, aoAvancar, carregando

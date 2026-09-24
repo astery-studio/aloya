@@ -3,7 +3,7 @@
  */
 import { Text, View } from 'react-native';
 import Button from '../../../components/common/Button/Button';
-import FormLayout from '../../../layouts/FormLayout';
+import FormLayout from '../../../layouts/FormLayout/FormLayout';
 import { estilos } from './OnboardingComplete.styles';
 
 export default function OnboardingComplete({ aoIniciar, logo }) {

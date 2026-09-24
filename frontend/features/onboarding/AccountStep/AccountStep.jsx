@@ -8,12 +8,12 @@ import Button from '../../../components/common/Button/Button';
 import EmailInput from '../../../components/forms/EmailInput';
 import PasswordInput from '../../../components/forms/PasswordInput';
 import TextInput from '../../../components/forms/TextInput';
-import AuthLayout from '../../../layouts/AuthLayout';
+import AuthLayout from '../../../layouts/AuthLayout/AuthLayout';
 import { cores } from '../../../theme';
 import { estilos } from './AccountStep.styles';
 
 export default function AccountStep({ dados, aoAlterar, aoAvancar,
-    aoVoltar, aoEntrar, carregando }) {
+    aoVoltar, aoEntrar, carregando, erros = {} }) {
     const alterarNome = useCallback((nome) => aoAlterar({ nome }), [aoAlterar]);
     const alterarEmail = useCallback((email) => aoAlterar({ email }), [aoAlterar]);
     const alterarSenha = useCallback((senha) => aoAlterar({ senha }), [aoAlterar]);
@@ -34,11 +34,16 @@ export default function AccountStep({ dados, aoAlterar, aoAvancar,
             rodape={rodape}>
             <View style={estilos.campos}>
                 <TextInput label="Nome" placeholder="Nome" value={dados.nome}
-                    onChangeText={alterarNome} />
-                <EmailInput value={dados.email} onChangeText={alterarEmail} />
-                <PasswordInput value={dados.senha} onChangeText={alterarSenha} />
+                    sanitizar={(texto) => texto
+                        .replace(/[^\p{L} -]/gu, '')
+                        .replace(/\s+/g, ' ')}
+                    erro={erros.nome} onChangeText={alterarNome} />
+                <EmailInput value={dados.email} erro={erros.email}
+                    onChangeText={alterarEmail} />
+                <PasswordInput value={dados.senha} erro={erros.senha}
+                    onChangeText={alterarSenha} />
                 <PasswordInput label="Confirmar senha" value={dados.confirmacao}
-                    onChangeText={alterarConfirmacao} />
+                    erro={erros.confirmacao} onChangeText={alterarConfirmacao} />
             </View>
             <Pressable accessibilityRole="checkbox"
                 accessibilityState={{ checked: dados.aceitouTermos }}

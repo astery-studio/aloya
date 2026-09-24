@@ -1,8 +1,8 @@
 /**
  * Estrutura reutilizável das etapas que coletam durações em dias.
  */
-import NumberInput from '../../../components/forms/NumberInput';
-import OnboardingStep from './OnboardingStep';
+import NumberInput from '../../../components/forms/NumberInput/NumberInput';
+import OnboardingStep from '../OnboardingStep/OnboardingStep';
 
 export default function DurationStep({
     etapa, titulo, valor, aoAlterar, aoVoltar, aoAvancar,
