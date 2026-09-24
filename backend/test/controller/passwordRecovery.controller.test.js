@@ -77,3 +77,56 @@ test('redefine a senha com dados validados', async () => {
     assert.equal(res.statusCode, 200);
     assert.deepEqual(chamadas, [['redefinir', dados]]);
 });
+
+test('rejeita entradas inválidas antes de acessar o serviço', async () => {
+    const erros = [{ campo: 'email', mensagem: 'Inválido.' }];
+    const { controller, chamadas } = criarController({
+        valido: false,
+        erros,
+        dados: {}
+    });
+
+    for (const metodo of ['solicitar', 'redefinir']) {
+        const res = resposta();
+        await controller[metodo]({ body: {} }, res, () => {});
+        assert.equal(res.statusCode, 422);
+        assert.deepEqual(res.body.erro.detalhes, erros);
+    }
+    assert.deepEqual(chamadas, []);
+});
+
+test('encaminha falhas de todas as operações ao middleware', async () => {
+    const erro = new Error('falha interna');
+    const service = {
+        solicitar: async () => { throw erro; },
+        validarToken: async () => { throw erro; },
+        redefinir: async () => { throw erro; }
+    };
+    const validator = {
+        validarSolicitacao: () => ({
+            valido: true,
+            erros: [],
+            dados: { email: 'a@b.com' }
+        }),
+        validarRedefinicao: () => ({
+            valido: true,
+            erros: [],
+            dados: { token: 'jwt', senha: 'nova-senha' }
+        })
+    };
+    const controller = criarPasswordRecoveryController({
+        passwordRecoveryService: service,
+        passwordRecoveryValidator: validator
+    });
+    const casos = [
+        ['solicitar', { body: {} }],
+        ['validarToken', { params: { token: 'jwt' } }],
+        ['redefinir', { body: {} }]
+    ];
+
+    for (const [metodo, req] of casos) {
+        let recebido;
+        await controller[metodo](req, resposta(), (falha) => { recebido = falha; });
+        assert.equal(recebido, erro);
+    }
+});
