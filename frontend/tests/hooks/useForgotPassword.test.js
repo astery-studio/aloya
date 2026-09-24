@@ -61,3 +61,20 @@ test.each([
 
     expect(result.current.erro).toBe(mensagem);
 });
+
+test('não atualiza estado após desmontagem durante o envio', async () => {
+    let concluir;
+    const solicitarRecuperacao = jest.fn(() => new Promise((resolve) => {
+        concluir = resolve;
+    }));
+    const { result, unmount } = await renderHook(() =>
+        useForgotPassword({ solicitarRecuperacao })
+    );
+    let promessa;
+    await act(() => {
+        promessa = result.current.enviar();
+    });
+    await unmount();
+    concluir({ mensagem: 'ok' });
+    await expect(promessa).resolves.toEqual({ mensagem: 'ok' });
+});
