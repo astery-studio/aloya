@@ -98,7 +98,13 @@ export default function App() {
                 const sessao = await obterToken()
 
                 if (ativo) {
-                    setEstadoSessao(sessaoEhValida(sessao) ? 'autenticada' : 'anonima')
+                    const sessaoAutenticada = sessaoEhValida(sessao)
+
+                    setEstadoSessao(sessaoAutenticada ? 'autenticada' : 'anonima')
+
+                    if (sessaoAutenticada) {
+                        carregarPerfil()
+                    }
                 }
             } catch {
                 if (ativo) {
@@ -115,18 +121,17 @@ export default function App() {
             controladorPerfilAtual.current?.abort()
             controladorPerfilAtual.current = null
         }
-    }, [configuracao.servicos])
-
-    useEffect(() => {
-        if (estadoSessao === 'autenticada') {
-            carregarPerfil()
-        }
-    }, [estadoSessao, carregarPerfil])
+    }, [carregarPerfil, configuracao.servicos])
 
     async function salvarPerfil(alteracoes) {
         const perfilAtualizado = await configuracao.servicos.accountService.atualizarPerfil(alteracoes)
         setPerfil(perfilAtualizado)
         return perfilAtualizado
+    }
+
+    function concluirLogin() {
+        setEstadoSessao('autenticada')
+        carregarPerfil()
     }
 
     function finalizarSessao() {
@@ -161,7 +166,7 @@ export default function App() {
         return (
             <>
                 <StatusBar style="dark" />
-                <LoginScreen realizarLogin={configuracao.servicos.authService.realizarLogin} aoEntrar={() => setEstadoSessao('autenticada')} />
+                <LoginScreen realizarLogin={configuracao.servicos.authService.realizarLogin} aoEntrar={concluirLogin} />
             </>
         )
     }
