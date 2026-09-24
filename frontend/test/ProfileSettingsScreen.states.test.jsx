@@ -5,21 +5,10 @@ import {
     screen
 } from '@testing-library/react-native'
 
-jest.mock(
-    'phosphor-react-native/src/icons/LockKey',
-    () => ({
-        LockKeyIcon:
-            jest.fn(() => null)
-    })
-)
-
-jest.mock(
-    'phosphor-react-native/src/icons/WarningCircle',
-    () => ({
-        WarningCircleIcon:
-            jest.fn(() => null)
-    })
-)
+jest.mock('../components/icons/AppIcons', () => ({
+    LockKeyIcon: jest.fn(() => null),
+    WarningCircleIcon: jest.fn(() => null)
+}))
 
 jest.mock(
     '../layouts/SettingsLayout/SettingsLayout',

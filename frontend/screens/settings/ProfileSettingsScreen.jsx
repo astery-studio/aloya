@@ -1,8 +1,7 @@
 //Controla a tela completa de dados pessoais e seus fluxos de conta.
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
-import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
-import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
+import {LockKeyIcon, WarningCircleIcon} from '../../components/icons/AppIcons'
 
 import ButtonScreen from '../../components/common/Button/ButtonScreen'
 import { EditFieldSheet } from '../../components/feedback/EditFieldSheet/EditFieldSheet'

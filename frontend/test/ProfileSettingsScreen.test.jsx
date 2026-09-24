@@ -1,21 +1,12 @@
 //Testa a integração dos estados principais da tela de configurações de perfil.
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
 
+jest.mock('../components/icons/AppIcons', () => ({
+    LockKeyIcon: jest.fn(() => null),
+    WarningCircleIcon: jest.fn(() => null)
+}))
+
 import { ProfileSettingsScreen } from '../screens/settings/ProfileSettingsScreen'
-
-jest.mock(
-    'phosphor-react-native/src/icons/LockKey',
-    () => ({
-        LockKeyIcon: () => null
-    })
-)
-
-jest.mock(
-    'phosphor-react-native/src/icons/WarningCircle',
-    () => ({
-        WarningCircleIcon: () => null
-    })
-)
 
 jest.mock(
     '../layouts/SettingsLayout/SettingsLayout',
