@@ -36,3 +36,50 @@ test('expõe uma mensagem segura quando o login falha', async () => {
     await act(() => result.current.limparErro());
     expect(result.current.erro).toBeNull();
 });
+
+test.each([
+    [{ mensagemUsuario: 'Mensagem pública.' }, 'Mensagem pública.'],
+    [{}, 'Não foi possível entrar.']
+])('prioriza mensagens seguras de falha', async (falha, mensagem) => {
+    const realizarLogin = jest.fn().mockRejectedValue(falha);
+    const { result } = await renderHook(() => useLogin({ realizarLogin }));
+
+    await act(async () => result.current.enviarLogin({}));
+
+    expect(result.current.erro).toBe(mensagem);
+});
+
+test('não atualiza estado depois que a tela é desmontada', async () => {
+    let concluir;
+    const realizarLogin = jest.fn(() => new Promise((resolve) => {
+        concluir = resolve;
+    }));
+    const { result, unmount } = await renderHook(() => useLogin({ realizarLogin }));
+    let promessa;
+
+    await act(() => {
+        promessa = result.current.enviarLogin({});
+    });
+    await unmount();
+    concluir({ autenticacao: { token: 'jwt' } });
+    await promessa;
+
+    expect(salvarToken).toHaveBeenCalled();
+});
+
+test('ignora falha concluída depois da desmontagem', async () => {
+    let rejeitar;
+    const realizarLogin = jest.fn(() => new Promise((resolve, reject) => {
+        rejeitar = reject;
+    }));
+    const { result, unmount } = await renderHook(() => useLogin({ realizarLogin }));
+    let promessa;
+
+    await act(() => {
+        promessa = result.current.enviarLogin({});
+    });
+    await unmount();
+    rejeitar(new Error('falha tardia'));
+
+    await expect(promessa).resolves.toBeNull();
+});
