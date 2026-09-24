@@ -33,3 +33,31 @@ test('reenvia pelo serviço específico e expõe falhas', async () => {
     expect(result.current.erro).toBe(falha.message);
     expect(result.current.carregando).toBe(false);
 });
+
+test('reenvia pelo serviço original quando não há serviço específico', async () => {
+    const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
+    const { result } = await renderHook(() =>
+        useForgotPassword({ solicitarRecuperacao })
+    );
+
+    await act(() => result.current.setEmail('pessoa@email.com'));
+    await act(async () => result.current.reenviar());
+    await act(() => result.current.limparErro());
+
+    expect(solicitarRecuperacao).toHaveBeenCalledWith({ email: 'pessoa@email.com' });
+    expect(result.current.erro).toBeNull();
+});
+
+test.each([
+    [{ mensagemUsuario: 'Mensagem pública.' }, 'Mensagem pública.'],
+    [{}, 'Não foi possível enviar o e-mail.']
+])('prioriza mensagens seguras de recuperação', async (falha, mensagem) => {
+    const solicitarRecuperacao = jest.fn().mockRejectedValue(falha);
+    const { result } = await renderHook(() =>
+        useForgotPassword({ solicitarRecuperacao })
+    );
+
+    await act(async () => result.current.enviar());
+
+    expect(result.current.erro).toBe(mensagem);
+});
