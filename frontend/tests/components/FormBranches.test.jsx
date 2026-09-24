@@ -45,8 +45,10 @@ test('TimeInput formata horário e permite remover', async () => {
             podeRemover aoRemover={remover} />
     );
 
-    fireEvent.changeText(screen.getByLabelText('Horário'), '1845');
-    fireEvent.press(screen.getByRole('button', { name: 'Remover horário 12:30' }));
+    await fireEvent.changeText(screen.getByLabelText('Horário'), '1845');
+    await fireEvent.press(
+        screen.getByRole('button', { name: 'Remover horário 12:30' })
+    );
 
     expect(alterar).toHaveBeenCalledWith('18:45');
     expect(remover).toHaveBeenCalledTimes(1);
