@@ -2,11 +2,11 @@
  * Testes integrados das telas e interações do fluxo de autenticação.
  */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
-import ResetPasswordScreen from '../screens/auth/ResetPasswordScreen';
+import ForgotPasswordScreen from '../../screens/auth/ForgotPasswordScreen';
+import LoginScreen from '../../screens/auth/LoginScreen';
+import ResetPasswordScreen from '../../screens/auth/ResetPasswordScreen';
 
-jest.mock('../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
+jest.mock('../../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
 
 test('login inicia desativado e envia as credenciais preenchidas', async () => {
     const realizarLogin = jest.fn().mockResolvedValue({
