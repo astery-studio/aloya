@@ -1,8 +1,7 @@
 //Controla a tela completa de dados pessoais e seus fluxos de conta.
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
-import {LockKeyIcon, WarningCircleIcon} from '../../components/icons/AppIcons'
-
+import { LockKeyIcon, WarningCircleIcon } from '../../components/icons/AppIcons'
 import ButtonScreen from '../../components/common/Button/ButtonScreen'
 import { EditFieldSheet } from '../../components/feedback/EditFieldSheet/EditFieldSheet'
 import SimpleModal from '../../components/feedback/Modal/SimpleModal'
@@ -34,6 +33,14 @@ function perfilEhValido(perfil) {
         && typeof perfil.email === 'string'
         && typeof perfil.dataNascimento === 'string'
         && (perfil.identidadeGenero === null || typeof perfil.identidadeGenero === 'string')
+}
+
+function obterChavePerfil(perfil) {
+    if (!perfilEhValido(perfil)) {
+        return null
+    }
+
+    return JSON.stringify([perfil.nome, perfil.email, perfil.dataNascimento, perfil.identidadeGenero])
 }
 
 function obterAlteracoes(dadosOriginais, dadosAtuais) {
@@ -79,8 +86,10 @@ function obterMensagemSucesso(perfilAtualizado) {
 }
 
 function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = false, onRecarregar, onSalvar, onVoltar, onAlterarSenha, confirmarSenhaExclusao, excluirConta, encerrarSessao, onContaExcluida, onSessaoEncerrada}) {
+    const chavePerfil = obterChavePerfil(perfil)
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil))
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil))
+    const [chavePerfilSincronizada, setChavePerfilSincronizada] = useState(chavePerfil)
     const [campoEditado, setCampoEditado] = useState(null)
     const [valorCampo, setValorCampo] = useState('')
     const [erroCampo, setErroCampo] = useState('')
@@ -94,15 +103,12 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
     const [exclusaoVisivel, setExclusaoVisivel] = useState(false)
     const [logoutVisivel, setLogoutVisivel] = useState(false)
 
-    useEffect(() => {
-        if (!perfilEhValido(perfil)) {
-            return
-        }
-
+    if (chavePerfil !== null && chavePerfil !== chavePerfilSincronizada) {
         const novosDados = copiarDadosPerfil(perfil)
+        setChavePerfilSincronizada(chavePerfil)
         setDadosOriginais(novosDados)
         setDadosAtuais(novosDados)
-    }, [perfil?.nome, perfil?.email, perfil?.dataNascimento, perfil?.identidadeGenero])
+    }
 
     const alteracoes = obterAlteracoes(dadosOriginais, dadosAtuais)
     const possuiAlteracoes = Object.keys(alteracoes).length > 0
@@ -191,22 +197,13 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         }
 
         const dadosEnviados = {...dadosAtuais}
-
         setSalvando(true)
         setErroSalvarVisivel(false)
 
         try {
-            const perfilAtualizado =
-                await onSalvar(
-                    Object.freeze({...alteracoes})
-                )
-
+            const perfilAtualizado = await onSalvar(Object.freeze({...alteracoes}))
             setDadosOriginais(dadosEnviados)
-            setMensagemSucesso(
-                obterMensagemSucesso(
-                    perfilAtualizado
-                )
-            )
+            setMensagemSucesso(obterMensagemSucesso(perfilAtualizado))
             setSucessoVisivel(true)
         } catch (erro) {
             setMensagemErroSalvar(obterMensagemErroSalvar(erro))
@@ -280,12 +277,7 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         return (
             <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
                 <View style={estilos.estadoTela}>
-                    <Text
-                        accessibilityRole="header"
-                        style={estilos.tituloErro}
-                    >
-                        Ocorreu um erro
-                    </Text>
+                    <Text accessibilityRole="header" style={estilos.tituloErro}>Ocorreu um erro</Text>
                     <Text accessibilityRole="alert" style={estilos.mensagemErro}>Não foi possível carregar suas configurações de perfil. Tente novamente.</Text>
 
                     {typeof onRecarregar === 'function' ? (
@@ -345,18 +337,8 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
                 fundoIcone={tema.cores.neutras.bordaClara}
                 titulo="Algo deu errado"
                 mensagem={mensagemErroSalvar}
-                acaoPrincipal={{
-                    texto: 'Tentar novamente',
-                    variante: 'preto',
-                    aoPressionar: salvarAlteracoes,
-                    carregando: salvando
-                }}
-                acaoSecundaria={{
-                    texto: 'Voltar',
-                    variante: 'branco',
-                    aoPressionar: () => setErroSalvarVisivel(false),
-                    desativado: salvando
-                }}
+                acaoPrincipal={{texto: 'Tentar novamente', variante: 'preto', aoPressionar: salvarAlteracoes, carregando: salvando}}
+                acaoSecundaria={{texto: 'Voltar', variante: 'branco', aoPressionar: () => setErroSalvarVisivel(false), desativado: salvando}}
             />
 
             <DeleteAccount
