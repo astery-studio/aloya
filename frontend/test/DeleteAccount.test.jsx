@@ -129,7 +129,7 @@ describe('DeleteAccount', () => {
 
         expect(
             screen.getByText(
-                'Digite sua senha atual para continuar.'
+                'Por segurança, insira sua senha atual para continuar com a exclusão da conta.'
             )
         ).toBeOnTheScreen()
 
@@ -562,6 +562,18 @@ describe('DeleteAccount', () => {
                 })
             ).toBeOnTheScreen()
         })
+
+        expect(
+            screen.getByText(
+                'Ocorreu um erro ao apagar sua conta.'
+            )
+        ).toBeOnTheScreen()
+
+        expect(
+            screen.queryByText(
+                'Erro interno'
+            )
+        ).toBeNull()
 
         await fireEvent.press(
             screen.getByRole('button', {

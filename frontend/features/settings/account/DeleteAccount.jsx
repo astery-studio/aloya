@@ -110,7 +110,7 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
                 visivel={visivel && etapa === 'senha'}
                 aoFechar={fechar}
                 titulo="Confirme sua identidade"
-                mensagem="Digite sua senha atual para continuar."
+                mensagem="Por segurança, insira sua senha atual para continuar com a exclusão da conta."
                 senha={senha}
                 aoAlterarSenha={valor => {
                     setSenha(valor)
@@ -154,7 +154,11 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
                 corIcone={tema.cores.feedback.erro}
                 fundoIcone={tema.cores.neutras.bordaClara}
                 titulo="Algo deu errado"
-                mensagem="Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente."
+                mensagem={
+                    acaoComErro === 'exclusao'
+                        ? 'Ocorreu um erro ao apagar sua conta.'
+                        : 'Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente.'
+                }
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
