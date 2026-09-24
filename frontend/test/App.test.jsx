@@ -222,6 +222,10 @@ jest.mock(
     }
 )
 
+jest.mock('../screens/settings/ChangePasswordScreen', () => ({
+    ChangePasswordScreen: jest.fn(() => null)
+}))
+
 import { useFonts } from 'expo-font'
 import App from '../App'
 import { ProfileSettingsScreen } from '../screens/settings/ProfileSettingsScreen'

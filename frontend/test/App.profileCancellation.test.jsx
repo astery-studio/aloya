@@ -59,6 +59,10 @@ jest.mock('../screens/settings/ProfileSettingsScreen', () => {
     }
 })
 
+jest.mock('../screens/settings/ChangePasswordScreen', () => ({
+    ChangePasswordScreen: jest.fn(() => null)
+}))
+
 import App from '../App'
 import {criarServicosApp} from '../services/createAppServices'
 import {obterToken} from '../services/auth/tokenStorage'
