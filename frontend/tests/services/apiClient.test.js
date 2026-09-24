@@ -1,7 +1,7 @@
 /**
  * Testes de serialização, respostas e normalização de erros do cliente HTTP.
  */
-import { criarApiClient } from '../services/api/apiClient';
+import { criarApiClient } from '../../services/api/apiClient';
 
 test('envia corpo JSON e retorna os dados da API', async () => {
     const fetchImpl = jest.fn().mockResolvedValue({

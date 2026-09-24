@@ -2,7 +2,7 @@
  * Testes do adaptador de armazenamento seguro e de sua indisponibilidade.
  */
 import * as SecureStore from 'expo-secure-store';
-import { lerSeguro, removerSeguro, salvarSeguro } from '../services/storage/secureStorage';
+import { lerSeguro, removerSeguro, salvarSeguro } from '../../services/storage/secureStorage';
 
 jest.mock('expo-secure-store', () => ({
     isAvailableAsync: jest.fn(),

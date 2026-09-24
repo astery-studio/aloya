@@ -1,7 +1,7 @@
 /**
  * Testes dos contratos HTTP expostos pelo serviço de autenticação.
  */
-import { criarAuthService } from '../features/auth/services/authService';
+import { criarAuthService } from '../../features/auth/services/authService';
 
 test('encaminha operações de autenticação aos endpoints reais', async () => {
     const requisicao = jest.fn().mockResolvedValue({ ok: true });

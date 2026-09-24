@@ -1,10 +1,10 @@
 /**
  * Testes da persistência, leitura e descarte de sessões autenticadas.
  */
-import * as storage from '../services/storage/secureStorage';
-import { obterToken, removerToken, salvarToken } from '../services/auth/tokenStorage';
+import * as storage from '../../services/storage/secureStorage';
+import { obterToken, removerToken, salvarToken } from '../../services/auth/tokenStorage';
 
-jest.mock('../services/storage/secureStorage');
+jest.mock('../../services/storage/secureStorage');
 
 beforeEach(() => jest.clearAllMocks());
 
