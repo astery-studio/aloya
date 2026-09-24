@@ -150,30 +150,30 @@ describe('useResetPassword', () => {
         });
     });
 
-    test('usa a mensagem do erro quando não existe mensagem segura', async () => {
+    test('não expõe a mensagem interna quando não existe mensagem segura', async () => {
         const redefinirSenha = jest.fn().mockRejectedValue(
             new Error('Token inválido.')
-        );
+        )
 
-        const { result } = await renderHook(() =>
+        const {result} = await renderHook(() =>
             useResetPassword({
                 redefinirSenha,
                 token: 'token-invalido'
             })
-        );
+        )
 
-        await preencherSenhas(result);
+        await preencherSenhas(result)
 
         await act(async () => {
-            await result.current.enviar();
-        });
+            await result.current.enviar()
+        })
 
         expect(result.current).toMatchObject({
             carregando: false,
-            erro: 'Token inválido.',
+            erro: 'Não foi possível redefinir a senha.',
             sucesso: false
-        });
-    });
+        })
+    })
 
     test('usa a mensagem padrão e permite limpar o erro', async () => {
         const redefinirSenha = jest.fn()
@@ -202,4 +202,66 @@ describe('useResetPassword', () => {
 
         expect(result.current.erro).toBeNull();
     });
+
+    test('rejeita senha menor que oito caracteres', async () => {
+        const redefinirSenha = jest.fn()
+        const {result} = await renderHook(() => useResetPassword({redefinirSenha, token: 'token-valido'}))
+
+        await act(() => {
+            result.current.setSenha('Curta12')
+            result.current.setConfirmacao('Curta12')
+        })
+
+        await act(async () => {
+            await result.current.enviar()
+        })
+
+        expect(redefinirSenha).not.toHaveBeenCalled()
+        expect(result.current.erro).toBe('A senha deve possuir pelo menos 8 caracteres.')
+    })
+
+    test('rejeita senha maior que setenta e dois bytes', async () => {
+        const redefinirSenha = jest.fn()
+        const senhaGrande = 'á'.repeat(37)
+        const {result} = await renderHook(() => useResetPassword({redefinirSenha, token: 'token-valido'}))
+
+        await act(() => {
+            result.current.setSenha(senhaGrande)
+            result.current.setConfirmacao(senhaGrande)
+        })
+
+        await act(async () => {
+            await result.current.enviar()
+        })
+
+        expect(redefinirSenha).not.toHaveBeenCalled()
+        expect(result.current.erro).toBe('A senha ultrapassa o tamanho máximo permitido.')
+    })
+
+    test('impede duas redefinições simultâneas', async () => {
+        let concluir
+        const redefinirSenha = jest.fn(() => new Promise(resolve => {
+            concluir = resolve
+        }))
+
+        const {result} = await renderHook(() => useResetPassword({redefinirSenha, token: 'token-valido'}))
+
+        await preencherSenhas(result)
+
+        let primeira
+        let segunda
+
+        await act(async () => {
+            primeira = result.current.enviar()
+            segunda = result.current.enviar()
+        })
+
+        expect(redefinirSenha).toHaveBeenCalledTimes(1)
+
+        await act(async () => {
+            concluir({mensagem: 'Senha redefinida.'})
+            await primeira
+            await segunda
+        })
+    })
 });
