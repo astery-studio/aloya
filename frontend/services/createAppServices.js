@@ -24,11 +24,36 @@ function validarApiUrl(apiUrl) {
 function criarFetchComTempoLimite(fetchImpl) {
     return async function fetchComTempoLimite(url, opcoes = {}) {
         const controlador = new AbortController()
-        const temporizador = setTimeout(() => controlador.abort(), tempoLimiteDaRequisicao)
+        const sinalExterno = opcoes.signal
+        let tempoEsgotado = false
+
+        function cancelarPeloChamador() {
+            controlador.abort()
+        }
+
+        if (sinalExterno?.aborted) {
+            controlador.abort()
+        } else {
+            sinalExterno?.addEventListener?.('abort', cancelarPeloChamador, {
+                once: true
+            })
+        }
+
+        const temporizador = setTimeout(() => {
+            tempoEsgotado = true
+            controlador.abort()
+        }, tempoLimiteDaRequisicao)
 
         try {
-            return await fetchImpl(url, {...opcoes, signal: controlador.signal})
+            return await fetchImpl(url, {
+                ...opcoes,
+                signal: controlador.signal
+            })
         } catch (erro) {
+            if (erro?.name === 'AbortError' && sinalExterno?.aborted && !tempoEsgotado) {
+                throw erro
+            }
+
             if (erro?.name === 'AbortError') {
                 const erroDeTempo = new Error('A conexão demorou demais. Tente novamente.')
                 erroDeTempo.mensagemUsuario = erroDeTempo.message
@@ -40,6 +65,7 @@ function criarFetchComTempoLimite(fetchImpl) {
             throw erroDeRede
         } finally {
             clearTimeout(temporizador)
+            sinalExterno?.removeEventListener?.('abort', cancelarPeloChamador)
         }
     }
 }

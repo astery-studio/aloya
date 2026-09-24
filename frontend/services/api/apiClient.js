@@ -93,7 +93,7 @@ function criarApiClient({ baseUrl, fetchImpl = fetch }) {
         return erro;
     }
 
-    async function requisicao({ caminho, metodo = 'GET', corpo, token }) {
+    async function requisicao({ caminho, metodo = 'GET', corpo, token, signal }) {
         const resposta = await fetchImpl(`${baseUrl}${caminho}`, {
             method: metodo,
             headers: {
@@ -105,7 +105,8 @@ function criarApiClient({ baseUrl, fetchImpl = fetch }) {
             },
             ...(corpo === undefined ? {} : {
                 body: JSON.stringify(corpo)
-            })
+            }),
+            ...(signal ? {signal} : {})
         });
 
         const { dados, formatoValido } = await lerDadosDaResposta(resposta);
