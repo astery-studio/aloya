@@ -281,7 +281,25 @@ function ProfileSettingsScreen({perfil, carregando = false, erroCarregamento = f
         return (
             <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
                 <View style={estilos.estadoTela}>
-                    <Text accessibilityRole="header" style={estilos.tituloErro}>Ocorreu um erro</Text>
+                    <View
+                        accessible
+                        accessibilityRole="image"
+                        accessibilityLabel="Erro ao carregar perfil"
+                        style={estilos.iconeErro}
+                    >
+                        <WarningCircleIcon
+                            size={32}
+                            color={tema.cores.feedback.erro}
+                            weight="regular"
+                        />
+                    </View>
+
+                    <Text
+                        accessibilityRole="header"
+                        style={estilos.tituloErro}
+                    >
+                        Ocorreu um erro
+                    </Text>
                     <Text accessibilityRole="alert" style={estilos.mensagemErro}>Não foi possível carregar suas configurações de perfil. Tente novamente.</Text>
 
                     {typeof onRecarregar === 'function' ? (
