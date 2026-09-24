@@ -2,7 +2,7 @@
  * Testes dos estados e ações do hook de recuperação de senha.
  */
 import { act, renderHook } from '@testing-library/react-native';
-import { useForgotPassword } from '../features/auth/hooks/useForgotPassword';
+import { useForgotPassword } from '../../features/auth/hooks/useForgotPassword';
 
 test('normaliza o e-mail e guarda o resultado do envio', async () => {
     const resposta = { mensagem: 'E-mail enviado.' };

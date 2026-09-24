@@ -3,7 +3,7 @@
  */
 import { act, renderHook } from '@testing-library/react-native';
 import { Keyboard } from 'react-native';
-import { useKeyboard } from '../hooks/useKeyboard';
+import { useKeyboard } from '../../hooks/useKeyboard';
 
 afterEach(() => jest.restoreAllMocks());
 

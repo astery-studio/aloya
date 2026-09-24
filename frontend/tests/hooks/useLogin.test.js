@@ -2,10 +2,10 @@
  * Testes dos estados de sucesso e falha do hook de login.
  */
 import { act, renderHook } from '@testing-library/react-native';
-import { salvarToken } from '../services/auth/tokenStorage';
-import { useLogin } from '../features/auth/hooks/useLogin';
+import { salvarToken } from '../../services/auth/tokenStorage';
+import { useLogin } from '../../features/auth/hooks/useLogin';
 
-jest.mock('../services/auth/tokenStorage');
+jest.mock('../../services/auth/tokenStorage');
 
 beforeEach(() => jest.clearAllMocks());
 
