@@ -2,7 +2,7 @@
  * Define a estrutura visual compartilhada pelas telas de autenticação.
  */
 import { StyleSheet } from 'react-native';
-import { cores, espacamentos, typography } from '../theme';
+import { cores, espacamentos, typography } from '../../theme';
 
 const estilos = StyleSheet.create({
     tela: {

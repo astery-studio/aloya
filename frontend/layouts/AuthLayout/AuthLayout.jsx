@@ -7,8 +7,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeftIcon as ArrowLeft } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { cores } from '../theme';
-import { estilos } from './AuthLayout.styles';
+import { cores } from '../../theme';
+import { estilos } from '../AuthLayout/AuthLayout.styles';
 
 const coresFundo = ['#F5EDE3', '#F7F5F0'];
 const posicoesFundo = [0.04, 0.55];

@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { estilos } from './FormLayout.styles';
+import { estilos } from '../FormLayout/FormLayout.styles';
 
 const coresFundo = ['#F5EDE3', '#F7F5F0'];
 const posicoesFundo = [0.04, 0.55];

@@ -2,7 +2,7 @@
  * Define a estrutura visual e o alinhamento opcional do FormLayout.
  */
 import { StyleSheet } from 'react-native';
-import { espacamentos } from '../theme';
+import { espacamentos } from '../../theme';
 
 const estilos = StyleSheet.create({
     fundo: { flex: 1 },
