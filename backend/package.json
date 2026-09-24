@@ -24,10 +24,10 @@
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^10.0.10",
-    "prisma": "^7.9.1"
+    "nodemailer": "^10.0.10"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "prisma": "^7.9.1"
   }
 }
