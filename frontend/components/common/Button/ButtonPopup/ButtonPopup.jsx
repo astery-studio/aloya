@@ -1,7 +1,7 @@
 /**
  * Restringe o botão base às dimensões e variantes permitidas em modais.
  */
-import Button from './Button';
+import Button from '../Button';
 
 const variantesPermitidas = [
     'verde',

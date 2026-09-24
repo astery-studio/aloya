@@ -7,7 +7,7 @@ import {
     fontFamilies,
     radius,
     typography
-} from '../../../theme';
+} from '../../../../theme';
 
 const estilos = StyleSheet.create({
     container: {

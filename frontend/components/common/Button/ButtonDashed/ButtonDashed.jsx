@@ -3,7 +3,7 @@
  */
 import { PlusIcon as Plus } from 'phosphor-react-native/src/icons/Plus';
 
-import Button from './Button';
+import Button from '../Button';
 
 export default function ButtonDashed({
     texto,

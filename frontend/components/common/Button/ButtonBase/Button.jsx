@@ -2,7 +2,7 @@
  * Componente base dos botões, responsável por variantes, estados, ícones e acessibilidade.
  */
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { cores } from '../../../theme';
+import { cores } from '../../../../theme';
 import { estilos, tamanhos, variantes } from './Button.styles';
 
 export default function Button({
