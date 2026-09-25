@@ -1,6 +1,6 @@
 //Testa expansão, contagem, ícones e alterações individuais e coletivas do PermissionGroup.
 import {Animated} from 'react-native'
-import {fireEvent, render, screen} from '@testing-library/react-native'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react-native'
 
 jest.mock('../../components/icons/AppIcons', () => {
     const React = require('react')
@@ -77,23 +77,37 @@ describe('PermissionGroup', () => {
             />
         )
 
-        let cabecalho = screen.getByRole('button', {name: 'Ciclo e Sangramento'})
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Ciclo e Sangramento'})
+        )
 
-        fireEvent.press(cabecalho)
+        await waitFor(() => {
+            expect(
+                screen.getByRole('button', {name: 'Ciclo e Sangramento'})
+            ).toHaveProp(
+                'accessibilityState',
+                expect.objectContaining({expanded: true})
+            )
+        })
 
-        cabecalho = screen.getByRole('button', {name: 'Ciclo e Sangramento'})
-
-        expect(cabecalho).toHaveProp('accessibilityState', expect.objectContaining({expanded: true}))
         expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen()
         expect(screen.getByText('Sangramento de escape')).toBeOnTheScreen()
         expect(screen.getByText('Secreção/corrimento')).toBeOnTheScreen()
 
-        fireEvent.press(cabecalho)
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Ciclo e Sangramento'})
+        )
 
-        cabecalho = screen.getByRole('button', {name: 'Ciclo e Sangramento'})
+        await waitFor(() => {
+            expect(screen.queryByText('Fluxo menstrual')).toBeNull()
+        })
 
-        expect(cabecalho).toHaveProp('accessibilityState', expect.objectContaining({expanded: false}))
-        expect(screen.queryByText('Fluxo menstrual')).toBeNull()
+        expect(
+            screen.getByRole('button', {name: 'Ciclo e Sangramento'})
+        ).toHaveProp(
+            'accessibilityState',
+            expect.objectContaining({expanded: false})
+        )
     })
 
     test('pode começar expandido', async () => {
