@@ -43,6 +43,26 @@ test('interrompe uma requisição que ultrapassa o tempo limite', async () => {
     });
 });
 
+test('preserva o cancelamento solicitado pela tela', async () => {
+    const controlador = new AbortController();
+    const fetchImpl = jest.fn((url, opcoes) => new Promise((resolve, reject) => {
+        opcoes.signal.addEventListener('abort', () => {
+            const erro = new Error('cancelada');
+            erro.name = 'AbortError';
+            reject(erro);
+        });
+    }));
+    const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl });
+    const requisicao = cliente.requisicao({
+        caminho: '/users/me',
+        signal: controlador.signal
+    });
+
+    controlador.abort();
+
+    await expect(requisicao).rejects.toMatchObject({ name: 'AbortError' });
+});
+
 test('envia token sem serializar corpo ausente e aceita resposta vazia', async () => {
     const fetchImpl = jest.fn().mockResolvedValue({ ok: true, status: 204 });
     const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl });

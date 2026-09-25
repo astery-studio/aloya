@@ -1,10 +1,8 @@
 /**
- * Aplicativo provisório para testar o fluxo real de autenticação no Expo Go.
+ * Inicializa os fluxos públicos e a área autenticada de configurações.
  */
-import { useEffect, useMemo, useState } from 'react';
-import {
-    ActivityIndicator, Linking, NativeModules, Text, View
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Linking, NativeModules, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,15 +10,23 @@ import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
 import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
 import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold';
-import Button from './components/common/Button/Button';
-import { criarAuthService } from './features/auth/services/authService';
 import ForgotPasswordScreen from './screens/auth/ForgotPasswordScreen';
 import LoginScreen from './screens/auth/LoginScreen';
 import ResetPasswordScreen from './screens/auth/ResetPasswordScreen';
 import WelcomeScreen from './screens/auth/WelcomeScreen';
 import OnboardingScreen from './screens/onboarding/OnboardingScreen';
-import { criarApiClient } from './services/api/apiClient';
+import { ChangePasswordScreen } from './screens/settings/ChangePasswordScreen';
+import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen';
+import { SettingsScreen } from './screens/settings/SettingsScreen';
+import { criarServicosApp } from './services/createAppServices';
+import { obterToken } from './services/auth/tokenStorage';
 import { cores, fontFamilies } from './theme';
+
+const telasInternas = Object.freeze({
+    configuracoes: 'configuracoes',
+    perfil: 'perfil',
+    alterarSenha: 'alterarSenha'
+});
 
 function obterBaseUrl() {
     if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
@@ -29,85 +35,236 @@ function obterBaseUrl() {
     return `http://${host}:3000`;
 }
 
-function obterToken(url) {
+function obterTokenRecuperacao(url) {
     const token = url?.match(/[?&]token=([^&]+)/)?.[1];
     return token ? decodeURIComponent(token) : null;
+}
+
+function sessaoEhValida(sessao) {
+    return sessao !== null
+        && typeof sessao === 'object'
+        && typeof sessao.token === 'string'
+        && Boolean(sessao.token.trim());
 }
 
 export default function App() {
     const [fontes, erroFontes] = useFonts({
         DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold
     });
-    const [tela, setTela] = useState('boasVindas');
+    const [telaPublica, setTelaPublica] = useState('boasVindas');
+    const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const [estadoSessao, setEstadoSessao] = useState('verificando');
     const [tokenRecuperacao, setTokenRecuperacao] = useState(null);
+    const [perfil, setPerfil] = useState(null);
+    const [carregandoPerfil, setCarregandoPerfil] = useState(false);
+    const [erroPerfil, setErroPerfil] = useState(false);
+    const requisicaoAtual = useRef(0);
+    const controladorPerfilAtual = useRef(null);
     const apiUrl = obterBaseUrl();
-    useEffect(() => {
-        console.info(`[Aloya] API configurada em ${apiUrl}`);
-    }, [apiUrl]);
-    const auth = useMemo(() => {
-        const { requisicao } = criarApiClient({ baseUrl: apiUrl });
-        return criarAuthService({ requisicao });
+
+    const configuracao = useMemo(() => {
+        try {
+            const emDesenvolvimento = typeof __DEV__ !== 'undefined' && __DEV__;
+            return {
+                servicos: criarServicosApp({
+                    apiUrl,
+                    permitirHttpDesenvolvimento: emDesenvolvimento
+                }),
+                erro: null
+            };
+        } catch {
+            return {
+                servicos: null,
+                erro: 'Não foi possível configurar a conexão com a API.'
+            };
+        }
     }, [apiUrl]);
 
     useEffect(() => {
-        function abrirLink({ url }) {
-            const token = obterToken(url);
-            if (token) {
-                setTokenRecuperacao(token);
-                setTela('redefinirSenha');
+        console.info(`[Aloya] API configurada em ${apiUrl}`);
+    }, [apiUrl]);
+
+    const carregarPerfil = useCallback(async () => {
+        if (!configuracao.servicos) return;
+
+        controladorPerfilAtual.current?.abort();
+        const controlador = new AbortController();
+        const identificador = requisicaoAtual.current + 1;
+        controladorPerfilAtual.current = controlador;
+        requisicaoAtual.current = identificador;
+        setCarregandoPerfil(true);
+        setErroPerfil(false);
+
+        try {
+            const perfilRecebido = await configuracao.servicos.accountService.buscarPerfil({
+                signal: controlador.signal
+            });
+            if (requisicaoAtual.current === identificador) setPerfil(perfilRecebido);
+        } catch (erro) {
+            if (erro?.name === 'AbortError') return;
+            if (erro?.status === 401) {
+                setPerfil(null);
+                setTelaInterna(telasInternas.configuracoes);
+                setTelaPublica('login');
+                setEstadoSessao('anonima');
+            } else if (requisicaoAtual.current === identificador) {
+                setErroPerfil(true);
+            }
+        } finally {
+            if (requisicaoAtual.current === identificador) {
+                controladorPerfilAtual.current = null;
+                setCarregandoPerfil(false);
             }
         }
+    }, [configuracao.servicos]);
+
+    useEffect(() => {
+        let ativo = true;
+
+        async function verificarSessao() {
+            if (!configuracao.servicos) return;
+            try {
+                const sessao = await obterToken();
+                if (!ativo) return;
+                if (sessaoEhValida(sessao)) {
+                    setEstadoSessao('autenticada');
+                    carregarPerfil();
+                } else {
+                    setEstadoSessao('anonima');
+                }
+            } catch {
+                if (ativo) setEstadoSessao('erro');
+            }
+        }
+
+        verificarSessao();
+        return () => {
+            ativo = false;
+            requisicaoAtual.current += 1;
+            controladorPerfilAtual.current?.abort();
+            controladorPerfilAtual.current = null;
+        };
+    }, [carregarPerfil, configuracao.servicos]);
+
+    useEffect(() => {
+        function abrirLink({ url }) {
+            const token = obterTokenRecuperacao(url);
+            if (token) {
+                setTokenRecuperacao(token);
+                setTelaPublica('redefinirSenha');
+                setEstadoSessao('anonima');
+            }
+        }
+
         Linking.getInitialURL().then((url) => abrirLink({ url }));
         const inscricao = Linking.addEventListener('url', abrirLink);
         return () => inscricao.remove();
     }, []);
 
-    if (erroFontes) {
+    async function salvarPerfil(alteracoes) {
+        const perfilAtualizado = await configuracao.servicos.accountService.atualizarPerfil(alteracoes);
+        setPerfil(perfilAtualizado);
+        return perfilAtualizado;
+    }
+
+    function concluirAutenticacao() {
+        setPerfil(null);
+        setErroPerfil(false);
+        setTelaInterna(telasInternas.configuracoes);
+        setEstadoSessao('autenticada');
+        carregarPerfil();
+    }
+
+    function finalizarSessao() {
+        requisicaoAtual.current += 1;
+        controladorPerfilAtual.current?.abort();
+        controladorPerfilAtual.current = null;
+        setPerfil(null);
+        setErroPerfil(false);
+        setCarregandoPerfil(false);
+        setTelaInterna(telasInternas.configuracoes);
+        setTelaPublica('login');
+        setEstadoSessao('anonima');
+    }
+
+    if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         return (
             <SafeAreaView style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
-                <Text>Não foi possível carregar as fontes: {erroFontes.message}</Text>
+                <Text style={{ fontFamily: fontFamilies.bold, fontSize: 20, textAlign: 'center' }}>
+                    Ocorreu um erro
+                </Text>
+                <Text style={{ fontFamily: fontFamilies.regular, marginTop: 12, textAlign: 'center' }}>
+                    {configuracao.erro || (erroFontes
+                        ? `Não foi possível carregar as fontes: ${erroFontes.message}`
+                        : 'Não foi possível acessar a sessão segura deste aparelho.')}
+                </Text>
             </SafeAreaView>
         );
     }
-    if (!fontes) {
+
+    if (!fontes || estadoSessao === 'verificando') {
         return (
             <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                 <ActivityIndicator color={cores.marca.primaria} size="large" />
-                <Text>Carregando o fluxo de autenticação...</Text>
+                <Text>Carregando...</Text>
             </SafeAreaView>
         );
     }
 
     let conteudo;
-    if (tela === 'boasVindas') conteudo = <WelcomeScreen
-        aoCriarConta={() => setTela('cadastro')} aoEntrar={() => setTela('login')} />;
-    if (tela === 'login') conteudo = <LoginScreen realizarLogin={auth.realizarLogin}
-        aoVoltar={() => setTela('boasVindas')} aoRecuperarSenha={() => setTela('recuperarSenha')}
-        aoCriarConta={() => setTela('cadastro')} aoEntrar={() => setTela('autenticado')} />;
-    if (tela === 'recuperarSenha') conteudo = <ForgotPasswordScreen
-        solicitarRecuperacao={auth.solicitarRecuperacao}
-        reenviarRecuperacao={auth.solicitarRecuperacao}
-        aoVoltar={() => setTela('login')} aoConcluir={() => setTela('login')} />;
-    if (tela === 'redefinirSenha') conteudo = <ResetPasswordScreen
-        token={tokenRecuperacao} redefinirSenha={auth.redefinirSenha}
-        aoVoltar={() => setTela('login')} aoEntrar={() => setTela('login')} />;
-    if (tela === 'cadastro') conteudo = <OnboardingScreen cadastrar={auth.cadastrar}
-        verificarEmailDisponivel={auth.verificarEmailDisponivel}
-        aoVoltar={() => setTela('boasVindas')} aoEntrar={() => setTela('login')}
-        aoConcluir={() => setTela('autenticado')} />;
-    if (tela === 'autenticado') conteudo = (
-        <SafeAreaView style={{ flex: 1, padding: 24, justifyContent: 'center', gap: 24,
-            backgroundColor: cores.neutras.fundoClaro }}>
-            <Text style={{ fontFamily: fontFamilies.bold, fontSize: 28, textAlign: 'center' }}>
-                Autenticação concluída
-            </Text>
-            <Text style={{ fontFamily: fontFamilies.regular, fontSize: 16, textAlign: 'center' }}>
-                A API respondeu com sucesso e a sessão foi armazenada neste aparelho.
-            </Text>
-            <Button texto="Voltar ao início" variante="verde"
-                aoPressionar={() => setTela('boasVindas')} />
-        </SafeAreaView>
-    );
+    if (estadoSessao === 'anonima') {
+        if (telaPublica === 'boasVindas') conteudo = <WelcomeScreen
+            aoCriarConta={() => setTelaPublica('cadastro')}
+            aoEntrar={() => setTelaPublica('login')} />;
+        if (telaPublica === 'login') conteudo = <LoginScreen
+            realizarLogin={configuracao.servicos.authService.realizarLogin}
+            aoVoltar={() => setTelaPublica('boasVindas')}
+            aoRecuperarSenha={() => setTelaPublica('recuperarSenha')}
+            aoCriarConta={() => setTelaPublica('cadastro')}
+            aoEntrar={concluirAutenticacao} />;
+        if (telaPublica === 'recuperarSenha') conteudo = <ForgotPasswordScreen
+            solicitarRecuperacao={configuracao.servicos.authService.solicitarRecuperacao}
+            reenviarRecuperacao={configuracao.servicos.authService.solicitarRecuperacao}
+            aoVoltar={() => setTelaPublica('login')}
+            aoConcluir={() => setTelaPublica('login')} />;
+        if (telaPublica === 'redefinirSenha') conteudo = <ResetPasswordScreen
+            token={tokenRecuperacao}
+            redefinirSenha={configuracao.servicos.authService.redefinirSenha}
+            aoVoltar={() => setTelaPublica('login')}
+            aoEntrar={() => setTelaPublica('login')} />;
+        if (telaPublica === 'cadastro') conteudo = <OnboardingScreen
+            cadastrar={configuracao.servicos.authService.cadastrar}
+            verificarEmailDisponivel={configuracao.servicos.authService.verificarEmailDisponivel}
+            aoVoltar={() => setTelaPublica('boasVindas')}
+            aoEntrar={() => setTelaPublica('login')}
+            aoConcluir={concluirAutenticacao} />;
+    } else if (telaInterna === telasInternas.configuracoes) {
+        conteudo = <SettingsScreen
+            onAbrirPerfil={() => {
+                setTelaInterna(telasInternas.perfil);
+                if (!perfil && !carregandoPerfil && !erroPerfil) carregarPerfil();
+            }} />;
+    } else if (telaInterna === telasInternas.alterarSenha) {
+        conteudo = <ChangePasswordScreen
+            alterarSenha={configuracao.servicos.accountService.alterarSenha}
+            onVoltar={() => setTelaInterna(telasInternas.perfil)}
+            onConcluido={() => setTelaInterna(telasInternas.perfil)}
+            onSessaoExpirada={finalizarSessao} />;
+    } else {
+        conteudo = <ProfileSettingsScreen
+            perfil={perfil}
+            carregando={carregandoPerfil}
+            erroCarregamento={erroPerfil}
+            onRecarregar={carregarPerfil}
+            onSalvar={salvarPerfil}
+            onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            onAlterarSenha={() => setTelaInterna(telasInternas.alterarSenha)}
+            confirmarSenhaExclusao={configuracao.servicos.accountService.confirmarSenhaExclusao}
+            excluirConta={configuracao.servicos.accountService.excluirConta}
+            encerrarSessao={configuracao.servicos.authService.encerrarSessao}
+            onContaExcluida={finalizarSessao}
+            onSessaoEncerrada={finalizarSessao} />;
+    }
 
-    return <><StatusBar style="dark" />{conteudo}</>;
+    return <View style={{ flex: 1 }}><StatusBar style="dark" />{conteudo}</View>;
 }

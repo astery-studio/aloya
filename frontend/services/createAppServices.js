@@ -7,14 +7,17 @@ import { obterToken, removerToken } from './auth/tokenStorage'
 
 const tempoLimiteDaRequisicao = 15000
 
-function validarApiUrl(apiUrl) {
+function validarApiUrl(apiUrl, permitirHttpDesenvolvimento = false) {
     if (typeof apiUrl !== 'string' || !apiUrl.trim()) {
         throw new Error('A URL da API não foi configurada.')
     }
 
     const url = new URL(apiUrl.trim())
 
-    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) {
+    const protocoloPermitido = url.protocol === 'https:'
+        || (permitirHttpDesenvolvimento && url.protocol === 'http:')
+
+    if (!protocoloPermitido || url.username || url.password || url.search || url.hash) {
         throw new Error('A URL da API precisa utilizar HTTPS.')
     }
 
@@ -70,8 +73,8 @@ function criarFetchComTempoLimite(fetchImpl) {
     }
 }
 
-function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl = fetch} = {}) {
-    const baseUrl = validarApiUrl(apiUrl)
+function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl = fetch, permitirHttpDesenvolvimento = false} = {}) {
+    const baseUrl = validarApiUrl(apiUrl, permitirHttpDesenvolvimento)
     const fetchSeguro = criarFetchComTempoLimite(fetchImpl)
     const {requisicao} = criarApiClient({baseUrl, fetchImpl: fetchSeguro})
 
