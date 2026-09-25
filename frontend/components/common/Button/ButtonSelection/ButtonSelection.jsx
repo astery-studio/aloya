@@ -1,8 +1,10 @@
 //Mostra uma opção que pode ser selecionada. É usado nas listas de SelectionSheet.
 import { Pressable, Text, View } from 'react-native'
+import { CheckCircle } from 'phosphor-react-native'
 import { estilos, corIconeNormal, corIconeSelecionado } from './ButtonSelection.style'
 
-function ButtonSelection({ label, selected = false, onPress, icone: Icone, descricao, desabilitado = false }) {
+function ButtonSelection({ label, selected = false, onPress, icone: Icone, descricao, desabilitado = false, variante = 'lista' }) {
+    const intensidade = variante === 'intensidade'
     return (
         <Pressable
             onPress={onPress}
@@ -11,7 +13,9 @@ function ButtonSelection({ label, selected = false, onPress, icone: Icone, descr
             accessibilityState={{ selected, disabled: desabilitado }}
             style={[
                 estilos.container,
+                intensidade && estilos.intensidade,
                 selected && estilos.selecionado,
+                intensidade && selected && estilos.intensidadeSelecionada,
                 desabilitado && estilos.desabilitado
             ]}
         >
@@ -38,6 +42,7 @@ function ButtonSelection({ label, selected = false, onPress, icone: Icone, descr
                     </Text>
                 ) : null}
             </View>
+            {intensidade ? (selected ? <CheckCircle size={26} weight="fill" color={corIconeSelecionado} /> : <View style={estilos.radioVazio} />) : null}
         </Pressable>
     )
 }

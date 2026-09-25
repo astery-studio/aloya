@@ -14,7 +14,7 @@ const estilos = StyleSheet.create({
     },
 
     selecionado: {
-        backgroundColor: `${tema.cores.marca.secundaria}0D`
+        backgroundColor: '#F0F5F2'
     },
 
     desabilitado: {
@@ -34,12 +34,35 @@ const estilos = StyleSheet.create({
 
     labelSelecionado: {
         color: tema.cores.marca.secundaria,
-        fontFamily: fontFamilies.bold
+        fontFamily: fontFamilies.semibold,
+        fontWeight: '600'
     },
 
     descricao: {
         marginTop: 4,
         color: tema.cores.neutras.textoSecundarioClaro, ...tema.typography.caption
+    },
+
+    intensidade: {
+        minHeight: 64,
+        marginBottom: 0,
+        borderWidth: 1.41,
+        borderColor: tema.cores.neutras.bordaClara,
+        backgroundColor: tema.cores.neutras.superficieClara
+    },
+
+    intensidadeSelecionada: {
+        borderWidth: 1.41,
+        borderColor: tema.cores.marca.secundaria,
+        backgroundColor: '#F0F5F2'
+    },
+
+    radioVazio: {
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        borderWidth: 1.41,
+        borderColor: tema.cores.neutras.bordaTracejada
     }
 })
 
