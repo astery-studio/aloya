@@ -24,7 +24,7 @@
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --runInBand",
-    "lint": "expo lint App.js index.js components features hooks layouts screens services utils test tests --max-warnings 0"
+    "lint": "expo lint App.js index.js components features hooks layouts screens services utils tests --max-warnings 0"
   },
   "jest": {
     "preset": "jest-expo",
