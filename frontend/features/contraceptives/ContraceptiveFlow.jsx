@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pill } from 'phosphor-react-native';
-import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal';
+import SimpleModal from '../../components/feedback/Modal/SimpleModal';
 import { ContraceptivesScreen } from '../../screens/contraceptives/ContraceptivesScreen';
 import { NewContraceptiveScreen } from '../../screens/contraceptives/NewContraceptiveScreen';
 
@@ -20,7 +20,7 @@ function ContraceptiveFlow() {
             {tela === 'cadastro'
                 ? <NewContraceptiveScreen onVoltar={() => setTela('lista')} onCadastrar={cadastrar} />
                 : <ContraceptivesScreen anticoncepcionais={itens} onCadastrarNovo={() => setTela('cadastro')} />}
-            <AlertModal
+            <SimpleModal
                 visivel={Boolean(mensagem)}
                 aoFechar={() => setMensagem(null)}
                 icone={Pill}

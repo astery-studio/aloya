@@ -1,8 +1,9 @@
 import { View } from 'react-native';
+import { WarningCircle } from 'phosphor-react-native';
 import ButtonScreen from '../../../components/common/Button/ButtonScreen';
 import FormField from '../../../components/forms/FormField';
 import TextInput from '../../../components/forms/TextInput';
-import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal';
+import SimpleModal from '../../../components/feedback/Modal/SimpleModal';
 import { useContraceptiveForm } from '../hooks/useContraceptiveForm';
 import { AlertIntensitySelector } from './AlertIntensitySelector';
 import { ContraceptiveTypeSelector } from './ContraceptiveTypeSelector';
@@ -42,12 +43,15 @@ function ContraceptiveForm({ onSubmit, salvando = false }) {
 
             <AlertIntensitySelector valor={dados.intensidadeAlerta} aberto={painel === 'intensidade'} onAbrir={() => form.abrir('intensidade')} onSelecionar={(valor) => { alterar('intensidadeAlerta', valor); form.fecharPainel(); }} onFechar={form.fecharPainel} />
             <ButtonScreen texto="Salvar anticoncepcional" aoPressionar={enviar} carregando={salvando} estilo={{ marginTop: -8 }} />
-            <AlertModal
+            <SimpleModal
                 visivel={Boolean(alerta)}
                 aoFechar={form.fecharAlerta}
+                icone={WarningCircle}
+                corIcone={alerta?.tipo === 'rede' ? '#5C5C59' : '#C85A44'}
+                fundoIcone={alerta?.tipo === 'rede' ? '#EDEDED' : '#F5EDE3'}
                 titulo={alerta?.titulo}
                 mensagem={alerta?.mensagem}
-                acaoPrincipal={alerta?.tipo === 'rede' ? { texto: 'Tentar novamente', variante: 'verde', aoPressionar: enviar } : { texto: 'OK', variante: 'verde', aoPressionar: form.fecharAlerta }}
+                acaoPrincipal={alerta?.tipo === 'rede' ? { texto: 'Tentar novamente', variante: 'preto', aoPressionar: enviar } : { texto: 'OK', variante: 'verde', aoPressionar: form.fecharAlerta }}
                 acaoSecundaria={alerta?.tipo === 'rede' ? { texto: 'Voltar', aoPressionar: form.fecharAlerta } : undefined}
             />
         </View>
