@@ -129,7 +129,8 @@ function criarAccountDeletionService({
     //Remove vínculos que pertencem à titular ou contêm dados dela como contato
     async function removerVinculos(
         tx,
-        usuario
+        usuario,
+        momentoExclusao
     ) {
         const vinculos =
             await tx.vinculoRedeApoio.findMany({
@@ -151,7 +152,10 @@ function criarAccountDeletionService({
                 },
 
                 select: {
-                    id: true
+                    id: true,
+                    titularId: true,
+                    contatoId: true,
+                    status: true
                 }
             })
 
@@ -184,6 +188,28 @@ function criarAccountDeletionService({
                 }
             }
         })
+
+        const contatoIds = [...new Set(
+            vinculos
+                .filter((vinculo) => (
+                    vinculo.titularId === usuario.id
+                    && vinculo.status === 'ativo'
+                    && Number.isInteger(vinculo.contatoId)
+                ))
+                .map((vinculo) => vinculo.contatoId)
+        )]
+
+        if (contatoIds.length > 0) {
+            await tx.notificacao.createMany({
+                data: contatoIds.map((contatoId) => ({
+                    usuarioId: contatoId,
+                    tipoOrigem: 'rede_apoio',
+                    origemId: null,
+                    dataHoraProgramada: momentoExclusao,
+                    statusEnvio: 'agendada'
+                }))
+            })
+        }
     }
 
     //Executa a exclusão somente para a própria conta autenticada
@@ -194,6 +220,8 @@ function criarAccountDeletionService({
             papel,
             senhaAtual
         })
+
+        const momentoExclusao = now()
 
         //Nenhuma exclusão acontece antes da senha ser confirmada
         await prisma.$transaction(
@@ -207,7 +235,7 @@ function criarAccountDeletionService({
                             revogadaEm: null,
 
                             validadeSessao: {
-                                gt: now()
+                                gt: momentoExclusao
                             }
                         },
 
@@ -227,7 +255,8 @@ function criarAccountDeletionService({
 
                 await removerVinculos(
                     tx,
-                    usuario
+                    usuario,
+                    momentoExclusao
                 )
 
                 //O hash no filtro impede que uma troca de senha concorrente autorize uma exclusão com senha antiga

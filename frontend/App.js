@@ -55,6 +55,7 @@ export default function App() {
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
     const [estadoSessao, setEstadoSessao] = useState('verificando');
     const [tokenRecuperacao, setTokenRecuperacao] = useState(null);
+    const [mensagemLogin, setMensagemLogin] = useState(null);
     const [perfil, setPerfil] = useState(null);
     const [carregandoPerfil, setCarregandoPerfil] = useState(false);
     const [erroPerfil, setErroPerfil] = useState(false);
@@ -168,6 +169,7 @@ export default function App() {
     }
 
     function concluirAutenticacao() {
+        setMensagemLogin(null);
         setPerfil(null);
         setErroPerfil(false);
         setTelaInterna(telasInternas.configuracoes);
@@ -175,7 +177,7 @@ export default function App() {
         carregarPerfil();
     }
 
-    function finalizarSessao() {
+    function finalizarSessao(resultado = {}) {
         requisicaoAtual.current += 1;
         controladorPerfilAtual.current?.abort();
         controladorPerfilAtual.current = null;
@@ -184,6 +186,7 @@ export default function App() {
         setCarregandoPerfil(false);
         setTelaInterna(telasInternas.configuracoes);
         setTelaPublica('login');
+        setMensagemLogin(resultado?.mensagem || null);
         setEstadoSessao('anonima');
     }
 
@@ -218,6 +221,8 @@ export default function App() {
             aoEntrar={() => setTelaPublica('login')} />;
         if (telaPublica === 'login') conteudo = <LoginScreen
             realizarLogin={configuracao.servicos.authService.realizarLogin}
+            mensagemSucesso={mensagemLogin}
+            aoDispensarMensagemSucesso={() => setMensagemLogin(null)}
             aoVoltar={() => setTelaPublica('boasVindas')}
             aoRecuperarSenha={() => setTelaPublica('recuperarSenha')}
             aoCriarConta={() => setTelaPublica('cadastro')}

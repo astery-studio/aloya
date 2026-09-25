@@ -14,7 +14,8 @@ import { isValidEmail } from '../../utils/validation/isValidEmail';
 import { estilos } from './AuthScreens.styles';
 
 export default function LoginScreen({
-    realizarLogin, aoVoltar, aoRecuperarSenha, aoCriarConta, aoEntrar
+    realizarLogin, aoVoltar, aoRecuperarSenha, aoCriarConta, aoEntrar,
+    mensagemSucesso, aoDispensarMensagemSucesso
 }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
@@ -61,5 +62,9 @@ export default function LoginScreen({
             titulo={erroValidacao ? 'E-mail inválido' : 'Não foi possível entrar'}
             mensagem={erroValidacao || erro}
             acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }} />
+        <SimpleModal visivel={Boolean(mensagemSucesso)}
+            aoFechar={aoDispensarMensagemSucesso} icone={LockKey}
+            titulo="Operação concluída" mensagem={mensagemSucesso}
+            acaoPrincipal={{ texto: 'OK', aoPressionar: aoDispensarMensagemSucesso }} />
     </>;
 }

@@ -35,6 +35,19 @@ test('tentar novamente fecha o erro sem repetir as credenciais', async () => {
     expect(screen.getByLabelText('Email').props.value).toBe('pessoa@email.com');
 });
 
+test('login mostra e permite fechar a confirmação de conta excluída', async () => {
+    const aoDispensarMensagemSucesso = jest.fn();
+
+    await render(<LoginScreen
+        realizarLogin={jest.fn()}
+        mensagemSucesso="Sua conta foi excluída com sucesso."
+        aoDispensarMensagemSucesso={aoDispensarMensagemSucesso} />);
+
+    expect(screen.getByText('Sua conta foi excluída com sucesso.')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(aoDispensarMensagemSucesso).toHaveBeenCalledTimes(1);
+});
+
 test('recuperação só permite envio com e-mail válido', async () => {
     const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
     await render(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);

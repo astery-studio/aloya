@@ -288,7 +288,7 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
                     senhaHash: true
                 }
             })
-        
+
         //A sessão atual precisa ser conhecida para que ela possa ser preservada com segurança
         if (
             !Number.isInteger(sessaoId)

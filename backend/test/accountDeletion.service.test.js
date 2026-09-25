@@ -16,7 +16,9 @@ function criarUsuario() {
 }
 
 //Cria um Prisma controlado sem tocar em dados reais
-function criarPrismaMock() {
+function criarPrismaMock({
+    vinculos = [{id: 30}]
+} = {}) {
     const chamadas = []
 
     const prisma = {
@@ -47,11 +49,7 @@ function criarPrismaMock() {
 
         vinculoRedeApoio: {
             async findMany() {
-                return [
-                    {
-                        id: 30
-                    }
-                ]
+                return vinculos
             },
 
             async deleteMany(consulta) {
@@ -75,6 +73,17 @@ function criarPrismaMock() {
 
                 return {
                     count: 1
+                }
+            },
+
+            async createMany(consulta) {
+                chamadas.push([
+                    'notificar_contatos',
+                    consulta
+                ])
+
+                return {
+                    count: consulta.data.length
                 }
             }
         }
@@ -249,6 +258,54 @@ test(
         assert.equal(
             resultado.mensagem,
             'Sua conta foi excluída com sucesso.'
+        )
+    }
+)
+
+test(
+    'notifica cada contato ativo quando a conta titular é excluída',
+    async function () {
+        const momentoExclusao =
+            new Date('2026-09-15T12:00:00.000Z')
+        const {
+            prisma,
+            chamadas
+        } = criarPrismaMock({
+            vinculos: [
+                {id: 30, titularId: 1, contatoId: 2, status: 'ativo'},
+                {id: 31, titularId: 1, contatoId: 2, status: 'ativo'},
+                {id: 32, titularId: 1, contatoId: 3, status: 'pendente'},
+                {id: 33, titularId: 4, contatoId: 1, status: 'ativo'}
+            ]
+        })
+
+        const service = criarService({prisma})
+
+        await service.excluirConta(criarPedido())
+
+        const notificacao = chamadas.find(
+            (item) => item[0] === 'notificar_contatos'
+        )[1]
+
+        assert.deepEqual(notificacao.data, [
+            {
+                usuarioId: 2,
+                tipoOrigem: 'rede_apoio',
+                origemId: null,
+                dataHoraProgramada: momentoExclusao,
+                statusEnvio: 'agendada'
+            }
+        ])
+
+        assert.deepEqual(
+            chamadas.map((item) => item[0]),
+            [
+                'iniciar_transacao',
+                'excluir_notificacoes_orfas',
+                'excluir_vinculos',
+                'notificar_contatos',
+                'excluir_usuario'
+            ]
         )
     }
 )
