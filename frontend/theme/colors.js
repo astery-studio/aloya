@@ -12,6 +12,7 @@ const cores = Object.freeze({
         textoSecundarioClaro: '#5C5C59',
         bordaClara: '#E6E2D8',
         bordaTracejada: '#C8C4BA',
+        switchInativo: '#D8D4CC',
         fundoEscuro: '#181C1A',
         superficieEscura: '#232926',
         textoPrincipalEscuro: '#EAE8E3'
