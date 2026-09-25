@@ -40,8 +40,8 @@ import {ArrowsClockwiseIcon} from 'phosphor-react-native/src/icons/ArrowsClockwi
 import {HouseIcon} from 'phosphor-react-native/src/icons/House'
 import {CalendarBlankIcon} from 'phosphor-react-native/src/icons/CalendarBlank'
 import {GearIcon} from 'phosphor-react-native/src/icons/Gear'
-import {estilos} from '../components/navigation/BottomTab/BottomTabBar/BottomTabBar.style'
-import {BottomTabBar} from '../components/navigation/BottomTab/BottomTabBar/BottomTabBar'
+import {estilos} from '../../components/navigation/BottomTab/BottomTabBar/BottomTabBar.style'
+import {BottomTabBar} from '../../components/navigation/BottomTab/BottomTabBar/BottomTabBar'
 
 describe('BottomTabBar', () => {
     beforeEach(() => {

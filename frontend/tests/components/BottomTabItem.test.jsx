@@ -1,6 +1,6 @@
 import {fireEvent, render, screen} from '@testing-library/react-native'
-import {estilos,corAtiva,corInativa} from '../components/navigation/BottomTab/BottomTabItem/BottomTabItem.style'
-import {BottomTabItem} from '../components/navigation/BottomTab/BottomTabItem/BottomTabItem'
+import {estilos,corAtiva,corInativa} from '../../components/navigation/BottomTab/BottomTabItem/BottomTabItem.style'
+import {BottomTabItem} from '../../components/navigation/BottomTab/BottomTabItem/BottomTabItem'
 
 const IconeTeste = jest.fn(() => null)
 

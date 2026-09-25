@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import Button from '../components/common/Button/Button';
-import ButtonPopup from '../components/common/Button/ButtonPopup';
-import ButtonDashed from '../components/common/Button/ButtonDashed';
+import Button from '../../components/common/Button/Button';
+import ButtonPopup from '../../components/common/Button/ButtonPopup';
+import ButtonDashed from '../../components/common/Button/ButtonDashed';
 
 test('botão chama a ação ao toque', async () => {
     const aoPressionar = jest.fn();

@@ -9,8 +9,8 @@ jest.mock(
 )
 
 import {XIcon} from 'phosphor-react-native/src/icons/X'
-import {estilos, corIconeFechar} from '../layouts/BottomSheet/BottomSheetLayout.style'
-import {BottomSheetLayout} from '../layouts/BottomSheet/BottomSheetLayout'
+import {estilos, corIconeFechar} from '../../layouts/BottomSheet/BottomSheetLayout.style'
+import {BottomSheetLayout} from '../../layouts/BottomSheet/BottomSheetLayout'
 
 describe('BottomSheetLayout', () => {
     beforeEach(() => {

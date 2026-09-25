@@ -1,6 +1,6 @@
 //Testa os estados ativo, desativado e carregando do ButtonScreen.
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import ButtonScreen from '../components/common/Button/ButtonScreen';
+import ButtonScreen from '../../components/common/Button/ButtonScreen';
 
 test('executa a ação quando está ativo', async () => {
     const aoPressionar = jest.fn();

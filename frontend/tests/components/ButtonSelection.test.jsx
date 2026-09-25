@@ -1,6 +1,6 @@
 import {fireEvent, render, screen} from '@testing-library/react-native'
-import {corIconeNormal,corIconeSelecionado} from '../components/common/Button/ButtonSelection/ButtonSelection.style'
-import {ButtonSelection} from '../components/common/Button/ButtonSelection/ButtonSelection'
+import {corIconeNormal,corIconeSelecionado} from '../../components/common/Button/ButtonSelection/ButtonSelection.style'
+import {ButtonSelection} from '../../components/common/Button/ButtonSelection/ButtonSelection'
 
 const IconeTeste = jest.fn(() => null)
 
