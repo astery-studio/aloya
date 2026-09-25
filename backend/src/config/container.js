@@ -16,7 +16,8 @@ import {
     criarLoginRateLimit,
     criarConfiguracoesContaRateLimit,
     criarAlteracaoSenhaRateLimit,
-    criarExclusaoContaRateLimit
+    criarExclusaoContaRateLimit,
+    criarPermissionCategoryRateLimit
 } from '../middlewares/rateLimit.middleware.js'
 
 import { criarPasswordService } from '../services/password.service.js'
@@ -28,18 +29,21 @@ import { criarAuthService } from '../services/auth.service.js'
 import { criarAccountService } from '../services/account.service.js'
 import { criarAccountDeletionService } from '../services/accountDeletion.service.js'
 import { criarLogoutService } from '../services/logout.service.js'
+import { criarPermissionCategoryService } from '../services/permissionCategory.service.js'
 
 import { criarAuthValidator } from '../validators/auth.validator.js'
 import { criarParentalConsentValidator } from '../validators/parentalConsent.validator.js'
 import { criarPasswordRecoveryValidator } from '../validators/passwordRecovery.validator.js'
 import { criarAccountValidator } from '../validators/account.validator.js'
 import { criarAccountDeletionValidator } from '../validators/accountDeletion.validator.js'
+import { criarPermissionCategoryValidator } from '../validators/permissionCategory.validator.js'
 
 import { criarAuthController } from '../controllers/auth.controller.js'
 import { criarPasswordRecoveryController } from '../controllers/passwordRecovery.controller.js'
 import { criarAccountController } from '../controllers/account.controller.js'
 import { criarAccountDeletionController } from '../controllers/accountDeletion.controller.js'
 import { criarLogoutController } from '../controllers/logout.controller.js'
+import { criarPermissionCategoryController } from '../controllers/permissionCategory.controller.js'
 
 import { criarAuthMiddleware } from '../middlewares/auth.middleware.js'
 import { criarParentalConsentMiddleware } from '../middlewares/parentalConsent.middleware.js'
@@ -114,6 +118,10 @@ function criarContainer() {
         prisma
     })
 
+    const permissionCategoryService = criarPermissionCategoryService({
+        prisma
+    })
+
     const authValidator = criarAuthValidator({
         dateUtils
     })
@@ -126,6 +134,8 @@ function criarContainer() {
     })
 
     const accountDeletionValidator = criarAccountDeletionValidator()
+
+    const permissionCategoryValidator = criarPermissionCategoryValidator()
 
     const authController = criarAuthController({
         authService,
@@ -151,6 +161,11 @@ function criarContainer() {
 
     const logoutController = criarLogoutController({
         logoutService
+    })
+
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService,
+        permissionCategoryValidator
     })
 
     const authMiddleware = criarAuthMiddleware({
@@ -198,6 +213,12 @@ function criarContainer() {
         limite: env.alteracaoSenhaRateLimitMaximo
     })
 
+    const permissionCategoryRateLimit = criarPermissionCategoryRateLimit({
+        rateLimit,
+        janelaMs: env.categoriaPermissaoRateLimitJanelaMs,
+        limite: env.categoriaPermissaoRateLimitMaximo
+    })
+
     return {
         authController,
         passwordRecoveryController,
@@ -211,7 +232,9 @@ function criarContainer() {
         emailRateLimit,
         configuracoesContaRateLimit,
         alteracaoSenhaRateLimit,
-        exclusaoContaRateLimit
+        exclusaoContaRateLimit,
+        permissionCategoryController,
+        permissionCategoryRateLimit
     }
 }
 
