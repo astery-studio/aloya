@@ -3,6 +3,8 @@ import { INTENSIDADES, TIPOS, obterFrequencia } from './contraceptive.constants.
 
 const FORMATO_HORARIO = /^([01]\d|2[0-3]):[0-5]\d$/;
 const FORMATO_DATA = /^\d{4}-\d{2}-\d{2}$/;
+const LIMITE_NOME = 120;
+const LIMITE_HORARIOS = 24;
 
 function dataUtc(dataTexto) {
     if (!FORMATO_DATA.test(dataTexto ?? '')) return null;
@@ -13,6 +15,7 @@ function dataUtc(dataTexto) {
 function validarCadastroAnticoncepcional(entrada, hoje = new Date()) {
     const nome = typeof entrada?.nome === 'string' ? entrada.nome.trim() : '';
     if (!nome) throw new AppError('Informe o nome do anticoncepcional.', 422, 'NOME_OBRIGATORIO');
+    if (nome.length > LIMITE_NOME) throw new AppError('O nome deve ter no máximo 120 caracteres.', 422, 'NOME_MUITO_LONGO');
 
     const tipo = entrada?.tipo;
     if (!TIPOS.has(tipo)) throw new AppError('Selecione um tipo de anticoncepcional válido.', 422, 'TIPO_INVALIDO');
@@ -35,6 +38,9 @@ function validarCadastroAnticoncepcional(entrada, hoje = new Date()) {
     const horarios = Array.isArray(entrada.horarios) ? entrada.horarios : entrada.horariosProgramados;
     if (!Array.isArray(horarios) || horarios.length === 0 || horarios.every((horario) => !horario)) {
         throw new AppError('Informe ao menos um horário de uso.', 422, 'HORARIO_OBRIGATORIO');
+    }
+    if (horarios.length > LIMITE_HORARIOS) {
+        throw new AppError('Informe no máximo 24 horários de uso.', 422, 'LIMITE_HORARIOS_EXCEDIDO');
     }
     if (horarios.some((horario) => !FORMATO_HORARIO.test(horario))) {
         throw new AppError('Informe os horários no formato HH:mm.', 422, 'HORARIO_INVALIDO');
