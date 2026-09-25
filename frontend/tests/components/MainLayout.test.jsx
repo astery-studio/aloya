@@ -2,14 +2,14 @@ import { Text } from 'react-native'
 import { render, screen } from '@testing-library/react-native'
 
 jest.mock(
-    '../components/navigation/Header/Header',
+    '../../components/navigation/Header/Header',
     () => ({
         Header: jest.fn(() => null)
     })
 )
 
 jest.mock(
-    '../components/navigation/BottomTab/BottomTabBar/BottomTabBar',
+    '../../components/navigation/BottomTab/BottomTabBar/BottomTabBar',
     () => ({
         BottomTabBar: jest.fn(() => null)
     })

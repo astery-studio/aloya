@@ -1,7 +1,7 @@
 import {fireEvent,render,screen} from '@testing-library/react-native'
 
 jest.mock(
-    '../components/feedback/Bottomsheet/BottomSheet',
+    '../../components/feedback/Bottomsheet/BottomSheet',
     () => {
         const React = require('react')
         const {View} = require('react-native')
@@ -29,7 +29,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../layouts/BottomSheet/BottomSheetLayout',
+    '../../layouts/BottomSheet/BottomSheetLayout',
     () => {
         const React = require('react')
         const {
