@@ -17,7 +17,7 @@ function TextInput({
     ...outrasProps
 }) {
     const preenchido = Boolean(value);
-    const rotuloExterno = ['categoria', 'anticoncepcional'].includes(variante) && label;
+    const rotuloExterno = variante === 'categoria' && label;
     const rotuloInterno = variante === 'padrao' && preenchido && label;
     const corPlaceholder = variante === 'categoria' ? '#A8A49C'
         : variante === 'popup' ? 'rgba(34, 34, 34, 0.50)'
@@ -30,7 +30,6 @@ function TextInput({
                 estilos.container,
                 preenchido && variante === 'padrao' && estilos.preenchido,
                 variante === 'categoria' && estilos.categoria,
-                variante === 'anticoncepcional' && estilos.anticoncepcional,
                 variante === 'popup' && estilos.popup,
                 desativado && estilos.desativado,
                 erro && estilos.containerErro,
