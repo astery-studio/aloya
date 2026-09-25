@@ -21,6 +21,8 @@ const estilos = StyleSheet.create({
         padding: 0, minHeight: 24
     },
     categoria: { height: 56, borderWidth: 0.705 },
+    anticoncepcional: { height: 56, borderWidth: 0.705, paddingHorizontal: 8, gap: 4 },
+    caixaIcone: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     popup: { height: 52, backgroundColor: '#FAFAF8' },
     desativado: { opacity: 0.55 },
     acao: { padding: 8, marginRight: -8 },
