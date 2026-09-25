@@ -5,8 +5,8 @@ import {SafeAreaView} from 'react-native-safe-area-context'
 import ButtonScreen from '../../components/common/Button/ButtonScreen'
 import {estilos} from './FlowSelectionScreen.styles'
 
-//Recebe as duas ações de navegação e permite escolher o fluxo que será aberto.
-function FlowSelectionScreen({onAbrirConfiguracoes, onAbrirNovaCategoria}) {
+//Recebe as ações de navegação e permite escolher o fluxo que será aberto.
+function FlowSelectionScreen({onAbrirConfiguracoes, onAbrirNovaCategoria, onAbrirCategorias}) {
     return (
         <SafeAreaView style={estilos.tela}>
             <View style={estilos.conteudo}>
@@ -27,10 +27,17 @@ function FlowSelectionScreen({onAbrirConfiguracoes, onAbrirNovaCategoria}) {
                     />
 
                     <ButtonScreen
-                        texto="Fluxo criar categoria de membro"
+                        texto="Criar categoria de membro"
                         aoPressionar={onAbrirNovaCategoria}
                         variante="laranja"
                         rotuloAcessibilidade="Abrir fluxo de criação de categoria"
+                    />
+
+                    <ButtonScreen
+                        texto="Ver categorias cadastradas"
+                        aoPressionar={onAbrirCategorias}
+                        variante="branco"
+                        rotuloAcessibilidade="Abrir categorias cadastradas"
                     />
                 </View>
             </View>
