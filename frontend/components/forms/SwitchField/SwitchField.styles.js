@@ -1,3 +1,4 @@
+//Define o visual da linha de permissão e da versão compacta do interruptor.
 import {StyleSheet} from 'react-native'
 import {fontFamilies, tema} from '../../../theme'
 
@@ -15,6 +16,14 @@ const estilos = StyleSheet.create({
         borderWidth: 1.41,
         borderColor: tema.cores.neutras.bordaClara,
         borderRadius: 14
+    },
+
+    controle: {
+        width: 48,
+        minHeight: 44,
+        flexShrink: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     pressionado: {
