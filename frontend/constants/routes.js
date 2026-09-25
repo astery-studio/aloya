@@ -4,7 +4,9 @@ const rotas = Object.freeze({
     login: 'LoginScreen',
     configuracoes: 'SettingsScreen',
     perfil: 'ProfileSettingsScreen',
-    alterarSenha: 'ChangePasswordScreen'
+    alterarSenha: 'ChangePasswordScreen',
+    anticoncepcionais: 'ContraceptivesScreen',
+    novoAnticoncepcional: 'NewContraceptiveScreen'
 })
 
 export { rotas }
