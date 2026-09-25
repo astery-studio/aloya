@@ -4,6 +4,7 @@ import {Text, View} from 'react-native'
 
 import {gruposPermissoes, permissoesGerais} from '../constants/permissionOptions'
 import PermissionGroup from './PermissionGroup'
+import PermissionCounter from './PermissionCounter'
 import {estilos} from './PermissionGroups.styles'
 
 const idsPermitidos = new Set([
@@ -77,9 +78,10 @@ function PermissionGroups({permissoesSelecionadas = [], aoAlterar, desabilitado 
             <View style={estilos.cabecalho}>
                 <Text accessibilityRole="header" style={estilos.titulo}>Permissões de Acesso</Text>
 
-                <View style={estilos.contador}>
-                    <Text style={estilos.textoContador}>{quantidadeGruposAtivos} / {gruposPermissoes.length} ativos</Text>
-                </View>
+                <PermissionCounter
+                    quantidadeAtiva={quantidadeGruposAtivos}
+                    total={gruposPermissoes.length}
+                />
             </View>
 
             <View style={estilos.lista}>
