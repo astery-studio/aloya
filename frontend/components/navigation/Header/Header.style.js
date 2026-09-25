@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { tema } from '../../../theme'
+import { tema, fontFamilies } from '../../../theme'
 
 const estilos = StyleSheet.create({
     container: {
@@ -10,28 +10,39 @@ const estilos = StyleSheet.create({
         height: 56
     },
 
+    espacamentoSuperiorComVoltar: {
+        height: 48
+    },
+
     areaTitulo: {
         minHeight: 66,
         flexDirection: 'row',
         alignItems: 'flex-start',
-        paddingHorizontal:
-            tema.espacamentosLayout.margemHorizontalTela,
+        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
         paddingBottom: 32
     },
 
     areaTituloComVoltar: {
-        height: 64,
-        minHeight: 64,
+        minHeight: 72,
         alignItems: 'center',
-        paddingBottom: 16
+        paddingLeft: 12,
+        paddingRight: 60,
+        paddingBottom: 24
     },
 
     titulo: {
         flex: 1,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontSize: 28,
+        flexShrink: 1,
+        ...tema.typography.h1,
+        color: tema.cores.neutras.textoPrincipalClaro
+    },
+
+    tituloComVoltar: {
+        fontFamily: fontFamilies.bold,
+        fontSize: 18,
         fontWeight: '700',
-        lineHeight: 34
+        lineHeight: 27,
+        textAlign: 'center'
     },
 
     containerVoltar: {
@@ -39,20 +50,9 @@ const estilos = StyleSheet.create({
         height: 48,
         alignItems: 'center',
         justifyContent: 'center'
-    },
-
-    iconeVoltar: {
-        width: 32,
-        height: 32,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontSize: 24,
-        lineHeight: 32,
-        textAlign: 'center'
-    },
-
-    espacamentoFinal: {
-        width: 40
     }
 })
 
-export { estilos }
+const corIconeVoltar = tema.cores.neutras.textoSecundarioClaro
+
+export { estilos, corIconeVoltar }
