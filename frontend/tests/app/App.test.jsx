@@ -60,6 +60,22 @@ jest.mock('../../screens/auth/LoginScreen', () => {
     }
 })
 
+jest.mock('../../screens/testing/FlowSelectionScreen', () => {
+    const React = require('react')
+
+    function FlowSelectionScreen({onAbrirConfiguracoes}) {
+        React.useEffect(() => {
+            onAbrirConfiguracoes()
+        }, [onAbrirConfiguracoes])
+
+        return null
+    }
+
+    return {
+        FlowSelectionScreen: jest.fn(FlowSelectionScreen)
+    }
+})
+
 jest.mock('../../screens/settings/SettingsScreen', () => {
     const React = require('react')
     const {Pressable, Text, View} = require('react-native')
