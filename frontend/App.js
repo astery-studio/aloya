@@ -23,10 +23,14 @@ import { criarApiClient } from './services/api/apiClient';
 import { cores, fontFamilies } from './theme';
 
 function obterBaseUrl() {
-    if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
     const script = NativeModules.SourceCode?.scriptURL || '';
-    const host = script.match(/^https?:\/\/([^/:]+)/)?.[1] || '10.0.2.2';
-    return `http://${host}:3000`;
+    // O Expo Go pode informar o bundle usando exp://, além de http(s)://.
+    const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
+    // Em desenvolvimento, o host do bundle é a fonte mais confiável e evita
+    // manter um IP antigo carregado na memória do Metro.
+    if (__DEV__ && host) return `http://${host}:3000`;
+    if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
+    return 'http://10.0.2.2:3000';
 }
 
 function obterToken(url) {
