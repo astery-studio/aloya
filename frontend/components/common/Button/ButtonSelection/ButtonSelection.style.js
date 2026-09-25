@@ -14,7 +14,7 @@ const estilos = StyleSheet.create({
     },
 
     selecionado: {
-        backgroundColor: '#F0F5F2'
+        backgroundColor: `${tema.cores.marca.secundaria}0D`
     },
 
     desabilitado: {
@@ -34,8 +34,7 @@ const estilos = StyleSheet.create({
 
     labelSelecionado: {
         color: tema.cores.marca.secundaria,
-        fontFamily: fontFamilies.semibold,
-        fontWeight: '600'
+        fontFamily: fontFamilies.bold
     },
 
     descricao: {
