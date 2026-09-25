@@ -130,6 +130,7 @@ describe('App integrado', () => {
 
         await render(<App />);
 
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir fluxo de configurações' }));
         expect(await screen.findByText('Configurações')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Abrir perfil' }));
 
@@ -146,6 +147,7 @@ describe('App integrado', () => {
 
         await fireEvent.press(await screen.findByRole('button', { name: 'Ir para login' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Concluir login' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir fluxo de configurações' }));
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir perfil' }));
         await fireEvent.press(await screen.findByRole('button', { name: 'Finalizar sessão' }));
 

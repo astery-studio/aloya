@@ -20,6 +20,7 @@ import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen'
 import { SettingsScreen } from './screens/settings/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { NewSupportCategoryScreen } from './screens/support-network/NewSupportCategoryScreen';
+import { FlowSelectionScreen } from './screens/testing/FlowSelectionScreen';
 import { criarServicosApp } from './services/createAppServices';
 import { obterToken } from './services/auth/tokenStorage';
 import { cores, fontFamilies } from './theme';
@@ -29,7 +30,8 @@ const telasInternas = Object.freeze({
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
     anticoncepcionais: 'anticoncepcionais',
-    novaCategoria: 'novaCategoria'
+    novaCategoria: 'novaCategoria',
+    selecaoFluxo: 'selecaoFluxo'
 });
 
 function obterBaseUrl() {
@@ -60,7 +62,7 @@ export default function App() {
         DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold
     });
     const [telaPublica, setTelaPublica] = useState('boasVindas');
-    const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const [telaInterna, setTelaInterna] = useState(telasInternas.selecaoFluxo);
     const [estadoSessao, setEstadoSessao] = useState('verificando');
     const [tokenRecuperacao, setTokenRecuperacao] = useState(null);
     const [mensagemLogin, setMensagemLogin] = useState(null);
@@ -113,7 +115,7 @@ export default function App() {
             if (erro?.name === 'AbortError') return;
             if (erro?.status === 401) {
                 setPerfil(null);
-                setTelaInterna(telasInternas.configuracoes);
+                setTelaInterna(telasInternas.selecaoFluxo);
                 setTelaPublica('login');
                 setEstadoSessao('anonima');
             } else if (requisicaoAtual.current === identificador) {
@@ -180,7 +182,7 @@ export default function App() {
         setMensagemLogin(null);
         setPerfil(null);
         setErroPerfil(false);
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.selecaoFluxo);
         setEstadoSessao('autenticada');
         carregarPerfil();
     }
@@ -192,7 +194,7 @@ export default function App() {
         setPerfil(null);
         setErroPerfil(false);
         setCarregandoPerfil(false);
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.selecaoFluxo);
         setTelaPublica('login');
         setMensagemLogin(resultado?.mensagem || null);
         setEstadoSessao('anonima');
@@ -251,9 +253,12 @@ export default function App() {
             aoVoltar={() => setTelaPublica('boasVindas')}
             aoEntrar={() => setTelaPublica('login')}
             aoConcluir={concluirAutenticacao} />;
+    } else if (telaInterna === telasInternas.selecaoFluxo) {
+        conteudo = <FlowSelectionScreen
+            onAbrirConfiguracoes={() => setTelaInterna(telasInternas.configuracoes)}
+            onAbrirNovaCategoria={() => setTelaInterna(telasInternas.novaCategoria)} />;
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = <SettingsScreen
-            onAbrirNovaCategoria={() => setTelaInterna(telasInternas.novaCategoria)}
             onAbrirAnticoncepcionais={() => setTelaInterna(telasInternas.anticoncepcionais)}
             onAbrirPerfil={() => {
                 setTelaInterna(telasInternas.perfil);
@@ -262,8 +267,8 @@ export default function App() {
     } else if (telaInterna === telasInternas.novaCategoria) {
         conteudo = <NewSupportCategoryScreen
             criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
-            onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-            onConcluido={() => setTelaInterna(telasInternas.configuracoes)}
+            onVoltar={() => setTelaInterna(telasInternas.selecaoFluxo)}
+            onConcluido={() => setTelaInterna(telasInternas.selecaoFluxo)}
             onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.anticoncepcionais) {
         conteudo = <ContraceptiveFlow
