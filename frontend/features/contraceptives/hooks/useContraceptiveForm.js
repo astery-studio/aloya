@@ -21,14 +21,14 @@ function useContraceptiveForm(onSubmit) {
         setPainel(null);
     }
     function selecionarFrequencia(frequenciaId) {
-        setDados((atual) => ({ ...atual, frequenciaId, horarios: atual.horarios.slice(0, 1), dataPrimeiroUso: '' }));
+        setDados((atual) => ({ ...atual, frequenciaId, dataPrimeiroUso: '' }));
         setPainel(null);
     }
     async function enviar() {
         const mensagem = validarAnticoncepcional(dados, hoje);
         if (mensagem) {
-            const titulo = mensagem.includes('nome') ? 'Salvar sem nome'
-                : mensagem.includes('horário') ? 'Salvar sem horário' : 'Não foi possível salvar';
+            const titulo = mensagem.includes('nome') ? 'Nome não informado'
+                : mensagem.includes('horário') ? 'Horário não informado' : 'Revise os dados';
             setAlerta({ tipo: 'validacao', titulo, mensagem });
             return;
         }
@@ -36,7 +36,7 @@ function useContraceptiveForm(onSubmit) {
             const intensidadeAlerta = dados.intensidadeAlerta || 'critico';
             await onSubmit?.(criarAnticoncepcional({ ...dados, intensidadeAlerta }, frequencia));
         } catch {
-            setAlerta({ tipo: 'rede', titulo: 'Algo deu errado', mensagem: 'Ocorreu um erro ao salvar. Verifique sua conexão e tente novamente.' });
+            setAlerta({ tipo: 'rede', titulo: 'Não foi possível salvar', mensagem: 'Verifique sua conexão e tente novamente.' });
         }
     }
 
