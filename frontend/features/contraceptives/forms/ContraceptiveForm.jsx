@@ -1,5 +1,4 @@
 import { View } from 'react-native';
-import { FilePlus } from 'phosphor-react-native';
 import ButtonScreen from '../../../components/common/Button/ButtonScreen';
 import FormField from '../../../components/forms/FormField';
 import TextInput from '../../../components/forms/TextInput';
@@ -18,7 +17,7 @@ function ContraceptiveForm({ onSubmit, salvando = false }) {
 
     return (
         <View style={estilos.formulario}>
-            <FormField label="Nome da Medicação" campo={<TextInput placeholder="Digite o nome" value={dados.nome} onChangeText={(valor) => alterar('nome', valor)} variante="categoria" iconeEsquerda={FilePlus} />} />
+            <FormField label="Nome da Medicação" campo={<TextInput placeholder="Digite o nome" value={dados.nome} onChangeText={(valor) => alterar('nome', valor)} variante="categoria" />} />
             <ContraceptiveTypeSelector valor={dados.tipo} aberto={painel === 'tipo'} onAbrir={() => form.abrir('tipo')} onSelecionar={form.selecionarTipo} onFechar={form.fecharPainel} />
 
             {dados.tipo === 'diu_hormonal' ? (

@@ -24,7 +24,6 @@ const estilos = StyleSheet.create({
         padding: 0, minHeight: 24
     },
     categoria: { height: 56, borderWidth: 0.705 },
-    caixaIcone: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     popup: { height: 52, backgroundColor: '#FAFAF8' },
     desativado: { opacity: 0.55 },
     containerErro: { borderColor: cores.feedback.erro },
