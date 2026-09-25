@@ -34,14 +34,13 @@ yarn-error.*
 .env
 .env.*
 !.env.example
-.env*.local
 
 # typescript
 *.tsbuildinfo
 
-# test coverage
-coverage/
-
 # generated native folders
 /ios
 /android
+
+# test coverage
+coverage/
