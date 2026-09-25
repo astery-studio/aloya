@@ -5,7 +5,7 @@ import { estilos } from './TextInput.styles';
 // Recebe as opções do campo, mostra a entrada e devolve o texto tratado ao formulário.
 export default function TextInput({
     label, placeholder, value, onChangeText, variante = 'padrao',
-    desativado = false, acaoDireita, iconeEsquerda: IconeEsquerda, corIcone = '#C85A44', fundoIcone = 'transparent', estilo, sanitizar = (texto) => texto,
+    desativado = false, acaoDireita, estilo, sanitizar = (texto) => texto,
     ...outrasProps
 }) {
     const preenchido = Boolean(value);
@@ -26,7 +26,6 @@ export default function TextInput({
                 desativado && estilos.desativado,
                 estilo
             ]}>
-                {IconeEsquerda ? <View style={[estilos.caixaIcone, { backgroundColor: fundoIcone }]}><IconeEsquerda size={18} color={corIcone} /></View> : null}
                 <View style={estilos.conteudo}>
                     {rotuloInterno && <Text style={estilos.rotuloFlutuante}>{label}</Text>}
                     <EntradaNativa
