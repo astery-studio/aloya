@@ -9,7 +9,7 @@ function obterChave(opcao) {
     return String(opcao.id)
 }
 
-function SelectionSheet({visivel, titulo, opcoes = [], valorSelecionado, onSelecionar, onFechar }) {
+function SelectionSheet({visivel, titulo, opcoes = [], valorSelecionado, onSelecionar, onFechar, variante = 'padrao' }) {
     function renderizarOpcao({ item }) {
         function selecionarOpcao() {
             onSelecionar(item.id)
@@ -34,6 +34,7 @@ function SelectionSheet({visivel, titulo, opcoes = [], valorSelecionado, onSelec
             <BottomSheetLayout
                 titulo={titulo}
                 onFechar={onFechar}
+                variante={variante}
             >
                 <FlatList
                     data={opcoes}
@@ -43,7 +44,7 @@ function SelectionSheet({visivel, titulo, opcoes = [], valorSelecionado, onSelec
                     initialNumToRender={7}
                     windowSize={5}
                     style={estilos.lista}
-                    contentContainerStyle={estilos.conteudoLista}
+                    contentContainerStyle={[estilos.conteudoLista, variante === 'anticoncepcional' && estilos.conteudoListaAnticoncepcional]}
                     ListEmptyComponent={
                         <Text style={estilos.mensagemVazia}>
                             Nenhuma opção disponível.
