@@ -15,7 +15,7 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
                 tipo: dados.tipo,
                 horariosProgramados: dados.horarios,
                 frequencia: dados.frequencia,
-                dataPrimeiroUso: dados.dataPrimeiroUso,
+                dataInicioUso: dados.dataPrimeiroUso,
                 periodosPausa,
                 dataValidade: dados.dataValidade,
                 nivelIntensidadeAlerta: dados.intensidade

@@ -1,6 +1,7 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
 import { criarAuthService } from '../features/auth/services/authService'
 import { criarAccountService } from '../features/settings/services/accountService'
+import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
 import { criarApiClient } from './api/apiClient'
 import { criarRequisicaoAutenticada } from './api/authenticatedRequest'
 import { obterToken, removerToken } from './auth/tokenStorage'
@@ -95,9 +96,14 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         removerCredencialLocal: removerToken
     })
 
+    const contraceptiveService = criarContraceptiveService({
+        requisicaoAutenticada
+    })
+
     return Object.freeze({
         authService,
-        accountService
+        accountService,
+        contraceptiveService
     })
 }
 

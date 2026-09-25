@@ -1,6 +1,7 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
 import { criarAuthService } from '../../features/auth/services/authService'
 import { criarAccountService } from '../../features/settings/services/accountService'
+import { criarContraceptiveService } from '../../features/contraceptives/services/contraceptiveService'
 import { criarServicosApp } from '../../services/createAppServices'
 import { criarApiClient } from '../../services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../../services/api/authenticatedRequest'
@@ -17,6 +18,13 @@ jest.mock(
     '../../features/settings/services/accountService',
     () => ({
         criarAccountService: jest.fn()
+    })
+)
+
+jest.mock(
+    '../../features/contraceptives/services/contraceptiveService',
+    () => ({
+        criarContraceptiveService: jest.fn()
     })
 )
 
@@ -47,6 +55,7 @@ describe('createAppServices', () => {
     let requisicaoAutenticada
     let authService
     let accountService
+    let contraceptiveService
     let fetchSeguro
 
     beforeEach(() => {
@@ -59,6 +68,9 @@ describe('createAppServices', () => {
         })
         accountService = Object.freeze({
             nome: 'accountService'
+        })
+        contraceptiveService = Object.freeze({
+            nome: 'contraceptiveService'
         })
         fetchSeguro = null
 
@@ -82,6 +94,10 @@ describe('createAppServices', () => {
 
         criarAccountService.mockReturnValue(
             accountService
+        )
+
+        criarContraceptiveService.mockReturnValue(
+            contraceptiveService
         )
     })
 
@@ -121,9 +137,14 @@ describe('createAppServices', () => {
             removerCredencialLocal: removerToken
         })
 
+        expect(criarContraceptiveService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        })
+
         expect(servicos).toEqual({
             authService,
-            accountService
+            accountService,
+            contraceptiveService
         })
 
         expect(

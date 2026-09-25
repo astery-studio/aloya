@@ -5,6 +5,7 @@ import { criarContainer } from './config/container.js';
 import { criarAuthRoutes } from './routes/auth.routes.js';
 import { criarAccountRoutes } from './routes/account.routes.js';
 import { criarLogoutRoutes } from './routes/logout.routes.js';
+import { criarRotasAnticoncepcionais } from './features/contraceptives/contraceptive.routes.js';
 import { rotaNaoEncontrada, tratarErros } from './middlewares/error.middleware.js';
 
 const app = express();
@@ -54,6 +55,14 @@ app.use(
         alteracaoSenhaRateLimit: container.alteracaoSenhaRateLimit,
         accountDeletionController: container.accountDeletionController,
         exclusaoContaRateLimit: container.exclusaoContaRateLimit
+    })
+);
+
+app.use(
+    '/api/anticoncepcionais',
+    criarRotasAnticoncepcionais({
+        autenticar: container.authMiddleware.autenticar,
+        controller: container.contraceptiveController
     })
 );
 

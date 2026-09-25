@@ -69,6 +69,8 @@ import {
 import {
     criarParentalConsentMiddleware
 } from '../middlewares/parentalConsent.middleware.js';
+import { criarContraceptiveService } from '../features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveController } from '../features/contraceptives/contraceptive.controller.js';
 
 function criarContainer() {
     const transporter = nodemailer.createTransport({
@@ -150,6 +152,8 @@ function criarContainer() {
     const logoutService = criarLogoutService({
         prisma
     });
+
+    const contraceptiveService = criarContraceptiveService(prisma);
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -237,11 +241,16 @@ function criarContainer() {
         logoutService
     });
 
+    const contraceptiveController = criarContraceptiveController(
+        contraceptiveService
+    );
+
     return {
         authController,
         accountController,
         accountDeletionController,
         logoutController,
+        contraceptiveController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,

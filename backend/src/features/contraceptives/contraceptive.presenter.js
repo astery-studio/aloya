@@ -13,7 +13,7 @@ function apresentarAnticoncepcional(registro, agora = new Date()) {
     const regra = frequenciaId ? obterFrequencia(registro.tipo, frequenciaId) : null;
     const proximoUso = regra ? calcularProximoUso({
         horarios: registro.horariosProgramados,
-        dataPrimeiroUso: registro.dataPrimeiroUso,
+        dataPrimeiroUso: registro.dataInicioUso,
         regra,
         periodosPausa: registro.periodosPausa
     }, agora) : null;
@@ -24,7 +24,7 @@ function apresentarAnticoncepcional(registro, agora = new Date()) {
         tipo: registro.tipo,
         horarios: registro.horariosProgramados,
         frequenciaId,
-        dataPrimeiroUso: registro.dataPrimeiroUso?.toISOString().slice(0, 10) ?? null,
+        dataPrimeiroUso: registro.dataInicioUso?.toISOString().slice(0, 10) ?? null,
         dataValidade: registro.dataValidade?.toISOString().slice(0, 10) ?? null,
         intensidadeAlerta: registro.nivelIntensidadeAlerta,
         periodosPausa: registro.periodosPausa,

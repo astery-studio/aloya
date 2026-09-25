@@ -8,7 +8,7 @@ function registro(dados = {}) {
     return {
         id: 7, usuarioId: 3, nome: 'Mercilon', tipo: 'pilula',
         horariosProgramados: ['08:00'], frequencia: 'uso_21_dias_pausa_7_dias',
-        dataPrimeiroUso: new Date('2026-09-01T00:00:00.000Z'), dataValidade: null,
+        dataInicioUso: new Date('2026-09-01T00:00:00.000Z'), dataValidade: null,
         nivelIntensidadeAlerta: 'critico', periodosPausa: [], criadoEm: agora, ...dados
     };
 }
@@ -26,6 +26,7 @@ test('persiste cadastro vinculado exclusivamente ao usuário autenticado', async
     });
 
     assert.equal(criacao.usuarioId, 3);
+    assert.equal(criacao.dataInicioUso.toISOString(), '2026-09-01T00:00:00.000Z');
     assert.equal(criacao.nivelIntensidadeAlerta, 'critico');
     assert.equal(criacao.periodosPausa[0].inicio, '2026-09-22');
     assert.equal(resultado.id, 7);
