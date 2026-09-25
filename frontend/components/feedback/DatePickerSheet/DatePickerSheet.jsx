@@ -232,17 +232,13 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
             return
         }
 
-        setDataVisivel(
-            obterDataInicial(
-                valorSelecionado
-            )
-        )
-
+        //O calendário precisa ser limpo imediatamente para não exibir dados da abertura anterior.
+        /* eslint-disable react-hooks/set-state-in-effect */
+        setDataVisivel(obterDataInicial(valorSelecionado))
         setListaAberta(null)
         setErroSalvar('')
-    }, [
-        visivel
-    ])
+        /* eslint-enable react-hooks/set-state-in-effect */
+    }, [valorSelecionado, visivel])
 
     const podeMostrarMes = useCallback((ano, mes) => {
         if (
