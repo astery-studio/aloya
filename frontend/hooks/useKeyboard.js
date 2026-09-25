@@ -1,3 +1,6 @@
+/**
+ * Hook que acompanha visibilidade e altura do teclado e remove seus listeners ao desmontar.
+ */
 import { useEffect, useState } from 'react';
 import { Keyboard } from 'react-native';
 

@@ -7,10 +7,13 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~57.0.24",
     "expo-font": "~57.0.4",
+    "expo-linear-gradient": "~57.0.2",
+    "expo-secure-store": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "phosphor-react-native": "^3.0.6",
     "react": "19.2.3",
     "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
     "react-native-svg": "15.15.4"
   },
   "scripts": {
@@ -24,6 +27,11 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|phosphor-react-native))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
+    ],
     "collectCoverageFrom": [
       "components/**/*.{js,jsx}",
       "features/**/*.{js,jsx}",
@@ -35,7 +43,15 @@
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    }
   },
   "private": true,
   "devDependencies": {

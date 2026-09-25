@@ -1,3 +1,6 @@
+/**
+ * Compara duas datas pelo dia civil local, ignorando seus horários.
+ */
 // Compara o dia do calendário local, independentemente do horário.
 export function isSameDay(primeira, segunda) {
     if (!(primeira instanceof Date) || !(segunda instanceof Date)) return false;
