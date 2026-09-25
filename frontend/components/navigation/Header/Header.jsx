@@ -1,5 +1,4 @@
 import { Pressable, Text, View } from 'react-native'
-import { ArrowLeft } from 'phosphor-react-native'
 import { estilos } from './Header.style'
 
 function Header({ titulo, variante = 'padrao', onVoltar}) {
@@ -33,7 +32,8 @@ function Header({ titulo, variante = 'padrao', onVoltar}) {
                         style={estilos.containerVoltar}
                     >
 
-                        <ArrowLeft style={estilos.iconeVoltar} />
+                        <ArrowLeftIcon style={estilos.iconeVoltar} />
+                        
                     </Pressable>
                 ) : null}
 
