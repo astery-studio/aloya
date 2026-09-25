@@ -1,6 +1,7 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
 import { criarAuthService } from '../features/auth/services/authService'
 import { criarAccountService } from '../features/settings/services/accountService'
+import {criarSupportCategoryService} from '../features/support-network/services/supportCategoryService'
 import { criarApiClient } from './api/apiClient'
 import { criarRequisicaoAutenticada } from './api/authenticatedRequest'
 import { obterToken, removerToken } from './auth/tokenStorage'
@@ -92,9 +93,14 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         removerCredencialLocal: removerToken
     })
 
+    const supportCategoryService = criarSupportCategoryService({
+        requisicaoAutenticada
+    })
+
     return Object.freeze({
         authService,
-        accountService
+        accountService,
+        supportCategoryService
     })
 }
 
