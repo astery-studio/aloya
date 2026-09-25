@@ -2,8 +2,8 @@
 import {Animated} from 'react-native'
 import {fireEvent, render, screen} from '@testing-library/react-native'
 
-import SwitchField from '../../components/forms/SwitchField'
-import {estilos} from '../../components/forms/SwitchField.styles'
+import SwitchField from '../../components/forms/SwitchField/SwitchField'
+import {estilos} from '../../components/forms/SwitchField/SwitchField.styles'
 
 describe('SwitchField', () => {
     beforeEach(() => {
