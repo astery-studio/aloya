@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { criarAutenticacao, hashToken } from '../src/middlewares/authenticate.js';
+import { criarAutenticacao, hashToken } from '../../src/middlewares/authenticate.js';
 
 const agora = new Date('2026-09-24T12:00:00.000Z');
 

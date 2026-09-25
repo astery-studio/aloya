@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { validarCadastroAnticoncepcional } from '../src/features/contraceptives/contraceptive.validator.js';
+import { validarCadastroAnticoncepcional } from '../../../src/features/contraceptives/contraceptive.validator.js';
 
 const hoje = new Date('2026-09-24T12:00:00.000Z');
 const base = { nome: 'Mercilon', tipo: 'pilula', frequenciaId: 'pilula_continuo', horarios: ['08:00'] };

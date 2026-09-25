@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { obterFrequencia } from '../src/features/contraceptives/contraceptive.constants.js';
-import { calcularPeriodosPausa, calcularProximoUso, estaEmPausa } from '../src/features/contraceptives/contraceptive.schedule.js';
+import { obterFrequencia } from '../../../src/features/contraceptives/contraceptive.constants.js';
+import { calcularPeriodosPausa, calcularProximoUso, estaEmPausa } from '../../../src/features/contraceptives/contraceptive.schedule.js';
 
 test('calcula pausas consecutivas a partir do primeiro uso', () => {
     const regra = obterFrequencia('pilula', 'pilula_21_7');
