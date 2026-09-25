@@ -17,8 +17,8 @@ describe('SwitchField', () => {
         jest.restoreAllMocks()
     })
 
-    test('mostra o título e começa desligado por padrão', () => {
-        render(
+    test('mostra o título e começa desligado por padrão', async () => {
+        await render(
             <SwitchField
                 titulo="Acesso à Fase Atual"
                 aoAlterar={jest.fn()}
@@ -37,17 +37,17 @@ describe('SwitchField', () => {
         })
     })
 
-    test('solicita a ativação quando está desligado', () => {
+    test('solicita a ativação quando está desligado', async () => {
         const aoAlterar = jest.fn()
 
-        render(
+        await render(
             <SwitchField
                 titulo="Receber dicas"
                 aoAlterar={aoAlterar}
             />
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('switch', {
                 name: 'Receber dicas'
             })
@@ -57,10 +57,10 @@ describe('SwitchField', () => {
         expect(aoAlterar).toHaveBeenCalledWith(true)
     })
 
-    test('solicita a desativação quando está ligado', () => {
+    test('solicita a desativação quando está ligado', async () => {
         const aoAlterar = jest.fn()
 
-        render(
+        await render(
             <SwitchField
                 titulo="Receber dicas"
                 ativo
@@ -68,7 +68,7 @@ describe('SwitchField', () => {
             />
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('switch', {
                 name: 'Receber dicas'
             })
@@ -77,10 +77,10 @@ describe('SwitchField', () => {
         expect(aoAlterar).toHaveBeenCalledWith(false)
     })
 
-    test('não executa ação quando está desabilitado', () => {
+    test('não executa ação quando está desabilitado', async () => {
         const aoAlterar = jest.fn()
 
-        render(
+        await render(
             <SwitchField
                 titulo="Permissão indisponível"
                 ativo
@@ -100,13 +100,13 @@ describe('SwitchField', () => {
             disabled: true
         })
 
-        fireEvent.press(interruptor)
+        await fireEvent.press(interruptor)
 
         expect(aoAlterar).not.toHaveBeenCalled()
     })
 
-    test('fica desabilitado quando não recebe uma função de alteração', () => {
-        render(
+    test('fica desabilitado quando não recebe uma função de alteração', async () => {
+        await render(
             <SwitchField titulo="Sem ação" />
         )
 
@@ -117,10 +117,10 @@ describe('SwitchField', () => {
         ).toBeDisabled()
     })
 
-    test('limita títulos grandes a duas linhas', () => {
+    test('limita títulos grandes a duas linhas', async () => {
         const titulo = 'Permissão com um título muito grande para ocupar apenas uma linha'
 
-        render(
+        await render(
             <SwitchField
                 titulo={titulo}
                 aoAlterar={jest.fn()}
@@ -130,8 +130,8 @@ describe('SwitchField', () => {
         expect(screen.getByText(titulo)).toHaveProp('numberOfLines', 2)
     })
 
-    test('anima o indicador para a posição ativa', () => {
-        render(
+    test('anima o indicador para a posição ativa', async () => {
+        await render(
             <SwitchField
                 titulo="Permissão ativa"
                 ativo
