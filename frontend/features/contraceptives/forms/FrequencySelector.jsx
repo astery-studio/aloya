@@ -8,7 +8,7 @@ function FrequencySelector({ tipo, valor, aberto, onAbrir, onSelecionar, onFecha
     return (
         <>
             <SelectorField label="Frequência de Uso" valor={obterFrequencia(tipo, valor)?.label} placeholder="Selecione a frequência" onPress={onAbrir} icone={ArrowsClockwise} corIcone="#7B5EA7" fundoIcone="#EDE6F8" />
-            <SelectionSheet visivel={aberto} titulo="Frequência de Uso" opcoes={opcoes} valorSelecionado={valor} onSelecionar={onSelecionar} onFechar={onFechar} variante="anticoncepcional" />
+            <SelectionSheet visivel={aberto} titulo="Frequência de Uso" opcoes={opcoes} valorSelecionado={valor} onSelecionar={onSelecionar} onFechar={onFechar} />
         </>
     );
 }

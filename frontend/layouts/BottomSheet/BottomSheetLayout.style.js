@@ -23,17 +23,6 @@ const estilos = StyleSheet.create({
         lineHeight: 27
     },
 
-    cabecalhoAnticoncepcional: {
-        minHeight: 54,
-        paddingTop: 12,
-        paddingBottom: 0
-    },
-
-    tituloAnticoncepcional: {
-        fontSize: 17,
-        lineHeight: 26
-    },
-
     botaoFechar: {
         width: 40,
         height: 40,

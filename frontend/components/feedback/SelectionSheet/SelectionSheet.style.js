@@ -11,11 +11,6 @@ const estilos = StyleSheet.create({
         paddingBottom: tema.espacamentos.pequeno
     },
 
-    conteudoListaAnticoncepcional: {
-        paddingTop: tema.espacamentos.pequeno,
-        paddingBottom: 0
-    },
-
     mensagemVazia: {
         ...tema.typography.bodyDefault,
         paddingVertical: tema.espacamentos.grande,

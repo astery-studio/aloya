@@ -7,7 +7,7 @@ function ContraceptiveTypeSelector({ valor, aberto, onAbrir, onSelecionar, onFec
     return (
         <>
             <SelectorField label="Tipo" valor={obterTipo(valor)?.label} placeholder="Selecione o tipo" onPress={onAbrir} icone={Pill} />
-            <SelectionSheet visivel={aberto} titulo="Tipo de Anticoncepcional" opcoes={TIPOS_ANTICONCEPCIONAL} valorSelecionado={valor} onSelecionar={onSelecionar} onFechar={onFechar} variante="anticoncepcional" />
+            <SelectionSheet visivel={aberto} titulo="Tipo de Anticoncepcional" opcoes={TIPOS_ANTICONCEPCIONAL} valorSelecionado={valor} onSelecionar={onSelecionar} onFechar={onFechar} />
         </>
     );
 }
