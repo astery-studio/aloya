@@ -1,4 +1,4 @@
-//Inicializa os serviços reais e controla o fluxo autenticado das configurações.
+//Inicializa os serviços reais e controla os fluxos autenticados da aplicação.
 import {useCallback, useEffect, useRef, useState} from 'react'
 import {ActivityIndicator, Text, View} from 'react-native'
 import {StatusBar} from 'expo-status-bar'
@@ -10,6 +10,8 @@ import {DMSans_600SemiBold} from '@expo-google-fonts/dm-sans/600SemiBold'
 import {DMSans_700Bold} from '@expo-google-fonts/dm-sans/700Bold'
 
 import LoginScreen from './screens/auth/LoginScreen'
+import {FlowSelectionScreen} from './screens/testing/FlowSelectionScreen'
+import {NewSupportCategoryScreen} from './screens/support-network/NewSupportCategoryScreen'
 import {ChangePasswordScreen} from './screens/settings/ChangePasswordScreen'
 import {ProfileSettingsScreen} from './screens/settings/ProfileSettingsScreen'
 import {SettingsScreen} from './screens/settings/SettingsScreen'
@@ -38,12 +40,12 @@ function sessaoEhValida(sessao) {
     return sessao !== null && typeof sessao === 'object' && typeof sessao.token === 'string' && Boolean(sessao.token.trim())
 }
 
-//Inicializa o aplicativo e controla autenticação e navegação provisória das configurações.
+//Inicializa o aplicativo e controla autenticação e navegação provisória dos fluxos.
 export default function App() {
     const [fontesCarregadas, erroFontes] = useFonts({DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold})
     const [configuracao] = useState(criarConfiguracao)
     const [estadoSessao, setEstadoSessao] = useState('verificando')
-    const [telaInterna, setTelaInterna] = useState(rotas.configuracoes)
+    const [telaInterna, setTelaInterna] = useState(rotas.selecaoFluxo)
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
@@ -82,7 +84,7 @@ export default function App() {
 
             if (erro?.status === 401) {
                 setPerfil(null)
-                setTelaInterna(rotas.configuracoes)
+                setTelaInterna(rotas.selecaoFluxo)
                 setEstadoSessao('anonima')
             } else if (requisicaoAtual.current === identificador) {
                 setErroPerfil(true)
@@ -114,7 +116,7 @@ export default function App() {
                 const sessaoAutenticada = sessaoEhValida(sessao)
 
                 setEstadoSessao(sessaoAutenticada ? 'autenticada' : 'anonima')
-                setTelaInterna(rotas.configuracoes)
+                setTelaInterna(rotas.selecaoFluxo)
 
                 if (sessaoAutenticada) {
                     carregarPerfil()
@@ -145,13 +147,28 @@ export default function App() {
         return perfilAtualizado
     }
 
-    //Abre a área autenticada somente depois que login e armazenamento seguro terminam.
+    //Abre a seleção provisória somente depois que login e armazenamento seguro terminam.
     function concluirLogin() {
         setPerfil(null)
         setErroPerfil(false)
-        setTelaInterna(rotas.configuracoes)
+        setTelaInterna(rotas.selecaoFluxo)
         setEstadoSessao('autenticada')
         carregarPerfil()
+    }
+
+    //Abre o menu principal do fluxo de configurações.
+    function abrirConfiguracoes() {
+        setTelaInterna(rotas.configuracoes)
+    }
+
+    //Abre o formulário autenticado de criação de categoria.
+    function abrirNovaCategoria() {
+        setTelaInterna(rotas.novaCategoria)
+    }
+
+    //Volta para a tela provisória de escolha dos fluxos.
+    function abrirSelecaoFluxos() {
+        setTelaInterna(rotas.selecaoFluxo)
     }
 
     //Abre o perfil sem iniciar outra busca quando os dados já estão sendo carregados.
@@ -161,11 +178,6 @@ export default function App() {
         if (!perfil && !carregandoPerfil && !erroPerfil) {
             carregarPerfil()
         }
-    }
-
-    //Volta ao menu principal de configurações sem apagar os dados já carregados.
-    function abrirConfiguracoes() {
-        setTelaInterna(rotas.configuracoes)
     }
 
     //Abre a tela de alteração de senha a partir das configurações do perfil.
@@ -182,7 +194,7 @@ export default function App() {
         setPerfil(null)
         setErroPerfil(false)
         setCarregandoPerfil(false)
-        setTelaInterna(rotas.configuracoes)
+        setTelaInterna(rotas.selecaoFluxo)
         setEstadoSessao('anonima')
     }
 
@@ -214,6 +226,34 @@ export default function App() {
                     aoEntrar={concluirLogin}
                 />
             </>
+        )
+    }
+
+    if (telaInterna === rotas.selecaoFluxo) {
+        return (
+            <View style={estilos.tela}>
+                <StatusBar style="dark" />
+
+                <FlowSelectionScreen
+                    onAbrirConfiguracoes={abrirConfiguracoes}
+                    onAbrirNovaCategoria={abrirNovaCategoria}
+                />
+            </View>
+        )
+    }
+
+    if (telaInterna === rotas.novaCategoria) {
+        return (
+            <View style={estilos.tela}>
+                <StatusBar style="dark" />
+
+                <NewSupportCategoryScreen
+                    criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
+                    onVoltar={abrirSelecaoFluxos}
+                    onConcluido={abrirSelecaoFluxos}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            </View>
         )
     }
 
