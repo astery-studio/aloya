@@ -5,6 +5,7 @@ import {View} from 'react-native'
 import ButtonScreen from '../../../components/common/Button/ButtonScreen'
 import TextInput from '../../../components/forms/TextInput'
 import {GeneralPermissions} from './GeneralPermissions'
+import {PermissionGroups} from './PermissionGroups'
 import {estilos} from './SupportCategoryForm.styles'
 
 const ERRO_NOME = Object.freeze({
@@ -30,7 +31,7 @@ function normalizarNomeCategoria(nome) {
 }
 
 //Recebe dados controlados, valida o formulário e envia somente os campos permitidos.
-function SupportCategoryForm({dados, aoAlterar, aoSalvar, aoErroValidacao, carregando = false, bloqueado = false, renderizarPermissoesAcesso}) {
+function SupportCategoryForm({dados, aoAlterar, aoSalvar, aoErroValidacao, carregando = false, bloqueado = false}) {
     const nome = typeof dados?.nome === 'string' ? dados.nome : ''
 
     const dadosVisiveis = useMemo(() => {
@@ -54,8 +55,8 @@ function SupportCategoryForm({dados, aoAlterar, aoSalvar, aoErroValidacao, carre
         }
     }, [aoAlterar, camposDesabilitados])
 
-    //Adiciona ou remove uma permissão sem apagar as demais seleções do formulário.
-    const alterarPermissao = useCallback((permissaoId, ativa) => {
+    //Adiciona ou remove uma permissão geral sem apagar as demais seleções.
+    const alterarPermissaoGeral = useCallback((permissaoId, ativa) => {
         if (camposDesabilitados || typeof aoAlterar !== 'function') {
             return
         }
@@ -73,19 +74,30 @@ function SupportCategoryForm({dados, aoAlterar, aoSalvar, aoErroValidacao, carre
         })
     }, [aoAlterar, camposDesabilitados, dadosVisiveis])
 
+    //Recebe a lista completa das permissões de acesso e a envia ao estado do formulário.
+    const alterarPermissoesAcesso = useCallback(novasPermissoes => {
+        if (camposDesabilitados || typeof aoAlterar !== 'function' || !Array.isArray(novasPermissoes)) {
+            return
+        }
+
+        const permissoesSeguras = [...new Set(novasPermissoes.filter(permissao => typeof permissao === 'string'))]
+
+        aoAlterar({
+            dadosVisiveis: permissoesSeguras
+        })
+    }, [aoAlterar, camposDesabilitados])
+
     //Valida na mesma ordem do backend e mantém os campos preenchidos quando existe erro.
     const salvar = useCallback(() => {
         const nomeNormalizado = normalizarNomeCategoria(nome)
 
         if (!nomeNormalizado) {
             aoErroValidacao?.(ERRO_NOME)
-
             return
         }
 
         if (dadosVisiveis.length === 0) {
             aoErroValidacao?.(ERRO_PERMISSOES)
-
             return
         }
 
@@ -114,17 +126,15 @@ function SupportCategoryForm({dados, aoAlterar, aoSalvar, aoErroValidacao, carre
 
                 <GeneralPermissions
                     permissoesSelecionadas={dadosVisiveis}
-                    aoAlterar={alterarPermissao}
+                    aoAlterar={alterarPermissaoGeral}
                     desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
                 />
 
-                {typeof renderizarPermissoesAcesso === 'function'
-                    ? renderizarPermissoesAcesso({
-                        permissoesSelecionadas: dadosVisiveis,
-                        aoAlterar: alterarPermissao,
-                        desabilitado: camposDesabilitados
-                    })
-                    : null}
+                <PermissionGroups
+                    permissoesSelecionadas={dadosVisiveis}
+                    aoAlterar={alterarPermissoesAcesso}
+                    desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
+                />
             </View>
 
             <View style={estilos.acao}>
