@@ -2,7 +2,6 @@
 import { criarAuthService } from '../../features/auth/services/authService'
 import { criarAccountService } from '../../features/settings/services/accountService'
 import { criarContraceptiveService } from '../../features/contraceptives/services/contraceptiveService'
-import { criarSupportCategoryService } from '../../features/support-network/services/supportCategoryService'
 import { criarServicosApp } from '../../services/createAppServices'
 import { criarApiClient } from '../../services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../../services/api/authenticatedRequest'
@@ -27,11 +26,6 @@ jest.mock(
     () => ({
         criarContraceptiveService: jest.fn()
     })
-)
-
-jest.mock(
-    '../../features/support-network/services/supportCategoryService',
-    () => ({ criarSupportCategoryService: jest.fn() })
 )
 
 jest.mock(
@@ -62,7 +56,6 @@ describe('createAppServices', () => {
     let authService
     let accountService
     let contraceptiveService
-    let supportCategoryService
     let fetchSeguro
 
     beforeEach(() => {
@@ -79,7 +72,6 @@ describe('createAppServices', () => {
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
         })
-        supportCategoryService = Object.freeze({ nome: 'supportCategoryService' })
         fetchSeguro = null
 
         criarApiClient.mockImplementation(
@@ -107,7 +99,6 @@ describe('createAppServices', () => {
         criarContraceptiveService.mockReturnValue(
             contraceptiveService
         )
-        criarSupportCategoryService.mockReturnValue(supportCategoryService)
     })
 
     afterEach(() => {
@@ -149,13 +140,11 @@ describe('createAppServices', () => {
         expect(criarContraceptiveService).toHaveBeenCalledWith({
             requisicaoAutenticada
         })
-        expect(criarSupportCategoryService).toHaveBeenCalledWith({ requisicaoAutenticada })
 
         expect(servicos).toEqual({
             authService,
             accountService,
-            contraceptiveService,
-            supportCategoryService
+            contraceptiveService
         })
 
         expect(

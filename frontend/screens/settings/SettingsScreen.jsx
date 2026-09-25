@@ -1,7 +1,7 @@
 //Mostra o menu principal de configurações e encaminha a pessoa usuária para cada opção.
 import {ScrollView, Switch, Text, View} from 'react-native'
 
-import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, PillIcon, ShieldCheckIcon, UserIcon, UsersIcon} from '../../components/icons/AppIcons'
+import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, PillIcon, ShieldCheckIcon, UserIcon} from '../../components/icons/AppIcons'
 import {NavigationField} from '../../components/common/NavigationField/NavigationField'
 import {MainLayout} from '../../layouts/MainLayout/MainLayout'
 import {tema} from '../../theme'
@@ -44,7 +44,6 @@ function SettingsScreen({
     onAbrirPerfil,
     onAbrirParametrosCiclo,
     onAbrirAnticoncepcionais,
-    onAbrirNovaCategoria,
     modoNoturnoAtivo = false,
     onAlterarModoNoturno,
     onAbrirTelaInicial,
@@ -87,12 +86,6 @@ function SettingsScreen({
                         icone={PillIcon}
                         paleta="corVerde2"
                         onPress={onAbrirAnticoncepcionais}
-                    />
-                    <NavigationField
-                        label="Categorias de permissão"
-                        icone={UsersIcon}
-                        paleta="corVerde2"
-                        onPress={onAbrirNovaCategoria}
                     />
                 </View>
 

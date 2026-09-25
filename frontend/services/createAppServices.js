@@ -2,7 +2,6 @@
 import { criarAuthService } from '../features/auth/services/authService'
 import { criarAccountService } from '../features/settings/services/accountService'
 import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
-import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService'
 import { criarApiClient } from './api/apiClient'
 import { criarRequisicaoAutenticada } from './api/authenticatedRequest'
 import { obterToken, removerToken } from './auth/tokenStorage'
@@ -100,13 +99,11 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
     const contraceptiveService = criarContraceptiveService({
         requisicaoAutenticada
     })
-    const supportCategoryService = criarSupportCategoryService({ requisicaoAutenticada })
 
     return Object.freeze({
         authService,
         accountService,
-        contraceptiveService,
-        supportCategoryService
+        contraceptiveService
     })
 }
 
