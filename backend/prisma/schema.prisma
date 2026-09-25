@@ -424,9 +424,10 @@ model CategoriaPermissao {
   titularId Int     @map("titular_id")
   titular   Usuario @relation(fields: [titularId], references: [id], onDelete: Cascade)
 
-  nome String
+  nome             String
+  nomeNormalizado  String @map("nome_normalizado")
 
-  // O validator deve garantir um array de identificadores permitidos.
+  // Armazena somente identificadores que pertencem ao catálogo permitido pelo backend.
   conjuntoDadosVisiveis Json @default("[]") @map("conjunto_dados_visiveis")
 
   criadoEm     DateTime @default(now()) @map("criado_em")
@@ -434,9 +435,12 @@ model CategoriaPermissao {
 
   vinculos VinculoRedeApoio[]
 
-  // Permite a FK composta usada pelo vínculo de apoio.
+  // Permite a chave estrangeira composta usada pelos vínculos da Rede de Apoio.
   @@unique([id, titularId])
-  @@unique([titularId, nome])
+
+  // Impede nomes repetidos para a mesma titular, inclusive em requisições simultâneas.
+  @@unique([titularId, nomeNormalizado])
+
   @@map("categorias_permissao")
 }
 
