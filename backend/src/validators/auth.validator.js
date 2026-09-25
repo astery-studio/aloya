@@ -1,0 +1,356 @@
+/**
+ * Valida e normaliza os contratos de cadastro e login antes dos serviços.
+ */
+function criarAuthValidator({ dateUtils }) {
+    // Expressão regular para validar nomes contendo letras (incluindo acentuadas), espaços ou hífens.
+    const regexNome = /^[\p{L}]+(?:[ -][\p{L}]+)*$/u;
+
+    // Expressão regular padrão para validação básica da estrutura de um email.
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Função auxiliar para estruturar objetos de erro de validação
+    function erro(campo, mensagem) {
+        return { campo, mensagem };
+    }
+
+    // Função auxiliar para validar e converter parâmetros numéricos opcionais, garantindo que sejam inteiros estritamente positivos.
+    function inteiroPositivo(valor, campo, erros) {
+        if (valor === undefined || valor === null || valor === '') {
+            return null;
+        }
+
+        if (!Number.isInteger(valor) || valor <= 0) {
+            erros.push(
+                erro(campo, 'Informe um número inteiro positivo.')
+            );
+
+            return null;
+        }
+
+        return valor;
+    }
+
+    // Função principal responsável por validar todos os campos enviados no corpo da requisição de cadastro
+    function validarCadastro(body) {
+        body = body && typeof body === 'object'
+            ? body
+            : {};
+        const erros = [];
+        const hoje = new Date();
+
+        // Limpa e normaliza o nome enviado, removendo espaços excedentes.
+        const nome = typeof body.nome === 'string'
+            ? body.nome.trim().replace(/\s+/g, ' ')
+            : '';
+
+        // Valida as restrições de comprimento e caracteres permitidos para o nome.
+        if (nome.length < 3) {
+            erros.push(
+                erro('nome', 'O nome deve ter pelo menos 3 caracteres.')
+            );
+        } else if (nome.length > 120 || !regexNome.test(nome)) {
+            erros.push(
+                erro(
+                    'nome',
+                    'O nome deve conter apenas letras, espaços ou hífens.'
+                )
+            );
+        }
+
+        // Valida e formata a data de nascimento utilizando o utilitário de datas.
+        const dataNascimento =
+            dateUtils.criarDataValida(body.dataNascimento);
+
+        // Calcula a idade do usuário com base na data de nascimento informada.
+        const idade = dateUtils.calcularIdade(
+            body.dataNascimento
+        );
+
+        // Valida se a data de nascimento é real, não está no futuro e não resulta em idade negativa.
+        if (
+            !dataNascimento ||
+            dataNascimento > hoje ||
+            idade === null ||
+            idade < 0
+        ) {
+            erros.push(
+                erro(
+                    'dataNascimento',
+                    'Informe uma data de nascimento válida.'
+                )
+            );
+        }
+
+        // Normaliza o e-mail removendo espaços e convertendo para minúsculas
+        const email = typeof body.email === 'string'
+            ? body.email.trim().toLowerCase()
+            : '';
+
+        // Valida o formato e o tamanho máximo permitido para o e-mail.
+        if (!regexEmail.test(email) || email.length > 254) {
+            erros.push(
+                erro('email', 'Informe um e-mail válido.')
+            );
+        }
+
+        // Aplica a mesma regra mínima usada na redefinição de senha.
+        if (
+            typeof body.senha !== 'string' ||
+            body.senha.length === 0
+        ) {
+            erros.push(
+                erro('senha', 'Informe uma senha.')
+            );
+        } else if (body.senha.length < 8) {
+            erros.push(
+                erro(
+                    'senha',
+                    'A senha deve possuir pelo menos 8 caracteres.'
+                )
+            );
+        } else if (body.senha.length > 128) {
+            erros.push(
+                erro(
+                    'senha',
+                    'A senha deve possuir no máximo 128 caracteres.'
+                )
+            );
+        }
+
+        // Valida a data de início da última menstruação informada no cadastro.
+        const dataInicioUltimaMenstruacao =
+            dateUtils.criarDataValida(
+                body.dataInicioUltimaMenstruacao
+            );
+
+        // Impede que a data de início da menstruação seja inválida ou situada no futuro.
+        if (
+            !dataInicioUltimaMenstruacao ||
+            dataInicioUltimaMenstruacao > hoje
+        ) {
+            erros.push(
+                erro(
+                    'dataInicioUltimaMenstruacao',
+                    'Informe a data de início da sua última menstruação (não pode ser no futuro).'
+                )
+            );
+        }
+
+        // Valida opcionalmente a data de término da última menstruação, caso tenha sido cadastrada.
+        const dataFimUltimaMenstruacao =
+            body.dataFimUltimaMenstruacao
+                ? dateUtils.criarDataValida(
+                    body.dataFimUltimaMenstruacao
+                )
+                : null;
+
+        // Garante que a data de término seja coerente.
+        if (
+            body.dataFimUltimaMenstruacao &&
+            (
+                !dataFimUltimaMenstruacao ||
+                dataFimUltimaMenstruacao < dataInicioUltimaMenstruacao ||
+                dataFimUltimaMenstruacao > hoje
+            )
+        ) {
+            erros.push(
+                erro(
+                    'dataFimUltimaMenstruacao',
+                    'Informe uma data de término válida.'
+                )
+            );
+        }
+
+        // Valida a duração informada do ciclo utilizando a função auxiliar de inteiros positivos.
+        const duracaoCicloInformada = inteiroPositivo(
+            body.duracaoCicloInformada,
+            'duracaoCicloInformada',
+            erros
+        );
+
+        // Valida a duração informada da menstruação.
+        const duracaoMenstruacaoInformada = inteiroPositivo(
+            body.duracaoMenstruacaoInformada,
+            'duracaoMenstruacaoInformada',
+            erros
+        );
+
+        // Valida a duração informada da fase lútea.
+        const duracaoLuteaInformada = inteiroPositivo(
+            body.duracaoLuteaInformada,
+            'duracaoLuteaInformada',
+            erros
+        );
+
+        // Valida que a duração da menstruação nunca pode ser maior ou igual à duração total do ciclo.
+        if (
+            duracaoCicloInformada &&
+            duracaoMenstruacaoInformada &&
+            duracaoMenstruacaoInformada >= duracaoCicloInformada
+        ) {
+            erros.push(
+                erro(
+                    'duracaoMenstruacaoInformada',
+                    'A duração da menstruação deve ser menor que a duração do ciclo.'
+                )
+            );
+        }
+
+        // Valida se a fase lútea informada respeita o limite biológico calculado.
+        if (duracaoLuteaInformada !== null) {
+            const ciclo = duracaoCicloInformada || 28;
+            const menstruacao =
+                duracaoMenstruacaoInformada || 5;
+
+            if (duracaoLuteaInformada > ciclo - menstruacao - 2) {
+                erros.push(
+                    erro(
+                        'duracaoLuteaInformada',
+                        'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.'
+                    )
+                );
+            }
+        }
+
+        // Determina se o usuário é menor de 16 anos
+        const menorDe16 =
+            idade !== null &&
+            idade < 16;
+
+        // Normaliza o e-mail do responsável legal informado.
+        const emailResponsavelLegal =
+            typeof body.emailResponsavelLegal === 'string'
+                ? body.emailResponsavelLegal.trim().toLowerCase()
+                : null;
+
+        // O e-mail do responsável legal é opcional.
+        if (
+            emailResponsavelLegal &&
+            (
+                !regexEmail.test(emailResponsavelLegal) ||
+                emailResponsavelLegal.length > 254
+            )
+        ) {
+            erros.push(
+                erro(
+                    'emailResponsavelLegal',
+                    'Informe um e-mail válido.'
+                )
+            );
+        }
+
+        // Impede que a titular informe o próprio e-mail como e-mail de responsável legal.
+        if (
+            emailResponsavelLegal &&
+            emailResponsavelLegal === email
+        ) {
+            erros.push(
+                erro(
+                    'emailResponsavelLegal',
+                    'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.'
+                )
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+
+            dados: {
+                nome,
+                dataNascimento,
+                email,
+                senha: body.senha,
+
+                dataInicioUltimaMenstruacao,
+                dataFimUltimaMenstruacao,
+
+                duracaoCicloInformada,
+                duracaoMenstruacaoInformada,
+                duracaoLuteaInformada,
+
+                menorDe16,
+
+                emailResponsavelLegal:
+                    emailResponsavelLegal || null
+            }
+        };
+    }
+
+    // Valida e normaliza os dados recebidos na tentativa de login.
+    function validarLogin(body) {
+        body = body && typeof body === 'object' ? body : {};
+        const erros = [];
+
+        const email = typeof body.email === 'string'
+            ? body.email.trim().toLowerCase()
+            : '';
+
+        if (!email) {
+            erros.push(
+                erro('email', 'Informe seu e-mail.')
+            );
+        } else if (
+            !regexEmail.test(email) ||
+            email.length > 254
+        ) {
+            erros.push(
+                erro('email', 'Informe um e-mail válido.')
+            );
+        }
+
+        const senha = typeof body.senha === 'string'
+            ? body.senha
+            : '';
+
+        if (!senha) {
+            erros.push(
+                erro('senha', 'Informe sua senha.')
+            );
+        } else if (senha.length > 128) {
+            erros.push(
+                erro('senha', 'A senha deve possuir no máximo 128 caracteres.')
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+
+            dados: {
+                email,
+                senha
+            }
+        };
+    }
+
+    function validarEmail(body) {
+        const email = typeof body.email === 'string'
+            ? body.email.trim().toLowerCase()
+            : '';
+
+        const erros = [];
+
+        if (!regexEmail.test(email) || email.length > 254) {
+            erros.push(
+                erro('email', 'Informe um e-mail válido.')
+            );
+        }
+
+        return {
+            valido: erros.length === 0,
+            erros,
+            dados: { email }
+        };
+    }
+
+    return {
+        validarCadastro,
+        validarLogin,
+        validarEmail
+    };
+}
+
+export {
+    criarAuthValidator
+};
