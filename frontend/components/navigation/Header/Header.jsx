@@ -7,21 +7,24 @@ function Header({
     variante = 'padrao',
     onVoltar
 }) {
-    const temVoltar = variante === 'comVoltar'
+    const temVoltar = variante === 'comVoltar' || variante === 'cadastro'
+    const cadastro = variante === 'cadastro'
 
     return (
         <View style={estilos.container}>
             <View
                 style={[
                     estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar
+                    temVoltar && estilos.espacamentoSuperiorComVoltar,
+                    cadastro && estilos.espacamentoSuperiorCadastro
                 ]}
             />
 
             <View
                 style={[
                     estilos.areaTitulo,
-                    temVoltar && estilos.areaTituloComVoltar
+                    temVoltar && estilos.areaTituloComVoltar,
+                    cadastro && estilos.areaTituloCadastro
                 ]}
             >
                 {temVoltar ? (

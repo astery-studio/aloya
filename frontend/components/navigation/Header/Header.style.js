@@ -14,6 +14,10 @@ const estilos = StyleSheet.create({
         height: 48
     },
 
+    espacamentoSuperiorCadastro: {
+        height: 56
+    },
+
     areaTitulo: {
         minHeight: 66,
         flexDirection: 'row',
@@ -27,6 +31,13 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 12,
         paddingRight: 60,
+        paddingBottom: 24
+    },
+
+    areaTituloCadastro: {
+        minHeight: 56,
+        paddingLeft: 16,
+        paddingRight: 56,
         paddingBottom: 24
     },
 
