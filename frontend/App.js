@@ -43,6 +43,7 @@ import { BottomTabItem } from './components/navigation/BottomTab/BottomTabItem/B
 
 import { BottomSheetLayout } from './layouts/BottomSheet/BottomSheetLayout';
 import { MainLayout } from './layouts/MainLayout/MainLayout';
+import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 
 import { obterDadoLocal, removerDadoLocal, salvarDadoLocal } from './services/storage/localStorage';
 import { estilos } from './App.style';
@@ -209,6 +210,10 @@ export default function App() {
     const edicaoAtual = obterEdicaoAtual();
     const modalSenhaVisivel = ['senhaVazia', 'senhaPreenchida', 'senhaErro', 'senhaCarregando'].includes(modalAtivo);
     const modalSenhaCarregando = modalAtivo === 'senhaCarregando';
+
+    if (fontesCarregadas) {
+        return <ContraceptiveFlow />;
+    }
 
     return (
         <View style={estilos.tela}>
