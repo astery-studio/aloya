@@ -18,6 +18,7 @@ import OnboardingScreen from './screens/onboarding/OnboardingScreen';
 import { ChangePasswordScreen } from './screens/settings/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen';
 import { SettingsScreen } from './screens/settings/SettingsScreen';
+import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { criarServicosApp } from './services/createAppServices';
 import { obterToken } from './services/auth/tokenStorage';
 import { cores, fontFamilies } from './theme';
@@ -25,7 +26,8 @@ import { cores, fontFamilies } from './theme';
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     perfil: 'perfil',
-    alterarSenha: 'alterarSenha'
+    alterarSenha: 'alterarSenha',
+    anticoncepcionais: 'anticoncepcionais'
 });
 
 function obterBaseUrl() {
@@ -249,10 +251,16 @@ export default function App() {
             aoConcluir={concluirAutenticacao} />;
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = <SettingsScreen
+            onAbrirAnticoncepcionais={() => setTelaInterna(telasInternas.anticoncepcionais)}
             onAbrirPerfil={() => {
                 setTelaInterna(telasInternas.perfil);
                 if (!perfil && !carregandoPerfil && !erroPerfil) carregarPerfil();
             }} />;
+    } else if (telaInterna === telasInternas.anticoncepcionais) {
+        conteudo = <ContraceptiveFlow
+            service={configuracao.servicos.contraceptiveService}
+            onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.alterarSenha) {
         conteudo = <ChangePasswordScreen
             alterarSenha={configuracao.servicos.accountService.alterarSenha}
