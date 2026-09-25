@@ -329,12 +329,12 @@ function criarAccountValidator({ dateUtils }) {
         const tamanhoNovaSenha =
             [...novaSenha].length;
 
-        //verifica se a nova senha tem pelo menos 15 caracteres
-        if (tamanhoNovaSenha < 15) {
+        //verifica se a nova senha tem pelo menos 8 caracteres
+        if (tamanhoNovaSenha < 8) {
             erros.push(
                 erro(
                     'novaSenha',
-                    'A nova senha deve ter pelo menos 15 caracteres.'
+                    'A nova senha deve ter pelo menos 8 caracteres.'
                 )
             )
         }

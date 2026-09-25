@@ -53,8 +53,8 @@ function validarAlteracaoSenha(senhaAtual, novaSenha, confirmacaoNovaSenha) {
         return 'Preencha os três campos de senha.'
     }
 
-    if ([...novaSenha].length < 15) {
-        return 'A nova senha deve ter pelo menos 15 caracteres.'
+    if ([...novaSenha].length < 8) {
+        return 'A nova senha deve ter pelo menos 8 caracteres.'
     }
 
     if (contarBytesUtf8(novaSenha) > 72) {

@@ -124,12 +124,29 @@ test(
         const resultado =
             validator.validarAlteracaoSenha({
                 senhaAtual: 'senha atual',
-                novaSenha: 'senha curta',
-                confirmacaoNovaSenha:
-                    'senha curta'
+                novaSenha: 'curta7',
+                confirmacaoNovaSenha:'curta7'
             })
 
         assert.equal(resultado.valido, false)
+    }
+)
+
+//Teste para aceitar exatamente o tamanho mínimo permitido
+test(
+    'aceita nova senha com oito caracteres',
+    function () {
+        const validator = criarValidator()
+
+        const resultado =
+            validator.validarAlteracaoSenha({
+                senhaAtual: 'senha atual',
+                novaSenha: 'Nova@123',
+                confirmacaoNovaSenha:
+                    'Nova@123'
+            })
+
+        assert.equal(resultado.valido, true)
     }
 )
 

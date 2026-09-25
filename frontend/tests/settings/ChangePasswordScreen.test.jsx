@@ -77,12 +77,31 @@ describe('ChangePasswordScreen', () => {
         await render(<ChangePasswordScreen alterarSenha={alterarSenha} />)
 
         await fireEvent.changeText(screen.getByLabelText('Senha atual'), 'Senha atual segura!')
-        await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'Senha curta')
-        await fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'Senha curta')
+        await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'curta7')
+        await fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'curta7')
         await fireEvent.press(screen.getByRole('button', {name: 'Salvar senha'}))
 
         expect(alterarSenha).not.toHaveBeenCalled()
-        expect(screen.getByText('A nova senha deve ter pelo menos 15 caracteres.')).toBeOnTheScreen()
+        expect(screen.getByText('A nova senha deve ter pelo menos 8 caracteres.')).toBeOnTheScreen()
+    })
+
+    test('aceita senha com exatamente oito caracteres', async () => {
+        const alterarSenha = jest.fn().mockResolvedValue({
+            mensagem: 'Senha atualizada com sucesso.'
+        })
+
+        await render(<ChangePasswordScreen alterarSenha={alterarSenha} />)
+
+        await fireEvent.changeText(screen.getByLabelText('Senha atual'), 'Senha antiga segura!')
+        await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'Nova@123')
+        await fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'Nova@123')
+        await fireEvent.press(screen.getByRole('button', {name: 'Salvar senha'}))
+
+        expect(alterarSenha).toHaveBeenCalledWith({
+            senhaAtual: 'Senha antiga segura!',
+            novaSenha: 'Nova@123',
+            confirmacaoNovaSenha: 'Nova@123'
+        })
     })
 
     test('mostra credenciais incorretas e limpa somente a senha atual', async () => {
