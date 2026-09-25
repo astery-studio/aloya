@@ -10,7 +10,7 @@ const registro = {
     periodosPausa: [], criadoEm: agora
 };
 
-function criarBanco({ falhar = false } = {}) {
+function criarBanco({ falhar = false, falharListagem = false } = {}) {
     return {
         sessao: { findUnique: async () => ({
             usuarioId: 7, revogadaEm: null, validadeSessao: new Date('2026-09-25T00:00:00Z'),
@@ -21,7 +21,10 @@ function criarBanco({ falhar = false } = {}) {
                 if (falhar) throw new Error('banco indisponível');
                 return { ...registro, ...data };
             },
-            findMany: async () => [registro]
+            findMany: async () => {
+                if (falharListagem) throw new Error('consulta indisponível');
+                return [registro];
+            }
         }
     };
 }
@@ -57,4 +60,6 @@ test('normaliza erros de validação e internos', async () => {
             nome: 'Mercilon', tipo: 'pilula', frequenciaId: 'pilula_continuo', horarios: ['08:00']
         })
     })).status, 500));
+    await comApi(criarBanco({ falharListagem: true }), async (url) =>
+        assert.equal((await fetch(url, { headers: autorizacao })).status, 500));
 });
