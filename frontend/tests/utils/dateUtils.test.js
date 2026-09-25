@@ -1,5 +1,5 @@
-import { formatDate } from '../utils/date/formatDate';
-import { isSameDay } from '../utils/date/isSameDay';
+import { formatDate } from '../../utils/date/formatDate';
+import { isSameDay } from '../../utils/date/isSameDay';
 
 test('formata a digitação de uma data sem perder dígitos parciais', () => {
     expect(formatDate('08')).toBe('08');

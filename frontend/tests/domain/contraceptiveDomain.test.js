@@ -1,6 +1,6 @@
-import { calcularPeriodosDePausa } from '../domain/contraceptive/ContraceptiveSchedule';
-import { obterFrequencia, obterFrequencias } from '../features/contraceptives/constants/contraceptiveOptions';
-import { validarAnticoncepcional } from '../features/contraceptives/utils/contraceptiveValidation';
+import { calcularPeriodosDePausa } from '../../domain/contraceptive/ContraceptiveSchedule';
+import { obterFrequencia, obterFrequencias } from '../../features/contraceptives/constants/contraceptiveOptions';
+import { validarAnticoncepcional } from '../../features/contraceptives/utils/contraceptiveValidation';
 
 const base = { nome: 'Mercilon', tipo: 'pilula', frequenciaId: 'pilula_continuo', horarios: ['08:00'], intensidadeAlerta: '' };
 

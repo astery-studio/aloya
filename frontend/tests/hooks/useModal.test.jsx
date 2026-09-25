@@ -1,6 +1,6 @@
 import { Button, Text, View } from 'react-native'
 import {fireEvent, render, screen} from '@testing-library/react-native'
-import { useModal } from '../hooks/useModal'
+import { useModal } from '../../hooks/useModal'
 
 function ComponenteDeTeste({abertoInicialmente = false}) {
     const {visivel, abrirModal, fecharModal} = useModal(abertoInicialmente)

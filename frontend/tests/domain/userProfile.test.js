@@ -1,7 +1,7 @@
 //Testa a validação dos dados de perfil recebidos da API.
 import {
     criarUserProfile
-} from '../features/profile/models/userProfile'
+} from '../../features/profile/models/userProfile'
 
 function criarResposta(alteracoes = {}) {
     return {

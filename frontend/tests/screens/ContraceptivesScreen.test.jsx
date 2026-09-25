@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { ContraceptivesScreen } from '../screens/contraceptives/ContraceptivesScreen';
+import { ContraceptivesScreen } from '../../screens/contraceptives/ContraceptivesScreen';
 
 jest.mock('phosphor-react-native', () => {
     const { Text: MockText } = require('react-native');

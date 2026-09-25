@@ -1,6 +1,6 @@
 //Testa o comportamento seguro do serviço de logout.
-import { criarAuthService } from '../features/auth/services/authService'
-import { endpoints } from '../services/api/endpoints'
+import { criarAuthService } from '../../features/auth/services/authService'
+import { endpoints } from '../../services/api/endpoints'
 
 function criarDependencias({
     resposta = { status: 204 },

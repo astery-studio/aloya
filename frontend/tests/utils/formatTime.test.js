@@ -1,4 +1,4 @@
-import { formatTime } from '../utils/formatting/formatTime';
+import { formatTime } from '../../utils/formatting/formatTime';
 
 test('formata horário durante a digitação', () => {
     expect(formatTime('20')).toBe('20');

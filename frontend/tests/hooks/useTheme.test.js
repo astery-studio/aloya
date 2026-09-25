@@ -5,8 +5,8 @@ import {
     renderHook
 } from '@testing-library/react-native'
 
-import { useTheme } from '../hooks/useTheme'
-import { tema } from '../theme'
+import { useTheme } from '../../hooks/useTheme'
+import { tema } from '../../theme'
 
 describe('useTheme', () => {
     test('retorna o tema centralizado da aplicação', async () => {
