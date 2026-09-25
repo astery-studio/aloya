@@ -4,7 +4,7 @@ import {Animated, Easing, Pressable, Text, View} from 'react-native'
 import {estilos} from './SwitchField.styles'
 
 //Recebe o estado atual, anima o indicador e informa o novo valor ao componente pai.
-function SwitchField({titulo, ativo = false, aoAlterar, desabilitado = false, estilo}) {
+function SwitchField({titulo, ativo = false, aoAlterar, desabilitado = false, estilo, estiloTitulo, rotuloAcessibilidade, somenteControle = false}) {
     const estaAtivo = ativo === true
     const estaDesabilitado = desabilitado || typeof aoAlterar !== 'function'
     const deslocamento = useRef(new Animated.Value(estaAtivo ? 20 : 0)).current
@@ -34,7 +34,7 @@ function SwitchField({titulo, ativo = false, aoAlterar, desabilitado = false, es
             onPress={alternar}
             disabled={estaDesabilitado}
             accessibilityRole="switch"
-            accessibilityLabel={titulo}
+            accessibilityLabel={rotuloAcessibilidade || titulo}
             accessibilityHint="Ativa ou desativa esta permissão"
             accessibilityState={{
                 checked: estaAtivo,
@@ -47,9 +47,7 @@ function SwitchField({titulo, ativo = false, aoAlterar, desabilitado = false, es
                 estilo
             ]}
         >
-            <Text style={estilos.titulo} numberOfLines={2}>
-                {titulo}
-            </Text>
+            {!somenteControle ? <Text style={[estilos.titulo, estiloTitulo]} numberOfLines={2}>{titulo}</Text> : null}
 
             <View style={[estilos.trilha, estaAtivo ? estilos.trilhaAtiva : estilos.trilhaInativa]} pointerEvents="none">
                 <Animated.View
