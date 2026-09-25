@@ -178,6 +178,11 @@ jest.mock('../../screens/settings/ChangePasswordScreen', () => {
 })
 
 import {useFonts} from 'expo-font'
+
+jest.mock('../../screens/support-network/NewSupportCategoryScreen', () => ({
+    NewSupportCategoryScreen: jest.fn(() => null)
+}))
+
 import App from '../../App'
 import {ProfileSettingsScreen} from '../../screens/settings/ProfileSettingsScreen'
 import {obterToken} from '../../services/auth/tokenStorage'
