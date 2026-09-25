@@ -3,7 +3,8 @@ import { Pressable, Text, View } from 'react-native'
 import { XIcon } from 'phosphor-react-native/src/icons/X'
 import { estilos, corIconeFechar } from './BottomSheetLayout.style'
 
-function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, children }) {
+function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, variante = 'padrao', children }) {
+    const anticoncepcional = variante === 'anticoncepcional'
     function fecharPeloX() {
         if (!bloquearFechamento) {
             onFechar?.()
@@ -12,8 +13,8 @@ function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, child
 
     return (
         <View style={estilos.container}>
-            <View style={estilos.cabecalho}>
-                <Text style={estilos.titulo}>
+            <View style={[estilos.cabecalho, anticoncepcional && estilos.cabecalhoAnticoncepcional]}>
+                <Text style={[estilos.titulo, anticoncepcional && estilos.tituloAnticoncepcional]}>
                     {titulo}
                 </Text>
 
@@ -25,7 +26,7 @@ function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, child
                     style={estilos.botaoFechar}
                 >
                     <XIcon
-                        size={24}
+                        size={anticoncepcional ? 20 : 24}
                         color={corIconeFechar}
                         weight="regular"
                     />
