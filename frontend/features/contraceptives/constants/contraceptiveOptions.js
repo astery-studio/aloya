@@ -31,9 +31,9 @@ const FREQUENCIAS_POR_TIPO = Object.freeze({
 });
 
 const INTENSIDADES_ALERTA = Object.freeze([
-    { id: 'leve', label: 'Leve', descricao: 'DESCRIÇÃO' },
-    { id: 'moderado', label: 'Moderado', descricao: 'DESCRIÇÃO' },
-    { id: 'critico', label: 'Crítico', descricao: 'DESCRIÇÃO' }
+    { id: 'leve', label: 'Leve', descricao: '1 aviso no horário programado.' },
+    { id: 'moderado', label: 'Moderado', descricao: '2 avisos: no horário e 10 min depois.' },
+    { id: 'critico', label: 'Crítico', descricao: '3 avisos: no horário, 5 e 10 min depois.' }
 ]);
 
 function obterTipo(id) {
