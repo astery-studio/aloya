@@ -7,7 +7,7 @@ import { cores, radius, typography } from '../../../theme';
 const estilos = StyleSheet.create({
     linha: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 12 },
     campo: {
-        flex: 1, minHeight: 48, borderRadius: radius.buttonAndInput,
+        flex: 1, minHeight: 56, borderRadius: radius.buttonAndInput,
         borderWidth: 0.705, borderColor: cores.neutras.bordaClara,
         backgroundColor: cores.neutras.superficieClara,
         flexDirection: 'row', alignItems: 'center', gap: 12,

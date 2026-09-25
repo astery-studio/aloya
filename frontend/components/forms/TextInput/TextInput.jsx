@@ -11,11 +11,13 @@ const manterTexto = (texto) => texto;
 // Recebe as opções do campo, mostra a entrada e devolve o texto tratado ao formulário.
 function TextInput({
     label, placeholder, value, onChangeText, variante = 'padrao',
-    desativado = false, acaoDireita, estilo, erro, sanitizar = manterTexto,
+    desativado = false, acaoDireita, iconeEsquerda: IconeEsquerda,
+    corIcone = '#C85A44', fundoIcone = 'transparent', estilo, erro,
+    sanitizar = manterTexto,
     ...outrasProps
 }) {
     const preenchido = Boolean(value);
-    const rotuloExterno = variante === 'categoria' && label;
+    const rotuloExterno = ['categoria', 'anticoncepcional'].includes(variante) && label;
     const rotuloInterno = variante === 'padrao' && preenchido && label;
     const corPlaceholder = variante === 'categoria' ? '#A8A49C'
         : variante === 'popup' ? 'rgba(34, 34, 34, 0.50)'
@@ -28,11 +30,13 @@ function TextInput({
                 estilos.container,
                 preenchido && variante === 'padrao' && estilos.preenchido,
                 variante === 'categoria' && estilos.categoria,
+                variante === 'anticoncepcional' && estilos.anticoncepcional,
                 variante === 'popup' && estilos.popup,
                 desativado && estilos.desativado,
                 erro && estilos.containerErro,
                 estilo
             ]}>
+                {IconeEsquerda ? <View style={[estilos.caixaIcone, { backgroundColor: fundoIcone }]}><IconeEsquerda size={18} color={corIcone} /></View> : null}
                 <View style={estilos.conteudo}>
                     {rotuloInterno && <Text style={estilos.rotuloFlutuante}>{label}</Text>}
                     <EntradaNativa
