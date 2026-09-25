@@ -41,12 +41,14 @@ import {
 import { criarAccountService } from '../services/account.service.js';
 import { criarAccountDeletionService } from '../services/accountDeletion.service.js';
 import { criarLogoutService } from '../services/logout.service.js';
+import { criarPermissionCategoryService } from '../services/permissionCategory.service.js';
 
 import {
     criarAuthValidator
 } from '../validators/auth.validator.js';
 import { criarAccountValidator } from '../validators/account.validator.js';
 import { criarAccountDeletionValidator } from '../validators/accountDeletion.validator.js';
+import { criarPermissionCategoryValidator } from '../validators/permissionCategory.validator.js';
 
 import {
     criarParentalConsentValidator
@@ -58,6 +60,7 @@ import {
 import { criarAccountController } from '../controllers/account.controller.js';
 import { criarAccountDeletionController } from '../controllers/accountDeletion.controller.js';
 import { criarLogoutController } from '../controllers/logout.controller.js';
+import { criarPermissionCategoryController } from '../controllers/permissionCategory.controller.js';
 import { criarPasswordRecoveryService } from '../services/passwordRecovery.service.js';
 import { criarPasswordRecoveryValidator } from '../validators/passwordRecovery.validator.js';
 import { criarPasswordRecoveryController } from '../controllers/passwordRecovery.controller.js';
@@ -152,6 +155,7 @@ function criarContainer() {
     const logoutService = criarLogoutService({
         prisma
     });
+    const permissionCategoryService = criarPermissionCategoryService({ prisma });
 
     const contraceptiveService = criarContraceptiveService(prisma);
 
@@ -240,6 +244,10 @@ function criarContainer() {
     const logoutController = criarLogoutController({
         logoutService
     });
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService,
+        permissionCategoryValidator: criarPermissionCategoryValidator()
+    });
 
     const contraceptiveController = criarContraceptiveController(
         contraceptiveService
@@ -250,6 +258,8 @@ function criarContainer() {
         accountController,
         accountDeletionController,
         logoutController,
+        permissionCategoryController,
+        permissionCategoryRateLimit: configuracoesContaRateLimit,
         contraceptiveController,
         authMiddleware,
         parentalConsentMiddleware,

@@ -6,6 +6,7 @@ import { criarAuthRoutes } from './routes/auth.routes.js';
 import { criarAccountRoutes } from './routes/account.routes.js';
 import { criarLogoutRoutes } from './routes/logout.routes.js';
 import { criarRotasAnticoncepcionais } from './features/contraceptives/contraceptive.routes.js';
+import { criarPermissionCategoryRoutes } from './routes/permissionCategory.routes.js';
 import { rotaNaoEncontrada, tratarErros } from './middlewares/error.middleware.js';
 
 const app = express();
@@ -63,6 +64,17 @@ app.use(
     criarRotasAnticoncepcionais({
         autenticar: container.authMiddleware.autenticar,
         controller: container.contraceptiveController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarPermissionCategoryRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        permissionCategoryRateLimit: container.permissionCategoryRateLimit,
+        permissionCategoryController: container.permissionCategoryController
     })
 );
 

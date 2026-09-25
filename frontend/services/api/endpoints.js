@@ -14,7 +14,8 @@ const endpoints = Object.freeze({
     exclusaoConta: caminhoConta,
     verificacaoSenhaExclusao: `${caminhoConta}/account-deletion/verify-password`,
     logout: '/auth/logout',
-    anticoncepcionais: '/api/anticoncepcionais'
+    anticoncepcionais: '/api/anticoncepcionais',
+    categoriasPermissao: '/support-network/permission-categories'
 })
 
 export { endpoints }

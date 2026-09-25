@@ -19,6 +19,7 @@ import { ChangePasswordScreen } from './screens/settings/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen';
 import { SettingsScreen } from './screens/settings/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
+import { NewSupportCategoryScreen } from './screens/support-network/NewSupportCategoryScreen';
 import { criarServicosApp } from './services/createAppServices';
 import { obterToken } from './services/auth/tokenStorage';
 import { cores, fontFamilies } from './theme';
@@ -27,7 +28,8 @@ const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
-    anticoncepcionais: 'anticoncepcionais'
+    anticoncepcionais: 'anticoncepcionais',
+    novaCategoria: 'novaCategoria'
 });
 
 function obterBaseUrl() {
@@ -251,11 +253,18 @@ export default function App() {
             aoConcluir={concluirAutenticacao} />;
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = <SettingsScreen
+            onAbrirNovaCategoria={() => setTelaInterna(telasInternas.novaCategoria)}
             onAbrirAnticoncepcionais={() => setTelaInterna(telasInternas.anticoncepcionais)}
             onAbrirPerfil={() => {
                 setTelaInterna(telasInternas.perfil);
                 if (!perfil && !carregandoPerfil && !erroPerfil) carregarPerfil();
             }} />;
+    } else if (telaInterna === telasInternas.novaCategoria) {
+        conteudo = <NewSupportCategoryScreen
+            criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
+            onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            onConcluido={() => setTelaInterna(telasInternas.configuracoes)}
+            onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.anticoncepcionais) {
         conteudo = <ContraceptiveFlow
             service={configuracao.servicos.contraceptiveService}
