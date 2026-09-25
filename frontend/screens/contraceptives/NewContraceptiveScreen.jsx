@@ -6,7 +6,7 @@ import { estilos } from './contraceptiveScreens.styles';
 function NewContraceptiveScreen({ onVoltar, onCadastrar, salvando = false }) {
     return (
         <View style={estilos.tela}>
-            <Header titulo="Cadastro de Anticoncepcional" variante="cadastro" onVoltar={onVoltar} />
+            <Header titulo="Cadastro de Anticoncepcional" variante="comVoltar" onVoltar={onVoltar} />
             <ScrollView contentContainerStyle={estilos.conteudoFormulario} keyboardShouldPersistTaps="handled">
                 <ContraceptiveForm onSubmit={onCadastrar} salvando={salvando} />
             </ScrollView>
