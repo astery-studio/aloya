@@ -223,11 +223,42 @@ function criarExclusaoContaRateLimit({
     })
 }
 
+//Limita tentativas de criação de categorias por titular autenticada.
+function criarPermissionCategoryRateLimit({rateLimit, janelaMs, limite, logger = console}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+
+        //Usa a titular autenticada como chave, evitando que uma conta afete outra.
+        keyGenerator: req => `usuario:${req.usuario.id}`,
+
+        handler: (req, res) => {
+            //Registra somente o evento, sem nome da categoria ou permissões selecionadas.
+            logger.warn({
+                evento: 'limite_criacao_categoria_permissao',
+                usuarioId: req.usuario.id,
+                metodo: req.method,
+                rota: req.originalUrl
+            })
+
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_CRIACAO_CATEGORIA',
+                    mensagem: 'Muitas tentativas de criação em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            })
+        }
+    })
+}
+
 export {
     criarCadastroRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit,
     criarConfiguracoesContaRateLimit,
     criarAlteracaoSenhaRateLimit,
-    criarExclusaoContaRateLimit
+    criarExclusaoContaRateLimit,
+    criarPermissionCategoryRateLimit
 }

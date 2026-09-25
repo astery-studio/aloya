@@ -45,6 +45,9 @@ const env = {
     alteracaoSenhaRateLimitJanelaMs: obterInteiroPositivo('ALTERACAO_SENHA_RATE_LIMIT_JANELA_MS', 900000),
     alteracaoSenhaRateLimitMaximo: obterInteiroPositivo('ALTERACAO_SENHA_RATE_LIMIT_MAXIMO', 5),
 
+    categoriaPermissaoRateLimitJanelaMs: obterInteiroPositivo('CATEGORIA_PERMISSAO_RATE_LIMIT_JANELA_MS', 900000),
+    categoriaPermissaoRateLimitMaximo: obterInteiroPositivo('CATEGORIA_PERMISSAO_RATE_LIMIT_MAXIMO', 20),
+
     jwtSecret: obterVariavelObrigatoria('JWT_SECRET'),
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '90d',
     bcryptRounds,
