@@ -9,9 +9,11 @@ const rotas = Object.freeze({
     recuperarSenha: 'ForgotPasswordScreen',
     redefinirSenha: 'ResetPasswordScreen',
     onboarding: 'OnboardingScreen',
+    selecaoFluxo: 'FlowSelectionScreen',
     configuracoes: 'SettingsScreen',
     perfil: 'ProfileSettingsScreen',
-    alterarSenha: 'ChangePasswordScreen'
+    alterarSenha: 'ChangePasswordScreen',
+    novaCategoria: 'NewSupportCategoryScreen'
 })
 
-export { rotas }
+export {rotas}
