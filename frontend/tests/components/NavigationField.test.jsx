@@ -7,15 +7,15 @@ jest.mock(
     })
 )
 
-import {tema} from '../theme'
+import {tema} from '../../theme'
 
 import {
     estilos
-} from '../components/common/NavigationField/NavigationField.style'
+} from '../../components/common/NavigationField/NavigationField.style'
 
 import {
     NavigationField
-} from '../components/common/NavigationField/NavigationField'
+} from '../../components/common/NavigationField/NavigationField'
 
 const IconeTeste = jest.fn(() => null)
 

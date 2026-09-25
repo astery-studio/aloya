@@ -63,7 +63,7 @@ jest.mock(
     }
 )
 
-import {SelectionSheet} from '../components/feedback/SelectionSheet/SelectionSheet'
+import {SelectionSheet} from '../../components/feedback/SelectionSheet/SelectionSheet'
 
 const IconeTeste = jest.fn(() => null)
 

@@ -8,8 +8,8 @@ jest.mock(
 )
 
 import {ArrowLeftIcon} from 'phosphor-react-native/src/icons/ArrowLeft'
-import {estilos,corIconeVoltar} from '../components/navigation/Header/Header.style'
-import {Header} from '../components/navigation/Header/Header'
+import {estilos,corIconeVoltar} from '../../components/navigation/Header/Header.style'
+import {Header} from '../../components/navigation/Header/Header'
 
 describe('Header', () => {
     beforeEach(() => {

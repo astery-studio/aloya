@@ -88,7 +88,7 @@ jest.mock(
     }
 )
 
-import {DatePickerSheet} from '../components/feedback/DatePickerSheet/DatePickerSheet'
+import {DatePickerSheet} from '../../components/feedback/DatePickerSheet/DatePickerSheet'
 const mensagemDeErro = 'Não foi possível salvar a data. Tente novamente.'
 
 describe('DatePickerSheet', () => {

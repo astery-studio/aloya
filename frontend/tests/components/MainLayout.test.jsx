@@ -15,10 +15,10 @@ jest.mock(
     })
 )
 
-import { Header } from '../components/navigation/Header/Header'
-import { BottomTabBar } from '../components/navigation/BottomTab/BottomTabBar/BottomTabBar'
-import { estilos } from '../layouts/MainLayout/MainLayout.style'
-import { MainLayout } from '../layouts/MainLayout/MainLayout'
+import { Header } from '../../components/navigation/Header/Header'
+import { BottomTabBar } from '../../components/navigation/BottomTab/BottomTabBar/BottomTabBar'
+import { estilos } from '../../layouts/MainLayout/MainLayout.style'
+import { MainLayout } from '../../layouts/MainLayout/MainLayout'
 
 describe('MainLayout', () => {
     beforeEach(() => {

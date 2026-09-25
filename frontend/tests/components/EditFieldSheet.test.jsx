@@ -68,7 +68,7 @@ jest.mock(
     }
 )
 
-import {EditFieldSheet} from '../components/feedback/EditFieldSheet/EditFieldSheet'
+import {EditFieldSheet} from '../../components/feedback/EditFieldSheet/EditFieldSheet'
 
 describe('EditFieldSheet', () => {
     test('renderiza o título, o valor e o botão de salvar', async () => {
