@@ -1,6 +1,7 @@
 //Mostra alertas comuns e confirmações que exigem a senha atual da pessoa usuária.
 import { Text, View } from 'react-native'
-import { LockKeyIcon, WarningCircleIcon } from '../../../icons/AppIcons'
+import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
+import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
 
 import ButtonPopup from '../../../common/Button/ButtonPopup'
 import PasswordInput from '../../../forms/PasswordInput'
