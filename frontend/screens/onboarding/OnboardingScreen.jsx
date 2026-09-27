@@ -212,23 +212,31 @@ export default function OnboardingScreen({
             setErro({ titulo: 'Data inválida', mensagem: 'Informe uma data de nascimento válida.' });
             return;
         }
-        if (ehMenorDe16(dados.dataNascimento) && dados.emailResponsavelLegal) {
-            if (!isValidEmail(dados.emailResponsavelLegal)) {
-                setErrosCampos({ emailResponsavelLegal: 'Informe um e-mail válido.' });
-                setErro({ titulo: 'E-mail inválido', mensagem: 'Informe um e-mail válido.' });
-                return;
-            }
-            if (dados.emailResponsavelLegal.trim().toLowerCase()
-                === dados.email.trim().toLowerCase()) {
-                const mensagem =
-                    'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.';
-                setErrosCampos({ emailResponsavelLegal: mensagem });
+        if (ehMenorDe16(dados.dataNascimento)) {
+            const mensagem = validarEmailResponsavel(dados.emailResponsavelLegal);
+            if (mensagem) {
                 setErro({ titulo: 'E-mail inválido', mensagem });
                 return;
             }
         }
         setErrosCampos({});
         avancar();
+    }
+
+    function validarEmailResponsavel(valor) {
+        const email = valor.trim();
+        let mensagem = null;
+        if (email && !isValidEmail(email)) mensagem = 'Informe um e-mail válido.';
+        if (email && email.toLowerCase() === dados.email.trim().toLowerCase()) {
+            mensagem = 'O e-mail do responsável deve ser diferente do seu e-mail de cadastro.';
+        }
+        setErrosCampos((atuais) => ({ ...atuais, emailResponsavelLegal: mensagem }));
+        return mensagem;
+    }
+
+    function alterarEmailResponsavel(emailResponsavelLegal) {
+        alterar({ emailResponsavelLegal });
+        if (errosCampos.emailResponsavelLegal) validarEmailResponsavel(emailResponsavelLegal);
     }
 
     const comum = { aoVoltar: voltar, carregando };
@@ -241,7 +249,8 @@ export default function OnboardingScreen({
         aoAlterar={(dataNascimento) => alterar({ dataNascimento })}
         menorDe16={ehMenorDe16(dados.dataNascimento)}
         emailResponsavelLegal={dados.emailResponsavelLegal}
-        aoAlterarEmailResponsavel={(emailResponsavelLegal) => alterar({ emailResponsavelLegal })}
+        aoAlterarEmailResponsavel={alterarEmailResponsavel}
+        aoValidarEmailResponsavel={() => validarEmailResponsavel(dados.emailResponsavelLegal)}
         erroEmailResponsavel={errosCampos.emailResponsavelLegal}
         aoAvancar={avancarNascimento} />;
     if (etapa === 2) conteudo = <LastMenstruationStep {...comum}

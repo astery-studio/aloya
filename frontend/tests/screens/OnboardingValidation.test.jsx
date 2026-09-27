@@ -141,6 +141,23 @@ test('data de nascimento futura não solicita responsável legal', async () => {
     expect(screen.getByText('Data inválida')).toBeTruthy();
 });
 
+test('valida e-mail do responsável ao sair do campo e durante a correção', async () => {
+    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012015');
+    const emailResponsavel = screen.getByLabelText(
+        'E-mail do responsável legal (opcional)'
+    );
+
+    await fireEvent.changeText(emailResponsavel, 'email-invalido');
+    await fireEvent(emailResponsavel, 'blur');
+    expect(screen.getByText('Informe um e-mail válido.')).toBeTruthy();
+
+    await fireEvent.changeText(emailResponsavel, 'responsavel@email.com');
+    expect(screen.queryByText('Informe um e-mail válido.')).toBeNull();
+});
+
 test('cancelar a saída mantém a etapa e os dados preenchidos', async () => {
     const aoVoltar = jest.fn();
     await render(<OnboardingScreen cadastrar={jest.fn()} aoVoltar={aoVoltar} />);
