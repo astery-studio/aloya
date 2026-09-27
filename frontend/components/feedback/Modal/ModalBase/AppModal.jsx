@@ -1,7 +1,8 @@
 /**
  * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
  */
-import { Modal, Text, View } from 'react-native';
+import { useRef } from 'react';
+import { AccessibilityInfo, findNodeHandle, Modal, Text, View } from 'react-native';
 import { cores } from '../../../../theme';
 import { estilos } from './AppModal.styles';
 
@@ -9,6 +10,8 @@ export default function AppModal({
     variante = 'simples', visivel, aoFechar, icone: Icone,
     corIcone, fundoIcone, titulo, mensagem, destaque, children
 }) {
+    const referenciaTitulo = useRef(null);
+
     if (!['simples', 'alerta', 'acao'].includes(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
@@ -21,12 +24,18 @@ export default function AppModal({
     const acao = variante === 'acao';
     const corDoIcone = corIcone || (acao ? cores.feedback.erro : cores.marca.primaria);
 
+    function focarTitulo() {
+        const identificador = findNodeHandle(referenciaTitulo.current);
+        if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
+    }
+
     return (
         <Modal
             visible={visivel}
             transparent
             animationType="fade"
             onRequestClose={aoFechar}
+            onShow={focarTitulo}
         >
             <View style={estilos.fundo}>
                 <View
@@ -52,7 +61,8 @@ export default function AppModal({
                             </View>
                         )}
                         <View style={estilos.textos}>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
+                            <Text ref={referenciaTitulo} accessible
+                                accessibilityRole="header" style={estilos.titulo}>
                                 {titulo}
                             </Text>
                             {mensagem ? (
