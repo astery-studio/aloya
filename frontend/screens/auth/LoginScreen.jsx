@@ -3,9 +3,9 @@
  */
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { LockKeyIcon as LockKey } from 'phosphor-react-native/src/icons/LockKey';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
+import { LockKeyIcon as LockKey } from '../../components/icons/AppIcons';
 import EmailInput from '../../components/forms/EmailInput';
 import PasswordInput from '../../components/forms/PasswordInput';
 import { useLogin } from '../../features/auth/hooks/useLogin';

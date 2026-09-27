@@ -5,8 +5,8 @@ import {
     KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeftIcon as ArrowLeft } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ArrowLeftIcon as ArrowLeft } from '../../components/icons/AppIcons';
 import { cores } from '../../theme';
 import { estilos } from '../AuthLayout/AuthLayout.styles';
 

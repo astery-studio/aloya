@@ -2,10 +2,10 @@
  * Tela que confirma uma nova senha usando o token de recuperação recebido.
  */
 import { useState } from 'react';
-import { LockKeyIcon as LockKey } from 'phosphor-react-native/src/icons/LockKey';
-import { WarningCircleIcon as WarningCircle } from 'phosphor-react-native/src/icons/WarningCircle';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
+import { LockKeyIcon as LockKey,
+    WarningCircleIcon as WarningCircle } from '../../components/icons/AppIcons';
 import PasswordInput from '../../components/forms/PasswordInput';
 import { useResetPassword } from '../../features/auth/hooks/useResetPassword';
 import AuthLayout from '../../layouts/AuthLayout';
