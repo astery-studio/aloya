@@ -149,3 +149,50 @@ test('confirmar a saída limpa os dados e encerra o fluxo', async () => {
     expect(aoVoltar).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText('Nome').props.value).toBe('');
 });
+
+async function concluirEtapas() {
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
+    for (let etapa = 0; etapa < 4; etapa += 1) {
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    }
+}
+
+test('conflito de e-mail no envio final retorna à etapa da conta', async () => {
+    const falha = Object.assign(new Error('detalhe interno'), {
+        codigo: 'EMAIL_JA_CADASTRADO'
+    });
+    await render(<OnboardingScreen cadastrar={jest.fn().mockRejectedValue(falha)} />);
+    await concluirEtapas();
+
+    expect(await screen.findByText('Este e-mail já está em uso')).toBeTruthy();
+    expect(screen.getByLabelText('Email').props.value).toBe('carla@email.com');
+    expect(screen.getByRole('button', { name: 'Fazer login' })).toBeTruthy();
+    expect(screen.queryByText('detalhe interno')).toBeNull();
+});
+
+test('erro final de campo retorna à etapa indicada pelo backend', async () => {
+    const falha = Object.assign(new Error('erro'), { codigo: 'ERRO_VALIDACAO',
+        detalhes: [{ campo: 'dataNascimento', mensagem: 'Revise a data informada.' }] });
+    await render(<OnboardingScreen cadastrar={jest.fn().mockRejectedValue(falha)} />);
+    await concluirEtapas();
+
+    expect(await screen.findByText('Revise este dado')).toBeTruthy();
+    expect(screen.getByLabelText('Data').props.value).toBe('04/01/2000');
+    expect(screen.getByText('Revise a data informada.')).toBeTruthy();
+});
+
+test('erro inesperado usa mensagem segura', async () => {
+    await render(<OnboardingScreen cadastrar={jest.fn()
+        .mockRejectedValue(new Error('senha do banco exposta'))} />);
+    await concluirEtapas();
+
+    expect(await screen.findByText('Algo deu errado')).toBeTruthy();
+    expect(screen.getByText(
+        'Não foi possível criar sua conta agora. Tente novamente em instantes.'
+    )).toBeTruthy();
+    expect(screen.queryByText('senha do banco exposta')).toBeNull();
+});
