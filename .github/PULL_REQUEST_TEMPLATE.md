@@ -118,3 +118,64 @@ Usuário
 ```
 
 ### Arquivos ou módulos principais
+
+| Área | Arquivo/módulo | Responsabilidade da mudança |
+|---|---|---|
+| | | |
+
+## Contratos e dados
+
+### API
+
+<!-- Informe método, rota, autenticação, request, response e códigos HTTP. Use "Não se aplica" se necessário. -->
+
+| Método e rota | Autenticação | Alteração | Compatibilidade |
+|---|---|---|---|
+| | | | |
+
+<details>
+<summary>Exemplo de requisição/resposta</summary>
+
+```json
+{}
+```
+
+</details>
+
+### Banco de dados
+
+- [ ] Não altera schema nem dados
+- [ ] Altera `schema.prisma`
+- [ ] Inclui migração versionada
+- [ ] Inclui atualização de seed
+- [ ] A migração foi testada em banco limpo
+- [ ] A migração foi testada sobre dados existentes
+- [ ] Há estratégia de rollback ou *forward fix*
+
+**Impacto, compatibilidade e estratégia de implantação:**
+
+<!-- Considere nulabilidade, valores padrão, índices, volume e ordem entre backend e migração. -->
+
+### Configuração e dependências
+
+<!-- Liste novas variáveis de ambiente, pacotes ou mudanças no .env.example. Nunca cole segredos. -->
+
+| Item | Obrigatório? | Valor seguro/padrão | Motivo |
+|---|---|---|---|
+| | | | |
+
+## Segurança, privacidade e linguagem inclusiva
+
+- [ ] Nenhum segredo ou dado real foi incluído em código, logs, fixtures ou screenshots
+- [ ] Entradas são validadas e normalizadas antes do uso
+- [ ] Autenticação e autorização foram verificadas no backend
+- [ ] Respostas e erros não permitem enumeração de contas nem vazam dados
+- [ ] Rate limit, expiração e uso único foram considerados quando aplicável
+- [ ] Senhas/tokens permanecem em armazenamento seguro e não aparecem em logs
+- [ ] O princípio de menor privilégio foi respeitado
+- [ ] Dados de saúde, ciclo, idade e consentimento recebem tratamento mínimo necessário
+- [ ] Textos preservam a comunicação agênero, acolhedora e inclusiva do Aloya
+
+**Riscos identificados e mitigação:**
+
+## Acessibilidade e experiência
