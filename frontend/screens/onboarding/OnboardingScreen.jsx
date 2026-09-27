@@ -23,6 +23,10 @@ const iniciais = {
     duracaoCiclo: 28, duracaoMenstruacao: 5, duracaoLutea: 14
 };
 
+function possuiDadosPreenchidos(dados) {
+    return Object.keys(iniciais).some((campo) => dados[campo] !== iniciais[campo]);
+}
+
 const etapaPorCampo = {
     nome: 0, email: 0, senha: 0,
     dataNascimento: 1, emailResponsavelLegal: 1,
@@ -78,8 +82,12 @@ export default function OnboardingScreen({
         (mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []
     );
     const solicitarSaida = useCallback((destino = aoVoltar) => {
+        if (!possuiDadosPreenchidos(dados)) {
+            destino?.();
+            return;
+        }
         setDestinoSaida(() => destino || (() => {}));
-    }, [aoVoltar]);
+    }, [aoVoltar, dados]);
     const voltar = () => etapa === 0 ? solicitarSaida() : setEtapa(etapa - 1);
     const avancar = () => setEtapa(etapa + 1);
 

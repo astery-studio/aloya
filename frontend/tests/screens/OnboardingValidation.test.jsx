@@ -214,6 +214,16 @@ test('cancelar a saída mantém a etapa e os dados preenchidos', async () => {
     expect(screen.getByLabelText('Nome').props.value).toBe('Carla');
 });
 
+test('sai sem confirmação quando nenhum dado foi preenchido', async () => {
+    const aoVoltar = jest.fn();
+    await render(<OnboardingScreen cadastrar={jest.fn()} aoVoltar={aoVoltar} />);
+
+    await fireEvent.press(screen.getByLabelText('Voltar'));
+
+    expect(aoVoltar).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Sair do cadastro?')).toBeNull();
+});
+
 test('confirmar a saída limpa os dados e encerra o fluxo', async () => {
     const aoVoltar = jest.fn();
     await render(<OnboardingScreen cadastrar={jest.fn()} aoVoltar={aoVoltar} />);
