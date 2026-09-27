@@ -179,3 +179,68 @@ Usuário
 **Riscos identificados e mitigação:**
 
 ## Acessibilidade e experiência
+
+- [ ] Não há mudança visual/interativa
+- [ ] Elementos interativos têm rótulo, papel e estado acessíveis
+- [ ] Ordem e destino do foco foram verificados, inclusive em modal/bottom sheet
+- [ ] Leitor de tela anuncia erros, instruções e mudanças relevantes
+- [ ] Contraste, tamanho de toque e redimensionamento de texto foram considerados
+- [ ] Fluxos de teclado e botão Voltar do Android foram testados
+- [ ] Estados de carregamento, vazio, erro, offline e sucesso foram tratados
+- [ ] A interface foi verificada em tamanhos de tela relevantes
+
+## Guia de testes
+
+### Pré-requisitos
+
+<!-- Informe sistema/plataforma, branch, banco/seed, variáveis e contas fictícias necessárias. -->
+
+1.
+2.
+
+### Teste automatizado — backend
+
+```bash
+cd backend
+npm test
+```
+
+- [ ] Suíte completa do backend aprovada
+- [ ] Foram adicionados/atualizados testes de validator
+- [ ] Foram adicionados/atualizados testes de middleware/rota/controller
+- [ ] Foram adicionados/atualizados testes de service e regras de negócio
+- [ ] Casos de segurança e regressão foram cobertos
+
+### Teste automatizado — frontend
+
+```bash
+cd frontend
+npm test
+npm run test:coverage
+```
+
+- [ ] Suíte completa do frontend aprovada
+- [ ] Cobertura global continua em pelo menos 90% para branches, functions, lines e statements
+- [ ] Componentes/hooks/services alterados possuem testes de comportamento
+- [ ] Estados assíncronos, falhas de API e interações foram cobertos
+
+### Teste manual / exploratório
+
+| ID | Cenário | Preparação e passos | Resultado esperado | Plataforma | Resultado |
+|---|---|---|---|---|---|
+| T01 | Fluxo principal | 1. ... | ... | Android/iOS/Web/API | ✅/❌ |
+| T02 | Entrada inválida | 1. ... | ... | | ✅/❌ |
+| T03 | Falha/indisponibilidade | 1. ... | ... | | ✅/❌ |
+| T04 | Limite/permissão | 1. ... | ... | | ✅/❌ |
+
+### Regressão executada
+
+<!-- Liste fluxos existentes próximos da mudança que foram retestados. -->
+
+- [ ] Cadastro, login e recuperação de senha (se afetados)
+- [ ] Consentimento parental (se afetado)
+- [ ] Navegação e persistência de sessão (se afetadas)
+- [ ] Fluxo do ciclo e onboarding (se afetados)
+- [ ] Erros e operação sem conexão (se afetados)
+
+### Evidências
