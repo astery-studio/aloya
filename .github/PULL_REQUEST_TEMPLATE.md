@@ -244,3 +244,48 @@ npm run test:coverage
 - [ ] Erros e operação sem conexão (se afetados)
 
 ### Evidências
+
+<!-- Anexe logs sanitizados, screenshots ou vídeo. Para UI, prefira antes/depois. -->
+
+| Antes | Depois |
+|---|---|
+| Não se aplica | |
+
+## Qualidade e revisão
+
+- [ ] Revisei meu próprio diff
+- [ ] Mantive responsabilidades separadas e evitei duplicação
+- [ ] Não deixei código morto, logs de depuração ou comentários temporários
+- [ ] Atualizei documentação e exemplos afetados
+- [ ] Tratei erros sem ocultar falhas importantes
+- [ ] Adicionei testes que falham sem a correção/funcionalidade
+- [ ] O lockfile foi atualizado somente quando necessário
+- [ ] A mudança é retrocompatível ou a incompatibilidade está documentada
+
+## Risco, implantação e rollback
+
+**Nível de risco:** baixo / médio / alto
+
+**Justificativa:**
+
+**Ordem de implantação e verificações pós-deploy:**
+
+1.
+2.
+
+**Sinais de problema a observar:**
+
+-
+
+**Plano de rollback ou *forward fix*:**
+
+## Pendências e acompanhamento
+
+<!-- Liste débitos aceitos, tarefas futuras e issues de acompanhamento. -->
+
+- [ ] Nenhuma pendência conhecida
+- [ ] Pendência:
+
+## Nota para revisores
+
+<!-- Aponte trechos sensíveis, decisões sobre as quais deseja opinião e uma ordem de revisão sugerida. -->
