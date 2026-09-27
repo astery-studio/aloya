@@ -118,3 +118,62 @@ Então [tratamento seguro e compreensível]
 - [ ] CA05 — Nenhum log, evento ou resposta expõe dado sensível desnecessário
 
 ## Proposta de experiência
+
+### Jornada
+
+```text
+Entrada
+  -> ação da pessoa
+  -> feedback/carregamento
+  -> sucesso ou recuperação de erro
+  -> próximo passo
+```
+
+### Estados da interface
+
+- [ ] Inicial
+- [ ] Carregando
+- [ ] Vazio
+- [ ] Sucesso
+- [ ] Validação
+- [ ] Erro recuperável
+- [ ] Erro sem recuperação imediata
+- [ ] Offline / conexão instável
+- [ ] Sem permissão / sessão expirada
+
+### Conteúdo e tom
+
+<!-- Informe textos importantes. Evite pressupor gênero, identidade, parceria ou regularidade do ciclo. -->
+
+### Wireframes/protótipos
+
+<!-- Adicione links ou imagens e registre a versão usada. -->
+
+## Acessibilidade
+
+- [ ] Semântica, rótulos, papéis e estados definidos
+- [ ] Ordem do foco e retorno após modal/bottom sheet definidos
+- [ ] Mensagens dinâmicas e erros anunciados
+- [ ] Contraste e escala de texto considerados
+- [ ] Áreas de toque adequadas
+- [ ] A experiência não depende apenas de cor, gesto ou animação
+- [ ] Alternativas para teclado/botão Voltar foram previstas
+
+**Comportamento esperado com tecnologia assistiva:**
+
+## Proposta técnica
+
+<!-- Preenchimento recomendado após refinamento técnico. -->
+
+### Componentes afetados
+
+- [ ] Frontend React Native / Expo
+- [ ] Backend Node.js / Express
+- [ ] API / contrato
+- [ ] Prisma / banco de dados
+- [ ] Armazenamento local / SecureStore
+- [ ] E-mail / serviço externo
+- [ ] Autenticação / autorização
+- [ ] Documentação
+
+### Fluxo entre camadas
