@@ -1,7 +1,8 @@
 /**
  * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
  */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import { CalendarBlankIcon as CalendarBlank,
     WarningCircleIcon as WarningCircle } from '../../components/icons/AppIcons';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
@@ -49,11 +50,36 @@ export default function OnboardingScreen({
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
     const [errosCampos, setErrosCampos] = useState({});
+    const [destinoSaida, setDestinoSaida] = useState(null);
     const alterar = useCallback(
         (mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []
     );
-    const voltar = () => etapa === 0 ? aoVoltar?.() : setEtapa(etapa - 1);
+    const solicitarSaida = useCallback((destino = aoVoltar) => {
+        setDestinoSaida(() => destino || (() => {}));
+    }, [aoVoltar]);
+    const voltar = () => etapa === 0 ? solicitarSaida() : setEtapa(etapa - 1);
     const avancar = () => setEtapa(etapa + 1);
+
+    useEffect(() => {
+        const inscricao = BackHandler.addEventListener(
+            'hardwareBackPress',
+            () => {
+                solicitarSaida();
+                return true;
+            }
+        );
+        return () => inscricao.remove();
+    }, [solicitarSaida]);
+
+    function confirmarSaida() {
+        const destino = destinoSaida;
+        setDados({ ...iniciais });
+        setEtapa(0);
+        setErro(null);
+        setErrosCampos({});
+        setDestinoSaida(null);
+        destino?.();
+    }
 
     async function finalizar(duracaoLutea = dados.duracaoLutea) {
         if (duracaoLutea > (dados.duracaoCiclo || 28)
@@ -169,7 +195,8 @@ export default function OnboardingScreen({
     const comum = { aoVoltar: voltar, carregando };
     let conteudo;
     if (etapa === 0) conteudo = <AccountStep dados={dados} aoAlterar={alterar}
-        aoAvancar={avancarConta} aoVoltar={voltar} aoEntrar={aoEntrar}
+        aoAvancar={avancarConta} aoVoltar={voltar}
+        aoEntrar={() => solicitarSaida(aoEntrar)}
         carregando={carregando} erros={errosCampos} />;
     if (etapa === 1) conteudo = <BirthDateStep {...comum} valor={dados.dataNascimento}
         aoAlterar={(dataNascimento) => alterar({ dataNascimento })}
@@ -195,5 +222,12 @@ export default function OnboardingScreen({
     return <>{conteudo}<SimpleModal visivel={Boolean(erro)}
         icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
         titulo={erro?.titulo} mensagem={erro?.mensagem}
-        acaoPrincipal={{ texto: 'Entendi', aoPressionar: () => setErro(null) }} /></>;
+        acaoPrincipal={{ texto: 'Entendi', aoPressionar: () => setErro(null) }} />
+        <SimpleModal visivel={Boolean(destinoSaida)} aoFechar={() => setDestinoSaida(null)}
+            icone={WarningCircle} titulo="Sair do cadastro?"
+            mensagem="Se você sair agora, os dados preenchidos serão perdidos."
+            acaoPrincipal={{ texto: 'Continuar cadastro',
+                aoPressionar: () => setDestinoSaida(null) }}
+            acaoSecundaria={{ texto: 'Sair e descartar', aoPressionar: confirmarSaida }} />
+    </>;
 }
