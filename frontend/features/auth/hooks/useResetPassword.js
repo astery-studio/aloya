@@ -17,7 +17,8 @@ function useResetPassword({ redefinirSenha, token }) {
             setSucesso(true);
             return resultado;
         } catch (falha) {
-            setErro(falha.mensagemUsuario || falha.message || 'Não foi possível redefinir a senha.');
+            setErro(falha.mensagemUsuario ||
+                'Não foi possível redefinir a senha. Tente novamente.');
             return null;
         } finally {
             setCarregando(false);

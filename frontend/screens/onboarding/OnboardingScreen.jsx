@@ -188,9 +188,9 @@ export default function OnboardingScreen({
             try {
                 const resultado = await verificarEmailDisponivel?.(dados.email);
                 if (resultado && !resultado.disponivel) {
-                    setErrosCampos({ email: 'Este e-mail já está em uso. Tente fazer login.' });
-                    setErro({ titulo: 'E-mail já cadastrado', mensagem:
-                        'Este e-mail já está em uso. Tente fazer login.' });
+                    const mensagem = 'Este e-mail já está em uso. Faça login ou use outro e-mail.';
+                    setErrosCampos({ email: mensagem });
+                    setErro({ titulo: 'Este e-mail já está em uso', mensagem, emailEmUso: true });
                     return;
                 }
                 avancar();

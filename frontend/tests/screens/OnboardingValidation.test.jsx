@@ -49,7 +49,7 @@ test('cadastro não avança quando o e-mail já existe', async () => {
     await fireEvent.press(screen.getByRole('checkbox'));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 
-    expect(await screen.findByText('E-mail já cadastrado')).toBeTruthy();
+    expect(await screen.findByText('Este e-mail já está em uso')).toBeTruthy();
     expect(screen.getByLabelText('Email')).toBeTruthy();
 });
 

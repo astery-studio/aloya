@@ -24,8 +24,8 @@ test('redefine senha válida e informa sucesso', async () => {
 
 test.each([
     [{ mensagemUsuario: 'Mensagem pública' }, 'Mensagem pública'],
-    [new Error('Falha conhecida'), 'Falha conhecida'],
-    [{}, 'Não foi possível redefinir a senha.']
+    [new Error('Falha interna'), 'Não foi possível redefinir a senha. Tente novamente.'],
+    [{}, 'Não foi possível redefinir a senha. Tente novamente.']
 ])('expõe erro seguro e permite limpá-lo', async (falha, mensagem) => {
     const redefinirSenha = jest.fn().mockRejectedValue(falha);
     const { result } = await renderHook(() =>

@@ -27,8 +27,8 @@ function useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao }) {
             return resposta;
         } catch (falha) {
             if (montado.current) {
-                setErro(falha.mensagemUsuario || falha.message ||
-                    'Não foi possível enviar o e-mail.');
+                setErro(falha.mensagemUsuario ||
+                    'Não foi possível enviar o e-mail. Tente novamente.');
             }
             return null;
         } finally {

@@ -45,7 +45,8 @@ export default function ResetPasswordScreen({
             mensagem="Faça login com sua nova senha."
             acaoPrincipal={{ texto: 'Entrar', aoPressionar: aoEntrar }} />
         <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
-            icone={WarningCircle} titulo={erroValidacao ? 'Senhas diferentes' : 'Algo deu errado'}
+            icone={WarningCircle} titulo={erroValidacao
+                ? 'Senhas diferentes' : 'Não foi possível alterar a senha'}
             mensagem={erroValidacao || fluxo.erro}
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;
