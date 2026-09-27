@@ -1,7 +1,8 @@
 /**
  * Testes das validações e transições executadas durante o onboarding.
  */
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { BackHandler } from 'react-native';
 import OnboardingScreen from '../../screens/onboarding/OnboardingScreen';
 
 jest.mock('../../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
@@ -148,6 +149,24 @@ test('confirmar a saída limpa os dados e encerra o fluxo', async () => {
 
     expect(aoVoltar).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText('Nome').props.value).toBe('');
+});
+
+test('voltar pelo sistema solicita confirmação sem mudar de etapa', async () => {
+    let tratarVoltar;
+    jest.spyOn(BackHandler, 'addEventListener').mockImplementation((evento, ouvinte) => {
+        tratarVoltar = ouvinte;
+        return { remove: jest.fn() };
+    });
+    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    await act(() => expect(tratarVoltar()).toBe(true));
+
+    expect(screen.getByText('Sair do cadastro?')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Continuar cadastro' }));
+    expect(screen.getByLabelText('Data')).toBeTruthy();
+    BackHandler.addEventListener.mockRestore();
 });
 
 async function concluirEtapas() {
