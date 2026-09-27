@@ -61,3 +61,62 @@ Baixa: impacto limitado ou cosmético.
 - **Impacto técnico ou operacional:**
 
 ## Ambiente
+
+| Item | Valor |
+|---|---|
+| Versão/commit/branch | |
+| Ambiente | local / desenvolvimento / homologação / produção |
+| Plataforma | Android / iOS / Web / API |
+| Dispositivo ou emulador | |
+| Versão do sistema operacional | |
+| Versão do Expo/Node.js | |
+| Navegador (se aplicável) | |
+| Tipo/versão do banco | |
+| Conexão | Wi-Fi / móvel / offline / instável |
+
+## Pré-condições
+
+<!-- Estado inicial, permissões, sessão, dados fictícios e configurações necessárias. -->
+
+-
+
+## Passos mínimos para reproduzir
+
+<!-- Use uma conta e dados fictícios. Seja preciso o suficiente para outra pessoa repetir. -->
+
+1.
+2.
+3.
+
+## Resultado observado
+
+<!-- Inclua mensagem e código de status exatos quando úteis, sem dados sensíveis. -->
+
+## Resultado esperado
+
+## Taxa de reprodução
+
+<!-- Exemplo: 4 de 5 tentativas. Informe também quando começou a ocorrer. -->
+
+- **Tentativas com falha / total:**
+- **Primeira versão ou data observada:**
+- **Última versão conhecida como funcional:**
+
+## Evidências sanitizadas
+
+<!-- Screenshots, vídeo, stack trace, request ID e logs. Oculte PII, tokens e dados de saúde. -->
+
+<details>
+<summary>Logs / stack trace</summary>
+
+```text
+Cole apenas o trecho relevante e sanitizado.
+```
+
+</details>
+
+<details>
+<summary>Requisição e resposta da API</summary>
+
+```http
+# Método, rota, headers não sensíveis e corpo fictício
