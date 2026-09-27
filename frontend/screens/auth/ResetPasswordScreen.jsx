@@ -18,6 +18,10 @@ export default function ResetPasswordScreen({
     const preenchido = Boolean(fluxo.senha && fluxo.confirmacao);
 
     function enviar() {
+        if (fluxo.senha.length < 8) {
+            setErroValidacao('A senha deve possuir pelo menos 8 caracteres.');
+            return;
+        }
         if (fluxo.senha !== fluxo.confirmacao) {
             setErroValidacao('A confirmação deve ser igual à nova senha.');
             return;
@@ -46,7 +50,8 @@ export default function ResetPasswordScreen({
             acaoPrincipal={{ texto: 'Entrar', aoPressionar: aoEntrar }} />
         <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
             icone={WarningCircle} titulo={erroValidacao
-                ? 'Senhas diferentes' : 'Não foi possível alterar a senha'}
+                ? (erroValidacao.includes('confirmação') ? 'Senhas diferentes' : 'Senha inválida')
+                : 'Não foi possível alterar a senha'}
             mensagem={erroValidacao || fluxo.erro}
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;

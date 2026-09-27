@@ -183,10 +183,6 @@ export default function OnboardingScreen({
             setErrosCampos({ senha: 'A senha deve possuir pelo menos 8 caracteres.' });
             setErro({ titulo: 'Senha inválida', mensagem:
                 'A senha deve possuir pelo menos 8 caracteres.' });
-        } else if (dados.senha.length > 128) {
-            setErrosCampos({ senha: 'A senha deve possuir no máximo 128 caracteres.' });
-            setErro({ titulo: 'Senha inválida', mensagem:
-                'A senha deve possuir no máximo 128 caracteres.' });
         } else if (dados.senha !== dados.confirmacao) {
             setErrosCampos({ confirmacao: 'As senhas não coincidem.' });
             setErro({ titulo: 'Senhas diferentes', mensagem: 'As senhas não coincidem.' });

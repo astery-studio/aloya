@@ -27,6 +27,10 @@ export default function LoginScreen({
             setErroValidacao('Informe um e-mail válido.');
             return;
         }
+        if (senha.length < 8) {
+            setErroValidacao('A senha deve possuir pelo menos 8 caracteres.');
+            return;
+        }
         const resultado = await enviarLogin({ email, senha });
         if (resultado) aoEntrar?.(resultado);
     }
@@ -58,7 +62,9 @@ export default function LoginScreen({
             <Button texto="Entrar" aoPressionar={enviar} desativado={!preenchido} carregando={carregando} />
         </AuthLayout>
         <SimpleModal visivel={Boolean(erro || erroValidacao)} aoFechar={limparAviso} icone={LockKey}
-            titulo={erroValidacao ? 'E-mail inválido' : 'Não foi possível entrar'}
+            titulo={erroValidacao
+                ? (erroValidacao.includes('senha') ? 'Senha inválida' : 'E-mail inválido')
+                : 'Não foi possível entrar'}
             mensagem={erroValidacao || erro}
             acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }} />
     </>;

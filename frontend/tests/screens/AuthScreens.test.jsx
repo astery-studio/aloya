@@ -15,11 +15,22 @@ test('login inicia desativado e envia as credenciais preenchidas', async () => {
     await render(<LoginScreen realizarLogin={realizarLogin} />);
     expect(screen.getByRole('button', { name: 'Entrar' })).toBeDisabled();
     await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
-    await fireEvent.changeText(screen.getByLabelText('Senha'), 'segredo');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), 'segredo1');
     await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
     await waitFor(() => expect(realizarLogin).toHaveBeenCalledWith({
-        email: 'pessoa@email.com', senha: 'segredo'
+        email: 'pessoa@email.com', senha: 'segredo1'
     }));
+});
+
+test('login rejeita senha com menos de oito caracteres', async () => {
+    const realizarLogin = jest.fn();
+    await render(<LoginScreen realizarLogin={realizarLogin} />);
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
+    await fireEvent.changeText(screen.getByLabelText('Senha'), 'curta');
+    await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
+
+    expect(screen.getByText('Senha inválida')).toBeTruthy();
+    expect(realizarLogin).not.toHaveBeenCalled();
 });
 
 test('tentar novamente fecha o erro sem repetir as credenciais', async () => {

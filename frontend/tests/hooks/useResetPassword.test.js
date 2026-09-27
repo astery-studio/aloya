@@ -10,6 +10,19 @@ test('não envia senhas vazias ou diferentes', async () => {
     expect(redefinirSenha).not.toHaveBeenCalled();
 });
 
+test('não envia senha com menos de oito caracteres', async () => {
+    const redefinirSenha = jest.fn();
+    const { result } = await renderHook(() =>
+        useResetPassword({ redefinirSenha, token: 'token' })
+    );
+    await act(() => result.current.setSenha('curta'));
+    await act(() => result.current.setConfirmacao('curta'));
+
+    await expect(result.current.enviar()).resolves.toBeNull();
+    expect(result.current.valido).toBe(false);
+    expect(redefinirSenha).not.toHaveBeenCalled();
+});
+
 test('redefine senha válida e informa sucesso', async () => {
     const redefinirSenha = jest.fn().mockResolvedValue({ mensagem: 'ok' });
     const { result } = await renderHook(() =>
