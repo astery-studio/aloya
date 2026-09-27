@@ -181,3 +181,38 @@ Cole apenas o trecho relevante e sanitizado.
 - [ ] Documentação/contrato foi atualizado, se necessário
 
 ## Guia de verificação da correção
+
+### Preparação
+
+1.
+2.
+
+### Casos a executar
+
+| ID | Cenário | Passos/dados fictícios | Resultado esperado |
+|---|---|---|---|
+| V01 | Regressão principal | | |
+| V02 | Caso limítrofe | | |
+| V03 | Entrada inválida/falha externa | | |
+| V04 | Fluxo relacionado | | |
+
+### Suítes recomendadas
+
+```bash
+# Backend
+cd backend
+npm test
+
+# Frontend (execute a partir da raiz em outro terminal)
+cd frontend
+npm test
+npm run test:coverage
+```
+
+## Risco de correção
+
+<!-- Quais fluxos podem sofrer regressão? Há migração, contrato de API ou versão antiga do app envolvida? -->
+
+## Informações adicionais
+
+<!-- Links relacionados, dependências, duplicatas ou observações. -->
