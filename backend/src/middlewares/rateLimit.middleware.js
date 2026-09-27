@@ -129,9 +129,104 @@ function criarContaLoginRateLimit({
     });
 }
 
+// Limita alterações dos dados da conta por usuário autenticado.
+function criarConfiguracoesContaRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+        keyGenerator: (req) => `usuario:${req.usuario.id}`,
+        handler: (req, res) => {
+            logger.warn({
+                evento: 'limite_alteracoes_configuracoes_conta',
+                usuarioId: req.usuario.id,
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_ALTERACOES_CONTA',
+                    mensagem: 'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
+// Limita tentativas malsucedidas de alteração de senha por usuário autenticado.
+function criarAlteracaoSenhaRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+        skipSuccessfulRequests: true,
+        keyGenerator: (req) => `usuario:${req.usuario.id}`,
+        handler: (req, res) => {
+            logger.warn({
+                evento: 'limite_tentativas_alteracao_senha',
+                usuarioId: req.usuario.id,
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_ALTERACAO_SENHA',
+                    mensagem: 'Muitas tentativas de alteração de senha. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
+// Limita tentativas malsucedidas de confirmação da senha para exclusão.
+function criarExclusaoContaRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
+    return rateLimit({
+        windowMs: janelaMs,
+        limit: limite,
+        standardHeaders: true,
+        legacyHeaders: false,
+        skipSuccessfulRequests: true,
+        keyGenerator: (req) => `usuario:${req.usuario.id}`,
+        handler: (req, res) => {
+            logger.warn({
+                evento: 'limite_tentativas_exclusao_conta',
+                usuarioId: req.usuario.id,
+                metodo: req.method,
+                rota: req.originalUrl
+            });
+            return res.status(429).json({
+                erro: {
+                    codigo: 'LIMITE_EXCLUSAO_CONTA',
+                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                }
+            });
+        }
+    });
+}
+
 export {
     criarCadastroRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit,
-    criarContaLoginRateLimit
+    criarContaLoginRateLimit,
+    criarConfiguracoesContaRateLimit,
+    criarAlteracaoSenhaRateLimit,
+    criarExclusaoContaRateLimit
 };

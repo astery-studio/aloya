@@ -1,5 +1,4 @@
 //Define o formato seguro dos dados de perfil recebidos da API
-
 const diasPorMes = Object.freeze([31,28,31,30,31,30,31,31,30,31,30,31])
 
 function anoEhBissexto(ano) {
@@ -62,6 +61,13 @@ function dataNascimentoEhValida(valor) {
 function criarUserProfile(respostaApi) {
     const dados = respostaApi?.configuracoes
 
+    const consentimentoParentalNecessario =
+        respostaApi?.consentimentoParentalNecessario
+
+    const consentimentoValido =
+        consentimentoParentalNecessario === undefined
+        || typeof consentimentoParentalNecessario === 'boolean'
+
     const dadosValidos =
         dados !== null
         && typeof dados === 'object'
@@ -73,6 +79,7 @@ function criarUserProfile(respostaApi) {
         && (dados.identidadeGenero === null || typeof dados.identidadeGenero === 'string')
         && dataNascimentoEhValida(dados.dataNascimento)
         && typeof dados.atualizadoEm === 'string'
+        && consentimentoValido
 
     if (!dadosValidos) {
         throw new Error(
@@ -86,7 +93,9 @@ function criarUserProfile(respostaApi) {
         email: dados.email,
         identidadeGenero: dados.identidadeGenero,
         dataNascimento: dados.dataNascimento,
-        atualizadoEm: dados.atualizadoEm
+        atualizadoEm: dados.atualizadoEm,
+        consentimentoParentalNecessario:
+            consentimentoParentalNecessario === true
     })
 }
 

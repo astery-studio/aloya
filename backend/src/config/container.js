@@ -12,6 +12,9 @@ import * as dateUtils from '../utils/date.utils.js';
 import {
     criarCadastroRateLimit,
     criarContaLoginRateLimit,
+    criarConfiguracoesContaRateLimit,
+    criarAlteracaoSenhaRateLimit,
+    criarExclusaoContaRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit
 } from '../middlewares/rateLimit.middleware.js';
@@ -35,10 +38,15 @@ import {
 import {
     criarAuthService
 } from '../services/auth.service.js';
+import { criarAccountService } from '../services/account.service.js';
+import { criarAccountDeletionService } from '../services/accountDeletion.service.js';
+import { criarLogoutService } from '../services/logout.service.js';
 
 import {
     criarAuthValidator
 } from '../validators/auth.validator.js';
+import { criarAccountValidator } from '../validators/account.validator.js';
+import { criarAccountDeletionValidator } from '../validators/accountDeletion.validator.js';
 
 import {
     criarParentalConsentValidator
@@ -47,6 +55,9 @@ import {
 import {
     criarAuthController
 } from '../controllers/auth.controller.js';
+import { criarAccountController } from '../controllers/account.controller.js';
+import { criarAccountDeletionController } from '../controllers/accountDeletion.controller.js';
+import { criarLogoutController } from '../controllers/logout.controller.js';
 import { criarPasswordRecoveryService } from '../services/passwordRecovery.service.js';
 import { criarPasswordRecoveryValidator } from '../validators/passwordRecovery.validator.js';
 import { criarPasswordRecoveryController } from '../controllers/passwordRecovery.controller.js';
@@ -58,6 +69,8 @@ import {
 import {
     criarParentalConsentMiddleware
 } from '../middlewares/parentalConsent.middleware.js';
+import { criarContraceptiveService } from '../features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveController } from '../features/contraceptives/contraceptive.controller.js';
 
 function criarContainer() {
     const transporter = nodemailer.createTransport({
@@ -124,12 +137,36 @@ function criarContainer() {
         dateUtils
     });
 
+    const accountService = criarAccountService({
+        prisma,
+        passwordService,
+        parentalConsentService,
+        dateUtils
+    });
+
+    const accountDeletionService = criarAccountDeletionService({
+        prisma,
+        passwordService
+    });
+
+    const logoutService = criarLogoutService({
+        prisma
+    });
+
+    const contraceptiveService = criarContraceptiveService(prisma);
+
     const authValidator = criarAuthValidator({
         dateUtils
     });
 
     const parentalConsentValidator =
         criarParentalConsentValidator();
+
+    const accountValidator = criarAccountValidator({
+        dateUtils
+    });
+
+    const accountDeletionValidator = criarAccountDeletionValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -165,6 +202,24 @@ function criarContainer() {
         limite: env.emailRateLimitMaximo
     });
 
+    const configuracoesContaRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo
+    });
+
+    const alteracaoSenhaRateLimit = criarAlteracaoSenhaRateLimit({
+        rateLimit,
+        janelaMs: env.alteracaoSenhaRateLimitJanelaMs,
+        limite: env.alteracaoSenhaRateLimitMaximo
+    });
+
+    const exclusaoContaRateLimit = criarExclusaoContaRateLimit({
+        rateLimit,
+        janelaMs: env.exclusaoContaRateLimitJanelaMs,
+        limite: env.exclusaoContaRateLimitMaximo
+    });
+
     const authController = criarAuthController({
         authService,
         authValidator,
@@ -172,14 +227,39 @@ function criarContainer() {
         parentalConsentValidator
     });
 
+    const accountController = criarAccountController({
+        accountService,
+        accountValidator
+    });
+
+    const accountDeletionController = criarAccountDeletionController({
+        accountDeletionService,
+        accountDeletionValidator
+    });
+
+    const logoutController = criarLogoutController({
+        logoutService
+    });
+
+    const contraceptiveController = criarContraceptiveController(
+        contraceptiveService
+    );
+
     return {
         authController,
+        accountController,
+        accountDeletionController,
+        logoutController,
+        contraceptiveController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
         emailRateLimit,
         loginRateLimit,
         contaLoginRateLimit,
+        configuracoesContaRateLimit,
+        alteracaoSenhaRateLimit,
+        exclusaoContaRateLimit,
         passwordRecoveryController
     };
 }

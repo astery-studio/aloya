@@ -11,7 +11,9 @@ const rotas = Object.freeze({
     onboarding: 'OnboardingScreen',
     configuracoes: 'SettingsScreen',
     perfil: 'ProfileSettingsScreen',
-    alterarSenha: 'ChangePasswordScreen'
+    alterarSenha: 'ChangePasswordScreen',
+    anticoncepcionais: 'ContraceptivesScreen',
+    novoAnticoncepcional: 'NewContraceptiveScreen'
 })
 
 export { rotas }

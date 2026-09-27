@@ -38,7 +38,8 @@ describe('criarUserProfile', () => {
             identidadeGenero: 'MULHER_CIS',
             dataNascimento: '2000-02-29',
             atualizadoEm:
-                '2026-09-22T20:00:00.000Z'
+                '2026-09-22T20:00:00.000Z',
+            consentimentoParentalNecessario: false
         })
 
         expect(perfil).not.toHaveProperty(

@@ -1,6 +1,3 @@
-/**
- * Middleware que valida a sessão enviada no cabeçalho e disponibiliza o usuário autenticado.
- */
 function criarAuthMiddleware({
     tokenService,
     prisma
@@ -61,6 +58,8 @@ function criarAuthMiddleware({
                 },
 
                 select: {
+                    id: true,
+
                     usuario: {
                         select: {
                             id: true,
@@ -89,7 +88,8 @@ function criarAuthMiddleware({
             // Disponibiliza somente dados necessários para os próximos controllers e middlewares.
             req.usuario = {
                 id: sessao.usuario.id,
-                papel: sessao.usuario.papel
+                papel: sessao.usuario.papel,
+                sessaoId: sessao.id
             };
 
             return next();
@@ -113,6 +113,4 @@ function criarAuthMiddleware({
     };
 }
 
-export {
-    criarAuthMiddleware
-};
+export { criarAuthMiddleware }

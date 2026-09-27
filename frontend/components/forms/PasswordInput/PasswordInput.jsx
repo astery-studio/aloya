@@ -4,6 +4,8 @@
 import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { EyeIcon as Eye, EyeSlashIcon as EyeSlash } from '../../icons/AppIcons';
+
+const IconeVazio = () => null;
 import { cores } from '../../../theme';
 import TextInput from '../TextInput/TextInput';
 import { estilos } from '../TextInput/TextInput.styles';
@@ -13,7 +15,7 @@ function PasswordInput({
     label = 'Senha', placeholder = label, desativado = false, ...props
 }) {
     const [visivel, definirVisivel] = useState(false);
-    const Icone = visivel ? Eye : EyeSlash;
+    const Icone = (visivel ? Eye : EyeSlash) || IconeVazio;
 
     return (
         <TextInput

@@ -2,9 +2,21 @@
  * Cliente HTTP que serializa requisições e normaliza erros retornados pela API.
  */
 function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
-    async function requisicao({ caminho, metodo = 'GET', corpo, token }) {
+    async function requisicao({ caminho, metodo = 'GET', corpo, token, signal: sinalExterno }) {
         const controle = new AbortController();
-        const temporizador = setTimeout(() => controle.abort(), timeoutMs);
+        let tempoEsgotado = false;
+        const cancelarPeloChamador = () => controle.abort();
+
+        if (sinalExterno?.aborted) {
+            controle.abort();
+        } else {
+            sinalExterno?.addEventListener?.('abort', cancelarPeloChamador, { once: true });
+        }
+
+        const temporizador = setTimeout(() => {
+            tempoEsgotado = true;
+            controle.abort();
+        }, timeoutMs);
         let resposta;
         try {
             resposta = await fetchImpl(`${baseUrl}${caminho}`, {
@@ -18,6 +30,10 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
                 ...(corpo === undefined ? {} : { body: JSON.stringify(corpo) })
             });
         } catch (falha) {
+            if (falha.name === 'AbortError' && sinalExterno?.aborted && !tempoEsgotado) {
+                throw falha;
+            }
+
             const erro = new Error(falha.name === 'AbortError'
                 ? 'A API não respondeu dentro do tempo esperado.'
                 : 'Não foi possível conectar ao servidor.');
@@ -25,6 +41,7 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
             throw erro;
         } finally {
             clearTimeout(temporizador);
+            sinalExterno?.removeEventListener?.('abort', cancelarPeloChamador);
         }
         const dados = resposta.status === 204 ? null : await resposta.json();
         if (!resposta.ok) {
