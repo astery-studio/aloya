@@ -15,6 +15,10 @@ test('modal simples mostra ícone, título e mensagem', async () => {
     expect(screen.getByText('ícone 22 #C85A44')).toBeTruthy();
     expect(screen.getByRole('header', { name: 'Sucesso' })).toBeTruthy();
     expect(screen.getByText('Tudo certo')).toBeTruthy();
+    expect(screen.getByTestId('app-modal-scroll').props).toMatchObject({
+        bounces: false,
+        keyboardShouldPersistTaps: 'handled'
+    });
 });
 
 test('variante alerta usa o cabeçalho vermelho criado pela base', async () => {

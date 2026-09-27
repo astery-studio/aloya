@@ -7,10 +7,15 @@ import { cores, fontFamilies, radius, shadows } from '../../../../theme';
 const estilos = StyleSheet.create({
     fundo: {
         flex: 1,
+        backgroundColor: 'rgba(34, 34, 34, 0.45)'
+    },
+    flexivel: { flex: 1 },
+    rolagem: {
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 16,
-        backgroundColor: 'rgba(34, 34, 34, 0.45)'
+        paddingVertical: 16
     },
     caixa: {
         width: '100%',

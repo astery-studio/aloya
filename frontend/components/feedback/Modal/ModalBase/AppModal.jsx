@@ -2,7 +2,11 @@
  * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
  */
 import { useRef } from 'react';
-import { AccessibilityInfo, findNodeHandle, Modal, Text, View } from 'react-native';
+import {
+    AccessibilityInfo, findNodeHandle, KeyboardAvoidingView, Modal,
+    Platform, ScrollView, Text, View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { cores } from '../../../../theme';
 import { estilos } from './AppModal.styles';
 
@@ -37,7 +41,12 @@ export default function AppModal({
             onRequestClose={aoFechar}
             onShow={focarTitulo}
         >
-            <View style={estilos.fundo}>
+            <SafeAreaView style={estilos.fundo}>
+                <KeyboardAvoidingView style={estilos.flexivel}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScrollView testID="app-modal-scroll"
+                    bounces={false} keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={estilos.rolagem}>
                 <View
                     accessibilityViewIsModal
                     style={[estilos.caixa, alerta ? estilos.caixaAlerta :
@@ -79,7 +88,9 @@ export default function AppModal({
                         ) : null}
                     </View>
                 </View>
-            </View>
+                </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
         </Modal>
     );
 }
