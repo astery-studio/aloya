@@ -177,3 +177,64 @@ Entrada
 - [ ] Documentação
 
 ### Fluxo entre camadas
+
+```text
+Screen -> Component/Hook -> Frontend Service -> HTTP
+HTTP -> Route -> Middleware -> Controller -> Service -> Prisma -> Database
+```
+
+### API proposta
+
+| Método | Rota | Autenticação | Request | Response | Erros esperados |
+|---|---|---|---|---|---|
+| | | | | | |
+
+<details>
+<summary>Contrato de exemplo</summary>
+
+```json
+{}
+```
+
+</details>
+
+### Modelo de dados e migração
+
+<!-- Entidades, relações, nulabilidade, restrições, índices, retenção e exclusão. -->
+
+- **Mudança no schema:**
+- **Migração de dados existentes:**
+- **Compatibilidade com versões antigas do app:**
+- **Rollback ou forward fix:**
+
+### Regras de negócio e validação
+
+| Regra | Camada responsável | Resposta ao descumprimento |
+|---|---|---|
+| | | |
+
+### Alternativas técnicas consideradas
+
+| Alternativa | Vantagens | Desvantagens | Decisão |
+|---|---|---|---|
+| | | | |
+
+## Segurança, privacidade e consentimento
+
+- [ ] Coleta somente os dados necessários
+- [ ] Define finalidade, retenção, atualização e exclusão
+- [ ] Aplica autorização no backend, não apenas na interface
+- [ ] Considera dados de saúde como sensíveis
+- [ ] Considera idade e consentimento parental quando aplicável
+- [ ] Evita enumeração de contas e mensagens reveladoras
+- [ ] Considera rate limit, abuso, replay e expiração
+- [ ] Mantém segredos e tokens fora de logs e armazenamento inseguro
+- [ ] Usa dados sintéticos em testes e demonstrações
+
+### Ameaças e mitigações
+
+| Ameaça/caso de abuso | Probabilidade | Impacto | Mitigação |
+|---|---|---|---|
+| | baixa/média/alta | baixo/médio/alto | |
+
+## Dependências, riscos e dúvidas
