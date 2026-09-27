@@ -127,6 +127,20 @@ test('voltar e avançar na mesma tentativa preserva os dados', async () => {
     expect(screen.getByLabelText('Data').props.value).toBe('04/01/2000');
 });
 
+test('data de nascimento futura não solicita responsável legal', async () => {
+    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    await fireEvent.changeText(screen.getByLabelText('Data'), '02022028');
+
+    expect(screen.queryByLabelText(
+        'E-mail do responsável legal (opcional)'
+    )).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByText('Data inválida')).toBeTruthy();
+});
+
 test('cancelar a saída mantém a etapa e os dados preenchidos', async () => {
     const aoVoltar = jest.fn();
     await render(<OnboardingScreen cadastrar={jest.fn()} aoVoltar={aoVoltar} />);

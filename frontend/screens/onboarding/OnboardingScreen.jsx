@@ -50,6 +50,8 @@ function paraIso(data) {
 function ehMenorDe16(dataTexto, hoje = new Date()) {
     if (!isValidDate(dataTexto)) return false;
     const [dia, mes, ano] = dataTexto.split('/').map(Number);
+    const nascimento = new Date(ano, mes - 1, dia);
+    if (nascimento > hoje) return false;
     let idade = hoje.getFullYear() - ano;
     const aniversarioAindaNaoChegou =
         hoje.getMonth() + 1 < mes ||
