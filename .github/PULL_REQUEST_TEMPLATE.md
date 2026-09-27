@@ -57,3 +57,64 @@ a necessidade. Para Issue relacionada, o link acima pode ser suficiente.
 - [ ] `build` / `ci`: dependências, build ou automação
 - [ ] `chore`: manutenção
 - [ ] Mudança incompatível (*breaking change*)
+
+## Áreas afetadas
+
+- [ ] Frontend (React Native / Expo)
+- [ ] Backend (Node.js / Express)
+- [ ] API / contrato HTTP
+- [ ] Banco de dados / Prisma / migração
+- [ ] Autenticação / autorização / consentimento parental
+- [ ] E-mail / comunicação externa
+- [ ] Armazenamento local / SecureStore
+- [ ] UI / design system
+- [ ] Acessibilidade
+- [ ] Documentação
+- [ ] Dependências / configuração / ambiente
+
+## Contexto e motivação
+
+### Problema anterior
+
+<!-- Como o sistema se comportava? Quem era afetado? Inclua evidências sem expor dados sensíveis. -->
+
+### Solução adotada
+
+<!-- Descreva as decisões técnicas e o fluxo principal. -->
+
+### Alternativas consideradas
+
+<!-- Registre alternativas descartadas e o motivo. -->
+
+## Escopo
+
+### Incluído
+
+-
+
+### Fora do escopo
+
+-
+
+## Detalhes da implementação
+
+<!--
+Explique apenas o necessário para orientar a revisão. Quando aplicável, descreva:
+- Frontend: screens, components, hooks, services, estados e navegação;
+- Backend: route -> middleware -> controller -> service -> Prisma;
+- dados: modelos, índices, restrições, seed e migração;
+- integrações: contratos, timeouts, repetição e tratamento de falhas.
+-->
+
+### Fluxo alterado
+
+```text
+Usuário
+  -> Tela / componente
+  -> Serviço do frontend
+  -> API
+  -> Rota / middleware / controller / service
+  -> Prisma / banco
+```
+
+### Arquivos ou módulos principais
