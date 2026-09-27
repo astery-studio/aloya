@@ -27,6 +27,10 @@ test('permite omitir descrição e rodapé', async () => {
     expect(screen.getByTestId('auth-layout')).toBeTruthy();
     expect(screen.queryByText('Acesse sua conta')).toBeNull();
     expect(screen.getByText('E-mail')).toBeTruthy();
+    expect(screen.getByTestId('auth-layout-scroll').props).toMatchObject({
+        keyboardShouldPersistTaps: 'handled',
+        showsVerticalScrollIndicator: false
+    });
 });
 
 test('exibe e aciona o retorno quando solicitado', async () => {

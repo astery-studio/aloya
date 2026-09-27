@@ -21,11 +21,15 @@ export default function AuthLayout({
             locations={posicoesFundo} style={estilos.tela}>
         <SafeAreaView style={estilos.flexivel} testID={testeId}>
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                testID={`${testeId}-keyboard`}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={estilos.flexivel}
             >
                 <ScrollView
+                    testID={`${testeId}-scroll`}
+                    keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                     keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
                     contentContainerStyle={estilos.rolagem}
                 >
                     {aoVoltar ? (
