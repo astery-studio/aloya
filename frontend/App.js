@@ -3,7 +3,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import {
-    ActivityIndicator, Linking, NativeModules, Text, View
+    ActivityIndicator, BackHandler, Linking, NativeModules, Text, View
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -14,6 +14,7 @@ import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
 import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold';
 import Button from './components/common/Button/Button';
 import { criarAuthService } from './features/auth/services/authService';
+import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
 import ForgotPasswordScreen from './screens/auth/ForgotPasswordScreen';
 import LoginScreen from './screens/auth/LoginScreen';
 import ResetPasswordScreen from './screens/auth/ResetPasswordScreen';
@@ -65,6 +66,16 @@ export default function App() {
         const inscricao = Linking.addEventListener('url', abrirLink);
         return () => inscricao.remove();
     }, []);
+
+    useEffect(() => {
+        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
+            const destino = obterDestinoDeRetorno(tela);
+            if (!destino) return false;
+            setTela(destino);
+            return true;
+        });
+        return () => inscricao.remove();
+    }, [tela]);
 
     if (erroFontes) {
         return (
