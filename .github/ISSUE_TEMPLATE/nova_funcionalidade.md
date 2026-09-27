@@ -299,3 +299,35 @@ npm run test:coverage
 - [ ] Fixtures usam somente dados sintéticos
 
 ### Roteiro de aceite manual
+
+1. Preparar:
+2. Executar:
+3. Verificar:
+4. Repetir em:
+
+## Entrega, observabilidade e rollback
+
+- **Estratégia de liberação:** única / gradual / feature flag
+- **Ordem entre banco, backend e frontend:**
+- **Compatibilidade durante a transição:**
+- **Métricas técnicas de saúde:**
+- **Logs/eventos permitidos (sem PII):**
+- **Condição para interromper/reverter:**
+- **Plano de rollback/forward fix:**
+
+## Definição de pronto
+
+- [ ] Critérios de aceite atendidos
+- [ ] Revisão de produto/UX concluída quando aplicável
+- [ ] Testes automatizados e manuais aprovados
+- [ ] Cobertura mínima preservada
+- [ ] Segurança, privacidade, consentimento e acessibilidade revisados
+- [ ] Migrações validadas em banco limpo e com dados existentes
+- [ ] Documentação, contrato de API e `.env.example` atualizados
+- [ ] Evidências anexadas ao PR
+- [ ] Plano de implantação e rollback documentado
+- [ ] Issues de acompanhamento abertas para itens fora do escopo
+
+## Referências
+
+<!-- Issues, decisões, documentação, pesquisas ou protótipos relacionados. -->
