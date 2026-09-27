@@ -238,3 +238,64 @@ HTTP -> Route -> Middleware -> Controller -> Service -> Prisma -> Database
 | | baixa/média/alta | baixo/médio/alto | |
 
 ## Dependências, riscos e dúvidas
+
+### Dependências
+
+-
+
+### Riscos
+
+| Risco | Probabilidade | Impacto | Mitigação/responsável |
+|---|---|---|---|
+| | | | |
+
+### Perguntas em aberto
+
+- [ ]
+
+## Estratégia de testes
+
+### Pirâmide de testes planejada
+
+- **Unitários:** validators, utils, hooks e regras de negócio isoladas
+- **Integração:** rotas/controllers/services, persistência e serviços do frontend
+- **Componentes:** renderização, interação, estados e acessibilidade
+- **Fluxo manual:** jornada completa entre app, API e banco
+- **Segurança:** autenticação, autorização, limites, entradas maliciosas e vazamento
+- **Regressão:** fluxos existentes que compartilham módulos ou dados
+
+### Matriz de cenários
+
+| ID | Tipo | Cenário/dados | Resultado esperado | Camada |
+|---|---|---|---|---|
+| T01 | Caminho feliz | | | unitário/integração/manual |
+| T02 | Limite mínimo/máximo | | | |
+| T03 | Entrada ausente/inválida | | | |
+| T04 | Sem autenticação/autorização | | | |
+| T05 | Falha de rede/serviço | | | |
+| T06 | Concorrência/repetição | | | |
+| T07 | Acessibilidade | | | |
+| T08 | Versão antiga/compatibilidade | | | |
+
+### Comandos de validação
+
+```bash
+# Backend
+cd backend
+npm test
+
+# Frontend (execute a partir da raiz em outro terminal)
+cd frontend
+npm test
+npm run test:coverage
+```
+
+### Cobertura mínima
+
+- [ ] Frontend mantém no mínimo 90% em branches, functions, lines e statements
+- [ ] Toda regra nova possui teste positivo, negativo e de limite
+- [ ] Toda correção descoberta durante a entrega recebe teste de regressão
+- [ ] Casos com data/fuso usam relógio controlado e limites de calendário
+- [ ] Fixtures usam somente dados sintéticos
+
+### Roteiro de aceite manual
