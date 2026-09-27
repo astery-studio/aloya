@@ -2,8 +2,7 @@
  * Campo controlado que mascara horários e oferece remoção opcional.
  */
 import { Pressable, TextInput, View } from 'react-native';
-import { ClockIcon as Clock } from 'phosphor-react-native/src/icons/Clock';
-import { TrashIcon as Trash } from 'phosphor-react-native/src/icons/Trash';
+import { ClockIcon as Clock, TrashIcon as Trash } from '../../icons/AppIcons';
 import { cores } from '../../../theme';
 import { formatTime } from '../../../utils/formatting/formatTime';
 import { estilos } from '../TimeInput/TimeInput.styles';
