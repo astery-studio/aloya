@@ -120,3 +120,64 @@ Cole apenas o trecho relevante e sanitizado.
 
 ```http
 # Método, rota, headers não sensíveis e corpo fictício
+```
+
+```json
+{}
+```
+
+</details>
+
+## Investigação inicial
+
+<!-- Opcional: hipótese, módulo suspeito, commit provável ou análise já realizada. Diferencie fatos de hipóteses. -->
+
+### Linha do tempo
+
+| Data/hora e fuso | Evento/observação |
+|---|---|
+| | |
+
+### Possível causa
+
+### Arquivos/módulos relacionados
+
+-
+
+## Dados, segurança e privacidade
+
+- [ ] Não há indício de exposição ou perda de dados
+- [ ] Pode envolver dados pessoais ou de saúde
+- [ ] Pode permitir acesso sem autorização
+- [ ] Pode expor existência de conta, token ou segredo
+- [ ] Pode afetar consentimento parental ou pessoa menor de idade
+- [ ] Pode permitir abuso, repetição excessiva ou ausência de rate limit
+
+**Detalhes seguros para triagem:**
+
+<!-- Se houver risco ativo, não publique detalhes exploráveis; informe apenas impacto e condições gerais. -->
+
+## Acessibilidade
+
+- [ ] Não se aplica
+- [ ] Leitor de tela
+- [ ] Ordem/retorno de foco
+- [ ] Rótulo, papel ou estado acessível
+- [ ] Contraste / percepção visual
+- [ ] Redimensionamento de texto
+- [ ] Área de toque / mobilidade
+- [ ] Teclado / botão Voltar
+
+**Tecnologia assistiva e comportamento:**
+
+## Critérios para considerar resolvido
+
+- [ ] A causa raiz foi identificada ou documentada
+- [ ] O cenário mínimo acima não apresenta mais a falha
+- [ ] Foi criado teste automatizado de regressão
+- [ ] Casos limítrofes e entradas inválidas foram verificados
+- [ ] Fluxos relacionados continuam funcionando
+- [ ] Logs e respostas não expõem dados sensíveis
+- [ ] Documentação/contrato foi atualizado, se necessário
+
+## Guia de verificação da correção
