@@ -20,6 +20,7 @@ function useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao }) {
     const executar = useCallback(async (acao) => {
         setCarregando(true);
         setErro(null);
+        setResultado(null);
 
         try {
             const resposta = await acao({ email: email.trim().toLowerCase() });

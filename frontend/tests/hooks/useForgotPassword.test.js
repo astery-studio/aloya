@@ -36,6 +36,22 @@ test('reenvia pelo serviço específico sem expor falhas internas', async () => 
     expect(result.current.carregando).toBe(false);
 });
 
+test('remove o sucesso anterior quando o reenvio falha', async () => {
+    const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
+    const reenviarRecuperacao = jest.fn().mockRejectedValue(new Error('falha'));
+    const { result } = await renderHook(() =>
+        useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao })
+    );
+
+    await act(() => result.current.setEmail('pessoa@email.com'));
+    await act(async () => result.current.enviar());
+    expect(result.current.resultado).toBeTruthy();
+
+    await act(async () => result.current.reenviar());
+    expect(result.current.resultado).toBeNull();
+    expect(result.current.erro).toBeTruthy();
+});
+
 test('reenvia pelo serviço original quando não há serviço específico', async () => {
     const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
     const { result } = await renderHook(() =>
