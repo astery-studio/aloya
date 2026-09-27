@@ -72,10 +72,6 @@ function criarPasswordRecoveryValidator() {
             erros.push(
                 erro('senha', 'A senha deve possuir pelo menos 8 caracteres.')
             );
-        } else if (senha.length > 128) {
-            erros.push(
-                erro('senha', 'A senha deve possuir no máximo 128 caracteres.')
-            );
         }
 
         return {
