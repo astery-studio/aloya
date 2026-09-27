@@ -23,6 +23,22 @@ const iniciais = {
     duracaoCiclo: 28, duracaoMenstruacao: 5, duracaoLutea: 14
 };
 
+const etapaPorCampo = {
+    nome: 0, email: 0, senha: 0,
+    dataNascimento: 1, emailResponsavelLegal: 1,
+    dataInicioUltimaMenstruacao: 2, dataFimUltimaMenstruacao: 2,
+    duracaoCicloInformada: 3, duracaoMenstruacaoInformada: 4,
+    duracaoLuteaInformada: 5
+};
+
+const campoNaTela = {
+    dataInicioUltimaMenstruacao: 'ultimaMenstruacao',
+    dataFimUltimaMenstruacao: 'ultimaMenstruacao',
+    duracaoCicloInformada: 'duracaoCiclo',
+    duracaoMenstruacaoInformada: 'duracaoMenstruacao',
+    duracaoLuteaInformada: 'duracaoLutea'
+};
+
 function paraIso(data) {
     if (!data) return null;
     if (data instanceof Date) return data.toISOString().slice(0, 10);
@@ -81,6 +97,28 @@ export default function OnboardingScreen({
         destino?.();
     }
 
+    function tratarFalhaCadastro(falha) {
+        if (falha.codigo === 'EMAIL_JA_CADASTRADO') {
+            const mensagem = 'Este e-mail já está em uso. Faça login ou use outro e-mail.';
+            setEtapa(0);
+            setErrosCampos({ email: mensagem });
+            setErro({ titulo: 'Este e-mail já está em uso', mensagem, emailEmUso: true });
+            return;
+        }
+        const detalhe = falha.codigo === 'ERRO_VALIDACAO'
+            ? falha.detalhes?.find(({ campo }) => etapaPorCampo[campo] !== undefined)
+            : null;
+        if (detalhe) {
+            const campo = campoNaTela[detalhe.campo] || detalhe.campo;
+            setEtapa(etapaPorCampo[detalhe.campo]);
+            setErrosCampos({ [campo]: detalhe.mensagem });
+            setErro({ titulo: 'Revise este dado', mensagem: detalhe.mensagem });
+            return;
+        }
+        setErro({ titulo: 'Algo deu errado', mensagem:
+            'Não foi possível criar sua conta agora. Tente novamente em instantes.' });
+    }
+
     async function finalizar(duracaoLutea = dados.duracaoLutea) {
         if (duracaoLutea > (dados.duracaoCiclo || 28)
             - (dados.duracaoMenstruacao || 5) - 2) {
@@ -106,8 +144,7 @@ export default function OnboardingScreen({
             await salvarToken(resultado.autenticacao);
             setEtapa(6);
         } catch (falha) {
-            setErro({ titulo: 'Algo deu errado', mensagem:
-                falha.mensagemUsuario || falha.message || 'Ocorreu um erro ao criar sua conta.' });
+            tratarFalhaCadastro(falha);
         } finally {
             setCarregando(false);
         }
@@ -219,10 +256,20 @@ export default function OnboardingScreen({
         aoPular={() => { alterar({ duracaoLutea: null }); finalizar(null); }} />;
     if (etapa === 6) conteudo = <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />;
 
+    const irParaLogin = () => {
+        setDados({ ...iniciais });
+        setErro(null);
+        aoEntrar?.();
+    };
+
     return <>{conteudo}<SimpleModal visivel={Boolean(erro)}
         icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
         titulo={erro?.titulo} mensagem={erro?.mensagem}
-        acaoPrincipal={{ texto: 'Entendi', aoPressionar: () => setErro(null) }} />
+        acaoPrincipal={erro?.emailEmUso
+            ? { texto: 'Fazer login', aoPressionar: irParaLogin }
+            : { texto: 'Entendi', aoPressionar: () => setErro(null) }}
+        acaoSecundaria={erro?.emailEmUso
+            ? { texto: 'Voltar', aoPressionar: () => setErro(null) } : undefined} />
         <SimpleModal visivel={Boolean(destinoSaida)} aoFechar={() => setDestinoSaida(null)}
             icone={WarningCircle} titulo="Sair do cadastro?"
             mensagem="Se você sair agora, os dados preenchidos serão perdidos."
