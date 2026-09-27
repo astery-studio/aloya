@@ -39,6 +39,11 @@ test('horário formata quatro dígitos como HH:MM', async () => {
     expect(aoMudar).toHaveBeenCalledWith('20:30');
 });
 
+test('toda a área do horário pode direcionar o foco', async () => {
+    await render(<TimeInput valor="" onChangeText={jest.fn()} />);
+    expect(() => fireEvent.press(screen.getByTestId('area-campo-horario'))).not.toThrow();
+});
+
 test('horário removível chama a ação de remoção', async () => {
     const aoRemover = jest.fn();
     await render(<TimeInput valor="08:00" podeRemover aoRemover={aoRemover} />);

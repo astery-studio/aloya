@@ -1,8 +1,8 @@
 /**
  * Campo textual controlado que concentra variantes, sanitização e ação lateral.
  */
-import { memo } from 'react';
-import { Text, TextInput as EntradaNativa, View } from 'react-native';
+import { memo, useRef } from 'react';
+import { Pressable, Text, TextInput as EntradaNativa, View } from 'react-native';
 import { cores } from '../../../theme';
 import { estilos } from './TextInput.styles';
 
@@ -12,8 +12,9 @@ const manterTexto = (texto) => texto;
 function TextInput({
     label, placeholder, value, onChangeText, variante = 'padrao',
     desativado = false, acaoDireita, estilo, erro, sanitizar = manterTexto,
-    ...outrasProps
+    testeId = 'area-campo-texto', ...outrasProps
 }) {
+    const entradaRef = useRef(null);
     const preenchido = Boolean(value);
     const rotuloExterno = variante === 'categoria' && label;
     const rotuloInterno = variante === 'padrao' && preenchido && label;
@@ -24,7 +25,9 @@ function TextInput({
     return (
         <View style={[estilos.grupoCampo, rotuloExterno && estilos.grupo]}>
             {rotuloExterno && <Text style={estilos.rotuloExterno}>{label}</Text>}
-            <View style={[
+            <Pressable accessible={false} testID={testeId}
+                disabled={desativado} onPress={() => entradaRef.current?.focus()}
+                style={[
                 estilos.container,
                 preenchido && variante === 'padrao' && estilos.preenchido,
                 variante === 'categoria' && estilos.categoria,
@@ -36,6 +39,7 @@ function TextInput({
                 <View style={estilos.conteudo}>
                     {rotuloInterno && <Text style={estilos.rotuloFlutuante}>{label}</Text>}
                     <EntradaNativa
+                        ref={entradaRef}
                         accessibilityLabel={label || placeholder}
                         editable={!desativado}
                         placeholder={rotuloInterno ? undefined : placeholder}
@@ -47,7 +51,7 @@ function TextInput({
                     />
                 </View>
                 {acaoDireita}
-            </View>
+            </Pressable>
             {erro ? (
                 <Text accessibilityRole="alert" style={estilos.erro}>
                     {erro}

@@ -18,7 +18,7 @@ export default function NumberInput({
     }
 
     return (
-        <Pressable accessible={false} disabled={desativado}
+        <Pressable accessible={false} testID="area-campo-numero" disabled={desativado}
             onPress={() => entradaRef.current?.focus()}
             style={[estilos.campo, desativado && estilos.desativado, estilo]}>
             <View style={estilos.conteudo}>
