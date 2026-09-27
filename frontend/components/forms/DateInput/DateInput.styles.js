@@ -11,10 +11,11 @@ const estilos = StyleSheet.create({
         alignItems: 'flex-start'
     },
     campo: {
-        width: '100%', height: 56, borderRadius: radius.buttonAndInput,
+        width: '100%', minHeight: 56, borderRadius: radius.buttonAndInput,
         borderWidth: 1.41, borderColor: cores.neutras.bordaClara,
         backgroundColor: cores.neutras.superficieClara,
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+        gap: 10, paddingVertical: 8
     },
     focado: {
         borderColor: cores.marca.primaria

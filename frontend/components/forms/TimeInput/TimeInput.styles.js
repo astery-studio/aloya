@@ -11,7 +11,7 @@ const estilos = StyleSheet.create({
         borderWidth: 0.705, borderColor: cores.neutras.bordaClara,
         backgroundColor: cores.neutras.superficieClara,
         flexDirection: 'row', alignItems: 'center', gap: 12,
-        paddingLeft: 15, paddingRight: 16
+        paddingLeft: 15, paddingRight: 16, paddingVertical: 8
     },
     entrada: {
         ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro,
