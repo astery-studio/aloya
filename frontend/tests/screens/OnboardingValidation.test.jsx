@@ -6,14 +6,20 @@ import { BackHandler } from 'react-native';
 import OnboardingScreen from '../../screens/onboarding/OnboardingScreen';
 
 jest.mock('../../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
+let mockPeriodoMenstrual = { inicio: '2026-08-03', fim: '2026-08-07' };
 jest.mock('../../features/onboarding/MenstruationCalendar/MenstruationCalendar', () => {
     const { Pressable, Text } = require('react-native');
     return { __esModule: true, default: ({ aoAlterar }) => (
         <Pressable accessibilityRole="button" accessibilityLabel="Selecionar período"
-            onPress={() => aoAlterar({ inicio: '2026-08-03', fim: '2026-08-07' })}>
+            onPress={() => aoAlterar(mockPeriodoMenstrual)}>
             <Text>Calendário menstrual</Text>
         </Pressable>
     ) };
+});
+
+afterEach(() => {
+    mockPeriodoMenstrual = { inicio: '2026-08-03', fim: '2026-08-07' };
+    jest.useRealTimers();
 });
 
 test('cadastro explica quando o nome tem menos de três caracteres', async () => {
@@ -156,6 +162,43 @@ test('valida e-mail do responsável ao sair do campo e durante a correção', as
 
     await fireEvent.changeText(emailResponsavel, 'responsavel@email.com');
     expect(screen.queryByText('Informe um e-mail válido.')).toBeNull();
+});
+
+test('rejeita menstruação futura considerando a data local', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 8, 27, 22));
+    mockPeriodoMenstrual = { inicio: '2026-09-28', fim: '2026-09-28' };
+    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    expect(screen.getByText('Data inválida')).toBeTruthy();
+});
+
+test('remove o e-mail do responsável quando a pessoa informa idade adulta', async () => {
+    const cadastrar = jest.fn().mockResolvedValue({
+        autenticacao: { token: 'jwt', tipo: 'Bearer' }
+    });
+    await render(<OnboardingScreen cadastrar={cadastrar} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012015');
+    await fireEvent.changeText(screen.getByLabelText(
+        'E-mail do responsável legal (opcional)'
+    ), 'responsavel@email.com');
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
+    for (let etapa = 0; etapa < 4; etapa += 1) {
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    }
+
+    expect(cadastrar).toHaveBeenCalledWith(expect.not.objectContaining({
+        emailResponsavelLegal: expect.anything()
+    }));
 });
 
 test('cancelar a saída mantém a etapa e os dados preenchidos', async () => {

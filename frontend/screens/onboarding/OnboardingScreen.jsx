@@ -41,7 +41,12 @@ const campoNaTela = {
 
 function paraIso(data) {
     if (!data) return null;
-    if (data instanceof Date) return data.toISOString().slice(0, 10);
+    if (data instanceof Date) {
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
+        return `${ano}-${mes}-${dia}`;
+    }
     if (/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
     const [dia, mes, ano] = data.split('/');
     return `${ano}-${mes}-${dia}`;
@@ -139,7 +144,7 @@ export default function OnboardingScreen({
                 duracaoCicloInformada: dados.duracaoCiclo,
                 duracaoMenstruacaoInformada: dados.duracaoMenstruacao,
                 duracaoLuteaInformada: duracaoLutea,
-                ...(dados.emailResponsavelLegal.trim()
+                ...(ehMenorDe16(dados.dataNascimento) && dados.emailResponsavelLegal.trim()
                     ? { emailResponsavelLegal: dados.emailResponsavelLegal.trim() }
                     : {})
             });
@@ -154,7 +159,7 @@ export default function OnboardingScreen({
 
     function avancarMenstruacao() {
         const inicio = paraIso(dados.ultimaMenstruacao?.inicio);
-        const hoje = new Date().toISOString().slice(0, 10);
+        const hoje = paraIso(new Date());
         if (!inicio || inicio > hoje) {
             setErro({ titulo: 'Data inválida', mensagem:
                 'Informe a data de início da sua última menstruação. Ela não pode ser uma data no futuro.' });
@@ -218,6 +223,8 @@ export default function OnboardingScreen({
                 setErro({ titulo: 'E-mail inválido', mensagem });
                 return;
             }
+        } else {
+            alterar({ emailResponsavelLegal: '' });
         }
         setErrosCampos({});
         avancar();
