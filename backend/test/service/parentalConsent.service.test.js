@@ -1,0 +1,556 @@
+/**
+ * Testes da emissão, confirmação e reenvio do consentimento parental.
+ */
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import {
+    criarParentalConsentService
+} from '../../src/services/parentalConsent.service.js';
+
+function criarCrypto() {
+    const tokenPuro = 't'.repeat(43);
+
+    return {
+        tokenPuro,
+        crypto: {
+            randomBytes() {
+                return { toString: () => tokenPuro };
+            },
+            createHash() {
+                return {
+                    update() {
+                        return this;
+                    },
+                    digest() {
+                        return 'hash-do-token';
+                    }
+                };
+            }
+        }
+    };
+}
+
+function criarTitular() {
+    return {
+        id: 1,
+        nome: 'Carla Cristina',
+        email: 'carla@email.com',
+        dataNascimento: new Date('2015-05-13T00:00:00.000Z')
+    };
+}
+
+test('cria solicitação armazenando somente o hash do token', async () => {
+    const registros = [];
+    const { crypto, tokenPuro } = criarCrypto();
+    const agora = new Date('2026-09-14T12:00:00.000Z');
+    const service = criarParentalConsentService({
+        prisma: {},
+        crypto,
+        baseUrl: 'https://aloya.test/consentimento',
+        dateUtils: {},
+        emailService: {},
+        now: () => agora
+    });
+    const tx = {
+        consentimentoParental: {
+            async create(argumentos) {
+                registros.push(argumentos);
+            }
+        }
+    };
+
+    const resultado = await service.criarPendente(tx, {
+        titularMenorId: 1,
+        nomeTitular: 'Carla Cristina',
+        emailTitular: 'carla@email.com',
+        emailResponsavelLegal: 'responsavel@email.com'
+    });
+
+    assert.equal(registros[0].data.tokenConfirmacaoHash, 'hash-do-token');
+    assert.equal(JSON.stringify(registros).includes(tokenPuro), false);
+    assert.equal(
+        registros[0].data.validadeLink.toISOString(),
+        '2026-09-14T13:00:00.000Z'
+    );
+    assert.equal(
+        resultado.linkConfirmacao,
+        `https://aloya.test/consentimento/${tokenPuro}`
+    );
+});
+
+test('solicita consentimento e envia o link ao responsável', async () => {
+    const atualizacoes = [];
+    const emails = [];
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async upsert(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test/consentimento',
+        dateUtils: {
+            calcularIdade() {
+                return 11;
+            }
+        },
+        emailService: {
+            async enviarEmailConsentimentoParental(dados) {
+                emails.push(dados);
+            }
+        },
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    const resultado = await service.solicitar(
+        1,
+        'responsavel@email.com'
+    );
+
+    assert.equal(atualizacoes.length, 1);
+    assert.equal(emails.length, 1);
+    assert.equal(resultado.emailEnviado, true);
+    assert.equal(resultado.statusConsentimento, 'pendente');
+});
+
+test('substitui e-mail e token ao reenviar o consentimento', async () => {
+    const atualizacoes = [];
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findUnique() {
+                return {
+                    emailResponsavelLegal: 'antigo@email.com',
+                    statusConsentimento: 'pendente'
+                };
+            },
+            async update(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test/consentimento',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {
+            async enviarEmailConsentimentoParental() {}
+        },
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    await service.reenviar(1, 'novo@email.com');
+
+    assert.equal(
+        atualizacoes[0].data.emailResponsavelLegal,
+        'novo@email.com'
+    );
+    assert.equal(
+        atualizacoes[0].data.tokenConfirmacaoHash,
+        'hash-do-token'
+    );
+    assert.equal(atualizacoes[0].data.respondidoEm, null);
+});
+
+test('libera a Rede de Apoio ao confirmar token válido', async () => {
+    const atualizacoes = [];
+    const { crypto, tokenPuro } = criarCrypto();
+    const agora = new Date('2026-09-14T12:00:00.000Z');
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'pendente',
+                    validadeLink: new Date('2026-09-14T13:00:00.000Z')
+                };
+            },
+            async update(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {},
+        now: () => agora
+    });
+
+    const resultado = await service.confirmar(tokenPuro);
+
+    assert.deepEqual(atualizacoes[0].data, {
+        statusConsentimento: 'liberado',
+        respondidoEm: agora
+    });
+    assert.equal(resultado.acessoRedeApoioLiberado, true);
+    assert.equal(
+        resultado.mensagem,
+        'Autorização concluída com sucesso.'
+    );
+});
+
+test('marca o link como expirado e rejeita a confirmação', async () => {
+    const atualizacoes = [];
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'pendente',
+                    validadeLink: new Date('2026-09-14T11:00:00.000Z')
+                };
+            },
+            async update(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {},
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    await assert.rejects(service.confirmar(tokenPuro), {
+        status: 410,
+        codigo: 'LINK_CONSENTIMENTO_EXPIRADO'
+    });
+
+    assert.deepEqual(atualizacoes[0].data, {
+        statusConsentimento: 'expirado'
+    });
+});
+
+test('libera o acesso e revoga pendências aos 16 anos', async () => {
+    const revogacoes = [];
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return {
+                    ...criarTitular(),
+                    dataNascimento:
+                        new Date('2010-05-13T00:00:00.000Z')
+                };
+            }
+        },
+        consentimentoParental: {
+            async updateMany(argumentos) {
+                revogacoes.push(argumentos);
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 16 },
+        emailService: {},
+        now: () => new Date('2026-09-14T12:00:00.000Z')
+    });
+
+    const resultado =
+        await service.verificarAcessoRedeApoio(1);
+
+    assert.deepEqual(revogacoes[0], {
+        where: {
+            titularMenorId: 1,
+            statusConsentimento: 'pendente'
+        },
+        data: {
+            statusConsentimento: 'revogado'
+        }
+    });
+    assert.equal(resultado.acessoLiberado, true);
+    assert.equal(resultado.motivo, 'MAIOR_DE_16_ANOS');
+    assert.equal(resultado.consentimentoNecessario, false);
+});
+
+test('rejeita solicitação para usuário inexistente', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return null;
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.solicitar(99, 'responsavel@email.com'),
+        {
+            status: 404,
+            codigo: 'USUARIO_NAO_ENCONTRADO'
+        }
+    );
+});
+
+test('rejeita o próprio e-mail como responsável legal', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {
+            calcularIdade() {
+                return 11;
+            }
+        },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.solicitar(1, 'carla@email.com'),
+        {
+            status: 422,
+            codigo: 'EMAIL_RESPONSAVEL_IGUAL_TITULAR'
+        }
+    );
+});
+
+test('rejeita reenvio sem solicitação anterior', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findUnique() {
+                return null;
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.reenviar(1),
+        {
+            status: 422,
+            codigo: 'EMAIL_RESPONSAVEL_NECESSARIO'
+        }
+    );
+});
+
+test('rejeita reenvio quando consentimento não está pendente', async () => {
+    const { crypto } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findUnique() {
+                return {
+                    emailResponsavelLegal: 'responsavel@email.com',
+                    statusConsentimento: 'liberado'
+                };
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.reenviar(1),
+        {
+            status: 409,
+            codigo: 'CONSENTIMENTO_NAO_PENDENTE'
+        }
+    );
+});
+
+test('rejeita token de consentimento inexistente', async () => {
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        consentimentoParental: {
+            async findFirst() {
+                return null;
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.confirmar(tokenPuro),
+        {
+            status: 400,
+            codigo: 'LINK_CONSENTIMENTO_INVALIDO'
+        }
+    );
+});
+
+test('rejeita token de consentimento revogado', async () => {
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'revogado',
+                    validadeLink: new Date('2026-09-14T13:00:00.000Z')
+                };
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    await assert.rejects(
+        service.confirmar(tokenPuro),
+        {
+            status: 410,
+            codigo: 'LINK_CONSENTIMENTO_INDISPONIVEL'
+        }
+    );
+});
+
+test('trata confirmação repetida de forma idempotente', async () => {
+    const { crypto, tokenPuro } = criarCrypto();
+    const prisma = {
+        usuario: {
+            async findUnique() {
+                return criarTitular();
+            }
+        },
+        consentimentoParental: {
+            async findFirst() {
+                return {
+                    id: 10,
+                    titularMenorId: 1,
+                    statusConsentimento: 'liberado',
+                    validadeLink: new Date('2026-09-14T13:00:00.000Z')
+                };
+            }
+        }
+    };
+    const service = criarParentalConsentService({
+        prisma,
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    const resultado =
+        await service.confirmar(tokenPuro);
+
+    assert.equal(
+        resultado.acessoRedeApoioLiberado,
+        true
+    );
+    assert.equal(
+        resultado.mensagem,
+        'A autorização já havia sido confirmada.'
+    );
+});
+
+test('converte falha de SMTP em erro público seguro', async () => {
+    const { crypto } = criarCrypto();
+    const service = criarParentalConsentService({
+        prisma: {},
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {
+            async enviarEmailConsentimentoParental() {
+                throw new Error(
+                    'Detalhes internos do SMTP.'
+                );
+            }
+        }
+    });
+
+    await assert.rejects(
+        service.enviarEmail({
+            nomeTitular: 'Carla Cristina',
+            emailResponsavelLegal: 'responsavel@email.com',
+            linkConfirmacao: 'https://aloya.test/token'
+        }),
+        {
+            message:
+                'Não foi possível enviar o pedido de autorização no momento. Tente novamente.',
+            status: 502,
+            codigo: 'FALHA_ENVIO_EMAIL'
+        }
+    );
+});

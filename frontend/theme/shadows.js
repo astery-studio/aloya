@@ -1,3 +1,6 @@
+/**
+ * Define as sombras padronizadas de pop-ups, alertas e painéis.
+ */
 const shadows = {
     popup: {
         boxShadow:

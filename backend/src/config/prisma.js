@@ -1,12 +1,11 @@
-require('dotenv').config();
+import 'dotenv/config';
 
-const {
-    PrismaBetterSqlite3
-} = require('@prisma/adapter-better-sqlite3');
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
+import prismaPackage from '@prisma/client';
 const {
     PrismaClient
-} = require('../generated/prisma/client');
+} = prismaPackage;
 
 function criarPrisma() {
     if (!process.env.DATABASE_URL) {
@@ -24,6 +23,10 @@ function criarPrisma() {
     });
 }
 
-module.exports = {
-    criarPrisma
+// Mantém uma única instância compartilhada pela aplicação.
+const prisma = criarPrisma();
+
+export {
+    criarPrisma,
+    prisma
 };

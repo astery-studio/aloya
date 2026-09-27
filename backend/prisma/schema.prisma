@@ -1,7 +1,5 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../src/generated/prisma"
-  moduleFormat = "cjs"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -383,6 +381,8 @@ model Anticoncepcional {
   horariosProgramados Json @default("[]") @map("horarios_programados")
 
   frequencia             FrequenciaUso?
+  dataInicioUso          DateTime?              @map("data_inicio_uso")
+  periodosPausa          Json                    @default("[]") @map("periodos_pausa")
   dataValidade           DateTime?              @map("data_validade")
   nivelIntensidadeAlerta NivelIntensidadeAlerta @default(critico) @map("nivel_intensidade_alerta")
 

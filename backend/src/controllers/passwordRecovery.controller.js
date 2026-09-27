@@ -1,0 +1,67 @@
+/**
+ * Controller HTTP que valida e delega solicitação, consulta e redefinição de senha.
+ */
+function criarPasswordRecoveryController({
+    passwordRecoveryService,
+    passwordRecoveryValidator
+}) {
+    async function solicitar(req, res, next) {
+        try {
+            const validacao = passwordRecoveryValidator
+                .validarSolicitacao(req.body);
+
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: 'Informe um e-mail válido.',
+                        detalhes: validacao.erros
+                    }
+                });
+            }
+
+            const resultado = await passwordRecoveryService
+                .solicitar(validacao.dados.email);
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return next(erro);
+        }
+    }
+
+    async function validarToken(req, res, next) {
+        try {
+            const resultado = await passwordRecoveryService
+                .validarToken(req.params.token);
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return next(erro);
+        }
+    }
+
+    async function redefinir(req, res, next) {
+        try {
+            const validacao = passwordRecoveryValidator
+                .validarRedefinicao(req.body);
+
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: 'Não foi possível redefinir a senha.',
+                        detalhes: validacao.erros
+                    }
+                });
+            }
+
+            const resultado = await passwordRecoveryService
+                .redefinir(validacao.dados);
+            return res.status(200).json(resultado);
+        } catch (erro) {
+            return next(erro);
+        }
+    }
+
+    return { solicitar, validarToken, redefinir };
+}
+
+export { criarPasswordRecoveryController };
