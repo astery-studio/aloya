@@ -10,17 +10,17 @@ import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
 import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
 import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold';
-import ForgotPasswordScreen from './screens/auth/ForgotPasswordScreen';
-import LoginScreen from './screens/auth/LoginScreen';
-import ResetPasswordScreen from './screens/auth/ResetPasswordScreen';
-import WelcomeScreen from './screens/auth/WelcomeScreen';
-import OnboardingScreen from './screens/onboarding/OnboardingScreen';
+import ForgotPasswordScreen from './src/features/auth/screens/ForgotPasswordScreen';
+import LoginScreen from './src/features/auth/screens/LoginScreen';
+import ResetPasswordScreen from './src/features/auth/screens/ResetPasswordScreen';
+import WelcomeScreen from './src/features/auth/screens/WelcomeScreen';
+import OnboardingScreen from './src/features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './src/features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './src/features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './src/features/settings/screens/SettingsScreen';
-import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
+import { ContraceptiveFlow } from './src/features/contraceptives/ContraceptiveFlow';
 import { criarServicosApp } from './services/createAppServices';
-import { obterToken } from './services/auth/tokenStorage';
+import { obterToken } from './src/shared/storage/tokenStorage';
 import { cores, fontFamilies } from './theme';
 
 const telasInternas = Object.freeze({

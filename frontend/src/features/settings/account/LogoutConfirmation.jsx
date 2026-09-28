@@ -1,7 +1,7 @@
 //Confirma o logout e encerra a sessão no servidor e no armazenamento seguro.
 import { useState } from 'react'
 import { WarningCircleIcon } from '../../../../components/icons/AppIcons'
-import ButtonPopup from '../../../../components/common/Button/ButtonPopup'
+import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup'
 import AlertModal from '../../../../components/feedback/Modal/AlertModal/AlertModal'
 import AppModal from '../../../../components/feedback/Modal/AppModal'
 import { tema } from '../../../../theme'

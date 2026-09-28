@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { LockKeyIcon, WarningCircleIcon } from '../../../../components/icons/AppIcons'
-import SimpleModal from '../../../../components/feedback/Modal/SimpleModal'
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
 import { ChangePassword } from '../security/ChangePassword'
 import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout'
 import { tema } from '../../../../theme'

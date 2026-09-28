@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { TrashIcon, WarningCircleIcon } from '../../../../components/icons/AppIcons'
 import AlertModal from '../../../../components/feedback/Modal/AlertModal/AlertModal'
-import SimpleModal from '../../../../components/feedback/Modal/SimpleModal'
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
 import { tema } from '../../../../theme'
 
 function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
