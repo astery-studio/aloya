@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { Header } from '../../components/navigation/Header/Header';
+import { Header } from '../../src/shared/components/navigation/Header/Header';
 import { ContraceptiveForm } from '../../features/contraceptives/forms/ContraceptiveForm';
 import { estilos } from './contraceptiveScreens.styles';
 

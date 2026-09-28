@@ -6,7 +6,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }))
 
-jest.mock('../../layouts/SettingsLayout/SettingsLayout', () => {
+jest.mock('../../src/features/settings/layouts/SettingsLayout/SettingsLayout', () => {
     const React = require('react')
     const { Text, View } = require('react-native')
 
@@ -20,7 +20,7 @@ jest.mock('../../layouts/SettingsLayout/SettingsLayout', () => {
     }
 })
 
-import { ChangePasswordScreen } from '../../screens/settings/ChangePasswordScreen'
+import { ChangePasswordScreen } from '../../src/features/settings/screens/ChangePasswordScreen'
 
 //Preenche os campos aguardando cada atualização do React terminar.
 async function preencherFormulario() {

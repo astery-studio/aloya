@@ -1,7 +1,7 @@
 import {fireEvent,render,screen} from '@testing-library/react-native'
 
 jest.mock(
-    '../components/feedback/Bottomsheet/BottomSheet',
+    '../src/shared/components/feedback/BottomSheet/BottomSheet',
     () => {
         const React = require('react')
         const {View} = require('react-native')
@@ -29,7 +29,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../layouts/BottomSheet/BottomSheetLayout',
+    '../src/shared/layouts/BottomSheet/BottomSheetLayout',
     () => {
         const React = require('react')
         const {
@@ -63,7 +63,7 @@ jest.mock(
     }
 )
 
-import {SelectionSheet} from '../components/feedback/SelectionSheet/SelectionSheet'
+import {SelectionSheet} from '../src/shared/components/feedback/SelectionSheet/SelectionSheet'
 
 const IconeTeste = jest.fn(() => null)
 

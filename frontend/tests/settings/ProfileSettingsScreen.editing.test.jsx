@@ -12,7 +12,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
 }))
 
 jest.mock(
-    '../../layouts/SettingsLayout/SettingsLayout',
+    '../../src/features/settings/layouts/SettingsLayout/SettingsLayout',
     () => {
         const React = require('react')
         const { View } =
@@ -37,7 +37,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../features/settings/profile/ProfileSettings',
+    '../../src/features/settings/profile/ProfileSettings',
     () => {
         const React = require('react')
 
@@ -133,7 +133,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../components/feedback/EditFieldSheet/EditFieldSheet',
+    '../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet',
     () => {
         const React = require('react')
 
@@ -211,7 +211,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../features/settings/profile/GenderSelector',
+    '../../src/features/settings/profile/GenderSelector',
     () => ({
         GenderSelector:
             jest.fn(() => null)
@@ -219,7 +219,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../features/settings/account/DeleteAccount',
+    '../../src/features/settings/account/DeleteAccount',
     () => ({
         DeleteAccount:
             jest.fn(() => null)
@@ -227,7 +227,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../features/settings/account/LogoutConfirmation',
+    '../../src/features/settings/account/LogoutConfirmation',
     () => ({
         LogoutConfirmation:
             jest.fn(() => null)
@@ -242,7 +242,7 @@ jest.mock(
     })
 )
 
-import { ProfileSettingsScreen } from '../../screens/settings/ProfileSettingsScreen'
+import { ProfileSettingsScreen } from '../../src/features/settings/screens/ProfileSettingsScreen'
 
 const perfil = {
     id: 15,

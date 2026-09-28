@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../theme'
+import { fontFamilies, tema } from '../../../../theme'
 
 const estilos = StyleSheet.create({
     estadoTela: {

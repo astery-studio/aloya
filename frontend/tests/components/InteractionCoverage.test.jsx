@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import { BottomSheet } from '../../components/feedback/Bottomsheet/BottomSheet';
-import { EditFieldSheet } from '../../components/feedback/EditFieldSheet/EditFieldSheet';
+import { BottomSheet } from '../../src/shared/components/feedback/BottomSheet/BottomSheet';
+import { EditFieldSheet } from '../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet';
 import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal';
 import NumberInput from '../../components/forms/NumberInput';
 import RadioOption from '../../components/forms/RadioOption';

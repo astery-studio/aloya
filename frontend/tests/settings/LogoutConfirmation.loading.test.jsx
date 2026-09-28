@@ -8,7 +8,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
 }))
 
 import {useState} from 'react'
-import {LogoutConfirmation} from '../../features/settings/account/LogoutConfirmation'
+import {LogoutConfirmation} from '../../src/features/settings/account/LogoutConfirmation'
 
 describe('LogoutConfirmation - bloqueio de fechamento', () => {
     beforeEach(() => {

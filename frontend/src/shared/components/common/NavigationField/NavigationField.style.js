@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../../theme'
+import { fontFamilies, tema } from '../../../../../theme'
 
 const setaConfig = tema.cores.neutras.bordaTracejada
 const corSetaBotao = tema.cores.neutras.textoSecundarioClaro

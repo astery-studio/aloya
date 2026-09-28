@@ -1,5 +1,5 @@
-import {criarAccountService} from '../../features/settings/services/accountService'
-import {endpoints} from '../../services/api/endpoints'
+import {criarAccountService} from '../../src/features/settings/services/accountService'
+import {endpoints} from '../../src/shared/services/api/endpoints'
 
 const respostaPerfil = {
     configuracoes: {

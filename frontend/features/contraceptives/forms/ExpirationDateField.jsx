@@ -1,5 +1,5 @@
 import { CalendarBlank } from 'phosphor-react-native';
-import { DatePickerSheet } from '../../../components/feedback/DatePickerSheet/DatePickerSheet';
+import { DatePickerSheet } from '../../../src/shared/components/feedback/DatePickerSheet/DatePickerSheet';
 import { SelectorField } from './SelectorField';
 
 function paraExibicao(iso) {

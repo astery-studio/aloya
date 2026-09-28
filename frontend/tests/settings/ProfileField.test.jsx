@@ -19,11 +19,11 @@ import {
 
 import {
     ProfileField
-} from '../../features/settings/profile/ProfileField'
+} from '../../src/features/settings/profile/ProfileField'
 
 import {
     corIconeEditar
-} from '../../features/settings/profile/ProfileField.style'
+} from '../../src/features/settings/profile/ProfileField.style'
 
 describe('ProfileField', () => {
     beforeEach(() => {

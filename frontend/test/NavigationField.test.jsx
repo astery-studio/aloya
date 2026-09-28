@@ -11,11 +11,11 @@ import {tema} from '../theme'
 
 import {
     estilos
-} from '../components/common/NavigationField/NavigationField.style'
+} from '../src/shared/components/common/NavigationField/NavigationField.style'
 
 import {
     NavigationField
-} from '../components/common/NavigationField/NavigationField'
+} from '../src/shared/components/common/NavigationField/NavigationField'
 
 const IconeTeste = jest.fn(() => null)
 

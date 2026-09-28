@@ -1,6 +1,6 @@
 import {Animated, Text} from 'react-native'
 import {act, render, screen} from '@testing-library/react-native'
-import {BottomSheet} from '../components/feedback/Bottomsheet/BottomSheet'
+import {BottomSheet} from '../src/shared/components/feedback/BottomSheet/BottomSheet'
 
 function obterModal(container) {
     const modais =

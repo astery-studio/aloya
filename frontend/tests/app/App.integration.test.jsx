@@ -36,11 +36,11 @@ jest.mock('../../screens/auth/LoginScreen', () => {
 jest.mock('../../screens/auth/ForgotPasswordScreen', () => jest.fn(() => null));
 jest.mock('../../screens/auth/ResetPasswordScreen', () => jest.fn(() => null));
 jest.mock('../../screens/onboarding/OnboardingScreen', () => jest.fn(() => null));
-jest.mock('../../screens/settings/ChangePasswordScreen', () => ({
+jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
 }));
 
-jest.mock('../../screens/settings/SettingsScreen', () => {
+jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return {
@@ -52,7 +52,7 @@ jest.mock('../../screens/settings/SettingsScreen', () => {
     };
 });
 
-jest.mock('../../screens/settings/ProfileSettingsScreen', () => {
+jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {

@@ -1,9 +1,9 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
-import { criarAuthService } from '../features/auth/services/authService'
-import { criarAccountService } from '../features/settings/services/accountService'
+import { criarAuthService } from '../src/features/auth/services/authService'
+import { criarAccountService } from '../src/features/settings/services/accountService'
 import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
 import { criarApiClient } from './api/apiClient'
-import { criarRequisicaoAutenticada } from './api/authenticatedRequest'
+import { criarRequisicaoAutenticada } from '../src/shared/services/api/authenticatedRequest'
 import { obterToken, removerToken } from './auth/tokenStorage'
 
 const tempoLimiteDaRequisicao = 15000

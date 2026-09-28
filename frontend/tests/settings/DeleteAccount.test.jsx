@@ -12,7 +12,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }))
 
-import { DeleteAccount } from '../../features/settings/account/DeleteAccount'
+import { DeleteAccount } from '../../src/features/settings/account/DeleteAccount'
 
 function criarProps(
     substituicoes = {}

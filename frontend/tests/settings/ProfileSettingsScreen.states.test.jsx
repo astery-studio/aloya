@@ -6,7 +6,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }))
 
-jest.mock('../../layouts/SettingsLayout/SettingsLayout', () => {
+jest.mock('../../src/features/settings/layouts/SettingsLayout/SettingsLayout', () => {
     const React = require('react')
 
     function SettingsLayout({children}) {
@@ -16,23 +16,23 @@ jest.mock('../../layouts/SettingsLayout/SettingsLayout', () => {
     return { SettingsLayout }
 })
 
-jest.mock('../../features/settings/profile/ProfileSettings', () => ({
+jest.mock('../../src/features/settings/profile/ProfileSettings', () => ({
     ProfileSettings: jest.fn(() => null)
 }))
 
-jest.mock('../../features/settings/profile/GenderSelector', () => ({
+jest.mock('../../src/features/settings/profile/GenderSelector', () => ({
     GenderSelector: jest.fn(() => null)
 }))
 
-jest.mock('../../components/feedback/EditFieldSheet/EditFieldSheet', () => ({
+jest.mock('../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet', () => ({
     EditFieldSheet: jest.fn(() => null)
 }))
 
-jest.mock('../../features/settings/account/DeleteAccount', () => ({
+jest.mock('../../src/features/settings/account/DeleteAccount', () => ({
     DeleteAccount: jest.fn(() => null)
 }))
 
-jest.mock('../../features/settings/account/LogoutConfirmation', () => ({
+jest.mock('../../src/features/settings/account/LogoutConfirmation', () => ({
     LogoutConfirmation: jest.fn(() => null)
 }))
 
@@ -41,8 +41,8 @@ jest.mock('../../components/feedback/Modal/SimpleModal', () => ({
     default: jest.fn(() => null)
 }))
 
-import { ProfileSettings } from '../../features/settings/profile/ProfileSettings'
-import { ProfileSettingsScreen } from '../../screens/settings/ProfileSettingsScreen'
+import { ProfileSettings } from '../../src/features/settings/profile/ProfileSettings'
+import { ProfileSettingsScreen } from '../../src/features/settings/screens/ProfileSettingsScreen'
 
 const perfilValido = {
     id: 15,

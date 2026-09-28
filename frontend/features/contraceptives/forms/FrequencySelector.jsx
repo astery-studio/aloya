@@ -1,5 +1,5 @@
 import { ArrowsClockwise } from 'phosphor-react-native';
-import { SelectionSheet } from '../../../components/feedback/SelectionSheet/SelectionSheet';
+import { SelectionSheet } from '../../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
 import { obterFrequencia, obterFrequencias } from '../constants/contraceptiveOptions';
 import { SelectorField } from './SelectorField';
 

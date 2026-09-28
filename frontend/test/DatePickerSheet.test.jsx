@@ -22,7 +22,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../components/feedback/Bottomsheet/BottomSheet',
+    '../src/shared/components/feedback/BottomSheet/BottomSheet',
     () => {
         const React = require('react')
         const {View} = require('react-native')
@@ -52,7 +52,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../layouts/BottomSheet/BottomSheetLayout',
+    '../src/shared/layouts/BottomSheet/BottomSheetLayout',
     () => {
         const React = require('react')
         const {
@@ -88,7 +88,7 @@ jest.mock(
     }
 )
 
-import {DatePickerSheet} from '../components/feedback/DatePickerSheet/DatePickerSheet'
+import {DatePickerSheet} from '../src/shared/components/feedback/DatePickerSheet/DatePickerSheet'
 const mensagemDeErro = 'Não foi possível salvar a data. Tente novamente.'
 
 describe('DatePickerSheet', () => {

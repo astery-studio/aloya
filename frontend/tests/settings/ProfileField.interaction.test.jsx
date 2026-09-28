@@ -2,8 +2,8 @@ jest.mock('../../components/icons/AppIcons', () => ({
     NotePencilIcon: jest.fn(() => null)
 }))
 
-import {ProfileField} from '../../features/settings/profile/ProfileField'
-import {estilos} from '../../features/settings/profile/ProfileField.style'
+import {ProfileField} from '../../src/features/settings/profile/ProfileField'
+import {estilos} from '../../src/features/settings/profile/ProfileField.style'
 
 describe('ProfileField - interação visual', () => {
     test('aplica o estilo pressionado durante o toque', () => {

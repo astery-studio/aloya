@@ -1,7 +1,7 @@
 //Define o visual do menu principal de configurações conforme o protótipo.
 import {StyleSheet} from 'react-native'
 
-import {fontFamilies, tema} from '../../theme'
+import {fontFamilies, tema} from '../../../../theme'
 
 const coresSwitch = Object.freeze({
     trilhaInativa: tema.cores.neutras.bordaTracejada,

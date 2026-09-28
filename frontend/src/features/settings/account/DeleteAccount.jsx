@@ -1,9 +1,9 @@
 //Controla a verificação da senha e a exclusão permanente da conta autenticada.
 import { useState } from 'react'
-import { TrashIcon, WarningCircleIcon } from '../../../components/icons/AppIcons'
-import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal'
-import SimpleModal from '../../../components/feedback/Modal/SimpleModal'
-import { tema } from '../../../theme'
+import { TrashIcon, WarningCircleIcon } from '../../../../components/icons/AppIcons'
+import AlertModal from '../../../../components/feedback/Modal/AlertModal/AlertModal'
+import SimpleModal from '../../../../components/feedback/Modal/SimpleModal'
+import { tema } from '../../../../theme'
 
 function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
     const [etapa, setEtapa] = useState('senha')

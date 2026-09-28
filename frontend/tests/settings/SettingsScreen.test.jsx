@@ -15,7 +15,7 @@ jest.mock('../../components/icons/AppIcons', () => {
     }
 })
 
-jest.mock('../../components/common/NavigationField/NavigationField', () => {
+jest.mock('../../src/shared/components/common/NavigationField/NavigationField', () => {
     const React = require('react')
     const {Pressable, Text} = require('react-native')
 
@@ -38,7 +38,7 @@ jest.mock('../../components/common/NavigationField/NavigationField', () => {
     return {NavigationField}
 })
 
-jest.mock('../../layouts/MainLayout/MainLayout', () => {
+jest.mock('../../src/shared/layouts/MainLayout/MainLayout', () => {
     const React = require('react')
     const {Pressable, Text, View} = require('react-native')
 
@@ -65,7 +65,7 @@ jest.mock('../../layouts/MainLayout/MainLayout', () => {
     return {MainLayout}
 })
 
-import {SettingsScreen} from '../../screens/settings/SettingsScreen'
+import {SettingsScreen} from '../../src/features/settings/screens/SettingsScreen'
 
 describe('SettingsScreen', () => {
     test('mostra todas as seções e opções do protótipo', async () => {

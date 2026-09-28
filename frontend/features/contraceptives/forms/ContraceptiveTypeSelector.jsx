@@ -1,5 +1,5 @@
 import { Pill } from 'phosphor-react-native';
-import { SelectionSheet } from '../../../components/feedback/SelectionSheet/SelectionSheet';
+import { SelectionSheet } from '../../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
 import { TIPOS_ANTICONCEPCIONAL, obterTipo } from '../constants/contraceptiveOptions';
 import { SelectorField } from './SelectorField';
 

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../../../theme'
+import { fontFamilies, tema } from '../../../../../../theme'
 
 const corAtiva = tema.cores.marca.secundaria
 const corInativa = tema.cores.neutras.textoSecundarioClaro

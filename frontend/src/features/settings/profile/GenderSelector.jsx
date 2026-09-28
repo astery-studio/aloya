@@ -1,5 +1,5 @@
 //Mostra as identidades de gênero aceitas pelo backend dentro do painel de seleção.
-import { SelectionSheet } from '../../../components/feedback/SelectionSheet/SelectionSheet'
+import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet'
 
 const opcoesIdentidadeGenero = Object.freeze([
     Object.freeze({ id: 'Prefiro não informar', label: 'Prefiro não informar' }),

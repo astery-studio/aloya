@@ -4,7 +4,7 @@ import { Clock } from 'phosphor-react-native';
 import ButtonDashed from '../../../components/common/Button/ButtonDashed';
 import ButtonScreen from '../../../components/common/Button/ButtonScreen';
 import TimeInput from '../../../components/forms/TimeInput';
-import { Header } from '../../../components/navigation/Header/Header';
+import { Header } from '../../../src/shared/components/navigation/Header/Header';
 import { SelectorField } from './SelectorField';
 import { estilos } from './contraceptiveForms.styles';
 

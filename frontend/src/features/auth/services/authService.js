@@ -1,7 +1,7 @@
 /**
  * Reúne operações de conta, autenticação e encerramento seguro da sessão.
  */
-import { endpoints } from '../../../services/api/endpoints'
+import { endpoints } from '../../../shared/services/api/endpoints'
 
 const mensagemErroConfiguracao = 'Não foi possível configurar o serviço de autenticação.'
 const mensagemErroCredencial = 'Não foi possível remover a credencial deste aparelho. Tente novamente.'

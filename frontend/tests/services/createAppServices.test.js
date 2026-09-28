@@ -1,21 +1,21 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
-import { criarAuthService } from '../../features/auth/services/authService'
-import { criarAccountService } from '../../features/settings/services/accountService'
+import { criarAuthService } from '../../src/features/auth/services/authService'
+import { criarAccountService } from '../../src/features/settings/services/accountService'
 import { criarContraceptiveService } from '../../features/contraceptives/services/contraceptiveService'
 import { criarServicosApp } from '../../services/createAppServices'
 import { criarApiClient } from '../../services/api/apiClient'
-import { criarRequisicaoAutenticada } from '../../services/api/authenticatedRequest'
+import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
 import { obterToken, removerToken } from '../../services/auth/tokenStorage'
 
 jest.mock(
-    '../../features/auth/services/authService',
+    '../../src/features/auth/services/authService',
     () => ({
         criarAuthService: jest.fn()
     })
 )
 
 jest.mock(
-    '../../features/settings/services/accountService',
+    '../../src/features/settings/services/accountService',
     () => ({
         criarAccountService: jest.fn()
     })
@@ -36,7 +36,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../services/api/authenticatedRequest',
+    '../../src/shared/services/api/authenticatedRequest',
     () => ({
         criarRequisicaoAutenticada: jest.fn()
     })

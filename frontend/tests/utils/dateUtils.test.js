@@ -3,7 +3,7 @@
  */
 import { formatDate } from '../../utils/date/formatDate';
 import { isSameDay } from '../../utils/date/isSameDay';
-import { getMonthDays } from '../../utils/getMonthDays';
+import { getMonthDays } from '../../src/shared/utils/getMonthDays';
 
 test('formata a digitação de uma data sem perder dígitos parciais', () => {
     expect(formatDate('08')).toBe('08');

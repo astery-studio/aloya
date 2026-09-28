@@ -11,7 +11,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
     WarningCircleIcon: jest.fn(() => null)
 }))
 
-import { LogoutConfirmation } from '../../features/settings/account/LogoutConfirmation'
+import { LogoutConfirmation } from '../../src/features/settings/account/LogoutConfirmation'
 
 describe('LogoutConfirmation', () => {
     test('não mostra o conteúdo quando está oculto', async () => {

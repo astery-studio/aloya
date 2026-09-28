@@ -1,8 +1,8 @@
 //Reúne os campos e ações exibidos no conteúdo das configurações de perfil.
 import { Text, View } from 'react-native'
-import { LockKeyIcon } from '../../../components/icons/AppIcons'
-import ButtonScreen from '../../../components/common/Button/ButtonScreen'
-import { NavigationField } from '../../../components/common/NavigationField/NavigationField'
+import { LockKeyIcon } from '../../../../components/icons/AppIcons'
+import ButtonScreen from '../../../../components/common/Button/ButtonScreen'
+import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField'
 import { ProfileField } from './ProfileField'
 import { estilos } from './ProfileSettings.style'
 

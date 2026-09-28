@@ -9,7 +9,7 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { CaretDownIcon as CaretDown } from 'phosphor-react-native/src/icons/CaretDown';
 import { CaretLeftIcon as CaretLeft } from 'phosphor-react-native/src/icons/CaretLeft';
 import { CaretRightIcon as CaretRight } from 'phosphor-react-native/src/icons/CaretRight';
-import { getMonthDays } from '../../../utils/getMonthDays';
+import { getMonthDays } from '../../../src/shared/utils/getMonthDays';
 import { cores } from '../../../theme';
 import { estilos } from './MenstruationCalendar.styles';
 

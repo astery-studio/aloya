@@ -12,7 +12,7 @@ import {
 
 import {
     Header
-} from '../../components/navigation/Header/Header'
+} from '../../../../shared/components/navigation/Header/Header'
 
 import {
     estilos

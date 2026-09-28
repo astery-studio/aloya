@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 
-import { ChangePassword } from '../../features/settings/security/ChangePassword'
+import { ChangePassword } from '../../src/features/settings/security/ChangePassword'
 
 function FormularioTeste({onSalvar = jest.fn(), carregando = false}) {
     const [senhaAtual, setSenhaAtual] = useState('')

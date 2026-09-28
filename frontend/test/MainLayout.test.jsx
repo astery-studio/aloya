@@ -2,23 +2,23 @@ import { Text } from 'react-native'
 import { render, screen } from '@testing-library/react-native'
 
 jest.mock(
-    '../components/navigation/Header/Header',
+    '../src/shared/components/navigation/Header/Header',
     () => ({
         Header: jest.fn(() => null)
     })
 )
 
 jest.mock(
-    '../components/navigation/BottomTab/BottomTabBar/BottomTabBar',
+    '../src/shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar',
     () => ({
         BottomTabBar: jest.fn(() => null)
     })
 )
 
-import { Header } from '../components/navigation/Header/Header'
-import { BottomTabBar } from '../components/navigation/BottomTab/BottomTabBar/BottomTabBar'
-import { estilos } from '../layouts/MainLayout/MainLayout.style'
-import { MainLayout } from '../layouts/MainLayout/MainLayout'
+import { Header } from '../src/shared/components/navigation/Header/Header'
+import { BottomTabBar } from '../src/shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar'
+import { estilos } from '../src/shared/layouts/MainLayout/MainLayout.style'
+import { MainLayout } from '../src/shared/layouts/MainLayout/MainLayout'
 
 describe('MainLayout', () => {
     beforeEach(() => {

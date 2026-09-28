@@ -1,4 +1,4 @@
-import { endpoints } from '../../../services/api/endpoints';
+import { endpoints } from '../../../src/shared/services/api/endpoints';
 
 function normalizarAnticoncepcional(registro) {
     const possuiProgramacao = registro.tipo !== 'diu_hormonal';

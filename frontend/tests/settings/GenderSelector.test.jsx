@@ -1,12 +1,12 @@
 //Confere se a seleção de gênero usa somente os valores aceitos pelo backend.
 import { render } from '@testing-library/react-native'
 
-jest.mock('../../components/feedback/SelectionSheet/SelectionSheet', () => ({
+jest.mock('../../src/shared/components/feedback/SelectionSheet/SelectionSheet', () => ({
     SelectionSheet: jest.fn(() => null)
 }))
 
-import { SelectionSheet } from '../../components/feedback/SelectionSheet/SelectionSheet'
-import { GenderSelector } from '../../features/settings/profile/GenderSelector'
+import { SelectionSheet } from '../../src/shared/components/feedback/SelectionSheet/SelectionSheet'
+import { GenderSelector } from '../../src/features/settings/profile/GenderSelector'
 
 describe('GenderSelector', () => {
     beforeEach(() => {

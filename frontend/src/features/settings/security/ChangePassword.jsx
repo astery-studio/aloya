@@ -1,8 +1,8 @@
 //Mostra os campos e o botão usados para alterar a senha da conta.
 import { memo } from 'react'
 import { View } from 'react-native'
-import ButtonScreen from '../../../components/common/Button/ButtonScreen'
-import PasswordInput from '../../../components/forms/PasswordInput'
+import ButtonScreen from '../../../../components/common/Button/ButtonScreen'
+import PasswordInput from '../../../../components/forms/PasswordInput'
 import { estilos } from './ChangePassword.style'
 
 function ChangePassword({senhaAtual, novaSenha, confirmacaoNovaSenha, onAlterarSenhaAtual, onAlterarNovaSenha, onAlterarConfirmacao, onSalvar, carregando = false}) {

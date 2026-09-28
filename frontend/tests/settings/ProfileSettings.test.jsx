@@ -5,7 +5,7 @@ jest.mock('../../components/icons/AppIcons', () => ({
     LockKeyIcon: jest.fn(() => null)
 }))
 
-jest.mock('../../features/settings/profile/ProfileField', () => {
+jest.mock('../../src/features/settings/profile/ProfileField', () => {
     const React = require('react')
     const { Pressable, Text } = require('react-native')
 
@@ -23,7 +23,7 @@ jest.mock('../../features/settings/profile/ProfileField', () => {
     }
 })
 
-jest.mock('../../components/common/NavigationField/NavigationField', () => {
+jest.mock('../../src/shared/components/common/NavigationField/NavigationField', () => {
     const React = require('react')
     const { Pressable, Text } = require('react-native')
 
@@ -61,9 +61,9 @@ jest.mock('../../components/common/Button/ButtonScreen', () => {
 })
 
 import ButtonScreen from '../../components/common/Button/ButtonScreen'
-import { NavigationField } from '../../components/common/NavigationField/NavigationField'
-import { ProfileField } from '../../features/settings/profile/ProfileField'
-import { ProfileSettings } from '../../features/settings/profile/ProfileSettings'
+import { NavigationField } from '../../src/shared/components/common/NavigationField/NavigationField'
+import { ProfileField } from '../../src/features/settings/profile/ProfileField'
+import { ProfileSettings } from '../../src/features/settings/profile/ProfileSettings'
 
 const dados = {
     nome: 'Julia',

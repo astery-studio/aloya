@@ -1,6 +1,6 @@
 //Reúne as operações autenticadas de perfil, senha e exclusão da própria conta.
-import { criarUserProfile } from '../../profile/models/userProfile'
-import { endpoints } from '../../../services/api/endpoints'
+import { criarUserProfile } from '../models/userProfile'
+import { endpoints } from '../../../shared/services/api/endpoints'
 
 const camposPermitidos = Object.freeze([
     'nome',
