@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { criarParentalConsentService } from '../../src/services/parentalConsent.service.js';
+import { criarParentalConsentService } from '../../../../src/features/auth/services/parentalConsent.service.js';
 
 function criarService() {
     const titular = {

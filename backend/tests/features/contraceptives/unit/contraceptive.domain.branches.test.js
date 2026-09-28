@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { obterFrequencia } from '../src/features/contraceptives/contraceptive.constants.js';
-import { apresentarAnticoncepcional } from '../src/features/contraceptives/contraceptive.presenter.js';
-import { calcularPeriodosPausa, calcularProximoUso } from '../src/features/contraceptives/contraceptive.schedule.js';
-import { criarContraceptiveService } from '../src/features/contraceptives/contraceptive.service.js';
+import { obterFrequencia } from '../../../../src/features/contraceptives/contraceptive.constants.js';
+import { apresentarAnticoncepcional } from '../../../../src/features/contraceptives/contraceptive.presenter.js';
+import { calcularPeriodosPausa, calcularProximoUso } from '../../../../src/features/contraceptives/contraceptive.schedule.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
 
 const inicio = new Date('2026-09-01T00:00:00.000Z');
 

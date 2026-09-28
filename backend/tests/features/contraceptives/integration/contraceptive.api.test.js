@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
-import { criarContraceptiveController } from '../src/features/contraceptives/contraceptive.controller.js';
-import { criarRotasAnticoncepcionais } from '../src/features/contraceptives/contraceptive.routes.js';
-import { criarContraceptiveService } from '../src/features/contraceptives/contraceptive.service.js';
-import { criarAuthMiddleware } from '../src/middlewares/auth.middleware.js';
-import { tratarErros } from '../src/middlewares/error.middleware.js';
+import { criarContraceptiveController } from '../../../../src/features/contraceptives/contraceptive.controller.js';
+import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/contraceptive.routes.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarAuthMiddleware } from '../../../../src/shared/middleware/auth.middleware.js';
+import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
 const agora = new Date('2026-09-24T07:00:00.000Z');
 const registro = {

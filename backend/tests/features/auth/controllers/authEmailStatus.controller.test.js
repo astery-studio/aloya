@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { criarAuthController } from '../../src/controllers/auth.controller.js';
+import { criarAuthController } from '../../../../src/features/auth/controllers/auth.controller.js';
 function resposta() {
     return {
         statusCode: null,
