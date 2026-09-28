@@ -3,7 +3,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import { criarAccountValidator } from '../src/validators/account.validator.js'
-import * as dateUtils from '../src/utils/date.utils.js'
+import * as dateUtils from '../src/shared/utils/date.utils.js'
 
 //Funcao para criar um mock do validator de conta
 function criarValidator() {

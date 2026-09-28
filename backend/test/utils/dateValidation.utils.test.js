@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
     calcularIdade,
     criarDataValida
-} from '../../src/utils/date.utils.js';
+} from '../../src/shared/utils/date.utils.js';
 
 test('cria apenas datas ISO reais', () => {
     assert.equal(criarDataValida(null), null);

@@ -5,7 +5,7 @@ import {
     adicionarDias,
     calcularDiasInclusivos,
     gerarDiasMenstruacao
-} from '../../src/utils/date.utils.js';
+} from '../../src/shared/utils/date.utils.js';
 
 test('adiciona dias sem alterar a data original', () => {
     const original = new Date(2026, 0, 31);

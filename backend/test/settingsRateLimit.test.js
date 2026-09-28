@@ -5,7 +5,7 @@ import {
     criarConfiguracoesContaRateLimit,
     criarAlteracaoSenhaRateLimit,
     criarExclusaoContaRateLimit
-} from '../src/middlewares/rateLimit.middleware.js';
+} from '../src/shared/middleware/rateLimit.middleware.js';
 
 function criarRateLimitMock() {
     return (opcoes) => opcoes;

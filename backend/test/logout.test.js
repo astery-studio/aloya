@@ -6,7 +6,7 @@ import express from 'express'
 import {criarLogoutService} from '../src/services/logout.service.js'
 import {criarLogoutController} from '../src/controllers/logout.controller.js'
 import {criarLogoutRoutes} from '../src/routes/logout.routes.js'
-import {criarAuthMiddleware} from '../src/middlewares/auth.middleware.js'
+import {criarAuthMiddleware} from '../src/shared/middleware/auth.middleware.js'
 
 test(
     'revoga apenas a sessão pertencente à pessoa autenticada',
