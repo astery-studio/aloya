@@ -9,3 +9,8 @@ node_modules
 /prisma/*.db-wal
 
 /src/generated/prisma
+
+#IAs sem sentido
+.agents/
+.claude/
+.windsurf/
