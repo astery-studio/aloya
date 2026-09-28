@@ -1,7 +1,7 @@
 //Mostra o menu principal de configurações e encaminha a pessoa usuária para cada opção.
 import {ScrollView, Switch, Text, View} from 'react-native'
 
-import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, PillIcon, ShieldCheckIcon, UserIcon} from '../../../../components/icons/AppIcons'
+import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, PillIcon, ShieldCheckIcon, UserIcon} from '../../../shared/components/icons/AppIcons'
 import {NavigationField} from '../../../shared/components/common/NavigationField/NavigationField'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
 import {tema} from '../../../../theme'

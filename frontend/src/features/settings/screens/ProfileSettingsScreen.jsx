@@ -1,7 +1,7 @@
 //Controla a tela completa de dados pessoais e seus fluxos de conta.
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, Text, View } from 'react-native'
-import { LockKeyIcon, WarningCircleIcon } from '../../../../components/icons/AppIcons'
+import { LockKeyIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
 import ButtonScreen from '../../../../components/common/Button/ButtonScreen'
 import { EditFieldSheet } from '../../../shared/components/feedback/EditFieldSheet/EditFieldSheet'
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'

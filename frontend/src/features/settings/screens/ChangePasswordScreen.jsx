@@ -1,7 +1,7 @@
 //Controla a tela completa de alteração de senha e seus avisos de erro e sucesso.
 import { useEffect, useRef, useState } from 'react'
 
-import { LockKeyIcon, WarningCircleIcon } from '../../../../components/icons/AppIcons'
+import { LockKeyIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
 import { ChangePassword } from '../security/ChangePassword'
 import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout'

@@ -1,6 +1,6 @@
 //Controla a verificação da senha e a exclusão permanente da conta autenticada.
 import { useState } from 'react'
-import { TrashIcon, WarningCircleIcon } from '../../../../components/icons/AppIcons'
+import { TrashIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
 import AlertModal from '../../../../components/feedback/Modal/AlertModal/AlertModal'
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
 import { tema } from '../../../../theme'

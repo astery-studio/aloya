@@ -10,7 +10,7 @@ jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({ DMSans_400Regular: '
 jest.mock('@expo-google-fonts/dm-sans/500Medium', () => ({ DMSans_500Medium: 'medium' }));
 jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({ DMSans_600SemiBold: 'semibold' }));
 jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({ DMSans_700Bold: 'bold' }));
-jest.mock('../../services/createAppServices', () => ({ criarServicosApp: jest.fn() }));
+jest.mock('../../src/app/createAppServices', () => ({ criarServicosApp: jest.fn() }));
 jest.mock('../../src/shared/storage/tokenStorage', () => ({ obterToken: jest.fn() }));
 
 jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
@@ -73,9 +73,9 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
     };
 });
 
-import App from '../../App';
+import App from '../../src/App';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
-import { criarServicosApp } from '../../services/createAppServices';
+import { criarServicosApp } from '../../src/app/createAppServices';
 
 function criarServicos() {
     return {
