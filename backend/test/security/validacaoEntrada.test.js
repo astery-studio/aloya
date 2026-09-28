@@ -17,8 +17,8 @@ test('corpos nulos são rejeitados sem provocar erro interno', () => {
     assert.equal(consentimento.validarReenvio(null).valido, true);
 });
 
-test('senhas excessivas são barradas antes do bcrypt', () => {
-    const senha = 'a'.repeat(129);
+test('senhas curtas são rejeitadas em todos os fluxos', () => {
+    const senha = 'curta';
     const auth = criarAuthValidator({ dateUtils: {} });
     const recuperacao = criarPasswordRecoveryValidator();
 

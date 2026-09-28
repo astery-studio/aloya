@@ -5,8 +5,8 @@ import {
     KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeftIcon as ArrowLeft } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ArrowLeftIcon as ArrowLeft } from '../../components/icons/AppIcons';
 import { cores } from '../../theme';
 import { estilos } from '../AuthLayout/AuthLayout.styles';
 
@@ -21,11 +21,15 @@ export default function AuthLayout({
             locations={posicoesFundo} style={estilos.tela}>
         <SafeAreaView style={estilos.flexivel} testID={testeId}>
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                testID={`${testeId}-keyboard`}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={estilos.flexivel}
             >
                 <ScrollView
+                    testID={`${testeId}-scroll`}
+                    keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                     keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
                     contentContainerStyle={estilos.rolagem}
                 >
                     {aoVoltar ? (

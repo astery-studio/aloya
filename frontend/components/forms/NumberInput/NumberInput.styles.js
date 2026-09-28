@@ -15,11 +15,12 @@ const texto = {
 
 const estilos = StyleSheet.create({
     campo: {
-        width: '100%', maxWidth: 342, height: 56,
+        width: '100%', maxWidth: 342, minHeight: 56,
         alignSelf: 'center', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0, borderRadius: radius.buttonAndInput,
         borderWidth: 1.41, borderColor: cores.marca.primaria,
-        backgroundColor: cores.neutras.superficieClara
+        backgroundColor: cores.neutras.superficieClara,
+        paddingVertical: 8
     },
     conteudo: {
         flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4

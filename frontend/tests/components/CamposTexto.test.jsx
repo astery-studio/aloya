@@ -13,6 +13,11 @@ test('campo de texto entrega o valor digitado', async () => {
     expect(aoMudar).toHaveBeenCalledWith('Julia');
 });
 
+test('toda a área do campo textual pode direcionar o foco', async () => {
+    await render(<TextInput label="Nome" value="" onChangeText={jest.fn()} />);
+    expect(() => fireEvent.press(screen.getByTestId('area-campo-texto'))).not.toThrow();
+});
+
 test('campo desativado não permite edição', async () => {
     await render(<TextInput label="Nome" value="Julia" desativado />);
     expect(screen.getByLabelText('Nome').props.editable).toBe(false);

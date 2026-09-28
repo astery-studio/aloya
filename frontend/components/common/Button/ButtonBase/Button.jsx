@@ -55,7 +55,6 @@ export default function Button({
                 )}
 
                 <Text
-                    numberOfLines={1}
                     style={[
                         estilos.texto,
                         tamanhoAtual.texto,

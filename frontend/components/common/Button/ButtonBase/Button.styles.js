@@ -19,12 +19,14 @@ const estilos = StyleSheet.create({
 
     conteudo: {
         alignItems: 'center',
+        flexShrink: 1,
         flexDirection: 'row',
         gap: 8,
         justifyContent: 'center'
     },
 
     texto: {
+        flexShrink: 1,
         textAlign: 'center'
     },
 
@@ -49,7 +51,8 @@ const estilos = StyleSheet.create({
 const tamanhos = {
     compacto: {
         container: {
-            height: 52
+            minHeight: 52,
+            paddingVertical: 12
         },
         texto: {
             ...typography.bodyDefault,
@@ -61,7 +64,8 @@ const tamanhos = {
 
     grande: {
         container: {
-            height: 56
+            minHeight: 56,
+            paddingVertical: 14
         },
         texto: {
             ...typography.bodyLarge,

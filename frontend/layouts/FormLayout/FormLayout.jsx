@@ -23,12 +23,16 @@ export default function FormLayout({
         >
             <SafeAreaView style={estilos.tela} testID={testeId}>
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    testID={`${testeId}-keyboard`}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={estilos.flexivel}
                 >
                     {cabecalho ? <View>{cabecalho}</View> : null}
                     <ScrollView
+                        testID={`${testeId}-scroll`}
+                        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                         keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
                         contentContainerStyle={[
                             estilos.rolagem,
                             centralizado && estilos.centralizado

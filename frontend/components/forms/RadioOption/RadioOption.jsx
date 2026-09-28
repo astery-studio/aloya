@@ -2,7 +2,7 @@
  * Representa uma opção única selecionável com estado visual e acessibilidade.
  */
 import { Pressable, Text, View } from 'react-native';
-import { CheckIcon as Check } from 'phosphor-react-native/src/icons/Check';
+import { CheckIcon as Check } from '../../icons/AppIcons';
 import { cores } from '../../../theme';
 import { estilos } from './RadioOption.styles';
 

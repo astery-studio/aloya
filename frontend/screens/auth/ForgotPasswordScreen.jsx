@@ -2,10 +2,10 @@
  * Tela que solicita e permite reenviar instruções de recuperação por e-mail.
  */
 import { useState } from 'react';
-import { EnvelopeSimpleIcon as EnvelopeSimple } from 'phosphor-react-native/src/icons/EnvelopeSimple';
-import { WarningCircleIcon as WarningCircle } from 'phosphor-react-native/src/icons/WarningCircle';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
+import { EnvelopeSimpleIcon as EnvelopeSimple,
+    WarningCircleIcon as WarningCircle } from '../../components/icons/AppIcons';
 import EmailInput from '../../components/forms/EmailInput';
 import { useForgotPassword } from '../../features/auth/hooks/useForgotPassword';
 import AuthLayout from '../../layouts/AuthLayout';

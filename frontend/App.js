@@ -2,7 +2,9 @@
  * Inicializa os fluxos públicos e a área autenticada de configurações.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Linking, NativeModules, Text, View } from 'react-native';
+import {
+    ActivityIndicator, BackHandler, Linking, NativeModules, Text, View
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +21,7 @@ import { ChangePasswordScreen } from './screens/settings/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './screens/settings/ProfileSettingsScreen';
 import { SettingsScreen } from './screens/settings/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
+import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
 import { criarServicosApp } from './services/createAppServices';
 import { obterToken } from './services/auth/tokenStorage';
 import { cores, fontFamilies } from './theme';
@@ -31,13 +34,13 @@ const telasInternas = Object.freeze({
 });
 
 function obterBaseUrl() {
+    if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
     const script = NativeModules.SourceCode?.scriptURL || '';
     // O Expo Go pode informar o bundle usando exp://, além de http(s)://.
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
     // Em desenvolvimento, o host do bundle é a fonte mais confiável e evita
     // manter um IP antigo carregado na memória do Metro.
     if (__DEV__ && host) return `http://${host}:3000`;
-    if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
     return 'http://10.0.2.2:3000';
 }
 
@@ -167,6 +170,17 @@ export default function App() {
         const inscricao = Linking.addEventListener('url', abrirLink);
         return () => inscricao.remove();
     }, []);
+
+    useEffect(() => {
+        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (estadoSessao !== 'anonima') return false;
+            const destino = obterDestinoDeRetorno(telaPublica);
+            if (!destino) return false;
+            setTelaPublica(destino);
+            return true;
+        });
+        return () => inscricao.remove();
+    }, [estadoSessao, telaPublica]);
 
     async function salvarPerfil(alteracoes) {
         const perfilAtualizado = await configuracao.servicos.accountService.atualizarPerfil(alteracoes);

@@ -2,10 +2,10 @@
  * Tela que confirma uma nova senha usando o token de recuperação recebido.
  */
 import { useState } from 'react';
-import { LockKeyIcon as LockKey } from 'phosphor-react-native/src/icons/LockKey';
-import { WarningCircleIcon as WarningCircle } from 'phosphor-react-native/src/icons/WarningCircle';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
+import { LockKeyIcon as LockKey,
+    WarningCircleIcon as WarningCircle } from '../../components/icons/AppIcons';
 import PasswordInput from '../../components/forms/PasswordInput';
 import { useResetPassword } from '../../features/auth/hooks/useResetPassword';
 import AuthLayout from '../../layouts/AuthLayout';
@@ -18,6 +18,10 @@ export default function ResetPasswordScreen({
     const preenchido = Boolean(fluxo.senha && fluxo.confirmacao);
 
     function enviar() {
+        if (fluxo.senha.length < 8) {
+            setErroValidacao('A senha deve possuir pelo menos 8 caracteres.');
+            return;
+        }
         if (fluxo.senha !== fluxo.confirmacao) {
             setErroValidacao('A confirmação deve ser igual à nova senha.');
             return;
@@ -45,7 +49,9 @@ export default function ResetPasswordScreen({
             mensagem="Faça login com sua nova senha."
             acaoPrincipal={{ texto: 'Entrar', aoPressionar: aoEntrar }} />
         <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
-            icone={WarningCircle} titulo={erroValidacao ? 'Senhas diferentes' : 'Algo deu errado'}
+            icone={WarningCircle} titulo={erroValidacao
+                ? (erroValidacao.includes('confirmação') ? 'Senhas diferentes' : 'Senha inválida')
+                : 'Não foi possível alterar a senha'}
             mensagem={erroValidacao || fluxo.erro}
             acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: limparErro }} />
     </>;

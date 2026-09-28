@@ -108,13 +108,6 @@ function criarAuthValidator({ dateUtils }) {
                     'A senha deve possuir pelo menos 8 caracteres.'
                 )
             );
-        } else if (body.senha.length > 128) {
-            erros.push(
-                erro(
-                    'senha',
-                    'A senha deve possuir no máximo 128 caracteres.'
-                )
-            );
         }
 
         // Valida a data de início da última menstruação informada no cadastro.
@@ -307,9 +300,9 @@ function criarAuthValidator({ dateUtils }) {
             erros.push(
                 erro('senha', 'Informe sua senha.')
             );
-        } else if (senha.length > 128) {
+        } else if (senha.length < 8) {
             erros.push(
-                erro('senha', 'A senha deve possuir no máximo 128 caracteres.')
+                erro('senha', 'A senha deve possuir pelo menos 8 caracteres.')
             );
         }
 

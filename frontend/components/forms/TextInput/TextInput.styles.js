@@ -6,10 +6,11 @@ import { cores, fontFamilies, radius, typography } from '../../../theme';
 
 const estilos = StyleSheet.create({
     container: {
-        width: '100%', height: 60, borderRadius: radius.buttonAndInput,
+        width: '100%', minHeight: 60, borderRadius: radius.buttonAndInput,
         borderWidth: 1.41, borderColor: cores.neutras.bordaClara,
         backgroundColor: cores.neutras.superficieClara,
-        flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16
+        flexDirection: 'row', alignItems: 'center',
+        paddingHorizontal: 16, paddingVertical: 8
     },
     preenchido: { borderColor: '#C8B8AD' },
     conteudo: { flex: 1, justifyContent: 'center' },
@@ -23,8 +24,8 @@ const estilos = StyleSheet.create({
         ...typography.bodyDefault, color: cores.neutras.textoPrincipalClaro,
         padding: 0, minHeight: 24
     },
-    categoria: { height: 56, borderWidth: 0.705 },
-    popup: { height: 52, backgroundColor: '#FAFAF8' },
+    categoria: { minHeight: 56, borderWidth: 0.705 },
+    popup: { minHeight: 52, backgroundColor: '#FAFAF8' },
     desativado: { opacity: 0.55 },
     containerErro: { borderColor: cores.feedback.erro },
     erro: {

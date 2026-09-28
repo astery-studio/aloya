@@ -1,7 +1,12 @@
 /**
  * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
  */
-import { Modal, Text, View } from 'react-native';
+import { useRef } from 'react';
+import {
+    AccessibilityInfo, findNodeHandle, KeyboardAvoidingView, Modal,
+    Platform, ScrollView, Text, View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { cores } from '../../../../theme';
 import { estilos } from './AppModal.styles';
 
@@ -9,6 +14,8 @@ export default function AppModal({
     variante = 'simples', visivel, aoFechar, icone: Icone,
     corIcone, fundoIcone, titulo, mensagem, destaque, children
 }) {
+    const referenciaTitulo = useRef(null);
+
     if (!['simples', 'alerta', 'acao'].includes(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
@@ -21,14 +28,25 @@ export default function AppModal({
     const acao = variante === 'acao';
     const corDoIcone = corIcone || (acao ? cores.feedback.erro : cores.marca.primaria);
 
+    function focarTitulo() {
+        const identificador = findNodeHandle(referenciaTitulo.current);
+        if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
+    }
+
     return (
         <Modal
             visible={visivel}
             transparent
             animationType="fade"
             onRequestClose={aoFechar}
+            onShow={focarTitulo}
         >
-            <View style={estilos.fundo}>
+            <SafeAreaView style={estilos.fundo}>
+                <KeyboardAvoidingView style={estilos.flexivel}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScrollView testID="app-modal-scroll"
+                    bounces={false} keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={estilos.rolagem}>
                 <View
                     accessibilityViewIsModal
                     style={[estilos.caixa, alerta ? estilos.caixaAlerta :
@@ -52,7 +70,8 @@ export default function AppModal({
                             </View>
                         )}
                         <View style={estilos.textos}>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
+                            <Text ref={referenciaTitulo} accessible
+                                accessibilityRole="header" style={estilos.titulo}>
                                 {titulo}
                             </Text>
                             {mensagem ? (
@@ -69,7 +88,9 @@ export default function AppModal({
                         ) : null}
                     </View>
                 </View>
-            </View>
+                </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
         </Modal>
     );
 }

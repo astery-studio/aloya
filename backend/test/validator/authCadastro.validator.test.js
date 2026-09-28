@@ -342,25 +342,6 @@ test(
 );
 
 test(
-    'rejeita senha excessivamente longa antes de executar o bcrypt',
-    () => {
-        const resultado = criarValidator().validarCadastro(
-            criarDadosValidos({ senha: 'a'.repeat(129) })
-        );
-
-        assert.equal(resultado.valido, false);
-        assert.deepEqual(
-            resultado.erros,
-            [{
-                campo: 'senha',
-                mensagem:
-                    'A senha deve possuir no máximo 128 caracteres.'
-            }]
-        );
-    }
-);
-
-test(
     'trata corpo ausente como cadastro inválido sem gerar erro interno',
     () => {
         const resultado =

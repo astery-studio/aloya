@@ -10,7 +10,7 @@ import OnboardingStep from '../OnboardingStep/OnboardingStep';
 export default function BirthDateStep({
     valor, aoAlterar, aoVoltar, aoAvancar, carregando,
     menorDe16 = false, emailResponsavelLegal = '', aoAlterarEmailResponsavel,
-    erroEmailResponsavel
+    aoValidarEmailResponsavel, erroEmailResponsavel
 }) {
     return (
         <OnboardingStep etapa={1} titulo="Qual sua data de nascimento?"
@@ -26,6 +26,7 @@ export default function BirthDateStep({
                         value={emailResponsavelLegal}
                         erro={erroEmailResponsavel}
                         onChangeText={aoAlterarEmailResponsavel}
+                        onBlur={aoValidarEmailResponsavel}
                     />
                     <Text style={{
                         ...typography.caption,

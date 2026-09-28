@@ -3,9 +3,9 @@
  */
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { LockKeyIcon as LockKey } from 'phosphor-react-native/src/icons/LockKey';
 import Button from '../../components/common/Button/Button';
 import SimpleModal from '../../components/feedback/Modal/SimpleModal';
+import { LockKeyIcon as LockKey } from '../../components/icons/AppIcons';
 import EmailInput from '../../components/forms/EmailInput';
 import PasswordInput from '../../components/forms/PasswordInput';
 import { useLogin } from '../../features/auth/hooks/useLogin';
@@ -26,6 +26,10 @@ export default function LoginScreen({
     async function enviar() {
         if (!isValidEmail(email)) {
             setErroValidacao('Informe um e-mail válido.');
+            return;
+        }
+        if (senha.length < 8) {
+            setErroValidacao('A senha deve possuir pelo menos 8 caracteres.');
             return;
         }
         const resultado = await enviarLogin({ email, senha });
@@ -59,7 +63,9 @@ export default function LoginScreen({
             <Button texto="Entrar" aoPressionar={enviar} desativado={!preenchido} carregando={carregando} />
         </AuthLayout>
         <SimpleModal visivel={Boolean(erro || erroValidacao)} aoFechar={limparAviso} icone={LockKey}
-            titulo={erroValidacao ? 'E-mail inválido' : 'Não foi possível entrar'}
+            titulo={erroValidacao
+                ? (erroValidacao.includes('senha') ? 'Senha inválida' : 'E-mail inválido')
+                : 'Não foi possível entrar'}
             mensagem={erroValidacao || erro}
             acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }} />
         <SimpleModal visivel={Boolean(mensagemSucesso)}

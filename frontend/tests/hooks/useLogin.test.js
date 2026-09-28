@@ -25,12 +25,12 @@ test('envia login, salva o token e informa sucesso', async () => {
     expect(retorno).toBe(resultado);
 });
 
-test('expõe uma mensagem segura quando o login falha', async () => {
+test('não expõe detalhes de uma falha inesperada no login', async () => {
     const realizarLogin = jest.fn().mockRejectedValue(new Error('Credenciais inválidas.'));
     const { result } = await renderHook(() => useLogin({ realizarLogin }));
     await act(async () => result.current.enviarLogin({}));
     expect(result.current).toMatchObject({ carregando: false, sucesso: false });
-    expect(result.current.erro).toBe('Credenciais inválidas.');
+    expect(result.current.erro).toBe('Não foi possível entrar. Tente novamente.');
     expect(salvarToken).not.toHaveBeenCalled();
 
     await act(() => result.current.limparErro());
@@ -39,7 +39,7 @@ test('expõe uma mensagem segura quando o login falha', async () => {
 
 test.each([
     [{ mensagemUsuario: 'Mensagem pública.' }, 'Mensagem pública.'],
-    [{}, 'Não foi possível entrar.']
+    [{}, 'Não foi possível entrar. Tente novamente.']
 ])('prioriza mensagens seguras de falha', async (falha, mensagem) => {
     const realizarLogin = jest.fn().mockRejectedValue(falha);
     const { result } = await renderHook(() => useLogin({ realizarLogin }));
