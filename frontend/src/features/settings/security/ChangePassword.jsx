@@ -1,7 +1,7 @@
 //Mostra os campos e o botão usados para alterar a senha da conta.
 import { memo } from 'react'
 import { View } from 'react-native'
-import ButtonScreen from '../../../../components/common/Button/ButtonScreen'
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
 import PasswordInput from '../../../shared/components/forms/PasswordInput'
 import { estilos } from './ChangePassword.style'
 

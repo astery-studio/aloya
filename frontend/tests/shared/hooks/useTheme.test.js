@@ -6,7 +6,7 @@ import {
 } from '@testing-library/react-native'
 
 import { useTheme } from '../../../src/shared/hooks/useTheme'
-import { tema } from '../../../theme'
+import { tema } from '../../../src/shared/theme'
 
 describe('useTheme', () => {
     test('retorna o tema centralizado da aplicação', async () => {

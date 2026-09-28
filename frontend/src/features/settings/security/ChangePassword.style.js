@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { tema } from '../../../../theme'
+import { tema } from '../../../shared/theme'
 
 const estilos = StyleSheet.create({
     container: {

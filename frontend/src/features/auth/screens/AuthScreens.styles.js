@@ -2,7 +2,7 @@
  * Centraliza estilos compartilhados pelas telas de autenticação.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, typography } from '../../../../theme';
+import { cores, fontFamilies, typography } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     campos: { gap: 12, width: '100%' },

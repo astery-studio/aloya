@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { cores, typography } from '../../../../theme';
+import { cores, typography } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     formulario: { gap: 20, paddingHorizontal: 24, paddingTop: 0, paddingBottom: 40 },

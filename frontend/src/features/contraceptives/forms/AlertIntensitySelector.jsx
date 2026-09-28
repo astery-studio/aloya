@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 import { Bell } from 'phosphor-react-native';
-import ButtonScreen from '../../../../components/common/Button/ButtonScreen';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { ButtonSelection } from '../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { INTENSIDADES_ALERTA } from '../constants/contraceptiveOptions';

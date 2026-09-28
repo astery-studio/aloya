@@ -10,7 +10,7 @@ import { CaretDownIcon as CaretDown } from 'phosphor-react-native/src/icons/Care
 import { CaretLeftIcon as CaretLeft } from 'phosphor-react-native/src/icons/CaretLeft';
 import { CaretRightIcon as CaretRight } from 'phosphor-react-native/src/icons/CaretRight';
 import { getMonthDays } from '../../../../shared/utils/getMonthDays';
-import { cores } from '../../../../../theme';
+import { cores } from '../../../../shared/theme';
 import { estilos } from './MenstruationCalendar.styles';
 
 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',

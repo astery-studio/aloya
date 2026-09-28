@@ -1,6 +1,6 @@
 //Define a estrutura visual do layout principal das telas internas.
 import { StyleSheet } from 'react-native'
-import { tema } from '../../../../theme'
+import { tema } from '../../theme'
 
 const estilos = StyleSheet.create({
     container: {

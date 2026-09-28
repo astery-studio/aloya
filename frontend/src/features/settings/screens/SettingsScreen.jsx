@@ -4,7 +4,7 @@ import {ScrollView, Switch, Text, View} from 'react-native'
 import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, PillIcon, ShieldCheckIcon, UserIcon} from '../../../shared/components/icons/AppIcons'
 import {NavigationField} from '../../../shared/components/common/NavigationField/NavigationField'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
-import {tema} from '../../../../theme'
+import {tema} from '../../../shared/theme'
 import {coresSwitch, estilos} from './SettingsScreen.style'
 
 //Cria uma divisão visual entre opções que pertencem ao mesmo grupo.

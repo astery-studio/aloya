@@ -7,7 +7,7 @@ jest.mock(
     })
 )
 
-import {tema} from '../../../../theme'
+import {tema} from '../../../../src/shared/theme'
 
 import {
     estilos

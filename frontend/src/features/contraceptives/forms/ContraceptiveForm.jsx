@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { WarningCircle } from 'phosphor-react-native';
-import ButtonScreen from '../../../../components/common/Button/ButtonScreen';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import FormField from '../../../shared/components/forms/FormField';
 import TextInput from '../../../shared/components/forms/TextInput';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';

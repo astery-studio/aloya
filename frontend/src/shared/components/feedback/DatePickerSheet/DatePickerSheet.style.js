@@ -1,6 +1,6 @@
 //Define a aparência do calendário e das listas de mês e ano
 import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../../../../theme'
+import { fontFamilies, tema } from '../../../theme'
 
 const estilos = StyleSheet.create({
     calendario: {

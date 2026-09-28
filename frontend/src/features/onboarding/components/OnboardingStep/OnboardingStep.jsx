@@ -5,7 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { ArrowLeftIcon as ArrowLeft } from 'phosphor-react-native/src/icons/ArrowLeft';
 import Button from '../../../../shared/components/common/Button/ButtonBase/Button';
 import FormLayout from '../../../../shared/layouts/FormLayout/FormLayout';
-import { cores } from '../../../../../theme';
+import { cores } from '../../../../shared/theme';
 import OnboardingProgress from '../OnboardingProgress/OnboardingProgress';
 import { estilos } from './OnboardingStep.styles';
 

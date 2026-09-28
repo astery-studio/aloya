@@ -41,7 +41,7 @@ jest.mock('../../../../src/shared/components/common/NavigationField/NavigationFi
     }
 })
 
-jest.mock('../../../../components/common/Button/ButtonScreen', () => {
+jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => {
     const React = require('react')
     const { Pressable, Text } = require('react-native')
 
@@ -60,7 +60,7 @@ jest.mock('../../../../components/common/Button/ButtonScreen', () => {
     }
 })
 
-import ButtonScreen from '../../../../components/common/Button/ButtonScreen'
+import ButtonScreen from '../../../../src/shared/components/common/Button/ButtonScreen'
 import { NavigationField } from '../../../../src/shared/components/common/NavigationField/NavigationField'
 import { ProfileField } from '../../../../src/features/settings/profile/ProfileField'
 import { ProfileSettings } from '../../../../src/features/settings/profile/ProfileSettings'

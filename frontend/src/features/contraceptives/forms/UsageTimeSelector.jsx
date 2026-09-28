@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 import { Clock } from 'phosphor-react-native';
 import ButtonDashed from '../../../shared/components/common/Button/ButtonDashed';
-import ButtonScreen from '../../../../components/common/Button/ButtonScreen';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import TimeInput from '../../../shared/components/forms/TimeInput';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { SelectorField } from './SelectorField';

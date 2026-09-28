@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { Bell } from 'phosphor-react-native';
-import { cores } from '../../../../theme';
+import { cores } from '../../../shared/theme';
 import { estilos } from './contraceptives.styles';
 
 const rotulos = { leve: 'Leve', moderado: 'Moderado', critico: 'Crítico' };

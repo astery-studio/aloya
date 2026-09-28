@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { cores, espacamentos, radius, typography } from '../../../../theme';
+import { cores, espacamentos, radius, typography } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     card: { padding: espacamentos.medio, borderRadius: radius.onboardingCalendar, borderWidth: 1, borderColor: cores.neutras.bordaClara, backgroundColor: cores.neutras.superficieClara, gap: espacamentos.pequeno },

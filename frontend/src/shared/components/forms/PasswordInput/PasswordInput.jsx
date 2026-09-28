@@ -5,7 +5,7 @@ import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { EyeIcon as Eye } from 'phosphor-react-native/src/icons/Eye';
 import { EyeSlashIcon as EyeSlash } from 'phosphor-react-native/src/icons/EyeSlash';
-import { cores } from '../../../../../theme';
+import { cores } from '../../../theme';
 import TextInput from '../TextInput/TextInput';
 import { estilos } from '../TextInput/TextInput.styles';
 

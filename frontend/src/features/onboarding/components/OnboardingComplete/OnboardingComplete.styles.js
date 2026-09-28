@@ -2,7 +2,7 @@
  * Define os estilos da mensagem final e da área reservada ao logotipo.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, typography } from '../../../../../theme';
+import { cores, fontFamilies, typography } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     conteudo: { alignItems: 'center', gap: 40, width: '100%' },

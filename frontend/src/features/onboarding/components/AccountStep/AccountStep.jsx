@@ -9,7 +9,7 @@ import EmailInput from '../../../../shared/components/forms/EmailInput';
 import PasswordInput from '../../../../shared/components/forms/PasswordInput';
 import TextInput from '../../../../shared/components/forms/TextInput';
 import AuthLayout from '../../../../shared/layouts/AuthLayout/AuthLayout';
-import { cores } from '../../../../../theme';
+import { cores } from '../../../../shared/theme';
 import { estilos } from './AccountStep.styles';
 
 export default function AccountStep({ dados, aoAlterar, aoAvancar,

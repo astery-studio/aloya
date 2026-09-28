@@ -2,7 +2,7 @@
  * Define os estilos dos campos, termos e rodapé da etapa de conta.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies } from '../../../../../theme';
+import { cores, fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     campos: { gap: 12 },

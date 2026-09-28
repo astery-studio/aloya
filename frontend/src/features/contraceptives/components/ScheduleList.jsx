@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { Clock } from 'phosphor-react-native';
-import { cores } from '../../../../theme';
+import { cores } from '../../../shared/theme';
 import { estilos } from './contraceptives.styles';
 
 function ScheduleList({ horarios = [] }) {

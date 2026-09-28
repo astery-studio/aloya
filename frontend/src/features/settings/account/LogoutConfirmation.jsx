@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
 import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup'
-import AlertModal from '../../../../components/feedback/Modal/AlertModal/AlertModal'
-import AppModal from '../../../../components/feedback/Modal/AppModal'
-import { tema } from '../../../../theme'
+import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
+import AppModal from '../../../shared/components/feedback/Modal/AppModal'
+import { tema } from '../../../shared/theme'
 
 function ignorarFechamento() {}
 

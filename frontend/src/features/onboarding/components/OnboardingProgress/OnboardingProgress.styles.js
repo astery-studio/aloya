@@ -2,7 +2,7 @@
  * Define trilha e preenchimento visual do progresso do cadastro.
  */
 import { StyleSheet } from 'react-native';
-import { cores, radius } from '../../../../../theme';
+import { cores, radius } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     area: {

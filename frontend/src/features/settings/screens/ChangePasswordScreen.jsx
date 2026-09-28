@@ -5,7 +5,7 @@ import { LockKeyIcon, WarningCircleIcon } from '../../../shared/components/icons
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
 import { ChangePassword } from '../security/ChangePassword'
 import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout'
-import { tema } from '../../../../theme'
+import { tema } from '../../../shared/theme'
 
 const senhasBloqueadas = new Set([
     'senha',

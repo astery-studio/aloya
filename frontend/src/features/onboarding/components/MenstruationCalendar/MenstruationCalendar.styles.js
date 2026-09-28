@@ -2,7 +2,7 @@
  * Aparência do calendário menstrual exibido dentro do onboarding.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, radius } from '../../../../../theme';
+import { cores, fontFamilies, radius } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     calendario: {

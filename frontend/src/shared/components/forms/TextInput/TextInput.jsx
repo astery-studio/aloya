@@ -3,7 +3,7 @@
  */
 import { memo } from 'react';
 import { Text, TextInput as EntradaNativa, View } from 'react-native';
-import { cores } from '../../../../../theme';
+import { cores } from '../../../theme';
 import { estilos } from './TextInput.styles';
 
 const manterTexto = (texto) => texto;

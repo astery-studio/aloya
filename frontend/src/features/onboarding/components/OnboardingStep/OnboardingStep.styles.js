@@ -2,7 +2,7 @@
  * Define posicionamento do cabeçalho e conteúdo das etapas do cadastro.
  */
 import { StyleSheet } from 'react-native';
-import { cores, espacamentos, typography } from '../../../../../theme';
+import { cores, espacamentos, typography } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     navegacao: {

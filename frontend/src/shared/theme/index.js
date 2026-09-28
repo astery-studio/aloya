@@ -1,8 +1,8 @@
 import { cores } from './colors'
 import { espacamentos, espacamentosLayout } from './spacing'
-import { fontFamilies, typography } from '../src/shared/theme/typography'
-import { radius } from '../src/shared/theme/radius'
-import { shadows } from '../src/shared/theme/shadows'
+import { fontFamilies, typography } from './typography'
+import { radius } from './radius'
+import { shadows } from './shadows'
 
 const tema = Object.freeze({
     cores,

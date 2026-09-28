@@ -2,7 +2,7 @@
 import { Pressable, Text, View } from 'react-native'
 import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight'
 
-import { tema } from '../../../../../theme'
+import { tema } from '../../../theme'
 import { estilos, setaConfig, corSetaBotao } from './NavigationField.style'
 
 const paletasDosIcones = {

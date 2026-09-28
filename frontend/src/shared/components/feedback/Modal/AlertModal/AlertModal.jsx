@@ -3,8 +3,8 @@ import { Text, View } from 'react-native'
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey'
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle'
 
-import ButtonPopup from '../../../../src/shared/components/common/Button/ButtonPopup'
-import PasswordInput from '../../../../src/shared/components/forms/PasswordInput'
+import ButtonPopup from '../../../common/Button/ButtonPopup'
+import PasswordInput from '../../../forms/PasswordInput'
 import AppModal from '../AppModal'
 import { estilos } from './AlertModal.styles'
 

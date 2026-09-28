@@ -2,7 +2,7 @@
  * Define a composição visual da tela inicial de autenticação.
  */
 import { StyleSheet } from 'react-native';
-import { cores, espacamentos, fontFamilies } from '../../../../theme';
+import { cores, espacamentos, fontFamilies } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     tela: {

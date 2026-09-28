@@ -2,7 +2,7 @@
  * Centraliza os estilos e variantes dos campos textuais reutilizáveis.
  */
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies, radius, typography } from '../../../../../theme';
+import { cores, fontFamilies, radius, typography } from '../../../theme';
 
 const estilos = StyleSheet.create({
     container: {

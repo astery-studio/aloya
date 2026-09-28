@@ -1,6 +1,6 @@
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { Plus } from 'phosphor-react-native';
-import ButtonScreen from '../../../../components/common/Button/ButtonScreen';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { ContraceptiveCard } from '../components/ContraceptiveCard';
 import { estilos } from './contraceptiveScreens.styles';

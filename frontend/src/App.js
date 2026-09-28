@@ -21,7 +21,7 @@ import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
-import { cores, fontFamilies } from '../theme';
+import { cores, fontFamilies } from './shared/theme';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',

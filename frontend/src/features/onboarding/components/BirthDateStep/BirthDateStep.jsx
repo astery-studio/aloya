@@ -4,7 +4,7 @@
 import { Text, View } from 'react-native';
 import DateInput from '../../../../shared/components/forms/DateInput';
 import EmailInput from '../../../../shared/components/forms/EmailInput';
-import { cores, typography } from '../../../../../theme';
+import { cores, typography } from '../../../../shared/theme';
 import OnboardingStep from '../OnboardingStep/OnboardingStep';
 
 export default function BirthDateStep({

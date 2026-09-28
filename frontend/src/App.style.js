@@ -3,7 +3,7 @@
 
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies, tema } from '../theme';
+import { fontFamilies, tema } from './shared/theme';
 
 const estilos = StyleSheet.create({
     tela: {
