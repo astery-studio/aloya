@@ -154,7 +154,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../components/feedback/Modal/SimpleModal',
+    '../../src/shared/components/feedback/Modal/SimpleModal',
     () => {
         const React = require('react')
 

@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { INTENSIDADES_ALERTA } from '../../../features/contraceptives/constants/contraceptiveOptions';
-import { useContraceptiveForm } from '../../../features/contraceptives/hooks/useContraceptiveForm';
+import { INTENSIDADES_ALERTA } from '../../../../src/features/contraceptives/constants/contraceptiveOptions';
+import { useContraceptiveForm } from '../../../../src/features/contraceptives/hooks/useContraceptiveForm';
 
 test('preserva múltiplos horários ao trocar a frequência da pílula', async () => {
     const { result } = await renderHook(() => useContraceptiveForm(jest.fn()));

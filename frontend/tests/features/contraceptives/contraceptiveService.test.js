@@ -2,7 +2,7 @@ import {
     criarContraceptiveService,
     criarCorpoCadastro,
     normalizarAnticoncepcional
-} from '../../../features/contraceptives/services/contraceptiveService';
+} from '../../../src/features/contraceptives/services/contraceptiveService';
 
 const registroApi = {
     id: 7,

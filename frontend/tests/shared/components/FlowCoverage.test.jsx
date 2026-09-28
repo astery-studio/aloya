@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import AccountStep from '../../features/onboarding/AccountStep/AccountStep';
-import OnboardingStep from '../../features/onboarding/OnboardingStep/OnboardingStep';
-import { SelectionSheet } from '../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
+import AccountStep from '../../../src/features/onboarding/components/AccountStep/AccountStep';
+import OnboardingStep from '../../../src/features/onboarding/components/OnboardingStep/OnboardingStep';
+import { SelectionSheet } from '../../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
 
 test('etapa compartilhada permite pular e usa valores padrão', async () => {
     const aoPular = jest.fn();

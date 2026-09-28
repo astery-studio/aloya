@@ -1,21 +1,21 @@
 import { render } from '@testing-library/react-native';
-import { useContraceptiveForm } from '../../../features/contraceptives/hooks/useContraceptiveForm';
-import { ContraceptiveForm } from '../../../features/contraceptives/forms/ContraceptiveForm';
+import { useContraceptiveForm } from '../../../../src/features/contraceptives/hooks/useContraceptiveForm';
+import { ContraceptiveForm } from '../../../../src/features/contraceptives/forms/ContraceptiveForm';
 
 const mockSimpleModal = jest.fn(() => null);
 
-jest.mock('../../../components/feedback/Modal/SimpleModal', () => ({
+jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => ({
     __esModule: true,
     default: (props) => mockSimpleModal(props)
 }));
-jest.mock('../../../features/contraceptives/hooks/useContraceptiveForm', () => ({
+jest.mock('../../../../src/features/contraceptives/hooks/useContraceptiveForm', () => ({
     useContraceptiveForm: jest.fn()
 }));
-jest.mock('../../../features/contraceptives/forms/AlertIntensitySelector', () => ({ AlertIntensitySelector: () => null }));
-jest.mock('../../../features/contraceptives/forms/ContraceptiveTypeSelector', () => ({ ContraceptiveTypeSelector: () => null }));
-jest.mock('../../../features/contraceptives/forms/ExpirationDateField', () => ({ ExpirationDateField: () => null }));
-jest.mock('../../../features/contraceptives/forms/FrequencySelector', () => ({ FrequencySelector: () => null }));
-jest.mock('../../../features/contraceptives/forms/UsageTimeSelector', () => ({ UsageTimeSelector: () => null }));
+jest.mock('../../../../src/features/contraceptives/forms/AlertIntensitySelector', () => ({ AlertIntensitySelector: () => null }));
+jest.mock('../../../../src/features/contraceptives/forms/ContraceptiveTypeSelector', () => ({ ContraceptiveTypeSelector: () => null }));
+jest.mock('../../../../src/features/contraceptives/forms/ExpirationDateField', () => ({ ExpirationDateField: () => null }));
+jest.mock('../../../../src/features/contraceptives/forms/FrequencySelector', () => ({ FrequencySelector: () => null }));
+jest.mock('../../../../src/features/contraceptives/forms/UsageTimeSelector', () => ({ UsageTimeSelector: () => null }));
 
 const base = {
     dados: { nome: '', tipo: '', intensidadeAlerta: '' },

@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import { BottomSheet } from '../../src/shared/components/feedback/BottomSheet/BottomSheet';
-import { EditFieldSheet } from '../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet';
-import AlertModal from '../../components/feedback/Modal/AlertModal/AlertModal';
-import NumberInput from '../../components/forms/NumberInput';
-import RadioOption from '../../components/forms/RadioOption';
+import { BottomSheet } from '../../../src/shared/components/feedback/BottomSheet/BottomSheet';
+import { EditFieldSheet } from '../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet';
+import AlertModal from '../../../components/feedback/Modal/AlertModal/AlertModal';
+import NumberInput from '../../../components/forms/NumberInput';
+import RadioOption from '../../../src/shared/components/forms/RadioOption';
 
 test('BottomSheet monta ao se tornar visível e anima após aparecer', async () => {
     const view = await render(<BottomSheet visivel={false}><Text>Painel</Text></BottomSheet>);

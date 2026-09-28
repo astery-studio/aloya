@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import FormLayout from '../../layouts/FormLayout';
+import FormLayout from '../../../src/shared/layouts/FormLayout';
 
 test('renderiza cabeçalho, conteúdo e ações', async () => {
     await render(

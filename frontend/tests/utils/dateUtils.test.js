@@ -1,8 +1,8 @@
 /**
  * Testes de formatação, validação e comparação dos utilitários de data.
  */
-import { formatDate } from '../../utils/date/formatDate';
-import { isSameDay } from '../../utils/date/isSameDay';
+import { formatDate } from '../../src/shared/utils/date/formatDate';
+import { isSameDay } from '../../src/shared/utils/date/isSameDay';
 import { getMonthDays } from '../../src/shared/utils/getMonthDays';
 
 test('formata a digitação de uma data sem perder dígitos parciais', () => {

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform, Text } from 'react-native';
-import AuthLayout from '../../layouts/AuthLayout';
-import { BottomSheetLayout } from '../../src/shared/layouts/BottomSheet/BottomSheetLayout';
+import AuthLayout from '../../../src/shared/layouts/AuthLayout';
+import { BottomSheetLayout } from '../../../src/shared/layouts/BottomSheet/BottomSheetLayout';
 
 test('AuthLayout usa ajuste de teclado do iOS', async () => {
     const sistemaOriginal = Platform.OS;

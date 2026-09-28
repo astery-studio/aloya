@@ -235,7 +235,7 @@ jest.mock(
 )
 
 jest.mock(
-    '../../components/feedback/Modal/SimpleModal',
+    '../../src/shared/components/feedback/Modal/SimpleModal',
     () => ({
         __esModule: true,
         default: jest.fn(() => null)

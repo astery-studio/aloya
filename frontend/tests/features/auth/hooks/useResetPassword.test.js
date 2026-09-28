@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
-import { useResetPassword } from '../../features/auth/hooks/useResetPassword';
+import { useResetPassword } from '../../../../src/features/auth/hooks/useResetPassword';
 
 test('não envia senhas vazias ou diferentes', async () => {
     const redefinirSenha = jest.fn();

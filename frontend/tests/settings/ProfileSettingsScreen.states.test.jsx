@@ -36,7 +36,7 @@ jest.mock('../../src/features/settings/account/LogoutConfirmation', () => ({
     LogoutConfirmation: jest.fn(() => null)
 }))
 
-jest.mock('../../components/feedback/Modal/SimpleModal', () => ({
+jest.mock('../../src/shared/components/feedback/Modal/SimpleModal', () => ({
     __esModule: true,
     default: jest.fn(() => null)
 }))

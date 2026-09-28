@@ -2,10 +2,10 @@
  * Exercita variantes opcionais dos componentes de formulário da Carla.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import ButtonPopup from '../../components/common/Button/ButtonPopup';
-import FormField from '../../components/forms/FormField';
-import TextInput from '../../components/forms/TextInput';
-import TimeInput from '../../components/forms/TimeInput';
+import ButtonPopup from '../../../src/shared/components/common/Button/ButtonPopup';
+import FormField from '../../../src/shared/components/forms/FormField';
+import TextInput from '../../../src/shared/components/forms/TextInput';
+import TimeInput from '../../../src/shared/components/forms/TimeInput';
 
 test('ButtonPopup rejeita variante fora do contrato', () => {
     expect(() => ButtonPopup({
