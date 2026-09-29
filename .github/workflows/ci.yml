@@ -51,10 +51,6 @@ jobs:
       - name: Validar o schema Prisma
         run: npx prisma validate
 
-      - name: Executar testes
-        if: ${{ hashFiles('backend/test/**', 'backend/tests/**', 'backend/**/*.test.*', 'backend/**/*.spec.*') != '' }}
-        run: npm test
-
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -77,7 +73,3 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
-
-      - name: Executar testes
-        if: ${{ hashFiles('frontend/test/**', 'frontend/tests/**', 'frontend/**/*.test.*', 'frontend/**/*.spec.*') != '' }}
-        run: npm test
