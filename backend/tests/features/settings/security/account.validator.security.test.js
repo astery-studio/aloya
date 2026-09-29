@@ -2,8 +2,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountValidator } from '../src/validators/account.validator.js'
-import * as dateUtils from '../src/shared/utils/date.utils.js'
+import { criarAccountValidator } from '../../../../src/validators/account.validator.js'
+import * as dateUtils from '../../../../src/shared/utils/date.utils.js'
 
 //Cria o validator com as mesmas dependências utilizadas pela aplicação
 function criarValidator() {

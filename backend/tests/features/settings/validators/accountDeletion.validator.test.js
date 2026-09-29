@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountDeletionValidator } from '../src/validators/accountDeletion.validator.js'
+import { criarAccountDeletionValidator } from '../../../../src/validators/accountDeletion.validator.js'
 
 //Cria o validator usado nos testes
 function criarValidator() {

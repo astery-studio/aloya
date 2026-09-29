@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountRoutes } from '../src/routes/account.routes.js'
+import { criarAccountRoutes } from '../../../../src/routes/account.routes.js'
 
 //Confirma a autenticação e a configuração exata de todas as rotas de conta.
 test(

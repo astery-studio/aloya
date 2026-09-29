@@ -2,8 +2,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountService } from '../src/services/account.service.js'
-import * as dateUtils from '../src/shared/utils/date.utils.js'
+import { criarAccountService } from '../../../../src/services/account.service.js'
+import * as dateUtils from '../../../../src/shared/utils/date.utils.js'
 
 //Funcao para criar um usuário de teste com valores padrão, podendo sobrescrever com o objeto alteracoes
 function criarUsuario(alteracoes = {}) {

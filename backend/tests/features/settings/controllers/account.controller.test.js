@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountController } from '../src/controllers/account.controller.js'
+import { criarAccountController } from '../../../../src/controllers/account.controller.js'
 
 //Função para criar um mock de resposta HTTP
 function criarRespostaMock() {
