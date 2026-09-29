@@ -52,6 +52,7 @@ jobs:
         run: npx prisma validate
 
       - name: Executar testes
+        if: ${{ hashFiles('backend/test/**', 'backend/tests/**', 'backend/**/*.test.*', 'backend/**/*.spec.*') != '' }}
         run: npm test
 
   frontend:
@@ -78,4 +79,5 @@ jobs:
         run: npm ci
 
       - name: Executar testes
+        if: ${{ hashFiles('frontend/test/**', 'frontend/tests/**', 'frontend/**/*.test.*', 'frontend/**/*.spec.*') != '' }}
         run: npm test
