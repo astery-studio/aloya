@@ -13,7 +13,7 @@ test('BottomSheet monta ao se tornar visível e anima após aparecer', async () 
 });
 
 test('EditFieldSheet tenta focar o campo quando não está salvando', async () => {
-    const view = await render(<EditFieldSheet visivel titulo="Nome" valor="Carla" />);
+    await render(<EditFieldSheet visivel titulo="Nome" valor="Carla" />);
     expect(() => fireEvent.press(screen.getByLabelText('Nome'))).not.toThrow();
 });
 
@@ -27,7 +27,7 @@ test('ação de fechamento carregando é ignorada com segurança', async () => {
 });
 
 test('campos usam padrões e cobrem interações opcionais', async () => {
-    const view = await render(<><NumberInput valor={1} /><RadioOption titulo="Única" /></>);
+    await render(<><NumberInput valor={1} /><RadioOption titulo="Única" /></>);
     await fireEvent.press(screen.getByLabelText('Duração em dias'));
     expect(screen.getByRole('radio', { name: 'Única' })).not.toBeSelected();
     expect(screen.queryByText('Descrição')).toBeNull();
