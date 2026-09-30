@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { criarAuthService } from '../../src/features/auth/services/auth.service.js';
+import { criarAuthService } from '../../../../src/features/auth/services/auth.service.js';
 
 test('consulta disponibilidade sem expor dados da conta', async () => {
     const consultas = [];

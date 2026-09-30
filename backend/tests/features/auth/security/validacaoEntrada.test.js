@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { criarAuthValidator } from '../../src/features/auth/validators/auth.validator.js';
-import { criarPasswordRecoveryValidator } from '../../src/features/auth/validators/passwordRecovery.validator.js';
-import { criarParentalConsentValidator } from '../../src/features/auth/validators/parentalConsent.validator.js';
+import { criarAuthValidator } from '../../../../src/features/auth/validators/auth.validator.js';
+import { criarPasswordRecoveryValidator } from '../../../../src/features/auth/validators/passwordRecovery.validator.js';
+import { criarParentalConsentValidator } from '../../../../src/features/auth/validators/parentalConsent.validator.js';
 
 test('corpos nulos são rejeitados sem provocar erro interno', () => {
     const auth = criarAuthValidator({ dateUtils: {} });

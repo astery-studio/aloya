@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { criarContaLoginRateLimit } from '../../src/shared/middleware/rateLimit.middleware.js';
+import { criarContaLoginRateLimit } from '../../../../src/shared/middleware/rateLimit.middleware.js';
 
 test('agrupa tentativas distribuídas pelo e-mail normalizado', () => {
     let opcoes;

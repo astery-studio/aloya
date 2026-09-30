@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarPasswordRecoveryValidator
-} from '../../src/features/auth/validators/passwordRecovery.validator.js';
+} from '../../../../src/features/auth/validators/passwordRecovery.validator.js';
 
 function criarValidator() {
     return criarPasswordRecoveryValidator();

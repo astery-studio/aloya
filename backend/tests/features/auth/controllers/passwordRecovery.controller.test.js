@@ -3,7 +3,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { criarPasswordRecoveryController } from '../../src/features/auth/controllers/passwordRecovery.controller.js';
+import { criarPasswordRecoveryController } from '../../../../src/features/auth/controllers/passwordRecovery.controller.js';
 
 function resposta() {
     return {
