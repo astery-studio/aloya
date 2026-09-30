@@ -4,7 +4,7 @@ import { Pressable, Text, TextInput, View } from 'react-native'
 
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
 import { formatDate } from '../../../utils/date/formatDate'
-import { BottomSheet } from '../Bottomsheet/BottomSheet'
+import { BottomSheet } from '../BottomSheet/BottomSheet'
 import { estilos } from './EditFieldSheet.style'
 
 function obterDataVisivel(valor) {

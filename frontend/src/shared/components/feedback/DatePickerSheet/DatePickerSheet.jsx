@@ -6,7 +6,7 @@ import {CaretLeftIcon} from 'phosphor-react-native/src/icons/CaretLeft'
 import {CaretRightIcon} from 'phosphor-react-native/src/icons/CaretRight'
 import {CaretDownIcon} from 'phosphor-react-native/src/icons/CaretDown'
 
-import {BottomSheet} from '../Bottomsheet/BottomSheet'
+import {BottomSheet} from '../BottomSheet/BottomSheet'
 import {BottomSheetLayout} from '../../../layouts/BottomSheet/BottomSheetLayout'
 import {getMonthDays} from '../../../utils/getMonthDays'
 import {estilos,corSeta} from './DatePickerSheet.style'

@@ -17,58 +17,58 @@ import {
     criarExclusaoContaRateLimit,
     criarEmailRateLimit,
     criarLoginRateLimit
-} from '../../middleware/rateLimit.middleware';
+} from '../middleware/rateLimit.middleware.js';
 
 import {
     criarPasswordService
-} from '../../../features/auth/services/password.service';
+} from '../../features/auth/services/password.service.js';
 
 import {
     criarTokenService
-} from '../../../features/auth/services/token.service';
+} from '../../features/auth/services/token.service.js';
 
 import {
     criarEmailService
-} from '../../../features/auth/services/email.service';
+} from '../../features/auth/services/email.service.js';
 
 import {
     criarParentalConsentService
-} from '../../../features/auth/services/parentalConsent.service';
+} from '../../features/auth/services/parentalConsent.service.js';
 
 import {
     criarAuthService
-} from '../../../features/auth/services/auth.service';
+} from '../../features/auth/services/auth.service.js';
 import { criarAccountService } from '../../services/account.service.js';
 import { criarAccountDeletionService } from '../../services/accountDeletion.service.js';
 import { criarLogoutService } from '../../services/logout.service.js';
 
 import {
     criarAuthValidator
-} from '../../../features/auth/validators/auth.validator';
+} from '../../features/auth/validators/auth.validator.js';
 import { criarAccountValidator } from '../../validators/account.validator.js';
 import { criarAccountDeletionValidator } from '../../validators/accountDeletion.validator.js';
 
 import {
     criarParentalConsentValidator
-} from '../../../features/auth/validators/parentalConsent.validator';
+} from '../../features/auth/validators/parentalConsent.validator.js';
 
 import {
     criarAuthController
-} from '../../../features/auth/controllers/auth.controller';
+} from '../../features/auth/controllers/auth.controller.js';
 import { criarAccountController } from '../../controllers/account.controller.js';
 import { criarAccountDeletionController } from '../../controllers/accountDeletion.controller.js';
 import { criarLogoutController } from '../../controllers/logout.controller.js';
-import { criarPasswordRecoveryService } from '../../../features/auth/services/passwordRecovery.service';
-import { criarPasswordRecoveryValidator } from '../../../features/auth/validators/passwordRecovery.validator';
-import { criarPasswordRecoveryController } from '../../../features/auth/controllers/passwordRecovery.controller';
+import { criarPasswordRecoveryService } from '../../features/auth/services/passwordRecovery.service.js';
+import { criarPasswordRecoveryValidator } from '../../features/auth/validators/passwordRecovery.validator.js';
+import { criarPasswordRecoveryController } from '../../features/auth/controllers/passwordRecovery.controller.js';
 
 import {
     criarAuthMiddleware
-} from '../../middleware/auth.middleware';
+} from '../middleware/auth.middleware.js';
 
 import {
     criarParentalConsentMiddleware
-} from '../../middleware/parentalConsent.middleware';
+} from '../middleware/parentalConsent.middleware.js';
 import { criarContraceptiveService } from '../../features/contraceptives/contraceptive.service.js';
 import { criarContraceptiveController } from '../../features/contraceptives/contraceptive.controller.js';
 

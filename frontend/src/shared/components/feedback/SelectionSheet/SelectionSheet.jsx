@@ -1,7 +1,7 @@
 //Mostra opções disponíveis dentro de um BottomSheet
 import { FlatList, Text } from 'react-native'
 import { estilos } from './SelectionSheet.style'
-import { BottomSheet } from '../Bottomsheet/BottomSheet'
+import { BottomSheet } from '../BottomSheet/BottomSheet'
 import { BottomSheetLayout } from '../../../layouts/BottomSheet/BottomSheetLayout'
 import { ButtonSelection } from '../../common/Button/ButtonSelection/ButtonSelection'
 
