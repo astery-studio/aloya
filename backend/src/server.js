@@ -1,12 +1,12 @@
 import express from 'express';
 import helmet from 'helmet';
-import { env } from './config/env.js';
-import { criarContainer } from './config/container.js';
-import { criarAuthRoutes } from './routes/auth.routes.js';
+import { env } from './shared/config/env.js';
+import { criarContainer } from './shared/config/container.js';
+import { criarAuthRoutes } from './features/auth/routes/auth.routes.js';
 import { criarAccountRoutes } from './routes/account.routes.js';
 import { criarLogoutRoutes } from './routes/logout.routes.js';
 import { criarRotasAnticoncepcionais } from './features/contraceptives/contraceptive.routes.js';
-import { rotaNaoEncontrada, tratarErros } from './middlewares/error.middleware.js';
+import { rotaNaoEncontrada, tratarErros } from './shared/middleware/error.middleware.js';
 
 const app = express();
 const container = criarContainer();

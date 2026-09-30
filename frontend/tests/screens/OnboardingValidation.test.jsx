@@ -2,10 +2,10 @@
  * Testes das validações e transições executadas durante o onboarding.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import OnboardingScreen from '../../screens/onboarding/OnboardingScreen';
+import OnboardingScreen from '../../src/features/onboarding/screens/OnboardingScreen';
 
-jest.mock('../../services/auth/tokenStorage', () => ({ salvarToken: jest.fn() }));
-jest.mock('../../features/onboarding/MenstruationCalendar/MenstruationCalendar', () => {
+jest.mock('../../src/shared/storage/tokenStorage', () => ({ salvarToken: jest.fn() }));
+jest.mock('../../src/features/onboarding/components/MenstruationCalendar/MenstruationCalendar', () => {
     const { Pressable, Text } = require('react-native');
     return { __esModule: true, default: ({ aoAlterar }) => (
         <Pressable accessibilityRole="button" accessibilityLabel="Selecionar período"

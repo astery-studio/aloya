@@ -9,7 +9,8 @@
     "start": "node src/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
-    "test:coverage": "node --test --experimental-test-coverage"
+    "test:coverage": "node --test --experimental-test-coverage",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +19,7 @@
     "@prisma/adapter-better-sqlite3": "7.9.1",
     "@prisma/client": "^7.9.1",
     "bcrypt": "^6.0.0",
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "12.11.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

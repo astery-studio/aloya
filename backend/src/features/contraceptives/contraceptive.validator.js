@@ -1,4 +1,4 @@
-import { AppError } from '../../errors/AppError.js';
+import { AppError } from '../../shared/errors/AppError.js';
 import { INTENSIDADES, TIPOS, obterFrequencia } from './contraceptive.constants.js';
 
 const FORMATO_HORARIO = /^([01]\d|2[0-3]):[0-5]\d$/;

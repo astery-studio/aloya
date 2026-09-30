@@ -10,10 +10,10 @@ jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({ DMSans_400Regular: '
 jest.mock('@expo-google-fonts/dm-sans/500Medium', () => ({ DMSans_500Medium: 'medium' }));
 jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({ DMSans_600SemiBold: 'semibold' }));
 jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({ DMSans_700Bold: 'bold' }));
-jest.mock('../../services/createAppServices', () => ({ criarServicosApp: jest.fn() }));
-jest.mock('../../services/auth/tokenStorage', () => ({ obterToken: jest.fn() }));
+jest.mock('../../src/app/createAppServices', () => ({ criarServicosApp: jest.fn() }));
+jest.mock('../../src/shared/storage/tokenStorage', () => ({ obterToken: jest.fn() }));
 
-jest.mock('../../screens/auth/WelcomeScreen', () => {
+jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return jest.fn(({ aoEntrar }) => React.createElement(
@@ -23,7 +23,7 @@ jest.mock('../../screens/auth/WelcomeScreen', () => {
     ));
 });
 
-jest.mock('../../screens/auth/LoginScreen', () => {
+jest.mock('../../src/features/auth/screens/LoginScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return jest.fn(({ aoEntrar }) => React.createElement(
@@ -33,14 +33,14 @@ jest.mock('../../screens/auth/LoginScreen', () => {
     ));
 });
 
-jest.mock('../../screens/auth/ForgotPasswordScreen', () => jest.fn(() => null));
-jest.mock('../../screens/auth/ResetPasswordScreen', () => jest.fn(() => null));
-jest.mock('../../screens/onboarding/OnboardingScreen', () => jest.fn(() => null));
-jest.mock('../../screens/settings/ChangePasswordScreen', () => ({
+jest.mock('../../src/features/auth/screens/ForgotPasswordScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
 }));
 
-jest.mock('../../screens/settings/SettingsScreen', () => {
+jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return {
@@ -52,7 +52,7 @@ jest.mock('../../screens/settings/SettingsScreen', () => {
     };
 });
 
-jest.mock('../../screens/settings/ProfileSettingsScreen', () => {
+jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
@@ -73,9 +73,9 @@ jest.mock('../../screens/settings/ProfileSettingsScreen', () => {
     };
 });
 
-import App from '../../App';
-import { obterToken } from '../../services/auth/tokenStorage';
-import { criarServicosApp } from '../../services/createAppServices';
+import App from '../../src/App';
+import { obterToken } from '../../src/shared/storage/tokenStorage';
+import { criarServicosApp } from '../../src/app/createAppServices';
 
 function criarServicos() {
     return {

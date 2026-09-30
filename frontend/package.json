@@ -33,13 +33,11 @@
       "/node_modules/@react-native/babel-preset/"
     ],
     "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
       "components/**/*.{js,jsx}",
-      "features/**/*.{js,jsx}",
-      "hooks/**/*.{js,jsx}",
-      "layouts/**/*.{js,jsx}",
-      "services/**/*.{js,jsx}",
       "utils/**/*.{js,jsx}",
-      "!**/*.style.js"
+      "!**/*.style.js",
+      "!**/*.styles.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
