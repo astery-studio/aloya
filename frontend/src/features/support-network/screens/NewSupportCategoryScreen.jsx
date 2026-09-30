@@ -4,7 +4,11 @@ import {View} from 'react-native'
 
 import {BellIcon, WarningCircleIcon} from '../../../shared/components/icons/AppIcons'
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
-import {SupportCategoryForm} from '../components/SupportCategoryForm'
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
+import {
+    prepararCategoriaParaSalvar,
+    SupportCategoryForm
+} from '../components/SupportCategoryForm'
 import {SettingsLayout} from '../../settings/layouts/SettingsLayout/SettingsLayout'
 import {tema} from '../../../shared/theme'
 import {estilos} from './NewSupportCategoryScreen.styles'
@@ -287,6 +291,18 @@ function NewSupportCategoryScreen({
         servicoDisponivel
     ])
 
+    //Valida os dados atuais antes de acionar a criação pelo botão fixo.
+    const salvarFormulario = useCallback(() => {
+        const resultado = prepararCategoriaParaSalvar(dados)
+
+        if (resultado.erro) {
+            mostrarErroValidacao(resultado.erro)
+            return
+        }
+
+        return salvarCategoria(resultado.dados)
+    }, [dados, mostrarErroValidacao, salvarCategoria])
+
     //Repete somente a última tentativa feita pela própria tela.
     const tentarNovamente = useCallback(() => {
         if (ultimaTentativa.current) {
@@ -321,6 +337,23 @@ function NewSupportCategoryScreen({
             <SettingsLayout
                 titulo="Nova Categoria"
                 onVoltar={voltar}
+                rodapeFixo
+                rodape={(
+                    <ButtonScreen
+                        texto="Salvar"
+                        aoPressionar={salvarFormulario}
+                        desativado={
+                            carregando
+                            || !servicoDisponivel
+                            || (
+                                dados.nome.trim().length === 0
+                                && dados.dadosVisiveis.length === 0
+                            )
+                        }
+                        carregando={carregando}
+                        variante="laranja"
+                    />
+                )}
             >
                 <View style={estilos.conteudo}>
                     <SupportCategoryForm
@@ -332,6 +365,7 @@ function NewSupportCategoryScreen({
                         }
                         carregando={carregando}
                         bloqueado={!servicoDisponivel}
+                        exibirAcao={false}
                     />
                 </View>
             </SettingsLayout>

@@ -42,6 +42,38 @@ function normalizarNomeCategoria(nome) {
         .replace(/\s+/gu, ' ')
 }
 
+//Valida e normaliza os dados usados tanto pelo formulário quanto por ações externas.
+function prepararCategoriaParaSalvar(dados) {
+    const nome = typeof dados?.nome === 'string'
+        ? dados.nome
+        : ''
+    const dadosVisiveis = Array.isArray(dados?.dadosVisiveis)
+        ? [
+            ...new Set(
+                dados.dadosVisiveis.filter(
+                    permissao => typeof permissao === 'string'
+                )
+            )
+        ]
+        : []
+    const nomeNormalizado = normalizarNomeCategoria(nome)
+
+    if (!nomeNormalizado) {
+        return {erro: ERRO_NOME}
+    }
+
+    if (dadosVisiveis.length === 0) {
+        return {erro: ERRO_PERMISSOES}
+    }
+
+    return {
+        dados: {
+            nome: nomeNormalizado,
+            dadosVisiveis
+        }
+    }
+}
+
 //Recebe dados controlados, valida o formulário e envia somente os campos permitidos.
 function SupportCategoryForm({
     dados,
@@ -49,7 +81,8 @@ function SupportCategoryForm({
     aoSalvar,
     aoErroValidacao,
     carregando = false,
-    bloqueado = false
+    bloqueado = false,
+    exibirAcao = true
 }) {
     const nome =
         typeof dados?.nome === 'string'
@@ -174,25 +207,17 @@ function SupportCategoryForm({
 
     //Valida na mesma ordem do backend e mantém os campos preenchidos quando existe erro.
     const salvar = useCallback(() => {
-        const nomeNormalizado =
-            normalizarNomeCategoria(nome)
-
-        if (!nomeNormalizado) {
-            aoErroValidacao?.(ERRO_NOME)
-            return
-        }
-
-        if (dadosVisiveis.length === 0) {
-            aoErroValidacao?.(
-                ERRO_PERMISSOES
-            )
-            return
-        }
-
-        return aoSalvar({
-            nome: nomeNormalizado,
+        const resultado = prepararCategoriaParaSalvar({
+            nome,
             dadosVisiveis
         })
+
+        if (resultado.erro) {
+            aoErroValidacao?.(resultado.erro)
+            return
+        }
+
+        return aoSalvar(resultado.dados)
     }, [
         aoErroValidacao,
         aoSalvar,
@@ -250,19 +275,21 @@ function SupportCategoryForm({
                 />
             </View>
 
-            <View style={estilos.acao}>
-                <ButtonScreen
-                    texto="Salvar"
-                    aoPressionar={salvar}
-                    desativado={
-                        botaoDesativado
-                    }
-                    carregando={carregando}
-                    variante="laranja"
-                />
-            </View>
+            {exibirAcao ? (
+                <View style={estilos.acao}>
+                    <ButtonScreen
+                        texto="Salvar"
+                        aoPressionar={salvar}
+                        desativado={
+                            botaoDesativado
+                        }
+                        carregando={carregando}
+                        variante="laranja"
+                    />
+                </View>
+            ) : null}
         </View>
     )
 }
 
-export {SupportCategoryForm}
+export {prepararCategoriaParaSalvar, SupportCategoryForm}

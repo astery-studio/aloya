@@ -23,6 +23,15 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         marginTop: 128.2,
         paddingBottom: tema.espacamentos.grande
+    },
+
+    rodapeFixo: {
+        width: '100%',
+        alignItems: 'center',
+        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+        paddingTop: tema.espacamentos.medio,
+        paddingBottom: tema.espacamentos.grande,
+        backgroundColor: tema.cores.neutras.fundoClaro
     }
 })
 

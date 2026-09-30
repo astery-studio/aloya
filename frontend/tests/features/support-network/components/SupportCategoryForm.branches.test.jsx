@@ -68,6 +68,19 @@ describe('SupportCategoryForm - proteções internas', () => {
         })
     })
 
+    test('permite ocultar a ação quando o botão é exibido no rodapé da tela', async () => {
+        const {queryByTestId} = await render(
+            <SupportCategoryForm
+                dados={{nome: 'Família', dadosVisiveis: ['geral.fase_atual']}}
+                aoAlterar={jest.fn()}
+                aoSalvar={jest.fn()}
+                exibirAcao={false}
+            />
+        )
+
+        expect(queryByTestId('botao-falso')).toBeNull()
+    })
+
     test('sanitiza nome e encaminha somente alterações permitidas', async () => {
         const aoAlterar = jest.fn()
 

@@ -55,7 +55,9 @@ jest.mock(
             SettingsLayout: ({
                 titulo,
                 onVoltar,
-                children
+                children,
+                rodape,
+                rodapeFixo
             }) => React.createElement(
                 View,
                 null,
@@ -77,7 +79,16 @@ jest.mock(
                         'Voltar'
                     )
                 ),
-                children
+                children,
+                React.createElement(
+                    View,
+                    {
+                        testID: rodapeFixo
+                            ? 'rodape-fixo-simulado'
+                            : 'rodape-simulado'
+                    },
+                    rodape
+                )
             )
         }
     }
@@ -145,6 +156,10 @@ describe('NewSupportCategoryScreen', () => {
 
         expect(
             screen.getByText('Permissões de Acesso')
+        ).toBeOnTheScreen()
+
+        expect(
+            screen.getByTestId('rodape-fixo-simulado')
         ).toBeOnTheScreen()
     })
 

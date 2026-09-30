@@ -14,7 +14,7 @@ jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayo
     const {Pressable, Text, View} = require('react-native')
 
     return {
-        SettingsLayout: ({titulo, onVoltar, children}) => React.createElement(
+        SettingsLayout: ({titulo, onVoltar, children, rodape}) => React.createElement(
             View,
             null,
             React.createElement(Text, null, titulo),
@@ -27,7 +27,8 @@ jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayo
                 },
                 React.createElement(Text, null, 'Voltar')
             ),
-            children
+            children,
+            rodape
         )
     }
 })
@@ -35,8 +36,13 @@ jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayo
 jest.mock('../../../../src/features/support-network/components/SupportCategoryForm', () => {
     const React = require('react')
     const {View} = require('react-native')
+    const moduloReal = jest.requireActual(
+        '../../../../src/features/support-network/components/SupportCategoryForm'
+    )
 
     return {
+        prepararCategoriaParaSalvar:
+            moduloReal.prepararCategoriaParaSalvar,
         SupportCategoryForm: props => {
             mockFormularioProps = props
             return React.createElement(View, {testID: 'formulario-falso'})
