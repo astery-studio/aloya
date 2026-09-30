@@ -1,5 +1,5 @@
 //Cobre respostas defensivas e estados simultâneos da criação de categoria.
-import {act, fireEvent, render, screen, waitFor} from '@testing-library/react-native'
+import {act, fireEvent, render, screen} from '@testing-library/react-native'
 
 let mockFormularioProps
 let mockModalErroProps
