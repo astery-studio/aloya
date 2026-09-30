@@ -1,0 +1,48 @@
+name: Runtime Audit
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - backend/package.json
+      - backend/package-lock.json
+      - frontend/package.json
+      - frontend/package-lock.json
+      - .github/workflows/runtime-audit.yml
+  push:
+    branches: [main, develop]
+    paths:
+      - backend/package.json
+      - backend/package-lock.json
+      - frontend/package.json
+      - frontend/package-lock.json
+      - .github/workflows/runtime-audit.yml
+  schedule:
+    - cron: '41 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Runtime Audit ${{ matrix.application }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        application: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.application }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.application }}/package-lock.json
+      - run: npm ci
+      - name: Bloquear vulnerabilidades críticas de runtime
+        run: npm audit --omit=dev --audit-level=critical
