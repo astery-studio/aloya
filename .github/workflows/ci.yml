@@ -33,10 +33,10 @@ jobs:
 
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -51,8 +51,40 @@ jobs:
       - name: Validar o schema Prisma
         run: npx prisma validate
 
+      - name: Validar formatação da configuração
+        run: npm run format:check:ci
+
+      - name: Analisar qualidade do código
+        run: npm run lint
+
       - name: Executar testes
         run: npm test
+
+  database:
+    name: Database
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v6
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar e validar migrations em banco vazio
+        run: npm run db:validate-migrations
 
   frontend:
     name: Frontend
@@ -65,10 +97,10 @@ jobs:
 
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -76,6 +108,12 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
+
+      - name: Validar formatação da configuração
+        run: npm run format:check:ci
+
+      - name: Analisar qualidade do código
+        run: npm run lint
 
       - name: Executar testes
         run: npm test

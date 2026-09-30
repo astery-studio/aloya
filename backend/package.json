@@ -5,6 +5,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
+    "db:validate-migrations": "node scripts/validate-migrations.js",
     "dev": "node --watch src/server.js",
     "format": "prettier --write \"**/*.{js,json,md,ts}\"",
     "format:check": "prettier --check \"**/*.{js,json,md,ts}\"",
