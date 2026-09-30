@@ -16,8 +16,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "7.9.1",
-    "@prisma/client": "^7.9.1",
+    "@prisma/adapter-better-sqlite3": "7.10.0",
+    "@prisma/client": "7.10.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "12.11.1",
     "cors": "^2.8.6",
@@ -27,9 +27,13 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "10.0.10",
-    "prisma": "^7.9.1"
+    "prisma": "7.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "overrides": {
+    "deepmerge-ts": "8.0.2",
+    "mysql2": "3.24.5"
   }
 }
