@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import NumberInput from '../../../src/shared/components/forms/NumberInput';
-import { horarioValido } from '../../../utils/validation/isValidTime';
+import { horarioValido } from '../../../src/shared/utils/validation/isValidTime';
 
 test.each([null, undefined])('campo numérico representa %s como vazio', async (valor) => {
     await render(<NumberInput valor={valor} unidade="Ciclos"

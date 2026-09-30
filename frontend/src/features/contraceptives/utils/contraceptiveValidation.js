@@ -1,5 +1,5 @@
 import { isRequired } from '../../../shared/utils/validation/isRequired';
-import { horarioValido } from '../../../../utils/validation/isValidTime';
+import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { obterFrequencia, obterFrequencias, obterTipo } from '../constants/contraceptiveOptions';
 
 function dataIsoHoje() {

@@ -1,7 +1,7 @@
 /**
  * Testes das regras de validação de campos do frontend.
  */
-import { horarioValido } from '../../utils/validation/isValidTime';
+import { horarioValido } from '../../src/shared/utils/validation/isValidTime';
 import { isRequired } from '../../src/shared/utils/validation/isRequired';
 import { isValidDate } from '../../src/shared/utils/validation/isValidDate';
 import { isValidEmail } from '../../src/shared/utils/validation/isValidEmail';
