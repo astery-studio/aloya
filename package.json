@@ -1,5 +1,10 @@
 {
-  "dependencies": {
-    "nodemailer": "^10.0.10"
+  "name": "aloya",
+  "private": true,
+  "scripts": {
+    "format": "npm --prefix backend run format && npm --prefix frontend run format",
+    "format:check": "npm --prefix backend run format:check && npm --prefix frontend run format:check",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "test": "npm --prefix backend test && npm --prefix frontend test"
   }
 }

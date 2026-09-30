@@ -1,0 +1,8 @@
+**/node_modules/
+**/coverage/
+**/.expo/
+**/dist/
+**/web-build/
+**/src/generated/
+**/prisma/*.db*
+package-lock.json
