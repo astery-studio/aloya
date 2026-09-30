@@ -70,5 +70,5 @@ app.use(rotaNaoEncontrada);
 app.use(tratarErros);
 
 app.listen(env.port, () => {
-    console.log(`API executando na porta ${env.port}.`);
+    console.info(`API executando na porta ${env.port}.`);
 });

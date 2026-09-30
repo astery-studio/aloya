@@ -179,12 +179,6 @@ test(
                 }
             }
 
-            async function updateMany() {
-                return {
-                    count: 1
-                }
-            }
-
         let quantidadeComparacoes = 0;
 
         const passwordService = {
