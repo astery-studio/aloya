@@ -20,6 +20,8 @@ function criarRegistro(alteracoes = {}) {
         periodosPausa: [],
         dataValidade: null,
         nivelIntensidadeAlerta: 'critico',
+        ativo: true,
+        removidoEm: null,
         criadoEm: new Date('2026-09-01T12:00:00.000Z'),
         atualizadoEm,
         ...alteracoes
@@ -113,7 +115,7 @@ async function capturarErro(acao) {
     }
 }
 
-test('edita somente o anticoncepcional pertencente à usuária autenticada', async () => {
+test('edita somente o anticoncepcional ativo pertencente à usuária autenticada', async () => {
     const prisma = criarPrisma();
     const service = criarContraceptiveService(prisma, () => agora);
 
@@ -132,12 +134,14 @@ test('edita somente o anticoncepcional pertencente à usuária autenticada', asy
 
     assert.deepEqual(consultaInicial.argumentos.where, {
         id: 7,
-        usuarioId: 3
+        usuarioId: 3,
+        ativo: true
     });
 
     assert.deepEqual(atualizacao.argumentos.where, {
         id: 7,
         usuarioId: 3,
+        ativo: true,
         atualizadoEm
     });
 
@@ -170,7 +174,7 @@ test('edita somente o anticoncepcional pertencente à usuária autenticada', asy
     assert.equal(resultado.tipo, 'diu_hormonal');
 });
 
-test('não revela nem altera anticoncepcional inexistente ou pertencente a outra usuária', async () => {
+test('não revela nem altera anticoncepcional inexistente, removido ou de outra usuária', async () => {
     const prisma = criarPrisma({registroAtual: null});
     const service = criarContraceptiveService(prisma, () => agora);
 
@@ -212,6 +216,7 @@ test('impede sobrescrita quando o registro muda durante a transação', async ()
     assert.deepEqual(atualizacao.argumentos.where, {
         id: 7,
         usuarioId: 3,
+        ativo: true,
         atualizadoEm
     });
 

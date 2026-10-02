@@ -68,17 +68,22 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
         return apresentarAnticoncepcional(registro, relogio());
     }
 
-    //Lista somente os anticoncepcionais pertencentes à usuária autenticada.
+    //Lista somente os anticoncepcionais ativos pertencentes à usuária autenticada.
     async function listar(usuarioId) {
         const registros = await prisma.anticoncepcional.findMany({
-            where: {usuarioId},
-            orderBy: {criadoEm: 'desc'}
+            where: {
+                usuarioId,
+                ativo: true
+            },
+            orderBy: {
+                criadoEm: 'desc'
+            }
         });
 
         return registros.map((registro) => apresentarAnticoncepcional(registro, relogio()));
     }
 
-    //Atualiza o anticoncepcional e suas notificações futuras dentro da mesma transação.
+    //Atualiza somente um anticoncepcional ativo e suas notificações futuras.
     async function editar(usuarioId, idRecebido, entrada) {
         const agora = relogio();
         const id = validarIdAnticoncepcional(idRecebido);
@@ -89,7 +94,8 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
             const registroAtual = await transacao.anticoncepcional.findFirst({
                 where: {
                     id,
-                    usuarioId
+                    usuarioId,
+                    ativo: true
                 }
             });
 
@@ -105,6 +111,7 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
                 where: {
                     id,
                     usuarioId,
+                    ativo: true,
                     atualizadoEm: registroAtual.atualizadoEm
                 },
                 data: dadosPersistencia
@@ -126,7 +133,8 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
             const registroAtualizado = await transacao.anticoncepcional.findFirst({
                 where: {
                     id,
-                    usuarioId
+                    usuarioId,
+                    ativo: true
                 }
             });
 
