@@ -9,8 +9,17 @@ function criarChaveUsuario(requisicao) {
         : 'usuario:nao-autenticado';
 }
 
+//Devolve o nome plural da operação usado nas mensagens de configuração.
+function obterOperacaoPlural(operacao) {
+    return operacao === 'edição'
+        ? 'edições'
+        : 'remoções';
+}
+
 //Valida a configuração obrigatória antes de criar o middleware.
 function validarConfiguracao({rateLimit, janelaMs, limite}, operacao) {
+    const operacaoPlural = obterOperacaoPlural(operacao);
+
     if (typeof rateLimit !== 'function') {
         throw new Error(`O criador do rate limit de ${operacao} de anticoncepcionais não foi configurado.`);
     }
@@ -20,7 +29,7 @@ function validarConfiguracao({rateLimit, janelaMs, limite}, operacao) {
     }
 
     if (!Number.isInteger(limite) || limite <= 0) {
-        throw new Error(`O limite de ${operacao} de anticoncepcionais deve ser um inteiro positivo.`);
+        throw new Error(`O limite de ${operacaoPlural} de anticoncepcionais deve ser um inteiro positivo.`);
     }
 }
 
