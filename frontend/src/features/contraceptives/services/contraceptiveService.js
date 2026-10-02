@@ -1,4 +1,4 @@
-//Centraliza as operações autenticadas de listagem, cadastro e edição de anticoncepcionais.
+//Centraliza as operações autenticadas de listagem, cadastro, edição e remoção de anticoncepcionais.
 import { endpoints } from '../../../shared/services/api/endpoints';
 
 //Recebe um registro da API e retorna o formato imutável utilizado pelas telas.
@@ -80,10 +80,25 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
         return normalizarAnticoncepcional(resposta.anticoncepcional);
     }
 
+    //Remove o anticoncepcional identificado sem enviar corpo ou informações da conta.
+    async function remover(id) {
+        const caminho = criarCaminhoAnticoncepcional(id);
+
+        await requisicaoAutenticada({
+            metodo: 'DELETE',
+            caminho
+        });
+
+        return Object.freeze({
+            id: String(id)
+        });
+    }
+
     return Object.freeze({
         listar,
         cadastrar,
-        editar
+        editar,
+        remover
     });
 }
 
