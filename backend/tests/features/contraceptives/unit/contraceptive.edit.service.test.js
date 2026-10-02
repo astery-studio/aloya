@@ -1,4 +1,4 @@
-//Testa autorização, normalização, concorrência e persistência da edição de anticoncepcionais.
+//Testa autorização, normalização, concorrência, notificações e persistência da edição de anticoncepcionais.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
@@ -67,6 +67,29 @@ function criarPrisma({registroAtual = criarRegistro(), quantidadeAtualizada = 1}
                 chamadas.push({operacao: 'updateMany', argumentos});
                 return {count: quantidadeAtualizada};
             }
+        },
+
+        notificacao: {
+            async updateMany(argumentos) {
+                chamadas.push({
+                    operacao: 'notificacao.updateMany',
+                    argumentos
+                });
+
+                return {count: 1};
+            },
+
+            async create(argumentos) {
+                chamadas.push({
+                    operacao: 'notificacao.create',
+                    argumentos
+                });
+
+                return {
+                    id: 1,
+                    ...argumentos.data
+                };
+            }
         }
     };
 
@@ -105,6 +128,7 @@ test('edita somente o anticoncepcional pertencente à usuária autenticada', asy
 
     const consultaInicial = prisma.chamadas.find((chamada) => chamada.operacao === 'findFirst');
     const atualizacao = prisma.chamadas.find((chamada) => chamada.operacao === 'updateMany');
+    const cancelamento = prisma.chamadas.find((chamada) => chamada.operacao === 'notificacao.updateMany');
 
     assert.deepEqual(consultaInicial.argumentos.where, {
         id: 7,
@@ -125,6 +149,23 @@ test('edita somente o anticoncepcional pertencente à usuária autenticada', asy
     assert.deepEqual(atualizacao.argumentos.data.periodosPausa, []);
     assert.equal(atualizacao.argumentos.data.dataValidade.toISOString(), '2030-10-02T00:00:00.000Z');
     assert.equal(atualizacao.argumentos.data.nivelIntensidadeAlerta, 'moderado');
+
+    assert.deepEqual(cancelamento.argumentos.where, {
+        usuarioId: 3,
+        tipoOrigem: 'anticoncepcional',
+        origemId: 7,
+        statusEnvio: 'agendada',
+        dataHoraDisparo: null,
+        dataHoraProgramada: {
+            gt: agora
+        }
+    });
+
+    assert.deepEqual(cancelamento.argumentos.data, {
+        statusEnvio: 'cancelada'
+    });
+
+    assert.equal(prisma.chamadas.some((chamada) => chamada.operacao === 'notificacao.create'), false);
     assert.equal(resultado.nome, 'Mirena');
     assert.equal(resultado.tipo, 'diu_hormonal');
 });
@@ -140,6 +181,7 @@ test('não revela nem altera anticoncepcional inexistente ou pertencente a outra
     assert.equal(erro?.status, 404);
     assert.equal(erro?.codigo, 'ANTICONCEPCIONAL_NAO_ENCONTRADO');
     assert.equal(prisma.chamadas.some((chamada) => chamada.operacao === 'updateMany'), false);
+    assert.equal(prisma.chamadas.some((chamada) => chamada.operacao === 'notificacao.updateMany'), false);
 });
 
 test('rejeita atualização sem alteração real', async () => {
@@ -151,6 +193,7 @@ test('rejeita atualização sem alteração real', async () => {
     assert.equal(erro?.status, 422);
     assert.equal(erro?.codigo, 'SEM_ALTERACOES');
     assert.equal(prisma.chamadas.some((chamada) => chamada.operacao === 'updateMany'), false);
+    assert.equal(prisma.chamadas.some((chamada) => chamada.operacao === 'notificacao.updateMany'), false);
 });
 
 test('impede sobrescrita quando o registro muda durante a transação', async () => {
@@ -171,6 +214,8 @@ test('impede sobrescrita quando o registro muda durante a transação', async ()
         usuarioId: 3,
         atualizadoEm
     });
+
+    assert.equal(prisma.chamadas.some((chamada) => chamada.operacao === 'notificacao.updateMany'), false);
 });
 
 test('valida identificador e corpo antes de abrir a transação', async () => {

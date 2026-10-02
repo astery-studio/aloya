@@ -27,7 +27,7 @@ const autorizacao = {
     'content-type': 'application/json'
 };
 
-//Cria um banco falso que respeita propriedade, concorrência e transação.
+//Cria um banco falso que respeita propriedade, concorrência, notificações e transação.
 function criarBanco({usuarioDono = 7, existe = true} = {}) {
     let registro = {
         id: 1,
@@ -79,6 +79,19 @@ function criarBanco({usuarioDono = 7, existe = true} = {}) {
                 };
 
                 return {count: 1};
+            }
+        },
+
+        notificacao: {
+            async updateMany() {
+                return {count: 1};
+            },
+
+            async create({data}) {
+                return {
+                    id: 1,
+                    ...data
+                };
             }
         },
 
