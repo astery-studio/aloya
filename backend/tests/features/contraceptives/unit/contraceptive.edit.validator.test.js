@@ -106,28 +106,22 @@ test('limpa agenda e frequência quando o novo tipo é DIU', () => {
     assert.equal(dados.dataValidade.toISOString(), '2030-10-02T00:00:00.000Z');
 });
 
-test('exige validade para anel sem descartar frequência e horário', () => {
+test('anel não exige validade e descarta uma validade antiga', () => {
     const anel = {
         nome: 'Anel',
         tipo: 'anel_vaginal',
         frequenciaId: 'anel_21',
         horarios: ['09:00'],
         dataPrimeiroUso: '2026-10-02',
+        dataValidade: '2026-12-01',
         intensidadeAlerta: 'leve'
     };
 
-    const erro = capturarErro(() => validarEdicaoAnticoncepcional(anel, hoje));
-
-    assert.equal(erro?.codigo, 'VALIDADE_INVALIDA');
-
-    const dados = validarEdicaoAnticoncepcional({
-        ...anel,
-        dataValidade: '2026-12-01'
-    }, hoje);
+    const dados = validarEdicaoAnticoncepcional(anel, hoje);
 
     assert.equal(dados.frequencia, 'uso_21_dias');
     assert.deepEqual(dados.horarios, ['09:00']);
-    assert.equal(dados.dataValidade.toISOString(), '2026-12-01T00:00:00.000Z');
+    assert.equal(dados.dataValidade, null);
 });
 
 test('aceita somente identificadores inteiros positivos e seguros', () => {

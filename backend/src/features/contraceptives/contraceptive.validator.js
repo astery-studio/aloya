@@ -156,7 +156,7 @@ function validarDadosAnticoncepcional(entrada, hoje, permitirAliases, aplicarInt
         regraFrequencia,
         frequencia: regraFrequencia.valor,
         dataPrimeiroUso,
-        dataValidade: tipo === 'anel_vaginal' ? validarDataValidade(entrada.dataValidade, hoje) : null
+        dataValidade: null
     };
 }
 
