@@ -1,4 +1,4 @@
-//Executa cadastro, listagem e edição segura dos anticoncepcionais da usuária autenticada.
+//Executa cadastro, listagem, edição e remoção segura dos anticoncepcionais da usuária autenticada.
 import { AppError } from '../../shared/errors/AppError.js';
 import { calcularPeriodosPausa } from './contraceptive.schedule.js';
 import { apresentarAnticoncepcional } from './contraceptive.presenter.js';
@@ -146,10 +146,68 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
         });
     }
 
+    //Desativa o anticoncepcional e cancela seus reenvios pendentes na mesma transação.
+    async function remover(usuarioId, idRecebido) {
+        const agora = relogio();
+        const id = validarIdAnticoncepcional(idRecebido);
+
+        return prisma.$transaction(async (transacao) => {
+            const registroAtual = await transacao.anticoncepcional.findFirst({
+                where: {
+                    id,
+                    usuarioId,
+                    ativo: true
+                },
+                select: {
+                    id: true,
+                    atualizadoEm: true
+                }
+            });
+
+            if (!registroAtual) {
+                throw new AppError('Anticoncepcional não encontrado.', 404, 'ANTICONCEPCIONAL_NAO_ENCONTRADO');
+            }
+
+            const resultado = await transacao.anticoncepcional.updateMany({
+                where: {
+                    id,
+                    usuarioId,
+                    ativo: true,
+                    atualizadoEm: registroAtual.atualizadoEm
+                },
+                data: {
+                    ativo: false,
+                    removidoEm: agora
+                }
+            });
+
+            if (resultado.count !== 1) {
+                throw new AppError('O anticoncepcional foi alterado em outra operação. Atualize os dados e tente novamente.', 409, 'CONFLITO_REMOCAO');
+            }
+
+            await transacao.notificacao.updateMany({
+                where: {
+                    usuarioId,
+                    tipoOrigem: 'anticoncepcional',
+                    origemId: id,
+                    statusEnvio: 'agendada'
+                },
+                data: {
+                    statusEnvio: 'cancelada'
+                }
+            });
+
+            return {
+                id
+            };
+        });
+    }
+
     return {
         cadastrar,
         listar,
-        editar
+        editar,
+        remover
     };
 }
 
