@@ -1,5 +1,5 @@
 //Orquestra a edição e a remoção segura de um anticoncepcional já cadastrado.
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { PillIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
@@ -20,29 +20,48 @@ function EditContraceptiveScreen({
     const [confirmacaoExclusaoVisivel, setConfirmacaoExclusaoVisivel] = useState(false);
     const [erroExclusaoVisivel, setErroExclusaoVisivel] = useState(false);
     const [sucesso, setSucesso] = useState(null);
+    const operacaoEmAndamento = useRef(null);
+    const telaMontada = useRef(true);
     const ocupado = salvando || excluindo;
     const registroValido = anticoncepcional && typeof anticoncepcional === 'object' && anticoncepcional.id;
 
+    //Registra quando a tela deixa de existir para evitar atualizações de estado atrasadas.
+    useEffect(() => {
+        telaMontada.current = true;
+
+        return () => {
+            telaMontada.current = false;
+        };
+    }, []);
+
     //Envia a atualização uma única vez e permite que o formulário trate a falha.
     async function atualizar(dadosAtualizados) {
-        if (salvando || excluindo || typeof aoAtualizar !== 'function') return false;
+        if (operacaoEmAndamento.current || typeof aoAtualizar !== 'function') return false;
 
+        operacaoEmAndamento.current = 'atualizacao';
         setSalvando(true);
 
         try {
             await aoAtualizar(dadosAtualizados);
+
+            if (!telaMontada.current) return false;
+
             setSucesso('atualizacao');
             return true;
         } catch (erro) {
             throw erro;
         } finally {
-            setSalvando(false);
+            operacaoEmAndamento.current = null;
+
+            if (telaMontada.current) {
+                setSalvando(false);
+            }
         }
     }
 
     //Abre a confirmação sem executar a remoção imediatamente.
     function solicitarExclusao() {
-        if (ocupado || typeof aoExcluir !== 'function') return;
+        if (operacaoEmAndamento.current || ocupado || typeof aoExcluir !== 'function') return;
 
         setErroExclusaoVisivel(false);
         setConfirmacaoExclusaoVisivel(true);
@@ -50,27 +69,40 @@ function EditContraceptiveScreen({
 
     //Remove somente depois da confirmação explícita da pessoa usuária.
     async function confirmarExclusao() {
-        if (ocupado || typeof aoExcluir !== 'function' || !registroValido) return false;
+        if (operacaoEmAndamento.current || typeof aoExcluir !== 'function' || !registroValido) return false;
 
+        operacaoEmAndamento.current = 'exclusao';
         setExcluindo(true);
         setErroExclusaoVisivel(false);
 
         try {
             await aoExcluir(anticoncepcional.id);
+
+            if (!telaMontada.current) return false;
+
             setConfirmacaoExclusaoVisivel(false);
             setSucesso('exclusao');
             return true;
         } catch {
-            setConfirmacaoExclusaoVisivel(false);
-            setErroExclusaoVisivel(true);
+            if (telaMontada.current) {
+                setConfirmacaoExclusaoVisivel(false);
+                setErroExclusaoVisivel(true);
+            }
+
             return false;
         } finally {
-            setExcluindo(false);
+            operacaoEmAndamento.current = null;
+
+            if (telaMontada.current) {
+                setExcluindo(false);
+            }
         }
     }
 
     //Fecha o sucesso e retorna para a listagem, que já terá sido atualizada pelo fluxo.
     function concluirSucesso() {
+        if (operacaoEmAndamento.current) return;
+
         setSucesso(null);
         aoVoltar?.();
     }

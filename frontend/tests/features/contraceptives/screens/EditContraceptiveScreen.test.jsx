@@ -1,4 +1,4 @@
-//Testa atualização, confirmação e estados assíncronos da tela de edição.
+//Testa atualização, confirmação, concorrência e estados assíncronos da tela de edição.
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { EditContraceptiveScreen } from '../../../../src/features/contraceptives/screens/EditContraceptiveScreen';
 
@@ -45,6 +45,22 @@ const anticoncepcionalAtualizado = {
     nome: 'Mercilon atualizado'
 };
 
+//Cria uma promessa controlada pelo teste para simular uma API que ainda não respondeu.
+function criarPromessaControlada() {
+    let resolver;
+    let rejeitar;
+    const promessa = new Promise((resolve, reject) => {
+        resolver = resolve;
+        rejeitar = reject;
+    });
+
+    return {
+        promessa,
+        resolver,
+        rejeitar
+    };
+}
+
 //Retorna a versão mais recente de um modal pelo seu título.
 function obterModal(titulo) {
     return mockSimpleModal.mock.calls
@@ -69,23 +85,14 @@ test('mostra o título, o formulário preenchido e a ação de apagar', async ()
         />
     );
 
-    expect(
-        screen.getByText('Editar o Anticoncepcional')
-    ).toBeOnTheScreen();
+    expect(screen.getByText('Editar o Anticoncepcional')).toBeOnTheScreen();
+    expect(screen.getByRole('button', {name: 'Apagar medicação'})).toBeEnabled();
 
-    expect(
-        screen.getByRole('button', {
-            name: 'Apagar medicação'
-        })
-    ).toBeEnabled();
-
-    expect(mockContraceptiveForm).toHaveBeenCalledWith(
-        expect.objectContaining({
-            anticoncepcional,
-            salvando: false,
-            onSubmit: expect.any(Function)
-        })
-    );
+    expect(mockContraceptiveForm).toHaveBeenCalledWith(expect.objectContaining({
+        anticoncepcional,
+        salvando: false,
+        onSubmit: expect.any(Function)
+    }));
 });
 
 test('mostra uma mensagem segura quando o registro não foi informado', async () => {
@@ -95,14 +102,8 @@ test('mostra uma mensagem segura quando o registro não foi informado', async ()
         />
     );
 
-    expect(
-        screen.getByText('Anticoncepcional indisponível')
-    ).toBeOnTheScreen();
-
-    expect(
-        screen.getByRole('alert')
-    ).toHaveTextContent('Não foi possível carregar os dados para edição.');
-
+    expect(screen.getByText('Anticoncepcional indisponível')).toBeOnTheScreen();
+    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar os dados para edição.');
     expect(mockContraceptiveForm).not.toHaveBeenCalled();
 });
 
@@ -140,6 +141,39 @@ test('atualiza e mostra o sucesso somente depois da resposta', async () => {
     expect(aoVoltar).toHaveBeenCalledTimes(1);
 });
 
+test('bloqueia duas atualizações iniciadas antes da próxima renderização', async () => {
+    const requisicao = criarPromessaControlada();
+    const aoAtualizar = jest.fn().mockReturnValue(requisicao.promessa);
+
+    await render(
+        <EditContraceptiveScreen
+            anticoncepcional={anticoncepcional}
+            aoAtualizar={aoAtualizar}
+            aoExcluir={jest.fn()}
+            aoVoltar={jest.fn()}
+        />
+    );
+
+    const propriedadesFormulario = mockContraceptiveForm.mock.calls.at(-1)[0];
+    let primeiraAtualizacao;
+    let segundaAtualizacao;
+
+    await act(async () => {
+        primeiraAtualizacao = propriedadesFormulario.onSubmit(anticoncepcionalAtualizado);
+        segundaAtualizacao = await propriedadesFormulario.onSubmit(anticoncepcionalAtualizado);
+    });
+
+    expect(segundaAtualizacao).toBe(false);
+    expect(aoAtualizar).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+        requisicao.resolver(anticoncepcionalAtualizado);
+        await primeiraAtualizacao;
+    });
+
+    expect(obterModal('Anticoncepcional atualizado com sucesso').visivel).toBe(true);
+});
+
 test('não transforma falha de atualização em sucesso', async () => {
     const falha = new Error('erro interno');
     const aoAtualizar = jest.fn().mockRejectedValue(falha);
@@ -159,9 +193,7 @@ test('não transforma falha de atualização em sucesso', async () => {
         act(async () => propriedadesFormulario.onSubmit(anticoncepcionalAtualizado))
     ).rejects.toThrow('erro interno');
 
-    expect(
-        obterModal('Anticoncepcional atualizado com sucesso')?.visivel
-    ).not.toBe(true);
+    expect(obterModal('Anticoncepcional atualizado com sucesso')?.visivel).not.toBe(true);
 });
 
 test('abre a confirmação sem remover no primeiro toque', async () => {
@@ -176,11 +208,7 @@ test('abre a confirmação sem remover no primeiro toque', async () => {
         />
     );
 
-    await fireEvent.press(
-        screen.getByRole('button', {
-            name: 'Apagar medicação'
-        })
-    );
+    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
 
     expect(aoExcluir).not.toHaveBeenCalled();
 
@@ -204,11 +232,7 @@ test('remove somente depois da confirmação e mostra o sucesso', async () => {
         />
     );
 
-    await fireEvent.press(
-        screen.getByRole('button', {
-            name: 'Apagar medicação'
-        })
-    );
+    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
 
     const confirmacao = obterModal('Apagar anticoncepcional');
 
@@ -218,10 +242,42 @@ test('remove somente depois da confirmação e mostra o sucesso', async () => {
 
     expect(aoExcluir).toHaveBeenCalledTimes(1);
     expect(aoExcluir).toHaveBeenCalledWith('7');
+    expect(obterModal('Anticoncepcional removido com sucesso').visivel).toBe(true);
+});
 
-    expect(
-        obterModal('Anticoncepcional removido com sucesso').visivel
-    ).toBe(true);
+test('bloqueia duas exclusões iniciadas antes da próxima renderização', async () => {
+    const requisicao = criarPromessaControlada();
+    const aoExcluir = jest.fn().mockReturnValue(requisicao.promessa);
+
+    await render(
+        <EditContraceptiveScreen
+            anticoncepcional={anticoncepcional}
+            aoAtualizar={jest.fn()}
+            aoExcluir={aoExcluir}
+            aoVoltar={jest.fn()}
+        />
+    );
+
+    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
+
+    const confirmacao = obterModal('Apagar anticoncepcional');
+    let primeiraExclusao;
+    let segundaExclusao;
+
+    await act(async () => {
+        primeiraExclusao = confirmacao.acaoPrincipal.aoPressionar();
+        segundaExclusao = await confirmacao.acaoPrincipal.aoPressionar();
+    });
+
+    expect(segundaExclusao).toBe(false);
+    expect(aoExcluir).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+        requisicao.resolver();
+        await primeiraExclusao;
+    });
+
+    expect(obterModal('Anticoncepcional removido com sucesso').visivel).toBe(true);
 });
 
 test('mantém a tela e mostra erro amigável quando a remoção falha', async () => {
@@ -236,11 +292,7 @@ test('mantém a tela e mostra erro amigável quando a remoção falha', async ()
         />
     );
 
-    await fireEvent.press(
-        screen.getByRole('button', {
-            name: 'Apagar medicação'
-        })
-    );
+    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
 
     const confirmacao = obterModal('Apagar anticoncepcional');
 
@@ -264,9 +316,5 @@ test('desativa a remoção quando a ação não foi fornecida', async () => {
         />
     );
 
-    expect(
-        screen.getByRole('button', {
-            name: 'Apagar medicação'
-        })
-    ).toBeDisabled();
+    expect(screen.getByRole('button', {name: 'Apagar medicação'})).toBeDisabled();
 });
