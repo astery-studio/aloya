@@ -20,7 +20,7 @@ if (
     !Number.isInteger(bcryptRounds) ||
     bcryptRounds < 10 ||
     bcryptRounds > 15
-    ) {
+) {
     throw new Error('BCRYPT_ROUNDS deve ser um inteiro entre 10 e 15.');
 }
 
@@ -78,6 +78,14 @@ const edicaoAnticoncepcionalRateLimitJanelaMs = Number(
 
 const edicaoAnticoncepcionalRateLimitMaximo = Number(
     process.env.EDICAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO || 20
+);
+
+const remocaoAnticoncepcionalRateLimitJanelaMs = Number(
+    process.env.REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const remocaoAnticoncepcionalRateLimitMaximo = Number(
+    process.env.REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO || 5
 );
 
 if (
@@ -142,7 +150,9 @@ const limitesAdicionais = [
     ['EXCLUSAO_CONTA_RATE_LIMIT_JANELA_MS', exclusaoContaRateLimitJanelaMs],
     ['EXCLUSAO_CONTA_RATE_LIMIT_MAXIMO', exclusaoContaRateLimitMaximo],
     ['EDICAO_ANTICONCEPCIONAL_RATE_LIMIT_JANELA_MS', edicaoAnticoncepcionalRateLimitJanelaMs],
-    ['EDICAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO', edicaoAnticoncepcionalRateLimitMaximo]
+    ['EDICAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO', edicaoAnticoncepcionalRateLimitMaximo],
+    ['REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_JANELA_MS', remocaoAnticoncepcionalRateLimitJanelaMs],
+    ['REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO', remocaoAnticoncepcionalRateLimitMaximo]
 ];
 
 for (const [nome, valor] of limitesAdicionais) {
@@ -165,6 +175,8 @@ const env = {
     exclusaoContaRateLimitMaximo,
     edicaoAnticoncepcionalRateLimitJanelaMs,
     edicaoAnticoncepcionalRateLimitMaximo,
+    remocaoAnticoncepcionalRateLimitJanelaMs,
+    remocaoAnticoncepcionalRateLimitMaximo,
     jwtSecret: obterVariavelObrigatoria('JWT_SECRET'), //a chave para criar a sessão do usuário
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '90d', // O token de login gerado dura 90 dias
 
