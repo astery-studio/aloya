@@ -1,11 +1,12 @@
+//Monta e conecta as dependências usadas pela aplicação.
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
 import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
+
 import { env } from './env.js';
 import { prisma } from './prisma.js';
-
 import * as dateUtils from '../utils/date.utils.js';
 
 import {
@@ -18,42 +19,21 @@ import {
     criarLoginRateLimit
 } from '../middleware/rateLimit.middleware.js';
 
-import {
-    criarPasswordService
-} from '../../features/auth/services/password.service.js';
-
-import {
-    criarTokenService
-} from '../../features/auth/services/token.service.js';
-
-import {
-    criarEmailService
-} from '../../features/auth/services/email.service.js';
-
-import {
-    criarParentalConsentService
-} from '../../features/auth/services/parentalConsent.service.js';
-
-import {
-    criarAuthService
-} from '../../features/auth/services/auth.service.js';
+import { criarPasswordService } from '../../features/auth/services/password.service.js';
+import { criarTokenService } from '../../features/auth/services/token.service.js';
+import { criarEmailService } from '../../features/auth/services/email.service.js';
+import { criarParentalConsentService } from '../../features/auth/services/parentalConsent.service.js';
+import { criarAuthService } from '../../features/auth/services/auth.service.js';
 import { criarAccountService } from '../../services/account.service.js';
 import { criarAccountDeletionService } from '../../services/accountDeletion.service.js';
 import { criarLogoutService } from '../../services/logout.service.js';
 
-import {
-    criarAuthValidator
-} from '../../features/auth/validators/auth.validator.js';
+import { criarAuthValidator } from '../../features/auth/validators/auth.validator.js';
 import { criarAccountValidator } from '../../validators/account.validator.js';
 import { criarAccountDeletionValidator } from '../../validators/accountDeletion.validator.js';
+import { criarParentalConsentValidator } from '../../features/auth/validators/parentalConsent.validator.js';
 
-import {
-    criarParentalConsentValidator
-} from '../../features/auth/validators/parentalConsent.validator.js';
-
-import {
-    criarAuthController
-} from '../../features/auth/controllers/auth.controller.js';
+import { criarAuthController } from '../../features/auth/controllers/auth.controller.js';
 import { criarAccountController } from '../../controllers/account.controller.js';
 import { criarAccountDeletionController } from '../../controllers/accountDeletion.controller.js';
 import { criarLogoutController } from '../../controllers/logout.controller.js';
@@ -61,17 +41,16 @@ import { criarPasswordRecoveryService } from '../../features/auth/services/passw
 import { criarPasswordRecoveryValidator } from '../../features/auth/validators/passwordRecovery.validator.js';
 import { criarPasswordRecoveryController } from '../../features/auth/controllers/passwordRecovery.controller.js';
 
-import {
-    criarAuthMiddleware
-} from '../middleware/auth.middleware.js';
-
-import {
-    criarParentalConsentMiddleware
-} from '../middleware/parentalConsent.middleware.js';
+import { criarAuthMiddleware } from '../middleware/auth.middleware.js';
+import { criarParentalConsentMiddleware } from '../middleware/parentalConsent.middleware.js';
 import { criarContraceptiveService } from '../../features/contraceptives/contraceptive.service.js';
 import { criarContraceptiveController } from '../../features/contraceptives/contraceptive.controller.js';
-import { criarEdicaoAnticoncepcionalRateLimit } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
+import {
+    criarEdicaoAnticoncepcionalRateLimit,
+    criarRemocaoAnticoncepcionalRateLimit
+} from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
 
+//Cria todos os serviços, controllers e middlewares compartilhados pelo servidor.
 function criarContainer() {
     const transporter = nodemailer.createTransport({
         host: env.smtp.host,
@@ -104,14 +83,13 @@ function criarContainer() {
         remetente: env.smtp.from
     });
 
-    const parentalConsentService =
-        criarParentalConsentService({
-            prisma,
-            emailService,
-            crypto,
-            baseUrl: env.parentalConsentBaseUrl,
-            dateUtils
-        });
+    const parentalConsentService = criarParentalConsentService({
+        prisma,
+        emailService,
+        crypto,
+        baseUrl: env.parentalConsentBaseUrl,
+        dateUtils
+    });
 
     const passwordRecoveryService = criarPasswordRecoveryService({
         prisma,
@@ -121,8 +99,7 @@ function criarContainer() {
         baseUrl: env.passwordResetBaseUrl
     });
 
-    const passwordRecoveryValidator =
-        criarPasswordRecoveryValidator();
+    const passwordRecoveryValidator = criarPasswordRecoveryValidator();
 
     const passwordRecoveryController = criarPasswordRecoveryController({
         passwordRecoveryService,
@@ -159,8 +136,7 @@ function criarContainer() {
         dateUtils
     });
 
-    const parentalConsentValidator =
-        criarParentalConsentValidator();
+    const parentalConsentValidator = criarParentalConsentValidator();
 
     const accountValidator = criarAccountValidator({
         dateUtils
@@ -173,10 +149,9 @@ function criarContainer() {
         prisma
     });
 
-    const parentalConsentMiddleware =
-        criarParentalConsentMiddleware({
-            parentalConsentService
-        });
+    const parentalConsentMiddleware = criarParentalConsentMiddleware({
+        parentalConsentService
+    });
 
     const cadastroRateLimit = criarCadastroRateLimit({
         rateLimit,
@@ -226,6 +201,12 @@ function criarContainer() {
         limite: env.edicaoAnticoncepcionalRateLimitMaximo
     });
 
+    const remocaoAnticoncepcionalRateLimit = criarRemocaoAnticoncepcionalRateLimit({
+        rateLimit,
+        janelaMs: env.remocaoAnticoncepcionalRateLimitJanelaMs,
+        limite: env.remocaoAnticoncepcionalRateLimitMaximo
+    });
+
     const authController = criarAuthController({
         authService,
         authValidator,
@@ -267,7 +248,8 @@ function criarContainer() {
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
-        edicaoAnticoncepcionalRateLimit
+        edicaoAnticoncepcionalRateLimit,
+        remocaoAnticoncepcionalRateLimit
     };
 }
 
