@@ -141,3 +141,11 @@ test('aceita somente identificadores inteiros positivos e seguros', () => {
         assert.equal(erro?.codigo, 'ID_ANTICONCEPCIONAL_INVALIDO');
     }
 });
+
+test('rejeita listas de horários com posições vazias', () => {
+    const horarios = new Array(1);
+    const erro = capturarErro(() => validarEdicaoAnticoncepcional({...pilulaValida, horarios}, hoje));
+
+    assert.equal(erro?.status, 422);
+    assert.equal(erro?.codigo, 'HORARIO_INVALIDO');
+});

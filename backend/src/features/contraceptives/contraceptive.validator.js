@@ -126,7 +126,7 @@ function validarDadosAnticoncepcional(entrada, hoje, permitirAliases, aplicarInt
         throw new AppError('Informe no máximo 24 horários de uso.', 422, 'LIMITE_HORARIOS_EXCEDIDO');
     }
 
-    const possuiHorarioInvalido = horarios.some((horario, indice) => !Object.hasOwn(horarios, indice) || typeof horario !== 'string' || !FORMATO_HORARIO.test(horario));
+    const possuiHorarioInvalido = Array.from({length: horarios.length}, (_, indice) => indice).some((indice) => !Object.hasOwn(horarios, indice) || typeof horarios[indice] !== 'string' || !FORMATO_HORARIO.test(horarios[indice]));
 
     if (possuiHorarioInvalido) {
         throw new AppError('Informe os horários no formato HH:mm.', 422, 'HORARIO_INVALIDO');
