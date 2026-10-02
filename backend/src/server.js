@@ -59,10 +59,10 @@ app.use(
 );
 
 app.use(
-    '/api/anticoncepcionais',
     criarRotasAnticoncepcionais({
         autenticar: container.authMiddleware.autenticar,
-        controller: container.contraceptiveController
+        controller: container.contraceptiveController,
+        edicaoRateLimit: container.edicaoAnticoncepcionalRateLimit
     })
 );
 

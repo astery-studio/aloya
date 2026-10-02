@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
 import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
-
 import { env } from './env.js';
 import { prisma } from './prisma.js';
 
@@ -71,6 +70,7 @@ import {
 } from '../middleware/parentalConsent.middleware.js';
 import { criarContraceptiveService } from '../../features/contraceptives/contraceptive.service.js';
 import { criarContraceptiveController } from '../../features/contraceptives/contraceptive.controller.js';
+import { criarEdicaoAnticoncepcionalRateLimit } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
 
 function criarContainer() {
     const transporter = nodemailer.createTransport({
@@ -220,6 +220,12 @@ function criarContainer() {
         limite: env.exclusaoContaRateLimitMaximo
     });
 
+    const edicaoAnticoncepcionalRateLimit = criarEdicaoAnticoncepcionalRateLimit({
+        rateLimit,
+        janelaMs: env.edicaoAnticoncepcionalRateLimitJanelaMs,
+        limite: env.edicaoAnticoncepcionalRateLimitMaximo
+    });
+
     const authController = criarAuthController({
         authService,
         authValidator,
@@ -260,7 +266,8 @@ function criarContainer() {
         configuracoesContaRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
-        passwordRecoveryController
+        passwordRecoveryController,
+        edicaoAnticoncepcionalRateLimit
     };
 }
 
