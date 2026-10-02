@@ -18,7 +18,7 @@ import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
-import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
+import { ContraceptiveHuTestAccess } from './features/contraceptives/testing/ContraceptiveHuTestAccess';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
@@ -257,10 +257,11 @@ export default function App() {
                 if (!perfil && !carregandoPerfil && !erroPerfil) carregarPerfil();
             }} />;
     } else if (telaInterna === telasInternas.anticoncepcionais) {
-        conteudo = <ContraceptiveFlow
+        conteudo = <ContraceptiveHuTestAccess
             service={configuracao.servicos.contraceptiveService}
             onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-            onSessaoExpirada={finalizarSessao} />;
+            onSessaoExpirada={finalizarSessao} 
+        />;
     } else if (telaInterna === telasInternas.alterarSenha) {
         conteudo = <ChangePasswordScreen
             alterarSenha={configuracao.servicos.accountService.alterarSenha}
