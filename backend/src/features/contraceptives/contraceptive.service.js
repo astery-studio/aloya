@@ -2,6 +2,7 @@
 import { AppError } from '../../shared/errors/AppError.js';
 import { calcularPeriodosPausa } from './contraceptive.schedule.js';
 import { apresentarAnticoncepcional } from './contraceptive.presenter.js';
+import { sincronizarNotificacoesEdicao } from './contraceptive.notifications.js';
 import {
     validarCadastroAnticoncepcional,
     validarEdicaoAnticoncepcional,
@@ -77,10 +78,11 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
         return registros.map((registro) => apresentarAnticoncepcional(registro, relogio()));
     }
 
-    //Atualiza somente um anticoncepcional da usuária e impede sobrescrita concorrente.
+    //Atualiza o anticoncepcional e suas notificações futuras dentro da mesma transação.
     async function editar(usuarioId, idRecebido, entrada) {
+        const agora = relogio();
         const id = validarIdAnticoncepcional(idRecebido);
-        const dados = validarEdicaoAnticoncepcional(entrada, relogio());
+        const dados = validarEdicaoAnticoncepcional(entrada, agora);
         const dadosPersistencia = prepararDadosPersistencia(dados);
 
         return prisma.$transaction(async (transacao) => {
@@ -112,6 +114,15 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
                 throw new AppError('O anticoncepcional foi alterado em outra operação. Atualize os dados e tente novamente.', 409, 'CONFLITO_EDICAO');
             }
 
+            await sincronizarNotificacoesEdicao({
+                transacao,
+                usuarioId,
+                anticoncepcionalId: id,
+                registroAtual,
+                dadosNovos: dadosPersistencia,
+                agora
+            });
+
             const registroAtualizado = await transacao.anticoncepcional.findFirst({
                 where: {
                     id,
@@ -123,7 +134,7 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
                 throw new AppError('O anticoncepcional foi alterado em outra operação. Atualize os dados e tente novamente.', 409, 'CONFLITO_EDICAO');
             }
 
-            return apresentarAnticoncepcional(registroAtualizado, relogio());
+            return apresentarAnticoncepcional(registroAtualizado, agora);
         });
     }
 
