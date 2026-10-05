@@ -4,26 +4,53 @@ function preencherDoisDigitos(valor) {
     return String(valor).padStart(2, '0');
 }
 
-function formatarData(valor) {
-    if (typeof valor === 'string') {
-        return valor.slice(0, 10);
+function validarTextoData(texto) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) {
+        throw new TypeError('Data de calendário inválida.');
     }
 
-    const estaNormalizadaEmUtc = valor.getUTCHours() === 0
-        && valor.getUTCMinutes() === 0
-        && valor.getUTCSeconds() === 0
-        && valor.getUTCMilliseconds() === 0;
-    const ano = estaNormalizadaEmUtc
-        ? valor.getUTCFullYear()
-        : valor.getFullYear();
-    const mes = estaNormalizadaEmUtc
-        ? valor.getUTCMonth() + 1
-        : valor.getMonth() + 1;
-    const dia = estaNormalizadaEmUtc
-        ? valor.getUTCDate()
-        : valor.getDate();
+    const [ano, mes, dia] = texto.split('-').map(Number);
+    if (ano < 1900) {
+        throw new TypeError('Data de calendário inválida.');
+    }
 
-    return `${ano}-${preencherDoisDigitos(mes)}-${preencherDoisDigitos(dia)}`;
+    const data = new Date(Date.UTC(ano, mes - 1, dia));
+    const correspondeAoTexto = data.getUTCFullYear() === ano
+        && data.getUTCMonth() === mes - 1
+        && data.getUTCDate() === dia;
+
+    if (!correspondeAoTexto) {
+        throw new TypeError('Data de calendário inválida.');
+    }
+
+    return texto;
+}
+
+function formatarData(valor) {
+    if (typeof valor === 'string') {
+        return validarTextoData(valor);
+    }
+
+    if (!(valor instanceof Date) || Number.isNaN(valor.getTime())) {
+        throw new TypeError('Data de calendário inválida.');
+    }
+
+    const ano = valor.getUTCFullYear();
+    const mes = valor.getUTCMonth() + 1;
+    const dia = valor.getUTCDate();
+
+    return validarTextoData(
+        `${ano}-${preencherDoisDigitos(mes)}-${preencherDoisDigitos(dia)}`
+    );
+}
+
+function ehDataCalendarioValida(valor) {
+    try {
+        formatarData(valor);
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 function paraDataCalendario(valor) {
@@ -32,6 +59,10 @@ function paraDataCalendario(valor) {
 }
 
 function adicionarDias(valor, quantidade) {
+    if (!Number.isSafeInteger(quantidade)) {
+        throw new TypeError('Quantidade de dias inválida.');
+    }
+
     const data = paraDataCalendario(valor);
     data.setUTCDate(data.getUTCDate() + quantidade);
     return formatarData(data);
@@ -46,6 +77,7 @@ function diferencaDias(inicio, fim) {
 export {
     adicionarDias,
     diferencaDias,
+    ehDataCalendarioValida,
     formatarData,
     paraDataCalendario
 };
