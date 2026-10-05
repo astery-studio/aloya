@@ -22,9 +22,13 @@ function criarPredictionService({ prisma, agora = () => new Date() }) {
             throw erro;
         }
         const { registrosCiclo: registros, ...parametros } = usuario;
-        return calcularPrevisao({
-            registros, parametros, dataReferencia: formatarData(agora())
-        });
+        const instanteGeracao = agora();
+        return {
+            ...calcularPrevisao({
+                registros, parametros, dataReferencia: formatarData(instanteGeracao)
+            }),
+            dataGeracao: instanteGeracao.toISOString()
+        };
     }
     return { buscar };
 }

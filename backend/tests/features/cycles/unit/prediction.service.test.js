@@ -25,4 +25,5 @@ test('consulta somente dados da pessoa autenticada e limita o histórico', async
         dataInicio: true, dataFim: true
     });
     assert.equal(resultado.proximoInicioEstimado, '2026-10-29');
+    assert.equal(resultado.dataGeracao, '2026-10-05T12:00:00.000Z');
 });
