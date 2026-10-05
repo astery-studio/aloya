@@ -1,9 +1,57 @@
 import {
     diferencaDias,
+    ehDataCalendarioValida,
     formatarData,
     paraDataCalendario
 } from './utils/calendar.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
+
+function selecionarRegistrosElegiveis(registros, dataReferencia) {
+    const referencia = formatarData(dataReferencia);
+    const elegiveis = [];
+    const ambiguidades = [];
+
+    for (const registro of registros) {
+        if (!registro || !ehDataCalendarioValida(registro.dataInicio)) {
+            ambiguidades.push('INICIO_INVALIDO');
+            continue;
+        }
+
+        if (formatarData(registro.dataInicio) > referencia) {
+            ambiguidades.push('INICIO_FUTURO_IGNORADO');
+            continue;
+        }
+
+        const possuiFim = registro.dataFim !== null
+            && registro.dataFim !== undefined;
+        const fimValido = !possuiFim
+            || ehDataCalendarioValida(registro.dataFim);
+
+        if (!fimValido) {
+            ambiguidades.push('FIM_INVALIDO_IGNORADO');
+        }
+
+        const fimFuturo = fimValido
+            && possuiFim
+            && formatarData(registro.dataFim) > referencia;
+
+        if (fimFuturo) {
+            ambiguidades.push('FIM_FUTURO_IGNORADO');
+        }
+
+        elegiveis.push({
+            ...registro,
+            dataFim: fimValido && !fimFuturo
+                ? registro.dataFim ?? null
+                : null
+        });
+    }
+
+    return {
+        registros: elegiveis,
+        ambiguidades: [...new Set(ambiguidades)]
+    };
+}
 
 function construirIntervalos(registros) {
     const ordenados = registros
@@ -48,5 +96,6 @@ function identificarAmbiguidades(registros) {
 export {
     construirIntervalos,
     identificarAmbiguidades,
+    selecionarRegistrosElegiveis,
     selecionarIntervalosRecentes
 };

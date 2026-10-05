@@ -4,6 +4,9 @@ import { CONFIG_PREVISAO } from './prediction.config.js';
 
 function criarPredictionService({ prisma, agora = () => new Date() }) {
     async function buscar(usuarioId) {
+        const instanteGeracao = agora();
+        const dataReferencia = formatarData(instanteGeracao);
+        const fimDataReferencia = new Date(`${dataReferencia}T23:59:59.999Z`);
         const usuario = await prisma.usuario.findUnique({
             where: { id: usuarioId },
             select: {
@@ -11,6 +14,9 @@ function criarPredictionService({ prisma, agora = () => new Date() }) {
                 duracaoMenstruacaoInformada: true,
                 duracaoLuteaInformada: true,
                 registrosCiclo: {
+                    where: {
+                        dataInicio: { lte: fimDataReferencia }
+                    },
                     orderBy: { dataInicio: 'desc' },
                     take: CONFIG_PREVISAO.maximoIntervalos + 1,
                     select: {
@@ -29,9 +35,6 @@ function criarPredictionService({ prisma, agora = () => new Date() }) {
         }
 
         const { registrosCiclo: registros, ...parametros } = usuario;
-        const instanteGeracao = agora();
-        const dataReferencia = formatarData(instanteGeracao);
-
         return {
             ...calcularPrevisao({
                 registros,
