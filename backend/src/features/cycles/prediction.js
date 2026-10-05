@@ -1,5 +1,6 @@
 import { adicionarDias, diferencaDias, formatarData } from './prediction.calendar.js';
 import { classificarConfiabilidade } from './prediction.confidence.js';
+import { CONFIG_PREVISAO } from './prediction.config.js';
 import { construirIntervalos } from './prediction.history.js';
 import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
@@ -11,7 +12,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         status: 'DADOS_INSUFICIENTES', motivos: ['INICIO_ELEGIVEL_AUSENTE']
     };
     const intervalos = construirIntervalos(registros);
-    const ciclo = selecionarDuracao(intervalos, parametros.duracaoCicloInformada, 28);
+    const ciclo = selecionarDuracao(intervalos, parametros.duracaoCicloInformada, CONFIG_PREVISAO.cicloPadrao);
     const ultimo = [...registros].sort((a, b) => b.dataInicio - a.dataInicio)[0];
     const inicioCiclo = formatarData(ultimo.dataInicio);
     const menstrual = preverMenstruacao({
@@ -26,15 +27,15 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         parametros.duracaoMenstruacaoInformada
     );
     const duracaoAtual = selecionarDuracao(
-        duracoesSangramento.slice(-6).map((duracao) => ({ duracao })),
-        parametros.duracaoMenstruacaoInformada, 5
+        duracoesSangramento.slice(-CONFIG_PREVISAO.maximoIntervalos).map((duracao) => ({ duracao })),
+        parametros.duracaoMenstruacaoInformada, CONFIG_PREVISAO.sangramentoPadrao
     );
     const fimMenstrual = ultimo.dataFim
         ? formatarData(ultimo.dataFim)
         : adicionarDias(inicioCiclo, duracaoAtual.valor - 1);
     const fases = estimarFases({
         inicioCiclo, fimMenstrual,
-        proximoInicio: menstrual.proximoInicioEstimado, duracaoLutea: parametros.duracaoLuteaInformada ?? 14
+        proximoInicio: menstrual.proximoInicioEstimado, duracaoLutea: parametros.duracaoLuteaInformada ?? CONFIG_PREVISAO.luteaPadrao
     });
     const confiabilidade = classificarConfiabilidade({
         intervalos, origem: ciclo.origem, ambiguidades
@@ -61,10 +62,10 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
                 ? ORIGENS.DECLARADA : ORIGENS.PADRAO,
             limitacoes: ['OVULACAO_NAO_OBSERVADA', 'DURACAO_LUTEA_NAO_COMPROVADA']
         },
-        quantidadeIntervalosUtilizados: Math.min(intervalos.length, 6),
+        quantidadeIntervalosUtilizados: Math.min(intervalos.length, CONFIG_PREVISAO.maximoIntervalos),
         origemDuracaoCiclo: ciclo.origem, duracaoCicloEstimada: ciclo.valor,
         limitacoes, avisos: [AVISO_ESTIMATIVA, AVISO_ANTICONCEPCIONAIS],
-        versaoAlgoritmo: '1.0.0'
+        versaoAlgoritmo: CONFIG_PREVISAO.versao
     };
 }
 export { calcularPrevisao, LIMITACAO_ANTICONCEPCIONAIS };

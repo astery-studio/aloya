@@ -1,5 +1,6 @@
 import { formatarData } from './prediction.calendar.js';
 import { calcularPrevisao } from './prediction.js';
+import { CONFIG_PREVISAO } from './prediction.config.js';
 
 function criarPredictionService({ prisma, agora = () => new Date() }) {
     async function buscar(usuarioId) {
@@ -10,7 +11,7 @@ function criarPredictionService({ prisma, agora = () => new Date() }) {
                 duracaoMenstruacaoInformada: true,
                 duracaoLuteaInformada: true,
                 registrosCiclo: {
-                    orderBy: { dataInicio: 'desc' }, take: 7,
+                    orderBy: { dataInicio: 'desc' }, take: CONFIG_PREVISAO.maximoIntervalos + 1,
                     select: { dataInicio: true, dataFim: true }
                 }
             }

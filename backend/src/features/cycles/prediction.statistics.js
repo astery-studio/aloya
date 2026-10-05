@@ -13,7 +13,7 @@ function mediana(valores) {
 }
 
 function selecionarDuracao(intervalos, duracaoDeclarada, padrao) {
-    const recentes = intervalos.slice(-6).map(({ duracao }) => duracao);
+    const recentes = intervalos.slice(-CONFIG_PREVISAO.maximoIntervalos).map(({ duracao }) => duracao);
     if (recentes.length) return {
         valor: mediana(recentes), origem: ORIGENS.HISTORICO,
         quantidade: recentes.length
@@ -26,3 +26,4 @@ function selecionarDuracao(intervalos, duracaoDeclarada, padrao) {
 }
 
 export { ORIGENS, mediana, selecionarDuracao };
+import { CONFIG_PREVISAO } from './prediction.config.js';
