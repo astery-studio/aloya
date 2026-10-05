@@ -1,6 +1,6 @@
 import { adicionarDias } from './utils/calendar.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
-import { selecionarDuracao } from './utils/statistics.js';
+import { selecionarDuracao } from './prediction.duration.js';
 
 function preverMenstruacao({ ultimoInicio, duracaoCiclo, dataReferencia }) {
     const proximoInicioEstimado = adicionarDias(ultimoInicio, duracaoCiclo);
@@ -16,7 +16,7 @@ function preverMenstruacao({ ultimoInicio, duracaoCiclo, dataReferencia }) {
 
 function preverSangramento(inicio, duracoesCompletas, duracaoDeclarada) {
     const selecao = selecionarDuracao(
-        duracoesCompletas.slice(-6).map((duracao) => ({ duracao })),
+        duracoesCompletas.slice(-CONFIG_PREVISAO.maximoIntervalos),
         duracaoDeclarada,
         CONFIG_PREVISAO.sangramentoPadrao
     );

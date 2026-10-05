@@ -1,21 +1,29 @@
 import { adicionarDias, diferencaDias, formatarData } from './utils/calendar.js';
 import { classificarConfiabilidade } from './prediction.confidence.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
-import { construirIntervalos, identificarAmbiguidades } from './prediction.history.js';
+import { ORIGENS, selecionarDuracao } from './prediction.duration.js';
+import {
+    construirIntervalos,
+    identificarAmbiguidades,
+    selecionarIntervalosRecentes
+} from './prediction.history.js';
 import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
 import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
-import { ORIGENS, selecionarDuracao } from './utils/statistics.js';
 
 const LIMITACAO_ANTICONCEPCIONAIS = 'EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS';
 
 function ordenarRegistros(registros) {
-    return [...registros].sort((a, b) => a.dataInicio - b.dataInicio);
+    return [...registros].sort((a, b) => (
+        formatarData(a.dataInicio).localeCompare(formatarData(b.dataInicio))
+    ));
 }
 
 function obterDuracoesSangramento(registrosOrdenados) {
     return registrosOrdenados
-        .filter(({ dataInicio, dataFim }) => dataFim && dataFim >= dataInicio)
+        .filter(({ dataInicio, dataFim }) => (
+            dataFim && diferencaDias(dataInicio, dataFim) >= 0
+        ))
         .map(({ dataInicio, dataFim }) => (
             diferencaDias(dataInicio, dataFim) + 1
         ));
@@ -74,8 +82,10 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         ...identificarAmbiguidades(registros)
     ])];
     const intervalos = construirIntervalos(registros);
+    const intervalosRecentes = selecionarIntervalosRecentes(intervalos);
+    const duracoesCiclo = intervalosRecentes.map(({ duracao }) => duracao);
     const ciclo = selecionarDuracao(
-        intervalos,
+        duracoesCiclo,
         parametros.duracaoCicloInformada,
         CONFIG_PREVISAO.cicloPadrao
     );
@@ -97,8 +107,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
     );
 
     const duracoesRecentes = duracoesSangramento
-        .slice(-CONFIG_PREVISAO.maximoIntervalos)
-        .map((duracao) => ({ duracao }));
+        .slice(-CONFIG_PREVISAO.maximoIntervalos);
     const duracaoAtual = selecionarDuracao(
         duracoesRecentes,
         parametros.duracaoMenstruacaoInformada,

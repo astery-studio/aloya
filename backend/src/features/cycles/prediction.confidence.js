@@ -1,9 +1,10 @@
-import { mediana, ORIGENS } from './utils/statistics.js';
+import { ORIGENS } from './prediction.duration.js';
+import { selecionarIntervalosRecentes } from './prediction.history.js';
+import { mediana } from './utils/statistics.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
 
 function classificarConfiabilidade({ intervalos, origem, ambiguidades = [] }) {
-    const valores = intervalos
-        .slice(-CONFIG_PREVISAO.maximoIntervalos)
+    const valores = selecionarIntervalosRecentes(intervalos)
         .map(({ duracao }) => duracao);
     const amplitude = valores.length
         ? Math.max(...valores) - Math.min(...valores)

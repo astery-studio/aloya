@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { classificarConfiabilidade } from '../../../../src/features/cycles/prediction.confidence.js';
-import { ORIGENS } from '../../../../src/features/cycles/utils/statistics.js';
+import { ORIGENS } from '../../../../src/features/cycles/prediction.duration.js';
 
 const classificar = (valores, extras = {}) => classificarConfiabilidade({
     intervalos: valores.map((duracao) => ({ duracao })),
