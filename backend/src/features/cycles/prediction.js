@@ -6,7 +6,61 @@ import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
 import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
 import { ORIGENS, selecionarDuracao } from './prediction.statistics.js';
+
 const LIMITACAO_ANTICONCEPCIONAIS = 'EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS';
+
+function ordenarRegistros(registros) {
+    return [...registros].sort((a, b) => a.dataInicio - b.dataInicio);
+}
+
+function obterDuracoesSangramento(registrosOrdenados) {
+    return registrosOrdenados
+        .filter(({ dataInicio, dataFim }) => dataFim && dataFim >= dataInicio)
+        .map(({ dataInicio, dataFim }) => (
+            diferencaDias(dataInicio, dataFim) + 1
+        ));
+}
+
+function obterFimMenstrual({ ultimoRegistro, inicioCiclo, duracaoEstimada }) {
+    if (ultimoRegistro.dataFim) {
+        return formatarData(ultimoRegistro.dataFim);
+    }
+
+    return adicionarDias(inicioCiclo, duracaoEstimada - 1);
+}
+
+function obterStatusPrevisao(menstrual, fases) {
+    const fasesIndisponiveis = Boolean(fases.motivo);
+    const previsaoMenstrualDisponivel = menstrual.status === 'DISPONIVEL';
+
+    if (fasesIndisponiveis && previsaoMenstrualDisponivel) {
+        return 'PARCIALMENTE_DISPONIVEL';
+    }
+
+    return menstrual.status;
+}
+
+function obterFaseAtual(menstrual, fases, dataReferencia) {
+    if (menstrual.status === 'PREVISAO_ULTRAPASSADA') {
+        return null;
+    }
+
+    return identificarFaseAtual(fases.fases, dataReferencia);
+}
+
+function obterLimitacoes(fases, ambiguidades) {
+    const limitacoes = [
+        LIMITACAO_ANTICONCEPCIONAIS,
+        'FAIXA_ESTIMADA_NAO_VALIDADA'
+    ];
+
+    if (fases.motivo) {
+        limitacoes.push(fases.motivo);
+    }
+
+    return [...limitacoes, ...ambiguidades];
+}
+
 function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades = [] }) {
     if (!registros.length) return {
         status: 'DADOS_INSUFICIENTES', motivos: ['INICIO_ELEGIVEL_AUSENTE']
