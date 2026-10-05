@@ -38,15 +38,10 @@ import {
 import {
     criarAuthService
 } from '../../features/auth/services/auth.service.js';
-import { criarAccountService } from '../../services/account.service.js';
-import { criarAccountDeletionService } from '../../services/accountDeletion.service.js';
-import { criarLogoutService } from '../../services/logout.service.js';
 
 import {
     criarAuthValidator
 } from '../../features/auth/validators/auth.validator.js';
-import { criarAccountValidator } from '../../validators/account.validator.js';
-import { criarAccountDeletionValidator } from '../../validators/accountDeletion.validator.js';
 
 import {
     criarParentalConsentValidator
@@ -55,12 +50,74 @@ import {
 import {
     criarAuthController
 } from '../../features/auth/controllers/auth.controller.js';
-import { criarAccountController } from '../../controllers/account.controller.js';
-import { criarAccountDeletionController } from '../../controllers/accountDeletion.controller.js';
-import { criarLogoutController } from '../../controllers/logout.controller.js';
-import { criarPasswordRecoveryService } from '../../features/auth/services/passwordRecovery.service.js';
-import { criarPasswordRecoveryValidator } from '../../features/auth/validators/passwordRecovery.validator.js';
-import { criarPasswordRecoveryController } from '../../features/auth/controllers/passwordRecovery.controller.js';
+
+import {
+    criarPasswordRecoveryService
+} from '../../features/auth/services/passwordRecovery.service.js';
+
+import {
+    criarPasswordRecoveryValidator
+} from '../../features/auth/validators/passwordRecovery.validator.js';
+
+import {
+    criarPasswordRecoveryController
+} from '../../features/auth/controllers/passwordRecovery.controller.js';
+
+import {
+    criarContraceptiveService
+} from '../../features/contraceptives/contraceptive.service.js';
+
+import {
+    criarContraceptiveController
+} from '../../features/contraceptives/contraceptive.controller.js';
+
+import {
+    criarPermissionCategoryService
+} from '../../features/support-network/services/permissionCategory.service.js';
+
+import {
+    criarPermissionCategoryValidator
+} from '../../features/support-network/validators/permissionCategory.validator.js';
+
+import {
+    criarPermissionCategoryController
+} from '../../features/support-network/controllers/permissionCategory.controller.js';
+
+import {
+    criarPermissionCategoryRateLimit
+} from '../../features/support-network/middleware/permissionCategoryRateLimit.middleware.js';
+
+import {
+    criarAccountService
+} from '../../services/account.service.js';
+
+import {
+    criarAccountDeletionService
+} from '../../services/accountDeletion.service.js';
+
+import {
+    criarLogoutService
+} from '../../services/logout.service.js';
+
+import {
+    criarAccountValidator
+} from '../../validators/account.validator.js';
+
+import {
+    criarAccountDeletionValidator
+} from '../../validators/accountDeletion.validator.js';
+
+import {
+    criarAccountController
+} from '../../controllers/account.controller.js';
+
+import {
+    criarAccountDeletionController
+} from '../../controllers/accountDeletion.controller.js';
+
+import {
+    criarLogoutController
+} from '../../controllers/logout.controller.js';
 
 import {
     criarAuthMiddleware
@@ -69,8 +126,6 @@ import {
 import {
     criarParentalConsentMiddleware
 } from '../middleware/parentalConsent.middleware.js';
-import { criarContraceptiveService } from '../../features/contraceptives/contraceptive.service.js';
-import { criarContraceptiveController } from '../../features/contraceptives/contraceptive.controller.js';
 
 function criarContainer() {
     const transporter = nodemailer.createTransport({
@@ -113,21 +168,23 @@ function criarContainer() {
             dateUtils
         });
 
-    const passwordRecoveryService = criarPasswordRecoveryService({
-        prisma,
-        tokenService,
-        passwordService,
-        emailService,
-        baseUrl: env.passwordResetBaseUrl
-    });
+    const passwordRecoveryService =
+        criarPasswordRecoveryService({
+            prisma,
+            tokenService,
+            passwordService,
+            emailService,
+            baseUrl: env.passwordResetBaseUrl
+        });
 
     const passwordRecoveryValidator =
         criarPasswordRecoveryValidator();
 
-    const passwordRecoveryController = criarPasswordRecoveryController({
-        passwordRecoveryService,
-        passwordRecoveryValidator
-    });
+    const passwordRecoveryController =
+        criarPasswordRecoveryController({
+            passwordRecoveryService,
+            passwordRecoveryValidator
+        });
 
     const authService = criarAuthService({
         prisma,
@@ -144,16 +201,23 @@ function criarContainer() {
         dateUtils
     });
 
-    const accountDeletionService = criarAccountDeletionService({
-        prisma,
-        passwordService
-    });
+    const accountDeletionService =
+        criarAccountDeletionService({
+            prisma,
+            passwordService
+        });
 
     const logoutService = criarLogoutService({
         prisma
     });
 
-    const contraceptiveService = criarContraceptiveService(prisma);
+    const contraceptiveService =
+        criarContraceptiveService(prisma);
+
+    const permissionCategoryService =
+        criarPermissionCategoryService({
+            prisma
+        });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -166,7 +230,11 @@ function criarContainer() {
         dateUtils
     });
 
-    const accountDeletionValidator = criarAccountDeletionValidator();
+    const accountDeletionValidator =
+        criarAccountDeletionValidator();
+
+    const permissionCategoryValidator =
+        criarPermissionCategoryValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -178,72 +246,113 @@ function criarContainer() {
             parentalConsentService
         });
 
-    const cadastroRateLimit = criarCadastroRateLimit({
-        rateLimit,
-        janelaMs: env.cadastroRateLimitJanelaMs,
-        limite: env.cadastroRateLimitMaximo
-    });
+    const cadastroRateLimit =
+        criarCadastroRateLimit({
+            rateLimit,
+            janelaMs:
+                env.cadastroRateLimitJanelaMs,
+            limite:
+                env.cadastroRateLimitMaximo
+        });
 
-    const loginRateLimit = criarLoginRateLimit({
-        rateLimit,
-        janelaMs: env.loginRateLimitJanelaMs,
-        limite: env.loginRateLimitMaximo
-    });
+    const loginRateLimit =
+        criarLoginRateLimit({
+            rateLimit,
+            janelaMs:
+                env.loginRateLimitJanelaMs,
+            limite:
+                env.loginRateLimitMaximo
+        });
 
-    const contaLoginRateLimit = criarContaLoginRateLimit({
-        rateLimit,
-        janelaMs: env.loginRateLimitJanelaMs,
-        limite: env.loginRateLimitMaximo
-    });
+    const contaLoginRateLimit =
+        criarContaLoginRateLimit({
+            rateLimit,
+            janelaMs:
+                env.loginRateLimitJanelaMs,
+            limite:
+                env.loginRateLimitMaximo
+        });
 
-    const emailRateLimit = criarEmailRateLimit({
-        rateLimit,
-        janelaMs: env.emailRateLimitJanelaMs,
-        limite: env.emailRateLimitMaximo
-    });
+    const emailRateLimit =
+        criarEmailRateLimit({
+            rateLimit,
+            janelaMs:
+                env.emailRateLimitJanelaMs,
+            limite:
+                env.emailRateLimitMaximo
+        });
 
-    const configuracoesContaRateLimit = criarConfiguracoesContaRateLimit({
-        rateLimit,
-        janelaMs: env.configuracoesContaRateLimitJanelaMs,
-        limite: env.configuracoesContaRateLimitMaximo
-    });
+    const configuracoesContaRateLimit =
+        criarConfiguracoesContaRateLimit({
+            rateLimit,
+            janelaMs:
+                env.configuracoesContaRateLimitJanelaMs,
+            limite:
+                env.configuracoesContaRateLimitMaximo
+        });
 
-    const alteracaoSenhaRateLimit = criarAlteracaoSenhaRateLimit({
-        rateLimit,
-        janelaMs: env.alteracaoSenhaRateLimitJanelaMs,
-        limite: env.alteracaoSenhaRateLimitMaximo
-    });
+    const permissionCategoryRateLimit =
+        criarPermissionCategoryRateLimit({
+            rateLimit,
+            janelaMs:
+                env.configuracoesContaRateLimitJanelaMs,
+            limite:
+                env.configuracoesContaRateLimitMaximo
+        });
 
-    const exclusaoContaRateLimit = criarExclusaoContaRateLimit({
-        rateLimit,
-        janelaMs: env.exclusaoContaRateLimitJanelaMs,
-        limite: env.exclusaoContaRateLimitMaximo
-    });
+    const alteracaoSenhaRateLimit =
+        criarAlteracaoSenhaRateLimit({
+            rateLimit,
+            janelaMs:
+                env.alteracaoSenhaRateLimitJanelaMs,
+            limite:
+                env.alteracaoSenhaRateLimitMaximo
+        });
 
-    const authController = criarAuthController({
-        authService,
-        authValidator,
-        parentalConsentService,
-        parentalConsentValidator
-    });
+    const exclusaoContaRateLimit =
+        criarExclusaoContaRateLimit({
+            rateLimit,
+            janelaMs:
+                env.exclusaoContaRateLimitJanelaMs,
+            limite:
+                env.exclusaoContaRateLimitMaximo
+        });
 
-    const accountController = criarAccountController({
-        accountService,
-        accountValidator
-    });
+    const authController =
+        criarAuthController({
+            authService,
+            authValidator,
+            parentalConsentService,
+            parentalConsentValidator
+        });
 
-    const accountDeletionController = criarAccountDeletionController({
-        accountDeletionService,
-        accountDeletionValidator
-    });
+    const accountController =
+        criarAccountController({
+            accountService,
+            accountValidator
+        });
 
-    const logoutController = criarLogoutController({
-        logoutService
-    });
+    const accountDeletionController =
+        criarAccountDeletionController({
+            accountDeletionService,
+            accountDeletionValidator
+        });
 
-    const contraceptiveController = criarContraceptiveController(
-        contraceptiveService
-    );
+    const logoutController =
+        criarLogoutController({
+            logoutService
+        });
+
+    const contraceptiveController =
+        criarContraceptiveController(
+            contraceptiveService
+        );
+
+    const permissionCategoryController =
+        criarPermissionCategoryController({
+            permissionCategoryService,
+            permissionCategoryValidator
+        });
 
     return {
         authController,
@@ -251,6 +360,7 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
@@ -258,6 +368,7 @@ function criarContainer() {
         loginRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
+        permissionCategoryRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController
