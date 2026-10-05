@@ -26,3 +26,10 @@ test('usa duração declarada antes do padrão provisório', () => {
         quantidade: 0
     });
 });
+
+test('rejeita durações inválidas sem filtrá-las silenciosamente', () => {
+    assert.throws(() => selecionarDuracao([28, Number.NaN], null, 28));
+    assert.throws(() => selecionarDuracao([28, Infinity], null, 28));
+    assert.throws(() => selecionarDuracao([28, 0], null, 28));
+    assert.throws(() => selecionarDuracao([], -1, 28));
+});

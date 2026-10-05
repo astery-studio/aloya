@@ -13,10 +13,10 @@ test('soma dias de calendário em viradas de mês, ano e ano bissexto', () => {
     assert.equal(adicionarDias('2028-02-28', 1), '2028-02-29');
 });
 
-test('calcula dias a partir do dia civil local', () => {
+test('calcula datas persistidas pelos componentes normalizados em UTC', () => {
     const inicio = new Date('2026-10-17T23:30:00-03:00');
 
-    assert.equal(adicionarDias(inicio, 1), '2026-10-18');
+    assert.equal(adicionarDias(inicio, 1), '2026-10-19');
     assert.equal(diferencaDias('2026-10-18', '2026-10-20'), 2);
 });
 
@@ -28,10 +28,14 @@ test('não modifica objetos Date recebidos', () => {
 });
 
 test('preserva o dia civil informado sem deslocamento de fuso', () => {
-    assert.equal(formatarData('2026-03-01T23:30:00-03:00'), '2026-03-01');
-    assert.equal(
-        formatarData(new Date(2026, 2, 1, 23, 30)),
-        '2026-03-01'
-    );
+    assert.equal(formatarData('2026-03-01'), '2026-03-01');
     assert.equal(formatarData(new Date('2026-03-01T00:00:00Z')), '2026-03-01');
+});
+
+test('rejeita datas impossíveis, formatos ambíguos e deslocamentos inválidos', () => {
+    assert.throws(() => formatarData('2026-02-30'), /inválida/);
+    assert.throws(() => formatarData('0000-01-01'), /inválida/);
+    assert.throws(() => formatarData('01/03/2026'), /inválida/);
+    assert.throws(() => formatarData('2026-03-01T23:30:00-03:00'), /inválida/);
+    assert.throws(() => adicionarDias('2026-03-01', 1.5), /inválida/);
 });

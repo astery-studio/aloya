@@ -1,4 +1,12 @@
 function mediana(valores) {
+    const entradaValida = Array.isArray(valores)
+        && valores.length > 0
+        && valores.every(Number.isFinite);
+
+    if (!entradaValida) {
+        throw new TypeError('A mediana exige valores numéricos finitos.');
+    }
+
     const ordenados = [...valores].sort((a, b) => a - b);
     const meio = Math.floor(ordenados.length / 2);
     return ordenados.length % 2
