@@ -5,11 +5,16 @@ import { ORIGENS, selecionarDuracao } from './prediction.duration.js';
 import {
     construirIntervalos,
     identificarAmbiguidades,
-    selecionarIntervalosRecentes
+    selecionarIntervalosRecentes,
+    selecionarRegistrosElegiveis
 } from './prediction.history.js';
-import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages.js';
+import {
+    AVISO_ANTICONCEPCIONAIS,
+    AVISO_ESTIMATIVA,
+    INCENTIVO_CONFIANCA_BAIXA
+} from './prediction.messages.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
-import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
+import { estimarFases } from './prediction.phases.js';
 
 const LIMITACAO_ANTICONCEPCIONAIS = 'EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS';
 
@@ -48,14 +53,6 @@ function obterStatusPrevisao(menstrual, fases) {
     return menstrual.status;
 }
 
-function obterFaseAtual(menstrual, fases, dataReferencia) {
-    if (menstrual.status === 'PREVISAO_ULTRAPASSADA') {
-        return null;
-    }
-
-    return identificarFaseAtual(fases.fases, dataReferencia);
-}
-
 function obterLimitacoes(fases, ambiguidades) {
     const limitacoes = [
         LIMITACAO_ANTICONCEPCIONAIS,
@@ -70,18 +67,25 @@ function obterLimitacoes(fases, ambiguidades) {
 }
 
 function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades = [] }) {
-    if (!registros.length) {
+    const historico = selecionarRegistrosElegiveis(registros, dataReferencia);
+    const registrosElegiveis = historico.registros;
+
+    if (!registrosElegiveis.length) {
         return {
             status: 'DADOS_INSUFICIENTES',
-            motivos: ['INICIO_ELEGIVEL_AUSENTE']
+            motivos: [
+                'INICIO_ELEGIVEL_AUSENTE',
+                ...historico.ambiguidades
+            ]
         };
     }
 
     const ambiguidadesEfetivas = [...new Set([
         ...ambiguidades,
-        ...identificarAmbiguidades(registros)
+        ...historico.ambiguidades,
+        ...identificarAmbiguidades(registrosElegiveis)
     ])];
-    const intervalos = construirIntervalos(registros);
+    const intervalos = construirIntervalos(registrosElegiveis);
     const intervalosRecentes = selecionarIntervalosRecentes(intervalos);
     const duracoesCiclo = intervalosRecentes.map(({ duracao }) => duracao);
     const ciclo = selecionarDuracao(
@@ -89,7 +93,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         parametros.duracaoCicloInformada,
         CONFIG_PREVISAO.cicloPadrao
     );
-    const registrosOrdenados = ordenarRegistros(registros);
+    const registrosOrdenados = ordenarRegistros(registrosElegiveis);
     const ultimoRegistro = registrosOrdenados.at(-1);
     const inicioCiclo = formatarData(ultimoRegistro.dataInicio);
 
@@ -131,6 +135,11 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         ambiguidades: ambiguidadesEfetivas
     });
     const limitacoes = obterLimitacoes(fases, ambiguidadesEfetivas);
+    const avisos = [AVISO_ESTIMATIVA, AVISO_ANTICONCEPCIONAIS];
+
+    if (confiabilidade.nivel === 'BAIXA') {
+        avisos.push(INCENTIVO_CONFIANCA_BAIXA);
+    }
 
     return {
         status: obterStatusPrevisao(menstrual, fases),
@@ -139,8 +148,8 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         faixaEstimada: null,
         periodoSangramentoEstimado: futuro,
         fasesEstimadas: fases.fases,
+        dataOvulacaoEstimada: fases.fases?.ovulatoria.data ?? null,
         janelaFertilEstimada: fases.janelaFertil,
-        faseAtualEstimada: obterFaseAtual(menstrual, fases, dataReferencia),
         confiabilidadeMenstrual: confiabilidade,
         baseEstimativaOvulacao: {
             status: fases.motivo ? 'INDISPONIVEL' : 'ESTIMATIVA_POR_CALENDARIO',
@@ -155,7 +164,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         origemDuracaoCiclo: ciclo.origem,
         duracaoCicloEstimada: ciclo.valor,
         limitacoes,
-        avisos: [AVISO_ESTIMATIVA, AVISO_ANTICONCEPCIONAIS],
+        avisos,
         versaoAlgoritmo: CONFIG_PREVISAO.versao
     };
 }
