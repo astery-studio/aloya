@@ -2,7 +2,7 @@ import { adicionarDias, diferencaDias, formatarData } from './prediction.calenda
 import { classificarConfiabilidade } from './prediction.confidence.js';
 import { construirIntervalos } from './prediction.history.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
-import { estimarFases } from './prediction.phases.js';
+import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
 import { ORIGENS, selecionarDuracao } from './prediction.statistics.js';
 const LIMITACAO_ANTICONCEPCIONAIS = 'EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS';
 function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades = [] }) {
@@ -51,6 +51,8 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
             status: ultimo.dataFim ? 'REGISTRADO' : 'INICIO_REGISTRADO_FIM_DESCONHECIDO'
         },
         fasesEstimadas: fases.fases, janelaFertilEstimada: fases.janelaFertil,
+        faseAtualEstimada: menstrual.status === 'PREVISAO_ULTRAPASSADA'
+            ? null : identificarFaseAtual(fases.fases, dataReferencia),
         confiabilidadeMenstrual: confiabilidade,
         baseEstimativaOvulacao: {
             status: fases.motivo ? 'INDISPONIVEL' : 'ESTIMATIVA_POR_CALENDARIO',

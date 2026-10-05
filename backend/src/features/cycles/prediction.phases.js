@@ -25,4 +25,13 @@ function estimarFases({ inicioCiclo, fimMenstrual, proximoInicio, duracaoLutea }
     };
 }
 
-export { estimarFases };
+function identificarFaseAtual(fases, dataReferencia) {
+    if (!fases) return null;
+    if (dataReferencia >= fases.menstrual.inicio && dataReferencia <= fases.menstrual.fim) return 'MENSTRUAL';
+    if (dataReferencia >= fases.folicularPosMenstrual.inicio && dataReferencia <= fases.folicularPosMenstrual.fim) return 'FOLICULAR';
+    if (dataReferencia === fases.ovulatoria.data) return 'OVULATORIA';
+    if (dataReferencia >= fases.lutea.inicio && dataReferencia <= fases.lutea.fim) return 'LUTEA';
+    return null;
+}
+
+export { estimarFases, identificarFaseAtual };
