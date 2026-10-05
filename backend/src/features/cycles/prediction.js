@@ -62,34 +62,53 @@ function obterLimitacoes(fases, ambiguidades) {
 }
 
 function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades = [] }) {
-    if (!registros.length) return {
-        status: 'DADOS_INSUFICIENTES', motivos: ['INICIO_ELEGIVEL_AUSENTE']
-    };
+    if (!registros.length) {
+        return {
+            status: 'DADOS_INSUFICIENTES',
+            motivos: ['INICIO_ELEGIVEL_AUSENTE']
+        };
+    }
+
     const ambiguidadesEfetivas = [...new Set([
-        ...ambiguidades, ...identificarAmbiguidades(registros)
+        ...ambiguidades,
+        ...identificarAmbiguidades(registros)
     ])];
     const intervalos = construirIntervalos(registros);
-    const ciclo = selecionarDuracao(intervalos, parametros.duracaoCicloInformada, CONFIG_PREVISAO.cicloPadrao);
-    const ultimo = [...registros].sort((a, b) => b.dataInicio - a.dataInicio)[0];
-    const inicioCiclo = formatarData(ultimo.dataInicio);
+    const ciclo = selecionarDuracao(
+        intervalos,
+        parametros.duracaoCicloInformada,
+        CONFIG_PREVISAO.cicloPadrao
+    );
+    const registrosOrdenados = ordenarRegistros(registros);
+    const ultimoRegistro = registrosOrdenados.at(-1);
+    const inicioCiclo = formatarData(ultimoRegistro.dataInicio);
+
     const menstrual = preverMenstruacao({
-        ultimoInicio: inicioCiclo, duracaoCiclo: ciclo.valor, dataReferencia
+        ultimoInicio: inicioCiclo,
+        duracaoCiclo: ciclo.valor,
+        dataReferencia
     });
-    const duracoesSangramento = [...registros]
-        .sort((a, b) => a.dataInicio - b.dataInicio)
-        .filter(({ dataInicio, dataFim }) => dataFim && dataFim >= dataInicio)
-        .map(({ dataInicio, dataFim }) => diferencaDias(dataInicio, dataFim) + 1);
+
+    const duracoesSangramento = obterDuracoesSangramento(registrosOrdenados);
     const futuro = preverSangramento(
-        menstrual.proximoInicioEstimado, duracoesSangramento,
+        menstrual.proximoInicioEstimado,
+        duracoesSangramento,
         parametros.duracaoMenstruacaoInformada
     );
+
+    const duracoesRecentes = duracoesSangramento
+        .slice(-CONFIG_PREVISAO.maximoIntervalos)
+        .map((duracao) => ({ duracao }));
     const duracaoAtual = selecionarDuracao(
-        duracoesSangramento.slice(-CONFIG_PREVISAO.maximoIntervalos).map((duracao) => ({ duracao })),
-        parametros.duracaoMenstruacaoInformada, CONFIG_PREVISAO.sangramentoPadrao
+        duracoesRecentes,
+        parametros.duracaoMenstruacaoInformada,
+        CONFIG_PREVISAO.sangramentoPadrao
     );
-    const fimMenstrual = ultimo.dataFim
-        ? formatarData(ultimo.dataFim)
-        : adicionarDias(inicioCiclo, duracaoAtual.valor - 1);
+    const fimMenstrual = obterFimMenstrual({
+        ultimoRegistro,
+        inicioCiclo,
+        duracaoEstimada: duracaoAtual.valor
+    });
     const fases = estimarFases({
         inicioCiclo, fimMenstrual,
         proximoInicio: menstrual.proximoInicioEstimado, duracaoLutea: parametros.duracaoLuteaInformada ?? CONFIG_PREVISAO.luteaPadrao
