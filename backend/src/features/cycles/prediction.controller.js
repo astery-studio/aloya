@@ -6,10 +6,14 @@ function criarPredictionController({ predictionService }) {
             const previsao = await predictionService.buscar(req.usuario.id);
             return res.json({ previsao });
         } catch (erro) {
-            if (!erro.status) erro.mensagemUsuario = MENSAGEM_ERRO;
+            if (!erro.status) {
+                erro.mensagemUsuario = MENSAGEM_ERRO;
+            }
+
             return next(erro);
         }
     }
+
     return { buscar };
 }
 

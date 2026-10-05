@@ -1,3 +1,5 @@
+import { CONFIG_PREVISAO } from './prediction.config.js';
+
 const ORIGENS = Object.freeze({
     HISTORICO: 'HISTORICO_INDIVIDUAL',
     DECLARADA: 'DURACAO_DECLARADA',
@@ -13,11 +15,18 @@ function mediana(valores) {
 }
 
 function selecionarDuracao(intervalos, duracaoDeclarada, padrao) {
-    const recentes = intervalos.slice(-CONFIG_PREVISAO.maximoIntervalos).map(({ duracao }) => duracao);
-    if (recentes.length) return {
-        valor: mediana(recentes), origem: ORIGENS.HISTORICO,
-        quantidade: recentes.length
-    };
+    const recentes = intervalos
+        .slice(-CONFIG_PREVISAO.maximoIntervalos)
+        .map(({ duracao }) => duracao);
+
+    if (recentes.length) {
+        return {
+            valor: mediana(recentes),
+            origem: ORIGENS.HISTORICO,
+            quantidade: recentes.length
+        };
+    }
+
     return {
         valor: duracaoDeclarada ?? padrao,
         origem: duracaoDeclarada ? ORIGENS.DECLARADA : ORIGENS.PADRAO,
@@ -26,4 +35,3 @@ function selecionarDuracao(intervalos, duracaoDeclarada, padrao) {
 }
 
 export { ORIGENS, mediana, selecionarDuracao };
-import { CONFIG_PREVISAO } from './prediction.config.js';

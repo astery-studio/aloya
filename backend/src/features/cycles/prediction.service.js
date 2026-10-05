@@ -11,26 +11,37 @@ function criarPredictionService({ prisma, agora = () => new Date() }) {
                 duracaoMenstruacaoInformada: true,
                 duracaoLuteaInformada: true,
                 registrosCiclo: {
-                    orderBy: { dataInicio: 'desc' }, take: CONFIG_PREVISAO.maximoIntervalos + 1,
-                    select: { dataInicio: true, dataFim: true }
+                    orderBy: { dataInicio: 'desc' },
+                    take: CONFIG_PREVISAO.maximoIntervalos + 1,
+                    select: {
+                        dataInicio: true,
+                        dataFim: true
+                    }
                 }
             }
         });
+
         if (!usuario) {
             const erro = new Error('Usuário não encontrado.');
             erro.status = 404;
             erro.codigo = 'USUARIO_NAO_ENCONTRADO';
             throw erro;
         }
+
         const { registrosCiclo: registros, ...parametros } = usuario;
         const instanteGeracao = agora();
+        const dataReferencia = formatarData(instanteGeracao);
+
         return {
             ...calcularPrevisao({
-                registros, parametros, dataReferencia: formatarData(instanteGeracao)
+                registros,
+                parametros,
+                dataReferencia
             }),
             dataGeracao: instanteGeracao.toISOString()
         };
     }
+
     return { buscar };
 }
 
