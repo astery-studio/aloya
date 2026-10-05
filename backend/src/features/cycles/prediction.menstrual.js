@@ -1,11 +1,13 @@
 import { adicionarDias } from './prediction.calendar.js';
-import { selecionarDuracao } from './prediction.statistics.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
+import { selecionarDuracao } from './prediction.statistics.js';
 
 function preverMenstruacao({ ultimoInicio, duracaoCiclo, dataReferencia }) {
     const proximoInicioEstimado = adicionarDias(ultimoInicio, duracaoCiclo);
+    const previsaoUltrapassada = dataReferencia > proximoInicioEstimado;
+
     return {
-        status: dataReferencia > proximoInicioEstimado
+        status: previsaoUltrapassada
             ? 'PREVISAO_ULTRAPASSADA'
             : 'DISPONIVEL',
         proximoInicioEstimado
