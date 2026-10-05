@@ -7,40 +7,40 @@ import {estilos} from './CyclesScreen.styles'
 
 const exemplos = Object.freeze([
     Object.freeze({
-        id: 'alta-completa',
+        id: 'alta-simples',
         nivel: 'alta',
-        exibirRotulo: true,
-        nome: 'Alta completa'
+        variante: 'simples',
+        nome: 'Alta simples'
     }),
     Object.freeze({
-        id: 'media-completa',
+        id: 'media-simples',
         nivel: 'media',
-        exibirRotulo: true,
-        nome: 'Média completa'
+        variante: 'simples',
+        nome: 'Média simples'
     }),
     Object.freeze({
-        id: 'baixa-completa',
+        id: 'baixa-simples',
         nivel: 'baixa',
-        exibirRotulo: true,
-        nome: 'Baixa completa'
+        variante: 'simples',
+        nome: 'Baixa simples'
     }),
     Object.freeze({
-        id: 'alta-compacta',
+        id: 'alta-composta',
         nivel: 'alta',
-        exibirRotulo: false,
-        nome: 'Alta compacta'
+        variante: 'composta',
+        nome: 'Alta composta'
     }),
     Object.freeze({
-        id: 'media-compacta',
+        id: 'media-composta',
         nivel: 'media',
-        exibirRotulo: false,
-        nome: 'Média compacta'
+        variante: 'composta',
+        nome: 'Média composta'
     }),
     Object.freeze({
-        id: 'baixa-compacta',
+        id: 'baixa-composta',
         nivel: 'baixa',
-        exibirRotulo: false,
-        nome: 'Baixa compacta'
+        variante: 'composta',
+        nome: 'Baixa composta'
     })
 ])
 
@@ -61,7 +61,7 @@ function CyclesScreen({onSelecionarAba}) {
                     </Text>
 
                     <Text style={estilos.descricao}>
-                        Compare os três níveis nas versões completa e compacta.
+                        Compare os três níveis nas variantes simples e composta.
                     </Text>
                 </View>
 
@@ -74,7 +74,7 @@ function CyclesScreen({onSelecionarAba}) {
                             <View style={estilos.amostra}>
                                 <ConfidenceBadge
                                     nivel={exemplo.nivel}
-                                    exibirRotulo={exemplo.exibirRotulo}
+                                    variante={exemplo.variante}
                                 />
                             </View>
 
