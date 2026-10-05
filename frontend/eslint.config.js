@@ -3,7 +3,7 @@ const expoConfig = require('eslint-config-expo/flat');
 const globals = require('globals');
 
 module.exports = defineConfig([
-    globalIgnores(['coverage/**', 'dist/**', 'web-build/**']),
+    globalIgnores(['coverage/**', 'dist/**', 'dist-performance/**', 'web-build/**']),
     expoConfig,
     {
         rules: {

@@ -1,10 +1,21 @@
 {
   "name": "aloya",
   "private": true,
+  "dependencies": {
+    "nodemailer": "^10.0.10"
+  },
   "scripts": {
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npx expo start --clear",
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
     "format:check": "npm --prefix backend run format:check && npm --prefix frontend run format:check",
     "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
-    "test": "npm --prefix backend test && npm --prefix frontend test"
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "tunnel": "cd \"$env:USERPROFILE\\Downloads\" && .\\cloudflared.exe tunnel --url http://localhost:3000"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }

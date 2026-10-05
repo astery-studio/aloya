@@ -23,12 +23,13 @@
     "format:check": "prettier --check \"**/*.{js,jsx,json,md}\"",
     "format:check:ci": "prettier --check eslint.config.js jest.coverage.config.js package.json",
     "ios": "expo start --ios",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "expo lint src tests",
     "web": "expo start --web",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --runInBand",
-    "test:coverage:report": "jest --config jest.coverage.config.js --coverage --runInBand"
+    "test:coverage:report": "jest --config jest.coverage.config.js --coverage --runInBand",
+    "lint:support-network": "expo lint src/features/support-network src/shared/components/forms/SwitchField tests/features/support-network"
   },
   "jest": {
     "preset": "jest-expo",
@@ -38,13 +39,11 @@
       "/node_modules/@react-native/babel-preset/"
     ],
     "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
       "components/**/*.{js,jsx}",
-      "features/**/*.{js,jsx}",
-      "hooks/**/*.{js,jsx}",
-      "layouts/**/*.{js,jsx}",
-      "services/**/*.{js,jsx}",
       "utils/**/*.{js,jsx}",
-      "!**/*.style.js"
+      "!**/*.style.js",
+      "!**/*.styles.js"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
@@ -62,11 +61,14 @@
   "devDependencies": {
     "@testing-library/react-native": "^14.0.1",
     "eslint": "^9.39.5",
-    "eslint-config-expo": "^57.0.2",
+    "eslint-config-expo": "~57.0.2",
     "globals": "^17.12.0",
     "jest": "~29.7.0",
     "jest-expo": "~57.0.5",
     "prettier": "^3.9.9",
     "react-test-renderer": "19.2.3"
+  },
+  "overrides": {
+    "uuid": "11.1.1"
   }
 }

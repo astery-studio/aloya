@@ -1,207 +1,320 @@
 # Aloya — Banco de Dados
 
-## 1. O que é um banco de dados?
+## 1. Visão geral
 
-Banco de dados é o local onde as informações do sistema são armazenadas de maneira persistente.
+O Aloya utiliza um banco de dados relacional para persistir informações da aplicação.
 
-Por exemplo, quando um usuário cria uma conta, seus dados precisam continuar existindo mesmo depois que o aplicativo for fechado.
+A persistência atual utiliza:
 
----
+- SQLite;
+- Prisma ORM 7;
+- `@prisma/client`;
+- `@prisma/adapter-better-sqlite3`;
+- migrations versionadas.
 
-# 2. Banco utilizado
+SQLite armazena o banco em um arquivo local e não exige a instalação de um servidor de banco separado.
 
-O Aloya utilizará:
+## 2. Configuração da conexão
 
-```text
-PostgreSQL
-```
-
-O PostgreSQL é um banco de dados relacional.
-
----
-
-# 3. Banco relacional
-
-Um banco relacional organiza os dados em tabelas.
-
-Por exemplo:
+A conexão é definida no arquivo:
 
 ```text
-USER
-────────────────────
-id
-name
-email
-password
+backend/.env
 ```
 
-Outra tabela:
+Configuração usada no desenvolvimento:
+
+```env
+DATABASE_URL="file:./prisma/aloya-dev.db"
+```
+
+O Prisma lê a variável por meio de:
 
 ```text
-CYCLE
-────────────────────
-id
-userId
-startDate
-endDate
+backend/prisma.config.ts
 ```
 
-O `userId` pode relacionar um ciclo a um usuário.
-
----
-
-# 4. Entidades
-
-Antes de criar as tabelas, precisamos identificar as entidades do sistema.
-
-Possíveis entidades do Aloya:
+A aplicação cria o cliente com o adaptador Better SQLite 3 em:
 
 ```text
-User
-Cycle
-MenstrualRecord
-Symptom
-Mood
-Partner
-CommunityPost
+backend/src/shared/config/prisma.js
 ```
 
-> **Importante:** essa lista é inicial e deve ser revisada conforme os requisitos definitivos.
-
----
-
-# 5. Relacionamentos
-
-Os dados possuem relações.
-
-Exemplo:
+## 3. Arquivos principais
 
 ```text
-User
- │
- └── Cycle
-       │
-       └── MenstrualRecord
+backend/
+├── prisma/
+│   ├── migrations/
+│   ├── schema.prisma
+│   └── seed.js
+├── prisma.config.ts
+└── src/
+    └── shared/
+        └── config/
+            └── prisma.js
 ```
 
-Um usuário pode possuir vários registros de ciclo.
+### `schema.prisma`
 
-Isso representa uma relação:
+Define:
+
+- entidades;
+- atributos;
+- tipos;
+- chaves primárias;
+- chaves estrangeiras;
+- relacionamentos;
+- índices;
+- restrições únicas;
+- comportamento de exclusão.
+
+### `migrations/`
+
+Contém o histórico versionado das alterações estruturais do banco.
+
+### `prisma.config.ts`
+
+Informa ao Prisma:
+
+- localização do schema;
+- localização das migrations;
+- URL do datasource.
+
+### `prisma.js`
+
+Cria e exporta a instância compartilhada do `PrismaClient`.
+
+## 4. Entidades principais
+
+O modelo contém entidades relacionadas às seguintes áreas.
+
+### Usuário e autenticação
+
+- `Usuario`;
+- `Sessao`;
+- `ConfirmacaoEmail`;
+- `RecuperacaoSenha`;
+- `ConsentimentoParental`.
+
+### Ciclo menstrual
+
+- `RegistroCiclo`;
+- `DiaMenstruacao`;
+- `Previsao`.
+
+### Diário
+
+- `RegistroDiario`.
+
+### Anticoncepcionais
+
+- `Anticoncepcional`;
+- `UsoAnticoncepcional`.
+
+### Rede de apoio
+
+- `CategoriaPermissao`;
+- `VinculoRedeApoio`.
+
+### Notificações e suporte
+
+- `PreferenciaNotificacao`;
+- `Notificacao`;
+- `Conversa`;
+- `MensagemSuporte`.
+
+## 5. Relacionamentos
+
+Exemplos de relacionamentos existentes:
 
 ```text
-1 usuário → vários ciclos
+Usuario
+ ├── Sessao
+ ├── RecuperacaoSenha
+ ├── RegistroCiclo
+ ├── RegistroDiario
+ ├── Anticoncepcional
+ ├── CategoriaPermissao
+ ├── Notificacao
+ └── VinculoRedeApoio
 ```
 
----
-
-# 6. Chaves
-
-## Primary Key
-
-É o identificador único de um registro.
-
-Exemplo:
+Um usuário pode possuir vários registros de ciclo:
 
 ```text
-id = 15
+Usuario 1 → N RegistroCiclo
 ```
 
-Nenhum outro registro deve possuir o mesmo identificador.
-
----
-
-## Foreign Key
-
-É utilizada para relacionar tabelas.
-
-Exemplo:
+Um usuário pode possuir vários anticoncepcionais:
 
 ```text
-Cycle.userId
+Usuario 1 → N Anticoncepcional
 ```
 
-pode apontar para:
+Um anticoncepcional pode possuir vários registros de uso:
 
 ```text
-User.id
+Anticoncepcional 1 → N UsoAnticoncepcional
 ```
 
----
+As relações utilizam chaves estrangeiras e, quando aplicável, exclusão em cascata.
 
-# 7. Modelagem
+## 6. Integridade dos dados
 
-Antes de implementar o banco, deve-se criar um modelo contendo:
+O schema contém restrições como:
 
-* entidades;
-* atributos;
-* tipos;
-* relacionamentos;
-* regras;
-* restrições.
+- e-mail de usuário único;
+- token armazenado em formato de hash;
+- categoria de permissão única por titular e nome normalizado;
+- registro de ciclo único por usuário e data inicial;
+- registro de diário único por usuário e data;
+- índices para consultas frequentes;
+- chaves estrangeiras para garantir relacionamentos válidos.
 
-> **TODO:** adicionar diagrama ER do Aloya.
-
----
-
-# 8. Regras
-
-Algumas informações podem possuir restrições.
-
-Exemplo:
-
-```text
-email → deve ser único
-password → obrigatória
-userId → deve existir
-```
-
-Essas regras podem ser aplicadas em diferentes camadas:
+A validação ocorre em diferentes camadas:
 
 ```text
 Frontend
-Backend
-Database
+   ↓
+Validator do backend
+   ↓
+Regra de negócio
+   ↓
+Prisma
+   ↓
+SQLite
 ```
 
----
+## 7. Migrations
 
-# 9. Migrations
+Migrations registram alterações no schema ao longo do desenvolvimento.
 
-Migration representa uma alteração na estrutura do banco.
+Para criar e aplicar uma migration durante o desenvolvimento:
 
-Por exemplo:
+```bash
+npx prisma migrate dev --name nome_da_alteracao
+```
+
+Exemplo:
+
+```bash
+npx prisma migrate dev --name adicionar_preferencia_visual
+```
+
+Para aplicar migrations já existentes:
+
+```bash
+npx prisma migrate deploy
+```
+
+Para consultar o estado das migrations:
+
+```bash
+npx prisma migrate status
+```
+
+As migrations devem ser enviadas ao Git.
+
+O arquivo local `.db` não deve ser enviado.
+
+## 8. Prisma Client
+
+Depois de instalar as dependências ou alterar o schema, gere o cliente:
+
+```bash
+npx prisma generate
+```
+
+Para validar o schema:
+
+```bash
+npx prisma validate
+```
+
+Para formatar o schema:
+
+```bash
+npx prisma format
+```
+
+## 9. Prisma Studio
+
+Para inspecionar os dados em uma interface visual:
+
+```bash
+npx prisma studio
+```
+
+O Prisma Studio deve ser usado apenas em ambiente de desenvolvimento.
+
+## 10. Seed
+
+Quando houver dados iniciais configurados no projeto, o seed pode ser executado com:
+
+```bash
+npx prisma db seed
+```
+
+Antes de usar esse comando, confirme se `prisma/seed.js` contém os dados que devem ser inseridos.
+
+## 11. Arquivos que não devem ser versionados
+
+Os seguintes arquivos são locais:
 
 ```text
-Banco inicial
-      ↓
-Adicionar tabela User
-      ↓
-Migration
-      ↓
-Adicionar tabela Cycle
-      ↓
-Migration
+backend/.env
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/prisma/*.db-shm
+backend/prisma/*.db-wal
 ```
 
-As migrations permitem acompanhar a evolução do banco ao longo do desenvolvimento.
+Eles devem permanecer no `.gitignore`.
 
----
-
-# 10. Segurança
-
-Informações sensíveis não devem ser armazenadas de maneira insegura.
-
-Especialmente:
+Devem ser versionados:
 
 ```text
-senhas
-tokens
-credenciais
-DATABASE_URL
+backend/.env.example
+backend/prisma/schema.prisma
+backend/prisma/migrations/
+backend/prisma.config.ts
 ```
 
-Senhas devem ser armazenadas utilizando hashing apropriado.
+## 12. Segurança
 
-Credenciais do banco devem permanecer em variáveis de ambiente.
+O banco pode armazenar dados pessoais e sensíveis. Por isso:
 
----
+- senhas são persistidas somente como hash;
+- tokens puros não devem ser armazenados;
+- credenciais permanecem no `.env`;
+- respostas HTTP não expõem hashes;
+- consultas usam a identidade obtida da sessão;
+- dados de uma conta não devem ser retornados para outra conta;
+- arquivos locais do banco não devem ser publicados.
+
+## 13. Testes de persistência
+
+A suíte inclui testes com SQLite real para validar migrations, constraints e integração.
+
+Execute:
+
+```bash
+npm test
+```
+
+Uma suíte aprovada deve terminar sem testes com falha.
+
+## 14. Limitações e evolução
+
+SQLite atende ao ambiente atual de desenvolvimento e à entrega acadêmica.
+
+Se o projeto futuramente migrar para outro banco, serão necessários:
+
+- alteração do datasource;
+- troca ou remoção do adaptador SQLite;
+- revisão das migrations;
+- testes de compatibilidade;
+- revisão das instruções de implantação.
+
+Até que essa migração aconteça, toda a documentação deve identificar SQLite como o banco utilizado.

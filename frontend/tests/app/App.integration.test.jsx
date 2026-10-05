@@ -10,10 +10,10 @@ jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({ DMSans_400Regular: '
 jest.mock('@expo-google-fonts/dm-sans/500Medium', () => ({ DMSans_500Medium: 'medium' }));
 jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({ DMSans_600SemiBold: 'semibold' }));
 jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({ DMSans_700Bold: 'bold' }));
-jest.mock('../../services/createAppServices', () => ({ criarServicosApp: jest.fn() }));
-jest.mock('../../services/auth/tokenStorage', () => ({ obterToken: jest.fn() }));
+jest.mock('../../src/app/createAppServices', () => ({ criarServicosApp: jest.fn() }));
+jest.mock('../../src/shared/storage/tokenStorage', () => ({ obterToken: jest.fn() }));
 
-jest.mock('../../screens/auth/WelcomeScreen', () => {
+jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return jest.fn(({ aoEntrar }) => React.createElement(
@@ -23,7 +23,7 @@ jest.mock('../../screens/auth/WelcomeScreen', () => {
     ));
 });
 
-jest.mock('../../screens/auth/LoginScreen', () => {
+jest.mock('../../src/features/auth/screens/LoginScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return jest.fn(({ aoEntrar }) => React.createElement(
@@ -33,26 +33,100 @@ jest.mock('../../screens/auth/LoginScreen', () => {
     ));
 });
 
-jest.mock('../../screens/auth/ForgotPasswordScreen', () => jest.fn(() => null));
-jest.mock('../../screens/auth/ResetPasswordScreen', () => jest.fn(() => null));
-jest.mock('../../screens/onboarding/OnboardingScreen', () => jest.fn(() => null));
-jest.mock('../../screens/settings/ChangePasswordScreen', () => ({
+jest.mock('../../src/features/auth/screens/ForgotPasswordScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
 }));
 
-jest.mock('../../screens/settings/SettingsScreen', () => {
+jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const React = require('react');
-    const { Pressable, Text } = require('react-native');
+    const { Pressable, Text, View } = require('react-native');
     return {
-        SettingsScreen: jest.fn(({ onAbrirPerfil }) => React.createElement(
-            Pressable,
-            { accessibilityRole: 'button', accessibilityLabel: 'Abrir perfil', onPress: onAbrirPerfil },
-            React.createElement(Text, null, 'Configurações')
+        SettingsScreen: jest.fn(({ onAbrirPerfil, onSelecionarAba }) => React.createElement(
+            View,
+            null,
+            React.createElement(Text, null, 'Configurações'),
+            React.createElement(
+                Pressable,
+                { accessibilityRole: 'button', accessibilityLabel: 'Abrir perfil', onPress: onAbrirPerfil },
+                React.createElement(Text, null, 'Perfil')
+            ),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Abrir membros',
+                    onPress: () => onSelecionarAba?.('membros')
+                },
+                React.createElement(Text, null, 'Membros')
+            )
         ))
     };
 });
 
-jest.mock('../../screens/settings/ProfileSettingsScreen', () => {
+jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba }) => React.createElement(
+            View,
+            null,
+            React.createElement(Text, null, 'Tela de Membros'),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Criar nova categoria',
+                    onPress: onCriarCategoria
+                },
+                React.createElement(Text, null, 'Criar categoria')
+            ),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Voltar para configurações',
+                    onPress: () => onSelecionarAba?.('configuracoes')
+                },
+                React.createElement(Text, null, 'Configurações')
+            )
+        ))
+    };
+});
+
+jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        NewSupportCategoryScreen: jest.fn(({ onVoltar, onConcluido }) => React.createElement(
+            View,
+            null,
+            React.createElement(Text, null, 'Nova categoria'),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Voltar para membros',
+                    onPress: onVoltar
+                },
+                React.createElement(Text, null, 'Voltar')
+            ),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Concluir categoria',
+                    onPress: onConcluido
+                },
+                React.createElement(Text, null, 'Concluir')
+            )
+        ))
+    };
+});
+
+jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
@@ -73,9 +147,9 @@ jest.mock('../../screens/settings/ProfileSettingsScreen', () => {
     };
 });
 
-import App from '../../App';
-import { obterToken } from '../../services/auth/tokenStorage';
-import { criarServicosApp } from '../../services/createAppServices';
+import App from '../../src/App';
+import { obterToken } from '../../src/shared/storage/tokenStorage';
+import { criarServicosApp } from '../../src/app/createAppServices';
 
 function criarServicos() {
     return {
@@ -99,6 +173,10 @@ function criarServicos() {
             alterarSenha: jest.fn(),
             confirmarSenhaExclusao: jest.fn(),
             excluirConta: jest.fn()
+        },
+        contraceptiveService: {},
+        supportCategoryService: {
+            criarCategoria: jest.fn()
         }
     };
 }
@@ -137,6 +215,53 @@ describe('App integrado', () => {
             expect(screen.getByText('Perfil: Julia')).toBeOnTheScreen();
         });
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
+    });
+
+    test('abre membros e inicia a criação de categoria', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Criar nova categoria' }));
+        expect(await screen.findByText('Nova categoria')).toBeOnTheScreen();
+    });
+
+    test('volta da criação de categoria para membros', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Criar nova categoria' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Voltar para membros' }));
+
+        expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
+    });
+
+    test('retorna para membros depois de concluir a categoria', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Criar nova categoria' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Concluir categoria' }));
+
+        expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
+    });
+
+    test('retorna de membros para configurações pelo menu', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar para configurações' }));
+
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
     });
 
     test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {
