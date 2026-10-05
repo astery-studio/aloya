@@ -21,6 +21,9 @@ test('consulta somente dados da pessoa autenticada e limita o histórico', async
 
     assert.deepEqual(consulta.where, { id: 42 });
     assert.equal(consulta.select.registrosCiclo.take, 7);
+    assert.deepEqual(consulta.select.registrosCiclo.where, {
+        dataInicio: { lte: new Date('2026-10-05T23:59:59.999Z') }
+    });
     assert.deepEqual(consulta.select.registrosCiclo.select, {
         dataInicio: true, dataFim: true
     });

@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
     construirIntervalos,
     identificarAmbiguidades,
+    selecionarRegistrosElegiveis,
     selecionarIntervalosRecentes
 } from '../../../../src/features/cycles/prediction.history.js';
 
@@ -18,6 +19,33 @@ test('dois inícios formam um intervalo e o ciclo mais recente fica incompleto',
     assert.equal(intervalos.length, 1);
     assert.equal(intervalos[0].duracao, 31);
     assert.equal(registros[0].dataFim, null);
+});
+
+test('exclui inícios futuros e tecnicamente inválidos sem alterar a entrada', () => {
+    const registros = [
+        { dataInicio: '2026-09-01', dataFim: '2026-09-05' },
+        { dataInicio: '2026-10-20', dataFim: null },
+        { dataInicio: 'data-inválida', dataFim: null }
+    ];
+    const copia = structuredClone(registros);
+    const resultado = selecionarRegistrosElegiveis(registros, '2026-10-05');
+
+    assert.deepEqual(resultado.registros, [registros[0]]);
+    assert.deepEqual(resultado.ambiguidades, [
+        'INICIO_FUTURO_IGNORADO',
+        'INICIO_INVALIDO'
+    ]);
+    assert.deepEqual(registros, copia);
+});
+
+test('não usa término futuro em avaliação cronológica', () => {
+    const resultado = selecionarRegistrosElegiveis([{
+        dataInicio: '2026-10-01',
+        dataFim: '2026-10-10'
+    }], '2026-10-05');
+
+    assert.equal(resultado.registros[0].dataFim, null);
+    assert.deepEqual(resultado.ambiguidades, ['FIM_FUTURO_IGNORADO']);
 });
 
 test('preserva intervalos incomuns e não modifica os registros recebidos', () => {
