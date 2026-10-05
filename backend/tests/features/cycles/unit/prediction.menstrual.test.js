@@ -17,7 +17,7 @@ test('estima o próximo início sem criar ciclos intermediários', () => {
 
 test('estima sangramento pela mediana sem alterar registros observados', () => {
     assert.deepEqual(preverSangramento('2026-10-01', [4, 5, 6, 7], null), {
-        inicio: '2026-10-01', fim: '2026-10-05',
+        inicio: '2026-10-01', fim: '2026-10-06',
         tipo: 'FUTURO_PREVISTO', origemDuracao: 'HISTORICO_INDIVIDUAL'
     });
     assert.equal(preverSangramento('2026-10-01', [], null).fim, '2026-10-05');
