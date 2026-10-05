@@ -28,6 +28,10 @@ test('gera previsão inicial provisória e explicita suas limitações', () => {
     assert.equal(resultado.baseEstimativaOvulacao.origemDuracaoLutea, 'PADRAO_PROVISORIO');
     assert.ok(resultado.limitacoes.includes('EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS'));
     assert.ok(resultado.limitacoes.includes('FIM_SANGRAMENTO_ATUAL_NAO_REGISTRADO'));
+    assert.deepEqual(resultado.sangramentoAtual, {
+        inicio: '2026-10-01', fim: null,
+        status: 'INICIO_REGISTRADO_FIM_DESCONHECIDO'
+    });
     assert.equal(registros[0].dataFim, null);
 });
 

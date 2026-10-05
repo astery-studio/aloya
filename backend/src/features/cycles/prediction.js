@@ -16,7 +16,8 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
     const menstrual = preverMenstruacao({
         ultimoInicio: inicioCiclo, duracaoCiclo: ciclo.valor, dataReferencia
     });
-    const duracoesSangramento = registros
+    const duracoesSangramento = [...registros]
+        .sort((a, b) => a.dataInicio - b.dataInicio)
         .filter(({ dataFim }) => dataFim)
         .map(({ dataInicio, dataFim }) => diferencaDias(dataInicio, dataFim) + 1);
     const futuro = preverSangramento(
@@ -45,9 +46,14 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
             ? 'PARCIALMENTE_DISPONIVEL' : menstrual.status,
         dataReferencia, proximoInicioEstimado: menstrual.proximoInicioEstimado,
         faixaEstimada: null, periodoSangramentoEstimado: futuro,
+        sangramentoAtual: {
+            inicio: inicioCiclo, fim: ultimo.dataFim ? formatarData(ultimo.dataFim) : null,
+            status: ultimo.dataFim ? 'REGISTRADO' : 'INICIO_REGISTRADO_FIM_DESCONHECIDO'
+        },
         fasesEstimadas: fases.fases, janelaFertilEstimada: fases.janelaFertil,
         confiabilidadeMenstrual: confiabilidade,
         baseEstimativaOvulacao: {
+            status: fases.motivo ? 'INDISPONIVEL' : 'ESTIMATIVA_POR_CALENDARIO',
             origemDuracaoLutea: parametros.duracaoLuteaInformada
                 ? ORIGENS.DECLARADA : ORIGENS.PADRAO,
             limitacoes: ['OVULACAO_NAO_OBSERVADA', 'DURACAO_LUTEA_NAO_COMPROVADA']
