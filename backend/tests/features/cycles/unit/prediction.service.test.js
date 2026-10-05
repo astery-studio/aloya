@@ -27,3 +27,14 @@ test('consulta somente dados da pessoa autenticada e limita o histórico', async
     assert.equal(resultado.proximoInicioEstimado, '2026-10-29');
     assert.equal(resultado.dataGeracao, '2026-10-05T12:00:00.000Z');
 });
+
+test('usa o relógio atual somente quando não há relógio injetado', async () => {
+    const prisma = { usuario: { findUnique: async () => ({
+        duracaoCicloInformada: 28, duracaoMenstruacaoInformada: 5,
+        duracaoLuteaInformada: 14, registrosCiclo: []
+    }) } };
+
+    const resultado = await criarPredictionService({ prisma }).buscar(1);
+
+    assert.match(resultado.dataGeracao, /^\d{4}-\d{2}-\d{2}T/);
+});
