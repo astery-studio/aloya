@@ -29,8 +29,25 @@ test('gera previsão inicial provisória e explicita suas limitações', () => {
     assert.ok(resultado.limitacoes.includes('EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS'));
     assert.match(resultado.avisos[0], /não substitui orientação médica/);
     assert.match(resultado.avisos[1], /não considera os efeitos de anticoncepcionais/);
+    assert.match(resultado.avisos[2], /Continue registrando/);
+    assert.equal(resultado.dataOvulacaoEstimada, '2026-10-14');
     assert.equal('sangramentoAtual' in resultado, false);
     assert.equal(registros[0].dataFim, null);
+});
+
+test('não usa início futuro para calcular a previsão atual', () => {
+    const resultado = calcularPrevisao({
+        registros: [
+            { dataInicio: '2026-10-01', dataFim: null },
+            { dataInicio: '2026-11-01', dataFim: null }
+        ],
+        parametros,
+        dataReferencia: '2026-10-05'
+    });
+
+    assert.equal(resultado.proximoInicioEstimado, '2026-10-29');
+    assert.ok(resultado.limitacoes.includes('INICIO_FUTURO_IGNORADO'));
+    assert.equal(resultado.confiabilidadeMenstrual.nivel, 'BAIXA');
 });
 
 test('mantém previsão vencida sem avançar ciclos fictícios', () => {
