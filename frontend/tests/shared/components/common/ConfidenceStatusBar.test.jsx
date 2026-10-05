@@ -3,6 +3,15 @@ import {render, screen} from '@testing-library/react-native'
 
 import {ConfidenceStatusBar} from '../../../../src/shared/components/common/ConfidenceBadge/ConfidenceStatusBar'
 
+function obterBarra(numero) {
+    return screen.getByTestId(
+        `confidence-status-bar-${numero}`,
+        {
+            includeHiddenElements: true
+        }
+    )
+}
+
 describe('ConfidenceStatusBar', () => {
     test.each([
         ['baixa', [1, 0.2, 0.2]],
@@ -16,7 +25,7 @@ describe('ConfidenceStatusBar', () => {
             />
         )
 
-        expect(screen.getByTestId('confidence-status-bar-1')).toHaveStyle({
+        expect(obterBarra(1)).toHaveStyle({
             width: 4,
             height: 5,
             borderRadius: 4,
@@ -24,7 +33,7 @@ describe('ConfidenceStatusBar', () => {
             opacity: opacidades[0]
         })
 
-        expect(screen.getByTestId('confidence-status-bar-2')).toHaveStyle({
+        expect(obterBarra(2)).toHaveStyle({
             width: 4,
             height: 9,
             borderRadius: 4,
@@ -32,12 +41,29 @@ describe('ConfidenceStatusBar', () => {
             opacity: opacidades[1]
         })
 
-        expect(screen.getByTestId('confidence-status-bar-3')).toHaveStyle({
+        expect(obterBarra(3)).toHaveStyle({
             width: 4,
             height: 12,
             borderRadius: 4,
             backgroundColor: '#2C4C3B',
             opacity: opacidades[2]
+        })
+    })
+
+    test('mantém as barras escondidas dos leitores de tela', async () => {
+        const resultado = await render(
+            <ConfidenceStatusBar
+                nivel="alta"
+                cor="#2C4C3B"
+            />
+        )
+
+        expect(resultado.toJSON()).toMatchObject({
+            props: {
+                accessible: false,
+                accessibilityElementsHidden: true,
+                importantForAccessibility: 'no-hide-descendants'
+            }
         })
     })
 
