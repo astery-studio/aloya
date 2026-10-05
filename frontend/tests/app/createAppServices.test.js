@@ -8,26 +8,17 @@ import { criarApiClient } from '../../src/shared/services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
 import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage'
 
-jest.mock(
-    '../../src/features/auth/services/authService',
-    () => ({
-        criarAuthService: jest.fn()
-    })
-)
+jest.mock('../../src/features/auth/services/authService', () => ({
+    criarAuthService: jest.fn()
+}))
 
-jest.mock(
-    '../../src/features/settings/services/accountService',
-    () => ({
-        criarAccountService: jest.fn()
-    })
-)
+jest.mock('../../src/features/settings/services/accountService', () => ({
+    criarAccountService: jest.fn()
+}))
 
-jest.mock(
-    '../../src/features/contraceptives/services/contraceptiveService',
-    () => ({
-        criarContraceptiveService: jest.fn()
-    })
-)
+jest.mock('../../src/features/contraceptives/services/contraceptiveService', () => ({
+    criarContraceptiveService: jest.fn()
+}))
 
 jest.mock(
     '../../src/features/support-network/services/supportCategoryService',
@@ -43,20 +34,14 @@ jest.mock(
     })
 )
 
-jest.mock(
-    '../../src/shared/services/api/authenticatedRequest',
-    () => ({
-        criarRequisicaoAutenticada: jest.fn()
-    })
-)
+jest.mock('../../src/shared/services/api/authenticatedRequest', () => ({
+    criarRequisicaoAutenticada: jest.fn()
+}))
 
-jest.mock(
-    '../../src/shared/storage/tokenStorage',
-    () => ({
-        obterToken: jest.fn(),
-        removerToken: jest.fn()
-    })
-)
+jest.mock('../../src/shared/storage/tokenStorage', () => ({
+    obterToken: jest.fn(),
+    removerToken: jest.fn()
+}))
 
 describe('createAppServices', () => {
     let requisicao
@@ -86,15 +71,9 @@ describe('createAppServices', () => {
         })
         fetchSeguro = null
 
-        criarApiClient.mockImplementation(
-            ({fetchImpl}) => {
-                fetchSeguro = fetchImpl
-
-                return {
-                    requisicao
-                }
-            }
-        )
+        criarApiClient.mockReturnValue({
+            requisicao
+        })
 
         criarRequisicaoAutenticada.mockReturnValue(
             requisicaoAutenticada
@@ -117,10 +96,6 @@ describe('createAppServices', () => {
         )
     })
 
-    afterEach(() => {
-        jest.useRealTimers()
-    })
-
     test('monta e congela os serviços da aplicação', () => {
         const fetchImpl = jest.fn()
 
@@ -131,12 +106,11 @@ describe('createAppServices', () => {
 
         expect(criarApiClient).toHaveBeenCalledWith({
             baseUrl: 'https://api.aloya.com',
-            fetchImpl: expect.any(Function)
+            fetchImpl,
+            timeoutMs: 15000
         })
 
-        expect(
-            criarRequisicaoAutenticada
-        ).toHaveBeenCalledWith({
+        expect(criarRequisicaoAutenticada).toHaveBeenCalledWith({
             requisicao,
             obterCredencial: obterToken,
             removerCredencial: removerToken
@@ -168,33 +142,30 @@ describe('createAppServices', () => {
             supportCategoryService
         })
 
-        expect(
-            Object.isFrozen(servicos)
-        ).toBe(true)
+        expect(Object.isFrozen(servicos)).toBe(true)
     })
 
     test('usa a URL configurada no ambiente', () => {
-        const apiUrlAnterior =
-            process.env.EXPO_PUBLIC_API_URL
-
-        process.env.EXPO_PUBLIC_API_URL =
-            'https://api.aloya.com/'
+        const apiUrlAnterior = process.env.EXPO_PUBLIC_API_URL
+        process.env.EXPO_PUBLIC_API_URL = 'https://api.aloya.com/'
 
         try {
+            const fetchImpl = jest.fn()
+
             criarServicosApp({
-                fetchImpl: jest.fn()
+                fetchImpl
             })
 
             expect(criarApiClient).toHaveBeenCalledWith({
                 baseUrl: 'https://api.aloya.com',
-                fetchImpl: expect.any(Function)
+                fetchImpl,
+                timeoutMs: 15000
             })
         } finally {
             if (apiUrlAnterior === undefined) {
                 delete process.env.EXPO_PUBLIC_API_URL
             } else {
-                process.env.EXPO_PUBLIC_API_URL =
-                    apiUrlAnterior
+                process.env.EXPO_PUBLIC_API_URL = apiUrlAnterior
             }
         }
     })
@@ -204,27 +175,18 @@ describe('createAppServices', () => {
         '',
         '   ',
         123
-    ])(
-        'rejeita uma URL ausente ou inválida: %p',
-        (apiUrl) => {
-            expect(
-                () => criarServicosApp({
-                    apiUrl,
-                    fetchImpl: jest.fn()
-                })
-            ).toThrow(
-                'A URL da API não foi configurada.'
-            )
-        }
-    )
+    ])('rejeita uma URL ausente ou inválida: %p', (apiUrl) => {
+        expect(() => criarServicosApp({
+            apiUrl,
+            fetchImpl: jest.fn()
+        })).toThrow('A URL da API não foi configurada.')
+    })
 
     test('rejeita uma URL malformada', () => {
-        expect(
-            () => criarServicosApp({
-                apiUrl: 'api-invalida',
-                fetchImpl: jest.fn()
-            })
-        ).toThrow()
+        expect(() => criarServicosApp({
+            apiUrl: 'api-invalida',
+            fetchImpl: jest.fn()
+        })).toThrow()
     })
 
     test.each([
@@ -232,145 +194,26 @@ describe('createAppServices', () => {
         'https://usuario:senha@api.aloya.com',
         'https://api.aloya.com?ambiente=teste',
         'https://api.aloya.com#configuracao'
-    ])(
-        'rejeita uma URL insegura: %s',
-        (apiUrl) => {
-            expect(
-                () => criarServicosApp({
-                    apiUrl,
-                    fetchImpl: jest.fn()
-                })
-            ).toThrow(
-                'A URL da API precisa utilizar HTTPS.'
-            )
-        }
-    )
+    ])('rejeita uma URL insegura: %s', (apiUrl) => {
+        expect(() => criarServicosApp({
+            apiUrl,
+            fetchImpl: jest.fn()
+        })).toThrow('A URL da API precisa utilizar HTTPS.')
+    })
 
     test('permite HTTP somente quando o modo de desenvolvimento é solicitado', () => {
+        const fetchImpl = jest.fn()
+
         criarServicosApp({
             apiUrl: 'http://10.0.2.2:3000/',
-            fetchImpl: jest.fn(),
+            fetchImpl,
             permitirHttpDesenvolvimento: true
         })
 
         expect(criarApiClient).toHaveBeenCalledWith({
             baseUrl: 'http://10.0.2.2:3000',
-            fetchImpl: expect.any(Function)
-        })
-    })
-
-    test('repassa as opções e adiciona o sinal de cancelamento', async () => {
-        jest.useFakeTimers()
-
-        const resposta = {
-            ok: true
-        }
-
-        const fetchImpl =
-            jest.fn().mockResolvedValue(resposta)
-
-        criarServicosApp({
-            apiUrl: 'https://api.aloya.com',
-            fetchImpl
-        })
-
-        const opcoes = {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json'
-            }
-        }
-
-        await expect(
-            fetchSeguro(
-                'https://api.aloya.com/users/me',
-                opcoes
-            )
-        ).resolves.toBe(resposta)
-
-        expect(fetchImpl).toHaveBeenCalledWith(
-            'https://api.aloya.com/users/me',
-            {
-                ...opcoes,
-                signal: expect.anything()
-            }
-        )
-
-        expect(opcoes).toEqual({
-            method: 'GET',
-            headers: {
-                Accept: 'application/json'
-            }
-        })
-
-        expect(jest.getTimerCount()).toBe(0)
-    })
-
-    test('cancela uma requisição que ultrapassa o tempo limite', async () => {
-        jest.useFakeTimers()
-
-        const fetchImpl = jest.fn(
-            (url, {signal}) => new Promise(
-                (resolver, rejeitar) => {
-                    signal.addEventListener(
-                        'abort',
-                        () => {
-                            const erro =
-                                new Error('Abortado')
-
-                            erro.name = 'AbortError'
-                            rejeitar(erro)
-                        }
-                    )
-                }
-            )
-        )
-
-        criarServicosApp({
-            apiUrl: 'https://api.aloya.com',
-            fetchImpl
-        })
-
-        const resultado = expect(
-            fetchSeguro(
-                'https://api.aloya.com/users/me'
-            )
-        ).rejects.toMatchObject({
-            message:
-                'A conexão demorou demais. Tente novamente.',
-            mensagemUsuario:
-                'A conexão demorou demais. Tente novamente.'
-        })
-
-        jest.advanceTimersByTime(15000)
-
-        await resultado
-
-        expect(jest.getTimerCount()).toBe(0)
-    })
-
-    test('converte erros internos em uma mensagem segura de conexão', async () => {
-        const fetchImpl =
-            jest.fn().mockRejectedValue(
-                new Error(
-                    'Detalhe interno da conexão'
-                )
-            )
-
-        criarServicosApp({
-            apiUrl: 'https://api.aloya.com',
-            fetchImpl
-        })
-
-        await expect(
-            fetchSeguro(
-                'https://api.aloya.com/users/me'
-            )
-        ).rejects.toMatchObject({
-            message:
-                'Não foi possível conectar ao servidor. Verifique sua conexão.',
-            mensagemUsuario:
-                'Não foi possível conectar ao servidor. Verifique sua conexão.'
+            fetchImpl,
+            timeoutMs: 15000
         })
     })
 })

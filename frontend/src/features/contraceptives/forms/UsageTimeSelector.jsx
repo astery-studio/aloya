@@ -10,6 +10,8 @@ import { estilos } from './contraceptiveForms.styles';
 
 function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConfirmar, onFechar }) {
     const [temporarios, setTemporarios] = useState(horarios.length ? horarios : ['']);
+    // Descarta edições canceladas e restaura os horários confirmados ao reabrir.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { if (aberto) setTemporarios(horarios.length ? horarios : ['']); }, [aberto, horarios]);
 
     const resumo = horarios.filter(Boolean).join(', ');

@@ -72,6 +72,11 @@ import {
 } from '../../features/contraceptives/contraceptive.controller.js';
 
 import {
+    criarEdicaoAnticoncepcionalRateLimit,
+    criarRemocaoAnticoncepcionalRateLimit
+} from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
+
+import {
     criarPermissionCategoryService
 } from '../../features/support-network/services/permissionCategory.service.js';
 
@@ -318,6 +323,24 @@ function criarContainer() {
                 env.exclusaoContaRateLimitMaximo
         });
 
+    const edicaoAnticoncepcionalRateLimit =
+        criarEdicaoAnticoncepcionalRateLimit({
+            rateLimit,
+            janelaMs:
+                env.edicaoAnticoncepcionalRateLimitJanelaMs,
+            limite:
+                env.edicaoAnticoncepcionalRateLimitMaximo
+        });
+
+    const remocaoAnticoncepcionalRateLimit =
+        criarRemocaoAnticoncepcionalRateLimit({
+            rateLimit,
+            janelaMs:
+                env.remocaoAnticoncepcionalRateLimitJanelaMs,
+            limite:
+                env.remocaoAnticoncepcionalRateLimitMaximo
+        });
+
     const authController =
         criarAuthController({
             authService,
@@ -371,7 +394,9 @@ function criarContainer() {
         permissionCategoryRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
-        passwordRecoveryController
+        passwordRecoveryController,
+        edicaoAnticoncepcionalRateLimit,
+        remocaoAnticoncepcionalRateLimit
     };
 }
 
