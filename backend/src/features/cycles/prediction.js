@@ -1,7 +1,7 @@
 import { adicionarDias, diferencaDias, formatarData } from './prediction.calendar.js';
 import { classificarConfiabilidade } from './prediction.confidence.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
-import { construirIntervalos } from './prediction.history.js';
+import { construirIntervalos, identificarAmbiguidades } from './prediction.history.js';
 import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
 import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
@@ -11,6 +11,9 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
     if (!registros.length) return {
         status: 'DADOS_INSUFICIENTES', motivos: ['INICIO_ELEGIVEL_AUSENTE']
     };
+    const ambiguidadesEfetivas = [...new Set([
+        ...ambiguidades, ...identificarAmbiguidades(registros)
+    ])];
     const intervalos = construirIntervalos(registros);
     const ciclo = selecionarDuracao(intervalos, parametros.duracaoCicloInformada, CONFIG_PREVISAO.cicloPadrao);
     const ultimo = [...registros].sort((a, b) => b.dataInicio - a.dataInicio)[0];
@@ -20,7 +23,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
     });
     const duracoesSangramento = [...registros]
         .sort((a, b) => a.dataInicio - b.dataInicio)
-        .filter(({ dataFim }) => dataFim)
+        .filter(({ dataInicio, dataFim }) => dataFim && dataFim >= dataInicio)
         .map(({ dataInicio, dataFim }) => diferencaDias(dataInicio, dataFim) + 1);
     const futuro = preverSangramento(
         menstrual.proximoInicioEstimado, duracoesSangramento,
@@ -38,11 +41,12 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         proximoInicio: menstrual.proximoInicioEstimado, duracaoLutea: parametros.duracaoLuteaInformada ?? CONFIG_PREVISAO.luteaPadrao
     });
     const confiabilidade = classificarConfiabilidade({
-        intervalos, origem: ciclo.origem, ambiguidades
+        intervalos, origem: ciclo.origem, ambiguidades: ambiguidadesEfetivas
     });
     const limitacoes = [LIMITACAO_ANTICONCEPCIONAIS, 'FAIXA_ESTIMADA_NAO_VALIDADA'];
     if (!ultimo.dataFim) limitacoes.push('FIM_SANGRAMENTO_ATUAL_NAO_REGISTRADO');
     if (fases.motivo) limitacoes.push(fases.motivo);
+    limitacoes.push(...ambiguidadesEfetivas);
     return {
         status: fases.motivo && menstrual.status === 'DISPONIVEL'
             ? 'PARCIALMENTE_DISPONIVEL' : menstrual.status,

@@ -13,7 +13,17 @@ function construirIntervalos(registros) {
         inicioAnterior: ordenados[indice],
         inicioSeguinte,
         duracao: Math.round((inicioSeguinte - ordenados[indice]) / DIA_EM_MS)
-    }));
+    })).filter(({ duracao }) => duracao > 0);
 }
 
-export { construirIntervalos };
+function identificarAmbiguidades(registros) {
+    const inicios = registros.map(({ dataInicio }) => dataInicio.toISOString().slice(0, 10));
+    const motivos = [];
+    if (new Set(inicios).size !== inicios.length) motivos.push('INICIOS_DUPLICADOS');
+    if (registros.some(({ dataInicio, dataFim }) => dataFim && dataFim < dataInicio)) {
+        motivos.push('FIM_ANTERIOR_AO_INICIO');
+    }
+    return motivos;
+}
+
+export { construirIntervalos, identificarAmbiguidades };

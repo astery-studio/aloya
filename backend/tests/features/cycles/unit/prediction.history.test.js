@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { construirIntervalos } from '../../../../src/features/cycles/prediction.history.js';
+import { construirIntervalos, identificarAmbiguidades } from '../../../../src/features/cycles/prediction.history.js';
 
 test('dois inícios formam um intervalo e o ciclo mais recente fica incompleto', () => {
     const registros = [
@@ -26,4 +26,12 @@ test('preserva intervalos incomuns e não modifica os registros recebidos', () =
 
     assert.deepEqual(construirIntervalos(registros).map(({ duracao }) => duracao), [80, 21]);
     assert.deepEqual(registros, copia);
+});
+
+test('identifica somente ambiguidades presentes nos registros', () => {
+    const inicio = new Date('2026-04-12T00:00:00Z');
+    assert.deepEqual(identificarAmbiguidades([
+        { dataInicio: inicio, dataFim: new Date('2026-04-11T00:00:00Z') },
+        { dataInicio: inicio, dataFim: null }
+    ]), ['INICIOS_DUPLICADOS', 'FIM_ANTERIOR_AO_INICIO']);
 });
