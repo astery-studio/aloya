@@ -1,16 +1,54 @@
-//Mostra provisoriamente todas as variantes do IconButton para validação visual no Expo.
-import {Alert, ScrollView, Text, View} from 'react-native'
-import {CalendarBlankIcon, InfoIcon, NotePencilIcon, TrashIcon} from '../../../shared/components/icons/AppIcons'
-import {IconButton} from '../../../shared/components/common/IconButton/IconButton'
+//Mostra provisoriamente todas as variantes do ConfidenceBadge para validação visual no Expo.
+import {ScrollView, Text, View} from 'react-native'
+
+import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
 import {estilos} from './CyclesScreen.styles'
 
-function mostrarAcao(acao) {
-    Alert.alert(
-        'IconButton',
-        `${acao} acionado.`
-    )
-}
+const exemplos = Object.freeze([
+    Object.freeze({
+        id: 'alta-com-rotulo',
+        nivel: 'alta',
+        exibirRotulo: true,
+        nome: 'Confiança alta',
+        descricao: 'Variante alta com rótulo'
+    }),
+    Object.freeze({
+        id: 'media-com-rotulo',
+        nivel: 'media',
+        exibirRotulo: true,
+        nome: 'Confiança média',
+        descricao: 'Variante média com rótulo'
+    }),
+    Object.freeze({
+        id: 'baixa-com-rotulo',
+        nivel: 'baixa',
+        exibirRotulo: true,
+        nome: 'Confiança baixa',
+        descricao: 'Variante baixa com rótulo'
+    }),
+    Object.freeze({
+        id: 'alta-sem-rotulo',
+        nivel: 'alta',
+        exibirRotulo: false,
+        nome: 'Alta',
+        descricao: 'Variante alta sem rótulo'
+    }),
+    Object.freeze({
+        id: 'media-sem-rotulo',
+        nivel: 'media',
+        exibirRotulo: false,
+        nome: 'Média',
+        descricao: 'Variante média sem rótulo'
+    }),
+    Object.freeze({
+        id: 'baixa-sem-rotulo',
+        nivel: 'baixa',
+        exibirRotulo: false,
+        nome: 'Baixa',
+        descricao: 'Variante baixa sem rótulo'
+    })
+])
 
 function CyclesScreen({onSelecionarAba}) {
     return (
@@ -25,117 +63,38 @@ function CyclesScreen({onSelecionarAba}) {
             >
                 <View style={estilos.apresentacao}>
                     <Text style={estilos.titulo}>
-                        Teste do IconButton
+                        Teste do ConfidenceBadge
                     </Text>
 
                     <Text style={estilos.descricao}>
-                        Toque nos botões para conferir as ações e compare todas as variantes visuais.
+                        Compare os níveis de confiança com e sem o rótulo completo.
                     </Text>
                 </View>
 
                 <View style={estilos.lista}>
-                    <View style={estilos.item}>
-                        <View style={estilos.amostra}>
-                            <IconButton
-                                icone={CalendarBlankIcon}
-                                variante="selecionado"
-                                rotuloAcessibilidade="Abrir calendário"
-                                aoPressionar={() => mostrarAcao('Abrir calendário')}
-                            />
+                    {exemplos.map(exemplo => (
+                        <View
+                            key={exemplo.id}
+                            style={estilos.item}
+                        >
+                            <View style={estilos.amostra}>
+                                <ConfidenceBadge
+                                    nivel={exemplo.nivel}
+                                    exibirRotulo={exemplo.exibirRotulo}
+                                />
+                            </View>
+
+                            <View style={estilos.informacoes}>
+                                <Text style={estilos.nome}>
+                                    {exemplo.nome}
+                                </Text>
+
+                                <Text style={estilos.variante}>
+                                    {exemplo.descricao}
+                                </Text>
+                            </View>
                         </View>
-
-                        <View style={estilos.informacoes}>
-                            <Text style={estilos.nome}>
-                                Abrir calendário
-                            </Text>
-
-                            <Text style={estilos.variante}>
-                                Variante selecionado
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View style={estilos.item}>
-                        <View style={estilos.amostra}>
-                            <IconButton
-                                icone={TrashIcon}
-                                variante="perigo"
-                                rotuloAcessibilidade="Excluir"
-                                aoPressionar={() => mostrarAcao('Excluir')}
-                            />
-                        </View>
-
-                        <View style={estilos.informacoes}>
-                            <Text style={estilos.nome}>
-                                Excluir
-                            </Text>
-
-                            <Text style={estilos.variante}>
-                                Variante perigo
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View style={estilos.item}>
-                        <View style={estilos.amostra}>
-                            <IconButton
-                                icone={InfoIcon}
-                                rotuloAcessibilidade="Abrir informações"
-                                aoPressionar={() => mostrarAcao('Abrir informações')}
-                            />
-                        </View>
-
-                        <View style={estilos.informacoes}>
-                            <Text style={estilos.nome}>
-                                Abrir informações
-                            </Text>
-
-                            <Text style={estilos.variante}>
-                                Variante neutro
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View style={estilos.item}>
-                        <View style={estilos.amostra}>
-                            <IconButton
-                                icone={NotePencilIcon}
-                                rotuloAcessibilidade="Editar"
-                                aoPressionar={() => mostrarAcao('Editar')}
-                            />
-                        </View>
-
-                        <View style={estilos.informacoes}>
-                            <Text style={estilos.nome}>
-                                Editar
-                            </Text>
-
-                            <Text style={estilos.variante}>
-                                Variante neutro
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View style={estilos.item}>
-                        <View style={estilos.amostra}>
-                            <IconButton
-                                icone={TrashIcon}
-                                variante="desativado"
-                                rotuloAcessibilidade="Excluir indisponível"
-                                aoPressionar={() => mostrarAcao('Excluir indisponível')}
-                            />
-                        </View>
-
-                        <View style={estilos.informacoes}>
-                            <Text style={estilos.nome}>
-                                Excluir indisponível
-                            </Text>
-
-                            <Text style={estilos.variante}>
-                                Variante desativado
-                            </Text>
-                        </View>
-                    </View>
+                    ))}
                 </View>
             </ScrollView>
         </MainLayout>

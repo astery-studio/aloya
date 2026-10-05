@@ -1,5 +1,6 @@
-//Define o visual da tela provisória usada para testar todas as variantes do IconButton.
+//Define o visual da tela provisória usada para testar todas as variantes do ConfidenceBadge.
 import {StyleSheet} from 'react-native'
+
 import {fontFamilies, tema} from '../../../shared/theme'
 
 const estilos = StyleSheet.create({
@@ -50,8 +51,8 @@ const estilos = StyleSheet.create({
     },
 
     amostra: {
-        width: 60,
-        height: 52,
+        width: 150,
+        minHeight: 52,
         flexShrink: 0,
         alignItems: 'center',
         justifyContent: 'center',
