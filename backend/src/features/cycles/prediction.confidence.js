@@ -1,4 +1,4 @@
-import { mediana, ORIGENS } from './prediction.statistics.js';
+import { mediana, ORIGENS } from './utils/statistics.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
 
 function classificarConfiabilidade({ intervalos, origem, ambiguidades = [] }) {

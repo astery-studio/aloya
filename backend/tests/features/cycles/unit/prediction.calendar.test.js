@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { adicionarDias, diferencaDias } from '../../../../src/features/cycles/prediction.calendar.js';
+import {
+    adicionarDias,
+    diferencaDias
+} from '../../../../src/features/cycles/utils/calendar.js';
 
 test('soma dias de calendário em viradas de mês, ano e ano bissexto', () => {
     assert.equal(adicionarDias('2026-01-31', 1), '2026-02-01');

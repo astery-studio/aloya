@@ -23,4 +23,9 @@ function diferencaDias(inicio, fim) {
     );
 }
 
-export { adicionarDias, diferencaDias, formatarData };
+export {
+    adicionarDias,
+    diferencaDias,
+    formatarData,
+    paraDataCalendario
+};

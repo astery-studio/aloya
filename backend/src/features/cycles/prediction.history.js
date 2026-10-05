@@ -1,12 +1,8 @@
-const DIA_EM_MS = 86_400_000;
-
-function dataCalendario(data) {
-    return new Date(`${data.toISOString().slice(0, 10)}T00:00:00.000Z`);
-}
+import { diferencaDias, paraDataCalendario } from './utils/calendar.js';
 
 function construirIntervalos(registros) {
     const ordenados = registros
-        .map(({ dataInicio }) => dataCalendario(dataInicio))
+        .map(({ dataInicio }) => paraDataCalendario(dataInicio))
         .sort((a, b) => a - b);
 
     return ordenados
@@ -14,9 +10,7 @@ function construirIntervalos(registros) {
         .map((inicioSeguinte, indice) => ({
             inicioAnterior: ordenados[indice],
             inicioSeguinte,
-            duracao: Math.round(
-                (inicioSeguinte - ordenados[indice]) / DIA_EM_MS
-            )
+            duracao: diferencaDias(ordenados[indice], inicioSeguinte)
         }))
         .filter(({ duracao }) => duracao > 0);
 }

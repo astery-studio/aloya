@@ -1,11 +1,11 @@
-import { adicionarDias, diferencaDias, formatarData } from './prediction.calendar.js';
+import { adicionarDias, diferencaDias, formatarData } from './utils/calendar.js';
 import { classificarConfiabilidade } from './prediction.confidence.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
 import { construirIntervalos, identificarAmbiguidades } from './prediction.history.js';
 import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
 import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
-import { ORIGENS, selecionarDuracao } from './prediction.statistics.js';
+import { ORIGENS, selecionarDuracao } from './utils/statistics.js';
 
 const LIMITACAO_ANTICONCEPCIONAIS = 'EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS';
 

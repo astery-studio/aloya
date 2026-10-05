@@ -1,4 +1,4 @@
-import { formatarData } from './prediction.calendar.js';
+import { formatarData } from './utils/calendar.js';
 import { calcularPrevisao } from './prediction.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
 

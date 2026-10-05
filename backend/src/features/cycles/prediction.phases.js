@@ -1,4 +1,4 @@
-import { adicionarDias } from './prediction.calendar.js';
+import { adicionarDias } from './utils/calendar.js';
 
 function estimarFases({ inicioCiclo, fimMenstrual, proximoInicio, duracaoLutea }) {
     const inicioLutea = adicionarDias(proximoInicio, -duracaoLutea);

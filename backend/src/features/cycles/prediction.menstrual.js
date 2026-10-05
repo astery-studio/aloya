@@ -1,6 +1,6 @@
-import { adicionarDias } from './prediction.calendar.js';
+import { adicionarDias } from './utils/calendar.js';
 import { CONFIG_PREVISAO } from './prediction.config.js';
-import { selecionarDuracao } from './prediction.statistics.js';
+import { selecionarDuracao } from './utils/statistics.js';
 
 function preverMenstruacao({ ultimoInicio, duracaoCiclo, dataReferencia }) {
     const proximoInicioEstimado = adicionarDias(ultimoInicio, duracaoCiclo);

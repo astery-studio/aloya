@@ -1,4 +1,4 @@
-import { CONFIG_PREVISAO } from './prediction.config.js';
+import { CONFIG_PREVISAO } from '../prediction.config.js';
 
 const ORIGENS = Object.freeze({
     HISTORICO: 'HISTORICO_INDIVIDUAL',
