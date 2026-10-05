@@ -5,7 +5,7 @@ import { calcularPrevisao } from '../../../../src/features/cycles/prediction.js'
 import { identificarFaseAtual } from '../../../../src/features/cycles/prediction.phases.js';
 import { criarPredictionService } from '../../../../src/features/cycles/prediction.service.js';
 
-test('usa dados observados e parâmetro lúteo declarado sem contaminá-los', () => {
+test('usa histórico somente no cálculo e respeita o parâmetro lúteo declarado', () => {
     const registros = [
         { dataInicio: new Date('2026-09-01T00:00:00Z'), dataFim: new Date('2026-09-04T00:00:00Z') },
         { dataInicio: new Date('2026-10-01T00:00:00Z'), dataFim: new Date('2026-10-06T00:00:00Z') }
@@ -16,7 +16,7 @@ test('usa dados observados e parâmetro lúteo declarado sem contaminá-los', ()
     }, dataReferencia: '2026-10-10' });
 
     assert.equal(resultado.origemDuracaoCiclo, 'HISTORICO_INDIVIDUAL');
-    assert.equal(resultado.sangramentoAtual.status, 'REGISTRADO');
+    assert.equal('sangramentoAtual' in resultado, false);
     assert.equal(resultado.baseEstimativaOvulacao.origemDuracaoLutea, 'DURACAO_DECLARADA');
     assert.equal(resultado.faseAtualEstimada, 'FOLICULAR');
 });

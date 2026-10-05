@@ -29,11 +29,7 @@ test('gera previsão inicial provisória e explicita suas limitações', () => {
     assert.ok(resultado.limitacoes.includes('EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS'));
     assert.match(resultado.avisos[0], /não substitui orientação médica/);
     assert.match(resultado.avisos[1], /não considera os efeitos de anticoncepcionais/);
-    assert.ok(resultado.limitacoes.includes('FIM_SANGRAMENTO_ATUAL_NAO_REGISTRADO'));
-    assert.deepEqual(resultado.sangramentoAtual, {
-        inicio: '2026-10-01', fim: null,
-        status: 'INICIO_REGISTRADO_FIM_DESCONHECIDO'
-    });
+    assert.equal('sangramentoAtual' in resultado, false);
     assert.equal(registros[0].dataFim, null);
 });
 

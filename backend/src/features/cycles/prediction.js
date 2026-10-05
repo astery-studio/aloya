@@ -44,7 +44,6 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         intervalos, origem: ciclo.origem, ambiguidades: ambiguidadesEfetivas
     });
     const limitacoes = [LIMITACAO_ANTICONCEPCIONAIS, 'FAIXA_ESTIMADA_NAO_VALIDADA'];
-    if (!ultimo.dataFim) limitacoes.push('FIM_SANGRAMENTO_ATUAL_NAO_REGISTRADO');
     if (fases.motivo) limitacoes.push(fases.motivo);
     limitacoes.push(...ambiguidadesEfetivas);
     return {
@@ -52,10 +51,6 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
             ? 'PARCIALMENTE_DISPONIVEL' : menstrual.status,
         dataReferencia, proximoInicioEstimado: menstrual.proximoInicioEstimado,
         faixaEstimada: null, periodoSangramentoEstimado: futuro,
-        sangramentoAtual: {
-            inicio: inicioCiclo, fim: ultimo.dataFim ? formatarData(ultimo.dataFim) : null,
-            status: ultimo.dataFim ? 'REGISTRADO' : 'INICIO_REGISTRADO_FIM_DESCONHECIDO'
-        },
         fasesEstimadas: fases.fases, janelaFertilEstimada: fases.janelaFertil,
         faseAtualEstimada: menstrual.status === 'PREVISAO_ULTRAPASSADA'
             ? null : identificarFaseAtual(fases.fases, dataReferencia),
