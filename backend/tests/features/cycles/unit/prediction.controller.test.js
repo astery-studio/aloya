@@ -13,12 +13,15 @@ test('busca previsão usando somente a identidade da sessão', async () => {
     } });
     let corpo;
 
+    let cacheControl;
     await controller.buscar({ usuario: { id: 8 }, query: { usuarioId: 99 } }, {
+        set: (nome, valor) => { cacheControl = `${nome}: ${valor}`; },
         json: (valor) => { corpo = valor; }
     }, assert.fail);
 
     assert.equal(usuarioRecebido, 8);
     assert.deepEqual(corpo, { previsao: { status: 'DISPONIVEL' } });
+    assert.equal(cacheControl, 'Cache-Control: private, no-store');
 });
 
 test('prepara mensagem segura para falha interna', async () => {

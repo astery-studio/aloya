@@ -46,6 +46,8 @@ function classificarConfiabilidade({ intervalos, origem, ambiguidades = [] }) {
         || ambiguidades.length || amplitude > CONFIG_PREVISAO.variacaoElevada;
     const alta = valores.length >= CONFIG_PREVISAO.maximoIntervalos
         && amplitude <= CONFIG_PREVISAO.variacaoModerada
+        && origem === ORIGENS.HISTORICO
+        && ambiguidades.length === 0
         && !motivos.includes('MUDANCA_RECENTE');
 
     if (alta) {

@@ -23,3 +23,13 @@ test('distingue variação moderada, mudança recente e histórico consistente',
         nivel: 'ALTA', motivos: ['HISTORICO_CONSISTENTE']
     });
 });
+
+test('ambiguidade prevalece sobre histórico numericamente consistente', () => {
+    const resultado = classificar(
+        [27, 28, 29, 28, 27, 29],
+        { ambiguidades: ['INICIOS_DUPLICADOS'] }
+    );
+
+    assert.equal(resultado.nivel, 'BAIXA');
+    assert.equal(resultado.motivos.includes('HISTORICO_CONSISTENTE'), false);
+});
