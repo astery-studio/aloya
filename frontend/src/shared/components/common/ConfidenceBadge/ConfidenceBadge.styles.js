@@ -1,4 +1,4 @@
-//Define as medidas, tipografia e cores das versões completa e compacta da confiabilidade.
+//Define o visual das variantes simples e composta da confiabilidade.
 import {StyleSheet} from 'react-native'
 
 import {fontFamilies, tema} from '../../../theme'
@@ -9,19 +9,7 @@ const estilos = StyleSheet.create({
         flexShrink: 0
     },
 
-    completo: {
-        width: 140.33,
-        height: 59.33,
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start',
-        gap: 4,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderWidth: 0.666667,
-        borderRadius: 16
-    },
-
-    compacto: {
+    simples: {
         height: 24,
         maxWidth: '100%',
         flexDirection: 'row',
@@ -33,10 +21,39 @@ const estilos = StyleSheet.create({
         borderRadius: tema.radius.switch
     },
 
+    composta: {
+        width: 140.33,
+        height: 59.33,
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        gap: 4,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderWidth: 0.666667,
+        borderRadius: 16
+    },
+
     linha: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6
+    },
+
+    ponto: {
+        width: 5.99,
+        height: 5.99,
+        flexShrink: 0,
+        borderRadius: 2.99578
+    },
+
+    textoSimples: {
+        flexShrink: 1,
+        fontFamily: fontFamilies.semibold,
+        fontSize: 12,
+        fontStyle: 'normal',
+        fontWeight: '600',
+        lineHeight: 18,
+        includeFontPadding: false
     },
 
     rotulo: {
@@ -57,23 +74,6 @@ const estilos = StyleSheet.create({
         fontStyle: 'normal',
         fontWeight: '600',
         lineHeight: 20,
-        includeFontPadding: false
-    },
-
-    ponto: {
-        width: 5.99,
-        height: 5.99,
-        flexShrink: 0,
-        borderRadius: 2.99578
-    },
-
-    textoCompacto: {
-        flexShrink: 1,
-        fontFamily: fontFamilies.semibold,
-        fontSize: 12,
-        fontStyle: 'normal',
-        fontWeight: '600',
-        lineHeight: 18,
         includeFontPadding: false
     }
 })

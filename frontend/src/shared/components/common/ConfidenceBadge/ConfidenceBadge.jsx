@@ -1,7 +1,8 @@
-//Mostra a confiabilidade dos dados do ciclo nas versões completa ou compacta.
+//Mostra a confiabilidade dos dados do ciclo nas variantes simples ou composta.
 import {Text, View} from 'react-native'
 
-import {ChartBarIcon, ChartLineUpIcon} from '../../icons/AppIcons'
+import {ChartLineUpIcon} from '../../icons/AppIcons'
+import {ConfidenceStatusBar} from './ConfidenceStatusBar'
 import {estilos, variantes} from './ConfidenceBadge.styles'
 
 const niveis = Object.freeze({
@@ -19,31 +20,40 @@ const niveis = Object.freeze({
     })
 })
 
-function ConfidenceBadge({nivel, exibirRotulo = true}) {
+const variantesPermitidas = Object.freeze([
+    'simples',
+    'composta'
+])
+
+function ConfidenceBadge({nivel, variante = 'simples'}) {
     const configuracao = niveis[nivel]
 
     if (!configuracao) {
         throw new Error(`Nível de confiança inválido: ${nivel}`)
     }
 
-    const {rotulo, visual} = configuracao
-    const estiloDasCores = {
-        backgroundColor: visual.fundo,
-        borderColor: visual.borda
+    if (!variantesPermitidas.includes(variante)) {
+        throw new Error(`Variante de confiança inválida: ${variante}`)
     }
+
+    const {rotulo, visual} = configuracao
+    const ehComposta = variante === 'composta'
 
     return (
         <View
             accessible
             accessibilityRole="text"
-            accessibilityLabel={`Confiabilidade ${rotulo.toLowerCase()}`}
+            accessibilityLabel={`${ehComposta ? 'Confiabilidade' : 'Confiança'} ${rotulo.toLowerCase()}`}
             style={[
                 estilos.container,
-                exibirRotulo ? estilos.completo : estilos.compacto,
-                estiloDasCores
+                ehComposta ? estilos.composta : estilos.simples,
+                {
+                    backgroundColor: visual.fundo,
+                    borderColor: visual.borda
+                }
             ]}
         >
-            {exibirRotulo ? (
+            {ehComposta ? (
                 <>
                     <View style={estilos.linha}>
                         <ChartLineUpIcon
@@ -66,10 +76,9 @@ function ConfidenceBadge({nivel, exibirRotulo = true}) {
                     </View>
 
                     <View style={estilos.linha}>
-                        <ChartBarIcon
-                            size={18}
-                            color={visual.cor}
-                            weight="fill"
+                        <ConfidenceStatusBar
+                            nivel={nivel}
+                            cor={visual.cor}
                         />
 
                         <Text
@@ -99,7 +108,7 @@ function ConfidenceBadge({nivel, exibirRotulo = true}) {
                     <Text
                         numberOfLines={1}
                         style={[
-                            estilos.textoCompacto,
+                            estilos.textoSimples,
                             {
                                 color: visual.cor
                             }
