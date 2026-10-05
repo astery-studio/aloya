@@ -1,4 +1,9 @@
-import { diferencaDias, paraDataCalendario } from './utils/calendar.js';
+import {
+    diferencaDias,
+    formatarData,
+    paraDataCalendario
+} from './utils/calendar.js';
+import { CONFIG_PREVISAO } from './prediction.config.js';
 
 function construirIntervalos(registros) {
     const ordenados = registros
@@ -15,6 +20,10 @@ function construirIntervalos(registros) {
         .filter(({ duracao }) => duracao > 0);
 }
 
+function selecionarIntervalosRecentes(intervalos) {
+    return intervalos.slice(-CONFIG_PREVISAO.maximoIntervalos);
+}
+
 function identificarAmbiguidades(registros) {
     const inicios = registros.map(({ dataInicio }) => (
         dataInicio.toISOString().slice(0, 10)
@@ -25,11 +34,19 @@ function identificarAmbiguidades(registros) {
         motivos.push('INICIOS_DUPLICADOS');
     }
 
-    if (registros.some(({ dataInicio, dataFim }) => dataFim && dataFim < dataInicio)) {
+    const possuiFimAnteriorAoInicio = registros.some(({ dataInicio, dataFim }) => (
+        dataFim && diferencaDias(dataInicio, dataFim) < 0
+    ));
+
+    if (possuiFimAnteriorAoInicio) {
         motivos.push('FIM_ANTERIOR_AO_INICIO');
     }
 
     return motivos;
 }
 
-export { construirIntervalos, identificarAmbiguidades };
+export {
+    construirIntervalos,
+    identificarAmbiguidades,
+    selecionarIntervalosRecentes
+};
