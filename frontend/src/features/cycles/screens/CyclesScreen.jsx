@@ -7,46 +7,40 @@ import {estilos} from './CyclesScreen.styles'
 
 const exemplos = Object.freeze([
     Object.freeze({
-        id: 'alta-com-rotulo',
+        id: 'alta-completa',
         nivel: 'alta',
         exibirRotulo: true,
-        nome: 'Confiança alta',
-        descricao: 'Variante alta com rótulo'
+        nome: 'Alta completa'
     }),
     Object.freeze({
-        id: 'media-com-rotulo',
+        id: 'media-completa',
         nivel: 'media',
         exibirRotulo: true,
-        nome: 'Confiança média',
-        descricao: 'Variante média com rótulo'
+        nome: 'Média completa'
     }),
     Object.freeze({
-        id: 'baixa-com-rotulo',
+        id: 'baixa-completa',
         nivel: 'baixa',
         exibirRotulo: true,
-        nome: 'Confiança baixa',
-        descricao: 'Variante baixa com rótulo'
+        nome: 'Baixa completa'
     }),
     Object.freeze({
-        id: 'alta-sem-rotulo',
+        id: 'alta-compacta',
         nivel: 'alta',
         exibirRotulo: false,
-        nome: 'Alta',
-        descricao: 'Variante alta sem rótulo'
+        nome: 'Alta compacta'
     }),
     Object.freeze({
-        id: 'media-sem-rotulo',
+        id: 'media-compacta',
         nivel: 'media',
         exibirRotulo: false,
-        nome: 'Média',
-        descricao: 'Variante média sem rótulo'
+        nome: 'Média compacta'
     }),
     Object.freeze({
-        id: 'baixa-sem-rotulo',
+        id: 'baixa-compacta',
         nivel: 'baixa',
         exibirRotulo: false,
-        nome: 'Baixa',
-        descricao: 'Variante baixa sem rótulo'
+        nome: 'Baixa compacta'
     })
 ])
 
@@ -67,7 +61,7 @@ function CyclesScreen({onSelecionarAba}) {
                     </Text>
 
                     <Text style={estilos.descricao}>
-                        Compare os níveis de confiança com e sem o rótulo completo.
+                        Compare os três níveis nas versões completa e compacta.
                     </Text>
                 </View>
 
@@ -84,15 +78,9 @@ function CyclesScreen({onSelecionarAba}) {
                                 />
                             </View>
 
-                            <View style={estilos.informacoes}>
-                                <Text style={estilos.nome}>
-                                    {exemplo.nome}
-                                </Text>
-
-                                <Text style={estilos.variante}>
-                                    {exemplo.descricao}
-                                </Text>
-                            </View>
+                            <Text style={estilos.nome}>
+                                {exemplo.nome}
+                            </Text>
                         </View>
                     ))}
                 </View>

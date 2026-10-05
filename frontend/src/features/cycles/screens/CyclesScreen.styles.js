@@ -39,7 +39,7 @@ const estilos = StyleSheet.create({
 
     item: {
         width: '100%',
-        minHeight: 76,
+        minHeight: 104,
         flexDirection: 'row',
         alignItems: 'center',
         gap: tema.espacamentos.medio,
@@ -51,8 +51,8 @@ const estilos = StyleSheet.create({
     },
 
     amostra: {
-        width: 150,
-        minHeight: 52,
+        width: 160,
+        minHeight: 80,
         flexShrink: 0,
         alignItems: 'center',
         justifyContent: 'center',
@@ -60,24 +60,12 @@ const estilos = StyleSheet.create({
         borderRadius: tema.radius.buttonAndInput
     },
 
-    informacoes: {
-        flex: 1,
-        minWidth: 0
-    },
-
     nome: {
+        flex: 1,
         color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.medium,
         fontSize: 16,
         lineHeight: 24,
-        includeFontPadding: false
-    },
-
-    variante: {
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 14,
-        lineHeight: 21,
         includeFontPadding: false
     }
 })
