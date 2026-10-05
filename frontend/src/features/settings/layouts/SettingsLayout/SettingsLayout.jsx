@@ -19,7 +19,7 @@ import {
 } from './SettingsLayout.style'
 
 //Recebe o título, conteúdo e rodapé e retorna a estrutura comum das configurações.
-function SettingsLayout({titulo, onVoltar, children, rodape, testeId = 'settings-layout'}) {
+function SettingsLayout({titulo, onVoltar, children, rodape, rodapeFixo = false, testeId = 'settings-layout'}) {
     const temRodape = rodape !== undefined && rodape !== null
 
     return (
@@ -50,7 +50,7 @@ function SettingsLayout({titulo, onVoltar, children, rodape, testeId = 'settings
                 >
                     {children}
 
-                    {temRodape ? (
+                    {temRodape && !rodapeFixo ? (
                         <View
                             testID="rodape-settings-layout"
                             style={estilos.rodape}
@@ -59,6 +59,15 @@ function SettingsLayout({titulo, onVoltar, children, rodape, testeId = 'settings
                         </View>
                     ) : null}
                 </ScrollView>
+
+                {temRodape && rodapeFixo ? (
+                    <View
+                        testID="rodape-fixo-settings-layout"
+                        style={estilos.rodapeFixo}
+                    >
+                        {rodape}
+                    </View>
+                ) : null}
             </KeyboardAvoidingView>
         </SafeAreaView>
     )

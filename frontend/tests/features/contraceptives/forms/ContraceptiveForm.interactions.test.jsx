@@ -148,10 +148,6 @@ function criarControle(sobrescritas = {}) {
     }
 
     return {
-        dados: {
-            ...dadosPadrao,
-            ...(sobrescritas.dados ?? {})
-        },
         painel: null,
         alerta: null,
         hoje: '2026-10-02',

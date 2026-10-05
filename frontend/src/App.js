@@ -19,15 +19,19 @@ import { ChangePasswordScreen } from './features/settings/screens/ChangePassword
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveHuTestAccess } from './features/contraceptives/testing/ContraceptiveHuTestAccess';
+import { MembersScreen } from './features/support-network/screens/MembersScreen';
+import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
+    membros: 'membros',
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
-    anticoncepcionais: 'anticoncepcionais'
+    anticoncepcionais: 'anticoncepcionais',
+    novaCategoria: 'novaCategoria'
 });
 
 function obterBaseUrl() {
@@ -196,6 +200,17 @@ export default function App() {
         setEstadoSessao('anonima');
     }
 
+    function selecionarAba(aba) {
+        if (aba === 'membros') {
+            setTelaInterna(telasInternas.membros);
+            return;
+        }
+
+        if (aba === 'configuracoes') {
+            setTelaInterna(telasInternas.configuracoes);
+        }
+    }
+
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         return (
             <SafeAreaView style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
@@ -249,13 +264,24 @@ export default function App() {
             aoVoltar={() => setTelaPublica('boasVindas')}
             aoEntrar={() => setTelaPublica('login')}
             aoConcluir={concluirAutenticacao} />;
+    } else if (telaInterna === telasInternas.membros) {
+        conteudo = <MembersScreen
+            onCriarCategoria={() => setTelaInterna(telasInternas.novaCategoria)}
+            onSelecionarAba={selecionarAba} />;
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = <SettingsScreen
+            onSelecionarAba={selecionarAba}
             onAbrirAnticoncepcionais={() => setTelaInterna(telasInternas.anticoncepcionais)}
             onAbrirPerfil={() => {
                 setTelaInterna(telasInternas.perfil);
                 if (!perfil && !carregandoPerfil && !erroPerfil) carregarPerfil();
             }} />;
+    } else if (telaInterna === telasInternas.novaCategoria) {
+        conteudo = <NewSupportCategoryScreen
+            criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
+            onVoltar={() => setTelaInterna(telasInternas.membros)}
+            onConcluido={() => setTelaInterna(telasInternas.membros)}
+            onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.anticoncepcionais) {
         conteudo = <ContraceptiveHuTestAccess
             service={configuracao.servicos.contraceptiveService}

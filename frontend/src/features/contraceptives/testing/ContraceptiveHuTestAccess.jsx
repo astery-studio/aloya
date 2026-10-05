@@ -23,12 +23,12 @@ function ContraceptiveHuTestAccess({
     const [erro, setErro] = useState(null);
 
     //Informa ao aplicativo quando a API rejeita a sessão atual.
-    function tratarSessaoExpirada(falha) {
+    const tratarSessaoExpirada = useCallback((falha) => {
         if (falha?.status !== 401) return false;
 
         onSessaoExpirada?.();
         return true;
-    }
+    }, [onSessaoExpirada]);
 
     //Busca os anticoncepcionais reais sem manter requisições depois que a tela fecha.
     const carregar = useCallback(async (signal) => {
@@ -60,11 +60,13 @@ function ContraceptiveHuTestAccess({
                 setCarregando(false);
             }
         }
-    }, [service, onSessaoExpirada]);
+    }, [service, tratarSessaoExpirada]);
 
     useEffect(() => {
         const controlador = new AbortController();
 
+        // A listagem externa inicia ao montar e é cancelada ao desmontar.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         carregar(controlador.signal);
 
         return () => controlador.abort();

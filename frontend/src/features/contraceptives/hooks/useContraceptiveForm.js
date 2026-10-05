@@ -72,7 +72,7 @@ function useContraceptiveForm(onSubmit, anticoncepcionalInicial = null) {
     const [dados, setDados] = useState(() => criarDadosIniciais(anticoncepcionalInicial));
     const [painel, setPainel] = useState(null);
     const [alerta, setAlerta] = useState(null);
-    const hoje = useMemo(dataIsoHoje, []);
+    const hoje = useMemo(() => dataIsoHoje(), []);
     const frequencia = obterFrequencia(dados.tipo, dados.frequenciaId);
     const modoEdicao = dadosOriginais.id !== null;
     const possuiAlteracoes = modoEdicao && !dadosSaoIguais(dados, dadosOriginais);

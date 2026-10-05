@@ -26,11 +26,11 @@
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "10.0.10"
+    "nodemailer": "10.0.10",
+    "prisma": "7.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "prisma": "7.10.0"
+    "nodemon": "^3.1.14"
   },
   "overrides": {
     "deepmerge-ts": "8.0.2",
