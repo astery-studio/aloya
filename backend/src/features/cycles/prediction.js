@@ -110,23 +110,28 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         duracaoEstimada: duracaoAtual.valor
     });
     const fases = estimarFases({
-        inicioCiclo, fimMenstrual,
-        proximoInicio: menstrual.proximoInicioEstimado, duracaoLutea: parametros.duracaoLuteaInformada ?? CONFIG_PREVISAO.luteaPadrao
+        inicioCiclo,
+        fimMenstrual,
+        proximoInicio: menstrual.proximoInicioEstimado,
+        duracaoLutea: parametros.duracaoLuteaInformada
+            ?? CONFIG_PREVISAO.luteaPadrao
     });
     const confiabilidade = classificarConfiabilidade({
-        intervalos, origem: ciclo.origem, ambiguidades: ambiguidadesEfetivas
+        intervalos,
+        origem: ciclo.origem,
+        ambiguidades: ambiguidadesEfetivas
     });
-    const limitacoes = [LIMITACAO_ANTICONCEPCIONAIS, 'FAIXA_ESTIMADA_NAO_VALIDADA'];
-    if (fases.motivo) limitacoes.push(fases.motivo);
-    limitacoes.push(...ambiguidadesEfetivas);
+    const limitacoes = obterLimitacoes(fases, ambiguidadesEfetivas);
+
     return {
-        status: fases.motivo && menstrual.status === 'DISPONIVEL'
-            ? 'PARCIALMENTE_DISPONIVEL' : menstrual.status,
-        dataReferencia, proximoInicioEstimado: menstrual.proximoInicioEstimado,
-        faixaEstimada: null, periodoSangramentoEstimado: futuro,
-        fasesEstimadas: fases.fases, janelaFertilEstimada: fases.janelaFertil,
-        faseAtualEstimada: menstrual.status === 'PREVISAO_ULTRAPASSADA'
-            ? null : identificarFaseAtual(fases.fases, dataReferencia),
+        status: obterStatusPrevisao(menstrual, fases),
+        dataReferencia,
+        proximoInicioEstimado: menstrual.proximoInicioEstimado,
+        faixaEstimada: null,
+        periodoSangramentoEstimado: futuro,
+        fasesEstimadas: fases.fases,
+        janelaFertilEstimada: fases.janelaFertil,
+        faseAtualEstimada: obterFaseAtual(menstrual, fases, dataReferencia),
         confiabilidadeMenstrual: confiabilidade,
         baseEstimativaOvulacao: {
             status: fases.motivo ? 'INDISPONIVEL' : 'ESTIMATIVA_POR_CALENDARIO',
@@ -134,10 +139,16 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
                 ? ORIGENS.DECLARADA : ORIGENS.PADRAO,
             limitacoes: ['OVULACAO_NAO_OBSERVADA', 'DURACAO_LUTEA_NAO_COMPROVADA']
         },
-        quantidadeIntervalosUtilizados: Math.min(intervalos.length, CONFIG_PREVISAO.maximoIntervalos),
-        origemDuracaoCiclo: ciclo.origem, duracaoCicloEstimada: ciclo.valor,
-        limitacoes, avisos: [AVISO_ESTIMATIVA, AVISO_ANTICONCEPCIONAIS],
+        quantidadeIntervalosUtilizados: Math.min(
+            intervalos.length,
+            CONFIG_PREVISAO.maximoIntervalos
+        ),
+        origemDuracaoCiclo: ciclo.origem,
+        duracaoCicloEstimada: ciclo.valor,
+        limitacoes,
+        avisos: [AVISO_ESTIMATIVA, AVISO_ANTICONCEPCIONAIS],
         versaoAlgoritmo: CONFIG_PREVISAO.versao
     };
 }
+
 export { calcularPrevisao, LIMITACAO_ANTICONCEPCIONAIS };
