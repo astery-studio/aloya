@@ -1,6 +1,7 @@
 import { adicionarDias, diferencaDias, formatarData } from './prediction.calendar.js';
 import { classificarConfiabilidade } from './prediction.confidence.js';
 import { construirIntervalos } from './prediction.history.js';
+import { AVISO_ANTICONCEPCIONAIS, AVISO_ESTIMATIVA } from './prediction.messages.js';
 import { preverMenstruacao, preverSangramento } from './prediction.menstrual.js';
 import { estimarFases, identificarFaseAtual } from './prediction.phases.js';
 import { ORIGENS, selecionarDuracao } from './prediction.statistics.js';
@@ -62,7 +63,8 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         },
         quantidadeIntervalosUtilizados: Math.min(intervalos.length, 6),
         origemDuracaoCiclo: ciclo.origem, duracaoCicloEstimada: ciclo.valor,
-        limitacoes, versaoAlgoritmo: '1.0.0'
+        limitacoes, avisos: [AVISO_ESTIMATIVA, AVISO_ANTICONCEPCIONAIS],
+        versaoAlgoritmo: '1.0.0'
     };
 }
 export { calcularPrevisao, LIMITACAO_ANTICONCEPCIONAIS };
