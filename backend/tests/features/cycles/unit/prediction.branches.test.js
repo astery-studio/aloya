@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { calcularPrevisao } from '../../../../src/features/cycles/prediction.js';
-import { identificarFaseAtual } from '../../../../src/features/cycles/prediction.phases.js';
 import { criarPredictionService } from '../../../../src/features/cycles/prediction.service.js';
 
 test('usa histórico somente no cálculo e respeita o parâmetro lúteo declarado', () => {
@@ -18,14 +17,14 @@ test('usa histórico somente no cálculo e respeita o parâmetro lúteo declarad
     assert.equal(resultado.origemDuracaoCiclo, 'HISTORICO_INDIVIDUAL');
     assert.equal('sangramentoAtual' in resultado, false);
     assert.equal(resultado.baseEstimativaOvulacao.origemDuracaoLutea, 'DURACAO_DECLARADA');
-    assert.equal(resultado.faseAtualEstimada, 'FOLICULAR');
+    assert.equal('faseAtualEstimada' in resultado, false);
 });
 
 test('omite fases incompatíveis sem omitir a próxima menstruação', () => {
     const resultado = calcularPrevisao({
         registros: [{ dataInicio: new Date('2026-10-01T00:00:00Z'), dataFim: new Date('2026-10-18T00:00:00Z') }],
         parametros: { duracaoCicloInformada: 20, duracaoMenstruacaoInformada: null, duracaoLuteaInformada: 14 },
-        dataReferencia: '2026-10-10'
+        dataReferencia: '2026-10-19'
     });
 
     assert.equal(resultado.status, 'PARCIALMENTE_DISPONIVEL');
@@ -34,12 +33,7 @@ test('omite fases incompatíveis sem omitir a próxima menstruação', () => {
     assert.equal(resultado.baseEstimativaOvulacao.status, 'INDISPONIVEL');
 });
 
-test('trata fase fora dos intervalos e usuário inexistente', async () => {
-    assert.equal(identificarFaseAtual({
-        menstrual: { inicio: '2026-10-01', fim: '2026-10-05' },
-        folicularPosMenstrual: { inicio: '2026-10-06', fim: '2026-10-10' },
-        ovulatoria: { data: '2026-10-11' }, lutea: { inicio: '2026-10-12', fim: '2026-10-20' }
-    }, '2026-09-30'), null);
+test('trata usuário inexistente sem produzir previsão', async () => {
     const service = criarPredictionService({
         prisma: { usuario: { findUnique: async () => null } }
     });

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { estimarFases, identificarFaseAtual } from '../../../../src/features/cycles/prediction.phases.js';
+import { estimarFases } from '../../../../src/features/cycles/prediction.phases.js';
 
 test('estima categorias educativas e janela fértil pelo calendário', () => {
     const resultado = estimarFases({
@@ -18,10 +18,6 @@ test('estima categorias educativas e janela fértil pelo calendário', () => {
     assert.deepEqual(resultado.janelaFertil, {
         inicio: '2026-10-09', fim: '2026-10-14'
     });
-    assert.equal(identificarFaseAtual(resultado.fases, '2026-10-05'), 'MENSTRUAL');
-    assert.equal(identificarFaseAtual(resultado.fases, '2026-10-10'), 'FOLICULAR');
-    assert.equal(identificarFaseAtual(resultado.fases, '2026-10-14'), 'OVULATORIA');
-    assert.equal(identificarFaseAtual(resultado.fases, '2026-10-20'), 'LUTEA');
 });
 
 test('preserva previsão menstrual quando fases não cabem', () => {
@@ -33,5 +29,4 @@ test('preserva previsão menstrual quando fases não cabem', () => {
     assert.equal(resultado.fases, null);
     assert.equal(resultado.janelaFertil, null);
     assert.equal(resultado.motivo, 'INTERVALOS_DE_FASE_INCOMPATIVEIS');
-    assert.equal(identificarFaseAtual(resultado.fases, '2026-10-10'), null);
 });
