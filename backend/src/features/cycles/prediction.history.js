@@ -26,7 +26,7 @@ function selecionarIntervalosRecentes(intervalos) {
 
 function identificarAmbiguidades(registros) {
     const inicios = registros.map(({ dataInicio }) => (
-        dataInicio.toISOString().slice(0, 10)
+        formatarData(dataInicio)
     ));
     const motivos = [];
 
