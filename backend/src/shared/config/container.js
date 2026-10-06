@@ -72,6 +72,18 @@ import {
 } from '../../features/contraceptives/contraceptive.controller.js';
 
 import {
+    criarCycleHistoryRepository
+} from '../../features/cycles/cycleHistory.repository.js';
+
+import {
+    criarCycleHistoryService
+} from '../../features/cycles/cycleHistory.service.js';
+
+import {
+    criarCycleHistoryController
+} from '../../features/cycles/cycleHistory.controller.js';
+
+import {
     criarPermissionCategoryService
 } from '../../features/support-network/services/permissionCategory.service.js';
 
@@ -214,6 +226,16 @@ function criarContainer() {
     const contraceptiveService =
         criarContraceptiveService(prisma);
 
+    const cycleHistoryRepository =
+        criarCycleHistoryRepository({
+            prisma
+        });
+
+    const cycleHistoryService =
+        criarCycleHistoryService({
+            repository: cycleHistoryRepository
+        });
+
     const permissionCategoryService =
         criarPermissionCategoryService({
             prisma
@@ -348,6 +370,11 @@ function criarContainer() {
             contraceptiveService
         );
 
+    const cycleHistoryController =
+        criarCycleHistoryController({
+            cycleHistoryService
+        });
+
     const permissionCategoryController =
         criarPermissionCategoryController({
             permissionCategoryService,
@@ -360,6 +387,7 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        cycleHistoryController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,
