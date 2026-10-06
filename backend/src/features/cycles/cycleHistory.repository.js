@@ -1,8 +1,5 @@
-//Consulta páginas e contagens do histórico sem expor dados de outras contas.
-import {
-    LIMITE_MAXIMO,
-    criarCursorHistorico
-} from './cycleHistory.validator.js';
+//Consulta páginas, totais e posições do histórico sem expor dados de outras contas.
+import {LIMITE_MAXIMO, criarCursorHistorico} from './cycleHistory.validator.js';
 
 const SELECAO_DO_CICLO = Object.freeze({
     id: true,
@@ -23,11 +20,7 @@ function validarUsuarioId(usuarioId) {
 
 //Confere novamente o limite antes de executar a consulta no banco.
 function validarLimite(limite) {
-    if (
-        !Number.isSafeInteger(limite)
-        || limite <= 0
-        || limite > LIMITE_MAXIMO
-    ) {
+    if (!Number.isSafeInteger(limite) || limite <= 0 || limite > LIMITE_MAXIMO) {
         throw new TypeError('O limite interno da página é inválido.');
     }
 }
@@ -38,24 +31,22 @@ function validarCursor(cursor) {
         return;
     }
 
-    if (
-        typeof cursor !== 'object'
-        || Array.isArray(cursor)
-        || !(cursor.dataInicio instanceof Date)
-        || Number.isNaN(cursor.dataInicio.getTime())
-        || !Number.isSafeInteger(cursor.id)
-        || cursor.id <= 0
-    ) {
+    if (typeof cursor !== 'object' || Array.isArray(cursor) || !(cursor.dataInicio instanceof Date) || Number.isNaN(cursor.dataInicio.getTime()) || !Number.isSafeInteger(cursor.id) || cursor.id <= 0) {
         throw new TypeError('O cursor interno da página é inválido.');
     }
 }
 
-//Monta o filtro estável que busca somente registros posteriores ao cursor na ordenação.
-function criarFiltro(usuarioId, cursor) {
+//Confere se uma contagem devolvida pelo banco pode ser usada com segurança.
+function validarContagem(quantidade) {
+    if (!Number.isSafeInteger(quantidade) || quantidade < 0) {
+        throw new TypeError('A contagem do histórico retornou um resultado inválido.');
+    }
+}
+
+//Monta o filtro que busca somente registros posteriores ao cursor na ordenação.
+function criarFiltroDaPagina(usuarioId, cursor) {
     if (!cursor) {
-        return {
-            usuarioId
-        };
+        return {usuarioId};
     }
 
     return {
@@ -76,31 +67,40 @@ function criarFiltro(usuarioId, cursor) {
     };
 }
 
+//Monta o filtro que conta os registros já percorridos, incluindo o item do cursor.
+function criarFiltroDaPosicao(usuarioId, cursor) {
+    return {
+        usuarioId,
+        OR: [
+            {
+                dataInicio: {
+                    gt: cursor.dataInicio
+                }
+            },
+            {
+                dataInicio: cursor.dataInicio,
+                id: {
+                    gte: cursor.id
+                }
+            }
+        ]
+    };
+}
+
 //Cria o acesso paginado ao histórico usando somente operações necessárias do Prisma.
 function criarCycleHistoryRepository({prisma} = {}) {
-    if (
-        !prisma
-        || typeof prisma.registroCiclo?.findMany !== 'function'
-        || typeof prisma.registroCiclo?.count !== 'function'
-    ) {
+    if (!prisma || typeof prisma.registroCiclo?.findMany !== 'function' || typeof prisma.registroCiclo?.count !== 'function') {
         throw new TypeError('O Prisma do histórico de ciclos é inválido.');
     }
 
     //Busca uma página e usa um registro adicional apenas para detectar continuidade.
-    async function listarPagina({
-        usuarioId,
-        limite,
-        cursor = null
-    } = {}) {
+    async function listarPagina({usuarioId, limite, cursor = null} = {}) {
         validarUsuarioId(usuarioId);
         validarLimite(limite);
         validarCursor(cursor);
 
         const registrosEncontrados = await prisma.registroCiclo.findMany({
-            where: criarFiltro(
-                usuarioId,
-                cursor
-            ),
+            where: criarFiltroDaPagina(usuarioId, cursor),
             orderBy: [
                 {
                     dataInicio: 'desc'
@@ -118,17 +118,12 @@ function criarCycleHistoryRepository({prisma} = {}) {
         }
 
         const temMais = registrosEncontrados.length > limite;
-        const registros = temMais
-            ? registrosEncontrados.slice(0, limite)
-            : registrosEncontrados.slice();
-
+        const registros = temMais ? registrosEncontrados.slice(0, limite) : registrosEncontrados.slice();
         const ultimoRegistro = registros.at(-1);
-        const proximoCursor = temMais && ultimoRegistro
-            ? criarCursorHistorico({
-                dataInicio: ultimoRegistro.dataInicio,
-                id: ultimoRegistro.id
-            })
-            : null;
+        const proximoCursor = temMais && ultimoRegistro ? criarCursorHistorico({
+            dataInicio: ultimoRegistro.dataInicio,
+            id: ultimoRegistro.id
+        }) : null;
 
         return {
             registros,
@@ -147,22 +142,32 @@ function criarCycleHistoryRepository({prisma} = {}) {
             }
         });
 
-        if (
-            !Number.isSafeInteger(quantidade)
-            || quantidade < 0
-        ) {
-            throw new TypeError('A contagem do histórico retornou um resultado inválido.');
+        validarContagem(quantidade);
+        return quantidade;
+    }
+
+    //Conta quantos ciclos já foram percorridos antes da página solicitada.
+    async function contarAteCursor(usuarioId, cursor = null) {
+        validarUsuarioId(usuarioId);
+        validarCursor(cursor);
+
+        if (!cursor) {
+            return 0;
         }
 
+        const quantidade = await prisma.registroCiclo.count({
+            where: criarFiltroDaPosicao(usuarioId, cursor)
+        });
+
+        validarContagem(quantidade);
         return quantidade;
     }
 
     return {
         listarPagina,
-        contarDoUsuario
+        contarDoUsuario,
+        contarAteCursor
     };
 }
 
-export {
-    criarCycleHistoryRepository
-};
+export {criarCycleHistoryRepository};
