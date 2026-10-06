@@ -11,6 +11,13 @@ const estadosPermitidos = Object.freeze([
     'incerto'
 ])
 
+const coresDoCiclo = Object.freeze({
+    ativa: '#2C4C3B',
+    desativada: '#A9A9A6'
+})
+
+const corDoAviso = '#B97D22'
+
 function normalizarNumeroDoCiclo(valor) {
     if (!Number.isInteger(valor) || valor <= 0) {
         return '--'
@@ -77,142 +84,144 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
             style={estilos.container}
         >
             <View style={[estilos.cabecalho, estaEmAndamento && estilos.cabecalhoEmAndamento]}>
-                <View
-                    accessible
-                    accessibilityRole="text"
-                    accessibilityLabel={rotuloDoCiclo}
-                    style={estilos.numero}
-                >
-                    <Text style={estilos.textoDoNumero}>
-                        {numero}
-                    </Text>
-                </View>
+                <View style={estilos.linhaDoCabecalho}>
+                    <View style={estilos.identificacao}>
+                        <View
+                            accessible
+                            accessibilityRole="text"
+                            accessibilityLabel={rotuloDoCiclo}
+                            style={estilos.numero}
+                        >
+                            <Text style={estilos.textoDoNumero}>
+                                {numero}
+                            </Text>
+                        </View>
 
-                <View style={estilos.textos}>
-                    <Text
-                        numberOfLines={2}
-                        style={estilos.periodo}
-                    >
-                        {periodo}
-                    </Text>
+                        <View style={estilos.textos}>
+                            <Text
+                                numberOfLines={2}
+                                style={estilos.periodo}
+                            >
+                                {periodo}
+                            </Text>
 
-                    {estaEmAndamento ? (
-                        <Text style={estilos.status}>
-                            Em andamento
-                        </Text>
-                    ) : null}
-                </View>
+                            {estaEmAndamento ? (
+                                <Text style={estilos.status}>
+                                    Em andamento
+                                </Text>
+                            ) : null}
+                        </View>
+                    </View>
 
-                <View style={estilos.acoes}>
-                    <IconButton
-                        icone={NotePencilIcon}
-                        aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
-                        rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
-                        variante="neutro"
-                    />
+                    <View style={estilos.acoes}>
+                        <IconButton
+                            icone={PencilSimpleIcon}
+                            aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
+                            rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
+                            variante="neutro"
+                        />
 
-                    <IconButton
-                        icone={TrashIcon}
-                        aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
-                        rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
-                        variante="neutro"
-                    />
+                        <IconButton
+                            icone={TrashIcon}
+                            aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
+                            rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
+                            variante="neutro"
+                        />
+                    </View>
                 </View>
             </View>
 
             <View style={estilos.separador} />
 
-            <View style={estilos.indicadores}>
-                <View
-                    accessible
-                    accessibilityRole="text"
-                    accessibilityLabel={diasMenstruais === null ? 'Dias de menstruação não informados' : `${obterTextoDosDias(diasMenstruais)} de menstruação`}
-                    style={[estilos.indicador, estilos.indicadorMenstruacao]}
-                >
-                    <Text style={[estilos.valorDoIndicador, estilos.textoMenstruacao]}>
-                        {diasMenstruais === null ? '—' : obterTextoDosDias(diasMenstruais)}
-                    </Text>
-
-                    <Text
-                        numberOfLines={1}
-                        style={[estilos.descricaoDoIndicador, estilos.textoMenstruacao]}
+            <View style={estilos.conteudoInferior}>
+                <View style={estilos.indicadores}>
+                    <View
+                        accessible
+                        accessibilityRole="text"
+                        accessibilityLabel={diasMenstruais === null ? 'Dias de menstruação não informados' : `${obterTextoDosDias(diasMenstruais)} de menstruação`}
+                        style={[estilos.indicador, estilos.indicadorMenstruacao]}
                     >
-                        menstruação
-                    </Text>
-                </View>
-
-                <View
-                    accessible
-                    accessibilityRole="text"
-                    accessibilityLabel={duracaoDisponivel ? `${obterTextoDosDias(duracaoDias)} de ciclo` : 'Duração do ciclo ainda não disponível'}
-                    style={[
-                        estilos.indicador,
-                        estilos.indicadorCiclo,
-                        !duracaoDisponivel && estilos.indicadorIndisponivel
-                    ]}
-                >
-                    <ArrowsClockwiseIcon
-                        size={16}
-                        color={duracaoDisponivel ? estilosCiclo.cor : estilosCiclo.corDesativada}
-                        weight="regular"
-                    />
-
-                    <Text style={[
-                        estilos.valorDoIndicador,
-                        estilos.textoCiclo,
-                        !duracaoDisponivel && estilos.textoIndisponivel
-                    ]}>
-                        {duracaoDisponivel ? obterTextoDosDias(duracaoDias) : '—'}
-                    </Text>
-
-                    <Text
-                        numberOfLines={1}
-                        style={[
-                            estilos.descricaoDoIndicador,
-                            estilos.textoCiclo,
-                            !duracaoDisponivel && estilos.textoIndisponivel
-                        ]}
-                    >
-                        ciclo
-                    </Text>
-                </View>
-            </View>
-
-            {estimativaIncerta ? (
-                <View
-                    accessible
-                    accessibilityRole="alert"
-                    accessibilityLabel="Estimativa incerta. Os dados deste ciclo podem ser imprecisos."
-                    style={estilos.aviso}
-                >
-                    <WarningCircleIcon
-                        size={20}
-                        color={estilosAviso.cor}
-                        weight="fill"
-                    />
-
-                    <View style={estilos.textosDoAviso}>
-                        <Text style={estilos.tituloDoAviso}>
-                            Estimativa incerta
+                        <Text
+                            numberOfLines={1}
+                            style={[estilos.valorDoIndicador, estilos.textoMenstruacao]}
+                        >
+                            {diasMenstruais === null ? '—' : obterTextoDosDias(diasMenstruais)}
                         </Text>
 
-                        <Text style={estilos.mensagemDoAviso}>
-                            Os dados deste ciclo podem ser imprecisos.
+                        <Text
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.85}
+                            style={[estilos.descricaoDoIndicador, estilos.textoMenstruacao]}
+                        >
+                            menstruação
+                        </Text>
+                    </View>
+
+                    <View
+                        accessible
+                        accessibilityRole="text"
+                        accessibilityLabel={duracaoDisponivel ? `${obterTextoDosDias(duracaoDias)} de ciclo` : 'Duração do ciclo ainda não disponível'}
+                        style={[
+                            estilos.indicador,
+                            estilos.indicadorCiclo,
+                            !duracaoDisponivel && estilos.indicadorIndisponivel
+                        ]}
+                    >
+                        <ArrowsClockwiseIcon
+                            size={16}
+                            color={duracaoDisponivel ? coresDoCiclo.ativa : coresDoCiclo.desativada}
+                            weight="regular"
+                        />
+
+                        <Text style={[
+                            estilos.valorDoIndicador,
+                            estilos.textoCiclo,
+                            !duracaoDisponivel && estilos.textoIndisponivel
+                        ]}>
+                            {duracaoDisponivel ? obterTextoDosDias(duracaoDias) : '—'}
+                        </Text>
+
+                        <Text
+                            numberOfLines={1}
+                            style={[
+                                estilos.descricaoDoIndicador,
+                                estilos.textoCiclo,
+                                !duracaoDisponivel && estilos.textoIndisponivel
+                            ]}
+                        >
+                            ciclo
                         </Text>
                     </View>
                 </View>
-            ) : null}
+
+                {estimativaIncerta ? (
+                    <View
+                        accessible
+                        accessibilityRole="alert"
+                        accessibilityLabel="Estimativa incerta. Os dados deste ciclo podem ser imprecisos."
+                        style={estilos.aviso}
+                    >
+                        <WarningCircleIcon
+                            size={20}
+                            color={corDoAviso}
+                            weight="fill"
+                        />
+
+                        <View style={estilos.textosDoAviso}>
+                            <Text style={estilos.tituloDoAviso}>
+                                Estimativa incerta
+                            </Text>
+
+                            <Text style={estilos.mensagemDoAviso}>
+                                Os dados deste ciclo podem ser imprecisos.
+                            </Text>
+                        </View>
+                    </View>
+                ) : null}
+            </View>
         </View>
     )
 }
-
-const estilosCiclo = Object.freeze({
-    cor: '#2C4C3B',
-    corDesativada: '#A9A9A6'
-})
-
-const estilosAviso = Object.freeze({
-    cor: '#B97D22'
-})
 
 export {CycleHistoryCard}

@@ -18,16 +18,28 @@ const estilos = StyleSheet.create({
     cabecalho: {
         width: '100%',
         minHeight: 69,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingLeft: 16,
-        paddingRight: 10,
+        justifyContent: 'center',
+        paddingHorizontal: 16,
         paddingVertical: 12
     },
 
     cabecalhoEmAndamento: {
         minHeight: 80
+    },
+
+    linhaDoCabecalho: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+
+    identificacao: {
+        flex: 1,
+        minWidth: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 20
     },
 
     numero: {
@@ -86,22 +98,31 @@ const estilos = StyleSheet.create({
     separador: {
         height: 1,
         marginHorizontal: 16,
-        backgroundColor: tema.cores.neutras.bordaClara
+        backgroundColor: '#F0EDE7'
+    },
+
+    conteudoInferior: {
+        width: '100%',
+        paddingTop: 12,
+        flexDirection: 'column',
+        alignItems: 'flex-start'
     },
 
     indicadores: {
         width: '100%',
         flexDirection: 'row',
+        flexWrap: 'wrap',
         alignItems: 'center',
         gap: 8,
         paddingHorizontal: 16,
-        paddingVertical: 12
+        paddingBottom: 12
     },
 
     indicador: {
-        flex: 1,
         minWidth: 0,
         height: 31,
+        flexBasis: 140,
+        flexGrow: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -157,7 +178,9 @@ const estilos = StyleSheet.create({
     },
 
     aviso: {
+        width: 'auto',
         minHeight: 52,
+        alignSelf: 'stretch',
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
