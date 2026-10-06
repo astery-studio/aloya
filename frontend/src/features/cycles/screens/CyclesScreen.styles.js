@@ -1,4 +1,4 @@
-//Define o visual da tela provisória usada para testar todas as variantes do ConfidenceBadge.
+//Organiza os dois estados do resumo sem interferir nas medidas internas dos cards.
 import {StyleSheet} from 'react-native'
 
 import {fontFamilies, tema} from '../../../shared/theme'
@@ -32,40 +32,16 @@ const estilos = StyleSheet.create({
         includeFontPadding: false
     },
 
-    lista: {
+    exemplo: {
         width: '100%',
-        gap: 12
-    },
-
-    item: {
-        width: '100%',
-        minHeight: 104,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: tema.espacamentos.medio,
-        padding: 12,
-        backgroundColor: tema.cores.neutras.superficieClara,
-        borderWidth: 0.7,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: tema.radius.buttonAndInput
-    },
-
-    amostra: {
-        width: 160,
-        minHeight: 80,
-        flexShrink: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: tema.cores.neutras.fundoClaro,
-        borderRadius: tema.radius.buttonAndInput
+        gap: tema.espacamentos.pequeno
     },
 
     nome: {
-        flex: 1,
-        color: tema.cores.neutras.textoPrincipalClaro,
+        color: tema.cores.neutras.textoSecundarioClaro,
         fontFamily: fontFamilies.medium,
-        fontSize: 16,
-        lineHeight: 24,
+        fontSize: 14,
+        lineHeight: 21,
         includeFontPadding: false
     }
 })

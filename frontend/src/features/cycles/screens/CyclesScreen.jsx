@@ -1,48 +1,9 @@
-//Mostra provisoriamente todas as variantes do ConfidenceBadge para validação visual no Expo.
+//Mostra provisoriamente os estados preenchido e vazio do resumo de ciclos para validação visual no Expo.
 import {ScrollView, Text, View} from 'react-native'
 
-import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
+import {CycleSummaryCard} from '../components/CycleSummaryCard/CycleSummaryCard'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
 import {estilos} from './CyclesScreen.styles'
-
-const exemplos = Object.freeze([
-    Object.freeze({
-        id: 'alta-simples',
-        nivel: 'alta',
-        variante: 'simples',
-        nome: 'Alta simples'
-    }),
-    Object.freeze({
-        id: 'media-simples',
-        nivel: 'media',
-        variante: 'simples',
-        nome: 'Média simples'
-    }),
-    Object.freeze({
-        id: 'baixa-simples',
-        nivel: 'baixa',
-        variante: 'simples',
-        nome: 'Baixa simples'
-    }),
-    Object.freeze({
-        id: 'alta-composta',
-        nivel: 'alta',
-        variante: 'composta',
-        nome: 'Alta composta'
-    }),
-    Object.freeze({
-        id: 'media-composta',
-        nivel: 'media',
-        variante: 'composta',
-        nome: 'Média composta'
-    }),
-    Object.freeze({
-        id: 'baixa-composta',
-        nivel: 'baixa',
-        variante: 'composta',
-        nome: 'Baixa composta'
-    })
-])
 
 function CyclesScreen({onSelecionarAba}) {
     return (
@@ -57,32 +18,36 @@ function CyclesScreen({onSelecionarAba}) {
             >
                 <View style={estilos.apresentacao}>
                     <Text style={estilos.titulo}>
-                        Teste do ConfidenceBadge
+                        Teste do resumo de ciclos
                     </Text>
 
                     <Text style={estilos.descricao}>
-                        Compare os três níveis nas variantes simples e composta.
+                        Compare o card com métricas e o estado sem ciclos registrados.
                     </Text>
                 </View>
 
-                <View style={estilos.lista}>
-                    {exemplos.map(exemplo => (
-                        <View
-                            key={exemplo.id}
-                            style={estilos.item}
-                        >
-                            <View style={estilos.amostra}>
-                                <ConfidenceBadge
-                                    nivel={exemplo.nivel}
-                                    variante={exemplo.variante}
-                                />
-                            </View>
+                <View style={estilos.exemplo}>
+                    <Text style={estilos.nome}>
+                        Com métricas
+                    </Text>
 
-                            <Text style={estilos.nome}>
-                                {exemplo.nome}
-                            </Text>
-                        </View>
-                    ))}
+                    <CycleSummaryCard
+                        cicloMedioDias={28}
+                        menstruacaoMediaDias={5}
+                        quantidadeCiclos={5}
+                        confianca="alta"
+                    />
+                </View>
+
+                <View style={estilos.exemplo}>
+                    <Text style={estilos.nome}>
+                        Sem métricas
+                    </Text>
+
+                    <CycleSummaryCard
+                        quantidadeCiclos={0}
+                        confianca="baixa"
+                    />
                 </View>
             </ScrollView>
         </MainLayout>
