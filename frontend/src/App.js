@@ -21,6 +21,7 @@ import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
+import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
@@ -31,7 +32,8 @@ const telasInternas = Object.freeze({
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
     anticoncepcionais: 'anticoncepcionais',
-    novaCategoria: 'novaCategoria'
+    novaCategoria: 'novaCategoria',
+    inicio: 'inicio'
 });
 
 function obterBaseUrl() {
@@ -201,6 +203,11 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
+        if (aba === 'inicio') {
+            setTelaInterna(telasInternas.inicio);
+            return;
+        }
+
         if (aba === 'membros') {
             setTelaInterna(telasInternas.membros);
             return;
@@ -264,6 +271,12 @@ export default function App() {
             aoVoltar={() => setTelaPublica('boasVindas')}
             aoEntrar={() => setTelaPublica('login')}
             aoConcluir={concluirAutenticacao} />;
+    } else if (telaInterna === telasInternas.inicio) {
+        conteudo = <CycleTodayContainer
+            service={configuracao.servicos.cyclePredictionService}
+            aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            aoSelecionarAba={selecionarAba}
+            onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.membros) {
         conteudo = <MembersScreen
             onCriarCategoria={() => setTelaInterna(telasInternas.novaCategoria)}
