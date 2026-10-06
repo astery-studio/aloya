@@ -1,4 +1,4 @@
-//Testa o isolamento por conta, a ordenação e a paginação do repositório de ciclos.
+//Testa o isolamento, a ordenação, a paginação e a contagem do repositório de ciclos.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -36,23 +36,44 @@ function criarRegistro({
     };
 }
 
-//Cria um Prisma controlado e registra todas as consultas realizadas.
+//Cria um Prisma controlado e registra separadamente listagens e contagens.
 function criarDependencias({
     registros = [],
-    erro
+    contagem,
+    erroListagem,
+    erroContagem
 } = {}) {
-    const chamadas = [];
+    const chamadas = {
+        listar: [],
+        contar: []
+    };
 
     const prisma = {
         registroCiclo: {
             async findMany(argumentos) {
-                chamadas.push(argumentos);
+                chamadas.listar.push(argumentos);
 
-                if (erro) {
-                    throw erro;
+                if (erroListagem) {
+                    throw erroListagem;
                 }
 
                 return registros;
+            },
+
+            async count(argumentos) {
+                chamadas.contar.push(argumentos);
+
+                if (erroContagem) {
+                    throw erroContagem;
+                }
+
+                if (contagem !== undefined) {
+                    return contagem;
+                }
+
+                return Array.isArray(registros)
+                    ? registros.length
+                    : 0;
             }
         }
     };
@@ -78,14 +99,14 @@ test('consulta somente os ciclos da conta autenticada', async () => {
     });
 
     assert.deepEqual(
-        chamadas[0].where,
+        chamadas.listar[0].where,
         {
             usuarioId: 7
         }
     );
 
     assert.equal(
-        'usuarioId' in chamadas[0].select,
+        'usuarioId' in chamadas.listar[0].select,
         false
     );
 });
@@ -102,7 +123,7 @@ test('ordena por data e id em ordem decrescente', async () => {
     });
 
     assert.deepEqual(
-        chamadas[0].orderBy,
+        chamadas.listar[0].orderBy,
         [
             {
                 dataInicio: 'desc'
@@ -126,7 +147,7 @@ test('seleciona somente os campos necessários', async () => {
     });
 
     assert.deepEqual(
-        chamadas[0].select,
+        chamadas.listar[0].select,
         {
             id: true,
             dataInicio: true,
@@ -151,7 +172,7 @@ test('busca somente um registro adicional para detectar próxima página', async
     });
 
     assert.equal(
-        chamadas[0].take,
+        chamadas.listar[0].take,
         21
     );
 });
@@ -302,7 +323,7 @@ test('aplica data e id do cursor sem remover o filtro da conta', async () => {
     });
 
     assert.deepEqual(
-        chamadas[0].where,
+        chamadas.listar[0].where,
         {
             usuarioId: 7,
             OR: [
@@ -323,7 +344,48 @@ test('aplica data e id do cursor sem remover o filtro da conta', async () => {
     );
 });
 
-test('rejeita identificador de usuário inválido antes do banco', async () => {
+test('conta somente os ciclos da conta autenticada', async () => {
+    const {
+        repository,
+        chamadas
+    } = criarDependencias({
+        contagem: 25
+    });
+
+    const quantidade =
+        await repository.contarDoUsuario(7);
+
+    assert.equal(
+        quantidade,
+        25
+    );
+
+    assert.deepEqual(
+        chamadas.contar,
+        [
+            {
+                where: {
+                    usuarioId: 7
+                }
+            }
+        ]
+    );
+});
+
+test('aceita contagem igual a zero', async () => {
+    const {
+        repository
+    } = criarDependencias({
+        contagem: 0
+    });
+
+    assert.equal(
+        await repository.contarDoUsuario(7),
+        0
+    );
+});
+
+test('rejeita identificador inválido antes da listagem', async () => {
     const {
         repository,
         chamadas
@@ -342,7 +404,28 @@ test('rejeita identificador de usuário inválido antes do banco', async () => {
     );
 
     assert.equal(
-        chamadas.length,
+        chamadas.listar.length,
+        0
+    );
+});
+
+test('rejeita identificador inválido antes da contagem', async () => {
+    const {
+        repository,
+        chamadas
+    } = criarDependencias();
+
+    await assert.rejects(
+        repository.contarDoUsuario('7'),
+        {
+            name: 'TypeError',
+            message:
+                'O identificador da pessoa usuária é inválido.'
+        }
+    );
+
+    assert.equal(
+        chamadas.contar.length,
         0
     );
 });
@@ -366,7 +449,7 @@ test('rejeita limite interno inválido antes do banco', async () => {
     );
 
     assert.equal(
-        chamadas.length,
+        chamadas.listar.length,
         0
     );
 });
@@ -394,19 +477,19 @@ test('rejeita cursor interno inválido antes do banco', async () => {
     );
 
     assert.equal(
-        chamadas.length,
+        chamadas.listar.length,
         0
     );
 });
 
-test('propaga falha do banco sem substituí-la', async () => {
+test('propaga falha da listagem sem substituí-la', async () => {
     const erroDoBanco =
-        new Error('Falha simulada no banco.');
+        new Error('Falha simulada na listagem.');
 
     const {
         repository
     } = criarDependencias({
-        erro: erroDoBanco
+        erroListagem: erroDoBanco
     });
 
     await assert.rejects(
@@ -418,10 +501,49 @@ test('propaga falha do banco sem substituí-la', async () => {
     );
 });
 
-test('rejeita Prisma sem a operação necessária', () => {
+test('propaga falha da contagem sem substituí-la', async () => {
+    const erroDoBanco =
+        new Error('Falha simulada na contagem.');
+
+    const {
+        repository
+    } = criarDependencias({
+        erroContagem: erroDoBanco
+    });
+
+    await assert.rejects(
+        repository.contarDoUsuario(7),
+        erroDoBanco
+    );
+});
+
+test('rejeita contagem inesperada do Prisma', async () => {
+    const {
+        repository
+    } = criarDependencias({
+        contagem: -1
+    });
+
+    await assert.rejects(
+        repository.contarDoUsuario(7),
+        {
+            name: 'TypeError',
+            message:
+                'A contagem do histórico retornou um resultado inválido.'
+        }
+    );
+});
+
+test('rejeita Prisma sem as operações necessárias', () => {
     assert.throws(
         () => criarCycleHistoryRepository({
-            prisma: {}
+            prisma: {
+                registroCiclo: {
+                    async findMany() {
+                        return [];
+                    }
+                }
+            }
         }),
         {
             name: 'TypeError',
@@ -431,7 +553,7 @@ test('rejeita Prisma sem a operação necessária', () => {
     );
 });
 
-test('rejeita retorno inesperado do Prisma', async () => {
+test('rejeita retorno inesperado da listagem', async () => {
     const {
         repository
     } = criarDependencias({
