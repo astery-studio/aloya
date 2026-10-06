@@ -2,7 +2,7 @@
 import {Text, View} from 'react-native'
 
 import {IconButton} from '../../../../shared/components/common/IconButton/IconButton'
-import {ArrowsClockwiseIcon, NotePencilIcon, TrashIcon, WarningCircleIcon} from '../../../../shared/components/icons/AppIcons'
+import {ArrowsClockwiseIcon, PencilSimpleIcon, TrashIcon, WarningCircleIcon} from '../../../../shared/components/icons/AppIcons'
 import {estilos} from './CycleHistoryCard.styles'
 
 const estadosPermitidos = Object.freeze([
