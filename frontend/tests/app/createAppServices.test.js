@@ -7,6 +7,7 @@ import { criarServicosApp } from '../../src/app/createAppServices'
 import { criarApiClient } from '../../src/shared/services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
 import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage'
+import {criarCycleHistoryService} from '../../src/features/cycles/services/cycleHistoryService'
 
 jest.mock(
     '../../src/features/auth/services/authService',
@@ -19,6 +20,13 @@ jest.mock(
     '../../src/features/settings/services/accountService',
     () => ({
         criarAccountService: jest.fn()
+    })
+)
+
+jest.mock(
+    '../../src/features/cycles/services/cycleHistoryService',
+    () => ({
+        criarCycleHistoryService: jest.fn()
     })
 )
 
@@ -66,6 +74,7 @@ describe('createAppServices', () => {
     let contraceptiveService
     let supportCategoryService
     let fetchSeguro
+    let cycleHistoryService
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -80,6 +89,9 @@ describe('createAppServices', () => {
         })
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
+        })
+        cycleHistoryService = Object.freeze({
+            nome: 'cycleHistoryService'
         })
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
@@ -112,6 +124,10 @@ describe('createAppServices', () => {
             contraceptiveService
         )
 
+        criarCycleHistoryService.mockReturnValue(
+            cycleHistoryService
+        )
+
         criarSupportCategoryService.mockReturnValue(
             supportCategoryService
         )
@@ -127,6 +143,10 @@ describe('createAppServices', () => {
         const servicos = criarServicosApp({
             apiUrl: ' https://api.aloya.com/ ',
             fetchImpl
+        })
+
+        expect(criarCycleHistoryService).toHaveBeenCalledWith({
+            requisicaoAutenticada
         })
 
         expect(criarApiClient).toHaveBeenCalledWith({
@@ -165,6 +185,7 @@ describe('createAppServices', () => {
             authService,
             accountService,
             contraceptiveService,
+            cycleHistoryService,
             supportCategoryService
         })
 
