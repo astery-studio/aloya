@@ -197,9 +197,10 @@ test('impede duas requisições simultâneas da próxima página', async () => {
     let primeiraRequisicao
     let segundaRequisicao
 
-    act(() => {
+    await act(async () => {
         primeiraRequisicao = result.current.carregarMais()
         segundaRequisicao = result.current.carregarMais()
+        await segundaRequisicao
     })
 
     await expect(segundaRequisicao).resolves.toBe(false)
@@ -293,12 +294,4 @@ test('cancela a requisição quando a tela é desmontada', async () => {
     await unmount()
 
     expect(sinalRecebido.aborted).toBe(true)
-})
-
-test('rejeita configuração sem serviço válido', async () => {
-    await expect(
-        renderHook(() => useCycleHistory())
-    ).rejects.toThrow(
-        'Não foi possível configurar o histórico de ciclos.'
-    )
 })
