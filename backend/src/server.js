@@ -18,6 +18,10 @@ import {
 } from './features/contraceptives/contraceptive.routes.js';
 
 import {
+    criarCycleHistoryRoutes
+} from './features/cycles/cycleHistory.routes.js';
+
+import {
     criarPermissionCategoryRoutes
 } from './features/support-network/routes/permissionCategory.routes.js';
 
@@ -105,6 +109,17 @@ app.use(
             container.authMiddleware.autenticar,
         controller:
             container.contraceptiveController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleHistoryRoutes({
+        Router: express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        cycleHistoryController:
+            container.cycleHistoryController
     })
 );
 
