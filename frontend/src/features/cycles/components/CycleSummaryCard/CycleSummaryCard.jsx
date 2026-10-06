@@ -135,10 +135,12 @@ function CycleSummaryCard({cicloMedioDias, menstruacaoMediaDias, quantidadeCiclo
                     {obterTextoDosCiclos(quantidadeSegura)}
                 </Text>
 
-                <ConfidenceBadge
-                    nivel={confianca}
-                    variante="simples"
-                />
+                <View style={estilos.caixaDaTag}>
+                    <ConfidenceBadge
+                        nivel={confianca}
+                        variante="simples"
+                    />
+                </View>
             </View>
         </View>
     )

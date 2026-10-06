@@ -110,13 +110,16 @@ const estilos = StyleSheet.create({
     },
 
     rodape: {
+        width: '100%',
         flex: 1,
-        minHeight: 49.18,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 8,
-        paddingHorizontal: 20
+        paddingTop: 12,
+        paddingRight: 20,
+        paddingBottom: 14,
+        paddingLeft: 20
     },
 
     quantidade: {
@@ -128,6 +131,12 @@ const estilos = StyleSheet.create({
         fontWeight: '400',
         lineHeight: 19.5,
         includeFontPadding: false
+    },
+
+    caixaDaTag: {
+        flexShrink: 0,
+        alignSelf: 'center',
+        justifyContent: 'center'
     }
 })
 
