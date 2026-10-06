@@ -1,4 +1,4 @@
-//Consulta páginas do histórico sem expor dados de outras contas ou carregar todos os registros.
+//Consulta páginas e contagens do histórico sem expor dados de outras contas.
 import {
     LIMITE_MAXIMO,
     criarCursorHistorico
@@ -81,6 +81,7 @@ function criarCycleHistoryRepository({prisma} = {}) {
     if (
         !prisma
         || typeof prisma.registroCiclo?.findMany !== 'function'
+        || typeof prisma.registroCiclo?.count !== 'function'
     ) {
         throw new TypeError('O Prisma do histórico de ciclos é inválido.');
     }
@@ -136,8 +137,29 @@ function criarCycleHistoryRepository({prisma} = {}) {
         };
     }
 
+    //Conta somente os ciclos pertencentes à pessoa autenticada.
+    async function contarDoUsuario(usuarioId) {
+        validarUsuarioId(usuarioId);
+
+        const quantidade = await prisma.registroCiclo.count({
+            where: {
+                usuarioId
+            }
+        });
+
+        if (
+            !Number.isSafeInteger(quantidade)
+            || quantidade < 0
+        ) {
+            throw new TypeError('A contagem do histórico retornou um resultado inválido.');
+        }
+
+        return quantidade;
+    }
+
     return {
-        listarPagina
+        listarPagina,
+        contarDoUsuario
     };
 }
 
