@@ -49,6 +49,19 @@ function CyclesScreen({onSelecionarAba}) {
                         confianca="baixa"
                     />
                 </View>
+
+                <View style={estilos.exemplo}>
+                    <Text style={estilos.nome}>
+                        Confiança média
+                    </Text>
+
+                    <CycleSummaryCard
+                        cicloMedioDias={30}
+                        menstruacaoMediaDias={6}
+                        quantidadeCiclos={3}
+                        confianca="media"
+                    />
+                </View>
             </ScrollView>
         </MainLayout>
     )
