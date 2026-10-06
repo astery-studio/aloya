@@ -1,5 +1,5 @@
 //Compõe o resumo, a lista e os estados de carregamento, vazio e erro do histórico de ciclos.
-import {ActivityIndicator, FlatList, Text, View} from 'react-native'
+import {ActivityIndicator, FlatList, Pressable, Text, View} from 'react-native'
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
@@ -39,12 +39,7 @@ function obterChaveDoCiclo(ciclo, indice) {
 
 function DivisorDaLista() {
     return (
-        <View
-            accessible
-            accessibilityRole="header"
-            accessibilityLabel="Todos os ciclos"
-            style={estilos.divisorDaLista}
-        >
+        <View accessible accessibilityRole="header" accessibilityLabel="Todos os ciclos" style={estilos.divisorDaLista}>
             <View style={estilos.linhaDoDivisor} />
 
             <Text style={estilos.textoDoDivisor}>
@@ -56,12 +51,61 @@ function DivisorDaLista() {
     )
 }
 
+function RodapeDaLista({carregando, erro, aoTentarNovamente}) {
+    if (carregando) {
+        return (
+            <View testID="cycle-history-loading-more" accessibilityLiveRegion="polite" style={estilos.rodapeDaLista}>
+                <ActivityIndicator size="small" color={tema.cores.marca.secundaria} />
+
+                <Text style={estilos.textoDoRodape}>
+                    Carregando mais ciclos...
+                </Text>
+            </View>
+        )
+    }
+
+    if (erro) {
+        const podeTentarNovamente = typeof aoTentarNovamente === 'function'
+
+        return (
+            <View accessible accessibilityRole="alert" accessibilityLabel="Não foi possível carregar mais ciclos." style={estilos.rodapeDaLista}>
+                <Text style={estilos.textoDoRodape}>
+                    Não foi possível carregar mais ciclos.
+                </Text>
+
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Tentar carregar mais ciclos novamente"
+                    disabled={!podeTentarNovamente}
+                    onPress={aoTentarNovamente}
+                    style={({pressed}) => [
+                        estilos.botaoDoRodape,
+                        pressed && podeTentarNovamente && estilos.botaoDoRodapePressionado,
+                        !podeTentarNovamente && estilos.botaoDoRodapeDesabilitado
+                    ]}
+                >
+                    <Text style={estilos.textoDoBotaoDoRodape}>
+                        Tentar novamente
+                    </Text>
+                </Pressable>
+            </View>
+        )
+    }
+
+    return null
+}
+
 function CycleHistoryScreen({
     ciclos = [],
     resumo,
     carregando = false,
+    carregandoMais = false,
     erro,
+    erroCarregarMais,
+    temMais = false,
     aoTentarNovamente,
+    aoCarregarMais,
+    aoTentarCarregarMais,
     aoAbrirCalendario,
     aoEditarCiclo,
     aoExcluirCiclo,
@@ -70,7 +114,9 @@ function CycleHistoryScreen({
     const ciclosSeguros = Array.isArray(ciclos) ? ciclos.filter(ciclo => ciclo && typeof ciclo === 'object') : []
     const resumoSeguro = normalizarResumo(resumo)
     const possuiErro = typeof erro === 'string' && erro.trim().length > 0
+    const possuiErroCarregarMais = typeof erroCarregarMais === 'string' && erroCarregarMais.trim().length > 0
     const estaVazio = ciclosSeguros.length === 0
+    const podeCarregarMais = temMais && !carregandoMais && !possuiErroCarregarMais && typeof aoCarregarMais === 'function'
 
     const resumoDosCiclos = (
         <CycleSummaryCard
@@ -84,11 +130,7 @@ function CycleHistoryScreen({
     function renderizarCiclo({item}) {
         return (
             <View style={estilos.itemDaLista}>
-                <CycleHistoryCard
-                    ciclo={item}
-                    aoEditar={aoEditarCiclo}
-                    aoExcluir={aoExcluirCiclo}
-                />
+                <CycleHistoryCard ciclo={item} aoEditar={aoEditarCiclo} aoExcluir={aoExcluirCiclo} />
             </View>
         )
     }
@@ -100,15 +142,8 @@ function CycleHistoryScreen({
             <View style={estilos.conteudoEstatico}>
                 {resumoDosCiclos}
 
-                <View
-                    testID="cycle-history-loading"
-                    accessibilityLiveRegion="polite"
-                    style={estilos.estadoCentralizado}
-                >
-                    <ActivityIndicator
-                        size="small"
-                        color={tema.cores.marca.secundaria}
-                    />
+                <View testID="cycle-history-loading" accessibilityLiveRegion="polite" style={estilos.estadoCentralizado}>
+                    <ActivityIndicator size="small" color={tema.cores.marca.secundaria} />
 
                     <Text style={estilos.mensagemDoEstado}>
                         Carregando histórico de ciclos...
@@ -136,11 +171,7 @@ function CycleHistoryScreen({
                     </Text>
 
                     <View style={estilos.botaoDoEstado}>
-                        <ButtonScreen
-                            texto="Tentar Novamente"
-                            variante="preto"
-                            aoPressionar={aoTentarNovamente}
-                        />
+                        <ButtonScreen texto="Tentar Novamente" variante="preto" aoPressionar={aoTentarNovamente} />
                     </View>
                 </View>
             </View>
@@ -160,11 +191,7 @@ function CycleHistoryScreen({
                     </Text>
 
                     <View style={estilos.botaoDoEstado}>
-                        <ButtonScreen
-                            texto="Ir para o Calendário"
-                            variante="laranja"
-                            aoPressionar={aoAbrirCalendario}
-                        />
+                        <ButtonScreen texto="Ir para o Calendário" variante="laranja" aoPressionar={aoAbrirCalendario} />
                     </View>
                 </View>
             </View>
@@ -182,6 +209,15 @@ function CycleHistoryScreen({
                         <DivisorDaLista />
                     </View>
                 }
+                ListFooterComponent={
+                    <RodapeDaLista
+                        carregando={carregandoMais}
+                        erro={possuiErroCarregarMais}
+                        aoTentarNovamente={aoTentarCarregarMais}
+                    />
+                }
+                onEndReached={podeCarregarMais ? aoCarregarMais : undefined}
+                onEndReachedThreshold={0.35}
                 contentContainerStyle={estilos.conteudoDaLista}
                 showsVerticalScrollIndicator={false}
                 initialNumToRender={5}
@@ -193,11 +229,7 @@ function CycleHistoryScreen({
     }
 
     return (
-        <MainLayout
-            titulo="Histórico de Ciclos"
-            abaAtiva="ciclos"
-            onSelecionarAba={onSelecionarAba}
-        >
+        <MainLayout titulo="Histórico de Ciclos" abaAtiva="ciclos" onSelecionarAba={onSelecionarAba}>
             {conteudo}
         </MainLayout>
     )

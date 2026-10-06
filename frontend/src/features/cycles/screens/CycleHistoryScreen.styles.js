@@ -87,6 +87,50 @@ const estilos = StyleSheet.create({
     itemDaLista: {
         width: '100%',
         marginBottom: 12
+    },
+
+    rodapeDaLista: {
+        minHeight: 76,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: tema.espacamentos.pequeno,
+        paddingVertical: tema.espacamentos.medio
+    },
+
+    textoDoRodape: {
+        color: tema.cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 14,
+        fontWeight: '400',
+        lineHeight: 21,
+        textAlign: 'center',
+        includeFontPadding: false
+    },
+
+    botaoDoRodape: {
+        minWidth: 48,
+        minHeight: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: tema.espacamentos.medio,
+        borderRadius: 12
+    },
+
+    botaoDoRodapePressionado: {
+        opacity: 0.65
+    },
+
+    botaoDoRodapeDesabilitado: {
+        opacity: 0.45
+    },
+
+    textoDoBotaoDoRodape: {
+        color: tema.cores.marca.secundaria,
+        fontFamily: fontFamilies.bold,
+        fontSize: 14,
+        fontWeight: '700',
+        lineHeight: 21,
+        includeFontPadding: false
     }
 })
 
