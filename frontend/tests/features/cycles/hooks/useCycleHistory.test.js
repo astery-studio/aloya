@@ -32,7 +32,7 @@ test('carrega automaticamente a primeira página', async () => {
         listarPagina: jest.fn().mockResolvedValue(criarPagina())
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.carregando).toBe(false)
@@ -57,7 +57,7 @@ test('mostra carregamento enquanto a primeira requisição está pendente', asyn
         }))
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     expect(result.current.carregando).toBe(true)
 
@@ -73,7 +73,7 @@ test('mostra erro amigável sem expor detalhes técnicos', async () => {
         listarPagina: jest.fn().mockRejectedValue(new Error('Falha privada do banco'))
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.carregando).toBe(false)
@@ -90,7 +90,7 @@ test('permite tentar o carregamento inicial novamente', async () => {
             .mockResolvedValueOnce(criarPagina())
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.erro).not.toBeNull()
@@ -119,7 +119,7 @@ test('carrega a próxima página e mantém os ciclos anteriores', async () => {
             }))
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.temMais).toBe(true)
@@ -157,7 +157,7 @@ test('não repete um ciclo recebido em duas páginas', async () => {
             }))
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.temMais).toBe(true)
@@ -188,7 +188,7 @@ test('impede duas requisições simultâneas da próxima página', async () => {
             }))
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.temMais).toBe(true)
@@ -213,6 +213,11 @@ test('impede duas requisições simultâneas da próxima página', async () => {
 
         await primeiraRequisicao
     })
+
+    expect(result.current.ciclos).toEqual([
+        primeiroCiclo,
+        segundoCiclo
+    ])
 })
 
 test('mantém os ciclos visíveis quando a próxima página falha', async () => {
@@ -226,7 +231,7 @@ test('mantém os ciclos visíveis quando a próxima página falha', async () => 
             .mockRejectedValueOnce(new Error('Falha de rede'))
     }
 
-    const {result} = renderHook(() => useCycleHistory({service}))
+    const {result} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(result.current.temMais).toBe(true)
@@ -250,7 +255,8 @@ test('encerra a sessão quando a API devolve erro 401', async () => {
     }
 
     const onSessaoExpirada = jest.fn()
-    const {result} = renderHook(() => useCycleHistory({
+
+    const {result} = await renderHook(() => useCycleHistory({
         service,
         onSessaoExpirada
     }))
@@ -276,7 +282,7 @@ test('cancela a requisição quando a tela é desmontada', async () => {
         })
     }
 
-    const {unmount} = renderHook(() => useCycleHistory({service}))
+    const {unmount} = await renderHook(() => useCycleHistory({service}))
 
     await waitFor(() => {
         expect(sinalRecebido).toBeDefined()
@@ -284,11 +290,15 @@ test('cancela a requisição quando a tela é desmontada', async () => {
 
     expect(sinalRecebido.aborted).toBe(false)
 
-    unmount()
+    await unmount()
 
     expect(sinalRecebido.aborted).toBe(true)
 })
 
-test('rejeita configuração sem serviço válido', () => {
-    expect(() => renderHook(() => useCycleHistory())).toThrow('Não foi possível configurar o histórico de ciclos.')
+test('rejeita configuração sem serviço válido', async () => {
+    await expect(
+        renderHook(() => useCycleHistory())
+    ).rejects.toThrow(
+        'Não foi possível configurar o histórico de ciclos.'
+    )
 })
