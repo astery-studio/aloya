@@ -2,7 +2,7 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {ActivityIndicator, Linking, NativeModules, Text, View} from 'react-native'
+import {ActivityIndicator, Alert, Linking, NativeModules, Text, View} from 'react-native'
 import {StatusBar} from 'expo-status-bar'
 import {useFonts} from 'expo-font'
 import {SafeAreaView} from 'react-native-safe-area-context'
@@ -16,7 +16,7 @@ import LoginScreen from './features/auth/screens/LoginScreen'
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen'
 import WelcomeScreen from './features/auth/screens/WelcomeScreen'
 import {ContraceptiveFlow} from './features/contraceptives/ContraceptiveFlow'
-import {CyclesScreen} from './features/cycles/screens/CyclesScreen'
+import {CycleHistoryFlow} from './features/cycles/CycleHistoryFlow'
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen'
 import {ChangePasswordScreen} from './features/settings/screens/ChangePasswordScreen'
 import {ProfileSettingsScreen} from './features/settings/screens/ProfileSettingsScreen'
@@ -401,8 +401,13 @@ export default function App() {
         )
     } else if (telaInterna === telasInternas.ciclos) {
         conteudo = (
-            <CyclesScreen
+            <CycleHistoryFlow
+                service={configuracao.servicos.cycleHistoryService}
+                aoAbrirCalendario={() => Alert.alert('Calendário', 'O calendário ainda será integrado.')}
+                aoEditarCiclo={ciclo => Alert.alert('Editar ciclo', `Ciclo ${ciclo.numero}`)}
+                aoExcluirCiclo={ciclo => Alert.alert('Excluir ciclo', `Ciclo ${ciclo.numero}`)}
                 onSelecionarAba={selecionarAba}
+                onSessaoExpirada={finalizarSessao}
             />
         )
     } else if (telaInterna === telasInternas.configuracoes) {
