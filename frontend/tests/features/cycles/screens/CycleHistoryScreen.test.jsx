@@ -244,4 +244,97 @@ describe('CycleHistoryScreen', () => {
 
         expect(onSelecionarAba).toHaveBeenCalledWith('inicio')
     })
+
+    test('solicita a próxima página ao chegar perto do fim', async () => {
+        const aoCarregarMais = jest.fn()
+
+        await render(
+            <CycleHistoryScreen
+                ciclos={ciclos}
+                resumo={resumoCarregado}
+                temMais
+                aoCarregarMais={aoCarregarMais}
+                aoAbrirCalendario={jest.fn()}
+                aoEditarCiclo={jest.fn()}
+                aoExcluirCiclo={jest.fn()}
+            />
+        )
+
+        await fireEvent(
+            screen.getByTestId('cycle-history-list'),
+            'endReached'
+        )
+
+        expect(aoCarregarMais).toHaveBeenCalledTimes(1)
+    })
+
+    test('mostra carregamento da próxima página sem esconder os ciclos', async () => {
+        await render(
+            <CycleHistoryScreen
+                ciclos={ciclos}
+                resumo={resumoCarregado}
+                temMais
+                carregandoMais
+                aoCarregarMais={jest.fn()}
+                aoAbrirCalendario={jest.fn()}
+                aoEditarCiclo={jest.fn()}
+                aoExcluirCiclo={jest.fn()}
+            />
+        )
+
+        expect(screen.getByTestId('cycle-history-loading-more')).toBeOnTheScreen()
+        expect(screen.getAllByTestId('cycle-history-card')).toHaveLength(2)
+    })
+
+    test('mantém a lista e permite repetir a paginação após uma falha', async () => {
+        const aoTentarCarregarMais = jest.fn()
+
+        await render(
+            <CycleHistoryScreen
+                ciclos={ciclos}
+                resumo={resumoCarregado}
+                temMais
+                erroCarregarMais="Detalhe técnico privado"
+                aoTentarCarregarMais={aoTentarCarregarMais}
+                aoAbrirCalendario={jest.fn()}
+                aoEditarCiclo={jest.fn()}
+                aoExcluirCiclo={jest.fn()}
+            />
+        )
+
+        expect(screen.getAllByTestId('cycle-history-card')).toHaveLength(2)
+        expect(screen.getByText('Não foi possível carregar mais ciclos.')).toBeOnTheScreen()
+        expect(screen.queryByText('Detalhe técnico privado')).not.toBeOnTheScreen()
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Tentar carregar mais ciclos novamente'
+            })
+        )
+
+        expect(aoTentarCarregarMais).toHaveBeenCalledTimes(1)
+    })
+
+    test('não solicita outra página quando não existem mais ciclos', async () => {
+        const aoCarregarMais = jest.fn()
+
+        await render(
+            <CycleHistoryScreen
+                ciclos={ciclos}
+                resumo={resumoCarregado}
+                temMais={false}
+                aoCarregarMais={aoCarregarMais}
+                aoAbrirCalendario={jest.fn()}
+                aoEditarCiclo={jest.fn()}
+                aoExcluirCiclo={jest.fn()}
+            />
+        )
+
+        await fireEvent(
+            screen.getByTestId('cycle-history-list'),
+            'endReached'
+        )
+
+        expect(aoCarregarMais).not.toHaveBeenCalled()
+    })
 })
