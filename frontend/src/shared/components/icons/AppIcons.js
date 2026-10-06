@@ -14,6 +14,7 @@ import {InfoIcon} from 'phosphor-react-native/src/icons/Info'
 import {LightningIcon} from 'phosphor-react-native/src/icons/Lightning'
 import {LockKeyIcon} from 'phosphor-react-native/src/icons/LockKey'
 import {MoonIcon} from 'phosphor-react-native/src/icons/Moon'
+import {NotePencilIcon} from 'phosphor-react-native/src/icons/NotePencil'
 import {PencilSimpleIcon} from 'phosphor-react-native/src/icons/PencilSimple'
 import {PersonArmsSpreadIcon} from 'phosphor-react-native/src/icons/PersonArmsSpread'
 import {PillIcon} from 'phosphor-react-native/src/icons/Pill'
@@ -24,4 +25,4 @@ import {UsersIcon} from 'phosphor-react-native/src/icons/Users'
 import {WarningCircleIcon} from 'phosphor-react-native/src/icons/WarningCircle'
 import {XIcon} from 'phosphor-react-native/src/icons/X'
 
-export {ArrowLeftIcon, ArrowsClockwiseIcon, BellIcon, CalendarBlankIcon, CaretDownIcon, CaretUpIcon, ChartLineUpIcon, DropIcon, FirstAidKitIcon, HeartIcon, HouseIcon, InfoIcon, LightningIcon, LockKeyIcon, MoonIcon, PencilSimpleIcon, PersonArmsSpreadIcon, PillIcon, ShieldCheckIcon, TrashIcon, UserIcon, UsersIcon, WarningCircleIcon, XIcon}
+export {ArrowLeftIcon, ArrowsClockwiseIcon, BellIcon, CalendarBlankIcon, CaretDownIcon, CaretUpIcon, ChartLineUpIcon, DropIcon, FirstAidKitIcon, HeartIcon, HouseIcon, InfoIcon, LightningIcon, LockKeyIcon, MoonIcon, NotePencilIcon, PencilSimpleIcon, PersonArmsSpreadIcon, PillIcon, ShieldCheckIcon, TrashIcon, UserIcon, UsersIcon, WarningCircleIcon, XIcon}
