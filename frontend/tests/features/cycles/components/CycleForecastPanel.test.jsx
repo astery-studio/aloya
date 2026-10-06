@@ -14,7 +14,8 @@ test('exibe previsão, confiança e aviso médico', async () => {
 
     expect(screen.getByText('Fase Folicular')).toBeOnTheScreen();
     expect(screen.getByText('29 de outubro')).toBeOnTheScreen();
-    expect(screen.getByText('Confiabilidade: baixa')).toBeOnTheScreen();
+    expect(screen.getByText('Confiabilidade')).toBeOnTheScreen();
+    expect(screen.getByText('baixa')).toBeOnTheScreen();
     expect(screen.getByText(/não substitui orientação médica/)).toBeOnTheScreen();
 });
 

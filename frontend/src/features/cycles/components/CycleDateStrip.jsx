@@ -23,11 +23,10 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData }) {
                         <Text style={[estilos.semana, selecionado && estilos.textoSelecionado]}>
                             {item.semana}
                         </Text>
-                        <View style={[estilos.numero, estilos[item.fase], selecionado && estilos.numeroSelecionado]}>
-                            <Text style={[estilos.textoNumero, selecionado && estilos.textoSelecionado]}>
-                                {item.dia ?? '?'}
-                            </Text>
-                        </View>
+                        <Text style={[estilos.textoNumero, selecionado && estilos.textoSelecionado]}>
+                            {item.dia ?? '?'}
+                        </Text>
+                        <View style={[estilos.indicador, item.hoje && estilos.indicadorHoje, selecionado && estilos.indicadorSelecionado]} />
                     </Pressable>
                 );
             })}

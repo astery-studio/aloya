@@ -50,7 +50,7 @@ function diferencaDias(inicio, fim) {
 }
 
 function criarDiasDaFaixa(dataCentral, fases) {
-    return Array.from({ length: 7 }, (_, indice) => {
+    return Array.from({ length: 16 }, (_, indice) => {
         const data = adicionarDias(dataCentral, indice - 3);
         const objeto = paraDataUtc(data);
         return {
@@ -59,7 +59,8 @@ function criarDiasDaFaixa(dataCentral, fases) {
             semana: new Intl.DateTimeFormat('pt-BR', {
                 weekday: 'short', timeZone: 'UTC'
             }).format(objeto).replace('.', ''),
-            fase: obterFase(data, fases)
+            fase: obterFase(data, fases),
+            hoje: indice === 3
         };
     });
 }

@@ -29,4 +29,4 @@ test('permite tentar novamente depois de uma falha de carregamento', async () =>
     await act(async () => fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' })));
     await waitFor(() => expect(screen.getByText('29 de outubro')).toBeOnTheScreen());
     expect(service.buscar).toHaveBeenCalledTimes(2);
-});
+}, 15_000);

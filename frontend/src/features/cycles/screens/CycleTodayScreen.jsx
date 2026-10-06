@@ -9,7 +9,7 @@ import { conteudoPorFase } from '../constants/phaseContent';
 import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { estilos } from './CycleTodayScreen.styles';
 
-function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirCalendario, aoSelecionarAba }) {
+function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional, aoAbrirCalendario, aoSelecionarAba }) {
     const referencia = dataSelecionada || previsao?.dataReferencia;
     const fases = previsao?.fasesEstimadas;
     const fase = referencia ? obterFase(referencia, fases) : 'desconhecida';
@@ -29,7 +29,15 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
             ) : (
                 <ScrollView contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
                     {dias.length ? <CycleDateStrip dias={dias} dataSelecionada={referencia} aoSelecionarData={aoSelecionarData} /> : null}
-                    <CycleForecastPanel fase={fase} diaCiclo={obterDiaCiclo(referencia, fases)} previsao={semDados ? null : previsao} conteudoDaFase={conteudoPorFase[fase]} aoCadastrarMenstruacao={aoCadastrarMenstruacao} aoAbrirDiario={aoAbrirDiario} />
+                    <CycleForecastPanel
+                        fase={fase}
+                        diaCiclo={obterDiaCiclo(referencia, fases)}
+                        previsao={semDados ? null : previsao}
+                        conteudoDaFase={conteudoPorFase[fase]}
+                        aoCadastrarMenstruacao={aoCadastrarMenstruacao}
+                        aoAbrirDiario={aoAbrirDiario}
+                        aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
+                    />
                 </ScrollView>
             )}
             <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />

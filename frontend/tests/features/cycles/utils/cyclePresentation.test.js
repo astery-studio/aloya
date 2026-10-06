@@ -15,10 +15,11 @@ test('identifica as fases sem deslocar datas UTC', () => {
     expect(obterDiaCiclo('2026-10-08', fases)).toBe(8);
 });
 
-test('gera sete dias ao redor da data selecionada', () => {
+test('gera dezesseis dias a partir de três dias antes da data selecionada', () => {
     const dias = criarDiasDaFaixa('2026-10-05', fases);
-    expect(dias).toHaveLength(7);
+    expect(dias).toHaveLength(16);
     expect(dias[0].data).toBe('2026-10-02');
-    expect(dias[6].data).toBe('2026-10-08');
+    expect(dias[15].data).toBe('2026-10-17');
+    expect(dias[3].hoje).toBe(true);
     expect(formatarDataLonga('2026-10-14')).toBe('14 de outubro');
 });
