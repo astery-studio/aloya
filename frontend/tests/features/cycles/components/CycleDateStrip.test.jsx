@@ -57,3 +57,53 @@ test('apresenta interrogação quando o número do dia não está disponível', 
     expect(screen.getByText('?')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'ter, dia ?' })).toBeOnTheScreen();
 });
+
+const variantes = [
+    ['menstrual', '#C85A44', '#C85A44', '#F7F5F0'],
+    ['folicular', '#2C4C3B', '#2C4C3B', '#F7F5F0'],
+    ['ovulatoria', '#4A758E', '#4A758E', '#F7F5F0'],
+    ['lutea', '#D68C3A', '#D68C3A', '#F7F5F0'],
+    ['desconhecida', '#5C5C59', '#E6E2D8', '#FFFFFF']
+];
+
+test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, borda, conteudo) => {
+    await montar({
+        dias: [{ data: '2026-10-07', dia: 7, semana: 'qua', fase }],
+        dataSelecionada: '2026-10-07'
+    });
+
+    expect(screen.getByRole('button', { name: 'qua, dia 7' })).toHaveStyle({
+        backgroundColor: fundo,
+        borderColor: borda,
+        shadowColor: '#000000',
+        shadowOpacity: 0.04,
+        shadowRadius: 12,
+        elevation: 1
+    });
+    expect(screen.getByText('qua')).toHaveStyle({ color: conteudo, opacity: 0.85 });
+    expect(screen.getByText('7')).toHaveStyle({ color: conteudo });
+    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: conteudo });
+});
+
+test('mantém o estilo neutro no dia não selecionado', async () => {
+    await montar({ dataSelecionada: 'outra-data' });
+
+    const botao = screen.getByRole('button', { name: 'dom, dia 4' });
+    expect(botao).toHaveStyle({ backgroundColor: '#FFFFFF', borderColor: '#E6E2D8' });
+    expect(botao).not.toHaveStyle({ shadowOpacity: 0.04 });
+    expect(screen.getByText('dom')).toHaveStyle({ color: '#5C5C59', opacity: 0.7 });
+    expect(screen.getByText('4')).toHaveStyle({ color: '#5C5C59' });
+});
+
+test('diferencia o indicador de hoje dos demais dias', async () => {
+    await montar({
+        dias: [
+            { data: '2026-10-07', dia: 7, semana: 'qua', fase: 'folicular', hoje: true },
+            { data: '2026-10-08', dia: 8, semana: 'qui', fase: 'folicular' }
+        ],
+        dataSelecionada: 'outra-data'
+    });
+
+    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: '#222222' });
+    expect(screen.getByTestId('indicador-2026-10-08')).toHaveStyle({ backgroundColor: 'transparent' });
+});

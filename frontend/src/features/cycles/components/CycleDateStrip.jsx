@@ -31,7 +31,7 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData }) {
                         <Text style={[estilos.textoNumero, selecionado && estilos.numeroSelecionado, selecionado && item.fase === 'desconhecida' && estilos.textoSelecionadoDesconhecido]}>
                             {item.dia ?? '?'}
                         </Text>
-                        <View style={[estilos.indicador, item.hoje && estilos.indicadorHoje, selecionado && estilos.indicadorSelecionado, selecionado && item.fase === 'desconhecida' && estilos.indicadorSelecionadoDesconhecido]} />
+                        <View testID={`indicador-${item.data}`} style={[estilos.indicador, item.hoje && estilos.indicadorHoje, selecionado && estilos.indicadorSelecionado, selecionado && item.fase === 'desconhecida' && estilos.indicadorSelecionadoDesconhecido]} />
                     </Pressable>
                 );
             })}
