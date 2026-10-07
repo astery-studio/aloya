@@ -1,4 +1,4 @@
-//Testa a proteção e a ordem de execução da rota mensal do calendário.
+//Testa a proteção e a ordem de execução das rotas de ciclo.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
@@ -24,6 +24,7 @@ function criarDependencias() {
 
     function autenticar() {}
     function buscarMes() {}
+    function buscarEstadoAtual() {}
 
     return {
         chamadas,
@@ -36,7 +37,8 @@ function criarDependencias() {
                 autenticar
             },
             calendarController: {
-                buscarMes
+                buscarMes,
+                buscarEstadoAtual
             }
         }
     };
@@ -60,6 +62,18 @@ test('rejeita configuração com dependências incompletas', () => {
         {
             ...dependencias,
             calendarController: null
+        },
+        {
+            ...dependencias,
+            calendarController: {
+                buscarMes() {}
+            }
+        },
+        {
+            ...dependencias,
+            calendarController: {
+                buscarEstadoAtual() {}
+            }
         }
     ];
 
@@ -74,7 +88,7 @@ test('rejeita configuração com dependências incompletas', () => {
     }
 });
 
-test('protege a rota antes de executar o controller', () => {
+test('protege as rotas antes de executar os controllers', () => {
     const {
         chamadas,
         dependencias
@@ -91,6 +105,11 @@ test('protege a rota antes de executar o controller', () => {
             'get',
             '/calendar',
             dependencias.calendarController.buscarMes
+        ],
+        [
+            'get',
+            '/current',
+            dependencias.calendarController.buscarEstadoAtual
         ]
     ]);
 });
