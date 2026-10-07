@@ -19,6 +19,10 @@ import {
 } from './features/contraceptives/contraceptive.routes.js';
 
 import {
+    criarCalendarRoutes
+} from './features/cycles/calendar/calendar.routes.js';
+
+import {
     criarPermissionCategoryRoutes
 } from './features/support-network/routes/permissionCategory.routes.js';
 
@@ -109,6 +113,18 @@ app.use(
             container.edicaoAnticoncepcionalRateLimit,
         remocaoRateLimit:
             container.remocaoAnticoncepcionalRateLimit
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCalendarRoutes({
+        Router:
+            express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        calendarController:
+            container.calendarController
     })
 );
 
