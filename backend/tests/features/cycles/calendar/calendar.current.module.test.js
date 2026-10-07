@@ -39,8 +39,16 @@ test('compõe o estado atual usando o relógio recebido', async () => {
         'function'
     );
     assert.equal(
-        typeof modulo.currentCycleController.buscarEstadoAtual,
+        typeof modulo.calendarController.buscarMes,
         'function'
+    );
+    assert.equal(
+        typeof modulo.calendarController.buscarEstadoAtual,
+        'function'
+    );
+    assert.equal(
+        Object.isFrozen(modulo.calendarController),
+        true
     );
 
     const resultado = await modulo.currentCycleService.buscarEstadoAtual({

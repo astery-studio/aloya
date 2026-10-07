@@ -19,19 +19,22 @@ function criarCalendarModule({
         repository: calendarRepository,
         agora
     });
-    const calendarController = criarCalendarController({
+    const monthlyController = criarCalendarController({
         calendarService
     });
     const currentCycleController = criarCurrentCycleController({
         currentCycleService
+    });
+    const calendarController = Object.freeze({
+        ...monthlyController,
+        ...currentCycleController
     });
 
     return Object.freeze({
         calendarRepository,
         calendarService,
         currentCycleService,
-        calendarController,
-        currentCycleController
+        calendarController
     });
 }
 
