@@ -28,7 +28,7 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData }) {
                         <Text style={[estilos.semana, selecionado && estilos.textoSelecionado]}>
                             {item.semana}
                         </Text>
-                        <Text style={[estilos.textoNumero, selecionado && estilos.textoSelecionado]}>
+                        <Text style={[estilos.textoNumero, selecionado && estilos.textoSelecionado, selecionado && estilos.numeroSelecionado]}>
                             {item.dia ?? '?'}
                         </Text>
                         <View style={[estilos.indicador, item.hoje && estilos.indicadorHoje, selecionado && estilos.indicadorSelecionado]} />
