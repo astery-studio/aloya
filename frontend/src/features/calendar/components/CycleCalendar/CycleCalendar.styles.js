@@ -4,6 +4,14 @@ import {StyleSheet} from 'react-native'
 import {cores, fontFamilies} from '../../../../shared/theme'
 
 const estilos = StyleSheet.create({
+    semana: {
+        position: 'relative',
+        flexDirection: 'row',
+        width: '100%',
+        height: 56,
+        marginBottom: 8
+    },
+
     celulaDia: {
         flex: 1,
         height: 56,
@@ -65,6 +73,24 @@ const estilos = StyleSheet.create({
 
     numeroDiaFuturo: {
         color: cores.neutras.bordaTracejada
+    },
+
+    trechoJanelaFertil: {
+        position: 'absolute',
+        top: -3,
+        bottom: -3,
+        borderWidth: 1.5,
+        borderStyle: 'dashed',
+        borderRadius: 17,
+        zIndex: 3
+    },
+
+    janelaFertilAtual: {
+        borderColor: cores.neutras.textoSecundarioClaro
+    },
+
+    janelaFertilPrevista: {
+        borderColor: 'rgba(92, 92, 89, 0.52)'
     },
 
     pressionado: {
