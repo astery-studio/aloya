@@ -15,11 +15,13 @@ import { estilos } from './CycleForecastPanel.styles';
 
 const AVISO_MEDICO = 'Esta é uma estimativa baseada no seu histórico e não substitui orientação médica nem garante eficácia como método contraceptivo.';
 const ROTULOS = { menstrual: 'Fase Menstrual', folicular: 'Fase Folicular', ovulatoria: 'Fase Ovulatória', lutea: 'Fase Lútea', desconhecida: 'Seu ciclo' };
+const CORES_FASE = { menstrual: '#C85A44', folicular: '#3B7150', ovulatoria: '#4A758E', lutea: '#D68C3A', desconhecida: '#5C5C59' };
+const CORES_CONFIANCA = { baixa: '#C85A44', media: '#D68C3A', alta: '#2C4C3B' };
 const RECURSOS_SEM_CICLO = [
-    { titulo: 'Fases do ciclo', descricao: 'Entenda o que acontece em cada fase.', Icone: ArrowsClockwiseIcon },
-    { titulo: 'Janela fértil', descricao: 'Acompanhe sua estimativa de fertilidade.', Icone: SparkleIcon },
-    { titulo: 'Próxima menstruação', descricao: 'Visualize quando o próximo ciclo pode começar.', Icone: CalendarDotsIcon },
-    { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente ao longo do ciclo.', Icone: HeartbeatIcon }
+    { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: '#2C4C3B' },
+    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: '#D68C3A' },
+    { titulo: 'Próxima menstruação', descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.', Icone: CalendarDotsIcon, cor: '#D68C3A' },
+    { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.', Icone: HeartbeatIcon, cor: '#2C4C3B' }
 ];
 
 function BotaoAcao({ texto, Icone, destaque = false, pesoIcone = 'regular', aoPressionar }) {
@@ -31,15 +33,31 @@ function BotaoAcao({ texto, Icone, destaque = false, pesoIcone = 'regular', aoPr
     );
 }
 
-function FormaProvisoria({ compacta = false }) {
-    return <View accessibilityLabel="Símbolo provisório da fase" style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}><View style={[estilos.formaInterna, compacta && estilos.formaInternaCompacta]} /></View>;
+function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
+    const comContorno = fase === 'folicular' || fase === 'ovulatoria';
+    const cor = CORES_FASE[fase];
+    return (
+        <View accessibilityLabel="Símbolo provisório da fase" style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
+            {comContorno ? <View style={[estilos.formaInterna, compacta && estilos.formaInternaCompacta, { borderColor: cor }]} /> : null}
+            <View style={[estilos.sombraForma, compacta && estilos.sombraFormaCompacta, { backgroundColor: cor }]} />
+        </View>
+    );
 }
 
 function SeloConfiabilidade({ nivel }) {
+    const barrasAtivas = nivel === 'alta' ? 3 : nivel === 'media' ? 2 : 1;
     return (
         <View style={[estilos.seloConfiabilidade, estilos[`selo_${nivel}`]]}>
-            <Text style={estilos.seloRotulo}>Confiabilidade</Text>
-            <Text style={estilos.seloNivel}>{nivel}</Text>
+            <View style={estilos.seloCabecalho}>
+                <ChartBarIcon size={15} color={CORES_CONFIANCA[nivel]} weight="bold" />
+                <Text style={[estilos.seloRotulo, estilos[`cor_${nivel}`]]}>Confiabilidade</Text>
+            </View>
+            <View style={estilos.seloResultado}>
+                <View style={estilos.barrasConfiabilidade}>
+                    {[5, 9, 12].map((altura, indice) => <View key={altura} style={[estilos.barraConfiabilidade, { height: altura }, indice < barrasAtivas ? estilos[`barra_${nivel}`] : estilos.barraInativa]} />)}
+                </View>
+                <Text style={[estilos.seloNivel, estilos[`cor_${nivel}`]]}>{nivel}</Text>
+            </View>
         </View>
     );
 }
@@ -51,12 +69,27 @@ function PainelPrevisao({ previsao }) {
 
     return (
         <View style={estilos.secaoPrevisao}>
-            <View style={estilos.cartaoProximoCiclo}>
+            <View style={[estilos.cartaoProximoCiclo, (incerta || nivel === 'baixa') && estilos.cartaoProximoCicloComAviso]}>
                 <View style={estilos.dataProximoCiclo}>
                     <Text style={estilos.rotuloPrevisao}>Próximo ciclo</Text>
                     <Text style={estilos.valorPrincipal}>{formatarDataLonga(previsao.proximoInicioEstimado)}</Text>
                 </View>
                 <SeloConfiabilidade nivel={nivel} />
+                {incerta ? (
+                    <View style={estilos.avisoConfiabilidade}>
+                        <WarningIcon size={18} color="#D68C3A" />
+                        <View style={estilos.textosAvisoConfiabilidade}>
+                            <Text style={estilos.tituloAvisoConfiabilidade}>Estimativa incerta</Text>
+                            <Text style={estilos.textoAvisoConfiabilidade}>Os dados deste ciclo podem ser imprecisos.</Text>
+                        </View>
+                    </View>
+                ) : null}
+                {!incerta && nivel === 'baixa' ? (
+                    <View style={estilos.avisoConfiabilidade}>
+                        <WarningIcon size={18} color="#D68C3A" />
+                        <Text style={estilos.textoAvisoBaixa}>Continue registrando seus ciclos para que suas previsões fiquem cada vez mais precisas.</Text>
+                    </View>
+                ) : null}
             </View>
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
