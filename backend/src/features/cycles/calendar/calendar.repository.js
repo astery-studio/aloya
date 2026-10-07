@@ -26,6 +26,11 @@ function criarCalendarRepository({prisma} = {}) {
                     duracaoCicloInformada: true,
                     duracaoMenstruacaoInformada: true,
                     duracaoLuteaInformada: true,
+                    _count: {
+                        select: {
+                            registrosCiclo: true
+                        }
+                    },
                     registrosCiclo: {
                         where: {
                             dataInicio: {lt: fimMesExclusivo}

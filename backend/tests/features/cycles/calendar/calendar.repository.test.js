@@ -42,11 +42,14 @@ test('rejeita configuração sem as operações obrigatórias do Prisma', () => 
     }
 });
 
-test('busca somente os parâmetros e sete ciclos necessários para a previsão', async () => {
+test('busca somente os parâmetros, a contagem e sete ciclos necessários', async () => {
     const usuario = {
         duracaoCicloInformada: 28,
         duracaoMenstruacaoInformada: 5,
         duracaoLuteaInformada: 14,
+        _count: {
+            registrosCiclo: 2
+        },
         registrosCiclo: []
     };
     const prisma = criarPrisma({usuario});
@@ -65,6 +68,11 @@ test('busca somente os parâmetros e sete ciclos necessários para a previsão',
             duracaoCicloInformada: true,
             duracaoMenstruacaoInformada: true,
             duracaoLuteaInformada: true,
+            _count: {
+                select: {
+                    registrosCiclo: true
+                }
+            },
             registrosCiclo: {
                 where: {
                     dataInicio: {lt: fimMesExclusivo}
@@ -136,6 +144,9 @@ test('apresenta os dias do mês com o identificador do ciclo editável', async (
             duracaoCicloInformada: 28,
             duracaoMenstruacaoInformada: 5,
             duracaoLuteaInformada: 14,
+            _count: {
+                registrosCiclo: 2
+            },
             registrosCiclo: []
         },
         registrosDoMes: [
@@ -184,6 +195,9 @@ test('retorna uma coleção vazia quando o mês não possui menstruação regist
             duracaoCicloInformada: null,
             duracaoMenstruacaoInformada: null,
             duracaoLuteaInformada: 14,
+            _count: {
+                registrosCiclo: 1
+            },
             registrosCiclo: []
         }
     });
@@ -196,4 +210,5 @@ test('retorna uma coleção vazia quando o mês não possui menstruação regist
     });
 
     assert.deepEqual(resultado.diasMenstruacao, []);
+    assert.equal(resultado.usuario._count.registrosCiclo, 1);
 });
