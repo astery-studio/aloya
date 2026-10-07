@@ -1,4 +1,4 @@
-//Busca somente os dados necessários para montar um mês do calendário.
+//Busca somente os dados necessários para calendário e estado atual do ciclo.
 import { CONFIG_PREVISAO } from '../prediction.config.js';
 
 function validarDependencias(prisma) {
@@ -13,6 +13,37 @@ function validarDependencias(prisma) {
 function criarCalendarRepository({prisma} = {}) {
     validarDependencias(prisma);
 
+    function buscarUsuarioComCiclos(usuarioId, fimReferenciaExclusivo) {
+        return prisma.usuario.findUnique({
+            where: {id: usuarioId},
+            select: {
+                duracaoCicloInformada: true,
+                duracaoMenstruacaoInformada: true,
+                duracaoLuteaInformada: true,
+                _count: {
+                    select: {
+                        registrosCiclo: true
+                    }
+                },
+                registrosCiclo: {
+                    where: {
+                        dataInicio: {lt: fimReferenciaExclusivo}
+                    },
+                    orderBy: [
+                        {dataInicio: 'desc'},
+                        {id: 'desc'}
+                    ],
+                    take: CONFIG_PREVISAO.maximoIntervalos + 1,
+                    select: {
+                        id: true,
+                        dataInicio: true,
+                        dataFim: true
+                    }
+                }
+            }
+        });
+    }
+
     async function buscarDadosDoMes({usuarioId, inicioMes, fimMesExclusivo}) {
         const intervaloData = {
             gte: inicioMes,
@@ -20,34 +51,10 @@ function criarCalendarRepository({prisma} = {}) {
         };
 
         const [usuario, registrosDoMes] = await Promise.all([
-            prisma.usuario.findUnique({
-                where: {id: usuarioId},
-                select: {
-                    duracaoCicloInformada: true,
-                    duracaoMenstruacaoInformada: true,
-                    duracaoLuteaInformada: true,
-                    _count: {
-                        select: {
-                            registrosCiclo: true
-                        }
-                    },
-                    registrosCiclo: {
-                        where: {
-                            dataInicio: {lt: fimMesExclusivo}
-                        },
-                        orderBy: [
-                            {dataInicio: 'desc'},
-                            {id: 'desc'}
-                        ],
-                        take: CONFIG_PREVISAO.maximoIntervalos + 1,
-                        select: {
-                            id: true,
-                            dataInicio: true,
-                            dataFim: true
-                        }
-                    }
-                }
-            }),
+            buscarUsuarioComCiclos(
+                usuarioId,
+                fimMesExclusivo
+            ),
             prisma.registroCiclo.findMany({
                 where: {
                     usuarioId,
@@ -90,7 +97,17 @@ function criarCalendarRepository({prisma} = {}) {
         };
     }
 
-    return {buscarDadosDoMes};
+    async function buscarDadosAtuais({usuarioId, fimReferenciaExclusivo}) {
+        return buscarUsuarioComCiclos(
+            usuarioId,
+            fimReferenciaExclusivo
+        );
+    }
+
+    return {
+        buscarDadosDoMes,
+        buscarDadosAtuais
+    };
 }
 
 export { criarCalendarRepository };
