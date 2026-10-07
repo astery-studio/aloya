@@ -16,7 +16,7 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData }) {
                     <Pressable
                         key={item.data}
                         accessibilityRole="button"
-                        accessibilityLabel={`${item.semana}, dia ${item.dia}`}
+                        accessibilityLabel={`${item.semana}, dia ${item.dia ?? '?'}`}
                         accessibilityState={{ selected: selecionado }}
                         onPress={() => aoSelecionarData?.(item.data)}
                         style={[
