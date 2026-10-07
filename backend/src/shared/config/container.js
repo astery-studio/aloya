@@ -77,6 +77,10 @@ import {
 } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
 
 import {
+    criarCalendarModule
+} from '../../features/cycles/calendar/calendar.module.js';
+
+import {
     criarPermissionCategoryService
 } from '../../features/support-network/services/permissionCategory.service.js';
 
@@ -218,6 +222,11 @@ function criarContainer() {
 
     const contraceptiveService =
         criarContraceptiveService(prisma);
+
+    const calendarModule =
+        criarCalendarModule({
+            prisma
+        });
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -383,6 +392,8 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        calendarController:
+            calendarModule.calendarController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,
