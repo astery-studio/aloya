@@ -6,6 +6,7 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData }) {
         <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
+            style={estilos.container}
             contentContainerStyle={estilos.faixa}
             accessibilityLabel="Datas do ciclo"
         >
@@ -18,7 +19,11 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData }) {
                         accessibilityLabel={`${item.semana}, dia ${item.dia}`}
                         accessibilityState={{ selected: selecionado }}
                         onPress={() => aoSelecionarData?.(item.data)}
-                        style={[estilos.dia, selecionado && estilos.diaSelecionado]}
+                        style={[
+                            estilos.dia,
+                            selecionado && estilos.diaSelecionado,
+                            selecionado && estilos[`diaSelecionado_${item.fase}`]
+                        ]}
                     >
                         <Text style={[estilos.semana, selecionado && estilos.textoSelecionado]}>
                             {item.semana}

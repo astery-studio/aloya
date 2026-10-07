@@ -13,7 +13,8 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
     const referencia = dataSelecionada || previsao?.dataReferencia;
     const fases = previsao?.fasesEstimadas;
     const fase = referencia ? obterFase(referencia, fases) : 'desconhecida';
-    const dias = referencia ? criarDiasDaFaixa(referencia, fases) : [];
+    const dataBaseDaFaixa = previsao?.dataReferencia || referencia;
+    const dias = dataBaseDaFaixa ? criarDiasDaFaixa(dataBaseDaFaixa, fases) : [];
     const semDados = previsao?.status === 'DADOS_INSUFICIENTES';
 
     return (
