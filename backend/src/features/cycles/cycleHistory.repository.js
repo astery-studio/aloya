@@ -1,5 +1,12 @@
-//Consulta páginas, totais e posições do histórico sem expor dados de outras contas.
-import {LIMITE_MAXIMO, criarCursorHistorico} from './cycleHistory.validator.js';
+//Consulta páginas, totais, posições e dados do resumo sem acessar outras contas.
+import {
+    CONFIG_PREVISAO
+} from './prediction.config.js';
+
+import {
+    LIMITE_MAXIMO,
+    criarCursorHistorico
+} from './cycleHistory.validator.js';
 
 const SELECAO_DO_CICLO = Object.freeze({
     id: true,
@@ -9,6 +16,12 @@ const SELECAO_DO_CICLO = Object.freeze({
     duracaoCiclo: true,
     classificacao: true,
     ehCicloInicial: true
+});
+
+const SELECAO_DO_RESUMO = Object.freeze({
+    dataInicio: true,
+    dataFim: true,
+    duracaoMenstruacao: true
 });
 
 //Confere se o identificador interno da pessoa usuária é válido.
@@ -118,12 +131,18 @@ function criarCycleHistoryRepository({prisma} = {}) {
         }
 
         const temMais = registrosEncontrados.length > limite;
-        const registros = temMais ? registrosEncontrados.slice(0, limite) : registrosEncontrados.slice();
+        const registros = temMais
+            ? registrosEncontrados.slice(0, limite)
+            : registrosEncontrados.slice();
+
         const ultimoRegistro = registros.at(-1);
-        const proximoCursor = temMais && ultimoRegistro ? criarCursorHistorico({
-            dataInicio: ultimoRegistro.dataInicio,
-            id: ultimoRegistro.id
-        }) : null;
+
+        const proximoCursor = temMais && ultimoRegistro
+            ? criarCursorHistorico({
+                dataInicio: ultimoRegistro.dataInicio,
+                id: ultimoRegistro.id
+            })
+            : null;
 
         return {
             registros,
@@ -132,17 +151,49 @@ function criarCycleHistoryRepository({prisma} = {}) {
         };
     }
 
+    //Busca apenas os registros recentes necessários para calcular o resumo.
+    async function listarParaResumo(usuarioId) {
+        validarUsuarioId(usuarioId);
+
+        const registros =
+            await prisma.registroCiclo.findMany({
+                where: {
+                    usuarioId
+                },
+                orderBy: [
+                    {
+                        dataInicio: 'desc'
+                    },
+                    {
+                        id: 'desc'
+                    }
+                ],
+                take:
+                    CONFIG_PREVISAO.maximoIntervalos
+                    + 1,
+                select: SELECAO_DO_RESUMO
+            });
+
+        if (!Array.isArray(registros)) {
+            throw new TypeError('A consulta do resumo de ciclos retornou um resultado inválido.');
+        }
+
+        return registros;
+    }
+
     //Conta somente os ciclos pertencentes à pessoa autenticada.
     async function contarDoUsuario(usuarioId) {
         validarUsuarioId(usuarioId);
 
-        const quantidade = await prisma.registroCiclo.count({
-            where: {
-                usuarioId
-            }
-        });
+        const quantidade =
+            await prisma.registroCiclo.count({
+                where: {
+                    usuarioId
+                }
+            });
 
         validarContagem(quantidade);
+
         return quantidade;
     }
 
@@ -155,19 +206,28 @@ function criarCycleHistoryRepository({prisma} = {}) {
             return 0;
         }
 
-        const quantidade = await prisma.registroCiclo.count({
-            where: criarFiltroDaPosicao(usuarioId, cursor)
-        });
+        const quantidade =
+            await prisma.registroCiclo.count({
+                where:
+                    criarFiltroDaPosicao(
+                        usuarioId,
+                        cursor
+                    )
+            });
 
         validarContagem(quantidade);
+
         return quantidade;
     }
 
     return {
         listarPagina,
+        listarParaResumo,
         contarDoUsuario,
         contarAteCursor
     };
 }
 
-export {criarCycleHistoryRepository};
+export {
+    criarCycleHistoryRepository
+};
