@@ -7,6 +7,7 @@ import {CalendarDotsIcon} from 'phosphor-react-native/src/icons/CalendarDots'
 import {CaretDownIcon} from 'phosphor-react-native/src/icons/CaretDown'
 import {CaretUpIcon} from 'phosphor-react-native/src/icons/CaretUp'
 import {ChartBarIcon} from 'phosphor-react-native/src/icons/ChartBar'
+import {ChartLineUpIcon} from 'phosphor-react-native/src/icons/ChartLineUp'
 import {DropIcon} from 'phosphor-react-native/src/icons/Drop'
 import {EggIcon} from 'phosphor-react-native/src/icons/Egg'
 import {FirstAidKitIcon} from 'phosphor-react-native/src/icons/FirstAidKit'
@@ -38,6 +39,7 @@ export {
     CaretDownIcon,
     CaretUpIcon,
     ChartBarIcon,
+    ChartLineUpIcon,
     DropIcon,
     EggIcon,
     FirstAidKitIcon,
