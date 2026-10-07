@@ -18,7 +18,7 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
             style={estilos.item}
         >
             <Icone
-                size={26}
+                size={24}
                 color={corDoItem}
                 weight={ativo ? 'fill' : 'regular'}
             />
