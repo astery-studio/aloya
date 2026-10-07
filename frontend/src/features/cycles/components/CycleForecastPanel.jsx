@@ -1,8 +1,10 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import {
     ArrowsClockwiseIcon,
     CalendarDotsIcon,
-    ChartBarIcon,
     DropIcon,
     EggIcon,
     HeartbeatIcon,
@@ -16,7 +18,6 @@ import { estilos } from './CycleForecastPanel.styles';
 const AVISO_MEDICO = 'Esta é uma estimativa baseada no seu histórico e não substitui orientação médica nem garante eficácia como método contraceptivo.';
 const ROTULOS = { menstrual: 'Fase Menstrual', folicular: 'Fase Folicular', ovulatoria: 'Fase Ovulatória', lutea: 'Fase Lútea', desconhecida: 'Seu ciclo' };
 const CORES_FASE = { menstrual: '#C85A44', folicular: '#3B7150', ovulatoria: '#4A758E', lutea: '#D68C3A', desconhecida: '#5C5C59' };
-const CORES_CONFIANCA = { baixa: '#C85A44', media: '#D68C3A', alta: '#2C4C3B' };
 const RECURSOS_SEM_CICLO = [
     { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: '#2C4C3B' },
     { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: '#D68C3A' },
@@ -24,12 +25,16 @@ const RECURSOS_SEM_CICLO = [
     { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.', Icone: HeartbeatIcon, cor: '#2C4C3B' }
 ];
 
-function BotaoAcao({ texto, Icone, destaque = false, pesoIcone = 'regular', aoPressionar }) {
+function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
     return (
-        <Pressable accessibilityRole="button" accessibilityLabel={texto} onPress={aoPressionar} style={[estilos.botaoAcao, destaque ? estilos.botaoPrimario : estilos.botaoSecundario]}>
-            <Icone size={20} color={destaque ? '#FDF6F3' : '#FFFFFF'} weight={pesoIcone} />
-            <Text style={[estilos.textoBotao, destaque && estilos.textoBotaoDestaque]}>{texto}</Text>
-        </Pressable>
+        <ButtonScreen
+            texto={texto}
+            icone={Icone}
+            variante={destaque ? 'laranja' : 'verde'}
+            aoPressionar={aoPressionar}
+            rotuloAcessibilidade={texto}
+            estilo={estilos.botaoAcao}
+        />
     );
 }
 
@@ -40,24 +45,6 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
         <View accessibilityLabel="Símbolo provisório da fase" style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
             {comContorno ? <View style={[estilos.formaInterna, compacta && estilos.formaInternaCompacta, { borderColor: cor }]} /> : null}
             <View style={[estilos.sombraForma, compacta && estilos.sombraFormaCompacta, { backgroundColor: cor }]} />
-        </View>
-    );
-}
-
-function SeloConfiabilidade({ nivel }) {
-    const barrasAtivas = nivel === 'alta' ? 3 : nivel === 'media' ? 2 : 1;
-    return (
-        <View style={[estilos.seloConfiabilidade, estilos[`selo_${nivel}`]]}>
-            <View style={estilos.seloCabecalho}>
-                <ChartBarIcon size={15} color={CORES_CONFIANCA[nivel]} weight="bold" />
-                <Text style={[estilos.seloRotulo, estilos[`cor_${nivel}`]]}>Confiabilidade</Text>
-            </View>
-            <View style={estilos.seloResultado}>
-                <View style={estilos.barrasConfiabilidade}>
-                    {[5, 9, 12].map((altura, indice) => <View key={altura} style={[estilos.barraConfiabilidade, { height: altura }, indice < barrasAtivas ? estilos[`barra_${nivel}`] : estilos.barraInativa]} />)}
-                </View>
-                <Text style={[estilos.seloNivel, estilos[`cor_${nivel}`]]}>{nivel}</Text>
-            </View>
         </View>
     );
 }
@@ -74,7 +61,7 @@ function PainelPrevisao({ previsao }) {
                     <Text style={estilos.rotuloPrevisao}>Próximo ciclo</Text>
                     <Text style={estilos.valorPrincipal}>{formatarDataLonga(previsao.proximoInicioEstimado)}</Text>
                 </View>
-                <SeloConfiabilidade nivel={nivel} />
+                <ConfidenceBadge nivel={nivel} variante="composta" />
                 {incerta ? (
                     <View style={estilos.avisoConfiabilidade}>
                         <WarningIcon size={18} color="#D68C3A" />
@@ -140,13 +127,18 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
         <View style={estilos.estadoSemCiclo}>
             <View style={estilos.cartaoIntroducao}>
                 <FormaProvisoria compacta />
-                <Text style={estilos.tituloSemCiclo}>Conheça seu ciclo</Text>
-                <Text style={estilos.descricaoSemCiclo}>Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo.</Text>
-                <View style={estilos.acoesSemCiclo}>
-                    <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque pesoIcone="fill" aoPressionar={aoCadastrarMenstruacao} />
-                    <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
-                    <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
-                </View>
+                <EmptyState
+                    variante="apresentacao"
+                    titulo="Conheça seu ciclo"
+                    mensagem="Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo."
+                    acao={(
+                        <View style={estilos.acoesSemCiclo}>
+                            <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
+                            <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
+                            <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
+                        </View>
+                    )}
+                />
             </View>
             <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
             <View style={estilos.recursos}>
@@ -172,7 +164,7 @@ function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, previsao, conteud
                 ) : null}
             </View>
             <View style={estilos.acoes}>
-                <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque pesoIcone="fill" aoPressionar={aoCadastrarMenstruacao} />
+                <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
                 <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
                 <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
             </View>
