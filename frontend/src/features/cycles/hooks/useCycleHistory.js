@@ -1,8 +1,15 @@
-//Controla carregamento inicial, erros, cancelamento e paginação do histórico de ciclos.
+//Controla carregamento, resumo, erros, cancelamento e paginação do histórico.
 import {useCallback, useEffect, useRef, useState} from 'react'
 
 const LIMITE_DA_PAGINA = 20
 const MENSAGEM_ERRO = 'Não foi possível carregar seu histórico de ciclos. Tente novamente.'
+
+const RESUMO_INICIAL = Object.freeze({
+    cicloMedioDias: null,
+    menstruacaoMediaDias: null,
+    quantidadeCiclos: 0,
+    confianca: 'baixa'
+})
 
 //Confere se o serviço necessário foi configurado corretamente.
 function validarService(service) {
@@ -22,6 +29,7 @@ function useCycleHistory({service, onSessaoExpirada} = {}) {
     validarService(service)
 
     const [ciclos, setCiclos] = useState([])
+    const [resumo, setResumo] = useState(RESUMO_INICIAL)
     const [quantidadeCiclos, setQuantidadeCiclos] = useState(0)
     const [paginacao, setPaginacao] = useState({
         temMais: false,
@@ -71,6 +79,7 @@ function useCycleHistory({service, onSessaoExpirada} = {}) {
             }
 
             setCiclos(pagina.ciclos)
+            setResumo(pagina.resumo)
             setQuantidadeCiclos(pagina.quantidadeCiclos)
             setPaginacao({
                 temMais: pagina.paginacao.temMais,
@@ -134,6 +143,7 @@ function useCycleHistory({service, onSessaoExpirada} = {}) {
             }
 
             setCiclos(atuais => unirCiclos(atuais, pagina.ciclos))
+            setResumo(pagina.resumo)
             setQuantidadeCiclos(pagina.quantidadeCiclos)
             setPaginacao({
                 temMais: pagina.paginacao.temMais,
@@ -180,6 +190,7 @@ function useCycleHistory({service, onSessaoExpirada} = {}) {
 
     return {
         ciclos,
+        resumo,
         quantidadeCiclos,
         carregando,
         carregandoMais,

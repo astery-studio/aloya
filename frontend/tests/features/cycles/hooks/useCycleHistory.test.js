@@ -1,4 +1,4 @@
-//Testa carregamento, paginação, cancelamento e falhas do histórico de ciclos.
+//Testa carregamento, resumo, paginação, cancelamento e falhas do histórico.
 import {act, renderHook, waitFor} from '@testing-library/react-native'
 
 import {useCycleHistory} from '../../../../src/features/cycles/hooks/useCycleHistory'
@@ -15,9 +15,26 @@ const segundoCiclo = Object.freeze({
     periodo: '07 Ago até 03 Set'
 })
 
-function criarPagina({ciclos = [primeiroCiclo], quantidadeCiclos = 1, temMais = false, proximoCursor = null} = {}) {
+function criarResumo(quantidadeCiclos = 1, alteracoes = {}) {
+    return Object.freeze({
+        cicloMedioDias: 28,
+        menstruacaoMediaDias: 5,
+        quantidadeCiclos,
+        confianca: 'media',
+        ...alteracoes
+    })
+}
+
+function criarPagina({
+    ciclos = [primeiroCiclo],
+    quantidadeCiclos = 1,
+    resumo = criarResumo(quantidadeCiclos),
+    temMais = false,
+    proximoCursor = null
+} = {}) {
     return {
         ciclos,
+        resumo,
         quantidadeCiclos,
         paginacao: {
             limite: 20,
@@ -27,9 +44,11 @@ function criarPagina({ciclos = [primeiroCiclo], quantidadeCiclos = 1, temMais = 
     }
 }
 
-test('carrega automaticamente a primeira página', async () => {
+test('carrega automaticamente a primeira página e o resumo', async () => {
+    const pagina = criarPagina()
+
     const service = {
-        listarPagina: jest.fn().mockResolvedValue(criarPagina())
+        listarPagina: jest.fn().mockResolvedValue(pagina)
     }
 
     const {result} = await renderHook(() => useCycleHistory({service}))
@@ -44,11 +63,12 @@ test('carrega automaticamente a primeira página', async () => {
     })
 
     expect(result.current.ciclos).toEqual([primeiroCiclo])
+    expect(result.current.resumo).toBe(pagina.resumo)
     expect(result.current.quantidadeCiclos).toBe(1)
     expect(result.current.erro).toBeNull()
 })
 
-test('mostra carregamento enquanto a primeira requisição está pendente', async () => {
+test('mostra resumo inicial seguro enquanto a primeira requisição está pendente', async () => {
     let resolver
 
     const service = {
@@ -60,6 +80,13 @@ test('mostra carregamento enquanto a primeira requisição está pendente', asyn
     const {result} = await renderHook(() => useCycleHistory({service}))
 
     expect(result.current.carregando).toBe(true)
+
+    expect(result.current.resumo).toEqual({
+        cicloMedioDias: null,
+        menstruacaoMediaDias: null,
+        quantidadeCiclos: 0,
+        confianca: 'baixa'
+    })
 
     await act(async () => {
         resolver(criarPagina())
@@ -84,10 +111,12 @@ test('mostra erro amigável sem expor detalhes técnicos', async () => {
 })
 
 test('permite tentar o carregamento inicial novamente', async () => {
+    const pagina = criarPagina()
+
     const service = {
         listarPagina: jest.fn()
             .mockRejectedValueOnce(new Error('Falha temporária'))
-            .mockResolvedValueOnce(criarPagina())
+            .mockResolvedValueOnce(pagina)
     }
 
     const {result} = await renderHook(() => useCycleHistory({service}))
@@ -103,9 +132,14 @@ test('permite tentar o carregamento inicial novamente', async () => {
     expect(service.listarPagina).toHaveBeenCalledTimes(2)
     expect(result.current.erro).toBeNull()
     expect(result.current.ciclos).toEqual([primeiroCiclo])
+    expect(result.current.resumo).toBe(pagina.resumo)
 })
 
 test('carrega a próxima página e mantém os ciclos anteriores', async () => {
+    const resumoAtualizado = criarResumo(2, {
+        confianca: 'alta'
+    })
+
     const service = {
         listarPagina: jest.fn()
             .mockResolvedValueOnce(criarPagina({
@@ -115,7 +149,8 @@ test('carrega a próxima página e mantém os ciclos anteriores', async () => {
             }))
             .mockResolvedValueOnce(criarPagina({
                 ciclos: [segundoCiclo],
-                quantidadeCiclos: 2
+                quantidadeCiclos: 2,
+                resumo: resumoAtualizado
             }))
     }
 
@@ -140,6 +175,7 @@ test('carrega a próxima página e mantém os ciclos anteriores', async () => {
         segundoCiclo
     ])
 
+    expect(result.current.resumo).toBe(resumoAtualizado)
     expect(result.current.temMais).toBe(false)
 })
 
@@ -152,7 +188,10 @@ test('não repete um ciclo recebido em duas páginas', async () => {
                 proximoCursor: 'cursor-seguro'
             }))
             .mockResolvedValueOnce(criarPagina({
-                ciclos: [primeiroCiclo, segundoCiclo],
+                ciclos: [
+                    primeiroCiclo,
+                    segundoCiclo
+                ],
                 quantidadeCiclos: 2
             }))
     }
@@ -238,11 +277,14 @@ test('mantém os ciclos visíveis quando a próxima página falha', async () => 
         expect(result.current.temMais).toBe(true)
     })
 
+    const resumoAnterior = result.current.resumo
+
     await act(async () => {
         await result.current.carregarMais()
     })
 
     expect(result.current.ciclos).toEqual([primeiroCiclo])
+    expect(result.current.resumo).toBe(resumoAnterior)
     expect(result.current.erro).toBeNull()
     expect(result.current.erroCarregarMais).toBe('Não foi possível carregar seu histórico de ciclos. Tente novamente.')
 })
