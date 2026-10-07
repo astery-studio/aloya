@@ -33,6 +33,8 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada 
 
     useEffect(() => {
         const controlador = new AbortController();
+        // A busca externa inicia ao montar o fluxo e cancela ao desmontar.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         carregar(controlador.signal);
         return () => controlador.abort();
     }, [carregar]);

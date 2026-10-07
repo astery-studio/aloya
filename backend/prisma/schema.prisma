@@ -382,16 +382,20 @@ model Anticoncepcional {
 
   frequencia             FrequenciaUso?
   dataInicioUso          DateTime?              @map("data_inicio_uso")
-  periodosPausa          Json                    @default("[]") @map("periodos_pausa")
+  periodosPausa          Json                   @default("[]") @map("periodos_pausa")
   dataValidade           DateTime?              @map("data_validade")
   nivelIntensidadeAlerta NivelIntensidadeAlerta @default(critico) @map("nivel_intensidade_alerta")
+
+  // A remoção lógica preserva o histórico de usos já registrados.
+  ativo      Boolean   @default(true)
+  removidoEm DateTime? @map("removido_em")
 
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
   usos UsoAnticoncepcional[]
 
-  @@index([usuarioId])
+  @@index([usuarioId, ativo])
   @@map("anticoncepcionais")
 }
 

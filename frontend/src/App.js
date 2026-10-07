@@ -15,7 +15,7 @@ import ForgotPasswordScreen from './features/auth/screens/ForgotPasswordScreen'
 import LoginScreen from './features/auth/screens/LoginScreen'
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen'
 import WelcomeScreen from './features/auth/screens/WelcomeScreen'
-import {ContraceptiveFlow} from './features/contraceptives/ContraceptiveFlow'
+import {ContraceptiveHuTestAccess} from './features/contraceptives/testing/ContraceptiveHuTestAccess'
 import {CycleHistoryFlow} from './features/cycles/CycleHistoryFlow'
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen'
 import {ChangePasswordScreen} from './features/settings/screens/ChangePasswordScreen'
@@ -435,7 +435,7 @@ export default function App() {
         )
     } else if (telaInterna === telasInternas.anticoncepcionais) {
         conteudo = (
-            <ContraceptiveFlow
+            <ContraceptiveHuTestAccess
                 service={configuracao.servicos.contraceptiveService}
                 onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                 onSessaoExpirada={finalizarSessao}

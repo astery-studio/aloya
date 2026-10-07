@@ -1,3 +1,4 @@
+//Configura e inicia a API HTTP da aplicação.
 import express from 'express';
 import helmet from 'helmet';
 
@@ -42,7 +43,6 @@ const app = express();
 const container = criarContainer();
 
 app.disable('x-powered-by');
-
 app.use(helmet());
 
 app.use(
@@ -108,7 +108,11 @@ app.use(
         autenticar:
             container.authMiddleware.autenticar,
         controller:
-            container.contraceptiveController
+            container.contraceptiveController,
+        edicaoRateLimit:
+            container.edicaoAnticoncepcionalRateLimit,
+        remocaoRateLimit:
+            container.remocaoAnticoncepcionalRateLimit
     })
 );
 
