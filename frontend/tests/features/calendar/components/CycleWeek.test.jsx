@@ -1,5 +1,6 @@
 //Testa semanas, interação dos dias e continuidade da janela fértil.
 import {fireEvent, render, screen} from '@testing-library/react-native'
+import {StyleSheet} from 'react-native'
 
 import {
     CycleWeek,
@@ -59,11 +60,10 @@ describe('CycleWeek', () => {
             'janela-fertil-2026-10-02-2026-10-04'
         )
 
-        expect(contorno).toHaveStyle({
-            left: `${100 / 7}%`,
-            width: `${300 / 7}%`
-        })
+        const estiloContorno = StyleSheet.flatten(contorno.props.style)
 
+        expect(parseFloat(estiloContorno.left)).toBeCloseTo(100 / 7, 10)
+        expect(parseFloat(estiloContorno.width)).toBeCloseTo(300 / 7, 10)
         expect(contorno).toHaveStyle(estilos.janelaFertilAtual)
     })
 
