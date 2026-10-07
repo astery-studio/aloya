@@ -27,9 +27,17 @@ const ciclos = Object.freeze([
     })
 ])
 
+const resumo = Object.freeze({
+    cicloMedioDias: 28,
+    menstruacaoMediaDias: 5,
+    quantidadeCiclos: 3,
+    confianca: 'media'
+})
+
 function criarEstadoDoHook(alteracoes = {}) {
     return {
         ciclos,
+        resumo,
         quantidadeCiclos: 3,
         carregando: false,
         carregandoMais: false,
@@ -89,6 +97,7 @@ test('encaminha os estados do hook para a tela', async () => {
     expect(CycleHistoryScreen).toHaveBeenCalledWith(
         expect.objectContaining({
             ciclos: estado.ciclos,
+            resumo: estado.resumo,
             carregando: true,
             carregandoMais: true,
             erro: 'Erro inicial',
@@ -102,31 +111,16 @@ test('encaminha os estados do hook para a tela', async () => {
     )
 })
 
-test('usa a quantidade real sem inventar os cálculos estatísticos', async () => {
+test('encaminha o resumo calculado sem sobrescrever seus valores', async () => {
+    const resumoCalculado = {
+        cicloMedioDias: 30,
+        menstruacaoMediaDias: 6,
+        quantidadeCiclos: 6,
+        confianca: 'alta'
+    }
+
     useCycleHistory.mockReturnValue(criarEstadoDoHook({
-        quantidadeCiclos: 7
-    }))
-
-    await render(
-        <CycleHistoryFlow
-            service={{
-                listarPagina: jest.fn()
-            }}
-        />
-    )
-
-    const propriedades = CycleHistoryScreen.mock.calls[0][0]
-
-    expect(propriedades.resumo).toEqual({
-        quantidadeCiclos: 7
-    })
-
-    expect(propriedades.resumo).not.toHaveProperty('cicloMedioDias')
-    expect(propriedades.resumo).not.toHaveProperty('menstruacaoMediaDias')
-})
-
-test('preserva o resumo quando os cálculos forem fornecidos pela outra integração', async () => {
-    useCycleHistory.mockReturnValue(criarEstadoDoHook({
+        resumo: resumoCalculado,
         quantidadeCiclos: 6
     }))
 
@@ -135,21 +129,12 @@ test('preserva o resumo quando os cálculos forem fornecidos pela outra integra�
             service={{
                 listarPagina: jest.fn()
             }}
-            resumo={{
-                cicloMedioDias: 28,
-                menstruacaoMediaDias: 5,
-                quantidadeCiclos: 999,
-                confianca: 'alta'
-            }}
         />
     )
 
-    expect(CycleHistoryScreen.mock.calls[0][0].resumo).toEqual({
-        cicloMedioDias: 28,
-        menstruacaoMediaDias: 5,
-        quantidadeCiclos: 6,
-        confianca: 'alta'
-    })
+    expect(
+        CycleHistoryScreen.mock.calls[0][0].resumo
+    ).toBe(resumoCalculado)
 })
 
 test('encaminha as ações visuais sem criar regras intermediárias', async () => {
