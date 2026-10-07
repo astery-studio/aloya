@@ -1,5 +1,5 @@
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
@@ -12,7 +12,6 @@ import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresen
 import { estilos } from './CycleTodayScreen.styles';
 
 function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional, aoAbrirCalendario, aoSelecionarAba }) {
-    const insets = useSafeAreaInsets();
     const referencia = dataSelecionada || previsao?.dataReferencia;
     const fases = previsao?.fasesEstimadas;
     const fase = referencia ? obterFase(referencia, fases) : 'desconhecida';
@@ -47,7 +46,7 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
                     />
                 </ScrollView>
             )}
-            <BottomTabBar abaAtiva="inicio" insetInferior={insets.bottom} onSelecionar={aoSelecionarAba} />
+            <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
             <SimpleModal
                 visivel={erro}
                 aoFechar={aoVoltar}

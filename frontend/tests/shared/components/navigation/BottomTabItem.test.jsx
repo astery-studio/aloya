@@ -134,7 +134,7 @@ describe('BottomTabItem', () => {
             IconeTeste.mock.calls[0][0]
         ).toEqual(
             expect.objectContaining({
-                size: 24,
+                size: 26,
                 color: corAtiva,
                 weight: 'fill'
             })
@@ -158,7 +158,7 @@ describe('BottomTabItem', () => {
             IconeTeste.mock.calls[0][0]
         ).toEqual(
             expect.objectContaining({
-                size: 24,
+                size: 26,
                 color: corInativa,
                 weight: 'regular'
             })

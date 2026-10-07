@@ -8,16 +8,17 @@ const estilos = StyleSheet.create({
     item: {
         flex: 1,
         minWidth: 0,
-        height: 54,
-        alignItems: 'center'
+        height: '100%',
+        alignItems: 'center',
+        paddingTop: 14
     },
 
     label: {
         marginTop: 4,
         color: corInativa,
-        fontFamily: fontFamilies.medium,
-        fontSize: 11,
-        lineHeight: 16,
+        fontFamily: fontFamilies.regular,
+        fontSize: 12,
+        lineHeight: 18,
         textAlign: 'center',
         includeFontPadding: false
     },
@@ -31,7 +32,7 @@ const estilos = StyleSheet.create({
         width: 5,
         height: 5,
         borderRadius: 3,
-        marginTop: 4,
+        marginTop: 5,
         backgroundColor: corAtiva
     }
 })
