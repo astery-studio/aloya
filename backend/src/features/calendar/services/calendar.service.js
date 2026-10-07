@@ -1,9 +1,9 @@
 //Monta os dados compactos de um mês do calendário usando os cálculos de previsão.
 import { AppError } from '../../../shared/errors/AppError.js';
-import { calcularPrevisao } from '../prediction.js';
-import { formatarData } from '../utils/calendar.js';
+import { calcularPrevisao } from '../../cycles/prediction.js';
+import { formatarData } from '../../cycles/utils/calendar.js';
 import { criarIntervaloMensal } from '../utils/calendar.period.js';
-import { validarMesCalendario } from './calendar.validator.js';
+import { validarMesCalendario } from '../validators/calendar.validator.js';
 
 function validarRepository(repository) {
     if (typeof repository?.buscarDadosDoMes !== 'function') {

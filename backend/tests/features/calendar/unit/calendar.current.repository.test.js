@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCalendarRepository } from '../../../../src/features/cycles/calendar/calendar.repository.js';
+import { criarCalendarRepository } from '../../../../src/features/calendar/repositories/calendar.repository.js';
 
 test('busca o estado atual sem consultar os dias do calendário', async () => {
     const chamadas = {

@@ -5,8 +5,8 @@ import test from 'node:test';
 
 import express from 'express';
 
-import { criarCalendarModule } from '../../../../src/features/cycles/calendar/calendar.module.js';
-import { criarCalendarRoutes } from '../../../../src/features/cycles/calendar/calendar.routes.js';
+import { criarCalendarModule } from '../../../../src/features/calendar/calendar.module.js';
+import { criarCalendarRoutes } from '../../../../src/features/calendar/routes/calendar.routes.js';
 import { criarAuthMiddleware } from '../../../../src/shared/middleware/auth.middleware.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 

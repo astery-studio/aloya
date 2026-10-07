@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarIntervaloMensal } from '../../../../src/features/cycles/utils/calendar.period.js';
+import { criarIntervaloMensal } from '../../../../src/features/calendar/utils/calendar.period.js';
 
 test('cria os limites exatos de um mês comum', () => {
     const intervalo = criarIntervaloMensal({

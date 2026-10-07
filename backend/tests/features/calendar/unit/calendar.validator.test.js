@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { validarMesCalendario } from '../../../../src/features/cycles/calendar/calendar.validator.js';
+import { validarMesCalendario } from '../../../../src/features/calendar/validators/calendar.validator.js';
 
 function capturarErro(acao) {
     try {

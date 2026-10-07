@@ -20,7 +20,7 @@ import {
 
 import {
     criarCalendarRoutes
-} from './features/cycles/calendar/calendar.routes.js';
+} from './features/calendar/routes/calendar.routes.js';
 
 import {
     criarPermissionCategoryRoutes

@@ -1,8 +1,8 @@
-//Testa a resposta HTTP e o uso exclusivo da identidade autenticada no calendário.
+//Testa a resposta HTTP segura do estado atual exibido na Home.
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCalendarController } from '../../../../src/features/cycles/calendar/calendar.controller.js';
+import { criarCurrentCycleController } from '../../../../src/features/calendar/controllers/calendar.current.controller.js';
 
 function criarRespostaMock() {
     return {
@@ -27,58 +27,60 @@ function criarRespostaMock() {
     };
 }
 
-function criarCalendario() {
+function criarEstadoAtual() {
     return {
-        mes: '2026-10',
         possuiCiclos: true,
-        diasMenstruacao: [
-            {
-                data: '2026-10-01',
-                registroCicloId: 18
-            }
-        ],
-        previsao: null
+        dataReferencia: '2026-10-10',
+        diaDoCiclo: 12,
+        faseAtual: 'FOLICULAR',
+        estaNaJanelaFertil: true,
+        proximoInicioEstimado: '2026-10-27',
+        nivelConfianca: 'BAIXA',
+        statusPrevisao: 'DISPONIVEL'
     };
 }
 
 test('rejeita configuração sem service válido', () => {
-    for (const calendarService of [undefined, null, {}, {buscarMes: true}]) {
+    for (const currentCycleService of [
+        undefined,
+        null,
+        {},
+        {buscarEstadoAtual: true}
+    ]) {
         assert.throws(
-            () => criarCalendarController({calendarService}),
+            () => criarCurrentCycleController({
+                currentCycleService
+            }),
             {
                 name: 'TypeError',
-                message: 'Não foi possível configurar o controller do calendário.'
+                message: 'Não foi possível configurar o controller do estado atual.'
             }
         );
     }
 });
 
-test('busca o mês usando somente a identidade autenticada', async () => {
+test('usa somente a identidade autenticada', async () => {
     let argumentosRecebidos = null;
-    const calendario = criarCalendario();
-    const controller = criarCalendarController({
-        calendarService: {
-            async buscarMes(argumentos) {
+    const estadoAtual = criarEstadoAtual();
+    const controller = criarCurrentCycleController({
+        currentCycleService: {
+            async buscarEstadoAtual(argumentos) {
                 argumentosRecebidos = argumentos;
-                return calendario;
+                return estadoAtual;
             }
         }
     });
     const resposta = criarRespostaMock();
 
-    await controller.buscarMes(
+    await controller.buscarEstadoAtual(
         {
             usuario: {
                 id: 7
             },
             query: {
-                mes: '2026-10',
                 usuarioId: 999
             },
             body: {
-                usuarioId: 999
-            },
-            params: {
                 usuarioId: 999
             }
         },
@@ -87,32 +89,28 @@ test('busca o mês usando somente a identidade autenticada', async () => {
     );
 
     assert.deepEqual(argumentosRecebidos, {
-        usuarioId: 7,
-        mes: '2026-10'
+        usuarioId: 7
     });
     assert.equal(resposta.statusRecebido, 200);
     assert.deepEqual(resposta.corpoRecebido, {
-        calendario
+        estadoAtual
     });
 });
 
-test('impede armazenamento HTTP compartilhado de dados sensíveis', async () => {
-    const controller = criarCalendarController({
-        calendarService: {
-            async buscarMes() {
-                return criarCalendario();
+test('impede armazenamento HTTP compartilhado dos dados do ciclo', async () => {
+    const controller = criarCurrentCycleController({
+        currentCycleService: {
+            async buscarEstadoAtual() {
+                return criarEstadoAtual();
             }
         }
     });
     const resposta = criarRespostaMock();
 
-    await controller.buscarMes(
+    await controller.buscarEstadoAtual(
         {
             usuario: {
                 id: 7
-            },
-            query: {
-                mes: '2026-10'
             }
         },
         resposta,
@@ -129,27 +127,24 @@ test('impede armazenamento HTTP compartilhado de dados sensíveis', async () => 
     );
 });
 
-test('encaminha erros controlados sem substituir sua mensagem', async () => {
-    const erroValidacao = new Error('Informe o mês no formato AAAA-MM.');
-    erroValidacao.status = 422;
-    erroValidacao.codigo = 'MES_CALENDARIO_INVALIDO';
+test('preserva erros controlados do service', async () => {
+    const erroSessao = new Error('Sessão inválida.');
+    erroSessao.status = 401;
+    erroSessao.codigo = 'SESSAO_INVALIDA';
 
-    const controller = criarCalendarController({
-        calendarService: {
-            async buscarMes() {
-                throw erroValidacao;
+    const controller = criarCurrentCycleController({
+        currentCycleService: {
+            async buscarEstadoAtual() {
+                throw erroSessao;
             }
         }
     });
     let erroRecebido = null;
 
-    await controller.buscarMes(
+    await controller.buscarEstadoAtual(
         {
             usuario: {
                 id: 7
-            },
-            query: {
-                mes: '2026-13'
             }
         },
         criarRespostaMock(),
@@ -158,29 +153,26 @@ test('encaminha erros controlados sem substituir sua mensagem', async () => {
         }
     );
 
-    assert.equal(erroRecebido, erroValidacao);
+    assert.equal(erroRecebido, erroSessao);
     assert.equal(erroRecebido.mensagemUsuario, undefined);
 });
 
-test('define a mensagem pública exigida para erros internos', async () => {
+test('define mensagem pública segura para falha interna', async () => {
     const erroInterno = new Error('Detalhes privados do banco');
 
-    const controller = criarCalendarController({
-        calendarService: {
-            async buscarMes() {
+    const controller = criarCurrentCycleController({
+        currentCycleService: {
+            async buscarEstadoAtual() {
                 throw erroInterno;
             }
         }
     });
     let erroRecebido = null;
 
-    await controller.buscarMes(
+    await controller.buscarEstadoAtual(
         {
             usuario: {
                 id: 7
-            },
-            query: {
-                mes: '2026-10'
             }
         },
         criarRespostaMock(),
@@ -194,5 +186,4 @@ test('define a mensagem pública exigida para erros internos', async () => {
         erroRecebido.mensagemUsuario,
         'Não foi possível carregar os dados do calendário. Tente novamente.'
     );
-    assert.equal(erroRecebido.status, undefined);
 });

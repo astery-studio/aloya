@@ -78,7 +78,7 @@ import {
 
 import {
     criarCalendarModule
-} from '../../features/cycles/calendar/calendar.module.js';
+} from '../../features/calendar/calendar.module.js';
 
 import {
     criarPermissionCategoryService

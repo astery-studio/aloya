@@ -1,9 +1,9 @@
 //Compõe as camadas do calendário a partir de uma única dependência do Prisma.
-import { criarCalendarController } from './calendar.controller.js';
-import { criarCurrentCycleController } from './calendar.current.controller.js';
-import { criarCalendarRepository } from './calendar.repository.js';
-import { criarCalendarService } from './calendar.service.js';
-import { criarCurrentCycleService } from './calendar.current.service.js';
+import { criarCalendarController } from './controllers/calendar.controller.js';
+import { criarCurrentCycleController } from './controllers/calendar.current.controller.js';
+import { criarCalendarRepository } from './repositories/calendar.repository.js';
+import { criarCalendarService } from './services/calendar.service.js';
+import { criarCurrentCycleService } from './services/calendar.current.service.js';
 
 function criarCalendarModule({
     prisma,

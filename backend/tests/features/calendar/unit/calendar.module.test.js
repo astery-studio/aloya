@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCalendarModule } from '../../../../src/features/cycles/calendar/calendar.module.js';
+import { criarCalendarModule } from '../../../../src/features/calendar/calendar.module.js';
 
 function criarPrisma() {
     return {

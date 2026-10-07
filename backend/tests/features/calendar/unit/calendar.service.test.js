@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCalendarService } from '../../../../src/features/cycles/calendar/calendar.service.js';
+import { criarCalendarService } from '../../../../src/features/calendar/services/calendar.service.js';
 
 function criarRepository(resultado) {
     const chamadas = [];

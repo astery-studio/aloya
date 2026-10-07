@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCalendarRoutes } from '../../../../src/features/cycles/calendar/calendar.routes.js';
+import { criarCalendarRoutes } from '../../../../src/features/calendar/routes/calendar.routes.js';
 
 function criarDependencias() {
     const chamadas = [];

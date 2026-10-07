@@ -1,12 +1,12 @@
 //Calcula o estado atual exibido na Home sem carregar a grade mensal.
 import { AppError } from '../../../shared/errors/AppError.js';
-import { calcularPrevisao } from '../prediction.js';
+import { calcularPrevisao } from '../../cycles/prediction.js';
 import {
     adicionarDias,
     diferencaDias,
     formatarData,
     paraDataCalendario
-} from '../utils/calendar.js';
+} from '../../cycles/utils/calendar.js';
 
 function validarDependencias(repository, agora) {
     const possuiConsulta = typeof repository?.buscarDadosAtuais === 'function';

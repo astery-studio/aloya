@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCurrentCycleService } from '../../../../src/features/cycles/calendar/calendar.current.service.js';
+import { criarCurrentCycleService } from '../../../../src/features/calendar/services/calendar.current.service.js';
 
 const agora = () => new Date('2026-10-10T15:00:00.000Z');
 

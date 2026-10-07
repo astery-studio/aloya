@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarCalendarRepository } from '../../../../src/features/cycles/calendar/calendar.repository.js';
+import { criarCalendarRepository } from '../../../../src/features/calendar/repositories/calendar.repository.js';
 
 const inicioMes = new Date('2026-10-01T00:00:00.000Z');
 const fimMesExclusivo = new Date('2026-11-01T00:00:00.000Z');
