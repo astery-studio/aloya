@@ -1,6 +1,6 @@
 import { Modal, Text, View } from 'react-native';
-import { WarningCircleIcon } from 'phosphor-react-native';
 import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup';
+import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { estilos } from './PredictionErrorModal.styles';
 
 function PredictionErrorModal({ visivel, aoTentarNovamente, aoVoltar }) {
