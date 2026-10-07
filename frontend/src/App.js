@@ -47,6 +47,10 @@ function obterBaseUrl() {
     return 'http://10.0.2.2:3000';
 }
 
+function permitirHttpParaTeste() {
+    return process.env.EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING === 'true';
+}
+
 function obterTokenRecuperacao(url) {
     const token = url?.match(/[?&]token=([^&]+)/)?.[1];
     return token ? decodeURIComponent(token) : null;
@@ -81,7 +85,8 @@ export default function App() {
             return {
                 servicos: criarServicosApp({
                     apiUrl,
-                    permitirHttpDesenvolvimento: emDesenvolvimento
+                    permitirHttpDesenvolvimento:
+                        emDesenvolvimento || permitirHttpParaTeste()
                 }),
                 erro: null
             };
