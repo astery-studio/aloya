@@ -1,4 +1,4 @@
-//Busca páginas do histórico e converte a resposta segura da API para o formato visual da tela.
+//Busca páginas do histórico e converte a resposta segura da API para o formato visual.
 import {endpoints} from '../../../shared/services/api/endpoints'
 
 const LIMITE_PADRAO = 20
@@ -31,6 +31,12 @@ const classificacoesPermitidas = Object.freeze([
     'irregular'
 ])
 
+const confiancasPermitidas = Object.freeze([
+    'baixa',
+    'media',
+    'alta'
+])
+
 //Confere se o valor recebido possui somente uma estrutura comum de objeto.
 function ehObjetoSimples(valor) {
     if (valor === null || typeof valor !== 'object' || Array.isArray(valor)) {
@@ -38,10 +44,11 @@ function ehObjetoSimples(valor) {
     }
 
     const prototipo = Object.getPrototypeOf(valor)
+
     return prototipo === Object.prototype || prototipo === null
 }
 
-//Cria um erro local amigável sem incluir dados menstruais na mensagem.
+//Cria um erro amigável sem incluir dados menstruais na mensagem.
 function criarErroResposta() {
     const erro = new Error('Não foi possível interpretar o histórico de ciclos.')
     erro.codigo = 'RESPOSTA_HISTORICO_INVALIDA'
@@ -49,7 +56,7 @@ function criarErroResposta() {
     return erro
 }
 
-//Confere se uma data usa o formato YYYY-MM-DD e realmente existe no calendário.
+//Confere se uma data usa o formato YYYY-MM-DD e realmente existe.
 function dataIsoEhValida(valor) {
     if (typeof valor !== 'string') {
         return false
@@ -69,13 +76,13 @@ function dataIsoEhValida(valor) {
     return data.getUTCFullYear() === ano && data.getUTCMonth() === mes - 1 && data.getUTCDate() === dia
 }
 
-//Transforma uma data ISO em um texto curto sem sofrer alteração de fuso horário.
+//Transforma uma data ISO em texto curto sem alteração de fuso.
 function formatarDataCurta(dataIso) {
     const [, , mes, dia] = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataIso)
     return `${dia} ${mesesAbreviados[Number(mes) - 1]}`
 }
 
-//Cria o período exibido no card usando as datas recebidas da API.
+//Cria o período exibido no card.
 function criarPeriodo(dataInicio, dataFim) {
     const inicio = formatarDataCurta(dataInicio)
     const fim = dataFim === null ? 'hoje' : formatarDataCurta(dataFim)
@@ -87,7 +94,32 @@ function duracaoEhValida(valor) {
     return valor === null || (Number.isSafeInteger(valor) && valor > 0)
 }
 
-//Valida e converte um ciclo da API para o formato usado pelos componentes.
+//Confere uma métrica opcional do resumo.
+function metricaResumoEhValida(valor) {
+    return valor === null || (Number.isSafeInteger(valor) && valor > 0)
+}
+
+//Valida e congela o resumo calculado pelo backend.
+function normalizarResumo(resumo, quantidadeCiclos) {
+    const valido = ehObjetoSimples(resumo)
+        && metricaResumoEhValida(resumo.cicloMedioDias)
+        && metricaResumoEhValida(resumo.menstruacaoMediaDias)
+        && resumo.quantidadeCiclos === quantidadeCiclos
+        && confiancasPermitidas.includes(resumo.confianca)
+
+    if (!valido) {
+        throw criarErroResposta()
+    }
+
+    return Object.freeze({
+        cicloMedioDias: resumo.cicloMedioDias,
+        menstruacaoMediaDias: resumo.menstruacaoMediaDias,
+        quantidadeCiclos: resumo.quantidadeCiclos,
+        confianca: resumo.confianca
+    })
+}
+
+//Valida e converte um ciclo da API.
 function normalizarCicloHistorico(registro) {
     const valido = ehObjetoSimples(registro)
         && Number.isSafeInteger(registro.id)
@@ -133,13 +165,13 @@ function validarPaginacao(limite, cursor) {
     }
 }
 
-//Monta o caminho da página sem permitir a inclusão de parâmetros arbitrários.
+//Monta o caminho da página sem aceitar parâmetros arbitrários.
 function criarCaminhoHistorico(limite, cursor) {
     const caminho = `${endpoints.historicoCiclos}?limit=${limite}`
     return cursor === null ? caminho : `${caminho}&cursor=${encodeURIComponent(cursor)}`
 }
 
-//Valida o envelope da API e congela a página para evitar alterações acidentais.
+//Valida o envelope da API e congela a página.
 function normalizarPagina(resposta, limiteSolicitado) {
     if (!ehObjetoSimples(resposta) || !Array.isArray(resposta.ciclos) || !Number.isSafeInteger(resposta.quantidadeCiclos) || resposta.quantidadeCiclos < 0 || !ehObjetoSimples(resposta.paginacao)) {
         throw criarErroResposta()
@@ -155,9 +187,11 @@ function normalizarPagina(resposta, limiteSolicitado) {
     }
 
     const ciclos = Object.freeze(resposta.ciclos.map(normalizarCicloHistorico))
+    const resumo = normalizarResumo(resposta.resumo, resposta.quantidadeCiclos)
 
     return Object.freeze({
         ciclos,
+        resumo,
         quantidadeCiclos: resposta.quantidadeCiclos,
         paginacao: Object.freeze({
             limite: paginacao.limite,
@@ -167,13 +201,13 @@ function normalizarPagina(resposta, limiteSolicitado) {
     })
 }
 
-//Cria o serviço autenticado responsável pelo carregamento incremental do histórico.
+//Cria o serviço autenticado responsável pelo carregamento incremental.
 function criarCycleHistoryService({requisicaoAutenticada} = {}) {
     if (typeof requisicaoAutenticada !== 'function') {
         throw new Error('Não foi possível configurar o serviço do histórico de ciclos.')
     }
 
-    //Carrega uma página e preserva o sinal usado para cancelar requisições antigas.
+    //Carrega uma página e preserva o sinal de cancelamento.
     async function listarPagina({limite = LIMITE_PADRAO, cursor = null, signal} = {}) {
         validarPaginacao(limite, cursor)
 

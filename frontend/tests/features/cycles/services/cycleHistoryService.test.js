@@ -1,4 +1,4 @@
-//Testa paginação, formatação e validação defensiva do serviço do histórico.
+//Testa paginação, resumo, formatação e validação defensiva do histórico.
 import {criarCycleHistoryService, normalizarCicloHistorico} from '../../../../src/features/cycles/services/cycleHistoryService'
 
 const cicloApi = Object.freeze({
@@ -14,9 +14,17 @@ const cicloApi = Object.freeze({
     cicloInicial: false
 })
 
+const resumoApi = Object.freeze({
+    cicloMedioDias: 28,
+    menstruacaoMediaDias: 5,
+    quantidadeCiclos: 3,
+    confianca: 'media'
+})
+
 function criarRespostaApi(alteracoes = {}) {
     return {
         ciclos: [cicloApi],
+        resumo: resumoApi,
         quantidadeCiclos: 3,
         paginacao: {
             limite: 20,
@@ -82,8 +90,10 @@ test('lista a primeira página usando autenticação', async () => {
 
     expect(resultado.ciclos).toHaveLength(1)
     expect(resultado.quantidadeCiclos).toBe(3)
+    expect(resultado.resumo).toEqual(resumoApi)
     expect(Object.isFrozen(resultado)).toBe(true)
     expect(Object.isFrozen(resultado.ciclos)).toBe(true)
+    expect(Object.isFrozen(resultado.resumo)).toBe(true)
     expect(Object.isFrozen(resultado.paginacao)).toBe(true)
 })
 
@@ -144,9 +154,42 @@ test('rejeita datas inexistentes na resposta da API', () => {
     })).toThrow('Não foi possível interpretar o histórico de ciclos.')
 })
 
+test.each([
+    {
+        resumo: undefined
+    },
+    {
+        resumo: {
+            ...resumoApi,
+            quantidadeCiclos: 2
+        }
+    },
+    {
+        resumo: {
+            ...resumoApi,
+            confianca: 'desconhecida'
+        }
+    },
+    {
+        resumo: {
+            ...resumoApi,
+            cicloMedioDias: -1
+        }
+    }
+])('rejeita resumo inválido da API', async alteracoes => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi(alteracoes))
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+
+    await expect(service.listarPagina()).rejects.toMatchObject({
+        codigo: 'RESPOSTA_HISTORICO_INVALIDA',
+        mensagemUsuario: 'Não foi possível interpretar o histórico de ciclos.'
+    })
+})
+
 test('rejeita resposta malformada sem quebrar a tela silenciosamente', async () => {
     const requisicaoAutenticada = jest.fn().mockResolvedValue({
         ciclos: 'dados inválidos',
+        resumo: resumoApi,
         quantidadeCiclos: 3,
         paginacao: {}
     })
