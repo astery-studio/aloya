@@ -107,30 +107,29 @@ function PainelPrevisao({ previsao }) {
                     <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} a ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>
                 </View>
             </View>
-            {incerta ? <Text style={estilos.alerta}>Estimativa incerta para este ciclo</Text> : null}
-            {nivel === 'baixa' ? <Text style={estilos.incentivo}>Continue registrando seus ciclos para que suas previsões fiquem cada vez mais precisas.</Text> : null}
             <Text style={estilos.aviso}>{AVISO_MEDICO}</Text>
         </View>
     );
 }
 
-function ConteudoFase({ conteudo }) {
+function ConteudoFase({ conteudo, fase }) {
     if (!conteudo) return null;
+    const cor = CORES_FASE[fase];
     return (
         <View>
             <View style={estilos.secaoTexto}>
                 <Text style={estilos.tituloSecao}>{conteudo.tituloExplicacao}</Text>
-                <View style={estilos.textoComMarcador}><View style={estilos.marcador} /><Text style={estilos.descricaoFase}>{conteudo.descricao}</Text></View>
+                <View style={estilos.textoComMarcador}><View style={[estilos.marcador, { backgroundColor: cor }]} /><Text style={estilos.descricaoFase}>{conteudo.descricao}</Text></View>
             </View>
             <View style={estilos.secaoSintomas}>
                 <Text style={estilos.tituloSecao}>Sintomas comuns</Text>
                 <View style={estilos.listaSintomas}>
-                    {conteudo.sintomas.map((sintoma) => <View key={sintoma} style={estilos.sintoma}><View style={estilos.marcadorSintoma} /><Text style={estilos.textoSintoma}>{sintoma}</Text></View>)}
+                    {conteudo.sintomas.map((sintoma) => <View key={sintoma} style={estilos.sintoma}><View style={[estilos.marcadorSintoma, { backgroundColor: cor }]} /><Text style={estilos.textoSintoma}>{sintoma}</Text></View>)}
                 </View>
             </View>
             <View style={estilos.secaoDicas}>
                 <Text style={estilos.tituloSecao}>Dicas para hoje</Text>
-                {conteudo.dicas.map((dica, indice) => <View key={dica} style={estilos.dica}><View style={estilos.numeroDica}><Text style={estilos.textoNumeroDica}>{indice + 1}</Text></View><Text style={estilos.textoDica}>{dica}</Text></View>)}
+                {conteudo.dicas.map((dica, indice) => <View key={dica} style={estilos.dica}><View style={estilos.numeroDica}><Text style={[estilos.textoNumeroDica, { color: cor }]}>{indice + 1}</Text></View><Text style={estilos.textoDica}>{dica}</Text></View>)}
             </View>
         </View>
     );
@@ -142,7 +141,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
             <View style={estilos.cartaoIntroducao}>
                 <FormaProvisoria compacta />
                 <Text style={estilos.tituloSemCiclo}>Conheça seu ciclo</Text>
-                <Text style={estilos.descricaoSemCiclo}>Registre sua menstruação para acompanhar as fases do ciclo e visualizar suas estimativas.</Text>
+                <Text style={estilos.descricaoSemCiclo}>Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo.</Text>
                 <View style={estilos.acoesSemCiclo}>
                     <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque pesoIcone="fill" aoPressionar={aoCadastrarMenstruacao} />
                     <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
@@ -151,7 +150,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
             </View>
             <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
             <View style={estilos.recursos}>
-                {RECURSOS_SEM_CICLO.map(({ titulo, descricao, Icone }) => <View key={titulo} style={estilos.recurso}><View style={estilos.iconeRecurso}><Icone size={21} color="#C85A44" /></View><View style={estilos.textoRecurso}><Text style={estilos.tituloRecurso}>{titulo}</Text><Text style={estilos.descricaoRecurso}>{descricao}</Text></View></View>)}
+                {RECURSOS_SEM_CICLO.map(({ titulo, descricao, Icone, cor }) => <View key={titulo} style={estilos.recurso}><View style={estilos.iconeRecurso}><Icone size={20} color={cor} /></View><View style={estilos.textoRecurso}><Text style={estilos.tituloRecurso}>{titulo}</Text><Text style={estilos.descricaoRecurso}>{descricao}</Text></View></View>)}
             </View>
         </View>
     );
@@ -161,14 +160,24 @@ function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, previsao, conteud
     if (!previsao) return <EstadoSemCiclo aoCadastrarMenstruacao={aoCadastrarMenstruacao} aoAbrirDiario={aoAbrirDiario} aoAbrirAnticoncepcional={aoAbrirAnticoncepcional} />;
     return (
         <View style={estilos.conteudo}>
-            <View style={estilos.heroiFase}><FormaProvisoria /><Text accessibilityRole="header" style={estilos.tituloFase}>{ROTULOS[fase]}</Text>{diaCiclo ? <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text> : null}</View>
+            <View style={[estilos.heroiFase, (fase === 'folicular' || fase === 'ovulatoria') && estilos.heroiFaseFertil]}>
+                <FormaProvisoria fase={fase} />
+                <Text accessibilityRole="header" style={estilos.tituloFase}>{ROTULOS[fase]}</Text>
+                {diaCiclo ? <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text> : null}
+                {fase === 'folicular' || fase === 'ovulatoria' ? (
+                    <View style={[estilos.destaqueFertil, { borderColor: CORES_FASE[fase] }]}>
+                        <View style={estilos.iconeDestaqueFertil}><SparkleIcon size={22} color={CORES_FASE[fase]} weight="fill" /></View>
+                        <View><Text style={estilos.tituloDestaqueFertil}>Janela fértil</Text><Text style={estilos.textoDestaqueFertil}>Você está na janela fértil.</Text></View>
+                    </View>
+                ) : null}
+            </View>
             <View style={estilos.acoes}>
                 <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque pesoIcone="fill" aoPressionar={aoCadastrarMenstruacao} />
                 <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
                 <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
             </View>
             <PainelPrevisao previsao={previsao} />
-            <ConteudoFase conteudo={conteudoDaFase} />
+            <ConteudoFase conteudo={conteudoDaFase} fase={fase} />
         </View>
     );
 }
