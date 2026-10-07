@@ -1,11 +1,12 @@
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CalendarBlankIcon } from '../../../shared/components/icons/AppIcons';
+import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { cores } from '../../../shared/theme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleForecastPanel } from '../components/CycleForecastPanel';
-import { PredictionErrorModal } from '../components/PredictionErrorModal';
 import { conteudoPorFase } from '../constants/phaseContent';
 import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { estilos } from './CycleTodayScreen.styles';
@@ -20,16 +21,19 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
     const semDados = previsao?.status === 'DADOS_INSUFICIENTES';
 
     return (
-        <SafeAreaView edges={['top']} style={estilos.tela}>
+        <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
             {carregando ? (
                 <View style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
             ) : (
                 <ScrollView contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
                     <View style={estilos.cabecalho}>
                         <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                        <Pressable accessibilityRole="button" accessibilityLabel="Abrir calendário" onPress={aoAbrirCalendario} style={estilos.botaoCalendario}>
-                            <CalendarBlankIcon size={22} color={cores.neutras.textoSecundarioClaro} />
-                        </Pressable>
+                        <IconButton
+                            icone={CalendarBlankIcon}
+                            aoPressionar={aoAbrirCalendario}
+                            rotuloAcessibilidade="Abrir calendário"
+                            variante="selecionado"
+                        />
                     </View>
                     {dias.length ? <CycleDateStrip dias={dias} dataSelecionada={referencia} aoSelecionarData={aoSelecionarData} /> : null}
                     <CycleForecastPanel
@@ -44,7 +48,16 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
                 </ScrollView>
             )}
             <BottomTabBar abaAtiva="inicio" insetInferior={insets.bottom} onSelecionar={aoSelecionarAba} />
-            <PredictionErrorModal visivel={erro} aoTentarNovamente={aoTentarNovamente} aoVoltar={aoVoltar} />
+            <SimpleModal
+                visivel={erro}
+                aoFechar={aoVoltar}
+                icone={WarningCircleIcon}
+                corIcone="#B43D3D"
+                titulo="Algo deu errado"
+                mensagem="Não foi possível carregar sua previsão no momento. Tente novamente."
+                acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: aoTentarNovamente }}
+                acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: aoVoltar }}
+            />
         </SafeAreaView>
     );
 }
