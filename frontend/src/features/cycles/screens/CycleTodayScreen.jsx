@@ -1,5 +1,6 @@
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
-import { CalendarBlankIcon } from 'phosphor-react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CalendarBlankIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { cores } from '../../../shared/theme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
@@ -10,6 +11,7 @@ import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresen
 import { estilos } from './CycleTodayScreen.styles';
 
 function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional, aoAbrirCalendario, aoSelecionarAba }) {
+    const insets = useSafeAreaInsets();
     const referencia = dataSelecionada || previsao?.dataReferencia;
     const fases = previsao?.fasesEstimadas;
     const fase = referencia ? obterFase(referencia, fases) : 'desconhecida';
@@ -18,17 +20,17 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
     const semDados = previsao?.status === 'DADOS_INSUFICIENTES';
 
     return (
-        <View style={estilos.tela}>
-            <View style={estilos.cabecalho}>
-                <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                <Pressable accessibilityRole="button" accessibilityLabel="Abrir calendário" onPress={aoAbrirCalendario} style={estilos.botaoCalendario}>
-                    <CalendarBlankIcon size={22} color={cores.neutras.textoPrincipalClaro} />
-                </Pressable>
-            </View>
+        <SafeAreaView edges={['top']} style={estilos.tela}>
             {carregando ? (
                 <View style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
             ) : (
                 <ScrollView contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
+                    <View style={estilos.cabecalho}>
+                        <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
+                        <Pressable accessibilityRole="button" accessibilityLabel="Abrir calendário" onPress={aoAbrirCalendario} style={estilos.botaoCalendario}>
+                            <CalendarBlankIcon size={22} color={cores.neutras.textoSecundarioClaro} />
+                        </Pressable>
+                    </View>
                     {dias.length ? <CycleDateStrip dias={dias} dataSelecionada={referencia} aoSelecionarData={aoSelecionarData} /> : null}
                     <CycleForecastPanel
                         fase={fase}
@@ -41,9 +43,9 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
                     />
                 </ScrollView>
             )}
-            <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
+            <BottomTabBar abaAtiva="inicio" insetInferior={insets.bottom} onSelecionar={aoSelecionarAba} />
             <PredictionErrorModal visivel={erro} aoTentarNovamente={aoTentarNovamente} aoVoltar={aoVoltar} />
-        </View>
+        </SafeAreaView>
     );
 }
 

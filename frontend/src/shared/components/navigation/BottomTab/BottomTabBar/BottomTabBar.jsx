@@ -38,7 +38,7 @@ const abas = [
     }
 ]
 
-function BottomTabBar({ abaAtiva, onSelecionar }) {
+function BottomTabBar({ abaAtiva, insetInferior = 0, onSelecionar }) {
     function renderizarAba(aba) {
         function selecionarAba() {
             onSelecionar?.(aba.id)
@@ -58,7 +58,10 @@ function BottomTabBar({ abaAtiva, onSelecionar }) {
     }
 
     return (
-        <View style={estilos.barra}>
+        <View style={insetInferior > 0 ? [estilos.barra, {
+            height: 66.67 + insetInferior,
+            paddingBottom: insetInferior
+        }] : estilos.barra}>
             {abas.map(renderizarAba)}
         </View>
     )

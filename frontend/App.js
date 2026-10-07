@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppPrincipal from './src/App';
 import { CycleTodayScreen } from './src/features/cycles/screens/CycleTodayScreen';
 
@@ -34,5 +35,9 @@ function AppDemonstracaoHu013() {
 
 export default function App() {
     const demonstrarHu013 = process.env.EXPO_PUBLIC_PREVIEW_HU013 === 'true';
-    return demonstrarHu013 ? <AppDemonstracaoHu013 /> : <AppPrincipal />;
+    return (
+        <SafeAreaProvider>
+            {demonstrarHu013 ? <AppDemonstracaoHu013 /> : <AppPrincipal />}
+        </SafeAreaProvider>
+    );
 }
