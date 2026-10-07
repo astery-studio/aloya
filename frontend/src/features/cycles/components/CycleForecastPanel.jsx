@@ -1,5 +1,15 @@
 import { Pressable, Text, View } from 'react-native';
-import { ArrowsClockwiseIcon, CalendarDotsIcon, DropIcon, HeartbeatIcon, NotePencilIcon, PillIcon, SparkleIcon } from 'phosphor-react-native';
+import {
+    ArrowsClockwiseIcon,
+    CalendarDotsIcon,
+    ChartBarIcon,
+    DropIcon,
+    EggIcon,
+    HeartbeatIcon,
+    PillIcon,
+    SparkleIcon,
+    WarningIcon
+} from '../../../shared/components/icons/AppIcons';
 import { formatarDataLonga } from '../utils/cyclePresentation';
 import { estilos } from './CycleForecastPanel.styles';
 
@@ -12,11 +22,11 @@ const RECURSOS_SEM_CICLO = [
     { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente ao longo do ciclo.', Icone: HeartbeatIcon }
 ];
 
-function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
+function BotaoAcao({ texto, Icone, destaque = false, pesoIcone = 'regular', aoPressionar }) {
     return (
         <Pressable accessibilityRole="button" accessibilityLabel={texto} onPress={aoPressionar} style={[estilos.botaoAcao, destaque ? estilos.botaoPrimario : estilos.botaoSecundario]}>
-            <Icone size={20} color="#FFFFFF" />
-            <Text style={estilos.textoBotao}>{texto}</Text>
+            <Icone size={20} color={destaque ? '#FDF6F3' : '#FFFFFF'} weight={pesoIcone} />
+            <Text style={[estilos.textoBotao, destaque && estilos.textoBotaoDestaque]}>{texto}</Text>
         </Pressable>
     );
 }
@@ -50,11 +60,17 @@ function PainelPrevisao({ previsao }) {
             </View>
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
-                    <Text style={estilos.rotuloPrevisao}>Ovulação</Text>
+                    <View style={estilos.cabecalhoCartaoSecundario}>
+                        <EggIcon size={18} color="#4A758E" />
+                        <Text style={estilos.rotuloPrevisao}>Ovulação</Text>
+                    </View>
                     <Text style={estilos.valorSecundario}>{formatarDataLonga(previsao.dataOvulacaoEstimada)}</Text>
                 </View>
                 <View style={estilos.cartaoSecundario}>
-                    <Text style={estilos.rotuloPrevisao}>Janela fértil</Text>
+                    <View style={estilos.cabecalhoCartaoSecundario}>
+                        <SparkleIcon size={18} color="rgba(34, 34, 34, 0.8)" />
+                        <Text style={estilos.rotuloPrevisao}>Janela fértil</Text>
+                    </View>
                     <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} a ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>
                 </View>
             </View>
@@ -95,8 +111,8 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
                 <Text style={estilos.tituloSemCiclo}>Conheça seu ciclo</Text>
                 <Text style={estilos.descricaoSemCiclo}>Registre sua menstruação para acompanhar as fases do ciclo e visualizar suas estimativas.</Text>
                 <View style={estilos.acoesSemCiclo}>
-                    <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
-                    <BotaoAcao texto="Cadastrar no Diário" Icone={NotePencilIcon} aoPressionar={aoAbrirDiario} />
+                    <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque pesoIcone="fill" aoPressionar={aoCadastrarMenstruacao} />
+                    <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
                     <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
                 </View>
             </View>
@@ -114,8 +130,8 @@ function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, previsao, conteud
         <View style={estilos.conteudo}>
             <View style={estilos.heroiFase}><FormaProvisoria /><Text accessibilityRole="header" style={estilos.tituloFase}>{ROTULOS[fase]}</Text>{diaCiclo ? <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text> : null}</View>
             <View style={estilos.acoes}>
-                <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
-                <BotaoAcao texto="Cadastrar no Diário" Icone={NotePencilIcon} aoPressionar={aoAbrirDiario} />
+                <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque pesoIcone="fill" aoPressionar={aoCadastrarMenstruacao} />
+                <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
                 <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
             </View>
             <PainelPrevisao previsao={previsao} />
