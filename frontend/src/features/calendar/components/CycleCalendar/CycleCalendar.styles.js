@@ -4,6 +4,53 @@ import {StyleSheet} from 'react-native'
 import {cores, fontFamilies} from '../../../../shared/theme'
 
 const estilos = StyleSheet.create({
+    calendario: {
+        flex: 1,
+        backgroundColor: cores.neutras.fundoClaro
+    },
+
+    cabecalhoSemana: {
+        flexDirection: 'row',
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderColor: cores.neutras.bordaClara,
+        backgroundColor: cores.neutras.fundoClaro,
+        zIndex: 4
+    },
+
+    nomeDiaSemana: {
+        flex: 1,
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.semibold,
+        fontSize: 13,
+        lineHeight: 20,
+        textAlign: 'center'
+    },
+
+    lista: {
+        flex: 1
+    },
+
+    conteudoLista: {
+        flexGrow: 1,
+        justifyContent: 'flex-end'
+    },
+
+    carregamentoInicial: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 240
+    },
+
+    carregamentoPaginacao: {
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
     mes: {
         paddingTop: 20,
         paddingHorizontal: 18,
