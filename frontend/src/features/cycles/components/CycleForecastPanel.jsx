@@ -17,7 +17,8 @@ import { estilos } from './CycleForecastPanel.styles';
 
 const AVISO_MEDICO = 'Esta é uma estimativa baseada no seu histórico e não substitui orientação médica nem garante eficácia como método contraceptivo.';
 const ROTULOS = { menstrual: 'Fase Menstrual', folicular: 'Fase Folicular', ovulatoria: 'Fase Ovulatória', lutea: 'Fase Lútea', desconhecida: 'Seu ciclo' };
-const CORES_FASE = { menstrual: '#C85A44', folicular: '#3B7150', ovulatoria: '#4A758E', lutea: '#D68C3A', desconhecida: '#5C5C59' };
+const CORES_FORMA = { menstrual: '#C85A44', folicular: '#3B7150', ovulatoria: '#4A758E', lutea: '#D68C3A', desconhecida: '#5C5C59' };
+const CORES_CONTEUDO = { ...CORES_FORMA, folicular: '#2C4C3B' };
 const RECURSOS_SEM_CICLO = [
     { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: '#2C4C3B' },
     { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: '#D68C3A' },
@@ -40,7 +41,7 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
 
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
     const comContorno = fase === 'folicular' || fase === 'ovulatoria';
-    const cor = CORES_FASE[fase];
+    const cor = CORES_FORMA[fase];
     return (
         <View accessibilityLabel="Símbolo provisório da fase" style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
             {comContorno ? <View style={[estilos.formaInterna, compacta && estilos.formaInternaCompacta, { borderColor: cor }]} /> : null}
@@ -49,9 +50,9 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
     );
 }
 
-function PainelPrevisao({ previsao }) {
+function PainelPrevisao({ previsao, janelaFertil }) {
     const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
-    const janela = previsao.janelaFertilEstimada;
+    const janela = janelaFertil ?? previsao.janelaFertilEstimada;
     const incerta = previsao.status === 'PARCIALMENTE_DISPONIVEL';
 
     return (
@@ -91,7 +92,7 @@ function PainelPrevisao({ previsao }) {
                         <SparkleIcon size={18} color="rgba(34, 34, 34, 0.8)" />
                         <Text style={estilos.rotuloPrevisao}>Janela fértil</Text>
                     </View>
-                    <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} a ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>
+                    <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} até ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>
                 </View>
             </View>
             <Text style={estilos.aviso}>{AVISO_MEDICO}</Text>
@@ -101,7 +102,7 @@ function PainelPrevisao({ previsao }) {
 
 function ConteudoFase({ conteudo, fase }) {
     if (!conteudo) return null;
-    const cor = CORES_FASE[fase];
+    const cor = CORES_CONTEUDO[fase];
     return (
         <View>
             <View style={estilos.secaoTexto}>
@@ -148,17 +149,18 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
     );
 }
 
-function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, previsao, conteudoDaFase, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
+function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, janelaFertil, previsao, conteudoDaFase, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
     if (!previsao) return <EstadoSemCiclo aoCadastrarMenstruacao={aoCadastrarMenstruacao} aoAbrirDiario={aoAbrirDiario} aoAbrirAnticoncepcional={aoAbrirAnticoncepcional} />;
+    const faseAtual = Object.hasOwn(ROTULOS, fase) ? fase : 'desconhecida';
     return (
         <View style={estilos.conteudo}>
-            <View style={[estilos.heroiFase, (fase === 'folicular' || fase === 'ovulatoria') && estilos.heroiFaseFertil]}>
-                <FormaProvisoria fase={fase} />
-                <Text accessibilityRole="header" style={estilos.tituloFase}>{ROTULOS[fase]}</Text>
+            <View style={[estilos.heroiFase, (faseAtual === 'folicular' || faseAtual === 'ovulatoria') && estilos.heroiFaseFertil]}>
+                <FormaProvisoria fase={faseAtual} />
+                <Text accessibilityRole="header" style={estilos.tituloFase}>{ROTULOS[faseAtual]}</Text>
                 {diaCiclo ? <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text> : null}
-                {fase === 'folicular' || fase === 'ovulatoria' ? (
-                    <View style={[estilos.destaqueFertil, { borderColor: CORES_FASE[fase] }]}>
-                        <View style={estilos.iconeDestaqueFertil}><SparkleIcon size={22} color={CORES_FASE[fase]} weight="fill" /></View>
+                {faseAtual === 'folicular' || faseAtual === 'ovulatoria' ? (
+                    <View style={[estilos.destaqueFertil, { borderColor: CORES_FORMA[faseAtual] }]}>
+                        <View style={estilos.iconeDestaqueFertil}><SparkleIcon size={22} color={CORES_FORMA[faseAtual]} weight="fill" /></View>
                         <View><Text style={estilos.tituloDestaqueFertil}>Janela fértil</Text><Text style={estilos.textoDestaqueFertil}>Você está na janela fértil.</Text></View>
                     </View>
                 ) : null}
@@ -168,8 +170,8 @@ function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, previsao, conteud
                 <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
                 <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
             </View>
-            <PainelPrevisao previsao={previsao} />
-            <ConteudoFase conteudo={conteudoDaFase} fase={fase} />
+            <PainelPrevisao previsao={previsao} janelaFertil={janelaFertil} />
+            <ConteudoFase conteudo={conteudoDaFase} fase={faseAtual} />
         </View>
     );
 }
