@@ -7,6 +7,7 @@ const estilos = StyleSheet.create({
     heroiFaseFertil: { height: 454.67 },
     formaProvisoria: { width: 260, height: 304, alignItems: 'center', justifyContent: 'center', paddingVertical: 12 },
     formaInterna: { position: 'absolute', top: 25, width: 234, height: 234, borderRadius: 117, borderWidth: 1.95, borderStyle: 'dashed', opacity: 0.4 },
+    iconeForma: { alignItems: 'center', justifyContent: 'center', opacity: 0.9 },
     sombraForma: { position: 'absolute', width: 135.2, height: 23.4, left: 62.4, top: 237.5, borderRadius: 999, opacity: 0.1 },
     formaProvisoriaCompacta: { width: 190, height: 200, paddingVertical: 5 },
     formaInternaCompacta: { top: 14.5, width: 171, height: 171, borderRadius: 86 },

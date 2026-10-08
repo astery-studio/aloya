@@ -8,6 +8,7 @@ import {
     DropIcon,
     EggIcon,
     HeartbeatIcon,
+    MoonIcon,
     PillIcon,
     SparkleIcon,
     WarningIcon
@@ -19,6 +20,13 @@ const AVISO_MEDICO = 'Esta é uma estimativa baseada no seu histórico e não su
 const ROTULOS = { menstrual: 'Fase Menstrual', folicular: 'Fase Folicular', ovulatoria: 'Fase Ovulatória', lutea: 'Fase Lútea', desconhecida: 'Seu ciclo' };
 const CORES_FORMA = { menstrual: '#C85A44', folicular: '#3B7150', ovulatoria: '#4A758E', lutea: '#D68C3A', desconhecida: '#5C5C59' };
 const CORES_CONTEUDO = { ...CORES_FORMA, folicular: '#2C4C3B' };
+const ICONES_FASE = {
+    menstrual: DropIcon,
+    folicular: SparkleIcon,
+    ovulatoria: EggIcon,
+    lutea: MoonIcon,
+    desconhecida: ArrowsClockwiseIcon
+};
 const RECURSOS_SEM_CICLO = [
     { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: '#2C4C3B' },
     { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: '#D68C3A' },
@@ -42,9 +50,13 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
     const comContorno = fase === 'folicular' || fase === 'ovulatoria';
     const cor = CORES_FORMA[fase];
+    const IconeFase = ICONES_FASE[fase];
     return (
-        <View accessibilityLabel="Símbolo provisório da fase" style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
+        <View accessibilityLabel={`Símbolo provisório: ${ROTULOS[fase]}`} style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
             {comContorno ? <View style={[estilos.formaInterna, compacta && estilos.formaInternaCompacta, { borderColor: cor }]} /> : null}
+            <View style={estilos.iconeForma}>
+                <IconeFase size={compacta ? 72 : 104} color={cor} weight="duotone" />
+            </View>
             <View style={[estilos.sombraForma, compacta && estilos.sombraFormaCompacta, { backgroundColor: cor }]} />
         </View>
     );
