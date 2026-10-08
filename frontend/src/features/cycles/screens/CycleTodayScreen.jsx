@@ -43,7 +43,7 @@ function CycleTodayScreen({
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
             ) : (
-                <ScrollView contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
+                <ScrollView style={estilos.areaRolagem} contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
                     <View style={estilos.cabecalho}>
                         <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
                         <IconButton
@@ -66,7 +66,9 @@ function CycleTodayScreen({
                     />
                 </ScrollView>
             )}
-            <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
+            <SafeAreaView edges={['bottom', 'left', 'right']} style={estilos.navegacao}>
+                <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
+            </SafeAreaView>
             <SimpleModal
                 visivel={!carregando && Boolean(tipoErro)}
                 aoFechar={aoVoltar}
