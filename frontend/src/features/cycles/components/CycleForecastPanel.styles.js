@@ -10,7 +10,6 @@ const estilos = StyleSheet.create({
     iconeForma: { alignItems: 'center', justifyContent: 'center', opacity: 0.9 },
     sombraForma: { position: 'absolute', width: 135.2, height: 23.4, left: 62.4, top: 237.5, borderRadius: radius.circular, opacity: 0.1 },
     formaProvisoriaCompacta: { width: 190, height: 200, paddingVertical: 5 },
-    formaInternaCompacta: { top: 14.5, width: 171, height: 171, borderRadius: 86 },
     sombraFormaCompacta: { width: 98.8, height: 17.1, left: 45.6, top: 171.25 },
     tituloFase: { color: cores.neutras.textoPrincipalClaro, fontFamily: fontFamilies.bold, fontSize: 28, lineHeight: 35, textAlign: 'center' },
     diaCiclo: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 16, lineHeight: 24, marginTop: 4 },

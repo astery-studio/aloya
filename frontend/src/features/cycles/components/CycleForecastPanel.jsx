@@ -54,7 +54,7 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
     const IconeFase = ICONES_FASE[fase];
     return (
         <View accessibilityLabel={`Símbolo provisório: ${ROTULOS[fase]}`} style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
-            {comContorno ? <View style={[estilos.formaInterna, compacta && estilos.formaInternaCompacta, { borderColor: cor }]} /> : null}
+            {comContorno ? <View style={[estilos.formaInterna, { borderColor: cor }]} /> : null}
             <View style={estilos.iconeForma}>
                 <IconeFase size={compacta ? 72 : 104} color={cor} weight="duotone" />
             </View>

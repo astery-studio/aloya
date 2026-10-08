@@ -65,3 +65,45 @@ test('executa as três ações do painel com previsão', async () => {
     expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
 });
+
+test('prioriza a janela fértil recebida por prop e aceita confiança média', async () => {
+    const janelaFertil = { inicio: '2026-09-08', fim: '2026-09-14' };
+    await render(
+        <CycleForecastPanel
+            previsao={{ ...previsao, confiabilidadeMenstrual: { nivel: 'MEDIA' } }}
+            janelaFertil={janelaFertil}
+        />
+    );
+
+    expect(screen.getByText('Média')).toBeOnTheScreen();
+    expect(screen.getByText('8 de setembro até 14 de setembro')).toBeOnTheScreen();
+    expect(screen.queryByText('Estimativa incerta')).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Continue registrando seus ciclos/)).not.toBeOnTheScreen();
+});
+
+test('explica previsão parcial sem confiança nem janela fértil', async () => {
+    await render(
+        <CycleForecastPanel
+            previsao={{
+                ...previsao,
+                status: 'PARCIALMENTE_DISPONIVEL',
+                confiabilidadeMenstrual: undefined,
+                janelaFertilEstimada: undefined
+            }}
+        />
+    );
+
+    expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
+    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toBeOnTheScreen();
+    expect(screen.getByText('Indisponível')).toBeOnTheScreen();
+    expect(screen.getByText('Baixa')).toBeOnTheScreen();
+});
+
+test('trata fase inválida como ciclo desconhecido', async () => {
+    await render(<CycleForecastPanel fase="inexistente" previsao={previsao} />);
+
+    expect(screen.getByText('Seu ciclo')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Símbolo provisório: Seu ciclo')).toBeOnTheScreen();
+    expect(screen.queryByText(/Dia \d+ do ciclo/)).not.toBeOnTheScreen();
+    expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
+});
