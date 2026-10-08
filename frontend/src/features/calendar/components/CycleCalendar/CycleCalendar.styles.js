@@ -1,35 +1,49 @@
+//Centraliza os estilos visuais dos componentes do calendário.
 import {StyleSheet} from 'react-native'
-import {tema} from '../../../../shared/theme/theme'
+import {cores, fontFamilies} from '../../../../shared/theme'
 
-const COR_TEXTO = '#222222'
-const COR_TEXTO_SECUNDARIO = '#5C5C59'
-const COR_DIVISAO = '#EDEAE4'
 const COR_JANELA_FERTIL = 'rgba(34, 34, 34, 0.70)'
 
-export const estilos = StyleSheet.create({
-    container: {
+const estilos = StyleSheet.create({
+    calendario: {
         flex: 1,
-        backgroundColor: tema.cores.fundo
+        backgroundColor: cores.neutras.fundoClaro
     },
     cabecalhoSemana: {
         flexDirection: 'row',
         paddingHorizontal: 8,
-        paddingVertical: 10
+        paddingVertical: 10,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderColor: cores.neutras.bordaClara,
+        backgroundColor: cores.neutras.fundoClaro,
+        zIndex: 4
     },
     nomeDiaSemana: {
         flex: 1,
-        color: COR_TEXTO_SECUNDARIO,
-        fontFamily: tema.fontes.familia,
-        fontSize: 12,
-        fontWeight: '500',
-        lineHeight: 18,
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.semibold,
+        fontSize: 13,
+        lineHeight: 20,
         textAlign: 'center'
     },
     lista: {
         flex: 1
     },
     conteudoLista: {
-        paddingBottom: 24
+        flexGrow: 1,
+        justifyContent: 'flex-end'
+    },
+    carregamentoInicial: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 240
+    },
+    carregamentoPaginacao: {
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     mes: {
         paddingHorizontal: 8
@@ -45,16 +59,16 @@ export const estilos = StyleSheet.create({
         marginBottom: 8
     },
     nomeMes: {
-        color: COR_TEXTO,
-        fontFamily: tema.fontes.familia,
+        color: '#222222',
+        fontFamily: fontFamilies.bold,
         fontSize: 15,
         fontStyle: 'normal',
         fontWeight: '700',
         lineHeight: 22.5
     },
     anoMes: {
-        color: COR_TEXTO_SECUNDARIO,
-        fontFamily: tema.fontes.familia,
+        color: '#5C5C59',
+        fontFamily: fontFamilies.regular,
         fontSize: 12,
         fontStyle: 'normal',
         fontWeight: '400',
@@ -64,21 +78,28 @@ export const estilos = StyleSheet.create({
         alignSelf: 'stretch',
         height: 0.991,
         marginTop: 8,
-        backgroundColor: COR_DIVISAO
+        backgroundColor: '#EDEAE4'
     },
     semana: {
         position: 'relative',
         flexDirection: 'row',
+        width: '100%',
         height: 53.99
     },
     celulaDia: {
-        position: 'relative',
         flex: 1,
         height: 53.99,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'flex-start'
+    },
+    conteudoDia: {
+        flex: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 2
     },
     segmentoDia: {
         position: 'absolute',
@@ -97,54 +118,27 @@ export const estilos = StyleSheet.create({
         borderTopRightRadius: 99,
         borderBottomRightRadius: 99
     },
-    segmentoPrevisto: {
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        borderColor: 'rgba(34, 34, 34, 0.42)'
-    },
-    menstruacaoAtual: {
-        backgroundColor: 'rgba(200, 90, 68, 0.90)'
-    },
-    menstruacaoPrevista: {
-        backgroundColor: 'rgba(200, 90, 68, 0.58)'
-    },
-    folicularAtual: {
-        backgroundColor: 'rgba(44, 76, 59, 0.90)'
-    },
-    folicularPrevista: {
-        backgroundColor: 'rgba(44, 76, 59, 0.58)'
-    },
-    ovulatoriaAtual: {
-        backgroundColor: 'rgba(74, 117, 142, 0.90)'
-    },
-    ovulatoriaPrevista: {
-        backgroundColor: 'rgba(74, 117, 142, 0.58)'
-    },
-    luteaAtual: {
-        backgroundColor: 'rgba(214, 140, 58, 0.90)'
-    },
-    luteaPrevista: {
-        backgroundColor: 'rgba(214, 140, 58, 0.58)'
-    },
-    conteudoDia: {
-        zIndex: 2,
-        width: '100%',
-        height: '100%',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    containerIconeDia: {
+    iconeDia: {
         flexDirection: 'row',
         width: '100%',
         height: 10.992,
+        marginBottom: 3,
         justifyContent: 'center',
         alignItems: 'flex-start'
     },
     numeroDia: {
         color: 'rgba(34, 34, 34, 0.70)',
         textAlign: 'center',
-        fontFamily: tema.fontes.familia,
+        fontFamily: fontFamilies.regular,
+        fontSize: 13,
+        fontStyle: 'normal',
+        fontWeight: '400',
+        lineHeight: 13
+    },
+    numeroDiaMarcado: {
+        color: '#FFFFFF',
+        textAlign: 'center',
+        fontFamily: fontFamilies.regular,
         fontSize: 13,
         fontStyle: 'normal',
         fontWeight: '400',
@@ -153,18 +147,8 @@ export const estilos = StyleSheet.create({
     numeroDiaFuturo: {
         color: 'rgba(34, 34, 34, 0.28)'
     },
-    numeroDiaMarcado: {
-        color: '#FFFFFF',
-        textAlign: 'center',
-        fontFamily: tema.fontes.familia,
-        fontSize: 13,
-        fontStyle: 'normal',
-        fontWeight: '700',
-        lineHeight: 13
-    },
     trechoJanelaFertil: {
         position: 'absolute',
-        zIndex: 3,
         top: 0,
         bottom: 0,
         borderTopWidth: 2,
@@ -172,21 +156,48 @@ export const estilos = StyleSheet.create({
         borderBottomWidth: 2,
         borderLeftWidth: 2,
         borderStyle: 'dashed',
-        borderColor: COR_JANELA_FERTIL,
-        borderRadius: 16
+        borderRadius: 16,
+        zIndex: 3
     },
-    trechoJanelaFertilPrevisto: {
+    janelaFertilAtual: {
+        borderColor: COR_JANELA_FERTIL
+    },
+    janelaFertilPrevista: {
         borderColor: 'rgba(34, 34, 34, 0.42)'
     },
-    carregamentoCentral: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 32
-    },
-    carregamentoPaginacao: {
-        paddingVertical: 14,
-        alignItems: 'center',
-        justifyContent: 'center'
+    pressionado: {
+        opacity: 0.72
     }
 })
+
+const estilosTipos = StyleSheet.create({
+    menstruacao: {
+        backgroundColor: 'rgba(200, 90, 68, 0.90)'
+    },
+    folicular: {
+        backgroundColor: 'rgba(44, 76, 59, 0.90)'
+    },
+    ovulacao: {
+        backgroundColor: 'rgba(74, 117, 142, 0.90)'
+    },
+    lutea: {
+        backgroundColor: 'rgba(214, 140, 58, 0.90)'
+    }
+})
+
+const estilosTiposPrevistos = StyleSheet.create({
+    menstruacao: {
+        backgroundColor: 'rgba(200, 90, 68, 0.58)'
+    },
+    folicular: {
+        backgroundColor: 'rgba(44, 76, 59, 0.56)'
+    },
+    ovulacao: {
+        backgroundColor: 'rgba(74, 117, 142, 0.56)'
+    },
+    lutea: {
+        backgroundColor: 'rgba(214, 140, 58, 0.58)'
+    }
+})
+
+export {estilos, estilosTipos, estilosTiposPrevistos}

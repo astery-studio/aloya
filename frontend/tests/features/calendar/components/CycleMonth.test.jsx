@@ -1,40 +1,74 @@
-import React from 'react'
-import {render, screen} from '@testing-library/react-native'
+//Testa o cabeçalho, a grade e as interações de um mês completo.
+import {fireEvent, render, screen} from '@testing-library/react-native'
 import {CycleMonth} from '../../../../src/features/calendar/components/CycleCalendar/CycleMonth'
-import {estilos} from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar.styles'
 import {normalizarMes} from '../../../../src/features/calendar/utils/cycleCalendar.utils'
 
-const mes = normalizarMes({
-    ano: 2026,
-    mes: 10,
-    dias: []
-})
+function criarMes(alteracoes = {}) {
+    return normalizarMes({
+        mes: '2026-10',
+        possuiCiclos: true,
+        diasMenstruacao: [],
+        previsao: null,
+        ...alteracoes
+    }, '2026-10-03')
+}
 
 describe('CycleMonth', () => {
-    test('mostra o cabeçalho do mês com mês e ano separados', () => {
-        render(<CycleMonth mes={mes} />)
+    test('mostra o nome, o ano e todos os dias do mês', async () => {
+        await render(<CycleMonth mes={criarMes()} />)
 
-        expect(screen.getByText('Outubro')).toHaveStyle(estilos.nomeMes)
-        expect(screen.getByText('2026')).toHaveStyle(estilos.anoMes)
+        expect(screen.getByRole('header', {name: 'Outubro de 2026'})).toBeOnTheScreen()
+        expect(screen.getByText('Outubro')).toBeOnTheScreen()
+        expect(screen.getByText('2026')).toBeOnTheScreen()
+        expect(screen.getByText('1')).toBeOnTheScreen()
+        expect(screen.getByText('31')).toBeOnTheScreen()
+        expect(screen.getByTestId('mes-2026-10')).toBeOnTheScreen()
+        expect(screen.getByTestId('divisor-mes-2026-10')).toBeOnTheScreen()
     })
 
-    test('monta todas as semanas necessárias para o mês', () => {
-        render(<CycleMonth mes={mes} />)
+    test('mostra cinco semanas para outubro de 2026', async () => {
+        const mes = criarMes()
+        const resultado = await render(<CycleMonth mes={mes} />)
+        const arvore = resultado.toJSON()
 
         expect(mes.semanas).toHaveLength(5)
-        expect(screen.getByLabelText('Dia 1 de Outubro de 2026')).toBeOnTheScreen()
-        expect(screen.getByLabelText('Dia 31 de Outubro de 2026')).toBeOnTheScreen()
+        expect(arvore.children).toHaveLength(7)
     })
 
-    test('mostra a divisão visual depois da grade mensal', () => {
-        render(<CycleMonth mes={mes} />)
+    test('encaminha a edição de uma menstruação registrada', async () => {
+        const aoPressionarDia = jest.fn()
+        const mes = criarMes({
+            diasMenstruacao: [{data: '2026-10-01', registroCicloId: 18}]
+        })
 
-        expect(screen.getByTestId('divisor-mes-2026-10')).toHaveStyle(estilos.divisorMes)
+        await render(<CycleMonth mes={mes} aoPressionarDia={aoPressionarDia} />)
+        fireEvent.press(screen.getByRole('button', {name: 'Dia 1 de outubro de 2026, menstruação registrada'}))
+
+        expect(aoPressionarDia).toHaveBeenCalledTimes(1)
+        expect(aoPressionarDia).toHaveBeenCalledWith({data: '2026-10-01', registroCicloId: 18})
     })
 
-    test('não renderiza conteúdo quando o mês é inválido', () => {
-        const {toJSON} = render(<CycleMonth mes={null} />)
+    test('não transforma previsões em botões', async () => {
+        const aoPressionarDia = jest.fn()
+        const mes = criarMes({
+            previsao: {
+                faseFolicular: {
+                    inicio: '2026-10-04',
+                    fim: '2026-10-06'
+                }
+            }
+        })
 
-        expect(toJSON()).toBeNull()
+        await render(<CycleMonth mes={mes} aoPressionarDia={aoPressionarDia} />)
+
+        expect(screen.getByLabelText('Dia 4 de outubro de 2026, provável fase folicular')).toBeOnTheScreen()
+        expect(screen.queryByRole('button')).toBeNull()
+        expect(aoPressionarDia).not.toHaveBeenCalled()
+    })
+
+    test('não quebra quando recebe um mês inválido', async () => {
+        const resultado = await render(<CycleMonth mes={null} />)
+
+        expect(resultado.toJSON()).toBeNull()
     })
 })
