@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayScreen } from '../../../../src/features/cycles/screens/CycleTodayScreen';
+import { estilos } from '../../../../src/features/cycles/screens/CycleTodayScreen.styles';
 
 const previsao = {
     status: 'DISPONIVEL',
@@ -105,4 +106,38 @@ test('apresenta início sem faixa quando ciclo e previsão não existem', async 
 
     expect(screen.queryByLabelText('Datas do ciclo')).not.toBeOnTheScreen();
     expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+});
+
+test('encaminha todas as interações da tela carregada', async () => {
+    const acoes = {
+        aoAbrirCalendario: jest.fn(),
+        aoSelecionarData: jest.fn(),
+        aoSelecionarAba: jest.fn(),
+        aoCadastrarMenstruacao: jest.fn(),
+        aoAbrirDiario: jest.fn(),
+        aoAbrirAnticoncepcional: jest.fn()
+    };
+    await renderizar({ previsao, ...acoes });
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
+    await fireEvent.press(screen.getByRole('tab', { name: 'Ciclos' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
+
+    expect(acoes.aoAbrirCalendario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoSelecionarData).toHaveBeenCalledWith('2026-10-14');
+    expect(acoes.aoSelecionarAba).toHaveBeenCalledWith('ciclos');
+    expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
+});
+
+test('reserva espaço responsivo para conteúdo, cabeçalho e navegação', () => {
+    expect(estilos.areaRolagem).toMatchObject({ flex: 1 });
+    expect(estilos.cabecalho).toMatchObject({ width: '100%', minHeight: 78, paddingTop: 32 });
+    expect(estilos.titulo).toMatchObject({ flexShrink: 1 });
+    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 128 });
+    expect(estilos.navegacao).toMatchObject({ flexShrink: 0 });
 });
