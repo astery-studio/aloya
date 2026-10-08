@@ -104,9 +104,9 @@ const estilos = StyleSheet.create({
     segmentoDia: {
         position: 'absolute',
         top: 3.998,
-        right: 0,
+        right: -0.5,
         bottom: 3.998,
-        left: 0
+        left: -0.5
     },
     inicioSegmento: {
         left: 4.273,
