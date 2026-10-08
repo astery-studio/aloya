@@ -1,135 +1,80 @@
-//Mostra um dia do calendário com fase, previsão e interação acessível.
-import {memo} from 'react'
+import React, {memo} from 'react'
 import {Pressable, Text, View} from 'react-native'
 import {DropIcon} from 'phosphor-react-native/src/icons/Drop'
-import {PlantIcon} from 'phosphor-react-native/src/icons/Plant'
-import {SunIcon} from 'phosphor-react-native/src/icons/Sun'
-import {WaveSineIcon} from 'phosphor-react-native/src/icons/WaveSine'
+import {FlowerLotusIcon} from 'phosphor-react-native/src/icons/FlowerLotus'
+import {LeafIcon} from 'phosphor-react-native/src/icons/Leaf'
+import {WavesIcon} from 'phosphor-react-native/src/icons/Waves'
+import {TIPOS_DIA} from '../../utils/cycleCalendar.utils'
+import {estilos} from './CycleCalendar.styles'
 
-import {NOMES_MESES, TIPOS_DIA} from '../../utils/cycleCalendar.utils'
-import {
-    estilos,
-    estilosTipos,
-    estilosTiposPrevistos
-} from './CycleCalendar.styles'
-
-const iconesPorTipo = Object.freeze({
+const ICONES_POR_TIPO = Object.freeze({
     [TIPOS_DIA.menstruacao]: DropIcon,
-    [TIPOS_DIA.folicular]: PlantIcon,
-    [TIPOS_DIA.ovulacao]: SunIcon,
-    [TIPOS_DIA.lutea]: WaveSineIcon
+    [TIPOS_DIA.folicular]: LeafIcon,
+    [TIPOS_DIA.ovulatoria]: FlowerLotusIcon,
+    [TIPOS_DIA.lutea]: WavesIcon
 })
 
-const rotulosPorTipo = Object.freeze({
-    [TIPOS_DIA.menstruacao]: 'menstruação',
-    [TIPOS_DIA.folicular]: 'fase folicular',
-    [TIPOS_DIA.ovulacao]: 'ovulação',
-    [TIPOS_DIA.lutea]: 'fase lútea'
-})
-
-function criarRotuloAcessibilidade(dia) {
-    const [ano, mes] = dia.data.split('-').map(Number)
-    const partes = [`Dia ${dia.dia} de ${NOMES_MESES[mes - 1].toLowerCase()} de ${ano}`]
-
-    if (dia.registroCicloId) {
-        partes.push('menstruação registrada')
-    } else if (dia.tipo) {
-        partes.push(`${dia.previsto ? 'provável ' : ''}${rotulosPorTipo[dia.tipo]}`)
+const ESTILOS_POR_TIPO = Object.freeze({
+    [TIPOS_DIA.menstruacao]: {
+        atual: estilos.menstruacaoAtual,
+        previsto: estilos.menstruacaoPrevista
+    },
+    [TIPOS_DIA.folicular]: {
+        atual: estilos.folicularAtual,
+        previsto: estilos.folicularPrevista
+    },
+    [TIPOS_DIA.ovulatoria]: {
+        atual: estilos.ovulatoriaAtual,
+        previsto: estilos.ovulatoriaPrevista
+    },
+    [TIPOS_DIA.lutea]: {
+        atual: estilos.luteaAtual,
+        previsto: estilos.luteaPrevista
     }
-
-    if (dia.janelaFertil) partes.push(dia.janelaFertilPrevista ? 'provável janela fértil' : 'janela fértil')
-    if (dia.futuro && !dia.tipo) partes.push('data futura')
-
-    return partes.join(', ')
-}
+})
 
 function ConteudoDia({dia}) {
-    const Icone = dia.tipo ? iconesPorTipo[dia.tipo] : null
+    const Icone = ICONES_POR_TIPO[dia.tipo]
 
     return (
-        <>
+        <View style={estilos.conteudoDia}>
             {Icone ? (
-                <View style={estilos.iconeDia}>
-                    <Icone
-                        size={15}
-                        color="#FFFFFF"
-                        weight="regular"
-                    />
+                <View style={estilos.containerIconeDia}>
+                    <Icone color="#FFFFFF" size={10.992} weight={dia.tipo === TIPOS_DIA.menstruacao ? 'fill' : 'regular'} />
                 </View>
             ) : null}
-
-            <Text
-                style={[
-                    estilos.numeroDia,
-                    dia.tipo && estilos.numeroDiaMarcado,
-                    dia.futuro && !dia.tipo && estilos.numeroDiaFuturo
-                ]}
-            >
-                {dia.dia}
-            </Text>
-        </>
-    )
-}
-
-function CycleDay({dia, aoPressionarDia}) {
-    if (!dia) return <View style={estilos.celulaDia} />
-
-    const interativo = Boolean(dia.registroCicloId && typeof aoPressionarDia === 'function')
-    const estiloTipo = dia.previsto
-        ? estilosTiposPrevistos[dia.tipo]
-        : estilosTipos[dia.tipo]
-    const rotuloAcessibilidade = criarRotuloAcessibilidade(dia)
-
-    function pressionar() {
-        if (!interativo) return
-
-        aoPressionarDia({
-            data: dia.data,
-            registroCicloId: dia.registroCicloId
-        })
-    }
-
-    return (
-        <View style={estilos.celulaDia}>
-            {dia.tipo ? (
-                <View
-                    testID={`fundo-dia-${dia.data}`}
-                    pointerEvents="none"
-                    style={[
-                        estilos.segmentoDia,
-                        estiloTipo,
-                        dia.inicioSegmento && estilos.inicioSegmento,
-                        dia.fimSegmento && estilos.fimSegmento,
-                        !dia.fimSegmento && estilos.separadorSegmento
-                    ]}
-                />
-            ) : null}
-
-            {interativo ? (
-                <Pressable
-                    onPress={pressionar}
-                    accessibilityRole="button"
-                    accessibilityLabel={rotuloAcessibilidade}
-                    style={({pressed}) => [
-                        estilos.conteudoDia,
-                        pressed && estilos.pressionado
-                    ]}
-                >
-                    <ConteudoDia dia={dia} />
-                </Pressable>
-            ) : (
-                <View
-                    accessible
-                    accessibilityLabel={rotuloAcessibilidade}
-                    style={estilos.conteudoDia}
-                >
-                    <ConteudoDia dia={dia} />
-                </View>
-            )}
+            <Text style={dia.tipo ? estilos.numeroDiaMarcado : [estilos.numeroDia, dia.futuro && estilos.numeroDiaFuturo]}>{dia.numero}</Text>
         </View>
     )
 }
 
-const CycleDayMemorizado = memo(CycleDay)
+function CycleDayBase({dia, aoPressionarDia}) {
+    if (!dia) {
+        return <View style={estilos.celulaDia} />
+    }
 
-export {CycleDayMemorizado as CycleDay}
+    const podeEditar = Boolean(dia.editavel && dia.registroCicloId != null && typeof aoPressionarDia === 'function')
+    const estilosTipo = ESTILOS_POR_TIPO[dia.tipo]
+    const estiloMarcacao = estilosTipo ? estilosTipo[dia.previsto ? 'previsto' : 'atual'] : null
+    const rotulo = dia.editavel ? `Dia ${dia.numero} de ${dia.rotuloMes}, menstruação registrada` : `Dia ${dia.numero} de ${dia.rotuloMes}`
+
+    return (
+        <Pressable accessibilityLabel={rotulo} accessibilityRole={podeEditar ? 'button' : 'text'} disabled={!podeEditar} onPress={podeEditar ? () => aoPressionarDia(dia) : undefined} style={estilos.celulaDia}>
+            {dia.tipo ? (
+                <View
+                    pointerEvents="none"
+                    style={[
+                        estilos.segmentoDia,
+                        estiloMarcacao,
+                        dia.inicioSegmento && estilos.inicioSegmento,
+                        dia.fimSegmento && estilos.fimSegmento,
+                        dia.previsto && estilos.segmentoPrevisto
+                    ]}
+                />
+            ) : null}
+            <ConteudoDia dia={dia} />
+        </Pressable>
+    )
+}
+
+export const CycleDay = memo(CycleDayBase)
