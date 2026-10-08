@@ -4,7 +4,8 @@ import {
     useCallback,
     useEffect,
     useMemo,
-    useRef
+    useRef,
+    useState
 } from 'react'
 import {
     ActivityIndicator,
@@ -63,15 +64,15 @@ function CycleCalendar({
     aoPressionarDia
 }) {
     const listaRef = useRef(null)
-    const hojeRef = useRef(obterHojeLocal())
+    const [hoje] = useState(obterHojeLocal)
     const posicionamentoInicialConcluido = useRef(false)
     const usuarioInteragiu = useRef(false)
     const solicitouAnteriores = useRef(false)
     const solicitouPosteriores = useRef(false)
 
     const mesesNormalizados = useMemo(
-        () => normalizarMeses(meses, hojeRef.current),
-        [meses]
+        () => normalizarMeses(meses, hoje),
+        [hoje, meses]
     )
 
     useEffect(() => {

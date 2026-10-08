@@ -4,7 +4,7 @@ import {
     render
 } from '@testing-library/react-native'
 
-import CycleCalendar from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar'
+import {CycleCalendar} from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar'
 
 function criarMes(chave, alteracoes = {}) {
     return {
