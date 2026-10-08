@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayScreen } from '../../../../src/features/cycles/screens/CycleTodayScreen';
 
@@ -63,5 +63,46 @@ test('mantém a faixa de datas no estado sem dados', async () => {
     await renderizar({ previsao: { ...previsao, status: 'DADOS_INSUFICIENTES' } });
 
     expect(screen.getByLabelText('Datas do ciclo')).toBeOnTheScreen();
+    expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+});
+
+test('permite repetir ou fechar o erro de previsão', async () => {
+    const aoTentarNovamente = jest.fn();
+    const aoVoltar = jest.fn();
+    await renderizar({ erroPrevisao: true, aoTentarNovamente, aoVoltar });
+
+    expect(screen.getByText('Algo deu errado')).toBeOnTheScreen();
+    expect(screen.getByText(/Não foi possível carregar sua previsão/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+
+    expect(aoTentarNovamente).toHaveBeenCalledTimes(1);
+    expect(aoVoltar).toHaveBeenCalledTimes(1);
+});
+
+test('prioriza o erro de sincronização quando ambos são informados', async () => {
+    await renderizar({ erroPrevisao: true, erroSincronizacao: true });
+
+    expect(screen.getByText('Falha na sincronização')).toBeOnTheScreen();
+    expect(screen.getByText(/Não foi possível sincronizar seus dados/)).toBeOnTheScreen();
+    expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
+});
+
+test.each([
+    ['fases', previsao.fasesEstimadas],
+    ['fasesEstimadas', previsao.fasesEstimadas]
+])('usa ciclo.%s quando não há previsão', async (propriedade, fases) => {
+    await renderizar({
+        ciclo: { dataReferencia: '2026-10-08', [propriedade]: fases }
+    });
+
+    expect(screen.getByRole('button', { name: 'qui, dia 8' }).props.accessibilityState.selected).toBe(true);
+    expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+});
+
+test('apresenta início sem faixa quando ciclo e previsão não existem', async () => {
+    await renderizar();
+
+    expect(screen.queryByLabelText('Datas do ciclo')).not.toBeOnTheScreen();
     expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
 });
