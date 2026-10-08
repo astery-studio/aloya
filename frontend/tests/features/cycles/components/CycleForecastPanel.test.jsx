@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { CycleForecastPanel } from '../../../../src/features/cycles/components/CycleForecastPanel';
+import { estilos } from '../../../../src/features/cycles/components/CycleForecastPanel.styles';
 import { conteudoPorFase } from '../../../../src/features/cycles/constants/phaseContent';
 
 const previsao = {
@@ -106,4 +107,43 @@ test('trata fase inválida como ciclo desconhecido', async () => {
     expect(screen.getByLabelText('Símbolo provisório: Seu ciclo')).toBeOnTheScreen();
     expect(screen.queryByText(/Dia \d+ do ciclo/)).not.toBeOnTheScreen();
     expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
+});
+
+test('orienta novos registros quando a confiança é baixa', async () => {
+    await render(<CycleForecastPanel previsao={previsao} />);
+
+    expect(screen.getByText(/Continue registrando seus ciclos/)).toBeOnTheScreen();
+    expect(screen.getByText('9 de outubro até 14 de outubro')).toBeOnTheScreen();
+});
+
+test('oferece ações e recursos completos quando ainda não há ciclo', async () => {
+    const acoes = {
+        aoCadastrarMenstruacao: jest.fn(),
+        aoAbrirDiario: jest.fn(),
+        aoAbrirAnticoncepcional: jest.fn()
+    };
+    await render(<CycleForecastPanel {...acoes} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
+
+    expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Fases do ciclo')).toBeOnTheScreen();
+    expect(screen.getByText('Janela fértil')).toBeOnTheScreen();
+    expect(screen.getByText('Próxima menstruação')).toBeOnTheScreen();
+    expect(screen.getByText('Sintomas e bem-estar')).toBeOnTheScreen();
+});
+
+test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
+    expect(estilos.destaqueFertil).toMatchObject({ width: '100%', minHeight: 68 });
+    expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 52 });
+    expect(estilos.dataProximoCiclo).toMatchObject({ flex: 1, minWidth: 140 });
+    expect(estilos.previsoesSecundarias).toMatchObject({ flexWrap: 'wrap' });
+    expect(estilos.cartaoSecundario).toMatchObject({ flex: 1, minWidth: 130 });
+    expect(estilos.sintoma).toMatchObject({ flexGrow: 1, flexBasis: '47%', minWidth: 130 });
+    expect(estilos.cartaoIntroducao).toMatchObject({ minHeight: 666 });
+    expect(estilos.recurso).toMatchObject({ minHeight: 92 });
 });
