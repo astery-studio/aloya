@@ -4,6 +4,35 @@ import {StyleSheet} from 'react-native'
 import {cores, fontFamilies} from '../../../../shared/theme'
 
 const estilos = StyleSheet.create({
+    mes: {
+        paddingTop: 20,
+        paddingHorizontal: 18,
+        paddingBottom: 18,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: cores.neutras.bordaClara
+    },
+
+    cabecalhoMes: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 8,
+        marginBottom: 18
+    },
+
+    nomeMes: {
+        color: cores.neutras.textoPrincipalClaro,
+        fontFamily: fontFamilies.bold,
+        fontSize: 22,
+        lineHeight: 29
+    },
+
+    anoMes: {
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
+        fontSize: 18,
+        lineHeight: 27
+    },
+
     semana: {
         position: 'relative',
         flexDirection: 'row',
