@@ -11,18 +11,37 @@ import { conteudoPorFase } from '../constants/phaseContent';
 import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { estilos } from './CycleTodayScreen.styles';
 
-function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar, aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional, aoAbrirCalendario, aoSelecionarAba }) {
-    const referencia = dataSelecionada || previsao?.dataReferencia;
-    const fases = previsao?.fasesEstimadas;
+const CONFIGURACOES_ERRO = Object.freeze({
+    previsao: Object.freeze({
+        titulo: 'Algo deu errado',
+        mensagem: 'Não foi possível carregar sua previsão no momento. Tente novamente.'
+    }),
+    sincronizacao: Object.freeze({
+        titulo: 'Falha na sincronização',
+        mensagem: 'Não foi possível sincronizar seus dados. Verifique sua conexão e tente novamente.'
+    })
+});
+
+function CycleTodayScreen({
+    ciclo, previsao, conteudoDaFase, janelaFertil, carregando = false,
+    erro = false, erroPrevisao = false, erroSincronizacao = false,
+    dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar,
+    aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional,
+    aoAbrirCalendario, aoSelecionarAba
+}) {
+    const referencia = dataSelecionada || previsao?.dataReferencia || ciclo?.dataReferencia;
+    const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
     const fase = referencia ? obterFase(referencia, fases) : 'desconhecida';
     const dataBaseDaFaixa = previsao?.dataReferencia || referencia;
     const dias = dataBaseDaFaixa ? criarDiasDaFaixa(dataBaseDaFaixa, fases) : [];
-    const semDados = previsao?.status === 'DADOS_INSUFICIENTES';
+    const semDados = !previsao || previsao.status === 'DADOS_INSUFICIENTES';
+    const tipoErro = erroSincronizacao ? 'sincronizacao' : (erroPrevisao || erro ? 'previsao' : null);
+    const configuracaoErro = CONFIGURACOES_ERRO[tipoErro] || CONFIGURACOES_ERRO.previsao;
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
             {carregando ? (
-                <View style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
+                <View accessibilityLiveRegion="polite" style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
             ) : (
                 <ScrollView contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
                     <View style={estilos.cabecalho}>
@@ -38,8 +57,9 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
                     <CycleForecastPanel
                         fase={fase}
                         diaCiclo={obterDiaCiclo(referencia, fases)}
+                        janelaFertil={janelaFertil}
                         previsao={semDados ? null : previsao}
-                        conteudoDaFase={conteudoPorFase[fase]}
+                        conteudoDaFase={conteudoDaFase ?? conteudoPorFase[fase]}
                         aoCadastrarMenstruacao={aoCadastrarMenstruacao}
                         aoAbrirDiario={aoAbrirDiario}
                         aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
@@ -48,12 +68,12 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
             )}
             <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
             <SimpleModal
-                visivel={erro}
+                visivel={!carregando && Boolean(tipoErro)}
                 aoFechar={aoVoltar}
                 icone={WarningCircleIcon}
-                corIcone="#B43D3D"
-                titulo="Algo deu errado"
-                mensagem="Não foi possível carregar sua previsão no momento. Tente novamente."
+                corIcone={cores.feedback.erro}
+                titulo={configuracaoErro.titulo}
+                mensagem={configuracaoErro.mensagem}
                 acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: aoTentarNovamente }}
                 acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: aoVoltar }}
             />
@@ -61,4 +81,4 @@ function CycleTodayScreen({ previsao, carregando = false, erro = false, dataSele
     );
 }
 
-export { CycleTodayScreen };
+export { CONFIGURACOES_ERRO, CycleTodayScreen };
