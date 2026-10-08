@@ -13,13 +13,14 @@ import {
     SparkleIcon,
     WarningIcon
 } from '../../../shared/components/icons/AppIcons';
+import { cores } from '../../../shared/theme';
 import { formatarDataLonga } from '../utils/cyclePresentation';
 import { estilos } from './CycleForecastPanel.styles';
 
 const AVISO_MEDICO = 'Esta é uma estimativa baseada no seu histórico e não substitui orientação médica nem garante eficácia como método contraceptivo.';
 const ROTULOS = { menstrual: 'Fase Menstrual', folicular: 'Fase Folicular', ovulatoria: 'Fase Ovulatória', lutea: 'Fase Lútea', desconhecida: 'Seu ciclo' };
-const CORES_FORMA = { menstrual: '#C85A44', folicular: '#3B7150', ovulatoria: '#4A758E', lutea: '#D68C3A', desconhecida: '#5C5C59' };
-const CORES_CONTEUDO = { ...CORES_FORMA, folicular: '#2C4C3B' };
+const CORES_FORMA = { menstrual: cores.marca.primaria, folicular: cores.ciclo.formaFolicular, ovulatoria: cores.feedback.informacao, lutea: cores.feedback.aviso, desconhecida: cores.neutras.textoSecundarioClaro };
+const CORES_CONTEUDO = { ...CORES_FORMA, folicular: cores.ciclo.conteudoFolicular };
 const ICONES_FASE = {
     menstrual: DropIcon,
     folicular: SparkleIcon,
@@ -28,10 +29,10 @@ const ICONES_FASE = {
     desconhecida: ArrowsClockwiseIcon
 };
 const RECURSOS_SEM_CICLO = [
-    { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: '#2C4C3B' },
-    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: '#D68C3A' },
-    { titulo: 'Próxima menstruação', descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.', Icone: CalendarDotsIcon, cor: '#D68C3A' },
-    { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.', Icone: HeartbeatIcon, cor: '#2C4C3B' }
+    { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: cores.marca.secundaria },
+    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: cores.feedback.aviso },
+    { titulo: 'Próxima menstruação', descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.', Icone: CalendarDotsIcon, cor: cores.feedback.aviso },
+    { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.', Icone: HeartbeatIcon, cor: cores.marca.secundaria }
 ];
 
 function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
@@ -77,7 +78,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 <ConfidenceBadge nivel={nivel} variante="composta" />
                 {incerta ? (
                     <View style={estilos.avisoConfiabilidade}>
-                        <WarningIcon size={18} color="#D68C3A" />
+                        <WarningIcon size={18} color={cores.feedback.aviso} />
                         <View style={estilos.textosAvisoConfiabilidade}>
                             <Text style={estilos.tituloAvisoConfiabilidade}>Estimativa incerta</Text>
                             <Text style={estilos.textoAvisoConfiabilidade}>Os dados deste ciclo podem ser imprecisos.</Text>
@@ -86,7 +87,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 ) : null}
                 {!incerta && nivel === 'baixa' ? (
                     <View style={estilos.avisoConfiabilidade}>
-                        <WarningIcon size={18} color="#D68C3A" />
+                        <WarningIcon size={18} color={cores.feedback.aviso} />
                         <Text style={estilos.textoAvisoBaixa}>Continue registrando seus ciclos para que suas previsões fiquem cada vez mais precisas.</Text>
                     </View>
                 ) : null}
@@ -94,14 +95,14 @@ function PainelPrevisao({ previsao, janelaFertil }) {
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <EggIcon size={18} color="#4A758E" />
+                        <EggIcon size={18} color={cores.feedback.informacao} />
                         <Text style={estilos.rotuloPrevisao}>Ovulação</Text>
                     </View>
                     <Text style={estilos.valorSecundario}>{formatarDataLonga(previsao.dataOvulacaoEstimada)}</Text>
                 </View>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <SparkleIcon size={18} color="rgba(34, 34, 34, 0.8)" />
+                        <SparkleIcon size={18} color={cores.ciclo.iconeEscuro} />
                         <Text style={estilos.rotuloPrevisao}>Janela fértil</Text>
                     </View>
                     <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} até ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>

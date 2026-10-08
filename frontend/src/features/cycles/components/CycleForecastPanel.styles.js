@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { fontFamilies } from '../../../shared/theme';
+import { cores, fontFamilies, radius, shadows } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     conteudo: { paddingTop: 16 },
@@ -8,20 +8,20 @@ const estilos = StyleSheet.create({
     formaProvisoria: { width: 260, height: 304, alignItems: 'center', justifyContent: 'center', paddingVertical: 12 },
     formaInterna: { position: 'absolute', top: 25, width: 234, height: 234, borderRadius: 117, borderWidth: 1.95, borderStyle: 'dashed', opacity: 0.4 },
     iconeForma: { alignItems: 'center', justifyContent: 'center', opacity: 0.9 },
-    sombraForma: { position: 'absolute', width: 135.2, height: 23.4, left: 62.4, top: 237.5, borderRadius: 999, opacity: 0.1 },
+    sombraForma: { position: 'absolute', width: 135.2, height: 23.4, left: 62.4, top: 237.5, borderRadius: radius.circular, opacity: 0.1 },
     formaProvisoriaCompacta: { width: 190, height: 200, paddingVertical: 5 },
     formaInternaCompacta: { top: 14.5, width: 171, height: 171, borderRadius: 86 },
     sombraFormaCompacta: { width: 98.8, height: 17.1, left: 45.6, top: 171.25 },
-    tituloFase: { color: '#222222', fontFamily: fontFamilies.bold, fontSize: 28, lineHeight: 35, textAlign: 'center' },
-    diaCiclo: { color: '#5C5C59', fontFamily: fontFamilies.regular, fontSize: 16, lineHeight: 24, marginTop: 4 },
-    destaqueFertil: { width: 358, height: 67.67, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12, marginTop: 20, borderWidth: 1.33333, borderStyle: 'dashed', borderRadius: 16, backgroundColor: 'rgba(44, 76, 59, 0.03)' },
-    iconeDestaqueFertil: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', borderWidth: 0.666667, borderColor: '#E6E2D8', borderRadius: 12 },
-    tituloDestaqueFertil: { color: '#222222', fontFamily: fontFamilies.bold, fontSize: 14, lineHeight: 21 },
-    textoDestaqueFertil: { color: '#5C5C59', fontFamily: fontFamilies.regular, fontSize: 13, lineHeight: 20 },
+    tituloFase: { color: cores.neutras.textoPrincipalClaro, fontFamily: fontFamilies.bold, fontSize: 28, lineHeight: 35, textAlign: 'center' },
+    diaCiclo: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 16, lineHeight: 24, marginTop: 4 },
+    destaqueFertil: { width: 358, height: 67.67, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12, marginTop: 20, borderWidth: 1.33333, borderStyle: 'dashed', borderRadius: radius.grande, backgroundColor: cores.ciclo.fundoFertil },
+    iconeDestaqueFertil: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: cores.neutras.superficieClara, borderWidth: 0.666667, borderColor: cores.neutras.bordaClara, borderRadius: radius.medio },
+    tituloDestaqueFertil: { color: cores.neutras.textoPrincipalClaro, fontFamily: fontFamilies.bold, fontSize: 14, lineHeight: 21 },
+    textoDestaqueFertil: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 13, lineHeight: 20 },
     acoes: { gap: 12, paddingHorizontal: 16, paddingTop: 32 },
     botaoAcao: { height: 55, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: 12 },
     secaoPrevisao: { paddingHorizontal: 16, paddingTop: 32 },
-    cartaoProximoCiclo: { minHeight: 135.33, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: 20, borderRadius: 24, backgroundColor: '#FFFFFF', borderWidth: 0.666667, borderColor: '#E6E2D8', shadowColor: '#000000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 1 },
+    cartaoProximoCiclo: { minHeight: 135.33, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: 20, borderRadius: radius.cartao, backgroundColor: cores.neutras.superficieClara, borderWidth: 0.666667, borderColor: cores.neutras.bordaClara, ...shadows.cardSuave },
     cartaoProximoCicloComAviso: { minHeight: 197.74 },
     dataProximoCiclo: { width: 164 },
     rotuloPrevisao: { color: '#5C5C59', fontFamily: fontFamilies.bold, fontSize: 12, lineHeight: 18, letterSpacing: 1.2, textTransform: 'uppercase' },
