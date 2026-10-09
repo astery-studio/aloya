@@ -51,9 +51,23 @@ jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
 }))
 
-jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => ({
-    ContraceptiveFlow: jest.fn(() => null)
-}))
+jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => {
+    const React = require('react')
+    const {Pressable, Text, View} = require('react-native')
+
+    return {
+        ContraceptiveFlow: jest.fn(({onVoltar}) => React.createElement(
+            View,
+            null,
+            React.createElement(Text, null, 'Fluxo de anticoncepcionais'),
+            React.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Voltar ao ciclo',
+                onPress: onVoltar
+            })
+        ))
+    }
+})
 
 jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     const React = require('react')

@@ -76,6 +76,7 @@ describe('SettingsScreen', () => {
         expect(screen.getByText('Configurações de Perfil')).toBeOnTheScreen()
         expect(screen.getByText('Meu Ciclo')).toBeOnTheScreen()
         expect(screen.getByText('Parâmetros do Ciclo')).toBeOnTheScreen()
+        expect(screen.queryByRole('button', {name: 'Anticoncepcionais'})).toBeNull()
         expect(screen.getByText('Preferências')).toBeOnTheScreen()
         expect(screen.getByText('Modo noturno')).toBeOnTheScreen()
         expect(screen.getByText('Tela inicial')).toBeOnTheScreen()

@@ -117,6 +117,8 @@ app.use(
             container.authMiddleware.autenticar,
         controller:
             container.contraceptiveController,
+        usoController:
+            container.contraceptiveUsageController,
         edicaoRateLimit:
             container.edicaoAnticoncepcionalRateLimit,
         remocaoRateLimit:

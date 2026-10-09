@@ -2,6 +2,8 @@
 import { AppError } from '../../shared/errors/AppError.js';
 import { calcularPeriodosPausa } from './contraceptive.schedule.js';
 import { apresentarAnticoncepcional } from './contraceptive.presenter.js';
+import { apresentarAnticoncepcionalListagem, ordenarAnticoncepcionaisListagem } from './contraceptive.listing.presenter.js';
+import { validarFusoHorario } from './contraceptiveUsage.validator.js';
 import { sincronizarNotificacoesEdicao } from './contraceptive.notifications.js';
 import {
     validarCadastroAnticoncepcional,
@@ -68,19 +70,31 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
         return apresentarAnticoncepcional(registro, relogio());
     }
 
-    //Lista somente os anticoncepcionais ativos pertencentes à usuária autenticada.
-    async function listar(usuarioId) {
+    //Lista os registros e seus usos sem produzir gravações durante a leitura.
+    async function listar(usuarioId, { incluirRemovidos = false, fusoHorario = 'UTC' } = {}) {
+        const fuso = validarFusoHorario(fusoHorario);
+        const agora = relogio();
         const registros = await prisma.anticoncepcional.findMany({
             where: {
                 usuarioId,
-                ativo: true
+                ...(incluirRemovidos ? {} : { ativo: true })
             },
             orderBy: {
                 criadoEm: 'desc'
+            },
+            include: {
+                usos: {
+                    orderBy: [
+                        { dataUsoProgramado: 'desc' },
+                        { horarioProgramado: 'desc' }
+                    ]
+                }
             }
         });
 
-        return registros.map((registro) => apresentarAnticoncepcional(registro, relogio()));
+        return ordenarAnticoncepcionaisListagem(registros.map((registro) => (
+            apresentarAnticoncepcionalListagem(registro, agora, fuso)
+        )));
     }
 
     //Atualiza somente um anticoncepcional ativo e suas notificações futuras.

@@ -20,7 +20,7 @@ import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
-import { ContraceptiveHuTestAccess } from './features/contraceptives/testing/ContraceptiveHuTestAccess';
+import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
@@ -93,7 +93,6 @@ export default function App() {
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
-    const [origemAnticoncepcionais, setOrigemAnticoncepcionais] = useState(telasInternas.configuracoes)
     const requisicaoAtual = useRef(0)
     const controladorPerfilAtual = useRef(null)
     const apiUrl = obterBaseUrl()
@@ -380,10 +379,7 @@ export default function App() {
         conteudo = <CycleTodayContainer
             service={configuracao.servicos.cyclePredictionService}
             aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-            aoAbrirAnticoncepcional={() => {
-                setOrigemAnticoncepcionais(telasInternas.inicio)
-                setTelaInterna(telasInternas.anticoncepcionais)
-            }}
+            aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
             aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
             aoSelecionarAba={selecionarAba}
             onSessaoExpirada={finalizarSessao} />;
@@ -421,10 +417,6 @@ export default function App() {
         conteudo = (
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
-                onAbrirAnticoncepcionais={() => {
-                    setOrigemAnticoncepcionais(telasInternas.configuracoes)
-                    setTelaInterna(telasInternas.anticoncepcionais)
-                }}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil)
 
@@ -445,9 +437,10 @@ export default function App() {
         )
     } else if (telaInterna === telasInternas.anticoncepcionais) {
         conteudo = (
-            <ContraceptiveHuTestAccess
+            <ContraceptiveFlow
+                key="lista-anticoncepcionais"
                 service={configuracao.servicos.contraceptiveService}
-                onVoltar={() => setTelaInterna(origemAnticoncepcionais)}
+                onVoltar={() => setTelaInterna(telasInternas.inicio)}
                 onSessaoExpirada={finalizarSessao}
             />
         )
