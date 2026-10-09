@@ -57,6 +57,82 @@ test('expande e apresenta registros do histórico em lista', async () => {
     expect(screen.getByText('Confirmado')).toBeOnTheScreen();
 });
 
+test('mantém o conteúdo oculto quando o painel está recolhido', async () => {
+    const aoAlternar = jest.fn();
+    await render(
+        <UsageHistoryPanel
+            registros={[{ id: '1', data: '07/10/2026', horario: '08:00', estado: 'confirmado' }]}
+            aoAlternar={aoAlternar}
+        />
+    );
+
+    const botao = screen.getByRole('button', { name: 'Histórico de uso' });
+    expect(botao.props.accessibilityState).toEqual({ expanded: false });
+    expect(screen.queryByText('07/10/2026')).not.toBeOnTheScreen();
+
+    await fireEvent.press(botao);
+    expect(aoAlternar).toHaveBeenCalledTimes(1);
+});
+
+test('apresenta explicitamente a ausência de confirmação', async () => {
+    await render(
+        <UsageHistoryPanel
+            expandido
+            registros={[{
+                id: '1',
+                data: '04/09/2026',
+                horarioProgramado: '14:00',
+                estado: 'naoConfirmado'
+            }]}
+            aoAlternar={jest.fn()}
+        />
+    );
+
+    expect(screen.getByText('Não confirmado')).toBeOnTheScreen();
+    expect(screen.getByText('Não houve confirmação')).toBeOnTheScreen();
+});
+
+test('mapeia todos os estados de histórico para o StatusBadge correto', async () => {
+    await render(
+        <UsageHistoryPanel
+            expandido
+            registros={[
+                { id: '1', data: '05/09/2026', estado: 'confirmado' },
+                { id: '2', data: '04/09/2026', estado: 'foraDoPrazo' },
+                { id: '3', data: '03/09/2026', estado: 'naoConfirmado' }
+            ]}
+            aoAlternar={jest.fn()}
+        />
+    );
+
+    expect(screen.getByLabelText('Confirmado')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Confirmado fora do prazo')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Não confirmado')).toBeOnTheScreen();
+});
+
+test('reproduz as medidas exatas do painel e dos registros', () => {
+    expect(estilosUso.cabecalhoPainel).toMatchObject({ width: '100%', height: 28, paddingTop: 10 });
+    expect(estilosUso.botaoPainel).toMatchObject({ width: 124.99, height: 18, gap: 4 });
+    expect(estilosUso.tituloPainel).toMatchObject({
+        width: 93,
+        height: 18,
+        fontWeight: '500',
+        fontSize: 12,
+        lineHeight: 18
+    });
+    expect(estilosUso.conteudoPainel).toMatchObject({ paddingTop: 8, paddingHorizontal: 16 });
+    expect(estilosUso.listaRegistros).toMatchObject({ width: '100%', gap: 6 });
+    expect(estilosUso.registro).toMatchObject({
+        width: '100%',
+        height: 95,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        backgroundColor: '#F7F5F0',
+        borderRadius: 10
+    });
+    expect(estilosUso.registroNaoConfirmado).toMatchObject({ height: 91 });
+});
+
 test('apresenta calendário e permite navegar entre meses', async () => {
     const anterior = jest.fn();
     const proximo = jest.fn();
