@@ -47,11 +47,6 @@ function CycleCalendar({
         return mesesNormalizados.length > 0 ? 0 : undefined
     }, [hoje, mesesNormalizados])
 
-    const indiceInicial = useMemo(
-        () => indiceMesAtual == null ? undefined : Math.max(indiceMesAtual - 1, 0),
-        [indiceMesAtual]
-    )
-
     const layoutsMeses = useMemo(() => {
         let deslocamento = 0
 
@@ -127,7 +122,7 @@ function CycleCalendar({
                 renderItem={renderizarMes}
                 keyExtractor={extrairChave}
                 getItemLayout={obterLayoutMes}
-                initialScrollIndex={indiceInicial}
+                initialScrollIndex={indiceMesAtual}
                 style={estilos.lista}
                 contentContainerStyle={estilos.conteudoLista}
                 ListHeaderComponent={carregandoAnteriores ? <IndicadorCarregamento rotulo="Carregando meses anteriores" /> : null}

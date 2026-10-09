@@ -20,7 +20,7 @@ describe('CycleCalendar', () => {
         expect(resultado.queryByTestId('cycle-calendar-list')).toBeNull()
     })
 
-    test('mostra os dias da semana e renderiza o mês atual e o anterior', async () => {
+    test('mostra os dias da semana e inicia no mês atual', async () => {
         const resultado = await render(
             <CycleCalendar
                 meses={[
@@ -39,8 +39,7 @@ describe('CycleCalendar', () => {
             .map((elemento) => elemento.props.accessibilityLabel)
             .filter((rotulo) => rotulo?.includes(' de 2026'))
 
-        expect(mesesRenderizados).toEqual(['Setembro de 2026', 'Outubro de 2026'])
-        expect(resultado.queryByRole('header', {name: 'Agosto de 2026'})).toBeNull()
+        expect(mesesRenderizados).toEqual(['Outubro de 2026'])
     })
 
     test('encaminha a abertura de um ciclo registrado', async () => {
