@@ -72,7 +72,7 @@ describe('useCalendar', () => {
         expect(result.current.carregandoPosteriores).toBe(false)
     })
 
-    test('mantém os meses já carregados quando uma paginação falha e permite tentar novamente', async () => {
+    test('mantém meses visíveis quando a paginação falha e permite tentar novamente', async () => {
         const mesAtual = obterChaveMes()
         const mesAnterior = obterMesAnterior(mesAtual)
         const service = {
@@ -139,12 +139,14 @@ describe('useCalendar', () => {
         expect(sinalRecebido).toBeDefined()
         expect(sinalRecebido.aborted).toBe(false)
 
-        unmount()
+        await act(async () => {
+            unmount()
+        })
 
         expect(sinalRecebido.aborted).toBe(true)
     })
 
-    test('rejeita configuração sem serviço válido sem lançar durante o render', async () => {
+    test('mostra erro e encerra o carregamento se não receber um serviço válido', async () => {
         const {result} = await renderHook(() => useCalendar())
 
         await waitFor(() => expect(result.current.carregando).toBe(false))

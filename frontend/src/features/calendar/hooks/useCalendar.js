@@ -47,18 +47,21 @@ function useCalendar({service, onSessaoExpirada} = {}) {
     }, [meses])
 
     const carregarMes = useCallback(async (mes, tipo = 'inicial') => {
-        if (typeof service?.buscarMes !== 'function' || requisicoes.current.has(mes)) {
-            return
-        }
+        if (requisicoes.current.has(mes)) return
 
-        if (mesesRef.current.some(item => item.mes === mes)) {
+        if (mesesRef.current.some(item => item.mes === mes)) return
+
+        ultimaFalha.current = {mes, tipo}
+        setErro(null)
+
+        if (typeof service?.buscarMes !== 'function') {
+            setErro(MENSAGEM_ERRO)
+            if (tipo === 'inicial') setCarregando(false)
             return
         }
 
         const controlador = new AbortController()
         requisicoes.current.set(mes, controlador)
-        ultimaFalha.current = {mes, tipo}
-        setErro(null)
 
         if (tipo === 'inicial') setCarregando(true)
         if (tipo === 'anterior') setCarregandoAnteriores(true)
