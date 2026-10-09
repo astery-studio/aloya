@@ -16,8 +16,8 @@ function PendingUsesBanner({ quantidade }) {
             accessibilityLabel={descricao}
             style={estilosUso.banner}
         >
-            <WarningCircleIcon size={14.99} color="#B07D2A" />
-            <Text numberOfLines={1} style={estilosUso.textoBanner}>{descricao}</Text>
+            <WarningCircleIcon size={14.99} color="#B07D2A" weight="fill" />
+            <Text style={estilosUso.textoBanner}>{descricao}</Text>
         </View>
     );
 }

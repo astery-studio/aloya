@@ -26,6 +26,7 @@ import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
 
 const telasInternas = Object.freeze({
+    inicio: 'inicio',
     configuracoes: 'configuracoes',
     membros: 'membros',
     perfil: 'perfil',
@@ -201,6 +202,10 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
+        if (aba === 'inicio') {
+            setTelaInterna(telasInternas.inicio);
+            return;
+        }
         if (aba === 'membros') {
             setTelaInterna(telasInternas.membros);
             return;
@@ -264,6 +269,15 @@ export default function App() {
             aoVoltar={() => setTelaPublica('boasVindas')}
             aoEntrar={() => setTelaPublica('login')}
             aoConcluir={concluirAutenticacao} />;
+    } else if (telaInterna === telasInternas.inicio) {
+        conteudo = <ContraceptiveFlow
+            key="usos-home"
+            inicio
+            service={configuracao.servicos.contraceptiveService}
+            onSelecionarAba={selecionarAba}
+            onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            onSessaoExpirada={finalizarSessao}
+        />;
     } else if (telaInterna === telasInternas.membros) {
         conteudo = <MembersScreen
             onCriarCategoria={() => setTelaInterna(telasInternas.novaCategoria)}
@@ -284,6 +298,7 @@ export default function App() {
             onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.anticoncepcionais) {
         conteudo = <ContraceptiveFlow
+            key="lista-anticoncepcionais"
             service={configuracao.servicos.contraceptiveService}
             onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
             onSessaoExpirada={finalizarSessao} 

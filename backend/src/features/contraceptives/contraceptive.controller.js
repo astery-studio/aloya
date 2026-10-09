@@ -17,12 +17,15 @@ function criarContraceptiveController(service) {
         }
     }
 
-    //Lista somente os anticoncepcionais ativos da usuária autenticada.
+    //Mantém a listagem ativa padrão e permite consultar os históricos removidos.
     async function listar(requisicao, resposta, proximo) {
         try {
-            const anticoncepcionais = await service.listar(
-                requisicao.usuario.id
-            );
+            const opcoes = {};
+            if (requisicao.query?.incluirRemovidos === 'true') opcoes.incluirRemovidos = true;
+            if (requisicao.query?.fusoHorario !== undefined) opcoes.fusoHorario = requisicao.query.fusoHorario;
+            const anticoncepcionais = Object.keys(opcoes).length
+                ? await service.listar(requisicao.usuario.id, opcoes)
+                : await service.listar(requisicao.usuario.id);
 
             resposta.status(200).json({
                 anticoncepcionais

@@ -2,6 +2,29 @@ import { Text, View } from 'react-native';
 import { ArrowsClockwiseIcon, WarningCircleIcon } from '../../icons/AppIcons';
 import { estilos, variantes } from './StatusBadge.styles';
 
+// Preserva a largura do Figma, limitada pelo espaço disponível, e permite crescer em altura.
+// No Android, o padding tipográfico padrão também excedia as caixas de 15/17px.
+function dimensoesFlexiveis(estilo) {
+    return {
+        width: estilo.width,
+        height: 'auto',
+        minHeight: estilo.height,
+        maxWidth: '100%'
+    };
+}
+
+function textoFlexivel(estilo) {
+    return {
+        width: 'auto',
+        height: 'auto',
+        minHeight: estilo.height,
+        maxWidth: '100%',
+        flexShrink: 1,
+        includeFontPadding: false,
+        textAlignVertical: 'center'
+    };
+}
+
 const estados = Object.freeze({
     pendente: { rotulo: 'Pendente de Uso', variante: 'pendenteDeUso', ponto: true },
     pendenteDeUso: { rotulo: 'Pendente de Uso', variante: 'pendenteDeUso', ponto: true },
@@ -50,6 +73,13 @@ const estados = Object.freeze({
     emAndamento: { rotulo: 'Em andamento', variante: 'confirmado', ponto: true }
 });
 
+// A correção pertence somente às variantes das HU-019/HU-023.
+const variantesDeUso = new Set([
+    'pendenteDeUso', 'alertaLeve', 'alertaModerado', 'alertaCritico',
+    'atrasadoProximosHorarios', 'confirmado', 'confirmadoHistoricoUso',
+    'confirmadoForaPrazoHistoricoUso', 'naoConfirmadoHistoricoUso', 'validadeAindaPrazo'
+]);
+
 function StatusBadge({ estado, rotulo }) {
     const configuracao = estados[estado];
 
@@ -59,6 +89,8 @@ function StatusBadge({ estado, rotulo }) {
 
     const visual = variantes[configuracao.variante];
     const texto = rotulo || configuracao.rotulo;
+    const ajustarTextoDeUso = estado !== 'emAndamento' && variantesDeUso.has(configuracao.variante);
+    const confirmadoNoHistorico = configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado';
 
     if (configuracao.estimativa) {
         const acessibilidade = `${texto}. ${configuracao.descricao}`;
@@ -90,15 +122,15 @@ function StatusBadge({ estado, rotulo }) {
             accessible
             accessibilityRole="text"
             accessibilityLabel={texto}
-            style={[estilos.container, visual.container]}
+            style={[estilos.container, visual.container, ajustarTextoDeUso && dimensoesFlexiveis(visual.container), confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width }]}
         >
             {configuracao.iconeCiclo ? (
                 <ArrowsClockwiseIcon size={13} color={visual.texto.color} />
             ) : null}
             {configuracao.ponto ? (
-                <Text style={[estilos.ponto, { color: visual.texto.color }]}>●</Text>
+                <Text style={[estilos.ponto, { color: visual.texto.color }, ajustarTextoDeUso && { includeFontPadding: false }]}>●</Text>
             ) : null}
-            <Text numberOfLines={1} style={[estilos.texto, visual.texto]}>{valor || texto}</Text>
+            <Text numberOfLines={confirmadoNoHistorico || !ajustarTextoDeUso ? 1 : undefined} style={[estilos.texto, visual.texto, ajustarTextoDeUso && textoFlexivel(visual.texto), confirmadoNoHistorico && { flexShrink: 0 }]}>{valor || texto}</Text>
             {sufixo ? (
                 <Text numberOfLines={1} style={[estilos.texto, visual.sufixo]}>{sufixo}</Text>
             ) : null}

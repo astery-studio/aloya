@@ -172,6 +172,7 @@ function validarEdicaoAnticoncepcional(entrada, hoje = new Date()) {
 }
 
 export {
+    FORMATO_HORARIO,
     dataUtc,
     validarCadastroAnticoncepcional,
     validarEdicaoAnticoncepcional,

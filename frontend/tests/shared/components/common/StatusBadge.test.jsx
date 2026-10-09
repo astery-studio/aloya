@@ -75,3 +75,36 @@ test('rejeita estados desconhecidos', async () => {
         'Estado de StatusBadge inválido: inexistente'
     );
 });
+
+test.each([
+    ['pendenteDeUso', 'Pendente de Uso', 11, 16],
+    ['confirmadoForaPrazoHistoricoUso', 'Confirmado fora do prazo', 11, 16],
+    ['validadeAindaPrazo', '30 meses restantes', 12, 18]
+])('não trunca nem fixa a altura do texto em %s', async (estado, rotulo, fontSize, lineHeight) => {
+    await render(<StatusBadge estado={estado} />);
+    const texto = screen.getByText(rotulo);
+    expect(texto).not.toHaveProp('numberOfLines');
+    expect(texto).toHaveStyle({height: 'auto', width: 'auto', includeFontPadding: false, fontSize, lineHeight});
+    expect(screen.getByLabelText(rotulo)).toHaveStyle({height: 'auto', minHeight: variantes[estado].container.height});
+});
+
+test.each(['confirmadoHistorico', 'confirmadoHistoricoUso'])('dimensiona %s pelo texto sem quebrar Confirmado', async (estado) => {
+    await render(<StatusBadge estado={estado} />);
+    expect(screen.getByLabelText('Confirmado')).toHaveStyle({ width: 'auto', minWidth: 81, minHeight: 23 });
+    expect(screen.getByText('Confirmado')).toHaveProp('numberOfLines', 1);
+    expect(screen.getByText('Confirmado')).toHaveStyle({ width: 'auto', flexShrink: 0 });
+});
+
+test('preserva o comportamento e as dimensões das variantes de outras HUs', async () => {
+    const { rerender } = await render(<StatusBadge estado="diasCiclo" />);
+    expect(screen.getByLabelText('29 dias ciclo')).toHaveStyle(variantes.diasCiclo.container);
+    expect(screen.getByText('29 dias')).toHaveProp('numberOfLines', 1);
+    expect(screen.getByText('29 dias')).toHaveStyle({width: 45, height: 20});
+    await rerender(<StatusBadge estado="estimativaIncerta" />);
+    expect(screen.getByText('Estimativa incerta')).toHaveStyle({height: 17});
+    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toHaveProp('numberOfLines', 1);
+    await rerender(<StatusBadge estado="emAndamento" />);
+    expect(screen.getByLabelText('Em andamento')).toHaveStyle(variantes.confirmado.container);
+    expect(screen.getByText('Em andamento')).toHaveProp('numberOfLines', 1);
+    expect(screen.getByText('Em andamento')).toHaveStyle({height: 17});
+});

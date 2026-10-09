@@ -70,6 +70,8 @@ import {
 import {
     criarContraceptiveController
 } from '../../features/contraceptives/contraceptive.controller.js';
+import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia, lerJanelasDeUso } from '../../features/contraceptives/contraceptiveUsage.service.js';
+import { criarContraceptiveUsageController } from '../../features/contraceptives/contraceptiveUsage.controller.js';
 
 import {
     criarEdicaoAnticoncepcionalRateLimit,
@@ -218,6 +220,10 @@ function criarContainer() {
 
     const contraceptiveService =
         criarContraceptiveService(prisma);
+    const contraceptiveUsageService = criarContraceptiveUsageService(prisma, {
+        avaliarJanelaEficacia: criarAvaliadorJanelaEficacia(lerJanelasDeUso())
+    });
+    const contraceptiveUsageController = criarContraceptiveUsageController(contraceptiveUsageService);
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -383,6 +389,7 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        contraceptiveUsageController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,

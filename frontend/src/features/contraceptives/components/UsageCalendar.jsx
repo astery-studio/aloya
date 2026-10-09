@@ -1,5 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
-import { ArrowLeftIcon } from '../../../shared/components/icons/AppIcons';
+import { CaretLeftIcon } from 'phosphor-react-native/src/icons/CaretLeft';
+import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
+import { estadoRegistroUso, partesDaDataUso } from '../utils/usageHistory';
 import { estilosUso } from './usageComponents.styles';
 
 const DIAS_POR_SEMANA = 7;
@@ -61,13 +63,26 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
     const { ano, numeroMes } = obterPartesDoMes(mes);
     const semanas = criarSemanas(ano, numeroMes);
     const possuiSeisSemanas = semanas.length === 6;
-    const registros = new Map(dias.map((item) => [Number(item.dia ?? item.data?.slice(-2)), item]));
+    const registros = new Map();
+    const prioridades = { confirmado: 1, foraDoPrazo: 2, naoConfirmado: 3 };
+    dias.forEach((item) => {
+        const partes = partesDaDataUso(item.data);
+        if (partes && partes.chaveMes !== mes) return;
+        const dia = Number(item.dia ?? partes?.dia);
+        const estado = estadoRegistroUso(item);
+        const totalDias = new Date(Date.UTC(ano, numeroMes, 0)).getUTCDate();
+        if (!estado || !Number.isInteger(dia) || dia < 1 || dia > totalDias) return;
+        if ((prioridades[registros.get(dia)] ?? 0) < prioridades[estado]) registros.set(dia, estado);
+    });
     const titulo = `${MESES[numeroMes - 1]} ${ano}`;
 
     return (
         <View
             testID="usage-calendar"
-            style={[estilosUso.calendario, possuiSeisSemanas && estilosUso.calendarioSeisSemanas]}
+            style={[
+                estilosUso.calendario,
+                possuiSeisSemanas && estilosUso.calendarioSeisSemanas
+            ]}
         >
             <View style={estilosUso.cabecalhoCalendario}>
                 <Pressable
@@ -76,7 +91,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                     onPress={aoMesAnterior}
                     style={estilosUso.botaoMes}
                 >
-                    <ArrowLeftIcon size={14} color="#5C5C59" />
+                    <CaretLeftIcon size={14} color="#5C5C59" />
                 </Pressable>
                 <Text numberOfLines={1} style={estilosUso.tituloMes}>{titulo}</Text>
                 <Pressable
@@ -85,7 +100,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                     onPress={aoProximoMes}
                     style={estilosUso.botaoMes}
                 >
-                    <ArrowLeftIcon size={14} color="#5C5C59" style={estilosUso.setaProximo} />
+                    <CaretRightIcon size={14} color="#5C5C59" />
                 </Pressable>
             </View>
 
@@ -108,7 +123,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                     {semanas.map((semana, indiceSemana) => (
                         <View key={`semana-${indiceSemana}`} style={estilosUso.linhaSemana}>
                             {semana.map((dia, indiceDia) => {
-                                const estado = dia ? registros.get(dia)?.estado : null;
+                                const estado = dia ? registros.get(dia) : null;
                                 const rotuloEstado = ESTADOS[estado];
                                 const hoje = ehHoje(ano, numeroMes, dia);
 
@@ -143,14 +158,14 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                 </View>
             </View>
 
-            <View style={estilosUso.legenda}>
+            <View testID="usage-calendar-legend" style={estilosUso.legenda}>
                 {Object.entries(ESTADOS).map(([estado, rotulo]) => (
                     <View
                         key={estado}
-                        style={[estilosUso.itemLegenda, estilosUso[`itemLegenda_${estado}`]]}
+                        style={estilosUso.itemLegenda}
                     >
                         <View style={[estilosUso.marcadorLegenda, estilosUso[`marcador_${estado}`]]} />
-                        <Text style={[estilosUso.textoLegenda, estilosUso[`textoLegenda_${estado}`]]}>
+                        <Text style={estilosUso.textoLegenda}>
                             {rotulo}
                         </Text>
                     </View>
