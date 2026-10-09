@@ -18,17 +18,12 @@ jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBa
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     ArrowLeftIcon: () => null,
-    InfoIcon: () => null
-}))
-
-jest.mock('../../../../src/shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar', () => {
-    const ReactInterno = require('react')
-    const {View} = require('react-native')
-
-    return {
-        BottomTabBar: () => ReactInterno.createElement(View, {testID: 'bottom-tab-bar'})
+    InfoIcon: props => {
+        const ReactInterno = require('react')
+        const {View} = require('react-native')
+        return ReactInterno.createElement(View, {testID: 'icone-legenda', ...props})
     }
-})
+}))
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const ReactInterno = require('react')
@@ -117,11 +112,14 @@ jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLe
 
 describe('CalendarScreen', () => {
     test('mostra calendário, título e confiança', async () => {
+        const aoCadastrarMenstruacao = jest.fn()
+
         await render(
             <CalendarScreen
                 meses={[{mes: '2026-10', possuiCiclos: true}]}
                 confianca="alta"
                 aoVoltar={jest.fn()}
+                aoCadastrarMenstruacao={aoCadastrarMenstruacao}
             />
         )
 
@@ -154,7 +152,23 @@ describe('CalendarScreen', () => {
         expect(fimDoGrupo + estilos.cabecalho.paddingBottom).toBeLessThanOrEqual(
             estilos.cabecalho.height
         )
-        expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen()
+        expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen()
+        expect(screen.getByRole('button', {name: 'Cadastrar Menstruação'})).toBeOnTheScreen()
+        expect(screen.queryByTestId('bottom-tab-bar')).toBeNull()
+        expect(estilos.rodape).toMatchObject({
+            flexShrink: 0,
+            borderTopWidth: 1,
+            paddingLeft: 24,
+            paddingRight: 24
+        })
+
+        await fireEvent.press(screen.getByRole('button', {name: 'Cadastrar Menstruação'}))
+        expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1)
+        expect(screen.getByTestId('acao-legenda-calendario')).toHaveStyle({
+            padding: 8,
+            alignItems: 'center'
+        })
+        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 21.995)
     })
 
     test('abre e fecha a legenda pelo botão de informação', async () => {
@@ -197,6 +211,7 @@ describe('CalendarScreen', () => {
             screen.getByText('Você ainda não possui nenhum ciclo registrado. Toque em um dia no Calendário para começar.')
         ).toBeOnTheScreen()
         expect(screen.queryByTestId('confidence-badge')).toBeNull()
+        expect(screen.getAllByRole('button', {name: 'Cadastrar Menstruação'})).toHaveLength(1)
 
         await fireEvent.press(
             screen.getByRole('button', {name: 'Cadastrar Menstruação'})

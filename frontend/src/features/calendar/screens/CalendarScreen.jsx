@@ -6,7 +6,6 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/
 import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
 import {ArrowLeftIcon, InfoIcon} from '../../../shared/components/icons/AppIcons'
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
-import {BottomTabBar} from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar'
 import {CycleCalendar} from '../components/CycleCalendar/CycleCalendar'
 import {CycleLegendSheet} from '../components/CycleLegendSheet/CycleLegendSheet'
 import {estilos} from './CalendarScreen.styles'
@@ -72,8 +71,7 @@ function CalendarScreen({
     aoCarregarPosteriores,
     aoTentarNovamente,
     aoVoltar,
-    aoCadastrarMenstruacao,
-    onSelecionarAba
+    aoCadastrarMenstruacao
 }) {
     const [legendaVisivel, setLegendaVisivel] = useState(false)
 
@@ -126,13 +124,17 @@ function CalendarScreen({
                 </View>
 
                 <Pressable
+                    testID="acao-legenda-calendario"
                     accessibilityRole="button"
                     accessibilityLabel="Abrir legenda do calendário"
                     onPress={() => setLegendaVisivel(true)}
                     hitSlop={8}
-                    style={estilos.acaoCabecalho}
+                    style={estilos.acaoLegenda}
                 >
-                    <InfoIcon size={20} color={estilos.corIconeCabecalho} />
+                    <InfoIcon
+                        size={21.995}
+                        color={estilos.corIconeCabecalho}
+                    />
                 </Pressable>
             </View>
 
@@ -156,20 +158,14 @@ function CalendarScreen({
                     />
                 </View>
 
-                {estadoVazio ? (
-                    <View style={estilos.areaAcao}>
-                        <ButtonScreen
-                            texto="Cadastrar Menstruação"
-                            aoPressionar={aoCadastrarMenstruacao}
-                        />
-                    </View>
-                ) : null}
             </View>
 
-            <BottomTabBar
-                abaAtiva="diario"
-                onSelecionar={onSelecionarAba}
-            />
+            <View testID="rodape-calendario" style={estilos.rodape}>
+                <ButtonScreen
+                    texto="Cadastrar Menstruação"
+                    aoPressionar={aoCadastrarMenstruacao}
+                />
+            </View>
 
             <CycleLegendSheet
                 visivel={legendaVisivel}

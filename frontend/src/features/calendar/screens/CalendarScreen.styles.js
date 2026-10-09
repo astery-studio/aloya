@@ -26,6 +26,11 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
+    acaoLegenda: {
+        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     centralizadorCabecalho: {
         position: 'absolute',
         top: 56,
@@ -90,10 +95,15 @@ const estilos = StyleSheet.create({
         fontWeight: '500',
         lineHeight: 21
     },
-    areaAcao: {
-        paddingHorizontal: 16,
-        paddingTop: 8,
-        paddingBottom: 12
+    rodape: {
+        flexShrink: 0,
+        paddingTop: 20,
+        paddingRight: 24,
+        paddingBottom: 24,
+        paddingLeft: 24,
+        borderTopWidth: 1,
+        borderTopColor: '#EDEAE4',
+        backgroundColor: cores.neutras.fundoClaro
     }
 })
 
