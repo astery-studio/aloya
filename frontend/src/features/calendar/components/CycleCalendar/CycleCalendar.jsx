@@ -2,7 +2,6 @@
 import {
     memo,
     useCallback,
-    useEffect,
     useMemo,
     useRef,
     useState
@@ -42,9 +41,7 @@ function IndicadorCarregamento({rotulo, inicial = false}) {
         <View
             accessibilityRole="progressbar"
             accessibilityLabel={rotulo}
-            style={inicial
-                ? estilos.carregamentoInicial
-                : estilos.carregamentoPaginacao}
+            style={inicial ? estilos.carregamentoInicial : estilos.carregamentoPaginacao}
         >
             <ActivityIndicator
                 color={cores.marca.primaria}
@@ -75,22 +72,34 @@ function CycleCalendar({
         [hoje, meses]
     )
 
-    useEffect(() => {
-        if (mesesNormalizados.length === 0) {
-            posicionamentoInicialConcluido.current = false
+    const indiceMesAtual = useMemo(() => {
+        const chaveAtual = hoje.slice(0, 7)
+        const indiceExato = mesesNormalizados.findIndex((mes) => mes.chave === chaveAtual)
+
+        if (indiceExato >= 0) return indiceExato
+
+        for (let indice = mesesNormalizados.length - 1; indice >= 0; indice -= 1) {
+            if (mesesNormalizados[indice].chave <= chaveAtual) return indice
         }
 
-        solicitouAnteriores.current = false
-        solicitouPosteriores.current = false
-    }, [mesesNormalizados.length])
+        return mesesNormalizados.length > 0 ? 0 : -1
+    }, [hoje, mesesNormalizados])
 
-    useEffect(() => {
-        if (!carregandoAnteriores) solicitouAnteriores.current = false
-    }, [carregandoAnteriores])
+    const layoutsMeses = useMemo(() => {
+        let deslocamento = 0
 
-    useEffect(() => {
-        if (!carregandoPosteriores) solicitouPosteriores.current = false
-    }, [carregandoPosteriores])
+        return mesesNormalizados.map((mes, index) => {
+            const comprimento = 58.982 + mes.semanas.length * 53.99
+            const layout = {index, length: comprimento, offset: deslocamento}
+            deslocamento += comprimento
+            return layout
+        })
+    }, [mesesNormalizados])
+
+    const obterLayoutMes = useCallback(
+        (_, index) => layoutsMeses[index],
+        [layoutsMeses]
+    )
 
     const renderizarMes = useCallback(({item}) => (
         <CycleMonth
@@ -105,22 +114,20 @@ function CycleCalendar({
     )
 
     const posicionarNoMesAtual = useCallback(() => {
-        if (
-            posicionamentoInicialConcluido.current
-            || mesesNormalizados.length === 0
-        ) {
-            return
-        }
+        if (posicionamentoInicialConcluido.current || indiceMesAtual < 0) return
 
         posicionamentoInicialConcluido.current = true
-
-        listaRef.current?.scrollToEnd({
-            animated: false
+        listaRef.current?.scrollToIndex({
+            index: indiceMesAtual,
+            animated: false,
+            viewPosition: 1
         })
-    }, [mesesNormalizados.length])
+    }, [indiceMesAtual])
 
     const registrarInteracao = useCallback(() => {
         usuarioInteragiu.current = true
+        solicitouAnteriores.current = false
+        solicitouPosteriores.current = false
     }, [])
 
     const verificarInicio = useCallback((evento) => {
@@ -189,22 +196,15 @@ function CycleCalendar({
                 data={mesesNormalizados}
                 renderItem={renderizarMes}
                 keyExtractor={extrairChave}
+                getItemLayout={obterLayoutMes}
                 style={estilos.lista}
                 contentContainerStyle={estilos.conteudoLista}
-                ListHeaderComponent={carregandoAnteriores
-                    ? (
-                        <IndicadorCarregamento
-                            rotulo="Carregando meses anteriores"
-                        />
-                    )
-                    : null}
-                ListFooterComponent={carregandoPosteriores
-                    ? (
-                        <IndicadorCarregamento
-                            rotulo="Carregando próximos meses"
-                        />
-                    )
-                    : null}
+                ListHeaderComponent={carregandoAnteriores ? (
+                    <IndicadorCarregamento rotulo="Carregando meses anteriores" />
+                ) : null}
+                ListFooterComponent={carregandoPosteriores ? (
+                    <IndicadorCarregamento rotulo="Carregando próximos meses" />
+                ) : null}
                 initialNumToRender={2}
                 maxToRenderPerBatch={2}
                 updateCellsBatchingPeriod={50}
