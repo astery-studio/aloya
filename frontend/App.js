@@ -29,6 +29,7 @@ function AppDemonstracaoHu013() {
         aoSelecionarData={setDataSelecionada}
         aoCadastrarMenstruacao={() => {}}
         aoAbrirDiario={() => {}}
+        aoAbrirAnticoncepcional={() => {}}
         aoAbrirCalendario={() => {}}
     />;
 }

@@ -143,7 +143,11 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
     expect(estilos.formaProvisoria).toMatchObject({ width: 260, height: 304 });
     expect(estilos.formaProvisoriaCompacta).toMatchObject({ width: 190, height: 200 });
     expect(estilos.destaqueFertil).toMatchObject({ width: '100%', minHeight: 68 });
-    expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 52 });
+    expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 62 });
+    expect(estilos.textoAvisoBaixa).toMatchObject({ flex: 1, maxWidth: 226 });
+    expect(estilos.rotuloPrevisao.letterSpacing).toBe(1.44);
+    expect(estilos.secaoPrevisao.paddingTop).toBe(16);
+    expect(estilos.cartaoProximoCiclo).toMatchObject({ rowGap: 16, columnGap: 12 });
     expect(estilos.dataProximoCiclo).toMatchObject({ flex: 1, minWidth: 140 });
     expect(estilos.previsoesSecundarias).toMatchObject({ flexWrap: 'wrap' });
     expect(estilos.cartaoSecundario).toMatchObject({ flex: 1, minWidth: 130 });

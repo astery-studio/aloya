@@ -137,5 +137,6 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
     expect(estilos.areaRolagem).toMatchObject({ flex: 1 });
     expect(estilos.cabecalho).toMatchObject({ width: '100%', minHeight: 78, paddingTop: 32 });
     expect(estilos.titulo).toMatchObject({ flexShrink: 1 });
-    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 128 });
+    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 16 });
+    expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });

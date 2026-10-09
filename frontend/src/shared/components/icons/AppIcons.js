@@ -18,11 +18,13 @@ import {InfoIcon} from 'phosphor-react-native/src/icons/Info'
 import {LightningIcon} from 'phosphor-react-native/src/icons/Lightning'
 import {LockKeyIcon} from 'phosphor-react-native/src/icons/LockKey'
 import {MoonIcon} from 'phosphor-react-native/src/icons/Moon'
+import {NotepadIcon} from 'phosphor-react-native/src/icons/Notepad'
 import {NotePencilIcon} from 'phosphor-react-native/src/icons/NotePencil'
 import {PersonArmsSpreadIcon} from 'phosphor-react-native/src/icons/PersonArmsSpread'
 import {PillIcon} from 'phosphor-react-native/src/icons/Pill'
 import {ShieldCheckIcon} from 'phosphor-react-native/src/icons/ShieldCheck'
 import {SparkleIcon} from 'phosphor-react-native/src/icons/Sparkle'
+import {SunIcon} from 'phosphor-react-native/src/icons/Sun'
 import {TrashIcon} from 'phosphor-react-native/src/icons/Trash'
 import {UserIcon} from 'phosphor-react-native/src/icons/User'
 import {UsersIcon} from 'phosphor-react-native/src/icons/Users'
@@ -50,11 +52,13 @@ export {
     LightningIcon,
     LockKeyIcon,
     MoonIcon,
+    NotepadIcon,
     NotePencilIcon,
     PersonArmsSpreadIcon,
     PillIcon,
     ShieldCheckIcon,
     SparkleIcon,
+    SunIcon,
     TrashIcon,
     UserIcon,
     UsersIcon,

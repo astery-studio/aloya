@@ -6,10 +6,12 @@ import {
     ArrowsClockwiseIcon,
     CalendarDotsIcon,
     DropIcon,
-    EggIcon,
     HeartbeatIcon,
+    NotepadIcon,
     PillIcon,
     SparkleIcon,
+    SunIcon,
+    WarningCircleIcon,
     WarningIcon
 } from '../../../shared/components/icons/AppIcons';
 import { cores } from '../../../shared/theme';
@@ -22,7 +24,7 @@ const CORES_FORMA = { menstrual: cores.marca.primaria, folicular: cores.ciclo.fo
 const CORES_CONTEUDO = { ...CORES_FORMA, folicular: cores.ciclo.conteudoFolicular };
 const RECURSOS_SEM_CICLO = [
     { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações para cada momento.', Icone: ArrowsClockwiseIcon, cor: cores.marca.secundaria },
-    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões baseadas no seu histórico.', Icone: SparkleIcon, cor: cores.feedback.aviso },
+    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões baseadas no seu histórico.', Icone: SparkleIcon, cor: cores.feedback.aviso, peso: 'fill' },
     { titulo: 'Próxima menstruação', descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.', Icone: CalendarDotsIcon, cor: cores.feedback.aviso },
     { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.', Icone: HeartbeatIcon, cor: cores.marca.secundaria }
 ];
@@ -38,6 +40,10 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
             estilo={estilos.botaoAcao}
         />
     );
+}
+
+function GotaPreenchidaIcon(props) {
+    return <DropIcon {...props} weight="fill" />;
 }
 
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
@@ -77,7 +83,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 ) : null}
                 {!incerta && nivel === 'baixa' ? (
                     <View style={estilos.avisoConfiabilidade}>
-                        <WarningIcon size={18} color={cores.feedback.aviso} />
+                        <WarningCircleIcon size={18} color={cores.feedback.aviso} weight="fill" />
                         <Text style={estilos.textoAvisoBaixa}>Continue registrando seus ciclos para que suas previsões fiquem cada vez mais precisas.</Text>
                     </View>
                 ) : null}
@@ -85,14 +91,14 @@ function PainelPrevisao({ previsao, janelaFertil }) {
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <EggIcon size={18} color={cores.feedback.informacao} />
+                        <SunIcon size={18} color={cores.feedback.informacao} weight="fill" />
                         <Text style={estilos.rotuloPrevisao}>Ovulação</Text>
                     </View>
                     <Text style={estilos.valorSecundario}>{formatarDataLonga(previsao.dataOvulacaoEstimada)}</Text>
                 </View>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <SparkleIcon size={18} color={cores.ciclo.iconeEscuro} />
+                        <SparkleIcon size={18} color={cores.ciclo.iconeEscuro} weight="fill" />
                         <Text style={estilos.rotuloPrevisao}>Janela fértil</Text>
                     </View>
                     <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} até ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>
@@ -137,8 +143,8 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
                     mensagem="Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo."
                     acao={(
                         <View style={estilos.acoesSemCiclo}>
-                            <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
-                            <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
+                            <BotaoAcao texto="Cadastrar Menstruação" Icone={GotaPreenchidaIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
+                            <BotaoAcao texto="Cadastrar no Diário" Icone={NotepadIcon} aoPressionar={aoAbrirDiario} />
                             <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
                         </View>
                     )}
@@ -146,7 +152,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
             </View>
             <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
             <View style={estilos.recursos}>
-                {RECURSOS_SEM_CICLO.map(({ titulo, descricao, Icone, cor }) => <View key={titulo} style={estilos.recurso}><View style={estilos.iconeRecurso}><Icone size={20} color={cor} /></View><View style={estilos.textoRecurso}><Text style={estilos.tituloRecurso}>{titulo}</Text><Text style={estilos.descricaoRecurso}>{descricao}</Text></View></View>)}
+                {RECURSOS_SEM_CICLO.map(({ titulo, descricao, Icone, cor, peso = 'regular' }) => <View key={titulo} style={estilos.recurso}><View style={estilos.iconeRecurso}><Icone size={20} color={cor} weight={peso} /></View><View style={estilos.textoRecurso}><Text style={estilos.tituloRecurso}>{titulo}</Text><Text style={estilos.descricaoRecurso}>{descricao}</Text></View></View>)}
             </View>
         </View>
     );
@@ -169,8 +175,8 @@ function CycleForecastPanel({ fase = 'desconhecida', diaCiclo, janelaFertil, pre
                 ) : null}
             </View>
             <View style={estilos.acoes}>
-                <BotaoAcao texto="Cadastrar Menstruação" Icone={DropIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
-                <BotaoAcao texto="Cadastrar no Diário" Icone={CalendarDotsIcon} aoPressionar={aoAbrirDiario} />
+                <BotaoAcao texto="Cadastrar Menstruação" Icone={GotaPreenchidaIcon} destaque aoPressionar={aoCadastrarMenstruacao} />
+                <BotaoAcao texto="Cadastrar no Diário" Icone={NotepadIcon} aoPressionar={aoAbrirDiario} />
                 <BotaoAcao texto="Anticoncepcional" Icone={PillIcon} aoPressionar={aoAbrirAnticoncepcional} />
             </View>
             <PainelPrevisao previsao={previsao} janelaFertil={janelaFertil} />
