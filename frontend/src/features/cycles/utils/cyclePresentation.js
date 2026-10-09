@@ -49,9 +49,9 @@ function diferencaDias(inicio, fim) {
     return Math.round((segunda - primeira) / DIA_MS);
 }
 
-function criarDiasDaFaixa(dataCentral, fases) {
-    return Array.from({ length: 16 }, (_, indice) => {
-        const data = adicionarDias(dataCentral, indice - 3);
+function criarDiasDaFaixa(dataCentral, fases, deslocamentoInicial = -3, quantidade = 16) {
+    return Array.from({ length: quantidade }, (_, indice) => {
+        const data = adicionarDias(dataCentral, deslocamentoInicial + indice);
         const objeto = paraDataUtc(data);
         return {
             data,
@@ -60,7 +60,7 @@ function criarDiasDaFaixa(dataCentral, fases) {
                 weekday: 'short', timeZone: 'UTC'
             }).format(objeto).replace('.', ''),
             fase: obterFase(data, fases),
-            hoje: indice === 3
+            hoje: data === dataCentral
         };
     });
 }
