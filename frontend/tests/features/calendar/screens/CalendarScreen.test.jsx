@@ -1,5 +1,5 @@
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react-native'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react-native'
 import {CalendarScreen} from '../../../../src/features/calendar/screens/CalendarScreen'
 
 jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
@@ -147,13 +147,19 @@ describe('CalendarScreen', () => {
             />
         )
 
-        fireEvent.press(screen.getByRole('button', {name: 'Abrir legenda do calendário'}))
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Abrir legenda do calendário'})
+        )
 
-        expect(screen.getByTestId('cycle-legend-sheet')).toHaveTextContent('Itens: 10')
+        expect(await screen.findByText('Itens: 10')).toBeOnTheScreen()
 
-        fireEvent.press(screen.getByRole('button', {name: 'Fechar legenda'}))
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Fechar legenda'})
+        )
 
-        expect(screen.queryByTestId('cycle-legend-sheet')).toBeNull()
+        await waitFor(() => {
+            expect(screen.queryByTestId('cycle-legend-sheet')).toBeNull()
+        })
     })
 
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {
@@ -173,7 +179,9 @@ describe('CalendarScreen', () => {
         ).toBeOnTheScreen()
         expect(screen.queryByTestId('confidence-badge')).toBeNull()
 
-        fireEvent.press(screen.getByRole('button', {name: 'Cadastrar Menstruação'}))
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Cadastrar Menstruação'})
+        )
 
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1)
     })
@@ -193,7 +201,9 @@ describe('CalendarScreen', () => {
 
         expect(screen.getByTestId('alert-modal')).toBeOnTheScreen()
 
-        fireEvent.press(screen.getByRole('button', {name: 'Tentar novamente'}))
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Tentar novamente'})
+        )
 
         expect(aoTentarNovamente).toHaveBeenCalledTimes(1)
     })
