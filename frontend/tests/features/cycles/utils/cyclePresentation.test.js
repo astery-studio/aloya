@@ -34,3 +34,17 @@ test('gera páginas adicionais em qualquer direção mantendo a referência iden
     expect(posteriores[0].data).toBe('2026-10-18');
     expect(posteriores.at(-1).data).toBe('2026-10-31');
 });
+
+test('projeta as fases em ciclos seguintes e anteriores ao intervalo inicial', () => {
+    expect(obterFase('2026-10-29', fases, 28)).toBe('menstrual');
+    expect(obterFase('2026-11-03', fases, 28)).toBe('folicular');
+    expect(obterFase('2026-11-11', fases, 28)).toBe('ovulatoria');
+    expect(obterFase('2026-11-12', fases, 28)).toBe('lutea');
+    expect(obterFase('2026-11-25', fases, 28)).toBe('lutea');
+    expect(obterFase('2026-09-30', fases, 28)).toBe('lutea');
+});
+
+test('infere duração do ciclo pelas fases quando a previsão não informa o valor', () => {
+    expect(obterFase('2026-10-29', fases)).toBe('menstrual');
+    expect(obterFase('data inválida', fases, 28)).toBe('desconhecida');
+});

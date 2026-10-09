@@ -33,7 +33,7 @@ function dataNoIntervalo(data, intervalo) {
         && data >= intervalo.inicio && data <= intervalo.fim);
 }
 
-function obterFase(data, fases) {
+function obterFaseDireta(data, fases) {
     if (!fases) return 'desconhecida';
     if (dataNoIntervalo(data, fases.menstrual)) return 'menstrual';
     if (dataNoIntervalo(data, fases.folicularPosMenstrual)) return 'folicular';
@@ -49,7 +49,22 @@ function diferencaDias(inicio, fim) {
     return Math.round((segunda - primeira) / DIA_MS);
 }
 
-function criarDiasDaFaixa(dataCentral, fases, deslocamentoInicial = -3, quantidade = 16) {
+function obterFase(data, fases, duracaoCiclo) {
+    const faseConhecida = obterFaseDireta(data, fases);
+    if (faseConhecida !== 'desconhecida') return faseConhecida;
+
+    const inicioCiclo = fases?.menstrual?.inicio;
+    const inicioProximoCiclo = adicionarDias(fases?.lutea?.fim, 1);
+    const duracao = duracaoCiclo ?? diferencaDias(inicioCiclo, inicioProximoCiclo);
+    if (!Number.isSafeInteger(duracao) || duracao <= 0) return 'desconhecida';
+
+    const diferenca = diferencaDias(inicioCiclo, data);
+    if (diferenca === null) return 'desconhecida';
+    const diaProjetado = ((diferenca % duracao) + duracao) % duracao;
+    return obterFaseDireta(adicionarDias(inicioCiclo, diaProjetado), fases);
+}
+
+function criarDiasDaFaixa(dataCentral, fases, deslocamentoInicial = -3, quantidade = 16, duracaoCiclo) {
     return Array.from({ length: quantidade }, (_, indice) => {
         const data = adicionarDias(dataCentral, deslocamentoInicial + indice);
         const objeto = paraDataUtc(data);
@@ -59,7 +74,7 @@ function criarDiasDaFaixa(dataCentral, fases, deslocamentoInicial = -3, quantida
             semana: new Intl.DateTimeFormat('pt-BR', {
                 weekday: 'short', timeZone: 'UTC'
             }).format(objeto).replace('.', ''),
-            fase: obterFase(data, fases),
+            fase: obterFase(data, fases, duracaoCiclo),
             hoje: data === dataCentral
         };
     });
