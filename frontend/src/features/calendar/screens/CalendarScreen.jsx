@@ -40,7 +40,11 @@ function CalendarScreen({
     meses = [],
     confianca,
     carregando = false,
+    carregandoAnteriores = false,
+    carregandoPosteriores = false,
     erro,
+    aoCarregarAnteriores,
+    aoCarregarPosteriores,
     aoTentarNovamente,
     aoVoltar,
     aoCadastrarMenstruacao,
@@ -109,6 +113,10 @@ function CalendarScreen({
                     <CycleCalendar
                         meses={mesesValidos}
                         carregando={carregando}
+                        carregandoAnteriores={carregandoAnteriores}
+                        carregandoPosteriores={carregandoPosteriores}
+                        aoCarregarAnteriores={aoCarregarAnteriores}
+                        aoCarregarPosteriores={aoCarregarPosteriores}
                     />
                 </View>
 

@@ -54,12 +54,7 @@ jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModa
     const ReactInterno = require('react')
     const {Pressable, Text, View} = require('react-native')
 
-    return function AlertModalMock({
-        visivel,
-        titulo,
-        mensagem,
-        acaoPrincipal
-    }) {
+    return function AlertModalMock({visivel, titulo, mensagem, acaoPrincipal}) {
         if (!visivel) return null
 
         return ReactInterno.createElement(
