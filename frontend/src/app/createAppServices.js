@@ -1,8 +1,11 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
+import {criarCalendarService} from '../features/calendar/services/calendarService'
+import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService'
 import { criarAuthService } from '../features/auth/services/authService'
 import { criarAccountService } from '../features/settings/services/accountService'
 import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService'
+import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService'
 import { criarApiClient } from '../shared/services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../shared/services/api/authenticatedRequest'
 import { obterToken, removerToken } from '../shared/storage/tokenStorage'
@@ -51,7 +54,15 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         removerCredencialLocal: removerToken
     })
 
+    const calendarService = criarCalendarService({
+        requisicaoAutenticada
+    })
+
     const contraceptiveService = criarContraceptiveService({
+        requisicaoAutenticada
+    })
+
+    const cycleHistoryService = criarCycleHistoryService({
         requisicaoAutenticada
     })
 
@@ -59,12 +70,19 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         requisicaoAutenticada
     })
 
+    const cyclePredictionService = criarCyclePredictionService({
+        requisicaoAutenticada
+    })
+
     return Object.freeze({
         authService,
         accountService,
+        calendarService,
         contraceptiveService,
-        supportCategoryService
+        cycleHistoryService,
+        supportCategoryService,
+        cyclePredictionService
     })
 }
 
-export { criarServicosApp }
+export {criarServicosApp}

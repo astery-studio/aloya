@@ -74,9 +74,33 @@ import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia, lerJanela
 import { criarContraceptiveUsageController } from '../../features/contraceptives/contraceptiveUsage.controller.js';
 
 import {
+    criarPredictionService
+} from '../../features/cycles/prediction.service.js';
+
+import {
+    criarPredictionController
+} from '../../features/cycles/prediction.controller.js';
+
+import {
     criarEdicaoAnticoncepcionalRateLimit,
     criarRemocaoAnticoncepcionalRateLimit
 } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
+
+import {
+    criarCalendarModule
+} from '../../features/calendar/calendar.module.js';
+
+import {
+    criarCycleHistoryRepository
+} from '../../features/cycles/cycleHistory.repository.js';
+
+import {
+    criarCycleHistoryService
+} from '../../features/cycles/cycleHistory.service.js';
+
+import {
+    criarCycleHistoryController
+} from '../../features/cycles/cycleHistory.controller.js';
 
 import {
     criarPermissionCategoryService
@@ -224,6 +248,24 @@ function criarContainer() {
         avaliarJanelaEficacia: criarAvaliadorJanelaEficacia(lerJanelasDeUso())
     });
     const contraceptiveUsageController = criarContraceptiveUsageController(contraceptiveUsageService);
+
+    const calendarModule =
+        criarCalendarModule({
+            prisma
+        });
+
+    const cycleHistoryRepository =
+        criarCycleHistoryRepository({
+            prisma
+        });
+
+    const cycleHistoryService =
+        criarCycleHistoryService({
+            repository: cycleHistoryRepository
+        });
+
+    const predictionService =
+        criarPredictionService({ prisma });
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -377,6 +419,14 @@ function criarContainer() {
             contraceptiveService
         );
 
+    const cycleHistoryController =
+        criarCycleHistoryController({
+            cycleHistoryService
+        });
+
+    const predictionController =
+        criarPredictionController({ predictionService });
+
     const permissionCategoryController =
         criarPermissionCategoryController({
             permissionCategoryService,
@@ -390,6 +440,11 @@ function criarContainer() {
         logoutController,
         contraceptiveController,
         contraceptiveUsageController,
+        calendarController:
+            calendarModule.calendarController,
+        cycleHistoryController,
+
+        predictionController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,
