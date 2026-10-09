@@ -72,6 +72,14 @@ import {
 } from '../../features/contraceptives/contraceptive.controller.js';
 
 import {
+    criarPredictionService
+} from '../../features/cycles/prediction.service.js';
+
+import {
+    criarPredictionController
+} from '../../features/cycles/prediction.controller.js';
+
+import {
     criarEdicaoAnticoncepcionalRateLimit,
     criarRemocaoAnticoncepcionalRateLimit
 } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
@@ -79,6 +87,18 @@ import {
 import {
     criarCalendarModule
 } from '../../features/calendar/calendar.module.js';
+
+import {
+    criarCycleHistoryRepository
+} from '../../features/cycles/cycleHistory.repository.js';
+
+import {
+    criarCycleHistoryService
+} from '../../features/cycles/cycleHistory.service.js';
+
+import {
+    criarCycleHistoryController
+} from '../../features/cycles/cycleHistory.controller.js';
 
 import {
     criarPermissionCategoryService
@@ -227,6 +247,19 @@ function criarContainer() {
         criarCalendarModule({
             prisma
         });
+
+    const cycleHistoryRepository =
+        criarCycleHistoryRepository({
+            prisma
+        });
+
+    const cycleHistoryService =
+        criarCycleHistoryService({
+            repository: cycleHistoryRepository
+        });
+
+    const predictionService =
+        criarPredictionService({ prisma });
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -380,6 +413,14 @@ function criarContainer() {
             contraceptiveService
         );
 
+    const cycleHistoryController =
+        criarCycleHistoryController({
+            cycleHistoryService
+        });
+
+    const predictionController =
+        criarPredictionController({ predictionService });
+
     const permissionCategoryController =
         criarPermissionCategoryController({
             permissionCategoryService,
@@ -394,6 +435,9 @@ function criarContainer() {
         contraceptiveController,
         calendarController:
             calendarModule.calendarController,
+        cycleHistoryController,
+
+        predictionController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,

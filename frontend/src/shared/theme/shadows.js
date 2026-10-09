@@ -15,6 +15,14 @@ const shadows = {
     sheet: {
         boxShadow:
             '0 -4px 32px 0 rgba(34, 34, 34, 0.08)'
+    },
+
+    cardSuave: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.04,
+        shadowRadius: 12,
+        elevation: 1
     }
 };
 

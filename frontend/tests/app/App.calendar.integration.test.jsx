@@ -49,10 +49,10 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                 Pressable,
                 {
                     accessibilityRole: 'button',
-                    accessibilityLabel: 'Abrir calendário pelo menu',
-                    onPress: () => onSelecionarAba('diario')
+                    accessibilityLabel: 'Abrir início',
+                    onPress: () => onSelecionarAba('inicio')
                 },
-                ReactInterno.createElement(Text, null, 'Diário')
+                ReactInterno.createElement(Text, null, 'Início')
             )
         )
     }
@@ -77,7 +77,7 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
                 Pressable,
                 {
                     accessibilityRole: 'button',
-                    accessibilityLabel: 'Voltar ao Diário',
+                    accessibilityLabel: 'Voltar ao Início',
                     onPress: aoVoltar
                 },
                 ReactInterno.createElement(Text, null, 'Voltar')
@@ -90,28 +90,6 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
                     onPress: aoCadastrarMenstruacao
                 },
                 ReactInterno.createElement(Text, null, 'Cadastrar Menstruação')
-            )
-        )
-    }
-})
-
-jest.mock('../../src/features/calendar/testing/CalendarTemporaryAccessScreen', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text, View} = require('react-native')
-
-    return {
-        CalendarTemporaryAccessScreen: ({aoAbrirCalendario}) => ReactInterno.createElement(
-            View,
-            {testID: 'diario-provisorio'},
-            ReactInterno.createElement(Text, null, 'Diário provisório'),
-            ReactInterno.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Abrir calendário',
-                    onPress: aoAbrirCalendario
-                },
-                ReactInterno.createElement(Text, null, 'Abrir calendário')
             )
         )
     }
@@ -132,6 +110,9 @@ describe('App — calendário', () => {
             accountService: {
                 buscarPerfil: jest.fn().mockResolvedValue({nome: 'Kayla'})
             },
+            cyclePredictionService: {
+                buscar: jest.fn().mockResolvedValue({status: 'DADOS_INSUFICIENTES'})
+            },
             calendarService: {
                 buscarMes: jest.fn()
             }
@@ -151,16 +132,17 @@ describe('App — calendário', () => {
         jest.restoreAllMocks()
     })
 
-    test('abre o calendário pelo Diário provisório e fornece o serviço configurado', async () => {
+    test('abre o calendário pelo ícone do início e retorna à tela inicial', async () => {
         await render(<App />)
 
         expect(await screen.findByText('Configurações')).toBeOnTheScreen()
 
         await fireEvent.press(
-            screen.getByRole('button', {name: 'Abrir calendário pelo menu'})
+            screen.getByRole('button', {name: 'Abrir início'})
         )
 
-        expect(await screen.findByText('Diário provisório')).toBeOnTheScreen()
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen()
+        expect(screen.queryByTestId('diario-provisorio')).toBeNull()
 
         await fireEvent.press(
             screen.getByRole('button', {name: 'Abrir calendário'})
@@ -173,7 +155,7 @@ describe('App — calendário', () => {
             'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
         )
 
-        await fireEvent.press(screen.getByRole('button', {name: 'Voltar ao Diário'}))
-        expect(await screen.findByText('Diário provisório')).toBeOnTheScreen()
+        await fireEvent.press(screen.getByRole('button', {name: 'Voltar ao Início'}))
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen()
     })
 })

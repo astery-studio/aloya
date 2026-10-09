@@ -1,12 +1,14 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
-import {criarAuthService} from '../features/auth/services/authService'
-import {criarAccountService} from '../features/settings/services/accountService'
 import {criarCalendarService} from '../features/calendar/services/calendarService'
-import {criarContraceptiveService} from '../features/contraceptives/services/contraceptiveService'
-import {criarSupportCategoryService} from '../features/support-network/services/supportCategoryService'
-import {criarApiClient} from '../shared/services/api/apiClient'
-import {criarRequisicaoAutenticada} from '../shared/services/api/authenticatedRequest'
-import {obterToken, removerToken} from '../shared/storage/tokenStorage'
+import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService'
+import { criarAuthService } from '../features/auth/services/authService'
+import { criarAccountService } from '../features/settings/services/accountService'
+import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
+import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService'
+import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService'
+import { criarApiClient } from '../shared/services/api/apiClient'
+import { criarRequisicaoAutenticada } from '../shared/services/api/authenticatedRequest'
+import { obterToken, removerToken } from '../shared/storage/tokenStorage'
 
 const tempoLimiteDaRequisicao = 15000
 
@@ -60,7 +62,15 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         requisicaoAutenticada
     })
 
+    const cycleHistoryService = criarCycleHistoryService({
+        requisicaoAutenticada
+    })
+
     const supportCategoryService = criarSupportCategoryService({
+        requisicaoAutenticada
+    })
+
+    const cyclePredictionService = criarCyclePredictionService({
         requisicaoAutenticada
     })
 
@@ -69,7 +79,9 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         accountService,
         calendarService,
         contraceptiveService,
-        supportCategoryService
+        cycleHistoryService,
+        supportCategoryService,
+        cyclePredictionService
     })
 }
 
