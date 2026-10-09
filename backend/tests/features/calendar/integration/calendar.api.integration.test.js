@@ -337,6 +337,21 @@ test('protege e carrega somente o calendário da usuária autenticada', async ()
             JSON.stringify(corpo).includes('2026-10-02'),
             false
         );
+
+        const respostaNovembro = await fetch(`${url}?mes=2026-11`, {
+            headers: {Authorization: 'Bearer token-ana'}
+        });
+        const novembro = await respostaNovembro.json();
+        assert.equal(respostaNovembro.status, 200);
+        const ultimoPeriodo = novembro.calendario.previsao.periodos.at(-1);
+        assert.equal(ultimoPeriodo.previsto, true);
+        assert.deepEqual(ultimoPeriodo.menstruacaoPrevista, {
+            inicio: '2026-11-24', fim: '2026-11-28'
+        });
+        assert.deepEqual(ultimoPeriodo.faseFolicular, {
+            inicio: '2026-11-29', fim: '2026-11-30'
+        });
+        assert.deepEqual(novembro.calendario.diasMenstruacao, []);
     });
 });
 

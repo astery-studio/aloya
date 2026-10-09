@@ -238,7 +238,9 @@ test('recorta as fases e previsões para o mês solicitado', async () => {
         mes: '2026-10'
     });
 
-    assert.deepEqual(resultado.previsao, {
+    const {periodos, ...previsaoPrincipal} = resultado.previsao;
+    assert.equal(periodos.length, 2);
+    assert.deepEqual(previsaoPrincipal, {
         status: 'PREVISAO_ULTRAPASSADA',
         nivelConfianca: 'BAIXA',
         faseMenstrual: {
@@ -264,6 +266,65 @@ test('recorta as fases e previsões para o mês solicitado', async () => {
         },
         versaoAlgoritmo: '1.0.0'
     });
+});
+
+test('projeta previsões para os meses futuros mantendo os parâmetros do algoritmo', async () => {
+    const repository = criarRepository({
+        usuario: criarUsuario({
+            quantidadeCiclos: 2,
+            registrosCiclo: [
+                {
+                    id: 2,
+                    dataInicio: new Date('2026-09-29T00:00:00.000Z'),
+                    dataFim: new Date('2026-10-03T00:00:00.000Z')
+                },
+                {
+                    id: 1,
+                    dataInicio: new Date('2026-09-01T00:00:00.000Z'),
+                    dataFim: new Date('2026-09-05T00:00:00.000Z')
+                }
+            ]
+        }),
+        diasMenstruacao: []
+    });
+    const service = criarCalendarService({repository});
+
+    const novembro = await service.buscarMes({usuarioId: 4, mes: '2026-11'});
+    const dezembro = await service.buscarMes({usuarioId: 4, mes: '2026-12'});
+    const futuroDistante = await service.buscarMes({usuarioId: 4, mes: '2040-07'});
+
+    const {periodos: periodosNovembro, ...previsaoNovembro} = novembro.previsao;
+    assert.equal(periodosNovembro.length, 2);
+    assert.deepEqual(previsaoNovembro, {
+        status: 'PREVISAO_ULTRAPASSADA',
+        nivelConfianca: 'BAIXA',
+        faseMenstrual: null,
+        faseFolicular: {inicio: '2026-11-01', fim: '2026-11-08'},
+        ovulacao: '2026-11-09',
+        faseLutea: {inicio: '2026-11-10', fim: '2026-11-23'},
+        janelaFertil: {inicio: '2026-11-04', fim: '2026-11-09'},
+        menstruacaoPrevista: {inicio: '2026-11-24', fim: '2026-11-28'},
+        versaoAlgoritmo: '1.0.0'
+    });
+
+    const {periodos: periodosDezembro, ...previsaoDezembro} = dezembro.previsao;
+    assert.equal(periodosDezembro.length, 2);
+    assert.deepEqual(previsaoDezembro, {
+        status: 'PREVISAO_ULTRAPASSADA',
+        nivelConfianca: 'BAIXA',
+        faseMenstrual: null,
+        faseFolicular: {inicio: '2026-12-01', fim: '2026-12-06'},
+        ovulacao: '2026-12-07',
+        faseLutea: {inicio: '2026-12-08', fim: '2026-12-21'},
+        janelaFertil: {inicio: '2026-12-02', fim: '2026-12-07'},
+        menstruacaoPrevista: {inicio: '2026-12-22', fim: '2026-12-26'},
+        versaoAlgoritmo: '1.0.0'
+    });
+
+    assert.equal(
+        futuroDistante.previsao.menstruacaoPrevista.inicio.slice(0, 7),
+        '2040-07'
+    );
 });
 
 test('rejeita dados internos inconsistentes em vez de mascarar a falha', async () => {
