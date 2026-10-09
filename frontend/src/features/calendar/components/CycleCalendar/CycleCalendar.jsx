@@ -1,52 +1,18 @@
 //Mostra meses virtualizados do calendário sem renderizar todo o histórico.
-import {
-    memo,
-    useCallback,
-    useMemo,
-    useRef,
-    useState
-} from 'react'
-import {
-    ActivityIndicator,
-    FlatList,
-    Platform,
-    Text,
-    View
-} from 'react-native'
-
+import {memo, useCallback, useMemo, useRef, useState} from 'react'
+import {ActivityIndicator, FlatList, Platform, Text, View} from 'react-native'
 import {cores} from '../../../../shared/theme'
-import {
-    normalizarMeses,
-    obterHojeLocal
-} from '../../utils/cycleCalendar.utils'
+import {normalizarMeses, obterHojeLocal} from '../../utils/cycleCalendar.utils'
 import {CycleMonth} from './CycleMonth'
 import {estilos} from './CycleCalendar.styles'
 
-const DIAS_SEMANA = Object.freeze([
-    'Dom',
-    'Seg',
-    'Ter',
-    'Qua',
-    'Qui',
-    'Sex',
-    'Sáb'
-])
-
-const CONFIGURACAO_POSICAO = Object.freeze({
-    minIndexForVisible: 0
-})
+const DIAS_SEMANA = Object.freeze(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'])
+const CONFIGURACAO_POSICAO = Object.freeze({minIndexForVisible: 0})
 
 function IndicadorCarregamento({rotulo, inicial = false}) {
     return (
-        <View
-            accessibilityRole="progressbar"
-            accessibilityLabel={rotulo}
-            style={inicial ? estilos.carregamentoInicial : estilos.carregamentoPaginacao}
-        >
-            <ActivityIndicator
-                color={cores.marca.primaria}
-                size={inicial ? 'large' : 'small'}
-            />
+        <View accessibilityRole="progressbar" accessibilityLabel={rotulo} style={inicial ? estilos.carregamentoInicial : estilos.carregamentoPaginacao}>
+            <ActivityIndicator color={cores.marca.primaria} size={inicial ? 'large' : 'small'} />
         </View>
     )
 }
@@ -66,10 +32,7 @@ function CycleCalendar({
     const solicitouAnteriores = useRef(false)
     const solicitouPosteriores = useRef(false)
 
-    const mesesNormalizados = useMemo(
-        () => normalizarMeses(meses, hoje),
-        [hoje, meses]
-    )
+    const mesesNormalizados = useMemo(() => normalizarMeses(meses, hoje), [hoje, meses])
 
     const indiceMesAtual = useMemo(() => {
         const chaveAtual = hoje.slice(0, 7)
@@ -84,6 +47,11 @@ function CycleCalendar({
         return mesesNormalizados.length > 0 ? 0 : undefined
     }, [hoje, mesesNormalizados])
 
+    const indiceInicial = useMemo(
+        () => indiceMesAtual == null ? undefined : Math.max(indiceMesAtual - 1, 0),
+        [indiceMesAtual]
+    )
+
     const layoutsMeses = useMemo(() => {
         let deslocamento = 0
 
@@ -95,22 +63,13 @@ function CycleCalendar({
         })
     }, [mesesNormalizados])
 
-    const obterLayoutMes = useCallback(
-        (_, index) => layoutsMeses[index],
-        [layoutsMeses]
-    )
+    const obterLayoutMes = useCallback((_, index) => layoutsMeses[index], [layoutsMeses])
 
     const renderizarMes = useCallback(({item}) => (
-        <CycleMonth
-            mes={item}
-            aoPressionarDia={aoPressionarDia}
-        />
+        <CycleMonth mes={item} aoPressionarDia={aoPressionarDia} />
     ), [aoPressionarDia])
 
-    const extrairChave = useCallback(
-        (item) => item.chave,
-        []
-    )
+    const extrairChave = useCallback((item) => item.chave, [])
 
     const registrarInteracao = useCallback(() => {
         usuarioInteragiu.current = true
@@ -127,9 +86,7 @@ function CycleCalendar({
             || carregandoAnteriores
             || solicitouAnteriores.current
             || typeof aoCarregarAnteriores !== 'function'
-        ) {
-            return
-        }
+        ) return
 
         solicitouAnteriores.current = true
         aoCarregarAnteriores()
@@ -141,9 +98,7 @@ function CycleCalendar({
             || carregandoPosteriores
             || solicitouPosteriores.current
             || typeof aoCarregarPosteriores !== 'function'
-        ) {
-            return
-        }
+        ) return
 
         solicitouPosteriores.current = true
         aoCarregarPosteriores()
@@ -152,29 +107,16 @@ function CycleCalendar({
     if (carregando && mesesNormalizados.length === 0) {
         return (
             <View style={estilos.calendario}>
-                <IndicadorCarregamento
-                    inicial
-                    rotulo="Carregando calendário"
-                />
+                <IndicadorCarregamento inicial rotulo="Carregando calendário" />
             </View>
         )
     }
 
     return (
         <View style={estilos.calendario}>
-            <View
-                accessible
-                accessibilityRole="header"
-                accessibilityLabel="Dias da semana"
-                style={estilos.cabecalhoSemana}
-            >
+            <View accessible accessibilityRole="header" accessibilityLabel="Dias da semana" style={estilos.cabecalhoSemana}>
                 {DIAS_SEMANA.map((dia) => (
-                    <Text
-                        key={dia}
-                        style={estilos.nomeDiaSemana}
-                    >
-                        {dia}
-                    </Text>
+                    <Text key={dia} style={estilos.nomeDiaSemana}>{dia}</Text>
                 ))}
             </View>
 
@@ -185,15 +127,11 @@ function CycleCalendar({
                 renderItem={renderizarMes}
                 keyExtractor={extrairChave}
                 getItemLayout={obterLayoutMes}
-                initialScrollIndex={indiceMesAtual}
+                initialScrollIndex={indiceInicial}
                 style={estilos.lista}
                 contentContainerStyle={estilos.conteudoLista}
-                ListHeaderComponent={carregandoAnteriores ? (
-                    <IndicadorCarregamento rotulo="Carregando meses anteriores" />
-                ) : null}
-                ListFooterComponent={carregandoPosteriores ? (
-                    <IndicadorCarregamento rotulo="Carregando próximos meses" />
-                ) : null}
+                ListHeaderComponent={carregandoAnteriores ? <IndicadorCarregamento rotulo="Carregando meses anteriores" /> : null}
+                ListFooterComponent={carregandoPosteriores ? <IndicadorCarregamento rotulo="Carregando próximos meses" /> : null}
                 initialNumToRender={2}
                 maxToRenderPerBatch={2}
                 updateCellsBatchingPeriod={50}
