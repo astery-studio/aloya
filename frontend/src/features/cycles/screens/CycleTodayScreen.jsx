@@ -17,8 +17,8 @@ const CONFIGURACOES_ERRO = Object.freeze({
         mensagem: 'Não foi possível carregar sua previsão no momento. Tente novamente.'
     }),
     sincronizacao: Object.freeze({
-        titulo: 'Falha na sincronização',
-        mensagem: 'Não foi possível sincronizar seus dados. Verifique sua conexão e tente novamente.'
+        titulo: 'Algo deu errado',
+        mensagem: 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
     })
 });
 
@@ -50,7 +50,7 @@ function CycleTodayScreen({
                             icone={CalendarBlankIcon}
                             aoPressionar={aoAbrirCalendario}
                             rotuloAcessibilidade="Abrir calendário"
-                            variante="selecionado"
+                            variante="calendario"
                         />
                     </View>
                     {dias.length ? <CycleDateStrip dias={dias} dataSelecionada={referencia} aoSelecionarData={aoSelecionarData} /> : null}
@@ -66,14 +66,13 @@ function CycleTodayScreen({
                     />
                 </ScrollView>
             )}
-            <SafeAreaView edges={['bottom', 'left', 'right']} style={estilos.navegacao}>
-                <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
-            </SafeAreaView>
+            <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
             <SimpleModal
                 visivel={!carregando && Boolean(tipoErro)}
                 aoFechar={aoVoltar}
                 icone={WarningCircleIcon}
                 corIcone={cores.feedback.erro}
+                fundoIcone={cores.neutras.fundoClaro}
                 titulo={configuracaoErro.titulo}
                 mensagem={configuracaoErro.mensagem}
                 acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: aoTentarNovamente }}

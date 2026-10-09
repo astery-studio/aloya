@@ -8,8 +8,7 @@ const estilos = StyleSheet.create({
     titulo: { ...typography.h2, flexShrink: 1, color: cores.neutras.textoPrincipalClaro, lineHeight: 28 },
     rolagem: { flexGrow: 1, paddingBottom: espacamentos.extraGrande * 4 },
     carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-    textoCarregando: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 15, lineHeight: 21 },
-    navegacao: { flexShrink: 0, backgroundColor: cores.neutras.superficieClara }
+    textoCarregando: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 15, lineHeight: 21 }
 });
 
 export { estilos };
