@@ -8,7 +8,7 @@ import {
     criarCursorHistorico,
     decodificarCursorHistorico,
     validarConsultaHistorico
-} from '../../../../src/features/cycles/cycleHistory.validator.js';
+} from '../../../../src/features/cycles/validators/cycleHistory.validator.js';
 
 const dataInicio = new Date('2026-09-04T00:00:00.000Z');
 

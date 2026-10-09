@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import prismaPackage from '@prisma/client';
-import { criarContraceptiveController } from '../../../../src/features/contraceptives/contraceptive.controller.js';
-import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveController } from '../../../../src/features/contraceptives/controllers/contraceptive.controller.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
 const { PrismaClient } = prismaPackage;

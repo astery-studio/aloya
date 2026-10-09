@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { calcularPrevisao } from '../../../../src/features/cycles/prediction.js';
-import { criarPredictionService } from '../../../../src/features/cycles/prediction.service.js';
+import { calcularPrevisao } from '../../../../src/features/cycles/utils/prediction.js';
+import { criarPredictionService } from '../../../../src/features/cycles/services/prediction.service.js';
 
 test('usa histórico somente no cálculo e respeita o parâmetro lúteo declarado', () => {
     const registros = [

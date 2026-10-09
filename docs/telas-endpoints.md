@@ -513,7 +513,7 @@ Corpo:
 
 Porém, no estado atual do backend:
 
-- a rota não está registrada em `src/server.js`;
+- a rota não está registrada em `src/shared/http/server.js`;
 - não existe um grupo `/support-network` montado no servidor atual;
 - uma tentativa real de cadastro receberá `404 ROTA_NAO_ENCONTRADA`.
 
@@ -655,10 +655,10 @@ frontend/src/features/support-network/services/supportCategoryService.js
 ### Backend
 
 ```text
-backend/src/server.js
+backend/src/shared/http/server.js
 backend/src/features/auth/routes/auth.routes.js
-backend/src/routes/account.routes.js
-backend/src/routes/logout.routes.js
+backend/src/features/settings/routes/account.routes.js
+backend/src/features/auth/routes/logout.routes.js
 backend/src/features/contraceptives/contraceptive.routes.js
 ```
 

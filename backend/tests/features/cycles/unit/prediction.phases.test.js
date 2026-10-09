@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { estimarFases } from '../../../../src/features/cycles/prediction.phases.js';
+import { estimarFases } from '../../../../src/features/cycles/utils/prediction.phases.js';
 
 test('estima categorias educativas e janela fértil pelo calendário', () => {
     const resultado = estimarFases({

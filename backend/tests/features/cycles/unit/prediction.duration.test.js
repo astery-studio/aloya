@@ -4,7 +4,7 @@ import test from 'node:test';
 import {
     ORIGENS,
     selecionarDuracao
-} from '../../../../src/features/cycles/prediction.duration.js';
+} from '../../../../src/features/cycles/utils/prediction.duration.js';
 
 test('prioriza durações históricas já selecionadas', () => {
     assert.deepEqual(selecionarDuracao([26, 27, 28, 29, 30, 31], 25, 28), {

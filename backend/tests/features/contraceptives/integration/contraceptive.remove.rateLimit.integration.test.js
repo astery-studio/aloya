@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
 
-import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/contraceptive.routes.js';
+import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptive.routes.js';
 
 //Inicia uma API temporária e registra a ordem dos middlewares e controllers.
 async function comApi({autenticado = true}, executar) {

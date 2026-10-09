@@ -8,7 +8,7 @@ node_modules
 /prisma/*.db-shm
 /prisma/*.db-wal
 
-/src/generated/prisma
+/src/shared/generated/prisma
 
 #IAs sem sentido
 .agents/

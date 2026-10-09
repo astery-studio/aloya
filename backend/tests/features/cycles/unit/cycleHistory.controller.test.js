@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {criarCycleHistoryController} from '../../../../src/features/cycles/cycleHistory.controller.js';
+import {criarCycleHistoryController} from '../../../../src/features/cycles/controllers/cycleHistory.controller.js';
 
 //Cria uma resposta Express controlada para inspecionar status, corpo e cabeçalhos.
 function criarRespostaMock() {

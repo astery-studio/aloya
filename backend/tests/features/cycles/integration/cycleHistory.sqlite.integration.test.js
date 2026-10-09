@@ -12,10 +12,10 @@ import express from 'express';
 import {PrismaBetterSqlite3} from '@prisma/adapter-better-sqlite3';
 import prismaPackage from '@prisma/client';
 
-import {criarCycleHistoryRepository} from '../../../../src/features/cycles/cycleHistory.repository.js';
-import {criarCycleHistoryService} from '../../../../src/features/cycles/cycleHistory.service.js';
-import {criarCycleHistoryController} from '../../../../src/features/cycles/cycleHistory.controller.js';
-import {criarCycleHistoryRoutes} from '../../../../src/features/cycles/cycleHistory.routes.js';
+import {criarCycleHistoryRepository} from '../../../../src/features/cycles/repositories/cycleHistory.repository.js';
+import {criarCycleHistoryService} from '../../../../src/features/cycles/services/cycleHistory.service.js';
+import {criarCycleHistoryController} from '../../../../src/features/cycles/controllers/cycleHistory.controller.js';
+import {criarCycleHistoryRoutes} from '../../../../src/features/cycles/routes/cycleHistory.routes.js';
 import {tratarErros} from '../../../../src/shared/middleware/error.middleware.js';
 
 const {PrismaClient} = prismaPackage;

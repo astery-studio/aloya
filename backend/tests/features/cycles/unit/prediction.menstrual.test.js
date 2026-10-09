@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { preverMenstruacao, preverSangramento } from '../../../../src/features/cycles/prediction.menstrual.js';
+import { preverMenstruacao, preverSangramento } from '../../../../src/features/cycles/utils/prediction.menstrual.js';
 
 test('estima o próximo início sem criar ciclos intermediários', () => {
     assert.deepEqual(preverMenstruacao({

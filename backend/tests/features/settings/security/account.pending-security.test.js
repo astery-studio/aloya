@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountService } from '../../../../src/services/account.service.js'
+import { criarAccountService } from '../../../../src/features/settings/services/account.service.js'
 import * as dateUtils from '../../../../src/shared/utils/date.utils.js'
 
 //Cria uma usuária autenticada para os testes

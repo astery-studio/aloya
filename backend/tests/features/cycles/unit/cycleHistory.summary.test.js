@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarResumoHistorico
-} from '../../../../src/features/cycles/cycleHistory.summary.js';
+} from '../../../../src/features/cycles/utils/cycleHistory.summary.js';
 
 const DIA_EM_MS = 86_400_000;
 

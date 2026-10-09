@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarPredictionService } from '../../../../src/features/cycles/prediction.service.js';
+import { criarPredictionService } from '../../../../src/features/cycles/services/prediction.service.js';
 
 test('consulta somente dados da pessoa autenticada e limita o histórico', async () => {
     let consulta;

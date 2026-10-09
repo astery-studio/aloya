@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarCycleHistoryRepository
-} from '../../../../src/features/cycles/cycleHistory.repository.js';
+} from '../../../../src/features/cycles/repositories/cycleHistory.repository.js';
 
 function criarDependencias({registros = []} = {}) {
     const chamadas = [];

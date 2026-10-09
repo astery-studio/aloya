@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarEdicaoAnticoncepcionalRateLimit } from '../../../../src/features/contraceptives/contraceptiveRateLimit.middleware.js';
+import { criarEdicaoAnticoncepcionalRateLimit } from '../../../../src/features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 //Cria o middleware e captura a configuração entregue ao express-rate-limit.
 function prepararRateLimit() {

@@ -5,7 +5,7 @@ import test from 'node:test';
 import {
     validarEdicaoAnticoncepcional,
     validarIdAnticoncepcional
-} from '../../../../src/features/contraceptives/contraceptive.validator.js';
+} from '../../../../src/features/contraceptives/validators/contraceptive.validator.js';
 
 const hoje = new Date('2026-10-02T12:00:00.000Z');
 

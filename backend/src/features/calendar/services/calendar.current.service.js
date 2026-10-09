@@ -1,6 +1,6 @@
 //Calcula o estado atual exibido na Home sem carregar a grade mensal.
 import { AppError } from '../../../shared/errors/AppError.js';
-import { calcularPrevisao } from '../../cycles/prediction.js';
+import { calcularPrevisao } from '../../cycles/utils/prediction.js';
 import {
     adicionarDias,
     diferencaDias,
