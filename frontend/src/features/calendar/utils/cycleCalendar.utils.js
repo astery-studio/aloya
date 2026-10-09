@@ -96,14 +96,17 @@ function intervaloContem(intervalo, data) {
 }
 
 function prepararPrevisao(previsao) {
-    return {
-        menstruacaoPrevista: validarIntervalo(previsao?.menstruacaoPrevista),
-        faseMenstrual: validarIntervalo(previsao?.faseMenstrual),
-        faseFolicular: validarIntervalo(previsao?.faseFolicular),
-        faseLutea: validarIntervalo(previsao?.faseLutea),
-        janelaFertil: validarIntervalo(previsao?.janelaFertil),
-        ovulacao: previsao?.ovulacao
-    }
+    const periodos = Array.isArray(previsao?.periodos) ? previsao.periodos : [previsao]
+
+    return periodos.filter(periodo => periodo && typeof periodo === 'object').map(periodo => ({
+        previsto: periodo.previsto === true,
+        menstruacaoPrevista: validarIntervalo(periodo.menstruacaoPrevista),
+        faseMenstrual: validarIntervalo(periodo.faseMenstrual),
+        faseFolicular: validarIntervalo(periodo.faseFolicular),
+        faseLutea: validarIntervalo(periodo.faseLutea),
+        janelaFertil: validarIntervalo(periodo.janelaFertil),
+        ovulacao: periodo.ovulacao
+    }))
 }
 
 function criarRegistrosPorData(diasMenstruacao) {
@@ -129,38 +132,42 @@ function obterMarcacao(data, previsao, registroCicloId) {
         }
     }
 
-    if (intervaloContem(previsao?.menstruacaoPrevista, data)) {
+    if (previsao.some(periodo => intervaloContem(periodo.menstruacaoPrevista, data))) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: true
         }
     }
 
-    if (intervaloContem(previsao?.faseMenstrual, data)) {
+    const menstrual = previsao.find(periodo => intervaloContem(periodo.faseMenstrual, data))
+    if (menstrual) {
         return {
             tipo: TIPOS_DIA.menstruacao,
-            previsto: false
+            previsto: menstrual.previsto
         }
     }
 
-    if (intervaloContem(previsao?.faseFolicular, data)) {
+    const folicular = previsao.find(periodo => intervaloContem(periodo.faseFolicular, data))
+    if (folicular) {
         return {
             tipo: TIPOS_DIA.folicular,
-            previsto: false
+            previsto: folicular.previsto
         }
     }
 
-    if (previsao?.ovulacao === data) {
+    const ovulatorio = previsao.find(periodo => periodo.ovulacao === data)
+    if (ovulatorio) {
         return {
             tipo: TIPOS_DIA.ovulacao,
-            previsto: false
+            previsto: ovulatorio.previsto
         }
     }
 
-    if (intervaloContem(previsao?.faseLutea, data)) {
+    const luteo = previsao.find(periodo => intervaloContem(periodo.faseLutea, data))
+    if (luteo) {
         return {
             tipo: TIPOS_DIA.lutea,
-            previsto: false
+            previsto: luteo.previsto
         }
     }
 
@@ -176,8 +183,9 @@ function criarDia(casa, contexto) {
     const registroCicloId = contexto.registrosPorData.get(casa.data) ?? null
     const marcacao = obterMarcacao(casa.data, contexto.previsao, registroCicloId)
     const futuro = casa.data > contexto.hoje
-    const previsto = Boolean(marcacao.tipo && (marcacao.previsto || futuro))
-    const janelaFertil = intervaloContem(contexto.previsao?.janelaFertil, casa.data)
+    const previsto = Boolean(!registroCicloId && marcacao.tipo && (marcacao.previsto || futuro))
+    const periodoFertil = contexto.previsao.find(periodo => intervaloContem(periodo.janelaFertil, casa.data))
+    const janelaFertil = Boolean(periodoFertil)
 
     return {
         ...casa,
@@ -186,7 +194,7 @@ function criarDia(casa, contexto) {
         futuro,
         registroCicloId,
         janelaFertil,
-        janelaFertilPrevista: janelaFertil && futuro
+        janelaFertilPrevista: janelaFertil && (periodoFertil.previsto || futuro)
     }
 }
 
