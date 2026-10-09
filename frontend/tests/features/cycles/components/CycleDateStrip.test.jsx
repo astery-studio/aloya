@@ -20,7 +20,28 @@ test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
     const faixa = screen.getByLabelText('Datas do ciclo');
     expect(faixa.props.horizontal).toBe(true);
     expect(faixa.props.showsHorizontalScrollIndicator).toBe(false);
+    expect(faixa.props.windowSize).toBe(5);
+    expect(faixa.props.maintainVisibleContentPosition).toEqual({ minIndexForVisible: 1 });
     expect(screen.getAllByRole('button')).toHaveLength(2);
+});
+
+test.each([
+    ['anteriores', { x: 0, callback: 'aoCarregarAnteriores' }],
+    ['posteriores', { x: 610, callback: 'aoCarregarPosteriores' }]
+])('solicita mais datas %s ao alcançar a borda da faixa', async (_, { x, callback }) => {
+    const carregar = jest.fn();
+    await montar({ [callback]: carregar });
+    const faixa = screen.getByLabelText('Datas do ciclo');
+    const evento = { nativeEvent: {
+        contentOffset: { x, y: 0 },
+        contentSize: { width: 1000, height: 94 },
+        layoutMeasurement: { width: 390, height: 94 }
+    } };
+
+    await fireEvent(faixa, 'scrollEndDrag', evento);
+    await fireEvent(faixa, 'momentumScrollEnd', evento);
+
+    expect(carregar).toHaveBeenCalledTimes(1);
 });
 
 test('aceita a lista vazia padrão', async () => {
