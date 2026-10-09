@@ -9,7 +9,7 @@ const estilos = StyleSheet.create({
     },
     cabecalho: {
         display: 'flex',
-        height: 119,
+        height: 139,
         paddingTop: 56,
         paddingRight: 20,
         paddingBottom: 8,
@@ -26,12 +26,20 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
+    centralizadorCabecalho: {
+        position: 'absolute',
+        top: 56,
+        left: 0,
+        right: 0,
+        height: 75,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     caixaCalendario: {
         display: 'flex',
         width: 288,
         maxWidth: '82%',
         height: 75,
-        paddingLeft: 8,
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center'

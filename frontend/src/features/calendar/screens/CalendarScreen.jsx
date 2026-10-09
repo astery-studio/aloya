@@ -1,5 +1,5 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {Pressable, Text, View} from 'react-native'
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen'
@@ -36,6 +36,31 @@ function normalizarConfianca(valor) {
     return null
 }
 
+function ErroCalendario({erro, aoTentarNovamente}) {
+    const [fechado, setFechado] = useState(false)
+
+    function tentarNovamente() {
+        if (typeof aoTentarNovamente === 'function') {
+            aoTentarNovamente()
+        } else {
+            setFechado(true)
+        }
+    }
+
+    return (
+        <AlertModal
+            visivel={!fechado}
+            titulo="Não foi possível carregar o calendário"
+            mensagem={erro}
+            acaoPrincipal={{
+                texto: typeof aoTentarNovamente === 'function' ? 'Tentar novamente' : 'Fechar',
+                aoPressionar: tentarNovamente
+            }}
+            aoFechar={() => setFechado(true)}
+        />
+    )
+}
+
 function CalendarScreen({
     meses = [],
     confianca,
@@ -51,7 +76,6 @@ function CalendarScreen({
     onSelecionarAba
 }) {
     const [legendaVisivel, setLegendaVisivel] = useState(false)
-    const [erroFechado, setErroFechado] = useState(false)
 
     const mesesValidos = Array.isArray(meses) ? meses : []
     const confiancaValida = normalizarConfianca(confianca)
@@ -61,20 +85,6 @@ function CalendarScreen({
         || mes?.calendario?.possuiCiclos === true
     ))
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos
-
-    useEffect(() => {
-        setErroFechado(false)
-    }, [erro])
-
-    function tentarNovamente() {
-        if (typeof aoTentarNovamente === 'function') {
-            setErroFechado(false)
-            aoTentarNovamente()
-            return
-        }
-
-        setErroFechado(true)
-    }
 
     return (
         <View style={estilos.tela}>
@@ -90,14 +100,20 @@ function CalendarScreen({
                     <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
                 </Pressable>
 
-                <View style={estilos.caixaCalendario}>
-                    <View testID="titulo-e-confianca" style={estilos.tituloEConfianca}>
-                        <Text accessibilityRole="header" style={estilos.titulo}>
-                            Calendário
-                        </Text>
-                        {!estadoVazio && confiancaValida ? (
-                            <ConfidenceBadge nivel={confiancaValida} variante="simples" />
-                        ) : null}
+                <View
+                    testID="centralizador-cabecalho"
+                    pointerEvents="box-none"
+                    style={estilos.centralizadorCabecalho}
+                >
+                    <View style={estilos.caixaCalendario}>
+                        <View testID="titulo-e-confianca" style={estilos.tituloEConfianca}>
+                            <Text accessibilityRole="header" style={estilos.titulo}>
+                                Calendário
+                            </Text>
+                            {!estadoVazio && confiancaValida ? (
+                                <ConfidenceBadge nivel={confiancaValida} variante="simples" />
+                            ) : null}
+                        </View>
                     </View>
                 </View>
 
@@ -153,16 +169,9 @@ function CalendarScreen({
                 aoFechar={() => setLegendaVisivel(false)}
             />
 
-            <AlertModal
-                visivel={existeErro && !erroFechado}
-                titulo="Não foi possível carregar o calendário"
-                mensagem={erro || 'Não foi possível carregar os dados do calendário. Tente novamente.'}
-                acaoPrincipal={{
-                    texto: typeof aoTentarNovamente === 'function' ? 'Tentar novamente' : 'Fechar',
-                    aoPressionar: tentarNovamente
-                }}
-                aoFechar={() => setErroFechado(true)}
-            />
+            {existeErro ? (
+                <ErroCalendario key={erro} erro={erro} aoTentarNovamente={aoTentarNovamente} />
+            ) : null}
         </View>
     )
 }

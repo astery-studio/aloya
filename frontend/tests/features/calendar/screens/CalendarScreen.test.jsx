@@ -1,6 +1,7 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react-native'
 import {CalendarScreen} from '../../../../src/features/calendar/screens/CalendarScreen'
+import {estilos} from '../../../../src/features/calendar/screens/CalendarScreen.styles'
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
     const ReactInterno = require('react')
@@ -130,6 +131,24 @@ describe('CalendarScreen', () => {
         const tituloEConfianca = within(screen.getByTestId('titulo-e-confianca'))
         expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen()
         expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen()
+        expect(estilos.centralizadorCabecalho).toMatchObject({
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            alignItems: 'center'
+        })
+        expect(estilos.caixaCalendario).toMatchObject({
+            width: 288
+        })
+        expect(estilos.tituloEConfianca).toMatchObject({
+            flexDirection: 'column',
+            alignItems: 'center'
+        })
+        //O grupo inteiro precisa caber antes do cabeçalho dos dias da semana.
+        const fimDoGrupo = estilos.centralizadorCabecalho.top + estilos.caixaCalendario.height
+        expect(fimDoGrupo + estilos.cabecalho.paddingBottom).toBeLessThanOrEqual(
+            estilos.cabecalho.height
+        )
         expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen()
     })
 
@@ -201,5 +220,24 @@ describe('CalendarScreen', () => {
         )
 
         expect(aoTentarNovamente).toHaveBeenCalledTimes(1)
+    })
+
+    test('reabre o mesmo erro após uma nova falha, sem reabrir o erro já dispensado', async () => {
+        const props = {
+            meses: [{mes: '2026-10', possuiCiclos: true}],
+            confianca: 'alta',
+            aoVoltar: jest.fn()
+        }
+        const mensagem = 'Não foi possível carregar os dados do calendário. Tente novamente.'
+        const {rerender} = await render(<CalendarScreen {...props} erro={mensagem} />)
+
+        await fireEvent.press(screen.getByRole('button', {name: 'Fechar'}))
+        expect(screen.queryByTestId('alert-modal')).toBeNull()
+        await rerender(<CalendarScreen {...props} erro={mensagem} />)
+        expect(screen.queryByTestId('alert-modal')).toBeNull()
+
+        await rerender(<CalendarScreen {...props} />)
+        await rerender(<CalendarScreen {...props} erro={mensagem} />)
+        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen()
     })
 })
