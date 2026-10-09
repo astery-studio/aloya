@@ -164,3 +164,19 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
     expect(estilos.orbitaFormaEsquerda.transform).toEqual([{ rotate: '45deg' }]);
     expect(estilos.orbitaFormaDireita.transform).toEqual([{ rotate: '-45deg' }]);
 });
+
+test('declara os pesos tipográficos especificados para os textos da HU-013', () => {
+    expect(estilos).toMatchObject({
+        tituloFase: { fontWeight: '700' }, diaCiclo: { fontWeight: '400' },
+        tituloDestaqueFertil: { fontWeight: '700' }, textoDestaqueFertil: { fontWeight: '400' },
+        rotuloPrevisao: { fontWeight: '700' }, rotuloPrevisaoSecundaria: { fontWeight: '700' },
+        valorPrincipal: { fontWeight: '700' }, valorOvulacao: { fontWeight: '700' },
+        tituloAvisoConfiabilidade: { fontWeight: '700' }, textoAvisoConfiabilidade: { fontWeight: '400' },
+        textoAvisoBaixa: { fontWeight: '400' }, valorSecundario: { fontWeight: '700' },
+        aviso: { fontWeight: '400' }, tituloSecao: { fontWeight: '700' },
+        descricaoFase: { fontWeight: '400' }, textoSintoma: { fontWeight: '500' },
+        textoNumeroDica: { fontWeight: '700' }, textoDica: { fontWeight: '400' },
+        chamadaRecursos: { fontWeight: '700' }, tituloRecurso: { fontWeight: '700' },
+        descricaoRecurso: { fontWeight: '400' }
+    });
+});

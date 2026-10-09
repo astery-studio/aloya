@@ -136,7 +136,8 @@ test('encaminha todas as interações da tela carregada', async () => {
 test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
     expect(estilos.areaRolagem).toMatchObject({ flex: 1 });
     expect(estilos.cabecalho).toMatchObject({ width: '100%', minHeight: 78, paddingTop: 32 });
-    expect(estilos.titulo).toMatchObject({ flexShrink: 1 });
+    expect(estilos.titulo).toMatchObject({ flexShrink: 1, fontFamily: 'DMSans_700Bold', fontWeight: '700' });
+    expect(estilos.textoCarregando.fontWeight).toBe('400');
     expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 16 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });
