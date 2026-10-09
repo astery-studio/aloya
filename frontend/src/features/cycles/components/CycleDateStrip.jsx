@@ -33,7 +33,7 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData, aoCarreg
             data={dias}
             keyExtractor={(item) => item.data}
             getItemLayout={(_, index) => ({ length: LARGURA_ITEM, offset: LARGURA_ITEM * index, index })}
-            initialNumToRender={10}
+            initialNumToRender={16}
             maxToRenderPerBatch={10}
             windowSize={5}
             maintainVisibleContentPosition={{ minIndexForVisible: 1 }}

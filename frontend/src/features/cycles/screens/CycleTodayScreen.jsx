@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
@@ -21,6 +22,8 @@ const CONFIGURACOES_ERRO = Object.freeze({
         mensagem: 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
     })
 });
+const DIAS_POR_PAGINA = 14;
+const FAIXA_INICIAL = Object.freeze({ deslocamentoInicial: -3, quantidade: 16 });
 
 function CycleTodayScreen({
     ciclo, previsao, conteudoDaFase, janelaFertil, carregando = false,
@@ -29,11 +32,29 @@ function CycleTodayScreen({
     aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional,
     aoAbrirCalendario, aoSelecionarAba
 }) {
+    const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const referencia = dataSelecionada || previsao?.dataReferencia || ciclo?.dataReferencia;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
     const fase = referencia ? obterFase(referencia, fases) : 'desconhecida';
     const dataBaseDaFaixa = previsao?.dataReferencia || referencia;
-    const dias = dataBaseDaFaixa ? criarDiasDaFaixa(dataBaseDaFaixa, fases) : [];
+    const faixaAtual = faixaDias.dataBase === dataBaseDaFaixa
+        ? faixaDias
+        : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
+    const dias = dataBaseDaFaixa
+        ? criarDiasDaFaixa(dataBaseDaFaixa, fases, faixaAtual.deslocamentoInicial, faixaAtual.quantidade)
+        : [];
+    const carregarDias = (direcao) => setFaixaDias((atual) => {
+        const base = atual.dataBase === dataBaseDaFaixa
+            ? atual
+            : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
+        return {
+            ...base,
+            deslocamentoInicial: direcao === 'anteriores'
+                ? base.deslocamentoInicial - DIAS_POR_PAGINA
+                : base.deslocamentoInicial,
+            quantidade: base.quantidade + DIAS_POR_PAGINA
+        };
+    });
     const semDados = !previsao || previsao.status === 'DADOS_INSUFICIENTES';
     const tipoErro = erroSincronizacao ? 'sincronizacao' : (erroPrevisao || erro ? 'previsao' : null);
     const configuracaoErro = CONFIGURACOES_ERRO[tipoErro] || CONFIGURACOES_ERRO.previsao;
@@ -55,7 +76,13 @@ function CycleTodayScreen({
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
             ) : (
                 <ScrollView testID="conteudo-rolavel" style={estilos.areaRolagem} contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
-                    {dias.length ? <CycleDateStrip dias={dias} dataSelecionada={referencia} aoSelecionarData={aoSelecionarData} /> : null}
+                    {dias.length ? <CycleDateStrip
+                        dias={dias}
+                        dataSelecionada={referencia}
+                        aoSelecionarData={aoSelecionarData}
+                        aoCarregarAnteriores={() => carregarDias('anteriores')}
+                        aoCarregarPosteriores={() => carregarDias('posteriores')}
+                    /> : null}
                     <CycleForecastPanel
                         fase={fase}
                         diaCiclo={obterDiaCiclo(referencia, fases)}

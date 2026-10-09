@@ -75,6 +75,26 @@ test('mantém a faixa de datas no estado sem dados', async () => {
     expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
 });
 
+test('acrescenta páginas de dias passados e futuros ao alcançar as bordas', async () => {
+    await renderizar({ previsao });
+    const evento = (x) => ({ nativeEvent: {
+        contentOffset: { x, y: 0 },
+        contentSize: { width: 1000, height: 94 },
+        layoutMeasurement: { width: 390, height: 94 }
+    } });
+
+    await fireEvent(screen.getByLabelText('Datas do ciclo'), 'scrollEndDrag', evento(0));
+    let dias = screen.getByLabelText('Datas do ciclo').props.data;
+    expect(dias).toHaveLength(30);
+    expect(dias[0].data).toBe('2026-09-21');
+    expect(dias.at(-1).data).toBe('2026-10-20');
+
+    await fireEvent(screen.getByLabelText('Datas do ciclo'), 'scrollEndDrag', evento(610));
+    dias = screen.getByLabelText('Datas do ciclo').props.data;
+    expect(dias).toHaveLength(44);
+    expect(dias.at(-1).data).toBe('2026-11-03');
+});
+
 test('permite repetir ou fechar o erro de previsão', async () => {
     const aoTentarNovamente = jest.fn();
     const aoVoltar = jest.fn();
