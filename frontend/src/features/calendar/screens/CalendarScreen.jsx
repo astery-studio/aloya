@@ -111,7 +111,15 @@ function CalendarScreen({
                                 Calendário
                             </Text>
                             {!estadoVazio && confiancaValida ? (
-                                <ConfidenceBadge nivel={confiancaValida} variante="simples" />
+                                <View
+                                    testID="centralizador-confianca"
+                                    style={estilos.centralizadorConfianca}
+                                >
+                                    <ConfidenceBadge
+                                        nivel={confiancaValida}
+                                        variante="simples"
+                                    />
+                                </View>
                             ) : null}
                         </View>
                     </View>

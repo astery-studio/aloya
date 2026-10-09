@@ -144,6 +144,11 @@ describe('CalendarScreen', () => {
             flexDirection: 'column',
             alignItems: 'center'
         })
+        expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
+            alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'center'
+        })
         //O grupo inteiro precisa caber antes do cabeçalho dos dias da semana.
         const fimDoGrupo = estilos.centralizadorCabecalho.top + estilos.caixaCalendario.height
         expect(fimDoGrupo + estilos.cabecalho.paddingBottom).toBeLessThanOrEqual(

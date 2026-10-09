@@ -51,6 +51,11 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         gap: 2
     },
+    centralizadorConfianca: {
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     titulo: {
         color: cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
