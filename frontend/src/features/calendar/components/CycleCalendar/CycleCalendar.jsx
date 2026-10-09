@@ -2,12 +2,13 @@
 import {memo, useCallback, useMemo, useRef, useState} from 'react'
 import {ActivityIndicator, FlatList, Platform, Text, View} from 'react-native'
 import {cores} from '../../../../shared/theme'
-import {normalizarMeses, obterHojeLocal} from '../../utils/cycleCalendar.utils'
+import {criarNormalizadorMeses, obterHojeLocal} from '../../utils/cycleCalendar.utils'
 import {CycleMonth} from './CycleMonth'
 import {estilos} from './CycleCalendar.styles'
 
 const DIAS_SEMANA = Object.freeze(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'])
 const CONFIGURACAO_POSICAO = Object.freeze({minIndexForVisible: 0})
+const LIMIAR_FINAL = 0.15
 
 function IndicadorCarregamento({rotulo, inicial = false}) {
     return (
@@ -29,10 +30,13 @@ function CycleCalendar({
     const listaRef = useRef(null)
     const [hoje] = useState(obterHojeLocal)
     const usuarioInteragiu = useRef(false)
-    const solicitouAnteriores = useRef(false)
-    const solicitouPosteriores = useRef(false)
+    const solicitouAnteriores = useRef(null)
+    const solicitouPosteriores = useRef(null)
 
-    const mesesNormalizados = useMemo(() => normalizarMeses(meses, hoje), [hoje, meses])
+    const normalizar = useMemo(() => criarNormalizadorMeses(hoje), [hoje])
+    const mesesNormalizados = useMemo(() => normalizar(meses), [normalizar, meses])
+    const primeiroMes = mesesNormalizados[0]?.chave
+    const ultimoMes = mesesNormalizados[mesesNormalizados.length - 1]?.chave
 
     const indiceMesAtual = useMemo(() => {
         const chaveAtual = hoje.slice(0, 7)
@@ -48,15 +52,18 @@ function CycleCalendar({
     }, [hoje, mesesNormalizados])
 
     const layoutsMeses = useMemo(() => {
-        let deslocamento = 0
+        //O cabeçalho integra o conteúdo rolável e precisa entrar nos offsets.
+        let deslocamento = carregandoAnteriores ? estilos.carregamentoPaginacao.height : 0
+        const layouts = []
 
-        return mesesNormalizados.map((mes, index) => {
+        for (const [index, mes] of mesesNormalizados.entries()) {
             const comprimento = 58.982 + mes.semanas.length * 53.99
-            const layout = {index, length: comprimento, offset: deslocamento}
+            layouts.push({index, length: comprimento, offset: deslocamento})
             deslocamento += comprimento
-            return layout
-        })
-    }, [mesesNormalizados])
+        }
+
+        return layouts
+    }, [carregandoAnteriores, mesesNormalizados])
 
     const obterLayoutMes = useCallback((_, index) => layoutsMeses[index], [layoutsMeses])
 
@@ -66,12 +73,6 @@ function CycleCalendar({
 
     const extrairChave = useCallback((item) => item.chave, [])
 
-    const registrarInteracao = useCallback(() => {
-        usuarioInteragiu.current = true
-        solicitouAnteriores.current = false
-        solicitouPosteriores.current = false
-    }, [])
-
     const verificarInicio = useCallback((evento) => {
         const deslocamento = evento.nativeEvent.contentOffset.y
 
@@ -79,25 +80,54 @@ function CycleCalendar({
             deslocamento > 96
             || !usuarioInteragiu.current
             || carregandoAnteriores
-            || solicitouAnteriores.current
+            || !primeiroMes
+            || solicitouAnteriores.current === primeiroMes
             || typeof aoCarregarAnteriores !== 'function'
         ) return
 
-        solicitouAnteriores.current = true
+        solicitouAnteriores.current = primeiroMes
         aoCarregarAnteriores()
-    }, [aoCarregarAnteriores, carregandoAnteriores])
+    }, [aoCarregarAnteriores, carregandoAnteriores, primeiroMes])
 
     const verificarFinal = useCallback(() => {
         if (
             !usuarioInteragiu.current
             || carregandoPosteriores
-            || solicitouPosteriores.current
+            || !ultimoMes
+            || solicitouPosteriores.current === ultimoMes
             || typeof aoCarregarPosteriores !== 'function'
         ) return
 
-        solicitouPosteriores.current = true
+        solicitouPosteriores.current = ultimoMes
         aoCarregarPosteriores()
-    }, [aoCarregarPosteriores, carregandoPosteriores])
+    }, [aoCarregarPosteriores, carregandoPosteriores, ultimoMes])
+
+    const verificarFinalPorPosicao = useCallback((evento) => {
+        const medidas = evento?.nativeEvent
+        const alturaConteudo = medidas?.contentSize?.height
+        const alturaVisivel = medidas?.layoutMeasurement?.height
+        const deslocamento = medidas?.contentOffset?.y
+
+        if (!Number.isFinite(alturaConteudo) || !Number.isFinite(alturaVisivel)
+            || !Number.isFinite(deslocamento) || alturaVisivel <= 0) return
+
+        if (alturaConteudo - alturaVisivel - deslocamento <= alturaVisivel * LIMIAR_FINAL) {
+            verificarFinal()
+        }
+    }, [verificarFinal])
+
+    const registrarInteracao = useCallback((evento) => {
+        usuarioInteragiu.current = true
+        solicitouAnteriores.current = null
+        solicitouPosteriores.current = null
+        //onEndReached pode ter sido consumido antes da primeira interação.
+        verificarFinalPorPosicao(evento)
+    }, [verificarFinalPorPosicao])
+
+    const verificarRolagem = useCallback((evento) => {
+        verificarInicio(evento)
+        verificarFinalPorPosicao(evento)
+    }, [verificarInicio, verificarFinalPorPosicao])
 
     if (carregando && mesesNormalizados.length === 0) {
         return (
@@ -125,7 +155,12 @@ function CycleCalendar({
                 initialScrollIndex={indiceMesAtual}
                 style={estilos.lista}
                 contentContainerStyle={estilos.conteudoLista}
-                ListHeaderComponent={carregandoAnteriores ? <IndicadorCarregamento rotulo="Carregando meses anteriores" /> : null}
+                //Mantém o índice da âncora nativa estável ao mostrar/esconder o indicador.
+                ListHeaderComponent={
+                    <View collapsable={false}>
+                        {carregandoAnteriores ? <IndicadorCarregamento rotulo="Carregando meses anteriores" /> : null}
+                    </View>
+                }
                 ListFooterComponent={carregandoPosteriores ? <IndicadorCarregamento rotulo="Carregando próximos meses" /> : null}
                 initialNumToRender={2}
                 maxToRenderPerBatch={2}
@@ -134,10 +169,10 @@ function CycleCalendar({
                 removeClippedSubviews={Platform.OS === 'android'}
                 maintainVisibleContentPosition={CONFIGURACAO_POSICAO}
                 onScrollBeginDrag={registrarInteracao}
-                onScroll={verificarInicio}
+                onScroll={verificarRolagem}
                 scrollEventThrottle={32}
                 onEndReached={verificarFinal}
-                onEndReachedThreshold={0.15}
+                onEndReachedThreshold={LIMIAR_FINAL}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             />

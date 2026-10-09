@@ -81,16 +81,29 @@ function criarCasasDoMes({ano, mes}) {
     return casas
 }
 
-function intervaloContem(intervalo, data) {
-    return Boolean(
+function validarIntervalo(intervalo) {
+    return (
         intervalo
         && typeof intervalo.inicio === 'string'
         && typeof intervalo.fim === 'string'
         && FORMATO_DATA.test(intervalo.inicio)
         && FORMATO_DATA.test(intervalo.fim)
-        && data >= intervalo.inicio
-        && data <= intervalo.fim
-    )
+    ) ? intervalo : null
+}
+
+function intervaloContem(intervalo, data) {
+    return Boolean(intervalo && data >= intervalo.inicio && data <= intervalo.fim)
+}
+
+function prepararPrevisao(previsao) {
+    return {
+        menstruacaoPrevista: validarIntervalo(previsao?.menstruacaoPrevista),
+        faseMenstrual: validarIntervalo(previsao?.faseMenstrual),
+        faseFolicular: validarIntervalo(previsao?.faseFolicular),
+        faseLutea: validarIntervalo(previsao?.faseLutea),
+        janelaFertil: validarIntervalo(previsao?.janelaFertil),
+        ovulacao: previsao?.ovulacao
+    }
 }
 
 function criarRegistrosPorData(diasMenstruacao) {
@@ -215,7 +228,7 @@ function normalizarMes(mesRecebido, hoje = obterHojeLocal()) {
 
     const contexto = {
         hoje,
-        previsao: mes.previsao ?? null,
+        previsao: prepararPrevisao(mes.previsao),
         registrosPorData: criarRegistrosPorData(mes.diasMenstruacao)
     }
 
@@ -231,20 +244,39 @@ function normalizarMes(mesRecebido, hoje = obterHojeLocal()) {
     }
 }
 
-function normalizarMeses(meses, hoje = obterHojeLocal()) {
+function normalizarMeses(meses, hoje = obterHojeLocal(), normalizar = normalizarMes) {
     if (!Array.isArray(meses)) return []
 
     const mesesNormalizados = new Map()
 
     for (const mes of meses) {
-        const normalizado = normalizarMes(mes, hoje)
+        const normalizado = normalizar(mes, hoje)
         if (normalizado) mesesNormalizados.set(normalizado.chave, normalizado)
     }
 
     return [...mesesNormalizados.values()].sort((a, b) => a.chave.localeCompare(b.chave))
 }
 
+//Cada instância guarda somente entradas ainda alcançáveis pelo chamador.
+//Os dados devem ser atualizados imutavelmente, como as props do React.
+function criarNormalizadorMeses(hoje = obterHojeLocal()) {
+    const cache = new WeakMap()
+
+    function normalizarComCache(entrada) {
+        const mes = entrada?.calendario ?? entrada
+        if (!mes || typeof mes !== 'object') return normalizarMes(mes, hoje)
+        if (cache.has(mes)) return cache.get(mes)
+
+        const normalizado = normalizarMes(mes, hoje)
+        cache.set(mes, normalizado)
+        return normalizado
+    }
+
+    return (meses) => normalizarMeses(meses, hoje, normalizarComCache)
+}
+
 export {
+    criarNormalizadorMeses,
     NOMES_MESES,
     TIPOS_DIA,
     normalizarMes,
