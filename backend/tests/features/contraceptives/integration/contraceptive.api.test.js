@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
-import { criarContraceptiveController } from '../../../../src/features/contraceptives/contraceptive.controller.js';
-import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/contraceptive.routes.js';
-import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveController } from '../../../../src/features/contraceptives/controllers/contraceptive.controller.js';
+import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptive.routes.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
 import { criarAuthMiddleware } from '../../../../src/shared/middleware/auth.middleware.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 

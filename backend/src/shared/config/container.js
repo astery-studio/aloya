@@ -65,26 +65,26 @@ import {
 
 import {
     criarContraceptiveService
-} from '../../features/contraceptives/contraceptive.service.js';
+} from '../../features/contraceptives/services/contraceptive.service.js';
 
 import {
     criarContraceptiveController
-} from '../../features/contraceptives/contraceptive.controller.js';
-import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia, lerJanelasDeUso } from '../../features/contraceptives/contraceptiveUsage.service.js';
-import { criarContraceptiveUsageController } from '../../features/contraceptives/contraceptiveUsage.controller.js';
+} from '../../features/contraceptives/controllers/contraceptive.controller.js';
+import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia, lerJanelasDeUso } from '../../features/contraceptives/services/contraceptiveUsage.service.js';
+import { criarContraceptiveUsageController } from '../../features/contraceptives/controllers/contraceptiveUsage.controller.js';
 
 import {
     criarPredictionService
-} from '../../features/cycles/prediction.service.js';
+} from '../../features/cycles/services/prediction.service.js';
 
 import {
     criarPredictionController
-} from '../../features/cycles/prediction.controller.js';
+} from '../../features/cycles/controllers/prediction.controller.js';
 
 import {
     criarEdicaoAnticoncepcionalRateLimit,
     criarRemocaoAnticoncepcionalRateLimit
-} from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
+} from '../../features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 import {
     criarCalendarModule
@@ -92,15 +92,15 @@ import {
 
 import {
     criarCycleHistoryRepository
-} from '../../features/cycles/cycleHistory.repository.js';
+} from '../../features/cycles/repositories/cycleHistory.repository.js';
 
 import {
     criarCycleHistoryService
-} from '../../features/cycles/cycleHistory.service.js';
+} from '../../features/cycles/services/cycleHistory.service.js';
 
 import {
     criarCycleHistoryController
-} from '../../features/cycles/cycleHistory.controller.js';
+} from '../../features/cycles/controllers/cycleHistory.controller.js';
 
 import {
     criarPermissionCategoryService
@@ -120,35 +120,35 @@ import {
 
 import {
     criarAccountService
-} from '../../services/account.service.js';
+} from '../../features/settings/services/account.service.js';
 
 import {
     criarAccountDeletionService
-} from '../../services/accountDeletion.service.js';
+} from '../../features/settings/services/accountDeletion.service.js';
 
 import {
     criarLogoutService
-} from '../../services/logout.service.js';
+} from '../../features/auth/services/logout.service.js';
 
 import {
     criarAccountValidator
-} from '../../validators/account.validator.js';
+} from '../../features/settings/validators/account.validator.js';
 
 import {
     criarAccountDeletionValidator
-} from '../../validators/accountDeletion.validator.js';
+} from '../../features/settings/validators/accountDeletion.validator.js';
 
 import {
     criarAccountController
-} from '../../controllers/account.controller.js';
+} from '../../features/settings/controllers/account.controller.js';
 
 import {
     criarAccountDeletionController
-} from '../../controllers/accountDeletion.controller.js';
+} from '../../features/settings/controllers/accountDeletion.controller.js';
 
 import {
     criarLogoutController
-} from '../../controllers/logout.controller.js';
+} from '../../features/auth/controllers/logout.controller.js';
 
 import {
     criarAuthMiddleware

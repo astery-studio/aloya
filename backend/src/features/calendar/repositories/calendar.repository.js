@@ -1,5 +1,5 @@
 //Busca somente os dados necessários para calendário e estado atual do ciclo.
-import { CONFIG_PREVISAO } from '../../cycles/prediction.config.js';
+import { CONFIG_PREVISAO } from '../../cycles/constants/prediction.config.js';
 
 function validarDependencias(prisma) {
     const possuiUsuario = typeof prisma?.usuario?.findUnique === 'function';

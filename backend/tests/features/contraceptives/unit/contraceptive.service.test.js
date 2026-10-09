@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
 
 const agora = new Date('2026-09-24T07:00:00.000Z');
 

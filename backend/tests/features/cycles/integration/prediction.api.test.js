@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
 
-import { criarPredictionController } from '../../../../src/features/cycles/prediction.controller.js';
-import { criarPredictionRoutes } from '../../../../src/features/cycles/prediction.routes.js';
-import { criarPredictionService } from '../../../../src/features/cycles/prediction.service.js';
+import { criarPredictionController } from '../../../../src/features/cycles/controllers/prediction.controller.js';
+import { criarPredictionRoutes } from '../../../../src/features/cycles/routes/prediction.routes.js';
+import { criarPredictionService } from '../../../../src/features/cycles/services/prediction.service.js';
 import { criarAuthMiddleware } from '../../../../src/shared/middleware/auth.middleware.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 

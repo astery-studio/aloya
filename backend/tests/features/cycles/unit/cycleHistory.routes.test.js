@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {criarCycleHistoryRoutes} from '../../../../src/features/cycles/cycleHistory.routes.js';
+import {criarCycleHistoryRoutes} from '../../../../src/features/cycles/routes/cycleHistory.routes.js';
 
 //Cria dependências controladas e registra a ordem de configuração da rota.
 function criarDependencias() {

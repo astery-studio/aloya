@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarPredictionController, MENSAGEM_ERRO } from '../../../../src/features/cycles/prediction.controller.js';
+import { criarPredictionController, MENSAGEM_ERRO } from '../../../../src/features/cycles/controllers/prediction.controller.js';
 
 test('busca previsão usando somente a identidade da sessão', async () => {
     let usuarioRecebido;

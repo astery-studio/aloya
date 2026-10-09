@@ -4,11 +4,11 @@ import assert from 'node:assert/strict';
 
 import {
     criarCycleHistoryService
-} from '../../../../src/features/cycles/cycleHistory.service.js';
+} from '../../../../src/features/cycles/services/cycleHistory.service.js';
 
 import {
     criarCursorHistorico
-} from '../../../../src/features/cycles/cycleHistory.validator.js';
+} from '../../../../src/features/cycles/validators/cycleHistory.validator.js';
 
 const dataMaisRecente =
     new Date(

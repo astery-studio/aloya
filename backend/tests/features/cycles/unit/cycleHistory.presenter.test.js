@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
     apresentarCicloHistorico
-} from '../../../../src/features/cycles/cycleHistory.presenter.js';
+} from '../../../../src/features/cycles/presenters/cycleHistory.presenter.js';
 
 //Cria um registro interno válido que pode ser modificado individualmente.
 function criarRegistro(alteracoes = {}) {

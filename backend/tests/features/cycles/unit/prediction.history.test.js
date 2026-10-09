@@ -6,7 +6,7 @@ import {
     identificarAmbiguidades,
     selecionarRegistrosElegiveis,
     selecionarIntervalosRecentes
-} from '../../../../src/features/cycles/prediction.history.js';
+} from '../../../../src/features/cycles/utils/prediction.history.js';
 
 test('dois inícios formam um intervalo e o ciclo mais recente fica incompleto', () => {
     const registros = [

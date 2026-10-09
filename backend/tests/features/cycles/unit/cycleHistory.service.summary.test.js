@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 import {
     criarCycleHistoryService
-} from '../../../../src/features/cycles/cycleHistory.service.js';
+} from '../../../../src/features/cycles/services/cycleHistory.service.js';
 
 const DIA_EM_MS = 86_400_000;
 

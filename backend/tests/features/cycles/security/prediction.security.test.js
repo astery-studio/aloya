@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarPredictionController } from '../../../../src/features/cycles/prediction.controller.js';
+import { criarPredictionController } from '../../../../src/features/cycles/controllers/prediction.controller.js';
 
 test('ignora identidade fornecida pelo cliente e não expõe dados internos', async () => {
     let identidadeConsultada;

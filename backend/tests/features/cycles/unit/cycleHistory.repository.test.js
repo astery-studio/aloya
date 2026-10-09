@@ -2,8 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {criarCycleHistoryRepository} from '../../../../src/features/cycles/cycleHistory.repository.js';
-import {decodificarCursorHistorico} from '../../../../src/features/cycles/cycleHistory.validator.js';
+import {criarCycleHistoryRepository} from '../../../../src/features/cycles/repositories/cycleHistory.repository.js';
+import {decodificarCursorHistorico} from '../../../../src/features/cycles/validators/cycleHistory.validator.js';
 
 const dataMaisRecente = new Date('2026-09-04T00:00:00.000Z');
 const dataIntermediaria = new Date('2026-08-07T00:00:00.000Z');

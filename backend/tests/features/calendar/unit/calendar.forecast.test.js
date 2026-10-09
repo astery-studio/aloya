@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { criarCalendarService } from '../../../../src/features/calendar/services/calendar.service.js';
-import { calcularPrevisao } from '../../../../src/features/cycles/prediction.js';
-import { estimarFases } from '../../../../src/features/cycles/prediction.phases.js';
+import { calcularPrevisao } from '../../../../src/features/cycles/utils/prediction.js';
+import { estimarFases } from '../../../../src/features/cycles/utils/prediction.phases.js';
 import { adicionarDias } from '../../../../src/features/cycles/utils/calendar.js';
 
 function criarCenario({

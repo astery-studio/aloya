@@ -3,9 +3,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import express from 'express'
 
-import {criarLogoutService} from '../../../../src/services/logout.service.js'
-import {criarLogoutController} from '../../../../src/controllers/logout.controller.js'
-import {criarLogoutRoutes} from '../../../../src/routes/logout.routes.js'
+import {criarLogoutService} from '../../../../src/features/auth/services/logout.service.js'
+import {criarLogoutController} from '../../../../src/features/auth/controllers/logout.controller.js'
+import {criarLogoutRoutes} from '../../../../src/features/auth/routes/logout.routes.js'
 import {criarAuthMiddleware} from '../../../../src/shared/middleware/auth.middleware.js'
 
 test(

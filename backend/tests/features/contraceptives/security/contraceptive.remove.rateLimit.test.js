@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarRemocaoAnticoncepcionalRateLimit } from '../../../../src/features/contraceptives/contraceptiveRateLimit.middleware.js';
+import { criarRemocaoAnticoncepcionalRateLimit } from '../../../../src/features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 //Cria o middleware falso e permite inspecionar as opções recebidas.
 function criarRateLimitFalso() {

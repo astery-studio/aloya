@@ -8,10 +8,10 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import prismaPackage from '@prisma/client';
-import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia } from '../../../../src/features/contraceptives/contraceptiveUsage.service.js';
-import { criarContraceptiveUsageController } from '../../../../src/features/contraceptives/contraceptiveUsage.controller.js';
-import { criarRotasUsosAnticoncepcionais } from '../../../../src/features/contraceptives/contraceptiveUsage.routes.js';
-import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia } from '../../../../src/features/contraceptives/services/contraceptiveUsage.service.js';
+import { criarContraceptiveUsageController } from '../../../../src/features/contraceptives/controllers/contraceptiveUsage.controller.js';
+import { criarRotasUsosAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptiveUsage.routes.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
 test('HU-023 SQLite/API: doses, timestamp, desmarcação, prazo e autorização sem alterar notificações', async () => {

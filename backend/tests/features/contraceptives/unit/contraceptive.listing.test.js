@@ -1,18 +1,18 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarContraceptiveController } from '../../../../src/features/contraceptives/contraceptive.controller.js';
-import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveController } from '../../../../src/features/contraceptives/controllers/contraceptive.controller.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
 import {
     apresentarAnticoncepcionalListagem,
     apresentarUsoHistorico
-} from '../../../../src/features/contraceptives/contraceptive.listing.presenter.js';
+} from '../../../../src/features/contraceptives/presenters/contraceptive.listing.presenter.js';
 import {
     horarioPertenceAgenda,
     listarUsosAgendadosHoje,
     proximoUsoListagem,
     usoOcorreNaData
-} from '../../../../src/features/contraceptives/contraceptive.listing.schedule.js';
+} from '../../../../src/features/contraceptives/utils/contraceptive.listing.schedule.js';
 
 const agora = new Date('2026-10-09T10:00:00.000Z');
 

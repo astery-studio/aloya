@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountDeletionService } from '../../../../src/services/accountDeletion.service.js'
+import { criarAccountDeletionService } from '../../../../src/features/settings/services/accountDeletion.service.js'
 
 //Cria uma conta principal e uma sessão ativa para os testes
 function criarUsuario() {

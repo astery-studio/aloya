@@ -1,8 +1,8 @@
 //Monta os dados compactos de um mês do calendário usando os cálculos de previsão.
 import { AppError } from '../../../shared/errors/AppError.js';
-import { CONFIG_PREVISAO } from '../../cycles/prediction.config.js';
-import { calcularPrevisao } from '../../cycles/prediction.js';
-import { estimarFases } from '../../cycles/prediction.phases.js';
+import { CONFIG_PREVISAO } from '../../cycles/constants/prediction.config.js';
+import { calcularPrevisao } from '../../cycles/utils/prediction.js';
+import { estimarFases } from '../../cycles/utils/prediction.phases.js';
 import { adicionarDias, diferencaDias, formatarData } from '../../cycles/utils/calendar.js';
 import { criarIntervaloMensal } from '../utils/calendar.period.js';
 import { validarMesCalendario } from '../validators/calendar.validator.js';

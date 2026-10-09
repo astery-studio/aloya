@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { criarContraceptiveController } from '../../../../src/features/contraceptives/contraceptive.controller.js';
+import { criarContraceptiveController } from '../../../../src/features/contraceptives/controllers/contraceptive.controller.js';
 
 //Cria uma resposta HTTP falsa e registra o status e o corpo devolvidos.
 function criarResposta() {

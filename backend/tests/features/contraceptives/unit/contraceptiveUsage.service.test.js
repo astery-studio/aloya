@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { criarAvaliadorJanelaEficacia, lerJanelasDeUso } from '../../../../src/features/contraceptives/contraceptiveUsage.service.js';
-import { dataHoraNoFuso, dataLocalNoFuso } from '../../../../src/features/contraceptives/contraceptiveUsage.validator.js';
+import { criarAvaliadorJanelaEficacia, lerJanelasDeUso } from '../../../../src/features/contraceptives/services/contraceptiveUsage.service.js';
+import { dataHoraNoFuso, dataLocalNoFuso } from '../../../../src/features/contraceptives/validators/contraceptiveUsage.validator.js';
 
 test('não inventa prazos clínicos por tipo ou nome; a configuração é por identificador', () => {
     const avaliar = criarAvaliadorJanelaEficacia({ 1: 60 });

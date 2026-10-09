@@ -5,7 +5,7 @@ import test from 'node:test';
 import {
     calcularProximaNotificacao,
     sincronizarNotificacoesEdicao
-} from '../../../../src/features/contraceptives/contraceptive.notifications.js';
+} from '../../../../src/features/contraceptives/utils/contraceptive.notifications.js';
 
 const agora = new Date('2026-10-02T07:00:00.000Z');
 
