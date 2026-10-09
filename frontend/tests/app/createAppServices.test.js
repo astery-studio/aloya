@@ -1,12 +1,13 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
-import { criarAuthService } from '../../src/features/auth/services/authService'
-import { criarAccountService } from '../../src/features/settings/services/accountService'
-import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService'
-import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService'
-import { criarServicosApp } from '../../src/app/createAppServices'
-import { criarApiClient } from '../../src/shared/services/api/apiClient'
-import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
-import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage'
+import {criarAuthService} from '../../src/features/auth/services/authService'
+import {criarAccountService} from '../../src/features/settings/services/accountService'
+import {criarCalendarService} from '../../src/features/calendar/services/calendarService'
+import {criarContraceptiveService} from '../../src/features/contraceptives/services/contraceptiveService'
+import {criarSupportCategoryService} from '../../src/features/support-network/services/supportCategoryService'
+import {criarServicosApp} from '../../src/app/createAppServices'
+import {criarApiClient} from '../../src/shared/services/api/apiClient'
+import {criarRequisicaoAutenticada} from '../../src/shared/services/api/authenticatedRequest'
+import {obterToken, removerToken} from '../../src/shared/storage/tokenStorage'
 
 jest.mock('../../src/features/auth/services/authService', () => ({
     criarAuthService: jest.fn()
@@ -16,23 +17,21 @@ jest.mock('../../src/features/settings/services/accountService', () => ({
     criarAccountService: jest.fn()
 }))
 
+jest.mock('../../src/features/calendar/services/calendarService', () => ({
+    criarCalendarService: jest.fn()
+}))
+
 jest.mock('../../src/features/contraceptives/services/contraceptiveService', () => ({
     criarContraceptiveService: jest.fn()
 }))
 
-jest.mock(
-    '../../src/features/support-network/services/supportCategoryService',
-    () => ({
-        criarSupportCategoryService: jest.fn()
-    })
-)
+jest.mock('../../src/features/support-network/services/supportCategoryService', () => ({
+    criarSupportCategoryService: jest.fn()
+}))
 
-jest.mock(
-    '../../src/shared/services/api/apiClient',
-    () => ({
-        criarApiClient: jest.fn()
-    })
-)
+jest.mock('../../src/shared/services/api/apiClient', () => ({
+    criarApiClient: jest.fn()
+}))
 
 jest.mock('../../src/shared/services/api/authenticatedRequest', () => ({
     criarRequisicaoAutenticada: jest.fn()
@@ -48,9 +47,9 @@ describe('createAppServices', () => {
     let requisicaoAutenticada
     let authService
     let accountService
+    let calendarService
     let contraceptiveService
     let supportCategoryService
-    let fetchSeguro
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -63,37 +62,26 @@ describe('createAppServices', () => {
         accountService = Object.freeze({
             nome: 'accountService'
         })
+        calendarService = Object.freeze({
+            nome: 'calendarService'
+        })
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
         })
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
         })
-        fetchSeguro = null
 
         criarApiClient.mockReturnValue({
             requisicao
         })
 
-        criarRequisicaoAutenticada.mockReturnValue(
-            requisicaoAutenticada
-        )
-
-        criarAuthService.mockReturnValue(
-            authService
-        )
-
-        criarAccountService.mockReturnValue(
-            accountService
-        )
-
-        criarContraceptiveService.mockReturnValue(
-            contraceptiveService
-        )
-
-        criarSupportCategoryService.mockReturnValue(
-            supportCategoryService
-        )
+        criarRequisicaoAutenticada.mockReturnValue(requisicaoAutenticada)
+        criarAuthService.mockReturnValue(authService)
+        criarAccountService.mockReturnValue(accountService)
+        criarCalendarService.mockReturnValue(calendarService)
+        criarContraceptiveService.mockReturnValue(contraceptiveService)
+        criarSupportCategoryService.mockReturnValue(supportCategoryService)
     })
 
     test('monta e congela os serviços da aplicação', () => {
@@ -127,6 +115,10 @@ describe('createAppServices', () => {
             removerCredencialLocal: removerToken
         })
 
+        expect(criarCalendarService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        })
+
         expect(criarContraceptiveService).toHaveBeenCalledWith({
             requisicaoAutenticada
         })
@@ -138,6 +130,7 @@ describe('createAppServices', () => {
         expect(servicos).toEqual({
             authService,
             accountService,
+            calendarService,
             contraceptiveService,
             supportCategoryService
         })
@@ -152,9 +145,7 @@ describe('createAppServices', () => {
         try {
             const fetchImpl = jest.fn()
 
-            criarServicosApp({
-                fetchImpl
-            })
+            criarServicosApp({fetchImpl})
 
             expect(criarApiClient).toHaveBeenCalledWith({
                 baseUrl: 'https://api.aloya.com',
@@ -175,7 +166,7 @@ describe('createAppServices', () => {
         '',
         '   ',
         123
-    ])('rejeita uma URL ausente ou inválida: %p', (apiUrl) => {
+    ])('rejeita uma URL ausente ou inválida: %p', apiUrl => {
         expect(() => criarServicosApp({
             apiUrl,
             fetchImpl: jest.fn()
@@ -194,7 +185,7 @@ describe('createAppServices', () => {
         'https://usuario:senha@api.aloya.com',
         'https://api.aloya.com?ambiente=teste',
         'https://api.aloya.com#configuracao'
-    ])('rejeita uma URL insegura: %s', (apiUrl) => {
+    ])('rejeita uma URL insegura: %s', apiUrl => {
         expect(() => criarServicosApp({
             apiUrl,
             fetchImpl: jest.fn()
