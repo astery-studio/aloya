@@ -1,9 +1,5 @@
 //Testa carregamento, virtualização, paginação e interação do calendário.
-import {
-    fireEvent,
-    render
-} from '@testing-library/react-native'
-
+import {fireEvent, render} from '@testing-library/react-native'
 import {CycleCalendar} from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar'
 
 function criarMes(chave, alteracoes = {}) {
@@ -18,23 +14,13 @@ function criarMes(chave, alteracoes = {}) {
 
 describe('CycleCalendar', () => {
     test('mostra um indicador durante o carregamento inicial', async () => {
-        const resultado = await render(
-            <CycleCalendar
-                meses={[]}
-                carregando
-            />
-        )
+        const resultado = await render(<CycleCalendar meses={[]} carregando />)
 
-        expect(
-            resultado.getByLabelText('Carregando calendário')
-        ).toBeOnTheScreen()
-
-        expect(
-            resultado.queryByTestId('cycle-calendar-list')
-        ).toBeNull()
+        expect(resultado.getByLabelText('Carregando calendário')).toBeOnTheScreen()
+        expect(resultado.queryByTestId('cycle-calendar-list')).toBeNull()
     })
 
-    test('mostra os dias da semana e virtualiza os meses ordenados', async () => {
+    test('mostra os dias da semana e abre no mês atual com virtualização', async () => {
         const resultado = await render(
             <CycleCalendar
                 meses={[
@@ -45,12 +31,7 @@ describe('CycleCalendar', () => {
             />
         )
 
-        expect(
-            resultado.getByRole('header', {
-                name: 'Dias da semana'
-            })
-        ).toBeOnTheScreen()
-
+        expect(resultado.getByRole('header', {name: 'Dias da semana'})).toBeOnTheScreen()
         expect(resultado.getByText('Dom')).toBeOnTheScreen()
         expect(resultado.getByText('Sáb')).toBeOnTheScreen()
 
@@ -58,16 +39,9 @@ describe('CycleCalendar', () => {
             .map((elemento) => elemento.props.accessibilityLabel)
             .filter((rotulo) => rotulo?.includes(' de 2026'))
 
-        expect(mesesRenderizados).toEqual([
-            'Agosto de 2026',
-            'Setembro de 2026'
-        ])
-
-        expect(
-            resultado.queryByRole('header', {
-                name: 'Outubro de 2026'
-            })
-        ).toBeNull()
+        expect(mesesRenderizados).toEqual(['Outubro de 2026'])
+        expect(resultado.queryByRole('header', {name: 'Agosto de 2026'})).toBeNull()
+        expect(resultado.queryByRole('header', {name: 'Setembro de 2026'})).toBeNull()
     })
 
     test('encaminha a abertura de um ciclo registrado', async () => {
@@ -76,12 +50,7 @@ describe('CycleCalendar', () => {
             <CycleCalendar
                 meses={[
                     criarMes('2026-10', {
-                        diasMenstruacao: [
-                            {
-                                data: '2026-10-01',
-                                registroCicloId: 18
-                            }
-                        ]
+                        diasMenstruacao: [{data: '2026-10-01', registroCicloId: 18}]
                     })
                 ]}
                 aoPressionarDia={aoPressionarDia}
@@ -103,22 +72,12 @@ describe('CycleCalendar', () => {
     test('não carrega meses anteriores antes da interação da usuária', async () => {
         const aoCarregarAnteriores = jest.fn()
         const resultado = await render(
-            <CycleCalendar
-                meses={[criarMes('2026-10')]}
-                aoCarregarAnteriores={aoCarregarAnteriores}
-            />
+            <CycleCalendar meses={[criarMes('2026-10')]} aoCarregarAnteriores={aoCarregarAnteriores} />
         )
 
-        await fireEvent.scroll(
-            resultado.getByTestId('cycle-calendar-list'),
-            {
-                nativeEvent: {
-                    contentOffset: {
-                        y: 0
-                    }
-                }
-            }
-        )
+        await fireEvent.scroll(resultado.getByTestId('cycle-calendar-list'), {
+            nativeEvent: {contentOffset: {y: 0}}
+        })
 
         expect(aoCarregarAnteriores).not.toHaveBeenCalled()
     })
@@ -127,33 +86,15 @@ describe('CycleCalendar', () => {
         const aoCarregarAnteriores = jest.fn()
         const resultado = await render(
             <CycleCalendar
-                meses={[
-                    criarMes('2026-09'),
-                    criarMes('2026-10')
-                ]}
+                meses={[criarMes('2026-09'), criarMes('2026-10')]}
                 aoCarregarAnteriores={aoCarregarAnteriores}
             />
         )
 
         const calendario = resultado.getByTestId('cycle-calendar-list')
-
         await fireEvent(calendario, 'scrollBeginDrag')
-
-        await fireEvent.scroll(calendario, {
-            nativeEvent: {
-                contentOffset: {
-                    y: 80
-                }
-            }
-        })
-
-        await fireEvent.scroll(calendario, {
-            nativeEvent: {
-                contentOffset: {
-                    y: 40
-                }
-            }
-        })
+        await fireEvent.scroll(calendario, {nativeEvent: {contentOffset: {y: 80}}})
+        await fireEvent.scroll(calendario, {nativeEvent: {contentOffset: {y: 40}}})
 
         expect(aoCarregarAnteriores).toHaveBeenCalledTimes(1)
     })
@@ -161,16 +102,11 @@ describe('CycleCalendar', () => {
     test('carrega meses futuros somente após interação', async () => {
         const aoCarregarPosteriores = jest.fn()
         const resultado = await render(
-            <CycleCalendar
-                meses={[criarMes('2026-10')]}
-                aoCarregarPosteriores={aoCarregarPosteriores}
-            />
+            <CycleCalendar meses={[criarMes('2026-10')]} aoCarregarPosteriores={aoCarregarPosteriores} />
         )
 
         const calendario = resultado.getByTestId('cycle-calendar-list')
-
         await fireEvent(calendario, 'endReached')
-
         expect(aoCarregarPosteriores).not.toHaveBeenCalled()
 
         await fireEvent(calendario, 'scrollBeginDrag')
@@ -182,29 +118,16 @@ describe('CycleCalendar', () => {
 
     test('mostra indicadores durante paginações', async () => {
         const resultado = await render(
-            <CycleCalendar
-                meses={[criarMes('2026-10')]}
-                carregandoAnteriores
-                carregandoPosteriores
-            />
+            <CycleCalendar meses={[criarMes('2026-10')]} carregandoAnteriores carregandoPosteriores />
         )
 
-        expect(
-            resultado.getByLabelText('Carregando meses anteriores')
-        ).toBeOnTheScreen()
-
-        expect(
-            resultado.getByLabelText('Carregando próximos meses')
-        ).toBeOnTheScreen()
+        expect(resultado.getByLabelText('Carregando meses anteriores')).toBeOnTheScreen()
+        expect(resultado.getByLabelText('Carregando próximos meses')).toBeOnTheScreen()
     })
 
     test('tolera uma coleção inválida sem quebrar a tela', async () => {
-        const resultado = await render(
-            <CycleCalendar meses={null} />
-        )
+        const resultado = await render(<CycleCalendar meses={null} />)
 
-        expect(
-            resultado.getByTestId('cycle-calendar-list')
-        ).toBeOnTheScreen()
+        expect(resultado.getByTestId('cycle-calendar-list')).toBeOnTheScreen()
     })
 })
