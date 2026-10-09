@@ -28,20 +28,29 @@ function obterMesPosterior(mes) {
 }
 
 describe('useCalendar', () => {
-    test('busca o mês atual ao montar e encerra o carregamento', async () => {
+    test('busca o mês atual e prepara o mês seguinte para permitir rolagem futura', async () => {
         const mesAtual = obterChaveMes()
+        const mesSeguinte = obterMesPosterior(mesAtual)
         const service = {
-            buscarMes: jest.fn().mockResolvedValue(criarCalendario(mesAtual))
+            buscarMes: jest.fn(async ({mes}) => criarCalendario(mes))
         }
         const {result} = await renderHook(() => useCalendar({service}))
 
         await waitFor(() => {
             expect(result.current.carregando).toBe(false)
-            expect(result.current.meses).toEqual([criarCalendario(mesAtual)])
+            expect(result.current.carregandoPosteriores).toBe(false)
+            expect(result.current.meses).toEqual([
+                criarCalendario(mesAtual),
+                criarCalendario(mesSeguinte)
+            ])
         })
 
         expect(service.buscarMes).toHaveBeenCalledWith({
             mes: mesAtual,
+            signal: expect.any(AbortSignal)
+        })
+        expect(service.buscarMes).toHaveBeenCalledWith({
+            mes: mesSeguinte,
             signal: expect.any(AbortSignal)
         })
     })
@@ -54,6 +63,7 @@ describe('useCalendar', () => {
         const {result} = await renderHook(() => useCalendar({service}))
 
         await waitFor(() => expect(result.current.carregando).toBe(false))
+        await waitFor(() => expect(result.current.meses).toHaveLength(2))
 
         await act(async () => {
             await result.current.carregarAnteriores()
@@ -66,7 +76,8 @@ describe('useCalendar', () => {
         expect(result.current.meses.map(mes => mes.mes)).toEqual([
             obterMesAnterior(mesAtual),
             mesAtual,
-            obterMesPosterior(mesAtual)
+            obterMesPosterior(mesAtual),
+            obterMesPosterior(obterMesPosterior(mesAtual))
         ])
         expect(result.current.carregandoAnteriores).toBe(false)
         expect(result.current.carregandoPosteriores).toBe(false)
@@ -78,25 +89,34 @@ describe('useCalendar', () => {
         const service = {
             buscarMes: jest.fn()
                 .mockResolvedValueOnce(criarCalendario(mesAtual))
+                .mockResolvedValueOnce(criarCalendario(obterMesPosterior(mesAtual)))
                 .mockRejectedValueOnce(new Error('Falha de rede.'))
                 .mockResolvedValueOnce(criarCalendario(mesAnterior))
         }
         const {result} = await renderHook(() => useCalendar({service}))
 
         await waitFor(() => expect(result.current.carregando).toBe(false))
+        await waitFor(() => expect(result.current.meses).toHaveLength(2))
 
         await act(async () => {
             await result.current.carregarAnteriores()
         })
 
-        expect(result.current.meses).toEqual([criarCalendario(mesAtual)])
+        expect(result.current.meses).toEqual([
+            criarCalendario(mesAtual),
+            criarCalendario(obterMesPosterior(mesAtual))
+        ])
         expect(result.current.erro).toBe('Não foi possível carregar os dados do calendário. Tente novamente.')
 
         await act(async () => {
             await result.current.tentarNovamente()
         })
 
-        expect(result.current.meses.map(mes => mes.mes)).toEqual([mesAnterior, mesAtual])
+        expect(result.current.meses.map(mes => mes.mes)).toEqual([
+            mesAnterior,
+            mesAtual,
+            obterMesPosterior(mesAtual)
+        ])
         expect(result.current.erro).toBeNull()
     })
 

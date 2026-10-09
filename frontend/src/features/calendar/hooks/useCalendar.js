@@ -31,7 +31,7 @@ function ordenarMeses(meses) {
 }
 
 function useCalendar({service, onSessaoExpirada} = {}) {
-    const mesAtual = useRef(obterChaveMes()).current
+    const [mesAtual] = useState(obterChaveMes)
     const [meses, setMeses] = useState([])
     const [carregando, setCarregando] = useState(true)
     const [carregandoAnteriores, setCarregandoAnteriores] = useState(false)
@@ -41,6 +41,7 @@ function useCalendar({service, onSessaoExpirada} = {}) {
     const requisicoes = useRef(new Map())
     const montado = useRef(false)
     const ultimaFalha = useRef(null)
+    const preCarregouMesSeguinte = useRef(false)
 
     useEffect(() => {
         mesesRef.current = meses
@@ -109,18 +110,35 @@ function useCalendar({service, onSessaoExpirada} = {}) {
 
     useEffect(() => {
         montado.current = true
+        const requisicoesPendentes = requisicoes.current
+        //Inicia a consulta externa; as flags iniciais já têm estes valores no primeiro render.
+        //eslint-disable-next-line react-hooks/set-state-in-effect
         carregarMes(mesAtual, 'inicial')
 
         return () => {
             montado.current = false
 
-            for (const controlador of requisicoes.current.values()) {
+            for (const controlador of requisicoesPendentes.values()) {
                 controlador.abort()
             }
 
-            requisicoes.current.clear()
+            requisicoesPendentes.clear()
         }
     }, [carregarMes, mesAtual])
+
+    useEffect(() => {
+        const calendarioAtual = meses.find(item => item.mes === mesAtual)
+
+        if (
+            carregando
+            || calendarioAtual?.possuiCiclos !== true
+            || preCarregouMesSeguinte.current
+        ) return
+
+        //Garante conteúdo rolável no primeiro acesso e habilita a paginação futura.
+        preCarregouMesSeguinte.current = true
+        carregarMes(deslocarMes(mesAtual, 1), 'posterior')
+    }, [carregando, carregarMes, mesAtual, meses])
 
     const carregarAnteriores = useCallback(() => {
         const primeiroMes = mesesRef.current[0]?.mes || mesAtual
