@@ -1,4 +1,5 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
+import {criarCalendarService} from '../../src/features/calendar/services/calendarService'
 import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService'
 import { criarAuthService } from '../../src/features/auth/services/authService'
 import { criarAccountService } from '../../src/features/settings/services/accountService'
@@ -16,6 +17,10 @@ jest.mock('../../src/features/auth/services/authService', () => ({
 
 jest.mock('../../src/features/settings/services/accountService', () => ({
     criarAccountService: jest.fn()
+}))
+
+jest.mock('../../src/features/calendar/services/calendarService', () => ({
+    criarCalendarService: jest.fn()
 }))
 
 jest.mock('../../src/features/contraceptives/services/contraceptiveService', () => ({
@@ -37,12 +42,9 @@ jest.mock(
     })
 )
 
-jest.mock(
-    '../../src/shared/services/api/apiClient',
-    () => ({
-        criarApiClient: jest.fn()
-    })
-)
+jest.mock('../../src/shared/services/api/apiClient', () => ({
+    criarApiClient: jest.fn()
+}))
 
 jest.mock('../../src/shared/services/api/authenticatedRequest', () => ({
     criarRequisicaoAutenticada: jest.fn()
@@ -58,6 +60,7 @@ describe('createAppServices', () => {
     let requisicaoAutenticada
     let authService
     let accountService
+    let calendarService
     let contraceptiveService
     let cycleHistoryService
     let supportCategoryService
@@ -77,7 +80,9 @@ describe('createAppServices', () => {
         accountService = Object.freeze({
             nome: 'accountService'
         })
-
+        calendarService = Object.freeze({
+            nome: 'calendarService'
+        })
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
         })
@@ -98,6 +103,7 @@ describe('createAppServices', () => {
             requisicao
         })
 
+        criarCalendarService.mockReturnValue(calendarService)
         criarRequisicaoAutenticada.mockReturnValue(
             requisicaoAutenticada
         )
@@ -158,6 +164,10 @@ describe('createAppServices', () => {
             removerCredencialLocal: removerToken
         })
 
+        expect(criarCalendarService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        })
+
         expect(criarContraceptiveService).toHaveBeenCalledWith({
             requisicaoAutenticada
         })
@@ -177,6 +187,7 @@ describe('createAppServices', () => {
         expect(servicos).toEqual({
             authService,
             accountService,
+            calendarService,
             contraceptiveService,
             cycleHistoryService,
             supportCategoryService,
@@ -193,9 +204,7 @@ describe('createAppServices', () => {
         try {
             const fetchImpl = jest.fn()
 
-            criarServicosApp({
-                fetchImpl
-            })
+            criarServicosApp({fetchImpl})
 
             expect(criarApiClient).toHaveBeenCalledWith({
                 baseUrl: 'https://api.aloya.com',
@@ -216,7 +225,7 @@ describe('createAppServices', () => {
         '',
         '   ',
         123
-    ])('rejeita uma URL ausente ou inválida: %p', (apiUrl) => {
+    ])('rejeita uma URL ausente ou inválida: %p', apiUrl => {
         expect(() => criarServicosApp({
             apiUrl,
             fetchImpl: jest.fn()
@@ -235,7 +244,7 @@ describe('createAppServices', () => {
         'https://usuario:senha@api.aloya.com',
         'https://api.aloya.com?ambiente=teste',
         'https://api.aloya.com#configuracao'
-    ])('rejeita uma URL insegura: %s', (apiUrl) => {
+    ])('rejeita uma URL insegura: %s', apiUrl => {
         expect(() => criarServicosApp({
             apiUrl,
             fetchImpl: jest.fn()

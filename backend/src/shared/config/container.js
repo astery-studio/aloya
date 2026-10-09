@@ -85,6 +85,10 @@ import {
 } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
 
 import {
+    criarCalendarModule
+} from '../../features/calendar/calendar.module.js';
+
+import {
     criarCycleHistoryRepository
 } from '../../features/cycles/cycleHistory.repository.js';
 
@@ -238,6 +242,11 @@ function criarContainer() {
 
     const contraceptiveService =
         criarContraceptiveService(prisma);
+
+    const calendarModule =
+        criarCalendarModule({
+            prisma
+        });
 
     const cycleHistoryRepository =
         criarCycleHistoryRepository({
@@ -424,6 +433,8 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        calendarController:
+            calendarModule.calendarController,
         cycleHistoryController,
 
         predictionController,

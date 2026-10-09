@@ -1,4 +1,5 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
+import {criarCalendarService} from '../features/calendar/services/calendarService'
 import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService'
 import { criarAuthService } from '../features/auth/services/authService'
 import { criarAccountService } from '../features/settings/services/accountService'
@@ -53,6 +54,10 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         removerCredencialLocal: removerToken
     })
 
+    const calendarService = criarCalendarService({
+        requisicaoAutenticada
+    })
+
     const contraceptiveService = criarContraceptiveService({
         requisicaoAutenticada
     })
@@ -72,6 +77,7 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
     return Object.freeze({
         authService,
         accountService,
+        calendarService,
         contraceptiveService,
         cycleHistoryService,
         supportCategoryService,

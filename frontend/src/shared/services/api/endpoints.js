@@ -15,6 +15,8 @@ const endpoints = Object.freeze({
     verificacaoSenhaExclusao: `${caminhoConta}/account-deletion/verify-password`,
     logout: '/auth/logout',
     anticoncepcionais: '/api/anticoncepcionais',
+    calendario: '/api/cycles/calendar',
+    estadoAtualCiclo: '/api/cycles/current',
     historicoCiclos: '/api/cycles/history',
     categoriasPermissao: '/support-network/permission-categories',
     previsaoCiclo: '/cycles/prediction'

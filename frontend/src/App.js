@@ -1,6 +1,7 @@
 /**
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
+import {CalendarScreenContainer} from './features/calendar/screens/CalendarScreenContainer';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, NativeModules, Text, View } from 'react-native';
@@ -35,6 +36,7 @@ const telasInternas = Object.freeze({
     alterarSenha: 'alterarSenha',
     anticoncepcionais: 'anticoncepcionais',
     novaCategoria: 'novaCategoria',
+    calendario: 'calendario',
     inicio: 'inicio'
 });
 
@@ -382,8 +384,21 @@ export default function App() {
                 setOrigemAnticoncepcionais(telasInternas.inicio)
                 setTelaInterna(telasInternas.anticoncepcionais)
             }}
+            aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
             aoSelecionarAba={selecionarAba}
             onSessaoExpirada={finalizarSessao} />;
+    } else if (telaInterna === telasInternas.calendario) {
+        conteudo = (
+            <CalendarScreenContainer
+                service={configuracao.servicos.calendarService}
+                onSessaoExpirada={finalizarSessao}
+                aoVoltar={() => setTelaInterna(telasInternas.inicio)}
+                aoCadastrarMenstruacao={() => Alert.alert(
+                    'Cadastro de menstruação',
+                    'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
+                )}
+            />
+        )
     } else if (telaInterna === telasInternas.membros) {
         conteudo = (
             <MembersScreen
