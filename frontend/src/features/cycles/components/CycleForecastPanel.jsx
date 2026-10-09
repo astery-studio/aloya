@@ -8,7 +8,6 @@ import {
     DropIcon,
     EggIcon,
     HeartbeatIcon,
-    MoonIcon,
     PillIcon,
     SparkleIcon,
     WarningIcon
@@ -21,16 +20,9 @@ const AVISO_MEDICO = 'Esta é uma estimativa baseada no seu histórico e não su
 const ROTULOS = { menstrual: 'Fase Menstrual', folicular: 'Fase Folicular', ovulatoria: 'Fase Ovulatória', lutea: 'Fase Lútea', desconhecida: 'Seu ciclo' };
 const CORES_FORMA = { menstrual: cores.marca.primaria, folicular: cores.ciclo.formaFolicular, ovulatoria: cores.feedback.informacao, lutea: cores.feedback.aviso, desconhecida: cores.neutras.textoSecundarioClaro };
 const CORES_CONTEUDO = { ...CORES_FORMA, folicular: cores.ciclo.conteudoFolicular };
-const ICONES_FASE = {
-    menstrual: DropIcon,
-    folicular: SparkleIcon,
-    ovulatoria: EggIcon,
-    lutea: MoonIcon,
-    desconhecida: ArrowsClockwiseIcon
-};
 const RECURSOS_SEM_CICLO = [
-    { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações personalizadas.', Icone: ArrowsClockwiseIcon, cor: cores.marca.secundaria },
-    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões personalizadas.', Icone: SparkleIcon, cor: cores.feedback.aviso },
+    { titulo: 'Fases do ciclo', descricao: 'Menstrual, folicular, ovulatória e lútea com orientações para cada momento.', Icone: ArrowsClockwiseIcon, cor: cores.marca.secundaria },
+    { titulo: 'Janela fértil', descricao: 'Saiba seus dias de maior fertilidade com previsões baseadas no seu histórico.', Icone: SparkleIcon, cor: cores.feedback.aviso },
     { titulo: 'Próxima menstruação', descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.', Icone: CalendarDotsIcon, cor: cores.feedback.aviso },
     { titulo: 'Sintomas e bem-estar', descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.', Icone: HeartbeatIcon, cor: cores.marca.secundaria }
 ];
@@ -51,13 +43,11 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
     const comContorno = fase === 'folicular' || fase === 'ovulatoria';
     const cor = CORES_FORMA[fase];
-    const IconeFase = ICONES_FASE[fase];
     return (
         <View accessibilityLabel={`Símbolo provisório: ${ROTULOS[fase]}`} style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}>
             {comContorno ? <View style={[estilos.formaInterna, { borderColor: cor }]} /> : null}
-            <View style={estilos.iconeForma}>
-                <IconeFase size={compacta ? 72 : 104} color={cor} weight="duotone" />
-            </View>
+            {fase === 'ovulatoria' ? <View style={[estilos.orbitaForma, estilos.orbitaFormaEsquerda, { borderColor: cor }]} /> : null}
+            {fase === 'ovulatoria' ? <View style={[estilos.orbitaForma, estilos.orbitaFormaDireita, { borderColor: cor }]} /> : null}
             <View style={[estilos.sombraForma, compacta && estilos.sombraFormaCompacta, { backgroundColor: cor }]} />
         </View>
     );

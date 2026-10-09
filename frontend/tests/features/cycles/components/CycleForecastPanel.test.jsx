@@ -28,10 +28,10 @@ test('mantém o estado sem dados dentro da HU-013', async () => {
 });
 
 test.each([
-    ['menstrual', 'Fase Menstrual', 'O ciclo recomeça. O corpo libera', 'Sensação de cansaço'],
-    ['folicular', 'Fase Folicular', 'O ciclo recomeça e o corpo se prepara', 'Aumento de energia'],
-    ['ovulatoria', 'Fase Ovulatória', 'O óvulo é liberado', 'Pico de energia'],
-    ['lutea', 'Fase Lútea', 'Após a ovulação', 'Retenção de líquidos']
+    ['menstrual', 'Fase Menstrual', 'O ciclo recomeça. O corpo libera o revestimento uterino e a energia tende a se voltar para dentro. É um bom momento para reduzir o ritmo e observar como você se sente.', 'Sensação de cansaço'],
+    ['folicular', 'Fase Folicular', 'Os níveis hormonais começam a subir e muitas pessoas relatam mais disposição e clareza. É uma janela em que o corpo se prepara gradualmente para a ovulação.', 'Aumento de energia'],
+    ['ovulatoria', 'Fase Ovulatória', 'O óvulo é liberado e o corpo atinge um ponto de maior expansão no ciclo. É a fase em que a fertilidade estimada é mais alta.', 'Pico de energia'],
+    ['lutea', 'Fase Lútea', 'Após a ovulação, o corpo entra em uma fase de transição. A energia costuma diminuir gradualmente conforme o ciclo se aproxima do fim.', 'Retenção de líquidos']
 ])('exibe conteúdo completo da fase %s', async (fase, titulo, descricao, sintoma) => {
     await render(
         <CycleForecastPanel
@@ -44,7 +44,7 @@ test.each([
 
     expect(screen.getByText(titulo)).toBeOnTheScreen();
     expect(screen.getByLabelText(`Símbolo provisório: ${titulo}`)).toBeOnTheScreen();
-    expect(screen.getByText(new RegExp(descricao))).toBeOnTheScreen();
+    expect(screen.getByText(descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
     expect(screen.getByText('Observe como seu corpo está se sentindo hoje.')).toBeOnTheScreen();
     expect(screen.getByText('Continue registrando suas percepções ao longo do ciclo.')).toBeOnTheScreen();
@@ -132,12 +132,16 @@ test('oferece ações e recursos completos quando ainda não há ciclo', async (
     expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Fases do ciclo')).toBeOnTheScreen();
+    expect(screen.getByText(/orientações para cada momento/)).toBeOnTheScreen();
     expect(screen.getByText('Janela fértil')).toBeOnTheScreen();
+    expect(screen.getByText(/previsões baseadas no seu histórico/)).toBeOnTheScreen();
     expect(screen.getByText('Próxima menstruação')).toBeOnTheScreen();
     expect(screen.getByText('Sintomas e bem-estar')).toBeOnTheScreen();
 });
 
 test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
+    expect(estilos.formaProvisoria).toMatchObject({ width: 260, height: 304 });
+    expect(estilos.formaProvisoriaCompacta).toMatchObject({ width: 190, height: 200 });
     expect(estilos.destaqueFertil).toMatchObject({ width: '100%', minHeight: 68 });
     expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 52 });
     expect(estilos.dataProximoCiclo).toMatchObject({ flex: 1, minWidth: 140 });
@@ -146,4 +150,7 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
     expect(estilos.sintoma).toMatchObject({ flexGrow: 1, flexBasis: '47%', minWidth: 130 });
     expect(estilos.cartaoIntroducao).toMatchObject({ minHeight: 666 });
     expect(estilos.recurso).toMatchObject({ minHeight: 92 });
+    expect(estilos.orbitaForma).toMatchObject({ width: 94, height: 180, borderStyle: 'dashed' });
+    expect(estilos.orbitaFormaEsquerda.transform).toEqual([{ rotate: '45deg' }]);
+    expect(estilos.orbitaFormaDireita.transform).toEqual([{ rotate: '-45deg' }]);
 });
