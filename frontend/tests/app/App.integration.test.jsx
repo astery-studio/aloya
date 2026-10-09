@@ -52,11 +52,11 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     };
 });
 
-jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => {
+jest.mock('../../src/features/contraceptives/testing/ContraceptiveHuTestAccess', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
-        ContraceptiveFlow: jest.fn(({ onVoltar }) => React.createElement(View, null,
+        ContraceptiveHuTestAccess: jest.fn(({ onVoltar }) => React.createElement(View, null,
             React.createElement(Text, null, 'Fluxo de anticoncepcionais'),
             React.createElement(Pressable, { accessibilityRole: 'button', accessibilityLabel: 'Voltar ao ciclo', onPress: onVoltar })
         ))

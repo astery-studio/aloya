@@ -45,7 +45,8 @@ async function comApi(banco, executar) {
     app.use(express.json());
     app.use('/api/anticoncepcionais', criarRotasAnticoncepcionais({
         autenticar: authMiddleware.autenticar,
-        controller
+        controller,
+        edicaoRateLimit: (_requisicao, _resposta, proximo) => proximo()
     }));
     app.use(tratarErros);
 
