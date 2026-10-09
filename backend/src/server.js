@@ -19,6 +19,10 @@ import {
 } from './features/contraceptives/contraceptive.routes.js';
 
 import {
+    criarCycleHistoryRoutes
+} from './features/cycles/cycleHistory.routes.js';
+
+import {
     criarPredictionRoutes
 } from './features/cycles/prediction.routes.js';
 
@@ -113,6 +117,17 @@ app.use(
             container.edicaoAnticoncepcionalRateLimit,
         remocaoRateLimit:
             container.remocaoAnticoncepcionalRateLimit
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleHistoryRoutes({
+        Router: express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        cycleHistoryController:
+            container.cycleHistoryController
     })
 );
 

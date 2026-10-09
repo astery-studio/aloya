@@ -1,4 +1,5 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
+import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService'
 import { criarAuthService } from '../../src/features/auth/services/authService'
 import { criarAccountService } from '../../src/features/settings/services/accountService'
 import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService'
@@ -21,12 +22,13 @@ jest.mock('../../src/features/contraceptives/services/contraceptiveService', () 
     criarContraceptiveService: jest.fn()
 }))
 
-jest.mock(
-    '../../src/features/support-network/services/supportCategoryService',
-    () => ({
-        criarSupportCategoryService: jest.fn()
-    })
-)
+jest.mock('../../src/features/cycles/services/cycleHistoryService', () => ({
+    criarCycleHistoryService: jest.fn()
+}))
+
+jest.mock('../../src/features/support-network/services/supportCategoryService', () => ({
+    criarSupportCategoryService: jest.fn()
+}))
 
 jest.mock(
     '../../src/features/cycles/services/cyclePredictionService',
@@ -57,6 +59,7 @@ describe('createAppServices', () => {
     let authService
     let accountService
     let contraceptiveService
+    let cycleHistoryService
     let supportCategoryService
     let cyclePredictionService
     let fetchSeguro
@@ -66,15 +69,23 @@ describe('createAppServices', () => {
 
         requisicao = jest.fn()
         requisicaoAutenticada = jest.fn()
+
         authService = Object.freeze({
             nome: 'authService'
         })
+
         accountService = Object.freeze({
             nome: 'accountService'
         })
+
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
         })
+
+        cycleHistoryService = Object.freeze({
+            nome: 'cycleHistoryService'
+        })
+
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
         })
@@ -101,6 +112,10 @@ describe('createAppServices', () => {
 
         criarContraceptiveService.mockReturnValue(
             contraceptiveService
+        )
+
+        criarCycleHistoryService.mockReturnValue(
+            cycleHistoryService
         )
 
         criarSupportCategoryService.mockReturnValue(
@@ -147,6 +162,10 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         })
 
+        expect(criarCycleHistoryService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        })
+
         expect(criarSupportCategoryService).toHaveBeenCalledWith({
             requisicaoAutenticada
         })
@@ -159,6 +178,7 @@ describe('createAppServices', () => {
             authService,
             accountService,
             contraceptiveService,
+            cycleHistoryService,
             supportCategoryService,
             cyclePredictionService
         })

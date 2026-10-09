@@ -1,8 +1,9 @@
 /**
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
+import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Linking, NativeModules, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, NativeModules, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +23,6 @@ import { ContraceptiveHuTestAccess } from './features/contraceptives/testing/Con
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
-import { CyclesScreen } from './features/cycles/screens/CyclesScreen';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
@@ -393,8 +393,13 @@ export default function App() {
         )
     } else if (telaInterna === telasInternas.ciclos) {
         conteudo = (
-            <CyclesScreen
+            <CycleHistoryFlow
+                service={configuracao.servicos.cycleHistoryService}
+                aoAbrirCalendario={() => Alert.alert('Calendário', 'O calendário ainda será integrado.')}
+                aoEditarCiclo={ciclo => Alert.alert('Editar ciclo', `Ciclo ${ciclo.numero}`)}
+                aoExcluirCiclo={ciclo => Alert.alert('Excluir ciclo', `Ciclo ${ciclo.numero}`)}
                 onSelecionarAba={selecionarAba}
+                onSessaoExpirada={finalizarSessao}
             />
         )
     } else if (telaInterna === telasInternas.configuracoes) {

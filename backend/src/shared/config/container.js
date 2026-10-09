@@ -85,6 +85,18 @@ import {
 } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
 
 import {
+    criarCycleHistoryRepository
+} from '../../features/cycles/cycleHistory.repository.js';
+
+import {
+    criarCycleHistoryService
+} from '../../features/cycles/cycleHistory.service.js';
+
+import {
+    criarCycleHistoryController
+} from '../../features/cycles/cycleHistory.controller.js';
+
+import {
     criarPermissionCategoryService
 } from '../../features/support-network/services/permissionCategory.service.js';
 
@@ -226,6 +238,16 @@ function criarContainer() {
 
     const contraceptiveService =
         criarContraceptiveService(prisma);
+
+    const cycleHistoryRepository =
+        criarCycleHistoryRepository({
+            prisma
+        });
+
+    const cycleHistoryService =
+        criarCycleHistoryService({
+            repository: cycleHistoryRepository
+        });
 
     const predictionService =
         criarPredictionService({ prisma });
@@ -382,6 +404,11 @@ function criarContainer() {
             contraceptiveService
         );
 
+    const cycleHistoryController =
+        criarCycleHistoryController({
+            cycleHistoryService
+        });
+
     const predictionController =
         criarPredictionController({ predictionService });
 
@@ -397,6 +424,8 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        cycleHistoryController,
+
         predictionController,
         permissionCategoryController,
         authMiddleware,

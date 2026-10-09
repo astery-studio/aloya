@@ -1,4 +1,5 @@
 //Monta os serviços da aplicação usando uma URL HTTPS configurada pelo ambiente.
+import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService'
 import { criarAuthService } from '../features/auth/services/authService'
 import { criarAccountService } from '../features/settings/services/accountService'
 import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
@@ -56,6 +57,10 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         requisicaoAutenticada
     })
 
+    const cycleHistoryService = criarCycleHistoryService({
+        requisicaoAutenticada
+    })
+
     const supportCategoryService = criarSupportCategoryService({
         requisicaoAutenticada
     })
@@ -68,9 +73,10 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         authService,
         accountService,
         contraceptiveService,
+        cycleHistoryService,
         supportCategoryService,
         cyclePredictionService
     })
 }
 
-export { criarServicosApp }
+export {criarServicosApp}

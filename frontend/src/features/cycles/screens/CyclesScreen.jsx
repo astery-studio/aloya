@@ -1,48 +1,111 @@
-//Mostra provisoriamente todas as variantes do ConfidenceBadge para validação visual no Expo.
-import {ScrollView, Text, View} from 'react-native'
+//Mostra provisoriamente o resumo e todas as variantes do histórico de ciclos para validação no Expo.
+import {Alert, FlatList, Text, View} from 'react-native'
 
-import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
+import {CycleHistoryCard} from '../components/CycleHistoryCard/CycleHistoryCard'
+import {CycleSummaryCard} from '../components/CycleSummaryCard/CycleSummaryCard'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
 import {estilos} from './CyclesScreen.styles'
 
-const exemplos = Object.freeze([
+const ciclosDeTeste = Object.freeze([
     Object.freeze({
-        id: 'alta-simples',
-        nivel: 'alta',
-        variante: 'simples',
-        nome: 'Alta simples'
+        id: 'ciclo-05',
+        numero: 5,
+        periodo: '04 Set até hoje',
+        diasMenstruais: 4,
+        duracaoDias: null,
+        status: 'emAndamento'
     }),
     Object.freeze({
-        id: 'media-simples',
-        nivel: 'media',
-        variante: 'simples',
-        nome: 'Média simples'
+        id: 'ciclo-04',
+        numero: 4,
+        periodo: '07 Ago até 03 Set',
+        diasMenstruais: 5,
+        duracaoDias: 27,
+        status: 'concluido'
     }),
     Object.freeze({
-        id: 'baixa-simples',
-        nivel: 'baixa',
-        variante: 'simples',
-        nome: 'Baixa simples'
+        id: 'ciclo-03',
+        numero: 3,
+        periodo: '08 Jul até 06 Ago',
+        diasMenstruais: 6,
+        duracaoDias: 29,
+        status: 'incerto'
     }),
     Object.freeze({
-        id: 'alta-composta',
-        nivel: 'alta',
-        variante: 'composta',
-        nome: 'Alta composta'
+        id: 'ciclo-02',
+        numero: 2,
+        periodo: '10 Jun até 07 Jul',
+        diasMenstruais: 4,
+        duracaoDias: 27,
+        status: 'concluido'
     }),
     Object.freeze({
-        id: 'media-composta',
-        nivel: 'media',
-        variante: 'composta',
-        nome: 'Média composta'
-    }),
-    Object.freeze({
-        id: 'baixa-composta',
-        nivel: 'baixa',
-        variante: 'composta',
-        nome: 'Baixa composta'
+        id: 'ciclo-01',
+        numero: 1,
+        periodo: '12 Mai até 09 Jun',
+        diasMenstruais: 5,
+        duracaoDias: 28,
+        status: 'concluido'
     })
 ])
+
+function mostrarAcao(acao, ciclo) {
+    Alert.alert(
+        `${acao} ciclo`,
+        `${acao} o ciclo ${String(ciclo.numero).padStart(2, '0')}.`
+    )
+}
+
+function editarCiclo(ciclo) {
+    mostrarAcao('Editar', ciclo)
+}
+
+function excluirCiclo(ciclo) {
+    mostrarAcao('Excluir', ciclo)
+}
+
+function obterChaveDoCiclo(ciclo) {
+    return ciclo.id
+}
+
+function renderizarCiclo({item}) {
+    return (
+        <View style={estilos.item}>
+            <CycleHistoryCard
+                ciclo={item}
+                aoEditar={editarCiclo}
+                aoExcluir={excluirCiclo}
+            />
+        </View>
+    )
+}
+
+function CabecalhoDaLista() {
+    return (
+        <View style={estilos.cabecalhoDaLista}>
+            <View style={estilos.apresentacao}>
+                <Text style={estilos.titulo}>
+                    Teste do histórico de ciclos
+                </Text>
+
+                <Text style={estilos.descricao}>
+                    Confira o resumo e os ciclos em andamento, concluído e com estimativa incerta.
+                </Text>
+            </View>
+
+            <CycleSummaryCard
+                cicloMedioDias={28}
+                menstruacaoMediaDias={5}
+                quantidadeCiclos={5}
+                confianca="alta"
+            />
+
+            <Text style={estilos.tituloDaSecao}>
+                Ciclos registrados
+            </Text>
+        </View>
+    )
+}
 
 function CyclesScreen({onSelecionarAba}) {
     return (
@@ -51,40 +114,17 @@ function CyclesScreen({onSelecionarAba}) {
             abaAtiva="ciclos"
             onSelecionarAba={onSelecionarAba}
         >
-            <ScrollView
+            <FlatList
+                data={ciclosDeTeste}
+                renderItem={renderizarCiclo}
+                keyExtractor={obterChaveDoCiclo}
+                ListHeaderComponent={CabecalhoDaLista}
                 contentContainerStyle={estilos.conteudo}
                 showsVerticalScrollIndicator={false}
-            >
-                <View style={estilos.apresentacao}>
-                    <Text style={estilos.titulo}>
-                        Teste do ConfidenceBadge
-                    </Text>
-
-                    <Text style={estilos.descricao}>
-                        Compare os três níveis nas variantes simples e composta.
-                    </Text>
-                </View>
-
-                <View style={estilos.lista}>
-                    {exemplos.map(exemplo => (
-                        <View
-                            key={exemplo.id}
-                            style={estilos.item}
-                        >
-                            <View style={estilos.amostra}>
-                                <ConfidenceBadge
-                                    nivel={exemplo.nivel}
-                                    variante={exemplo.variante}
-                                />
-                            </View>
-
-                            <Text style={estilos.nome}>
-                                {exemplo.nome}
-                            </Text>
-                        </View>
-                    ))}
-                </View>
-            </ScrollView>
+                initialNumToRender={5}
+                maxToRenderPerBatch={5}
+                windowSize={3}
+            />
         </MainLayout>
     )
 }

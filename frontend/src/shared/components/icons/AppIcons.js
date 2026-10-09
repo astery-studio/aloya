@@ -20,6 +20,7 @@ import {LockKeyIcon} from 'phosphor-react-native/src/icons/LockKey'
 import {MoonIcon} from 'phosphor-react-native/src/icons/Moon'
 import {NotepadIcon} from 'phosphor-react-native/src/icons/Notepad'
 import {NotePencilIcon} from 'phosphor-react-native/src/icons/NotePencil'
+import {PencilSimpleIcon} from 'phosphor-react-native/src/icons/PencilSimple'
 import {PersonArmsSpreadIcon} from 'phosphor-react-native/src/icons/PersonArmsSpread'
 import {PillIcon} from 'phosphor-react-native/src/icons/Pill'
 import {ShieldCheckIcon} from 'phosphor-react-native/src/icons/ShieldCheck'
@@ -54,6 +55,7 @@ export {
     MoonIcon,
     NotepadIcon,
     NotePencilIcon,
+    PencilSimpleIcon,
     PersonArmsSpreadIcon,
     PillIcon,
     ShieldCheckIcon,
