@@ -43,6 +43,7 @@ test.each([
     );
 
     expect(screen.getByText(titulo)).toBeOnTheScreen();
+    expect(screen.getByText(titulo)).toHaveStyle({ fontFamily: 'DMSans_700Bold', fontWeight: '700' });
     expect(screen.getByLabelText(`Símbolo provisório: ${titulo}`)).toBeOnTheScreen();
     expect(screen.getByText(descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();

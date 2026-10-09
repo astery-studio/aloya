@@ -13,7 +13,7 @@ const estilos = StyleSheet.create({
     sombraForma: { position: 'absolute', width: 135, height: 23, left: 62, top: 238, borderRadius: radius.circular, opacity: 0.1 },
     formaProvisoriaCompacta: { width: 190, height: 200, paddingVertical: 5 },
     sombraFormaCompacta: { width: 99, height: 17, left: 46, top: 171 },
-    tituloFase: { color: cores.neutras.textoPrincipalClaro, fontFamily: fontFamilies.bold, fontSize: 28, lineHeight: 35, textAlign: 'center' },
+    tituloFase: { color: cores.neutras.textoPrincipalClaro, fontFamily: fontFamilies.bold, fontSize: 28, fontWeight: '700', lineHeight: 35, textAlign: 'center' },
     diaCiclo: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 16, lineHeight: 24, marginTop: 4 },
     destaqueFertil: { width: '100%', minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12, marginTop: 20, borderWidth: 1, borderStyle: 'dashed', borderRadius: radius.grande, backgroundColor: cores.ciclo.fundoFertil },
     iconeDestaqueFertil: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: cores.neutras.superficieClara, borderWidth: 1, borderColor: cores.neutras.bordaClara, borderRadius: radius.medio },
