@@ -95,6 +95,19 @@ test('acrescenta páginas de dias passados e futuros ao alcançar as bordas', as
     expect(dias.at(-1).data).toBe('2026-11-03');
 });
 
+test('mantém a fase estimada quando a previsão do ciclo passa da data prevista', async () => {
+    await renderizar({ previsao: {
+        ...previsao,
+        status: 'PREVISAO_ULTRAPASSADA',
+        dataReferencia: '2026-11-01',
+        duracaoCicloEstimada: 28
+    } });
+
+    expect(screen.getByText('Fase Menstrual')).toBeOnTheScreen();
+    expect(screen.getByText('Dia 32 do ciclo')).toBeOnTheScreen();
+    expect(screen.queryByText('Seu ciclo')).not.toBeOnTheScreen();
+});
+
 test('permite repetir ou fechar o erro de previsão', async () => {
     const aoTentarNovamente = jest.fn();
     const aoVoltar = jest.fn();
