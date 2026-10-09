@@ -1,5 +1,4 @@
-//Guarda os caminhos das operações de conta na API
-
+//Guarda os caminhos das operações da API.
 const caminhoConta = '/users/me'
 
 const endpoints = Object.freeze({
@@ -15,7 +14,9 @@ const endpoints = Object.freeze({
     verificacaoSenhaExclusao: `${caminhoConta}/account-deletion/verify-password`,
     logout: '/auth/logout',
     anticoncepcionais: '/api/anticoncepcionais',
-    categoriasPermissao: '/support-network/permission-categories'
+    categoriasPermissao: '/support-network/permission-categories',
+    calendario: '/api/cycles/calendar',
+    estadoAtualCiclo: '/api/cycles/current'
 })
 
-export { endpoints }
+export {endpoints}
