@@ -72,6 +72,14 @@ import {
 } from '../../features/contraceptives/contraceptive.controller.js';
 
 import {
+    criarPredictionService
+} from '../../features/cycles/prediction.service.js';
+
+import {
+    criarPredictionController
+} from '../../features/cycles/prediction.controller.js';
+
+import {
     criarEdicaoAnticoncepcionalRateLimit,
     criarRemocaoAnticoncepcionalRateLimit
 } from '../../features/contraceptives/contraceptiveRateLimit.middleware.js';
@@ -218,6 +226,9 @@ function criarContainer() {
 
     const contraceptiveService =
         criarContraceptiveService(prisma);
+
+    const predictionService =
+        criarPredictionService({ prisma });
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -371,6 +382,9 @@ function criarContainer() {
             contraceptiveService
         );
 
+    const predictionController =
+        criarPredictionController({ predictionService });
+
     const permissionCategoryController =
         criarPermissionCategoryController({
             permissionCategoryService,
@@ -383,6 +397,7 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        predictionController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,

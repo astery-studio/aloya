@@ -40,6 +40,29 @@ jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
 }));
 
+jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
+    const React = require('react');
+    const { Pressable, Text } = require('react-native');
+    return {
+        CycleTodayContainer: jest.fn(({ aoAbrirAnticoncepcional }) => React.createElement(
+            Pressable,
+            { accessibilityRole: 'button', accessibilityLabel: 'Anticoncepcional', onPress: aoAbrirAnticoncepcional },
+            React.createElement(Text, null, 'Ciclo hoje')
+        ))
+    };
+});
+
+jest.mock('../../src/features/contraceptives/testing/ContraceptiveHuTestAccess', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        ContraceptiveHuTestAccess: jest.fn(({ onVoltar }) => React.createElement(View, null,
+            React.createElement(Text, null, 'Fluxo de anticoncepcionais'),
+            React.createElement(Pressable, { accessibilityRole: 'button', accessibilityLabel: 'Voltar ao ciclo', onPress: onVoltar })
+        ))
+    };
+});
+
 jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
@@ -61,6 +84,15 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                     onPress: () => onSelecionarAba?.('membros')
                 },
                 React.createElement(Text, null, 'Membros')
+            ),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Abrir início',
+                    onPress: () => onSelecionarAba?.('inicio')
+                },
+                React.createElement(Text, null, 'Início')
             )
         ))
     };
@@ -262,6 +294,19 @@ describe('App integrado', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar para configurações' }));
 
         expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+    });
+
+    test('abre anticoncepcionais pela HU-013 e volta para a tela de ciclo', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
+        expect(await screen.findByText('Fluxo de anticoncepcionais')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao ciclo' }));
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
     });
 
     test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {

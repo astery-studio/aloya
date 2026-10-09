@@ -3,6 +3,7 @@ import { criarAuthService } from '../../src/features/auth/services/authService'
 import { criarAccountService } from '../../src/features/settings/services/accountService'
 import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService'
 import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService'
+import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService'
 import { criarServicosApp } from '../../src/app/createAppServices'
 import { criarApiClient } from '../../src/shared/services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
@@ -24,6 +25,13 @@ jest.mock(
     '../../src/features/support-network/services/supportCategoryService',
     () => ({
         criarSupportCategoryService: jest.fn()
+    })
+)
+
+jest.mock(
+    '../../src/features/cycles/services/cyclePredictionService',
+    () => ({
+        criarCyclePredictionService: jest.fn()
     })
 )
 
@@ -50,6 +58,7 @@ describe('createAppServices', () => {
     let accountService
     let contraceptiveService
     let supportCategoryService
+    let cyclePredictionService
     let fetchSeguro
 
     beforeEach(() => {
@@ -68,6 +77,9 @@ describe('createAppServices', () => {
         })
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
+        })
+        cyclePredictionService = Object.freeze({
+            nome: 'cyclePredictionService'
         })
         fetchSeguro = null
 
@@ -93,6 +105,10 @@ describe('createAppServices', () => {
 
         criarSupportCategoryService.mockReturnValue(
             supportCategoryService
+        )
+
+        criarCyclePredictionService.mockReturnValue(
+            cyclePredictionService
         )
     })
 
@@ -135,11 +151,16 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         })
 
+        expect(criarCyclePredictionService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        })
+
         expect(servicos).toEqual({
             authService,
             accountService,
             contraceptiveService,
-            supportCategoryService
+            supportCategoryService,
+            cyclePredictionService
         })
 
         expect(Object.isFrozen(servicos)).toBe(true)
