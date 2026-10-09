@@ -1,31 +1,31 @@
 /**
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {ActivityIndicator, Alert, Linking, NativeModules, Text, View} from 'react-native'
-import {StatusBar} from 'expo-status-bar'
-import {useFonts} from 'expo-font'
-import {SafeAreaView} from 'react-native-safe-area-context'
-import {DMSans_400Regular} from '@expo-google-fonts/dm-sans/400Regular'
-import {DMSans_500Medium} from '@expo-google-fonts/dm-sans/500Medium'
-import {DMSans_600SemiBold} from '@expo-google-fonts/dm-sans/600SemiBold'
-import {DMSans_700Bold} from '@expo-google-fonts/dm-sans/700Bold'
-
-import ForgotPasswordScreen from './features/auth/screens/ForgotPasswordScreen'
-import LoginScreen from './features/auth/screens/LoginScreen'
-import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen'
-import WelcomeScreen from './features/auth/screens/WelcomeScreen'
-import {ContraceptiveHuTestAccess} from './features/contraceptives/testing/ContraceptiveHuTestAccess'
-import {CycleHistoryFlow} from './features/cycles/CycleHistoryFlow'
-import OnboardingScreen from './features/onboarding/screens/OnboardingScreen'
-import {ChangePasswordScreen} from './features/settings/screens/ChangePasswordScreen'
-import {ProfileSettingsScreen} from './features/settings/screens/ProfileSettingsScreen'
-import {SettingsScreen} from './features/settings/screens/SettingsScreen'
-import {MembersScreen} from './features/support-network/screens/MembersScreen'
-import {NewSupportCategoryScreen} from './features/support-network/screens/NewSupportCategoryScreen'
-import {criarServicosApp} from './app/createAppServices'
-import {obterToken} from './shared/storage/tokenStorage'
-import {cores, fontFamilies} from './shared/theme'
+import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Linking, NativeModules, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
+import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
+import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
+import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold';
+import ForgotPasswordScreen from './features/auth/screens/ForgotPasswordScreen';
+import LoginScreen from './features/auth/screens/LoginScreen';
+import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
+import WelcomeScreen from './features/auth/screens/WelcomeScreen';
+import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
+import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
+import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
+import { SettingsScreen } from './features/settings/screens/SettingsScreen';
+import { ContraceptiveHuTestAccess } from './features/contraceptives/testing/ContraceptiveHuTestAccess';
+import { MembersScreen } from './features/support-network/screens/MembersScreen';
+import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
+import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
+import { criarServicosApp } from './app/createAppServices';
+import { obterToken } from './shared/storage/tokenStorage';
+import { cores, fontFamilies } from './shared/theme';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
@@ -34,8 +34,9 @@ const telasInternas = Object.freeze({
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
     anticoncepcionais: 'anticoncepcionais',
-    novaCategoria: 'novaCategoria'
-})
+    novaCategoria: 'novaCategoria',
+    inicio: 'inicio'
+});
 
 //Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
@@ -53,7 +54,10 @@ function obterBaseUrl() {
     return 'http://10.0.2.2:3000'
 }
 
-//Extrai o token presente no link de recuperação de senha.
+function permitirHttpParaTeste() {
+    return process.env.EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING === 'true';
+}
+
 function obterTokenRecuperacao(url) {
     const token = url?.match(/[?&]token=([^&]+)/)?.[1]
 
@@ -87,6 +91,7 @@ export default function App() {
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
+    const [origemAnticoncepcionais, setOrigemAnticoncepcionais] = useState(telasInternas.configuracoes)
     const requisicaoAtual = useRef(0)
     const controladorPerfilAtual = useRef(null)
     const apiUrl = obterBaseUrl()
@@ -98,7 +103,8 @@ export default function App() {
             return {
                 servicos: criarServicosApp({
                     apiUrl,
-                    permitirHttpDesenvolvimento: emDesenvolvimento
+                    permitirHttpDesenvolvimento:
+                        emDesenvolvimento || permitirHttpParaTeste()
                 }),
                 erro: null
             }
@@ -260,6 +266,11 @@ export default function App() {
 
     //Recebe a aba da barra inferior e abre as telas internas já disponíveis.
     function selecionarAba(aba) {
+        if (aba === 'inicio') {
+            setTelaInterna(telasInternas.inicio);
+            return;
+        }
+
         if (aba === 'membros') {
             setTelaInterna(telasInternas.membros)
             return
@@ -336,62 +347,43 @@ export default function App() {
     let conteudo
 
     if (estadoSessao === 'anonima') {
-        if (telaPublica === 'boasVindas') {
-            conteudo = (
-                <WelcomeScreen
-                    aoCriarConta={() => setTelaPublica('cadastro')}
-                    aoEntrar={() => setTelaPublica('login')}
-                />
-            )
-        }
-
-        if (telaPublica === 'login') {
-            conteudo = (
-                <LoginScreen
-                    realizarLogin={configuracao.servicos.authService.realizarLogin}
-                    mensagemSucesso={mensagemLogin}
-                    aoDispensarMensagemSucesso={() => setMensagemLogin(null)}
-                    aoVoltar={() => setTelaPublica('boasVindas')}
-                    aoRecuperarSenha={() => setTelaPublica('recuperarSenha')}
-                    aoCriarConta={() => setTelaPublica('cadastro')}
-                    aoEntrar={concluirAutenticacao}
-                />
-            )
-        }
-
-        if (telaPublica === 'recuperarSenha') {
-            conteudo = (
-                <ForgotPasswordScreen
-                    solicitarRecuperacao={configuracao.servicos.authService.solicitarRecuperacao}
-                    reenviarRecuperacao={configuracao.servicos.authService.solicitarRecuperacao}
-                    aoVoltar={() => setTelaPublica('login')}
-                    aoConcluir={() => setTelaPublica('login')}
-                />
-            )
-        }
-
-        if (telaPublica === 'redefinirSenha') {
-            conteudo = (
-                <ResetPasswordScreen
-                    token={tokenRecuperacao}
-                    redefinirSenha={configuracao.servicos.authService.redefinirSenha}
-                    aoVoltar={() => setTelaPublica('login')}
-                    aoEntrar={() => setTelaPublica('login')}
-                />
-            )
-        }
-
-        if (telaPublica === 'cadastro') {
-            conteudo = (
-                <OnboardingScreen
-                    cadastrar={configuracao.servicos.authService.cadastrar}
-                    verificarEmailDisponivel={configuracao.servicos.authService.verificarEmailDisponivel}
-                    aoVoltar={() => setTelaPublica('boasVindas')}
-                    aoEntrar={() => setTelaPublica('login')}
-                    aoConcluir={concluirAutenticacao}
-                />
-            )
-        }
+        if (telaPublica === 'boasVindas') conteudo = <WelcomeScreen
+            aoCriarConta={() => setTelaPublica('cadastro')}
+            aoEntrar={() => setTelaPublica('login')} />;
+        if (telaPublica === 'login') conteudo = <LoginScreen
+            realizarLogin={configuracao.servicos.authService.realizarLogin}
+            mensagemSucesso={mensagemLogin}
+            aoDispensarMensagemSucesso={() => setMensagemLogin(null)}
+            aoVoltar={() => setTelaPublica('boasVindas')}
+            aoRecuperarSenha={() => setTelaPublica('recuperarSenha')}
+            aoCriarConta={() => setTelaPublica('cadastro')}
+            aoEntrar={concluirAutenticacao} />;
+        if (telaPublica === 'recuperarSenha') conteudo = <ForgotPasswordScreen
+            solicitarRecuperacao={configuracao.servicos.authService.solicitarRecuperacao}
+            reenviarRecuperacao={configuracao.servicos.authService.solicitarRecuperacao}
+            aoVoltar={() => setTelaPublica('login')}
+            aoConcluir={() => setTelaPublica('login')} />;
+        if (telaPublica === 'redefinirSenha') conteudo = <ResetPasswordScreen
+            token={tokenRecuperacao}
+            redefinirSenha={configuracao.servicos.authService.redefinirSenha}
+            aoVoltar={() => setTelaPublica('login')}
+            aoEntrar={() => setTelaPublica('login')} />;
+        if (telaPublica === 'cadastro') conteudo = <OnboardingScreen
+            cadastrar={configuracao.servicos.authService.cadastrar}
+            verificarEmailDisponivel={configuracao.servicos.authService.verificarEmailDisponivel}
+            aoVoltar={() => setTelaPublica('boasVindas')}
+            aoEntrar={() => setTelaPublica('login')}
+            aoConcluir={concluirAutenticacao} />;
+    } else if (telaInterna === telasInternas.inicio) {
+        conteudo = <CycleTodayContainer
+            service={configuracao.servicos.cyclePredictionService}
+            aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            aoAbrirAnticoncepcional={() => {
+                setOrigemAnticoncepcionais(telasInternas.inicio)
+                setTelaInterna(telasInternas.anticoncepcionais)
+            }}
+            aoSelecionarAba={selecionarAba}
+            onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.membros) {
         conteudo = (
             <MembersScreen
@@ -414,7 +406,10 @@ export default function App() {
         conteudo = (
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
-                onAbrirAnticoncepcionais={() => setTelaInterna(telasInternas.anticoncepcionais)}
+                onAbrirAnticoncepcionais={() => {
+                    setOrigemAnticoncepcionais(telasInternas.configuracoes)
+                    setTelaInterna(telasInternas.anticoncepcionais)
+                }}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil)
 
@@ -437,7 +432,7 @@ export default function App() {
         conteudo = (
             <ContraceptiveHuTestAccess
                 service={configuracao.servicos.contraceptiveService}
-                onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onVoltar={() => setTelaInterna(origemAnticoncepcionais)}
                 onSessaoExpirada={finalizarSessao}
             />
         )

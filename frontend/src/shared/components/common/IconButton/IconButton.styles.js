@@ -49,6 +49,17 @@ const variantes = Object.freeze({
         icone: tema.cores.neutras.textoSecundarioClaro
     }),
 
+    calendario: Object.freeze({
+        container: Object.freeze({
+            backgroundColor: tema.cores.neutras.superficieClara,
+            borderWidth: 1,
+            borderColor: tema.cores.neutras.bordaClara,
+            borderRadius: tema.radius.onboardingCalendar
+        }),
+        icone: tema.cores.neutras.textoSecundarioClaro,
+        tamanhoIcone: 22
+    }),
+
     desativado: Object.freeze({
         container: Object.freeze({
             backgroundColor: 'transparent',

@@ -1,13 +1,14 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
-import {criarAuthService} from '../../src/features/auth/services/authService'
-import {criarContraceptiveService} from '../../src/features/contraceptives/services/contraceptiveService'
-import {criarCycleHistoryService} from '../../src/features/cycles/services/cycleHistoryService'
-import {criarAccountService} from '../../src/features/settings/services/accountService'
-import {criarSupportCategoryService} from '../../src/features/support-network/services/supportCategoryService'
-import {criarServicosApp} from '../../src/app/createAppServices'
-import {criarApiClient} from '../../src/shared/services/api/apiClient'
-import {criarRequisicaoAutenticada} from '../../src/shared/services/api/authenticatedRequest'
-import {obterToken, removerToken} from '../../src/shared/storage/tokenStorage'
+import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService'
+import { criarAuthService } from '../../src/features/auth/services/authService'
+import { criarAccountService } from '../../src/features/settings/services/accountService'
+import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService'
+import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService'
+import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService'
+import { criarServicosApp } from '../../src/app/createAppServices'
+import { criarApiClient } from '../../src/shared/services/api/apiClient'
+import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
+import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage'
 
 jest.mock('../../src/features/auth/services/authService', () => ({
     criarAuthService: jest.fn()
@@ -29,9 +30,19 @@ jest.mock('../../src/features/support-network/services/supportCategoryService', 
     criarSupportCategoryService: jest.fn()
 }))
 
-jest.mock('../../src/shared/services/api/apiClient', () => ({
-    criarApiClient: jest.fn()
-}))
+jest.mock(
+    '../../src/features/cycles/services/cyclePredictionService',
+    () => ({
+        criarCyclePredictionService: jest.fn()
+    })
+)
+
+jest.mock(
+    '../../src/shared/services/api/apiClient',
+    () => ({
+        criarApiClient: jest.fn()
+    })
+)
 
 jest.mock('../../src/shared/services/api/authenticatedRequest', () => ({
     criarRequisicaoAutenticada: jest.fn()
@@ -50,6 +61,8 @@ describe('createAppServices', () => {
     let contraceptiveService
     let cycleHistoryService
     let supportCategoryService
+    let cyclePredictionService
+    let fetchSeguro
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -76,6 +89,10 @@ describe('createAppServices', () => {
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
         })
+        cyclePredictionService = Object.freeze({
+            nome: 'cyclePredictionService'
+        })
+        fetchSeguro = null
 
         criarApiClient.mockReturnValue({
             requisicao
@@ -103,6 +120,10 @@ describe('createAppServices', () => {
 
         criarSupportCategoryService.mockReturnValue(
             supportCategoryService
+        )
+
+        criarCyclePredictionService.mockReturnValue(
+            cyclePredictionService
         )
     })
 
@@ -149,12 +170,17 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         })
 
+        expect(criarCyclePredictionService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        })
+
         expect(servicos).toEqual({
             authService,
             accountService,
             contraceptiveService,
             cycleHistoryService,
-            supportCategoryService
+            supportCategoryService,
+            cyclePredictionService
         })
 
         expect(Object.isFrozen(servicos)).toBe(true)

@@ -1,5 +1,5 @@
 //Testa as variantes, a acessibilidade e o bloqueio do botão compacto de ícone.
-import {fireEvent, render, screen} from '@testing-library/react-native'
+import {fireEvent, render, screen, userEvent} from '@testing-library/react-native'
 
 import {tema} from '../../../../src/shared/theme'
 import {IconButton} from '../../../../src/shared/components/common/IconButton/IconButton'
@@ -46,7 +46,7 @@ describe('IconButton', () => {
             />
         )
 
-        await fireEvent.press(screen.getByRole('button', {
+        await userEvent.setup().press(screen.getByRole('button', {
             name: 'Abrir calendário'
         }))
 
@@ -91,6 +91,26 @@ describe('IconButton', () => {
             disabled: false,
             selected: true
         })
+    })
+
+    test('usa a variante de calendário do protótipo', async () => {
+        await render(
+            <IconButton
+                icone={IconeTeste}
+                aoPressionar={jest.fn()}
+                rotuloAcessibilidade="Abrir calendário"
+                variante="calendario"
+            />
+        )
+
+        expect(screen.getByRole('button', {
+            name: 'Abrir calendário'
+        })).toHaveStyle(variantes.calendario.container)
+
+        expect(IconeTeste).toHaveBeenCalledWith(expect.objectContaining({
+            size: 22,
+            color: tema.cores.neutras.textoSecundarioClaro
+        }), undefined)
     })
 
     test('fica desativado quando recebe a propriedade desativado', async () => {

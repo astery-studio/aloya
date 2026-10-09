@@ -23,6 +23,10 @@ import {
 } from './features/cycles/cycleHistory.routes.js';
 
 import {
+    criarPredictionRoutes
+} from './features/cycles/prediction.routes.js';
+
+import {
     criarPermissionCategoryRoutes
 } from './features/support-network/routes/permissionCategory.routes.js';
 
@@ -124,6 +128,15 @@ app.use(
             container.authMiddleware,
         cycleHistoryController:
             container.cycleHistoryController
+    })
+);
+
+app.use(
+    '/cycles',
+    criarPredictionRoutes({
+        Router: express.Router,
+        autenticar: container.authMiddleware.autenticar,
+        controller: container.predictionController
     })
 );
 

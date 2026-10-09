@@ -16,7 +16,8 @@ const endpoints = Object.freeze({
     logout: '/auth/logout',
     anticoncepcionais: '/api/anticoncepcionais',
     historicoCiclos: '/api/cycles/history',
-    categoriasPermissao: '/support-network/permission-categories'
+    categoriasPermissao: '/support-network/permission-categories',
+    previsaoCiclo: '/cycles/prediction'
 })
 
 export {endpoints}

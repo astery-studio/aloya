@@ -9,8 +9,11 @@ function resposta() {
     return {
         statusCode: null,
         body: null,
+        contentType: null,
         status(codigo) { this.statusCode = codigo; return this; },
-        json(body) { this.body = body; return this; }
+        type(tipo) { this.contentType = tipo; return this; },
+        json(body) { this.body = body; return this; },
+        send(body) { this.body = body; return this; }
     };
 }
 
@@ -76,6 +79,31 @@ test('redefine a senha com dados validados', async () => {
 
     assert.equal(res.statusCode, 200);
     assert.deepEqual(chamadas, [['redefinir', dados]]);
+});
+
+test('cria uma página segura para abrir o token no aplicativo', () => {
+    const { controller } = criarController({});
+    const res = resposta();
+
+    controller.abrirNoAplicativo(
+        { query: { token: 'jwt.teste/token' } },
+        res
+    );
+
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.contentType, 'html');
+    assert.match(res.body, /package=com\.aloya\.app/);
+    assert.match(res.body, /jwt\.teste%2Ftoken/);
+});
+
+test('rejeita página intermediária sem token', () => {
+    const { controller } = criarController({});
+    const res = resposta();
+
+    controller.abrirNoAplicativo({ query: {} }, res);
+
+    assert.equal(res.statusCode, 400);
+    assert.match(res.body, /Link inválido/);
 });
 
 test('rejeita entradas inválidas antes de acessar o serviço', async () => {
