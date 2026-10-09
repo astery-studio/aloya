@@ -1,234 +1,158 @@
 # Aloya — Backend
 
-## 1. O que é o backend?
+## 1. Visão geral
 
-Backend é a parte do sistema responsável pelo processamento das informações.
+O backend do Aloya é uma API REST responsável por:
 
-Enquanto o frontend apresenta a interface, o backend:
+- receber e validar requisições;
+- aplicar as regras de negócio;
+- autenticar pessoas usuárias;
+- controlar sessões;
+- persistir dados;
+- proteger rotas;
+- devolver respostas JSON;
+- tratar erros de forma centralizada.
 
-* recebe requisições;
-* processa informações;
-* aplica regras de negócio;
-* acessa o banco;
-* autentica usuários;
-* retorna respostas.
+## 2. Tecnologias
 
----
+O backend utiliza:
 
-# 2. Tecnologias
+- Node.js;
+- Express 5;
+- Prisma ORM 7;
+- SQLite;
+- `@prisma/adapter-better-sqlite3`;
+- JSON Web Token;
+- bcrypt;
+- Nodemailer;
+- Helmet;
+- Express Rate Limit.
 
-O backend será desenvolvido utilizando:
-
-* Node.js;
-* Express;
-* Prisma;
-* PostgreSQL.
-
----
-
-# 3. Estrutura
-
-A estrutura planejada:
+## 3. Estrutura principal
 
 ```text
 backend/
-│
-├── src/
-│   ├── controllers/
-│   ├── routes/
-│   ├── services/
-│   ├── middlewares/
-│   ├── validators/
-│   ├── utils/
-│   ├── config/
-│   └── server.js
-│
 ├── prisma/
-│   ├── schema.prisma
-│   └── migrations/
-│
-├── .env
+├── src/
+│   ├── features/
+│   │   ├── auth/
+│   │   ├── calendar/
+│   │   ├── contraceptives/
+│   │   ├── cycles/
+│   │   ├── settings/
+│   │   └── support-network/
+│   └── shared/
+│       ├── config/
+│       ├── errors/
+│       ├── generated/
+│       ├── http/
+│       │   └── server.js
+│       ├── middleware/
+│       └── utils/
+├── tests/
 ├── .env.example
 ├── package.json
-└── README.md
+└── prisma.config.ts
 ```
 
----
+## 4. Responsabilidades das camadas
 
-# 4. Inicialização
+### Routes
 
-Entrar na pasta:
+As rotas definem os caminhos e métodos HTTP disponíveis.
 
-```bash
-cd backend
-```
-
-Inicializar o Node:
-
-```bash
-npm init -y
-```
-
-Instalar Express:
-
-```bash
-npm install express
-```
-
-Instalar outras dependências:
-
-```bash
-npm install cors dotenv
-```
-
-Para desenvolvimento:
-
-```bash
-npm install -D nodemon
-```
-
----
-
-# 5. Server
-
-O arquivo:
-
-```text
-src/server.js
-```
-
-será responsável por iniciar o servidor.
-
-O servidor deverá:
-
-1. criar a aplicação Express;
-2. configurar middlewares;
-3. registrar rotas;
-4. iniciar a aplicação.
-
----
-
-# 6. Routes
-
-Routes definem os caminhos da API.
-
-Exemplo:
-
-```text
-routes/
-├── authRoutes.js
-├── userRoutes.js
-├── cycleRoutes.js
-└── communityRoutes.js
-```
-
-Uma rota pode ser:
+Exemplos:
 
 ```text
 POST /auth/login
+GET /users/me
+PATCH /users/me
+GET /api/anticoncepcionais
 ```
 
----
+As rotas também aplicam middlewares de autenticação e limites de requisições.
 
-# 7. Controllers
+### Controllers
 
-Controllers recebem as requisições.
+Os controllers:
 
-Exemplo:
+- recebem a requisição;
+- chamam os validators;
+- delegam a operação aos services;
+- escolhem o status HTTP;
+- devolvem a resposta.
+
+Controllers não devem concentrar regras de negócio ou acesso direto ao banco.
+
+### Services
+
+Os services implementam:
+
+- regras de negócio;
+- operações com o Prisma;
+- transações;
+- autenticação;
+- controle de sessões;
+- integração com e-mail;
+- formatação dos resultados.
+
+### Validators
+
+Os validators verificam:
+
+- campos obrigatórios;
+- tipos;
+- formatos;
+- limites;
+- campos desconhecidos;
+- consistência entre valores.
+
+Dados inválidos normalmente resultam em `422 Unprocessable Entity`.
+
+### Middlewares
+
+O backend possui middlewares para:
+
+- autenticação;
+- tratamento global de erros;
+- rotas inexistentes;
+- rate limiting;
+- regras relacionadas ao consentimento parental.
+
+### Shared
+
+A pasta `shared` reúne recursos usados por mais de uma funcionalidade:
+
+- configuração das variáveis de ambiente;
+- instância compartilhada do Prisma;
+- erros da aplicação;
+- middlewares;
+- utilitários.
+
+## 5. Fluxo de uma requisição
 
 ```text
-authController.js
+Aplicativo mobile
+        ↓
+      Route
+        ↓
+    Middleware
+        ↓
+    Controller
+        ↓
+     Validator
+        ↓
+      Service
+        ↓
+      Prisma
+        ↓
+      SQLite
 ```
 
-Pode possuir funções como:
+A resposta percorre o fluxo inverso:
 
 ```text
-register()
-login()
-logout()
-```
-
-O controller não deve concentrar toda a regra de negócio.
-
----
-
-# 8. Services
-
-Services possuem a lógica de negócio.
-
-Exemplo:
-
-```text
-authService.js
-```
-
-Pode ser responsável por:
-
-* procurar usuário;
-* verificar senha;
-* gerar token;
-* criar usuário.
-
----
-
-# 9. Validators
-
-Validators verificam se os dados recebidos estão corretos.
-
-Por exemplo:
-
-```text
-email é válido?
-senha foi informada?
-nome foi informado?
-```
-
-A validação deve ocorrer antes de tentar executar operações desnecessárias.
-
----
-
-# 10. Middlewares
-
-Middlewares são funções executadas durante o processamento de uma requisição.
-
-Exemplo:
-
-```text
-Request
-   ↓
-Auth Middleware
-   ↓
-Controller
-```
-
-Um middleware de autenticação pode verificar se o usuário está autenticado antes de permitir acesso a uma rota.
-
----
-
-# 11. Fluxo
-
-A estrutura principal será:
-
-```text
-Request
-   ↓
-Route
-   ↓
-Middleware
-   ↓
-Controller
-   ↓
-Service
-   ↓
-Prisma
-   ↓
-Database
-```
-
-E:
-
-```text
-Database
+SQLite
    ↓
 Prisma
    ↓
@@ -236,7 +160,151 @@ Service
    ↓
 Controller
    ↓
-Response
+Resposta HTTP
+   ↓
+Aplicativo mobile
 ```
 
----
+## 6. Inicialização do servidor
+
+A entrada principal é:
+
+```text
+src/shared/http/server.js
+```
+
+O arquivo:
+
+1. cria a aplicação Express;
+2. desativa o cabeçalho `X-Powered-By`;
+3. habilita o Helmet;
+4. configura JSON com limite de 32 KB;
+5. registra as rotas;
+6. registra o tratamento de rota inexistente;
+7. registra o middleware global de erros;
+8. inicia o servidor.
+
+Para executar:
+
+```bash
+npm start
+```
+
+Para desenvolvimento com reinício automático:
+
+```bash
+npm run dev
+```
+
+A porta padrão é `3000`.
+
+## 7. Rotas atualmente registradas
+
+Os grupos ativos são:
+
+```text
+/auth
+/users
+/api/anticoncepcionais
+```
+
+A relação detalhada dos endpoints está em:
+
+```text
+docs/api.md
+```
+
+Uma entidade existente no Prisma não está automaticamente disponível pela API. Para isso, é necessário registrar suas rotas em `src/shared/http/server.js`.
+
+## 8. Banco de dados
+
+O backend utiliza SQLite por meio do Prisma ORM e do adaptador `@prisma/adapter-better-sqlite3`.
+
+A conexão é configurada pela variável:
+
+```env
+DATABASE_URL="file:./prisma/aloya-dev.db"
+```
+
+O arquivo local do banco não deve ser enviado ao Git porque contém dados do ambiente de desenvolvimento.
+
+As migrations, por outro lado, devem permanecer versionadas.
+
+## 9. Tratamento de erros
+
+O middleware global converte falhas conhecidas em respostas JSON seguras:
+
+```json
+{
+  "erro": {
+    "codigo": "ERRO_APLICACAO",
+    "mensagem": "Descrição pública do erro."
+  }
+}
+```
+
+Rotas inexistentes retornam:
+
+```json
+{
+  "erro": {
+    "codigo": "ROTA_NAO_ENCONTRADA",
+    "mensagem": "Recurso não encontrado."
+  }
+}
+```
+
+Erros inesperados não devem expor:
+
+- stack trace;
+- credenciais;
+- tokens;
+- hashes;
+- detalhes internos do banco.
+
+## 10. Segurança
+
+O backend aplica:
+
+- hash de senhas com bcrypt;
+- sessões autenticadas com JWT;
+- persistência somente do hash do token de sessão;
+- revogação de sessões;
+- rate limiting;
+- Helmet;
+- validação dos dados;
+- mensagens neutras em fluxos sensíveis;
+- variáveis de ambiente para credenciais;
+- proteção contra campos não permitidos.
+
+O arquivo `.env` nunca deve ser versionado.
+
+## 11. Testes
+
+Para executar todos os testes:
+
+```bash
+npm test
+```
+
+Para acompanhar alterações:
+
+```bash
+npm run test:watch
+```
+
+Para gerar cobertura:
+
+```bash
+npm run test:coverage
+```
+
+Os testes abrangem controllers, services, validators, rotas, autenticação, segurança e integração com SQLite.
+
+## 12. Documentos relacionados
+
+- `docs/api.md`: contratos HTTP;
+- `docs/banco-de-dados.md`: persistência e modelagem;
+- `docs/configuracao.md`: preparação do ambiente;
+- `docs/arquitetura.md`: visão arquitetural;
+- `docs/frontend.md`: aplicação mobile.

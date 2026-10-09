@@ -51,6 +51,9 @@ jobs:
       - name: Validar o schema Prisma
         run: npx prisma validate
 
+      - name: Executar testes
+        run: npm test
+
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
@@ -73,3 +76,6 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci
+
+      - name: Executar testes
+        run: npm test

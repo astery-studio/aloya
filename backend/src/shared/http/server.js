@@ -1,0 +1,183 @@
+//Configura e inicia a API HTTP da aplicação.
+import express from 'express';
+import helmet from 'helmet';
+
+import {
+    env
+} from '../config/env.js';
+
+import {
+    criarContainer
+} from '../config/container.js';
+
+import {
+    criarAuthRoutes
+} from '../../features/auth/routes/auth.routes.js';
+
+import {
+    criarRotasAnticoncepcionais
+} from '../../features/contraceptives/routes/contraceptive.routes.js';
+
+import {
+    criarCalendarRoutes
+} from '../../features/calendar/routes/calendar.routes.js';
+
+import {
+    criarCycleHistoryRoutes
+} from '../../features/cycles/routes/cycleHistory.routes.js';
+
+import {
+    criarPredictionRoutes
+} from '../../features/cycles/routes/prediction.routes.js';
+
+import {
+    criarPermissionCategoryRoutes
+} from '../../features/support-network/routes/permissionCategory.routes.js';
+
+import {
+    criarAccountRoutes
+} from '../../features/settings/routes/account.routes.js';
+
+import {
+    criarLogoutRoutes
+} from '../../features/auth/routes/logout.routes.js';
+
+import {
+    rotaNaoEncontrada,
+    tratarErros
+} from '../middleware/error.middleware.js';
+
+const app = express();
+const container = criarContainer();
+
+app.disable('x-powered-by');
+app.use(helmet());
+
+app.use(
+    express.json({
+        limit: '32kb',
+        strict: true
+    })
+);
+
+app.use(
+    '/auth',
+    criarLogoutRoutes({
+        Router: express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        logoutController:
+            container.logoutController
+    })
+);
+
+app.use(
+    '/auth',
+    criarAuthRoutes({
+        authController:
+            container.authController,
+        passwordRecoveryController:
+            container.passwordRecoveryController,
+        authMiddleware:
+            container.authMiddleware,
+        cadastroRateLimit:
+            container.cadastroRateLimit,
+        emailRateLimit:
+            container.emailRateLimit,
+        loginRateLimit:
+            container.loginRateLimit,
+        contaLoginRateLimit:
+            container.contaLoginRateLimit
+    })
+);
+
+app.use(
+    '/users',
+    criarAccountRoutes({
+        Router: express.Router,
+        accountController:
+            container.accountController,
+        authMiddleware:
+            container.authMiddleware,
+        configuracoesContaRateLimit:
+            container.configuracoesContaRateLimit,
+        alteracaoSenhaRateLimit:
+            container.alteracaoSenhaRateLimit,
+        accountDeletionController:
+            container.accountDeletionController,
+        exclusaoContaRateLimit:
+            container.exclusaoContaRateLimit
+    })
+);
+
+app.use(
+    '/api/anticoncepcionais',
+    criarRotasAnticoncepcionais({
+        autenticar:
+            container.authMiddleware.autenticar,
+        controller:
+            container.contraceptiveController,
+        usoController:
+            container.contraceptiveUsageController,
+        edicaoRateLimit:
+            container.edicaoAnticoncepcionalRateLimit,
+        remocaoRateLimit:
+            container.remocaoAnticoncepcionalRateLimit
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCalendarRoutes({
+        Router:
+            express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        calendarController:
+            container.calendarController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleHistoryRoutes({
+        Router: express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        cycleHistoryController:
+            container.cycleHistoryController
+    })
+);
+
+app.use(
+    '/cycles',
+    criarPredictionRoutes({
+        Router: express.Router,
+        autenticar: container.authMiddleware.autenticar,
+        controller: container.predictionController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarPermissionCategoryRoutes({
+        Router: express.Router,
+        authMiddleware:
+            container.authMiddleware,
+        parentalConsentMiddleware:
+            container.parentalConsentMiddleware,
+        permissionCategoryRateLimit:
+            container.permissionCategoryRateLimit,
+        permissionCategoryController:
+            container.permissionCategoryController
+    })
+);
+
+app.use(rotaNaoEncontrada);
+app.use(tratarErros);
+
+app.listen(env.port, () => {
+    console.log(
+        `API executando na porta ${env.port}.`
+    );
+});
