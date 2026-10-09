@@ -62,7 +62,6 @@ function CycleCalendar({
 }) {
     const listaRef = useRef(null)
     const [hoje] = useState(obterHojeLocal)
-    const posicionamentoInicialConcluido = useRef(false)
     const usuarioInteragiu = useRef(false)
     const solicitouAnteriores = useRef(false)
     const solicitouPosteriores = useRef(false)
@@ -82,7 +81,7 @@ function CycleCalendar({
             if (mesesNormalizados[indice].chave <= chaveAtual) return indice
         }
 
-        return mesesNormalizados.length > 0 ? 0 : -1
+        return mesesNormalizados.length > 0 ? 0 : undefined
     }, [hoje, mesesNormalizados])
 
     const layoutsMeses = useMemo(() => {
@@ -112,17 +111,6 @@ function CycleCalendar({
         (item) => item.chave,
         []
     )
-
-    const posicionarNoMesAtual = useCallback(() => {
-        if (posicionamentoInicialConcluido.current || indiceMesAtual < 0) return
-
-        posicionamentoInicialConcluido.current = true
-        listaRef.current?.scrollToIndex({
-            index: indiceMesAtual,
-            animated: false,
-            viewPosition: 1
-        })
-    }, [indiceMesAtual])
 
     const registrarInteracao = useCallback(() => {
         usuarioInteragiu.current = true
@@ -197,6 +185,7 @@ function CycleCalendar({
                 renderItem={renderizarMes}
                 keyExtractor={extrairChave}
                 getItemLayout={obterLayoutMes}
+                initialScrollIndex={indiceMesAtual}
                 style={estilos.lista}
                 contentContainerStyle={estilos.conteudoLista}
                 ListHeaderComponent={carregandoAnteriores ? (
@@ -211,7 +200,6 @@ function CycleCalendar({
                 windowSize={3}
                 removeClippedSubviews={Platform.OS === 'android'}
                 maintainVisibleContentPosition={CONFIGURACAO_POSICAO}
-                onContentSizeChange={posicionarNoMesAtual}
                 onScrollBeginDrag={registrarInteracao}
                 onScroll={verificarInicio}
                 scrollEventThrottle={32}
