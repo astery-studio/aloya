@@ -1,4 +1,5 @@
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { Plus } from 'phosphor-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { Header } from '../../../shared/components/navigation/Header/Header';
@@ -43,7 +44,7 @@ function ContraceptiveOverviewScreen({
             renderItem={({ item }) => <ContraceptiveOverviewCard anticoncepcional={item} aoAlternarUso={aoAlternarUso} renderizarAcoes={renderizarAcoes} />}
             ItemSeparatorComponent={() => <View style={estilosVisaoGeral.separador} />}
             ListHeaderComponent={pendentes ? <PendingUsesBanner quantidade={pendentes} /> : null}
-            ListEmptyComponent={<View style={estilosVisaoGeral.estado}><Text style={estilosVisaoGeral.tituloEstado}>Nenhum anticoncepcional</Text><Text style={estilosVisaoGeral.textoEstado}>{MENSAGEM_VAZIO}</Text></View>}
+            ListEmptyComponent={<View style={estilosVisaoGeral.estado}><Text style={estilosVisaoGeral.tituloEstado}>Nenhum anticoncepcional cadastrado</Text><Text style={estilosVisaoGeral.textoEstado}>{MENSAGEM_VAZIO}</Text></View>}
             contentContainerStyle={[estilosVisaoGeral.lista, { paddingBottom: 112 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
         />;
@@ -51,9 +52,9 @@ function ContraceptiveOverviewScreen({
 
     return (
         <SafeAreaView edges={['left', 'right']} style={estilosVisaoGeral.tela}>
-            <Header titulo="Anticoncepcionais" variante="comVoltar" onVoltar={aoVoltar} />
+            <Header titulo="Meus Anticoncepcionais" variante="comVoltar" onVoltar={aoVoltar} />
             <View style={estilosVisaoGeral.conteudo}>{corpo}</View>
-            {!carregando && !erro ? <View style={[estilosVisaoGeral.acaoFixa, { paddingBottom: Math.max(insets.bottom, 12) }]}><ButtonScreen texto="Cadastrar novo anticoncepcional" variante="laranja" aoPressionar={aoCadastrarNovo} /></View> : null}
+            {!carregando && !erro ? <View style={[estilosVisaoGeral.acaoFixa, { paddingBottom: Math.max(insets.bottom, 12) }]}><ButtonScreen texto="Cadastrar novo anticoncepcional" variante="verde" icone={Plus} aoPressionar={aoCadastrarNovo} /></View> : null}
         </SafeAreaView>
     );
 }
