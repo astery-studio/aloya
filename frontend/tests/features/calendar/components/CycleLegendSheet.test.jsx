@@ -1,4 +1,4 @@
-//Testa conteúdo, variantes e fechamento do painel de legenda.
+// Testa conteúdo, variantes e fechamento do painel de legenda.
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react-native'
 import {CycleLegendSheet} from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet'
@@ -10,7 +10,11 @@ jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', 
     return {
         BottomSheet: ({visivel, children}) => (
             visivel
-                ? ReactInterno.createElement(View, {testID: 'bottom-sheet-compartilhado'}, children)
+                ? ReactInterno.createElement(
+                    View,
+                    {testID: 'bottom-sheet-compartilhado'},
+                    children
+                )
                 : null
         )
     }
@@ -90,8 +94,8 @@ const itensLegenda = [
 ]
 
 describe('CycleLegendSheet', () => {
-    test('não renderiza o painel quando está invisível', () => {
-        render(
+    test('não renderiza o painel quando está invisível', async () => {
+        await render(
             <CycleLegendSheet
                 visivel={false}
                 itens={itensLegenda}
@@ -102,8 +106,8 @@ describe('CycleLegendSheet', () => {
         expect(screen.queryByTestId('bottom-sheet-compartilhado')).toBeNull()
     })
 
-    test('mostra título e os dez itens da legenda', () => {
-        render(
+    test('mostra título e os dez itens da legenda', async () => {
+        await render(
             <CycleLegendSheet
                 visivel
                 itens={itensLegenda}
@@ -120,8 +124,8 @@ describe('CycleLegendSheet', () => {
         }
     })
 
-    test('diferencia marcadores reais e previstos', () => {
-        render(
+    test('diferencia marcadores reais e previstos', async () => {
+        await render(
             <CycleLegendSheet
                 visivel
                 itens={itensLegenda}
@@ -129,29 +133,37 @@ describe('CycleLegendSheet', () => {
             />
         )
 
-        expect(screen.getByTestId('marcador-legenda-menstruacao-real')).toHaveStyle({
+        expect(
+            screen.getByTestId('marcador-legenda-menstruacao-real')
+        ).toHaveStyle({
             backgroundColor: 'rgba(200, 90, 68, 0.90)'
         })
 
-        expect(screen.getByTestId('marcador-legenda-menstruacao-prevista')).toHaveStyle({
+        expect(
+            screen.getByTestId('marcador-legenda-menstruacao-prevista')
+        ).toHaveStyle({
             backgroundColor: 'rgba(200, 90, 68, 0.58)'
         })
 
-        expect(screen.getByTestId('marcador-legenda-janelaFertil-real')).toHaveStyle({
+        expect(
+            screen.getByTestId('marcador-legenda-janelaFertil-real')
+        ).toHaveStyle({
             borderStyle: 'dashed',
             borderColor: 'rgba(34, 34, 34, 0.70)'
         })
 
-        expect(screen.getByTestId('marcador-legenda-janelaFertil-prevista')).toHaveStyle({
+        expect(
+            screen.getByTestId('marcador-legenda-janelaFertil-prevista')
+        ).toHaveStyle({
             borderStyle: 'dashed',
             borderColor: 'rgba(34, 34, 34, 0.42)'
         })
     })
 
-    test('fecha pelo botão do cabeçalho', () => {
+    test('fecha pelo botão do cabeçalho', async () => {
         const aoFechar = jest.fn()
 
-        render(
+        await render(
             <CycleLegendSheet
                 visivel
                 itens={itensLegenda}
@@ -164,8 +176,8 @@ describe('CycleLegendSheet', () => {
         expect(aoFechar).toHaveBeenCalledTimes(1)
     })
 
-    test('tolera itens inválidos sem quebrar o painel', () => {
-        render(
+    test('tolera itens inválidos sem quebrar o painel', async () => {
+        await render(
             <CycleLegendSheet
                 visivel
                 itens={[null, {}, ...itensLegenda.slice(0, 1)]}
