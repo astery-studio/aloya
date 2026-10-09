@@ -91,6 +91,7 @@ export default function App() {
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
+    const [origemAnticoncepcionais, setOrigemAnticoncepcionais] = useState(telasInternas.configuracoes)
     const requisicaoAtual = useRef(0)
     const controladorPerfilAtual = useRef(null)
     const apiUrl = obterBaseUrl()
@@ -377,6 +378,10 @@ export default function App() {
         conteudo = <CycleTodayContainer
             service={configuracao.servicos.cyclePredictionService}
             aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+            aoAbrirAnticoncepcional={() => {
+                setOrigemAnticoncepcionais(telasInternas.inicio)
+                setTelaInterna(telasInternas.anticoncepcionais)
+            }}
             aoSelecionarAba={selecionarAba}
             onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.membros) {
@@ -396,7 +401,10 @@ export default function App() {
         conteudo = (
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
-                onAbrirAnticoncepcionais={() => setTelaInterna(telasInternas.anticoncepcionais)}
+                onAbrirAnticoncepcionais={() => {
+                    setOrigemAnticoncepcionais(telasInternas.configuracoes)
+                    setTelaInterna(telasInternas.anticoncepcionais)
+                }}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil)
 
@@ -419,7 +427,7 @@ export default function App() {
         conteudo = (
             <ContraceptiveFlow
                 service={configuracao.servicos.contraceptiveService}
-                onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onVoltar={() => setTelaInterna(origemAnticoncepcionais)}
                 onSessaoExpirada={finalizarSessao}
             />
         )
