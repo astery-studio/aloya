@@ -12,6 +12,7 @@ const estilos = StyleSheet.create({
     conteudoFluxo: { flex: 1, paddingHorizontal: 24, gap: 12 },
     descricaoFluxo: { fontFamily: 'DMSans_400Regular', fontSize: 14, lineHeight: 21, color: cores.neutras.textoSecundarioClaro, marginBottom: 8 },
     listaHorariosFluxo: { gap: 12 },
+    erroHorario: { ...typography.caption, color: cores.feedback.erro, marginTop: 8 },
     acaoFixa: { paddingHorizontal: 24, paddingBottom: 40, paddingTop: 24 },
     opcoesIntensidade: { gap: 12 }
 });
