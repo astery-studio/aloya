@@ -146,9 +146,12 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
     expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 62 });
     expect(estilos.textoAvisoBaixa).toMatchObject({ flex: 1, maxWidth: 226 });
     expect(estilos.rotuloPrevisao.letterSpacing).toBe(1.44);
+    expect(estilos.rotuloPrevisaoSecundaria).toMatchObject({ fontFamily: 'DMSans_700Bold', fontSize: 12, letterSpacing: 1.2 });
+    expect(estilos.valorOvulacao).toMatchObject({ fontFamily: 'DMSans_700Bold', fontSize: 18, lineHeight: 27 });
+    expect(estilos.valorSecundario).toMatchObject({ fontFamily: 'DMSans_700Bold', fontSize: 15, lineHeight: 21 });
     expect(estilos.secaoPrevisao.paddingTop).toBe(16);
     expect(estilos.cartaoProximoCiclo).toMatchObject({ rowGap: 16, columnGap: 12 });
-    expect(estilos.dataProximoCiclo).toMatchObject({ flex: 1, minWidth: 140 });
+    expect(estilos.dataProximoCiclo).toMatchObject({ flex: 1, minWidth: 140, gap: 4 });
     expect(estilos.previsoesSecundarias).toMatchObject({ flexWrap: 'wrap' });
     expect(estilos.cartaoSecundario).toMatchObject({ flex: 1, minWidth: 130 });
     expect(estilos.sintoma).toMatchObject({ flexGrow: 1, flexBasis: '47%', minWidth: 130 });

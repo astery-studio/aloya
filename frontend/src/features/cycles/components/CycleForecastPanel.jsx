@@ -92,14 +92,14 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
                         <SunIcon size={18} color={cores.feedback.informacao} weight="fill" />
-                        <Text style={estilos.rotuloPrevisao}>Ovulação</Text>
+                        <Text style={estilos.rotuloPrevisaoSecundaria}>Ovulação</Text>
                     </View>
-                    <Text style={estilos.valorSecundario}>{formatarDataLonga(previsao.dataOvulacaoEstimada)}</Text>
+                    <Text style={estilos.valorOvulacao}>{formatarDataLonga(previsao.dataOvulacaoEstimada)}</Text>
                 </View>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
                         <SparkleIcon size={18} color={cores.ciclo.iconeEscuro} weight="fill" />
-                        <Text style={estilos.rotuloPrevisao}>Janela fértil</Text>
+                        <Text style={estilos.rotuloPrevisaoSecundaria}>Janela fértil</Text>
                     </View>
                     <Text style={estilos.valorSecundario}>{janela ? `${formatarDataLonga(janela.inicio)} até ${formatarDataLonga(janela.fim)}` : 'Indisponível'}</Text>
                 </View>
