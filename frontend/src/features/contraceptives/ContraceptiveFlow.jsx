@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pill } from 'phosphor-react-native';
 import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal';
-import { ContraceptiveOverviewScreen } from './screens/ContraceptiveOverviewScreen';
+import { ContraceptivesScreen } from './screens/ContraceptivesScreen';
 import { NewContraceptiveScreen } from './screens/NewContraceptiveScreen';
 
 const serviceLocal = Object.freeze({
@@ -54,43 +54,11 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada 
         }
     }
 
-    async function alternarUso(anticoncepcional, uso, confirmar) {
-        if (typeof service.alternarUso !== 'function') return;
-
-        try {
-            const usoAtualizado = await service.alternarUso({
-                anticoncepcionalId: anticoncepcional.id,
-                usoId: uso.id,
-                confirmar
-            });
-
-            setItens((atuais) => atuais.map((item) => item.id !== anticoncepcional.id
-                ? item
-                : {
-                    ...item,
-                    usosHoje: item.usosHoje.map((registro) => registro.id === uso.id
-                        ? { ...registro, ...usoAtualizado }
-                        : registro)
-                }));
-        } catch (falha) {
-            if (falha?.status === 401) onSessaoExpirada?.();
-            throw falha;
-        }
-    }
-
     return (
         <>
             {tela === 'cadastro'
                 ? <NewContraceptiveScreen onVoltar={() => setTela('lista')} onCadastrar={cadastrar} salvando={salvando} />
-                : <ContraceptiveOverviewScreen
-                    anticoncepcionais={itens}
-                    aoCadastrarNovo={() => setTela('cadastro')}
-                    aoVoltar={onVoltar}
-                    carregando={carregando}
-                    erro={erro}
-                    aoTentarNovamente={() => carregar()}
-                    aoAlternarUso={alternarUso}
-                />}
+                : <ContraceptivesScreen anticoncepcionais={itens} onCadastrarNovo={() => setTela('cadastro')} onVoltar={onVoltar} carregando={carregando} erro={erro} onTentarNovamente={() => carregar()} />}
             <SimpleModal
                 visivel={Boolean(mensagem)}
                 aoFechar={() => setMensagem(null)}

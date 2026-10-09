@@ -3,20 +3,7 @@ import { endpoints } from '../../../shared/services/api/endpoints';
 
 //Recebe um registro da API e retorna o formato imutável utilizado pelas telas.
 function normalizarAnticoncepcional(registro) {
-    const possuiProgramacao = !['diu_hormonal', 'anel_vaginal'].includes(registro.tipo);
-    const horarios = registro.horarios ?? registro.programacao?.horarios ?? [];
-    const usosHojeRecebidos = registro.usosHoje ?? [];
-    const usosHoje = usosHojeRecebidos.length
-        ? usosHojeRecebidos.map((uso) => Object.freeze({
-            id: String(uso.id),
-            horario: uso.horario ?? uso.horarioProgramado,
-            status: uso.status ?? uso.statusUso ?? 'pendente'
-        }))
-        : horarios.map((horario, indice) => Object.freeze({
-            id: `${registro.id}-${horario}-${indice}`,
-            horario,
-            status: 'pendente'
-        }));
+    const possuiProgramacao = registro.tipo !== 'diu_hormonal';
 
     return Object.freeze({
         id: String(registro.id),
@@ -24,12 +11,8 @@ function normalizarAnticoncepcional(registro) {
         tipo: registro.tipo,
         intensidadeAlerta: registro.intensidadeAlerta,
         dataValidade: registro.dataValidade,
-        contagemValidade: registro.contagemValidade ?? registro.validadeRestante,
-        proximoUsoPrevisto: registro.proximoUsoPrevisto ?? registro.programacao?.proximoUsoPrevisto ?? horarios[0],
-        usosHoje: Object.freeze(usosHoje),
-        historico: Object.freeze([...(registro.historico ?? [])]),
         programacao: possuiProgramacao ? Object.freeze({
-            horarios: Object.freeze([...horarios]),
+            horarios: Object.freeze([...(registro.horarios ?? [])]),
             frequenciaId: registro.frequenciaId,
             dataPrimeiroUso: registro.dataPrimeiroUso,
             periodosPausa: Object.freeze([...(registro.periodosPausa ?? [])]),
