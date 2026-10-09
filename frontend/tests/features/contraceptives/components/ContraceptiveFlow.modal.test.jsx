@@ -7,10 +7,10 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
     __esModule: true,
     default: (props) => mockSimpleModal(props)
 }));
-jest.mock('../../../../src/features/contraceptives/screens/ContraceptivesScreen', () => {
+jest.mock('../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen', () => {
     const { Pressable, Text } = require('react-native');
-    return { ContraceptivesScreen: ({ onCadastrarNovo }) => (
-        <Pressable accessibilityRole="button" onPress={onCadastrarNovo}>
+    return { ContraceptiveTrackingScreen: ({ aoCadastrarNovo }) => (
+        <Pressable accessibilityRole="button" onPress={aoCadastrarNovo}>
             <Text>Cadastrar</Text>
         </Pressable>
     ) };

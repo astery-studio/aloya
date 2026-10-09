@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pill } from 'phosphor-react-native';
 import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal';
-import { ContraceptivesScreen } from './screens/ContraceptivesScreen';
+import { ContraceptiveTrackingScreen } from './screens/ContraceptiveTrackingScreen';
 import { NewContraceptiveScreen } from './screens/NewContraceptiveScreen';
 
 const serviceLocal = Object.freeze({
@@ -16,6 +16,7 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada 
     const [carregando, setCarregando] = useState(true);
     const [salvando, setSalvando] = useState(false);
     const [erro, setErro] = useState(null);
+    const [erroUso, setErroUso] = useState(null);
 
     const carregar = useCallback(async (signal) => {
         setCarregando(true);
@@ -54,11 +55,37 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada 
         }
     }
 
+    async function alternarUso(anticoncepcional, uso, confirmar) {
+        if (typeof service.alternarUso !== 'function') return;
+
+        try {
+            await service.alternarUso({
+                anticoncepcionalId: anticoncepcional.id,
+                usoId: uso.id,
+                confirmar
+            });
+        } catch (falha) {
+            if (falha?.status === 401) onSessaoExpirada?.();
+            setErroUso(falha);
+            throw falha;
+        }
+    }
+
     return (
         <>
             {tela === 'cadastro'
                 ? <NewContraceptiveScreen onVoltar={() => setTela('lista')} onCadastrar={cadastrar} salvando={salvando} />
-                : <ContraceptivesScreen anticoncepcionais={itens} onCadastrarNovo={() => setTela('cadastro')} onVoltar={onVoltar} carregando={carregando} erro={erro} onTentarNovamente={() => carregar()} />}
+                : <ContraceptiveTrackingScreen
+                    anticoncepcionais={itens}
+                    aoCadastrarNovo={() => setTela('cadastro')}
+                    aoVoltar={onVoltar}
+                    carregando={carregando}
+                    erro={erro}
+                    erroUso={erroUso}
+                    aoDispensarErroUso={() => setErroUso(null)}
+                    aoTentarNovamente={() => carregar()}
+                    aoAlternarUso={alternarUso}
+                />}
             <SimpleModal
                 visivel={Boolean(mensagem)}
                 aoFechar={() => setMensagem(null)}
