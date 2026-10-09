@@ -70,8 +70,8 @@ const estilos = StyleSheet.create({
     },
     textos: {
         display: 'flex',
-        width: 178,
-        flexShrink: 0,
+        flex: 1,
+        minWidth: 0,
         flexDirection: 'column',
         alignItems: 'flex-start'
     },

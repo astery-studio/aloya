@@ -2,6 +2,7 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react-native'
 import {CycleLegendSheet} from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet'
+import {estilos} from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet.styles'
 
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => {
     const ReactInterno = require('react')
@@ -122,6 +123,12 @@ describe('CycleLegendSheet', () => {
             expect(screen.getByText(item.descricao)).toBeOnTheScreen()
             expect(screen.getByTestId(`item-legenda-${item.id}`)).toBeOnTheScreen()
         }
+
+        expect(estilos.textos).toMatchObject({
+            flex: 1,
+            minWidth: 0
+        })
+        expect(estilos.textos).not.toHaveProperty('width')
     })
 
     test('diferencia marcadores reais e previstos', async () => {
