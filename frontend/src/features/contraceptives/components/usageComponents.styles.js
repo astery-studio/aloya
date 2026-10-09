@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../shared/theme';
 
 const estilosUso = StyleSheet.create({
-    banner: { width: '100%', height: 39.41, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: '#FBF3E0', borderWidth: 0.70489, borderColor: '#E8C97A' },
-    textoBanner: { color: '#B07D2A', fontFamily: fontFamilies.semibold, fontSize: 13, lineHeight: 20 },
+    banner: { width: '100%', maxWidth: 350.01, height: 39.41, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', alignSelf: 'center', flexGrow: 0, flexShrink: 0, gap: 7, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: '#FBF3E0', borderWidth: 0.70489, borderColor: '#E8C97A' },
+    textoBanner: { width: 142, height: 20, flexGrow: 0, flexShrink: 0, color: '#B07D2A', fontFamily: fontFamilies.semibold, fontWeight: '600', fontSize: 13, lineHeight: 20 },
     painel: { width: '100%' },
     cabecalhoPainel: { height: 28, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 10 },
     tituloPainel: { color: '#5C5C59', fontFamily: fontFamilies.medium, fontSize: 12, lineHeight: 18 },

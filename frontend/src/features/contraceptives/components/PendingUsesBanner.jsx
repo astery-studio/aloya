@@ -10,9 +10,14 @@ function PendingUsesBanner({ quantidade }) {
         : `${quantidade} usos pendentes hoje`;
 
     return (
-        <View accessibilityRole="alert" style={estilosUso.banner}>
-            <WarningCircleIcon size={15} color="#B07D2A" />
-            <Text style={estilosUso.textoBanner}>{descricao}</Text>
+        <View
+            accessible
+            accessibilityRole="alert"
+            accessibilityLabel={descricao}
+            style={estilosUso.banner}
+        >
+            <WarningCircleIcon size={14.99} color="#B07D2A" />
+            <Text numberOfLines={1} style={estilosUso.textoBanner}>{descricao}</Text>
         </View>
     );
 }
