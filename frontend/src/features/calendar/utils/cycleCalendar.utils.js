@@ -164,6 +164,7 @@ function criarDia(casa, contexto) {
     const marcacao = obterMarcacao(casa.data, contexto.previsao, registroCicloId)
     const futuro = casa.data > contexto.hoje
     const previsto = Boolean(marcacao.tipo && (marcacao.previsto || futuro))
+    const janelaFertil = intervaloContem(contexto.previsao?.janelaFertil, casa.data)
 
     return {
         ...casa,
@@ -171,14 +172,13 @@ function criarDia(casa, contexto) {
         previsto,
         futuro,
         registroCicloId,
-        janelaFertil: intervaloContem(contexto.previsao?.janelaFertil, casa.data),
-        janelaFertilPrevista: intervaloContem(contexto.previsao?.janelaFertil, casa.data) && futuro
+        janelaFertil,
+        janelaFertilPrevista: janelaFertil && futuro
     }
 }
 
 function obterChaveSegmento(dia) {
-    if (!dia?.tipo) return null
-    return `${dia.tipo}:${dia.previsto ? 'previsto' : 'atual'}`
+    return dia?.tipo ?? null
 }
 
 function prepararSegmentos(semana) {
