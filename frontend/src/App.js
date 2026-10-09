@@ -2,7 +2,7 @@
  * Inicializa os fluxos públicos e a área autenticada do aplicativo.
  */
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {ActivityIndicator, Linking, NativeModules, Text, View} from 'react-native'
+import {ActivityIndicator, Alert, Linking, NativeModules, Text, View} from 'react-native'
 import {StatusBar} from 'expo-status-bar'
 import {useFonts} from 'expo-font'
 import {SafeAreaView} from 'react-native-safe-area-context'
@@ -17,6 +17,7 @@ import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen'
 import WelcomeScreen from './features/auth/screens/WelcomeScreen'
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen'
 import {CalendarScreenContainer} from './features/calendar/screens/CalendarScreenContainer'
+import {CalendarTemporaryAccessScreen} from './features/calendar/testing/CalendarTemporaryAccessScreen'
 import {ChangePasswordScreen} from './features/settings/screens/ChangePasswordScreen'
 import {ProfileSettingsScreen} from './features/settings/screens/ProfileSettingsScreen'
 import {SettingsScreen} from './features/settings/screens/SettingsScreen'
@@ -31,6 +32,7 @@ const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     membros: 'membros',
     diario: 'diario',
+    calendario: 'calendario',
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
     anticoncepcionais: 'anticoncepcionais',
@@ -237,6 +239,13 @@ export default function App() {
         }
     }
 
+    function informarCadastroMenstruacaoPendente() {
+        Alert.alert(
+            'Cadastro de menstruação',
+            'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
+        )
+    }
+
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         return (
             <SafeAreaView
@@ -361,11 +370,18 @@ export default function App() {
         )
     } else if (telaInterna === telasInternas.diario) {
         conteudo = (
+            <CalendarTemporaryAccessScreen
+                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                onSelecionarAba={selecionarAba}
+            />
+        )
+    } else if (telaInterna === telasInternas.calendario) {
+        conteudo = (
             <CalendarScreenContainer
                 service={configuracao.servicos.calendarService}
                 onSessaoExpirada={finalizarSessao}
-                aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-                onSelecionarAba={selecionarAba}
+                aoVoltar={() => setTelaInterna(telasInternas.diario)}
+                aoCadastrarMenstruacao={informarCadastroMenstruacaoPendente}
             />
         )
     } else if (telaInterna === telasInternas.configuracoes) {

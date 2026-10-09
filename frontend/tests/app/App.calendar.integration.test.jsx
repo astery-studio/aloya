@@ -1,6 +1,6 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react-native'
-import {Linking} from 'react-native'
+import {Alert, Linking} from 'react-native'
 
 jest.mock('expo-font', () => ({useFonts: () => [true, null]}))
 jest.mock('expo-status-bar', () => ({StatusBar: () => null}))
@@ -60,10 +60,10 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
 
 jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     const ReactInterno = require('react')
-    const {Text, View} = require('react-native')
+    const {Pressable, Text, View} = require('react-native')
 
     return {
-        CalendarScreenContainer: ({service}) => ReactInterno.createElement(
+        CalendarScreenContainer: ({service, aoVoltar, aoCadastrarMenstruacao}) => ReactInterno.createElement(
             View,
             {testID: 'calendar-container'},
             ReactInterno.createElement(
@@ -72,6 +72,46 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
                 typeof service?.buscarMes === 'function'
                     ? 'Calendário conectado à API'
                     : 'Serviço do calendário ausente'
+            ),
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Voltar ao Diário',
+                    onPress: aoVoltar
+                },
+                ReactInterno.createElement(Text, null, 'Voltar')
+            ),
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Cadastrar Menstruação',
+                    onPress: aoCadastrarMenstruacao
+                },
+                ReactInterno.createElement(Text, null, 'Cadastrar Menstruação')
+            )
+        )
+    }
+})
+
+jest.mock('../../src/features/calendar/testing/CalendarTemporaryAccessScreen', () => {
+    const ReactInterno = require('react')
+    const {Pressable, Text, View} = require('react-native')
+
+    return {
+        CalendarTemporaryAccessScreen: ({aoAbrirCalendario}) => ReactInterno.createElement(
+            View,
+            {testID: 'diario-provisorio'},
+            ReactInterno.createElement(Text, null, 'Diário provisório'),
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Abrir calendário',
+                    onPress: aoAbrirCalendario
+                },
+                ReactInterno.createElement(Text, null, 'Abrir calendário')
             )
         )
     }
@@ -104,13 +144,14 @@ describe('App — calendário', () => {
         jest.spyOn(Linking, 'addEventListener').mockReturnValue({
             remove: jest.fn()
         })
+        jest.spyOn(Alert, 'alert').mockImplementation(jest.fn())
     })
 
     afterEach(() => {
         jest.restoreAllMocks()
     })
 
-    test('abre o calendário pelo menu e fornece o serviço real configurado', async () => {
+    test('abre o calendário pelo Diário provisório e fornece o serviço configurado', async () => {
         await render(<App />)
 
         expect(await screen.findByText('Configurações')).toBeOnTheScreen()
@@ -119,6 +160,20 @@ describe('App — calendário', () => {
             screen.getByRole('button', {name: 'Abrir calendário pelo menu'})
         )
 
+        expect(await screen.findByText('Diário provisório')).toBeOnTheScreen()
+
+        await fireEvent.press(
+            screen.getByRole('button', {name: 'Abrir calendário'})
+        )
+
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen()
+        await fireEvent.press(screen.getByRole('button', {name: 'Cadastrar Menstruação'}))
+        expect(Alert.alert).toHaveBeenCalledWith(
+            'Cadastro de menstruação',
+            'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
+        )
+
+        await fireEvent.press(screen.getByRole('button', {name: 'Voltar ao Diário'}))
+        expect(await screen.findByText('Diário provisório')).toBeOnTheScreen()
     })
 })
