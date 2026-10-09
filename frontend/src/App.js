@@ -93,7 +93,6 @@ export default function App() {
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
-    const [origemAnticoncepcionais, setOrigemAnticoncepcionais] = useState(telasInternas.configuracoes)
     const requisicaoAtual = useRef(0)
     const controladorPerfilAtual = useRef(null)
     const apiUrl = obterBaseUrl()
@@ -380,10 +379,7 @@ export default function App() {
         conteudo = <CycleTodayContainer
             service={configuracao.servicos.cyclePredictionService}
             aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-            aoAbrirAnticoncepcional={() => {
-                setOrigemAnticoncepcionais(telasInternas.inicio)
-                setTelaInterna(telasInternas.anticoncepcionais)
-            }}
+            aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
             aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
             aoSelecionarAba={selecionarAba}
             onSessaoExpirada={finalizarSessao} />;
@@ -421,10 +417,6 @@ export default function App() {
         conteudo = (
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
-                onAbrirAnticoncepcionais={() => {
-                    setOrigemAnticoncepcionais(telasInternas.configuracoes)
-                    setTelaInterna(telasInternas.anticoncepcionais)
-                }}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil)
 
@@ -448,7 +440,7 @@ export default function App() {
             <ContraceptiveFlow
                 key="lista-anticoncepcionais"
                 service={configuracao.servicos.contraceptiveService}
-                onVoltar={() => setTelaInterna(origemAnticoncepcionais)}
+                onVoltar={() => setTelaInterna(telasInternas.inicio)}
                 onSessaoExpirada={finalizarSessao}
             />
         )

@@ -1,7 +1,7 @@
 //Mostra o menu principal de configurações e encaminha a pessoa usuária para cada opção.
 import {ScrollView, Switch, Text, View} from 'react-native'
 
-import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, PillIcon, ShieldCheckIcon, UserIcon} from '../../../shared/components/icons/AppIcons'
+import {ArrowsClockwiseIcon, BellIcon, HouseIcon, InfoIcon, MoonIcon, ShieldCheckIcon, UserIcon} from '../../../shared/components/icons/AppIcons'
 import {NavigationField} from '../../../shared/components/common/NavigationField/NavigationField'
 import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
 import {tema} from '../../../shared/theme'
@@ -43,7 +43,6 @@ function OpcaoModoNoturno({ativo, onAlterar}) {
 function SettingsScreen({
     onAbrirPerfil,
     onAbrirParametrosCiclo,
-    onAbrirAnticoncepcionais,
     modoNoturnoAtivo = false,
     onAlterarModoNoturno,
     onAbrirTelaInicial,
@@ -81,12 +80,6 @@ function SettingsScreen({
                         onPress={onAbrirParametrosCiclo}
                     />
 
-                    <NavigationField
-                        label="Anticoncepcionais"
-                        icone={PillIcon}
-                        paleta="corVerde2"
-                        onPress={onAbrirAnticoncepcionais}
-                    />
                 </View>
 
                 <View style={estilos.secao}>
