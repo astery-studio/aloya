@@ -17,6 +17,7 @@ function IconButton({icone: Icone, aoPressionar, rotuloAcessibilidade, variante 
 
     const estaDesativado = desativado || variante === 'desativado' || typeof aoPressionar !== 'function'
     const varianteVisual = estaDesativado ? variantes.desativado : variantes[variante]
+    const tamanhoIcone = variantes[variante].tamanhoIcone || 20
 
     return (
         <Pressable
@@ -36,7 +37,7 @@ function IconButton({icone: Icone, aoPressionar, rotuloAcessibilidade, variante 
             ]}
         >
             <Icone
-                size={20}
+                size={tamanhoIcone}
                 color={varianteVisual.icone}
                 weight="regular"
             />
