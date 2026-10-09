@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, within } from '@testing-library/react-native';
 import { PendingUsesBanner } from '../../../../src/features/contraceptives/components/PendingUsesBanner';
 import { UsageCalendar } from '../../../../src/features/contraceptives/components/UsageCalendar';
 import { UsageHistoryPanel } from '../../../../src/features/contraceptives/components/UsageHistoryPanel';
@@ -153,6 +153,129 @@ test('apresenta calendário e permite navegar entre meses', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
     expect(anterior).toHaveBeenCalledTimes(1);
     expect(proximo).toHaveBeenCalledTimes(1);
+});
+
+test('aplica os três estados visuais aos dias e os descreve para acessibilidade', async () => {
+    await render(
+        <UsageCalendar
+            mes="2026-09"
+            dias={[
+                { dia: 3, estado: 'foraDoPrazo' },
+                { dia: 4, estado: 'confirmado' },
+                { dia: 5, estado: 'naoConfirmado' }
+            ]}
+            aoMesAnterior={jest.fn()}
+            aoProximoMes={jest.fn()}
+        />
+    );
+
+    const foraDoPrazo = screen.getByLabelText('Dia 3, Fora do prazo');
+    const confirmado = screen.getByLabelText('Dia 4, Confirmado');
+    const naoConfirmado = screen.getByLabelText('Dia 5, Não confirmado');
+
+    expect(foraDoPrazo).toHaveStyle({ backgroundColor: 'rgba(214, 140, 58, 0.8)' });
+    expect(confirmado).toHaveStyle({ backgroundColor: 'rgba(44, 76, 59, 0.8)' });
+    expect(naoConfirmado).toHaveStyle({ backgroundColor: 'rgba(200, 90, 68, 0.8)' });
+    expect(within(foraDoPrazo).getByText('3')).toHaveStyle({ color: '#FFFFFF' });
+    expect(within(confirmado).getByText('4')).toHaveStyle({ color: '#FFFFFF' });
+    expect(within(naoConfirmado).getByText('5')).toHaveStyle({ color: '#FFFFFF' });
+});
+
+test('destaca o dia atual sem depender dos estados de uso', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2026, 8, 7, 12, 0, 0));
+
+    try {
+        await render(
+            <UsageCalendar
+                mes="2026-09"
+                dias={[]}
+                aoMesAnterior={jest.fn()}
+                aoProximoMes={jest.fn()}
+            />
+        );
+
+        const hoje = screen.getByLabelText('Dia 7, sem registro');
+        expect(hoje).toHaveStyle({ borderWidth: 1, borderColor: '#E6E2D8' });
+        expect(within(hoje).getByText('7')).toHaveStyle({ fontWeight: '900' });
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test('mantém cinco semanas no protótipo e comporta meses com seis semanas', async () => {
+    const { rerender } = await render(
+        <UsageCalendar
+            mes="2026-09"
+            dias={[]}
+            aoMesAnterior={jest.fn()}
+            aoProximoMes={jest.fn()}
+        />
+    );
+    expect(screen.getByTestId('usage-calendar')).toHaveStyle({ height: 256.43 });
+
+    await rerender(
+        <UsageCalendar
+            mes="2026-08"
+            dias={[]}
+            aoMesAnterior={jest.fn()}
+            aoProximoMes={jest.fn()}
+        />
+    );
+    expect(screen.getByTestId('usage-calendar')).toHaveStyle({ height: 291.43 });
+});
+
+test('reproduz as medidas e a tipografia exatas do calendário', () => {
+    expect(estilosUso.calendario).toMatchObject({
+        width: '100%',
+        maxWidth: 315.21,
+        height: 256.43,
+        padding: 8,
+        backgroundColor: '#F7F5F0',
+        borderRadius: 12
+    });
+    expect(estilosUso.cabecalhoCalendario).toMatchObject({ width: '100%', height: 22 });
+    expect(estilosUso.botaoMes).toMatchObject({ width: 26, height: 22, paddingVertical: 4, paddingHorizontal: 6 });
+    expect(estilosUso.tituloMes).toMatchObject({ height: 18, fontWeight: '700', fontSize: 12, lineHeight: 18 });
+    expect(estilosUso.margemDiasSemana).toMatchObject({ height: 19.49, paddingTop: 6 });
+    expect(estilosUso.diaSemana).toMatchObject({
+        height: 13.49,
+        fontWeight: '600',
+        fontSize: 9,
+        lineHeight: 14,
+        letterSpacing: 0.18
+    });
+    expect(estilosUso.margemGradeDias).toMatchObject({ height: 175.96, paddingTop: 2 });
+    expect(estilosUso.gradeDias).toMatchObject({ height: 173.96, gap: 1 });
+    expect(estilosUso.linhaSemana).toMatchObject({ height: 34, gap: 1 });
+    expect(estilosUso.celulaDia).toMatchObject({ height: 34, gap: 2, borderRadius: 8 });
+    expect(estilosUso.numeroDia).toMatchObject({
+        height: 12,
+        fontWeight: '400',
+        fontSize: 12,
+        lineHeight: 12
+    });
+});
+
+test('reproduz as medidas exatas da legenda', () => {
+    expect(estilosUso.legenda).toMatchObject({
+        width: '100%',
+        height: 23,
+        gap: 10,
+        paddingTop: 8,
+        paddingHorizontal: 13
+    });
+    expect(estilosUso.itemLegenda_confirmado).toMatchObject({ width: 64.99 });
+    expect(estilosUso.itemLegenda_foraDoPrazo).toMatchObject({ width: 74.99 });
+    expect(estilosUso.itemLegenda_naoConfirmado).toMatchObject({ width: 84.99 });
+    expect(estilosUso.marcadorLegenda).toMatchObject({
+        width: 5.99,
+        height: 5.99,
+        borderRadius: 2.99578
+    });
+    expect(estilosUso.textoLegenda_confirmado).toMatchObject({ width: 55 });
+    expect(estilosUso.textoLegenda_foraDoPrazo).toMatchObject({ width: 65 });
+    expect(estilosUso.textoLegenda_naoConfirmado).toMatchObject({ width: 75 });
 });
 
 test('controla o calendário pelo contrato público do painel', async () => {
