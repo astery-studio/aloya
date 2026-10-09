@@ -21,7 +21,7 @@ const estilos = StyleSheet.create({
     textoDestaqueFertil: { color: cores.neutras.textoSecundarioClaro, fontFamily: fontFamilies.regular, fontSize: 13, fontWeight: '400', lineHeight: 20 },
     acoes: { gap: 16, paddingHorizontal: 16, paddingTop: 32 },
     botaoAcao: { height: 55, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: radius.medio },
-    secaoPrevisao: { paddingHorizontal: 16, paddingTop: 16 },
+    secaoPrevisao: { paddingHorizontal: 16, paddingTop: 24 },
     cartaoProximoCiclo: { minHeight: 135, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', rowGap: 16, columnGap: 12, padding: 20, borderRadius: radius.cartao, backgroundColor: cores.neutras.superficieClara, borderWidth: 1, borderColor: cores.neutras.bordaClara, ...shadows.cardSuave },
     cartaoProximoCicloComAviso: { minHeight: 198 },
     dataProximoCiclo: { flex: 1, minWidth: 140, gap: 4 },

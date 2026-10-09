@@ -40,19 +40,21 @@ function CycleTodayScreen({
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
+            {!carregando ? (
+                <View style={estilos.cabecalho}>
+                    <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
+                    <IconButton
+                        icone={CalendarBlankIcon}
+                        aoPressionar={aoAbrirCalendario}
+                        rotuloAcessibilidade="Abrir calendário"
+                        variante="calendario"
+                    />
+                </View>
+            ) : null}
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
             ) : (
-                <ScrollView style={estilos.areaRolagem} contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
-                    <View style={estilos.cabecalho}>
-                        <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                        <IconButton
-                            icone={CalendarBlankIcon}
-                            aoPressionar={aoAbrirCalendario}
-                            rotuloAcessibilidade="Abrir calendário"
-                            variante="calendario"
-                        />
-                    </View>
+                <ScrollView testID="conteudo-rolavel" style={estilos.areaRolagem} contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
                     {dias.length ? <CycleDateStrip dias={dias} dataSelecionada={referencia} aoSelecionarData={aoSelecionarData} /> : null}
                     <CycleForecastPanel
                         fase={fase}

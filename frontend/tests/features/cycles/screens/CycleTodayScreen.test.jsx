@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, within } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayScreen } from '../../../../src/features/cycles/screens/CycleTodayScreen';
 import { estilos } from '../../../../src/features/cycles/screens/CycleTodayScreen.styles';
@@ -58,6 +58,14 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
     expect(screen.getByText('Conteúdo recebido pela tela.')).toBeOnTheScreen();
     expect(screen.getByText('8 de outubro até 12 de outubro')).toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'Início' }).props.accessibilityState.selected).toBe(true);
+});
+
+test('mantém o cabeçalho fora da área rolável', async () => {
+    const { getByTestId, getByText } = await renderizar({ previsao });
+    const rolagem = getByTestId('conteudo-rolavel');
+
+    expect(getByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+    expect(within(rolagem).queryByText('Aloya - Seu Ciclo Hoje')).toBeNull();
 });
 
 test('mantém a faixa de datas no estado sem dados', async () => {
