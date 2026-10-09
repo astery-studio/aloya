@@ -1,20 +1,6 @@
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react-native'
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react-native'
 import {CalendarScreen} from '../../../../src/features/calendar/screens/CalendarScreen'
-
-jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
-    const ReactInterno = require('react')
-    const {Text, View} = require('react-native')
-
-    return {
-        MainLayout: ({titulo, children}) => ReactInterno.createElement(
-            View,
-            {testID: 'main-layout'},
-            ReactInterno.createElement(Text, null, titulo),
-            children
-        )
-    }
-})
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
     const ReactInterno = require('react')
@@ -30,8 +16,18 @@ jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBa
 })
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
+    ArrowLeftIcon: () => null,
     InfoIcon: () => null
 }))
+
+jest.mock('../../../../src/shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar', () => {
+    const ReactInterno = require('react')
+    const {View} = require('react-native')
+
+    return {
+        BottomTabBar: () => ReactInterno.createElement(View, {testID: 'bottom-tab-bar'})
+    }
+})
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const ReactInterno = require('react')
@@ -107,7 +103,7 @@ jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLe
                         Pressable,
                         {
                             accessibilityRole: 'button',
-                            accessibilityLabel: 'Fechar legenda',
+                            accessibilityLabel: 'Fechar painel',
                             onPress: aoFechar
                         },
                         ReactInterno.createElement(Text, null, 'Fechar')
@@ -131,6 +127,10 @@ describe('CalendarScreen', () => {
         expect(screen.getByText('Calendário')).toBeOnTheScreen()
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen()
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('alta')
+        const tituloEConfianca = within(screen.getByTestId('titulo-e-confianca'))
+        expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen()
+        expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen()
+        expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen()
     })
 
     test('abre e fecha a legenda pelo botão de informação', async () => {
@@ -149,7 +149,7 @@ describe('CalendarScreen', () => {
         expect(await screen.findByText('Itens: 10')).toBeOnTheScreen()
 
         await fireEvent.press(
-            screen.getByRole('button', {name: 'Fechar legenda'})
+            screen.getByRole('button', {name: 'Fechar painel'})
         )
 
         await waitFor(() => {

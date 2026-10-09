@@ -1,28 +1,62 @@
-// Define o layout do conteúdo e dos estados da tela de calendário.
+// Define o cabeçalho compacto e a distribuição vertical da tela do calendário.
 import {StyleSheet} from 'react-native'
 import {cores, fontFamilies} from '../../../shared/theme'
 
 const estilos = StyleSheet.create({
-    conteudo: {
+    tela: {
         flex: 1,
         backgroundColor: cores.neutras.fundoClaro
     },
-    linhaConfianca: {
-        minHeight: 44,
-        paddingHorizontal: 16,
-        paddingTop: 8,
-        paddingBottom: 4,
+    cabecalho: {
+        display: 'flex',
+        height: 119,
+        paddingTop: 56,
+        paddingRight: 20,
+        paddingBottom: 8,
+        paddingLeft: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        alignSelf: 'stretch'
     },
-    botaoLegenda: {
-        width: 36,
-        height: 36,
+    acaoCabecalho: {
+        width: 32,
+        height: 40,
         alignItems: 'center',
         justifyContent: 'center'
     },
-    corInfo: cores.neutras.textoSecundarioClaro,
+    caixaCalendario: {
+        display: 'flex',
+        width: 288,
+        maxWidth: '82%',
+        height: 75,
+        paddingLeft: 8,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    tituloEConfianca: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 2
+    },
+    titulo: {
+        color: cores.neutras.textoPrincipalClaro,
+        fontFamily: fontFamilies.bold,
+        fontSize: 28,
+        fontWeight: '700',
+        lineHeight: 34,
+        textAlign: 'center'
+    },
+    corIconeCabecalho: cores.neutras.textoSecundarioClaro,
+    conteudo: {
+        flex: 1,
+        minHeight: 0,
+        backgroundColor: cores.neutras.fundoClaro
+    },
     areaCalendario: {
         flex: 1,
         minHeight: 0

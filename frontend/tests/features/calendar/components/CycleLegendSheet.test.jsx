@@ -171,7 +171,7 @@ describe('CycleLegendSheet', () => {
             />
         )
 
-        fireEvent.press(screen.getByRole('button', {name: 'Fechar legenda'}))
+        fireEvent.press(screen.getByRole('button', {name: 'Fechar painel'}))
 
         expect(aoFechar).toHaveBeenCalledTimes(1)
     })

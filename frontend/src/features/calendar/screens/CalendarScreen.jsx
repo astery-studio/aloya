@@ -1,12 +1,12 @@
-// Orquestra calendário, confiança, legenda e estados de erro ou vazio.
+// Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import {useEffect, useState} from 'react'
 import {Pressable, Text, View} from 'react-native'
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen'
 import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
-import {InfoIcon} from '../../../shared/components/icons/AppIcons'
+import {ArrowLeftIcon, InfoIcon} from '../../../shared/components/icons/AppIcons'
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
-import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
+import {BottomTabBar} from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar'
 import {CycleCalendar} from '../components/CycleCalendar/CycleCalendar'
 import {CycleLegendSheet} from '../components/CycleLegendSheet/CycleLegendSheet'
 import {estilos} from './CalendarScreen.styles'
@@ -77,30 +77,42 @@ function CalendarScreen({
     }
 
     return (
-        <MainLayout
-            titulo="Calendário"
-            varianteHeader="comVoltar"
-            onVoltar={aoVoltar}
-            abaAtiva="diario"
-            onSelecionarAba={onSelecionarAba}
-        >
-            <View style={estilos.conteudo}>
-                {!estadoVazio && confiancaValida ? (
-                    <View style={estilos.linhaConfianca}>
-                        <ConfidenceBadge nivel={confiancaValida} variante="simples" />
+        <View style={estilos.tela}>
+            <View testID="cabecalho-calendario" style={estilos.cabecalho}>
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Voltar"
+                    accessibilityState={{disabled: typeof aoVoltar !== 'function'}}
+                    disabled={typeof aoVoltar !== 'function'}
+                    onPress={aoVoltar}
+                    style={estilos.acaoCabecalho}
+                >
+                    <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
+                </Pressable>
 
-                        <Pressable
-                            accessibilityRole="button"
-                            accessibilityLabel="Abrir legenda do calendário"
-                            onPress={() => setLegendaVisivel(true)}
-                            hitSlop={8}
-                            style={estilos.botaoLegenda}
-                        >
-                            <InfoIcon size={20} color={estilos.corInfo} />
-                        </Pressable>
+                <View style={estilos.caixaCalendario}>
+                    <View testID="titulo-e-confianca" style={estilos.tituloEConfianca}>
+                        <Text accessibilityRole="header" style={estilos.titulo}>
+                            Calendário
+                        </Text>
+                        {!estadoVazio && confiancaValida ? (
+                            <ConfidenceBadge nivel={confiancaValida} variante="simples" />
+                        ) : null}
                     </View>
-                ) : null}
+                </View>
 
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Abrir legenda do calendário"
+                    onPress={() => setLegendaVisivel(true)}
+                    hitSlop={8}
+                    style={estilos.acaoCabecalho}
+                >
+                    <InfoIcon size={20} color={estilos.corIconeCabecalho} />
+                </Pressable>
+            </View>
+
+            <View style={estilos.conteudo}>
                 {estadoVazio ? (
                     <View accessibilityRole="alert" style={estilos.avisoVazio}>
                         <Text style={estilos.textoVazio}>
@@ -130,6 +142,11 @@ function CalendarScreen({
                 ) : null}
             </View>
 
+            <BottomTabBar
+                abaAtiva="diario"
+                onSelecionar={onSelecionarAba}
+            />
+
             <CycleLegendSheet
                 visivel={legendaVisivel}
                 itens={ITENS_LEGENDA}
@@ -146,7 +163,7 @@ function CalendarScreen({
                 }}
                 aoFechar={() => setErroFechado(true)}
             />
-        </MainLayout>
+        </View>
     )
 }
 

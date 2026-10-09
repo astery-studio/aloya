@@ -10,107 +10,86 @@ const cores = Object.freeze({
     janelaFertilPrevista: 'rgba(34, 34, 34, 0.42)',
     texto: '#222222',
     descricao: '#5C5C59',
-    fundo: '#FFFFFF',
-    puxador: '#E8E3D9'
+    fundo: '#FFFFFF'
 })
 
 const estilos = StyleSheet.create({
-    painel: {
-        flexShrink: 1,
-        maxHeight: '90%',
-        paddingTop: 8
-    },
-    puxador: {
-        width: 58,
-        height: 5,
-        alignSelf: 'center',
-        marginTop: 8,
-        marginBottom: 22,
-        borderRadius: 4,
-        backgroundColor: cores.puxador
-    },
-    cabecalho: {
-        minHeight: 52,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingLeft: 24,
-        paddingRight: 16,
-        marginBottom: 14
-    },
-    titulo: {
-        flex: 1,
-        color: cores.texto,
-        fontFamily: fontFamilies.bold,
-        fontSize: 24,
-        lineHeight: 32
-    },
-    botaoFechar: {
-        width: 40,
-        height: 40,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
     lista: {
-        flexShrink: 1
+        width: '100%',
+        height: 309,
+        flexShrink: 0
     },
     listaConteudo: {
-        paddingHorizontal: 24,
-        paddingTop: 4,
-        paddingBottom: 28
+        paddingTop: 20,
+        paddingBottom: 16,
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 16
     },
     item: {
-        minHeight: 80,
+        display: 'flex',
+        width: '100%',
+        minHeight: 44,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 16,
-        marginBottom: 16
+        gap: 14,
+        alignSelf: 'stretch'
     },
     marcador: {
-        width: 78,
-        height: 47,
+        display: 'flex',
+        width: 48,
+        height: 28,
         flexShrink: 0,
-        alignItems: 'center',
+        flexDirection: 'column',
         justifyContent: 'center',
-        gap: 1,
-        borderRadius: 24
+        alignItems: 'center',
+        gap: 2,
+        borderRadius: 16
     },
     icone: {
-        height: 13,
+        height: 10,
         alignItems: 'center',
         justifyContent: 'center'
     },
     diaMarcado: {
         color: cores.fundo,
         fontFamily: fontFamilies.regular,
-        fontSize: 12,
-        lineHeight: 15
+        fontSize: 10,
+        lineHeight: 12
     },
     marcadorJanela: {
-        borderWidth: 2,
+        borderWidth: 1.5,
         borderStyle: 'dashed',
         backgroundColor: cores.fundo
     },
     diaJanela: {
         color: cores.texto,
         fontFamily: fontFamilies.medium,
-        fontSize: 12,
-        lineHeight: 16
+        fontSize: 10,
+        lineHeight: 12
     },
     textos: {
-        flex: 1,
-        gap: 5
+        display: 'flex',
+        width: 178,
+        flexShrink: 0,
+        flexDirection: 'column',
+        alignItems: 'flex-start'
     },
     nome: {
         color: cores.texto,
         fontFamily: fontFamilies.semibold,
-        fontSize: 18,
-        lineHeight: 24
+        fontSize: 15,
+        fontStyle: 'normal',
+        fontWeight: '600',
+        lineHeight: 22.5
     },
     descricao: {
         color: cores.descricao,
         fontFamily: fontFamilies.regular,
-        fontSize: 16,
-        lineHeight: 23
+        fontSize: 13,
+        fontStyle: 'normal',
+        fontWeight: '400',
+        lineHeight: 19.5
     }
 })
 

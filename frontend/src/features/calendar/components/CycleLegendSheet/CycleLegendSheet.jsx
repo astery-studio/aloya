@@ -1,11 +1,11 @@
 //Apresenta a legenda real e prevista do calendário em um bottom sheet.
-import {Pressable, ScrollView, Text, View} from 'react-native'
+import {ScrollView, Text, View} from 'react-native'
 import {DropIcon} from 'phosphor-react-native/src/icons/Drop'
 import {PlantIcon} from 'phosphor-react-native/src/icons/Plant'
 import {SunIcon} from 'phosphor-react-native/src/icons/Sun'
 import {WavesIcon} from 'phosphor-react-native/src/icons/Waves'
-import {XIcon} from 'phosphor-react-native/src/icons/X'
 import {BottomSheet} from '../../../../shared/components/feedback/BottomSheet/BottomSheet'
+import {BottomSheetLayout} from '../../../../shared/layouts/BottomSheet/BottomSheetLayout'
 import {estilos, cores, fundosPrevistos, fundosReais} from './CycleLegendSheet.styles'
 
 const iconesPorTipo = Object.freeze({
@@ -13,14 +13,6 @@ const iconesPorTipo = Object.freeze({
     folicular: PlantIcon,
     ovulacao: SunIcon,
     lutea: WavesIcon
-})
-
-const nomesPorTipo = Object.freeze({
-    menstruacao: 'menstruação',
-    folicular: 'fase folicular',
-    ovulacao: 'ovulação',
-    lutea: 'fase lútea',
-    janelaFertil: 'janela fértil'
 })
 
 function obterCorJanela(prevista) {
@@ -91,35 +83,10 @@ function CycleLegendSheet({visivel, aoFechar, itens}) {
             visivel={visivel}
             onFechar={aoFechar}
         >
-            <View style={estilos.painel}>
-                <View
-                    accessible={false}
-                    importantForAccessibility="no"
-                    style={estilos.puxador}
-                />
-
-                <View style={estilos.cabecalho}>
-                    <Text
-                        accessibilityRole="header"
-                        style={estilos.titulo}
-                    >
-                        Legenda
-                    </Text>
-
-                    <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel="Fechar legenda"
-                        onPress={aoFechar}
-                        style={estilos.botaoFechar}
-                    >
-                        <XIcon
-                            size={24}
-                            color={cores.descricao}
-                            weight="regular"
-                        />
-                    </Pressable>
-                </View>
-
+            <BottomSheetLayout
+                titulo="Legenda"
+                onFechar={aoFechar}
+            >
                 <ScrollView
                     style={estilos.lista}
                     contentContainerStyle={estilos.listaConteudo}
@@ -127,9 +94,6 @@ function CycleLegendSheet({visivel, aoFechar, itens}) {
                     keyboardShouldPersistTaps="handled"
                 >
                     {itensValidos.map(item => {
-                        const prevista = item.prevista === true
-                        const nomeTipo = nomesPorTipo[item.tipo] || item.tipo
-
                         return (
                             <View
                                 key={item.id}
@@ -154,7 +118,7 @@ function CycleLegendSheet({visivel, aoFechar, itens}) {
                         )
                     })}
                 </ScrollView>
-            </View>
+            </BottomSheetLayout>
         </BottomSheet>
     )
 }
