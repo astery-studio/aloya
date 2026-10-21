@@ -41,6 +41,8 @@ function validarNome(nomeRecebido, erros) {
         }
     }
 
+    // A faixa explícita bloqueia caracteres de controle invisíveis na entrada.
+    // eslint-disable-next-line no-control-regex
     if (/[\u0000-\u001F\u007F]/u.test(nomeRecebido)) {
         erros.push(criarErro('nome', 'O nome da categoria contém caracteres não permitidos.'))
     }

@@ -5,7 +5,12 @@
   "description": "",
   "main": "src/shared/http/server.js",
   "scripts": {
+    "db:validate-migrations": "node scripts/validate-migrations.js",
     "dev": "node --watch src/shared/http/server.js",
+    "format": "prettier --write \"**/*.{js,json,md,ts}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md,ts}\"",
+    "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\" \"../.github/**/*.yml\" \"../docs/ci-cd.md\" \"../package.json\"",
+    "lint": "eslint . --max-warnings=0",
     "start": "node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
@@ -30,7 +35,11 @@
     "prisma": "7.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.9"
   },
   "overrides": {
     "deepmerge-ts": "8.0.2",
