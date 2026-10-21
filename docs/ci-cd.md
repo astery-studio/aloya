@@ -2,10 +2,10 @@
 
 ## Visão geral
 
-O repositório usa gates separados para qualidade, segurança, cobertura e
-entrega mobile. Nenhum secret é versionado. Builds de loja são gerados pelo
-EAS. O deploy do backend permanece fora do escopo até a equipe definir o
-provedor e a arquitetura de produção.
+O repositório usa gates de qualidade e segurança antes da entrega mobile.
+Nenhum secret é versionado. Builds de loja são gerados manualmente pelo EAS.
+O deploy do backend permanece fora do escopo até a equipe definir o provedor e
+a arquitetura de produção.
 
 ## Integração contínua
 
@@ -13,26 +13,25 @@ O workflow `.github/workflows/ci.yml` roda em pull requests e pushes para
 `main` e `develop`, pode ser executado manualmente e também é reutilizado pelos
 workflows de entrega.
 
-Os gates obrigatórios são:
+Os dois jobs são:
 
 - backend: instalação reprodutível, Prisma Client, schema, formatação, lint e
-  testes;
-- banco: aplicação de todas as migrations em um banco vazio;
-- aplicativo: formatação, lint sem warnings, configuração de release, testes,
-  compatibilidade Expo e geração dos bundles Android e iOS.
+  testes com cobertura, incluindo a aplicação de todas as migrations em um
+  banco vazio;
+- aplicativo: formatação, lint sem warnings, configuração segura do Expo e
+  testes com cobertura.
 
 Os workflows adicionais executam CodeQL, revisão de dependências em pull
-requests, auditoria periódica de dependências de runtime e publicação de
-relatórios de cobertura. A cobertura também bloqueia regressões abaixo do piso
-validado de cada aplicação. O audit bloqueia severidade alta no backend e
-crítica no frontend. O limite diferente é intencional: advisories altos atuais
-do frontend atingem ferramentas transitivas do Expo/Metro/Jest cujas versões
-mais recentes ainda não possuem correção upstream; vulnerabilidades críticas
-continuam bloqueadas.
+requests e auditoria periódica de dependências de runtime. A cobertura faz
+parte da CI e bloqueia regressões abaixo do piso validado de cada aplicação. O
+audit bloqueia severidade alta no backend e crítica no frontend. O limite
+diferente é intencional: advisories altos atuais do frontend atingem ferramentas
+transitivas do Expo/Metro/Jest cujas versões mais recentes ainda não possuem
+correção upstream; vulnerabilidades críticas continuam bloqueadas.
 
 Configure a proteção de `main` e `develop` para exigir, no mínimo, os checks
-`Backend`, `Database`, `Frontend`, `CodeQL JavaScript` e `Dependency Review`,
-além de revisão humana e branches atualizadas antes do merge.
+`Backend`, `Frontend`, `CodeQL JavaScript` e `Dependency Review`, além de
+revisão humana e branches atualizadas antes do merge.
 
 ## Segurança dos builds mobile
 
@@ -57,11 +56,10 @@ environments homônimos do GitHub.
 - `preview`: distribuição interna e APK Android instalável;
 - `production`: artefatos de loja com incremento remoto de versão.
 
-`.github/workflows/mobile-build.yml` executa novamente todo o quality gate e:
-
-- em push para `develop`, inicia builds EAS de preview;
-- em tags `v*`, inicia builds EAS de produção;
-- manualmente, permite escolher perfil e plataforma.
+`.github/workflows/mobile-build.yml` é deliberadamente manual. Ao iniciá-lo, a
+pessoa escolhe o perfil e a plataforma. O workflow executa todo o quality gate
+antes de solicitar o build ao EAS. A solicitação usa `--no-wait`, portanto o
+resultado final do build deve ser acompanhado no painel do EAS.
 
 `.github/workflows/mobile-submit.yml` é deliberadamente manual, usa o
 environment protegido `production` e envia o build de produção mais recente à

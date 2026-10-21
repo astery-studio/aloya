@@ -31,7 +31,6 @@
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --config jest.coverage.config.js --coverage --runInBand",
-    "test:coverage:report": "jest --config jest.coverage.config.js --coverage --runInBand",
     "lint:support-network": "expo lint src/features/support-network src/shared/components/forms/SwitchField tests/features/support-network"
   },
   "jest": {

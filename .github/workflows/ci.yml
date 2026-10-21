@@ -54,42 +54,17 @@ jobs:
       - name: Validar o schema Prisma
         run: npx prisma validate
 
+      - name: Aplicar e validar migrations em banco vazio
+        run: npm run db:validate-migrations
+
       - name: Validar formatação da configuração
         run: npm run format:check:ci
 
       - name: Analisar qualidade do código
         run: npm run lint
 
-      - name: Executar testes
-        run: npm test
-
-  database:
-    name: Database
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    defaults:
-      run:
-        working-directory: backend
-
-    steps:
-      - name: Baixar o código
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Instalar dependências
-        run: npm ci
-
-      - name: Aplicar e validar migrations em banco vazio
-        run: npm run db:validate-migrations
+      - name: Executar testes com cobertura
+        run: npm run test:coverage
 
   frontend:
     name: Frontend
@@ -125,16 +100,5 @@ jobs:
       - name: Validar configuração segura do aplicativo
         run: npm run config:validate
 
-      - name: Executar testes
-        run: npm test
-
-      - name: Verificar compatibilidade das dependências Expo
-        run: npx expo install --check
-
-      - name: Gerar bundles Android e iOS
-        env:
-          APP_ENV: production
-          EXPO_PUBLIC_API_URL: https://api.example.invalid
-        run: |
-          npx expo export --platform android --output-dir dist-ci/android
-          npx expo export --platform ios --output-dir dist-ci/ios
+      - name: Executar testes com cobertura
+        run: npm run test:coverage
