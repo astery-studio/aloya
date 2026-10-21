@@ -20,18 +20,18 @@ Os dois jobs são:
 - aplicativo: formatação, lint sem warnings, configuração segura do Expo e
   testes.
 
-Os workflows adicionais executam CodeQL, revisão de dependências em pull
-requests e auditoria periódica de dependências de runtime. A cobertura faz
-parte dos comandos locais do projeto, mas não bloqueia pull requests até que a
-equipe defina uma política. O audit bloqueia severidade alta no backend e
-crítica no frontend. O limite diferente é intencional: advisories altos atuais
-do frontend atingem ferramentas transitivas do Expo/Metro/Jest cujas versões
-mais recentes ainda não possuem correção upstream; vulnerabilidades críticas
-continuam bloqueadas.
+Os workflows adicionais executam CodeQL e auditoria de dependências de runtime
+em pull requests que alteram manifestos ou lockfiles, além da verificação
+periódica. A cobertura faz parte dos comandos locais do projeto, mas não
+bloqueia pull requests até que a equipe defina uma política. O audit bloqueia
+severidade alta no backend e crítica no frontend. O limite diferente é
+intencional: advisories altos atuais do frontend atingem ferramentas transitivas
+do Expo/Metro/Jest cujas versões mais recentes ainda não possuem correção
+upstream; vulnerabilidades críticas continuam bloqueadas.
 
 Configure a proteção de `main` e `develop` para exigir, no mínimo, os checks
-`Backend`, `Frontend`, `CodeQL JavaScript` e `Dependency Review`, além de
-revisão humana e branches atualizadas antes do merge.
+`Backend`, `Frontend` e `CodeQL JavaScript`, além de revisão humana e branches
+atualizadas antes do merge.
 
 ## Segurança dos builds mobile
 
