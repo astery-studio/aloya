@@ -9,7 +9,8 @@ coverage/
 /prisma/*.db-shm
 /prisma/*.db-wal
 
-/src/generated/prisma
+/src/shared/generated/prisma
+/src/generated/
 
 #IAs sem sentido
 .agents/

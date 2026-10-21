@@ -3,18 +3,18 @@
   "version": "1.0.0",
   "type": "module",
   "description": "",
-  "main": "src/server.js",
+  "main": "src/shared/http/server.js",
   "scripts": {
     "db:validate-migrations": "node scripts/validate-migrations.js",
-    "dev": "node --watch src/server.js",
+    "dev": "node --watch src/shared/http/server.js",
     "format": "prettier --write \"**/*.{js,json,md,ts}\"",
     "format:check": "prettier --check \"**/*.{js,json,md,ts}\"",
-    "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\"",
+    "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\" \"../.github/**/*.yml\" \"../docs/ci-cd.md\" \"../package.json\"",
     "lint": "eslint . --max-warnings=0",
-    "start": "node src/server.js",
+    "start": "node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
-    "test:coverage": "node --test --experimental-test-coverage",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include=\"src/**/*.js\" --test-coverage-exclude=\"src/generated/**\" --test-coverage-lines=95 --test-coverage-functions=95 --test-coverage-branches=93",
     "postinstall": "prisma generate"
   },
   "keywords": [],
@@ -43,6 +43,9 @@
   },
   "overrides": {
     "deepmerge-ts": "8.0.2",
-    "mysql2": "3.24.5"
+    "fast-uri": "3.1.8",
+    "ip-address": "10.7.3",
+    "mysql2": "3.24.5",
+    "qs": "6.16.0"
   }
 }

@@ -25,6 +25,18 @@ const cores = Object.freeze({
         informacao: '#4A758E'
     }),
 
+    ciclo: Object.freeze({
+        formaFolicular: '#3B7150',
+        conteudoFolicular: '#2C4C3B',
+        superficieSuave: '#FBFAF6',
+        fundoAviso: '#FBF3E0',
+        textoAviso: '#B07D2A',
+        fundoFertil: 'rgba(44, 76, 59, 0.03)',
+        bordaAviso: 'rgba(214, 140, 58, 0.3)',
+        bordaIntroducao: 'rgba(200, 90, 68, 0.2)',
+        iconeEscuro: 'rgba(34, 34, 34, 0.8)'
+    }),
+
     icones: Object.freeze({
         configuracoes: Object.freeze({
             verde: Object.freeze({

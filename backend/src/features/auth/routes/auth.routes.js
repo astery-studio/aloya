@@ -41,6 +41,11 @@ function criarAuthRoutes({
     );
 
     router.get(
+        '/password-recovery/open',
+        passwordRecoveryController.abrirNoAplicativo
+    );
+
+    router.get(
         '/password-recovery/:token',
         passwordRecoveryController.validarToken
     );

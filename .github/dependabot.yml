@@ -36,3 +36,12 @@ updates:
     groups:
       github-actions:
         patterns: ['*']
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:45'
+      timezone: America/Sao_Paulo
+    open-pull-requests-limit: 3

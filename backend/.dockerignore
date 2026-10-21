@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+coverage
+node_modules
+npm-debug.log*
+prisma/*.db*
+tests

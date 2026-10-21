@@ -33,28 +33,23 @@ O backend utiliza:
 ```text
 backend/
 ├── prisma/
-│   ├── migrations/
-│   ├── schema.prisma
-│   └── seed.js
 ├── src/
-│   ├── controllers/
 │   ├── features/
 │   │   ├── auth/
-│   │   │   ├── controllers/
-│   │   │   ├── routes/
-│   │   │   ├── services/
-│   │   │   └── validators/
-│   │   └── contraceptives/
-│   ├── routes/
-│   ├── services/
-│   ├── shared/
-│   │   ├── config/
-│   │   ├── errors/
-│   │   ├── middleware/
-│   │   └── utils/
-│   ├── validators/
-│   └── server.js
-├── test/
+│   │   ├── calendar/
+│   │   ├── contraceptives/
+│   │   ├── cycles/
+│   │   ├── settings/
+│   │   └── support-network/
+│   └── shared/
+│       ├── config/
+│       ├── errors/
+│       ├── generated/
+│       ├── http/
+│       │   └── server.js
+│       ├── middleware/
+│       └── utils/
+├── tests/
 ├── .env.example
 ├── package.json
 └── prisma.config.ts
@@ -175,7 +170,7 @@ Aplicativo mobile
 A entrada principal é:
 
 ```text
-src/server.js
+src/shared/http/server.js
 ```
 
 O arquivo:
@@ -219,7 +214,7 @@ A relação detalhada dos endpoints está em:
 docs/api.md
 ```
 
-Uma entidade existente no Prisma não está automaticamente disponível pela API. Para isso, é necessário registrar suas rotas em `src/server.js`.
+Uma entidade existente no Prisma não está automaticamente disponível pela API. Para isso, é necessário registrar suas rotas em `src/shared/http/server.js`.
 
 ## 8. Banco de dados
 

@@ -56,6 +56,24 @@ const typography = {
         fontWeight: '700',
         lineHeight: 15.6,
         letterSpacing: 0.24
+    },
+
+    labelCompact: {
+        fontFamily: fontFamilies.medium,
+        fontSize: 11,
+        lineHeight: 16
+    },
+
+    numberCompact: {
+        fontFamily: fontFamilies.medium,
+        fontSize: 17,
+        lineHeight: 26
+    },
+
+    numberCompactStrong: {
+        fontFamily: fontFamilies.bold,
+        fontSize: 17,
+        lineHeight: 26
     }
 };
 

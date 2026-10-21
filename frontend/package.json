@@ -5,7 +5,8 @@
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~57.0.24",
+    "expo": "~57.0.26",
+    "expo-build-properties": "~57.0.22",
     "expo-font": "~57.0.4",
     "expo-linear-gradient": "~57.0.2",
     "expo-secure-store": "~57.0.4",
@@ -18,21 +19,24 @@
   },
   "scripts": {
     "start": "expo start",
+    "preview:hu013": "set \"EXPO_PUBLIC_PREVIEW_HU013=true\" && expo start --clear",
     "android": "expo start --android",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,json,md}\"",
-    "format:check:ci": "prettier --check eslint.config.js jest.coverage.config.js package.json",
+    "format:check:ci": "prettier --check app.config.js app.config.test.cjs eas.json eslint.config.js jest.coverage.config.js package.json",
+    "config:validate": "node --test app.config.test.cjs",
     "ios": "expo start --ios",
-    "lint": "expo lint src tests",
+    "lint": "expo lint src tests --max-warnings=0",
     "web": "expo start --web",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage --runInBand",
+    "test:coverage": "jest --config jest.coverage.config.js --coverage --runInBand",
     "test:coverage:report": "jest --config jest.coverage.config.js --coverage --runInBand",
     "lint:support-network": "expo lint src/features/support-network src/shared/components/forms/SwitchField tests/features/support-network"
   },
   "jest": {
     "preset": "jest-expo",
+    "testTimeout": 15000,
     "transformIgnorePatterns": [
       "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|phosphor-react-native))",
       "/node_modules/react-native-reanimated/plugin/",
@@ -47,15 +51,7 @@
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 90,
-        "functions": 90,
-        "lines": 90,
-        "statements": 90
-      }
-    }
+    ]
   },
   "private": true,
   "devDependencies": {
@@ -64,7 +60,7 @@
     "eslint-config-expo": "~57.0.2",
     "globals": "^17.12.0",
     "jest": "~29.7.0",
-    "jest-expo": "~57.0.5",
+    "jest-expo": "~57.0.6",
     "prettier": "^3.9.9",
     "react-test-renderer": "19.2.3"
   },

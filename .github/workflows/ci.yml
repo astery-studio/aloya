@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_call:
   pull_request:
     branches:
       - main
@@ -34,6 +35,8 @@ jobs:
     steps:
       - name: Baixar o código
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Configurar Node.js
         uses: actions/setup-node@v6
@@ -72,6 +75,8 @@ jobs:
     steps:
       - name: Baixar o código
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Configurar Node.js
         uses: actions/setup-node@v6
@@ -98,6 +103,8 @@ jobs:
     steps:
       - name: Baixar o código
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Configurar Node.js
         uses: actions/setup-node@v6
@@ -115,5 +122,19 @@ jobs:
       - name: Analisar qualidade do código
         run: npm run lint
 
+      - name: Validar configuração segura do aplicativo
+        run: npm run config:validate
+
       - name: Executar testes
         run: npm test
+
+      - name: Verificar compatibilidade das dependências Expo
+        run: npx expo install --check
+
+      - name: Gerar bundles Android e iOS
+        env:
+          APP_ENV: production
+          EXPO_PUBLIC_API_URL: https://api.example.invalid
+        run: |
+          npx expo export --platform android --output-dir dist-ci/android
+          npx expo export --platform ios --output-dir dist-ci/ios

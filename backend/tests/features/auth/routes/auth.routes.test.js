@@ -24,6 +24,7 @@ function criarDependencias() {
     function solicitarRecuperacao() {}
     function validarTokenRecuperacao() {}
     function redefinirSenha() {}
+    function abrirRecuperacaoNoAplicativo() {}
 
     return {
         authController: {
@@ -45,7 +46,8 @@ function criarDependencias() {
         passwordRecoveryController: {
             solicitar: solicitarRecuperacao,
             validarToken: validarTokenRecuperacao,
-            redefinir: redefinirSenha
+            redefinir: redefinirSenha,
+            abrirNoAplicativo: abrirRecuperacaoNoAplicativo
         }
     };
 }
@@ -220,5 +222,19 @@ test('expõe validação e redefinição da senha', () => {
             dependencias.emailRateLimit,
             dependencias.passwordRecoveryController.redefinir
         ]
+    );
+});
+
+test('expõe a página intermediária para abrir o aplicativo', () => {
+    const dependencias = criarDependencias();
+    const rota = buscarRota(
+        criarAuthRoutes(dependencias),
+        '/password-recovery/open'
+    );
+
+    assert.equal(rota.methods.get, true);
+    assert.deepEqual(
+        rota.stack.map((camada) => camada.handle),
+        [dependencias.passwordRecoveryController.abrirNoAplicativo]
     );
 });

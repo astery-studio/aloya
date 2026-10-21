@@ -65,11 +65,42 @@ import {
 
 import {
     criarContraceptiveService
-} from '../../features/contraceptives/contraceptive.service.js';
+} from '../../features/contraceptives/services/contraceptive.service.js';
 
 import {
     criarContraceptiveController
-} from '../../features/contraceptives/contraceptive.controller.js';
+} from '../../features/contraceptives/controllers/contraceptive.controller.js';
+import { criarContraceptiveUsageService, criarAvaliadorJanelaEficacia, lerJanelasDeUso } from '../../features/contraceptives/services/contraceptiveUsage.service.js';
+import { criarContraceptiveUsageController } from '../../features/contraceptives/controllers/contraceptiveUsage.controller.js';
+
+import {
+    criarPredictionService
+} from '../../features/cycles/services/prediction.service.js';
+
+import {
+    criarPredictionController
+} from '../../features/cycles/controllers/prediction.controller.js';
+
+import {
+    criarEdicaoAnticoncepcionalRateLimit,
+    criarRemocaoAnticoncepcionalRateLimit
+} from '../../features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
+
+import {
+    criarCalendarModule
+} from '../../features/calendar/calendar.module.js';
+
+import {
+    criarCycleHistoryRepository
+} from '../../features/cycles/repositories/cycleHistory.repository.js';
+
+import {
+    criarCycleHistoryService
+} from '../../features/cycles/services/cycleHistory.service.js';
+
+import {
+    criarCycleHistoryController
+} from '../../features/cycles/controllers/cycleHistory.controller.js';
 
 import {
     criarPermissionCategoryService
@@ -89,35 +120,35 @@ import {
 
 import {
     criarAccountService
-} from '../../services/account.service.js';
+} from '../../features/settings/services/account.service.js';
 
 import {
     criarAccountDeletionService
-} from '../../services/accountDeletion.service.js';
+} from '../../features/settings/services/accountDeletion.service.js';
 
 import {
     criarLogoutService
-} from '../../services/logout.service.js';
+} from '../../features/auth/services/logout.service.js';
 
 import {
     criarAccountValidator
-} from '../../validators/account.validator.js';
+} from '../../features/settings/validators/account.validator.js';
 
 import {
     criarAccountDeletionValidator
-} from '../../validators/accountDeletion.validator.js';
+} from '../../features/settings/validators/accountDeletion.validator.js';
 
 import {
     criarAccountController
-} from '../../controllers/account.controller.js';
+} from '../../features/settings/controllers/account.controller.js';
 
 import {
     criarAccountDeletionController
-} from '../../controllers/accountDeletion.controller.js';
+} from '../../features/settings/controllers/accountDeletion.controller.js';
 
 import {
     criarLogoutController
-} from '../../controllers/logout.controller.js';
+} from '../../features/auth/controllers/logout.controller.js';
 
 import {
     criarAuthMiddleware
@@ -213,6 +244,28 @@ function criarContainer() {
 
     const contraceptiveService =
         criarContraceptiveService(prisma);
+    const contraceptiveUsageService = criarContraceptiveUsageService(prisma, {
+        avaliarJanelaEficacia: criarAvaliadorJanelaEficacia(lerJanelasDeUso())
+    });
+    const contraceptiveUsageController = criarContraceptiveUsageController(contraceptiveUsageService);
+
+    const calendarModule =
+        criarCalendarModule({
+            prisma
+        });
+
+    const cycleHistoryRepository =
+        criarCycleHistoryRepository({
+            prisma
+        });
+
+    const cycleHistoryService =
+        criarCycleHistoryService({
+            repository: cycleHistoryRepository
+        });
+
+    const predictionService =
+        criarPredictionService({ prisma });
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -318,6 +371,24 @@ function criarContainer() {
                 env.exclusaoContaRateLimitMaximo
         });
 
+    const edicaoAnticoncepcionalRateLimit =
+        criarEdicaoAnticoncepcionalRateLimit({
+            rateLimit,
+            janelaMs:
+                env.edicaoAnticoncepcionalRateLimitJanelaMs,
+            limite:
+                env.edicaoAnticoncepcionalRateLimitMaximo
+        });
+
+    const remocaoAnticoncepcionalRateLimit =
+        criarRemocaoAnticoncepcionalRateLimit({
+            rateLimit,
+            janelaMs:
+                env.remocaoAnticoncepcionalRateLimitJanelaMs,
+            limite:
+                env.remocaoAnticoncepcionalRateLimitMaximo
+        });
+
     const authController =
         criarAuthController({
             authService,
@@ -348,6 +419,14 @@ function criarContainer() {
             contraceptiveService
         );
 
+    const cycleHistoryController =
+        criarCycleHistoryController({
+            cycleHistoryService
+        });
+
+    const predictionController =
+        criarPredictionController({ predictionService });
+
     const permissionCategoryController =
         criarPermissionCategoryController({
             permissionCategoryService,
@@ -360,6 +439,12 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        contraceptiveUsageController,
+        calendarController:
+            calendarModule.calendarController,
+        cycleHistoryController,
+
+        predictionController,
         permissionCategoryController,
         authMiddleware,
         parentalConsentMiddleware,
@@ -371,7 +456,9 @@ function criarContainer() {
         permissionCategoryRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
-        passwordRecoveryController
+        passwordRecoveryController,
+        edicaoAnticoncepcionalRateLimit,
+        remocaoAnticoncepcionalRateLimit
     };
 }
 

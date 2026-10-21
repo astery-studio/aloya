@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Inicializar CodeQL
         uses: github/codeql-action/init@v4
         with:

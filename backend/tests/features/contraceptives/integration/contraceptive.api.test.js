@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
-import { criarContraceptiveController } from '../../../../src/features/contraceptives/contraceptive.controller.js';
-import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/contraceptive.routes.js';
-import { criarContraceptiveService } from '../../../../src/features/contraceptives/contraceptive.service.js';
+import { criarContraceptiveController } from '../../../../src/features/contraceptives/controllers/contraceptive.controller.js';
+import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptive.routes.js';
+import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
 import { criarAuthMiddleware } from '../../../../src/shared/middleware/auth.middleware.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
@@ -45,7 +45,8 @@ async function comApi(banco, executar) {
     app.use(express.json());
     app.use('/api/anticoncepcionais', criarRotasAnticoncepcionais({
         autenticar: authMiddleware.autenticar,
-        controller
+        controller,
+        edicaoRateLimit: (_requisicao, _resposta, proximo) => proximo()
     }));
     app.use(tratarErros);
 

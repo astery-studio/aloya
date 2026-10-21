@@ -2,6 +2,7 @@
  * Cliente HTTP que serializa requisições e normaliza erros retornados pela API.
  */
 function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
+    //Recebe os dados da requisição e executa uma chamada com timeout e cancelamento seguros.
     async function requisicao({ caminho, metodo = 'GET', corpo, token, signal: sinalExterno }) {
         const controle = new AbortController();
         let tempoEsgotado = false;
@@ -17,7 +18,9 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
             tempoEsgotado = true;
             controle.abort();
         }, timeoutMs);
+
         let resposta;
+
         try {
             resposta = await fetchImpl(`${baseUrl}${caminho}`, {
                 method: metodo,
@@ -30,20 +33,23 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
                 ...(corpo === undefined ? {} : { body: JSON.stringify(corpo) })
             });
         } catch (falha) {
-            if (falha.name === 'AbortError' && sinalExterno?.aborted && !tempoEsgotado) {
+            if (falha?.name === 'AbortError' && sinalExterno?.aborted && !tempoEsgotado) {
                 throw falha;
             }
 
-            const erro = new Error(falha.name === 'AbortError'
-                ? 'A API não respondeu dentro do tempo esperado.'
-                : 'Não foi possível conectar ao servidor.');
-            erro.mensagemUsuario = erro.message;
+            const mensagem = falha?.name === 'AbortError'
+                ? 'A conexão demorou demais. Tente novamente.'
+                : 'Não foi possível conectar ao servidor. Verifique sua conexão.';
+            const erro = new Error(mensagem);
+            erro.mensagemUsuario = mensagem;
             throw erro;
         } finally {
             clearTimeout(temporizador);
             sinalExterno?.removeEventListener?.('abort', cancelarPeloChamador);
         }
+
         const dados = resposta.status === 204 ? null : await resposta.json();
+
         if (!resposta.ok) {
             const erro = new Error(dados?.erro?.mensagem || 'Não foi possível concluir a solicitação.');
             erro.mensagemUsuario = erro.message;
@@ -52,10 +58,13 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
             erro.detalhes = dados?.erro?.detalhes;
             throw erro;
         }
+
         return dados;
     }
 
-    return { requisicao };
+    return {
+        requisicao
+    };
 }
 
 export { criarApiClient };

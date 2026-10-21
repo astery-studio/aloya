@@ -2,7 +2,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { criarAccountDeletionController } from '../../../../src/controllers/accountDeletion.controller.js'
+import { criarAccountDeletionController } from '../../../../src/features/settings/controllers/accountDeletion.controller.js'
 
 //Cria uma resposta HTTP controlada
 function criarRespostaMock() {

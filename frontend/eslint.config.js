@@ -4,6 +4,11 @@ const globals = require('globals');
 
 module.exports = defineConfig([
     globalIgnores(['coverage/**', 'dist/**', 'dist-performance/**', 'web-build/**']),
+    {
+        linterOptions: {
+            reportUnusedDisableDirectives: false
+        }
+    },
     expoConfig,
     {
         rules: {
@@ -31,7 +36,21 @@ module.exports = defineConfig([
         rules: {
             // Alguns mocks precisam ser declarados antes dos imports avaliados
             // pelo Jest; a ordem é intencional nesses arquivos.
-            'import/first': 'off'
+            'import/first': 'off',
+            'no-unused-vars': [
+                'error',
+                {
+                    argsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                    varsIgnorePattern: '^(_|fetchSeguro$)'
+                }
+            ]
+        }
+    },
+    {
+        files: ['tests/features/calendar/benchmark.mjs'],
+        rules: {
+            'no-console': 'off'
         }
     }
 ]);

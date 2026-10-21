@@ -218,6 +218,10 @@ function criarServicos(buscarPerfil) {
 
         contraceptiveService: {},
 
+        cycleHistoryService: {
+            listarPagina: jest.fn()
+        },
+
         supportCategoryService: {
             criarCategoria: jest.fn()
         }

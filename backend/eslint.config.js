@@ -20,9 +20,16 @@ export default [
                 {
                     argsIgnorePattern: '^_',
                     caughtErrorsIgnorePattern: '^_',
+                    ignoreRestSiblings: true,
                     varsIgnorePattern: '^_'
                 }
             ]
+        }
+    },
+    {
+        files: ['src/shared/http/server.js'],
+        rules: {
+            'no-console': ['warn', { allow: ['error', 'info', 'log', 'warn'] }]
         }
     }
 ];

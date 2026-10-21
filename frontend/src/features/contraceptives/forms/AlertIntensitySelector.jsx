@@ -11,6 +11,8 @@ import { estilos } from './contraceptiveForms.styles';
 function AlertIntensitySelector({ valor, aberto, onAbrir, onSelecionar, onFechar }) {
     const [temporario, setTemporario] = useState(valor || 'critico');
     const selecionada = INTENSIDADES_ALERTA.find((item) => item.id === (valor || 'critico'));
+    // Reabre o modal sempre com o último valor confirmado pelo formulário.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { if (aberto) setTemporario(valor || 'critico'); }, [aberto, valor]);
 
     return (

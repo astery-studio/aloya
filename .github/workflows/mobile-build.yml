@@ -1,0 +1,100 @@
+name: Mobile Delivery
+
+on:
+  push:
+    branches: [develop]
+    tags: ['v*']
+    paths:
+      - frontend/**
+      - .github/workflows/ci.yml
+      - .github/workflows/mobile-build.yml
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Perfil EAS
+        required: true
+        default: preview
+        type: choice
+        options: [preview, production]
+      platform:
+        description: Plataforma
+        required: true
+        default: all
+        type: choice
+        options: [all, android, ios]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-delivery-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Quality Gate
+    uses: ./.github/workflows/ci.yml
+
+  preview:
+    name: EAS Preview Build
+    if: >-
+      github.ref == 'refs/heads/develop' ||
+      (github.event_name == 'workflow_dispatch' && inputs.profile == 'preview')
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: preview
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Configurar Expo e EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: 25.3.0
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Iniciar build de preview
+        env:
+          EAS_PLATFORM: ${{ github.event_name == 'workflow_dispatch' && inputs.platform || 'all' }}
+        run: eas build --platform "$EAS_PLATFORM" --profile preview --non-interactive --no-wait
+
+  production:
+    name: EAS Production Build
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && inputs.profile == 'production')
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Configurar Expo e EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: 25.3.0
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Iniciar build de produção
+        env:
+          EAS_PLATFORM: ${{ github.event_name == 'workflow_dispatch' && inputs.platform || 'all' }}
+        run: eas build --platform "$EAS_PLATFORM" --profile production --non-interactive --no-wait
