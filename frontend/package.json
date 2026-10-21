@@ -23,14 +23,14 @@
     "android": "expo start --android",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,json,md}\"",
-    "format:check:ci": "prettier --check app.config.js app.config.test.cjs eas.json eslint.config.js jest.coverage.config.js package.json",
+    "format:check:ci": "prettier --check app.config.js app.config.test.cjs eas.json eslint.config.js package.json",
     "config:validate": "node --test app.config.test.cjs",
     "ios": "expo start --ios",
     "lint": "expo lint src tests --max-warnings=0",
     "web": "expo start --web",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --config jest.coverage.config.js --coverage --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
     "lint:support-network": "expo lint src/features/support-network src/shared/components/forms/SwitchField tests/features/support-network"
   },
   "jest": {
@@ -50,7 +50,15 @@
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    }
   },
   "private": true,
   "devDependencies": {

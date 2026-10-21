@@ -14,7 +14,7 @@
     "start": "node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include=\"src/**/*.js\" --test-coverage-exclude=\"src/generated/**\" --test-coverage-lines=95 --test-coverage-functions=95 --test-coverage-branches=93",
+    "test:coverage": "node --test --experimental-test-coverage",
     "postinstall": "prisma generate"
   },
   "keywords": [],

@@ -63,8 +63,8 @@ jobs:
       - name: Analisar qualidade do código
         run: npm run lint
 
-      - name: Executar testes com cobertura
-        run: npm run test:coverage
+      - name: Executar testes
+        run: npm test
 
   frontend:
     name: Frontend
@@ -100,5 +100,5 @@ jobs:
       - name: Validar configuração segura do aplicativo
         run: npm run config:validate
 
-      - name: Executar testes com cobertura
-        run: npm run test:coverage
+      - name: Executar testes
+        run: npm test

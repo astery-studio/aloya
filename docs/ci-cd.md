@@ -16,18 +16,18 @@ workflows de entrega.
 Os dois jobs são:
 
 - backend: instalação reprodutível, Prisma Client, schema, formatação, lint e
-  testes com cobertura, incluindo a aplicação de todas as migrations em um
-  banco vazio;
+  testes, incluindo a aplicação de todas as migrations em um banco vazio;
 - aplicativo: formatação, lint sem warnings, configuração segura do Expo e
-  testes com cobertura.
+  testes.
 
 Os workflows adicionais executam CodeQL, revisão de dependências em pull
 requests e auditoria periódica de dependências de runtime. A cobertura faz
-parte da CI e bloqueia regressões abaixo do piso validado de cada aplicação. O
-audit bloqueia severidade alta no backend e crítica no frontend. O limite
-diferente é intencional: advisories altos atuais do frontend atingem ferramentas
-transitivas do Expo/Metro/Jest cujas versões mais recentes ainda não possuem
-correção upstream; vulnerabilidades críticas continuam bloqueadas.
+parte dos comandos locais do projeto, mas não bloqueia pull requests até que a
+equipe defina uma política. O audit bloqueia severidade alta no backend e
+crítica no frontend. O limite diferente é intencional: advisories altos atuais
+do frontend atingem ferramentas transitivas do Expo/Metro/Jest cujas versões
+mais recentes ainda não possuem correção upstream; vulnerabilidades críticas
+continuam bloqueadas.
 
 Configure a proteção de `main` e `develop` para exigir, no mínimo, os checks
 `Backend`, `Frontend`, `CodeQL JavaScript` e `Dependency Review`, além de
