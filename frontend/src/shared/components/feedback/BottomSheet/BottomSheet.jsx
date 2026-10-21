@@ -67,6 +67,9 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
         if (montadoAtual.current) {
             animarSaida()
         }
+        // As funções de animação são recriadas durante o render; incluir suas
+        // identidades reiniciaria a animação sem alteração de visibilidade.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visivel])
 
     function quandoModalAparecer() {
