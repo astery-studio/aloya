@@ -3,8 +3,9 @@
 ## Visão geral
 
 O repositório usa gates separados para qualidade, segurança, cobertura e
-entrega. Nenhum secret é versionado. Builds de loja são gerados pelo EAS e a
-API é empacotada como imagem OCI não-root no GitHub Container Registry (GHCR).
+entrega mobile. Nenhum secret é versionado. Builds de loja são gerados pelo
+EAS. O deploy do backend permanece fora do escopo até a equipe definir o
+provedor e a arquitetura de produção.
 
 ## Integração contínua
 
@@ -70,25 +71,16 @@ loja e os identificadores dos aplicativos.
 
 ## Entrega do backend
 
-`.github/workflows/backend-image.yml` executa o quality gate, gera SBOM e
-proveniência e publica a imagem `ghcr.io/<owner>/<repo>-backend`:
-
-- `staging` e `sha-*` em alterações do backend integradas a `develop`;
-- `v*` e `sha-*` em tags de versão.
-
-A imagem executa como usuário não-root. O deploy final depende do provedor de
-runtime e banco escolhido pelo projeto; conecte o provedor ao pacote GHCR e
-injete as variáveis de `backend/.env.example` pelo cofre de secrets dele. O
-banco SQLite e os uploads persistentes, se usados, precisam de volume durável;
-para múltiplas réplicas, migre para um banco gerenciado antes de escalar.
+O repositório não define estratégia de deploy para o backend. Essa automação
+deve ser criada somente depois que a equipe decidir provedor, banco, persistência,
+escalabilidade e gerenciamento de secrets.
 
 ## Checklist inicial dos ambientes
 
-1. Criar os environments `preview`, `staging` e `production` no GitHub.
+1. Criar os environments `preview` e `production` no GitHub.
 2. Exigir aprovação para `production`.
 3. Adicionar `EXPO_TOKEN` em `preview` e `production`.
 4. Configurar `EXPO_PUBLIC_API_URL` nos ambientes EAS correspondentes.
 5. Inicializar as credenciais Android/iOS no EAS com um build local assistido.
 6. Configurar as credenciais de submissão das lojas no EAS.
 7. Habilitar as regras de proteção e os checks obrigatórios das branches.
-8. Conectar o provedor do backend ao pacote GHCR e ao cofre de secrets.
