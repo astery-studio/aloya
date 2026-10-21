@@ -18,6 +18,6 @@
     "tunnel": "cd \"$env:USERPROFILE\\Downloads\" && .\\cloudflared.exe tunnel --url http://localhost:3000"
   },
   "devDependencies": {
-    "concurrently": "^10.0.5"
+    "concurrently": "^10.0.6"
   }
 }
