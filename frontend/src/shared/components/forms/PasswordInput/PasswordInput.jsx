@@ -4,11 +4,11 @@
 import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { EyeIcon as Eye, EyeSlashIcon as EyeSlash } from '../../icons/AppIcons';
-
-const IconeVazio = () => null;
 import { cores } from '../../../theme';
 import TextInput from '../TextInput/TextInput';
 import { estilos } from '../TextInput/TextInput.styles';
+
+const IconeVazio = () => null;
 
 // Recebe as opções de senha, permite alternar sua visibilidade e devolve o texto.
 function PasswordInput({
