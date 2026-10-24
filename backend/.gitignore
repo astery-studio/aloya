@@ -1,4 +1,5 @@
 node_modules
+coverage/
 # Keep environment variables out of version control
 .env
 
@@ -9,6 +10,7 @@ node_modules
 /prisma/*.db-wal
 
 /src/shared/generated/prisma
+/src/generated/
 
 #IAs sem sentido
 .agents/

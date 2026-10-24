@@ -1,50 +1,84 @@
 # CI/CD do Aloya
 
+## Visão geral
+
+O repositório usa gates de qualidade e segurança antes da entrega mobile.
+Nenhum secret é versionado. Builds de loja são gerados manualmente pelo EAS.
+O deploy do backend permanece fora do escopo até a equipe definir o provedor e
+a arquitetura de produção.
+
 ## Integração contínua
 
-O workflow `.github/workflows/ci.yml` é executado em:
+O workflow `.github/workflows/ci.yml` roda em pull requests e pushes para
+`main` e `develop`, pode ser executado manualmente e também é reutilizado pelos
+workflows de entrega.
 
-- pull requests destinados a `main` ou `develop`;
-- pushes em `main` ou `develop`;
-- execução manual pela aba **Actions**.
+Os dois jobs são:
 
-O workflow publica dois checks independentes:
+- backend: instalação reprodutível, Prisma Client, schema, formatação, lint e
+  testes, incluindo a aplicação de todas as migrations em um banco vazio;
+- aplicativo: formatação, lint sem warnings, configuração segura do Expo e
+  testes.
 
-- `Backend`: instala dependências, gera o Prisma Client, valida o schema
-  Prisma e executa os testes;
-- `Frontend`: instala dependências e executa todos os testes Jest.
+Os workflows adicionais executam CodeQL e auditoria de dependências de runtime
+em pull requests que alteram manifestos ou lockfiles, além da verificação
+periódica. A cobertura faz parte dos comandos locais do projeto, mas não
+bloqueia pull requests até que a equipe defina uma política. O audit bloqueia
+severidade alta no backend e crítica no frontend. O limite diferente é
+intencional: advisories altos atuais do frontend atingem ferramentas transitivas
+do Expo/Metro/Jest cujas versões mais recentes ainda não possuem correção
+upstream; vulnerabilidades críticas continuam bloqueadas.
 
-As instalações usam `npm ci` e os arquivos `package-lock.json`, garantindo
-que o CI use as mesmas versões de dependências versionadas no repositório.
+Configure a proteção de `main` e `develop` para exigir, no mínimo, os checks
+`Backend`, `Frontend` e `CodeQL JavaScript`, além de revisão humana e branches
+atualizadas antes do merge.
 
-O check de cobertura ainda não é obrigatório: embora todos os testes passem,
-a cobertura atual não alcança os limites globais de 90% definidos no
-`frontend/package.json`. Quando esses limites forem atingidos, o comando do
-job `Frontend` poderá ser alterado de `npm test` para
-`npm run test:coverage`.
+## Segurança dos builds mobile
 
-As migrations devem ganhar um check próprio quando houver testes de
-integração com banco. O comando `prisma migrate deploy` não faz parte deste
-CI inicial e deverá ser validado contra o mesmo tipo de banco escolhido para
-produção antes de ser usado em deploys.
+`frontend/app.config.js` exige `EXPO_PUBLIC_API_URL` HTTPS em preview e
+produção, define identificadores nativos estáveis e desabilita tráfego HTTP no
+Android. HTTP pode ser habilitado somente no ambiente local de desenvolvimento
+com `EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING=true`.
 
-## Entrega contínua
+No EAS, crie os ambientes `preview` e `production` e configure neles:
 
-O deploy não é executado por este workflow. Antes de habilitar CD, o projeto
-precisa definir:
+- `EXPO_PUBLIC_API_URL`: URL HTTPS da API correspondente;
+- demais variáveis públicas necessárias ao bundle, nunca credenciais.
 
-- o provedor que hospedará o backend e o banco usado em produção;
-- os ambientes `staging` e `production` no GitHub;
-- os secrets específicos de cada ambiente;
-- o projeto Expo Application Services (EAS) e seus perfis de build.
+Credenciais privadas do Android e iOS devem permanecer no gerenciamento de
+credenciais do EAS. O token de automação fica no secret `EXPO_TOKEN` dos
+environments homônimos do GitHub.
 
-Após essas decisões, o fluxo recomendado é:
+## Entrega mobile
 
-- merge em `develop`: deploy automático do backend em `staging` e build EAS
-  de preview;
-- tag `v*` criada a partir de `main`: deploy em `production` e build EAS de
-  produção, ambos protegidos por aprovação do ambiente.
+`frontend/eas.json` contém os perfis:
 
-Secrets nunca devem ser gravados nos arquivos YAML ou no repositório. Eles
-devem ser cadastrados em **Settings > Environments** e liberados somente aos
-jobs que referenciam o ambiente correspondente.
+- `preview`: distribuição interna e APK Android instalável;
+- `production`: artefatos de loja com incremento remoto de versão.
+
+`.github/workflows/mobile-build.yml` é deliberadamente manual. Ao iniciá-lo, a
+pessoa escolhe o perfil e a plataforma. O workflow executa todo o quality gate
+antes de solicitar o build ao EAS. A solicitação usa `--no-wait`, portanto o
+resultado final do build deve ser acompanhado no painel do EAS.
+
+`.github/workflows/mobile-submit.yml` é deliberadamente manual, usa o
+environment protegido `production` e envia o build de produção mais recente à
+loja escolhida. Exija aprovação nesse environment para impedir publicação sem
+revisão. Antes do primeiro uso, gere ou associe no EAS as credenciais de cada
+loja e os identificadores dos aplicativos.
+
+## Entrega do backend
+
+O repositório não define estratégia de deploy para o backend. Essa automação
+deve ser criada somente depois que a equipe decidir provedor, banco, persistência,
+escalabilidade e gerenciamento de secrets.
+
+## Checklist inicial dos ambientes
+
+1. Criar os environments `preview` e `production` no GitHub.
+2. Exigir aprovação para `production`.
+3. Adicionar `EXPO_TOKEN` em `preview` e `production`.
+4. Configurar `EXPO_PUBLIC_API_URL` nos ambientes EAS correspondentes.
+5. Inicializar as credenciais Android/iOS no EAS com um build local assistido.
+6. Configurar as credenciais de submissão das lojas no EAS.
+7. Habilitar as regras de proteção e os checks obrigatórios das branches.

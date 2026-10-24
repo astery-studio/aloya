@@ -241,6 +241,7 @@ function DatePickerSheet({visivel, titulo = 'Selecionar data', valorSelecionado 
         setListaAberta(null)
         setErroSalvar('')
     }, [
+        valorSelecionado,
         visivel
     ])
 
