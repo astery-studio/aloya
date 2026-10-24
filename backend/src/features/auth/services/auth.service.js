@@ -130,11 +130,13 @@ function criarAuthService({
                     const sessao =
                         tokenService.gerarTokenSessao(usuario);
                     const cicloInicial =
-                        await criarRegistroInicial(
-                            tx,
-                            usuario.id,
-                            dados
-                        );
+                        dados.dataInicioUltimaMenstruacao
+                            ? await criarRegistroInicial(
+                                tx,
+                                usuario.id,
+                                dados
+                            )
+                            : null;
 
                     if (
                         dados.menorDe16 &&
@@ -198,15 +200,17 @@ function criarAuthService({
                     tipo: 'Bearer'
                 },
 
-                cicloInicial: {
-                    id: resultado.cicloInicial.id,
+                cicloInicial: resultado.cicloInicial
+                    ? {
+                        id: resultado.cicloInicial.id,
 
-                    dataInicio:
-                        resultado.cicloInicial.dataInicio,
+                        dataInicio:
+                            resultado.cicloInicial.dataInicio,
 
-                    dataFim:
-                        resultado.cicloInicial.dataFim
-                },
+                        dataFim:
+                            resultado.cicloInicial.dataFim
+                    }
+                    : null,
 
                 consentimentoParental: dados.menorDe16
                     ? {

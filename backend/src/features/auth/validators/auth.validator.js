@@ -117,16 +117,26 @@ function criarAuthValidator({ dateUtils }) {
             );
         }
 
-        // Valida a data de início da última menstruação informada no cadastro.
-        const dataInicioUltimaMenstruacao =
-            dateUtils.criarDataValida(
-                body.dataInicioUltimaMenstruacao
-            );
+        // Valida opcionalmente a data de início da última menstruação.
+        const informouDataInicioUltimaMenstruacao =
+            body.dataInicioUltimaMenstruacao !== undefined &&
+            body.dataInicioUltimaMenstruacao !== null &&
+            body.dataInicioUltimaMenstruacao !== '';
 
-        // Impede que a data de início da menstruação seja inválida ou situada no futuro.
+        const dataInicioUltimaMenstruacao =
+            informouDataInicioUltimaMenstruacao
+                ? dateUtils.criarDataValida(
+                    body.dataInicioUltimaMenstruacao
+                )
+                : null;
+
+        // Quando informada, impede data inválida ou situada no futuro.
         if (
-            !dataInicioUltimaMenstruacao ||
-            dataInicioUltimaMenstruacao > hoje
+            informouDataInicioUltimaMenstruacao &&
+            (
+                !dataInicioUltimaMenstruacao ||
+                dataInicioUltimaMenstruacao > hoje
+            )
         ) {
             erros.push(
                 erro(
@@ -137,8 +147,13 @@ function criarAuthValidator({ dateUtils }) {
         }
 
         // Valida opcionalmente a data de término da última menstruação, caso tenha sido cadastrada.
+        const informouDataFimUltimaMenstruacao =
+            body.dataFimUltimaMenstruacao !== undefined &&
+            body.dataFimUltimaMenstruacao !== null &&
+            body.dataFimUltimaMenstruacao !== '';
+
         const dataFimUltimaMenstruacao =
-            body.dataFimUltimaMenstruacao
+            informouDataFimUltimaMenstruacao
                 ? dateUtils.criarDataValida(
                     body.dataFimUltimaMenstruacao
                 )
@@ -146,8 +161,9 @@ function criarAuthValidator({ dateUtils }) {
 
         // Garante que a data de término seja coerente.
         if (
-            body.dataFimUltimaMenstruacao &&
+            informouDataFimUltimaMenstruacao &&
             (
+                !dataInicioUltimaMenstruacao ||
                 !dataFimUltimaMenstruacao ||
                 dataFimUltimaMenstruacao < dataInicioUltimaMenstruacao ||
                 dataFimUltimaMenstruacao > hoje
