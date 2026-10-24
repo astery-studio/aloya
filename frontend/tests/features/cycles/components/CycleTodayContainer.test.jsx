@@ -60,3 +60,13 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
         );
     });
 }, 30_000);
+
+test('apresenta a tela sem ciclo quando a API não encontra registros', async () => {
+    const service = {
+        buscar: jest.fn().mockResolvedValue({ status: 'DADOS_INSUFICIENTES' })
+    };
+    await renderizarTela({ service });
+
+    expect(await screen.findByText('Conheça seu ciclo')).toBeOnTheScreen();
+    expect(screen.queryByLabelText('Datas do ciclo')).not.toBeOnTheScreen();
+});

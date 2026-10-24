@@ -62,11 +62,17 @@ test('duração permite digitar o número sem alterar a unidade', async () => {
 
 test('última menstruação seleciona o intervalo no calendário próprio', async () => {
     const aoAlterar = jest.fn();
-    await render(<LastMenstruationStep
+    const aoNaoSei = jest.fn();
+    const { rerender } = await render(<LastMenstruationStep
         valor={{ inicio: '2026-08-03', fim: null }} aoAlterar={aoAlterar}
-        aoVoltar={jest.fn()} aoAvancar={jest.fn()} />);
+        aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoNaoSei={aoNaoSei} />);
     fireEvent.press(screen.getByLabelText('Selecionar dia 7'));
     expect(aoAlterar).toHaveBeenCalledWith({
         inicio: '2026-08-03', fim: '2026-08-07'
     });
+    fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    expect(aoNaoSei).toHaveBeenCalledTimes(1);
+    await rerender(<LastMenstruationStep valor={null} aoAlterar={jest.fn()}
+        aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoNaoSei={aoNaoSei} />);
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
 });

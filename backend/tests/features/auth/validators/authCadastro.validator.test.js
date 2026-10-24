@@ -90,6 +90,9 @@ test(
         const resultado =
             validator.validarCadastro(
                 criarDadosValidos({
+                    dataInicioUltimaMenstruacao:
+                        undefined,
+
                     dataFimUltimaMenstruacao:
                         undefined,
 
@@ -106,6 +109,12 @@ test(
 
         assert.equal(resultado.valido, true);
         assert.deepEqual(resultado.erros, []);
+
+        assert.equal(
+            resultado.dados
+                .dataInicioUltimaMenstruacao,
+            null
+        );
 
         assert.equal(
             resultado.dados
@@ -129,6 +138,27 @@ test(
             resultado.dados
                 .duracaoLuteaInformada,
             null
+        );
+    }
+);
+
+test(
+    'rejeita data final da menstruação sem uma data inicial',
+    () => {
+        const resultado = criarValidator().validarCadastro(
+            criarDadosValidos({
+                dataInicioUltimaMenstruacao: null,
+                dataFimUltimaMenstruacao: '2026-01-14'
+            })
+        );
+
+        assert.equal(resultado.valido, false);
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo === 'dataFimUltimaMenstruacao'
+            ),
+            true
         );
     }
 );

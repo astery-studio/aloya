@@ -271,6 +271,28 @@ async function concluirEtapas() {
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 }
 
+test('conclui o cadastro sem período menstrual quando a pessoa não sabe a data', async () => {
+    const cadastrar = jest.fn().mockResolvedValue({
+        autenticacao: { token: 'jwt', tipo: 'Bearer' }
+    });
+    await render(<OnboardingScreen cadastrar={cadastrar} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    for (let etapa = 0; etapa < 3; etapa += 1) {
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    }
+
+    await waitFor(() => expect(cadastrar).toHaveBeenCalledWith(expect.objectContaining({
+        dataInicioUltimaMenstruacao: null,
+        dataFimUltimaMenstruacao: null
+    })));
+});
+
 test('pular uma etapa já preenchida remove o valor antes de concluir', async () => {
     const cadastrar = jest.fn().mockResolvedValue({
         autenticacao: { token: 'jwt', tipo: 'Bearer' }

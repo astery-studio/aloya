@@ -15,16 +15,21 @@ jest.mock('../../src/shared/storage/tokenStorage', () => ({obterToken: jest.fn()
 
 jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
     const React = require('react')
-    const {Pressable, Text} = require('react-native')
+    const {Pressable, Text, View} = require('react-native')
 
-    return jest.fn(({aoEntrar}) => React.createElement(
-        Pressable,
-        {
+    return jest.fn(({aoCriarConta, aoEntrar}) => React.createElement(
+        View,
+        null,
+        React.createElement(Pressable, {
             accessibilityRole: 'button',
             accessibilityLabel: 'Ir para login',
             onPress: aoEntrar
-        },
-        React.createElement(Text, null, 'Boas-vindas')
+        }, React.createElement(Text, null, 'Boas-vindas')),
+        React.createElement(Pressable, {
+            accessibilityRole: 'button',
+            accessibilityLabel: 'Criar conta',
+            onPress: aoCriarConta
+        })
     ))
 })
 
@@ -59,7 +64,16 @@ jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => {
     const {Text} = require('react-native')
     return jest.fn(() => React.createElement(Text, null, 'Redefinição'))
 })
-jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null))
+jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => {
+    const React = require('react')
+    const {Pressable} = require('react-native')
+
+    return jest.fn(({aoConcluir}) => React.createElement(Pressable, {
+        accessibilityRole: 'button',
+        accessibilityLabel: 'Concluir cadastro',
+        onPress: aoConcluir
+    }))
+})
 
 jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
@@ -285,6 +299,9 @@ function criarServicos() {
         cycleHistoryService: {
             listarPagina: jest.fn()
         },
+        cyclePredictionService: {
+            buscar: jest.fn().mockResolvedValue({status: 'DADOS_INSUFICIENTES'})
+        },
         supportCategoryService: {
             criarCategoria: jest.fn()
         }
@@ -327,6 +344,16 @@ describe('App integrado', () => {
         expect(
             servicos.accountService.buscarPerfil
         ).not.toHaveBeenCalled()
+    })
+
+    test('abre a tela inicial após o cadastro para apresentar o estado sem ciclo', async () => {
+        obterToken.mockResolvedValue(null)
+        await render(<App />)
+
+        await fireEvent.press(await screen.findByRole('button', {name: 'Criar conta'}))
+        await fireEvent.press(screen.getByRole('button', {name: 'Concluir cadastro'}))
+
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen()
     })
 
     test('botão físico retorna do login para as boas-vindas', async () => {
