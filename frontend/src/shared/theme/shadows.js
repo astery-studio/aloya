@@ -1,0 +1,31 @@
+/**
+ * Define as sombras padronizadas de pop-ups, alertas e painéis.
+ */
+const shadows = {
+    popup: {
+        boxShadow:
+            '0 8px 40px 0 rgba(34, 34, 34, 0.10)'
+    },
+
+    alert: {
+        boxShadow:
+            '0 12px 48px 0 rgba(20, 32, 28, 0.18)'
+    },
+
+    sheet: {
+        boxShadow:
+            '0 -4px 32px 0 rgba(34, 34, 34, 0.08)'
+    },
+
+    cardSuave: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.04,
+        shadowRadius: 12,
+        elevation: 1
+    }
+};
+
+export {
+    shadows
+};

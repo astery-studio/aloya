@@ -2,10 +2,10 @@
  * Testes de apresentação e interação dos componentes do onboarding.
  */
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import BirthDateStep from '../../features/onboarding/BirthDateStep/BirthDateStep';
-import CycleLengthStep from '../../features/onboarding/CycleLengthStep/CycleLengthStep';
-import LastMenstruationStep from '../../features/onboarding/LastMenstruationStep/LastMenstruationStep';
-import OnboardingProgress from '../../features/onboarding/OnboardingProgress/OnboardingProgress';
+import BirthDateStep from '../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
+import CycleLengthStep from '../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
+import LastMenstruationStep from '../../src/features/onboarding/components/LastMenstruationStep/LastMenstruationStep';
+import OnboardingProgress from '../../src/features/onboarding/components/OnboardingProgress/OnboardingProgress';
 
 test('progresso calcula a largura pela etapa atual', async () => {
     await render(<OnboardingProgress etapaAtual={3} totalEtapas={5} />);

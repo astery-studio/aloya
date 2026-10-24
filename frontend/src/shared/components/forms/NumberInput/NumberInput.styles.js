@@ -1,0 +1,39 @@
+/**
+ * Aparência do campo numérico com unidade fixa.
+ */
+import { StyleSheet } from 'react-native';
+import { cores, fontFamilies, radius } from '../../../theme';
+
+const texto = {
+    color: cores.neutras.textoPrincipalClaro,
+    fontFamily: fontFamilies.regular,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
+    letterSpacing: 0.32
+};
+
+const estilos = StyleSheet.create({
+    campo: {
+        width: '100%', maxWidth: 342, minHeight: 56,
+        alignSelf: 'center', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0, borderRadius: radius.buttonAndInput,
+        borderWidth: 1.41, borderColor: cores.marca.primaria,
+        backgroundColor: cores.neutras.superficieClara,
+        paddingVertical: 8
+    },
+    conteudo: {
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4
+    },
+    entrada: {
+        ...texto,
+        minWidth: 32,
+        padding: 0,
+        textAlign: 'center',
+        textAlignVertical: 'center'
+    },
+    unidade: { ...texto },
+    desativado: { opacity: 0.55 }
+});
+
+export { estilos };

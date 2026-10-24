@@ -1,4 +1,4 @@
-import { obterDestinoDeRetorno } from '../../features/auth/utils/authNavigation';
+import { obterDestinoDeRetorno } from '../../src/features/auth/utils/authNavigation';
 
 test.each([
     ['login', 'boasVindas'],
