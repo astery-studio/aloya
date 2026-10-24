@@ -272,6 +272,11 @@ export default function App() {
         carregarPerfil()
     }
 
+    function concluirCadastro() {
+        concluirAutenticacao()
+        setTelaInterna(telasInternas.inicio)
+    }
+
     //Limpa os dados locais da área autenticada e retorna para o login.
     function finalizarSessao(resultado = {}) {
         requisicaoAtual.current += 1
@@ -396,7 +401,7 @@ export default function App() {
             verificarEmailDisponivel={configuracao.servicos.authService.verificarEmailDisponivel}
             aoVoltar={() => setTelaPublica('boasVindas')}
             aoEntrar={() => setTelaPublica('login')}
-            aoConcluir={concluirAutenticacao} />;
+            aoConcluir={concluirCadastro} />;
     } else if (telaInterna === telasInternas.inicio) {
         conteudo = <CycleTodayContainer
             service={configuracao.servicos.cyclePredictionService}
