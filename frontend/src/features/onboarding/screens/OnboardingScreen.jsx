@@ -197,6 +197,11 @@ export default function OnboardingScreen({
         avancar();
     }
 
+    function avancarSemMenstruacao() {
+        alterarCampo('ultimaMenstruacao', null);
+        avancar();
+    }
+
     async function avancarConta() {
         setErrosCampos({});
         if (dados.nome.trim().length < 3) {
@@ -288,7 +293,8 @@ export default function OnboardingScreen({
     if (etapa === 2) conteudo = <LastMenstruationStep {...comum}
         valor={dados.ultimaMenstruacao}
         aoAlterar={(ultimaMenstruacao) => alterarCampo('ultimaMenstruacao', ultimaMenstruacao)}
-        erro={errosCampos.ultimaMenstruacao} aoAvancar={avancarMenstruacao} />;
+        erro={errosCampos.ultimaMenstruacao} aoAvancar={avancarMenstruacao}
+        aoNaoSei={avancarSemMenstruacao} />;
     if (etapa === 3) conteudo = <CycleLengthStep {...comum} valor={dados.duracaoCiclo}
         aoAlterar={(duracaoCiclo) => alterarCampo('duracaoCiclo', duracaoCiclo)}
         erro={errosCampos.duracaoCiclo} aoAvancar={avancar}

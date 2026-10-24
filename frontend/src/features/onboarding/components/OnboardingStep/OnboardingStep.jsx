@@ -11,7 +11,8 @@ import { estilos } from './OnboardingStep.styles';
 
 export default function OnboardingStep({
     etapa, titulo, descricao, children, aoVoltar, aoPular,
-    aoAvancar, podeAvancar = true, carregando = false, erro
+    aoAvancar, podeAvancar = true, carregando = false, erro,
+    acaoSecundaria
 }) {
     const cabecalho = <>
         <View style={estilos.navegacao}>
@@ -29,8 +30,14 @@ export default function OnboardingStep({
 
     return (
         <FormLayout cabecalho={cabecalho} centralizado acoes={
-            <Button texto="Avançar" aoPressionar={aoAvancar}
-                desativado={!podeAvancar} carregando={carregando} />
+            <View style={estilos.acoes}>
+                {acaoSecundaria ? <Button texto={acaoSecundaria.texto}
+                    aoPressionar={acaoSecundaria.aoPressionar}
+                    variante="bordaLaranja"
+                    desativado={carregando || acaoSecundaria.desativada} /> : null}
+                <Button texto="Avançar" aoPressionar={aoAvancar}
+                    desativado={!podeAvancar} carregando={carregando} />
+            </View>
         }>
             <View style={estilos.conteudo}>
                 <View style={estilos.textos}>

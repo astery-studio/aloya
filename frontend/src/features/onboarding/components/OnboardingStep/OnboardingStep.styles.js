@@ -37,6 +37,10 @@ const estilos = StyleSheet.create({
         textAlign: 'center'
     },
     campo: { gap: espacamentos.pequeno, width: '100%' },
+    acoes: {
+        gap: espacamentos.pequeno,
+        width: '100%'
+    },
     erro: {
         ...typography.caption,
         color: cores.feedback.erro,
