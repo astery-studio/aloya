@@ -177,4 +177,26 @@ test('impede exclusão enquanto algum contato ativo estiver sem decisão', async
     assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
 });
 
+test('rejeita decisão referente a vínculo que não pertence mais à categoria', async () => {
+    const categoriaExclusao = criarCategoria({ vinculos: [{ id: 20 }] });
+    const { prisma } = criarPrisma({ categoriaExclusao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(
+        () =>
+            service.excluirCategoria(
+                criarPedido({
+                    decisoes: [
+                        { vinculoId: 20, acao: 'remover_acesso' },
+                        { vinculoId: 999, acao: 'remover_acesso' }
+                    ]
+                })
+            ),
+        {
+            status: 409,
+            codigo: 'IMPACTO_EXCLUSAO_ALTERADO'
+        }
+    );
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
