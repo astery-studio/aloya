@@ -23,7 +23,8 @@ function criarPedidoEdicao(alteracoes = {}) {
 function criarPrismaEdicaoMock({
     quantidadeContatos = 0,
     categoriaEncontrada = true,
-    versaoAtual = atualizadoEm
+    versaoAtual = atualizadoEm,
+    quantidadeAtualizada = 1
 } = {}) {
     const chamadas = []
     const categoriaAtual = {
@@ -57,7 +58,7 @@ function criarPrismaEdicaoMock({
             },
             async updateMany(argumentos) {
                 chamadas.push({operacao: 'updateMany', argumentos})
-                return {count: 1}
+                return {count: quantidadeAtualizada}
             }
         }
     }
@@ -230,4 +231,18 @@ test('solicita nova confirmação quando a quantidade de contatos mudou', async 
     )
 
     assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
+})
+
+test('detecta concorrência ocorrida entre a leitura e a gravação', async () => {
+    const {prisma} = criarPrismaEdicaoMock({quantidadeAtualizada: 0})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao()),
+        erro => {
+            assert.equal(erro.status, 409)
+            assert.equal(erro.codigo, 'CONFLITO_EDICAO_CATEGORIA')
+            return true
+        }
+    )
 })
