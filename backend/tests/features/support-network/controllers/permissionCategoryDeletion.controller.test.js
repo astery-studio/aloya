@@ -149,4 +149,29 @@ test('exclui usando a sessão e devolve a confirmação exigida', async () => {
     assert.equal(res.headers['cache-control'], 'no-store');
 });
 
+test('informa novo impacto quando os vínculos mudam antes da confirmação', async () => {
+    const erro = Object.assign(
+        new Error(
+            'Os contatos vinculados à categoria foram alterados. Revise as escolhas e tente novamente.'
+        ),
+        {
+            status: 409,
+            codigo: 'IMPACTO_EXCLUSAO_ALTERADO',
+            quantidadeContatos: 3
+        }
+    );
+    const controller = criarController({
+        async excluirCategoria() {
+            throw erro;
+        }
+    });
+    const res = criarResposta();
+
+    await controller.excluirCategoria(criarRequisicao(), res, assert.fail);
+
+    assert.equal(res.statusCode, 409);
+    assert.equal(res.body.erro.codigo, 'IMPACTO_EXCLUSAO_ALTERADO');
+    assert.equal(res.body.erro.detalhes.quantidadeContatos, 3);
+});
+
 export { criarController, criarRequisicao, criarResposta };
