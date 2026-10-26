@@ -20,6 +20,13 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
                 'post',
                 ...argumentos
             ])
+        },
+
+        get(...argumentos) {
+            chamadas.push([
+                'get',
+                ...argumentos
+            ])
         }
     }
 
@@ -27,6 +34,7 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
     function exigirAcessoRedeApoio() {}
     function limitarCriacao() {}
     function criarCategoria() {}
+    function listarCategorias() {}
 
     criarPermissionCategoryRoutes({
         Router() {
@@ -40,7 +48,8 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
         },
         permissionCategoryRateLimit: limitarCriacao,
         permissionCategoryController: {
-            criarCategoria
+            criarCategoria,
+            listarCategorias
         }
     })
 
@@ -52,6 +61,11 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
         [
             'use',
             exigirAcessoRedeApoio
+        ],
+        [
+            'get',
+            '/permission-categories',
+            listarCategorias
         ],
         [
             'post',
@@ -73,6 +87,10 @@ test('registra as proteções antes do endpoint de criação', () => {
         post(_caminho, limite, controller) {
             ordem.push(limite.name)
             ordem.push(controller.name)
+        },
+
+        get(_caminho, controller) {
+            ordem.push(controller.name)
         }
     }
 
@@ -80,6 +98,7 @@ test('registra as proteções antes do endpoint de criação', () => {
     function exigirAcessoRedeApoio() {}
     function limitarCriacao() {}
     function criarCategoria() {}
+    function listarCategorias() {}
 
     criarPermissionCategoryRoutes({
         Router: () => router,
@@ -91,14 +110,52 @@ test('registra as proteções antes do endpoint de criação', () => {
         },
         permissionCategoryRateLimit: limitarCriacao,
         permissionCategoryController: {
-            criarCategoria
+            criarCategoria,
+            listarCategorias
         }
     })
 
     assert.deepEqual(ordem, [
         'autenticar',
         'exigirAcessoRedeApoio',
+        'listarCategorias',
         'limitarCriacao',
         'criarCategoria'
     ])
+})
+
+test('não aplica o limitador de criação à consulta da lista', () => {
+    const chamadasGet = []
+
+    function listarCategorias() {}
+    function limitarCriacao() {}
+
+    criarPermissionCategoryRoutes({
+        Router: () => ({
+            use() {},
+            get(caminho, ...middlewares) {
+                chamadasGet.push([caminho, ...middlewares])
+            },
+            post() {}
+        }),
+        authMiddleware: {
+            autenticar() {}
+        },
+        parentalConsentMiddleware: {
+            exigirAcessoRedeApoio() {}
+        },
+        permissionCategoryRateLimit: limitarCriacao,
+        permissionCategoryController: {
+            criarCategoria() {},
+            listarCategorias
+        }
+    })
+
+    assert.deepEqual(chamadasGet, [
+        [
+            '/permission-categories',
+            listarCategorias
+        ]
+    ])
+    assert.equal(chamadasGet[0].includes(limitarCriacao), false)
 })

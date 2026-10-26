@@ -322,3 +322,151 @@ test('não devolve nome normalizado nem titularId na resposta', async () => {
     assert.equal(respostaSerializada.includes('nomeNormalizado'), false)
     assert.equal(respostaSerializada.includes('titularId'), false)
 })
+
+test('lista categorias usando somente a identidade da sessão', async () => {
+    const categorias = [criarCategoriaCriada()]
+    let dadosRecebidos = null
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarCriacaoCategoria() {
+                return criarValidacaoValida()
+            }
+        },
+        permissionCategoryService: {
+            async listarCategorias(dados) {
+                dadosRecebidos = dados
+
+                return categorias
+            }
+        }
+    })
+    const res = criarRespostaMock()
+
+    await controller.listarCategorias(
+        {
+            query: {
+                titularId: 999,
+                papel: 'administrador'
+            },
+            usuario: {
+                id: 7,
+                papel: 'principal'
+            }
+        },
+        res,
+        assert.fail
+    )
+
+    assert.deepEqual(dadosRecebidos, {
+        titularId: 7,
+        papel: 'principal'
+    })
+    assert.equal(res.statusRecebido, 200)
+    assert.equal(res.cabecalhos['Cache-Control'], 'private, no-store')
+    assert.equal(res.cabecalhos.Pragma, 'no-cache')
+    assert.deepEqual(res.corpoRecebido, {categorias})
+})
+
+test('devolve coleção vazia quando não existem categorias', async () => {
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarCriacaoCategoria() {
+                return criarValidacaoValida()
+            }
+        },
+        permissionCategoryService: {
+            async listarCategorias() {
+                return []
+            }
+        }
+    })
+    const res = criarRespostaMock()
+
+    await controller.listarCategorias(
+        {
+            usuario: {
+                id: 7,
+                papel: 'principal'
+            }
+        },
+        res,
+        assert.fail
+    )
+
+    assert.deepEqual(res.corpoRecebido, {
+        categorias: []
+    })
+})
+
+test('define a mensagem pública exigida quando a listagem falha', async () => {
+    const erroInterno = new Error('Detalhes privados do banco')
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarCriacaoCategoria() {
+                return criarValidacaoValida()
+            }
+        },
+        permissionCategoryService: {
+            async listarCategorias() {
+                throw erroInterno
+            }
+        }
+    })
+    let erroRecebido = null
+
+    await controller.listarCategorias(
+        {
+            usuario: {
+                id: 7,
+                papel: 'principal'
+            }
+        },
+        criarRespostaMock(),
+        erro => {
+            erroRecebido = erro
+        }
+    )
+
+    assert.equal(erroRecebido, erroInterno)
+    assert.equal(
+        erroRecebido.mensagemUsuario,
+        'Não foi possível carregar suas categorias no momento. Tente novamente.'
+    )
+})
+
+test('preserva erros públicos controlados durante a listagem', async () => {
+    const erroControlado = new Error('Somente a titular pode consultar categorias de permissão.')
+
+    erroControlado.status = 403
+    erroControlado.codigo = 'ACAO_NAO_PERMITIDA'
+
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarCriacaoCategoria() {
+                return criarValidacaoValida()
+            }
+        },
+        permissionCategoryService: {
+            async listarCategorias() {
+                throw erroControlado
+            }
+        }
+    })
+    let erroRecebido = null
+
+    await controller.listarCategorias(
+        {
+            usuario: {
+                id: 7,
+                papel: 'contato_apoio'
+            }
+        },
+        criarRespostaMock(),
+        erro => {
+            erroRecebido = erro
+        }
+    )
+
+    assert.equal(erroRecebido, erroControlado)
+    assert.equal(erroRecebido.mensagemUsuario, undefined)
+})

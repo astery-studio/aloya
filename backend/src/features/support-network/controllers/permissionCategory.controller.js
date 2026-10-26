@@ -1,4 +1,4 @@
-//Recebe a criação de categorias e usa exclusivamente a identidade obtida da sessão.
+//Recebe operações de categorias e usa exclusivamente a identidade obtida da sessão.
 function criarPermissionCategoryController({permissionCategoryService, permissionCategoryValidator}) {
     function responderErroValidacao(res, validacao) {
         const primeiroErro = validacao.erros[0]
@@ -43,8 +43,32 @@ function criarPermissionCategoryController({permissionCategoryService, permissio
         }
     }
 
+    //Lista as categorias da titular sem aceitar filtros de identidade enviados pelo cliente.
+    async function listarCategorias(req, res, next) {
+        try {
+            const categorias = await permissionCategoryService.listarCategorias({
+                titularId: req.usuario.id,
+                papel: req.usuario.papel
+            })
+
+            res.set('Cache-Control', 'private, no-store')
+            res.set('Pragma', 'no-cache')
+
+            return res.status(200).json({
+                categorias
+            })
+        } catch (erro) {
+            if (!erro.status) {
+                erro.mensagemUsuario = 'Não foi possível carregar suas categorias no momento. Tente novamente.'
+            }
+
+            return next(erro)
+        }
+    }
+
     return {
-        criarCategoria
+        criarCategoria,
+        listarCategorias
     }
 }
 

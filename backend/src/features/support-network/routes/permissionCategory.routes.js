@@ -4,6 +4,7 @@ function criarPermissionCategoryRoutes({Router, authMiddleware, parentalConsentM
 
     router.use(authMiddleware.autenticar)
     router.use(parentalConsentMiddleware.exigirAcessoRedeApoio)
+    router.get('/permission-categories', permissionCategoryController.listarCategorias)
     router.post('/permission-categories', permissionCategoryRateLimit, permissionCategoryController.criarCategoria)
 
     return router
