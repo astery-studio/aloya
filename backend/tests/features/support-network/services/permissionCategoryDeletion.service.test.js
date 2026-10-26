@@ -228,4 +228,29 @@ test('revoga imediatamente o acesso escolhido para remoção', async () => {
     assert.equal(resultado.quantidadeAcessosRemovidos, 1);
 });
 
+test('converte em individual preservando as permissões da categoria', async () => {
+    const categoriaExclusao = criarCategoria({ vinculos: [{ id: 21 }] });
+    const { prisma, chamadas } = criarPrisma({ categoriaExclusao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    const resultado = await service.excluirCategoria(
+        criarPedido({
+            decisoes: [{ vinculoId: 21, acao: 'manter_acesso_individual' }]
+        })
+    );
+
+    const atualizacao = chamadas.find(
+        ([nome, argumentos]) => nome === 'vinculo.updateMany' && argumentos.where?.id
+    )[1];
+
+    assert.deepEqual(atualizacao.where.id, { in: [21] });
+    assert.equal(atualizacao.data.categoriaId, null);
+    assert.deepEqual(atualizacao.data.permissoesIndividuais, [
+        'geral.fase_atual',
+        'emocional.sintomas_emocionais'
+    ]);
+    assert.equal('status' in atualizacao.data, false);
+    assert.equal(resultado.quantidadeAcessosMantidos, 1);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
