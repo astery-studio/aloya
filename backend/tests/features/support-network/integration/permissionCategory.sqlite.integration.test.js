@@ -848,3 +848,97 @@ test('exclui categoria sem contatos ativos e revoga convite pendente', async () 
         rmSync(diretorio, { recursive: true, force: true });
     }
 });
+
+test('aplica decisões distintas aos contatos e exclui a categoria atomicamente', async () => {
+    const { banco, caminhoBanco, diretorio } = criarBancoTemporario();
+
+    executarMigrationNormalizacao(banco);
+    banco.close();
+
+    const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({ url: urlBanco })
+    });
+    const permissoes = ['geral.fase_atual', 'emocional.sintomas_emocionais'];
+    const categoria = await prisma.categoriaPermissao.create({
+        data: {
+            titularId: 1,
+            nome: 'Família',
+            nomeNormalizado: 'família',
+            conjuntoDadosVisiveis: permissoes
+        }
+    });
+    const remover = await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            emailConvidado: 'ana@example.com',
+            categoriaId: categoria.id,
+            status: 'ativo'
+        }
+    });
+    const manter = await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            emailConvidado: 'carlos@example.com',
+            categoriaId: categoria.id,
+            status: 'ativo'
+        }
+    });
+    const servidor = criarAppComExclusao(prisma).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const endereco = servidor.address();
+        const baseUrl = `http://127.0.0.1:${endereco.port}/support-network/permission-categories/${categoria.id}`;
+        const impacto = await fetch(`${baseUrl}/deletion-impact`);
+        const corpoImpacto = await impacto.json();
+
+        assert.equal(corpoImpacto.quantidadeContatos, 2);
+        assert.deepEqual(
+            corpoImpacto.contatos.map((contato) => contato.vinculoId),
+            [remover.id, manter.id]
+        );
+
+        const resposta = await fetch(baseUrl, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                atualizadoEm: categoria.atualizadoEm.toISOString(),
+                decisoes: [
+                    { vinculoId: remover.id, acao: 'remover_acesso' },
+                    { vinculoId: manter.id, acao: 'manter_acesso_individual' }
+                ]
+            })
+        });
+        const corpo = await resposta.json();
+
+        assert.equal(resposta.status, 200, JSON.stringify(corpo));
+        assert.deepEqual(corpo.resultado, {
+            categoriaId: categoria.id,
+            quantidadeAcessosRemovidos: 1,
+            quantidadeAcessosMantidos: 1
+        });
+        assert.equal(
+            await prisma.categoriaPermissao.findUnique({ where: { id: categoria.id } }),
+            null
+        );
+
+        const [removidoDepois, mantidoDepois] = await Promise.all([
+            prisma.vinculoRedeApoio.findUnique({ where: { id: remover.id } }),
+            prisma.vinculoRedeApoio.findUnique({ where: { id: manter.id } })
+        ]);
+
+        assert.equal(removidoDepois.categoriaId, null);
+        assert.equal(removidoDepois.status, 'revogado');
+        assert.deepEqual(removidoDepois.permissoesIndividuais, []);
+        assert.equal(mantidoDepois.categoriaId, null);
+        assert.equal(mantidoDepois.status, 'ativo');
+        assert.deepEqual(mantidoDepois.permissoesIndividuais, permissoes);
+    } finally {
+        await prisma.$disconnect();
+        await new Promise((resolve, reject) => {
+            servidor.close((erro) => (erro ? reject(erro) : resolve()));
+        });
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
