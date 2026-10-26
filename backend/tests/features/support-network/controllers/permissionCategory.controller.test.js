@@ -603,3 +603,41 @@ test('retorna 400 sem chamar o service quando o id da categoria é inválido', a
         }
     });
 });
+
+test('retorna 422 e mantém o service intacto quando a edição é inválida', async () => {
+    let serviceChamado = false;
+    const validacao = {
+        valido: false,
+        erros: [{
+            campo: 'dadosVisiveis',
+            mensagem: 'Selecione ao menos um tipo de dado que esta categoria poderá visualizar.'
+        }],
+        dados: {}
+    };
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                return 10;
+            },
+            validarEdicaoCategoria() {
+                return validacao;
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria() {
+                serviceChamado = true;
+            }
+        }
+    });
+    const res = criarRespostaMock();
+
+    await controller.editarCategoria(
+        {params: {id: '10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        res,
+        assert.fail
+    );
+
+    assert.equal(serviceChamado, false);
+    assert.equal(res.statusRecebido, 422);
+    assert.deepEqual(res.corpoRecebido.erro.detalhes, validacao.erros);
+});
