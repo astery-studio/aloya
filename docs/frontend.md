@@ -57,8 +57,12 @@ cd frontend
 Para iniciar:
 
 ```bash
-npx expo start
+npx expo start --go
 ```
+
+Esse é o fluxo padrão da equipe e abre o projeto pelo Expo Go. Quando um teste
+depender de recursos nativos indisponíveis nele, use a development build com
+`npm run start:dev-client`.
 
 ---
 
