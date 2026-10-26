@@ -77,6 +77,10 @@ import { criarPermissionCategoryController } from '../../features/support-networ
 import { criarPermissionCategoryRateLimit } from '../../features/support-network/middleware/permissionCategoryRateLimit.middleware.js';
 
 import { criarPermissionCategoryUpdateRateLimit } from '../../features/support-network/middleware/permissionCategoryUpdateRateLimit.middleware.js';
+import { criarPermissionCategoryDeletionService } from '../../features/support-network/services/permissionCategoryDeletion.service.js';
+import { criarPermissionCategoryDeletionValidator } from '../../features/support-network/validators/permissionCategoryDeletion.validator.js';
+import { criarPermissionCategoryDeletionController } from '../../features/support-network/controllers/permissionCategoryDeletion.controller.js';
+import { criarPermissionCategoryDeletionRateLimit } from '../../features/support-network/middleware/permissionCategoryDeletionRateLimit.middleware.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -202,6 +206,10 @@ function criarContainer() {
         prisma
     });
 
+    const permissionCategoryDeletionService = criarPermissionCategoryDeletionService({
+        prisma
+    });
+
     const authValidator = criarAuthValidator({
         dateUtils
     });
@@ -215,6 +223,7 @@ function criarContainer() {
     const accountDeletionValidator = criarAccountDeletionValidator();
 
     const permissionCategoryValidator = criarPermissionCategoryValidator();
+    const permissionCategoryDeletionValidator = criarPermissionCategoryDeletionValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -265,6 +274,12 @@ function criarContainer() {
         rateLimit,
         janelaMs: env.configuracoesContaRateLimitJanelaMs,
         limite: env.configuracoesContaRateLimitMaximo
+    });
+
+    const permissionCategoryDeletionRateLimit = criarPermissionCategoryDeletionRateLimit({
+        rateLimit,
+        janelaMs: env.exclusaoContaRateLimitJanelaMs,
+        limite: env.exclusaoContaRateLimitMaximo
     });
 
     const alteracaoSenhaRateLimit = criarAlteracaoSenhaRateLimit({
@@ -325,6 +340,12 @@ function criarContainer() {
         permissionCategoryValidator
     });
 
+    const permissionCategoryDeletionController = criarPermissionCategoryDeletionController({
+        permissionCategoryDeletionService,
+        permissionCategoryDeletionValidator,
+        permissionCategoryValidator
+    });
+
     return {
         authController,
         accountController,
@@ -337,6 +358,7 @@ function criarContainer() {
 
         predictionController,
         permissionCategoryController,
+        permissionCategoryDeletionController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
@@ -346,6 +368,7 @@ function criarContainer() {
         configuracoesContaRateLimit,
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,
+        permissionCategoryDeletionRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
