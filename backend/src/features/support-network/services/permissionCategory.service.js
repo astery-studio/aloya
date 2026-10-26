@@ -83,6 +83,11 @@ function compararCategorias(primeira, segunda) {
     return resultado !== 0 ? resultado : primeira.id - segunda.id;
 }
 
+//Compara listas já normalizadas sem depender da identidade dos arrays.
+function permissoesSaoIguais(permissoesAtuais, permissoesNovas) {
+    return JSON.stringify(permissoesAtuais) === JSON.stringify(permissoesNovas);
+}
+
 function criarPermissionCategoryService({ prisma }) {
     //Cria uma categoria sem aceitar titularId ou quantidade de contatos vindos do cliente.
     async function criarCategoria({ titularId, papel, nome, dadosVisiveis }) {
@@ -177,9 +182,164 @@ function criarPermissionCategoryService({ prisma }) {
         return categorias.map(formatarCategoria).sort(compararCategorias);
     }
 
+    //Substitui os campos editáveis da categoria compartilhada em uma única transação.
+    async function editarCategoria({
+        titularId,
+        papel,
+        categoriaId,
+        nome,
+        dadosVisiveis,
+        atualizadoEm,
+        quantidadeContatosConfirmada = null
+    } = {}) {
+        validarTitular(
+            titularId,
+            papel,
+            'Somente a titular pode editar categorias de permissão.'
+        );
+        validarDadosDaCategoria(nome, dadosVisiveis);
+
+        if (!Number.isSafeInteger(categoriaId) || categoriaId <= 0) {
+            throw criarErro('Identificador de categoria inválido.', 400, 'ID_CATEGORIA_INVALIDO');
+        }
+
+        if (!(atualizadoEm instanceof Date) || Number.isNaN(atualizadoEm.getTime())) {
+            throw criarErro('A versão da categoria é inválida.', 422, 'VERSAO_CATEGORIA_INVALIDA');
+        }
+
+        const nomeNormalizado = normalizarNomeParaComparacao(nome);
+        const permissoesOrdenadas = ordenarPermissoesCategoria(dadosVisiveis);
+
+        try {
+            return await prisma.$transaction(async transacao => {
+                const categoriaAtual = await transacao.categoriaPermissao.findFirst({
+                    where: {
+                        id: categoriaId,
+                        titularId
+                    },
+                    select: {
+                        id: true,
+                        nome: true,
+                        nomeNormalizado: true,
+                        conjuntoDadosVisiveis: true,
+                        criadoEm: true,
+                        atualizadoEm: true,
+                        _count: {
+                            select: {
+                                vinculos: {
+                                    where: {
+                                        status: 'ativo'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (!categoriaAtual) {
+                    throw criarErro('Categoria de permissão não encontrada.', 404, 'CATEGORIA_NAO_ENCONTRADA');
+                }
+
+                if (categoriaAtual.atualizadoEm.getTime() !== atualizadoEm.getTime()) {
+                    throw criarErro(
+                        'A categoria foi alterada em outra operação. Atualize os dados e tente novamente.',
+                        409,
+                        'CONFLITO_EDICAO_CATEGORIA'
+                    );
+                }
+
+                const possuiAlteracao = categoriaAtual.nome !== nome
+                    || categoriaAtual.nomeNormalizado !== nomeNormalizado
+                    || !permissoesSaoIguais(categoriaAtual.conjuntoDadosVisiveis, permissoesOrdenadas);
+
+                if (!possuiAlteracao) {
+                    throw criarErro('Faça ao menos uma alteração antes de salvar.', 422, 'SEM_ALTERACOES');
+                }
+
+                const quantidadeContatos = categoriaAtual._count.vinculos;
+
+                if (quantidadeContatos > 0 && quantidadeContatosConfirmada !== quantidadeContatos) {
+                    const erro = criarErro(
+                        `Esta alteração afetará imediatamente ${quantidadeContatos} contato(s) vinculado(s) a esta categoria. Deseja continuar?`,
+                        409,
+                        'CONFIRMACAO_IMPACTO_NECESSARIA'
+                    );
+
+                    erro.quantidadeContatos = quantidadeContatos;
+                    throw erro;
+                }
+
+                const resultado = await transacao.categoriaPermissao.updateMany({
+                    where: {
+                        id: categoriaId,
+                        titularId,
+                        atualizadoEm
+                    },
+                    data: {
+                        nome,
+                        nomeNormalizado,
+                        conjuntoDadosVisiveis: permissoesOrdenadas
+                    }
+                });
+
+                if (resultado.count !== 1) {
+                    throw criarErro(
+                        'A categoria foi alterada em outra operação. Atualize os dados e tente novamente.',
+                        409,
+                        'CONFLITO_EDICAO_CATEGORIA'
+                    );
+                }
+
+                const categoriaAtualizada = await transacao.categoriaPermissao.findFirst({
+                    where: {
+                        id: categoriaId,
+                        titularId
+                    },
+                    select: {
+                        id: true,
+                        nome: true,
+                        conjuntoDadosVisiveis: true,
+                        criadoEm: true,
+                        atualizadoEm: true,
+                        _count: {
+                            select: {
+                                vinculos: {
+                                    where: {
+                                        status: 'ativo'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (!categoriaAtualizada) {
+                    throw criarErro(
+                        'A categoria foi alterada em outra operação. Atualize os dados e tente novamente.',
+                        409,
+                        'CONFLITO_EDICAO_CATEGORIA'
+                    );
+                }
+
+                return formatarCategoria(categoriaAtualizada);
+            });
+        } catch (erro) {
+            if (erro.code === 'P2002') {
+                throw criarErro(
+                    'Você já tem uma categoria com esse nome.',
+                    409,
+                    'CATEGORIA_NOME_DUPLICADO'
+                );
+            }
+
+            throw erro;
+        }
+    }
+
     return {
         criarCategoria,
-        listarCategorias
+        listarCategorias,
+        editarCategoria
     };
 }
 

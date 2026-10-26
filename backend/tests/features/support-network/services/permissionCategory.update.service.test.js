@@ -1,0 +1,91 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+
+import {criarPermissionCategoryService} from '../../../../src/features/support-network/services/permissionCategory.service.js'
+
+const criadoEm = new Date('2026-10-01T10:00:00.000Z')
+const atualizadoEm = new Date('2026-10-26T12:00:00.000Z')
+const novoAtualizadoEm = new Date('2026-10-26T13:00:00.000Z')
+
+function criarPedidoEdicao(alteracoes = {}) {
+    return {
+        titularId: 7,
+        papel: 'principal',
+        categoriaId: 12,
+        nome: 'Namorado',
+        dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+        atualizadoEm,
+        quantidadeContatosConfirmada: null,
+        ...alteracoes
+    }
+}
+
+function criarPrismaEdicaoMock({quantidadeContatos = 0} = {}) {
+    const chamadas = []
+    const categoriaAtual = {
+        id: 12,
+        nome: 'Parceiro(a)',
+        nomeNormalizado: 'parceiro(a)',
+        conjuntoDadosVisiveis: ['geral.fase_atual'],
+        criadoEm,
+        atualizadoEm,
+        _count: {
+            vinculos: quantidadeContatos
+        }
+    }
+    const categoriaAtualizada = {
+        ...categoriaAtual,
+        nome: 'Namorado',
+        nomeNormalizado: 'namorado',
+        conjuntoDadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+        atualizadoEm: novoAtualizadoEm
+    }
+    let consultas = 0
+
+    const transacao = {
+        categoriaPermissao: {
+            async findFirst(argumentos) {
+                chamadas.push({operacao: 'findFirst', argumentos})
+                consultas += 1
+                return consultas === 1 ? categoriaAtual : categoriaAtualizada
+            },
+            async updateMany(argumentos) {
+                chamadas.push({operacao: 'updateMany', argumentos})
+                return {count: 1}
+            }
+        }
+    }
+
+    return {
+        chamadas,
+        prisma: {
+            async $transaction(operacao) {
+                chamadas.push({operacao: 'transaction'})
+                return operacao(transacao)
+            }
+        }
+    }
+}
+
+test('atualiza diretamente uma categoria sem contatos vinculados', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    const categoria = await service.editarCategoria(criarPedidoEdicao())
+
+    const atualizacao = chamadas.find(chamada => chamada.operacao === 'updateMany')
+
+    assert.deepEqual(atualizacao.argumentos.data, {
+        nome: 'Namorado',
+        nomeNormalizado: 'namorado',
+        conjuntoDadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais']
+    })
+    assert.deepEqual(categoria, {
+        id: 12,
+        nome: 'Namorado',
+        dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+        quantidadeContatos: 0,
+        criadoEm,
+        atualizadoEm: novoAtualizadoEm
+    })
+})
