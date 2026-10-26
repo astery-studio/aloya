@@ -105,4 +105,15 @@ test('consulta somente contatos ativos da categoria pertencente à titular', asy
     });
 });
 
+test('não revela categoria inexistente ou pertencente a outra titular', async () => {
+    const { prisma } = criarPrisma({ categoriaImpacto: null });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(() => service.consultarImpacto(criarPedido()), {
+        status: 404,
+        codigo: 'CATEGORIA_NAO_ENCONTRADA',
+        message: 'Categoria de permissão não encontrada.'
+    });
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
