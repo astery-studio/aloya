@@ -20,7 +20,8 @@ function criarPrisma({
     categoriaImpacto = criarCategoria(),
     categoriaExclusao = criarCategoria(),
     quantidadeCategoriasExcluidas = 1,
-    quantidadeVinculosAtualizados
+    quantidadeVinculosAtualizados,
+    erroTransacao
 } = {}) {
     const chamadas = [];
     const transacao = {
@@ -57,6 +58,11 @@ function criarPrisma({
         },
         async $transaction(operacao) {
             chamadas.push(['transaction']);
+
+            if (erroTransacao) {
+                throw erroTransacao;
+            }
+
             return operacao(transacao);
         }
     };
@@ -362,6 +368,21 @@ test('interrompe a transação quando um vínculo ativo muda durante a exclusão
         }
     );
     assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+});
+
+test('converte conflito de chave estrangeira em impacto desatualizado', async () => {
+    const erroTransacao = Object.assign(new Error('foreign key constraint'), {
+        code: 'P2003'
+    });
+    const { prisma } = criarPrisma({ erroTransacao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(() => service.excluirCategoria(criarPedido()), {
+        status: 409,
+        codigo: 'IMPACTO_EXCLUSAO_ALTERADO',
+        message:
+            'Os contatos vinculados à categoria foram alterados. Revise as escolhas e tente novamente.'
+    });
 });
 
 export { criarCategoria, criarPedido, criarPrisma };
