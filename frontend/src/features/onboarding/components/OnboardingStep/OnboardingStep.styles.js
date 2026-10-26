@@ -26,6 +26,11 @@ const estilos = StyleSheet.create({
         gap: 12,
         maxWidth: 304
     },
+    textosFixos: {
+        alignSelf: 'center',
+        marginTop: espacamentos.extraGrande,
+        paddingHorizontal: espacamentos.pequeno
+    },
     titulo: {
         ...typography.h1,
         color: cores.neutras.textoPrincipalClaro,

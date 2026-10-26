@@ -1,7 +1,7 @@
 /**
  * Testes de apresentação e interação dos componentes do onboarding.
  */
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, within } from '@testing-library/react-native';
 import BirthDateStep from '../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
 import CycleLengthStep from '../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
 import LastMenstruationStep from '../../src/features/onboarding/components/LastMenstruationStep/LastMenstruationStep';
@@ -66,6 +66,12 @@ test('última menstruação seleciona o intervalo no calendário próprio', asyn
     const { rerender } = await render(<LastMenstruationStep
         valor={{ inicio: '2026-08-03', fim: null }} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoNaoSei={aoNaoSei} />);
+    expect(screen.getByTestId('onboarding-step-fixed-texts')).toHaveStyle({
+        marginTop: 32
+    });
+    expect(within(screen.getByTestId('form-layout-header')).getByTestId(
+        'onboarding-step-fixed-texts'
+    )).toBeTruthy();
     fireEvent.press(screen.getByLabelText('Selecionar dia 7'));
     expect(aoAlterar).toHaveBeenCalledWith({
         inicio: '2026-08-03', fim: '2026-08-07'

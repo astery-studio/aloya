@@ -12,8 +12,16 @@ import { estilos } from './OnboardingStep.styles';
 export default function OnboardingStep({
     etapa, titulo, descricao, children, aoVoltar, aoPular,
     aoAvancar, podeAvancar = true, carregando = false, erro,
-    acaoSecundaria
+    acaoSecundaria, cabecalhoFixo = false
 }) {
+    const textos = <View testID={cabecalhoFixo
+        ? 'onboarding-step-fixed-texts'
+        : 'onboarding-step-texts'}
+        style={[estilos.textos, cabecalhoFixo && estilos.textosFixos]}>
+        <Text style={estilos.titulo}>{titulo}</Text>
+        <Text style={estilos.descricao}>{descricao}</Text>
+    </View>;
+
     const cabecalho = <>
         <View style={estilos.navegacao}>
             <Pressable accessibilityLabel="Voltar" onPress={aoVoltar} hitSlop={12}
@@ -26,6 +34,7 @@ export default function OnboardingStep({
             </Pressable> : null}
         </View>
         <OnboardingProgress etapaAtual={etapa} />
+        {cabecalhoFixo ? textos : null}
     </>;
 
     return (
@@ -40,10 +49,7 @@ export default function OnboardingStep({
             </View>
         }>
             <View style={estilos.conteudo}>
-                <View style={estilos.textos}>
-                    <Text style={estilos.titulo}>{titulo}</Text>
-                    <Text style={estilos.descricao}>{descricao}</Text>
-                </View>
+                {!cabecalhoFixo ? textos : null}
                 <View style={estilos.campo}>
                     {children}
                     {erro ? <Text accessibilityRole="alert" style={estilos.erro}>{erro}</Text> : null}
