@@ -506,3 +506,113 @@ test('lista categorias da titular em ordem alfabética e conta somente vínculos
         });
     }
 });
+
+test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos', async () => {
+    const {banco, caminhoBanco, diretorio} = criarBancoTemporario();
+
+    executarMigrationNormalizacao(banco);
+    banco.close();
+
+    const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
+    const adapter = new PrismaBetterSqlite3({url: urlBanco});
+    const prisma = new PrismaClient({adapter});
+    const categoriaPreparada = await prisma.categoriaPermissao.create({
+        data: {
+            titularId: 1,
+            nome: 'Família Próxima',
+            nomeNormalizado: 'família próxima',
+            conjuntoDadosVisiveis: ['geral.fase_atual']
+        }
+    });
+    const vinculoPreparado = await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            emailConvidado: 'contato@example.com',
+            categoriaId: categoriaPreparada.id,
+            status: 'pendente'
+        }
+    });
+    const permissionCategoryService = criarPermissionCategoryService({prisma});
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService,
+        permissionCategoryValidator: criarPermissionCategoryValidator()
+    });
+    const app = express();
+
+    app.use(express.json());
+    app.use(
+        '/support-network',
+        criarPermissionCategoryRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, _res, next) {
+                    req.usuario = {id: 1, papel: 'principal'};
+                    next();
+                }
+            },
+            parentalConsentMiddleware: {
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
+            },
+            permissionCategoryRateLimit(_req, _res, next) {
+                next();
+            },
+            permissionCategoryUpdateRateLimit(_req, _res, next) {
+                next();
+            },
+            permissionCategoryController
+        })
+    );
+    app.use(tratarErros);
+
+    const servidor = app.listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const endereco = servidor.address();
+        const resposta = await fetch(
+            `http://127.0.0.1:${endereco.port}/support-network/permission-categories/${categoriaPreparada.id}`,
+            {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    nome: 'Namorado',
+                    dadosVisiveis: [
+                        'geral.fase_atual',
+                        'emocional.sintomas_emocionais'
+                    ],
+                    atualizadoEm: categoriaPreparada.atualizadoEm.toISOString()
+                })
+            }
+        );
+        const corpo = await resposta.json();
+
+        assert.equal(resposta.status, 200, JSON.stringify(corpo));
+        assert.equal(corpo.mensagem, 'Categoria atualizada com sucesso.');
+        assert.equal(corpo.categoria.nome, 'Namorado');
+        assert.equal(corpo.categoria.quantidadeContatos, 0);
+        assert.deepEqual(corpo.categoria.dadosVisiveis, [
+            'geral.fase_atual',
+            'emocional.sintomas_emocionais'
+        ]);
+
+        const categoria = await prisma.categoriaPermissao.findUnique({
+            where: {id: categoriaPreparada.id}
+        });
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({
+            where: {id: vinculoPreparado.id}
+        });
+
+        assert.equal(categoria.nome, 'Namorado');
+        assert.equal(categoria.nomeNormalizado, 'namorado');
+        assert.equal(vinculo.categoriaId, categoriaPreparada.id);
+        assert.equal(vinculo.status, 'pendente');
+    } finally {
+        await prisma.$disconnect();
+        await new Promise((resolve, reject) => {
+            servidor.close(erro => erro ? reject(erro) : resolve());
+        });
+        rmSync(diretorio, {recursive: true, force: true});
+    }
+});
