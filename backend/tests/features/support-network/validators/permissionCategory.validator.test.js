@@ -121,6 +121,17 @@ test('rejeita confirmação de impacto negativa, fracionária ou textual', () =>
     }
 })
 
+test('reaplica a mensagem de nome obrigatório durante a edição', () => {
+    const resultado = validator.validarEdicaoCategoria({
+        nome: '   ',
+        dadosVisiveis: ['geral.fase_atual'],
+        atualizadoEm: '2026-10-26T12:00:00.000Z'
+    })
+
+    assert.equal(resultado.valido, false)
+    assert.equal(resultado.erros.some(erro => erro.mensagem === 'Dê um nome para a categoria.'), true)
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',
