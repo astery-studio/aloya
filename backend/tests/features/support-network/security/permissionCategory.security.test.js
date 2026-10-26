@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 
 import { criarPermissionCategoryValidator } from '../../../../src/features/support-network/validators/permissionCategory.validator.js';
 import { criarPermissionCategoryController } from '../../../../src/features/support-network/controllers/permissionCategory.controller.js';
+import { criarPermissionCategoryDeletionController } from '../../../../src/features/support-network/controllers/permissionCategoryDeletion.controller.js';
+import { criarPermissionCategoryDeletionValidator } from '../../../../src/features/support-network/validators/permissionCategoryDeletion.validator.js';
 import { criarParentalConsentMiddleware } from '../../../../src/shared/middleware/parentalConsent.middleware.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
@@ -335,4 +337,52 @@ test('não expõe dados do formulário nem do banco quando a atualização falha
     assert.equal(resposta.includes('vida_intima'), false);
     assert.equal(resposta.includes('SQLITE_BUSY'), false);
     assert.equal(resposta.includes('privados.db'), false);
+});
+
+test('não expõe decisões, outra titular ou detalhes do banco ao excluir', async () => {
+    let parametrosRecebidos;
+    const controller = criarPermissionCategoryDeletionController({
+        permissionCategoryValidator: validator,
+        permissionCategoryDeletionValidator: criarPermissionCategoryDeletionValidator(),
+        permissionCategoryDeletionService: {
+            async excluirCategoria(parametros) {
+                parametrosRecebidos = parametros;
+                throw new Error('SQLITE_BUSY: C:\\dados\\rede-apoio.db');
+            }
+        }
+    });
+    const req = {
+        params: { id: '12' },
+        query: { titularId: '999' },
+        body: {
+            atualizadoEm: '2026-10-26T12:00:00.000Z',
+            decisoes: [{ vinculoId: 20, acao: 'remover_acesso' }]
+        },
+        usuario: { id: 7, papel: 'principal' }
+    };
+    const res = criarRespostaMock();
+    const consoleErrorOriginal = console.error;
+
+    console.error = () => {};
+    try {
+        await controller.excluirCategoria(req, res, (erro) =>
+            tratarErros(erro, req, res, () => {})
+        );
+    } finally {
+        console.error = consoleErrorOriginal;
+    }
+
+    assert.equal(parametrosRecebidos.titularId, 7);
+    assert.equal(res.statusCode, 500);
+    assert.equal(
+        res.body.erro.mensagem,
+        'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
+    );
+
+    const resposta = JSON.stringify(res.body);
+    assert.equal(resposta.includes('999'), false);
+    assert.equal(resposta.includes('remover_acesso'), false);
+    assert.equal(resposta.includes('vinculoId'), false);
+    assert.equal(resposta.includes('SQLITE_BUSY'), false);
+    assert.equal(resposta.includes('rede-apoio.db'), false);
 });
