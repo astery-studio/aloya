@@ -97,6 +97,17 @@ test('rejeita versão ausente, inválida ou não canônica na edição', () => {
     }
 })
 
+test('aceita a quantidade exata de contatos confirmada pela titular', () => {
+    const resultado = validator.validarEdicaoCategoria({
+        ...criarBodyValido(),
+        atualizadoEm: '2026-10-26T12:00:00.000Z',
+        quantidadeContatosConfirmada: 3
+    })
+
+    assert.equal(resultado.valido, true)
+    assert.equal(resultado.dados.quantidadeContatosConfirmada, 3)
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',
