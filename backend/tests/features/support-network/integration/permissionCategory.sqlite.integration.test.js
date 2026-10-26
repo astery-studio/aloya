@@ -616,3 +616,116 @@ test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos'
         rmSync(diretorio, {recursive: true, force: true});
     }
 });
+
+test('exige confirmação e propaga a atualização para vínculo ativo', async () => {
+    const {banco, caminhoBanco, diretorio} = criarBancoTemporario();
+
+    executarMigrationNormalizacao(banco);
+    banco.close();
+
+    const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({url: urlBanco})
+    });
+    const categoriaPreparada = await prisma.categoriaPermissao.create({
+        data: {
+            titularId: 1,
+            nome: 'Parceiro(a)',
+            nomeNormalizado: 'parceiro(a)',
+            conjuntoDadosVisiveis: ['geral.fase_atual']
+        }
+    });
+    const vinculoPreparado = await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            emailConvidado: 'ativo@example.com',
+            categoriaId: categoriaPreparada.id,
+            status: 'ativo'
+        }
+    });
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService: criarPermissionCategoryService({prisma}),
+        permissionCategoryValidator: criarPermissionCategoryValidator()
+    });
+    const app = express();
+
+    app.use(express.json());
+    app.use('/support-network', criarPermissionCategoryRoutes({
+        Router: express.Router,
+        authMiddleware: {
+            autenticar(req, _res, next) {
+                req.usuario = {id: 1, papel: 'principal'};
+                next();
+            }
+        },
+        parentalConsentMiddleware: {
+            exigirAcessoRedeApoio(_req, _res, next) {
+                next();
+            }
+        },
+        permissionCategoryRateLimit(_req, _res, next) {
+            next();
+        },
+        permissionCategoryUpdateRateLimit(_req, _res, next) {
+            next();
+        },
+        permissionCategoryController
+    }));
+    app.use(tratarErros);
+
+    const servidor = app.listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const endereco = servidor.address();
+        const url = `http://127.0.0.1:${endereco.port}/support-network/permission-categories/${categoriaPreparada.id}`;
+        const dados = {
+            nome: 'Namorado',
+            dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+            atualizadoEm: categoriaPreparada.atualizadoEm.toISOString()
+        };
+        const primeiraResposta = await fetch(url, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        });
+        const primeiroCorpo = await primeiraResposta.json();
+
+        assert.equal(primeiraResposta.status, 409);
+        assert.equal(primeiroCorpo.erro.codigo, 'CONFIRMACAO_IMPACTO_NECESSARIA');
+        assert.equal(primeiroCorpo.erro.detalhes.quantidadeContatos, 1);
+
+        const categoriaAntesDaConfirmacao = await prisma.categoriaPermissao.findUnique({
+            where: {id: categoriaPreparada.id}
+        });
+        assert.equal(categoriaAntesDaConfirmacao.nome, 'Parceiro(a)');
+
+        const respostaConfirmada = await fetch(url, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({...dados, quantidadeContatosConfirmada: 1})
+        });
+        const corpoConfirmado = await respostaConfirmada.json();
+
+        assert.equal(respostaConfirmada.status, 200, JSON.stringify(corpoConfirmado));
+        assert.equal(corpoConfirmado.categoria.nome, 'Namorado');
+        assert.equal(corpoConfirmado.categoria.quantidadeContatos, 1);
+
+        const vinculoDepois = await prisma.vinculoRedeApoio.findUnique({
+            where: {id: vinculoPreparado.id},
+            include: {categoria: true}
+        });
+        assert.equal(vinculoDepois.status, 'ativo');
+        assert.equal(vinculoDepois.categoria.nome, 'Namorado');
+        assert.deepEqual(vinculoDepois.categoria.conjuntoDadosVisiveis, [
+            'geral.fase_atual',
+            'emocional.sintomas_emocionais'
+        ]);
+    } finally {
+        await prisma.$disconnect();
+        await new Promise((resolve, reject) => {
+            servidor.close(erro => erro ? reject(erro) : resolve());
+        });
+        rmSync(diretorio, {recursive: true, force: true});
+    }
+});
