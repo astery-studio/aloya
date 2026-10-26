@@ -571,3 +571,35 @@ test('edita usando somente o id e o papel da sessão autenticada', async () => {
         quantidadeContatosConfirmada: null
     });
 });
+
+test('retorna 400 sem chamar o service quando o id da categoria é inválido', async () => {
+    let serviceChamado = false;
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                throw new TypeError('Identificador de categoria inválido.');
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria() {
+                serviceChamado = true;
+            }
+        }
+    });
+    const res = criarRespostaMock();
+
+    await controller.editarCategoria(
+        {params: {id: '../10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        res,
+        assert.fail
+    );
+
+    assert.equal(serviceChamado, false);
+    assert.equal(res.statusRecebido, 400);
+    assert.deepEqual(res.corpoRecebido, {
+        erro: {
+            codigo: 'ID_CATEGORIA_INVALIDO',
+            mensagem: 'Identificador de categoria inválido.'
+        }
+    });
+});
