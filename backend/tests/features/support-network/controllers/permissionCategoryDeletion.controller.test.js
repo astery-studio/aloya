@@ -119,4 +119,34 @@ test('rejeita exclusão sem decisões antes de chamar o serviço', async () => {
     );
 });
 
+test('exclui usando a sessão e devolve a confirmação exigida', async () => {
+    let argumentosRecebidos;
+    const resultado = {
+        categoriaId: 12,
+        quantidadeAcessosRemovidos: 0,
+        quantidadeAcessosMantidos: 0
+    };
+    const controller = criarController({
+        async excluirCategoria(argumentos) {
+            argumentosRecebidos = argumentos;
+            return resultado;
+        }
+    });
+    const res = criarResposta();
+
+    await controller.excluirCategoria(criarRequisicao(), res, assert.fail);
+
+    assert.deepEqual(argumentosRecebidos, {
+        titularId: 1,
+        papel: 'principal',
+        categoriaId: 12,
+        atualizadoEm: new Date('2026-10-26T12:00:00.000Z'),
+        decisoes: []
+    });
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.mensagem, 'Categoria excluída com sucesso.');
+    assert.deepEqual(res.body.resultado, resultado);
+    assert.equal(res.headers['cache-control'], 'no-store');
+});
+
 export { criarController, criarRequisicao, criarResposta };
