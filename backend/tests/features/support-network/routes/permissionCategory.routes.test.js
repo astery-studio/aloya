@@ -1,34 +1,25 @@
 //Testa se a criação de categorias utiliza todas as proteções na ordem correta.
-import test from 'node:test'
-import assert from 'node:assert/strict'
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-import { criarPermissionCategoryRoutes } from '../../../../src/features/support-network/routes/permissionCategory.routes.js'
+import { criarPermissionCategoryRoutes } from '../../../../src/features/support-network/routes/permissionCategory.routes.js';
 
 test('protege a criação com autenticação, consentimento e limite de requisições', () => {
-    const chamadas = []
+    const chamadas = [];
 
     const router = {
         use(...argumentos) {
-            chamadas.push([
-                'use',
-                ...argumentos
-            ])
+            chamadas.push(['use', ...argumentos]);
         },
 
         post(...argumentos) {
-            chamadas.push([
-                'post',
-                ...argumentos
-            ])
+            chamadas.push(['post', ...argumentos]);
         },
 
         get(...argumentos) {
-            chamadas.push([
-                'get',
-                ...argumentos
-            ])
+            chamadas.push(['get', ...argumentos]);
         }
-    }
+    };
 
     function autenticar() {}
     function exigirAcessoRedeApoio() {}
@@ -38,7 +29,7 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
 
     criarPermissionCategoryRoutes({
         Router() {
-            return router
+            return router;
         },
         authMiddleware: {
             autenticar
@@ -51,48 +42,33 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
             criarCategoria,
             listarCategorias
         }
-    })
+    });
 
     assert.deepEqual(chamadas, [
-        [
-            'use',
-            autenticar
-        ],
-        [
-            'use',
-            exigirAcessoRedeApoio
-        ],
-        [
-            'get',
-            '/permission-categories',
-            listarCategorias
-        ],
-        [
-            'post',
-            '/permission-categories',
-            limitarCriacao,
-            criarCategoria
-        ]
-    ])
-})
+        ['use', autenticar],
+        ['use', exigirAcessoRedeApoio],
+        ['get', '/permission-categories', listarCategorias],
+        ['post', '/permission-categories', limitarCriacao, criarCategoria]
+    ]);
+});
 
 test('registra as proteções antes do endpoint de criação', () => {
-    const ordem = []
+    const ordem = [];
 
     const router = {
         use(middleware) {
-            ordem.push(middleware.name)
+            ordem.push(middleware.name);
         },
 
         post(_caminho, limite, controller) {
-            ordem.push(limite.name)
-            ordem.push(controller.name)
+            ordem.push(limite.name);
+            ordem.push(controller.name);
         },
 
         get(_caminho, controller) {
-            ordem.push(controller.name)
+            ordem.push(controller.name);
         }
-    }
+    };
 
     function autenticar() {}
     function exigirAcessoRedeApoio() {}
@@ -113,7 +89,7 @@ test('registra as proteções antes do endpoint de criação', () => {
             criarCategoria,
             listarCategorias
         }
-    })
+    });
 
     assert.deepEqual(ordem, [
         'autenticar',
@@ -121,11 +97,11 @@ test('registra as proteções antes do endpoint de criação', () => {
         'listarCategorias',
         'limitarCriacao',
         'criarCategoria'
-    ])
-})
+    ]);
+});
 
 test('não aplica o limitador de criação à consulta da lista', () => {
-    const chamadasGet = []
+    const chamadasGet = [];
 
     function listarCategorias() {}
     function limitarCriacao() {}
@@ -134,7 +110,7 @@ test('não aplica o limitador de criação à consulta da lista', () => {
         Router: () => ({
             use() {},
             get(caminho, ...middlewares) {
-                chamadasGet.push([caminho, ...middlewares])
+                chamadasGet.push([caminho, ...middlewares]);
             },
             post() {}
         }),
@@ -149,13 +125,8 @@ test('não aplica o limitador de criação à consulta da lista', () => {
             criarCategoria() {},
             listarCategorias
         }
-    })
+    });
 
-    assert.deepEqual(chamadasGet, [
-        [
-            '/permission-categories',
-            listarCategorias
-        ]
-    ])
-    assert.equal(chamadasGet[0].includes(limitarCriacao), false)
-})
+    assert.deepEqual(chamadasGet, [['/permission-categories', listarCategorias]]);
+    assert.equal(chamadasGet[0].includes(limitarCriacao), false);
+});

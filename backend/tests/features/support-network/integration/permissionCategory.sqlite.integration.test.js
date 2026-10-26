@@ -1,69 +1,52 @@
-import test from 'node:test'
-import assert from 'node:assert/strict'
-import {
-    mkdtempSync,
-    readFileSync,
-    rmSync
-} from 'node:fs'
-import {tmpdir} from 'node:os'
-import {join} from 'node:path'
-import {fileURLToPath} from 'node:url'
-import {once} from 'node:events'
-import {DatabaseSync as Database} from 'node:sqlite'
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { once } from 'node:events';
+import { DatabaseSync as Database } from 'node:sqlite';
 
-import express from 'express'
-import {PrismaBetterSqlite3} from '@prisma/adapter-better-sqlite3'
-import prismaPackage from '@prisma/client'
+import express from 'express';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import prismaPackage from '@prisma/client';
 
-import {
-    criarPermissionCategoryRoutes
-} from '../../../../src/features/support-network/routes/permissionCategory.routes.js'
-import {
-    criarPermissionCategoryController
-} from '../../../../src/features/support-network/controllers/permissionCategory.controller.js'
-import {
-    criarPermissionCategoryService
-} from '../../../../src/features/support-network/services/permissionCategory.service.js'
-import {
-    criarPermissionCategoryValidator
-} from '../../../../src/features/support-network/validators/permissionCategory.validator.js'
-import {
-    tratarErros
-} from '../../../../src/shared/middleware/error.middleware.js'
+import { criarPermissionCategoryRoutes } from '../../../../src/features/support-network/routes/permissionCategory.routes.js';
+import { criarPermissionCategoryController } from '../../../../src/features/support-network/controllers/permissionCategory.controller.js';
+import { criarPermissionCategoryService } from '../../../../src/features/support-network/services/permissionCategory.service.js';
+import { criarPermissionCategoryValidator } from '../../../../src/features/support-network/validators/permissionCategory.validator.js';
+import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
-const {PrismaClient} = prismaPackage
+const { PrismaClient } = prismaPackage;
 
 const CAMINHO_MIGRATION_INICIAL = fileURLToPath(
     new URL(
         '../../../../prisma/migrations/20260913221156_estrutura_inicial/migration.sql',
         import.meta.url
     )
-)
+);
 
 const CAMINHO_MIGRATION_NORMALIZACAO = fileURLToPath(
     new URL(
         '../../../../prisma/migrations/20260925015114_normalizar_nome_categoria_permissao/migration.sql',
         import.meta.url
     )
-)
+);
 
 function criarBancoTemporario() {
-    const diretorio = mkdtempSync(
-        join(tmpdir(), 'aloya-categorias-')
-    )
-    const caminhoBanco = join(diretorio, 'teste.db')
-    const banco = new Database(caminhoBanco)
+    const diretorio = mkdtempSync(join(tmpdir(), 'aloya-categorias-'));
+    const caminhoBanco = join(diretorio, 'teste.db');
+    const banco = new Database(caminhoBanco);
 
-    banco.exec('PRAGMA foreign_keys = ON')
+    banco.exec('PRAGMA foreign_keys = ON');
 
-    const migrationInicial = readFileSync(
-        CAMINHO_MIGRATION_INICIAL,
-        'utf8'
-    )
+    const migrationInicial = readFileSync(CAMINHO_MIGRATION_INICIAL, 'utf8');
 
-    banco.exec(migrationInicial)
+    banco.exec(migrationInicial);
 
-    banco.prepare(`
+    banco
+        .prepare(
+            `
         INSERT INTO usuarios (
             id,
             nome,
@@ -86,17 +69,21 @@ function criarBancoTemporario() {
             CURRENT_TIMESTAMP,
             CURRENT_TIMESTAMP
         )
-    `).run()
+    `
+        )
+        .run();
 
     return {
         banco,
         caminhoBanco,
         diretorio
-    }
+    };
 }
 
 function inserirCategoriaExistente(banco) {
-    banco.prepare(`
+    banco
+        .prepare(
+            `
         INSERT INTO categorias_permissao (
             id,
             titular_id,
@@ -113,9 +100,13 @@ function inserirCategoriaExistente(banco) {
             '2026-09-20T10:00:00.000Z',
             '2026-09-21T11:00:00.000Z'
         )
-    `).run()
+    `
+        )
+        .run();
 
-    banco.prepare(`
+    banco
+        .prepare(
+            `
         INSERT INTO vinculos_rede_apoio (
             id,
             titular_id,
@@ -130,40 +121,36 @@ function inserirCategoriaExistente(banco) {
             10,
             CURRENT_TIMESTAMP
         )
-    `).run()
+    `
+        )
+        .run();
 }
 
 function executarMigrationNormalizacao(banco) {
-    const migration = readFileSync(
-        CAMINHO_MIGRATION_NORMALIZACAO,
-        'utf8'
-    )
+    const migration = readFileSync(CAMINHO_MIGRATION_NORMALIZACAO, 'utf8');
 
-    banco.exec(migration)
+    banco.exec(migration);
 }
 
 function removerBancoTemporario(banco, diretorio) {
-    banco.close()
+    banco.close();
 
     rmSync(diretorio, {
         recursive: true,
         force: true
-    })
+    });
 }
 
-test(
-    'preserva categorias e vínculos existentes ao normalizar os nomes',
-    () => {
-        const {
-            banco,
-            diretorio
-        } = criarBancoTemporario()
+test('preserva categorias e vínculos existentes ao normalizar os nomes', () => {
+    const { banco, diretorio } = criarBancoTemporario();
 
-        try {
-            inserirCategoriaExistente(banco)
-            executarMigrationNormalizacao(banco)
+    try {
+        inserirCategoriaExistente(banco);
+        executarMigrationNormalizacao(banco);
 
-            const categoria = banco.prepare(`
+        const categoria = banco
+            .prepare(
+                `
                 SELECT
                     id,
                     titular_id AS titularId,
@@ -174,223 +161,180 @@ test(
                     atualizado_em AS atualizadoEm
                 FROM categorias_permissao
                 WHERE id = 10
-            `).get()
-
-            assert.deepEqual(
-                {...categoria},
-                {
-                    id: 10,
-                    titularId: 1,
-                    nome: 'Família Próxima',
-                    nomeNormalizado: 'família próxima',
-                    dadosVisiveis: '["geral.fase_atual"]',
-                    criadoEm: '2026-09-20T10:00:00.000Z',
-                    atualizadoEm: '2026-09-21T11:00:00.000Z'
-                }
+            `
             )
+            .get();
 
-            const vinculo = banco.prepare(`
+        assert.deepEqual(
+            { ...categoria },
+            {
+                id: 10,
+                titularId: 1,
+                nome: 'Família Próxima',
+                nomeNormalizado: 'família próxima',
+                dadosVisiveis: '["geral.fase_atual"]',
+                criadoEm: '2026-09-20T10:00:00.000Z',
+                atualizadoEm: '2026-09-21T11:00:00.000Z'
+            }
+        );
+
+        const vinculo = banco
+            .prepare(
+                `
                 SELECT
                     id,
                     categoria_id AS categoriaId,
                     titular_id AS titularId
                 FROM vinculos_rede_apoio
                 WHERE id = 20
-            `).get()
-
-            assert.deepEqual(
-                {...vinculo},
-                {
-                    id: 20,
-                    categoriaId: 10,
-                    titularId: 1
-                }
+            `
             )
+            .get();
 
-            const problemasDeIntegridade = banco
-                .prepare('PRAGMA foreign_key_check')
-                .all()
+        assert.deepEqual(
+            { ...vinculo },
+            {
+                id: 20,
+                categoriaId: 10,
+                titularId: 1
+            }
+        );
 
-            assert.deepEqual(problemasDeIntegridade, [])
-        } finally {
-            removerBancoTemporario(banco, diretorio)
-        }
+        const problemasDeIntegridade = banco.prepare('PRAGMA foreign_key_check').all();
+
+        assert.deepEqual(problemasDeIntegridade, []);
+    } finally {
+        removerBancoTemporario(banco, diretorio);
     }
-)
+});
 
-test(
-    'cria uma categoria pelo endpoint usando SQLite real',
-    async () => {
-        const {
-            banco,
-            caminhoBanco,
-            diretorio
-        } = criarBancoTemporario()
+test('cria uma categoria pelo endpoint usando SQLite real', async () => {
+    const { banco, caminhoBanco, diretorio } = criarBancoTemporario();
 
-        executarMigrationNormalizacao(banco)
-        banco.close()
+    executarMigrationNormalizacao(banco);
+    banco.close();
 
-        const urlBanco =
-            `file:${caminhoBanco.replaceAll('\\', '/')}`
+    const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
 
-        const adapter = new PrismaBetterSqlite3({
-            url: urlBanco
-        })
+    const adapter = new PrismaBetterSqlite3({
+        url: urlBanco
+    });
 
-        const prisma = new PrismaClient({
-            adapter
-        })
+    const prisma = new PrismaClient({
+        adapter
+    });
 
-        const permissionCategoryService =
-            criarPermissionCategoryService({
-                prisma
-            })
+    const permissionCategoryService = criarPermissionCategoryService({
+        prisma
+    });
 
-        const permissionCategoryValidator =
-            criarPermissionCategoryValidator()
+    const permissionCategoryValidator = criarPermissionCategoryValidator();
 
-        const permissionCategoryController =
-            criarPermissionCategoryController({
-                permissionCategoryService,
-                permissionCategoryValidator
-            })
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService,
+        permissionCategoryValidator
+    });
 
-        const app = express()
+    const app = express();
 
-        app.use(express.json())
+    app.use(express.json());
 
-        app.use(
-            '/support-network',
-            criarPermissionCategoryRoutes({
-                Router: express.Router,
-                authMiddleware: {
-                    autenticar(req, _res, next) {
-                        req.usuario = {
-                            id: 1,
-                            papel: 'principal'
-                        }
+    app.use(
+        '/support-network',
+        criarPermissionCategoryRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, _res, next) {
+                    req.usuario = {
+                        id: 1,
+                        papel: 'principal'
+                    };
 
-                        next()
-                    }
-                },
-                parentalConsentMiddleware: {
-                    exigirAcessoRedeApoio(
-                        _req,
-                        _res,
-                        next
-                    ) {
-                        next()
-                    }
-                },
-                permissionCategoryRateLimit(
-                    _req,
-                    _res,
-                    next
-                ) {
-                    next()
-                },
-                permissionCategoryController
-            })
-        )
-
-        app.use(tratarErros)
-
-        const servidor = app.listen(
-            0,
-            '127.0.0.1'
-        )
-
-        try {
-            await once(servidor, 'listening')
-
-            const endereco = servidor.address()
-
-            const resposta = await fetch(
-                `http://127.0.0.1:${endereco.port}/support-network/permission-categories`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        nome: 'Profissionais de saúde',
-                        dadosVisiveis: [
-                            'geral.fase_atual',
-                            'saude.consultas'
-                        ]
-                    })
+                    next();
                 }
-            )
+            },
+            parentalConsentMiddleware: {
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
+            },
+            permissionCategoryRateLimit(_req, _res, next) {
+                next();
+            },
+            permissionCategoryController
+        })
+    );
 
-            const corpo = await resposta.json()
+    app.use(tratarErros);
 
-            assert.equal(resposta.status, 201)
-            assert.equal(
-                corpo.mensagem,
-                'Categoria criada com sucesso.'
-            )
-            assert.equal(
-                corpo.categoria.nome,
-                'Profissionais de saúde'
-            )
-            assert.deepEqual(
-                corpo.categoria.dadosVisiveis,
-                [
-                    'geral.fase_atual',
-                    'saude.consultas'
-                ]
-            )
+    const servidor = app.listen(0, '127.0.0.1');
 
-            const categoriaPersistida =
-                await prisma.categoriaPermissao.findUnique({
-                    where: {
-                        titularId_nomeNormalizado: {
-                            titularId: 1,
-                            nomeNormalizado:
-                                'profissionais de saúde'
-                        }
-                    }
+    try {
+        await once(servidor, 'listening');
+
+        const endereco = servidor.address();
+
+        const resposta = await fetch(
+            `http://127.0.0.1:${endereco.port}/support-network/permission-categories`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nome: 'Profissionais de saúde',
+                    dadosVisiveis: ['geral.fase_atual', 'saude.consultas']
                 })
+            }
+        );
 
-            assert.ok(categoriaPersistida)
-            assert.equal(
-                categoriaPersistida.nome,
-                'Profissionais de saúde'
-            )
-        } finally {
-            await prisma.$disconnect()
+        const corpo = await resposta.json();
 
-            await new Promise((resolve, reject) => {
-                servidor.close(erro => {
-                    if (erro) {
-                        reject(erro)
-                        return
-                    }
+        assert.equal(resposta.status, 201);
+        assert.equal(corpo.mensagem, 'Categoria criada com sucesso.');
+        assert.equal(corpo.categoria.nome, 'Profissionais de saúde');
+        assert.deepEqual(corpo.categoria.dadosVisiveis, ['geral.fase_atual', 'saude.consultas']);
 
-                    resolve()
-                })
-            })
+        const categoriaPersistida = await prisma.categoriaPermissao.findUnique({
+            where: {
+                titularId_nomeNormalizado: {
+                    titularId: 1,
+                    nomeNormalizado: 'profissionais de saúde'
+                }
+            }
+        });
 
-            rmSync(diretorio, {
-                recursive: true,
-                force: true
-            })
-        }
+        assert.ok(categoriaPersistida);
+        assert.equal(categoriaPersistida.nome, 'Profissionais de saúde');
+    } finally {
+        await prisma.$disconnect();
+
+        await new Promise((resolve, reject) => {
+            servidor.close((erro) => {
+                if (erro) {
+                    reject(erro);
+                    return;
+                }
+
+                resolve();
+            });
+        });
+
+        rmSync(diretorio, {
+            recursive: true,
+            force: true
+        });
     }
-)
+});
 
-test(
-    'lista categorias da titular em ordem alfabética e conta somente vínculos ativos',
-    async () => {
-        const {
-            banco,
-            caminhoBanco,
-            diretorio
-        } = criarBancoTemporario()
+test('lista categorias da titular em ordem alfabética e conta somente vínculos ativos', async () => {
+    const { banco, caminhoBanco, diretorio } = criarBancoTemporario();
 
-        executarMigrationNormalizacao(banco)
+    executarMigrationNormalizacao(banco);
 
-        banco.prepare(`
+    banco
+        .prepare(
+            `
             INSERT INTO usuarios (
                 id,
                 nome,
@@ -413,9 +357,11 @@ test(
                 CURRENT_TIMESTAMP,
                 CURRENT_TIMESTAMP
             )
-        `).run()
+        `
+        )
+        .run();
 
-        const inserirCategoria = banco.prepare(`
+    const inserirCategoria = banco.prepare(`
             INSERT INTO categorias_permissao (
                 id,
                 titular_id,
@@ -425,38 +371,20 @@ test(
                 atualizado_em
             )
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        `)
+        `);
 
-        inserirCategoria.run(
-            10,
-            1,
-            'Saúde',
-            'saúde',
-            '["saude.consultas"]'
-        )
-        inserirCategoria.run(
-            11,
-            1,
-            'Família 10',
-            'família 10',
-            '["geral.fase_atual","emocional.sintomas_emocionais"]'
-        )
-        inserirCategoria.run(
-            12,
-            1,
-            'Família 2',
-            'família 2',
-            '["geral.fase_atual"]'
-        )
-        inserirCategoria.run(
-            20,
-            2,
-            'Categoria privada',
-            'categoria privada',
-            '["geral.fase_atual"]'
-        )
+    inserirCategoria.run(10, 1, 'Saúde', 'saúde', '["saude.consultas"]');
+    inserirCategoria.run(
+        11,
+        1,
+        'Família 10',
+        'família 10',
+        '["geral.fase_atual","emocional.sintomas_emocionais"]'
+    );
+    inserirCategoria.run(12, 1, 'Família 2', 'família 2', '["geral.fase_atual"]');
+    inserirCategoria.run(20, 2, 'Categoria privada', 'categoria privada', '["geral.fase_atual"]');
 
-        const inserirVinculo = banco.prepare(`
+    const inserirVinculo = banco.prepare(`
             INSERT INTO vinculos_rede_apoio (
                 id,
                 titular_id,
@@ -466,119 +394,115 @@ test(
                 atualizado_em
             )
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        `)
+        `);
 
-        inserirVinculo.run(101, 1, 'ativo1@example.com', 10, 'ativo')
-        inserirVinculo.run(102, 1, 'ativo2@example.com', 10, 'ativo')
-        inserirVinculo.run(103, 1, 'pendente@example.com', 10, 'pendente')
-        inserirVinculo.run(104, 1, 'revogado@example.com', 10, 'revogado')
-        inserirVinculo.run(105, 1, 'familia10@example.com', 11, 'ativo')
-        inserirVinculo.run(201, 2, 'privado@example.com', 20, 'ativo')
+    inserirVinculo.run(101, 1, 'ativo1@example.com', 10, 'ativo');
+    inserirVinculo.run(102, 1, 'ativo2@example.com', 10, 'ativo');
+    inserirVinculo.run(103, 1, 'pendente@example.com', 10, 'pendente');
+    inserirVinculo.run(104, 1, 'revogado@example.com', 10, 'revogado');
+    inserirVinculo.run(105, 1, 'familia10@example.com', 11, 'ativo');
+    inserirVinculo.run(201, 2, 'privado@example.com', 20, 'ativo');
 
-        banco.close()
+    banco.close();
 
-        const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`
-        const adapter = new PrismaBetterSqlite3({url: urlBanco})
-        const prisma = new PrismaClient({adapter})
-        const permissionCategoryService = criarPermissionCategoryService({prisma})
-        const permissionCategoryController = criarPermissionCategoryController({
-            permissionCategoryService,
-            permissionCategoryValidator: criarPermissionCategoryValidator()
+    const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
+    const adapter = new PrismaBetterSqlite3({ url: urlBanco });
+    const prisma = new PrismaClient({ adapter });
+    const permissionCategoryService = criarPermissionCategoryService({ prisma });
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService,
+        permissionCategoryValidator: criarPermissionCategoryValidator()
+    });
+    const app = express();
+
+    app.use(express.json());
+    app.use(
+        '/support-network',
+        criarPermissionCategoryRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, _res, next) {
+                    req.usuario = { id: 1, papel: 'principal' };
+                    next();
+                }
+            },
+            parentalConsentMiddleware: {
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
+            },
+            permissionCategoryRateLimit(_req, _res, next) {
+                next();
+            },
+            permissionCategoryController
         })
-        const app = express()
+    );
+    app.use(tratarErros);
 
-        app.use(express.json())
-        app.use(
-            '/support-network',
-            criarPermissionCategoryRoutes({
-                Router: express.Router,
-                authMiddleware: {
-                    autenticar(req, _res, next) {
-                        req.usuario = {id: 1, papel: 'principal'}
-                        next()
-                    }
+    const servidor = app.listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+
+        const endereco = servidor.address();
+        const resposta = await fetch(
+            `http://127.0.0.1:${endereco.port}/support-network/permission-categories`
+        );
+        const corpo = await resposta.json();
+
+        assert.equal(resposta.status, 200);
+        assert.equal(resposta.headers.get('cache-control'), 'private, no-store');
+        assert.deepEqual(
+            corpo.categorias.map((categoria) => ({
+                id: categoria.id,
+                nome: categoria.nome,
+                dadosVisiveis: categoria.dadosVisiveis,
+                quantidadeContatos: categoria.quantidadeContatos
+            })),
+            [
+                {
+                    id: 12,
+                    nome: 'Família 2',
+                    dadosVisiveis: ['geral.fase_atual'],
+                    quantidadeContatos: 0
                 },
-                parentalConsentMiddleware: {
-                    exigirAcessoRedeApoio(_req, _res, next) {
-                        next()
-                    }
+                {
+                    id: 11,
+                    nome: 'Família 10',
+                    dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+                    quantidadeContatos: 1
                 },
-                permissionCategoryRateLimit(_req, _res, next) {
-                    next()
-                },
-                permissionCategoryController
-            })
-        )
-        app.use(tratarErros)
+                {
+                    id: 10,
+                    nome: 'Saúde',
+                    dadosVisiveis: ['saude.consultas'],
+                    quantidadeContatos: 2
+                }
+            ]
+        );
+        assert.equal(
+            corpo.categorias.some((categoria) => categoria.id === 20),
+            false
+        );
+        assert.equal('titularId' in corpo.categorias[0], false);
+        assert.equal('nomeNormalizado' in corpo.categorias[0], false);
+    } finally {
+        await prisma.$disconnect();
 
-        const servidor = app.listen(0, '127.0.0.1')
+        await new Promise((resolve, reject) => {
+            servidor.close((erro) => {
+                if (erro) {
+                    reject(erro);
+                    return;
+                }
 
-        try {
-            await once(servidor, 'listening')
+                resolve();
+            });
+        });
 
-            const endereco = servidor.address()
-            const resposta = await fetch(
-                `http://127.0.0.1:${endereco.port}/support-network/permission-categories`
-            )
-            const corpo = await resposta.json()
-
-            assert.equal(resposta.status, 200)
-            assert.equal(resposta.headers.get('cache-control'), 'private, no-store')
-            assert.deepEqual(
-                corpo.categorias.map(categoria => ({
-                    id: categoria.id,
-                    nome: categoria.nome,
-                    dadosVisiveis: categoria.dadosVisiveis,
-                    quantidadeContatos: categoria.quantidadeContatos
-                })),
-                [
-                    {
-                        id: 12,
-                        nome: 'Família 2',
-                        dadosVisiveis: ['geral.fase_atual'],
-                        quantidadeContatos: 0
-                    },
-                    {
-                        id: 11,
-                        nome: 'Família 10',
-                        dadosVisiveis: [
-                            'geral.fase_atual',
-                            'emocional.sintomas_emocionais'
-                        ],
-                        quantidadeContatos: 1
-                    },
-                    {
-                        id: 10,
-                        nome: 'Saúde',
-                        dadosVisiveis: ['saude.consultas'],
-                        quantidadeContatos: 2
-                    }
-                ]
-            )
-            assert.equal(
-                corpo.categorias.some(categoria => categoria.id === 20),
-                false
-            )
-            assert.equal('titularId' in corpo.categorias[0], false)
-            assert.equal('nomeNormalizado' in corpo.categorias[0], false)
-        } finally {
-            await prisma.$disconnect()
-
-            await new Promise((resolve, reject) => {
-                servidor.close(erro => {
-                    if (erro) {
-                        reject(erro)
-                        return
-                    }
-
-                    resolve()
-                })
-            })
-
-            rmSync(diretorio, {
-                recursive: true,
-                force: true
-            })
-        }
+        rmSync(diretorio, {
+            recursive: true,
+            force: true
+        });
     }
-)
+});
