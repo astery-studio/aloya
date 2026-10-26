@@ -265,3 +265,14 @@ test('converte nome duplicado em conflito público durante a edição', async ()
         }
     )
 })
+
+test('preserva falha desconhecida para o tratamento global seguro', async () => {
+    const erroBanco = new Error('SQLITE_BUSY: detalhe privado')
+    const {prisma} = criarPrismaEdicaoMock({erroAoAtualizar: erroBanco})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao()),
+        erro => erro === erroBanco
+    )
+})
