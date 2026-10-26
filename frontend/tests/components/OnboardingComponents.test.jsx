@@ -55,7 +55,7 @@ test('duração permite digitar o número sem alterar a unidade', async () => {
     const aoAlterar = jest.fn();
     await render(<CycleLengthStep valor={28} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
-    expect(screen.getByText('Dias')).toBeTruthy();
+    expect(screen.getByText('dias')).toBeTruthy();
     fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
     expect(aoAlterar).toHaveBeenCalledWith(30);
 });

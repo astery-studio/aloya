@@ -14,7 +14,7 @@ export default function DurationStep({
             aoVoltar={aoVoltar} aoAvancar={aoAvancar} aoPular={aoPular}
             podeAvancar={Number.isInteger(valor) && valor > 0}
             carregando={carregando} erro={erro}>
-            <NumberInput valor={valor} aoAlterar={aoAlterar} unidade="Dias" />
+            <NumberInput valor={valor} aoAlterar={aoAlterar} unidade="dias" />
         </OnboardingStep>
     );
 }
