@@ -168,6 +168,8 @@ app.use(
             container.parentalConsentMiddleware,
         permissionCategoryRateLimit:
             container.permissionCategoryRateLimit,
+        permissionCategoryUpdateRateLimit:
+            container.permissionCategoryUpdateRateLimit,
         permissionCategoryController:
             container.permissionCategoryController
     })

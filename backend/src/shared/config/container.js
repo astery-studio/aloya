@@ -119,6 +119,10 @@ import {
 } from '../../features/support-network/middleware/permissionCategoryRateLimit.middleware.js';
 
 import {
+    criarPermissionCategoryUpdateRateLimit
+} from '../../features/support-network/middleware/permissionCategoryUpdateRateLimit.middleware.js';
+
+import {
     criarAccountService
 } from '../../features/settings/services/account.service.js';
 
@@ -353,6 +357,15 @@ function criarContainer() {
                 env.configuracoesContaRateLimitMaximo
         });
 
+    const permissionCategoryUpdateRateLimit =
+        criarPermissionCategoryUpdateRateLimit({
+            rateLimit,
+            janelaMs:
+                env.configuracoesContaRateLimitJanelaMs,
+            limite:
+                env.configuracoesContaRateLimitMaximo
+        });
+
     const alteracaoSenhaRateLimit =
         criarAlteracaoSenhaRateLimit({
             rateLimit,
@@ -454,6 +467,7 @@ function criarContainer() {
         contaLoginRateLimit,
         configuracoesContaRateLimit,
         permissionCategoryRateLimit,
+        permissionCategoryUpdateRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
