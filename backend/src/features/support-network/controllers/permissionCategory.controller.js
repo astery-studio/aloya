@@ -71,9 +71,70 @@ function criarPermissionCategoryController({
         }
     }
 
+    //Atualiza a categoria identificada na rota usando somente a identidade autenticada.
+    async function editarCategoria(req, res, next) {
+        try {
+            let categoriaId
+
+            try {
+                categoriaId = permissionCategoryValidator.validarIdCategoria(req.params?.id)
+            } catch {
+                return res.status(400).json({
+                    erro: {
+                        codigo: 'ID_CATEGORIA_INVALIDO',
+                        mensagem: 'Identificador de categoria inválido.'
+                    }
+                })
+            }
+
+            const validacao = permissionCategoryValidator.validarEdicaoCategoria(req.body)
+
+            if (!validacao.valido) {
+                return responderErroValidacao(res, validacao)
+            }
+
+            const categoria = await permissionCategoryService.editarCategoria({
+                titularId: req.usuario.id,
+                papel: req.usuario.papel,
+                categoriaId,
+                nome: validacao.dados.nome,
+                dadosVisiveis: validacao.dados.dadosVisiveis,
+                atualizadoEm: validacao.dados.atualizadoEm,
+                quantidadeContatosConfirmada: validacao.dados.quantidadeContatosConfirmada
+            })
+
+            res.set('Cache-Control', 'no-store')
+
+            return res.status(200).json({
+                mensagem: 'Categoria atualizada com sucesso.',
+                categoria
+            })
+        } catch (erro) {
+            if (erro.codigo === 'CONFIRMACAO_IMPACTO_NECESSARIA') {
+                return res.status(409).json({
+                    erro: {
+                        codigo: erro.codigo,
+                        mensagem: erro.message,
+                        detalhes: {
+                            quantidadeContatos: erro.quantidadeContatos
+                        }
+                    }
+                })
+            }
+
+            if (!erro.status) {
+                erro.mensagemUsuario =
+                    'Ocorreu um erro ao atualizar sua categoria. Verifique sua conexão e tente novamente.'
+            }
+
+            return next(erro)
+        }
+    }
+
     return {
         criarCategoria,
-        listarCategorias
+        listarCategorias,
+        editarCategoria
     };
 }
 

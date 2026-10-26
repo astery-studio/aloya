@@ -56,6 +56,20 @@ function criarCategoriaCriada() {
     };
 }
 
+function criarValidacaoEdicaoValida() {
+    return {
+        valido: true,
+        erros: [],
+        dados: {
+            nome: 'Namorado',
+            nomeNormalizado: 'namorado',
+            dadosVisiveis: ['geral.fase_atual'],
+            atualizadoEm: new Date('2026-10-26T12:00:00.000Z'),
+            quantidadeContatosConfirmada: null
+        }
+    };
+}
+
 test('retorna 422 e não chama o service quando o nome está vazio', async () => {
     let serviceChamado = false;
 
@@ -476,4 +490,44 @@ test('preserva erros públicos controlados durante a listagem', async () => {
 
     assert.equal(erroRecebido, erroControlado);
     assert.equal(erroRecebido.mensagemUsuario, undefined);
+});
+
+test('atualiza categoria e devolve a mensagem do protótipo', async () => {
+    const categoria = {
+        ...criarCategoriaCriada(),
+        nome: 'Namorado'
+    };
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                return 10;
+            },
+            validarEdicaoCategoria() {
+                return criarValidacaoEdicaoValida();
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria() {
+                return categoria;
+            }
+        }
+    });
+    const res = criarRespostaMock();
+
+    await controller.editarCategoria(
+        {
+            params: {id: '10'},
+            body: {},
+            usuario: {id: 7, papel: 'principal'}
+        },
+        res,
+        assert.fail
+    );
+
+    assert.equal(res.statusRecebido, 200);
+    assert.equal(res.cabecalhos['Cache-Control'], 'no-store');
+    assert.deepEqual(res.corpoRecebido, {
+        mensagem: 'Categoria atualizada com sucesso.',
+        categoria
+    });
 });
