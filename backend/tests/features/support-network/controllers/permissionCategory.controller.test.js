@@ -681,3 +681,37 @@ test('retorna a quantidade necessária para montar o modal de impacto', async ()
         }
     });
 });
+
+test('define a mensagem amigável do protótipo para falha inesperada', async () => {
+    const erroInterno = new Error('SQLITE_BUSY: caminho privado');
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                return 10;
+            },
+            validarEdicaoCategoria() {
+                return criarValidacaoEdicaoValida();
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria() {
+                throw erroInterno;
+            }
+        }
+    });
+    let erroRecebido = null;
+
+    await controller.editarCategoria(
+        {params: {id: '10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        criarRespostaMock(),
+        erro => {
+            erroRecebido = erro;
+        }
+    );
+
+    assert.equal(erroRecebido, erroInterno);
+    assert.equal(
+        erroRecebido.mensagemUsuario,
+        'Ocorreu um erro ao atualizar sua categoria. Verifique sua conexão e tente novamente.'
+    );
+});
