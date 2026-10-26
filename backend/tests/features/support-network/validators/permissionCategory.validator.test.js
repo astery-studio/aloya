@@ -108,6 +108,19 @@ test('aceita a quantidade exata de contatos confirmada pela titular', () => {
     assert.equal(resultado.dados.quantidadeContatosConfirmada, 3)
 })
 
+test('rejeita confirmação de impacto negativa, fracionária ou textual', () => {
+    for (const quantidadeContatosConfirmada of [-1, 1.5, '3', null, Number.MAX_SAFE_INTEGER + 1]) {
+        const resultado = validator.validarEdicaoCategoria({
+            ...criarBodyValido(),
+            atualizadoEm: '2026-10-26T12:00:00.000Z',
+            quantidadeContatosConfirmada
+        })
+
+        assert.equal(resultado.valido, false)
+        assert.equal(resultado.erros.some(erro => erro.campo === 'quantidadeContatosConfirmada'), true)
+    }
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',
