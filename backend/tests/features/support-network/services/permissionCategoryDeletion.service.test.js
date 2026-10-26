@@ -284,4 +284,25 @@ test('aplica decisões mistas em lote antes de apagar a categoria', async () => 
     assert.equal(chamadas.at(-1)[0], 'categoria.deleteMany');
 });
 
+test('revoga convites e vínculos inativos restantes antes da exclusão', async () => {
+    const { prisma, chamadas } = criarPrisma();
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await service.excluirCategoria(criarPedido());
+
+    const atualizacao = chamadas.find(
+        ([nome, argumentos]) => nome === 'vinculo.updateMany' && argumentos.where?.NOT
+    )[1];
+
+    assert.deepEqual(atualizacao.where, {
+        titularId: 1,
+        categoriaId: 12,
+        NOT: { status: 'ativo' }
+    });
+    assert.equal(atualizacao.data.categoriaId, null);
+    assert.equal(atualizacao.data.status, 'revogado');
+    assert.equal(atualizacao.data.tokenConviteHash, null);
+    assert.deepEqual(atualizacao.data.permissoesIndividuais, []);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
