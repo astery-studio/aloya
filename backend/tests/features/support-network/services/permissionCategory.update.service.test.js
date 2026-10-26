@@ -288,3 +288,14 @@ test('propaga permissões pelo registro compartilhado sem recriar vínculos', as
         ['transaction', 'findFirst', 'updateMany', 'findFirst']
     )
 })
+
+test('permite edição pela titular que também é contato de apoio', async () => {
+    const {prisma} = criarPrismaEdicaoMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    const categoria = await service.editarCategoria(criarPedidoEdicao({
+        papel: 'principal_e_contato_apoio'
+    }))
+
+    assert.equal(categoria.id, 12)
+})
