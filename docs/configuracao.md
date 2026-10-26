@@ -5,9 +5,15 @@
 Para executar o projeto, instale:
 
 - Git;
-- Node.js;
+- Node.js 22.13 ou superior;
 - npm;
-- Expo Go, emulador Android ou simulador iOS, caso queira executar o aplicativo mobile.
+- development build do Aloya, emulador Android ou simulador iOS para executar
+  o aplicativo mobile.
+
+O frontend usa o Expo SDK 58. O Expo Go pode ser usado para verificações
+rápidas quando estiver na mesma versão do SDK, mas a development build é o
+ambiente recomendado porque mantém as dependências nativas sob controle do
+projeto.
 
 O backend utiliza SQLite. Não é necessário instalar um servidor de banco de dados separado.
 
@@ -291,6 +297,15 @@ O firewall precisa permitir o acesso à porta `3000`.
 
 ## 11. Executar o frontend
 
+Na primeira configuração de um aparelho Android, gere a development build:
+
+```bash
+npx eas-cli@latest build --platform android --profile development
+```
+
+Instale no aparelho o APK disponibilizado pelo EAS. Uma nova build é necessária
+somente quando dependências ou configurações nativas forem alteradas.
+
 Inicie o Expo:
 
 ```bash
@@ -302,6 +317,10 @@ Ou:
 ```bash
 npx expo start
 ```
+
+Como `expo-dev-client` faz parte do projeto, o servidor abrirá o Aloya na
+development build instalada, sem depender da versão do Expo Go publicada nas
+lojas.
 
 Comandos disponíveis:
 
