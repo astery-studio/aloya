@@ -15,6 +15,9 @@ import { criarPermissionCategoryRoutes } from '../../../../src/features/support-
 import { criarPermissionCategoryController } from '../../../../src/features/support-network/controllers/permissionCategory.controller.js';
 import { criarPermissionCategoryService } from '../../../../src/features/support-network/services/permissionCategory.service.js';
 import { criarPermissionCategoryValidator } from '../../../../src/features/support-network/validators/permissionCategory.validator.js';
+import { criarPermissionCategoryDeletionService } from '../../../../src/features/support-network/services/permissionCategoryDeletion.service.js';
+import { criarPermissionCategoryDeletionController } from '../../../../src/features/support-network/controllers/permissionCategoryDeletion.controller.js';
+import { criarPermissionCategoryDeletionValidator } from '../../../../src/features/support-network/validators/permissionCategoryDeletion.validator.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
 const { PrismaClient } = prismaPackage;
@@ -139,6 +142,49 @@ function removerBancoTemporario(banco, diretorio) {
         recursive: true,
         force: true
     });
+}
+
+function criarAppComExclusao(prisma) {
+    const permissionCategoryValidator = criarPermissionCategoryValidator();
+    const permissionCategoryDeletionController = criarPermissionCategoryDeletionController({
+        permissionCategoryDeletionService: criarPermissionCategoryDeletionService({ prisma }),
+        permissionCategoryDeletionValidator: criarPermissionCategoryDeletionValidator(),
+        permissionCategoryValidator
+    });
+    const app = express();
+
+    app.use(express.json());
+    app.use(
+        '/support-network',
+        criarPermissionCategoryRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, _res, next) {
+                    req.usuario = { id: 1, papel: 'principal' };
+                    next();
+                }
+            },
+            parentalConsentMiddleware: {
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
+            },
+            permissionCategoryRateLimit(_req, _res, next) {
+                next();
+            },
+            permissionCategoryDeletionRateLimit(_req, _res, next) {
+                next();
+            },
+            permissionCategoryController: criarPermissionCategoryController({
+                permissionCategoryService: criarPermissionCategoryService({ prisma }),
+                permissionCategoryValidator
+            }),
+            permissionCategoryDeletionController
+        })
+    );
+    app.use(tratarErros);
+
+    return app;
 }
 
 test('preserva categorias e vínculos existentes ao normalizar os nomes', () => {
@@ -721,6 +767,79 @@ test('exige confirmação e propaga a atualização para vínculo ativo', async 
             'geral.fase_atual',
             'emocional.sintomas_emocionais'
         ]);
+    } finally {
+        await prisma.$disconnect();
+        await new Promise((resolve, reject) => {
+            servidor.close((erro) => (erro ? reject(erro) : resolve()));
+        });
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
+
+test('exclui categoria sem contatos ativos e revoga convite pendente', async () => {
+    const { banco, caminhoBanco, diretorio } = criarBancoTemporario();
+
+    executarMigrationNormalizacao(banco);
+    banco.close();
+
+    const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({ url: urlBanco })
+    });
+    const categoria = await prisma.categoriaPermissao.create({
+        data: {
+            titularId: 1,
+            nome: 'Temporária',
+            nomeNormalizado: 'temporária',
+            conjuntoDadosVisiveis: ['geral.fase_atual']
+        }
+    });
+    const convite = await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            emailConvidado: 'pendente@example.com',
+            categoriaId: categoria.id,
+            status: 'pendente',
+            tokenConviteHash: 'hash-pendente'
+        }
+    });
+    const servidor = criarAppComExclusao(prisma).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const endereco = servidor.address();
+        const baseUrl = `http://127.0.0.1:${endereco.port}/support-network/permission-categories/${categoria.id}`;
+        const impacto = await fetch(`${baseUrl}/deletion-impact`);
+        const corpoImpacto = await impacto.json();
+
+        assert.equal(impacto.status, 200);
+        assert.equal(corpoImpacto.quantidadeContatos, 0);
+        assert.deepEqual(corpoImpacto.contatos, []);
+
+        const resposta = await fetch(baseUrl, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                atualizadoEm: categoria.atualizadoEm.toISOString(),
+                decisoes: []
+            })
+        });
+        const corpo = await resposta.json();
+
+        assert.equal(resposta.status, 200, JSON.stringify(corpo));
+        assert.equal(corpo.mensagem, 'Categoria excluída com sucesso.');
+        assert.equal(
+            await prisma.categoriaPermissao.findUnique({ where: { id: categoria.id } }),
+            null
+        );
+
+        const conviteDepois = await prisma.vinculoRedeApoio.findUnique({
+            where: { id: convite.id }
+        });
+
+        assert.equal(conviteDepois.categoriaId, null);
+        assert.equal(conviteDepois.status, 'revogado');
+        assert.equal(conviteDepois.tokenConviteHash, null);
     } finally {
         await prisma.$disconnect();
         await new Promise((resolve, reject) => {
