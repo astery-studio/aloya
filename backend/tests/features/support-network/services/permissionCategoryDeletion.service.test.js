@@ -199,4 +199,33 @@ test('rejeita decisão referente a vínculo que não pertence mais à categoria'
     );
 });
 
+test('revoga imediatamente o acesso escolhido para remoção', async () => {
+    const categoriaExclusao = criarCategoria({ vinculos: [{ id: 20 }] });
+    const { prisma, chamadas } = criarPrisma({ categoriaExclusao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    const resultado = await service.excluirCategoria(
+        criarPedido({
+            decisoes: [{ vinculoId: 20, acao: 'remover_acesso' }]
+        })
+    );
+
+    const atualizacao = chamadas.find(
+        ([nome, argumentos]) => nome === 'vinculo.updateMany' && argumentos.where?.id
+    )[1];
+
+    assert.deepEqual(atualizacao.where, {
+        id: { in: [20] },
+        titularId: 1,
+        categoriaId: 12,
+        status: 'ativo'
+    });
+    assert.equal(atualizacao.data.categoriaId, null);
+    assert.deepEqual(atualizacao.data.permissoesIndividuais, []);
+    assert.equal(atualizacao.data.status, 'revogado');
+    assert.equal(atualizacao.data.tokenConviteHash, null);
+    assert.equal(atualizacao.data.dataResposta instanceof Date, true);
+    assert.equal(resultado.quantidadeAcessosRemovidos, 1);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
