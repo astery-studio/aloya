@@ -396,4 +396,23 @@ test('preserva falha interna para permitir resposta pública segura', async () =
     );
 });
 
+test('valida id, versão e decisões antes de iniciar a transação', async () => {
+    const { prisma, chamadas } = criarPrisma();
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(
+        () => service.excluirCategoria(criarPedido({ categoriaId: 0 })),
+        { codigo: 'ID_CATEGORIA_INVALIDO' }
+    );
+    await assert.rejects(
+        () => service.excluirCategoria(criarPedido({ atualizadoEm: null })),
+        { codigo: 'VERSAO_CATEGORIA_INVALIDA' }
+    );
+    await assert.rejects(
+        () => service.excluirCategoria(criarPedido({ decisoes: null })),
+        { codigo: 'DECISOES_CONTATOS_OBRIGATORIAS' }
+    );
+    assert.equal(chamadas.includes('transaction'), false);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
