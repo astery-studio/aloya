@@ -24,6 +24,21 @@ test('o catálogo possui 29 permissões únicas', () => {
     assert.equal(Object.isFrozen(permissoesDaCategoria), true)
 })
 
+test('aceita somente identificadores positivos e seguros na edição', () => {
+    assert.equal(validator.validarIdCategoria('1'), 1)
+    assert.equal(validator.validarIdCategoria(42), 42)
+
+    for (const id of [undefined, null, '', '0', '-1', '1.5', '01', 'abc', Number.MAX_SAFE_INTEGER + 1]) {
+        assert.throws(
+            () => validator.validarIdCategoria(id),
+            {
+                name: 'TypeError',
+                message: 'Identificador de categoria inválido.'
+            }
+        )
+    }
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',

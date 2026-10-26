@@ -2,6 +2,7 @@
 import { ordenarPermissoesCategoria, permissaoCategoriaEhValida, permissoesDaCategoria } from '../constants/permissionCategory.constants.js'
 
 const TAMANHO_MAXIMO_NOME = 80
+const FORMATO_ID = /^[1-9]\d*$/u
 const CAMPOS_PERMITIDOS = Object.freeze(['nome', 'dadosVisiveis'])
 
 //Cria um erro de validação associado ao campo que precisa ser corrigido.
@@ -28,6 +29,23 @@ function normalizarNome(nome) {
 //Gera a versão usada exclusivamente para comparar nomes sem diferenciar maiúsculas e minúsculas.
 function criarNomeNormalizado(nome) {
     return nome.toLocaleLowerCase('pt-BR')
+}
+
+//Converte o parâmetro da rota em um identificador inteiro positivo seguro.
+function validarIdCategoria(idRecebido) {
+    const idTexto = typeof idRecebido === 'number' ? String(idRecebido) : idRecebido
+
+    if (typeof idTexto !== 'string' || !FORMATO_ID.test(idTexto)) {
+        throw new TypeError('Identificador de categoria inválido.')
+    }
+
+    const id = Number(idTexto)
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+        throw new TypeError('Identificador de categoria inválido.')
+    }
+
+    return id
 }
 
 //Valida o nome da categoria e devolve suas versões segura e normalizada.
@@ -121,8 +139,9 @@ function validarCriacaoCategoria(body) {
 
 function criarPermissionCategoryValidator() {
     return {
-        validarCriacaoCategoria
+        validarCriacaoCategoria,
+        validarIdCategoria
     }
 }
 
-export { criarPermissionCategoryValidator }
+export { criarPermissionCategoryValidator, validarIdCategoria }
