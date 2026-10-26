@@ -24,7 +24,8 @@ function criarPrismaEdicaoMock({
     quantidadeContatos = 0,
     categoriaEncontrada = true,
     versaoAtual = atualizadoEm,
-    quantidadeAtualizada = 1
+    quantidadeAtualizada = 1,
+    erroAoAtualizar = null
 } = {}) {
     const chamadas = []
     const categoriaAtual = {
@@ -58,6 +59,7 @@ function criarPrismaEdicaoMock({
             },
             async updateMany(argumentos) {
                 chamadas.push({operacao: 'updateMany', argumentos})
+                if (erroAoAtualizar) throw erroAoAtualizar
                 return {count: quantidadeAtualizada}
             }
         }
@@ -242,6 +244,23 @@ test('detecta concorrência ocorrida entre a leitura e a gravação', async () =
         erro => {
             assert.equal(erro.status, 409)
             assert.equal(erro.codigo, 'CONFLITO_EDICAO_CATEGORIA')
+            return true
+        }
+    )
+})
+
+test('converte nome duplicado em conflito público durante a edição', async () => {
+    const erroPrisma = new Error('Unique constraint failed')
+    erroPrisma.code = 'P2002'
+    const {prisma} = criarPrismaEdicaoMock({erroAoAtualizar: erroPrisma})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao()),
+        erro => {
+            assert.equal(erro.status, 409)
+            assert.equal(erro.codigo, 'CATEGORIA_NOME_DUPLICADO')
+            assert.equal(erro.message, 'Você já tem uma categoria com esse nome.')
             return true
         }
     )
