@@ -1,10 +1,15 @@
-//Cria categorias de permissão pertencentes exclusivamente à titular autenticada.
+//Gerencia categorias de permissão pertencentes exclusivamente à titular autenticada.
 import { ordenarPermissoesCategoria, permissaoCategoriaEhValida } from '../constants/permissionCategory.constants.js'
 
 const PAPEIS_TITULAR = Object.freeze([
     'principal',
     'principal_e_contato_apoio'
 ])
+
+const comparadorDeNomes = new Intl.Collator('pt-BR', {
+    numeric: true,
+    sensitivity: 'base'
+})
 
 //Cria um erro público controlado sem expor detalhes internos do banco.
 function criarErro(mensagem, status, codigo) {
@@ -59,6 +64,13 @@ function formatarCategoria(categoria) {
     }
 }
 
+//Garante ordem alfabética adequada ao português e resultado estável em nomes equivalentes.
+function compararCategorias(primeira, segunda) {
+    const resultado = comparadorDeNomes.compare(primeira.nome, segunda.nome)
+
+    return resultado !== 0 ? resultado : primeira.id - segunda.id
+}
+
 function criarPermissionCategoryService({prisma}) {
     //Cria uma categoria sem aceitar titularId ou quantidade de contatos vindos do cliente.
     async function criarCategoria({titularId, papel, nome, dadosVisiveis}) {
@@ -100,8 +112,56 @@ function criarPermissionCategoryService({prisma}) {
         }
     }
 
+    //Lista somente categorias da titular e conta apenas contatos com vínculo ativo.
+    async function listarCategorias({titularId, papel} = {}) {
+        validarTitular(titularId, papel)
+
+        if (typeof prisma?.categoriaPermissao?.findMany !== 'function') {
+            throw new TypeError('Não foi possível consultar as categorias de permissão.')
+        }
+
+        const categorias = await prisma.categoriaPermissao.findMany({
+            where: {
+                titularId
+            },
+            select: {
+                id: true,
+                nome: true,
+                conjuntoDadosVisiveis: true,
+                criadoEm: true,
+                atualizadoEm: true,
+                _count: {
+                    select: {
+                        vinculos: {
+                            where: {
+                                status: 'ativo'
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: [
+                {
+                    nomeNormalizado: 'asc'
+                },
+                {
+                    id: 'asc'
+                }
+            ]
+        })
+
+        if (!Array.isArray(categorias)) {
+            throw new TypeError('A listagem de categorias de permissão é inválida.')
+        }
+
+        return categorias
+            .map(formatarCategoria)
+            .sort(compararCategorias)
+    }
+
     return {
-        criarCategoria
+        criarCategoria,
+        listarCategorias
     }
 }
 

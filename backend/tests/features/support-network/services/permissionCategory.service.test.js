@@ -21,7 +21,7 @@ function criarPedidoValido() {
 }
 
 //Cria um Prisma controlado e registra todas as operações recebidas.
-function criarPrismaMock({erroAoCriar} = {}) {
+function criarPrismaMock({erroAoCriar, erroAoListar, categoriasAoListar = []} = {}) {
     const chamadas = []
 
     return {
@@ -45,6 +45,16 @@ function criarPrismaMock({erroAoCriar} = {}) {
                             vinculos: 0
                         }
                     }
+                },
+
+                async findMany(operacao) {
+                    chamadas.push(operacao)
+
+                    if (erroAoListar) {
+                        throw erroAoListar
+                    }
+
+                    return categoriasAoListar
                 }
             }
         }
@@ -206,4 +216,171 @@ test('não impõe limite total de categorias por titular', async () => {
     })
 
     assert.equal(chamadas.length, 2)
+})
+
+test('lista somente categorias da titular e conta vínculos ativos', async () => {
+    const categoriasAoListar = [
+        {
+            id: 30,
+            nome: 'saúde',
+            conjuntoDadosVisiveis: ['saude.consultas'],
+            criadoEm,
+            atualizadoEm,
+            _count: {
+                vinculos: 2
+            }
+        },
+        {
+            id: 20,
+            nome: 'Família 10',
+            conjuntoDadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+            criadoEm,
+            atualizadoEm,
+            _count: {
+                vinculos: 1
+            }
+        },
+        {
+            id: 10,
+            nome: 'Família 2',
+            conjuntoDadosVisiveis: ['geral.fase_atual'],
+            criadoEm,
+            atualizadoEm,
+            _count: {
+                vinculos: 0
+            }
+        }
+    ]
+    const {prisma, chamadas} = criarPrismaMock({categoriasAoListar})
+    const service = criarPermissionCategoryService({prisma})
+
+    const categorias = await service.listarCategorias({
+        titularId: 7,
+        papel: 'principal'
+    })
+
+    assert.deepEqual(chamadas, [
+        {
+            where: {
+                titularId: 7
+            },
+            select: {
+                id: true,
+                nome: true,
+                conjuntoDadosVisiveis: true,
+                criadoEm: true,
+                atualizadoEm: true,
+                _count: {
+                    select: {
+                        vinculos: {
+                            where: {
+                                status: 'ativo'
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: [
+                {
+                    nomeNormalizado: 'asc'
+                },
+                {
+                    id: 'asc'
+                }
+            ]
+        }
+    ])
+
+    assert.deepEqual(categorias, [
+        {
+            id: 10,
+            nome: 'Família 2',
+            dadosVisiveis: ['geral.fase_atual'],
+            quantidadeContatos: 0,
+            criadoEm,
+            atualizadoEm
+        },
+        {
+            id: 20,
+            nome: 'Família 10',
+            dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+            quantidadeContatos: 1,
+            criadoEm,
+            atualizadoEm
+        },
+        {
+            id: 30,
+            nome: 'saúde',
+            dadosVisiveis: ['saude.consultas'],
+            quantidadeContatos: 2,
+            criadoEm,
+            atualizadoEm
+        }
+    ])
+})
+
+test('devolve lista vazia quando a titular ainda não possui categorias', async () => {
+    const {prisma} = criarPrismaMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    const categorias = await service.listarCategorias({
+        titularId: 7,
+        papel: 'principal_e_contato_apoio'
+    })
+
+    assert.deepEqual(categorias, [])
+})
+
+test('impede contato de apoio de consultar categorias da titular', async () => {
+    const {prisma, chamadas} = criarPrismaMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.listarCategorias({
+            titularId: 7,
+            papel: 'contato_apoio'
+        }),
+        erro => {
+            assert.equal(erro.status, 403)
+            assert.equal(erro.codigo, 'ACAO_NAO_PERMITIDA')
+
+            return true
+        }
+    )
+
+    assert.equal(chamadas.length, 0)
+})
+
+test('não consulta categorias quando a sessão é inválida', async () => {
+    const {prisma, chamadas} = criarPrismaMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.listarCategorias({
+            titularId: 0,
+            papel: 'principal'
+        }),
+        erro => {
+            assert.equal(erro.status, 401)
+            assert.equal(erro.codigo, 'SESSAO_INVALIDA')
+
+            return true
+        }
+    )
+
+    assert.equal(chamadas.length, 0)
+})
+
+test('preserva falha desconhecida ao listar categorias', async () => {
+    const erroBanco = new Error('Banco indisponível')
+    const {prisma} = criarPrismaMock({erroAoListar: erroBanco})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.listarCategorias({
+            titularId: 7,
+            papel: 'principal'
+        }),
+        erro => erro === erroBanco
+    )
 })
