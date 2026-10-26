@@ -190,7 +190,8 @@ test('expõe a consulta protegida do impacto da exclusão', () => {
                 chamadasGet.push([caminho, ...middlewares]);
             },
             post() {},
-            put() {}
+            put() {},
+            delete() {}
         }),
         authMiddleware: { autenticar() {} },
         parentalConsentMiddleware: { exigirAcessoRedeApoio() {} },
