@@ -177,3 +177,35 @@ test('protege a atualização com autenticação, consentimento e limite própri
         ['/permission-categories/:id', limitarAtualizacao, editarCategoria]
     ]);
 });
+
+test('expõe a consulta protegida do impacto da exclusão', () => {
+    const chamadasGet = [];
+    function consultarImpacto() {}
+
+    criarPermissionCategoryRoutes({
+        Router: () => ({
+            use() {},
+            get(caminho, ...middlewares) {
+                chamadasGet.push([caminho, ...middlewares]);
+            },
+            post() {},
+            put() {}
+        }),
+        authMiddleware: { autenticar() {} },
+        parentalConsentMiddleware: { exigirAcessoRedeApoio() {} },
+        permissionCategoryRateLimit() {},
+        permissionCategoryController: {
+            criarCategoria() {},
+            listarCategorias() {},
+            editarCategoria() {}
+        },
+        permissionCategoryDeletionController: {
+            consultarImpacto
+        }
+    });
+
+    assert.deepEqual(chamadasGet.at(-1), [
+        '/permission-categories/:id/deletion-impact',
+        consultarImpacto
+    ]);
+});

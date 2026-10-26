@@ -5,7 +5,8 @@ function criarPermissionCategoryRoutes({
     parentalConsentMiddleware,
     permissionCategoryRateLimit,
     permissionCategoryUpdateRateLimit = permissionCategoryRateLimit,
-    permissionCategoryController
+    permissionCategoryController,
+    permissionCategoryDeletionController
 }) {
     const router = Router();
 
@@ -22,6 +23,13 @@ function criarPermissionCategoryRoutes({
         permissionCategoryUpdateRateLimit,
         permissionCategoryController.editarCategoria
     );
+
+    if (permissionCategoryDeletionController) {
+        router.get(
+            '/permission-categories/:id/deletion-impact',
+            permissionCategoryDeletionController.consultarImpacto
+        );
+    }
 
     return router;
 }
