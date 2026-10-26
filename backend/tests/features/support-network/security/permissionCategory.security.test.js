@@ -1,4 +1,4 @@
-//Testa as proteções integradas da criação de categorias de permissão.
+//Testa as proteções integradas das categorias de permissão.
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
@@ -228,4 +228,61 @@ test('a resposta interna não contém o corpo sensível enviado pela usuária', 
 
     assert.equal(respostaSerializada.includes('Categoria extremamente privada'), false)
     assert.equal(respostaSerializada.includes('vida_intima.atividade_sexual'), false)
+})
+
+test('não expõe detalhes internos nem aceita outra titular ao falhar na listagem', async () => {
+    let parametrosRecebidos = null
+
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: validator,
+        permissionCategoryService: {
+            async listarCategorias(parametros) {
+                parametrosRecebidos = parametros
+
+                throw new Error('SQLITE_BUSY: C:\\dados\\categorias.db')
+            }
+        }
+    })
+
+    const req = {
+        query: {
+            titularId: '999'
+        },
+        usuario: {
+            id: 7,
+            papel: 'principal'
+        }
+    }
+    const res = criarRespostaMock()
+    const consoleErrorOriginal = console.error
+
+    console.error = () => {}
+
+    try {
+        await controller.listarCategorias(
+            req,
+            res,
+            erro => tratarErros(erro, req, res, () => {})
+        )
+    } finally {
+        console.error = consoleErrorOriginal
+    }
+
+    assert.deepEqual(parametrosRecebidos, {
+        titularId: 7,
+        papel: 'principal'
+    })
+    assert.equal(res.statusCode, 500)
+    assert.deepEqual(res.body, {
+        erro: {
+            codigo: 'ERRO_INTERNO',
+            mensagem: 'Não foi possível carregar suas categorias no momento. Tente novamente.'
+        }
+    })
+
+    const respostaSerializada = JSON.stringify(res.body)
+
+    assert.equal(respostaSerializada.includes('SQLITE_BUSY'), false)
+    assert.equal(respostaSerializada.includes('categorias.db'), false)
+    assert.equal(respostaSerializada.includes('999'), false)
 })
