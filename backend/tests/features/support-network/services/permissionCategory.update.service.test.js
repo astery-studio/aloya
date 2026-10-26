@@ -181,3 +181,24 @@ test('rejeita formulário carregado a partir de uma versão antiga', async () =>
 
     assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
 })
+
+test('solicita confirmação antes de afetar contatos ativos', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock({quantidadeContatos: 2})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao()),
+        erro => {
+            assert.equal(erro.status, 409)
+            assert.equal(erro.codigo, 'CONFIRMACAO_IMPACTO_NECESSARIA')
+            assert.equal(erro.quantidadeContatos, 2)
+            assert.equal(
+                erro.message,
+                'Esta alteração afetará imediatamente 2 contato(s) vinculado(s) a esta categoria. Deseja continuar?'
+            )
+            return true
+        }
+    )
+
+    assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
+})
