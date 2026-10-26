@@ -39,6 +39,23 @@ test('aceita somente identificadores positivos e seguros na edição', () => {
     }
 })
 
+test('aceita e normaliza um corpo completo de edição', () => {
+    const resultado = validator.validarEdicaoCategoria({
+        nome: '  Namorado  ',
+        dadosVisiveis: ['emocional.sintomas_emocionais', 'geral.fase_atual'],
+        atualizadoEm: '2026-10-26T12:00:00.000Z'
+    })
+
+    assert.equal(resultado.valido, true)
+    assert.deepEqual(resultado.dados, {
+        nome: 'Namorado',
+        nomeNormalizado: 'namorado',
+        dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
+        atualizadoEm: new Date('2026-10-26T12:00:00.000Z'),
+        quantidadeContatosConfirmada: null
+    })
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',

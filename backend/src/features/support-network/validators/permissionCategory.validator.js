@@ -4,6 +4,11 @@ import { ordenarPermissoesCategoria, permissaoCategoriaEhValida, permissoesDaCat
 const TAMANHO_MAXIMO_NOME = 80
 const FORMATO_ID = /^[1-9]\d*$/u
 const CAMPOS_PERMITIDOS = Object.freeze(['nome', 'dadosVisiveis'])
+const CAMPOS_PERMITIDOS_EDICAO = Object.freeze([
+    ...CAMPOS_PERMITIDOS,
+    'atualizadoEm',
+    'quantidadeContatosConfirmada'
+])
 
 //Cria um erro de validação associado ao campo que precisa ser corrigido.
 function criarErro(campo, mensagem) {
@@ -106,6 +111,37 @@ function validarDadosVisiveis(dadosRecebidos, erros) {
     return ordenarPermissoesCategoria(dadosRecebidos)
 }
 
+//Valida a versão apresentada pelo cliente para impedir sobrescritas concorrentes.
+function validarAtualizadoEm(atualizadoEm, erros) {
+    if (typeof atualizadoEm !== 'string') {
+        erros.push(criarErro('atualizadoEm', 'A versão da categoria é inválida.'))
+        return null
+    }
+
+    const data = new Date(atualizadoEm)
+
+    if (Number.isNaN(data.getTime()) || data.toISOString() !== atualizadoEm) {
+        erros.push(criarErro('atualizadoEm', 'A versão da categoria é inválida.'))
+        return null
+    }
+
+    return data
+}
+
+//Aceita a confirmação somente quando ela informa uma quantidade inteira não negativa.
+function validarConfirmacaoImpacto(quantidade, erros) {
+    if (quantidade === undefined) {
+        return null
+    }
+
+    if (!Number.isSafeInteger(quantidade) || quantidade < 0) {
+        erros.push(criarErro('quantidadeContatosConfirmada', 'A confirmação de impacto é inválida.'))
+        return null
+    }
+
+    return quantidade
+}
+
 //Valida todo o corpo da criação e impede o envio de campos protegidos.
 function validarCriacaoCategoria(body) {
     if (!ehObjetoSimples(body)) {
@@ -137,9 +173,44 @@ function validarCriacaoCategoria(body) {
     }
 }
 
+//Valida a representação completa usada para substituir os dados editáveis da categoria.
+function validarEdicaoCategoria(body) {
+    if (!ehObjetoSimples(body)) {
+        return {
+            valido: false,
+            erros: [criarErro('dados', 'O corpo da requisição deve ser um objeto JSON.')],
+            dados: {}
+        }
+    }
+
+    const erros = []
+    const camposDesconhecidos = Object.keys(body).filter(campo => !CAMPOS_PERMITIDOS_EDICAO.includes(campo))
+    const {nome, nomeNormalizado} = validarNome(body.nome, erros)
+    const dadosVisiveis = validarDadosVisiveis(body.dadosVisiveis, erros)
+    const atualizadoEm = validarAtualizadoEm(body.atualizadoEm, erros)
+    const quantidadeContatosConfirmada = validarConfirmacaoImpacto(body.quantidadeContatosConfirmada, erros)
+
+    if (camposDesconhecidos.length > 0) {
+        erros.push(criarErro('dados', 'A requisição contém campos não permitidos.'))
+    }
+
+    return {
+        valido: erros.length === 0,
+        erros,
+        dados: {
+            nome,
+            nomeNormalizado,
+            dadosVisiveis,
+            atualizadoEm,
+            quantidadeContatosConfirmada
+        }
+    }
+}
+
 function criarPermissionCategoryValidator() {
     return {
         validarCriacaoCategoria,
+        validarEdicaoCategoria,
         validarIdCategoria
     }
 }
