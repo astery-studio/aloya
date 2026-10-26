@@ -40,7 +40,8 @@ produção, define identificadores nativos estáveis e desabilita tráfego HTTP 
 Android. HTTP pode ser habilitado somente no ambiente local de desenvolvimento
 com `EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING=true`.
 
-No EAS, crie os ambientes `preview` e `production` e configure neles:
+No EAS, crie os ambientes `development`, `preview` e `production` e configure
+neles:
 
 - `EXPO_PUBLIC_API_URL`: URL HTTPS da API correspondente;
 - demais variáveis públicas necessárias ao bundle, nunca credenciais.
@@ -53,6 +54,8 @@ environments homônimos do GitHub.
 
 `frontend/eas.json` contém os perfis:
 
+- `development`: development build opcional para testes que exigem recursos
+  nativos indisponíveis no Expo Go;
 - `preview`: distribuição interna e APK Android instalável;
 - `production`: artefatos de loja com incremento remoto de versão.
 
@@ -75,9 +78,9 @@ escalabilidade e gerenciamento de secrets.
 
 ## Checklist inicial dos ambientes
 
-1. Criar os environments `preview` e `production` no GitHub.
+1. Criar os environments `development`, `preview` e `production` no GitHub.
 2. Exigir aprovação para `production`.
-3. Adicionar `EXPO_TOKEN` em `preview` e `production`.
+3. Adicionar `EXPO_TOKEN` em `development`, `preview` e `production`.
 4. Configurar `EXPO_PUBLIC_API_URL` nos ambientes EAS correspondentes.
 5. Inicializar as credenciais Android/iOS no EAS com um build local assistido.
 6. Configurar as credenciais de submissão das lojas no EAS.
