@@ -174,4 +174,28 @@ test('informa novo impacto quando os vínculos mudam antes da confirmação', as
     assert.equal(res.body.erro.detalhes.quantidadeContatos, 3);
 });
 
+test('define mensagem amigável do protótipo para falha inesperada', async () => {
+    const erroInterno = new Error('detalhes internos');
+    let erroEncaminhado;
+    const controller = criarController({
+        async excluirCategoria() {
+            throw erroInterno;
+        }
+    });
+
+    await controller.excluirCategoria(
+        criarRequisicao(),
+        criarResposta(),
+        (erro) => {
+            erroEncaminhado = erro;
+        }
+    );
+
+    assert.equal(erroEncaminhado, erroInterno);
+    assert.equal(
+        erroEncaminhado.mensagemUsuario,
+        'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
+    );
+});
+
 export { criarController, criarRequisicao, criarResposta };
