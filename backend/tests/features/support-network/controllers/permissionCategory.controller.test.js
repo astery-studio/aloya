@@ -641,3 +641,43 @@ test('retorna 422 e mantém o service intacto quando a edição é inválida', a
     assert.equal(res.statusRecebido, 422);
     assert.deepEqual(res.corpoRecebido.erro.detalhes, validacao.erros);
 });
+
+test('retorna a quantidade necessária para montar o modal de impacto', async () => {
+    const erroImpacto = new Error(
+        'Esta alteração afetará imediatamente 2 contato(s) vinculado(s) a esta categoria. Deseja continuar?'
+    );
+    erroImpacto.status = 409;
+    erroImpacto.codigo = 'CONFIRMACAO_IMPACTO_NECESSARIA';
+    erroImpacto.quantidadeContatos = 2;
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                return 10;
+            },
+            validarEdicaoCategoria() {
+                return criarValidacaoEdicaoValida();
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria() {
+                throw erroImpacto;
+            }
+        }
+    });
+    const res = criarRespostaMock();
+
+    await controller.editarCategoria(
+        {params: {id: '10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        res,
+        assert.fail
+    );
+
+    assert.equal(res.statusRecebido, 409);
+    assert.deepEqual(res.corpoRecebido, {
+        erro: {
+            codigo: 'CONFIRMACAO_IMPACTO_NECESSARIA',
+            mensagem: erroImpacto.message,
+            detalhes: {quantidadeContatos: 2}
+        }
+    });
+});
