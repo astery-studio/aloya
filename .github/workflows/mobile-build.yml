@@ -8,7 +8,7 @@ on:
         required: true
         default: preview
         type: choice
-        options: [preview, production]
+        options: [development, preview, production]
       platform:
         description: Plataforma
         required: true
