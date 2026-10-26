@@ -126,3 +126,19 @@ test('impede contato de apoio de editar categoria da titular', async () => {
 
     assert.deepEqual(chamadas, [])
 })
+
+test('não inicia transação com id ou versão inválidos', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao({categoriaId: 0})),
+        erro => erro.codigo === 'ID_CATEGORIA_INVALIDO'
+    )
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao({atualizadoEm: '2026-10-26'})),
+        erro => erro.codigo === 'VERSAO_CATEGORIA_INVALIDA'
+    )
+
+    assert.deepEqual(chamadas, [])
+})
