@@ -508,14 +508,14 @@ test('lista categorias da titular em ordem alfabética e conta somente vínculos
 });
 
 test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos', async () => {
-    const {banco, caminhoBanco, diretorio} = criarBancoTemporario();
+    const { banco, caminhoBanco, diretorio } = criarBancoTemporario();
 
     executarMigrationNormalizacao(banco);
     banco.close();
 
     const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
-    const adapter = new PrismaBetterSqlite3({url: urlBanco});
-    const prisma = new PrismaClient({adapter});
+    const adapter = new PrismaBetterSqlite3({ url: urlBanco });
+    const prisma = new PrismaClient({ adapter });
     const categoriaPreparada = await prisma.categoriaPermissao.create({
         data: {
             titularId: 1,
@@ -532,7 +532,7 @@ test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos'
             status: 'pendente'
         }
     });
-    const permissionCategoryService = criarPermissionCategoryService({prisma});
+    const permissionCategoryService = criarPermissionCategoryService({ prisma });
     const permissionCategoryController = criarPermissionCategoryController({
         permissionCategoryService,
         permissionCategoryValidator: criarPermissionCategoryValidator()
@@ -546,7 +546,7 @@ test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos'
             Router: express.Router,
             authMiddleware: {
                 autenticar(req, _res, next) {
-                    req.usuario = {id: 1, papel: 'principal'};
+                    req.usuario = { id: 1, papel: 'principal' };
                     next();
                 }
             },
@@ -575,13 +575,10 @@ test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos'
             `http://127.0.0.1:${endereco.port}/support-network/permission-categories/${categoriaPreparada.id}`,
             {
                 method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     nome: 'Namorado',
-                    dadosVisiveis: [
-                        'geral.fase_atual',
-                        'emocional.sintomas_emocionais'
-                    ],
+                    dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
                     atualizadoEm: categoriaPreparada.atualizadoEm.toISOString()
                 })
             }
@@ -598,10 +595,10 @@ test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos'
         ]);
 
         const categoria = await prisma.categoriaPermissao.findUnique({
-            where: {id: categoriaPreparada.id}
+            where: { id: categoriaPreparada.id }
         });
         const vinculo = await prisma.vinculoRedeApoio.findUnique({
-            where: {id: vinculoPreparado.id}
+            where: { id: vinculoPreparado.id }
         });
 
         assert.equal(categoria.nome, 'Namorado');
@@ -611,21 +608,21 @@ test('atualiza categoria sem contatos ativos pelo endpoint e preserva vínculos'
     } finally {
         await prisma.$disconnect();
         await new Promise((resolve, reject) => {
-            servidor.close(erro => erro ? reject(erro) : resolve());
+            servidor.close((erro) => (erro ? reject(erro) : resolve()));
         });
-        rmSync(diretorio, {recursive: true, force: true});
+        rmSync(diretorio, { recursive: true, force: true });
     }
 });
 
 test('exige confirmação e propaga a atualização para vínculo ativo', async () => {
-    const {banco, caminhoBanco, diretorio} = criarBancoTemporario();
+    const { banco, caminhoBanco, diretorio } = criarBancoTemporario();
 
     executarMigrationNormalizacao(banco);
     banco.close();
 
     const urlBanco = `file:${caminhoBanco.replaceAll('\\', '/')}`;
     const prisma = new PrismaClient({
-        adapter: new PrismaBetterSqlite3({url: urlBanco})
+        adapter: new PrismaBetterSqlite3({ url: urlBanco })
     });
     const categoriaPreparada = await prisma.categoriaPermissao.create({
         data: {
@@ -644,33 +641,36 @@ test('exige confirmação e propaga a atualização para vínculo ativo', async 
         }
     });
     const permissionCategoryController = criarPermissionCategoryController({
-        permissionCategoryService: criarPermissionCategoryService({prisma}),
+        permissionCategoryService: criarPermissionCategoryService({ prisma }),
         permissionCategoryValidator: criarPermissionCategoryValidator()
     });
     const app = express();
 
     app.use(express.json());
-    app.use('/support-network', criarPermissionCategoryRoutes({
-        Router: express.Router,
-        authMiddleware: {
-            autenticar(req, _res, next) {
-                req.usuario = {id: 1, papel: 'principal'};
+    app.use(
+        '/support-network',
+        criarPermissionCategoryRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, _res, next) {
+                    req.usuario = { id: 1, papel: 'principal' };
+                    next();
+                }
+            },
+            parentalConsentMiddleware: {
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
+            },
+            permissionCategoryRateLimit(_req, _res, next) {
                 next();
-            }
-        },
-        parentalConsentMiddleware: {
-            exigirAcessoRedeApoio(_req, _res, next) {
+            },
+            permissionCategoryUpdateRateLimit(_req, _res, next) {
                 next();
-            }
-        },
-        permissionCategoryRateLimit(_req, _res, next) {
-            next();
-        },
-        permissionCategoryUpdateRateLimit(_req, _res, next) {
-            next();
-        },
-        permissionCategoryController
-    }));
+            },
+            permissionCategoryController
+        })
+    );
     app.use(tratarErros);
 
     const servidor = app.listen(0, '127.0.0.1');
@@ -686,7 +686,7 @@ test('exige confirmação e propaga a atualização para vínculo ativo', async 
         };
         const primeiraResposta = await fetch(url, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dados)
         });
         const primeiroCorpo = await primeiraResposta.json();
@@ -696,14 +696,14 @@ test('exige confirmação e propaga a atualização para vínculo ativo', async 
         assert.equal(primeiroCorpo.erro.detalhes.quantidadeContatos, 1);
 
         const categoriaAntesDaConfirmacao = await prisma.categoriaPermissao.findUnique({
-            where: {id: categoriaPreparada.id}
+            where: { id: categoriaPreparada.id }
         });
         assert.equal(categoriaAntesDaConfirmacao.nome, 'Parceiro(a)');
 
         const respostaConfirmada = await fetch(url, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({...dados, quantidadeContatosConfirmada: 1})
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...dados, quantidadeContatosConfirmada: 1 })
         });
         const corpoConfirmado = await respostaConfirmada.json();
 
@@ -712,8 +712,8 @@ test('exige confirmação e propaga a atualização para vínculo ativo', async 
         assert.equal(corpoConfirmado.categoria.quantidadeContatos, 1);
 
         const vinculoDepois = await prisma.vinculoRedeApoio.findUnique({
-            where: {id: vinculoPreparado.id},
-            include: {categoria: true}
+            where: { id: vinculoPreparado.id },
+            include: { categoria: true }
         });
         assert.equal(vinculoDepois.status, 'ativo');
         assert.equal(vinculoDepois.categoria.nome, 'Namorado');
@@ -724,8 +724,8 @@ test('exige confirmação e propaga a atualização para vínculo ativo', async 
     } finally {
         await prisma.$disconnect();
         await new Promise((resolve, reject) => {
-            servidor.close(erro => erro ? reject(erro) : resolve());
+            servidor.close((erro) => (erro ? reject(erro) : resolve()));
         });
-        rmSync(diretorio, {recursive: true, force: true});
+        rmSync(diretorio, { recursive: true, force: true });
     }
 });

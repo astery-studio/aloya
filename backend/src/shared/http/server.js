@@ -2,50 +2,27 @@
 import express from 'express';
 import helmet from 'helmet';
 
-import {
-    env
-} from '../config/env.js';
+import { env } from '../config/env.js';
 
-import {
-    criarContainer
-} from '../config/container.js';
+import { criarContainer } from '../config/container.js';
 
-import {
-    criarAuthRoutes
-} from '../../features/auth/routes/auth.routes.js';
+import { criarAuthRoutes } from '../../features/auth/routes/auth.routes.js';
 
-import {
-    criarRotasAnticoncepcionais
-} from '../../features/contraceptives/routes/contraceptive.routes.js';
+import { criarRotasAnticoncepcionais } from '../../features/contraceptives/routes/contraceptive.routes.js';
 
-import {
-    criarCalendarRoutes
-} from '../../features/calendar/routes/calendar.routes.js';
+import { criarCalendarRoutes } from '../../features/calendar/routes/calendar.routes.js';
 
-import {
-    criarCycleHistoryRoutes
-} from '../../features/cycles/routes/cycleHistory.routes.js';
+import { criarCycleHistoryRoutes } from '../../features/cycles/routes/cycleHistory.routes.js';
 
-import {
-    criarPredictionRoutes
-} from '../../features/cycles/routes/prediction.routes.js';
+import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
-import {
-    criarPermissionCategoryRoutes
-} from '../../features/support-network/routes/permissionCategory.routes.js';
+import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
 
-import {
-    criarAccountRoutes
-} from '../../features/settings/routes/account.routes.js';
+import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 
-import {
-    criarLogoutRoutes
-} from '../../features/auth/routes/logout.routes.js';
+import { criarLogoutRoutes } from '../../features/auth/routes/logout.routes.js';
 
-import {
-    rotaNaoEncontrada,
-    tratarErros
-} from '../middleware/error.middleware.js';
+import { rotaNaoEncontrada, tratarErros } from '../middleware/error.middleware.js';
 
 const app = express();
 const container = criarContainer();
@@ -64,30 +41,21 @@ app.use(
     '/auth',
     criarLogoutRoutes({
         Router: express.Router,
-        authMiddleware:
-            container.authMiddleware,
-        logoutController:
-            container.logoutController
+        authMiddleware: container.authMiddleware,
+        logoutController: container.logoutController
     })
 );
 
 app.use(
     '/auth',
     criarAuthRoutes({
-        authController:
-            container.authController,
-        passwordRecoveryController:
-            container.passwordRecoveryController,
-        authMiddleware:
-            container.authMiddleware,
-        cadastroRateLimit:
-            container.cadastroRateLimit,
-        emailRateLimit:
-            container.emailRateLimit,
-        loginRateLimit:
-            container.loginRateLimit,
-        contaLoginRateLimit:
-            container.contaLoginRateLimit
+        authController: container.authController,
+        passwordRecoveryController: container.passwordRecoveryController,
+        authMiddleware: container.authMiddleware,
+        cadastroRateLimit: container.cadastroRateLimit,
+        emailRateLimit: container.emailRateLimit,
+        loginRateLimit: container.loginRateLimit,
+        contaLoginRateLimit: container.contaLoginRateLimit
     })
 );
 
@@ -95,46 +63,32 @@ app.use(
     '/users',
     criarAccountRoutes({
         Router: express.Router,
-        accountController:
-            container.accountController,
-        authMiddleware:
-            container.authMiddleware,
-        configuracoesContaRateLimit:
-            container.configuracoesContaRateLimit,
-        alteracaoSenhaRateLimit:
-            container.alteracaoSenhaRateLimit,
-        accountDeletionController:
-            container.accountDeletionController,
-        exclusaoContaRateLimit:
-            container.exclusaoContaRateLimit
+        accountController: container.accountController,
+        authMiddleware: container.authMiddleware,
+        configuracoesContaRateLimit: container.configuracoesContaRateLimit,
+        alteracaoSenhaRateLimit: container.alteracaoSenhaRateLimit,
+        accountDeletionController: container.accountDeletionController,
+        exclusaoContaRateLimit: container.exclusaoContaRateLimit
     })
 );
 
 app.use(
     '/api/anticoncepcionais',
     criarRotasAnticoncepcionais({
-        autenticar:
-            container.authMiddleware.autenticar,
-        controller:
-            container.contraceptiveController,
-        usoController:
-            container.contraceptiveUsageController,
-        edicaoRateLimit:
-            container.edicaoAnticoncepcionalRateLimit,
-        remocaoRateLimit:
-            container.remocaoAnticoncepcionalRateLimit
+        autenticar: container.authMiddleware.autenticar,
+        controller: container.contraceptiveController,
+        usoController: container.contraceptiveUsageController,
+        edicaoRateLimit: container.edicaoAnticoncepcionalRateLimit,
+        remocaoRateLimit: container.remocaoAnticoncepcionalRateLimit
     })
 );
 
 app.use(
     '/api/cycles',
     criarCalendarRoutes({
-        Router:
-            express.Router,
-        authMiddleware:
-            container.authMiddleware,
-        calendarController:
-            container.calendarController
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        calendarController: container.calendarController
     })
 );
 
@@ -142,10 +96,8 @@ app.use(
     '/api/cycles',
     criarCycleHistoryRoutes({
         Router: express.Router,
-        authMiddleware:
-            container.authMiddleware,
-        cycleHistoryController:
-            container.cycleHistoryController
+        authMiddleware: container.authMiddleware,
+        cycleHistoryController: container.cycleHistoryController
     })
 );
 
@@ -162,16 +114,11 @@ app.use(
     '/support-network',
     criarPermissionCategoryRoutes({
         Router: express.Router,
-        authMiddleware:
-            container.authMiddleware,
-        parentalConsentMiddleware:
-            container.parentalConsentMiddleware,
-        permissionCategoryRateLimit:
-            container.permissionCategoryRateLimit,
-        permissionCategoryUpdateRateLimit:
-            container.permissionCategoryUpdateRateLimit,
-        permissionCategoryController:
-            container.permissionCategoryController
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        permissionCategoryRateLimit: container.permissionCategoryRateLimit,
+        permissionCategoryUpdateRateLimit: container.permissionCategoryUpdateRateLimit,
+        permissionCategoryController: container.permissionCategoryController
     })
 );
 
@@ -179,7 +126,5 @@ app.use(rotaNaoEncontrada);
 app.use(tratarErros);
 
 app.listen(env.port, () => {
-    console.log(
-        `API executando na porta ${env.port}.`
-    );
+    console.log(`API executando na porta ${env.port}.`);
 });

@@ -128,8 +128,7 @@ test('não aplica o limitador de criação à consulta da lista', () => {
             get(caminho, ...middlewares) {
                 chamadasGet.push([caminho, ...middlewares]);
             },
-            post() {}
-            ,
+            post() {},
             put() {}
         }),
         authMiddleware: {
@@ -163,8 +162,8 @@ test('protege a atualização com autenticação, consentimento e limite própri
                 chamadasPut.push([caminho, ...middlewares]);
             }
         }),
-        authMiddleware: {autenticar() {}},
-        parentalConsentMiddleware: {exigirAcessoRedeApoio() {}},
+        authMiddleware: { autenticar() {} },
+        parentalConsentMiddleware: { exigirAcessoRedeApoio() {} },
         permissionCategoryRateLimit() {},
         permissionCategoryUpdateRateLimit: limitarAtualizacao,
         permissionCategoryController: {
@@ -174,9 +173,7 @@ test('protege a atualização com autenticação, consentimento e limite própri
         }
     });
 
-    assert.deepEqual(chamadasPut, [[
-        '/permission-categories/:id',
-        limitarAtualizacao,
-        editarCategoria
-    ]]);
+    assert.deepEqual(chamadasPut, [
+        ['/permission-categories/:id', limitarAtualizacao, editarCategoria]
+    ]);
 });

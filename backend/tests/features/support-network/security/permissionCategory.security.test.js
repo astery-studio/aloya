@@ -310,20 +310,16 @@ test('não expõe dados do formulário nem do banco quando a atualização falha
         }
     });
     const req = {
-        params: {id: '12'},
-        body: {nome: 'Categoria extremamente privada'},
-        usuario: {id: 7, papel: 'principal'}
+        params: { id: '12' },
+        body: { nome: 'Categoria extremamente privada' },
+        usuario: { id: 7, papel: 'principal' }
     };
     const res = criarRespostaMock();
     const consoleErrorOriginal = console.error;
 
     console.error = () => {};
     try {
-        await controller.editarCategoria(
-            req,
-            res,
-            erro => tratarErros(erro, req, res, () => {})
-        );
+        await controller.editarCategoria(req, res, (erro) => tratarErros(erro, req, res, () => {}));
     } finally {
         console.error = consoleErrorOriginal;
     }

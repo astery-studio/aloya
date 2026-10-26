@@ -192,11 +192,7 @@ function criarPermissionCategoryService({ prisma }) {
         atualizadoEm,
         quantidadeContatosConfirmada = null
     } = {}) {
-        validarTitular(
-            titularId,
-            papel,
-            'Somente a titular pode editar categorias de permissão.'
-        );
+        validarTitular(titularId, papel, 'Somente a titular pode editar categorias de permissão.');
         validarDadosDaCategoria(nome, dadosVisiveis);
 
         if (!Number.isSafeInteger(categoriaId) || categoriaId <= 0) {
@@ -211,7 +207,7 @@ function criarPermissionCategoryService({ prisma }) {
         const permissoesOrdenadas = ordenarPermissoesCategoria(dadosVisiveis);
 
         try {
-            return await prisma.$transaction(async transacao => {
+            return await prisma.$transaction(async (transacao) => {
                 const categoriaAtual = await transacao.categoriaPermissao.findFirst({
                     where: {
                         id: categoriaId,
@@ -237,7 +233,11 @@ function criarPermissionCategoryService({ prisma }) {
                 });
 
                 if (!categoriaAtual) {
-                    throw criarErro('Categoria de permissão não encontrada.', 404, 'CATEGORIA_NAO_ENCONTRADA');
+                    throw criarErro(
+                        'Categoria de permissão não encontrada.',
+                        404,
+                        'CATEGORIA_NAO_ENCONTRADA'
+                    );
                 }
 
                 if (categoriaAtual.atualizadoEm.getTime() !== atualizadoEm.getTime()) {
@@ -248,12 +248,17 @@ function criarPermissionCategoryService({ prisma }) {
                     );
                 }
 
-                const possuiAlteracao = categoriaAtual.nome !== nome
-                    || categoriaAtual.nomeNormalizado !== nomeNormalizado
-                    || !permissoesSaoIguais(categoriaAtual.conjuntoDadosVisiveis, permissoesOrdenadas);
+                const possuiAlteracao =
+                    categoriaAtual.nome !== nome ||
+                    categoriaAtual.nomeNormalizado !== nomeNormalizado ||
+                    !permissoesSaoIguais(categoriaAtual.conjuntoDadosVisiveis, permissoesOrdenadas);
 
                 if (!possuiAlteracao) {
-                    throw criarErro('Faça ao menos uma alteração antes de salvar.', 422, 'SEM_ALTERACOES');
+                    throw criarErro(
+                        'Faça ao menos uma alteração antes de salvar.',
+                        422,
+                        'SEM_ALTERACOES'
+                    );
                 }
 
                 const quantidadeContatos = categoriaAtual._count.vinculos;

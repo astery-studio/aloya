@@ -516,9 +516,9 @@ test('atualiza categoria e devolve a mensagem do protótipo', async () => {
 
     await controller.editarCategoria(
         {
-            params: {id: '10'},
+            params: { id: '10' },
             body: {},
-            usuario: {id: 7, papel: 'principal'}
+            usuario: { id: 7, papel: 'principal' }
         },
         res,
         assert.fail
@@ -553,9 +553,9 @@ test('edita usando somente o id e o papel da sessão autenticada', async () => {
 
     await controller.editarCategoria(
         {
-            params: {id: '10'},
-            body: {titularId: 999, papel: 'administrador'},
-            usuario: {id: 7, papel: 'principal'}
+            params: { id: '10' },
+            body: { titularId: 999, papel: 'administrador' },
+            usuario: { id: 7, papel: 'principal' }
         },
         criarRespostaMock(),
         assert.fail
@@ -589,7 +589,7 @@ test('retorna 400 sem chamar o service quando o id da categoria é inválido', a
     const res = criarRespostaMock();
 
     await controller.editarCategoria(
-        {params: {id: '../10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        { params: { id: '../10' }, body: {}, usuario: { id: 7, papel: 'principal' } },
         res,
         assert.fail
     );
@@ -608,10 +608,12 @@ test('retorna 422 e mantém o service intacto quando a edição é inválida', a
     let serviceChamado = false;
     const validacao = {
         valido: false,
-        erros: [{
-            campo: 'dadosVisiveis',
-            mensagem: 'Selecione ao menos um tipo de dado que esta categoria poderá visualizar.'
-        }],
+        erros: [
+            {
+                campo: 'dadosVisiveis',
+                mensagem: 'Selecione ao menos um tipo de dado que esta categoria poderá visualizar.'
+            }
+        ],
         dados: {}
     };
     const controller = criarPermissionCategoryController({
@@ -632,7 +634,7 @@ test('retorna 422 e mantém o service intacto quando a edição é inválida', a
     const res = criarRespostaMock();
 
     await controller.editarCategoria(
-        {params: {id: '10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        { params: { id: '10' }, body: {}, usuario: { id: 7, papel: 'principal' } },
         res,
         assert.fail
     );
@@ -667,7 +669,7 @@ test('retorna a quantidade necessária para montar o modal de impacto', async ()
     const res = criarRespostaMock();
 
     await controller.editarCategoria(
-        {params: {id: '10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        { params: { id: '10' }, body: {}, usuario: { id: 7, papel: 'principal' } },
         res,
         assert.fail
     );
@@ -677,7 +679,7 @@ test('retorna a quantidade necessária para montar o modal de impacto', async ()
         erro: {
             codigo: 'CONFIRMACAO_IMPACTO_NECESSARIA',
             mensagem: erroImpacto.message,
-            detalhes: {quantidadeContatos: 2}
+            detalhes: { quantidadeContatos: 2 }
         }
     });
 });
@@ -702,9 +704,9 @@ test('define a mensagem amigável do protótipo para falha inesperada', async ()
     let erroRecebido = null;
 
     await controller.editarCategoria(
-        {params: {id: '10'}, body: {}, usuario: {id: 7, papel: 'principal'}},
+        { params: { id: '10' }, body: {}, usuario: { id: 7, papel: 'principal' } },
         criarRespostaMock(),
-        erro => {
+        (erro) => {
             erroRecebido = erro;
         }
     );
