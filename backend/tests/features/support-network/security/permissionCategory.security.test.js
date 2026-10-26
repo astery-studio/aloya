@@ -283,3 +283,60 @@ test('não expõe detalhes internos nem aceita outra titular ao falhar na listag
     assert.equal(respostaSerializada.includes('categorias.db'), false);
     assert.equal(respostaSerializada.includes('999'), false);
 });
+
+test('não expõe dados do formulário nem do banco quando a atualização falha', async () => {
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                return 12;
+            },
+            validarEdicaoCategoria() {
+                return {
+                    valido: true,
+                    erros: [],
+                    dados: {
+                        nome: 'Categoria extremamente privada',
+                        dadosVisiveis: ['vida_intima.atividade_sexual'],
+                        atualizadoEm: new Date('2026-10-26T12:00:00.000Z'),
+                        quantidadeContatosConfirmada: null
+                    }
+                };
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria() {
+                throw new Error('SQLITE_BUSY: C:\\dados\\privados.db');
+            }
+        }
+    });
+    const req = {
+        params: {id: '12'},
+        body: {nome: 'Categoria extremamente privada'},
+        usuario: {id: 7, papel: 'principal'}
+    };
+    const res = criarRespostaMock();
+    const consoleErrorOriginal = console.error;
+
+    console.error = () => {};
+    try {
+        await controller.editarCategoria(
+            req,
+            res,
+            erro => tratarErros(erro, req, res, () => {})
+        );
+    } finally {
+        console.error = consoleErrorOriginal;
+    }
+
+    assert.equal(res.statusCode, 500);
+    assert.equal(
+        res.body.erro.mensagem,
+        'Ocorreu um erro ao atualizar sua categoria. Verifique sua conexão e tente novamente.'
+    );
+
+    const resposta = JSON.stringify(res.body);
+    assert.equal(resposta.includes('Categoria extremamente privada'), false);
+    assert.equal(resposta.includes('vida_intima'), false);
+    assert.equal(resposta.includes('SQLITE_BUSY'), false);
+    assert.equal(resposta.includes('privados.db'), false);
+});
