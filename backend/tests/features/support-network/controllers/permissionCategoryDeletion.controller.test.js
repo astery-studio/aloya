@@ -72,4 +72,27 @@ test('consulta o impacto usando somente a identidade autenticada', async () => {
     assert.equal(res.headers['cache-control'], 'private, no-store');
 });
 
+test('rejeita id inválido sem consultar o impacto ou excluir', async () => {
+    let quantidadeChamadas = 0;
+    const controller = criarController({
+        async consultarImpacto() {
+            quantidadeChamadas += 1;
+        },
+        async excluirCategoria() {
+            quantidadeChamadas += 1;
+        }
+    });
+
+    for (const operacao of ['consultarImpacto', 'excluirCategoria']) {
+        const res = criarResposta();
+
+        await controller[operacao](criarRequisicao({ params: { id: 'invalido' } }), res, assert.fail);
+
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.erro.codigo, 'ID_CATEGORIA_INVALIDO');
+    }
+
+    assert.equal(quantidadeChamadas, 0);
+});
+
 export { criarController, criarRequisicao, criarResposta };
