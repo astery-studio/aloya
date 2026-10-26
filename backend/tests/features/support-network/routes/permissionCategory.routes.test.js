@@ -129,7 +129,8 @@ test('não aplica o limitador de criação à consulta da lista', () => {
                 chamadasGet.push([caminho, ...middlewares]);
             },
             post() {},
-            put() {}
+            put() {},
+            delete() {}
         }),
         authMiddleware: {
             autenticar() {}
@@ -200,12 +201,48 @@ test('expõe a consulta protegida do impacto da exclusão', () => {
             editarCategoria() {}
         },
         permissionCategoryDeletionController: {
-            consultarImpacto
+            consultarImpacto,
+            excluirCategoria() {}
         }
     });
 
     assert.deepEqual(chamadasGet.at(-1), [
         '/permission-categories/:id/deletion-impact',
         consultarImpacto
+    ]);
+});
+
+test('protege a exclusão com limite próprio após autenticação e consentimento', () => {
+    const chamadasDelete = [];
+    function limitarExclusao() {}
+    function excluirCategoria() {}
+
+    criarPermissionCategoryRoutes({
+        Router: () => ({
+            use() {},
+            get() {},
+            post() {},
+            put() {},
+            delete(caminho, ...middlewares) {
+                chamadasDelete.push([caminho, ...middlewares]);
+            }
+        }),
+        authMiddleware: { autenticar() {} },
+        parentalConsentMiddleware: { exigirAcessoRedeApoio() {} },
+        permissionCategoryRateLimit() {},
+        permissionCategoryDeletionRateLimit: limitarExclusao,
+        permissionCategoryController: {
+            criarCategoria() {},
+            listarCategorias() {},
+            editarCategoria() {}
+        },
+        permissionCategoryDeletionController: {
+            consultarImpacto() {},
+            excluirCategoria
+        }
+    });
+
+    assert.deepEqual(chamadasDelete, [
+        ['/permission-categories/:id', limitarExclusao, excluirCategoria]
     ]);
 });
