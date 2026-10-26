@@ -18,6 +18,10 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
 
         get(...argumentos) {
             chamadas.push(['get', ...argumentos]);
+        },
+
+        put(...argumentos) {
+            chamadas.push(['put', ...argumentos]);
         }
     };
 
@@ -26,6 +30,7 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
     function limitarCriacao() {}
     function criarCategoria() {}
     function listarCategorias() {}
+    function editarCategoria() {}
 
     criarPermissionCategoryRoutes({
         Router() {
@@ -40,7 +45,8 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
         permissionCategoryRateLimit: limitarCriacao,
         permissionCategoryController: {
             criarCategoria,
-            listarCategorias
+            listarCategorias,
+            editarCategoria
         }
     });
 
@@ -48,7 +54,8 @@ test('protege a criação com autenticação, consentimento e limite de requisi�
         ['use', autenticar],
         ['use', exigirAcessoRedeApoio],
         ['get', '/permission-categories', listarCategorias],
-        ['post', '/permission-categories', limitarCriacao, criarCategoria]
+        ['post', '/permission-categories', limitarCriacao, criarCategoria],
+        ['put', '/permission-categories/:id', limitarCriacao, editarCategoria]
     ]);
 });
 
@@ -67,6 +74,11 @@ test('registra as proteções antes do endpoint de criação', () => {
 
         get(_caminho, controller) {
             ordem.push(controller.name);
+        },
+
+        put(_caminho, limite, controller) {
+            ordem.push(limite.name);
+            ordem.push(controller.name);
         }
     };
 
@@ -75,6 +87,7 @@ test('registra as proteções antes do endpoint de criação', () => {
     function limitarCriacao() {}
     function criarCategoria() {}
     function listarCategorias() {}
+    function editarCategoria() {}
 
     criarPermissionCategoryRoutes({
         Router: () => router,
@@ -87,7 +100,8 @@ test('registra as proteções antes do endpoint de criação', () => {
         permissionCategoryRateLimit: limitarCriacao,
         permissionCategoryController: {
             criarCategoria,
-            listarCategorias
+            listarCategorias,
+            editarCategoria
         }
     });
 
@@ -96,7 +110,9 @@ test('registra as proteções antes do endpoint de criação', () => {
         'exigirAcessoRedeApoio',
         'listarCategorias',
         'limitarCriacao',
-        'criarCategoria'
+        'criarCategoria',
+        'limitarCriacao',
+        'editarCategoria'
     ]);
 });
 
@@ -113,6 +129,8 @@ test('não aplica o limitador de criação à consulta da lista', () => {
                 chamadasGet.push([caminho, ...middlewares]);
             },
             post() {}
+            ,
+            put() {}
         }),
         authMiddleware: {
             autenticar() {}
@@ -129,4 +147,36 @@ test('não aplica o limitador de criação à consulta da lista', () => {
 
     assert.deepEqual(chamadasGet, [['/permission-categories', listarCategorias]]);
     assert.equal(chamadasGet[0].includes(limitarCriacao), false);
+});
+
+test('protege a atualização com autenticação, consentimento e limite próprio', () => {
+    const chamadasPut = [];
+    function limitarAtualizacao() {}
+    function editarCategoria() {}
+
+    criarPermissionCategoryRoutes({
+        Router: () => ({
+            use() {},
+            get() {},
+            post() {},
+            put(caminho, ...middlewares) {
+                chamadasPut.push([caminho, ...middlewares]);
+            }
+        }),
+        authMiddleware: {autenticar() {}},
+        parentalConsentMiddleware: {exigirAcessoRedeApoio() {}},
+        permissionCategoryRateLimit() {},
+        permissionCategoryUpdateRateLimit: limitarAtualizacao,
+        permissionCategoryController: {
+            criarCategoria() {},
+            listarCategorias() {},
+            editarCategoria
+        }
+    });
+
+    assert.deepEqual(chamadasPut, [[
+        '/permission-categories/:id',
+        limitarAtualizacao,
+        editarCategoria
+    ]]);
 });

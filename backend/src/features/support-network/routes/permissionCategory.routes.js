@@ -4,6 +4,7 @@ function criarPermissionCategoryRoutes({
     authMiddleware,
     parentalConsentMiddleware,
     permissionCategoryRateLimit,
+    permissionCategoryUpdateRateLimit = permissionCategoryRateLimit,
     permissionCategoryController
 }) {
     const router = Router();
@@ -15,6 +16,11 @@ function criarPermissionCategoryRoutes({
         '/permission-categories',
         permissionCategoryRateLimit,
         permissionCategoryController.criarCategoria
+    );
+    router.put(
+        '/permission-categories/:id',
+        permissionCategoryUpdateRateLimit,
+        permissionCategoryController.editarCategoria
     );
 
     return router;
