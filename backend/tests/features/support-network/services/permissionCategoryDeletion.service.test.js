@@ -253,4 +253,35 @@ test('converte em individual preservando as permissões da categoria', async () 
     assert.equal(resultado.quantidadeAcessosMantidos, 1);
 });
 
+test('aplica decisões mistas em lote antes de apagar a categoria', async () => {
+    const categoriaExclusao = criarCategoria({
+        vinculos: [{ id: 20 }, { id: 21 }, { id: 22 }]
+    });
+    const { prisma, chamadas } = criarPrisma({ categoriaExclusao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    const resultado = await service.excluirCategoria(
+        criarPedido({
+            decisoes: [
+                { vinculoId: 20, acao: 'remover_acesso' },
+                { vinculoId: 21, acao: 'manter_acesso_individual' },
+                { vinculoId: 22, acao: 'remover_acesso' }
+            ]
+        })
+    );
+
+    const atualizacoesAtivas = chamadas.filter(
+        ([nome, argumentos]) => nome === 'vinculo.updateMany' && argumentos.where?.id
+    );
+
+    assert.deepEqual(atualizacoesAtivas[0][1].where.id.in, [20, 22]);
+    assert.deepEqual(atualizacoesAtivas[1][1].where.id.in, [21]);
+    assert.deepEqual(resultado, {
+        categoriaId: 12,
+        quantidadeAcessosRemovidos: 2,
+        quantidadeAcessosMantidos: 1
+    });
+    assert.equal(chamadas.at(-1)[0], 'categoria.deleteMany');
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
