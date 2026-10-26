@@ -56,6 +56,22 @@ test('aceita e normaliza um corpo completo de edição', () => {
     })
 })
 
+test('rejeita corpo de edição nulo, em lista ou com protótipo modificado', () => {
+    const corpoComPrototipo = {
+        ...criarBodyValido(),
+        atualizadoEm: '2026-10-26T12:00:00.000Z'
+    }
+
+    Object.setPrototypeOf(corpoComPrototipo, {titularId: 999})
+
+    for (const body of [null, [], corpoComPrototipo]) {
+        const resultado = validator.validarEdicaoCategoria(body)
+
+        assert.equal(resultado.valido, false)
+        assert.equal(resultado.erros[0].campo, 'dados')
+    }
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',
