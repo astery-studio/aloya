@@ -142,3 +142,22 @@ test('não inicia transação com id ou versão inválidos', async () => {
 
     assert.deepEqual(chamadas, [])
 })
+
+test('rejeita salvamento sem alteração real', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao({
+            nome: 'Parceiro(a)',
+            dadosVisiveis: ['geral.fase_atual']
+        })),
+        erro => {
+            assert.equal(erro.status, 422)
+            assert.equal(erro.codigo, 'SEM_ALTERACOES')
+            return true
+        }
+    )
+
+    assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
+})
