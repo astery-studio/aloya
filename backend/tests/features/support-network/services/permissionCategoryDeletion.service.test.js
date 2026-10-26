@@ -385,4 +385,15 @@ test('converte conflito de chave estrangeira em impacto desatualizado', async ()
     });
 });
 
+test('preserva falha interna para permitir resposta pública segura', async () => {
+    const erroTransacao = new Error('senha-do-banco-nao-pode-vazar');
+    const { prisma } = criarPrisma({ erroTransacao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(
+        () => service.excluirCategoria(criarPedido()),
+        (erro) => erro === erroTransacao
+    );
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
