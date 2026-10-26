@@ -116,4 +116,20 @@ test('não revela categoria inexistente ou pertencente a outra titular', async (
     });
 });
 
+test('impede contato de apoio de consultar ou excluir categoria', async () => {
+    const { prisma, chamadas } = criarPrisma();
+    const service = criarPermissionCategoryDeletionService({ prisma });
+    const pedido = criarPedido({ papel: 'contato_apoio' });
+
+    await assert.rejects(() => service.consultarImpacto(pedido), {
+        status: 403,
+        codigo: 'ACAO_NAO_PERMITIDA'
+    });
+    await assert.rejects(() => service.excluirCategoria(pedido), {
+        status: 403,
+        codigo: 'ACAO_NAO_PERMITIDA'
+    });
+    assert.deepEqual(chamadas, []);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
