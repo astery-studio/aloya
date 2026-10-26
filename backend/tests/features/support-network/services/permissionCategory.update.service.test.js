@@ -276,3 +276,15 @@ test('preserva falha desconhecida para o tratamento global seguro', async () => 
         erro => erro === erroBanco
     )
 })
+
+test('propaga permissões pelo registro compartilhado sem recriar vínculos', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock({quantidadeContatos: 2})
+    const service = criarPermissionCategoryService({prisma})
+
+    await service.editarCategoria(criarPedidoEdicao({quantidadeContatosConfirmada: 2}))
+
+    assert.deepEqual(
+        chamadas.map(chamada => chamada.operacao),
+        ['transaction', 'findFirst', 'updateMany', 'findFirst']
+    )
+})
