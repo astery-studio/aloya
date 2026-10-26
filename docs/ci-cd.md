@@ -54,8 +54,8 @@ environments homônimos do GitHub.
 
 `frontend/eas.json` contém os perfis:
 
-- `development`: development build com ferramentas de depuração e distribuição
-  interna;
+- `development`: development build opcional para testes que exigem recursos
+  nativos indisponíveis no Expo Go;
 - `preview`: distribuição interna e APK Android instalável;
 - `production`: artefatos de loja com incremento remoto de versão.
 
