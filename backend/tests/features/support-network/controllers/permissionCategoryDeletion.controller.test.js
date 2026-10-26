@@ -95,4 +95,28 @@ test('rejeita id inválido sem consultar o impacto ou excluir', async () => {
     assert.equal(quantidadeChamadas, 0);
 });
 
+test('rejeita exclusão sem decisões antes de chamar o serviço', async () => {
+    let chamado = false;
+    const controller = criarController({
+        async excluirCategoria() {
+            chamado = true;
+        }
+    });
+    const res = criarResposta();
+
+    await controller.excluirCategoria(
+        criarRequisicao({ body: { atualizadoEm: '2026-10-26T12:00:00.000Z' } }),
+        res,
+        assert.fail
+    );
+
+    assert.equal(chamado, false);
+    assert.equal(res.statusCode, 422);
+    assert.equal(res.body.erro.codigo, 'ERRO_VALIDACAO');
+    assert.equal(
+        res.body.erro.mensagem,
+        'Informe uma decisão para cada contato vinculado à categoria.'
+    );
+});
+
 export { criarController, criarRequisicao, criarResposta };
