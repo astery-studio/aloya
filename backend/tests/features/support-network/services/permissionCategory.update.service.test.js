@@ -202,3 +202,16 @@ test('solicita confirmação antes de afetar contatos ativos', async () => {
 
     assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
 })
+
+test('atualiza categoria quando a titular confirma a quantidade atual', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock({quantidadeContatos: 2})
+    const service = criarPermissionCategoryService({prisma})
+
+    const categoria = await service.editarCategoria(criarPedidoEdicao({
+        quantidadeContatosConfirmada: 2
+    }))
+
+    assert.equal(chamadas.filter(chamada => chamada.operacao === 'updateMany').length, 1)
+    assert.equal(categoria.quantidadeContatos, 2)
+    assert.equal(categoria.nome, 'Namorado')
+})
