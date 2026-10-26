@@ -85,6 +85,18 @@ test('rejeita campos internos e de outra titular na edição', () => {
     assert.equal(resultado.erros.some(erro => erro.campo === 'dados'), true)
 })
 
+test('rejeita versão ausente, inválida ou não canônica na edição', () => {
+    for (const atualizadoEm of [undefined, null, '', '2026-10-26', '2026-10-26T12:00:00Z', 'data-inválida']) {
+        const resultado = validator.validarEdicaoCategoria({
+            ...criarBodyValido(),
+            atualizadoEm
+        })
+
+        assert.equal(resultado.valido, false)
+        assert.equal(resultado.erros.some(erro => erro.campo === 'atualizadoEm'), true)
+    }
+})
+
 test('aceita uma categoria válida e normaliza seu nome', () => {
     const resultado = validator.validarCriacaoCategoria({
         nome: '  Família   Próxima  ',
