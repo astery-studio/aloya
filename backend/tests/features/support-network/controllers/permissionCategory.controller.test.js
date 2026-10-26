@@ -531,3 +531,43 @@ test('atualiza categoria e devolve a mensagem do protótipo', async () => {
         categoria
     });
 });
+
+test('edita usando somente o id e o papel da sessão autenticada', async () => {
+    let parametrosRecebidos = null;
+    const controller = criarPermissionCategoryController({
+        permissionCategoryValidator: {
+            validarIdCategoria() {
+                return 10;
+            },
+            validarEdicaoCategoria() {
+                return criarValidacaoEdicaoValida();
+            }
+        },
+        permissionCategoryService: {
+            async editarCategoria(parametros) {
+                parametrosRecebidos = parametros;
+                return criarCategoriaCriada();
+            }
+        }
+    });
+
+    await controller.editarCategoria(
+        {
+            params: {id: '10'},
+            body: {titularId: 999, papel: 'administrador'},
+            usuario: {id: 7, papel: 'principal'}
+        },
+        criarRespostaMock(),
+        assert.fail
+    );
+
+    assert.deepEqual(parametrosRecebidos, {
+        titularId: 7,
+        papel: 'principal',
+        categoriaId: 10,
+        nome: 'Namorado',
+        dadosVisiveis: ['geral.fase_atual'],
+        atualizadoEm: new Date('2026-10-26T12:00:00.000Z'),
+        quantidadeContatosConfirmada: null
+    });
+});
