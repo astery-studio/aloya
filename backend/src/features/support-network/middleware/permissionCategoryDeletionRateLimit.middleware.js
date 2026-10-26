@@ -1,4 +1,9 @@
-function criarPermissionCategoryDeletionRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
+function criarPermissionCategoryDeletionRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console
+}) {
     return rateLimit({
         windowMs: janelaMs,
         limit: limite,

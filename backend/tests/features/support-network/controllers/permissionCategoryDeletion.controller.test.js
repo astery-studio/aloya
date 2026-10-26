@@ -86,7 +86,11 @@ test('rejeita id inválido sem consultar o impacto ou excluir', async () => {
     for (const operacao of ['consultarImpacto', 'excluirCategoria']) {
         const res = criarResposta();
 
-        await controller[operacao](criarRequisicao({ params: { id: 'invalido' } }), res, assert.fail);
+        await controller[operacao](
+            criarRequisicao({ params: { id: 'invalido' } }),
+            res,
+            assert.fail
+        );
 
         assert.equal(res.statusCode, 400);
         assert.equal(res.body.erro.codigo, 'ID_CATEGORIA_INVALIDO');
@@ -183,13 +187,9 @@ test('define mensagem amigável do protótipo para falha inesperada', async () =
         }
     });
 
-    await controller.excluirCategoria(
-        criarRequisicao(),
-        criarResposta(),
-        (erro) => {
-            erroEncaminhado = erro;
-        }
-    );
+    await controller.excluirCategoria(criarRequisicao(), criarResposta(), (erro) => {
+        erroEncaminhado = erro;
+    });
 
     assert.equal(erroEncaminhado, erroInterno);
     assert.equal(

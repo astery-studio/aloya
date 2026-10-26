@@ -40,10 +40,7 @@ function validarAtualizadoEm(valor, erros) {
 function validarDecisoes(valor, erros) {
     if (!Array.isArray(valor)) {
         erros.push(
-            criarErro(
-                'decisoes',
-                'Informe uma decisão para cada contato vinculado à categoria.'
-            )
+            criarErro('decisoes', 'Informe uma decisão para cada contato vinculado à categoria.')
         );
         return [];
     }

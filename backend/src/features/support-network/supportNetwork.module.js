@@ -8,7 +8,10 @@ import { criarPermissionCategoryDeletionController } from './controllers/permiss
 function criarSupportNetworkModule({ prisma } = {}) {
     const permissionCategoryService = criarPermissionCategoryService({ prisma });
     const permissionCategoryValidator = criarPermissionCategoryValidator();
-    const permissionCategoryController = criarPermissionCategoryController({ permissionCategoryService, permissionCategoryValidator });
+    const permissionCategoryController = criarPermissionCategoryController({
+        permissionCategoryService,
+        permissionCategoryValidator
+    });
     const permissionCategoryDeletionService = criarPermissionCategoryDeletionService({ prisma });
     const permissionCategoryDeletionValidator = criarPermissionCategoryDeletionValidator();
     const permissionCategoryDeletionController = criarPermissionCategoryDeletionController({

@@ -161,14 +161,11 @@ test('exclui diretamente uma categoria sem contatos ativos', async () => {
         quantidadeAcessosMantidos: 0
     });
     assert.equal(chamadas.filter(([nome]) => nome === 'categoria.deleteMany').length, 1);
-    assert.deepEqual(
-        chamadas.find(([nome]) => nome === 'categoria.deleteMany')[1].where,
-        {
-            id: 12,
-            titularId: 1,
-            atualizadoEm: VERSAO
-        }
-    );
+    assert.deepEqual(chamadas.find(([nome]) => nome === 'categoria.deleteMany')[1].where, {
+        id: 12,
+        titularId: 1,
+        atualizadoEm: VERSAO
+    });
 });
 
 test('impede exclusão enquanto algum contato ativo estiver sem decisão', async () => {
@@ -191,7 +188,10 @@ test('impede exclusão enquanto algum contato ativo estiver sem decisão', async
             quantidadeContatos: 2
         }
     );
-    assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+    assert.equal(
+        chamadas.some(([nome]) => nome === 'categoria.deleteMany'),
+        false
+    );
 });
 
 test('rejeita decisão referente a vínculo que não pertence mais à categoria', async () => {
@@ -333,8 +333,14 @@ test('rejeita formulário carregado de uma versão antiga da categoria', async (
         status: 409,
         codigo: 'CONFLITO_EXCLUSAO_CATEGORIA'
     });
-    assert.equal(chamadas.some(([nome]) => nome === 'vinculo.updateMany'), false);
-    assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+    assert.equal(
+        chamadas.some(([nome]) => nome === 'vinculo.updateMany'),
+        false
+    );
+    assert.equal(
+        chamadas.some(([nome]) => nome === 'categoria.deleteMany'),
+        false
+    );
 });
 
 test('detecta concorrência ocorrida no instante de apagar a categoria', async () => {
@@ -367,7 +373,10 @@ test('interrompe a transação quando um vínculo ativo muda durante a exclusão
             codigo: 'IMPACTO_EXCLUSAO_ALTERADO'
         }
     );
-    assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+    assert.equal(
+        chamadas.some(([nome]) => nome === 'categoria.deleteMany'),
+        false
+    );
 });
 
 test('converte conflito de chave estrangeira em impacto desatualizado', async () => {
@@ -400,18 +409,15 @@ test('valida id, versão e decisões antes de iniciar a transação', async () =
     const { prisma, chamadas } = criarPrisma();
     const service = criarPermissionCategoryDeletionService({ prisma });
 
-    await assert.rejects(
-        () => service.excluirCategoria(criarPedido({ categoriaId: 0 })),
-        { codigo: 'ID_CATEGORIA_INVALIDO' }
-    );
-    await assert.rejects(
-        () => service.excluirCategoria(criarPedido({ atualizadoEm: null })),
-        { codigo: 'VERSAO_CATEGORIA_INVALIDA' }
-    );
-    await assert.rejects(
-        () => service.excluirCategoria(criarPedido({ decisoes: null })),
-        { codigo: 'DECISOES_CONTATOS_OBRIGATORIAS' }
-    );
+    await assert.rejects(() => service.excluirCategoria(criarPedido({ categoriaId: 0 })), {
+        codigo: 'ID_CATEGORIA_INVALIDO'
+    });
+    await assert.rejects(() => service.excluirCategoria(criarPedido({ atualizadoEm: null })), {
+        codigo: 'VERSAO_CATEGORIA_INVALIDA'
+    });
+    await assert.rejects(() => service.excluirCategoria(criarPedido({ decisoes: null })), {
+        codigo: 'DECISOES_CONTATOS_OBRIGATORIAS'
+    });
     assert.equal(chamadas.includes('transaction'), false);
 });
 
