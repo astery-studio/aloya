@@ -132,4 +132,26 @@ test('impede contato de apoio de consultar ou excluir categoria', async () => {
     assert.deepEqual(chamadas, []);
 });
 
+test('exclui diretamente uma categoria sem contatos ativos', async () => {
+    const { prisma, chamadas } = criarPrisma();
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    const resultado = await service.excluirCategoria(criarPedido());
+
+    assert.deepEqual(resultado, {
+        categoriaId: 12,
+        quantidadeAcessosRemovidos: 0,
+        quantidadeAcessosMantidos: 0
+    });
+    assert.equal(chamadas.filter(([nome]) => nome === 'categoria.deleteMany').length, 1);
+    assert.deepEqual(
+        chamadas.find(([nome]) => nome === 'categoria.deleteMany')[1].where,
+        {
+            id: 12,
+            titularId: 1,
+            atualizadoEm: VERSAO
+        }
+    );
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
