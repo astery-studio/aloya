@@ -305,4 +305,19 @@ test('revoga convites e vínculos inativos restantes antes da exclusão', async 
     assert.deepEqual(atualizacao.data.permissoesIndividuais, []);
 });
 
+test('rejeita formulário carregado de uma versão antiga da categoria', async () => {
+    const categoriaExclusao = criarCategoria({
+        atualizadoEm: new Date('2026-10-26T12:30:00.000Z')
+    });
+    const { prisma, chamadas } = criarPrisma({ categoriaExclusao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(() => service.excluirCategoria(criarPedido()), {
+        status: 409,
+        codigo: 'CONFLITO_EXCLUSAO_CATEGORIA'
+    });
+    assert.equal(chamadas.some(([nome]) => nome === 'vinculo.updateMany'), false);
+    assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
