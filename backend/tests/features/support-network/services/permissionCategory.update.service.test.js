@@ -109,3 +109,20 @@ test('não revela categoria inexistente ou pertencente a outra titular', async (
     assert.deepEqual(consulta.argumentos.where, {id: 12, titularId: 7})
     assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
 })
+
+test('impede contato de apoio de editar categoria da titular', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock()
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao({papel: 'contato_apoio'})),
+        erro => {
+            assert.equal(erro.status, 403)
+            assert.equal(erro.codigo, 'ACAO_NAO_PERMITIDA')
+            assert.equal(erro.message, 'Somente a titular pode editar categorias de permissão.')
+            return true
+        }
+    )
+
+    assert.deepEqual(chamadas, [])
+})
