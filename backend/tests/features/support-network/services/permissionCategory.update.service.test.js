@@ -20,7 +20,7 @@ function criarPedidoEdicao(alteracoes = {}) {
     }
 }
 
-function criarPrismaEdicaoMock({quantidadeContatos = 0} = {}) {
+function criarPrismaEdicaoMock({quantidadeContatos = 0, categoriaEncontrada = true} = {}) {
     const chamadas = []
     const categoriaAtual = {
         id: 12,
@@ -47,7 +47,9 @@ function criarPrismaEdicaoMock({quantidadeContatos = 0} = {}) {
             async findFirst(argumentos) {
                 chamadas.push({operacao: 'findFirst', argumentos})
                 consultas += 1
-                return consultas === 1 ? categoriaAtual : categoriaAtualizada
+                return consultas === 1
+                    ? (categoriaEncontrada ? categoriaAtual : null)
+                    : categoriaAtualizada
             },
             async updateMany(argumentos) {
                 chamadas.push({operacao: 'updateMany', argumentos})
@@ -88,4 +90,22 @@ test('atualiza diretamente uma categoria sem contatos vinculados', async () => {
         criadoEm,
         atualizadoEm: novoAtualizadoEm
     })
+})
+
+test('não revela categoria inexistente ou pertencente a outra titular', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock({categoriaEncontrada: false})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao()),
+        erro => {
+            assert.equal(erro.status, 404)
+            assert.equal(erro.codigo, 'CATEGORIA_NAO_ENCONTRADA')
+            return true
+        }
+    )
+
+    const consulta = chamadas.find(chamada => chamada.operacao === 'findFirst')
+    assert.deepEqual(consulta.argumentos.where, {id: 12, titularId: 7})
+    assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
 })
