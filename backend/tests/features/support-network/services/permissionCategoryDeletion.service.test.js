@@ -154,4 +154,27 @@ test('exclui diretamente uma categoria sem contatos ativos', async () => {
     );
 });
 
+test('impede exclusão enquanto algum contato ativo estiver sem decisão', async () => {
+    const categoriaExclusao = criarCategoria({
+        vinculos: [{ id: 20 }, { id: 21 }]
+    });
+    const { prisma, chamadas } = criarPrisma({ categoriaExclusao });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(
+        () =>
+            service.excluirCategoria(
+                criarPedido({
+                    decisoes: [{ vinculoId: 20, acao: 'remover_acesso' }]
+                })
+            ),
+        {
+            status: 409,
+            codigo: 'IMPACTO_EXCLUSAO_ALTERADO',
+            quantidadeContatos: 2
+        }
+    );
+    assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+});
+
 export { criarCategoria, criarPedido, criarPrisma };
