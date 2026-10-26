@@ -22,13 +22,13 @@ function criarErro(mensagem, status, codigo) {
 }
 
 //Confirma que a operação está sendo executada por uma titular válida.
-function validarTitular(titularId, papel) {
+function validarTitular(titularId, papel, mensagemAcao = 'Somente a titular pode criar categorias de permissão.') {
     if (!Number.isInteger(titularId) || titularId <= 0) {
         throw criarErro('Sua sessão é inválida.', 401, 'SESSAO_INVALIDA')
     }
 
     if (!PAPEIS_TITULAR.includes(papel)) {
-        throw criarErro('Somente a titular pode criar categorias de permissão.', 403, 'ACAO_NAO_PERMITIDA')
+        throw criarErro(mensagemAcao, 403, 'ACAO_NAO_PERMITIDA')
     }
 }
 
@@ -114,7 +114,11 @@ function criarPermissionCategoryService({prisma}) {
 
     //Lista somente categorias da titular e conta apenas contatos com vínculo ativo.
     async function listarCategorias({titularId, papel} = {}) {
-        validarTitular(titularId, papel)
+        validarTitular(
+            titularId,
+            papel,
+            'Somente a titular pode visualizar categorias de permissão.'
+        )
 
         if (typeof prisma?.categoriaPermissao?.findMany !== 'function') {
             throw new TypeError('Não foi possível consultar as categorias de permissão.')

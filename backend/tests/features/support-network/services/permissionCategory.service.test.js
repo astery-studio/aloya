@@ -343,6 +343,7 @@ test('impede contato de apoio de consultar categorias da titular', async () => {
         erro => {
             assert.equal(erro.status, 403)
             assert.equal(erro.codigo, 'ACAO_NAO_PERMITIDA')
+            assert.equal(erro.message, 'Somente a titular pode visualizar categorias de permissão.')
 
             return true
         }
