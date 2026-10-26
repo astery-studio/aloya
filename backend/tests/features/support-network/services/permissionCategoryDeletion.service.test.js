@@ -16,7 +16,11 @@ function criarCategoria(sobrescritas = {}) {
     };
 }
 
-function criarPrisma({ categoriaImpacto = criarCategoria(), categoriaExclusao = criarCategoria() } = {}) {
+function criarPrisma({
+    categoriaImpacto = criarCategoria(),
+    categoriaExclusao = criarCategoria(),
+    quantidadeCategoriasExcluidas = 1
+} = {}) {
     const chamadas = [];
     const transacao = {
         categoriaPermissao: {
@@ -26,7 +30,7 @@ function criarPrisma({ categoriaImpacto = criarCategoria(), categoriaExclusao = 
             },
             async deleteMany(argumentos) {
                 chamadas.push(['categoria.deleteMany', argumentos]);
-                return { count: 1 };
+                return { count: quantidadeCategoriasExcluidas };
             }
         },
         vinculoRedeApoio: {
@@ -318,6 +322,16 @@ test('rejeita formulário carregado de uma versão antiga da categoria', async (
     });
     assert.equal(chamadas.some(([nome]) => nome === 'vinculo.updateMany'), false);
     assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
+});
+
+test('detecta concorrência ocorrida no instante de apagar a categoria', async () => {
+    const { prisma } = criarPrisma({ quantidadeCategoriasExcluidas: 0 });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(() => service.excluirCategoria(criarPedido()), {
+        status: 409,
+        codigo: 'CONFLITO_EXCLUSAO_CATEGORIA'
+    });
 });
 
 export { criarCategoria, criarPedido, criarPrisma };
