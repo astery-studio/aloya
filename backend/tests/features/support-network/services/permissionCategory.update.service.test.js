@@ -20,7 +20,11 @@ function criarPedidoEdicao(alteracoes = {}) {
     }
 }
 
-function criarPrismaEdicaoMock({quantidadeContatos = 0, categoriaEncontrada = true} = {}) {
+function criarPrismaEdicaoMock({
+    quantidadeContatos = 0,
+    categoriaEncontrada = true,
+    versaoAtual = atualizadoEm
+} = {}) {
     const chamadas = []
     const categoriaAtual = {
         id: 12,
@@ -28,7 +32,7 @@ function criarPrismaEdicaoMock({quantidadeContatos = 0, categoriaEncontrada = tr
         nomeNormalizado: 'parceiro(a)',
         conjuntoDadosVisiveis: ['geral.fase_atual'],
         criadoEm,
-        atualizadoEm,
+        atualizadoEm: versaoAtual,
         _count: {
             vinculos: quantidadeContatos
         }
@@ -155,6 +159,22 @@ test('rejeita salvamento sem alteração real', async () => {
         erro => {
             assert.equal(erro.status, 422)
             assert.equal(erro.codigo, 'SEM_ALTERACOES')
+            return true
+        }
+    )
+
+    assert.equal(chamadas.some(chamada => chamada.operacao === 'updateMany'), false)
+})
+
+test('rejeita formulário carregado a partir de uma versão antiga', async () => {
+    const {prisma, chamadas} = criarPrismaEdicaoMock({versaoAtual: novoAtualizadoEm})
+    const service = criarPermissionCategoryService({prisma})
+
+    await assert.rejects(
+        () => service.editarCategoria(criarPedidoEdicao()),
+        erro => {
+            assert.equal(erro.status, 409)
+            assert.equal(erro.codigo, 'CONFLITO_EDICAO_CATEGORIA')
             return true
         }
     )
