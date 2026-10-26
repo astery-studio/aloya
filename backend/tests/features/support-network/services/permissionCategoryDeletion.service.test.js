@@ -19,7 +19,8 @@ function criarCategoria(sobrescritas = {}) {
 function criarPrisma({
     categoriaImpacto = criarCategoria(),
     categoriaExclusao = criarCategoria(),
-    quantidadeCategoriasExcluidas = 1
+    quantidadeCategoriasExcluidas = 1,
+    quantidadeVinculosAtualizados
 } = {}) {
     const chamadas = [];
     const transacao = {
@@ -37,7 +38,13 @@ function criarPrisma({
             async updateMany(argumentos) {
                 chamadas.push(['vinculo.updateMany', argumentos]);
                 const ids = argumentos.where?.id?.in;
-                return { count: Array.isArray(ids) ? ids.length : 0 };
+                const quantidadePadrao = Array.isArray(ids) ? ids.length : 0;
+                return {
+                    count:
+                        quantidadeVinculosAtualizados === undefined
+                            ? quantidadePadrao
+                            : quantidadeVinculosAtualizados
+                };
             }
         }
     };
@@ -332,6 +339,29 @@ test('detecta concorrência ocorrida no instante de apagar a categoria', async (
         status: 409,
         codigo: 'CONFLITO_EXCLUSAO_CATEGORIA'
     });
+});
+
+test('interrompe a transação quando um vínculo ativo muda durante a exclusão', async () => {
+    const categoriaExclusao = criarCategoria({ vinculos: [{ id: 20 }] });
+    const { prisma, chamadas } = criarPrisma({
+        categoriaExclusao,
+        quantidadeVinculosAtualizados: 0
+    });
+    const service = criarPermissionCategoryDeletionService({ prisma });
+
+    await assert.rejects(
+        () =>
+            service.excluirCategoria(
+                criarPedido({
+                    decisoes: [{ vinculoId: 20, acao: 'remover_acesso' }]
+                })
+            ),
+        {
+            status: 409,
+            codigo: 'IMPACTO_EXCLUSAO_ALTERADO'
+        }
+    );
+    assert.equal(chamadas.some(([nome]) => nome === 'categoria.deleteMany'), false);
 });
 
 export { criarCategoria, criarPedido, criarPrisma };
