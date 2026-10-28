@@ -42,7 +42,7 @@ const categoria = Object.freeze({
 })
 
 describe('SupportCategoryCard', () => {
-    test('mostra os dados e o ícone correto da categoria', async () => {
+    test('mostra os dados e os ícones corretos da categoria', async () => {
         await render(
             <SupportCategoryCard
                 categoria={categoria}
@@ -53,13 +53,31 @@ describe('SupportCategoryCard', () => {
             />
         )
 
-        expect(screen.getByText('Família')).toBeOnTheScreen()
+        expect(
+            screen.getByText('Família')
+        ).toBeOnTheScreen()
+
         expect(
             screen.getByText('3 tipos de dado permitidos')
         ).toBeOnTheScreen()
-        expect(screen.getByTestId('UserCheckIcon')).toBeOnTheScreen()
-        expect(screen.getByTestId('PencilSimpleIcon')).toBeOnTheScreen()
-        expect(screen.getByTestId('TrashIcon')).toBeOnTheScreen()
+
+        expect(
+            screen.getByTestId(
+                'UserCheckIcon',
+                {
+                    includeHiddenElements: true
+                }
+            )
+        ).toBeOnTheScreen()
+
+        expect(
+            screen.getByTestId('PencilSimpleIcon')
+        ).toBeOnTheScreen()
+
+        expect(
+            screen.getByTestId('TrashIcon')
+        ).toBeOnTheScreen()
+
         expect(
             screen.getByLabelText('2 contatos vinculados')
         ).toBeOnTheScreen()
@@ -73,17 +91,24 @@ describe('SupportCategoryCard', () => {
             />
         )
 
-        expect(
-            screen.getByTestId('support-category-summary')
-        ).toHaveProp('numberOfLines', 1)
+        const resumo = screen.getByTestId(
+            'support-category-summary'
+        )
 
-        expect(
-            screen.getByTestId('support-category-summary')
-        ).toHaveProp('adjustsFontSizeToFit', true)
+        expect(resumo).toHaveProp(
+            'numberOfLines',
+            1
+        )
 
-        expect(
-            screen.getByTestId('support-category-summary')
-        ).toHaveProp('minimumFontScale', 0.72)
+        expect(resumo).toHaveProp(
+            'adjustsFontSizeToFit',
+            true
+        )
+
+        expect(resumo).toHaveProp(
+            'minimumFontScale',
+            0.72
+        )
     })
 
     test('encaminha edição e exclusão', async () => {
@@ -159,6 +184,12 @@ describe('SupportCategoryCard', () => {
                 name: 'Editar categoria Família'
             })
         ).toBeDisabled()
+
+        expect(
+            screen.queryByRole('button', {
+                name: 'Excluir categoria Família'
+            })
+        ).toBeNull()
     })
 
     test.each([
@@ -168,7 +199,9 @@ describe('SupportCategoryCard', () => {
     ])(
         'formata %p contatos corretamente',
         (quantidade, esperado) => {
-            expect(criarRotuloContatos(quantidade)).toBe(esperado)
+            expect(
+                criarRotuloContatos(quantidade)
+            ).toBe(esperado)
         }
     )
 

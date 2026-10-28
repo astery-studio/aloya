@@ -12,30 +12,19 @@ jest.mock(
         const {View} = require('react-native')
 
         function criarIcone(nome) {
-            return function IconeFalso(
-                propriedades
-            ) {
-                return React.createElement(
-                    View,
-                    {
-                        ...propriedades,
-                        testID: nome
-                    }
-                )
+            return function IconeFalso(propriedades) {
+                return React.createElement(View, {
+                    ...propriedades,
+                    testID: nome
+                })
             }
         }
 
         return {
-            PencilSimpleIcon:
-                criarIcone(
-                    'PencilSimpleIcon'
-                ),
-            TrashIcon:
-                criarIcone('TrashIcon'),
-            UserIcon:
-                criarIcone('UserIcon'),
-            UsersIcon:
-                criarIcone('UsersIcon')
+            PencilSimpleIcon: criarIcone('PencilSimpleIcon'),
+            TrashIcon: criarIcone('TrashIcon'),
+            UserCheckIcon: criarIcone('UserCheckIcon'),
+            UsersIcon: criarIcone('UsersIcon')
         }
     }
 )
@@ -51,15 +40,9 @@ import {
 } from '../../../../src/features/support-network/constants/permissionOptions'
 
 const todasAsPermissoes = [
-    ...permissoesGerais.map(
-        permissao => permissao.id
-    ),
-    ...gruposPermissoes.flatMap(
-        grupo =>
-            grupo.permissoes.map(
-                permissao =>
-                    permissao.id
-            )
+    ...permissoesGerais.map(permissao => permissao.id),
+    ...gruposPermissoes.flatMap(grupo =>
+        grupo.permissoes.map(permissao => permissao.id)
     )
 ]
 
@@ -86,8 +69,7 @@ const categorias = [
     {
         id: 2,
         nome: 'Parceiro(a)',
-        dadosVisiveis:
-            todasAsPermissoes,
+        dadosVisiveis: todasAsPermissoes,
         quantidadeContatos: 1
     }
 ]
@@ -104,12 +86,8 @@ describe('SupportCategoryList', () => {
         )
 
         const nomes = screen
-            .getAllByTestId(
-                'support-category-name'
-            )
-            .map(elemento =>
-                elemento.props.children
-            )
+            .getAllByTestId('support-category-name')
+            .map(elemento => elemento.props.children)
 
         expect(nomes).toEqual([
             'Família',
@@ -118,23 +96,21 @@ describe('SupportCategoryList', () => {
         ])
     })
 
-    test('cria resumos amigáveis para as permissões', () => {
-        expect(
-            criarResumoPermissoes(
-                todasAsPermissoes
-            )
-        ).toBe(
-            'Todos os dados permitidos'
-        )
-
+    test('mostra o nome somente quando existe uma permissão', () => {
         expect(
             criarResumoPermissoes([
                 'emocional.sintomas_emocionais'
             ])
-        ).toBe(
-            'Apenas Humor permitido'
-        )
+        ).toBe('Apenas Humor permitido')
 
+        expect(
+            criarResumoPermissoes([
+                'geral.fase_atual'
+            ])
+        ).toBe('Apenas Fase atual permitido')
+    })
+
+    test('resume duas ou mais permissões pela quantidade', () => {
         expect(
             criarResumoPermissoes([
                 'geral.fase_atual',
@@ -148,9 +124,13 @@ describe('SupportCategoryList', () => {
                 'geral.dicas',
                 'ciclo.fluxo_menstrual'
             ])
-        ).toBe(
-            '3 tipos de dado permitidos'
-        )
+        ).toBe('3 tipos de dado permitidos')
+    })
+
+    test('mostra resumo especial quando todos os dados estão permitidos', () => {
+        expect(
+            criarResumoPermissoes(todasAsPermissoes)
+        ).toBe('Todos os dados permitidos')
     })
 
     test('ignora permissões e categorias inválidas', () => {
@@ -181,9 +161,7 @@ describe('SupportCategoryList', () => {
         )
 
         expect(
-            screen.getByText(
-                'Nenhuma categoria registrada'
-            )
+            screen.getByText('Nenhuma categoria registrada')
         ).toBeOnTheScreen()
 
         expect(
@@ -194,17 +172,14 @@ describe('SupportCategoryList', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name:
-                    'Criar nova categoria de permissão'
+                name: 'Criar nova categoria de permissão'
             })
         )
 
-        expect(onCriar).toHaveBeenCalledTimes(
-            1
-        )
+        expect(onCriar).toHaveBeenCalledTimes(1)
     })
 
-    test('mostra o carregamento inicial sem apagar dados existentes', async () => {
+    test('mostra carregamento inicial sem apagar dados existentes', async () => {
         const {rerender} = await render(
             <SupportCategoryList
                 categorias={[]}
@@ -213,9 +188,7 @@ describe('SupportCategoryList', () => {
         )
 
         expect(
-            screen.getByLabelText(
-                'Carregando categorias'
-            )
+            screen.getByLabelText('Carregando categorias')
         ).toBeOnTheScreen()
 
         await rerender(
@@ -231,9 +204,7 @@ describe('SupportCategoryList', () => {
         ).toBeOnTheScreen()
 
         expect(
-            screen.queryByLabelText(
-                'Carregando categorias'
-            )
+            screen.queryByLabelText('Carregando categorias')
         ).toBeNull()
     })
 
@@ -242,9 +213,7 @@ describe('SupportCategoryList', () => {
             <SupportCategoryList
                 categorias={categorias}
                 atualizando
-                onTentarNovamente={
-                    jest.fn()
-                }
+                onTentarNovamente={jest.fn()}
                 onCriar={jest.fn()}
             />
         )
@@ -254,30 +223,23 @@ describe('SupportCategoryList', () => {
         ).toBeOnTheScreen()
 
         expect(
-            screen.getByLabelText(
-                'Atualizando categorias'
-            )
+            screen.getByLabelText('Atualizando categorias')
         ).toBeOnTheScreen()
     })
 
     test('mostra erro inicial e executa nova tentativa', async () => {
-        const onTentarNovamente =
-            jest.fn()
+        const onTentarNovamente = jest.fn()
 
         await render(
             <SupportCategoryList
                 categorias={[]}
                 erro="ERRO_REDE"
-                onTentarNovamente={
-                    onTentarNovamente
-                }
+                onTentarNovamente={onTentarNovamente}
             />
         )
 
         expect(
-            screen.getByText(
-                'Ocorreu um erro'
-            )
+            screen.getByText('Ocorreu um erro')
         ).toBeOnTheScreen()
 
         expect(
@@ -287,9 +249,7 @@ describe('SupportCategoryList', () => {
         ).toBeOnTheScreen()
 
         expect(
-            screen.queryByText(
-                'Criar nova categoria'
-            )
+            screen.queryByText('Criar nova categoria')
         ).toBeNull()
 
         await fireEvent.press(
@@ -318,25 +278,18 @@ describe('SupportCategoryList', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name:
-                    'Editar categoria Família'
+                name: 'Editar categoria Família'
             })
         )
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name:
-                    'Excluir categoria Família'
+                name: 'Excluir categoria Família'
             })
         )
 
-        expect(onEditar).toHaveBeenCalledWith(
-            categorias[1]
-        )
-
-        expect(onExcluir).toHaveBeenCalledWith(
-            categorias[1]
-        )
+        expect(onEditar).toHaveBeenCalledWith(categorias[1])
+        expect(onExcluir).toHaveBeenCalledWith(categorias[1])
     })
 
     test('encaminha o estado da operação para a categoria correta', async () => {
@@ -352,9 +305,7 @@ describe('SupportCategoryList', () => {
         )
 
         expect(
-            screen.getByLabelText(
-                'Excluindo categoria Família'
-            )
+            screen.getByLabelText('Excluindo categoria Família')
         ).toBeOnTheScreen()
 
         expect(
