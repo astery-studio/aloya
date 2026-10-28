@@ -1,4 +1,8 @@
-//Carrega e apresenta as categorias de permissão da titular autenticada.
+//Carrega, apresenta e coordena a edição das categorias de permissão.
+import {
+    useCallback,
+    useState
+} from 'react'
 import {
     SafeAreaView
 } from 'react-native-safe-area-context'
@@ -12,6 +16,9 @@ import {
 import {
     useSupportCategories
 } from '../hooks/useSupportCategories'
+import {
+    EditSupportCategoryScreen
+} from './EditSupportCategoryScreen'
 import {estilos} from './SupportCategoriesScreen.styles'
 
 function SupportCategoriesScreen({
@@ -22,11 +29,85 @@ function SupportCategoriesScreen({
     onEditar,
     onExcluir
 }) {
+    const [
+        categoriaEmEdicao,
+        definirCategoriaEmEdicao
+    ] = useState(null)
+
     const estado =
         useSupportCategories({
             service,
             onSessaoExpirada
         })
+
+    const edicaoIntegradaDisponivel =
+        typeof service?.editarCategoria
+            === 'function'
+
+    //Abre a edição integrada quando o serviço está disponível e preserva compatibilidade externa.
+    const editarCategoria =
+        useCallback(categoria => {
+            if (
+                edicaoIntegradaDisponivel
+            ) {
+                definirCategoriaEmEdicao(
+                    categoria
+                )
+                return
+            }
+
+            onEditar?.(categoria)
+        }, [
+            edicaoIntegradaDisponivel,
+            onEditar
+        ])
+
+    //Substitui a categoria na coleção visível sem recarregar a listagem.
+    const receberCategoriaAtualizada =
+        useCallback(categoria => {
+            estado.atualizarCategoria(
+                categoria
+            )
+
+            definirCategoriaEmEdicao(
+                categoria
+            )
+        }, [
+            estado.atualizarCategoria
+        ])
+
+    const fecharEdicao =
+        useCallback(() => {
+            definirCategoriaEmEdicao(
+                null
+            )
+        }, [])
+
+    if (
+        categoriaEmEdicao !== null
+        && edicaoIntegradaDisponivel
+    ) {
+        return (
+            <EditSupportCategoryScreen
+                categoria={
+                    categoriaEmEdicao
+                }
+                editarCategoria={
+                    service.editarCategoria
+                }
+                onVoltar={fecharEdicao}
+                onCategoriaAtualizada={
+                    receberCategoriaAtualizada
+                }
+                onConcluido={
+                    fecharEdicao
+                }
+                onSessaoExpirada={
+                    onSessaoExpirada
+                }
+            />
+        )
+    }
 
     return (
         <SafeAreaView
@@ -51,7 +132,9 @@ function SupportCategoriesScreen({
                     estado.atualizando
                 }
                 erro={estado.erro}
-                onEditar={onEditar}
+                onEditar={
+                    editarCategoria
+                }
                 onExcluir={onExcluir}
                 onCriar={onCriar}
                 onTentarNovamente={
