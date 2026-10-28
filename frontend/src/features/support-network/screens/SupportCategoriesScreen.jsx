@@ -12,7 +12,6 @@ import { useDeleteSupportCategory } from '../hooks/useDeleteSupportCategory';
 import { useSupportCategories } from '../hooks/useSupportCategories';
 import { EditSupportCategoryScreen } from './EditSupportCategoryScreen';
 import { estilos } from './SupportCategoriesScreen.styles';
-import { useState } from 'react';
 
 function criarListaDecisoes(impacto, decisoes) {
     if (!Array.isArray(impacto?.contatos)) {
@@ -55,24 +54,27 @@ function SupportCategoriesScreen({
         onSessaoExpirada
     });
 
-    const edicaoIntegradaDisponivel = typeof service?.editarCategoria === 'function';
+    const edicaoIntegradaDisponivel =
+        typeof service?.editarCategoria === 'function';
 
     const exclusaoIntegradaDisponivel =
-        typeof service?.consultarImpactoExclusao === 'function' &&
-        typeof service?.excluirCategoria === 'function';
+        typeof service?.consultarImpactoExclusao === 'function'
+        && typeof service?.excluirCategoria === 'function';
 
     // Abre a edição integrada quando o serviço está disponível.
     const editarCategoria = useCallback(
         (categoria) => {
             if (edicaoIntegradaDisponivel) {
                 definirCategoriaEmEdicao(categoria);
-
                 return;
             }
 
             onEditar?.(categoria);
         },
-        [edicaoIntegradaDisponivel, onEditar]
+        [
+            edicaoIntegradaDisponivel,
+            onEditar
+        ]
     );
 
     // Consulta o impacto antes de apresentar a confirmação de exclusão.
@@ -80,20 +82,22 @@ function SupportCategoriesScreen({
         (categoria) => {
             if (exclusaoIntegradaDisponivel) {
                 void exclusao.solicitarExclusao(categoria);
-
                 return;
             }
 
             onExcluir?.(categoria);
         },
-        [exclusao, exclusaoIntegradaDisponivel, onExcluir]
+        [
+            exclusao,
+            exclusaoIntegradaDisponivel,
+            onExcluir
+        ]
     );
 
     // Substitui a categoria na coleção visível sem recarregar a listagem.
     const receberCategoriaAtualizada = useCallback(
         (categoria) => {
             atualizarCategoria(categoria);
-
             definirCategoriaEmEdicao(categoria);
         },
         [atualizarCategoria]
@@ -105,14 +109,25 @@ function SupportCategoriesScreen({
 
     // Repete a operação adequada sem perder as decisões preenchidas.
     const tentarNovamenteExclusao = useCallback(() => {
-        if (exclusao.erro?.codigo === 'IMPACTO_EXCLUSAO_ALTERADO' || exclusao.impacto === null) {
+        if (
+            exclusao.erro?.codigo === 'IMPACTO_EXCLUSAO_ALTERADO'
+            || exclusao.impacto === null
+        ) {
             return exclusao.tentarNovamente();
         }
 
-        return exclusao.confirmarExclusao(criarListaDecisoes(exclusao.impacto, exclusao.decisoes));
+        return exclusao.confirmarExclusao(
+            criarListaDecisoes(
+                exclusao.impacto,
+                exclusao.decisoes
+            )
+        );
     }, [exclusao]);
 
-    if (categoriaEmEdicao !== null && edicaoIntegradaDisponivel) {
+    if (
+        categoriaEmEdicao !== null
+        && edicaoIntegradaDisponivel
+    ) {
         return (
             <EditSupportCategoryScreen
                 categoria={categoriaEmEdicao}
@@ -125,7 +140,9 @@ function SupportCategoriesScreen({
         );
     }
 
-    const operacaoExclusaoEmAndamento = exclusao.carregandoImpacto || exclusao.excluindo;
+    const operacaoExclusaoEmAndamento =
+        exclusao.carregandoImpacto
+        || exclusao.excluindo;
 
     return (
         <>
@@ -134,7 +151,11 @@ function SupportCategoriesScreen({
                 edges={['bottom']}
                 style={estilos.tela}
             >
-                <Header titulo="Categorias de Permissão" variante="comVoltar" onVoltar={onVoltar} />
+                <Header
+                    titulo="Categorias de Permissão"
+                    variante="comVoltar"
+                    onVoltar={onVoltar}
+                />
 
                 <SupportCategoryList
                     categorias={estado.categorias}
@@ -146,9 +167,15 @@ function SupportCategoriesScreen({
                     onCriar={onCriar}
                     onTentarNovamente={estado.tentarNovamente}
                     categoriaEmAndamentoId={
-                        operacaoExclusaoEmAndamento ? exclusao.categoria?.id : null
+                        operacaoExclusaoEmAndamento
+                            ? exclusao.categoria?.id
+                            : null
                     }
-                    acaoEmAndamento={operacaoExclusaoEmAndamento ? 'excluir' : null}
+                    acaoEmAndamento={
+                        operacaoExclusaoEmAndamento
+                            ? 'excluir'
+                            : null
+                    }
                     desabilitado={exclusao.excluindo}
                 />
             </SafeAreaView>
@@ -170,7 +197,11 @@ function SupportCategoriesScreen({
                 aoFechar={exclusao.fecharErro}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                fundoIcone={
+                    tema.cores.icones
+                        .configuracoes
+                        .laranja.caixa
+                }
                 titulo="Ocorreu um erro"
                 mensagem={exclusao.erro?.mensagem}
                 acaoPrincipal={{
@@ -192,7 +223,11 @@ function SupportCategoriesScreen({
                 aoFechar={exclusao.concluirSucesso}
                 icone={BellIcon}
                 corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                fundoIcone={
+                    tema.cores.icones
+                        .configuracoes
+                        .laranja.caixa
+                }
                 titulo="Categoria excluída com sucesso."
                 acaoPrincipal={{
                     texto: 'OK',
