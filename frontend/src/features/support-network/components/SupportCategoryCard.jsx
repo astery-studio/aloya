@@ -90,7 +90,7 @@ function SupportCategoryCard({
                     <UserCheckIcon
                         size={18}
                         color={tema.cores.marca.secundaria}
-                        weight="fill"
+                        weight="regular"
                     />
                 </View>
 
