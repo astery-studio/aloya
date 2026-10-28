@@ -15,7 +15,7 @@ const mockUseDeleteSupportCategory =
 let mockListaProps
 let mockModalExclusaoProps
 
-const categoria = Object.freeze({
+const mockCategoria = Object.freeze({
     id: 7,
     nome: 'Família',
     dadosVisiveis: Object.freeze([
@@ -128,7 +128,7 @@ jest.mock(
                                 onPress: () =>
                                     propriedades
                                         .onExcluir(
-                                            categoria
+                                            mockCategoria
                                         )
                             }
                         )
@@ -294,7 +294,9 @@ function criarEstadoCategorias(
     alteracoes = {}
 ) {
     return {
-        categorias: [categoria],
+        categorias: [
+            mockCategoria
+        ],
         carregando: false,
         atualizando: false,
         erro: null,
@@ -443,7 +445,7 @@ describe(
                 expect(
                     solicitarExclusao
                 ).toHaveBeenCalledWith(
-                    categoria
+                    mockCategoria
                 )
             }
         )
@@ -460,7 +462,8 @@ describe(
                 mockUseDeleteSupportCategory
                     .mockReturnValue(
                         criarEstadoExclusao({
-                            categoria,
+                            categoria:
+                                mockCategoria,
                             impacto,
                             decisoes,
                             modalVisivel:
@@ -490,7 +493,7 @@ describe(
                 expect(
                     mockModalExclusaoProps
                         .categoria
-                ).toBe(categoria)
+                ).toBe(mockCategoria)
 
                 expect(
                     mockModalExclusaoProps
@@ -606,7 +609,8 @@ describe(
                 mockUseDeleteSupportCategory
                     .mockReturnValue(
                         criarEstadoExclusao({
-                            categoria,
+                            categoria:
+                                mockCategoria,
                             impacto,
                             decisoes: {
                                 20:
@@ -693,7 +697,7 @@ describe(
                 expect(
                     onExcluir
                 ).toHaveBeenCalledWith(
-                    categoria
+                    mockCategoria
                 )
             }
         )
