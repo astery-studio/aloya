@@ -1,4 +1,4 @@
-//Testa carregamento, decisões, exclusão e recuperação do fluxo.
+// Testa carregamento, decisões, exclusão e recuperação do fluxo.
 import {
     act,
     renderHook,
@@ -34,7 +34,7 @@ const impacto = Object.freeze({
     ])
 })
 
-async function montarHook({
+function montarHook({
     service,
     onCategoriaExcluida,
     onSessaoExpirada
@@ -49,15 +49,28 @@ async function montarHook({
 }
 
 async function carregarImpacto(
-    result
+    result,
+    categoriaSelecionada = categoria
 ) {
     await act(async () => {
         await result.current
             .solicitarExclusao(
-                categoria
+                categoriaSelecionada
             )
     })
 }
+
+const decisoesCompletas = Object.freeze([
+    Object.freeze({
+        vinculoId: 20,
+        acao: 'remover_acesso'
+    }),
+    Object.freeze({
+        vinculoId: 21,
+        acao:
+            'manter_acesso_individual'
+    })
+])
 
 describe(
     'useDeleteSupportCategory',
@@ -131,7 +144,7 @@ describe(
                     result
                 )
 
-                act(() => {
+                await act(async () => {
                     result.current
                         .alterarDecisao(
                             20,
@@ -167,7 +180,7 @@ describe(
                     result
                 )
 
-                act(() => {
+                await act(async () => {
                     result.current
                         .aplicarATodos(
                             'manter_acesso_individual'
@@ -207,16 +220,22 @@ describe(
                     result
                 )
 
+                let excluiu
+
                 await act(async () => {
-                    await result.current
-                        .confirmarExclusao([
-                            {
-                                vinculoId: 20,
-                                acao:
-                                    'remover_acesso'
-                            }
-                        ])
+                    excluiu =
+                        await result.current
+                            .confirmarExclusao([
+                                {
+                                    vinculoId:
+                                        20,
+                                    acao:
+                                        'remover_acesso'
+                                }
+                            ])
                 })
+
+                expect(excluiu).toBe(false)
 
                 expect(
                     excluirCategoria
@@ -259,18 +278,9 @@ describe(
 
                 await act(async () => {
                     await result.current
-                        .confirmarExclusao([
-                            {
-                                vinculoId: 20,
-                                acao:
-                                    'remover_acesso'
-                            },
-                            {
-                                vinculoId: 21,
-                                acao:
-                                    'manter_acesso_individual'
-                            }
-                        ])
+                        .confirmarExclusao(
+                            decisoesCompletas
+                        )
                 })
 
                 expect(
@@ -484,10 +494,9 @@ describe(
 
                 const service = {
                     consultarImpactoExclusao:
-                        jest.fn((
-                            _categoriaId,
-                            {signal}
-                        ) => {
+                        jest.fn(({
+                            signal
+                        } = {}) => {
                             sinalRecebido =
                                 signal
 
@@ -497,6 +506,20 @@ describe(
                         })
                 }
 
+                service
+                    .consultarImpactoExclusao =
+                    jest.fn((
+                        _categoriaId,
+                        {signal}
+                    ) => {
+                        sinalRecebido =
+                            signal
+
+                        return new Promise(
+                            () => {}
+                        )
+                    })
+
                 const {
                     result,
                     unmount
@@ -504,11 +527,13 @@ describe(
                     service
                 })
 
-                act(() => {
+                await act(async () => {
                     void result.current
                         .solicitarExclusao(
                             categoria
                         )
+
+                    await Promise.resolve()
                 })
 
                 await waitFor(() => {
@@ -517,7 +542,13 @@ describe(
                     ).toBeDefined()
                 })
 
-                unmount()
+                expect(
+                    sinalRecebido.aborted
+                ).toBe(false)
+
+                await act(async () => {
+                    unmount()
+                })
 
                 expect(
                     sinalRecebido.aborted
