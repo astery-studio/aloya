@@ -26,6 +26,8 @@ const estilos = StyleSheet.create({
                 .superficieClara,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent:
+            'space-between',
         gap: 12
     },
 
@@ -36,6 +38,19 @@ const estilos = StyleSheet.create({
     opcaoSelecionadaManter: {
         borderColor:
             cores.marca.secundaria
+    },
+
+    fundoPerigo: {
+        backgroundColor: '#FDF0F0'
+    },
+
+    fundoManter: {
+        backgroundColor: '#F0F5F2'
+    },
+
+    textos: {
+        flex: 1,
+        gap: 2
     },
 
     indicador: {
@@ -76,7 +91,6 @@ const estilos = StyleSheet.create({
     },
 
     titulo: {
-        flex: 1,
         color:
             cores.neutras
                 .textoSecundarioClaro,
@@ -100,6 +114,17 @@ const estilos = StyleSheet.create({
         fontFamily:
             fontFamilies.semibold,
         fontWeight: '600'
+    },
+
+    descricao: {
+        color:
+            cores.neutras
+                .textoSecundarioClaro,
+        fontFamily:
+            fontFamilies.regular,
+        fontSize: 13,
+        fontWeight: '400',
+        lineHeight: 19
     },
 
     pressionada: {

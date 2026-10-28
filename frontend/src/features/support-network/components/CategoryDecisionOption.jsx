@@ -5,18 +5,28 @@ import {
     View
 } from 'react-native'
 
+import {
+    CheckIcon
+} from '../../../shared/components/icons/AppIcons'
+import {cores} from '../../../shared/theme'
 import {estilos} from './CategoryDecisionOption.styles'
 
 function CategoryDecisionOption({
     titulo,
+    descricao,
     selecionado = false,
     variante = 'manter',
+    tipoIndicador = 'radio',
+    destacarFundo = false,
     aoPressionar,
     desabilitado = false,
     rotuloAcessibilidade
 }) {
     const perigo =
         variante === 'remover'
+
+    const indicadorCheck =
+        tipoIndicador === 'check'
 
     const bloqueado =
         desabilitado
@@ -46,6 +56,13 @@ function CategoryDecisionOption({
                         : estilos
                             .opcaoSelecionadaManter
                 ),
+                selecionado
+                && destacarFundo
+                && (
+                    perigo
+                        ? estilos.fundoPerigo
+                        : estilos.fundoManter
+                ),
                 pressed
                 && !bloqueado
                 && estilos.pressionada,
@@ -53,6 +70,36 @@ function CategoryDecisionOption({
                 && estilos.desabilitada
             ]}
         >
+            <View style={estilos.textos}>
+                <Text
+                    numberOfLines={3}
+                    style={[
+                        estilos.titulo,
+                        selecionado
+                        && (
+                            perigo
+                                ? estilos
+                                    .tituloPerigo
+                                : estilos
+                                    .tituloManter
+                        )
+                    ]}
+                >
+                    {titulo}
+                </Text>
+
+                {descricao ? (
+                    <Text
+                        numberOfLines={3}
+                        style={
+                            estilos.descricao
+                        }
+                    >
+                        {descricao}
+                    </Text>
+                ) : null}
+            </View>
+
             <View
                 testID={
                     perigo
@@ -72,31 +119,25 @@ function CategoryDecisionOption({
                 ]}
             >
                 {selecionado ? (
-                    <View
-                        style={
-                            estilos
-                                .centroIndicador
-                        }
-                    />
+                    indicadorCheck ? (
+                        <CheckIcon
+                            size={14}
+                            weight="bold"
+                            color={
+                                cores.neutras
+                                    .superficieClara
+                            }
+                        />
+                    ) : (
+                        <View
+                            style={
+                                estilos
+                                    .centroIndicador
+                            }
+                        />
+                    )
                 ) : null}
             </View>
-
-            <Text
-                numberOfLines={3}
-                style={[
-                    estilos.titulo,
-                    selecionado
-                    && (
-                        perigo
-                            ? estilos
-                                .tituloPerigo
-                            : estilos
-                                .tituloManter
-                    )
-                ]}
-            >
-                {titulo}
-            </Text>
         </Pressable>
     )
 }
