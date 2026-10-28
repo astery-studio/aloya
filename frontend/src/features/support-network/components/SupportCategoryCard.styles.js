@@ -1,10 +1,7 @@
 //Define a apresentação dos cartões da lista de categorias de permissão.
 import {StyleSheet} from 'react-native'
 
-import {
-    fontFamilies,
-    tema
-} from '../../../shared/theme'
+import {fontFamilies, tema} from '../../../shared/theme'
 
 const estilos = StyleSheet.create({
     cartao: {
@@ -14,11 +11,9 @@ const estilos = StyleSheet.create({
         paddingTop: 16,
         paddingBottom: 14,
         gap: 14,
-        backgroundColor:
-            tema.cores.neutras.superficieClara,
+        backgroundColor: tema.cores.neutras.superficieClara,
         borderWidth: 1.5,
-        borderColor:
-            tema.cores.neutras.bordaClara,
+        borderColor: tema.cores.neutras.bordaClara,
         borderRadius: tema.radius.grande
     },
 
@@ -28,45 +23,44 @@ const estilos = StyleSheet.create({
 
     conteudoPrincipal: {
         width: '100%',
-        minHeight: 54,
+        minHeight: 44,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10
     },
 
     caixaIcone: {
-        width: 40,
-        height: 40,
+        width: 36,
+        height: 36,
         flexShrink: 0,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor:
-            tema.cores.ciclo.superficieSuave,
-        borderWidth: 1,
-        borderColor:
-            tema.cores.neutras.bordaClara,
-        borderRadius: 12
-    },
-
-    confirmacaoIcone: {
-        position: 'absolute',
-        right: 5,
-        bottom: 6,
-        color: tema.cores.marca.secundaria,
-        fontFamily: fontFamilies.bold,
-        fontSize: 9,
-        lineHeight: 10
+        backgroundColor: tema.cores.neutras.fundoClaro,
+        borderWidth: 0.7,
+        borderColor: tema.cores.neutras.bordaClara,
+        borderRadius: 10
     },
 
     textos: {
         minWidth: 0,
         flex: 1,
-        gap: 3
+        flexShrink: 1,
+        paddingTop: 2,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start'
+    },
+
+    containerTitulo: {
+        width: '100%',
+        height: 24,
+        alignItems: 'flex-start',
+        justifyContent: 'center'
     },
 
     nome: {
-        color:
-            tema.cores.neutras.textoPrincipalClaro,
+        width: '100%',
+        color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
         fontSize: 17,
         fontWeight: '700',
@@ -74,30 +68,44 @@ const estilos = StyleSheet.create({
         includeFontPadding: false
     },
 
+    containerResumo: {
+        width: '100%',
+        minHeight: 22,
+        paddingTop: 4,
+        paddingRight: 2,
+        alignItems: 'flex-start',
+        justifyContent: 'center'
+    },
+
     resumo: {
-        color:
-            tema.cores.neutras.textoSecundarioClaro,
+        width: '100%',
+        color: tema.cores.neutras.textoSecundarioClaro,
         fontFamily: fontFamilies.regular,
         fontSize: 14,
         fontWeight: '400',
-        lineHeight: 20,
+        lineHeight: 18,
         includeFontPadding: false
     },
 
     acoes: {
-        minWidth: 92,
         flexShrink: 0,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'flex-end',
         gap: 4
+    },
+
+    areaAcao: {
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     divisor: {
         width: '100%',
         height: 1,
-        backgroundColor:
-            tema.cores.neutras.bordaClara
+        backgroundColor: tema.cores.neutras.bordaClara
     },
 
     contatos: {
@@ -109,8 +117,7 @@ const estilos = StyleSheet.create({
     },
 
     textoContatos: {
-        color:
-            tema.cores.neutras.textoSecundarioClaro,
+        color: tema.cores.neutras.textoSecundarioClaro,
         fontFamily: fontFamilies.regular,
         fontSize: 15,
         fontWeight: '400',
@@ -119,8 +126,7 @@ const estilos = StyleSheet.create({
     },
 
     quantidadeContatos: {
-        color:
-            tema.cores.neutras.textoPrincipalClaro,
+        color: tema.cores.neutras.textoPrincipalClaro,
         fontFamily: fontFamilies.bold,
         fontWeight: '700'
     }

@@ -1,15 +1,11 @@
 //Representa uma categoria de permissão e encaminha suas ações de edição e exclusão.
-import {
-    ActivityIndicator,
-    Text,
-    View
-} from 'react-native'
+import {ActivityIndicator, Text, View} from 'react-native'
 
 import {IconButton} from '../../../shared/components/common/IconButton/IconButton'
 import {
     PencilSimpleIcon,
     TrashIcon,
-    UserIcon,
+    UserCheckIcon,
     UsersIcon
 } from '../../../shared/components/icons/AppIcons'
 import {tema} from '../../../shared/theme'
@@ -45,8 +41,7 @@ function SupportCategoryCard({
     )
 
     const resumoSeguro =
-        typeof resumoPermissoes === 'string'
-        && resumoPermissoes.trim()
+        typeof resumoPermissoes === 'string' && resumoPermissoes.trim()
             ? resumoPermissoes.trim()
             : 'Permissões não informadas'
 
@@ -92,41 +87,48 @@ function SupportCategoryCard({
                     accessibilityElementsHidden
                     style={estilos.caixaIcone}
                 >
-                    <UserIcon
-                        size={25}
+                    <UserCheckIcon
+                        size={18}
                         color={tema.cores.marca.secundaria}
-                        weight="regular"
+                        weight="fill"
                     />
-
-                    <Text style={estilos.confirmacaoIcone}>
-                        ✓
-                    </Text>
                 </View>
 
                 <View style={estilos.textos}>
-                    <Text
-                        testID="support-category-name"
-                        numberOfLines={1}
-                        style={estilos.nome}
-                    >
-                        {nome}
-                    </Text>
+                    <View style={estilos.containerTitulo}>
+                        <Text
+                            testID="support-category-name"
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.85}
+                            style={estilos.nome}
+                        >
+                            {nome}
+                        </Text>
+                    </View>
 
-                    <Text
-                        numberOfLines={2}
-                        style={estilos.resumo}
-                    >
-                        {resumoSeguro}
-                    </Text>
+                    <View style={estilos.containerResumo}>
+                        <Text
+                            testID="support-category-summary"
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.72}
+                            style={estilos.resumo}
+                        >
+                            {resumoSeguro}
+                        </Text>
+                    </View>
                 </View>
 
                 <View style={estilos.acoes}>
                     {editando ? (
-                        <ActivityIndicator
-                            accessibilityLabel={`Editando categoria ${nome}`}
-                            color={tema.cores.marca.secundaria}
-                            size="small"
-                        />
+                        <View style={estilos.areaAcao}>
+                            <ActivityIndicator
+                                accessibilityLabel={`Editando categoria ${nome}`}
+                                color={tema.cores.marca.secundaria}
+                                size="small"
+                            />
+                        </View>
                     ) : (
                         <IconButton
                             icone={PencilSimpleIcon}
@@ -137,11 +139,13 @@ function SupportCategoryCard({
                     )}
 
                     {excluindo ? (
-                        <ActivityIndicator
-                            accessibilityLabel={`Excluindo categoria ${nome}`}
-                            color={tema.cores.feedback.erro}
-                            size="small"
-                        />
+                        <View style={estilos.areaAcao}>
+                            <ActivityIndicator
+                                accessibilityLabel={`Excluindo categoria ${nome}`}
+                                color={tema.cores.feedback.erro}
+                                size="small"
+                            />
+                        </View>
                     ) : (
                         <IconButton
                             icone={TrashIcon}
@@ -157,9 +161,7 @@ function SupportCategoryCard({
             <View style={estilos.divisor} />
 
             <View
-                accessibilityLabel={criarRotuloContatos(
-                    quantidadeSegura
-                )}
+                accessibilityLabel={criarRotuloContatos(quantidadeSegura)}
                 style={estilos.contatos}
             >
                 <UsersIcon
