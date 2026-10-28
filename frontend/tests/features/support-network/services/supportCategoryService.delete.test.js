@@ -301,16 +301,16 @@ describe(
             '7'
         ])(
             'rejeita o identificador inválido %p',
-            categoriaId => {
+            async categoriaId => {
                 const servico =
                     criarServico(jest.fn())
 
-                expect(() =>
+                await expect(
                     servico
                         .consultarImpactoExclusao(
                             categoriaId
                         )
-                ).toThrow(
+                ).rejects.toThrow(
                     'O identificador da categoria é inválido.'
                 )
             }
