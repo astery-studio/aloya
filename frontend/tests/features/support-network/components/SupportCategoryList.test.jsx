@@ -140,9 +140,7 @@ describe('SupportCategoryList', () => {
                 'geral.fase_atual',
                 'emocional.sintomas_emocionais'
             ])
-        ).toBe(
-            'Fase atual e Humor permitidos'
-        )
+        ).toBe('2 tipos de dado permitidos')
 
         expect(
             criarResumoPermissoes([

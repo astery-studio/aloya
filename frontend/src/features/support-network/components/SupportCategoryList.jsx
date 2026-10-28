@@ -96,18 +96,10 @@ function normalizarPermissoes(
     ]
 }
 
-function criarResumoPermissoes(
-    dadosVisiveis
-) {
-    const permissoes =
-        normalizarPermissoes(
-            dadosVisiveis
-        )
+function criarResumoPermissoes(dadosVisiveis) {
+    const permissoes = normalizarPermissoes(dadosVisiveis)
 
-    if (
-        permissoes.length
-        === TODAS_AS_PERMISSOES.length
-    ) {
+    if (permissoes.length === TODAS_AS_PERMISSOES.length) {
         return 'Todos os dados permitidos'
     }
 
@@ -115,21 +107,13 @@ function criarResumoPermissoes(
         return 'Nenhum dado permitido'
     }
 
-    const rotulos = permissoes.map(
-        permissao =>
-            ROTULO_POR_PERMISSAO
-                .get(permissao)
-    )
+    if (permissoes.length === 1) {
+        const rotulo = ROTULO_POR_PERMISSAO.get(permissoes[0])
 
-    if (rotulos.length === 1) {
-        return `Apenas ${rotulos[0]} permitido`
+        return `Apenas ${rotulo} permitido`
     }
 
-    if (rotulos.length === 2) {
-        return `${rotulos[0]} e ${rotulos[1]} permitidos`
-    }
-
-    return `${rotulos.length} tipos de dado permitidos`
+    return `${permissoes.length} tipos de dado permitidos`
 }
 
 function categoriaEhValida(categoria) {
