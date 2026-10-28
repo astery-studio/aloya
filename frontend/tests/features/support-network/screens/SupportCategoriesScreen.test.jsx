@@ -1,9 +1,23 @@
-//Testa a composição e o encaminhamento de ações da tela de categorias.
+//Testa a integração da tela com o hook e as ações da lista.
 import {
     fireEvent,
     render,
     screen
 } from '@testing-library/react-native'
+
+const mockUseSupportCategories =
+    jest.fn()
+
+jest.mock(
+    '../../../../src/features/support-network/hooks/useSupportCategories',
+    () => ({
+        useSupportCategories:
+            opcoes =>
+                mockUseSupportCategories(
+                    opcoes
+                )
+    })
+)
 
 jest.mock(
     '../../../../src/shared/components/navigation/Header/Header',
@@ -21,7 +35,8 @@ jest.mock(
             onVoltar
         }) {
             const desabilitado =
-                typeof onVoltar !== 'function'
+                typeof onVoltar
+                !== 'function'
 
             return React.createElement(
                 View,
@@ -71,7 +86,8 @@ jest.mock(
     '../../../../src/shared/components/icons/AppIcons',
     () => {
         const React = require('react')
-        const {View} = require('react-native')
+        const {View} =
+            require('react-native')
 
         function criarIcone(nome) {
             return function IconeFalso(
@@ -93,11 +109,17 @@ jest.mock(
                     'PencilSimpleIcon'
                 ),
             TrashIcon:
-                criarIcone('TrashIcon'),
+                criarIcone(
+                    'TrashIcon'
+                ),
             UserIcon:
-                criarIcone('UserIcon'),
+                criarIcone(
+                    'UserIcon'
+                ),
             UsersIcon:
-                criarIcone('UsersIcon')
+                criarIcone(
+                    'UsersIcon'
+                )
         }
     }
 )
@@ -106,215 +128,337 @@ import {
     SupportCategoriesScreen
 } from '../../../../src/features/support-network/screens/SupportCategoriesScreen'
 
-const categoria = {
+const categoria = Object.freeze({
     id: 1,
     nome: 'Família',
-    dadosVisiveis: [
+    dadosVisiveis: Object.freeze([
         'geral.fase_atual'
-    ],
-    quantidadeContatos: 2
+    ]),
+    quantidadeContatos: 2,
+    criadoEm:
+        '2026-09-25T10:00:00.000Z',
+    atualizadoEm:
+        '2026-09-25T10:00:00.000Z'
+})
+
+function criarEstadoHook(
+    alteracoes = {}
+) {
+    return {
+        categorias: [categoria],
+        carregando: false,
+        atualizando: false,
+        erro: null,
+        tentarNovamente:
+            jest.fn(),
+        atualizarLista:
+            jest.fn(),
+        adicionarCategoria:
+            jest.fn(),
+        atualizarCategoria:
+            jest.fn(),
+        removerCategoria:
+            jest.fn(),
+        ...alteracoes
+    }
 }
 
-describe('SupportCategoriesScreen', () => {
-    test('mostra o cabeçalho e a lista de categorias', async () => {
-        await render(
-            <SupportCategoriesScreen
-                categorias={[categoria]}
-                onVoltar={jest.fn()}
-                onCriar={jest.fn()}
-                onEditar={jest.fn()}
-                onExcluir={jest.fn()}
-            />
-        )
+describe(
+    'SupportCategoriesScreen',
+    () => {
+        beforeEach(() => {
+            mockUseSupportCategories
+                .mockReset()
 
-        expect(
-            screen.getByText(
-                'Categorias de Permissão'
+            mockUseSupportCategories
+                .mockReturnValue(
+                    criarEstadoHook()
+                )
+        })
+
+        test('conecta o serviço ao hook e mostra as categorias', async () => {
+            const service = {
+                listarCategorias:
+                    jest.fn()
+            }
+
+            const onSessaoExpirada =
+                jest.fn()
+
+            await render(
+                <SupportCategoriesScreen
+                    service={service}
+                    onSessaoExpirada={
+                        onSessaoExpirada
+                    }
+                    onCriar={jest.fn()}
+                    onEditar={jest.fn()}
+                    onExcluir={jest.fn()}
+                />
             )
-        ).toBeOnTheScreen()
 
-        expect(
-            screen.getByText(
-                'Variante: comVoltar'
-            )
-        ).toBeOnTheScreen()
-
-        expect(
-            screen.getByText('Família')
-        ).toBeOnTheScreen()
-
-        expect(
-            screen.getByTestId(
-                'support-categories-screen'
-            )
-        ).toBeOnTheScreen()
-    })
-
-    test('encaminha a ação de voltar', async () => {
-        const onVoltar = jest.fn()
-
-        await render(
-            <SupportCategoriesScreen
-                onVoltar={onVoltar}
-            />
-        )
-
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name: 'Voltar'
+            expect(
+                mockUseSupportCategories
+            ).toHaveBeenCalledWith({
+                service,
+                onSessaoExpirada
             })
-        )
 
-        expect(
-            onVoltar
-        ).toHaveBeenCalledTimes(1)
-    })
+            expect(
+                screen.getByText(
+                    'Categorias de Permissão'
+                )
+            ).toBeOnTheScreen()
 
-    test('encaminha a criação de categoria', async () => {
-        const onCriar = jest.fn()
+            expect(
+                screen.getByText(
+                    'Variante: comVoltar'
+                )
+            ).toBeOnTheScreen()
 
-        await render(
-            <SupportCategoriesScreen
-                onCriar={onCriar}
-            />
-        )
+            expect(
+                screen.getByText('Família')
+            ).toBeOnTheScreen()
+        })
 
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name:
-                    'Criar nova categoria de permissão'
-            })
-        )
+        test('encaminha a ação de voltar', async () => {
+            const onVoltar = jest.fn()
 
-        expect(
-            onCriar
-        ).toHaveBeenCalledTimes(1)
-    })
-
-    test('encaminha edição e exclusão da categoria', async () => {
-        const onEditar = jest.fn()
-        const onExcluir = jest.fn()
-
-        await render(
-            <SupportCategoriesScreen
-                categorias={[categoria]}
-                onEditar={onEditar}
-                onExcluir={onExcluir}
-                onCriar={jest.fn()}
-            />
-        )
-
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name:
-                    'Editar categoria Família'
-            })
-        )
-
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name:
-                    'Excluir categoria Família'
-            })
-        )
-
-        expect(
-            onEditar
-        ).toHaveBeenCalledWith(
-            categoria
-        )
-
-        expect(
-            onExcluir
-        ).toHaveBeenCalledWith(
-            categoria
-        )
-    })
-
-    test('mostra o estado de erro e encaminha nova tentativa', async () => {
-        const onTentarNovamente =
-            jest.fn()
-
-        await render(
-            <SupportCategoriesScreen
-                erro="ERRO_REDE"
-                onTentarNovamente={
-                    onTentarNovamente
-                }
-            />
-        )
-
-        expect(
-            screen.getByText(
-                'Ocorreu um erro'
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                    onVoltar={onVoltar}
+                    onCriar={jest.fn()}
+                />
             )
-        ).toBeOnTheScreen()
 
-        expect(
-            screen.getByText(
-                'Não foi possível carregar suas categorias no momento. Tente novamente.'
+            await fireEvent.press(
+                screen.getByRole(
+                    'button',
+                    {
+                        name: 'Voltar'
+                    }
+                )
             )
-        ).toBeOnTheScreen()
 
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name: 'Tentar Novamente'
-            })
-        )
+            expect(
+                onVoltar
+            ).toHaveBeenCalledTimes(1)
+        })
 
-        expect(
-            onTentarNovamente
-        ).toHaveBeenCalledTimes(1)
-    })
+        test('encaminha a criação de categoria', async () => {
+            const onCriar = jest.fn()
 
-    test('mantém as categorias durante atualização secundária', async () => {
-        await render(
-            <SupportCategoriesScreen
-                categorias={[categoria]}
-                atualizando
-                onCriar={jest.fn()}
-            />
-        )
-
-        expect(
-            screen.getByText('Família')
-        ).toBeOnTheScreen()
-
-        expect(
-            screen.getByLabelText(
-                'Atualizando categorias'
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                    onCriar={onCriar}
+                />
             )
-        ).toBeOnTheScreen()
-    })
 
-    test('encaminha o estado da operação em andamento', async () => {
-        await render(
-            <SupportCategoriesScreen
-                categorias={[categoria]}
-                categoriaEmAndamentoId={1}
-                acaoEmAndamento="excluir"
-                onEditar={jest.fn()}
-                onExcluir={jest.fn()}
-                onCriar={jest.fn()}
-            />
-        )
-
-        expect(
-            screen.getByLabelText(
-                'Excluindo categoria Família'
+            await fireEvent.press(
+                screen.getByRole(
+                    'button',
+                    {
+                        name:
+                            'Criar nova categoria de permissão'
+                    }
+                )
             )
-        ).toBeOnTheScreen()
-    })
 
-    test('desabilita o retorno quando a ação não foi fornecida', async () => {
-        await render(
-            <SupportCategoriesScreen />
-        )
+            expect(
+                onCriar
+            ).toHaveBeenCalledTimes(1)
+        })
 
-        expect(
-            screen.getByRole('button', {
-                name: 'Voltar'
-            })
-        ).toBeDisabled()
-    })
-})
+        test('encaminha a categoria para edição', async () => {
+            const onEditar = jest.fn()
+
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                    onEditar={onEditar}
+                    onCriar={jest.fn()}
+                />
+            )
+
+            await fireEvent.press(
+                screen.getByRole(
+                    'button',
+                    {
+                        name:
+                            'Editar categoria Família'
+                    }
+                )
+            )
+
+            expect(
+                onEditar
+            ).toHaveBeenCalledWith(
+                categoria
+            )
+        })
+
+        test('encaminha a categoria para exclusão', async () => {
+            const onExcluir = jest.fn()
+
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                    onExcluir={onExcluir}
+                    onCriar={jest.fn()}
+                />
+            )
+
+            await fireEvent.press(
+                screen.getByRole(
+                    'button',
+                    {
+                        name:
+                            'Excluir categoria Família'
+                    }
+                )
+            )
+
+            expect(
+                onExcluir
+            ).toHaveBeenCalledWith(
+                categoria
+            )
+        })
+
+        test('mostra o carregamento inicial', async () => {
+            mockUseSupportCategories
+                .mockReturnValue(
+                    criarEstadoHook({
+                        categorias: [],
+                        carregando: true
+                    })
+                )
+
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                />
+            )
+
+            expect(
+                screen.getByLabelText(
+                    'Carregando categorias'
+                )
+            ).toBeOnTheScreen()
+        })
+
+        test('mantém as categorias durante atualização secundária', async () => {
+            mockUseSupportCategories
+                .mockReturnValue(
+                    criarEstadoHook({
+                        atualizando: true
+                    })
+                )
+
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                    onCriar={jest.fn()}
+                />
+            )
+
+            expect(
+                screen.getByText('Família')
+            ).toBeOnTheScreen()
+
+            expect(
+                screen.getByLabelText(
+                    'Atualizando categorias'
+                )
+            ).toBeOnTheScreen()
+        })
+
+        test('mostra o erro e encaminha nova tentativa', async () => {
+            const tentarNovamente =
+                jest.fn()
+
+            mockUseSupportCategories
+                .mockReturnValue(
+                    criarEstadoHook({
+                        categorias: [],
+                        erro: 'ERRO_REDE',
+                        tentarNovamente
+                    })
+                )
+
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                />
+            )
+
+            expect(
+                screen.getByText(
+                    'Ocorreu um erro'
+                )
+            ).toBeOnTheScreen()
+
+            await fireEvent.press(
+                screen.getByRole(
+                    'button',
+                    {
+                        name:
+                            'Tentar Novamente'
+                    }
+                )
+            )
+
+            expect(
+                tentarNovamente
+            ).toHaveBeenCalledTimes(1)
+        })
+
+        test('mostra o estado vazio', async () => {
+            mockUseSupportCategories
+                .mockReturnValue(
+                    criarEstadoHook({
+                        categorias: []
+                    })
+                )
+
+            await render(
+                <SupportCategoriesScreen
+                    service={{
+                        listarCategorias:
+                            jest.fn()
+                    }}
+                    onCriar={jest.fn()}
+                />
+            )
+
+            expect(
+                screen.getByText(
+                    'Nenhuma categoria registrada'
+                )
+            ).toBeOnTheScreen()
+        })
+    }
+)

@@ -1,4 +1,4 @@
-//Compõe o cabeçalho e a listagem das categorias de permissão.
+//Carrega e apresenta as categorias de permissão da titular autenticada.
 import {
     SafeAreaView
 } from 'react-native-safe-area-context'
@@ -9,22 +9,25 @@ import {
 import {
     SupportCategoryList
 } from '../components/SupportCategoryList'
+import {
+    useSupportCategories
+} from '../hooks/useSupportCategories'
 import {estilos} from './SupportCategoriesScreen.styles'
 
 function SupportCategoriesScreen({
-    categorias = [],
-    carregando = false,
-    atualizando = false,
-    erro = null,
-    categoriaEmAndamentoId = null,
-    acaoEmAndamento = null,
-    desabilitado = false,
+    service,
+    onSessaoExpirada,
     onVoltar,
-    onEditar,
-    onExcluir,
     onCriar,
-    onTentarNovamente
+    onEditar,
+    onExcluir
 }) {
+    const estado =
+        useSupportCategories({
+            service,
+            onSessaoExpirada
+        })
+
     return (
         <SafeAreaView
             testID="support-categories-screen"
@@ -38,24 +41,21 @@ function SupportCategoriesScreen({
             />
 
             <SupportCategoryList
-                categorias={categorias}
-                carregando={carregando}
-                atualizando={atualizando}
-                erro={erro}
-                categoriaEmAndamentoId={
-                    categoriaEmAndamentoId
+                categorias={
+                    estado.categorias
                 }
-                acaoEmAndamento={
-                    acaoEmAndamento
+                carregando={
+                    estado.carregando
                 }
-                desabilitado={
-                    desabilitado
+                atualizando={
+                    estado.atualizando
                 }
+                erro={estado.erro}
                 onEditar={onEditar}
                 onExcluir={onExcluir}
                 onCriar={onCriar}
                 onTentarNovamente={
-                    onTentarNovamente
+                    estado.tentarNovamente
                 }
             />
         </SafeAreaView>
