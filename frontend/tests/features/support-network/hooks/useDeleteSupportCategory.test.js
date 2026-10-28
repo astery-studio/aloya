@@ -34,6 +34,31 @@ const impacto = Object.freeze({
     ])
 })
 
+async function montarHook({
+    service,
+    onCategoriaExcluida,
+    onSessaoExpirada
+}) {
+    return renderHook(() =>
+        useDeleteSupportCategory({
+            service,
+            onCategoriaExcluida,
+            onSessaoExpirada
+        })
+    )
+}
+
+async function carregarImpacto(
+    result
+) {
+    await act(async () => {
+        await result.current
+            .solicitarExclusao(
+                categoria
+            )
+    })
+}
+
 describe(
     'useDeleteSupportCategory',
     () => {
@@ -49,18 +74,13 @@ describe(
                 }
 
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service
-                        })
-                    )
+                    await montarHook({
+                        service
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 expect(
                     service
@@ -97,24 +117,19 @@ describe(
             'altera somente a decisão selecionada',
             async () => {
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impacto
-                                        )
-                            }
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impacto
+                                    )
+                        }
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 act(() => {
                     result.current
@@ -138,24 +153,19 @@ describe(
             'aplica uma decisão a todos',
             async () => {
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impacto
-                                        )
-                            }
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impacto
+                                    )
+                        }
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 act(() => {
                     result.current
@@ -182,25 +192,20 @@ describe(
                     jest.fn()
 
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impacto
-                                        ),
-                                excluirCategoria
-                            }
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impacto
+                                    ),
+                            excluirCategoria
+                        }
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 await act(async () => {
                     await result.current
@@ -236,26 +241,21 @@ describe(
                     jest.fn()
 
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impacto
-                                        ),
-                                excluirCategoria
-                            },
-                            onCategoriaExcluida
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impacto
+                                    ),
+                            excluirCategoria
+                        },
+                        onCategoriaExcluida
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 await act(async () => {
                     await result.current
@@ -302,6 +302,10 @@ describe(
                 expect(
                     result.current.sucesso
                 ).toBe(true)
+
+                expect(
+                    result.current.impacto
+                ).toBeNull()
             }
         )
 
@@ -325,25 +329,20 @@ describe(
                 }
 
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impactoVazio
-                                        ),
-                                excluirCategoria
-                            }
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impactoVazio
+                                    ),
+                            excluirCategoria
+                        }
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 await act(async () => {
                     await result.current
@@ -367,31 +366,26 @@ describe(
             'mantém o fluxo aberto quando a exclusão falha',
             async () => {
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impacto
-                                        ),
-                                excluirCategoria:
-                                    jest.fn()
-                                        .mockRejectedValue(
-                                            new Error(
-                                                'Erro privado'
-                                            )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impacto
+                                    ),
+                            excluirCategoria:
+                                jest.fn()
+                                    .mockRejectedValue(
+                                        new Error(
+                                            'Erro privado'
                                         )
-                            }
-                        })
-                    )
+                                    )
+                        }
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 await act(async () => {
                     await result.current
@@ -419,11 +413,16 @@ describe(
                 expect(
                     result.current.impacto
                 ).toEqual(impacto)
+
+                expect(
+                    result.current
+                        .modalVisivel
+                ).toBe(true)
             }
         )
 
         test(
-            'solicita nova consulta quando o impacto mudou',
+            'solicita revisão quando o impacto mudou',
             async () => {
                 const erro =
                     new Error(
@@ -434,29 +433,24 @@ describe(
                     'IMPACTO_EXCLUSAO_ALTERADO'
 
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockResolvedValue(
-                                            impacto
-                                        ),
-                                excluirCategoria:
-                                    jest.fn()
-                                        .mockRejectedValue(
-                                            erro
-                                        )
-                            }
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockResolvedValue(
+                                        impacto
+                                    ),
+                            excluirCategoria:
+                                jest.fn()
+                                    .mockRejectedValue(
+                                        erro
+                                    )
+                        }
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 await act(async () => {
                     await result.current
@@ -503,15 +497,15 @@ describe(
                         })
                 }
 
-                const {result, unmount} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service
-                        })
-                    )
+                const {
+                    result,
+                    unmount
+                } = await montarHook({
+                    service
+                })
 
                 act(() => {
-                    result.current
+                    void result.current
                         .solicitarExclusao(
                             categoria
                         )
@@ -547,25 +541,20 @@ describe(
                     jest.fn()
 
                 const {result} =
-                    renderHook(() =>
-                        useDeleteSupportCategory({
-                            service: {
-                                consultarImpactoExclusao:
-                                    jest.fn()
-                                        .mockRejectedValue(
-                                            erro
-                                        )
-                            },
-                            onSessaoExpirada
-                        })
-                    )
+                    await montarHook({
+                        service: {
+                            consultarImpactoExclusao:
+                                jest.fn()
+                                    .mockRejectedValue(
+                                        erro
+                                    )
+                        },
+                        onSessaoExpirada
+                    })
 
-                await act(async () => {
-                    await result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
-                })
+                await carregarImpacto(
+                    result
+                )
 
                 expect(
                     onSessaoExpirada
