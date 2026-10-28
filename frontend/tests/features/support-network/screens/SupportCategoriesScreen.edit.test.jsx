@@ -22,7 +22,7 @@ const categoria = Object.freeze({
         '2026-10-26T12:00:00.000Z'
 })
 
-const categoriaAtualizada =
+const mockCategoriaAtualizada =
     Object.freeze({
         ...categoria,
         nome: 'Parceiro(a)',
@@ -33,9 +33,7 @@ const categoriaAtualizada =
 jest.mock(
     '../../../../src/features/support-network/hooks/useSupportCategories',
     () => ({
-        useSupportCategories: (
-            configuracao
-        ) =>
+        useSupportCategories: configuracao =>
             mockUseSupportCategories(
                 configuracao
             )
@@ -161,7 +159,7 @@ jest.mock(
                                 'Simular categoria atualizada',
                             onPress: () =>
                                 onCategoriaAtualizada(
-                                    categoriaAtualizada
+                                    mockCategoriaAtualizada
                                 )
                         }
                     ),
@@ -323,7 +321,7 @@ describe(
                 expect(
                     atualizarCategoria
                 ).toHaveBeenCalledWith(
-                    categoriaAtualizada
+                    mockCategoriaAtualizada
                 )
 
                 expect(
