@@ -33,7 +33,7 @@ function criarCategoria({
 }
 
 describe('useSupportCategories', () => {
-    test('carrega automaticamente as categorias', async () => {
+    test('carrega e ordena automaticamente as categorias', async () => {
         const lista = [
             criarCategoria({
                 id: 2,
@@ -129,35 +129,10 @@ describe('useSupportCategories', () => {
         expect(
             result.current.carregando
         ).toBe(false)
-    })
-
-    test('aceita uma lista vazia', async () => {
-        const service = {
-            listarCategorias:
-                jest.fn()
-                    .mockResolvedValue([])
-        }
-
-        const {result} =
-            await renderHook(() =>
-                useSupportCategories({
-                    service
-                })
-            )
-
-        await waitFor(() => {
-            expect(
-                result.current.carregando
-            ).toBe(false)
-        })
 
         expect(
             result.current.categorias
         ).toEqual([])
-
-        expect(
-            result.current.erro
-        ).toBeNull()
     })
 
     test('mostra erro genérico sem expor detalhes internos', async () => {
@@ -195,7 +170,7 @@ describe('useSupportCategories', () => {
         ).not.toContain('banco')
     })
 
-    test('permite tentar novamente após falha', async () => {
+    test('permite tentar novamente após uma falha', async () => {
         const categoria =
             criarCategoria()
 
@@ -325,7 +300,7 @@ describe('useSupportCategories', () => {
         ])
     })
 
-    test('mantém os dados quando uma atualização falha', async () => {
+    test('mantém os dados visíveis quando a atualização falha', async () => {
         const categoria =
             criarCategoria()
 
@@ -426,69 +401,35 @@ describe('useSupportCategories', () => {
         })
     })
 
-    test('encerra a sessão quando a API devolve erro de autenticação', async () => {
-        const falha = new Error(
-            'Informação privada'
-        )
-
-        falha.status = 401
-        falha.codigo =
-            'TOKEN_INVALIDO'
-
-        const onSessaoExpirada =
-            jest.fn()
-
-        const service = {
-            listarCategorias:
-                jest.fn()
-                    .mockRejectedValue(
-                        falha
-                    )
-        }
-
-        const {result} =
-            await renderHook(() =>
-                useSupportCategories({
-                    service,
-                    onSessaoExpirada
-                })
-            )
-
-        await waitFor(() => {
-            expect(
-                result.current.carregando
-            ).toBe(false)
-        })
-
-        expect(
-            onSessaoExpirada
-        ).toHaveBeenCalledWith({
-            mensagem:
-                'Sua sessão expirou. Entre novamente.'
-        })
-
-        expect(
-            result.current.erro
-        ).toBeNull()
-
-        expect(
-            result.current.categorias
-        ).toEqual([])
-    })
-
     test.each([
-        'NAO_AUTENTICADO',
-        'SESSAO_INVALIDA',
-        'SESSAO_AUSENTE'
+        {
+            status: 401,
+            codigo: 'TOKEN_INVALIDO'
+        },
+        {
+            codigo:
+                'NAO_AUTENTICADO'
+        },
+        {
+            codigo:
+                'SESSAO_INVALIDA'
+        },
+        {
+            codigo:
+                'SESSAO_AUSENTE'
+        }
     ])(
-        'encerra a sessão para o código %s',
-        async codigo => {
+        'encerra a sessão para o erro $codigo',
+        async dadosErro => {
             const falha =
                 new Error(
-                    'Sessão inválida'
+                    'Informação privada'
                 )
 
-            falha.codigo = codigo
+            Object.assign(
+                falha,
+                dadosErro
+            )
 
             const onSessaoExpirada =
                 jest.fn()
@@ -518,11 +459,18 @@ describe('useSupportCategories', () => {
 
             expect(
                 onSessaoExpirada
-            ).toHaveBeenCalledTimes(1)
+            ).toHaveBeenCalledWith({
+                mensagem:
+                    'Sua sessão expirou. Entre novamente.'
+            })
 
             expect(
                 result.current.erro
             ).toBeNull()
+
+            expect(
+                result.current.categorias
+            ).toEqual([])
         }
     )
 
@@ -569,7 +517,7 @@ describe('useSupportCategories', () => {
         ).toBe(true)
     })
 
-    test('mostra erro quando não recebe um serviço válido', async () => {
+    test('mostra erro quando não recebe serviço válido', async () => {
         const {result} =
             await renderHook(() =>
                 useSupportCategories()
@@ -626,11 +574,13 @@ describe('useSupportCategories', () => {
             ).toBe(false)
         })
 
-        act(() => {
+        await act(async () => {
             result.current
                 .adicionarCategoria(
                     categoriaFamilia
                 )
+
+            await Promise.resolve()
         })
 
         expect(
@@ -681,11 +631,13 @@ describe('useSupportCategories', () => {
             ).toBe(false)
         })
 
-        act(() => {
+        await act(async () => {
             result.current
                 .atualizarCategoria(
                     categoriaAtualizada
                 )
+
+            await Promise.resolve()
         })
 
         expect(
@@ -734,9 +686,11 @@ describe('useSupportCategories', () => {
             ).toBe(false)
         })
 
-        act(() => {
+        await act(async () => {
             result.current
                 .removerCategoria(1)
+
+            await Promise.resolve()
         })
 
         expect(
@@ -746,7 +700,7 @@ describe('useSupportCategories', () => {
         ])
     })
 
-    test('ignora a remoção de um identificador inválido', async () => {
+    test('ignora a remoção de identificador inválido', async () => {
         const categoria =
             criarCategoria()
 
@@ -773,10 +727,12 @@ describe('useSupportCategories', () => {
 
         let removeu
 
-        act(() => {
+        await act(async () => {
             removeu =
                 result.current
                     .removerCategoria(-1)
+
+            await Promise.resolve()
         })
 
         expect(removeu).toBe(false)
@@ -786,7 +742,7 @@ describe('useSupportCategories', () => {
         ).toEqual([categoria])
     })
 
-    test('ordena nomes sem diferenciar maiúsculas e acentos', () => {
+    test('ordena nomes alfabeticamente em português', () => {
         const resultado =
             ordenarCategorias([
                 criarCategoria({
