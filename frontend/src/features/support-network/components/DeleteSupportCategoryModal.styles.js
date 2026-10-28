@@ -1,12 +1,6 @@
-import {
-    StyleSheet
-} from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import {
-    cores,
-    fontFamilies,
-    radius
-} from '../../../shared/theme'
+import { cores, fontFamilies, radius } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     container: {
@@ -30,22 +24,15 @@ const estilos = StyleSheet.create({
         paddingTop: 18,
         paddingBottom: 16,
         borderWidth: 1.4,
-        borderColor:
-            cores.neutras.bordaClara,
-        borderRadius:
-            radius.buttonAndInput,
-        backgroundColor:
-            cores.neutras
-                .superficieClara,
+        borderColor: cores.neutras.bordaClara,
+        borderRadius: radius.buttonAndInput,
+        backgroundColor: cores.neutras.superficieClara,
         gap: 14
     },
 
     tituloAplicar: {
-        color:
-            cores.neutras
-                .textoPrincipalClaro,
-        fontFamily:
-            fontFamilies.bold,
+        color: cores.neutras.textoPrincipalClaro,
+        fontFamily: fontFamilies.bold,
         fontSize: 17,
         fontWeight: '700',
         lineHeight: 24,
@@ -53,11 +40,8 @@ const estilos = StyleSheet.create({
     },
 
     descricaoAplicar: {
-        color:
-            cores.neutras
-                .textoSecundarioClaro,
-        fontFamily:
-            fontFamilies.regular,
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
         fontSize: 14,
         fontWeight: '400',
         lineHeight: 21,
@@ -78,16 +62,12 @@ const estilos = StyleSheet.create({
     linha: {
         flex: 1,
         height: 1,
-        backgroundColor:
-            cores.neutras.bordaClara
+        backgroundColor: cores.neutras.bordaClara
     },
 
     textoSeparador: {
-        color:
-            cores.neutras
-                .textoSecundarioClaro,
-        fontFamily:
-            fontFamilies.bold,
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.bold,
         fontSize: 12,
         fontWeight: '700',
         lineHeight: 18,
@@ -105,16 +85,13 @@ const estilos = StyleSheet.create({
         paddingTop: 14,
         paddingBottom: 4,
         borderTopWidth: 1,
-        borderTopColor:
-            cores.neutras.bordaClara,
-        backgroundColor:
-            cores.neutras
-                .superficieClara
+        borderTopColor: cores.neutras.bordaClara,
+        backgroundColor: cores.neutras.superficieClara
     },
 
     botaoConfirmar: {
         width: '100%'
     }
-})
+});
 
-export {estilos}
+export { estilos };

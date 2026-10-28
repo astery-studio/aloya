@@ -1,25 +1,18 @@
 // Testa carregamento, decisões, exclusão e recuperação do fluxo.
-import {
-    act,
-    renderHook,
-    waitFor
-} from '@testing-library/react-native'
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 
-import {
-    useDeleteSupportCategory
-} from '../../../../src/features/support-network/hooks/useDeleteSupportCategory'
+import { useDeleteSupportCategory } from '../../../../src/features/support-network/hooks/useDeleteSupportCategory';
 
 const categoria = Object.freeze({
     id: 7,
     nome: 'Família'
-})
+});
 
 const impacto = Object.freeze({
     categoria: Object.freeze({
         id: 7,
         nome: 'Família',
-        atualizadoEm:
-            '2026-10-26T12:00:00.000Z'
+        atualizadoEm: '2026-10-26T12:00:00.000Z'
     }),
     quantidadeContatos: 2,
     contatos: Object.freeze([
@@ -32,32 +25,22 @@ const impacto = Object.freeze({
             nome: 'Carlos'
         })
     ])
-})
+});
 
-function montarHook({
-    service,
-    onCategoriaExcluida,
-    onSessaoExpirada
-}) {
+function montarHook({ service, onCategoriaExcluida, onSessaoExpirada }) {
     return renderHook(() =>
         useDeleteSupportCategory({
             service,
             onCategoriaExcluida,
             onSessaoExpirada
         })
-    )
+    );
 }
 
-async function carregarImpacto(
-    result,
-    categoriaSelecionada = categoria
-) {
+async function carregarImpacto(result, categoriaSelecionada = categoria) {
     await act(async () => {
-        await result.current
-            .solicitarExclusao(
-                categoriaSelecionada
-            )
-    })
+        await result.current.solicitarExclusao(categoriaSelecionada);
+    });
 }
 
 const decisoesCompletas = Object.freeze([
@@ -67,534 +50,301 @@ const decisoesCompletas = Object.freeze([
     }),
     Object.freeze({
         vinculoId: 21,
-        acao:
-            'manter_acesso_individual'
+        acao: 'manter_acesso_individual'
     })
-])
+]);
 
-describe(
-    'useDeleteSupportCategory',
-    () => {
-        test(
-            'consulta o impacto ao solicitar a exclusão',
-            async () => {
-                const service = {
-                    consultarImpactoExclusao:
-                        jest.fn()
-                            .mockResolvedValue(
-                                impacto
-                            )
+describe('useDeleteSupportCategory', () => {
+    test('consulta o impacto ao solicitar a exclusão', async () => {
+        const service = {
+            consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto)
+        };
+
+        const { result } = await montarHook({
+            service
+        });
+
+        await carregarImpacto(result);
+
+        expect(service.consultarImpactoExclusao).toHaveBeenCalledWith(7, {
+            signal: expect.any(AbortSignal)
+        });
+
+        expect(result.current.impacto).toEqual(impacto);
+
+        expect(result.current.decisoes).toEqual({
+            20: null,
+            21: null
+        });
+
+        expect(result.current.modalVisivel).toBe(true);
+    });
+
+    test('altera somente a decisão selecionada', async () => {
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto)
+            }
+        });
+
+        await carregarImpacto(result);
+
+        await act(async () => {
+            result.current.alterarDecisao(20, 'remover_acesso');
+        });
+
+        expect(result.current.decisoes).toEqual({
+            20: 'remover_acesso',
+            21: null
+        });
+    });
+
+    test('aplica uma decisão a todos', async () => {
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto)
+            }
+        });
+
+        await carregarImpacto(result);
+
+        await act(async () => {
+            result.current.aplicarATodos('manter_acesso_individual');
+        });
+
+        expect(result.current.decisoes).toEqual({
+            20: 'manter_acesso_individual',
+            21: 'manter_acesso_individual'
+        });
+    });
+
+    test('não exclui enquanto faltam decisões', async () => {
+        const excluirCategoria = jest.fn();
+
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto),
+                excluirCategoria
+            }
+        });
+
+        await carregarImpacto(result);
+
+        let excluiu;
+
+        await act(async () => {
+            excluiu = await result.current.confirmarExclusao([
+                {
+                    vinculoId: 20,
+                    acao: 'remover_acesso'
                 }
+            ]);
+        });
 
-                const {result} =
-                    await montarHook({
-                        service
-                    })
+        expect(excluiu).toBe(false);
 
-                await carregarImpacto(
-                    result
-                )
+        expect(excluirCategoria).not.toHaveBeenCalled();
+    });
 
-                expect(
-                    service
-                        .consultarImpactoExclusao
-                ).toHaveBeenCalledWith(
-                    7,
-                    {
-                        signal:
-                            expect.any(
-                                AbortSignal
-                            )
-                    }
-                )
+    test('exclui com a versão e as decisões completas', async () => {
+        const excluirCategoria = jest.fn().mockResolvedValue({
+            categoriaId: 7,
+            quantidadeAcessosRemovidos: 1,
+            quantidadeAcessosMantidos: 1
+        });
 
-                expect(
-                    result.current.impacto
-                ).toEqual(impacto)
+        const onCategoriaExcluida = jest.fn();
 
-                expect(
-                    result.current.decisoes
-                ).toEqual({
-                    20: null,
-                    21: null
-                })
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto),
+                excluirCategoria
+            },
+            onCategoriaExcluida
+        });
 
-                expect(
-                    result.current
-                        .modalVisivel
-                ).toBe(true)
-            }
-        )
+        await carregarImpacto(result);
 
-        test(
-            'altera somente a decisão selecionada',
-            async () => {
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impacto
-                                    )
-                        }
-                    })
+        await act(async () => {
+            await result.current.confirmarExclusao(decisoesCompletas);
+        });
 
-                await carregarImpacto(
-                    result
-                )
-
-                await act(async () => {
-                    result.current
-                        .alterarDecisao(
-                            20,
-                            'remover_acesso'
-                        )
-                })
-
-                expect(
-                    result.current.decisoes
-                ).toEqual({
-                    20:
-                        'remover_acesso',
-                    21: null
-                })
-            }
-        )
-
-        test(
-            'aplica uma decisão a todos',
-            async () => {
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impacto
-                                    )
-                        }
-                    })
-
-                await carregarImpacto(
-                    result
-                )
-
-                await act(async () => {
-                    result.current
-                        .aplicarATodos(
-                            'manter_acesso_individual'
-                        )
-                })
-
-                expect(
-                    result.current.decisoes
-                ).toEqual({
-                    20:
-                        'manter_acesso_individual',
-                    21:
-                        'manter_acesso_individual'
-                })
-            }
-        )
-
-        test(
-            'não exclui enquanto faltam decisões',
-            async () => {
-                const excluirCategoria =
-                    jest.fn()
-
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impacto
-                                    ),
-                            excluirCategoria
-                        }
-                    })
-
-                await carregarImpacto(
-                    result
-                )
-
-                let excluiu
-
-                await act(async () => {
-                    excluiu =
-                        await result.current
-                            .confirmarExclusao([
-                                {
-                                    vinculoId:
-                                        20,
-                                    acao:
-                                        'remover_acesso'
-                                }
-                            ])
-                })
-
-                expect(excluiu).toBe(false)
-
-                expect(
-                    excluirCategoria
-                ).not.toHaveBeenCalled()
-            }
-        )
-
-        test(
-            'exclui com a versão e as decisões completas',
-            async () => {
-                const excluirCategoria =
-                    jest.fn()
-                        .mockResolvedValue({
-                            categoriaId: 7,
-                            quantidadeAcessosRemovidos:
-                                1,
-                            quantidadeAcessosMantidos:
-                                1
-                        })
-
-                const onCategoriaExcluida =
-                    jest.fn()
-
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impacto
-                                    ),
-                            excluirCategoria
-                        },
-                        onCategoriaExcluida
-                    })
-
-                await carregarImpacto(
-                    result
-                )
-
-                await act(async () => {
-                    await result.current
-                        .confirmarExclusao(
-                            decisoesCompletas
-                        )
-                })
-
-                expect(
-                    excluirCategoria
-                ).toHaveBeenCalledWith(
-                    7,
-                    {
-                        atualizadoEm:
-                            '2026-10-26T12:00:00.000Z',
-                        decisoes: [
-                            {
-                                vinculoId: 20,
-                                acao:
-                                    'remover_acesso'
-                            },
-                            {
-                                vinculoId: 21,
-                                acao:
-                                    'manter_acesso_individual'
-                            }
-                        ]
-                    }
-                )
-
-                expect(
-                    onCategoriaExcluida
-                ).toHaveBeenCalledWith(7)
-
-                expect(
-                    result.current.sucesso
-                ).toBe(true)
-
-                expect(
-                    result.current.impacto
-                ).toBeNull()
-            }
-        )
-
-        test(
-            'permite excluir uma categoria sem contatos',
-            async () => {
-                const excluirCategoria =
-                    jest.fn()
-                        .mockResolvedValue({
-                            categoriaId: 7,
-                            quantidadeAcessosRemovidos:
-                                0,
-                            quantidadeAcessosMantidos:
-                                0
-                        })
-
-                const impactoVazio = {
-                    ...impacto,
-                    quantidadeContatos: 0,
-                    contatos: []
+        expect(excluirCategoria).toHaveBeenCalledWith(7, {
+            atualizadoEm: '2026-10-26T12:00:00.000Z',
+            decisoes: [
+                {
+                    vinculoId: 20,
+                    acao: 'remover_acesso'
+                },
+                {
+                    vinculoId: 21,
+                    acao: 'manter_acesso_individual'
                 }
+            ]
+        });
 
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impactoVazio
-                                    ),
-                            excluirCategoria
-                        }
-                    })
+        expect(onCategoriaExcluida).toHaveBeenCalledWith(7);
 
-                await carregarImpacto(
-                    result
-                )
+        expect(result.current.sucesso).toBe(true);
 
-                await act(async () => {
-                    await result.current
-                        .confirmarExclusao([])
-                })
+        expect(result.current.impacto).toBeNull();
+    });
 
-                expect(
-                    excluirCategoria
-                ).toHaveBeenCalledWith(
-                    7,
-                    {
-                        atualizadoEm:
-                            '2026-10-26T12:00:00.000Z',
-                        decisoes: []
-                    }
-                )
+    test('permite excluir uma categoria sem contatos', async () => {
+        const excluirCategoria = jest.fn().mockResolvedValue({
+            categoriaId: 7,
+            quantidadeAcessosRemovidos: 0,
+            quantidadeAcessosMantidos: 0
+        });
+
+        const impactoVazio = {
+            ...impacto,
+            quantidadeContatos: 0,
+            contatos: []
+        };
+
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impactoVazio),
+                excluirCategoria
             }
-        )
+        });
 
-        test(
-            'mantém o fluxo aberto quando a exclusão falha',
-            async () => {
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impacto
-                                    ),
-                            excluirCategoria:
-                                jest.fn()
-                                    .mockRejectedValue(
-                                        new Error(
-                                            'Erro privado'
-                                        )
-                                    )
-                        }
-                    })
+        await carregarImpacto(result);
 
-                await carregarImpacto(
-                    result
-                )
+        await act(async () => {
+            await result.current.confirmarExclusao([]);
+        });
 
-                await act(async () => {
-                    await result.current
-                        .confirmarExclusao([
-                            {
-                                vinculoId: 20,
-                                acao:
-                                    'remover_acesso'
-                            },
-                            {
-                                vinculoId: 21,
-                                acao:
-                                    'remover_acesso'
-                            }
-                        ])
-                })
+        expect(excluirCategoria).toHaveBeenCalledWith(7, {
+            atualizadoEm: '2026-10-26T12:00:00.000Z',
+            decisoes: []
+        });
+    });
 
-                expect(
-                    result.current.erro
-                        .mensagem
-                ).toBe(
-                    'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
-                )
-
-                expect(
-                    result.current.impacto
-                ).toEqual(impacto)
-
-                expect(
-                    result.current
-                        .modalVisivel
-                ).toBe(true)
+    test('mantém o fluxo aberto quando a exclusão falha', async () => {
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto),
+                excluirCategoria: jest.fn().mockRejectedValue(new Error('Erro privado'))
             }
-        )
+        });
 
-        test(
-            'solicita revisão quando o impacto mudou',
-            async () => {
-                const erro =
-                    new Error(
-                        'Detalhes privados'
-                    )
+        await carregarImpacto(result);
 
-                erro.codigo =
-                    'IMPACTO_EXCLUSAO_ALTERADO'
-
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockResolvedValue(
-                                        impacto
-                                    ),
-                            excluirCategoria:
-                                jest.fn()
-                                    .mockRejectedValue(
-                                        erro
-                                    )
-                        }
-                    })
-
-                await carregarImpacto(
-                    result
-                )
-
-                await act(async () => {
-                    await result.current
-                        .confirmarExclusao([
-                            {
-                                vinculoId: 20,
-                                acao:
-                                    'remover_acesso'
-                            },
-                            {
-                                vinculoId: 21,
-                                acao:
-                                    'remover_acesso'
-                            }
-                        ])
-                })
-
-                expect(
-                    result.current.erro
-                        .mensagem
-                ).toBe(
-                    'Os contatos vinculados à categoria foram alterados. Revise as escolhas e tente novamente.'
-                )
-            }
-        )
-
-        test(
-            'cancela a consulta pendente ao desmontar',
-            async () => {
-                let sinalRecebido
-
-                const service = {
-                    consultarImpactoExclusao:
-                        jest.fn(({
-                            signal
-                        } = {}) => {
-                            sinalRecebido =
-                                signal
-
-                            return new Promise(
-                                () => {}
-                            )
-                        })
+        await act(async () => {
+            await result.current.confirmarExclusao([
+                {
+                    vinculoId: 20,
+                    acao: 'remover_acesso'
+                },
+                {
+                    vinculoId: 21,
+                    acao: 'remover_acesso'
                 }
+            ]);
+        });
 
-                service
-                    .consultarImpactoExclusao =
-                    jest.fn((
-                        _categoriaId,
-                        {signal}
-                    ) => {
-                        sinalRecebido =
-                            signal
+        expect(result.current.erro.mensagem).toBe(
+            'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
+        );
 
-                        return new Promise(
-                            () => {}
-                        )
-                    })
+        expect(result.current.impacto).toEqual(impacto);
 
-                const {
-                    result,
-                    unmount
-                } = await montarHook({
-                    service
-                })
+        expect(result.current.modalVisivel).toBe(true);
+    });
 
-                await act(async () => {
-                    void result.current
-                        .solicitarExclusao(
-                            categoria
-                        )
+    test('solicita revisão quando o impacto mudou', async () => {
+        const erro = new Error('Detalhes privados');
 
-                    await Promise.resolve()
-                })
+        erro.codigo = 'IMPACTO_EXCLUSAO_ALTERADO';
 
-                await waitFor(() => {
-                    expect(
-                        sinalRecebido
-                    ).toBeDefined()
-                })
-
-                expect(
-                    sinalRecebido.aborted
-                ).toBe(false)
-
-                await act(async () => {
-                    unmount()
-                })
-
-                expect(
-                    sinalRecebido.aborted
-                ).toBe(true)
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockResolvedValue(impacto),
+                excluirCategoria: jest.fn().mockRejectedValue(erro)
             }
-        )
+        });
 
-        test(
-            'encerra a sessão quando a API rejeita a autenticação',
-            async () => {
-                const erro =
-                    new Error(
-                        'Detalhes privados'
-                    )
+        await carregarImpacto(result);
 
-                erro.status = 401
-                erro.codigo =
-                    'SESSAO_INVALIDA'
+        await act(async () => {
+            await result.current.confirmarExclusao([
+                {
+                    vinculoId: 20,
+                    acao: 'remover_acesso'
+                },
+                {
+                    vinculoId: 21,
+                    acao: 'remover_acesso'
+                }
+            ]);
+        });
 
-                const onSessaoExpirada =
-                    jest.fn()
+        expect(result.current.erro.mensagem).toBe(
+            'Os contatos vinculados à categoria foram alterados. Revise as escolhas e tente novamente.'
+        );
+    });
 
-                const {result} =
-                    await montarHook({
-                        service: {
-                            consultarImpactoExclusao:
-                                jest.fn()
-                                    .mockRejectedValue(
-                                        erro
-                                    )
-                        },
-                        onSessaoExpirada
-                    })
+    test('cancela a consulta pendente ao desmontar', async () => {
+        let sinalRecebido;
 
-                await carregarImpacto(
-                    result
-                )
+        const service = {
+            consultarImpactoExclusao: jest.fn(({ signal } = {}) => {
+                sinalRecebido = signal;
 
-                expect(
-                    onSessaoExpirada
-                ).toHaveBeenCalledTimes(1)
+                return new Promise(() => {});
+            })
+        };
 
-                expect(
-                    result.current.erro
-                ).toBeNull()
-            }
-        )
-    }
-)
+        service.consultarImpactoExclusao = jest.fn((_categoriaId, { signal }) => {
+            sinalRecebido = signal;
+
+            return new Promise(() => {});
+        });
+
+        const { result, unmount } = await montarHook({
+            service
+        });
+
+        await act(async () => {
+            void result.current.solicitarExclusao(categoria);
+
+            await Promise.resolve();
+        });
+
+        await waitFor(() => {
+            expect(sinalRecebido).toBeDefined();
+        });
+
+        expect(sinalRecebido.aborted).toBe(false);
+
+        await act(async () => {
+            unmount();
+        });
+
+        expect(sinalRecebido.aborted).toBe(true);
+    });
+
+    test('encerra a sessão quando a API rejeita a autenticação', async () => {
+        const erro = new Error('Detalhes privados');
+
+        erro.status = 401;
+        erro.codigo = 'SESSAO_INVALIDA';
+
+        const onSessaoExpirada = jest.fn();
+
+        const { result } = await montarHook({
+            service: {
+                consultarImpactoExclusao: jest.fn().mockRejectedValue(erro)
+            },
+            onSessaoExpirada
+        });
+
+        await carregarImpacto(result);
+
+        expect(onSessaoExpirada).toHaveBeenCalledTimes(1);
+
+        expect(result.current.erro).toBeNull();
+    });
+});

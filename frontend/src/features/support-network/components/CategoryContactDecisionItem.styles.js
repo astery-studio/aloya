@@ -1,12 +1,6 @@
-import {
-    StyleSheet
-} from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import {
-    cores,
-    fontFamilies,
-    radius
-} from '../../../shared/theme'
+import { cores, fontFamilies, radius } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     container: {
@@ -15,23 +9,16 @@ const estilos = StyleSheet.create({
         paddingTop: 20,
         paddingBottom: 16,
         borderWidth: 1.4,
-        borderColor:
-            cores.neutras.bordaClara,
-        borderRadius:
-            radius.buttonAndInput,
-        backgroundColor:
-            cores.neutras
-                .superficieClara,
+        borderColor: cores.neutras.bordaClara,
+        borderRadius: radius.buttonAndInput,
+        backgroundColor: cores.neutras.superficieClara,
         gap: 16
     },
 
     nome: {
         alignSelf: 'center',
-        color:
-            cores.neutras
-                .textoPrincipalClaro,
-        fontFamily:
-            fontFamilies.bold,
+        color: cores.neutras.textoPrincipalClaro,
+        fontFamily: fontFamilies.bold,
         fontSize: 17,
         fontWeight: '700',
         lineHeight: 24,
@@ -42,6 +29,6 @@ const estilos = StyleSheet.create({
         width: '100%',
         gap: 10
     }
-})
+});
 
-export {estilos}
+export { estilos };

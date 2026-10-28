@@ -1,14 +1,8 @@
-import {
-    StyleSheet
-} from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import {
-    cores,
-    fontFamilies,
-    radius
-} from '../../../shared/theme'
+import { cores, fontFamilies, radius } from '../../../shared/theme';
 
-const COR_PERIGO = '#BD3E3E'
+const COR_PERIGO = '#BD3E3E';
 
 const estilos = StyleSheet.create({
     opcao: {
@@ -17,17 +11,12 @@ const estilos = StyleSheet.create({
         paddingHorizontal: 14,
         paddingVertical: 10,
         borderWidth: 1.4,
-        borderColor:
-            cores.neutras.bordaClara,
-        borderRadius:
-            radius.buttonAndInput,
-        backgroundColor:
-            cores.neutras
-                .superficieClara,
+        borderColor: cores.neutras.bordaClara,
+        borderRadius: radius.buttonAndInput,
+        backgroundColor: cores.neutras.superficieClara,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent:
-            'space-between',
+        justifyContent: 'space-between',
         gap: 12
     },
 
@@ -36,8 +25,7 @@ const estilos = StyleSheet.create({
     },
 
     opcaoSelecionadaManter: {
-        borderColor:
-            cores.marca.secundaria
+        borderColor: cores.marca.secundaria
     },
 
     fundoPerigo: {
@@ -59,14 +47,10 @@ const estilos = StyleSheet.create({
         flexShrink: 0,
         borderRadius: 11,
         borderWidth: 1.5,
-        borderColor:
-            cores.neutras
-                .bordaTracejada,
+        borderColor: cores.neutras.bordaTracejada,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor:
-            cores.neutras
-                .superficieClara
+        backgroundColor: cores.neutras.superficieClara
     },
 
     indicadorPerigo: {
@@ -75,27 +59,20 @@ const estilos = StyleSheet.create({
     },
 
     indicadorManter: {
-        borderColor:
-            cores.marca.secundaria,
-        backgroundColor:
-            cores.marca.secundaria
+        borderColor: cores.marca.secundaria,
+        backgroundColor: cores.marca.secundaria
     },
 
     centroIndicador: {
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor:
-            cores.neutras
-                .superficieClara
+        backgroundColor: cores.neutras.superficieClara
     },
 
     titulo: {
-        color:
-            cores.neutras
-                .textoSecundarioClaro,
-        fontFamily:
-            fontFamilies.regular,
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
         fontSize: 15,
         fontWeight: '400',
         lineHeight: 20
@@ -103,25 +80,19 @@ const estilos = StyleSheet.create({
 
     tituloPerigo: {
         color: COR_PERIGO,
-        fontFamily:
-            fontFamilies.semibold,
+        fontFamily: fontFamilies.semibold,
         fontWeight: '600'
     },
 
     tituloManter: {
-        color:
-            cores.marca.secundaria,
-        fontFamily:
-            fontFamilies.semibold,
+        color: cores.marca.secundaria,
+        fontFamily: fontFamilies.semibold,
         fontWeight: '600'
     },
 
     descricao: {
-        color:
-            cores.neutras
-                .textoSecundarioClaro,
-        fontFamily:
-            fontFamilies.regular,
+        color: cores.neutras.textoSecundarioClaro,
+        fontFamily: fontFamilies.regular,
         fontSize: 13,
         fontWeight: '400',
         lineHeight: 19
@@ -139,9 +110,6 @@ const estilos = StyleSheet.create({
     desabilitada: {
         opacity: 0.5
     }
-})
+});
 
-export {
-    COR_PERIGO,
-    estilos
-}
+export { COR_PERIGO, estilos };
