@@ -1,4 +1,4 @@
-//Cria e lista categorias de permissão usando a sessão autenticada.
+//Cria, lista e edita categorias de permissão usando a sessão autenticada.
 import {
     endpoints
 } from '../../../shared/services/api/endpoints'
@@ -59,7 +59,76 @@ function criarErroLocal(
     return erro
 }
 
-//Valida, normaliza e limita os únicos campos permitidos na criação.
+//Valida o identificador positivo usado no caminho da edição.
+function validarCategoriaId(categoriaId) {
+    if (
+        !Number.isSafeInteger(categoriaId)
+        || categoriaId <= 0
+    ) {
+        throw criarErroLocal(
+            'O identificador da categoria é inválido.',
+            'ID_CATEGORIA_INVALIDO'
+        )
+    }
+
+    return categoriaId
+}
+
+//Valida uma data completa no formato UTC esperado pelo backend.
+function validarAtualizadoEm(atualizadoEm) {
+    if (
+        typeof atualizadoEm !== 'string'
+        || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u
+            .test(atualizadoEm)
+    ) {
+        throw criarErroLocal(
+            'A versão da categoria é inválida.',
+            'VERSAO_CATEGORIA_INVALIDA'
+        )
+    }
+
+    const data = new Date(atualizadoEm)
+
+    if (
+        Number.isNaN(data.getTime())
+        || data.toISOString() !== atualizadoEm
+    ) {
+        throw criarErroLocal(
+            'A versão da categoria é inválida.',
+            'VERSAO_CATEGORIA_INVALIDA'
+        )
+    }
+
+    return atualizadoEm
+}
+
+//Valida a quantidade enviada ao confirmar o impacto da alteração.
+function validarQuantidadeConfirmada(
+    quantidadeContatosConfirmada
+) {
+    if (
+        quantidadeContatosConfirmada
+        === undefined
+    ) {
+        return undefined
+    }
+
+    if (
+        !Number.isSafeInteger(
+            quantidadeContatosConfirmada
+        )
+        || quantidadeContatosConfirmada < 0
+    ) {
+        throw criarErroLocal(
+            'A confirmação de impacto é inválida.',
+            'CONFIRMACAO_IMPACTO_INVALIDA'
+        )
+    }
+
+    return quantidadeContatosConfirmada
+}
+
+//Valida, normaliza e limita os únicos campos editáveis de uma categoria.
 function prepararDadosCategoria(dados) {
     if (!ehObjetoSimples(dados)) {
         throw criarErroLocal(
@@ -150,6 +219,82 @@ function prepararDadosCategoria(dados) {
     })
 }
 
+//Prepara a substituição completa da categoria e preserva sua versão original.
+function prepararEdicaoCategoria(
+    categoriaId,
+    dados
+) {
+    const id =
+        validarCategoriaId(categoriaId)
+
+    if (!ehObjetoSimples(dados)) {
+        throw criarErroLocal(
+            'Os dados da categoria são inválidos.',
+            'DADOS_CATEGORIA_INVALIDOS'
+        )
+    }
+
+    const camposPermitidos = new Set([
+        'nome',
+        'dadosVisiveis',
+        'atualizadoEm',
+        'quantidadeContatosConfirmada'
+    ])
+
+    const camposRecebidos =
+        Object.keys(dados)
+
+    const possuiCampoProibido =
+        camposRecebidos.some(
+            campo =>
+                !camposPermitidos.has(campo)
+        )
+
+    if (possuiCampoProibido) {
+        throw criarErroLocal(
+            'Os dados da categoria são inválidos.',
+            'DADOS_CATEGORIA_INVALIDOS'
+        )
+    }
+
+    const categoria =
+        prepararDadosCategoria({
+            nome: dados.nome,
+            dadosVisiveis:
+                dados.dadosVisiveis
+        })
+
+    const atualizadoEm =
+        validarAtualizadoEm(
+            dados.atualizadoEm
+        )
+
+    const quantidadeContatosConfirmada =
+        validarQuantidadeConfirmada(
+            dados.quantidadeContatosConfirmada
+        )
+
+    const corpo = {
+        nome: categoria.nome,
+        dadosVisiveis:
+            categoria.dadosVisiveis,
+        atualizadoEm
+    }
+
+    if (
+        quantidadeContatosConfirmada
+        !== undefined
+    ) {
+        corpo.quantidadeContatosConfirmada =
+            quantidadeContatosConfirmada
+    }
+
+    return Object.freeze({
+        categoriaId: id,
+        corpo: Object.freeze(corpo)
+    })
+}
+
 //Valida todos os itens da listagem e remove campos que não pertencem ao contrato público.
 function prepararListaCategorias(
     resposta
@@ -194,6 +339,9 @@ function criarSupportCategoryService({
 
     let criacaoEmAndamento = null
     let chaveDaCriacao = null
+
+    const edicoesEmAndamento =
+        new Map()
 
     //Busca somente as categorias pertencentes à sessão autenticada.
     async function listarCategorias({
@@ -268,8 +416,85 @@ function criarSupportCategoryService({
         return criacaoEmAndamento
     }
 
+    //Substitui os dados editáveis e impede duas alterações concorrentes na mesma categoria.
+    function editarCategoria(
+        categoriaId,
+        dados
+    ) {
+        const edicao =
+            prepararEdicaoCategoria(
+                categoriaId,
+                dados
+            )
+
+        const chaveAtual =
+            JSON.stringify(edicao.corpo)
+
+        const edicaoAtual =
+            edicoesEmAndamento.get(
+                edicao.categoriaId
+            )
+
+        if (edicaoAtual) {
+            if (
+                edicaoAtual.chave
+                === chaveAtual
+            ) {
+                return edicaoAtual.promessa
+            }
+
+            return Promise.reject(
+                criarErroLocal(
+                    'Aguarde a atualização atual da categoria.',
+                    'EDICAO_CATEGORIA_EM_ANDAMENTO'
+                )
+            )
+        }
+
+        let promessa
+
+        promessa =
+            requisicaoAutenticada({
+                metodo: 'PUT',
+                caminho:
+                    `${endpoints.categoriasPermissao}/${edicao.categoriaId}`,
+                corpo: edicao.corpo
+            })
+                .then(resposta =>
+                    criarSupportCategory(
+                        resposta?.categoria
+                    )
+                )
+                .finally(() => {
+                    const operacaoAtual =
+                        edicoesEmAndamento.get(
+                            edicao.categoriaId
+                        )
+
+                    if (
+                        operacaoAtual?.promessa
+                        === promessa
+                    ) {
+                        edicoesEmAndamento.delete(
+                            edicao.categoriaId
+                        )
+                    }
+                })
+
+        edicoesEmAndamento.set(
+            edicao.categoriaId,
+            {
+                chave: chaveAtual,
+                promessa
+            }
+        )
+
+        return promessa
+    }
+
     return Object.freeze({
         criarCategoria,
+        editarCategoria,
         listarCategorias
     })
 }
