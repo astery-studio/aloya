@@ -60,10 +60,6 @@ describe('useSupportCategories', () => {
                 })
             )
 
-        expect(
-            result.current.carregando
-        ).toBe(true)
-
         await waitFor(() => {
             expect(
                 result.current.carregando
@@ -96,6 +92,43 @@ describe('useSupportCategories', () => {
                 result.current.categorias
             )
         ).toBe(true)
+    })
+
+    test('mantém o carregamento inicial enquanto a requisição está pendente', async () => {
+        let concluirRequisicao
+
+        const service = {
+            listarCategorias:
+                jest.fn(
+                    () =>
+                        new Promise(
+                            resolve => {
+                                concluirRequisicao =
+                                    resolve
+                            }
+                        )
+                )
+        }
+
+        const {result} =
+            await renderHook(() =>
+                useSupportCategories({
+                    service
+                })
+            )
+
+        expect(
+            result.current.carregando
+        ).toBe(true)
+
+        await act(async () => {
+            concluirRequisicao([])
+            await Promise.resolve()
+        })
+
+        expect(
+            result.current.carregando
+        ).toBe(false)
     })
 
     test('aceita uma lista vazia', async () => {
@@ -212,6 +245,7 @@ describe('useSupportCategories', () => {
 
     test('mantém as categorias visíveis durante atualização', async () => {
         let concluirAtualizacao
+        let promessaAtualizacao
 
         const categoriaInicial =
             criarCategoria({
@@ -220,7 +254,8 @@ describe('useSupportCategories', () => {
 
         const categoriaAtualizada =
             criarCategoria({
-                nome: 'Família próxima'
+                nome:
+                    'Família próxima'
             })
 
         const service = {
@@ -253,16 +288,17 @@ describe('useSupportCategories', () => {
             ).toBe(false)
         })
 
-        act(() => {
-            result.current
-                .atualizarLista()
+        await act(async () => {
+            promessaAtualizacao =
+                result.current
+                    .atualizarLista()
+
+            await Promise.resolve()
         })
 
-        await waitFor(() => {
-            expect(
-                result.current.atualizando
-            ).toBe(true)
-        })
+        expect(
+            result.current.atualizando
+        ).toBe(true)
 
         expect(
             result.current.categorias
@@ -274,6 +310,8 @@ describe('useSupportCategories', () => {
             concluirAtualizacao([
                 categoriaAtualizada
             ])
+
+            await promessaAtualizacao
         })
 
         expect(
@@ -378,11 +416,14 @@ describe('useSupportCategories', () => {
 
         await act(async () => {
             concluirRequisicao([])
+            await Promise.resolve()
         })
 
-        expect(
-            result.current.carregando
-        ).toBe(false)
+        await waitFor(() => {
+            expect(
+                result.current.carregando
+            ).toBe(false)
+        })
     })
 
     test('encerra a sessão quando a API devolve erro de autenticação', async () => {
@@ -509,9 +550,11 @@ describe('useSupportCategories', () => {
                 })
             )
 
-        expect(
-            sinalRecebido
-        ).toBeDefined()
+        await waitFor(() => {
+            expect(
+                sinalRecebido
+            ).toBeDefined()
+        })
 
         expect(
             sinalRecebido.aborted
