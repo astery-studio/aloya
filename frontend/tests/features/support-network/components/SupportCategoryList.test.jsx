@@ -93,8 +93,8 @@ const categorias = [
 ]
 
 describe('SupportCategoryList', () => {
-    test('ordena as categorias alfabeticamente', () => {
-        render(
+    test('ordena as categorias alfabeticamente', async () => {
+        await render(
             <SupportCategoryList
                 categorias={categorias}
                 onCriar={jest.fn()}
@@ -172,10 +172,10 @@ describe('SupportCategoryList', () => {
         ).toHaveLength(3)
     })
 
-    test('mostra o estado vazio e permite criar', () => {
+    test('mostra o estado vazio e permite criar', async () => {
         const onCriar = jest.fn()
 
-        render(
+        await render(
             <SupportCategoryList
                 categorias={[]}
                 onCriar={onCriar}
@@ -194,7 +194,7 @@ describe('SupportCategoryList', () => {
             )
         ).toBeOnTheScreen()
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name:
                     'Criar nova categoria de permissão'
@@ -206,8 +206,8 @@ describe('SupportCategoryList', () => {
         )
     })
 
-    test('mostra o carregamento inicial sem apagar dados existentes', () => {
-        const {rerender} = render(
+    test('mostra o carregamento inicial sem apagar dados existentes', async () => {
+        const {rerender} = await render(
             <SupportCategoryList
                 categorias={[]}
                 carregando
@@ -220,7 +220,7 @@ describe('SupportCategoryList', () => {
             )
         ).toBeOnTheScreen()
 
-        rerender(
+        await rerender(
             <SupportCategoryList
                 categorias={categorias}
                 carregando
@@ -239,8 +239,8 @@ describe('SupportCategoryList', () => {
         ).toBeNull()
     })
 
-    test('preserva a lista durante atualização secundária', () => {
-        render(
+    test('preserva a lista durante atualização secundária', async () => {
+        await render(
             <SupportCategoryList
                 categorias={categorias}
                 atualizando
@@ -262,11 +262,11 @@ describe('SupportCategoryList', () => {
         ).toBeOnTheScreen()
     })
 
-    test('mostra erro inicial e executa nova tentativa', () => {
+    test('mostra erro inicial e executa nova tentativa', async () => {
         const onTentarNovamente =
             jest.fn()
 
-        render(
+        await render(
             <SupportCategoryList
                 categorias={[]}
                 erro="ERRO_REDE"
@@ -294,7 +294,7 @@ describe('SupportCategoryList', () => {
             )
         ).toBeNull()
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Tentar Novamente'
             })
@@ -305,11 +305,11 @@ describe('SupportCategoryList', () => {
         ).toHaveBeenCalledTimes(1)
     })
 
-    test('encaminha edição e exclusão da categoria selecionada', () => {
+    test('encaminha edição e exclusão da categoria selecionada', async () => {
         const onEditar = jest.fn()
         const onExcluir = jest.fn()
 
-        render(
+        await render(
             <SupportCategoryList
                 categorias={categorias}
                 onEditar={onEditar}
@@ -318,14 +318,14 @@ describe('SupportCategoryList', () => {
             />
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name:
                     'Editar categoria Família'
             })
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name:
                     'Excluir categoria Família'
@@ -341,8 +341,8 @@ describe('SupportCategoryList', () => {
         )
     })
 
-    test('encaminha o estado da operação para a categoria correta', () => {
-        render(
+    test('encaminha o estado da operação para a categoria correta', async () => {
+        await render(
             <SupportCategoryList
                 categorias={categorias}
                 categoriaEmAndamentoId={1}

@@ -55,8 +55,8 @@ const categoria = Object.freeze({
 })
 
 describe('SupportCategoryCard', () => {
-    test('mostra os dados da categoria', () => {
-        render(
+    test('mostra os dados da categoria', async () => {
+        await render(
             <SupportCategoryCard
                 categoria={categoria}
                 resumoPermissoes="3 tipos de dado permitidos"
@@ -83,11 +83,11 @@ describe('SupportCategoryCard', () => {
         ).toBeOnTheScreen()
     })
 
-    test('encaminha a categoria para edição e exclusão', () => {
+    test('encaminha a categoria para edição e exclusão', async () => {
         const onEditar = jest.fn()
         const onExcluir = jest.fn()
 
-        render(
+        await render(
             <SupportCategoryCard
                 categoria={categoria}
                 resumoPermissoes="Fase atual permitida"
@@ -96,14 +96,14 @@ describe('SupportCategoryCard', () => {
             />
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name:
                     'Editar categoria Família'
             })
         )
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name:
                     'Excluir categoria Família'
@@ -119,11 +119,11 @@ describe('SupportCategoryCard', () => {
         )
     })
 
-    test('bloqueia as ações quando está desabilitado', () => {
+    test('bloqueia as ações quando está desabilitado', async () => {
         const onEditar = jest.fn()
         const onExcluir = jest.fn()
 
-        render(
+        await render(
             <SupportCategoryCard
                 categoria={categoria}
                 resumoPermissoes="Fase atual permitida"
@@ -148,8 +148,8 @@ describe('SupportCategoryCard', () => {
         ).toBeDisabled()
     })
 
-    test('mostra o estado da ação em andamento', () => {
-        render(
+    test('mostra o estado da ação em andamento', async () => {
+        await render(
             <SupportCategoryCard
                 categoria={categoria}
                 resumoPermissoes="Fase atual permitida"
@@ -171,6 +171,13 @@ describe('SupportCategoryCard', () => {
                     'Editar categoria Família'
             })
         ).toBeDisabled()
+
+        expect(
+            screen.queryByRole('button', {
+                name:
+                    'Excluir categoria Família'
+            })
+        ).toBeNull()
     })
 
     test.each([
@@ -181,21 +188,24 @@ describe('SupportCategoryCard', () => {
     ])(
         'formata a quantidade %p como %s',
         (quantidade, esperado) => {
+            const quantidadeNormalizada =
+                Number.isSafeInteger(
+                    quantidade
+                )
+                && quantidade >= 0
+                    ? quantidade
+                    : 0
+
             expect(
                 criarRotuloContatos(
-                    Number.isSafeInteger(
-                        quantidade
-                    )
-                    && quantidade >= 0
-                        ? quantidade
-                        : 0
+                    quantidadeNormalizada
                 )
             ).toBe(esperado)
         }
     )
 
-    test('não renderiza categoria sem nome', () => {
-        render(
+    test('não renderiza categoria sem nome', async () => {
+        await render(
             <SupportCategoryCard
                 categoria={{
                     ...categoria,
