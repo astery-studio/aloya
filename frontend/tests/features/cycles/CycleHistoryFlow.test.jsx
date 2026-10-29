@@ -1,9 +1,14 @@
 //Testa a conexão entre o hook de dados e a tela visual do histórico.
-import {render} from '@testing-library/react-native'
+import {act, render} from '@testing-library/react-native'
 
 import {CycleHistoryFlow} from '../../../src/features/cycles/CycleHistoryFlow'
+import {CycleEditFlow} from '../../../src/features/cycles/CycleEditFlow'
 import {useCycleHistory} from '../../../src/features/cycles/hooks/useCycleHistory'
 import {CycleHistoryScreen} from '../../../src/features/cycles/screens/CycleHistoryScreen'
+
+jest.mock('../../../src/features/cycles/CycleEditFlow', () => ({
+    CycleEditFlow: jest.fn(() => null)
+}))
 
 jest.mock(
     '../../../src/features/cycles/hooks/useCycleHistory',
@@ -137,9 +142,8 @@ test('encaminha o resumo calculado sem sobrescrever seus valores', async () => {
     ).toBe(resumoCalculado)
 })
 
-test('encaminha as ações visuais sem criar regras intermediárias', async () => {
+test('conecta a edição do card ao fluxo interno', async () => {
     const aoAbrirCalendario = jest.fn()
-    const aoEditarCiclo = jest.fn()
     const aoExcluirCiclo = jest.fn()
     const onSelecionarAba = jest.fn()
 
@@ -149,7 +153,6 @@ test('encaminha as ações visuais sem criar regras intermediárias', async () =
                 listarPagina: jest.fn()
             }}
             aoAbrirCalendario={aoAbrirCalendario}
-            aoEditarCiclo={aoEditarCiclo}
             aoExcluirCiclo={aoExcluirCiclo}
             onSelecionarAba={onSelecionarAba}
         />
@@ -158,10 +161,22 @@ test('encaminha as ações visuais sem criar regras intermediárias', async () =
     expect(CycleHistoryScreen).toHaveBeenCalledWith(
         expect.objectContaining({
             aoAbrirCalendario,
-            aoEditarCiclo,
+            aoEditarCiclo: expect.any(Function),
             aoExcluirCiclo,
             onSelecionarAba
         }),
         undefined
     )
+
+    await act(() => CycleHistoryScreen.mock.calls[0][0].aoEditarCiclo(ciclos[0]))
+    expect(CycleEditFlow).toHaveBeenCalledWith(
+        expect.objectContaining({
+            ciclo: ciclos[0],
+            onAtualizado: expect.any(Function),
+            onFechar: expect.any(Function)
+        }),
+        undefined
+    )
+
+    await act(() => CycleEditFlow.mock.calls.at(-1)[0].onFechar())
 })
