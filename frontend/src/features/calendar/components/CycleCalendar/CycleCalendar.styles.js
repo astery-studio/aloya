@@ -9,7 +9,7 @@ function criarEstilosCalendario(tema) {
     const estilos = StyleSheet.create({
         calendario: {
             flex: 1,
-            backgroundColor: cores.neutras.fundoClaro
+            backgroundColor: tema.cores.interface.fundo
         },
         cabecalhoSemana: {
             flexDirection: 'row',
@@ -17,13 +17,13 @@ function criarEstilosCalendario(tema) {
             paddingVertical: 10,
             borderTopWidth: StyleSheet.hairlineWidth,
             borderBottomWidth: StyleSheet.hairlineWidth,
-            borderColor: cores.neutras.bordaClara,
-            backgroundColor: cores.neutras.fundoClaro,
+            borderColor: tema.cores.interface.borda,
+            backgroundColor: tema.cores.interface.fundo,
             zIndex: 4
         },
         nomeDiaSemana: {
             flex: 1,
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             lineHeight: 20,
