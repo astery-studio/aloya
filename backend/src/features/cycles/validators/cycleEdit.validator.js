@@ -58,4 +58,30 @@ function criarCycleEditValidator({ agora = () => new Date() } = {}) {
 
         if (desconhecido) {
             throw erro(`O campo "${desconhecido}" não é permitido.`, 'CAMPOS_CICLO_NAO_PERMITIDOS');
+        }
 
+        if (campos.length === 0) {
+            throw erro('Informe ao menos uma data para editar.', 'EDICAO_CICLO_VAZIA');
+        }
+
+        const hoje = paraDataCalendario(formatarData(agora()));
+        const dados = {};
+
+        for (const campo of campos) {
+            dados[campo] = validarData(body[campo], campo, hoje);
+        }
+
+        if (dados.dataInicio && dados.dataFim && dados.dataInicio > dados.dataFim) {
+            throw erro(
+                'A data de início não pode ser posterior à data de término.',
+                'ORDEM_DATAS_CICLO_INVALIDA'
+            );
+        }
+
+        return dados;
+    }
+
+    return { validarIdCiclo, validarCorpo };
+}
+
+export { criarCycleEditValidator, validarIdCiclo };
