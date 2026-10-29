@@ -3,6 +3,7 @@
  */
 import {CalendarScreenContainer} from './features/calendar/screens/CalendarScreenContainer';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
+import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, NativeModules, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -93,6 +94,8 @@ export default function App() {
     const [perfil, setPerfil] = useState(null)
     const [carregandoPerfil, setCarregandoPerfil] = useState(false)
     const [erroPerfil, setErroPerfil] = useState(false)
+    const [cicloCalendarioEditado, setCicloCalendarioEditado] = useState(null)
+    const [revisaoCalendario, setRevisaoCalendario] = useState(0)
     const requisicaoAtual = useRef(0)
     const controladorPerfilAtual = useRef(null)
     const apiUrl = obterBaseUrl()
@@ -287,6 +290,22 @@ export default function App() {
         }
     }
 
+    async function abrirEdicaoPeloCalendario({registroCicloId}) {
+        try {
+            const ciclo = await configuracao.servicos.cycleHistoryService.buscar(registroCicloId)
+            setCicloCalendarioEditado(ciclo)
+        } catch (falha) {
+            if (falha?.status === 401) {
+                finalizarSessao({mensagem: 'Sua sessão expirou. Entre novamente.'})
+                return
+            }
+
+            Alert.alert(
+                'Algo deu errado',
+                falha?.mensagemUsuario || 'Não foi possível carregar este registro. Tente novamente.'
+            )
+        }
+    }
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         return (
             <SafeAreaView
@@ -385,15 +404,29 @@ export default function App() {
             onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.calendario) {
         conteudo = (
-            <CalendarScreenContainer
-                service={configuracao.servicos.calendarService}
-                onSessaoExpirada={finalizarSessao}
-                aoVoltar={() => setTelaInterna(telasInternas.inicio)}
-                aoCadastrarMenstruacao={() => Alert.alert(
-                    'Cadastro de menstruação',
-                    'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
-                )}
-            />
+            <>
+                <CalendarScreenContainer
+                    key={revisaoCalendario}
+                    service={configuracao.servicos.calendarService}
+                    onSessaoExpirada={finalizarSessao}
+                    aoVoltar={() => setTelaInterna(telasInternas.inicio)}
+                    aoCadastrarMenstruacao={() => Alert.alert(
+                        'Cadastro de menstruação',
+                        'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
+                    )}
+                    aoEditarCiclo={abrirEdicaoPeloCalendario}
+                />
+                {cicloCalendarioEditado ? (
+                    <CycleEditFlow
+                        key={cicloCalendarioEditado.id}
+                        ciclo={cicloCalendarioEditado}
+                        service={configuracao.servicos.cycleHistoryService}
+                        onFechar={() => setCicloCalendarioEditado(null)}
+                        onAtualizado={() => setRevisaoCalendario(atual => atual + 1)}
+                        onSessaoExpirada={finalizarSessao}
+                    />
+                ) : null}
+            </>
         )
     } else if (telaInterna === telasInternas.membros) {
         conteudo = (
@@ -407,7 +440,6 @@ export default function App() {
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
                 aoAbrirCalendario={() => Alert.alert('Calendário', 'O calendário ainda será integrado.')}
-                aoEditarCiclo={ciclo => Alert.alert('Editar ciclo', `Ciclo ${ciclo.numero}`)}
                 aoExcluirCiclo={ciclo => Alert.alert('Excluir ciclo', `Ciclo ${ciclo.numero}`)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
