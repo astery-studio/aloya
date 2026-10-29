@@ -118,4 +118,64 @@ test('abre preenchido, confirma e salva pelo serviço real do fluxo', async () =
     );
     expect(onAtualizado).toHaveBeenCalledTimes(1);
     expect(await screen.findByText('Ciclo atualizado com sucesso')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(onFechar).toHaveBeenCalled();
+});
+
+test('avisa antes de fechar com alterações não salvas', async () => {
+    const onFechar = jest.fn();
+    await render(
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={{ editar: jest.fn() }}
+            onFechar={onFechar}
+        />
+    );
+
+    await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição' }));
+    expect(await screen.findByText('Dados não salvos')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Continuar a editar' }));
+    expect(screen.queryByText('Dados não salvos')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sair sem salvar' }));
+    expect(onFechar).toHaveBeenCalled();
+});
+
+test('fecha imediatamente quando nada foi alterado', async () => {
+    const onFechar = jest.fn();
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={{ editar: jest.fn() }} onFechar={onFechar} />
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição' }));
+    expect(onFechar).toHaveBeenCalled();
+});
+
+test('apresenta validação antes de chamar o serviço', async () => {
+    const service = { editar: jest.fn() };
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service} />
+    );
+    await fireEvent.changeText(screen.getByLabelText('Início'), '31/02/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    expect(await screen.findByText('Data incorreta')).toBeOnTheScreen();
+    expect(service.editar).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(screen.queryByText('Data incorreta')).toBeNull();
+});
+
+test('cancela a confirmação antes de salvar', async () => {
+    const service = { editar: jest.fn() };
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service} />
+    );
+    await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(service.editar).not.toHaveBeenCalled();
+    expect(screen.queryByText('Atualizar ciclo')).toBeNull();
+});
 
