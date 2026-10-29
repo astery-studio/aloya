@@ -24,6 +24,7 @@ import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
+import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { useTheme } from './shared/hooks/useTheme';
@@ -33,6 +34,7 @@ import { fontFamilies } from './shared/theme';
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     membros: 'membros',
+    categoriasPermissao: 'categoriasPermissao',
     ciclos: 'ciclos',
     perfil: 'perfil',
     alterarSenha: 'alterarSenha',
@@ -155,6 +157,8 @@ export default function App() {
     const [telaPublica, setTelaPublica] = useState('boasVindas');
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+
+    const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -361,6 +365,8 @@ export default function App() {
 
         setTelaInterna(telasInternas.configuracoes);
 
+        setOrigemNovaCategoria(telasInternas.membros);
+
         setTelaPublica('login');
 
         setMensagemLogin(resultado?.mensagem || null);
@@ -390,6 +396,15 @@ export default function App() {
         if (aba === 'configuracoes') {
             setTelaInterna(telasInternas.configuracoes);
         }
+    }
+
+    function abrirNovaCategoria(origem) {
+        setOrigemNovaCategoria(origem);
+        setTelaInterna(telasInternas.novaCategoria);
+    }
+
+    function retornarDaNovaCategoria() {
+        setTelaInterna(origemNovaCategoria);
     }
 
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
@@ -495,8 +510,20 @@ export default function App() {
     } else if (telaInterna === telasInternas.membros) {
         conteudo = (
             <MembersScreen
-                onCriarCategoria={() => setTelaInterna(telasInternas.novaCategoria)}
+                onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
                 onSelecionarAba={selecionarAba}
+            />
+        );
+    } else if (telaInterna === telasInternas.categoriasPermissao) {
+        conteudo = (
+            <SupportCategoriesScreen
+                service={configuracao.servicos.supportCategoryService}
+                onSessaoExpirada={finalizarSessao}
+                onVoltar={() => setTelaInterna(telasInternas.membros)}
+                onCriar={() => abrirNovaCategoria(telasInternas.categoriasPermissao)}
+                onEditar={(categoria) => Alert.alert('Editar categoria', categoria.nome)}
+                onExcluir={(categoria) => Alert.alert('Excluir categoria', categoria.nome)}
             />
         );
     } else if (telaInterna === telasInternas.ciclos) {
@@ -529,8 +556,8 @@ export default function App() {
         conteudo = (
             <NewSupportCategoryScreen
                 criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
-                onVoltar={() => setTelaInterna(telasInternas.membros)}
-                onConcluido={() => setTelaInterna(telasInternas.membros)}
+                onVoltar={retornarDaNovaCategoria}
+                onConcluido={retornarDaNovaCategoria}
                 onSessaoExpirada={finalizarSessao}
             />
         );

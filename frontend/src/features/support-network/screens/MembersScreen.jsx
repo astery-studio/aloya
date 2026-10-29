@@ -7,7 +7,7 @@ import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { criarEstilos } from './MembersScreen.styles';
 
-function MembersScreen({ onCriarCategoria, onSelecionarAba }) {
+function MembersScreen({ onAbrirCategorias, onSelecionarAba }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     return (
@@ -27,10 +27,10 @@ function MembersScreen({ onCriarCategoria, onSelecionarAba }) {
                 </View>
 
                 <ButtonScreen
-                    texto="Criar nova categoria"
-                    aoPressionar={onCriarCategoria}
+                    texto="Categorias de Permissão"
+                    aoPressionar={onAbrirCategorias}
                     variante="laranja"
-                    rotuloAcessibilidade="Criar nova categoria de membros"
+                    rotuloAcessibilidade="Abrir categorias de permissão"
                 />
             </ScrollView>
         </MainLayout>
