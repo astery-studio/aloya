@@ -1,6 +1,5 @@
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { EditFieldSheet } from '../../../shared/components/feedback/EditFieldSheet/EditFieldSheet';
-import NumberInput from '../../../shared/components/forms/NumberInput';
 
 function CycleParameterEditor({
     visivel,
@@ -19,9 +18,13 @@ function CycleParameterEditor({
         <EditFieldSheet
             visivel={visivel}
             titulo={`Editar ${label}`}
+            tipo="numero"
+            valor={valor}
+            onAlterar={onAlterar}
             onFechar={onCancelar}
             erro={erro}
             salvando={desabilitado}
+            rotuloAcessibilidade={label}
             botaoSalvar={
                 <ButtonScreen
                     texto="Salvar"
@@ -30,15 +33,7 @@ function CycleParameterEditor({
                     desativado={!valorValido || Boolean(erro) || valor === valorOriginal}
                 />
             }
-        >
-            <NumberInput
-                valor={valor}
-                aoAlterar={onAlterar}
-                unidade="dias"
-                desativado={desabilitado}
-                rotuloAcessibilidade={label}
-            />
-        </EditFieldSheet>
+        />
     );
 }
 
