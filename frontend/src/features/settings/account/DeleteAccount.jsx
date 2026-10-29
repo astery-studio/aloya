@@ -6,12 +6,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { TrashIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { cores } from '../../../shared/theme';
 
-function FluxoDeleteAccount({
-    onFechar,
-    confirmarSenhaExclusao,
-    excluirConta,
-    onContaExcluida
-}) {
+function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida }) {
     const [etapa, setEtapa] = useState('senha');
     const [senha, setSenha] = useState('');
     const [erroSenha, setErroSenha] = useState('');
