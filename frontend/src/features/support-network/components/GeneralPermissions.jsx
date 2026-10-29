@@ -3,11 +3,14 @@ import {useCallback, useMemo} from 'react'
 import {Text, View} from 'react-native'
 
 import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField'
+import {useTheme} from '../../../shared/hooks/useTheme'
 import {permissoesGerais} from '../constants/permissionOptions'
-import {estilos} from './GeneralPermissions.styles'
+import {criarEstilos} from './GeneralPermissions.styles'
 
 //Recebe as permissões selecionadas e informa qual permissão teve o estado alterado.
 function GeneralPermissions({permissoesSelecionadas = [], aoAlterar, desabilitado = false, estilo}) {
+    const tema = useTheme()
+    const estilos = useMemo(() => criarEstilos(tema), [tema])
     const permissoesAtivas = useMemo(() => {
         const permissoesRecebidas = Array.isArray(permissoesSelecionadas) ? permissoesSelecionadas : []
 

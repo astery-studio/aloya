@@ -1,15 +1,17 @@
 //Define a organização visual da seção de permissões gerais.
 import {StyleSheet} from 'react-native'
-import {fontFamilies, tema} from '../../../shared/theme'
+import {fontFamilies} from '../../../shared/theme'
+import {temaClaro} from '../../../shared/theme/themePalettes'
 
-const estilos = StyleSheet.create({
+function criarEstilos(tema) {
+    return StyleSheet.create({
     container: {
         width: '100%',
         alignSelf: 'stretch'
     },
 
     titulo: {
-        color: tema.cores.neutras.textoPrincipalClaro,
+        color: tema.cores.interface.textoPrincipal,
         fontFamily: fontFamilies.bold,
         fontSize: 20,
         fontWeight: '700',
@@ -22,6 +24,9 @@ const estilos = StyleSheet.create({
         width: '100%',
         gap: 10
     }
-})
+    })
+}
 
-export {estilos}
+const estilos = criarEstilos(temaClaro)
+
+export {criarEstilos, estilos}
