@@ -5,14 +5,11 @@ const espacamentos = Object.freeze({
     grande: 24,
     extraGrande: 32,
     maximo: 48
-})
+});
 
 const espacamentosLayout = Object.freeze({
     margemHorizontalTela: espacamentos.grande,
     espacamentoEntreColunas: espacamentos.medio
-})
+});
 
-export {
-    espacamentos,
-    espacamentosLayout
-}
+export { espacamentos, espacamentosLayout };
