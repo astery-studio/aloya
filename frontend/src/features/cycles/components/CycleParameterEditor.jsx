@@ -1,10 +1,6 @@
-import { Text, View } from 'react-native';
-
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
-import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
+import { EditFieldSheet } from '../../../shared/components/feedback/EditFieldSheet/EditFieldSheet';
 import NumberInput from '../../../shared/components/forms/NumberInput';
-import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { estilos } from './CycleParameterField.styles';
 
 function CycleParameterEditor({
     visivel,
@@ -20,30 +16,29 @@ function CycleParameterEditor({
     const valorValido = Number.isSafeInteger(valor) && valor > 0;
 
     return (
-        <BottomSheet visivel={visivel} onFechar={onCancelar} bloquearFechamento={desabilitado}>
-            <BottomSheetLayout titulo={`Editar ${label}`} onFechar={onCancelar}>
-                <NumberInput
-                    valor={valor}
-                    aoAlterar={onAlterar}
-                    unidade="dias"
-                    desativado={desabilitado}
-                    rotuloAcessibilidade={label}
+        <EditFieldSheet
+            visivel={visivel}
+            titulo={`Editar ${label}`}
+            onFechar={onCancelar}
+            erro={erro}
+            salvando={desabilitado}
+            botaoSalvar={
+                <ButtonScreen
+                    texto="Salvar"
+                    variante="verde"
+                    aoPressionar={onSalvar}
+                    desativado={!valorValido || Boolean(erro) || valor === valorOriginal}
                 />
-                {erro ? (
-                    <Text accessibilityRole="alert" style={estilos.erroEdicao}>
-                        {erro}
-                    </Text>
-                ) : null}
-                <View style={estilos.acao}>
-                    <ButtonScreen
-                        texto="Salvar"
-                        variante="verde"
-                        aoPressionar={onSalvar}
-                        desativado={!valorValido || Boolean(erro) || valor === valorOriginal}
-                    />
-                </View>
-            </BottomSheetLayout>
-        </BottomSheet>
+            }
+        >
+            <NumberInput
+                valor={valor}
+                aoAlterar={onAlterar}
+                unidade="dias"
+                desativado={desabilitado}
+                rotuloAcessibilidade={label}
+            />
+        </EditFieldSheet>
     );
 }
 

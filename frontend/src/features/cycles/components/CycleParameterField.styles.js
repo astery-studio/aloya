@@ -12,18 +12,6 @@ const estilos = StyleSheet.create({
         fontFamily: fontFamilies.regular,
         fontSize: 12,
         lineHeight: 18
-    },
-    erroEdicao: {
-        marginTop: tema.espacamentos.pequeno,
-        color: tema.cores.feedback.erro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 13,
-        lineHeight: 19,
-        textAlign: 'center'
-    },
-    acao: {
-        width: '100%',
-        marginTop: tema.espacamentos.grande
     }
 });
 
