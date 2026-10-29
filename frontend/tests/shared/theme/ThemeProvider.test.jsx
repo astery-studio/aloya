@@ -18,8 +18,8 @@ function LeitorTema() {
 }
 
 describe('ThemeProvider', () => {
-    test('aplica o tema claro escolhido explicitamente', () => {
-        render(
+    test('aplica o tema claro escolhido explicitamente', async () => {
+        await render(
             <ThemeProvider preferencia="claro" esquemaDoSistema="dark">
                 <LeitorTema />
             </ThemeProvider>
@@ -30,8 +30,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('claro');
     });
 
-    test('aplica o tema escuro escolhido explicitamente', () => {
-        render(
+    test('aplica o tema escuro escolhido explicitamente', async () => {
+        await render(
             <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
                 <LeitorTema />
             </ThemeProvider>
@@ -40,8 +40,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('escuro');
     });
 
-    test('segue o sistema escuro no modo automático', () => {
-        render(
+    test('segue o sistema escuro no modo automático', async () => {
+        await render(
             <ThemeProvider preferencia="automatico" esquemaDoSistema="dark">
                 <LeitorTema />
             </ThemeProvider>
@@ -52,8 +52,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('escuro');
     });
 
-    test('segue o sistema claro no modo automático', () => {
-        render(
+    test('segue o sistema claro no modo automático', async () => {
+        await render(
             <ThemeProvider preferencia="automatico" esquemaDoSistema="light">
                 <LeitorTema />
             </ThemeProvider>
@@ -62,8 +62,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('claro');
     });
 
-    test('usa automático como preferência segura para valor inválido', () => {
-        render(
+    test('usa automático como preferência segura para valor inválido', async () => {
+        await render(
             <ThemeProvider preferencia="invalido" esquemaDoSistema="dark">
                 <LeitorTema />
             </ThemeProvider>
@@ -74,8 +74,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('escuro');
     });
 
-    test('atualiza o tema imediatamente quando a preferência muda', () => {
-        const resultado = render(
+    test('atualiza o tema imediatamente quando a preferência muda', async () => {
+        const resultado = await render(
             <ThemeProvider preferencia="claro" esquemaDoSistema="light">
                 <LeitorTema />
             </ThemeProvider>
@@ -83,7 +83,7 @@ describe('ThemeProvider', () => {
 
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('claro');
 
-        resultado.rerender(
+        await resultado.rerender(
             <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
                 <LeitorTema />
             </ThemeProvider>
@@ -92,8 +92,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('escuro');
     });
 
-    test('atualiza o modo automático quando o sistema muda', () => {
-        const resultado = render(
+    test('atualiza o modo automático quando o sistema muda', async () => {
+        const resultado = await render(
             <ThemeProvider preferencia="automatico" esquemaDoSistema="light">
                 <LeitorTema />
             </ThemeProvider>
@@ -101,7 +101,7 @@ describe('ThemeProvider', () => {
 
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('claro');
 
-        resultado.rerender(
+        await resultado.rerender(
             <ThemeProvider preferencia="automatico" esquemaDoSistema="dark">
                 <LeitorTema />
             </ThemeProvider>
@@ -110,8 +110,8 @@ describe('ThemeProvider', () => {
         expect(screen.getByTestId('modo-tema')).toHaveTextContent('escuro');
     });
 
-    test('fornece a cor de fundo correspondente ao modo', () => {
-        render(
+    test('fornece a cor de fundo correspondente ao modo', async () => {
+        await render(
             <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
                 <LeitorTema />
             </ThemeProvider>
