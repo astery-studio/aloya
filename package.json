@@ -6,7 +6,8 @@
   },
   "scripts": {
     "backend": "cd backend && npm start",
-    "frontend": "cd frontend && npx expo start --clear",
+    "frontend": "npm --prefix frontend start -- --clear",
+    "frontend:dev-client": "npm --prefix frontend run start:dev-client -- --clear",
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
     "format:check": "npm --prefix backend run format:check:ci && npm --prefix frontend run format:check:ci",
     "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
