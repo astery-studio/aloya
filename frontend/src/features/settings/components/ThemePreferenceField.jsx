@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
 
 import { MoonIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
@@ -40,7 +41,7 @@ function ThemePreferenceField({
             onPress={onPress}
             disabled={desabilitado}
             accessibilityRole="button"
-            accessibilityLabel={`Aparência: ${rotulo}`}
+            accessibilityLabel={`Modo de Cor: ${rotulo}`}
             accessibilityHint="Abre as opções de tema do aplicativo"
             accessibilityState={{
                 disabled: desabilitado,
@@ -56,15 +57,15 @@ function ThemePreferenceField({
                 />
             </View>
 
-            <View style={estilos.conteudoTexto}>
-                <Text style={estilos.label} numberOfLines={1}>
-                    Aparência
-                </Text>
+            <Text style={estilos.label} numberOfLines={1}>
+                Modo de Cor
+            </Text>
 
-                <Text style={estilos.preferencia} numberOfLines={1}>
-                    {rotulo}
-                </Text>
-            </View>
+            <CaretRightIcon
+                size={20}
+                color={tema.cores.interface.textoDesabilitado}
+                weight="regular"
+            />
         </Pressable>
     );
 }
