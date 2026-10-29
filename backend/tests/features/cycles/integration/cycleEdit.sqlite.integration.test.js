@@ -118,4 +118,64 @@ function criarAplicacao(prisma) {
         agora: () => new Date('2026-10-29T12:00:00.000Z')
     });
     const controller = criarCycleEditController({ service, validator });
+    const app = express();
+    app.use(express.json());
+    app.use(
+        '/api/cycles',
+        criarCycleEditRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, res, next) {
+                    if (req.headers.authorization !== 'Bearer token') {
+                        return res.status(401).json({ erro: { codigo: 'NAO_AUTENTICADO' } });
+                    }
+                    req.usuario = { id: 1 };
+                    return next();
+                }
+            },
+            controller
+        })
+    );
+    app.use(tratarErros);
+    return app;
+}
+
+async function requisitar(url, id, body) {
+    const resposta = await fetch(`${url}/${id}`, {
+        method: 'PATCH',
+        headers: { authorization: 'Bearer token', 'content-type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    return { resposta, corpo: await resposta.json() };
+}
+
+test('edita o ciclo de forma atômica e recalcula dados derivados', async (t) => {
+    const { diretorio, caminho } = criarBancoTemporario();
+    const prisma = criarPrisma(caminho);
+    const servidor = criarAplicacao(prisma).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        await popular(prisma);
+        const url = `http://127.0.0.1:${servidor.address().port}/api/cycles`;
+
+        await t.test('carrega o ciclo selecionado no calendário', async () => {
+            const resposta = await fetch(`${url}/2`, {
+                headers: { authorization: 'Bearer token' }
+            });
+            const corpo = await resposta.json();
+
+            assert.equal(resposta.status, 200);
+            assert.deepEqual(corpo.ciclo, {
+                id: 2,
+                dataInicio: '2026-08-07',
+                dataFim: '2026-08-11',
+                duracaoMenstruacao: 5,
+                duracaoCiclo: 30
+            });
+        });
+
+        await t.test('reverte toda a edição quando uma operação intermediária falha', async () => {
+            const antes = await prisma.registroCiclo.findUnique({
+                where: { id: 2 },
 
