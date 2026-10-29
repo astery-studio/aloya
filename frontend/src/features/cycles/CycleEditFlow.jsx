@@ -118,4 +118,64 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 visivel={painelVisivel}
                 dataInicio={dataInicio}
                 dataFim={dataFim}
+                alterado={alterado}
+                salvando={salvando}
+                onAlterarInicio={setDataInicio}
+                onAlterarFim={setDataFim}
+                onFechar={solicitarFechamento}
+                onSalvar={solicitarSalvamento}
+            />
+            <SimpleModal
+                visivel={feedback?.tipo === 'confirmacao'}
+                aoFechar={() => setFeedback(null)}
+                icone={WarningCircleIcon}
+                corIcone={tema.cores.feedback.erro}
+                titulo="Atualizar ciclo"
+                mensagem="Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?"
+                acaoPrincipal={{ texto: 'Confirmar', aoPressionar: confirmarSalvamento }}
+                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: () => setFeedback(null) }}
+            />
+            <SimpleModal
+                visivel={feedback?.tipo === 'saida'}
+                aoFechar={() => setFeedback(null)}
+                icone={WarningCircleIcon}
+                titulo="Dados não salvos"
+                mensagem="Deseja descartar as alterações feitas neste registro?"
+                acaoPrincipal={{
+                    texto: 'Continuar a editar',
+                    aoPressionar: () => setFeedback(null)
+                }}
+                acaoSecundaria={{ texto: 'Sair sem salvar', aoPressionar: onFechar }}
+            />
+            <SimpleModal
+                visivel={feedback?.tipo === 'sucesso'}
+                aoFechar={onFechar}
+                icone={DropIcon}
+                titulo="Ciclo atualizado com sucesso"
+                acaoPrincipal={{ texto: 'OK', aoPressionar: onFechar }}
+            />
+            <SimpleModal
+                visivel={['erro', 'validacao'].includes(feedback?.tipo)}
+                aoFechar={() => setFeedback(null)}
+                icone={WarningCircleIcon}
+                corIcone={tema.cores.feedback.erro}
+                titulo={feedback?.titulo}
+                mensagem={feedback?.mensagem}
+                acaoPrincipal={
+                    feedback?.tipo === 'erro'
+                        ? {
+                              texto: 'Tentar novamente',
+                              variante: 'preto',
+                              aoPressionar: confirmarSalvamento
+                          }
+                        : { texto: 'OK', aoPressionar: () => setFeedback(null) }
+                }
+                acaoSecundaria={
+                    feedback?.tipo === 'erro'
+                        ? {
+                              texto: 'Voltar',
+                              variante: 'branco',
+                              aoPressionar: () => setFeedback(null)
+                          }
+                        : undefined
 
