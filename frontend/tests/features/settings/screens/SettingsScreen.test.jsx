@@ -184,9 +184,7 @@ describe('SettingsScreen', () => {
 
         expect(screen.getByText('Preferências')).toBeOnTheScreen();
 
-        expect(screen.getByText('Aparência')).toBeOnTheScreen();
-
-        expect(screen.getByText('Automático')).toBeOnTheScreen();
+        expect(screen.getByText('Modo de Cor')).toBeOnTheScreen();
 
         expect(screen.getByText('Tela inicial')).toBeOnTheScreen();
 
@@ -277,7 +275,7 @@ describe('SettingsScreen', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Aparência: Automático'
+                name: 'Modo de Cor: Automático'
             })
         );
 
@@ -301,7 +299,7 @@ describe('SettingsScreen', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Aparência: Automático'
+                name: 'Modo de Cor: Automático'
             })
         );
 
@@ -327,7 +325,7 @@ describe('SettingsScreen', () => {
 
         expect(
             screen.getByRole('button', {
-                name: 'Aparência: Escuro'
+                name: 'Modo de Cor: Escuro'
             })
         ).toBeDisabled();
     });

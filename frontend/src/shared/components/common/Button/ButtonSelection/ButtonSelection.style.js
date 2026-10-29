@@ -80,7 +80,8 @@ function criarEstilos(tema) {
 
         labelModoCorSelecionado: {
             color: tema.cores.interface.textoSobreDestaque,
-            fontFamily: fontFamilies.bold
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
         },
 
         radioVazio: {

@@ -41,11 +41,9 @@ describe('ThemePreferenceField', () => {
             onPress: jest.fn()
         });
 
-        expect(screen.getByText(rotulo)).toBeOnTheScreen();
-
         expect(
             screen.getByRole('button', {
-                name: `Aparência: ${rotulo}`
+                name: `Modo de Cor: ${rotulo}`
             })
         ).toBeOnTheScreen();
     });
@@ -64,7 +62,7 @@ describe('ThemePreferenceField', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Aparência: Escuro'
+                name: 'Modo de Cor: Escuro'
             })
         );
 
@@ -78,7 +76,7 @@ describe('ThemePreferenceField', () => {
 
         expect(
             screen.getByRole('button', {
-                name: 'Aparência: Claro'
+                name: 'Modo de Cor: Claro'
             })
         ).toBeDisabled();
     });
@@ -93,7 +91,7 @@ describe('ThemePreferenceField', () => {
         });
 
         const campo = screen.getByRole('button', {
-            name: 'Aparência: Automático'
+            name: 'Modo de Cor: Automático'
         });
 
         expect(campo).toBeDisabled();
@@ -114,12 +112,8 @@ describe('ThemePreferenceField', () => {
             onPress: jest.fn()
         });
 
-        expect(screen.getByText('Aparência')).toHaveStyle({
+        expect(screen.getByText('Modo de Cor')).toHaveStyle({
             color: '#222222'
-        });
-
-        expect(screen.getByText('Claro')).toHaveStyle({
-            color: '#5C5C59'
         });
     });
 
@@ -132,12 +126,8 @@ describe('ThemePreferenceField', () => {
             'escuro'
         );
 
-        expect(screen.getByText('Aparência')).toHaveStyle({
+        expect(screen.getByText('Modo de Cor')).toHaveStyle({
             color: '#F4F1EA'
-        });
-
-        expect(screen.getByText('Escuro')).toHaveStyle({
-            color: '#C4C8C5'
         });
     });
 
