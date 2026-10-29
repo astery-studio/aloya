@@ -58,4 +58,64 @@ function validarEdicao(dataInicio, dataFim) {
 }
 
 function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirada }) {
+    const inicioOriginal = formatarDataParaCampo(ciclo.dataInicio);
+    const fimOriginal = formatarDataParaCampo(ciclo.dataFim);
+    const [dataInicio, setDataInicio] = useState(inicioOriginal);
+    const [dataFim, setDataFim] = useState(fimOriginal);
+    const [painelVisivel, setPainelVisivel] = useState(true);
+    const [salvando, setSalvando] = useState(false);
+    const [feedback, setFeedback] = useState(null);
+    const alterado = dataInicio !== inicioOriginal || dataFim !== fimOriginal;
+
+    function solicitarFechamento() {
+        if (salvando) return;
+        if (alterado) setFeedback({ tipo: 'saida' });
+        else onFechar?.();
+    }
+
+    function solicitarSalvamento() {
+        const validacao = validarEdicao(dataInicio, dataFim);
+        setFeedback(
+            validacao.inicio ? { tipo: 'confirmacao' } : { tipo: 'validacao', ...validacao }
+        );
+    }
+
+    async function confirmarSalvamento() {
+        const validacao = validarEdicao(dataInicio, dataFim);
+        if (!validacao.inicio) return;
+        setFeedback(null);
+        setSalvando(true);
+        try {
+            await service.editar(ciclo.id, {
+                dataInicio: validacao.inicio,
+                dataFim: validacao.fim
+            });
+            setPainelVisivel(false);
+            setFeedback({ tipo: 'sucesso' });
+            await onAtualizado?.();
+        } catch (falha) {
+            if (falha?.status === 401) {
+                onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
+                return;
+            }
+            setFeedback({
+                tipo: 'erro',
+                titulo:
+                    falha?.codigo === 'SOBREPOSICAO_CICLO' ? 'Ciclo existente' : 'Algo deu errado',
+                mensagem:
+                    falha?.mensagemUsuario ||
+                    falha?.message ||
+                    'Ocorreu um erro ao atualizar este registro. Tente novamente.'
+            });
+        } finally {
+            setSalvando(false);
+        }
+    }
+
+    return (
+        <>
+            <CycleEditSheet
+                visivel={painelVisivel}
+                dataInicio={dataInicio}
+                dataFim={dataFim}
 
