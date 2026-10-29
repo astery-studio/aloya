@@ -1,5 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { CycleDateStrip } from '../../../../src/features/cycles/components/CycleDateStrip';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const dias = [
     { data: '2026-10-04', dia: 4, semana: 'dom', fase: 'menstrual' },
@@ -7,11 +8,7 @@ const dias = [
 ];
 
 function montar(propriedades = {}) {
-    return render(<CycleDateStrip
-        dias={dias}
-        dataSelecionada="2026-10-05"
-        {...propriedades}
-    />);
+    return render(<CycleDateStrip dias={dias} dataSelecionada="2026-10-05" {...propriedades} />);
 }
 
 test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
@@ -32,11 +29,13 @@ test.each([
     const carregar = jest.fn();
     await montar({ [callback]: carregar });
     const faixa = screen.getByLabelText('Datas do ciclo');
-    const evento = { nativeEvent: {
-        contentOffset: { x, y: 0 },
-        contentSize: { width: 1000, height: 94 },
-        layoutMeasurement: { width: 390, height: 94 }
-    } };
+    const evento = {
+        nativeEvent: {
+            contentOffset: { x, y: 0 },
+            contentSize: { width: 1000, height: 94 },
+            layoutMeasurement: { width: 390, height: 94 }
+        }
+    };
 
     await fireEvent(faixa, 'scrollEndDrag', evento);
     await fireEvent(faixa, 'momentumScrollEnd', evento);
@@ -56,17 +55,18 @@ test('permite selecionar outra data e expõe o estado acessível', async () => {
 
     fireEvent.press(screen.getByRole('button', { name: 'dom, dia 4' }));
     expect(aoSelecionarData).toHaveBeenCalledWith('2026-10-04');
-    expect(screen.getByRole('button', { name: 'dom, dia 4' }))
-        .toHaveProp('accessibilityState', { selected: false });
-    expect(screen.getByRole('button', { name: 'seg, dia 5' }))
-        .toHaveProp('accessibilityState', { selected: true });
+    expect(screen.getByRole('button', { name: 'dom, dia 4' })).toHaveProp('accessibilityState', {
+        selected: false
+    });
+    expect(screen.getByRole('button', { name: 'seg, dia 5' })).toHaveProp('accessibilityState', {
+        selected: true
+    });
 });
 
 test('não exige callback para pressionar uma data', async () => {
     await montar();
 
-    expect(() => fireEvent.press(screen.getByRole('button', { name: 'dom, dia 4' })))
-        .not.toThrow();
+    expect(() => fireEvent.press(screen.getByRole('button', { name: 'dom, dia 4' }))).not.toThrow();
 });
 
 test('apresenta interrogação quando o número do dia não está disponível', async () => {
@@ -126,5 +126,7 @@ test('diferencia o indicador de hoje dos demais dias', async () => {
     });
 
     expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: '#222222' });
-    expect(screen.getByTestId('indicador-2026-10-08')).toHaveStyle({ backgroundColor: 'transparent' });
+    expect(screen.getByTestId('indicador-2026-10-08')).toHaveStyle({
+        backgroundColor: 'transparent'
+    });
 });
