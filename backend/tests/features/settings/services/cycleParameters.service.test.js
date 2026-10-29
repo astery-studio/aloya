@@ -35,6 +35,17 @@ test('apresenta os valores padrão quando não existem parâmetros manuais', asy
     });
 });
 
+test('rejeita consulta de usuário inexistente', async () => {
+    const service = criarCycleParametersService({
+        prisma: { usuario: { findUnique: async () => null } },
+        recalcularPrevisoes: async () => {}
+    });
+    await assert.rejects(() => service.buscar(999), {
+        status: 404,
+        codigo: 'USUARIO_NAO_ENCONTRADO'
+    });
+});
+
 test('rejeita salvamento sem alteração real', async () => {
     const atuais = {
         duracaoCicloInformada: 28,

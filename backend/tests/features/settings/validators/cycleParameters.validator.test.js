@@ -19,6 +19,11 @@ test('aceita os três parâmetros inteiros e positivos', () => {
 });
 
 test('rejeita campos ausentes, desconhecidos ou não inteiros', () => {
+    for (const body of [null, [], 'parâmetros']) {
+        const resultado = validator.validar(body);
+        assert.equal(resultado.valido, false);
+        assert.equal(resultado.erros[0].campo, 'dados');
+    }
     const resultado = validator.validar({
         ...validos,
         duracaoLuteaInformada: 12.5,
