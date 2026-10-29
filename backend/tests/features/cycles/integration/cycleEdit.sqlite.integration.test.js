@@ -178,4 +178,64 @@ test('edita o ciclo de forma atômica e recalcula dados derivados', async (t) =>
         await t.test('reverte toda a edição quando uma operação intermediária falha', async () => {
             const antes = await prisma.registroCiclo.findUnique({
                 where: { id: 2 },
+                include: { diasMenstruacao: true }
+            });
+
+            await prisma.$executeRawUnsafe(`
+                CREATE TRIGGER falhar_dias_ciclo
+                BEFORE INSERT ON dias_menstruacao
+                WHEN NEW.registro_ciclo_id = 2
+                BEGIN
+                    SELECT RAISE(ABORT, 'falha simulada');
+                END
+            `);
+
+            const { resposta, corpo } = await requisitar(url, 2, { dataFim: '2026-08-10' });
+            await prisma.$executeRawUnsafe('DROP TRIGGER falhar_dias_ciclo');
+
+            const depois = await prisma.registroCiclo.findUnique({
+                where: { id: 2 },
+                include: { diasMenstruacao: true }
+            });
+
+            assert.equal(resposta.status, 500);
+            assert.equal(corpo.erro.codigo, 'ERRO_INTERNO');
+            assert.equal(depois.dataInicio.getTime(), antes.dataInicio.getTime());
+            assert.equal(depois.dataFim.getTime(), antes.dataFim.getTime());
+            assert.equal(depois.diasMenstruacao.length, antes.diasMenstruacao.length);
+        });
+
+        await t.test('atualiza datas, dias, durações e invalida a previsão', async () => {
+            const { resposta, corpo } = await requisitar(url, 2, {
+                dataInicio: '2026-08-06',
+                dataFim: '2026-08-10'
+            });
+
+            assert.equal(resposta.status, 200);
+            assert.equal(corpo.mensagem, 'Registro de menstruação atualizado com sucesso.');
+            assert.deepEqual(corpo.ciclo, {
+                id: 2,
+                dataInicio: '2026-08-06',
+                dataFim: '2026-08-10',
+                duracaoMenstruacao: 5,
+                duracaoCiclo: 29
+            });
+
+            const registros = await prisma.registroCiclo.findMany({
+                where: { usuarioId: 1 },
+                orderBy: { dataInicio: 'asc' },
+                include: { diasMenstruacao: { orderBy: { data: 'asc' } } }
+            });
+            assert.deepEqual(
+                registros.map((ciclo) => ciclo.duracaoCiclo),
+                [null, 29, 29]
+            );
+            assert.deepEqual(
+                registros[1].diasMenstruacao.map((dia) => dia.data.toISOString().slice(0, 10)),
+                ['2026-08-06', '2026-08-07', '2026-08-08', '2026-08-09', '2026-08-10']
+            );
+            assert.equal(await prisma.previsao.count({ where: { usuarioId: 1 } }), 0);
+        });
+
+        await t.test('informa o período conflitante e preserva o registro', async () => {
 
