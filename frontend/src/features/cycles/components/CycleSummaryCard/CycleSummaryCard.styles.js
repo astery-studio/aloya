@@ -1,143 +1,148 @@
 //Preserva as medidas do protótipo sem impedir que o card se adapte a telas estreitas.
-import {StyleSheet} from 'react-native'
+import { StyleSheet } from 'react-native';
 
-import {fontFamilies, tema} from '../../../../shared/theme'
+import { fontFamilies } from '../../../../shared/theme';
+import { temaClaro } from '../../../../shared/theme/themePalettes';
 
-const estilos = StyleSheet.create({
-    container: {
-        width: '100%',
-        maxWidth: 350,
-        alignSelf: 'center',
-        overflow: 'hidden',
-        backgroundColor: tema.cores.neutras.superficieClara,
-        borderWidth: 1.41,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: 16
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            maxWidth: 350,
+            alignSelf: 'center',
+            overflow: 'hidden',
+            backgroundColor: tema.cores.interface.superficie,
+            borderWidth: 1.41,
+            borderColor: tema.cores.interface.borda,
+            borderRadius: 16
+        },
 
-    comMetricas: {
-        height: 210.4
-    },
+        comMetricas: {
+            height: 210.4
+        },
 
-    semMetricas: {
-        height: 100
-    },
+        semMetricas: {
+            height: 100
+        },
 
-    cabecalho: {
-        width: '100%',
-        height: 50.82,
-        justifyContent: 'center',
-        paddingHorizontal: 20,
-        borderBottomWidth: 1.41,
-        borderBottomColor: tema.cores.neutras.bordaClara
-    },
+        cabecalho: {
+            width: '100%',
+            height: 50.82,
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            borderBottomWidth: 1.41,
+            borderBottomColor: tema.cores.interface.borda
+        },
 
-    cabecalhoCentralizado: {
-        alignItems: 'center'
-    },
+        cabecalhoCentralizado: {
+            alignItems: 'center'
+        },
 
-    cabecalhoAlinhado: {
-        alignItems: 'flex-start'
-    },
+        cabecalhoAlinhado: {
+            alignItems: 'flex-start'
+        },
 
-    titulo: {
-        maxWidth: '100%',
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.bold,
-        fontSize: 12,
-        fontStyle: 'normal',
-        fontWeight: '700',
-        lineHeight: 18,
-        letterSpacing: 0.5,
-        includeFontPadding: false
-    },
+        titulo: {
+            maxWidth: '100%',
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.bold,
+            fontSize: 12,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 18,
+            letterSpacing: 0.5,
+            includeFontPadding: false
+        },
 
-    metricas: {
-        width: '100%',
-        height: 103.6,
-        flexDirection: 'row',
-        borderBottomWidth: 1.41,
-        borderBottomColor: tema.cores.neutras.bordaClara
-    },
+        metricas: {
+            width: '100%',
+            height: 103.6,
+            flexDirection: 'row',
+            borderBottomWidth: 1.41,
+            borderBottomColor: tema.cores.interface.borda
+        },
 
-    metrica: {
-        flex: 1,
-        minWidth: 0,
-        justifyContent: 'center',
-        paddingHorizontal: 20
-    },
+        metrica: {
+            flex: 1,
+            minWidth: 0,
+            justifyContent: 'center',
+            paddingHorizontal: 20
+        },
 
-    metricaComSeparador: {
-        borderRightWidth: 0.99,
-        borderRightColor: tema.cores.neutras.bordaClara
-    },
+        metricaComSeparador: {
+            borderRightWidth: 0.99,
+            borderRightColor: tema.cores.interface.borda
+        },
 
-    rotuloMetrica: {
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 13,
-        fontStyle: 'normal',
-        fontWeight: '400',
-        lineHeight: 19.5,
-        includeFontPadding: false
-    },
+        rotuloMetrica: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 19.5,
+            includeFontPadding: false
+        },
 
-    valorDaMetrica: {
-        flexDirection: 'row',
-        alignItems: 'baseline',
-        gap: 8
-    },
+        valorDaMetrica: {
+            flexDirection: 'row',
+            alignItems: 'baseline',
+            gap: 8
+        },
 
-    numero: {
-        flexShrink: 1,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.bold,
-        fontSize: 40,
-        fontStyle: 'normal',
-        fontWeight: '700',
-        lineHeight: 48,
-        includeFontPadding: false
-    },
+        numero: {
+            flexShrink: 1,
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 40,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 48,
+            includeFontPadding: false
+        },
 
-    dias: {
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 15,
-        fontStyle: 'normal',
-        fontWeight: '400',
-        lineHeight: 22.5,
-        includeFontPadding: false
-    },
+        dias: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 15,
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 22.5,
+            includeFontPadding: false
+        },
 
-    rodape: {
-        width: '100%',
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        paddingTop: 12,
-        paddingRight: 20,
-        paddingBottom: 14,
-        paddingLeft: 20
-    },
+        rodape: {
+            width: '100%',
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 8,
+            paddingTop: 12,
+            paddingRight: 20,
+            paddingBottom: 14,
+            paddingLeft: 20
+        },
 
-    quantidade: {
-        flexShrink: 1,
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 13,
-        fontStyle: 'normal',
-        fontWeight: '400',
-        lineHeight: 19.5,
-        includeFontPadding: false
-    },
+        quantidade: {
+            flexShrink: 1,
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 19.5,
+            includeFontPadding: false
+        },
 
-    caixaDaTag: {
-        flexShrink: 0,
-        alignSelf: 'center',
-        justifyContent: 'center'
-    }
-})
+        caixaDaTag: {
+            flexShrink: 0,
+            alignSelf: 'center',
+            justifyContent: 'center'
+        }
+    });
+}
 
-export {estilos}
+const estilos = criarEstilos(temaClaro);
+
+export { criarEstilos, estilos };
