@@ -55,3 +55,18 @@ test('usa superfície e texto neutros no estado não confirmado', async () => {
         color: '#C4C8C5'
     });
 });
+
+test('diferencia métricas de menstruação e ciclo no tema escuro', async () => {
+    const primeiro = await renderWithTheme(<StatusBadge estado="diasMenstruacao" />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByText('6 dias')).toHaveStyle({ color: '#F08A75' });
+    primeiro.unmount();
+
+    await renderWithTheme(<StatusBadge estado="diasCiclo" />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByText('29 dias')).toHaveStyle({ color: '#9FD6B6' });
+});
