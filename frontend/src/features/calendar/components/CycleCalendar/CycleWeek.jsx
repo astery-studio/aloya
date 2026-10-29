@@ -57,6 +57,7 @@ function CycleWeek({ semana, aoPressionarDia, estilosTema = estilosTemaClaro }) 
                     key={dia?.data ?? `vazio-${indice}`}
                     dia={dia}
                     aoPressionarDia={aoPressionarDia}
+                    estilosTema={estilosTema}
                 />
             ))}
 
