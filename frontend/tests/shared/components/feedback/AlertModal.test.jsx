@@ -170,3 +170,14 @@ test('rejeita modal visível sem ação ou fechamento', () => {
         titulo: 'Alerta inválido'
     })).toThrow('AlertModal precisa de pelo menos uma ação')
 })
+
+test('usa superfície elevada no modo escuro', async () => {
+    await renderWithTheme(
+        <AlertModal visivel aoFechar={jest.fn()} titulo="Aviso escuro" />,
+        { preferencia: 'escuro' }
+    )
+
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({
+        backgroundColor: '#2B322E'
+    })
+})
