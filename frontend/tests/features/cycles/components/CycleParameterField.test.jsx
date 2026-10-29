@@ -17,7 +17,7 @@ jest.mock('../../../../src/features/settings/profile/ProfileField', () => {
 jest.mock('../../../../src/features/cycles/components/CycleParameterEditor', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        CycleParameterEditor: ({ visivel, label, onAlterar, onCancelar }) =>
+        CycleParameterEditor: ({ visivel, label, onAlterar, onCancelar, onSalvar }) =>
             visivel ? (
                 <>
                     <Text>{`Editor: ${label}`}</Text>
@@ -30,6 +30,11 @@ jest.mock('../../../../src/features/cycles/components/CycleParameterEditor', () 
                         accessibilityRole="button"
                         accessibilityLabel="Cancelar edição"
                         onPress={onCancelar}
+                    />
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Salvar edição"
+                        onPress={onSalvar}
                     />
                 </>
             ) : null
@@ -57,4 +62,15 @@ test('restaura o valor original ao cancelar a edição', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Editar Duração do Ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cancelar edição' }));
     expect(onAlterar).toHaveBeenLastCalledWith(28);
+});
+
+test('fecha o editor ao salvar e apresenta valor inválido com erro', async () => {
+    await render(
+        <CycleParameterField label="Duração" valor={null} erro="Campo inválido" onAlterar={jest.fn()} />
+    );
+    expect(screen.getByText('Informe a duração')).toBeOnTheScreen();
+    expect(screen.getByRole('alert')).toHaveTextContent('Campo inválido');
+    await fireEvent.press(screen.getByRole('button', { name: 'Editar Duração' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
+    expect(screen.queryByText('Editor: Duração')).toBeNull();
 });
