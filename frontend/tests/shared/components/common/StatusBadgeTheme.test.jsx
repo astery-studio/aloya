@@ -1,8 +1,9 @@
-import { screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 
 import { StatusBadge } from '../../../../src/shared/components/common/StatusBadge/StatusBadge';
 import { criarVariantes } from '../../../../src/shared/components/common/StatusBadge/StatusBadge.styles';
 import { temaClaro, temaEscuro } from '../../../../src/shared/theme/themePalettes';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 import { renderWithTheme } from '../../../helpers/renderWithTheme';
 
 test('usa contraste de aviso adequado no tema escuro', async () => {
@@ -45,6 +46,24 @@ test.each([
     });
 });
 
+test('atualiza o selo imediatamente quando o tema muda', async () => {
+    const { rerender } = await render(
+        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+            <StatusBadge estado="confirmado" />
+        </ThemeProvider>
+    );
+
+    expect(screen.getByText('Confirmado')).toHaveStyle({ color: '#2C4C3B' });
+
+    await rerender(
+        <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
+            <StatusBadge estado="confirmado" />
+        </ThemeProvider>
+    );
+
+    expect(screen.getByText('Confirmado')).toHaveStyle({ color: '#9FD6B6' });
+});
+
 test('usa superfície e texto neutros no estado não confirmado', async () => {
     await renderWithTheme(<StatusBadge estado="naoConfirmadoHistoricoUso" />, {
         preferencia: 'escuro'
@@ -64,7 +83,7 @@ test('diferencia métricas de menstruação e ciclo no tema escuro', async () =>
     });
 
     expect(screen.getByText('6 dias')).toHaveStyle({ color: '#F08A75' });
-    primeiro.unmount();
+    await primeiro.unmount();
 
     await renderWithTheme(<StatusBadge estado="diasCiclo" />, {
         preferencia: 'escuro'
