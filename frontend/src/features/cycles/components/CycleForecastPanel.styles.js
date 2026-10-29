@@ -48,7 +48,7 @@ function criarEstilos(tema) {
         formaProvisoriaCompacta: { width: 190, height: 200, paddingVertical: 5 },
         sombraFormaCompacta: { width: 99, height: 17, left: 46, top: 171 },
         tituloFase: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 28,
             fontWeight: '700',
@@ -56,7 +56,7 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
         diaCiclo: {
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             fontWeight: '400',
@@ -75,27 +75,29 @@ function criarEstilos(tema) {
             borderWidth: 1,
             borderStyle: 'dashed',
             borderRadius: radius.grande,
-            backgroundColor: cores.ciclo.fundoFertil
+            backgroundColor: tema.escuro
+                ? tema.cores.interface.destaqueSuave
+                : cores.ciclo.fundoFertil
         },
         iconeDestaqueFertil: {
             width: 40,
             height: 40,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: cores.neutras.superficieClara,
+            backgroundColor: tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara,
+            borderColor: tema.cores.interface.borda,
             borderRadius: radius.medio
         },
         tituloDestaqueFertil: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 14,
             fontWeight: '700',
             lineHeight: 21
         },
         textoDestaqueFertil: {
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             fontWeight: '400',
@@ -121,15 +123,15 @@ function criarEstilos(tema) {
             columnGap: 12,
             padding: 20,
             borderRadius: tema.radius.cartao,
-            backgroundColor: cores.neutras.superficieClara,
+            backgroundColor: tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara,
+            borderColor: tema.cores.interface.borda,
             ...shadows.cardSuave
         },
         cartaoProximoCicloComAviso: { minHeight: 198 },
         dataProximoCiclo: { flex: 1, minWidth: 140, gap: 4 },
         rotuloPrevisao: {
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontWeight: '700',
@@ -138,7 +140,7 @@ function criarEstilos(tema) {
             textTransform: 'uppercase'
         },
         rotuloPrevisaoSecundaria: {
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontWeight: '700',
@@ -147,7 +149,7 @@ function criarEstilos(tema) {
             textTransform: 'uppercase'
         },
         valorPrincipal: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 24,
             fontWeight: '700',
@@ -155,7 +157,7 @@ function criarEstilos(tema) {
             textTransform: 'capitalize'
         },
         valorOvulacao: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             fontWeight: '700',
@@ -169,7 +171,7 @@ function criarEstilos(tema) {
             gap: 15,
             paddingHorizontal: 12,
             paddingVertical: 9,
-            backgroundColor: cores.ciclo.fundoAviso,
+            backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.14)' : cores.ciclo.fundoAviso,
             borderWidth: 1,
             borderColor: cores.ciclo.bordaAviso,
             borderRadius: radius.pequeno
@@ -183,7 +185,7 @@ function criarEstilos(tema) {
             lineHeight: 17
         },
         textoAvisoConfiabilidade: {
-            color: cores.ciclo.textoAviso,
+            color: tema.escuro ? '#F2B45F' : cores.ciclo.textoAviso,
             fontFamily: fontFamilies.regular,
             fontSize: 11,
             fontWeight: '400',
@@ -193,7 +195,7 @@ function criarEstilos(tema) {
         textoAvisoBaixa: {
             flex: 1,
             maxWidth: 226,
-            color: cores.ciclo.textoAviso,
+            color: tema.escuro ? '#F2B45F' : cores.ciclo.textoAviso,
             fontFamily: fontFamilies.regular,
             fontSize: 11,
             fontWeight: '400',
@@ -208,9 +210,9 @@ function criarEstilos(tema) {
             gap: 8,
             padding: 16,
             borderRadius: radius.cartao,
-            backgroundColor: cores.neutras.superficieClara,
+            backgroundColor: tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara,
+            borderColor: tema.cores.interface.borda,
             ...shadows.cardSuave
         },
         cabecalhoCartaoSecundario: {
@@ -220,7 +222,7 @@ function criarEstilos(tema) {
             gap: 8
         },
         valorSecundario: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             fontWeight: '700',
@@ -228,7 +230,7 @@ function criarEstilos(tema) {
         },
         aviso: {
             width: '100%',
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             fontWeight: '400',
@@ -238,7 +240,7 @@ function criarEstilos(tema) {
         },
         secaoTexto: { paddingHorizontal: 16, paddingTop: 40 },
         tituloSecao: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             fontWeight: '700',
@@ -260,7 +262,7 @@ function criarEstilos(tema) {
         },
         descricaoFase: {
             flex: 1,
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             fontWeight: '400',
@@ -280,9 +282,9 @@ function criarEstilos(tema) {
             paddingHorizontal: 14,
             paddingVertical: 8,
             borderRadius: radius.circular,
-            backgroundColor: cores.neutras.superficieClara,
+            backgroundColor: tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara
+            borderColor: tema.cores.interface.borda
         },
         marcadorSintoma: {
             width: 6,
@@ -292,7 +294,7 @@ function criarEstilos(tema) {
         },
         textoSintoma: {
             flexShrink: 1,
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontSize: 12,
             fontWeight: '500',
@@ -306,9 +308,11 @@ function criarEstilos(tema) {
             gap: 12,
             padding: 16,
             borderRadius: radius.grande,
-            backgroundColor: cores.ciclo.superficieSuave,
+            backgroundColor: tema.escuro
+                ? tema.cores.interface.superficieElevada
+                : cores.ciclo.superficieSuave,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara
+            borderColor: tema.cores.interface.borda
         },
         numeroDica: {
             width: 34,
@@ -316,9 +320,9 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: radius.medio,
-            backgroundColor: cores.neutras.superficieClara,
+            backgroundColor: tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara
+            borderColor: tema.cores.interface.borda
         },
         textoNumeroDica: {
             color: cores.marca.primaria,
@@ -329,7 +333,7 @@ function criarEstilos(tema) {
         },
         textoDica: {
             flex: 1,
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',
@@ -348,7 +352,7 @@ function criarEstilos(tema) {
         },
         acoesSemCiclo: { alignSelf: 'stretch', gap: 16, paddingTop: 16 },
         chamadaRecursos: {
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontWeight: '700',
@@ -363,9 +367,9 @@ function criarEstilos(tema) {
             gap: 12,
             padding: 16,
             borderRadius: radius.grande,
-            backgroundColor: cores.neutras.superficieClara,
+            backgroundColor: tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara,
+            borderColor: tema.cores.interface.borda,
             ...shadows.cardSuave
         },
         iconeRecurso: {
@@ -374,20 +378,22 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: radius.medio,
-            backgroundColor: cores.ciclo.superficieSuave,
+            backgroundColor: tema.escuro
+                ? tema.cores.interface.superficieElevada
+                : cores.ciclo.superficieSuave,
             borderWidth: 1,
-            borderColor: cores.neutras.bordaClara
+            borderColor: tema.cores.interface.borda
         },
         textoRecurso: { flex: 1 },
         tituloRecurso: {
-            color: cores.neutras.textoPrincipalClaro,
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 14,
             fontWeight: '700',
             lineHeight: 21
         },
         descricaoRecurso: {
-            color: cores.neutras.textoSecundarioClaro,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             fontWeight: '400',
