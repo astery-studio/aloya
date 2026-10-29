@@ -1,25 +1,40 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { BottomSheet } from '../../../src/shared/components/feedback/BottomSheet/BottomSheet';
 import { EditFieldSheet } from '../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet';
 import AlertModal from '../../../src/shared/components/feedback/Modal/AlertModal/AlertModal';
 import NumberInput from '../../../src/shared/components/forms/NumberInput';
 import RadioOption from '../../../src/shared/components/forms/RadioOption';
+import { renderWithTheme } from '../../helpers/renderWithTheme';
 
 test('BottomSheet monta ao se tornar visível e anima após aparecer', async () => {
-    const view = await render(<BottomSheet visivel={false}><Text>Painel</Text></BottomSheet>);
-    await view.rerender(<BottomSheet visivel><Text>Painel</Text></BottomSheet>);
+    const view = await renderWithTheme(
+        <BottomSheet visivel={false}>
+            <Text>Painel</Text>
+        </BottomSheet>
+    );
+    await view.rerender(
+        <BottomSheet visivel>
+            <Text>Painel</Text>
+        </BottomSheet>
+    );
     expect(screen.getByText('Painel')).toBeTruthy();
 });
 
 test('EditFieldSheet tenta focar o campo quando não está salvando', async () => {
-    await render(<EditFieldSheet visivel titulo="Nome" valor="Carla" />);
+    await renderWithTheme(<EditFieldSheet visivel titulo="Nome" valor="Carla" />);
     expect(() => fireEvent.press(screen.getByLabelText('Nome'))).not.toThrow();
 });
 
 test('ação de fechamento carregando é ignorada com segurança', async () => {
-    const view = await render(<AlertModal visivel titulo="Aguarde" aoFechar={jest.fn()}
-        acaoPrincipal={{ texto: 'Salvar', carregando: true }} />);
+    const view = await renderWithTheme(
+        <AlertModal
+            visivel
+            titulo="Aguarde"
+            aoFechar={jest.fn()}
+            acaoPrincipal={{ texto: 'Salvar', carregando: true }}
+        />
+    );
     const modal = view.container.queryAll(
         (elemento) => typeof elemento.props.onRequestClose === 'function'
     )[0];
@@ -27,7 +42,12 @@ test('ação de fechamento carregando é ignorada com segurança', async () => {
 });
 
 test('campos usam padrões e cobrem interações opcionais', async () => {
-    await render(<><NumberInput valor={1} /><RadioOption titulo="Única" /></>);
+    await renderWithTheme(
+        <>
+            <NumberInput valor={1} />
+            <RadioOption titulo="Única" />
+        </>
+    );
     await fireEvent.press(screen.getByLabelText('Duração em dias'));
     expect(screen.getByRole('radio', { name: 'Única' })).not.toBeSelected();
     expect(screen.queryByText('Descrição')).toBeNull();
