@@ -48,13 +48,13 @@ function calcularContraste(primeiraCor, segundaCor) {
 }
 
 describe('themePalettes', () => {
-    test('retorna o tema correspondente ao modo informado', () => {
+    test('retorna o tema do modo informado', () => {
         expect(obterTemaPorModo(MODOS_TEMA.claro)).toBe(temaClaro);
 
         expect(obterTemaPorModo(MODOS_TEMA.escuro)).toBe(temaEscuro);
     });
 
-    test('usa o tema claro como fallback seguro', () => {
+    test('usa o tema claro como fallback', () => {
         expect(obterTemaPorModo('desconhecido')).toBe(temaClaro);
 
         expect(obterTemaPorModo()).toBe(temaClaro);
@@ -70,7 +70,7 @@ describe('themePalettes', () => {
         expect(temaEscuro.escuro).toBe(true);
     });
 
-    test('mantém os contratos compartilhados nos dois temas', () => {
+    test('mantém contratos compartilhados', () => {
         for (const tema of [temaClaro, temaEscuro]) {
             expect(tema.espacamentos).toBeDefined();
 
@@ -93,17 +93,39 @@ describe('themePalettes', () => {
     test.each([
         ['claro', interfaceClara],
         ['escuro', interfaceEscura]
-    ])('garante contraste mínimo no tema %s', (_nome, paleta) => {
+    ])('garante contraste dos textos no tema %s', (_nome, paleta) => {
         const combinacoes = [
             [paleta.textoPrincipal, paleta.fundo],
             [paleta.textoPrincipal, paleta.superficie],
             [paleta.textoSecundario, paleta.fundo],
-            [paleta.textoSecundario, paleta.superficie]
+            [paleta.textoSecundario, paleta.superficie],
+            [paleta.textoPrincipal, paleta.destaqueSuave]
         ];
 
         for (const [texto, fundo] of combinacoes) {
             expect(calcularContraste(texto, fundo)).toBeGreaterThanOrEqual(4.5);
         }
+    });
+
+    test.each([
+        ['claro', interfaceClara],
+        ['escuro', interfaceEscura]
+    ])('garante contraste do destaque no tema %s', (_nome, paleta) => {
+        expect(calcularContraste(paleta.destaque, paleta.fundo)).toBeGreaterThanOrEqual(4.5);
+
+        expect(calcularContraste(paleta.destaque, paleta.superficie)).toBeGreaterThanOrEqual(4.5);
+
+        expect(
+            calcularContraste(paleta.textoSobreDestaque, paleta.destaque)
+        ).toBeGreaterThanOrEqual(4.5);
+    });
+
+    test('usa destaque verde escuro no tema claro', () => {
+        expect(interfaceClara.destaque).toBe('#2C4C3B');
+    });
+
+    test('usa destaque verde claro no tema escuro', () => {
+        expect(interfaceEscura.destaque).toBe('#9FD6B6');
     });
 
     test('usa conteúdo claro na barra de status escura', () => {

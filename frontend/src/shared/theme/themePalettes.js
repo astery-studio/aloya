@@ -15,7 +15,13 @@ const interfaceClara = Object.freeze({
     borda: '#E6E2D8',
     separador: '#EDEAE4',
     switchInativo: '#D8D4CC',
+
+    destaque: '#2C4C3B',
+    destaqueSuave: '#EDF4F0',
+    textoSobreDestaque: '#FFFFFF',
+
     sobreposicao: 'rgba(34, 34, 34, 0.48)',
+
     barraStatus: 'dark'
 });
 
@@ -29,7 +35,13 @@ const interfaceEscura = Object.freeze({
     borda: '#4A514D',
     separador: '#353C38',
     switchInativo: '#656B67',
+
+    destaque: '#9FD6B6',
+    destaqueSuave: '#31463B',
+    textoSobreDestaque: '#152018',
+
     sobreposicao: 'rgba(0, 0, 0, 0.68)',
+
     barraStatus: 'light'
 });
 
