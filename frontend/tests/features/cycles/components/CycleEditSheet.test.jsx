@@ -1,0 +1,48 @@
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
+jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => ({
+    BottomSheet: ({ visivel, children }) => visivel ? children : null
+}));
+jest.mock('../../../../src/shared/layouts/BottomSheet/BottomSheetLayout', () => ({
+    BottomSheetLayout: ({ children }) => children
+}));
+jest.mock('../../../../src/shared/components/forms/DateInput/DateInput', () => {
+    const { TextInput } = require('react-native');
+    return ({ valor, onChangeText, rotuloAcessibilidade }) => (
+        <TextInput accessibilityLabel={rotuloAcessibilidade} value={valor} onChangeText={onChangeText} />
+    );
+});
+jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
+    const { Pressable } = require('react-native');
+    return ({ texto, aoPressionar, desativado }) => (
+        <Pressable accessibilityRole="button" accessibilityLabel={texto} disabled={desativado} onPress={aoPressionar} />
+    );
+});
+
+import { CycleEditSheet } from '../../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet';
+
+function criarProps(alteracoes = {}) {
+    return {
+        visivel: true, dataInicio: '01/10/2026', dataFim: '05/10/2026',
+        alterado: false, salvando: false, onAlterarInicio: jest.fn(),
+        onAlterarFim: jest.fn(), onFechar: jest.fn(), onSalvar: jest.fn(), ...alteracoes
+    };
+}
+
+test('edita e limpa as datas do ciclo', async () => {
+    const props = criarProps({ alterado: true });
+    await render(<CycleEditSheet {...props} />);
+    await fireEvent.changeText(screen.getByLabelText('Data de início do ciclo'), '02/10/2026');
+    await fireEvent.changeText(screen.getByLabelText('Data de término do ciclo'), '');
+    await fireEvent.press(screen.getByRole('button', { name: 'Limpar data de término' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    expect(props.onAlterarInicio).toHaveBeenCalledWith('02/10/2026');
+    expect(props.onAlterarFim).toHaveBeenCalledWith('');
+    expect(props.onSalvar).toHaveBeenCalled();
+});
+
+test('oculta a limpeza e bloqueia salvamento sem alteração', async () => {
+    await render(<CycleEditSheet {...criarProps({ dataFim: '', alterado: false })} />);
+    expect(screen.queryByRole('button', { name: 'Limpar data de término' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
+});
