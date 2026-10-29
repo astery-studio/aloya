@@ -58,4 +58,19 @@ function CycleEditSheet({
                             >
                                 <Text style={estilos.textoLimpar}>Limpar data de término</Text>
                             </Pressable>
+                        ) : null}
+                    </View>
 
+                    <ButtonScreen
+                        texto="Salvar alterações"
+                        aoPressionar={onSalvar}
+                        desativado={!alterado || salvando}
+                        carregando={salvando}
+                    />
+                </View>
+            </BottomSheetLayout>
+        </BottomSheet>
+    );
+}
+
+export { CycleEditSheet };
