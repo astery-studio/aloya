@@ -1,9 +1,7 @@
 //Centraliza os estilos visuais dos componentes do calendário.
 import { StyleSheet } from 'react-native';
-import { cores, fontFamilies } from '../../../../shared/theme';
+import { fontFamilies } from '../../../../shared/theme';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
-
-const COR_JANELA_FERTIL = 'rgba(34, 34, 34, 0.70)';
 
 function criarEstilosCalendario(tema) {
     const estilos = StyleSheet.create({
@@ -162,10 +160,14 @@ function criarEstilosCalendario(tema) {
             zIndex: 3
         },
         janelaFertilAtual: {
-            borderColor: COR_JANELA_FERTIL
+            borderColor: tema.escuro
+                ? tema.cores.interface.textoSecundario
+                : 'rgba(34, 34, 34, 0.70)'
         },
         janelaFertilPrevista: {
-            borderColor: 'rgba(34, 34, 34, 0.42)'
+            borderColor: tema.escuro
+                ? tema.cores.interface.textoDesabilitado
+                : 'rgba(34, 34, 34, 0.42)'
         },
         pressionado: {
             opacity: 0.72
@@ -206,7 +208,7 @@ function criarEstilosCalendario(tema) {
         estilos,
         estilosTipos,
         estilosTiposPrevistos,
-        corCarregamento: tema.cores.marca.primaria,
+        corCarregamento: tema.escuro ? tema.cores.interface.destaque : tema.cores.marca.primaria,
         corIconeMarcado: '#FFFFFF'
     });
 }
