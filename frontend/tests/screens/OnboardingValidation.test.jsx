@@ -1,8 +1,9 @@
 /**
  * Testes das validações e transições executadas durante o onboarding.
  */
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import OnboardingScreen from '../../src/features/onboarding/screens/OnboardingScreen';
+import { renderWithTheme } from '../helpers/renderWithTheme';
 
 jest.mock('../../src/shared/storage/tokenStorage', () => ({ salvarToken: jest.fn() }));
 jest.mock('../../src/features/onboarding/components/MenstruationCalendar/MenstruationCalendar', () => {
@@ -17,7 +18,7 @@ jest.mock('../../src/features/onboarding/components/MenstruationCalendar/Menstru
 
 test('cadastro explica quando o nome tem menos de três caracteres', async () => {
     const cadastrar = jest.fn();
-    await render(<OnboardingScreen cadastrar={cadastrar} />);
+    await renderWithTheme(<OnboardingScreen cadastrar={cadastrar} />);
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Al');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'al@email.com');
@@ -38,7 +39,7 @@ test('cadastro explica quando o nome tem menos de três caracteres', async () =>
 
 test('cadastro não avança quando o e-mail já existe', async () => {
     const verificarEmailDisponivel = jest.fn().mockResolvedValue({ disponivel: false });
-    await render(<OnboardingScreen cadastrar={jest.fn()}
+    await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()}
         verificarEmailDisponivel={verificarEmailDisponivel} />);
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
@@ -57,7 +58,7 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
         autenticacao: { token: 'jwt', tipo: 'Bearer' }
     });
     const seletor = () => null;
-    await render(<OnboardingScreen cadastrar={cadastrar}
+    await renderWithTheme(<OnboardingScreen cadastrar={cadastrar}
         renderizarSeletorCiclo={seletor}
         renderizarSeletorMenstruacao={seletor} renderizarSeletorLutea={seletor} />);
 
@@ -82,7 +83,7 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
 });
 
 test('cadastro rejeita senha curta junto ao campo', async () => {
-    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()} />);
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'carla@email.com');
@@ -97,7 +98,7 @@ test('cadastro rejeita senha curta junto ao campo', async () => {
 });
 
 test('nome remove números e caracteres especiais durante a digitação', async () => {
-    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()} />);
 
     const nome = screen.getByLabelText('Nome');
     await fireEvent.changeText(nome, 'Carla 123! Cristina');
