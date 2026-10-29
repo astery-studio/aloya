@@ -238,4 +238,8 @@ test('fecha confirmação, descarte e validação pelas ações dos modais', asy
     await fireEvent.press(screen.getByRole('button', { name: 'Fechar Dados não salvos' }));
     expect(screen.queryByText('Dados não salvos')).toBeNull();
 
-
+    await fireEvent.changeText(screen.getByLabelText('Início'), '31/02/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar Data incorreta' }));
+    expect(screen.queryByText('Data incorreta')).toBeNull();
+});
