@@ -33,13 +33,13 @@ async function renderizar(componente, preferencia = 'claro') {
 }
 
 async function preencherSenha(senha = 'senha-segura') {
-    fireEvent.changeText(screen.getByLabelText('Senha atual'), senha);
+    await fireEvent.changeText(screen.getByLabelText('Senha atual'), senha);
 }
 
 async function continuarComSenha(senha = 'senha-segura') {
     await preencherSenha(senha);
 
-    fireEvent.press(
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Continuar'
         })
@@ -67,7 +67,6 @@ describe('DeleteAccount', () => {
         await renderizar(<DeleteAccount {...props} />);
 
         expect(screen.queryByText('Confirme sua identidade')).toBeNull();
-
         expect(screen.queryByText('Excluir conta permanentemente?')).toBeNull();
     });
 
@@ -102,7 +101,7 @@ describe('DeleteAccount', () => {
 
         await renderizar(<DeleteAccount {...props} />);
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Cancelar'
             })
@@ -213,7 +212,7 @@ describe('DeleteAccount', () => {
 
         expect(screen.queryByText('Falha interna')).toBeNull();
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Tentar novamente'
             })
@@ -238,7 +237,7 @@ describe('DeleteAccount', () => {
 
         await abrirConfirmacao();
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Cancelar'
             })
@@ -257,7 +256,7 @@ describe('DeleteAccount', () => {
 
         await abrirConfirmacao();
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Excluir permanentemente'
             })
@@ -286,7 +285,7 @@ describe('DeleteAccount', () => {
 
         await abrirConfirmacao('senha correta');
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Excluir permanentemente'
             })
@@ -314,7 +313,7 @@ describe('DeleteAccount', () => {
 
         await abrirConfirmacao('senha antiga');
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Excluir permanentemente'
             })
@@ -352,7 +351,7 @@ describe('DeleteAccount', () => {
 
         await abrirConfirmacao();
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Excluir permanentemente'
             })
@@ -369,7 +368,7 @@ describe('DeleteAccount', () => {
         expect(screen.getByText('Ocorreu um erro ao apagar sua conta.')).toBeOnTheScreen();
         expect(screen.queryByText('Erro interno')).toBeNull();
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Tentar novamente'
             })
@@ -399,7 +398,7 @@ describe('DeleteAccount', () => {
             ).toBeOnTheScreen();
         });
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Voltar'
             })
@@ -423,7 +422,7 @@ describe('DeleteAccount', () => {
 
         await abrirConfirmacao();
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Excluir permanentemente'
             })
