@@ -142,6 +142,10 @@ import {
     criarAccountController
 } from '../../features/settings/controllers/account.controller.js';
 
+import { criarCycleParametersService } from '../../features/settings/services/cycleParameters.service.js';
+import { criarCycleParametersValidator } from '../../features/settings/validators/cycleParameters.validator.js';
+import { criarCycleParametersController } from '../../features/settings/controllers/cycleParameters.controller.js';
+
 import {
     criarAccountDeletionController
 } from '../../features/settings/controllers/accountDeletion.controller.js';
@@ -266,6 +270,13 @@ function criarContainer() {
 
     const predictionService =
         criarPredictionService({ prisma });
+
+    const cycleParametersService = criarCycleParametersService({
+        prisma,
+        recalcularPrevisoes: predictionService.buscar
+    });
+
+    const cycleParametersValidator = criarCycleParametersValidator();
 
     const permissionCategoryService =
         criarPermissionCategoryService({
@@ -403,6 +414,11 @@ function criarContainer() {
             accountValidator
         });
 
+    const cycleParametersController = criarCycleParametersController({
+        service: cycleParametersService,
+        validator: cycleParametersValidator
+    });
+
     const accountDeletionController =
         criarAccountDeletionController({
             accountDeletionService,
@@ -436,6 +452,7 @@ function criarContainer() {
     return {
         authController,
         accountController,
+        cycleParametersController,
         accountDeletionController,
         logoutController,
         contraceptiveController,
