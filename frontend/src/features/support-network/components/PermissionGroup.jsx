@@ -20,7 +20,27 @@ import { criarEstilos } from './PermissionGroup.styles';
 //Recebe o nome da paleta e devolve somente uma paleta conhecida pelo aplicativo.
 function obterPaleta(paleta, tema) {
     const paletasDosGrupos = tema.cores.redeApoio;
-    return paletasDosGrupos[paleta] ?? paletasDosGrupos.ciclo;
+    const paletaBase = paletasDosGrupos[paleta] ?? paletasDosGrupos.ciclo;
+
+    if (!tema.escuro) return paletaBase;
+
+    const coresEscuras = {
+        ciclo: '#F08A75',
+        corpo: '#9FD6B6',
+        emocional: '#C7A7E8',
+        energia: '#F2B45F',
+        vidaIntima: '#E59ABB',
+        saude: '#AEBBEF'
+    };
+    const cor = coresEscuras[paleta] ?? coresEscuras.ciclo;
+
+    return {
+        ...paletaBase,
+        icone: cor,
+        fundoIcone: tema.cores.interface.superficieElevada,
+        fundoExpandido: tema.cores.interface.destaqueSuave,
+        bordaExpandida: cor
+    };
 }
 
 //Renderiza somente componentes de ícone conhecidos e declarados fora do componente.
