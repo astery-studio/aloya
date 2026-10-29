@@ -178,4 +178,15 @@ function criarCycleEditService({ prisma } = {}) {
                 }
             });
 
+            return {
+                ...editado,
+                dataInicio: formatarData(editado.dataInicio),
+                dataFim: editado.dataFim ? formatarData(editado.dataFim) : null
+            };
+        });
+    }
 
+    return { buscar, editar };
+}
+
+export { criarCycleEditService };
