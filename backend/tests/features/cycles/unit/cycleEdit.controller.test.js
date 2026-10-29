@@ -58,4 +58,23 @@ test('encaminha falhas com mensagem pública apenas para erros inesperados', asy
     const controller = criarCycleEditController({ service, validator });
     let recebido;
     await controller.buscar({ params: { id: '1' }, usuario: { id: 2 } }, criarResposta(), (e) => { recebido = e; });
+    assert.equal(recebido.mensagemUsuario, 'Ocorreu um erro ao carregar este registro. Tente novamente.');
+    await controller.editar({ params: { id: '1' }, usuario: { id: 2 }, body: {} }, criarResposta(), (e) => { recebido = e; });
+    assert.equal(recebido, esperado);
+    assert.equal(esperado.mensagemUsuario, undefined);
+});
 
+test('protege a mensagem de erro inesperado durante a edição', async () => {
+    const falha = new Error('banco');
+    const controller = criarCycleEditController({
+        service: { async buscar() {}, async editar() { throw falha; } },
+        validator
+    });
+    let recebido;
+    await controller.editar(
+        { params: { id: '1' }, usuario: { id: 2 }, body: {} },
+        criarResposta(),
+        (erro) => { recebido = erro; }
+    );
+    assert.equal(recebido.mensagemUsuario, 'Ocorreu um erro ao atualizar este registro. Tente novamente.');
+});
