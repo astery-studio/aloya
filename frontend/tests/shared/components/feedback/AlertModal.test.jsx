@@ -1,6 +1,6 @@
 //Testa o conteúdo, as ações e a confirmação por senha do AlertModal.
 import { useState } from 'react'
-import { fireEvent, render, screen } from '@testing-library/react-native'
+import { fireEvent, screen } from '@testing-library/react-native'
 
 jest.mock('phosphor-react-native/src/icons/LockKey', () => ({
     LockKeyIcon: jest.fn(() => null)
@@ -11,6 +11,7 @@ jest.mock('phosphor-react-native/src/icons/WarningCircle', () => ({
 }))
 
 import AlertModal from '../../../../src/shared/components/feedback/Modal/AlertModal/AlertModal'
+import { renderWithTheme } from '../../../helpers/renderWithTheme'
 
 function AlertModalComSenha({aoContinuar = jest.fn(), aoFechar = jest.fn(), carregando = false, erroSenha}) {
     const [senha, definirSenha] = useState('')
@@ -31,13 +32,13 @@ function AlertModalComSenha({aoContinuar = jest.fn(), aoFechar = jest.fn(), carr
 }
 
 test('não mostra o conteúdo quando está oculto', async () => {
-    await render(<AlertModal visivel={false} titulo="Erro" aoFechar={jest.fn()} />)
+    await renderWithTheme(<AlertModal visivel={false} titulo="Erro" aoFechar={jest.fn()} />)
 
     expect(screen.queryByText('Erro')).toBeNull()
 })
 
 test('mostra título, mensagem e destaque', async () => {
-    await render(
+    await renderWithTheme(
         <AlertModal visivel aoFechar={jest.fn()} titulo="Não foi possível salvar" mensagem="Confira os dados e tente novamente." destaque="Nenhuma alteração foi perdida." />
     )
 
@@ -49,7 +50,7 @@ test('mostra título, mensagem e destaque', async () => {
 test('cria a ação Entendi quando recebe somente aoFechar', async () => {
     const aoFechar = jest.fn()
 
-    await render(<AlertModal visivel aoFechar={aoFechar} titulo="Aviso" />)
+    await renderWithTheme(<AlertModal visivel aoFechar={aoFechar} titulo="Aviso" />)
     await fireEvent.press(screen.getByRole('button', { name: 'Entendi' }))
 
     expect(aoFechar).toHaveBeenCalledTimes(1)
@@ -59,7 +60,7 @@ test('executa as ações principal e secundária separadamente', async () => {
     const principal = jest.fn()
     const secundaria = jest.fn()
 
-    await render(
+    await renderWithTheme(
         <AlertModal
             visivel
             aoFechar={jest.fn()}
@@ -82,7 +83,7 @@ test('executa as ações principal e secundária separadamente', async () => {
 test('bloqueia ação que está carregando', async () => {
     const aoPressionar = jest.fn()
 
-    await render(
+    await renderWithTheme(
         <AlertModal visivel aoFechar={jest.fn()} titulo="Aguarde" acaoPrincipal={{ texto: 'Confirmar', aoPressionar, carregando: true }} />
     )
 
@@ -96,7 +97,7 @@ test('bloqueia ação que está carregando', async () => {
 })
 
 test('mostra o campo de senha e começa com Continuar desativado', async () => {
-    await render(<AlertModalComSenha />)
+    await renderWithTheme(<AlertModalComSenha />)
 
     expect(screen.getByLabelText('Senha atual')).toBeOnTheScreen()
     expect(screen.getByRole('button', { name: 'Continuar' })).toBeDisabled()
@@ -106,7 +107,7 @@ test('mostra o campo de senha e começa com Continuar desativado', async () => {
 test('ativa Continuar depois que a senha é preenchida', async () => {
     const aoContinuar = jest.fn()
 
-    await render(<AlertModalComSenha aoContinuar={aoContinuar} />)
+    await renderWithTheme(<AlertModalComSenha aoContinuar={aoContinuar} />)
 
     await fireEvent.changeText(screen.getByLabelText('Senha atual'), 'Senha atual segura')
     const botaoContinuar = screen.getByRole('button', { name: 'Continuar' })
@@ -121,20 +122,20 @@ test('ativa Continuar depois que a senha é preenchida', async () => {
 test('fecha a variante com senha pelo botão Cancelar', async () => {
     const aoFechar = jest.fn()
 
-    await render(<AlertModalComSenha aoFechar={aoFechar} />)
+    await renderWithTheme(<AlertModalComSenha aoFechar={aoFechar} />)
     await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }))
 
     expect(aoFechar).toHaveBeenCalledTimes(1)
 })
 
 test('mostra o erro devolvido pela API sem expor detalhes técnicos', async () => {
-    await render(<AlertModalComSenha erroSenha="Senha atual incorreta." />)
+    await renderWithTheme(<AlertModalComSenha erroSenha="Senha atual incorreta." />)
 
     expect(screen.getByRole('alert')).toHaveTextContent('Senha atual incorreta.')
 })
 
 test('bloqueia o campo e os botões enquanto está carregando', async () => {
-    await render(<AlertModalComSenha carregando />)
+    await renderWithTheme(<AlertModalComSenha carregando />)
 
     expect(screen.getByLabelText('Senha atual')).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Continuar' })).toBeDisabled()
