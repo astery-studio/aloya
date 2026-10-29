@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { EmptyState } from '../../../../src/shared/components/feedback/EmptyState/EmptyState';
+import { renderWithTheme } from '../../../helpers/renderWithTheme';
 
 test.each(['vazio', 'erro', 'apresentacao'])('apresenta a variante %s', async (variante) => {
-    await render(
+    await renderWithTheme(
         <EmptyState
             variante={variante}
             titulo="Título do estado"

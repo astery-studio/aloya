@@ -1,17 +1,14 @@
 /**
  * Testes da estrutura, retorno e conteúdo apresentados pelo AuthLayout.
  */
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import AuthLayout from '../../src/shared/layouts/AuthLayout';
+import { renderWithTheme } from '../helpers/renderWithTheme';
 
 test('organiza título, descrição, formulário e rodapé', async () => {
-    await render(
-        <AuthLayout
-            titulo="Entrar"
-            descricao="Acesse sua conta"
-            rodape={<Text>Criar conta</Text>}
-        >
+    await renderWithTheme(
+        <AuthLayout titulo="Entrar" descricao="Acesse sua conta" rodape={<Text>Criar conta</Text>}>
             <Text>Campos de autenticação</Text>
         </AuthLayout>
     );
@@ -23,7 +20,11 @@ test('organiza título, descrição, formulário e rodapé', async () => {
 });
 
 test('permite omitir descrição e rodapé', async () => {
-    await render(<AuthLayout titulo="Recuperar senha"><Text>E-mail</Text></AuthLayout>);
+    await renderWithTheme(
+        <AuthLayout titulo="Recuperar senha">
+            <Text>E-mail</Text>
+        </AuthLayout>
+    );
     expect(screen.getByTestId('auth-layout')).toBeTruthy();
     expect(screen.queryByText('Acesse sua conta')).toBeNull();
     expect(screen.getByText('E-mail')).toBeTruthy();
@@ -31,7 +32,7 @@ test('permite omitir descrição e rodapé', async () => {
 
 test('exibe e aciona o retorno quando solicitado', async () => {
     const aoVoltar = jest.fn();
-    await render(<AuthLayout titulo="Entrar" aoVoltar={aoVoltar} />);
+    await renderWithTheme(<AuthLayout titulo="Entrar" aoVoltar={aoVoltar} />);
     await fireEvent.press(screen.getByLabelText('Voltar'));
     expect(aoVoltar).toHaveBeenCalledTimes(1);
 });
