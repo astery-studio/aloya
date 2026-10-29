@@ -28,6 +28,7 @@ function CycleMonth({ mes, aoPressionarDia, estilosTema = estilosTemaClaro }) {
                     key={`${mes.chave}-semana-${indice}`}
                     semana={semana}
                     aoPressionarDia={aoPressionarDia}
+                    estilosTema={estilosTema}
                 />
             ))}
             <View testID={`divisor-mes-${mes.chave}`} style={estilos.divisorMes} />
