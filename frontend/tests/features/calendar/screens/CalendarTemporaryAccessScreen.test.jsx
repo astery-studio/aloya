@@ -1,7 +1,8 @@
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react-native'
+import {fireEvent, screen} from '@testing-library/react-native'
 
 import {CalendarTemporaryAccessScreen} from '../../../../src/features/calendar/testing/CalendarTemporaryAccessScreen'
+import {renderWithTheme} from '../../../helpers/renderWithTheme'
 
 jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
     const ReactInterno = require('react')
@@ -32,7 +33,7 @@ describe('CalendarTemporaryAccessScreen', () => {
         const aoAbrirCalendario = jest.fn()
         const onSelecionarAba = jest.fn()
 
-        await render(
+        await renderWithTheme(
             <CalendarTemporaryAccessScreen
                 aoAbrirCalendario={aoAbrirCalendario}
                 onSelecionarAba={onSelecionarAba}
