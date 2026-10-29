@@ -1,76 +1,82 @@
 //Define os estilos compartilhados pelas telas do fluxo de anticoncepcionais.
 import { StyleSheet } from 'react-native';
-import { cores, espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { temaClaro } from '../../../shared/theme/themePalettes';
 
-const estilos = StyleSheet.create({
-    tela: {
-        flex: 1,
-        backgroundColor: cores.neutras.fundoClaro
-    },
+function criarEstilos(tema) {
+    const interfaceTema = tema.cores.interface;
+    return StyleSheet.create({
+        tela: {
+            flex: 1,
+            backgroundColor: interfaceTema.fundo
+        },
 
-    conteudoFormulario: {
-        paddingBottom: espacamentos.grande
-    },
+        conteudoFormulario: {
+            paddingBottom: espacamentos.grande
+        },
 
-    lista: {
-        flexGrow: 1,
-        padding: espacamentos.grande
-    },
+        lista: {
+            flexGrow: 1,
+            padding: espacamentos.grande
+        },
 
-    separador: {
-        height: espacamentos.medio
-    },
+        separador: {
+            height: espacamentos.medio
+        },
 
-    vazio: {
-        flex: 1,
-        minHeight: 280,
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: espacamentos.pequeno,
-        paddingHorizontal: espacamentos.grande
-    },
+        vazio: {
+            flex: 1,
+            minHeight: 280,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: espacamentos.pequeno,
+            paddingHorizontal: espacamentos.grande
+        },
 
-    tituloVazio: {
-        ...typography.h2,
-        textAlign: 'center',
-        color: cores.neutras.textoPrincipalClaro
-    },
+        tituloVazio: {
+            ...typography.h2,
+            textAlign: 'center',
+            color: interfaceTema.textoPrincipal
+        },
 
-    textoVazio: {
-        ...typography.bodyDefault,
-        textAlign: 'center',
-        color: cores.neutras.textoSecundarioClaro
-    },
+        textoVazio: {
+            ...typography.bodyDefault,
+            textAlign: 'center',
+            color: interfaceTema.textoSecundario
+        },
 
-    acao: {
-        marginTop: espacamentos.grande
-    },
+        acao: {
+            marginTop: espacamentos.grande
+        },
 
-    acaoExcluir: {
-        minHeight: 44,
-        marginTop: -16,
-        marginHorizontal: espacamentos.grande,
-        marginBottom: espacamentos.grande,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        acaoExcluir: {
+            minHeight: 44,
+            marginTop: -16,
+            marginHorizontal: espacamentos.grande,
+            marginBottom: espacamentos.grande,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    textoExcluir: {
-        color: cores.feedback.erro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 14,
-        lineHeight: 21,
-        textAlign: 'center',
-        textDecorationLine: 'underline'
-    },
+        textoExcluir: {
+            color: tema.escuro ? '#FF9B88' : tema.cores.feedback.erro,
+            fontFamily: fontFamilies.regular,
+            fontSize: 14,
+            lineHeight: 21,
+            textAlign: 'center',
+            textDecorationLine: 'underline'
+        },
 
-    acaoPressionada: {
-        opacity: 0.6
-    },
+        acaoPressionada: {
+            opacity: 0.6
+        },
 
-    acaoDesabilitada: {
-        opacity: 0.4
-    }
-});
+        acaoDesabilitada: {
+            opacity: 0.4
+        }
+    });
+}
 
-export { estilos };
+const estilos = criarEstilos(temaClaro);
+
+export { criarEstilos, estilos };
