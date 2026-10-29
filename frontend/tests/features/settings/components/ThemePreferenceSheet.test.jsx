@@ -78,23 +78,23 @@ describe('ThemePreferenceSheet', () => {
             />
         );
 
-        expect(screen.getByText('Aparência')).toBeOnTheScreen();
+        expect(screen.getByText('Modo de Cor')).toBeOnTheScreen();
 
         expect(
             screen.getByRole('button', {
-                name: 'Claro'
+                name: 'Modo Claro'
             })
         ).toBeOnTheScreen();
 
         expect(
             screen.getByRole('button', {
-                name: 'Escuro'
+                name: 'Modo Escuro'
             })
         ).toBeOnTheScreen();
 
         expect(
             screen.getByRole('button', {
-                name: 'Automático'
+                name: 'Automático do Sistema'
             })
         ).toBeOnTheScreen();
 
@@ -117,7 +117,7 @@ describe('ThemePreferenceSheet', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Escuro'
+                name: 'Modo Escuro'
             })
         );
 
@@ -144,7 +144,7 @@ describe('ThemePreferenceSheet', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Escuro'
+                name: 'Modo Escuro'
             })
         );
 
@@ -171,7 +171,7 @@ describe('ThemePreferenceSheet', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Escuro'
+                name: 'Modo Escuro'
             })
         );
 
@@ -198,7 +198,7 @@ describe('ThemePreferenceSheet', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Escuro'
+                name: 'Modo Escuro'
             })
         );
 
@@ -227,10 +227,19 @@ describe('ThemePreferenceSheet', () => {
 
         expect(mockSelectionSheet).toHaveBeenLastCalledWith(
             expect.objectContaining({
-                titulo: 'Aparência',
+                titulo: 'Modo de Cor',
                 valorSelecionado: 'escuro',
-                opcoes: OPCOES_TEMA
+                opcoes: OPCOES_TEMA,
+                varianteOpcao: 'modoCor'
             })
         );
+    });
+
+    test('ordena as opções como no protótipo', () => {
+        expect(OPCOES_TEMA.map(({ id, label }) => ({ id, label }))).toEqual([
+            { id: 'automatico', label: 'Automático do Sistema' },
+            { id: 'claro', label: 'Modo Claro' },
+            { id: 'escuro', label: 'Modo Escuro' }
+        ]);
     });
 });

@@ -204,4 +204,26 @@ describe('ButtonSelection', () => {
             color: '#C4C8C5'
         });
     });
+
+    test('destaca o modo de cor selecionado como uma faixa', async () => {
+        await renderizarBotao(
+            {
+                variante: 'modoCor',
+                selected: true
+            },
+            'escuro'
+        );
+
+        expect(screen.getByRole('button')).toHaveStyle({
+            minHeight: 52,
+            backgroundColor: '#9FD6B6'
+        });
+
+        expect(screen.getByText('Opção mensal')).toHaveStyle({
+            color: '#152018',
+            fontWeight: '700'
+        });
+
+        expect(screen.queryByTestId('radio-selecao-vazio')).toBeNull();
+    });
 });
