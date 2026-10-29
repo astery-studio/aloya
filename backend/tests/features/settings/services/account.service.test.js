@@ -66,9 +66,8 @@ function criarPrismaMock(usuario) {
     return prisma;
 }
 
-// Testes do serviço de conta
-test('retorna somente os campos das configurações', // Funcao de teste assíncrona
-async function () {
+// Testa os campos públicos retornados pelas configurações da conta.
+test('retorna somente os campos das configurações', async function () {
     const prisma = criarPrismaMock(
         criarUsuario({
             senhaHash: 'nao-deve-ser-retornado'
