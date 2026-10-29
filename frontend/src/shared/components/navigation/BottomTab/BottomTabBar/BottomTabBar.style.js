@@ -1,15 +1,16 @@
-import { StyleSheet } from 'react-native'
-import { tema } from '../../../../theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    barra: {
-        width: '100%',
-        height: 91,
-        flexDirection: 'row',
-        backgroundColor: tema.cores.neutras.superficieClara,
-        borderTopWidth: 1,
-        borderTopColor: tema.cores.neutras.bordaClara
-    }
-})
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        barra: {
+            width: '100%',
+            height: 91,
+            flexDirection: 'row',
+            backgroundColor: tema.cores.interface.superficie,
+            borderTopWidth: 1,
+            borderTopColor: tema.cores.interface.borda
+        }
+    });
+}
 
-export { estilos }
+export { criarEstilos };
