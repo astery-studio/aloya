@@ -1,73 +1,76 @@
-import {StyleSheet} from 'react-native'
-import {tema} from '../../../theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    container: {
-        width: 44,
-        minWidth: 44,
-        height: 44,
-        minHeight: 44,
-        flexShrink: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: tema.radius.buttonAndInput
-    },
+function criarEstilos(tema) {
+    const estilos = StyleSheet.create({
+        container: {
+            width: 44,
+            minWidth: 44,
+            height: 44,
+            minHeight: 44,
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: tema.radius.buttonAndInput
+        },
 
-    pressionado: {
-        opacity: 0.65,
-        transform: [
-            {
-                scale: 0.96
-            }
-        ]
-    }
-})
+        pressionado: {
+            opacity: 0.65,
+            transform: [
+                {
+                    scale: 0.96
+                }
+            ]
+        }
+    });
 
-const variantes = Object.freeze({
-    neutro: Object.freeze({
-        container: Object.freeze({
-            backgroundColor: 'transparent',
-            borderWidth: 0
+    const variantes = Object.freeze({
+        neutro: Object.freeze({
+            container: Object.freeze({
+                backgroundColor: 'transparent',
+                borderWidth: 0
+            }),
+            icone: tema.cores.interface.textoSecundario
         }),
-        icone: tema.cores.neutras.textoSecundarioClaro
-    }),
 
-    perigo: Object.freeze({
-        container: Object.freeze({
-            backgroundColor: 'transparent',
-            borderWidth: 0
+        perigo: Object.freeze({
+            container: Object.freeze({
+                backgroundColor: 'transparent',
+                borderWidth: 0
+            }),
+            icone: tema.cores.feedback.erro
         }),
-        icone: tema.cores.feedback.erro
-    }),
 
-    selecionado: Object.freeze({
-        container: Object.freeze({
-            backgroundColor: tema.cores.neutras.superficieClara,
-            borderWidth: 1,
-            borderColor: tema.cores.neutras.bordaClara
+        selecionado: Object.freeze({
+            container: Object.freeze({
+                backgroundColor: tema.cores.interface.superficie,
+                borderWidth: 1,
+                borderColor: tema.cores.interface.borda
+            }),
+            icone: tema.cores.interface.textoSecundario
         }),
-        icone: tema.cores.neutras.textoSecundarioClaro
-    }),
 
-    calendario: Object.freeze({
-        container: Object.freeze({
-            backgroundColor: tema.cores.neutras.superficieClara,
-            borderWidth: 1,
-            borderColor: tema.cores.neutras.bordaClara,
-            borderRadius: tema.radius.onboardingCalendar
+        calendario: Object.freeze({
+            container: Object.freeze({
+                backgroundColor: tema.cores.interface.superficie,
+                borderWidth: 1,
+                borderColor: tema.cores.interface.borda,
+                borderRadius: tema.radius.onboardingCalendar
+            }),
+            icone: tema.cores.interface.textoSecundario,
+            tamanhoIcone: 22
         }),
-        icone: tema.cores.neutras.textoSecundarioClaro,
-        tamanhoIcone: 22
-    }),
 
-    desativado: Object.freeze({
-        container: Object.freeze({
-            backgroundColor: 'transparent',
-            borderWidth: 0,
-            opacity: 0.4
-        }),
-        icone: tema.cores.neutras.textoSecundarioClaro
-    })
-})
+        desativado: Object.freeze({
+            container: Object.freeze({
+                backgroundColor: 'transparent',
+                borderWidth: 0,
+                opacity: 0.4
+            }),
+            icone: tema.cores.interface.textoDesabilitado
+        })
+    });
 
-export {estilos, variantes}
+    return { estilos, variantes };
+}
+
+export { criarEstilos };
