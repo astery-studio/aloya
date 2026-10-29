@@ -422,7 +422,7 @@ describe('EditFieldSheet', () => {
 
         const campo = screen.getByLabelText('Duração do ciclo')
         expect(campo).toHaveProp('keyboardType', 'number-pad')
-        expect(screen.getByText('dias')).toBeOnTheScreen()
+        expect(campo).toHaveProp('value', '28 dias')
 
         await fireEvent.changeText(campo, '30 dias')
         expect(onAlterar).toHaveBeenCalledWith(30)

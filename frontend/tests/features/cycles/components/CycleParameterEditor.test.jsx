@@ -16,7 +16,6 @@ test('reutiliza o sheet de edição com o campo numérico do ciclo', async () =>
     );
 
     expect(screen.getByText('Editar Duração do Ciclo')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Duração do Ciclo')).toHaveProp('value', '28');
-    expect(screen.getByText('dias')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Duração do Ciclo')).toHaveProp('value', '28 dias');
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
 });
