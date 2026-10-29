@@ -1,6 +1,8 @@
 import { screen } from '@testing-library/react-native';
 
 import { StatusBadge } from '../../../../src/shared/components/common/StatusBadge/StatusBadge';
+import { criarVariantes } from '../../../../src/shared/components/common/StatusBadge/StatusBadge.styles';
+import { temaClaro, temaEscuro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme } from '../../../helpers/renderWithTheme';
 
 test('usa contraste de aviso adequado no tema escuro', async () => {
@@ -82,4 +84,17 @@ test('mantém o aviso de estimativa legível no tema escuro', async () => {
     expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toHaveStyle({
         color: '#F2B45F'
     });
+});
+
+test.each([
+    ['pendenteDeUso', 152.6, 23],
+    ['confirmadoHistoricoUso', 81, 23],
+    ['diasMenstruacao', 143.41, 30.88],
+    ['estimativaIncerta', 316.62, 52.41]
+])('preserva as dimensões de %s ao trocar o tema', (estado, width, height) => {
+    const varianteClara = criarVariantes(temaClaro)[estado];
+    const varianteEscura = criarVariantes(temaEscuro)[estado];
+
+    expect(varianteClara.container).toMatchObject({ width, height });
+    expect(varianteEscura.container).toMatchObject({ width, height });
 });
