@@ -28,3 +28,17 @@ test.each(['alertaLeve', 'alertaModerado', 'alertaCritico'])(
         });
     }
 );
+
+test.each([
+    ['confirmado', 'Confirmado'],
+    ['confirmadoHistoricoUso', 'Confirmado'],
+    ['validadeAindaPrazo', '30 meses restantes']
+])('usa contraste de sucesso em %s no tema escuro', async (estado, rotulo) => {
+    await renderWithTheme(<StatusBadge estado={estado} />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByText(rotulo)).toHaveStyle({
+        color: '#9FD6B6'
+    });
+});
