@@ -46,3 +46,20 @@ test('modal aceita segunda ação sem disparar a primeira', async () => {
     expect(segunda).toHaveBeenCalledTimes(1);
     expect(primeira).not.toHaveBeenCalled();
 });
+
+test('modal simples mantém texto legível no modo escuro', async () => {
+    await renderWithTheme(
+        <SimpleModal
+            visivel
+            titulo="Confirmação escura"
+            mensagem="Mensagem visível"
+            acaoPrincipal={{ texto: 'Entendi', aoPressionar: jest.fn() }}
+        />,
+        { preferencia: 'escuro' }
+    );
+
+    expect(screen.getByRole('header', { name: 'Confirmação escura' })).toHaveStyle({
+        color: '#F4F1EA'
+    });
+    expect(screen.getByText('Mensagem visível')).toHaveStyle({ color: '#C4C8C5' });
+});
