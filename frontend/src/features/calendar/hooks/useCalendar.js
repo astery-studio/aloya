@@ -157,6 +157,14 @@ function useCalendar({service, onSessaoExpirada} = {}) {
         return carregarMes(mesAtual, 'inicial')
     }, [carregarMes, mesAtual])
 
+    const recarregarMeses = useCallback(async () => {
+        const mesesParaRecarregar = mesesRef.current.map(item => item.mes)
+        mesesRef.current = []
+        setMeses([])
+        preCarregouMesSeguinte.current = false
+        await Promise.all(mesesParaRecarregar.map(mes => carregarMes(mes, mes === mesAtual ? 'inicial' : 'posterior')))
+    }, [carregarMes, mesAtual])
+
     return {
         meses,
         carregando,
@@ -165,7 +173,8 @@ function useCalendar({service, onSessaoExpirada} = {}) {
         erro,
         carregarAnteriores,
         carregarPosteriores,
-        tentarNovamente
+        tentarNovamente,
+        recarregarMeses
     }
 }
 
