@@ -159,7 +159,7 @@ test('encaminha as ações visuais sem criar regras intermediárias', async () =
         expect.objectContaining({
             aoAbrirCalendario,
             aoEditarCiclo,
-            aoExcluirCiclo,
+            aoExcluirCiclo: expect.any(Function),
             onSelecionarAba
         }),
         undefined

@@ -6,6 +6,7 @@ import { criarAccountService } from '../../src/features/settings/services/accoun
 import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService'
 import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService'
 import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService'
+import {criarCycleRemovalService} from '../../src/features/cycles/services/cycleRemovalService'
 import { criarServicosApp } from '../../src/app/createAppServices'
 import { criarApiClient } from '../../src/shared/services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
@@ -42,6 +43,10 @@ jest.mock(
     })
 )
 
+jest.mock('../../src/features/cycles/services/cycleRemovalService', () => ({
+    criarCycleRemovalService: jest.fn()
+}))
+
 jest.mock('../../src/shared/services/api/apiClient', () => ({
     criarApiClient: jest.fn()
 }))
@@ -65,6 +70,7 @@ describe('createAppServices', () => {
     let cycleHistoryService
     let supportCategoryService
     let cyclePredictionService
+    let cycleRemovalService
     let fetchSeguro
 
     beforeEach(() => {
@@ -97,6 +103,7 @@ describe('createAppServices', () => {
         cyclePredictionService = Object.freeze({
             nome: 'cyclePredictionService'
         })
+        cycleRemovalService = Object.freeze({removerDia: jest.fn(), excluirCiclo: jest.fn()})
         fetchSeguro = null
 
         criarApiClient.mockReturnValue({
@@ -131,6 +138,7 @@ describe('createAppServices', () => {
         criarCyclePredictionService.mockReturnValue(
             cyclePredictionService
         )
+        criarCycleRemovalService.mockReturnValue(cycleRemovalService)
     })
 
     test('monta e congela os serviços da aplicação', () => {
@@ -184,12 +192,14 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         })
 
+        expect(criarCycleRemovalService).toHaveBeenCalledWith({requisicaoAutenticada})
+
         expect(servicos).toEqual({
             authService,
             accountService,
-            calendarService,
+            calendarService: expect.objectContaining({nome: 'calendarService', ...cycleRemovalService}),
             contraceptiveService,
-            cycleHistoryService,
+            cycleHistoryService: expect.objectContaining({nome: 'cycleHistoryService', ...cycleRemovalService}),
             supportCategoryService,
             cyclePredictionService
         })
