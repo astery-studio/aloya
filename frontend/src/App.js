@@ -24,6 +24,7 @@ import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
+import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
@@ -37,6 +38,7 @@ const telasInternas = Object.freeze({
     anticoncepcionais: 'anticoncepcionais',
     novaCategoria: 'novaCategoria',
     calendario: 'calendario',
+    parametrosCiclo: 'parametrosCiclo',
     inicio: 'inicio'
 });
 
@@ -87,6 +89,7 @@ export default function App() {
 
     const [telaPublica, setTelaPublica] = useState('boasVindas')
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes)
+    const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes)
     const [estadoSessao, setEstadoSessao] = useState('verificando')
     const [tokenRecuperacao, setTokenRecuperacao] = useState(null)
     const [mensagemLogin, setMensagemLogin] = useState(null)
@@ -287,6 +290,11 @@ export default function App() {
         }
     }
 
+    function abrirParametrosCiclo(origem) {
+        setRetornoParametros(origem)
+        setTelaInterna(telasInternas.parametrosCiclo)
+    }
+
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         return (
             <SafeAreaView
@@ -381,6 +389,7 @@ export default function App() {
             aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
             aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
             aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+            aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
             aoSelecionarAba={selecionarAba}
             onSessaoExpirada={finalizarSessao} />;
     } else if (telaInterna === telasInternas.calendario) {
@@ -393,6 +402,7 @@ export default function App() {
                     'Cadastro de menstruação',
                     'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
                 )}
+                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.calendario)}
             />
         )
     } else if (telaInterna === telasInternas.membros) {
@@ -424,6 +434,15 @@ export default function App() {
                         carregarPerfil()
                     }
                 }}
+                onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
+            />
+        )
+    } else if (telaInterna === telasInternas.parametrosCiclo) {
+        conteudo = (
+            <CycleParametersScreen
+                service={configuracao.servicos.cycleParametersService}
+                onVoltar={() => setTelaInterna(retornoParametros)}
+                onSessaoExpirada={finalizarSessao}
             />
         )
     } else if (telaInterna === telasInternas.novaCategoria) {
