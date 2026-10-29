@@ -42,3 +42,16 @@ test.each([
         color: '#9FD6B6'
     });
 });
+
+test('usa superfície e texto neutros no estado não confirmado', async () => {
+    await renderWithTheme(<StatusBadge estado="naoConfirmadoHistoricoUso" />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByLabelText('Não confirmado')).toHaveStyle({
+        backgroundColor: '#353C38'
+    });
+    expect(screen.getByText('Não confirmado')).toHaveStyle({
+        color: '#C4C8C5'
+    });
+});
