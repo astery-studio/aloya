@@ -238,4 +238,33 @@ test('edita o ciclo de forma atômica e recalcula dados derivados', async (t) =>
         });
 
         await t.test('informa o período conflitante e preserva o registro', async () => {
+            const antes = await prisma.registroCiclo.findUnique({ where: { id: 2 } });
+            const { resposta, corpo } = await requisitar(url, 2, {
+                dataInicio: '2026-09-03',
+                dataFim: '2026-09-05'
+            });
+            const depois = await prisma.registroCiclo.findUnique({ where: { id: 2 } });
 
+            assert.equal(resposta.status, 409);
+            assert.equal(corpo.erro.codigo, 'SOBREPOSICAO_CICLO');
+            assert.match(corpo.erro.mensagem, /2026-09-04 a 2026-09-08/);
+            assert.equal(depois.dataInicio.getTime(), antes.dataInicio.getTime());
+            assert.equal(depois.dataFim.getTime(), antes.dataFim.getTime());
+        });
+
+        await t.test('não revela ciclos pertencentes a outra conta', async () => {
+            const inexistente = await requisitar(url, 999, { dataFim: '2026-08-03' });
+            const alheio = await requisitar(url, 4, { dataFim: '2026-08-03' });
+
+            assert.equal(inexistente.resposta.status, 404);
+            assert.equal(alheio.resposta.status, 404);
+            assert.deepEqual(alheio.corpo, inexistente.corpo);
+        });
+    } finally {
+        await new Promise((resolve, reject) =>
+            servidor.close((falha) => (falha ? reject(falha) : resolve()))
+        );
+        await prisma.$disconnect();
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
