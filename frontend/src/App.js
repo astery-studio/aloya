@@ -402,7 +402,6 @@ export default function App() {
                     'Cadastro de menstruação',
                     'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
                 )}
-                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.calendario)}
             />
         )
     } else if (telaInterna === telasInternas.membros) {
