@@ -51,3 +51,15 @@ test.each(['laranja', 'verde', 'vermelho', 'bordaLaranja', 'bordaVerde'])('aceit
 
     expect(screen.getByRole('button', { name: 'Cadastrar anticoncepcional' })).toBeOnTheScreen();
 });
+
+test('usa destaque e contraste do modo escuro', async () => {
+    await renderWithTheme(
+        <ButtonScreen texto="Continuar" variante="verde" aoPressionar={jest.fn()} />,
+        { preferencia: 'escuro' }
+    );
+
+    expect(screen.getByRole('button', { name: 'Continuar' })).toHaveStyle({
+        backgroundColor: '#9FD6B6'
+    });
+    expect(screen.getByText('Continuar')).toHaveStyle({ color: '#152018' });
+});
