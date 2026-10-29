@@ -60,6 +60,29 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.destaqueSuave
         },
 
+        modoCor: {
+            minHeight: 52,
+            marginBottom: 8,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            borderWidth: 0,
+            backgroundColor: 'transparent'
+        },
+
+        modoCorSelecionado: {
+            backgroundColor: tema.cores.interface.destaque
+        },
+
+        labelModoCor: {
+            fontSize: 16,
+            lineHeight: 24
+        },
+
+        labelModoCorSelecionado: {
+            color: tema.cores.interface.textoSobreDestaque,
+            fontFamily: fontFamilies.bold
+        },
+
         radioVazio: {
             width: 22,
             height: 22,
