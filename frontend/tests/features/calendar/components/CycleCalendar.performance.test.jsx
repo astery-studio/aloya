@@ -28,3 +28,19 @@ test('paginação e loading não renderizam novamente o mês preservado', async 
     expect(novoSelecionar).toHaveBeenCalledWith({data: '2026-10-01', registroCicloId: 18})
     expect(selecionar).not.toHaveBeenCalled()
 })
+
+test('mantém a virtualização ativa no modo escuro', async () => {
+    CycleMonth.type.mockClear()
+    const mes = {mes: '2026-10', diasMenstruacao: []}
+    const resultado = await renderWithTheme(
+        <CycleCalendar meses={[mes]} aoPressionarDia={jest.fn()} />,
+        {preferencia: 'escuro'}
+    )
+    const quantidadeInicial = CycleMonth.type.mock.calls.length
+
+    await resultado.rerender(
+        <CycleCalendar meses={[mes]} carregandoAnteriores aoPressionarDia={jest.fn()} />
+    )
+
+    expect(CycleMonth.type.mock.calls.length).toBe(quantidadeInicial)
+})
