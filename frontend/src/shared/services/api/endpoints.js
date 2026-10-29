@@ -18,6 +18,7 @@ const endpoints = Object.freeze({
     calendario: '/api/cycles/calendar',
     estadoAtualCiclo: '/api/cycles/current',
     historicoCiclos: '/api/cycles/history',
+    ciclos: '/api/cycles',
     categoriasPermissao: '/support-network/permission-categories',
     previsaoCiclo: '/cycles/prediction'
 })
