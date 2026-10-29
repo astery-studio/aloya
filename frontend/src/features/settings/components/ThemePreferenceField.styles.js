@@ -29,14 +29,6 @@ function criarEstilos(tema) {
             borderRadius: 10
         },
 
-        conteudoTexto: {
-            flex: 1,
-            minWidth: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12
-        },
-
         label: {
             flex: 1,
             minWidth: 0,
@@ -45,16 +37,6 @@ function criarEstilos(tema) {
             fontSize: 16,
             lineHeight: 24,
             includeFontPadding: false
-        },
-
-        preferencia: {
-            flexShrink: 0,
-            color: tema.cores.interface.textoSecundario,
-            fontFamily: fontFamilies.medium,
-            fontSize: 14,
-            lineHeight: 21,
-            includeFontPadding: false,
-            textAlign: 'right'
         }
     });
 }
