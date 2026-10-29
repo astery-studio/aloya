@@ -1,17 +1,20 @@
 /**
  * Exercita variantes opcionais dos componentes de formulário da Carla.
  */
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 import ButtonPopup from '../../../src/shared/components/common/Button/ButtonPopup';
 import FormField from '../../../src/shared/components/forms/FormField';
 import TextInput from '../../../src/shared/components/forms/TextInput';
 import TimeInput from '../../../src/shared/components/forms/TimeInput';
 
 test('ButtonPopup rejeita variante fora do contrato', () => {
-    expect(() => ButtonPopup({
-        texto: 'Continuar',
-        variante: 'inexistente'
-    })).toThrow('Variante de ButtonPopup inválida: inexistente');
+    expect(() =>
+        ButtonPopup({
+            texto: 'Continuar',
+            variante: 'inexistente'
+        })
+    ).toThrow('Variante de ButtonPopup inválida: inexistente');
 });
 
 test('ButtonPopup usa variante padrão quando ela é omitida', async () => {
@@ -46,14 +49,11 @@ test('TimeInput formata horário e permite remover', async () => {
     const alterar = jest.fn();
     const remover = jest.fn();
     await render(
-        <TimeInput valor="12:30" onChangeText={alterar}
-            podeRemover aoRemover={remover} />
+        <TimeInput valor="12:30" onChangeText={alterar} podeRemover aoRemover={remover} />
     );
 
     await fireEvent.changeText(screen.getByLabelText('Horário'), '1845');
-    await fireEvent.press(
-        screen.getByRole('button', { name: 'Remover horário 12:30' })
-    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Remover horário 12:30' }));
 
     expect(alterar).toHaveBeenCalledWith('18:45');
     expect(remover).toHaveBeenCalledTimes(1);
