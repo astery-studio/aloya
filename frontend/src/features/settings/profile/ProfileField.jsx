@@ -24,6 +24,16 @@ function obterValorVisivel(valor) {
     return String(valor).trim();
 }
 
+function obterEstiloCampo({ estilos, pressionado, desabilitado }) {
+    return [
+        estilos.container,
+
+        pressionado && !desabilitado ? estilos.pressionado : null,
+
+        desabilitado ? estilos.desabilitado : null
+    ];
+}
+
 function ProfileField({ label, valor, onPress, desabilitado = false }) {
     const tema = useTheme();
 
@@ -48,11 +58,13 @@ function ProfileField({ label, valor, onPress, desabilitado = false }) {
             accessibilityState={{
                 disabled: estaDesabilitado
             }}
-            style={({ pressed }) => [
-                estilos.container,
-                pressed && !estaDesabilitado && estilos.pressionado,
-                estaDesabilitado && estilos.desabilitado
-            ]}
+            style={({ pressed }) =>
+                obterEstiloCampo({
+                    estilos,
+                    pressionado: pressed,
+                    desabilitado: estaDesabilitado
+                })
+            }
         >
             <View style={estilos.textos}>
                 <Text style={estilos.label} numberOfLines={1}>
@@ -77,4 +89,4 @@ function ProfileField({ label, valor, onPress, desabilitado = false }) {
     );
 }
 
-export { ProfileField, obterValorVisivel, valorFoiInformado };
+export { ProfileField, obterEstiloCampo, obterValorVisivel, valorFoiInformado };

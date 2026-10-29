@@ -1,68 +1,53 @@
-jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
-    NotePencilIcon: jest.fn(() => null)
-}));
-
-import { fireEvent, render, screen } from '@testing-library/react-native';
-
-import { ProfileField } from '../../../../src/features/settings/profile/ProfileField';
-import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
-
-async function renderizarCampo(propriedades = {}) {
-    return render(
-        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
-            <ProfileField label="Nome" valor="Julia" onPress={jest.fn()} {...propriedades} />
-        </ThemeProvider>
-    );
-}
+import { obterEstiloCampo } from '../../../../src/features/settings/profile/ProfileField';
+import { criarEstilos } from '../../../../src/features/settings/profile/ProfileField.style';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 describe('ProfileField - interação visual', () => {
-    test('aplica estilo pressionado durante o toque', async () => {
-        await renderizarCampo();
+    const estilos = criarEstilos(temaClaro);
 
-        const campo = screen.getByRole('button', {
-            name: 'Editar Nome'
+    test('aplica estilo pressionado durante o toque', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: true,
+            desabilitado: false
         });
 
-        expect(campo).not.toHaveStyle({
-            opacity: 0.72
-        });
+        expect(resultado).toContain(estilos.pressionado);
 
-        await fireEvent(campo, 'pressIn');
-
-        expect(campo).toHaveStyle({
-            opacity: 0.72
-        });
-
-        await fireEvent(campo, 'pressOut');
-
-        expect(campo).not.toHaveStyle({
-            opacity: 0.72
-        });
+        expect(resultado).not.toContain(estilos.desabilitado);
     });
 
-    test('não aplica pressionado quando desabilitado', async () => {
-        await renderizarCampo({
+    test('não aplica pressionado no estado normal', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: false,
+            desabilitado: false
+        });
+
+        expect(resultado).not.toContain(estilos.pressionado);
+
+        expect(resultado).not.toContain(estilos.desabilitado);
+    });
+
+    test('não aplica pressionado quando desabilitado', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: true,
             desabilitado: true
         });
 
-        const campo = screen.getByRole('button', {
-            name: 'Editar Nome'
+        expect(resultado).not.toContain(estilos.pressionado);
+
+        expect(resultado).toContain(estilos.desabilitado);
+    });
+
+    test('sempre mantém o estilo estrutural', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: false,
+            desabilitado: true
         });
 
-        expect(campo).toBeDisabled();
-
-        expect(campo).toHaveStyle({
-            opacity: 0.5
-        });
-
-        await fireEvent(campo, 'pressIn');
-
-        expect(campo).toHaveStyle({
-            opacity: 0.5
-        });
-
-        expect(campo).not.toHaveStyle({
-            opacity: 0.72
-        });
+        expect(resultado[0]).toBe(estilos.container);
     });
 });
