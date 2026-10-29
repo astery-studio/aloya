@@ -118,4 +118,64 @@ function criarCycleEditService({ prisma } = {}) {
                     'O registro foi alterado em outra operação. Atualize os dados e tente novamente.',
                     409,
                     'CONFLITO_EDICAO_CICLO'
+                );
+            }
+
+            await tx.diaMenstruacao.deleteMany({ where: { registroCicloId: cicloId } });
+
+            const quantidadeDias = dataFim ? diferencaDias(dataInicio, dataFim) + 1 : 1;
+            await tx.diaMenstruacao.createMany({
+                data: Array.from({ length: quantidadeDias }, (_, indice) => ({
+                    registroCicloId: cicloId,
+                    data: new Date(dataInicio.getTime() + indice * 86_400_000)
+                }))
+            });
+
+            const ciclos = await tx.registroCiclo.findMany({
+                where: { usuarioId },
+                orderBy: [{ dataInicio: 'asc' }, { id: 'asc' }],
+                select: {
+                    id: true,
+                    dataInicio: true,
+                    duracaoCiclo: true,
+                    ehCicloInicial: true
+                }
+            });
+
+            for (const [indice, ciclo] of ciclos.entries()) {
+                const anterior = ciclos[indice - 1];
+                const duracaoCiclo = anterior
+                    ? diferencaDias(anterior.dataInicio, ciclo.dataInicio)
+                    : null;
+                const ehCicloInicial = indice === 0;
+
+                if (
+                    ciclo.duracaoCiclo === duracaoCiclo &&
+                    ciclo.ehCicloInicial === ehCicloInicial
+                ) {
+                    continue;
+                }
+
+                await tx.registroCiclo.update({
+                    where: { id: ciclo.id },
+                    data: {
+                        duracaoCiclo,
+                        ehCicloInicial
+                    }
+                });
+            }
+
+            await tx.previsao.deleteMany({ where: { usuarioId } });
+
+            const editado = await tx.registroCiclo.findUnique({
+                where: { id: cicloId },
+                select: {
+                    id: true,
+                    dataInicio: true,
+                    dataFim: true,
+                    duracaoMenstruacao: true,
+                    duracaoCiclo: true
+                }
+            });
+
 
