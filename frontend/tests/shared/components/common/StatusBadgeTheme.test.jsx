@@ -15,3 +15,16 @@ test('usa contraste de aviso adequado no tema escuro', async () => {
         backgroundColor: 'rgba(242, 180, 95, 0.16)'
     });
 });
+
+test.each(['alertaLeve', 'alertaModerado', 'alertaCritico'])(
+    'usa contraste informativo em %s no tema escuro',
+    async (estado) => {
+        await renderWithTheme(<StatusBadge estado={estado} />, {
+            preferencia: 'escuro'
+        });
+
+        expect(screen.getByText(/Alerta/)).toHaveStyle({
+            color: '#8FC3DD'
+        });
+    }
+);
