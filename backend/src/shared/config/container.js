@@ -68,6 +68,8 @@ import { criarCycleHistoryService } from '../../features/cycles/services/cycleHi
 
 import { criarCycleHistoryController } from '../../features/cycles/controllers/cycleHistory.controller.js';
 
+import { criarCycleRemovalModule } from '../../features/cycles/cycleRemoval.module.js';
+
 import { criarPermissionCategoryService } from '../../features/support-network/services/permissionCategory.service.js';
 
 import { criarPermissionCategoryValidator } from '../../features/support-network/validators/permissionCategory.validator.js';
@@ -199,6 +201,8 @@ function criarContainer() {
     const cycleHistoryService = criarCycleHistoryService({
         repository: cycleHistoryRepository
     });
+
+    const cycleRemovalModule = criarCycleRemovalModule({prisma});
 
     const predictionService = criarPredictionService({ prisma });
 
@@ -355,6 +359,7 @@ function criarContainer() {
         contraceptiveUsageController,
         calendarController: calendarModule.calendarController,
         cycleHistoryController,
+        cycleRemovalController: cycleRemovalModule.controller,
 
         predictionController,
         permissionCategoryController,

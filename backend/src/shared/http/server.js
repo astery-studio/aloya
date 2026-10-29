@@ -14,6 +14,8 @@ import { criarCalendarRoutes } from '../../features/calendar/routes/calendar.rou
 
 import { criarCycleHistoryRoutes } from '../../features/cycles/routes/cycleHistory.routes.js';
 
+import { criarCycleRemovalRoutes } from '../../features/cycles/routes/cycleRemoval.routes.js';
+
 import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
@@ -98,6 +100,15 @@ app.use(
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         cycleHistoryController: container.cycleHistoryController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleRemovalRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        cycleRemovalController: container.cycleRemovalController
     })
 );
 
