@@ -4,20 +4,17 @@ import { PREFERENCIAS_TEMA } from '../../../shared/theme/themePreferences';
 const OPCOES_TEMA = Object.freeze([
     Object.freeze({
         id: PREFERENCIAS_TEMA.claro,
-        label: 'Claro',
-        descricao: 'Mantém a aparência clara do aplicativo.'
+        label: 'Modo Claro'
     }),
 
     Object.freeze({
         id: PREFERENCIAS_TEMA.escuro,
-        label: 'Escuro',
-        descricao: 'Mantém a aparência escura do aplicativo.'
+        label: 'Modo Escuro'
     }),
 
     Object.freeze({
         id: PREFERENCIAS_TEMA.automatico,
-        label: 'Automático',
-        descricao: 'Segue a aparência configurada no dispositivo.'
+        label: 'Automático do Sistema'
     })
 ]);
 
