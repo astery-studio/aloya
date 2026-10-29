@@ -1,41 +1,50 @@
-import { StyleSheet } from 'react-native'
-import { tema, fontFamilies } from '../../theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    container: {
-        flexShrink: 1
-    },
+import { fontFamilies } from '../../theme';
 
-    cabecalho: {
-        minHeight: 62,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 12,
-        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            flexShrink: 1,
+            backgroundColor: tema.cores.interface.superficieElevada
+        },
 
-    titulo: {
-        flex: 1,
-        flexShrink: 1,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.bold,
-        fontSize: 18,
-        lineHeight: 27
-    },
+        cabecalho: {
+            minHeight: 62,
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingTop: 12,
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+            backgroundColor: tema.cores.interface.superficieElevada
+        },
 
-    botaoFechar: {
-        width: 40,
-        height: 40,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        titulo: {
+            flex: 1,
+            flexShrink: 1,
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 18,
+            lineHeight: 27
+        },
 
-    conteudo: {
-        flexShrink: 1,
-        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela
-    }
-})
+        botaoFechar: {
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 20
+        },
 
-const corIconeFechar = tema.cores.neutras.textoSecundarioClaro
+        desabilitado: {
+            opacity: 0.5
+        },
 
-export { estilos, corIconeFechar }
+        conteudo: {
+            flexShrink: 1,
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+            backgroundColor: tema.cores.interface.superficieElevada
+        }
+    });
+}
+
+export { criarEstilos };
