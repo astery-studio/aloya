@@ -1,23 +1,38 @@
-//Reúne os campos e ações exibidos no conteúdo das configurações de perfil.
-import { Text, View } from 'react-native'
-import { LockKeyIcon } from '../../../shared/components/icons/AppIcons'
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
-import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField'
-import { ProfileField } from './ProfileField'
-import { estilos } from './ProfileSettings.style'
+// Reúne os campos e ações exibidos no conteúdo das configurações de perfil.
+import { useMemo } from 'react';
+import { Text, View } from 'react-native';
+
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField';
+import { LockKeyIcon } from '../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { ProfileField } from './ProfileField';
+import { criarEstilos } from './ProfileSettings.style';
 
 function formatarDataNascimento(dataNascimento) {
-    const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataNascimento ?? '')
+    const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dataNascimento ?? '');
 
     if (!partes) {
-        return null
+        return null;
     }
 
-    return `${partes[3]}/${partes[2]}/${partes[1]}`
+    return `${partes[3]}/${partes[2]}/${partes[1]}`;
 }
 
-function ProfileSettings({dados, onEditarCampo, onAlterarSenha, onSalvar, podeSalvar = false, salvando = false, bloqueado = false}) {
-    const camposBloqueados = bloqueado || salvando
+function ProfileSettings({
+    dados,
+    onEditarCampo,
+    onAlterarSenha,
+    onSalvar,
+    podeSalvar = false,
+    salvando = false,
+    bloqueado = false
+}) {
+    const tema = useTheme();
+
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
+    const camposBloqueados = bloqueado || salvando;
 
     return (
         <View style={estilos.container}>
@@ -75,7 +90,7 @@ function ProfileSettings({dados, onEditarCampo, onAlterarSenha, onSalvar, podeSa
                 carregando={salvando}
             />
         </View>
-    )
+    );
 }
 
-export { ProfileSettings }
+export { ProfileSettings, formatarDataNascimento };
