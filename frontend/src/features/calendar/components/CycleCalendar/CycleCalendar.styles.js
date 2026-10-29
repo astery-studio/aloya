@@ -129,7 +129,7 @@ function criarEstilosCalendario(tema) {
             alignItems: 'flex-start'
         },
         numeroDia: {
-            color: 'rgba(34, 34, 34, 0.70)',
+            color: tema.escuro ? tema.cores.interface.textoSecundario : 'rgba(34, 34, 34, 0.70)',
             textAlign: 'center',
             fontFamily: fontFamilies.regular,
             fontSize: 13,
@@ -147,7 +147,7 @@ function criarEstilosCalendario(tema) {
             lineHeight: 13
         },
         numeroDiaFuturo: {
-            color: 'rgba(34, 34, 34, 0.28)'
+            color: tema.escuro ? tema.cores.interface.textoDesabilitado : 'rgba(34, 34, 34, 0.28)'
         },
         trechoJanelaFertil: {
             position: 'absolute',
