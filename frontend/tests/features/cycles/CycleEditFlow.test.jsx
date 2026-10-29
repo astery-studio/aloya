@@ -179,3 +179,63 @@ test('cancela a confirmação antes de salvar', async () => {
     expect(screen.queryByText('Atualizar ciclo')).toBeNull();
 });
 
+test('apresenta sobreposição e permite tentar novamente', async () => {
+    const service = { editar: jest.fn()
+        .mockRejectedValueOnce({ codigo: 'SOBREPOSICAO_CICLO', mensagemUsuario: 'Já existe' })
+        .mockResolvedValueOnce({}) };
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service} onAtualizado={jest.fn()} />
+    );
+    await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(await screen.findByText('Ciclo existente')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    await waitFor(() => expect(service.editar).toHaveBeenCalledTimes(2));
+});
+
+test('encerra o fluxo quando a sessão expira', async () => {
+    const onSessaoExpirada = jest.fn();
+    const service = { editar: jest.fn().mockRejectedValue({ status: 401 }) };
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service} onSessaoExpirada={onSessaoExpirada} />
+    );
+    await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    await waitFor(() => expect(onSessaoExpirada).toHaveBeenCalledWith({
+        mensagem: 'Sua sessão expirou. Entre novamente.'
+    }));
+});
+
+test('usa mensagem segura para erro inesperado e permite voltar', async () => {
+    const service = { editar: jest.fn().mockRejectedValue({}) };
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service} />
+    );
+    await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    expect(screen.queryByText('Algo deu errado')).toBeNull();
+});
+
+test('fecha confirmação, descarte e validação pelas ações dos modais', async () => {
+    await render(
+        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={{ editar: jest.fn() }} />
+    );
+    await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar Atualizar ciclo' }));
+    expect(screen.queryByText('Atualizar ciclo')).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar Dados não salvos' }));
+    expect(screen.queryByText('Dados não salvos')).toBeNull();
+
+
