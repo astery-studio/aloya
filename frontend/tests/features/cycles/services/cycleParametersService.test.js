@@ -8,6 +8,16 @@ const parametros = {
 };
 
 describe('cycleParametersService', () => {
+    test('rejeita configuração sem cliente HTTP', () => {
+        expect(() => criarCycleParametersService()).toThrow('configurar');
+    });
+
+    test('consulta sem fabricar um signal ausente', async () => {
+        const requisicaoAutenticada = jest.fn().mockResolvedValue({ parametros });
+        const service = criarCycleParametersService({ requisicaoAutenticada });
+        await service.buscar();
+        expect(requisicaoAutenticada).toHaveBeenCalledWith({ caminho: endpoints.parametrosCiclo });
+    });
     test('consulta os parâmetros com cancelamento', async () => {
         const requisicaoAutenticada = jest.fn().mockResolvedValue({ parametros });
         const service = criarCycleParametersService({ requisicaoAutenticada });

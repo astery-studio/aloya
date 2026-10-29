@@ -10,6 +10,10 @@ const validos = {
 };
 
 describe('validação dos parâmetros do ciclo', () => {
+    test('rejeita objeto ausente usando os valores padrão', () => {
+        expect(Object.keys(validarParametrosCiclo())).toHaveLength(3);
+        expect(parametrosSaoIguais()).toBe(false);
+    });
     test('aceita os valores válidos e detecta alteração real', () => {
         expect(validarParametrosCiclo(validos)).toEqual({});
         expect(parametrosSaoIguais(validos, { ...validos })).toBe(true);
