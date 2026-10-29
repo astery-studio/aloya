@@ -33,4 +33,14 @@ describe('renderWithTheme', () => {
 
         expect(screen.getByTestId('tema-atual')).toHaveTextContent('escuro:#181C1A');
     });
+
+    test('preserva o provedor durante uma rerenderização', async () => {
+        const resultado = await renderWithTheme(<ThemeProbe />, {
+            preferencia: 'escuro'
+        });
+
+        await resultado.rerender(<ThemeProbe />);
+
+        expect(screen.getByTestId('tema-atual')).toHaveTextContent('escuro:#181C1A');
+    });
 });

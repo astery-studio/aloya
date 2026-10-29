@@ -2,12 +2,25 @@ import { render } from '@testing-library/react-native';
 
 import { ThemeProvider } from '../../src/shared/theme/ThemeProvider';
 
-function renderWithTheme(componente, { preferencia = 'claro', esquemaDoSistema = 'light' } = {}) {
-    return render(
-        <ThemeProvider preferencia={preferencia} esquemaDoSistema={esquemaDoSistema}>
-            {componente}
-        </ThemeProvider>
-    );
+async function renderWithTheme(
+    componente,
+    { preferencia = 'claro', esquemaDoSistema = 'light' } = {}
+) {
+    function envolverComTema(conteudo) {
+        return (
+            <ThemeProvider preferencia={preferencia} esquemaDoSistema={esquemaDoSistema}>
+                {conteudo}
+            </ThemeProvider>
+        );
+    }
+
+    const resultado = await render(envolverComTema(componente));
+    const rerenderOriginal = resultado.rerender;
+
+    return {
+        ...resultado,
+        rerender: (novoComponente) => rerenderOriginal(envolverComTema(novoComponente))
+    };
 }
 
 export { renderWithTheme };
