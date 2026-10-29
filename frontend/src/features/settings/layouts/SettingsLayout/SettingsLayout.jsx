@@ -1,33 +1,28 @@
-//Organiza o cabeçalho, o conteúdo e o rodapé opcional das telas internas de configurações.
-import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    View
-} from 'react-native'
+// Organiza cabeçalho, conteúdo e rodapé das telas internas de configurações.
+import { useMemo } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-    SafeAreaView
-} from 'react-native-safe-area-context'
+import { Header } from '../../../../shared/components/navigation/Header/Header';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { criarEstilos } from './SettingsLayout.style';
 
-import {
-    Header
-} from '../../../../shared/components/navigation/Header/Header'
+function SettingsLayout({
+    titulo,
+    onVoltar,
+    children,
+    rodape,
+    rodapeFixo = false,
+    testeId = 'settings-layout'
+}) {
+    const tema = useTheme();
 
-import {
-    estilos
-} from './SettingsLayout.style'
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-//Recebe o título, conteúdo e rodapé e retorna a estrutura comum das configurações.
-function SettingsLayout({titulo, onVoltar, children, rodape, rodapeFixo = false, testeId = 'settings-layout'}) {
-    const temRodape = rodape !== undefined && rodape !== null
+    const temRodape = rodape !== undefined && rodape !== null;
 
     return (
-        <SafeAreaView
-            testID={testeId}
-            edges={['bottom']}
-            style={estilos.container}
-        >
+        <SafeAreaView testID={testeId} edges={['bottom']} style={estilos.container}>
             <Header
                 titulo={titulo}
                 variante="comVoltar"
@@ -51,26 +46,20 @@ function SettingsLayout({titulo, onVoltar, children, rodape, rodapeFixo = false,
                     {children}
 
                     {temRodape && !rodapeFixo ? (
-                        <View
-                            testID="rodape-settings-layout"
-                            style={estilos.rodape}
-                        >
+                        <View testID="rodape-settings-layout" style={estilos.rodape}>
                             {rodape}
                         </View>
                     ) : null}
                 </ScrollView>
 
                 {temRodape && rodapeFixo ? (
-                    <View
-                        testID="rodape-fixo-settings-layout"
-                        style={estilos.rodapeFixo}
-                    >
+                    <View testID="rodape-fixo-settings-layout" style={estilos.rodapeFixo}>
                         {rodape}
                     </View>
                 ) : null}
             </KeyboardAvoidingView>
         </SafeAreaView>
-    )
+    );
 }
 
-export { SettingsLayout }
+export { SettingsLayout };
