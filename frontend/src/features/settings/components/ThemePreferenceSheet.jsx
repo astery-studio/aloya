@@ -49,9 +49,10 @@ function ThemePreferenceSheet({ visivel, preferencia, salvando = false, aoSeleci
     return (
         <SelectionSheet
             visivel={Boolean(visivel)}
-            titulo="Aparência"
+            titulo="Modo de Cor"
             opcoes={OPCOES_TEMA}
             valorSelecionado={preferencia}
+            varianteOpcao="modoCor"
             onSelecionar={selecionarPreferencia}
             onFechar={fechar}
         />
