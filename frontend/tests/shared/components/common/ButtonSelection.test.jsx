@@ -1,169 +1,207 @@
-import {fireEvent, render, screen} from '@testing-library/react-native'
-import {corIconeNormal,corIconeSelecionado} from '../../../../src/shared/components/common/Button/ButtonSelection/ButtonSelection.style'
-import {ButtonSelection} from '../../../../src/shared/components/common/Button/ButtonSelection/ButtonSelection'
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
-const IconeTeste = jest.fn(() => null)
+const mockCheckCircle = jest.fn(() => null);
+
+jest.mock('phosphor-react-native', () => ({
+    CheckCircle: (propriedades) => mockCheckCircle(propriedades)
+}));
+
+import { ButtonSelection } from '../../../../src/shared/components/common/Button/ButtonSelection/ButtonSelection';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
+
+const IconeTeste = jest.fn(() => null);
+
+function renderizarBotao(propriedades = {}, preferencia = 'claro') {
+    return render(
+        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+            <ButtonSelection label="Opção mensal" {...propriedades} />
+        </ThemeProvider>
+    );
+}
 
 describe('ButtonSelection', () => {
     beforeEach(() => {
-        IconeTeste.mockClear()
-    })
+        jest.clearAllMocks();
+    });
 
-    test('renderiza o label e a descrição', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção mensal"
-                descricao="Uma vez por mês"
-            />
-        )
+    test('renderiza label e descrição', async () => {
+        await renderizarBotao({
+            descricao: 'Uma vez por mês'
+        });
 
-        expect(
-            screen.getByText('Opção mensal')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Opção mensal')).toBeOnTheScreen();
 
-        expect(
-            screen.getByText('Uma vez por mês')
-        ).toBeOnTheScreen()
-    })
+        expect(screen.getByText('Uma vez por mês')).toBeOnTheScreen();
+    });
 
-    test('não renderiza uma descrição quando ela não é informada', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção sem descrição"
-            />
-        )
+    test('não renderiza descrição ausente', async () => {
+        await renderizarBotao();
 
-        expect(
-            screen.getByText('Opção sem descrição')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Opção mensal')).toBeOnTheScreen();
 
-        expect(
-            screen.queryByText('Uma vez por mês')
-        ).toBeNull()
-    })
+        expect(screen.queryByText('Uma vez por mês')).toBeNull();
+    });
 
-    test('executa a ação quando a opção é pressionada', async () => {
-        const onPress = jest.fn()
+    test('executa a ação ao pressionar', async () => {
+        const onPress = jest.fn();
 
-        await render(
-            <ButtonSelection
-                label="Selecionar opção"
-                onPress={onPress}
-            />
-        )
+        await renderizarBotao({
+            onPress
+        });
 
-        await fireEvent.press(
-            screen.getByRole('button')
-        )
+        await fireEvent.press(screen.getByRole('button'));
 
-        expect(onPress).toHaveBeenCalledTimes(1)
-    })
+        expect(onPress).toHaveBeenCalledTimes(1);
+    });
 
-    test('informa que a opção está selecionada', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção selecionada"
-                selected
-            />
-        )
+    test('informa o estado selecionado', async () => {
+        await renderizarBotao({
+            selected: true
+        });
 
-        const botao =
-            screen.getByRole('button')
+        const botao = screen.getByRole('button');
 
-        expect(botao).toBeSelected()
-        expect(botao).toBeEnabled()
-    })
+        expect(botao).toBeSelected();
 
-    test('informa que a opção não está selecionada por padrão', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção normal"
-            />
-        )
+        expect(botao).toBeEnabled();
+    });
 
-        const botao =
-            screen.getByRole('button')
+    test('inicia sem seleção', async () => {
+        await renderizarBotao();
 
-        expect(botao).not.toBeSelected()
-        expect(botao).toBeEnabled()
-    })
+        expect(screen.getByRole('button')).not.toBeSelected();
+    });
 
-    test('não executa a ação quando está desabilitada', async () => {
-        const onPress = jest.fn()
+    test('não executa ação desabilitada', async () => {
+        const onPress = jest.fn();
 
-        await render(
-            <ButtonSelection
-                label="Opção desabilitada"
-                desabilitado
-                onPress={onPress}
-            />
-        )
+        await renderizarBotao({
+            desabilitado: true,
+            onPress
+        });
 
-        const botao =
-            screen.getByRole('button')
+        const botao = screen.getByRole('button');
 
-        expect(botao).not.toBeSelected()
-        expect(botao).toBeDisabled()
+        expect(botao).toBeDisabled();
 
-        await fireEvent.press(botao)
+        await fireEvent.press(botao);
 
-        expect(onPress).not.toHaveBeenCalled()
-    })
+        expect(onPress).not.toHaveBeenCalled();
+    });
 
-    test('renderiza o ícone com o tamanho e a cor normais', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção com ícone"
-                icone={IconeTeste}
-            />
-        )
+    test('usa cor principal no ícone não selecionado', async () => {
+        await renderizarBotao({
+            icone: IconeTeste
+        });
 
-        expect(
-            IconeTeste
-        ).toHaveBeenCalledTimes(1)
-
-        expect(
-            IconeTeste.mock.calls[0][0]
-        ).toEqual(
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
             expect.objectContaining({
                 size: 24,
-                color: corIconeNormal
+                color: '#222222'
             })
-        )
-    })
+        );
+    });
 
-    test('renderiza o ícone com a cor selecionada', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção selecionada"
-                icone={IconeTeste}
-                selected
-            />
-        )
+    test('usa destaque claro no ícone selecionado', async () => {
+        await renderizarBotao({
+            icone: IconeTeste,
+            selected: true
+        });
 
-        expect(
-            IconeTeste
-        ).toHaveBeenCalledTimes(1)
-
-        expect(
-            IconeTeste.mock.calls[0][0]
-        ).toEqual(
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
             expect.objectContaining({
                 size: 24,
-                color: corIconeSelecionado
+                color: '#2C4C3B'
             })
-        )
-    })
+        );
+    });
 
-    test('não tenta renderizar um ícone quando ele não é informado', async () => {
-        await render(
-            <ButtonSelection
-                label="Opção sem ícone"
-            />
-        )
+    test('usa destaque acessível no tema escuro', async () => {
+        await renderizarBotao(
+            {
+                icone: IconeTeste,
+                selected: true
+            },
+            'escuro'
+        );
 
-        expect(
-            IconeTeste
-        ).not.toHaveBeenCalled()
-    })
-})
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
+            expect.objectContaining({
+                size: 24,
+                color: '#9FD6B6'
+            })
+        );
+
+        expect(screen.getByText('Opção mensal')).toHaveStyle({
+            color: '#9FD6B6'
+        });
+
+        expect(screen.getByRole('button')).toHaveStyle({
+            backgroundColor: '#31463B'
+        });
+    });
+
+    test('não renderiza ícone quando ausente', async () => {
+        await renderizarBotao();
+
+        expect(IconeTeste).not.toHaveBeenCalled();
+    });
+
+    test('mostra rádio vazio na intensidade não selecionada', async () => {
+        await renderizarBotao({
+            variante: 'intensidade'
+        });
+
+        expect(screen.getByTestId('radio-selecao-vazio')).toBeOnTheScreen();
+
+        expect(mockCheckCircle).not.toHaveBeenCalled();
+    });
+
+    test('mostra confirmação na intensidade selecionada', async () => {
+        await renderizarBotao({
+            variante: 'intensidade',
+            selected: true
+        });
+
+        expect(screen.queryByTestId('radio-selecao-vazio')).toBeNull();
+
+        expect(mockCheckCircle).toHaveBeenCalledWith(
+            expect.objectContaining({
+                size: 26,
+                weight: 'fill',
+                color: '#2C4C3B'
+            })
+        );
+    });
+
+    test('usa superfície escura na variante intensidade', async () => {
+        await renderizarBotao(
+            {
+                variante: 'intensidade'
+            },
+            'escuro'
+        );
+
+        expect(screen.getByRole('button')).toHaveStyle({
+            backgroundColor: '#232926',
+            borderColor: '#4A514D'
+        });
+
+        expect(screen.getByText('Opção mensal')).toHaveStyle({
+            color: '#F4F1EA'
+        });
+    });
+
+    test('usa texto secundário na descrição escura', async () => {
+        await renderizarBotao(
+            {
+                descricao: 'Descrição da opção'
+            },
+            'escuro'
+        );
+
+        expect(screen.getByText('Descrição da opção')).toHaveStyle({
+            color: '#C4C8C5'
+        });
+    });
+});
