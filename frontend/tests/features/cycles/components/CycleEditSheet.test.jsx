@@ -8,15 +8,19 @@ jest.mock('../../../../src/shared/layouts/BottomSheet/BottomSheetLayout', () => 
 }));
 jest.mock('../../../../src/shared/components/forms/DateInput/DateInput', () => {
     const { TextInput } = require('react-native');
-    return ({ valor, onChangeText, rotuloAcessibilidade }) => (
+    return function DateInputMock({ valor, onChangeText, rotuloAcessibilidade }) {
+        return (
         <TextInput accessibilityLabel={rotuloAcessibilidade} value={valor} onChangeText={onChangeText} />
-    );
+        );
+    };
 });
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const { Pressable } = require('react-native');
-    return ({ texto, aoPressionar, desativado }) => (
+    return function ButtonScreenMock({ texto, aoPressionar, desativado }) {
+        return (
         <Pressable accessibilityRole="button" accessibilityLabel={texto} disabled={desativado} onPress={aoPressionar} />
-    );
+        );
+    };
 });
 
 import { CycleEditSheet } from '../../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet';
