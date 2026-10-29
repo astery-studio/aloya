@@ -46,6 +46,15 @@ jest.mock('../../../../src/features/calendar/screens/CalendarScreen', () => {
                     onPress: props.aoTentarNovamente
                 },
                 ReactInterno.createElement(Text, null, 'Tentar novamente')
+            ),
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Editar ciclo do dia',
+                    onPress: () => props.aoEditarCiclo?.({registroCicloId: 9})
+                },
+                ReactInterno.createElement(Text, null, 'Editar ciclo')
             )
         )
     }
@@ -121,6 +130,25 @@ describe('CalendarScreenContainer', () => {
         expect(carregarAnteriores).toHaveBeenCalledTimes(1)
         expect(carregarPosteriores).toHaveBeenCalledTimes(1)
         expect(tentarNovamente).toHaveBeenCalledTimes(1)
+    })
+
+    test('encaminha a seleção menstrual para a edição do ciclo', async () => {
+        const aoEditarCiclo = jest.fn()
+        mockUseCalendar.mockReturnValue({
+            meses: [], carregando: false, carregandoAnteriores: false,
+            carregandoPosteriores: false, erro: null,
+            carregarAnteriores: jest.fn(), carregarPosteriores: jest.fn(),
+            tentarNovamente: jest.fn()
+        })
+
+        await render(
+            <CalendarScreenContainer
+                service={{buscarMes: jest.fn()}}
+                aoEditarCiclo={aoEditarCiclo}
+            />
+        )
+        await fireEvent.press(screen.getByRole('button', {name: 'Editar ciclo do dia'}))
+        expect(aoEditarCiclo).toHaveBeenCalledWith({registroCicloId: 9})
     })
 
     test('não usa a confiança de um mês que não seja o atual', async () => {
