@@ -1,6 +1,7 @@
-import {fireEvent, render} from '@testing-library/react-native'
+import {fireEvent} from '@testing-library/react-native'
 import {CycleCalendar} from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar'
 import {CycleMonth} from '../../../../src/features/calendar/components/CycleCalendar/CycleMonth'
+import {renderWithTheme} from '../../../helpers/renderWithTheme'
 
 jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleMonth', () => {
     const {memo, createElement} = require('react')
@@ -11,7 +12,7 @@ jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleMonth
 test('paginação e loading não renderizam novamente o mês preservado', async () => {
     const mes = {mes: '2026-10', diasMenstruacao: [{data: '2026-10-01', registroCicloId: 18}]}
     const selecionar = jest.fn()
-    const resultado = await render(<CycleCalendar meses={[mes]} aoPressionarDia={selecionar} />)
+    const resultado = await renderWithTheme(<CycleCalendar meses={[mes]} aoPressionarDia={selecionar} />)
     const renderizacoes = () => CycleMonth.type.mock.calls.filter(([props]) => props.mes.chave === mes.mes).length
     const antes = renderizacoes()
     expect(antes).toBeGreaterThan(0)
