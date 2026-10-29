@@ -37,7 +37,9 @@ test('modal aceita segunda ação sem disparar a primeira', async () => {
     const primeira = jest.fn();
     const segunda = jest.fn();
     await renderWithTheme(
-        <SimpleModal visivel titulo="E-mail enviado"
+        <SimpleModal
+            visivel
+            titulo="E-mail enviado"
             acaoPrincipal={{ texto: 'Entendi', aoPressionar: primeira }}
             acaoSecundaria={{ texto: 'Enviar novamente', aoPressionar: segunda }}
         />

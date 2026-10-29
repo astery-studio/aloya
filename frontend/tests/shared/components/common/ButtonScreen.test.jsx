@@ -46,11 +46,22 @@ test('fica desativado quando não recebe uma ação', async () => {
     expect(screen.getByRole('button', { name: 'Confirmar' })).toBeDisabled();
 });
 
-test.each(['laranja', 'verde', 'vermelho', 'bordaLaranja', 'bordaVerde'])('aceita a variante %s', async (variante) => {
-    await renderWithTheme(<ButtonScreen texto="Cadastrar anticoncepcional" variante={variante} aoPressionar={jest.fn()} />);
+test.each(['laranja', 'verde', 'vermelho', 'bordaLaranja', 'bordaVerde'])(
+    'aceita a variante %s',
+    async (variante) => {
+        await renderWithTheme(
+            <ButtonScreen
+                texto="Cadastrar anticoncepcional"
+                variante={variante}
+                aoPressionar={jest.fn()}
+            />
+        );
 
-    expect(screen.getByRole('button', { name: 'Cadastrar anticoncepcional' })).toBeOnTheScreen();
-});
+        expect(
+            screen.getByRole('button', { name: 'Cadastrar anticoncepcional' })
+        ).toBeOnTheScreen();
+    }
+);
 
 test('usa destaque e contraste do modo escuro', async () => {
     await renderWithTheme(
