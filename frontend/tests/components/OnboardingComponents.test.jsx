@@ -1,14 +1,15 @@
 /**
  * Testes de apresentação e interação dos componentes do onboarding.
  */
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import BirthDateStep from '../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
 import CycleLengthStep from '../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
 import LastMenstruationStep from '../../src/features/onboarding/components/LastMenstruationStep/LastMenstruationStep';
 import OnboardingProgress from '../../src/features/onboarding/components/OnboardingProgress/OnboardingProgress';
+import { renderWithTheme } from '../helpers/renderWithTheme';
 
 test('progresso calcula a largura pela etapa atual', async () => {
-    await render(<OnboardingProgress etapaAtual={3} totalEtapas={5} />);
+    await renderWithTheme(<OnboardingProgress etapaAtual={3} totalEtapas={5} />);
     const barra = screen.getByLabelText('Etapa 3 de 5');
     expect(barra).toHaveAccessibilityValue({ min: 0, max: 5, now: 3 });
     expect(screen.getByTestId('progresso-preenchido')).toHaveStyle({ width: '60%' });
@@ -21,14 +22,14 @@ test.each([
 ])('progresso limita valores fora da faixa', async (
     etapaAtual, totalEtapas, rotulo, largura
 ) => {
-    await render(<OnboardingProgress etapaAtual={etapaAtual} totalEtapas={totalEtapas} />);
+    await renderWithTheme(<OnboardingProgress etapaAtual={etapaAtual} totalEtapas={totalEtapas} />);
     expect(screen.getByLabelText(rotulo)).toBeTruthy();
     expect(screen.getByTestId('progresso-preenchido')).toHaveStyle({ width: largura });
 });
 
 test('nascimento habilita avanço apenas com data válida', async () => {
     const aoAvancar = jest.fn();
-    const { rerender } = await render(<BirthDateStep valor=""
+    const { rerender } = await renderWithTheme(<BirthDateStep valor=""
         aoAlterar={jest.fn()} aoVoltar={jest.fn()} aoAvancar={aoAvancar} />);
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
     await rerender(<BirthDateStep valor="04/01/2000"
@@ -39,7 +40,7 @@ test('nascimento habilita avanço apenas com data válida', async () => {
 
 test('nascimento oferece e-mail opcional para menor de 16 anos', async () => {
     const aoAlterarEmailResponsavel = jest.fn();
-    await render(<BirthDateStep valor="04/01/2012" menorDe16
+    await renderWithTheme(<BirthDateStep valor="04/01/2012" menorDe16
         emailResponsavelLegal="responsavel@email.com"
         erroEmailResponsavel="E-mail inválido"
         aoAlterarEmailResponsavel={aoAlterarEmailResponsavel}
@@ -53,7 +54,7 @@ test('nascimento oferece e-mail opcional para menor de 16 anos', async () => {
 
 test('duração permite digitar o número sem alterar a unidade', async () => {
     const aoAlterar = jest.fn();
-    await render(<CycleLengthStep valor={28} aoAlterar={aoAlterar}
+    await renderWithTheme(<CycleLengthStep valor={28} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
     expect(screen.getByText('Dias')).toBeTruthy();
     fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
@@ -62,7 +63,7 @@ test('duração permite digitar o número sem alterar a unidade', async () => {
 
 test('última menstruação seleciona o intervalo no calendário próprio', async () => {
     const aoAlterar = jest.fn();
-    await render(<LastMenstruationStep
+    await renderWithTheme(<LastMenstruationStep
         valor={{ inicio: '2026-08-03', fim: null }} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} />);
     fireEvent.press(screen.getByLabelText('Selecionar dia 7'));
