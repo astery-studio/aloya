@@ -422,9 +422,14 @@ describe('EditFieldSheet', () => {
 
         const campo = screen.getByLabelText('Duração do ciclo')
         expect(campo).toHaveProp('keyboardType', 'number-pad')
-        expect(campo).toHaveProp('value', '28 dias')
+        expect(campo).toHaveProp('value', '28')
+        expect(campo).toHaveProp('maxLength', 2)
+        expect(screen.getByText('dias')).toBeOnTheScreen()
 
-        await fireEvent.changeText(campo, '30 dias')
+        await fireEvent.changeText(campo, '30')
         expect(onAlterar).toHaveBeenCalledWith(30)
+
+        await fireEvent.changeText(campo, '')
+        expect(onAlterar).toHaveBeenLastCalledWith(null)
     })
 })

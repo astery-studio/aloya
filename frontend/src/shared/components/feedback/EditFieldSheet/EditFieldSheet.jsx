@@ -33,7 +33,7 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
     const valorVisivel = ehData
         ? obterDataVisivel(valor)
         : ehNumero && valor !== null && valor !== undefined
-            ? `${valor} ${sufixo ?? ''}`.trim()
+            ? String(valor)
             : String(valor ?? '')
 
     function focarCampo() {
@@ -72,7 +72,10 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
             >
                 <Pressable
                     onPress={focarCampo}
-                    style={estilos.caixaCampo}
+                    style={[
+                        estilos.caixaCampo,
+                        ehNumero && estilos.caixaCampoNumero
+                    ]}
                     accessible={false}
                 >
                     <TextInput
@@ -81,7 +84,7 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                         onChangeText={tratarMudanca}
                         editable={!salvando}
                         multiline={false}
-                        maxLength={ehData ? 10 : ehNumero ? 3 + String(sufixo ?? '').length : ehEmail ? 254 : 120 }
+                        maxLength={ehData ? 10 : ehNumero ? 2 : ehEmail ? 254 : 120 }
                         keyboardType={ ehData || ehNumero ? 'number-pad' : ehEmail ? 'email-address' : 'default'
                         }
                         selectTextOnFocus={ehNumero}
@@ -98,9 +101,13 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                         accessibilityLabel={rotuloAcessibilidade ?? (ehData ? 'Data de nascimento' : ehEmail ? 'E-mail' : 'Nome')}
                         style={[
                             estilos.campo,
-                            ehData && estilos.campoData
+                            ehData && estilos.campoData,
+                            ehNumero && estilos.campoNumero
                         ]}
                     />
+                    {ehNumero && sufixo ? (
+                        <Text style={estilos.sufixoNumero}>{sufixo}</Text>
+                    ) : null}
                 </Pressable>
 
                 {erro ? (
