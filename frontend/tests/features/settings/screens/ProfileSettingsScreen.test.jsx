@@ -1,236 +1,153 @@
 //Testa a integração dos estados principais da tela de configurações de perfil.
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     LockKeyIcon: jest.fn(() => null),
     WarningCircleIcon: jest.fn(() => null)
-}))
+}));
 
-import { ProfileSettingsScreen } from '../../../../src/features/settings/screens/ProfileSettingsScreen'
+import { ProfileSettingsScreen } from '../../../../src/features/settings/screens/ProfileSettingsScreen';
 
-jest.mock(
-    '../../../../src/features/settings/layouts/SettingsLayout/SettingsLayout',
-    () => {
-        const React = require('react')
-        const { View } = require('react-native')
+jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayout', () => {
+    const React = require('react');
+    const { View } = require('react-native');
 
-        return {
-            SettingsLayout: ({
-                children,
-                rodape
-            }) => React.createElement(
-                View,
-                null,
-                children,
-                rodape
-            )
-        }
-    }
-)
+    return {
+        SettingsLayout: ({ children, rodape }) => React.createElement(View, null, children, rodape)
+    };
+});
 
-jest.mock(
-    '../../../../src/features/settings/profile/ProfileSettings',
-    () => {
-        const React = require('react')
+jest.mock('../../../../src/features/settings/profile/ProfileSettings', () => {
+    const React = require('react');
 
-        const {
-            Pressable,
-            Text,
-            View
-        } = require('react-native')
+    const { Pressable, Text, View } = require('react-native');
 
-        function ProfileSettings({
-            onEditarCampo,
-            onSalvar,
-            podeSalvar
-        }) {
-            return React.createElement(
-                View,
-                null,
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole:
-                            'button',
-                        accessibilityLabel:
-                            'Alterar gênero no teste',
-                        onPress: () =>
-                            onEditarCampo(
-                                'identidadeGenero'
-                            )
-                    },
-                    React.createElement(
-                        Text,
-                        null,
-                        'Alterar gênero'
-                    )
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole:
-                            'button',
-                        accessibilityLabel:
-                            'Salvar perfil no teste',
-                        disabled: !podeSalvar,
-                        onPress: onSalvar
-                    },
-                    React.createElement(
-                        Text,
-                        null,
-                        'Salvar perfil'
-                    )
-                )
-            )
-        }
-
-        return {
-            ProfileSettings
-        }
-    }
-)
-
-jest.mock(
-    '../../../../src/features/settings/profile/GenderSelector',
-    () => {
-        const React = require('react')
-
-        const {
-            Pressable,
-            Text
-        } = require('react-native')
-
-        function GenderSelector({
-            visivel,
-            onSelecionar
-        }) {
-            if (!visivel) {
-                return null
-            }
-
-            return React.createElement(
+    function ProfileSettings({ onEditarCampo, onSalvar, podeSalvar }) {
+        return React.createElement(
+            View,
+            null,
+            React.createElement(
                 Pressable,
                 {
-                    accessibilityRole:
-                        'button',
-                    accessibilityLabel:
-                        'Escolher outro gênero',
-                    onPress: () =>
-                        onSelecionar('Outro')
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Alterar gênero no teste',
+                    onPress: () => onEditarCampo('identidadeGenero')
                 },
-                React.createElement(
-                    Text,
-                    null,
-                    'Outro'
-                )
+                React.createElement(Text, null, 'Alterar gênero')
+            ),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Salvar perfil no teste',
+                    disabled: !podeSalvar,
+                    onPress: onSalvar
+                },
+                React.createElement(Text, null, 'Salvar perfil')
             )
-        }
-
-        return {
-            GenderSelector
-        }
+        );
     }
-)
 
-jest.mock(
-    '../../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet',
-    () => ({
-        EditFieldSheet: () => null
-    })
-)
+    return {
+        ProfileSettings
+    };
+});
 
-jest.mock(
-    '../../../../src/features/settings/account/DeleteAccount',
-    () => ({
-        DeleteAccount: () => null
-    })
-)
+jest.mock('../../../../src/features/settings/profile/GenderSelector', () => {
+    const React = require('react');
 
-jest.mock(
-    '../../../../src/features/settings/account/LogoutConfirmation',
-    () => ({
-        LogoutConfirmation: () => null
-    })
-)
+    const { Pressable, Text } = require('react-native');
 
-jest.mock(
-    '../../../../src/shared/components/feedback/Modal/SimpleModal',
-    () => {
-        const React = require('react')
+    function GenderSelector({ visivel, onSelecionar }) {
+        if (!visivel) {
+            return null;
+        }
 
-        const {
+        return React.createElement(
             Pressable,
-            Text,
-            View
-        } = require('react-native')
+            {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Escolher outro gênero',
+                onPress: () => onSelecionar('Outro')
+            },
+            React.createElement(Text, null, 'Outro')
+        );
+    }
 
-        function SimpleModal({
-            visivel,
-            titulo,
-            mensagem,
-            acaoPrincipal
-        }) {
-            if (!visivel) {
-                return null
-            }
+    return {
+        GenderSelector
+    };
+});
 
-            const conteudo = [
+jest.mock('../../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet', () => ({
+    EditFieldSheet: () => null
+}));
+
+jest.mock('../../../../src/features/settings/account/DeleteAccount', () => ({
+    DeleteAccount: () => null
+}));
+
+jest.mock('../../../../src/features/settings/account/LogoutConfirmation', () => ({
+    LogoutConfirmation: () => null
+}));
+
+jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => {
+    const React = require('react');
+
+    const { Pressable, Text, View } = require('react-native');
+
+    function SimpleModal({ visivel, titulo, mensagem, acaoPrincipal }) {
+        if (!visivel) {
+            return null;
+        }
+
+        const conteudo = [
+            React.createElement(
+                Text,
+                {
+                    key: 'titulo'
+                },
+                titulo
+            )
+        ];
+
+        if (mensagem) {
+            conteudo.push(
                 React.createElement(
                     Text,
                     {
-                        key: 'titulo'
+                        key: 'mensagem'
                     },
-                    titulo
+                    mensagem
                 )
-            ]
-
-            if (mensagem) {
-                conteudo.push(
-                    React.createElement(
-                        Text,
-                        {
-                            key: 'mensagem'
-                        },
-                        mensagem
-                    )
-                )
-            }
-
-            if (acaoPrincipal) {
-                conteudo.push(
-                    React.createElement(
-                        Pressable,
-                        {
-                            key: 'acao',
-                            accessibilityRole:
-                                'button',
-                            accessibilityLabel:
-                                acaoPrincipal.texto,
-                            onPress:
-                                acaoPrincipal.aoPressionar
-                        },
-                        React.createElement(
-                            Text,
-                            null,
-                            acaoPrincipal.texto
-                        )
-                    )
-                )
-            }
-
-            return React.createElement(
-                View,
-                null,
-                conteudo
-            )
+            );
         }
 
-        return {
-            __esModule: true,
-            default: SimpleModal
+        if (acaoPrincipal) {
+            conteudo.push(
+                React.createElement(
+                    Pressable,
+                    {
+                        key: 'acao',
+                        accessibilityRole: 'button',
+                        accessibilityLabel: acaoPrincipal.texto,
+                        onPress: acaoPrincipal.aoPressionar
+                    },
+                    React.createElement(Text, null, acaoPrincipal.texto)
+                )
+            );
         }
+
+        return React.createElement(View, null, conteudo);
     }
-)
+
+    return {
+        __esModule: true,
+        default: SimpleModal
+    };
+});
 
 const perfil = {
     id: 15,
@@ -238,186 +155,118 @@ const perfil = {
     email: 'julia@email.com',
     dataNascimento: '1999-04-08',
     identidadeGenero: 'Mulher Cisgênero',
-    atualizadoEm:
-        '2026-09-23T10:00:00.000Z',
+    atualizadoEm: '2026-09-23T10:00:00.000Z',
     consentimentoParentalNecessario: false
-}
+};
 
 async function alterarGeneroESalvar() {
     fireEvent.press(
-        screen.getByRole(
-            'button',
-            {
-                name:
-                    'Alterar gênero no teste'
-            }
-        )
-    )
+        screen.getByRole('button', {
+            name: 'Alterar gênero no teste'
+        })
+    );
 
     await waitFor(() => {
         expect(
-            screen.getByRole(
-                'button',
-                {
-                    name:
-                        'Escolher outro gênero'
-                }
-            )
-        ).toBeTruthy()
-    })
+            screen.getByRole('button', {
+                name: 'Escolher outro gênero'
+            })
+        ).toBeTruthy();
+    });
 
     fireEvent.press(
-        screen.getByRole(
-            'button',
-            {
-                name:
-                    'Escolher outro gênero'
-            }
-        )
-    )
+        screen.getByRole('button', {
+            name: 'Escolher outro gênero'
+        })
+    );
 
     await waitFor(() => {
-        const botaoSalvar =
-            screen.getByRole(
-                'button',
-                {
-                    name:
-                        'Salvar perfil no teste'
-                }
-            )
+        const botaoSalvar = screen.getByRole('button', {
+            name: 'Salvar perfil no teste'
+        });
 
-        expect(
-            botaoSalvar.props
-                .accessibilityState
-                ?.disabled
-        ).not.toBe(true)
-    })
+        expect(botaoSalvar.props.accessibilityState?.disabled).not.toBe(true);
+    });
 
     fireEvent.press(
-        screen.getByRole(
-            'button',
-            {
-                name:
-                    'Salvar perfil no teste'
-            }
-        )
-    )
+        screen.getByRole('button', {
+            name: 'Salvar perfil no teste'
+        })
+    );
 }
 
 describe('ProfileSettingsScreen', () => {
     test('informa quando o consentimento parental passa a ser necessário', async () => {
-        const onSalvar =
-            jest.fn().mockResolvedValue({
-                ...perfil,
-                identidadeGenero: 'Outro',
-                consentimentoParentalNecessario:
-                    true
-            })
+        const onSalvar = jest.fn().mockResolvedValue({
+            ...perfil,
+            identidadeGenero: 'Outro',
+            consentimentoParentalNecessario: true
+        });
 
-        await render(
-            <ProfileSettingsScreen
-                perfil={perfil}
-                onSalvar={onSalvar}
-            />
-        )
+        await render(<ProfileSettingsScreen perfil={perfil} onSalvar={onSalvar} />);
 
-        await alterarGeneroESalvar()
+        await alterarGeneroESalvar();
 
         await waitFor(() => {
-            expect(
-                screen.getByText(
-                    'Dados atualizados com sucesso'
-                )
-            ).toBeTruthy()
-        })
+            expect(screen.getByText('Dados atualizados com sucesso')).toBeTruthy();
+        });
 
         expect(
             screen.getByText(
                 'Para usar a Rede de Apoio, solicite a autorização do seu responsável legal.'
             )
-        ).toBeTruthy()
+        ).toBeTruthy();
 
-        expect(
-            onSalvar
-        ).toHaveBeenCalledWith({
+        expect(onSalvar).toHaveBeenCalledWith({
             identidadeGenero: 'Outro'
-        })
-    })
+        });
+    });
 
     test('mantém o modal simples quando o consentimento não é necessário', async () => {
-        const onSalvar =
-            jest.fn().mockResolvedValue({
-                ...perfil,
-                identidadeGenero: 'Outro',
-                consentimentoParentalNecessario:
-                    false
-            })
+        const onSalvar = jest.fn().mockResolvedValue({
+            ...perfil,
+            identidadeGenero: 'Outro',
+            consentimentoParentalNecessario: false
+        });
 
-        await render(
-            <ProfileSettingsScreen
-                perfil={perfil}
-                onSalvar={onSalvar}
-            />
-        )
+        await render(<ProfileSettingsScreen perfil={perfil} onSalvar={onSalvar} />);
 
-        await alterarGeneroESalvar()
+        await alterarGeneroESalvar();
 
         await waitFor(() => {
-            expect(
-                screen.getByText(
-                    'Dados atualizados com sucesso'
-                )
-            ).toBeTruthy()
-        })
+            expect(screen.getByText('Dados atualizados com sucesso')).toBeTruthy();
+        });
 
         expect(
             screen.queryByText(
                 'Para usar a Rede de Apoio, solicite a autorização do seu responsável legal.'
             )
-        ).toBeNull()
-    })
+        ).toBeNull();
+    });
 
     test('fecha o aviso de sucesso pela ação principal', async () => {
-        const onSalvar =
-            jest.fn().mockResolvedValue({
-                ...perfil,
-                identidadeGenero: 'Outro',
-                consentimentoParentalNecessario:
-                    true
-            })
+        const onSalvar = jest.fn().mockResolvedValue({
+            ...perfil,
+            identidadeGenero: 'Outro',
+            consentimentoParentalNecessario: true
+        });
 
-        await render(
-            <ProfileSettingsScreen
-                perfil={perfil}
-                onSalvar={onSalvar}
-            />
-        )
+        await render(<ProfileSettingsScreen perfil={perfil} onSalvar={onSalvar} />);
 
-        await alterarGeneroESalvar()
+        await alterarGeneroESalvar();
 
         await waitFor(() => {
-            expect(
-                screen.getByText(
-                    'Dados atualizados com sucesso'
-                )
-            ).toBeTruthy()
-        })
+            expect(screen.getByText('Dados atualizados com sucesso')).toBeTruthy();
+        });
 
         fireEvent.press(
-            screen.getByRole(
-                'button',
-                {
-                    name: 'OK'
-                }
-            )
-        )
+            screen.getByRole('button', {
+                name: 'OK'
+            })
+        );
 
         await waitFor(() => {
-            expect(
-                screen.queryByText(
-                    'Dados atualizados com sucesso'
-                )
-            ).toBeNull()
-        })
-    })
-})
+            expect(screen.queryByText('Dados atualizados com sucesso')).toBeNull();
+        });
+    });
+});
