@@ -77,8 +77,10 @@ function CycleCalendar({
     const obterLayoutMes = useCallback((_, index) => layoutsMeses[index], [layoutsMeses]);
 
     const renderizarMes = useCallback(
-        ({ item }) => <CycleMonth mes={item} aoPressionarDia={aoPressionarDia} />,
-        [aoPressionarDia]
+        ({ item }) => (
+            <CycleMonth mes={item} aoPressionarDia={aoPressionarDia} estilosTema={estilosTema} />
+        ),
+        [aoPressionarDia, estilosTema]
     );
 
     const extrairChave = useCallback((item) => item.chave, []);
