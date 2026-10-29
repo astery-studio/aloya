@@ -1,28 +1,33 @@
-function criarAccountService({ prisma, passwordService, parentalConsentService, dateUtils, now = () => new Date() }) {
+function criarAccountService({
+    prisma,
+    passwordService,
+    parentalConsentService,
+    dateUtils,
+    now = () => new Date()
+}) {
     const selectConfiguracoes = {
         id: true,
         nome: true,
         email: true,
         genero: true,
         dataNascimento: true,
+        temaVisual: true,
         atualizadoEm: true
-    }
+    };
 
     // Função auxiliar para criar um erro de conta não encontrada
     function criarErroContaNaoEncontrada() {
-        const erro = new Error(
-            'Conta não encontrada.'
-        )
+        const erro = new Error('Conta não encontrada.');
 
         erro.status = 404;
-        erro.codigo = 'CONTA_NAO_ENCONTRADA'
+        erro.codigo = 'CONTA_NAO_ENCONTRADA';
 
-        return erro
+        return erro;
     }
 
     // Função auxiliar para formatar a data no formato ISO (YYYY-MM-DD)
     function formatarData(data) {
-        return data.toISOString().slice(0, 10)
+        return data.toISOString().slice(0, 10);
     }
 
     // Função auxiliar para formatar as configurações do usuário
@@ -32,401 +37,303 @@ function criarAccountService({ prisma, passwordService, parentalConsentService, 
             nome: usuario.nome,
             email: usuario.email,
 
-            identidadeGenero:
-                usuario.genero,
+            identidadeGenero: usuario.genero,
 
-            dataNascimento: formatarData(
-                usuario.dataNascimento
-            ),
+            dataNascimento: formatarData(usuario.dataNascimento),
 
-            atualizadoEm:
-                usuario.atualizadoEm
-        }
+            temaVisual: usuario.temaVisual,
+
+            atualizadoEm: usuario.atualizadoEm
+        };
     }
 
     // Função auxiliar para comparar duas datas (ignorando a hora)
-    function datasSaoIguais(
-        dataAtual,
-        novaData
-    ) {
+    function datasSaoIguais(dataAtual, novaData) {
         return (
-            dataAtual.getFullYear()
-                === novaData.getFullYear()
-            && dataAtual.getMonth()
-                === novaData.getMonth()
-            && dataAtual.getDate()
-                === novaData.getDate()
-        )
+            dataAtual.getFullYear() === novaData.getFullYear() &&
+            dataAtual.getMonth() === novaData.getMonth() &&
+            dataAtual.getDate() === novaData.getDate()
+        );
     }
 
     // Função para buscar as configurações do usuário
     async function buscarConfiguracoes(usuarioId) {
-        const usuario =
-            await prisma.usuario.findUnique({
-                where: {
-                    id: usuarioId
-                },
+        const usuario = await prisma.usuario.findUnique({
+            where: {
+                id: usuarioId
+            },
 
-                select: selectConfiguracoes
-            })
+            select: selectConfiguracoes
+        });
 
         if (!usuario) {
-            throw criarErroContaNaoEncontrada()
+            throw criarErroContaNaoEncontrada();
         }
 
-        return formatarConfiguracoes(usuario)
+        return formatarConfiguracoes(usuario);
     }
 
     // Função para verificar se o e-mail está disponível para atualização
-    async function verificarEmailDisponivel(
-        usuarioId,
-        email
-    ) {
-        const usuarioComEmail =
-            await prisma.usuario.findUnique({
-                where: {
-                    email
-                },
+    async function verificarEmailDisponivel(usuarioId, email) {
+        const usuarioComEmail = await prisma.usuario.findUnique({
+            where: {
+                email
+            },
 
-                select: {
-                    id: true
-                }
-            })
+            select: {
+                id: true
+            }
+        });
 
-        if (
-            usuarioComEmail
-            && usuarioComEmail.id !== usuarioId
-        ) {
-            const erro = new Error(
-                'Este e-mail já está em uso.'
-            )
+        if (usuarioComEmail && usuarioComEmail.id !== usuarioId) {
+            const erro = new Error('Este e-mail já está em uso.');
 
             erro.status = 409;
-            erro.codigo = 'EMAIL_JA_CADASTRADO'
+            erro.codigo = 'EMAIL_JA_CADASTRADO';
 
-            throw erro
+            throw erro;
         }
     }
 
     // Função para identificar as alterações feitas nas configurações do usuário
-    function identificarAlteracoes(
-        usuarioAtual,
-        dados
-    ) {
-        const alteracoes = {}
+    function identificarAlteracoes(usuarioAtual, dados) {
+        const alteracoes = {};
 
-        if (
-            dados.nome !== undefined
-            && dados.nome !== usuarioAtual.nome
-        ) {
-            alteracoes.nome = dados.nome
+        if (dados.nome !== undefined && dados.nome !== usuarioAtual.nome) {
+            alteracoes.nome = dados.nome;
+        }
+
+        if (dados.email !== undefined && dados.email !== usuarioAtual.email) {
+            alteracoes.email = dados.email;
         }
 
         if (
-            dados.email !== undefined
-            && dados.email !== usuarioAtual.email
+            dados.identidadeGenero !== undefined &&
+            dados.identidadeGenero !== usuarioAtual.genero
         ) {
-            alteracoes.email = dados.email
+            alteracoes.genero = dados.identidadeGenero;
         }
 
         if (
-            dados.identidadeGenero !== undefined
-            && dados.identidadeGenero
-                !== usuarioAtual.genero
+            dados.dataNascimento !== undefined &&
+            !datasSaoIguais(usuarioAtual.dataNascimento, dados.dataNascimento)
         ) {
-            alteracoes.genero =
-                dados.identidadeGenero
+            alteracoes.dataNascimento = dados.dataNascimento;
         }
 
-        if (
-            dados.dataNascimento !== undefined
-            && !datasSaoIguais(
-                usuarioAtual.dataNascimento,
-                dados.dataNascimento
-            )
-        ) {
-            alteracoes.dataNascimento =
-                dados.dataNascimento
+        if (dados.temaVisual !== undefined && dados.temaVisual !== usuarioAtual.temaVisual) {
+            alteracoes.temaVisual = dados.temaVisual;
         }
 
-        return alteracoes
+        return alteracoes;
     }
 
     // Função para atualizar as configurações do usuário
-    async function atualizarConfiguracoes(
-        usuarioId,
-        dados
-    ) {
-        const usuarioAtual =
-            await prisma.usuario.findUnique({
-                where: {
-                    id: usuarioId
-                },
+    async function atualizarConfiguracoes(usuarioId, dados) {
+        const usuarioAtual = await prisma.usuario.findUnique({
+            where: {
+                id: usuarioId
+            },
 
-                select: selectConfiguracoes
-            })
+            select: selectConfiguracoes
+        });
 
         if (!usuarioAtual) {
-            throw criarErroContaNaoEncontrada()
+            throw criarErroContaNaoEncontrada();
         }
 
-        const alteracoes = identificarAlteracoes(
-            usuarioAtual,
-            dados
-        )
+        const alteracoes = identificarAlteracoes(usuarioAtual, dados);
 
         if (Object.keys(alteracoes).length === 0) {
-            const erro = new Error(
-                'Nenhuma alteração foi identificada.'
-            )
+            const erro = new Error('Nenhuma alteração foi identificada.');
 
             erro.status = 422;
-            erro.codigo = 'NENHUMA_ALTERACAO'
+            erro.codigo = 'NENHUMA_ALTERACAO';
 
-            throw erro
+            throw erro;
         }
 
         if (alteracoes.email !== undefined) {
-            await verificarEmailDisponivel(
-                usuarioId,
-                alteracoes.email
-            )
+            await verificarEmailDisponivel(usuarioId, alteracoes.email);
         }
 
         const momentoAtual = now();
 
-        const idadeAnterior =
-            dateUtils.calcularIdade(
-                usuarioAtual.dataNascimento,
-                momentoAtual
-            )
+        const idadeAnterior = dateUtils.calcularIdade(usuarioAtual.dataNascimento, momentoAtual);
 
-        const dataNascimentoAtualizada =
-            alteracoes.dataNascimento
-            || usuarioAtual.dataNascimento;
+        const dataNascimentoAtualizada = alteracoes.dataNascimento || usuarioAtual.dataNascimento;
 
-        const idadeAtualizada =
-            dateUtils.calcularIdade(
-                dataNascimentoAtualizada,
-                momentoAtual
-            )
+        const idadeAtualizada = dateUtils.calcularIdade(dataNascimentoAtualizada, momentoAtual);
 
         const passouASerMenorDe16 =
-            alteracoes.dataNascimento !== undefined
-            && idadeAnterior >= 16
-            && idadeAtualizada < 16;
+            alteracoes.dataNascimento !== undefined && idadeAnterior >= 16 && idadeAtualizada < 16;
 
         try {
-            const usuarioAtualizado =
-                await prisma.$transaction(
-                    async function salvarAlteracoes(tx) {
-                        const usuario =
-                            await tx.usuario.update({
-                                where: {
-                                    id: usuarioId
-                                },
+            const usuarioAtualizado = await prisma.$transaction(
+                async function salvarAlteracoes(tx) {
+                    const usuario = await tx.usuario.update({
+                        where: {
+                            id: usuarioId
+                        },
 
-                                data: alteracoes,
+                        data: alteracoes,
 
-                                select:
-                                    selectConfiguracoes
-                            });
+                        select: selectConfiguracoes
+                    });
 
-                        if (passouASerMenorDe16) {
-                            await parentalConsentService
-                                .reativarAposCorrecaoNascimento(
-                                    tx,
-                                    usuarioId
-                                )
-                        }
-
-                        return usuario
+                    if (passouASerMenorDe16) {
+                        await parentalConsentService.reativarAposCorrecaoNascimento(tx, usuarioId);
                     }
-                )
+
+                    return usuario;
+                }
+            );
 
             return {
-                configuracoes:
-                    formatarConfiguracoes(
-                        usuarioAtualizado
-                    ),
+                configuracoes: formatarConfiguracoes(usuarioAtualizado),
 
-                consentimentoParentalNecessario:
-                    passouASerMenorDe16
-            }
+                consentimentoParentalNecessario: passouASerMenorDe16
+            };
         } catch (erro) {
             if (erro.code === 'P2002') {
-                const erroEmail = new Error(
-                    'Este e-mail já está em uso.'
-                )
+                const erroEmail = new Error('Este e-mail já está em uso.');
 
                 erroEmail.status = 409;
-                erroEmail.codigo =
-                    'EMAIL_JA_CADASTRADO'
+                erroEmail.codigo = 'EMAIL_JA_CADASTRADO';
 
-                throw erroEmail
+                throw erroEmail;
             }
 
-            throw erro
+            throw erro;
         }
     }
 
     // Função para alterar a senha do usuário
-    async function alterarSenha({
-        usuarioId,
-        sessaoId,
-        senhaAtual,
-        novaSenha
-    }) {
-        const usuario =
-            await prisma.usuario.findUnique({
-                where: {
-                    id: usuarioId
-                },
+    async function alterarSenha({ usuarioId, sessaoId, senhaAtual, novaSenha }) {
+        const usuario = await prisma.usuario.findUnique({
+            where: {
+                id: usuarioId
+            },
 
-                select: {
-                    id: true,
-                    senhaHash: true
-                }
-            })
+            select: {
+                id: true,
+                senhaHash: true
+            }
+        });
 
         //A sessão atual precisa ser conhecida para que ela possa ser preservada com segurança
-        if (
-            !Number.isInteger(sessaoId)
-            || sessaoId <= 0
-        ) {
-            const erro = new Error(
-                'A sessão atual é inválida.'
-            )
+        if (!Number.isInteger(sessaoId) || sessaoId <= 0) {
+            const erro = new Error('A sessão atual é inválida.');
 
-            erro.status = 401
-            erro.codigo =
-                'SESSAO_ATUAL_INVALIDA'
+            erro.status = 401;
+            erro.codigo = 'SESSAO_ATUAL_INVALIDA';
 
-            throw erro
+            throw erro;
         }
 
         if (!usuario) {
-            throw criarErroContaNaoEncontrada()
+            throw criarErroContaNaoEncontrada();
         }
 
-        const senhaAtualCorreta =
-            await passwordService.compararSenha(
-                senhaAtual,
-                usuario.senhaHash
-            )
+        const senhaAtualCorreta = await passwordService.compararSenha(
+            senhaAtual,
+            usuario.senhaHash
+        );
 
         if (!senhaAtualCorreta) {
-            const erro = new Error(
-                'A senha atual está incorreta.'
-            )
+            const erro = new Error('A senha atual está incorreta.');
 
             erro.status = 401;
-            erro.codigo = 'SENHA_ATUAL_INCORRETA'
+            erro.codigo = 'SENHA_ATUAL_INCORRETA';
 
-            throw erro
+            throw erro;
         }
 
-        const novaSenhaEhIgual =
-            await passwordService.compararSenha(
-                novaSenha,
-                usuario.senhaHash
-            )
+        const novaSenhaEhIgual = await passwordService.compararSenha(novaSenha, usuario.senhaHash);
 
         if (novaSenhaEhIgual) {
-            const erro = new Error(
-                'A nova senha deve ser diferente da senha atual.'
-            )
+            const erro = new Error('A nova senha deve ser diferente da senha atual.');
 
             erro.status = 422;
-            erro.codigo = 'NOVA_SENHA_IGUAL_ATUAL'
+            erro.codigo = 'NOVA_SENHA_IGUAL_ATUAL';
 
-            throw erro
+            throw erro;
         }
 
-        const { senhaHash } =
-            await passwordService.gerarHash(
-                novaSenha
-            )
+        const { senhaHash } = await passwordService.gerarHash(novaSenha);
 
-        const momentoAtual = now()
+        const momentoAtual = now();
 
-        const outrasSessoesRevogadas =
-            await prisma.$transaction(
-                async function salvarNovaSenha(tx) {
-                    //Atualiza somente se a senha não tiver sido alterada por outra requisição
-                    const atualizacaoSenha =
-                        await tx.usuario.updateMany({
-                            where: {
-                                id: usuarioId,
-                                senhaHash:
-                                    usuario.senhaHash
-                            },
+        const outrasSessoesRevogadas = await prisma.$transaction(
+            async function salvarNovaSenha(tx) {
+                //Atualiza somente se a senha não tiver sido alterada por outra requisição
+                const atualizacaoSenha = await tx.usuario.updateMany({
+                    where: {
+                        id: usuarioId,
+                        senhaHash: usuario.senhaHash
+                    },
 
-                            data: {
-                                senhaHash
-                            }
-                        })
-
-                    if (atualizacaoSenha.count !== 1) {
-                        const erro = new Error(
-                            'A senha foi alterada por outra sessão. Entre novamente e repita a operação.'
-                        )
-
-                        erro.status = 409
-                        erro.codigo =
-                            'SENHA_ALTERADA_CONCORRENTEMENTE'
-
-                        throw erro
+                    data: {
+                        senhaHash
                     }
+                });
 
-                    //A sessão usada para alterar a senha permanece ativa. Todas as demais são  encerradas imediatamente.
-                    const sessoes =
-                        await tx.sessao.updateMany({
-                            where: {
-                                usuarioId,
+                if (atualizacaoSenha.count !== 1) {
+                    const erro = new Error(
+                        'A senha foi alterada por outra sessão. Entre novamente e repita a operação.'
+                    );
 
-                                id: {
-                                    not: sessaoId
-                                },
+                    erro.status = 409;
+                    erro.codigo = 'SENHA_ALTERADA_CONCORRENTEMENTE';
 
-                                revogadaEm: null
-                            },
+                    throw erro;
+                }
 
-                            data: {
-                                revogadaEm: momentoAtual
-                            }
-                        })
+                //A sessão usada para alterar a senha permanece ativa. Todas as demais são  encerradas imediatamente.
+                const sessoes = await tx.sessao.updateMany({
+                    where: {
+                        usuarioId,
 
-                    //Um link antigo de recuperação não pode substituir a senha recém-definida.
-                    await tx.recuperacaoSenha.updateMany({
-                        where: {
-                            usuarioId,
-                            statusLink: 'pendente'
+                        id: {
+                            not: sessaoId
                         },
 
-                        data: {
-                            statusLink: 'revogado'
-                        }
-                    })
+                        revogadaEm: null
+                    },
 
-                    return sessoes.count
-                }
-            )
+                    data: {
+                        revogadaEm: momentoAtual
+                    }
+                });
+
+                //Um link antigo de recuperação não pode substituir a senha recém-definida.
+                await tx.recuperacaoSenha.updateMany({
+                    where: {
+                        usuarioId,
+                        statusLink: 'pendente'
+                    },
+
+                    data: {
+                        statusLink: 'revogado'
+                    }
+                });
+
+                return sessoes.count;
+            }
+        );
 
         return {
-            mensagem:
-                'Senha atualizada com sucesso.',
+            mensagem: 'Senha atualizada com sucesso.',
 
-            outrasSessoesEncerradas:
-                outrasSessoesRevogadas
-        }
+            outrasSessoesEncerradas: outrasSessoesRevogadas
+        };
     }
 
     return {
         buscarConfiguracoes,
         atualizarConfiguracoes,
         alterarSenha
-    }
+    };
 }
 
-export { criarAccountService }
+export { criarAccountService };
