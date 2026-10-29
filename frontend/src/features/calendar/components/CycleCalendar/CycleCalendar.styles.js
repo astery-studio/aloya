@@ -61,7 +61,7 @@ function criarEstilosCalendario(tema) {
             marginBottom: 8
         },
         nomeMes: {
-            color: '#222222',
+            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             fontStyle: 'normal',
@@ -69,7 +69,7 @@ function criarEstilosCalendario(tema) {
             lineHeight: 22.5
         },
         anoMes: {
-            color: '#5C5C59',
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             fontStyle: 'normal',
@@ -80,7 +80,7 @@ function criarEstilosCalendario(tema) {
             alignSelf: 'stretch',
             height: 0.991,
             marginTop: 8,
-            backgroundColor: '#EDEAE4'
+            backgroundColor: tema.cores.interface.separador
         },
         semana: {
             position: 'relative',
