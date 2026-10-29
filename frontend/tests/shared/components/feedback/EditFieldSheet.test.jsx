@@ -405,16 +405,24 @@ describe('EditFieldSheet', () => {
         )
     })
 
-    test('renderiza um campo personalizado sem criar o campo de texto padrão', async () => {
+    test('aceita edição numérica pelo mesmo campo do sheet', async () => {
+        const onAlterar = jest.fn()
+
         await render(
-            <EditFieldSheet visivel titulo="Editar duração">
-                <Text>Campo numérico</Text>
-            </EditFieldSheet>
+            <EditFieldSheet
+                visivel
+                titulo="Editar duração"
+                tipo="numero"
+                valor={28}
+                onAlterar={onAlterar}
+                rotuloAcessibilidade="Duração do ciclo"
+            />
         )
 
-        expect(
-            screen.getByText('Campo numérico')
-        ).toBeOnTheScreen()
-        expect(screen.queryByLabelText('Nome')).toBeNull()
+        const campo = screen.getByLabelText('Duração do ciclo')
+        expect(campo).toHaveProp('keyboardType', 'number-pad')
+
+        await fireEvent.changeText(campo, '30 dias')
+        expect(onAlterar).toHaveBeenCalledWith(30)
     })
 })
