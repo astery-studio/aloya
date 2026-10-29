@@ -24,7 +24,7 @@ function obterDataVisivel(valor) {
     return texto
 }
 
-function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar, rotuloAcessibilidade }) {
+function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar, rotuloAcessibilidade, sufixo }) {
     const campoRef = useRef(null)
     const ehEmail = tipo === 'email'
     const ehData = tipo === 'data'
@@ -70,7 +70,10 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
             >
                 <Pressable
                     onPress={focarCampo}
-                    style={estilos.caixaCampo}
+                    style={[
+                        estilos.caixaCampo,
+                        ehNumero && estilos.caixaCampoNumero
+                    ]}
                     accessible={false}
                 >
                     <TextInput
@@ -95,9 +98,13 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                         accessibilityLabel={rotuloAcessibilidade ?? (ehData ? 'Data de nascimento' : ehEmail ? 'E-mail' : 'Nome')}
                         style={[
                             estilos.campo,
-                            (ehData || ehNumero) && estilos.campoData
+                            ehData && estilos.campoData,
+                            ehNumero && estilos.campoNumero
                         ]}
                     />
+                    {ehNumero && sufixo ? (
+                        <Text style={estilos.sufixoNumero}>{sufixo}</Text>
+                    ) : null}
                 </Pressable>
 
                 {erro ? (

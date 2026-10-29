@@ -14,6 +14,13 @@ const estilos = StyleSheet.create({
         backgroundColor: tema.cores.neutras.fundoClaro
     },
 
+    caixaCampoNumero: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        gap: 4
+    },
+
     campo: {
         ...tema.typography.bodyDefault,
         width: '100%',
@@ -32,6 +39,16 @@ const estilos = StyleSheet.create({
 
     campoData: {
         textAlign: 'center'
+    },
+
+    campoNumero: {
+        width: 24,
+        textAlign: 'left'
+    },
+
+    sufixoNumero: {
+        ...tema.typography.bodyDefault,
+        color: tema.cores.neutras.textoPrincipalClaro
     },
 
     erro: {

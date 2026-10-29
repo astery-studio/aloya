@@ -20,6 +20,7 @@ function CycleParameterEditor({
             titulo={`Editar ${label}`}
             tipo="numero"
             valor={valor}
+            sufixo="dias"
             onAlterar={onAlterar}
             onFechar={onCancelar}
             erro={erro}

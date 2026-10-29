@@ -414,6 +414,7 @@ describe('EditFieldSheet', () => {
                 titulo="Editar duração"
                 tipo="numero"
                 valor={28}
+                sufixo="dias"
                 onAlterar={onAlterar}
                 rotuloAcessibilidade="Duração do ciclo"
             />
@@ -421,6 +422,7 @@ describe('EditFieldSheet', () => {
 
         const campo = screen.getByLabelText('Duração do ciclo')
         expect(campo).toHaveProp('keyboardType', 'number-pad')
+        expect(screen.getByText('dias')).toBeOnTheScreen()
 
         await fireEvent.changeText(campo, '30 dias')
         expect(onAlterar).toHaveBeenCalledWith(30)
