@@ -151,6 +151,7 @@ test('apresenta início sem faixa quando ciclo e previsão não existem', async 
 test('encaminha todas as interações da tela carregada', async () => {
     const acoes = {
         aoAbrirCalendario: jest.fn(),
+        aoAbrirParametrosCiclo: jest.fn(),
         aoSelecionarData: jest.fn(),
         aoSelecionarAba: jest.fn(),
         aoCadastrarMenstruacao: jest.fn(),
@@ -160,6 +161,7 @@ test('encaminha todas as interações da tela carregada', async () => {
     await renderizar({ previsao, ...acoes });
 
     await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir parâmetros do ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
     await fireEvent.press(screen.getByRole('tab', { name: 'Ciclos' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
@@ -167,6 +169,7 @@ test('encaminha todas as interações da tela carregada', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
 
     expect(acoes.aoAbrirCalendario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirParametrosCiclo).toHaveBeenCalledTimes(1);
     expect(acoes.aoSelecionarData).toHaveBeenCalledWith('2026-10-14');
     expect(acoes.aoSelecionarAba).toHaveBeenCalledWith('ciclos');
     expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
