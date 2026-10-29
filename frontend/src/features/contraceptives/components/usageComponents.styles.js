@@ -80,7 +80,7 @@ function criarEstilosUso(tema) {
             alignItems: 'flex-start',
             paddingVertical: 12,
             paddingHorizontal: 14,
-            backgroundColor: interfaceTema.superficieElevada,
+            backgroundColor: tema.escuro ? interfaceTema.superficieElevada : interfaceTema.fundo,
             borderRadius: 10
         },
         registroNaoConfirmado: { minHeight: 91 },
@@ -171,7 +171,7 @@ function criarEstilosUso(tema) {
             flexGrow: 0,
             flexShrink: 0,
             padding: 8,
-            backgroundColor: interfaceTema.superficieElevada,
+            backgroundColor: tema.escuro ? interfaceTema.superficieElevada : interfaceTema.fundo,
             borderRadius: 12
         },
         calendarioSeisSemanas: { minHeight: 291.43 },

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { render } from '../mockTheme';
 import { ContraceptiveFlow } from '../../../../src/features/contraceptives/ContraceptiveFlow';
 
 const mockSimpleModal = jest.fn(() => null);
@@ -9,19 +10,23 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
 }));
 jest.mock('../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen', () => {
     const { Pressable, Text } = require('react-native');
-    return { ContraceptiveTrackingScreen: ({ aoCadastrarNovo }) => (
-        <Pressable accessibilityRole="button" onPress={aoCadastrarNovo}>
-            <Text>Cadastrar</Text>
-        </Pressable>
-    ) };
+    return {
+        ContraceptiveTrackingScreen: ({ aoCadastrarNovo }) => (
+            <Pressable accessibilityRole="button" onPress={aoCadastrarNovo}>
+                <Text>Cadastrar</Text>
+            </Pressable>
+        )
+    };
 });
 jest.mock('../../../../src/features/contraceptives/screens/NewContraceptiveScreen', () => {
     const { Pressable, Text } = require('react-native');
-    return { NewContraceptiveScreen: ({ onCadastrar }) => (
-        <Pressable accessibilityRole="button" onPress={() => onCadastrar({ nome: 'Mercilon' })}>
-            <Text>Salvar</Text>
-        </Pressable>
-    ) };
+    return {
+        NewContraceptiveScreen: ({ onCadastrar }) => (
+            <Pressable accessibilityRole="button" onPress={() => onCadastrar({ nome: 'Mercilon' })}>
+                <Text>Salvar</Text>
+            </Pressable>
+        )
+    };
 });
 
 test('exibe o sucesso com o popup simples existente', async () => {
@@ -33,8 +38,11 @@ test('exibe o sucesso com o popup simples existente', async () => {
         const propriedades = mockSimpleModal.mock.calls.at(-1)[0];
         expect(propriedades.visivel).toBe(true);
         expect(propriedades.titulo).toBe('Anticoncepcional cadastrado com sucesso.');
-        expect(propriedades.acaoPrincipal).toEqual(expect.objectContaining({
-            texto: 'OK', variante: 'verde'
-        }));
+        expect(propriedades.acaoPrincipal).toEqual(
+            expect.objectContaining({
+                texto: 'OK',
+                variante: 'verde'
+            })
+        );
     });
 });

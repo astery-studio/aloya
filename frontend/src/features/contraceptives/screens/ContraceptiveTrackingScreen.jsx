@@ -68,7 +68,7 @@ function IconeErro() {
     );
 }
 
-function AcaoCadastro({ aoPressionar }) {
+function AcaoCadastro({ aoPressionar, estilosAcompanhamento }) {
     const [largura, setLargura] = useState(350.01);
     // O texto de 18px do botão existente aparece com os 17px do protótipo.
     // Em telas estreitas, o mesmo botão continua inteiro, sem cortar o rótulo.
@@ -231,7 +231,10 @@ function ContraceptiveTrackingScreen({
             {!carregando ? (
                 <View style={estilosAcompanhamento.rodape}>
                     <View style={estilosAcompanhamento.conteudoRodape}>
-                        <AcaoCadastro aoPressionar={aoCadastrarNovo} />
+                        <AcaoCadastro
+                            aoPressionar={aoCadastrarNovo}
+                            estilosAcompanhamento={estilosAcompanhamento}
+                        />
                     </View>
                 </View>
             ) : null}

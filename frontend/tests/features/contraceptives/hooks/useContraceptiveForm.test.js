@@ -41,10 +41,9 @@ test('começa vazio no modo de cadastro', async () => {
 });
 
 test('preenche a edição com os dados atuais sem compartilhar o array original', async () => {
-    const { result } = await renderHook(() => useContraceptiveForm(
-        jest.fn(),
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(jest.fn(), anticoncepcionalCadastrado)
+    );
 
     expect(result.current.dados).toEqual({
         id: '7',
@@ -57,9 +56,7 @@ test('preenche a edição com os dados atuais sem compartilhar o array original'
         dataPrimeiroUso: '2026-09-25'
     });
 
-    expect(result.current.dados.horarios).not.toBe(
-        anticoncepcionalCadastrado.programacao.horarios
-    );
+    expect(result.current.dados.horarios).not.toBe(anticoncepcionalCadastrado.programacao.horarios);
 
     expect(result.current.modoEdicao).toBe(true);
     expect(result.current.possuiAlteracoes).toBe(false);
@@ -67,10 +64,9 @@ test('preenche a edição com os dados atuais sem compartilhar o array original'
 });
 
 test('detecta uma alteração real e volta ao estado inalterado quando ela é desfeita', async () => {
-    const { result } = await renderHook(() => useContraceptiveForm(
-        jest.fn(),
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(jest.fn(), anticoncepcionalCadastrado)
+    );
 
     await act(() => result.current.alterar('nome', 'Mercilon atualizado'));
 
@@ -84,10 +80,9 @@ test('detecta uma alteração real e volta ao estado inalterado quando ela é de
 });
 
 test('não considera a ordem dos horários como uma alteração real', async () => {
-    const { result } = await renderHook(() => useContraceptiveForm(
-        jest.fn(),
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(jest.fn(), anticoncepcionalCadastrado)
+    );
 
     await act(() => result.current.alterar('horarios', ['20:00', '08:00']));
 
@@ -95,10 +90,9 @@ test('não considera a ordem dos horários como uma alteração real', async () 
 });
 
 test('preserva os dados quando o mesmo tipo é selecionado novamente', async () => {
-    const { result } = await renderHook(() => useContraceptiveForm(
-        jest.fn(),
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(jest.fn(), anticoncepcionalCadastrado)
+    );
 
     await act(() => result.current.selecionarTipo('pilula'));
 
@@ -109,20 +103,21 @@ test('preserva os dados quando o mesmo tipo é selecionado novamente', async () 
 });
 
 test('limpa frequência e horários quando o tipo realmente muda', async () => {
-    const { result } = await renderHook(() => useContraceptiveForm(
-        jest.fn(),
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(jest.fn(), anticoncepcionalCadastrado)
+    );
 
     await act(() => result.current.selecionarTipo('injetavel'));
 
-    expect(result.current.dados).toEqual(expect.objectContaining({
-        tipo: 'injetavel',
-        frequenciaId: '',
-        horarios: [],
-        dataValidade: '',
-        dataPrimeiroUso: ''
-    }));
+    expect(result.current.dados).toEqual(
+        expect.objectContaining({
+            tipo: 'injetavel',
+            frequenciaId: '',
+            horarios: [],
+            dataValidade: '',
+            dataPrimeiroUso: ''
+        })
+    );
 
     expect(result.current.possuiAlteracoes).toBe(true);
 });
@@ -140,10 +135,9 @@ test('preserva múltiplos horários ao trocar a frequência da pílula', async (
 
 test('não envia uma edição que permanece inalterada', async () => {
     const onSubmit = jest.fn();
-    const { result } = await renderHook(() => useContraceptiveForm(
-        onSubmit,
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(onSubmit, anticoncepcionalCadastrado)
+    );
 
     let retorno;
 
@@ -157,10 +151,9 @@ test('não envia uma edição que permanece inalterada', async () => {
 
 test('envia a edição preservando o identificador original', async () => {
     const onSubmit = jest.fn().mockResolvedValue(undefined);
-    const { result } = await renderHook(() => useContraceptiveForm(
-        onSubmit,
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(onSubmit, anticoncepcionalCadastrado)
+    );
 
     await act(() => result.current.alterar('nome', 'Mercilon atualizado'));
 
@@ -172,20 +165,21 @@ test('envia a edição preservando o identificador original', async () => {
 
     expect(retorno).toBe(true);
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
-        id: '7',
-        nome: 'Mercilon atualizado',
-        tipo: 'pilula',
-        intensidadeAlerta: 'critico'
-    }));
+    expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+            id: '7',
+            nome: 'Mercilon atualizado',
+            tipo: 'pilula',
+            intensidadeAlerta: 'critico'
+        })
+    );
 });
 
 test('mantém os dados e mostra a mensagem correta quando a atualização falha', async () => {
     const onSubmit = jest.fn().mockRejectedValue(new Error('falha interna'));
-    const { result } = await renderHook(() => useContraceptiveForm(
-        onSubmit,
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(onSubmit, anticoncepcionalCadastrado)
+    );
 
     await act(() => result.current.alterar('nome', 'Mercilon atualizado'));
 
@@ -208,10 +202,12 @@ test('usa textos breves nos erros de validação e de rede do cadastro', async (
 
     await act(async () => result.current.enviar());
 
-    expect(result.current.alerta).toEqual(expect.objectContaining({
-        titulo: 'Nome não informado',
-        mensagem: 'Informe o nome do anticoncepcional.'
-    }));
+    expect(result.current.alerta).toEqual(
+        expect.objectContaining({
+            titulo: 'Nome não informado',
+            mensagem: 'Informe o nome do anticoncepcional.'
+        })
+    );
 
     await act(() => result.current.alterar('nome', 'Mercilon'));
     await act(() => result.current.selecionarTipo('pilula'));
@@ -231,10 +227,9 @@ test('usa textos breves nos erros de validação e de rede do cadastro', async (
 });
 
 test('ignora tentativas de alterar propriedades internas ou protegidas', async () => {
-    const { result } = await renderHook(() => useContraceptiveForm(
-        jest.fn(),
-        anticoncepcionalCadastrado
-    ));
+    const { result } = await renderHook(() =>
+        useContraceptiveForm(jest.fn(), anticoncepcionalCadastrado)
+    );
 
     let retorno;
 

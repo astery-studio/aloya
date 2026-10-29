@@ -1,5 +1,6 @@
 //Testa atualização, confirmação, concorrência e estados assíncronos da tela de edição.
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
+import { render } from '../mockTheme';
 import { EditContraceptiveScreen } from '../../../../src/features/contraceptives/screens/EditContraceptiveScreen';
 
 const mockContraceptiveForm = jest.fn(() => null);
@@ -86,24 +87,24 @@ test('mostra o título, o formulário preenchido e a ação de apagar', async ()
     );
 
     expect(screen.getByText('Editar o Anticoncepcional')).toBeOnTheScreen();
-    expect(screen.getByRole('button', {name: 'Apagar medicação'})).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Apagar medicação' })).toBeEnabled();
 
-    expect(mockContraceptiveForm).toHaveBeenCalledWith(expect.objectContaining({
-        anticoncepcional,
-        salvando: false,
-        onSubmit: expect.any(Function)
-    }));
+    expect(mockContraceptiveForm).toHaveBeenCalledWith(
+        expect.objectContaining({
+            anticoncepcional,
+            salvando: false,
+            onSubmit: expect.any(Function)
+        })
+    );
 });
 
 test('mostra uma mensagem segura quando o registro não foi informado', async () => {
-    await render(
-        <EditContraceptiveScreen
-            aoVoltar={jest.fn()}
-        />
-    );
+    await render(<EditContraceptiveScreen aoVoltar={jest.fn()} />);
 
     expect(screen.getByText('Anticoncepcional indisponível')).toBeOnTheScreen();
-    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar os dados para edição.');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+        'Não foi possível carregar os dados para edição.'
+    );
     expect(mockContraceptiveForm).not.toHaveBeenCalled();
 });
 
@@ -208,14 +209,16 @@ test('abre a confirmação sem remover no primeiro toque', async () => {
         />
     );
 
-    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
+    await fireEvent.press(screen.getByRole('button', { name: 'Apagar medicação' }));
 
     expect(aoExcluir).not.toHaveBeenCalled();
 
     const confirmacao = obterModal('Apagar anticoncepcional');
 
     expect(confirmacao.visivel).toBe(true);
-    expect(confirmacao.mensagem).toBe('Tem certeza que deseja remover este anticoncepcional? Os alertas programados para ele serão cancelados.');
+    expect(confirmacao.mensagem).toBe(
+        'Tem certeza que deseja remover este anticoncepcional? Os alertas programados para ele serão cancelados.'
+    );
     expect(confirmacao.acaoPrincipal.texto).toBe('Remover');
     expect(confirmacao.acaoSecundaria.texto).toBe('Cancelar');
 });
@@ -232,7 +235,7 @@ test('remove somente depois da confirmação e mostra o sucesso', async () => {
         />
     );
 
-    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
+    await fireEvent.press(screen.getByRole('button', { name: 'Apagar medicação' }));
 
     const confirmacao = obterModal('Apagar anticoncepcional');
 
@@ -258,7 +261,7 @@ test('bloqueia duas exclusões iniciadas antes da próxima renderização', asyn
         />
     );
 
-    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
+    await fireEvent.press(screen.getByRole('button', { name: 'Apagar medicação' }));
 
     const confirmacao = obterModal('Apagar anticoncepcional');
     let primeiraExclusao;
@@ -292,7 +295,7 @@ test('mantém a tela e mostra erro amigável quando a remoção falha', async ()
         />
     );
 
-    await fireEvent.press(screen.getByRole('button', {name: 'Apagar medicação'}));
+    await fireEvent.press(screen.getByRole('button', { name: 'Apagar medicação' }));
 
     const confirmacao = obterModal('Apagar anticoncepcional');
 
@@ -303,7 +306,9 @@ test('mantém a tela e mostra erro amigável quando a remoção falha', async ()
     const erro = obterModal('Algo deu errado');
 
     expect(erro.visivel).toBe(true);
-    expect(erro.mensagem).toBe('Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.');
+    expect(erro.mensagem).toBe(
+        'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
+    );
     expect(screen.getByText('Editar o Anticoncepcional')).toBeOnTheScreen();
 });
 
@@ -316,5 +321,5 @@ test('desativa a remoção quando a ação não foi fornecida', async () => {
         />
     );
 
-    expect(screen.getByRole('button', {name: 'Apagar medicação'})).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Apagar medicação' })).toBeDisabled();
 });
