@@ -178,4 +178,10 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                               aoPressionar: () => setFeedback(null)
                           }
                         : undefined
+                }
+            />
+        </>
+    );
+}
 
+export { CycleEditFlow, converterCampoParaIso, formatarDataParaCampo, validarEdicao };
