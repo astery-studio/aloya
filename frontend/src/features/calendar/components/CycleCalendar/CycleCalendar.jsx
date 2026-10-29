@@ -1,21 +1,27 @@
 //Mostra meses virtualizados do calendário sem renderizar todo o histórico.
-import {memo, useCallback, useMemo, useRef, useState} from 'react'
-import {ActivityIndicator, FlatList, Platform, Text, View} from 'react-native'
-import {cores} from '../../../../shared/theme'
-import {criarNormalizadorMeses, obterHojeLocal} from '../../utils/cycleCalendar.utils'
-import {CycleMonth} from './CycleMonth'
-import {estilos} from './CycleCalendar.styles'
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Platform, Text, View } from 'react-native';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { criarNormalizadorMeses, obterHojeLocal } from '../../utils/cycleCalendar.utils';
+import { CycleMonth } from './CycleMonth';
+import { criarEstilosCalendario } from './CycleCalendar.styles';
 
-const DIAS_SEMANA = Object.freeze(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'])
-const CONFIGURACAO_POSICAO = Object.freeze({minIndexForVisible: 0})
-const LIMIAR_FINAL = 0.15
+const DIAS_SEMANA = Object.freeze(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']);
+const CONFIGURACAO_POSICAO = Object.freeze({ minIndexForVisible: 0 });
+const LIMIAR_FINAL = 0.15;
 
-function IndicadorCarregamento({rotulo, inicial = false}) {
+function IndicadorCarregamento({ rotulo, estilosTema, inicial = false }) {
+    const { estilos, corCarregamento } = estilosTema;
+
     return (
-        <View accessibilityRole="progressbar" accessibilityLabel={rotulo} style={inicial ? estilos.carregamentoInicial : estilos.carregamentoPaginacao}>
-            <ActivityIndicator color={cores.marca.primaria} size={inicial ? 'large' : 'small'} />
+        <View
+            accessibilityRole="progressbar"
+            accessibilityLabel={rotulo}
+            style={inicial ? estilos.carregamentoInicial : estilos.carregamentoPaginacao}
+        >
+            <ActivityIndicator color={corCarregamento} size={inicial ? 'large' : 'small'} />
         </View>
-    )
+    );
 }
 
 function CycleCalendar({
@@ -27,121 +33,155 @@ function CycleCalendar({
     aoCarregarPosteriores,
     aoPressionarDia
 }) {
-    const listaRef = useRef(null)
-    const [hoje] = useState(obterHojeLocal)
-    const usuarioInteragiu = useRef(false)
-    const solicitouAnteriores = useRef(null)
-    const solicitouPosteriores = useRef(null)
+    const tema = useTheme();
+    const estilosTema = useMemo(() => criarEstilosCalendario(tema), [tema]);
+    const { estilos } = estilosTema;
+    const listaRef = useRef(null);
+    const [hoje] = useState(obterHojeLocal);
+    const usuarioInteragiu = useRef(false);
+    const solicitouAnteriores = useRef(null);
+    const solicitouPosteriores = useRef(null);
 
-    const normalizar = useMemo(() => criarNormalizadorMeses(hoje), [hoje])
-    const mesesNormalizados = useMemo(() => normalizar(meses), [normalizar, meses])
-    const primeiroMes = mesesNormalizados[0]?.chave
-    const ultimoMes = mesesNormalizados[mesesNormalizados.length - 1]?.chave
+    const normalizar = useMemo(() => criarNormalizadorMeses(hoje), [hoje]);
+    const mesesNormalizados = useMemo(() => normalizar(meses), [normalizar, meses]);
+    const primeiroMes = mesesNormalizados[0]?.chave;
+    const ultimoMes = mesesNormalizados[mesesNormalizados.length - 1]?.chave;
 
     const indiceMesAtual = useMemo(() => {
-        const chaveAtual = hoje.slice(0, 7)
-        const indiceExato = mesesNormalizados.findIndex((mes) => mes.chave === chaveAtual)
+        const chaveAtual = hoje.slice(0, 7);
+        const indiceExato = mesesNormalizados.findIndex((mes) => mes.chave === chaveAtual);
 
-        if (indiceExato >= 0) return indiceExato
+        if (indiceExato >= 0) return indiceExato;
 
         for (let indice = mesesNormalizados.length - 1; indice >= 0; indice -= 1) {
-            if (mesesNormalizados[indice].chave <= chaveAtual) return indice
+            if (mesesNormalizados[indice].chave <= chaveAtual) return indice;
         }
 
-        return mesesNormalizados.length > 0 ? 0 : undefined
-    }, [hoje, mesesNormalizados])
+        return mesesNormalizados.length > 0 ? 0 : undefined;
+    }, [hoje, mesesNormalizados]);
 
     const layoutsMeses = useMemo(() => {
         //O cabeçalho integra o conteúdo rolável e precisa entrar nos offsets.
-        let deslocamento = carregandoAnteriores ? estilos.carregamentoPaginacao.height : 0
-        const layouts = []
+        let deslocamento = carregandoAnteriores ? estilos.carregamentoPaginacao.height : 0;
+        const layouts = [];
 
         for (const [index, mes] of mesesNormalizados.entries()) {
-            const comprimento = 58.982 + mes.semanas.length * 53.99
-            layouts.push({index, length: comprimento, offset: deslocamento})
-            deslocamento += comprimento
+            const comprimento = 58.982 + mes.semanas.length * 53.99;
+            layouts.push({ index, length: comprimento, offset: deslocamento });
+            deslocamento += comprimento;
         }
 
-        return layouts
-    }, [carregandoAnteriores, mesesNormalizados])
+        return layouts;
+    }, [carregandoAnteriores, mesesNormalizados]);
 
-    const obterLayoutMes = useCallback((_, index) => layoutsMeses[index], [layoutsMeses])
+    const obterLayoutMes = useCallback((_, index) => layoutsMeses[index], [layoutsMeses]);
 
-    const renderizarMes = useCallback(({item}) => (
-        <CycleMonth mes={item} aoPressionarDia={aoPressionarDia} />
-    ), [aoPressionarDia])
+    const renderizarMes = useCallback(
+        ({ item }) => <CycleMonth mes={item} aoPressionarDia={aoPressionarDia} />,
+        [aoPressionarDia]
+    );
 
-    const extrairChave = useCallback((item) => item.chave, [])
+    const extrairChave = useCallback((item) => item.chave, []);
 
-    const verificarInicio = useCallback((evento) => {
-        const deslocamento = evento.nativeEvent.contentOffset.y
+    const verificarInicio = useCallback(
+        (evento) => {
+            const deslocamento = evento.nativeEvent.contentOffset.y;
 
-        if (
-            deslocamento > 96
-            || !usuarioInteragiu.current
-            || carregandoAnteriores
-            || !primeiroMes
-            || solicitouAnteriores.current === primeiroMes
-            || typeof aoCarregarAnteriores !== 'function'
-        ) return
+            if (
+                deslocamento > 96 ||
+                !usuarioInteragiu.current ||
+                carregandoAnteriores ||
+                !primeiroMes ||
+                solicitouAnteriores.current === primeiroMes ||
+                typeof aoCarregarAnteriores !== 'function'
+            )
+                return;
 
-        solicitouAnteriores.current = primeiroMes
-        aoCarregarAnteriores()
-    }, [aoCarregarAnteriores, carregandoAnteriores, primeiroMes])
+            solicitouAnteriores.current = primeiroMes;
+            aoCarregarAnteriores();
+        },
+        [aoCarregarAnteriores, carregandoAnteriores, primeiroMes]
+    );
 
     const verificarFinal = useCallback(() => {
         if (
-            !usuarioInteragiu.current
-            || carregandoPosteriores
-            || !ultimoMes
-            || solicitouPosteriores.current === ultimoMes
-            || typeof aoCarregarPosteriores !== 'function'
-        ) return
+            !usuarioInteragiu.current ||
+            carregandoPosteriores ||
+            !ultimoMes ||
+            solicitouPosteriores.current === ultimoMes ||
+            typeof aoCarregarPosteriores !== 'function'
+        )
+            return;
 
-        solicitouPosteriores.current = ultimoMes
-        aoCarregarPosteriores()
-    }, [aoCarregarPosteriores, carregandoPosteriores, ultimoMes])
+        solicitouPosteriores.current = ultimoMes;
+        aoCarregarPosteriores();
+    }, [aoCarregarPosteriores, carregandoPosteriores, ultimoMes]);
 
-    const verificarFinalPorPosicao = useCallback((evento) => {
-        const medidas = evento?.nativeEvent
-        const alturaConteudo = medidas?.contentSize?.height
-        const alturaVisivel = medidas?.layoutMeasurement?.height
-        const deslocamento = medidas?.contentOffset?.y
+    const verificarFinalPorPosicao = useCallback(
+        (evento) => {
+            const medidas = evento?.nativeEvent;
+            const alturaConteudo = medidas?.contentSize?.height;
+            const alturaVisivel = medidas?.layoutMeasurement?.height;
+            const deslocamento = medidas?.contentOffset?.y;
 
-        if (!Number.isFinite(alturaConteudo) || !Number.isFinite(alturaVisivel)
-            || !Number.isFinite(deslocamento) || alturaVisivel <= 0) return
+            if (
+                !Number.isFinite(alturaConteudo) ||
+                !Number.isFinite(alturaVisivel) ||
+                !Number.isFinite(deslocamento) ||
+                alturaVisivel <= 0
+            )
+                return;
 
-        if (alturaConteudo - alturaVisivel - deslocamento <= alturaVisivel * LIMIAR_FINAL) {
-            verificarFinal()
-        }
-    }, [verificarFinal])
+            if (alturaConteudo - alturaVisivel - deslocamento <= alturaVisivel * LIMIAR_FINAL) {
+                verificarFinal();
+            }
+        },
+        [verificarFinal]
+    );
 
-    const registrarInteracao = useCallback((evento) => {
-        usuarioInteragiu.current = true
-        solicitouAnteriores.current = null
-        solicitouPosteriores.current = null
-        //onEndReached pode ter sido consumido antes da primeira interação.
-        verificarFinalPorPosicao(evento)
-    }, [verificarFinalPorPosicao])
+    const registrarInteracao = useCallback(
+        (evento) => {
+            usuarioInteragiu.current = true;
+            solicitouAnteriores.current = null;
+            solicitouPosteriores.current = null;
+            //onEndReached pode ter sido consumido antes da primeira interação.
+            verificarFinalPorPosicao(evento);
+        },
+        [verificarFinalPorPosicao]
+    );
 
-    const verificarRolagem = useCallback((evento) => {
-        verificarInicio(evento)
-        verificarFinalPorPosicao(evento)
-    }, [verificarInicio, verificarFinalPorPosicao])
+    const verificarRolagem = useCallback(
+        (evento) => {
+            verificarInicio(evento);
+            verificarFinalPorPosicao(evento);
+        },
+        [verificarInicio, verificarFinalPorPosicao]
+    );
 
     if (carregando && mesesNormalizados.length === 0) {
         return (
             <View style={estilos.calendario}>
-                <IndicadorCarregamento inicial rotulo="Carregando calendário" />
+                <IndicadorCarregamento
+                    inicial
+                    rotulo="Carregando calendário"
+                    estilosTema={estilosTema}
+                />
             </View>
-        )
+        );
     }
 
     return (
         <View style={estilos.calendario}>
-            <View accessible accessibilityRole="header" accessibilityLabel="Dias da semana" style={estilos.cabecalhoSemana}>
+            <View
+                accessible
+                accessibilityRole="header"
+                accessibilityLabel="Dias da semana"
+                style={estilos.cabecalhoSemana}
+            >
                 {DIAS_SEMANA.map((dia) => (
-                    <Text key={dia} style={estilos.nomeDiaSemana}>{dia}</Text>
+                    <Text key={dia} style={estilos.nomeDiaSemana}>
+                        {dia}
+                    </Text>
                 ))}
             </View>
 
@@ -158,10 +198,22 @@ function CycleCalendar({
                 //Mantém o índice da âncora nativa estável ao mostrar/esconder o indicador.
                 ListHeaderComponent={
                     <View collapsable={false}>
-                        {carregandoAnteriores ? <IndicadorCarregamento rotulo="Carregando meses anteriores" /> : null}
+                        {carregandoAnteriores ? (
+                            <IndicadorCarregamento
+                                rotulo="Carregando meses anteriores"
+                                estilosTema={estilosTema}
+                            />
+                        ) : null}
                     </View>
                 }
-                ListFooterComponent={carregandoPosteriores ? <IndicadorCarregamento rotulo="Carregando próximos meses" /> : null}
+                ListFooterComponent={
+                    carregandoPosteriores ? (
+                        <IndicadorCarregamento
+                            rotulo="Carregando próximos meses"
+                            estilosTema={estilosTema}
+                        />
+                    ) : null
+                }
                 initialNumToRender={2}
                 maxToRenderPerBatch={2}
                 updateCellsBatchingPeriod={50}
@@ -177,13 +229,11 @@ function CycleCalendar({
                 showsVerticalScrollIndicator={false}
             />
         </View>
-    )
+    );
 }
 
-const CycleCalendarMemorizado = memo(CycleCalendar)
+const CycleCalendarMemorizado = memo(CycleCalendar);
 
-export {
-    CycleCalendarMemorizado as CycleCalendar
-}
+export { CycleCalendarMemorizado as CycleCalendar };
 
-export default CycleCalendarMemorizado
+export default CycleCalendarMemorizado;
