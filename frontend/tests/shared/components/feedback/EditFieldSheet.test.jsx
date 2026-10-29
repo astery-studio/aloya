@@ -404,4 +404,17 @@ describe('EditFieldSheet', () => {
             true
         )
     })
+
+    test('renderiza um campo personalizado sem criar o campo de texto padrão', async () => {
+        await render(
+            <EditFieldSheet visivel titulo="Editar duração">
+                <Text>Campo numérico</Text>
+            </EditFieldSheet>
+        )
+
+        expect(
+            screen.getByText('Campo numérico')
+        ).toBeOnTheScreen()
+        expect(screen.queryByLabelText('Nome')).toBeNull()
+    })
 })

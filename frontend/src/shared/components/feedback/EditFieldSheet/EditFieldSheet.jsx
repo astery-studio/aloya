@@ -24,7 +24,7 @@ function obterDataVisivel(valor) {
     return texto
 }
 
-function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar }) {
+function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar, children }) {
     const campoRef = useRef(null)
     const ehEmail = tipo === 'email'
     const ehData = tipo === 'data'
@@ -61,6 +61,11 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                 onFechar={onFechar}
                 bloquearFechamento={salvando}
             >
+                {children ? (
+                    <View style={estilos.campoPersonalizado}>{children}</View>
+                ) : null}
+
+                {!children ? (
                 <Pressable
                     onPress={focarCampo}
                     style={estilos.caixaCampo}
@@ -92,6 +97,7 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                         ]}
                     />
                 </Pressable>
+                ) : null}
 
                 {erro ? (
                     <Text

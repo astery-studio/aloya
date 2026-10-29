@@ -34,6 +34,10 @@ const estilos = StyleSheet.create({
         textAlign: 'center'
     },
 
+    campoPersonalizado: {
+        marginTop: 24
+    },
+
     erro: {
         ...tema.typography.caption,
         marginTop: tema.espacamentos.pequeno,
