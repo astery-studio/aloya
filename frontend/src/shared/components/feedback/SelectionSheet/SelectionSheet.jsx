@@ -18,7 +18,8 @@ function SelectionSheet({
     opcoes = [],
     valorSelecionado,
     onSelecionar,
-    onFechar
+    onFechar,
+    varianteOpcao = 'lista'
 }) {
     const tema = useTheme();
 
@@ -38,6 +39,7 @@ function SelectionSheet({
                 icone={item.icone}
                 selected={item.id === valorSelecionado}
                 desabilitado={selecaoDesabilitada}
+                variante={varianteOpcao}
                 onPress={selecionarOpcao}
             />
         );
