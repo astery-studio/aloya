@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import { StatusBadge } from '../../../../src/shared/components/common/StatusBadge/StatusBadge';
 import { variantes } from '../../../../src/shared/components/common/StatusBadge/StatusBadge.styles';
+import { renderWithTheme } from '../../../helpers/renderWithTheme';
 
 test.each([
     ['pendenteDeUso', 'Pendente de Uso'],
@@ -16,12 +17,12 @@ test.each([
     ['diasMenstruacao', '6 dias menstruação'],
     ['diasCiclo', '29 dias ciclo']
 ])('apresenta a variante %s', async (estado, rotulo) => {
-    await render(<StatusBadge estado={estado} />);
+    await renderWithTheme(<StatusBadge estado={estado} />);
     expect(screen.getByLabelText(rotulo)).toBeOnTheScreen();
 });
 
 test('mantém aliases retrocompatíveis para os estados públicos anteriores', async () => {
-    const { rerender } = await render(<StatusBadge estado="confirmadoHistorico" />);
+    const { rerender } = await renderWithTheme(<StatusBadge estado="confirmadoHistorico" />);
     expect(screen.getByLabelText('Confirmado')).toBeOnTheScreen();
 
     await rerender(<StatusBadge estado="confirmadoForaDoPrazo" />);
@@ -32,14 +33,14 @@ test('mantém aliases retrocompatíveis para os estados públicos anteriores', a
 });
 
 test('permite substituir o rótulo calculado', async () => {
-    await render(<StatusBadge estado="diasCiclo" rotulo="31 dias ciclo" />);
+    await renderWithTheme(<StatusBadge estado="diasCiclo" rotulo="31 dias ciclo" />);
     expect(screen.getByLabelText('31 dias ciclo')).toBeOnTheScreen();
     expect(screen.getByText('31 dias')).toBeOnTheScreen();
     expect(screen.getByText('ciclo')).toBeOnTheScreen();
 });
 
 test('renderiza o aviso completo de estimativa incerta', async () => {
-    await render(<StatusBadge estado="estimativaIncerta" />);
+    await renderWithTheme(<StatusBadge estado="estimativaIncerta" />);
 
     expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
     expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toBeOnTheScreen();
@@ -66,12 +67,12 @@ test('reproduz as medidas exatas definidas para HU-011', () => {
 });
 
 test('usa o glifo de nove pixels especificado para os estados com marcador', async () => {
-    await render(<StatusBadge estado="pendenteDeUso" />);
+    await renderWithTheme(<StatusBadge estado="pendenteDeUso" />);
     expect(screen.getByText('●')).toHaveStyle({ width: 9, height: 14, fontSize: 9, lineHeight: 14 });
 });
 
 test('rejeita estados desconhecidos', async () => {
-    await expect(render(<StatusBadge estado="inexistente" />)).rejects.toThrow(
+    await expect(renderWithTheme(<StatusBadge estado="inexistente" />)).rejects.toThrow(
         'Estado de StatusBadge inválido: inexistente'
     );
 });
@@ -81,7 +82,7 @@ test.each([
     ['confirmadoForaPrazoHistoricoUso', 'Confirmado fora do prazo', 11, 16],
     ['validadeAindaPrazo', '30 meses restantes', 12, 18]
 ])('não trunca nem fixa a altura do texto em %s', async (estado, rotulo, fontSize, lineHeight) => {
-    await render(<StatusBadge estado={estado} />);
+    await renderWithTheme(<StatusBadge estado={estado} />);
     const texto = screen.getByText(rotulo);
     expect(texto).not.toHaveProp('numberOfLines');
     expect(texto).toHaveStyle({height: 'auto', width: 'auto', includeFontPadding: false, fontSize, lineHeight});
@@ -89,14 +90,14 @@ test.each([
 });
 
 test.each(['confirmadoHistorico', 'confirmadoHistoricoUso'])('dimensiona %s pelo texto sem quebrar Confirmado', async (estado) => {
-    await render(<StatusBadge estado={estado} />);
+    await renderWithTheme(<StatusBadge estado={estado} />);
     expect(screen.getByLabelText('Confirmado')).toHaveStyle({ width: 'auto', minWidth: 81, minHeight: 23 });
     expect(screen.getByText('Confirmado')).toHaveProp('numberOfLines', 1);
     expect(screen.getByText('Confirmado')).toHaveStyle({ width: 'auto', flexShrink: 0 });
 });
 
 test('preserva o comportamento e as dimensões das variantes de outras HUs', async () => {
-    const { rerender } = await render(<StatusBadge estado="diasCiclo" />);
+    const { rerender } = await renderWithTheme(<StatusBadge estado="diasCiclo" />);
     expect(screen.getByLabelText('29 dias ciclo')).toHaveStyle(variantes.diasCiclo.container);
     expect(screen.getByText('29 dias')).toHaveProp('numberOfLines', 1);
     expect(screen.getByText('29 dias')).toHaveStyle({width: 45, height: 20});
