@@ -1,10 +1,10 @@
 //Testa validações, integração, erros, sucesso e proteção contra envio repetido da nova categoria.
 import {
     fireEvent,
-    render,
     screen,
     waitFor
 } from '@testing-library/react-native'
+import {renderWithTheme as render} from '../../../helpers/renderWithTheme'
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     const React = require('react')

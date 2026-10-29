@@ -1,5 +1,6 @@
 //Cobre validações e proteções internas do formulário de categoria.
-import {act, render} from '@testing-library/react-native'
+import {act} from '@testing-library/react-native'
+import {renderWithTheme as render} from '../../../helpers/renderWithTheme'
 
 let mockEntradaProps
 let mockGeraisProps

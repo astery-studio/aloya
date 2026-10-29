@@ -1,5 +1,6 @@
 //Testa o conteúdo e as ações da tela principal de membros.
-import {fireEvent, render, screen} from '@testing-library/react-native'
+import {fireEvent, screen} from '@testing-library/react-native'
+import {renderWithTheme as render} from '../../../helpers/renderWithTheme'
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => {
     const React = require('react')
