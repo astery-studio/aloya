@@ -1,11 +1,14 @@
 /**
- * Componente base dos botões, responsável por variantes, estados, ícones e acessibilidade.
+ * Componente base dos botões, responsável por variantes,
+ * estados, ícones e acessibilidade.
  */
+import { useMemo } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { cores } from '../../../../theme';
-import { estilos, tamanhos, variantes } from './Button.styles';
 
-export default function Button({
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarEstilos, criarTamanhos, criarVariantes } from './Button.styles';
+
+function Button({
     texto,
     aoPressionar,
     variante = 'laranja',
@@ -18,6 +21,14 @@ export default function Button({
     rotuloAcessibilidade,
     estilo
 }) {
+    const tema = useTheme();
+
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
+    const tamanhos = useMemo(() => criarTamanhos(tema), [tema]);
+
+    const variantes = useMemo(() => criarVariantes(tema), [tema]);
+
     if (!tamanhos[tamanho]) {
         throw new Error(`Tamanho de Button inválido: ${tamanho}`);
     }
@@ -27,32 +38,25 @@ export default function Button({
     }
 
     const tamanhoAtual = tamanhos[tamanho];
+
     const varianteAtual = variantes[variante];
 
-    const bloqueado =
-        desativado || carregando;
+    const bloqueado = desativado || carregando;
 
     const corConteudo = desativado
-        ? cores.neutras.textoSecundarioClaro
+        ? tema.cores.interface.textoDesabilitado
         : varianteAtual.texto.color;
 
     function renderizarConteudo() {
         if (carregando) {
-            return (
-                <ActivityIndicator
-                    color={corConteudo}
-                />
-            );
+            return <ActivityIndicator testID="button-loading" color={corConteudo} />;
         }
 
         return (
             <View style={estilos.conteudo}>
-                {Icone && posicaoIcone === 'esquerda' && (
-                    <Icone
-                        color={corConteudo}
-                        size={18}
-                    />
-                )}
+                {Icone && posicaoIcone === 'esquerda' ? (
+                    <Icone color={corConteudo} size={18} />
+                ) : null}
 
                 <Text
                     numberOfLines={1}
@@ -60,20 +64,19 @@ export default function Button({
                         estilos.texto,
                         tamanhoAtual.texto,
                         varianteAtual.texto,
-                        desativado && {
-                            color: corConteudo
-                        }
+                        desativado
+                            ? {
+                                  color: corConteudo
+                              }
+                            : null
                     ]}
                 >
                     {texto}
                 </Text>
 
-                {Icone && posicaoIcone === 'direita' && (
-                    <Icone
-                        color={corConteudo}
-                        size={18}
-                    />
-                )}
+                {Icone && posicaoIcone === 'direita' ? (
+                    <Icone color={corConteudo} size={18} />
+                ) : null}
             </View>
         );
     }
@@ -92,7 +95,9 @@ export default function Button({
                 estilos.container,
                 tamanhoAtual.container,
                 varianteAtual.container,
-                { width: largura },
+                {
+                    width: largura
+                },
                 desativado && estilos.desativado,
                 pressed && estilos.pressionado,
                 estilo
@@ -102,3 +107,5 @@ export default function Button({
         </Pressable>
     );
 }
+
+export default Button;
