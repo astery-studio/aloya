@@ -3,6 +3,11 @@ import { PREFERENCIAS_TEMA } from '../../../shared/theme/themePreferences';
 
 const OPCOES_TEMA = Object.freeze([
     Object.freeze({
+        id: PREFERENCIAS_TEMA.automatico,
+        label: 'Automático do Sistema'
+    }),
+
+    Object.freeze({
         id: PREFERENCIAS_TEMA.claro,
         label: 'Modo Claro'
     }),
@@ -10,11 +15,6 @@ const OPCOES_TEMA = Object.freeze([
     Object.freeze({
         id: PREFERENCIAS_TEMA.escuro,
         label: 'Modo Escuro'
-    }),
-
-    Object.freeze({
-        id: PREFERENCIAS_TEMA.automatico,
-        label: 'Automático do Sistema'
     })
 ]);
 
