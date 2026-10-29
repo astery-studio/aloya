@@ -21,6 +21,8 @@ function ButtonSelection({
 
     const intensidade = variante === 'intensidade';
 
+    const modoCor = variante === 'modoCor';
+
     const corIcone = selected ? tema.cores.interface.destaque : tema.cores.interface.textoPrincipal;
 
     return (
@@ -35,15 +37,26 @@ function ButtonSelection({
             style={[
                 estilos.container,
                 intensidade && estilos.intensidade,
+                modoCor && estilos.modoCor,
                 selected && estilos.selecionado,
                 intensidade && selected && estilos.intensidadeSelecionada,
+                modoCor && selected && estilos.modoCorSelecionado,
                 desabilitado && estilos.desabilitado
             ]}
         >
             {Icone ? <Icone size={24} color={corIcone} /> : null}
 
             <View style={estilos.textos}>
-                <Text style={[estilos.label, selected && estilos.labelSelecionado]}>{label}</Text>
+                <Text
+                    style={[
+                        estilos.label,
+                        modoCor && estilos.labelModoCor,
+                        selected && estilos.labelSelecionado,
+                        modoCor && selected && estilos.labelModoCorSelecionado
+                    ]}
+                >
+                    {label}
+                </Text>
 
                 {descricao ? <Text style={estilos.descricao}>{descricao}</Text> : null}
             </View>
