@@ -26,6 +26,8 @@ import {
     criarCycleHistoryRoutes
 } from '../../features/cycles/routes/cycleHistory.routes.js';
 
+import { criarCycleEditRoutes } from '../../features/cycles/routes/cycleEdit.routes.js';
+
 import {
     criarPredictionRoutes
 } from '../../features/cycles/routes/prediction.routes.js';
@@ -146,6 +148,15 @@ app.use(
             container.authMiddleware,
         cycleHistoryController:
             container.cycleHistoryController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleEditRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        controller: container.cycleEditController
     })
 );
 
