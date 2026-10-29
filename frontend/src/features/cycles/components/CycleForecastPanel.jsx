@@ -37,41 +37,57 @@ const ROTULOS = {
     lutea: 'Fase Lútea',
     desconhecida: 'Seu ciclo'
 };
-const CORES_FORMA = {
-    menstrual: cores.marca.primaria,
-    folicular: cores.ciclo.formaFolicular,
-    ovulatoria: cores.feedback.informacao,
-    lutea: cores.feedback.aviso,
-    desconhecida: cores.neutras.textoSecundarioClaro
-};
-const CORES_CONTEUDO = { ...CORES_FORMA, folicular: cores.ciclo.conteudoFolicular };
-const RECURSOS_SEM_CICLO = [
-    {
-        titulo: 'Fases do ciclo',
-        descricao: 'Menstrual, folicular, ovulatória e lútea com orientações para cada momento.',
-        Icone: ArrowsClockwiseIcon,
-        cor: cores.marca.secundaria
-    },
-    {
-        titulo: 'Janela fértil',
-        descricao: 'Saiba seus dias de maior fertilidade com previsões baseadas no seu histórico.',
-        Icone: SparkleIcon,
-        cor: cores.feedback.aviso,
-        peso: 'fill'
-    },
-    {
-        titulo: 'Próxima menstruação',
-        descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.',
-        Icone: CalendarDotsIcon,
-        cor: cores.feedback.aviso
-    },
-    {
-        titulo: 'Sintomas e bem-estar',
-        descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.',
-        Icone: HeartbeatIcon,
-        cor: cores.marca.secundaria
-    }
-];
+function criarCoresDaPrevisao(tema) {
+    const coresForma = {
+        menstrual: tema.escuro ? '#F08A75' : cores.marca.primaria,
+        folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.formaFolicular,
+        ovulatoria: tema.escuro ? '#8FC4DD' : cores.feedback.informacao,
+        lutea: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
+        desconhecida: tema.cores.interface.textoSecundario
+    };
+
+    return {
+        coresForma,
+        coresConteudo: {
+            ...coresForma,
+            folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.conteudoFolicular
+        },
+        corAviso: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
+        corIconeEscuro: tema.escuro ? tema.cores.interface.textoPrincipal : cores.ciclo.iconeEscuro
+    };
+}
+
+function criarRecursosSemCiclo(visual) {
+    return [
+        {
+            titulo: 'Fases do ciclo',
+            descricao:
+                'Menstrual, folicular, ovulatória e lútea com orientações para cada momento.',
+            Icone: ArrowsClockwiseIcon,
+            cor: visual.coresForma.folicular
+        },
+        {
+            titulo: 'Janela fértil',
+            descricao:
+                'Saiba seus dias de maior fertilidade com previsões baseadas no seu histórico.',
+            Icone: SparkleIcon,
+            cor: visual.corAviso,
+            peso: 'fill'
+        },
+        {
+            titulo: 'Próxima menstruação',
+            descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.',
+            Icone: CalendarDotsIcon,
+            cor: visual.corAviso
+        },
+        {
+            titulo: 'Sintomas e bem-estar',
+            descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.',
+            Icone: HeartbeatIcon,
+            cor: visual.coresForma.folicular
+        }
+    ];
+}
 
 function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
     const { estilos } = useCycleForecastVisual();
@@ -92,9 +108,9 @@ function GotaPreenchidaIcon(props) {
 }
 
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
-    const { estilos } = useCycleForecastVisual();
+    const { estilos, coresForma } = useCycleForecastVisual();
     const comContorno = fase === 'folicular' || fase === 'ovulatoria';
-    const cor = CORES_FORMA[fase];
+    const cor = coresForma[fase];
     return (
         <View
             accessibilityLabel={`Símbolo provisório: ${ROTULOS[fase]}`}
@@ -123,7 +139,7 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
 }
 
 function PainelPrevisao({ previsao, janelaFertil }) {
-    const { estilos } = useCycleForecastVisual();
+    const { estilos, corAviso, corIconeEscuro, coresForma } = useCycleForecastVisual();
     const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
     const janela = janelaFertil ?? previsao.janelaFertilEstimada;
     const incerta = previsao.status === 'PARCIALMENTE_DISPONIVEL';
@@ -145,7 +161,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 <ConfidenceBadge nivel={nivel} variante="composta" />
                 {incerta ? (
                     <View style={estilos.avisoConfiabilidade}>
-                        <WarningIcon size={18} color={cores.feedback.aviso} />
+                        <WarningIcon size={18} color={corAviso} />
                         <View style={estilos.textosAvisoConfiabilidade}>
                             <Text style={estilos.tituloAvisoConfiabilidade}>
                                 Estimativa incerta
@@ -158,7 +174,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 ) : null}
                 {!incerta && nivel === 'baixa' ? (
                     <View style={estilos.avisoConfiabilidade}>
-                        <WarningCircleIcon size={18} color={cores.feedback.aviso} weight="fill" />
+                        <WarningCircleIcon size={18} color={corAviso} weight="fill" />
                         <Text style={estilos.textoAvisoBaixa}>
                             Continue registrando seus ciclos para que suas previsões fiquem cada vez
                             mais precisas.
@@ -169,7 +185,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <SunIcon size={18} color={cores.feedback.informacao} weight="fill" />
+                        <SunIcon size={18} color={coresForma.ovulatoria} weight="fill" />
                         <Text style={estilos.rotuloPrevisaoSecundaria}>Ovulação</Text>
                     </View>
                     <Text style={estilos.valorOvulacao}>
@@ -178,7 +194,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                 </View>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <SparkleIcon size={18} color={cores.ciclo.iconeEscuro} weight="fill" />
+                        <SparkleIcon size={18} color={corIconeEscuro} weight="fill" />
                         <Text style={estilos.rotuloPrevisaoSecundaria}>Janela fértil</Text>
                     </View>
                     <Text style={estilos.valorSecundario}>
@@ -194,9 +210,9 @@ function PainelPrevisao({ previsao, janelaFertil }) {
 }
 
 function ConteudoFase({ conteudo, fase }) {
-    const { estilos } = useCycleForecastVisual();
+    const { estilos, coresConteudo } = useCycleForecastVisual();
     if (!conteudo) return null;
-    const cor = CORES_CONTEUDO[fase];
+    const cor = coresConteudo[fase];
     return (
         <View>
             <View style={estilos.secaoTexto}>
@@ -235,7 +251,9 @@ function ConteudoFase({ conteudo, fase }) {
 }
 
 function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
-    const { estilos } = useCycleForecastVisual();
+    const visual = useCycleForecastVisual();
+    const { estilos } = visual;
+    const recursosSemCiclo = criarRecursosSemCiclo(visual);
     return (
         <View style={estilos.estadoSemCiclo}>
             <View style={estilos.cartaoIntroducao}>
@@ -268,7 +286,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
             </View>
             <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
             <View style={estilos.recursos}>
-                {RECURSOS_SEM_CICLO.map(({ titulo, descricao, Icone, cor, peso = 'regular' }) => (
+                {recursosSemCiclo.map(({ titulo, descricao, Icone, cor, peso = 'regular' }) => (
                     <View key={titulo} style={estilos.recurso}>
                         <View style={estilos.iconeRecurso}>
                             <Icone size={20} color={cor} weight={peso} />
@@ -296,7 +314,8 @@ function CycleForecastPanel({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const visual = useMemo(() => ({ estilos }), [estilos]);
+    const coresDaPrevisao = useMemo(() => criarCoresDaPrevisao(tema), [tema]);
+    const visual = useMemo(() => ({ estilos, ...coresDaPrevisao }), [coresDaPrevisao, estilos]);
 
     if (!previsao)
         return (
@@ -330,13 +349,13 @@ function CycleForecastPanel({
                         <View
                             style={[
                                 estilos.destaqueFertil,
-                                { borderColor: CORES_FORMA[faseAtual] }
+                                { borderColor: visual.coresForma[faseAtual] }
                             ]}
                         >
                             <View style={estilos.iconeDestaqueFertil}>
                                 <SparkleIcon
                                     size={22}
-                                    color={CORES_FORMA[faseAtual]}
+                                    color={visual.coresForma[faseAtual]}
                                     weight="fill"
                                 />
                             </View>
