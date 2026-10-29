@@ -1,176 +1,179 @@
-import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
+import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
 import { CycleCalendar } from '../../calendar/components/CycleCalendar/CycleCalendar';
+import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
+import { estilos } from './RemoveMenstruationModal.styles';
 
-const estilos = Object.freeze({
-    fundo: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-        backgroundColor: 'rgba(0, 0, 0, 0.45)'
-    },
-    painel: { maxHeight: '92%', borderRadius: 20, padding: 24, backgroundColor: '#FFFFFF' },
-    titulo: { fontSize: 20, fontWeight: '700', color: '#222222', marginBottom: 12 },
-    texto: { fontSize: 16, lineHeight: 24, color: '#5C5C59', marginBottom: 12 },
-    aviso: { fontSize: 14, lineHeight: 20, color: '#8D3C30', marginBottom: 16 },
-    erro: { fontSize: 14, lineHeight: 20, color: '#B23B36', marginBottom: 12 },
-    sucesso: { fontSize: 14, lineHeight: 20, color: '#2C4C3B', marginBottom: 12 },
-    acoes: { gap: 10, marginTop: 16 },
-    botao: {
-        minHeight: 48,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 12,
-        paddingHorizontal: 16
-    },
-    botaoExcluir: { backgroundColor: '#C85A44' },
-    botaoCancelar: { backgroundColor: '#F7F5F0', borderWidth: 1, borderColor: '#A8A49C' },
-    textoBotao: { fontSize: 16, fontWeight: '600', color: '#222222' },
-    textoBotaoExcluir: { color: '#FFFFFF' }
-});
-
-function obterPeriodo(ciclo) {
-    if (typeof ciclo?.periodo === 'string' && ciclo.periodo.trim()) {
-        return ciclo.periodo.trim();
-    }
-
-    if (typeof ciclo?.dataInicio === 'string') {
-        const fim = typeof ciclo.dataFim === 'string' ? ciclo.dataFim : 'em andamento';
-        return `${ciclo.dataInicio} até ${fim}`;
-    }
-
-    return 'Período não informado';
+function formatarData(data) {
+    if (typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data)) return 'data não informada';
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}/${mes}/${ano}`;
 }
 
-function Acao({
-    texto,
-    aoPressionar,
-    primaria = false,
-    desativada,
-    carregando = false,
-    rotuloAcessibilidade
-}) {
-    const estiloBotao = primaria ? estilos.botaoExcluir : estilos.botaoCancelar;
+function obterPeriodo(ciclo) {
+    if (!ciclo?.dataInicio) return 'Período não informado';
+    return `${formatarData(ciclo.dataInicio)} a ${formatarData(ciclo.dataFim || obterHojeLocal())}`;
+}
 
+function Botao({ texto, primaria, desativado, onPress }) {
     return (
         <Pressable
             accessibilityRole="button"
-            accessibilityLabel={rotuloAcessibilidade || texto}
-            accessibilityState={{ disabled: desativada || carregando, busy: carregando }}
-            disabled={desativada || carregando}
-            onPress={aoPressionar}
-            style={[estilos.botao, estiloBotao, (desativada || carregando) && { opacity: 0.55 }]}
+            accessibilityLabel={texto}
+            accessibilityState={{ disabled: Boolean(desativado) }}
+            disabled={desativado}
+            onPress={onPress}
+            style={[
+                estilos.botao,
+                primaria ? estilos.botaoPrimario : estilos.botaoSecundario,
+                desativado && estilos.desativado
+            ]}
         >
-            <Text style={[estilos.textoBotao, primaria && estilos.textoBotaoExcluir]}>
-                {carregando ? 'Excluindo...' : texto}
+            <Text style={[estilos.textoBotao, primaria && estilos.textoBotaoPrimario]}>
+                {texto}
             </Text>
         </Pressable>
     );
 }
 
 function RemoveMenstruationModal({
-    modo,
+    modo = 'dia',
     visivel,
-    meses = [],
     ciclo,
+    meses = [],
+    dataSelecionada,
+    carregandoMeses = false,
+    erroMeses,
     carregando = false,
-    erro,
-    erroAtualizacao,
-    sucesso,
+    diasAlterados = false,
+    alerta,
     onRemoverDia,
     onExcluirCiclo,
-    onFechar
+    onSolicitarExcluirCiclo,
+    onFechar,
+    onCancelarExclusao,
+    onTentarNovamente,
+    onFecharAlerta,
+    onConcluir
 }) {
-    if (!['dia', 'cicloCompleto'].includes(modo)) {
+    if (!['dia', 'cicloCompleto'].includes(modo))
         throw new TypeError('O modo de remoção da menstruação é inválido.');
+    const tipoAlerta = alerta || (modo === 'cicloCompleto' ? 'confirmacao' : null);
+    const mensagemConfirmacao = `Tem certeza que deseja excluir todo o período de menstruação de ${formatarData(ciclo?.dataInicio)} a ${formatarData(ciclo?.dataFim || obterHojeLocal())} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`;
+    let modalAlerta = null;
+
+    if (tipoAlerta === 'confirmacao') {
+        modalAlerta = (
+            <AlertModal
+                visivel
+                titulo="Apagar ciclo"
+                mensagem={mensagemConfirmacao}
+                aoFechar={onCancelarExclusao}
+                acaoPrincipal={{
+                    texto: 'Apagar',
+                    variante: 'verde',
+                    aoPressionar: onExcluirCiclo,
+                    carregando
+                }}
+                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: onCancelarExclusao }}
+            />
+        );
+    } else if (tipoAlerta === 'erro') {
+        modalAlerta = (
+            <AlertModal
+                visivel
+                titulo="Algo deu errado"
+                mensagem="Ocorreu um erro ao excluir este registro. Tente novamente."
+                aoFechar={onFecharAlerta}
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: onTentarNovamente,
+                    carregando
+                }}
+                acaoSecundaria={{ texto: 'Voltar', aoPressionar: onFecharAlerta }}
+            />
+        );
+    } else if (tipoAlerta === 'sucesso-excluir' || tipoAlerta === 'sucesso-atualizar') {
+        modalAlerta = (
+            <AlertModal
+                visivel
+                titulo={
+                    tipoAlerta === 'sucesso-excluir'
+                        ? 'Ciclo excluído com sucesso'
+                        : 'Ciclo atualizado com sucesso'
+                }
+                mensagem="Registro de menstruação excluído com sucesso."
+                aoFechar={onFecharAlerta}
+                acaoPrincipal={{ texto: 'OK', variante: 'verde', aoPressionar: onFecharAlerta }}
+            />
+        );
     }
 
-    if (!visivel) return null;
-
-    const removendoDia = modo === 'dia';
-    const fechar = carregando ? undefined : onFechar;
-
     return (
-        <Modal transparent animationType="fade" visible onRequestClose={fechar}>
-            <View style={estilos.fundo}>
-                <View accessibilityViewIsModal style={estilos.painel}>
-                    {removendoDia ? (
-                        <>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
-                                Remover dia de menstruação
+        <>
+            {visivel ? (
+                <BottomSheet
+                    visivel={visivel}
+                    onFechar={carregando ? undefined : onFechar}
+                    bloquearFechamento={carregando}
+                >
+                    <BottomSheetLayout
+                        titulo="Remover Menstruação"
+                        onFechar={onFechar}
+                        bloquearFechamento={carregando}
+                    >
+                        <View
+                            style={estilos.conteudo}
+                            accessibilityHint={
+                                dataSelecionada ? `Dia selecionado: ${dataSelecionada}` : undefined
+                            }
+                        >
+                            <Text style={estilos.instrucao}>
+                                Toque em um dia preenchido para desmarcá-lo.
                             </Text>
-                            <Text style={estilos.texto}>
-                                Toque em um dia registrado para removê-lo. A remoção do dia é
-                                imediata e não pede confirmação.
-                            </Text>
-                            {erro ? (
-                                <Text accessibilityRole="alert" style={estilos.erro}>
-                                    {erro}
-                                </Text>
-                            ) : null}
-                            {erroAtualizacao ? (
-                                <Text accessibilityRole="alert" style={estilos.erro}>
-                                    {erroAtualizacao}
-                                </Text>
-                            ) : null}
-                            {sucesso ? (
-                                <Text accessibilityRole="status" style={estilos.sucesso}>
-                                    {sucesso}
-                                </Text>
-                            ) : null}
-                            <View style={{ height: 360 }}>
-                                <CycleCalendar
-                                    meses={meses}
-                                    aoPressionarDia={carregando ? undefined : onRemoverDia}
-                                />
-                            </View>
-                            <View style={estilos.acoes}>
-                                <Acao texto="Cancelar" aoPressionar={fechar} desativada={!fechar} />
-                            </View>
-                        </>
-                    ) : (
-                        <ScrollView showsVerticalScrollIndicator={false}>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
-                                Excluir ciclo
-                            </Text>
-                            <>
-                                <Text style={estilos.texto}>
-                                    O período {obterPeriodo(ciclo)} será excluído.
-                                </Text>
-                                <Text style={estilos.aviso}>
-                                    Esta ação não pode ser desfeita. Suas previsões serão
-                                    recalculadas.
-                                </Text>
-                                {erro ? (
+                            <View style={estilos.calendario}>
+                                {erroMeses ? (
                                     <Text accessibilityRole="alert" style={estilos.erro}>
-                                        {erro}
+                                        {erroMeses}
                                     </Text>
-                                ) : null}
-                                {erroAtualizacao ? (
-                                    <Text accessibilityRole="alert" style={estilos.erro}>
-                                        {erroAtualizacao}
-                                    </Text>
-                                ) : null}
-                                {sucesso ? (
-                                    <Text accessibilityRole="status" style={estilos.sucesso}>
-                                        {sucesso}
-                                    </Text>
-                                ) : null}
-                            </>
-                            <View style={estilos.acoes}>
-                                <Acao
-                                    texto="Excluir"
-                                    primaria
-                                    carregando={carregando}
-                                    desativada={!ciclo || typeof onExcluirCiclo !== 'function'}
-                                    aoPressionar={() => onExcluirCiclo?.(ciclo)}
-                                />
-                                <Acao texto="Cancelar" aoPressionar={fechar} desativada={!fechar} />
+                                ) : (
+                                    <CycleCalendar
+                                        meses={meses}
+                                        carregando={carregandoMeses}
+                                        aoPressionarDia={
+                                            carregando || carregandoMeses ? undefined : onRemoverDia
+                                        }
+                                    />
+                                )}
                             </View>
-                        </ScrollView>
-                    )}
-                </View>
-            </View>
-        </Modal>
+                            <View style={estilos.aviso}>
+                                <Text style={estilos.avisoTexto}>
+                                    ⓘ A remoção é imediata e altera somente o dia escolhido.
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={estilos.rodape}>
+                            <Botao
+                                texto="Concluir"
+                                primaria={diasAlterados}
+                                desativado={carregando || carregandoMeses}
+                                onPress={onConcluir}
+                            />
+                            <Botao
+                                texto="Excluir ciclo inteiro"
+                                primaria={!diasAlterados}
+                                desativado={carregando || carregandoMeses || !ciclo}
+                                onPress={onSolicitarExcluirCiclo}
+                            />
+                        </View>
+                    </BottomSheetLayout>
+                </BottomSheet>
+            ) : null}
+            {modalAlerta}
+        </>
     );
 }
 
