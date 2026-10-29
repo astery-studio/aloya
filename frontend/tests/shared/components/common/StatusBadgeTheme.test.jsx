@@ -70,3 +70,16 @@ test('diferencia métricas de menstruação e ciclo no tema escuro', async () =>
 
     expect(screen.getByText('29 dias')).toHaveStyle({ color: '#9FD6B6' });
 });
+
+test('mantém o aviso de estimativa legível no tema escuro', async () => {
+    await renderWithTheme(<StatusBadge estado="estimativaIncerta" />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByText('Estimativa incerta')).toHaveStyle({
+        color: '#F2B45F'
+    });
+    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toHaveStyle({
+        color: '#F2B45F'
+    });
+});
