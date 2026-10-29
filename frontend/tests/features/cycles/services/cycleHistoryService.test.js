@@ -1,5 +1,9 @@
 //Testa paginação, resumo, formatação e validação defensiva do histórico.
-import {criarCycleHistoryService, normalizarCicloHistorico} from '../../../../src/features/cycles/services/cycleHistoryService'
+import {
+    criarCycleHistoryService,
+    normalizarCicloEdicao,
+    normalizarCicloHistorico
+} from '../../../../src/features/cycles/services/cycleHistoryService'
 
 const cicloApi = Object.freeze({
     id: 3,
@@ -154,6 +158,13 @@ test('rejeita datas inexistentes na resposta da API', () => {
     })).toThrow('Não foi possível interpretar o histórico de ciclos.')
 })
 
+test.each([123, 'data inválida'])('rejeita formato de data inválido: %p', dataInicio => {
+    expect(() => normalizarCicloHistorico({
+        ...cicloApi,
+        dataInicio
+    })).toThrow('Não foi possível interpretar o histórico de ciclos.')
+})
+
 test.each([
     {
         resumo: undefined
@@ -199,6 +210,16 @@ test('rejeita resposta malformada sem quebrar a tela silenciosamente', async () 
     await expect(service.listarPagina()).rejects.toMatchObject({
         codigo: 'RESPOSTA_HISTORICO_INVALIDA',
         mensagemUsuario: 'Não foi possível interpretar o histórico de ciclos.'
+    })
+})
+
+test('rejeita paginação e quantidades incoerentes', async () => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi({
+        quantidadeCiclos: 0
+    }))
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+    await expect(service.listarPagina()).rejects.toMatchObject({
+        codigo: 'RESPOSTA_HISTORICO_INVALIDA'
     })
 })
 
