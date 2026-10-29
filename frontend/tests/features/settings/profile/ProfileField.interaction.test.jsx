@@ -1,43 +1,68 @@
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     NotePencilIcon: jest.fn(() => null)
-}))
+}));
 
-import {ProfileField} from '../../../../src/features/settings/profile/ProfileField'
-import {estilos} from '../../../../src/features/settings/profile/ProfileField.style'
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
+import { ProfileField } from '../../../../src/features/settings/profile/ProfileField';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
+
+async function renderizarCampo(propriedades = {}) {
+    return render(
+        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+            <ProfileField label="Nome" valor="Julia" onPress={jest.fn()} {...propriedades} />
+        </ThemeProvider>
+    );
+}
 
 describe('ProfileField - interação visual', () => {
-    test('aplica o estilo pressionado durante o toque', () => {
-        const componente = ProfileField({
-            label: 'Nome',
-            valor: 'Julia',
-            onPress: jest.fn()
-        })
+    test('aplica estilo pressionado durante o toque', async () => {
+        await renderizarCampo();
 
-        const calcularEstilo = componente.props.style
-        const estiloPressionado = calcularEstilo({
-            pressed: true
-        })
-        const estiloNormal = calcularEstilo({
-            pressed: false
-        })
+        const campo = screen.getByRole('button', {
+            name: 'Editar Nome'
+        });
 
-        expect(estiloPressionado).toContain(estilos.pressionado)
-        expect(estiloNormal).not.toContain(estilos.pressionado)
-    })
+        expect(campo).not.toHaveStyle({
+            opacity: 0.72
+        });
 
-    test('não aplica o estilo pressionado quando está desabilitado', () => {
-        const componente = ProfileField({
-            label: 'Nome',
-            valor: 'Julia',
-            onPress: jest.fn(),
+        await fireEvent(campo, 'pressIn');
+
+        expect(campo).toHaveStyle({
+            opacity: 0.72
+        });
+
+        await fireEvent(campo, 'pressOut');
+
+        expect(campo).not.toHaveStyle({
+            opacity: 0.72
+        });
+    });
+
+    test('não aplica pressionado quando desabilitado', async () => {
+        await renderizarCampo({
             desabilitado: true
-        })
+        });
 
-        const estiloPressionado = componente.props.style({
-            pressed: true
-        })
+        const campo = screen.getByRole('button', {
+            name: 'Editar Nome'
+        });
 
-        expect(estiloPressionado).not.toContain(estilos.pressionado)
-        expect(estiloPressionado).toContain(estilos.desabilitado)
-    })
-})
+        expect(campo).toBeDisabled();
+
+        expect(campo).toHaveStyle({
+            opacity: 0.5
+        });
+
+        await fireEvent(campo, 'pressIn');
+
+        expect(campo).toHaveStyle({
+            opacity: 0.5
+        });
+
+        expect(campo).not.toHaveStyle({
+            opacity: 0.72
+        });
+    });
+});
