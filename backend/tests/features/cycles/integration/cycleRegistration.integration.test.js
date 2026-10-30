@@ -138,3 +138,73 @@ test('compartilhamento revalida permissões, não notifica sem autorização e n
         (await module.sharingService.buscar({ contatoId: 2, titularId: '1' })).ciclos.length,
         1
     );
+    await assert.rejects(() => module.sharingService.buscar({ contatoId: 3, titularId: '1' }), {
+        status: 404
+    });
+    await prisma.vinculoRedeApoio.update({
+        where: { id: vinculo.id },
+        data: { status: 'revogado' }
+    });
+    await assert.rejects(() => module.sharingService.buscar({ contatoId: 2, titularId: '1' }), {
+        status: 404
+    });
+    await registrar({ data: '2026-10-02' });
+    assert.equal(await prisma.notificacao.count(), 1);
+});
+
+test('marcações retroativas preservam a cronologia e não unem ciclos separados', async (t) => {
+    const { registrar, prisma } = await cenario(t);
+    await registrar({ dataInicio: '2026-10-10', dataFim: '2026-10-12' });
+    const prependido = await registrar({ data: '2026-10-09' });
+    assert.equal(prependido.ciclo.dataInicio, '2026-10-09');
+    assert.equal(await prisma.registroCiclo.count(), 1);
+    await registrar({ data: '2026-10-16' });
+    await assert.rejects(() => registrar({ dataInicio: '2026-10-13', dataFim: '2026-10-15' }), {
+        status: 409
+    });
+    await assert.rejects(() => registrar({ data: '2026-11-01' }), { status: 422 });
+    assert.equal(await prisma.registroCiclo.count(), 2);
+});
+
+test('rotas autenticadas entregam o resultado síncrono e permitem repetir uma sincronização HTTP', async (t) => {
+    const { module, prisma } = await cenario(t);
+    const app = express();
+    app.use(express.json());
+    app.use(
+        '/api/cycles',
+        criarCycleRegistrationRoutes({
+            Router: express.Router,
+            controller: module.controller,
+            authMiddleware: {
+                autenticar(req, res, next) {
+                    if (req.get('Authorization') !== 'Bearer teste') return res.sendStatus(401);
+                    req.usuario = { id: 1 };
+                    next();
+                }
+            }
+        })
+    );
+    app.use(tratarErros);
+    const server = app.listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    t.after(() => new Promise((resolve) => server.close(resolve)));
+    const url = `http://127.0.0.1:${server.address().port}/api/cycles`;
+    assert.equal((await fetch(`${url}/registrations`, { method: 'POST' })).status, 401);
+    const opcoes = {
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer teste',
+            'Content-Type': 'application/json',
+            'Idempotency-Key': 'http-operacao-1'
+        },
+        body: JSON.stringify({ dataInicio: '2026-10-01', dataFim: '2026-10-05' })
+    };
+    const inicio = performance.now();
+    const resposta = await fetch(`${url}/registrations`, opcoes);
+    const corpo = await resposta.json();
+    t.diagnostic(
+        `Registro, persistência e recálculo HTTP: ${Math.round(performance.now() - inicio)}ms (medição local, sem garantia de rede/dispositivo).`
+    );
+    assert.equal(resposta.status, 201);
+    assert.equal(resposta.headers.get('cache-control'), 'private, no-store');
+    assert.ok(corpo.previsao.proximoInicioEstimado);
