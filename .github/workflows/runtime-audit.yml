@@ -3,12 +3,6 @@ name: Runtime Audit
 on:
   pull_request:
     branches: [main, develop]
-    paths:
-      - backend/package.json
-      - backend/package-lock.json
-      - frontend/package.json
-      - frontend/package-lock.json
-      - .github/workflows/runtime-audit.yml
   push:
     branches: [main, develop]
     paths:

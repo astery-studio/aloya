@@ -35,6 +35,7 @@ import {ShieldCheckIcon} from 'phosphor-react-native/src/icons/ShieldCheck'
 import {SparkleIcon} from 'phosphor-react-native/src/icons/Sparkle'
 import {SunIcon} from 'phosphor-react-native/src/icons/Sun'
 import {TrashIcon} from 'phosphor-react-native/src/icons/Trash'
+import {UserCheckIcon} from 'phosphor-react-native/src/icons/UserCheck'
 import {UserIcon} from 'phosphor-react-native/src/icons/User'
 import {UsersIcon} from 'phosphor-react-native/src/icons/Users'
 import {WarningCircleIcon} from 'phosphor-react-native/src/icons/WarningCircle'
@@ -78,6 +79,7 @@ export {
     SparkleIcon,
     SunIcon,
     TrashIcon,
+    UserCheckIcon,
     UserIcon,
     UsersIcon,
     WarningCircleIcon,

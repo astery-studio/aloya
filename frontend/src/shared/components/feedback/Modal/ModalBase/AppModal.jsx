@@ -1,7 +1,7 @@
 /**
  * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
  */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
     AccessibilityInfo, findNodeHandle, KeyboardAvoidingView, Modal,
     Platform, ScrollView, Text, View
@@ -12,9 +12,17 @@ import { estilos } from './AppModal.styles';
 
 export default function AppModal({
     variante = 'simples', visivel, aoFechar, icone: Icone,
-    corIcone, fundoIcone, titulo, mensagem, destaque, children
+    corIcone, fundoIcone, titulo, mensagem, destaque, aoOcultar, children
 }) {
     const referenciaTitulo = useRef(null);
+    const visivelAnterior = useRef(visivel);
+
+    useEffect(() => {
+        if (Platform.OS !== 'ios' && visivelAnterior.current && !visivel) {
+            aoOcultar?.();
+        }
+        visivelAnterior.current = visivel;
+    }, [aoOcultar, visivel]);
 
     if (!['simples', 'alerta', 'acao'].includes(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
@@ -38,6 +46,7 @@ export default function AppModal({
             visible={visivel}
             transparent
             animationType="fade"
+            onDismiss={aoOcultar}
             onRequestClose={aoFechar}
             onShow={focarTitulo}
         >

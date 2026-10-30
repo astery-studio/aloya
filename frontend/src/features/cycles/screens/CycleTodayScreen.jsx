@@ -26,37 +26,61 @@ const DIAS_POR_PAGINA = 14;
 const FAIXA_INICIAL = Object.freeze({ deslocamentoInicial: -3, quantidade: 16 });
 
 function CycleTodayScreen({
-    ciclo, previsao, conteudoDaFase, janelaFertil, carregando = false,
-    erro = false, erroPrevisao = false, erroSincronizacao = false,
-    dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar,
-    aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional,
-    aoAbrirCalendario, aoSelecionarAba
+    ciclo,
+    previsao,
+    conteudoDaFase,
+    janelaFertil,
+    carregando = false,
+    erro = false,
+    erroPrevisao = false,
+    erroSincronizacao = false,
+    dataSelecionada,
+    aoSelecionarData,
+    aoTentarNovamente,
+    aoVoltar,
+    aoCadastrarMenstruacao,
+    aoAbrirDiario,
+    aoAbrirAnticoncepcional,
+    aoAbrirCalendario,
+    aoSelecionarAba
 }) {
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const referencia = dataSelecionada || previsao?.dataReferencia || ciclo?.dataReferencia;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
-    const fase = referencia ? obterFase(referencia, fases, previsao?.duracaoCicloEstimada) : 'desconhecida';
+    const fase = referencia
+        ? obterFase(referencia, fases, previsao?.duracaoCicloEstimada)
+        : 'desconhecida';
     const dataBaseDaFaixa = previsao?.dataReferencia || referencia;
-    const faixaAtual = faixaDias.dataBase === dataBaseDaFaixa
-        ? faixaDias
-        : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-    const dias = dataBaseDaFaixa
-        ? criarDiasDaFaixa(dataBaseDaFaixa, fases, faixaAtual.deslocamentoInicial, faixaAtual.quantidade, previsao?.duracaoCicloEstimada)
-        : [];
-    const carregarDias = (direcao) => setFaixaDias((atual) => {
-        const base = atual.dataBase === dataBaseDaFaixa
-            ? atual
+    const faixaAtual =
+        faixaDias.dataBase === dataBaseDaFaixa
+            ? faixaDias
             : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-        return {
-            ...base,
-            deslocamentoInicial: direcao === 'anteriores'
-                ? base.deslocamentoInicial - DIAS_POR_PAGINA
-                : base.deslocamentoInicial,
-            quantidade: base.quantidade + DIAS_POR_PAGINA
-        };
-    });
+    const dias = dataBaseDaFaixa
+        ? criarDiasDaFaixa(
+              dataBaseDaFaixa,
+              fases,
+              faixaAtual.deslocamentoInicial,
+              faixaAtual.quantidade,
+              previsao?.duracaoCicloEstimada
+          )
+        : [];
+    const carregarDias = (direcao) =>
+        setFaixaDias((atual) => {
+            const base =
+                atual.dataBase === dataBaseDaFaixa
+                    ? atual
+                    : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
+            return {
+                ...base,
+                deslocamentoInicial:
+                    direcao === 'anteriores'
+                        ? base.deslocamentoInicial - DIAS_POR_PAGINA
+                        : base.deslocamentoInicial,
+                quantidade: base.quantidade + DIAS_POR_PAGINA
+            };
+        });
     const semDados = !previsao || previsao.status === 'DADOS_INSUFICIENTES';
-    const tipoErro = erroSincronizacao ? 'sincronizacao' : (erroPrevisao || erro ? 'previsao' : null);
+    const tipoErro = erroSincronizacao ? 'sincronizacao' : erroPrevisao || erro ? 'previsao' : null;
     const configuracaoErro = CONFIGURACOES_ERRO[tipoErro] || CONFIGURACOES_ERRO.previsao;
 
     return (
@@ -64,25 +88,37 @@ function CycleTodayScreen({
             {!carregando ? (
                 <View style={estilos.cabecalho}>
                     <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                    <IconButton
-                        icone={CalendarBlankIcon}
-                        aoPressionar={aoAbrirCalendario}
-                        rotuloAcessibilidade="Abrir calendário"
-                        variante="calendario"
-                    />
+                    <View style={estilos.acoesCabecalho}>
+                        <IconButton
+                            icone={CalendarBlankIcon}
+                            aoPressionar={aoAbrirCalendario}
+                            rotuloAcessibilidade="Abrir calendário"
+                            variante="calendario"
+                        />
+                    </View>
                 </View>
             ) : null}
             {carregando ? (
-                <View accessibilityLiveRegion="polite" style={estilos.carregando}><ActivityIndicator size="large" color={cores.marca.secundaria} /><Text style={estilos.textoCarregando}>Carregando sua previsão...</Text></View>
+                <View accessibilityLiveRegion="polite" style={estilos.carregando}>
+                    <ActivityIndicator size="large" color={cores.marca.secundaria} />
+                    <Text style={estilos.textoCarregando}>Carregando sua previsão...</Text>
+                </View>
             ) : (
-                <ScrollView testID="conteudo-rolavel" style={estilos.areaRolagem} contentContainerStyle={estilos.rolagem} showsVerticalScrollIndicator={false}>
-                    {dias.length ? <CycleDateStrip
-                        dias={dias}
-                        dataSelecionada={referencia}
-                        aoSelecionarData={aoSelecionarData}
-                        aoCarregarAnteriores={() => carregarDias('anteriores')}
-                        aoCarregarPosteriores={() => carregarDias('posteriores')}
-                    /> : null}
+                <ScrollView
+                    testID="conteudo-rolavel"
+                    style={estilos.areaRolagem}
+                    contentContainerStyle={estilos.rolagem}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {dias.length ? (
+                        <CycleDateStrip
+                            dias={dias}
+                            dataSelecionada={referencia}
+                            aoSelecionarData={aoSelecionarData}
+                            aoCarregarAnteriores={() => carregarDias('anteriores')}
+                            aoCarregarPosteriores={() => carregarDias('posteriores')}
+                        />
+                    ) : null}
                     <CycleForecastPanel
                         fase={fase}
                         diaCiclo={obterDiaCiclo(referencia, fases)}
@@ -106,7 +142,11 @@ function CycleTodayScreen({
                 fundoIcone={cores.neutras.fundoClaro}
                 titulo={configuracaoErro.titulo}
                 mensagem={configuracaoErro.mensagem}
-                acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: aoTentarNovamente }}
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: aoTentarNovamente
+                }}
                 acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: aoVoltar }}
             />
         </SafeAreaView>

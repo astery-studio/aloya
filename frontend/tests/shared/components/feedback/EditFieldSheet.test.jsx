@@ -404,4 +404,32 @@ describe('EditFieldSheet', () => {
             true
         )
     })
+
+    test('aceita edição numérica pelo mesmo campo do sheet', async () => {
+        const onAlterar = jest.fn()
+
+        await render(
+            <EditFieldSheet
+                visivel
+                titulo="Editar duração"
+                tipo="numero"
+                valor={28}
+                sufixo="dias"
+                onAlterar={onAlterar}
+                rotuloAcessibilidade="Duração do ciclo"
+            />
+        )
+
+        const campo = screen.getByLabelText('Duração do ciclo')
+        expect(campo).toHaveProp('keyboardType', 'number-pad')
+        expect(campo).toHaveProp('value', '28')
+        expect(campo).toHaveProp('maxLength', 2)
+        expect(screen.getByText('dias')).toBeOnTheScreen()
+
+        await fireEvent.changeText(campo, '30')
+        expect(onAlterar).toHaveBeenCalledWith(30)
+
+        await fireEvent.changeText(campo, '')
+        expect(onAlterar).toHaveBeenLastCalledWith(null)
+    })
 })

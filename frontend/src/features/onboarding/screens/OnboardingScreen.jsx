@@ -301,15 +301,10 @@ export default function OnboardingScreen({
         aoPular={() => { alterarCampo('duracaoCiclo', null); avancar(); }} />;
     if (etapa === 4) conteudo = <MenstruationLengthStep {...comum} valor={dados.duracaoMenstruacao}
         aoAlterar={(duracaoMenstruacao) => alterarCampo('duracaoMenstruacao', duracaoMenstruacao)}
-        erro={errosCampos.duracaoMenstruacao} aoAvancar={avancar}
-        aoPular={() => { alterarCampo('duracaoMenstruacao', null); avancar(); }} />;
+        erro={errosCampos.duracaoMenstruacao} aoAvancar={avancar} />;
     if (etapa === 5) conteudo = <LutealPhaseLengthStep {...comum} valor={dados.duracaoLutea}
         aoAlterar={(duracaoLutea) => alterarCampo('duracaoLutea', duracaoLutea)}
-        erro={errosCampos.duracaoLutea} aoAvancar={() => finalizar()}
-        aoPular={() => {
-            alterarCampo('duracaoLutea', null);
-            finalizar({ duracaoLutea: null });
-        }} />;
+        erro={errosCampos.duracaoLutea} aoAvancar={() => finalizar()} />;
     if (etapa === 6) conteudo = <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />;
 
     const irParaLogin = () => {

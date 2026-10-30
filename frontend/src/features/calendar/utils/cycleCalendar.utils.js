@@ -100,6 +100,9 @@ function prepararPrevisao(previsao) {
 
     return periodos.filter(periodo => periodo && typeof periodo === 'object').map(periodo => ({
         previsto: periodo.previsto === true,
+        registroCicloId: Number.isSafeInteger(periodo.registroCicloId) && periodo.registroCicloId > 0
+            ? periodo.registroCicloId
+            : null,
         menstruacaoPrevista: validarIntervalo(periodo.menstruacaoPrevista),
         faseMenstrual: validarIntervalo(periodo.faseMenstrual),
         faseFolicular: validarIntervalo(periodo.faseFolicular),
@@ -122,6 +125,27 @@ function criarRegistrosPorData(diasMenstruacao) {
     }
 
     return registros
+}
+
+function obterRegistroEditavel(data, previsao, registrosPorData) {
+    const registroConfirmadoId = registrosPorData.get(data) ?? null
+    if (registroConfirmadoId) return registroConfirmadoId
+
+    const periodoMenstrual = previsao.find(periodo => (
+        !periodo.previsto && intervaloContem(periodo.faseMenstrual, data)
+    ))
+
+    if (!periodoMenstrual) return null
+    if (periodoMenstrual.registroCicloId) return periodoMenstrual.registroCicloId
+
+    const idsDoIntervalo = new Set()
+    for (const [dataRegistrada, registroCicloId] of registrosPorData) {
+        if (intervaloContem(periodoMenstrual.faseMenstrual, dataRegistrada)) {
+            idsDoIntervalo.add(registroCicloId)
+        }
+    }
+
+    return idsDoIntervalo.size === 1 ? [...idsDoIntervalo][0] : null
 }
 
 function obterMarcacao(data, previsao, registroCicloId) {
@@ -180,10 +204,19 @@ function obterMarcacao(data, previsao, registroCicloId) {
 function criarDia(casa, contexto) {
     if (!casa) return null
 
-    const registroCicloId = contexto.registrosPorData.get(casa.data) ?? null
-    const marcacao = obterMarcacao(casa.data, contexto.previsao, registroCicloId)
+    const registroConfirmadoId = contexto.registrosPorData.get(casa.data) ?? null
+    const registroCicloId = registroConfirmadoId ?? (
+        casa.data <= contexto.hoje
+            ? obterRegistroEditavel(
+                casa.data,
+                contexto.previsao,
+                contexto.registrosPorData
+            )
+            : null
+    )
+    const marcacao = obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId)
     const futuro = casa.data > contexto.hoje
-    const previsto = Boolean(!registroCicloId && marcacao.tipo && (marcacao.previsto || futuro))
+    const previsto = Boolean(!registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro))
     const periodoFertil = contexto.previsao.find(periodo => intervaloContem(periodo.janelaFertil, casa.data))
     const janelaFertil = Boolean(periodoFertil)
 
@@ -193,6 +226,7 @@ function criarDia(casa, contexto) {
         previsto,
         futuro,
         registroCicloId,
+        menstruacaoRegistrada: Boolean(registroConfirmadoId),
         janelaFertil,
         janelaFertilPrevista: janelaFertil && (periodoFertil.previsto || futuro)
     }

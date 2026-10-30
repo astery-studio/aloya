@@ -10,12 +10,12 @@ function validarDependencias(prisma) {
     }
 }
 
-function criarCalendarRepository({prisma} = {}) {
+function criarCalendarRepository({ prisma } = {}) {
     validarDependencias(prisma);
 
     function buscarUsuarioComCiclos(usuarioId, fimReferenciaExclusivo) {
         return prisma.usuario.findUnique({
-            where: {id: usuarioId},
+            where: { id: usuarioId },
             select: {
                 duracaoCicloInformada: true,
                 duracaoMenstruacaoInformada: true,
@@ -27,34 +27,29 @@ function criarCalendarRepository({prisma} = {}) {
                 },
                 registrosCiclo: {
                     where: {
-                        dataInicio: {lt: fimReferenciaExclusivo}
+                        dataInicio: { lt: fimReferenciaExclusivo }
                     },
-                    orderBy: [
-                        {dataInicio: 'desc'},
-                        {id: 'desc'}
-                    ],
+                    orderBy: [{ dataInicio: 'desc' }, { id: 'desc' }],
                     take: CONFIG_PREVISAO.maximoIntervalos + 1,
                     select: {
                         id: true,
                         dataInicio: true,
-                        dataFim: true
+                        dataFim: true,
+                        duracaoMenstruacao: true
                     }
                 }
             }
         });
     }
 
-    async function buscarDadosDoMes({usuarioId, inicioMes, fimMesExclusivo}) {
+    async function buscarDadosDoMes({ usuarioId, inicioMes, fimMesExclusivo }) {
         const intervaloData = {
             gte: inicioMes,
             lt: fimMesExclusivo
         };
 
-        const [usuario, registrosDoMes] = await Promise.all([
-            buscarUsuarioComCiclos(
-                usuarioId,
-                fimMesExclusivo
-            ),
+        const [usuario, registrosDoMes, proximosCiclos] = await Promise.all([
+            buscarUsuarioComCiclos(usuarioId, fimMesExclusivo),
             prisma.registroCiclo.findMany({
                 where: {
                     usuarioId,
@@ -81,27 +76,38 @@ function criarCalendarRepository({prisma} = {}) {
                         }
                     }
                 }
+            }),
+            prisma.registroCiclo.findMany({
+                where: {
+                    usuarioId,
+                    dataInicio: { gte: fimMesExclusivo }
+                },
+                orderBy: [{ dataInicio: 'asc' }, { id: 'asc' }],
+                take: 1,
+                select: {
+                    id: true,
+                    dataInicio: true,
+                    dataFim: true
+                }
             })
         ]);
 
-        const diasMenstruacao = registrosDoMes.flatMap((registro) => (
-            registro.diasMenstruacao.map(({data}) => ({
+        const diasMenstruacao = registrosDoMes.flatMap((registro) =>
+            registro.diasMenstruacao.map(({ data }) => ({
                 data,
                 registroCicloId: registro.id
             }))
-        ));
+        );
 
         return {
             usuario,
-            diasMenstruacao
+            diasMenstruacao,
+            proximoCicloReal: proximosCiclos[0] ?? null
         };
     }
 
-    async function buscarDadosAtuais({usuarioId, fimReferenciaExclusivo}) {
-        return buscarUsuarioComCiclos(
-            usuarioId,
-            fimReferenciaExclusivo
-        );
+    async function buscarDadosAtuais({ usuarioId, fimReferenciaExclusivo }) {
+        return buscarUsuarioComCiclos(usuarioId, fimReferenciaExclusivo);
     }
 
     return {

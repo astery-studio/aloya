@@ -1,38 +1,66 @@
-//Mostra a área de membros da Rede de Apoio e permite iniciar a criação de categorias.
-import {ScrollView, Text, View} from 'react-native'
+//Mostra a área da Rede de Apoio e permite acessar as categorias de permissão.
+import {
+    ScrollView,
+    Text,
+    View
+} from 'react-native'
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
-import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
+import {
+    MainLayout
+} from '../../../shared/layouts/MainLayout/MainLayout'
 import {estilos} from './MembersScreen.styles'
 
-function MembersScreen({onCriarCategoria, onSelecionarAba}) {
+function MembersScreen({
+    onAbrirCategorias,
+    onSelecionarAba
+}) {
     return (
         <MainLayout
             titulo="Membros"
             abaAtiva="membros"
-            onSelecionarAba={onSelecionarAba}
+            onSelecionarAba={
+                onSelecionarAba
+            }
         >
             <ScrollView
                 testID="rolagem-members-screen"
-                contentContainerStyle={estilos.conteudo}
-                showsVerticalScrollIndicator={false}
+                contentContainerStyle={
+                    estilos.conteudo
+                }
+                showsVerticalScrollIndicator={
+                    false
+                }
             >
-                <View style={estilos.apresentacao}>
-                    <Text style={estilos.titulo}>
+                <View
+                    style={
+                        estilos.apresentacao
+                    }
+                >
+                    <Text
+                        style={
+                            estilos.titulo
+                        }
+                    >
                         Categorias de membros
                     </Text>
 
-                    <Text style={estilos.descricao}>
-                        Crie categorias para definir quais informações cada
-                        membro da sua Rede de Apoio poderá visualizar.
+                    <Text
+                        style={
+                            estilos.descricao
+                        }
+                    >
+                        Crie categorias para definir quais informações cada membro da sua Rede de Apoio poderá visualizar.
                     </Text>
                 </View>
 
                 <ButtonScreen
-                    texto="Criar nova categoria"
-                    aoPressionar={onCriarCategoria}
+                    texto="Categorias de Permissão"
+                    aoPressionar={
+                        onAbrirCategorias
+                    }
                     variante="laranja"
-                    rotuloAcessibilidade="Criar nova categoria de membros"
+                    rotuloAcessibilidade="Abrir categorias de permissão"
                 />
             </ScrollView>
         </MainLayout>

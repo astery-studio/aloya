@@ -16,10 +16,7 @@ function criarRepository(resultado) {
     };
 }
 
-function criarUsuario({
-    quantidadeCiclos = 0,
-    registrosCiclo = []
-} = {}) {
+function criarUsuario({ quantidadeCiclos = 0, registrosCiclo = [] } = {}) {
     return {
         duracaoCicloInformada: null,
         duracaoMenstruacaoInformada: null,
@@ -32,27 +29,25 @@ function criarUsuario({
 }
 
 test('rejeita configuração sem repositório válido', () => {
-    for (const repository of [undefined, null, {}, {buscarDadosDoMes: true}]) {
-        assert.throws(
-            () => criarCalendarService({repository}),
-            {
-                name: 'TypeError',
-                message: 'Não foi possível configurar o serviço do calendário.'
-            }
-        );
+    for (const repository of [undefined, null, {}, { buscarDadosDoMes: true }]) {
+        assert.throws(() => criarCalendarService({ repository }), {
+            name: 'TypeError',
+            message: 'Não foi possível configurar o serviço do calendário.'
+        });
     }
 });
 
 test('rejeita sessão inválida antes de consultar o repositório', async () => {
     const repository = criarRepository();
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     for (const usuarioId of [undefined, null, 0, -1, 1.5, '1']) {
         await assert.rejects(
-            () => service.buscarMes({
-                usuarioId,
-                mes: '2026-10'
-            }),
+            () =>
+                service.buscarMes({
+                    usuarioId,
+                    mes: '2026-10'
+                }),
             {
                 status: 401,
                 codigo: 'SESSAO_INVALIDA'
@@ -65,13 +60,14 @@ test('rejeita sessão inválida antes de consultar o repositório', async () => 
 
 test('rejeita mês inválido antes de consultar o repositório', async () => {
     const repository = criarRepository();
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     await assert.rejects(
-        () => service.buscarMes({
-            usuarioId: 7,
-            mes: '2026-13'
-        }),
+        () =>
+            service.buscarMes({
+                usuarioId: 7,
+                mes: '2026-13'
+            }),
         {
             status: 422,
             codigo: 'MES_CALENDARIO_INVALIDO'
@@ -86,7 +82,7 @@ test('consulta o mês usando limites UTC exclusivos', async () => {
         usuario: criarUsuario(),
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     await service.buscarMes({
         usuarioId: 7,
@@ -95,14 +91,8 @@ test('consulta o mês usando limites UTC exclusivos', async () => {
 
     assert.equal(repository.chamadas.length, 1);
     assert.equal(repository.chamadas[0].usuarioId, 7);
-    assert.equal(
-        repository.chamadas[0].inicioMes.toISOString(),
-        '2026-10-01T00:00:00.000Z'
-    );
-    assert.equal(
-        repository.chamadas[0].fimMesExclusivo.toISOString(),
-        '2026-11-01T00:00:00.000Z'
-    );
+    assert.equal(repository.chamadas[0].inicioMes.toISOString(), '2026-10-01T00:00:00.000Z');
+    assert.equal(repository.chamadas[0].fimMesExclusivo.toISOString(), '2026-11-01T00:00:00.000Z');
 });
 
 test('não revela se a identidade autenticada não possui conta', async () => {
@@ -110,13 +100,14 @@ test('não revela se a identidade autenticada não possui conta', async () => {
         usuario: null,
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     await assert.rejects(
-        () => service.buscarMes({
-            usuarioId: 999,
-            mes: '2026-10'
-        }),
+        () =>
+            service.buscarMes({
+                usuarioId: 999,
+                mes: '2026-10'
+            }),
         {
             status: 404,
             codigo: 'USUARIO_NAO_ENCONTRADO'
@@ -129,7 +120,7 @@ test('retorna estado vazio somente quando a conta não possui ciclos', async () 
         usuario: criarUsuario(),
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     const resultado = await service.buscarMes({
         usuarioId: 4,
@@ -151,7 +142,7 @@ test('não mostra estado vazio quando existem ciclos fora do mês solicitado', a
         }),
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     const resultado = await service.buscarMes({
         usuarioId: 4,
@@ -193,7 +184,7 @@ test('normaliza dias menstruais e mantém o ciclo disponível para edição', as
             }
         ]
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     const resultado = await service.buscarMes({
         usuarioId: 4,
@@ -210,6 +201,37 @@ test('normaliza dias menstruais e mantém o ciclo disponível para edição', as
             registroCicloId: 18
         }
     ]);
+});
+
+test('vincula a fase menstrual estimada sem fim ao ciclo que pode ser editado', async () => {
+    const repository = criarRepository({
+        usuario: criarUsuario({
+            quantidadeCiclos: 1,
+            registrosCiclo: [
+                {
+                    id: 18,
+                    dataInicio: new Date('2026-09-29T00:00:00.000Z'),
+                    dataFim: null
+                }
+            ]
+        }),
+        diasMenstruacao: []
+    });
+    const service = criarCalendarService({repository});
+
+    const resultado = await service.buscarMes({
+        usuarioId: 4,
+        mes: '2026-10'
+    });
+    const periodoBase = resultado.previsao.periodos.find(({previsto}) => !previsto);
+    const periodosPrevistos = resultado.previsao.periodos.filter(({previsto}) => previsto);
+
+    assert.deepEqual(periodoBase.faseMenstrual, {
+        inicio: '2026-10-01',
+        fim: '2026-10-03'
+    });
+    assert.equal(periodoBase.registroCicloId, 18);
+    assert.ok(periodosPrevistos.every(periodo => !('registroCicloId' in periodo)));
 });
 
 test('recorta as fases e previsões para o mês solicitado', async () => {
@@ -231,22 +253,19 @@ test('recorta as fases e previsões para o mês solicitado', async () => {
         }),
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     const resultado = await service.buscarMes({
         usuarioId: 4,
         mes: '2026-10'
     });
 
-    const {periodos, ...previsaoPrincipal} = resultado.previsao;
+    const { periodos, ...previsaoPrincipal } = resultado.previsao;
     assert.equal(periodos.length, 2);
     assert.deepEqual(previsaoPrincipal, {
         status: 'PREVISAO_ULTRAPASSADA',
         nivelConfianca: 'BAIXA',
-        faseMenstrual: {
-            inicio: '2026-10-01',
-            fim: '2026-10-03'
-        },
+        faseMenstrual: null,
         faseFolicular: {
             inicio: '2026-10-04',
             fim: '2026-10-11'
@@ -287,44 +306,98 @@ test('projeta previsões para os meses futuros mantendo os parâmetros do algori
         }),
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
-    const novembro = await service.buscarMes({usuarioId: 4, mes: '2026-11'});
-    const dezembro = await service.buscarMes({usuarioId: 4, mes: '2026-12'});
-    const futuroDistante = await service.buscarMes({usuarioId: 4, mes: '2040-07'});
+    const novembro = await service.buscarMes({ usuarioId: 4, mes: '2026-11' });
+    const dezembro = await service.buscarMes({ usuarioId: 4, mes: '2026-12' });
+    const futuroDistante = await service.buscarMes({ usuarioId: 4, mes: '2040-07' });
 
-    const {periodos: periodosNovembro, ...previsaoNovembro} = novembro.previsao;
+    const { periodos: periodosNovembro, ...previsaoNovembro } = novembro.previsao;
     assert.equal(periodosNovembro.length, 2);
     assert.deepEqual(previsaoNovembro, {
         status: 'PREVISAO_ULTRAPASSADA',
         nivelConfianca: 'BAIXA',
         faseMenstrual: null,
-        faseFolicular: {inicio: '2026-11-01', fim: '2026-11-08'},
+        faseFolicular: { inicio: '2026-11-01', fim: '2026-11-08' },
         ovulacao: '2026-11-09',
-        faseLutea: {inicio: '2026-11-10', fim: '2026-11-23'},
-        janelaFertil: {inicio: '2026-11-04', fim: '2026-11-09'},
-        menstruacaoPrevista: {inicio: '2026-11-24', fim: '2026-11-28'},
+        faseLutea: { inicio: '2026-11-10', fim: '2026-11-23' },
+        janelaFertil: { inicio: '2026-11-04', fim: '2026-11-09' },
+        menstruacaoPrevista: { inicio: '2026-11-24', fim: '2026-11-28' },
         versaoAlgoritmo: '1.0.0'
     });
 
-    const {periodos: periodosDezembro, ...previsaoDezembro} = dezembro.previsao;
+    const { periodos: periodosDezembro, ...previsaoDezembro } = dezembro.previsao;
     assert.equal(periodosDezembro.length, 2);
     assert.deepEqual(previsaoDezembro, {
         status: 'PREVISAO_ULTRAPASSADA',
         nivelConfianca: 'BAIXA',
         faseMenstrual: null,
-        faseFolicular: {inicio: '2026-12-01', fim: '2026-12-06'},
+        faseFolicular: { inicio: '2026-12-01', fim: '2026-12-06' },
         ovulacao: '2026-12-07',
-        faseLutea: {inicio: '2026-12-08', fim: '2026-12-21'},
-        janelaFertil: {inicio: '2026-12-02', fim: '2026-12-07'},
-        menstruacaoPrevista: {inicio: '2026-12-22', fim: '2026-12-26'},
+        faseLutea: { inicio: '2026-12-08', fim: '2026-12-21' },
+        janelaFertil: { inicio: '2026-12-02', fim: '2026-12-07' },
+        menstruacaoPrevista: { inicio: '2026-12-22', fim: '2026-12-26' },
         versaoAlgoritmo: '1.0.0'
     });
 
-    assert.equal(
-        futuroDistante.previsao.menstruacaoPrevista.inicio.slice(0, 7),
-        '2040-07'
-    );
+    assert.equal(futuroDistante.previsao.menstruacaoPrevista.inicio.slice(0, 7), '2040-07');
+});
+
+test('recalcula fases históricas pelo próximo início real e descarta a previsão antiga', async () => {
+    const repository = criarRepository({
+        usuario: criarUsuario({
+            quantidadeCiclos: 3,
+            registrosCiclo: [
+                {
+                    id: 2,
+                    dataInicio: new Date('2026-07-31T00:00:00.000Z'),
+                    dataFim: new Date('2026-08-04T00:00:00.000Z')
+                },
+                {
+                    id: 1,
+                    dataInicio: new Date('2026-07-03T00:00:00.000Z'),
+                    dataFim: new Date('2026-07-07T00:00:00.000Z')
+                }
+            ]
+        }),
+        diasMenstruacao: [
+            {
+                data: new Date('2026-08-01T00:00:00.000Z'),
+                registroCicloId: 2
+            }
+        ],
+        proximoCicloReal: {
+            id: 3,
+            dataInicio: new Date('2026-09-05T00:00:00.000Z'),
+            dataFim: new Date('2026-09-09T00:00:00.000Z')
+        }
+    });
+    const service = criarCalendarService({ repository });
+
+    const resultado = await service.buscarMes({
+        usuarioId: 4,
+        mes: '2026-08'
+    });
+
+    assert.deepEqual(resultado.diasMenstruacao, [{ data: '2026-08-01', registroCicloId: 2 }]);
+    assert.equal(resultado.previsao.menstruacaoPrevista, null);
+    assert.equal(resultado.previsao.faseMenstrual, null);
+    assert.deepEqual(resultado.previsao.faseFolicular, {
+        inicio: '2026-08-05',
+        fim: '2026-08-20'
+    });
+    assert.equal(resultado.previsao.ovulacao, '2026-08-21');
+    assert.deepEqual(resultado.previsao.faseLutea, {
+        inicio: '2026-08-22',
+        fim: '2026-08-31'
+    });
+    assert.deepEqual(resultado.previsao.janelaFertil, {
+        inicio: '2026-08-16',
+        fim: '2026-08-21'
+    });
+    assert.ok(resultado.previsao.periodos.length > 0);
+    assert.ok(resultado.previsao.periodos.every((periodo) => periodo.previsto === false));
+    assert.ok(resultado.previsao.periodos.every((periodo) => periodo.menstruacaoPrevista === null));
 });
 
 test('rejeita dados internos inconsistentes em vez de mascarar a falha', async () => {
@@ -337,13 +410,14 @@ test('rejeita dados internos inconsistentes em vez de mascarar a falha', async (
         },
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     await assert.rejects(
-        () => service.buscarMes({
-            usuarioId: 4,
-            mes: '2026-10'
-        }),
+        () =>
+            service.buscarMes({
+                usuarioId: 4,
+                mes: '2026-10'
+            }),
         {
             name: 'TypeError',
             message: 'Os dados do calendário são inválidos.'

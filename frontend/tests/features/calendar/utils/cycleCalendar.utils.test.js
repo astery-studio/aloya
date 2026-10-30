@@ -74,7 +74,8 @@ describe('cycleCalendar.utils', () => {
         expect(localizarDia(mes, 3)).toMatchObject({
             tipo: TIPOS_DIA.menstruacao,
             previsto: false,
-            registroCicloId: null,
+            registroCicloId: 18,
+            menstruacaoRegistrada: false,
             inicioSegmento: false,
             fimSegmento: true
         })
@@ -82,6 +83,8 @@ describe('cycleCalendar.utils', () => {
         expect(localizarDia(mes, 4)).toMatchObject({
             tipo: TIPOS_DIA.menstruacao,
             previsto: true,
+            registroCicloId: null,
+            menstruacaoRegistrada: false,
             inicioSegmento: true,
             fimSegmento: false
         })
@@ -89,8 +92,48 @@ describe('cycleCalendar.utils', () => {
         expect(localizarDia(mes, 5)).toMatchObject({
             tipo: TIPOS_DIA.menstruacao,
             previsto: true,
+            registroCicloId: null,
+            menstruacaoRegistrada: false,
             inicioSegmento: false,
             fimSegmento: true
+        })
+    })
+
+    test('mantém editável a fase menstrual estimada que atravessa o mês', () => {
+        const mes = normalizarMes({
+            mes: '2026-10',
+            possuiCiclos: true,
+            diasMenstruacao: [],
+            previsao: {
+                periodos: [
+                    {
+                        previsto: false,
+                        registroCicloId: 18,
+                        faseMenstrual: {inicio: '2026-10-01', fim: '2026-10-03'}
+                    },
+                    {
+                        previsto: true,
+                        menstruacaoPrevista: {inicio: '2026-10-27', fim: '2026-10-31'}
+                    }
+                ]
+            }
+        }, '2026-10-03')
+
+        expect(localizarDia(mes, 1)).toMatchObject({
+            tipo: TIPOS_DIA.menstruacao,
+            registroCicloId: 18,
+            menstruacaoRegistrada: false
+        })
+        expect(localizarDia(mes, 3)).toMatchObject({
+            tipo: TIPOS_DIA.menstruacao,
+            registroCicloId: 18,
+            menstruacaoRegistrada: false
+        })
+        expect(localizarDia(mes, 27)).toMatchObject({
+            tipo: TIPOS_DIA.menstruacao,
+            previsto: true,
+            registroCicloId: null,
+            menstruacaoRegistrada: false
         })
     })
 

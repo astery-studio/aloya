@@ -11,7 +11,8 @@ export default function DurationStep({
     return (
         <OnboardingStep etapa={etapa} titulo={titulo}
             descricao="Você pode ajustar isso depois com mais calma."
-            aoVoltar={aoVoltar} aoAvancar={aoAvancar} aoPular={aoPular}
+            aoVoltar={aoVoltar} aoAvancar={aoAvancar}
+            acaoSecundaria={aoPular ? { texto: 'Não sei', aoPressionar: aoPular } : null}
             podeAvancar={Number.isInteger(valor) && valor > 0}
             carregando={carregando} erro={erro}>
             <NumberInput valor={valor} aoAlterar={aoAlterar} unidade="dias" />
