@@ -16,6 +16,7 @@ import OnboardingComplete from '../components/OnboardingComplete/OnboardingCompl
 import { salvarToken } from '../../../shared/storage/tokenStorage';
 import { isValidDate } from '../../../shared/utils/validation/isValidDate';
 import { isValidEmail } from '../../../shared/utils/validation/isValidEmail';
+import { contarBytesUtf8 } from '../../../shared/utils/validation/contarBytesUtf8';
 
 const iniciais = {
     nome: '', email: '', senha: '', confirmacao: '', aceitouTermos: false,
@@ -149,16 +150,40 @@ export default function OnboardingScreen({
             'Ocorreu um erro ao criar sua conta. Verifique sua conexão e tente novamente.' });
     }
 
+    function invalidarDuracao(campo, etapaDestino, mensagem) {
+        setEtapa(etapaDestino);
+        setErrosCampos((atuais) => ({ ...atuais, [campo]: mensagem }));
+        setErro({ titulo: 'Duração inválida', mensagem });
+        return false;
+    }
+
+    function validarDuracoes(valores, ateEtapa) {
+        const campos = [['duracaoCiclo', 3], ['duracaoMenstruacao', 4], ['duracaoLutea', 5]];
+        for (const [campo, etapaCampo] of campos) {
+            if (etapaCampo <= ateEtapa && valores[campo] !== null
+                && (!Number.isInteger(valores[campo]) || valores[campo] <= 0)) {
+                return invalidarDuracao(campo, etapaCampo, 'Informe um número inteiro positivo.');
+            }
+        }
+        const { duracaoCiclo, duracaoMenstruacao, duracaoLutea } = valores;
+        if (ateEtapa >= 4 && duracaoCiclo !== null && duracaoMenstruacao !== null
+            && duracaoMenstruacao >= duracaoCiclo) {
+            return invalidarDuracao('duracaoMenstruacao', 4,
+                'A duração da menstruação deve ser menor que a duração do ciclo.');
+        }
+        if (ateEtapa >= 5 && duracaoLutea !== null
+            && duracaoLutea > (duracaoCiclo ?? 28) - (duracaoMenstruacao ?? 5) - 2) {
+            return invalidarDuracao('duracaoLutea', 5,
+                'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.');
+        }
+        return true;
+    }
+
     async function finalizar(sobrescritas = {}) {
         if (carregando) return;
         const dadosCadastro = { ...dados, ...sobrescritas };
+        if (!validarDuracoes(dadosCadastro, 5)) return;
         const duracaoLutea = dadosCadastro.duracaoLutea;
-        if (duracaoLutea !== null && duracaoLutea > (dadosCadastro.duracaoCiclo ?? 28)
-            - (dadosCadastro.duracaoMenstruacao ?? 5) - 2) {
-            setErro({ titulo: 'Duração inválida', mensagem:
-                'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.' });
-            return;
-        }
         setCarregando(true);
         setErro(null);
         try {
@@ -188,14 +213,21 @@ export default function OnboardingScreen({
 
     function avancarMenstruacao() {
         const inicio = paraIso(dados.ultimaMenstruacao?.inicio);
+        const fim = paraIso(dados.ultimaMenstruacao?.fim);
         const hoje = paraIso(new Date());
-        if (!inicio) {
+        if (!inicio && !fim) {
             avancarSemMenstruacao();
             return;
         }
-        if (inicio > hoje) {
+        if (!inicio || !isValidDate(inicio.split('-').reverse().join('/')) || inicio > hoje) {
             setErro({ titulo: 'Data inválida', mensagem:
                 'Informe a data de início da sua última menstruação. Ela não pode ser uma data no futuro.' });
+            return;
+        }
+        if (fim && (!isValidDate(fim.split('-').reverse().join('/')) || fim < inicio || fim > hoje)) {
+            const mensagem = 'Informe uma data de término válida.';
+            setErrosCampos({ ultimaMenstruacao: mensagem });
+            setErro({ titulo: 'Data inválida', mensagem });
             return;
         }
         avancar();
@@ -211,6 +243,10 @@ export default function OnboardingScreen({
         if (dados.nome.trim().length < 3) {
             setErrosCampos({ nome: 'O nome deve ter pelo menos 3 caracteres.' });
             setErro({ titulo: 'Nome inválido', mensagem: 'O nome deve ter pelo menos 3 caracteres.' });
+        } else if (dados.nome.trim().length > 120) {
+            const mensagem = 'O nome deve ter no máximo 120 caracteres.';
+            setErrosCampos({ nome: mensagem });
+            setErro({ titulo: 'Nome inválido', mensagem });
         } else if (!/^[\p{L}]+(?:[ -][\p{L}]+)*$/u.test(dados.nome.trim())) {
             setErrosCampos({ nome: 'Use apenas letras, espaços ou hífens.' });
             setErro({ titulo: 'Nome inválido', mensagem: 'Use apenas letras, espaços ou hífens.' });
@@ -221,6 +257,10 @@ export default function OnboardingScreen({
             setErrosCampos({ senha: 'A senha deve possuir pelo menos 8 caracteres.' });
             setErro({ titulo: 'Senha inválida', mensagem:
                 'A senha deve possuir pelo menos 8 caracteres.' });
+        } else if (contarBytesUtf8(dados.senha) > 72) {
+            const mensagem = 'A senha ultrapassa o tamanho máximo permitido.';
+            setErrosCampos({ senha: mensagem });
+            setErro({ titulo: 'Senha inválida', mensagem });
         } else if (dados.senha !== dados.confirmacao) {
             setErrosCampos({ confirmacao: 'As senhas não coincidem.' });
             setErro({ titulo: 'Senhas diferentes', mensagem: 'As senhas não coincidem.' });
@@ -301,11 +341,13 @@ export default function OnboardingScreen({
         aoNaoSei={avancarSemMenstruacao} />;
     if (etapa === 3) conteudo = <CycleLengthStep {...comum} valor={dados.duracaoCiclo}
         aoAlterar={(duracaoCiclo) => alterarCampo('duracaoCiclo', duracaoCiclo)}
-        erro={errosCampos.duracaoCiclo} aoAvancar={avancar}
+        erro={errosCampos.duracaoCiclo}
+        aoAvancar={() => { if (validarDuracoes(dados, 3)) avancar(); }}
         aoPular={() => { alterarCampo('duracaoCiclo', null); avancar(); }} />;
     if (etapa === 4) conteudo = <MenstruationLengthStep {...comum} valor={dados.duracaoMenstruacao}
         aoAlterar={(duracaoMenstruacao) => alterarCampo('duracaoMenstruacao', duracaoMenstruacao)}
-        erro={errosCampos.duracaoMenstruacao} aoAvancar={avancar}
+        erro={errosCampos.duracaoMenstruacao}
+        aoAvancar={() => { if (validarDuracoes(dados, 4)) avancar(); }}
         aoPular={() => { alterarCampo('duracaoMenstruacao', null); avancar(); }} />;
     if (etapa === 5) conteudo = <LutealPhaseLengthStep {...comum} valor={dados.duracaoLutea}
         aoAlterar={(duracaoLutea) => alterarCampo('duracaoLutea', duracaoLutea)}
