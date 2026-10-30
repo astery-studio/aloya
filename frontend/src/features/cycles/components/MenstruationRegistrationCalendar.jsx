@@ -58,3 +58,63 @@ function MenstruationRegistrationCalendar({
             getItemLayout={(_, index) => layouts[index]}
             keyExtractor={(mes) => mes.chave}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            initialNumToRender={2}
+            maxToRenderPerBatch={2}
+            windowSize={3}
+            onStartReached={onCarregarAnteriores}
+            renderItem={({ item: mes }) => (
+                <View style={estilos.mes}>
+                    <View style={estilos.tituloMes}>
+                        <Text style={estilos.nomeMes}>{NOMES_MESES[mes.mes - 1]}</Text>
+                        <Text style={estilos.ano}>{mes.ano}</Text>
+                    </View>
+                    {mes.semanas.map((semana, indice) => (
+                        <View key={indice} style={estilos.semana}>
+                            {semana.map((dia, coluna) => {
+                                if (!dia) return <View key={coluna} style={estilos.celula} />;
+                                const selecionado = selecionadas.has(dia.data);
+                                const uneAntes =
+                                    selecionado && selecionadas.has(deslocarDia(dia.data, -1));
+                                const uneDepois =
+                                    selecionado && selecionadas.has(deslocarDia(dia.data, 1));
+                                const ponta = selecionado && (!uneAntes || !uneDepois);
+                                const registrado = Boolean(dia.registroCicloId || dia.local);
+                                const desativado = bloqueado || dia.futuro;
+                                const rotulo = `${dia.dia} de ${NOMES_MESES[mes.mes - 1].toLowerCase()} de ${mes.ano}${registrado ? ', menstruação registrada' : selecionado ? ', selecionado' : dia.futuro ? ', data futura' : ''}`;
+                                return (
+                                    <View key={dia.data} style={estilos.celula}>
+                                        {selecionado && (
+                                            <View
+                                                pointerEvents="none"
+                                                testID={`selecao-${dia.data}`}
+                                                style={[
+                                                    estilos.faixa,
+                                                    !uneAntes && estilos.inicioFaixa,
+                                                    !uneDepois && estilos.fimFaixa
+                                                ]}
+                                            />
+                                        )}
+                                        <Pressable
+                                            hitSlop={6}
+                                            accessibilityRole="button"
+                                            accessibilityLabel={rotulo}
+                                            accessibilityActions={
+                                                !registrado && !desativado
+                                                    ? [
+                                                          {
+                                                              name: 'iniciarFaixa',
+                                                              label: 'Iniciar uma nova faixa neste dia'
+                                                          }
+                                                      ]
+                                                    : []
+                                            }
+                                            onAccessibilityAction={(evento) => {
+                                                if (
+                                                    !registrado &&
+                                                    !desativado &&
+                                                    evento.nativeEvent.actionName === 'iniciarFaixa'
+                                                )
+                                                    onIniciarFaixa?.(dia.data);
+                                            }}
+                                            accessibilityState={{
