@@ -22,8 +22,7 @@ export default function DurationStep({
             aoVoltar={aoVoltar} aoAvancar={aoAvancar}
             acaoSecundaria={cicloComOpcaoNaoSei && !selecionado
                 ? { texto: 'Não sei', aoPressionar: aoPular } : null}
-            podeAvancar={Number.isInteger(valor) && valor > 0
-                && (!cicloComOpcaoNaoSei || selecionado)}
+            podeAvancar={Number.isInteger(valor) && valor > 0}
             carregando={carregando} erro={erro}>
             <NumberInput valor={valor} aoAlterar={alterar} unidade="dias" />
         </OnboardingStep>

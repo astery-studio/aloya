@@ -41,7 +41,7 @@ test('horário formata quatro dígitos como HH:MM', async () => {
 });
 
 test('toda a área do horário pode direcionar o foco', async () => {
-    await render(<TimeInput valor="" onChangeText={jest.fn()} />);
+    await renderWithTheme(<TimeInput valor="" onChangeText={jest.fn()} />);
     expect(() => fireEvent.press(screen.getByTestId('area-campo-horario'))).not.toThrow();
 });
 

@@ -8,8 +8,7 @@ import {
     BackHandler,
     Linking,
     NativeModules,
-    Text,
-    View
+    Text
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';

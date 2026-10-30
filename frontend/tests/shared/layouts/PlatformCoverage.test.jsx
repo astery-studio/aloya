@@ -24,7 +24,7 @@ test('AuthLayout reduz a área útil acima do teclado no Android', async () => {
     const sistemaOriginal = Platform.OS;
     Object.defineProperty(Platform, 'OS', { configurable: true, value: 'android' });
     try {
-        await render(<AuthLayout titulo="Entrar" />);
+        await renderWithTheme(<AuthLayout titulo="Entrar" />);
         expect(screen.getByTestId('auth-layout-scroll').props.keyboardDismissMode).toBe('on-drag');
     } finally {
         Object.defineProperty(Platform, 'OS', { configurable: true, value: sistemaOriginal });

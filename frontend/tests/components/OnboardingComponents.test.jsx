@@ -1,7 +1,7 @@
 /**
  * Testes de apresentação e interação dos componentes do onboarding.
  */
-import { fireEvent, render, screen, within } from '@testing-library/react-native';
+import { fireEvent, screen, within } from '@testing-library/react-native';
 import BirthDateStep from '../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
 import CycleLengthStep from '../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
 import LastMenstruationStep from '../../src/features/onboarding/components/LastMenstruationStep/LastMenstruationStep';
@@ -71,8 +71,8 @@ test('duração permite digitar o número sem alterar a unidade', async () => {
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
     expect(screen.getByText('dias')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Não sei' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
-    fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
     expect(aoAlterar).toHaveBeenCalledWith(30);
     expect(screen.queryByRole('button', { name: 'Não sei' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();

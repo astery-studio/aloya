@@ -90,8 +90,11 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '5');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '14');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 
     expect(cadastrar).toHaveBeenCalledWith(
@@ -206,9 +209,13 @@ test('remove o e-mail do responsável quando a pessoa informa idade adulta', asy
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
-    for (let etapa = 0; etapa < 4; etapa += 1) {
-        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
-    }
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '5');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '14');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 
     expect(cadastrar).toHaveBeenCalledWith(expect.not.objectContaining({
         emailResponsavelLegal: expect.anything()
@@ -273,9 +280,12 @@ async function chegarAEtapaFinal() {
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
-    for (let etapa = 0; etapa < 3; etapa += 1) {
-        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
-    }
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '5');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '14');
 }
 
 async function concluirEtapas() {
@@ -295,9 +305,9 @@ test('conclui o cadastro sem período menstrual quando a pessoa não sabe a data
 
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
-    for (let etapa = 0; etapa < 3; etapa += 1) {
-        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
-    }
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
 
     await waitFor(() => expect(cadastrar).toHaveBeenCalledWith(expect.objectContaining({
         dataInicioUltimaMenstruacao: null,
@@ -316,9 +326,12 @@ test('pular uma etapa já preenchida remove o valor antes de concluir', async ()
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '5');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByLabelText('Voltar'));
-
+    await fireEvent.press(screen.getByLabelText('Voltar'));
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));

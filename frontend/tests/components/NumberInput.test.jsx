@@ -32,6 +32,6 @@ test('converte um campo apagado para valor nulo', async () => {
 });
 
 test('toda a área numérica pode direcionar o foco', async () => {
-    await render(<NumberInput valor={28} aoAlterar={jest.fn()} />);
+    await renderWithTheme(<NumberInput valor={28} aoAlterar={jest.fn()} />);
     expect(() => fireEvent.press(screen.getByTestId('area-campo-numero'))).not.toThrow();
 });
