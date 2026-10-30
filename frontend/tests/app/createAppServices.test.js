@@ -197,54 +197,60 @@ describe('createAppServices', () => {
             }),
             contraceptiveService,
             cycleHistoryService: expect.objectContaining({
+                nome: 'cycleHistoryService',
+                ...cycleRemovalService
+            }),
             supportCategoryService,
             cyclePredictionService,
-            cycleParametersService
-        })
+            cycleParametersService,
+            cycleRegistrationService: { registrar: expect.any(Function) },
+            menstruationSyncQueue: {
+                adicionar: expect.any(Function),
+                listar: expect.any(Function),
+                sincronizar: expect.any(Function)
+            }
+        });
 
-        expect(Object.isFrozen(servicos)).toBe(true)
-    })
+        expect(Object.isFrozen(servicos)).toBe(true);
+    });
 
     test('usa a URL configurada no ambiente', () => {
-        const apiUrlAnterior = process.env.EXPO_PUBLIC_API_URL
-        process.env.EXPO_PUBLIC_API_URL = 'https://api.aloya.com/'
+        const apiUrlAnterior = process.env.EXPO_PUBLIC_API_URL;
+        process.env.EXPO_PUBLIC_API_URL = 'https://api.aloya.com/';
 
         try {
-            const fetchImpl = jest.fn()
+            const fetchImpl = jest.fn();
 
-            criarServicosApp({fetchImpl})
+            criarServicosApp({ fetchImpl });
 
             expect(criarApiClient).toHaveBeenCalledWith({
                 baseUrl: 'https://api.aloya.com',
                 fetchImpl,
                 timeoutMs: 15000
-            })
+            });
         } finally {
             if (apiUrlAnterior === undefined) {
-                delete process.env.EXPO_PUBLIC_API_URL
+                delete process.env.EXPO_PUBLIC_API_URL;
             } else {
-                process.env.EXPO_PUBLIC_API_URL = apiUrlAnterior
+                process.env.EXPO_PUBLIC_API_URL = apiUrlAnterior;
             }
         }
-    })
+    });
 
-    test.each([
-        null,
-        '',
-        '   ',
-        123
-    ])('rejeita uma URL ausente ou inválida: %p', apiUrl => {
-        expect(() => criarServicosApp({
-            apiUrl,
-            fetchImpl: jest.fn()
-        })).toThrow('A URL da API não foi configurada.')
-    })
+    test.each([null, '', '   ', 123])('rejeita uma URL ausente ou inválida: %p', (apiUrl) => {
+        expect(() =>
+            criarServicosApp({
+                apiUrl,
+                fetchImpl: jest.fn()
+            })
+        ).toThrow('A URL da API não foi configurada.');
+    });
 
     test('rejeita uma URL malformada', () => {
-        expect(() => criarServicosApp({
-            apiUrl: 'api-invalida',
-            fetchImpl: jest.fn()
-        })).toThrow()
+        expect(() =>
+            criarServicosApp({
+                apiUrl: 'api-invalida',
+                fetchImpl: jest.fn()
     })
 
     test.each([
