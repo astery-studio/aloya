@@ -20,6 +20,7 @@ test('gera uma grade mensal alinhada ao dia da semana e marca apenas registros',
     expect(dias[12]).toEqual({ dia: 7, data: '2026-08-07', marcado: true });
     expect(dias[13]).toEqual({ dia: 8, data: '2026-08-08', marcado: true });
     expect(criarDiasDoMes({ mes: '2024-02', diasMenstruacao: [] })).toHaveLength(33);
+    expect(criarDiasDoMes({ mes: '2026-08' }).filter(Boolean)).toHaveLength(31);
 });
 
 test('renderiza os dias menstruais como alvos de toque e deixa outros dias sem ação', async () => {

@@ -55,7 +55,7 @@ const estilos = StyleSheet.create({
     },
     rodape: {
         height: 142,
-        paddingHorizontal: 24,
+        paddingHorizontal: 0,
         paddingTop: 12,
         paddingBottom: 20,
         gap: 8,

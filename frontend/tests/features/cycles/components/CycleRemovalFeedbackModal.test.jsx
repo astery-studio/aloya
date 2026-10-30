@@ -57,6 +57,20 @@ test('apresenta erro com quebra de linha e ações do protótipo', async () => {
     expect(onFechar).toHaveBeenCalledTimes(1);
 });
 
+test('bloqueia fechamento e ações do alerta de erro durante a tentativa', async () => {
+    await render(
+        <CycleRemovalFeedbackModal
+            tipo="erro"
+            carregando
+            onFechar={jest.fn()}
+            onTentarNovamente={jest.fn()}
+        />
+    );
+
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Voltar' })).toBeDisabled();
+});
+
 test.each([
     ['sucesso-excluir', 'Ciclo excluído com sucesso'],
     ['sucesso-atualizar', 'Ciclo atualizado com sucesso']
