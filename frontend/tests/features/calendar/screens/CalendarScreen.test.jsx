@@ -153,6 +153,12 @@ describe('CalendarScreen', () => {
             estilos.cabecalho.height
         )
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen()
+        expect(screen.getByTestId('calendar-safe-area')).toHaveProp('edges', {
+            top: 'off',
+            right: 'off',
+            bottom: 'additive',
+            left: 'off'
+        })
         expect(screen.getByRole('button', {name: 'Cadastrar Menstruação'})).toBeOnTheScreen()
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull()
         expect(estilos.rodape).toMatchObject({

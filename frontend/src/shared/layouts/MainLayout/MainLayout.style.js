@@ -11,6 +11,12 @@ const estilos = StyleSheet.create({
     conteudo: {
         flex: 1,
         minHeight: 0
+    },
+
+    navegacaoSegura: {
+        width: '100%',
+        flexShrink: 0,
+        backgroundColor: tema.cores.neutras.superficieClara
     }
 })
 

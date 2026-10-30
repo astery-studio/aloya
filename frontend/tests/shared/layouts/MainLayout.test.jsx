@@ -120,5 +120,35 @@ describe('MainLayout', () => {
                 'conteudo-main-layout'
             )
         ).toHaveStyle(estilos.conteudo)
+
+        expect(
+            screen.getByTestId('navegacao-segura-main-layout')
+        ).toHaveProp('edges', {
+            top: 'off',
+            right: 'off',
+            bottom: 'additive',
+            left: 'off'
+        })
+
+        expect(
+            screen.getByTestId('navegacao-segura-main-layout')
+        ).toHaveStyle(estilos.navegacaoSegura)
+    })
+
+    test('evita duplicar a área segura quando a tela externa já a fornece', async () => {
+        await render(
+            <MainLayout
+                titulo="Início"
+                abaAtiva="inicio"
+                onSelecionarAba={jest.fn()}
+                usarAreaSeguraInferior={false}
+            >
+                <Text>Conteúdo</Text>
+            </MainLayout>
+        )
+
+        expect(
+            screen.queryByTestId('navegacao-segura-main-layout')
+        ).toBeNull()
     })
 })
