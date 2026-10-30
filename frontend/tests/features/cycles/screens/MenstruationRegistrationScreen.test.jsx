@@ -58,3 +58,63 @@ test('duplo toque em um dia livre solicita uma nova faixa e não abre confirmaç
     await montar({ onAlternarData: alternar, onIniciarFaixa: iniciar });
     const dia = screen.getByRole('button', { name: '4 de setembro de 2026' });
     await fireEvent.press(dia);
+    await fireEvent.press(dia);
+    expect(alternar).toHaveBeenCalledTimes(1);
+    expect(alternar).toHaveBeenCalledWith('2026-09-04');
+    expect(iniciar).toHaveBeenCalledWith('2026-09-04');
+    expect(screen.queryByText('Ciclo existente')).toBeNull();
+    await fireEvent(dia, 'accessibilityAction', { nativeEvent: { actionName: 'iniciarFaixa' } });
+    expect(iniciar).toHaveBeenCalledTimes(2);
+});
+
+test('dia livre é enviado por um toque, datas futuras são bloqueadas e salvar exige seleção', async () => {
+    const alternar = jest.fn();
+    await montar({ onAlternarData: alternar, onSalvar: jest.fn() });
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: '21 de setembro de 2026' }));
+    expect(alternar).toHaveBeenCalledWith('2026-09-21');
+    expect(screen.queryByText('Ciclo existente')).toBeNull();
+    expect(
+        screen.getByRole('button', { name: '26 de setembro de 2026, data futura' })
+    ).toBeDisabled();
+});
+
+test('dia registrado abre orientação para editar sem alterar a seleção', async () => {
+    const alternar = jest.fn();
+    await montar({ onAlternarData: alternar });
+    await fireEvent.press(
+        screen.getByRole('button', { name: '7 de setembro de 2026, menstruação registrada' })
+    );
+    expect(screen.getByText('Ciclo existente')).toBeOnTheScreen();
+    expect(alternar).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(screen.queryByText('Ciclo existente')).toBeNull();
+});
+
+test('seleção controlada de intervalo é conservada após falha e enviada sem confirmação', async () => {
+    const datas = ['2026-09-21', '2026-09-22', '2026-09-23'];
+    const salvar = jest.fn();
+    const retry = jest.fn();
+    const tela = await montar({ datasSelecionadas: datas, onSalvar: salvar });
+    expect(screen.getByRole('button', { name: '22 de setembro de 2026, selecionado' })).toHaveProp(
+        'accessibilityState',
+        expect.objectContaining({ selected: true })
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
+    expect(salvar).toHaveBeenCalledWith(datas);
+    await tela.rerender(
+        <MenstruationRegistrationScreen
+            meses={meses}
+            hoje="2026-09-25"
+            datasSelecionadas={datas}
+            erro={{ codigo: 'REDE' }}
+            onTentarNovamente={retry}
+        />
+    );
+    expect(
+        screen.getByText('Não foi possível sincronizar alguns registros. Verifique sua conexão.')
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(retry).toHaveBeenCalledTimes(1);
+    await tela.rerender(
+        <MenstruationRegistrationScreen meses={meses} hoje="2026-09-25" datasSelecionadas={datas} />
