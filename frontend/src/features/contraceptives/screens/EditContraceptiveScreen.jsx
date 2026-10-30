@@ -1,6 +1,7 @@
 //Orquestra a edição e a remoção segura de um anticoncepcional já cadastrado.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { PillIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { Header } from '../../../shared/components/navigation/Header/Header';
@@ -108,7 +109,8 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
     if (!registroValido) {
         return (
-            <View style={estilos.tela}>
+            <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+                testID="edicao-anticoncepcional-area-segura">
                 <Header
                     titulo="Editar o Anticoncepcional"
                     variante="comVoltar"
@@ -124,12 +126,13 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                         Não foi possível carregar os dados para edição.
                     </Text>
                 </View>
-            </View>
+            </SafeAreaView>
         );
     }
 
     return (
-        <View style={estilos.tela}>
+        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+            testID="edicao-anticoncepcional-area-segura">
             <Header
                 titulo="Editar o Anticoncepcional"
                 variante="comVoltar"
@@ -229,7 +232,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                     aoPressionar: concluirSucesso
                 }}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 

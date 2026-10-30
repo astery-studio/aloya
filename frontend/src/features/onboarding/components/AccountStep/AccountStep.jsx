@@ -3,8 +3,8 @@
  */
 import { useCallback, useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { CheckIcon as Check } from 'phosphor-react-native/src/icons/Check';
 import Button from '../../../../shared/components/common/Button/Button';
+import { CheckIcon as Check } from '../../../../shared/components/icons/AppIcons';
 import EmailInput from '../../../../shared/components/forms/EmailInput';
 import PasswordInput from '../../../../shared/components/forms/PasswordInput';
 import TextInput from '../../../../shared/components/forms/TextInput';

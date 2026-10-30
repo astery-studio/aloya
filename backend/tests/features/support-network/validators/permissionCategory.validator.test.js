@@ -7,6 +7,18 @@ import { criarPermissionCategoryValidator } from '../../../../src/features/suppo
 
 const validator = criarPermissionCategoryValidator();
 
+test('aceita 15 caracteres e rejeita 16 na criação e edição', () => {
+    for (const nome of ['A'.repeat(15), 'A'.repeat(16)]) {
+        const dados = { nome, dadosVisiveis: ['geral.fase_atual'] };
+        assert.equal(validator.validarCriacaoCategoria(dados).valido, nome.length === 15);
+        assert.equal(
+            validator.validarEdicaoCategoria({ ...dados, atualizadoEm: '2026-10-26T12:00:00.000Z' })
+                .valido,
+            nome.length === 15
+        );
+    }
+});
+
 //Cria um corpo válido que pode ser modificado individualmente pelos testes.
 function criarBodyValido() {
     return {

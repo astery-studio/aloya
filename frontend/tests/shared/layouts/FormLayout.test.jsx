@@ -13,6 +13,15 @@ test('renderiza cabeçalho, conteúdo e ações', async () => {
     expect(screen.getByText('Cabeçalho')).toBeTruthy();
     expect(screen.getByText('Conteúdo')).toBeTruthy();
     expect(screen.getByText('Ações')).toBeTruthy();
+    expect(screen.getByTestId('form-layout-header')).toHaveStyle({ paddingTop: 16 });
+    expect(screen.getByTestId('form-layout-actions')).toHaveStyle({
+        paddingTop: 16,
+        paddingBottom: 24
+    });
+    expect(screen.getByTestId('form-layout-scroll').props).toMatchObject({
+        keyboardShouldPersistTaps: 'handled',
+        showsVerticalScrollIndicator: false
+    });
 });
 
 test('permite omitir regiões opcionais e personalizar o id', async () => {

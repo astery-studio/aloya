@@ -1,10 +1,18 @@
 /**
- * Estrutura base dos modais, responsável por apresentação,
- * variantes e conteúdo acionável.
+ * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
  */
 import { useEffect, useMemo, useRef } from 'react';
-import { Modal, Platform, Text, View } from 'react-native';
-
+import {
+    AccessibilityInfo,
+    findNodeHandle,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    Text,
+    View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../../hooks/useTheme';
 import { criarEstilos } from './AppModal.styles';
 
@@ -26,13 +34,13 @@ export default function AppModal({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const referenciaTitulo = useRef(null);
     const visivelAnterior = useRef(visivel);
 
     useEffect(() => {
         if (Platform.OS !== 'ios' && visivelAnterior.current && !visivel) {
             aoOcultar?.();
         }
-
         visivelAnterior.current = visivel;
     }, [aoOcultar, visivel]);
 
@@ -43,10 +51,13 @@ export default function AppModal({
     // Mantém o Modal montado enquanto o iOS conclui o fechamento e emite onDismiss.
     // Desmontá-lo aqui interrompe as ações que aguardam aoOcultar, como salvar.
     const alerta = variante === 'alerta';
-
     const acao = variante === 'acao';
-
     const corDoIcone = corIcone || (acao ? tema.cores.feedback.erro : tema.cores.marca.primaria);
+
+    function focarTitulo() {
+        const identificador = findNodeHandle(referenciaTitulo.current);
+        if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
+    }
 
     return (
         <Modal
@@ -55,72 +66,94 @@ export default function AppModal({
             animationType="fade"
             onDismiss={aoOcultar}
             onRequestClose={aoFechar}
+            onShow={focarTitulo}
         >
-            <View testID="app-modal-fundo" style={estilos.fundo}>
-                <View
-                    testID="app-modal-caixa"
-                    accessibilityViewIsModal
-                    style={[
-                        estilos.caixa,
-                        alerta
-                            ? estilos.caixaAlerta
-                            : acao
-                              ? estilos.caixaAcao
-                              : estilos.caixaSimples
-                    ]}
+            <SafeAreaView testID="app-modal-fundo" style={estilos.fundo}>
+                <KeyboardAvoidingView
+                    style={estilos.flexivel}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
-                    {alerta ? (
-                        <View style={estilos.cabecalhoAlerta}>
-                            {Icone ? (
-                                <View style={estilos.iconeAlerta}>
-                                    <Icone size={26} color={tema.cores.neutras.superficieClara} />
+                    <ScrollView
+                        testID="app-modal-scroll"
+                        bounces={false}
+                        keyboardShouldPersistTaps="handled"
+                        contentContainerStyle={estilos.rolagem}
+                    >
+                        <View
+                            testID="app-modal-caixa"
+                            accessibilityViewIsModal
+                            style={[
+                                estilos.caixa,
+                                alerta
+                                    ? estilos.caixaAlerta
+                                    : acao
+                                      ? estilos.caixaAcao
+                                      : estilos.caixaSimples
+                            ]}
+                        >
+                            {alerta ? (
+                                <View style={estilos.cabecalhoAlerta}>
+                                    {Icone ? (
+                                        <View style={estilos.iconeAlerta}>
+                                            <Icone
+                                                size={26}
+                                                color={tema.cores.neutras.superficieClara}
+                                            />
+                                        </View>
+                                    ) : null}
                                 </View>
                             ) : null}
-                        </View>
-                    ) : null}
-                    <View
-                        style={[
-                            estilos.conteudo,
-                            alerta
-                                ? estilos.conteudoAlerta
-                                : acao
-                                  ? estilos.conteudoAcao
-                                  : estilos.conteudoSimples
-                        ]}
-                    >
-                        {!alerta && Icone ? (
                             <View
                                 style={[
-                                    estilos.areaIcone,
-                                    estiloIcone,
-                                    acao && estilos.areaIconeAcao,
-                                    fundoIcone
-                                        ? {
-                                              backgroundColor: fundoIcone
-                                          }
-                                        : null
+                                    estilos.conteudo,
+                                    alerta
+                                        ? estilos.conteudoAlerta
+                                        : acao
+                                          ? estilos.conteudoAcao
+                                          : estilos.conteudoSimples
                                 ]}
                             >
-                                <Icone size={22} color={corDoIcone} />
+                                {!alerta && Icone ? (
+                                    <View
+                                        style={[
+                                            estilos.areaIcone,
+                                            estiloIcone,
+                                            acao && estilos.areaIconeAcao,
+                                            fundoIcone ? { backgroundColor: fundoIcone } : null
+                                        ]}
+                                    >
+                                        <Icone size={22} color={corDoIcone} />
+                                    </View>
+                                ) : null}
+                                <View style={estilos.textos}>
+                                    <Text
+                                        ref={referenciaTitulo}
+                                        accessible
+                                        accessibilityRole="header"
+                                        style={estilos.titulo}
+                                    >
+                                        {titulo}
+                                    </Text>
+                                    {mensagem ? (
+                                        <Text
+                                            style={[
+                                                estilos.mensagem,
+                                                alerta && estilos.mensagemAlerta
+                                            ]}
+                                        >
+                                            {mensagem}
+                                        </Text>
+                                    ) : null}
+                                    {destaque ? (
+                                        <Text style={estilos.destaque}>{destaque}</Text>
+                                    ) : null}
+                                </View>
+                                {children ? <View style={estilos.acoes}>{children}</View> : null}
                             </View>
-                        ) : null}
-
-                        <View style={estilos.textos}>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
-                                {titulo}
-                            </Text>
-
-                            {mensagem ? (
-                                <Text style={[estilos.mensagem, alerta && estilos.mensagemAlerta]}>
-                                    {mensagem}
-                                </Text>
-                            ) : null}
-                            {destaque ? <Text style={estilos.destaque}>{destaque}</Text> : null}
                         </View>
-                        {children ? <View style={estilos.acoes}>{children}</View> : null}
-                    </View>
-                </View>
-            </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
         </Modal>
     );
 }

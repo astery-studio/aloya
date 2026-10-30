@@ -3,6 +3,35 @@
  */
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 
+test.each(['envio', 'leitura'])(
+    'encerra %s travado mesmo quando o transporte ignora cancelamento',
+    async (etapa) => {
+        jest.useFakeTimers();
+        try {
+            const fetchImpl =
+                etapa === 'envio'
+                    ? jest.fn(() => new Promise(() => {}))
+                    : jest
+                          .fn()
+                          .mockResolvedValue({
+                              ok: true,
+                              status: 200,
+                              json: () => new Promise(() => {})
+                          });
+            const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl, timeoutMs: 1000 });
+            const resultado = expect(
+                cliente.requisicao({ caminho: '/categoria', metodo: 'POST' })
+            ).rejects.toMatchObject({ codigo: 'TEMPO_CONEXAO_ESGOTADO' });
+            await jest.advanceTimersByTimeAsync(1000);
+            await resultado;
+            expect(fetchImpl.mock.calls[0][1].signal.aborted).toBe(true);
+            expect(jest.getTimerCount()).toBe(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    }
+);
+
 test('envia chave de idempotência preservada nas retentativas', async () => {
     const fetchImpl = jest
         .fn()

@@ -152,11 +152,20 @@ test.each([
     expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
 });
 
-test('apresenta início sem faixa quando ciclo e previsão não existem', async () => {
-    await renderizar();
+test('apresenta a faixa horizontal com hoje selecionado quando ciclo e previsão não existem', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 30, 23, 30));
+    try {
+        await renderizar();
 
-    expect(screen.queryByLabelText('Datas do ciclo')).not.toBeOnTheScreen();
-    expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+        const faixa = screen.getByLabelText('Datas do ciclo');
+        expect(faixa).toHaveProp('horizontal', true);
+        expect(faixa.props.data).toHaveLength(16);
+        expect(faixa.props.data.every((dia) => dia.fase === 'desconhecida')).toBe(true);
+        expect(screen.getByRole('button', { name: 'sex, dia 30' })).toBeSelected();
+        expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+    } finally {
+        jest.useRealTimers();
+    }
 });
 
 test('encaminha todas as interações da tela carregada', async () => {

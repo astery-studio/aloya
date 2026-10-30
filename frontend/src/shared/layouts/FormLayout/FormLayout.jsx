@@ -30,12 +30,17 @@ export default function FormLayout({
         <LinearGradient colors={coresFundo} locations={posicoesFundo} style={estilos.fundo}>
             <SafeAreaView style={estilos.tela} testID={testeId}>
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    testID={`${testeId}-keyboard`}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={estilos.flexivel}
                 >
-                    {cabecalho ? <View>{cabecalho}</View> : null}
+                    {cabecalho ? <View testID={`${testeId}-header`}
+                        style={estilos.cabecalho}>{cabecalho}</View> : null}
                     <ScrollView
+                        testID={`${testeId}-scroll`}
+                        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                         keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
                         contentContainerStyle={[
                             estilos.rolagem,
                             centralizado && estilos.centralizado
@@ -43,7 +48,8 @@ export default function FormLayout({
                     >
                         {children}
                     </ScrollView>
-                    {acoes ? <View style={estilos.acoes}>{acoes}</View> : null}
+                    {acoes ? <View testID={`${testeId}-actions`}
+                        style={estilos.acoes}>{acoes}</View> : null}
                 </KeyboardAvoidingView>
             </SafeAreaView>
         </LinearGradient>

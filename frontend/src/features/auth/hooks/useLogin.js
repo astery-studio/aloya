@@ -29,7 +29,7 @@ function useLogin({ realizarLogin }) {
             return resultado;
         } catch (falha) {
             if (montado.current) {
-                setErro(falha.mensagemUsuario || falha.message || 'Não foi possível entrar.');
+                setErro(falha.mensagemUsuario || 'Não foi possível entrar. Tente novamente.');
             }
             return null;
         } finally {

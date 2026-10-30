@@ -3,7 +3,7 @@
  */
 import Button from '../Button';
 
-const variantesPermitidas = ['verde', 'branco', 'preto', 'vermelho'];
+const variantesPermitidas = ['verde', 'branco', 'preto', 'vermelho', 'texto'];
 
 export default function ButtonPopup({
     texto,

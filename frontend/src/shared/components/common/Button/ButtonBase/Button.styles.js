@@ -151,6 +151,18 @@ function criarVariantes(tema) {
             }
         },
 
+        texto: {
+            container: {
+                backgroundColor: 'transparent'
+            },
+
+            texto: {
+                color: tema.cores.interface.textoSecundario,
+                fontFamily: fontFamilies.medium,
+                fontWeight: '500'
+            }
+        },
+
         tracejado: {
             container: {
                 borderColor: tema.cores.interface.textoDesabilitado,

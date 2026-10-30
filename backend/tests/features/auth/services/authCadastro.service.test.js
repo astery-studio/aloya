@@ -754,3 +754,28 @@ test(
         );
     }
 );
+
+test(
+    'cria a conta sem registro de ciclo quando a menstruação não é informada',
+    async () => {
+        const {
+            authService,
+            chamadas
+        } = criarDependencias();
+
+        const resultado = await authService.cadastrar(
+            criarDadosValidos({
+                dataInicioUltimaMenstruacao: null,
+                dataFimUltimaMenstruacao: null
+            })
+        );
+
+        assert.equal(
+            chamadas.criarRegistroCiclo.length,
+            0
+        );
+        assert.equal(resultado.cicloInicial, null);
+        assert.equal(chamadas.criarUsuario.length, 1);
+        assert.equal(chamadas.criarSessao.length, 1);
+    }
+);

@@ -75,7 +75,7 @@ describe('Button', () => {
         });
     });
 
-    test.each(['verde', 'branco', 'preto', 'vermelho'])(
+    test.each(['verde', 'branco', 'preto', 'vermelho', 'texto'])(
         'popup aceita variante %s',
         async (variante) => {
             await renderizarBotao(<ButtonPopup texto="OK" variante={variante} />);

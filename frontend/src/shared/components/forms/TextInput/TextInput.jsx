@@ -1,8 +1,8 @@
 /**
  * Campo textual controlado que concentra variantes, sanitização e ação lateral.
  */
-import { memo, useMemo } from 'react';
-import { Text, TextInput as EntradaNativa, View } from 'react-native';
+import { memo, useMemo, useRef } from 'react';
+import { Pressable, Text, TextInput as EntradaNativa, View } from 'react-native';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './TextInput.styles';
 
@@ -24,6 +24,7 @@ function TextInput({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const entradaRef = useRef(null);
     const preenchido = Boolean(value);
     const rotuloExterno = variante === 'categoria' && label;
     const rotuloInterno = variante === 'padrao' && preenchido && label;
@@ -33,7 +34,13 @@ function TextInput({
             : tema.cores.interface.textoSecundario;
 
     return (
-        <View style={[estilos.grupoCampo, rotuloExterno && estilos.grupo]}>
+        <Pressable
+            accessible={false}
+            testID="area-campo-texto"
+            disabled={desativado}
+            onPress={() => entradaRef.current?.focus()}
+            style={[estilos.grupoCampo, rotuloExterno && estilos.grupo]}
+        >
             {rotuloExterno && <Text style={estilos.rotuloExterno}>{label}</Text>}
             <View
                 style={[
@@ -49,6 +56,7 @@ function TextInput({
                 <View style={estilos.conteudo}>
                     {rotuloInterno && <Text style={estilos.rotuloFlutuante}>{label}</Text>}
                     <EntradaNativa
+                        ref={entradaRef}
                         accessibilityLabel={label || placeholder}
                         editable={!desativado}
                         placeholder={rotuloInterno ? undefined : placeholder}
@@ -67,7 +75,7 @@ function TextInput({
                     {erro}
                 </Text>
             ) : null}
-        </View>
+        </Pressable>
     );
 }
 

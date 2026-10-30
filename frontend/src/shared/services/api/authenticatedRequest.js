@@ -22,6 +22,11 @@ function criarRequisicaoAutenticada({ requisicao, obterCredencial, removerCreden
 
     return async function requisicaoAutenticada(opcoes = {}) {
         const sessao = await obterCredencial();
+        if (opcoes.signal?.aborted) {
+            const erro = new Error('Requisição cancelada.');
+            erro.name = 'AbortError';
+            throw erro;
+        }
         const token = sessao?.token;
 
         if (typeof token !== 'string' || !token.trim()) {

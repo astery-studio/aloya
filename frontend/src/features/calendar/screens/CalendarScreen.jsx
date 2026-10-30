@@ -1,6 +1,7 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
@@ -199,15 +200,6 @@ function CalendarScreen({
             </View>
 
             <View style={estilos.conteudo}>
-                {estadoVazio ? (
-                    <View accessibilityRole="alert" style={estilos.avisoVazio}>
-                        <Text style={estilos.textoVazio}>
-                            Você ainda não possui nenhum ciclo registrado. Toque em um dia no
-                            Calendário para começar.
-                        </Text>
-                    </View>
-                ) : null}
-
                 <View style={estilos.areaCalendario}>
                     <CycleCalendar
                         meses={mesesValidos}
@@ -221,13 +213,27 @@ function CalendarScreen({
                 </View>
             </View>
 
-            <View testID="rodape-calendario" style={estilos.rodape}>
+            {estadoVazio ? (
+                <View accessibilityRole="alert" style={estilos.avisoVazio}>
+                    <InfoIcon size={18} color={tema.cores.interface.destaque} />
+                    <Text style={estilos.textoVazio}>
+                        Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar
+                        Menstruação’ pra começar.
+                    </Text>
+                </View>
+            ) : null}
+
+            <SafeAreaView
+                testID="rodape-calendario"
+                edges={['bottom']}
+                style={estilos.rodape}
+            >
                 <SyncStatusIndicator
                     status={statusSincronizacao}
                     onTentarNovamente={aoTentarSincronizar}
                 />
                 <ButtonScreen texto="Cadastrar Menstruação" aoPressionar={aoCadastrarMenstruacao} />
-            </View>
+            </SafeAreaView>
 
             <CycleLegendSheet
                 visivel={legendaVisivel}

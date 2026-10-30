@@ -90,6 +90,9 @@ test(
         const resultado =
             validator.validarCadastro(
                 criarDadosValidos({
+                    dataInicioUltimaMenstruacao:
+                        undefined,
+
                     dataFimUltimaMenstruacao:
                         undefined,
 
@@ -106,6 +109,12 @@ test(
 
         assert.equal(resultado.valido, true);
         assert.deepEqual(resultado.erros, []);
+
+        assert.equal(
+            resultado.dados
+                .dataInicioUltimaMenstruacao,
+            null
+        );
 
         assert.equal(
             resultado.dados
@@ -129,6 +138,27 @@ test(
             resultado.dados
                 .duracaoLuteaInformada,
             null
+        );
+    }
+);
+
+test(
+    'rejeita data final da menstruação sem uma data inicial',
+    () => {
+        const resultado = criarValidator().validarCadastro(
+            criarDadosValidos({
+                dataInicioUltimaMenstruacao: null,
+                dataFimUltimaMenstruacao: '2026-01-14'
+            })
+        );
+
+        assert.equal(resultado.valido, false);
+        assert.equal(
+            resultado.erros.some(
+                (item) =>
+                    item.campo === 'dataFimUltimaMenstruacao'
+            ),
+            true
         );
     }
 );
@@ -342,21 +372,18 @@ test(
 );
 
 test(
-    'rejeita senha excessivamente longa antes de executar o bcrypt',
+    'rejeita senha de cadastro acima do limite efetivo do bcrypt',
     () => {
         const resultado = criarValidator().validarCadastro(
-            criarDadosValidos({ senha: 'a'.repeat(129) })
+            criarDadosValidos({ senha: 'á'.repeat(37) })
         );
 
+        assert.equal(Buffer.byteLength('á'.repeat(37), 'utf8'), 74);
         assert.equal(resultado.valido, false);
-        assert.deepEqual(
-            resultado.erros,
-            [{
-                campo: 'senha',
-                mensagem:
-                    'A senha deve possuir no máximo 128 caracteres.'
-            }]
-        );
+        assert.deepEqual(resultado.erros, [{
+            campo: 'senha',
+            mensagem: 'A senha ultrapassa o tamanho máximo permitido.'
+        }]);
     }
 );
 

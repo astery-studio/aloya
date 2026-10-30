@@ -15,6 +15,15 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.sobreposicao
         },
 
+        flexivel: { flex: 1, width: '100%' },
+
+        rolagem: {
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 16
+        },
+
         caixa: {
             width: '100%',
             maxWidth: 342,

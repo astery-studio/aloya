@@ -3,9 +3,9 @@
  */
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { LockKeyIcon as LockKey } from 'phosphor-react-native/src/icons/LockKey';
 import Button from '../../../shared/components/common/Button/Button';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { LockKeyIcon as LockKey } from '../../../shared/components/icons/AppIcons';
 import EmailInput from '../../../shared/components/forms/EmailInput';
 import PasswordInput from '../../../shared/components/forms/PasswordInput';
 import { useLogin } from '../hooks/useLogin';
@@ -34,6 +34,10 @@ export default function LoginScreen({
     async function enviar() {
         if (!isValidEmail(email)) {
             setErroValidacao('Informe um e-mail válido.');
+            return;
+        }
+        if (senha.length < 8) {
+            setErroValidacao('A senha deve possuir pelo menos 8 caracteres.');
             return;
         }
         const resultado = await enviarLogin({ email, senha });
@@ -89,7 +93,13 @@ export default function LoginScreen({
                 visivel={Boolean(erro || erroValidacao)}
                 aoFechar={limparAviso}
                 icone={LockKey}
-                titulo={erroValidacao ? 'E-mail inválido' : 'Não foi possível entrar'}
+                titulo={
+                    erroValidacao
+                        ? erroValidacao.includes('senha')
+                            ? 'Senha inválida'
+                            : 'E-mail inválido'
+                        : 'Não foi possível entrar'
+                }
                 mensagem={erroValidacao || erro}
                 acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: limparAviso }}
             />

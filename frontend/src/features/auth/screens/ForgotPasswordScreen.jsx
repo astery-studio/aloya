@@ -2,10 +2,10 @@
  * Tela que solicita e permite reenviar instruções de recuperação por e-mail.
  */
 import { useState } from 'react';
-import { EnvelopeSimpleIcon as EnvelopeSimple } from 'phosphor-react-native/src/icons/EnvelopeSimple';
-import { WarningCircleIcon as WarningCircle } from 'phosphor-react-native/src/icons/WarningCircle';
 import Button from '../../../shared/components/common/Button/Button';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { EnvelopeSimpleIcon as EnvelopeSimple,
+    WarningCircleIcon as WarningCircle } from '../../../shared/components/icons/AppIcons';
 import EmailInput from '../../../shared/components/forms/EmailInput';
 import { useForgotPassword } from '../hooks/useForgotPassword';
 import AuthLayout from '../../../shared/layouts/AuthLayout';
@@ -42,8 +42,10 @@ export default function ForgotPasswordScreen({
             titulo="E-mail enviado"
             mensagem="Se este e-mail estiver cadastrado, você receberá as instruções em breve."
             acaoPrincipal={{ texto: 'Entendi', aoPressionar: aoConcluir }}
-            acaoSecundaria={{ texto: 'Enviar Novamente', aoPressionar: fluxo.reenviar,
-                carregando: fluxo.carregando }} />
+            acaoSecundaria={{
+                texto: 'Enviar Novamente', variante: 'texto',
+                aoPressionar: fluxo.reenviar, carregando: fluxo.carregando
+            }} />
         <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
             icone={WarningCircle} titulo={erroValidacao ? 'E-mail inválido' : 'Algo deu errado'}
             mensagem={erroValidacao || fluxo.erro}

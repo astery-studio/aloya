@@ -9,6 +9,7 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleForecastPanel } from '../components/CycleForecastPanel';
 import { conteudoPorFase } from '../constants/phaseContent';
+import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleTodayScreen.styles';
 
@@ -50,12 +51,12 @@ function CycleTodayScreen({
         ? tema.cores.interface.destaque
         : tema.cores.marca.secundaria;
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
-    const referencia = dataSelecionada || previsao?.dataReferencia || ciclo?.dataReferencia;
+    const dataBaseDaFaixa = previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
+    const referencia = dataSelecionada || dataBaseDaFaixa;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
     const fase = referencia
         ? obterFase(referencia, fases, previsao?.duracaoCicloEstimada)
         : 'desconhecida';
-    const dataBaseDaFaixa = previsao?.dataReferencia || referencia;
     const faixaAtual =
         faixaDias.dataBase === dataBaseDaFaixa
             ? faixaDias

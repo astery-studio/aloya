@@ -38,9 +38,11 @@ function criarEstilos(tema) {
         legenda: {
             minHeight: 40,
             paddingHorizontal: 24,
+            paddingVertical: 8,
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
+            alignContent: 'center',
             gap: 30,
             borderBottomWidth: StyleSheet.hairlineWidth,
             borderColor: tema.cores.interface.separador,

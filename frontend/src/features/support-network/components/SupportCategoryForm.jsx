@@ -1,69 +1,59 @@
 //Reúne o nome, as permissões e a ação de salvar uma nova categoria.
-import {
-    useCallback,
-    useMemo
-} from 'react'
-import {View} from 'react-native'
+import { useCallback, useMemo } from 'react';
+import { View } from 'react-native';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
-import TextInput from '../../../shared/components/forms/TextInput'
-import {GeneralPermissions} from './GeneralPermissions'
-import {PermissionGroups} from './PermissionGroups'
-import {estilos} from './SupportCategoryForm.styles'
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import TextInput from '../../../shared/components/forms/TextInput';
+import { GeneralPermissions } from './GeneralPermissions';
+import { PermissionGroups } from './PermissionGroups';
+import { estilos } from './SupportCategoryForm.styles';
 
 const ERRO_NOME = Object.freeze({
     codigo: 'NOME_CATEGORIA_OBRIGATORIO',
     titulo: 'Salvar sem nome',
     mensagem: 'Dê um nome para a categoria.'
-})
+});
 
 const ERRO_PERMISSOES = Object.freeze({
     codigo: 'PERMISSAO_CATEGORIA_OBRIGATORIA',
     titulo: 'Categoria sem permissões',
-    mensagem:
-        'Selecione ao menos um tipo de dado que esta categoria poderá visualizar.'
-})
+    mensagem: 'Selecione ao menos um tipo de dado que esta categoria poderá visualizar.'
+});
 
 //Remove caracteres perigosos sem atrapalhar a digitação de letras acentuadas.
 function sanitizarNomeCategoria(texto) {
-    return texto
-        .replace(
-            /[\u0000-\u001F\u007F<>]/gu,
-            ''
-        )
-        .slice(0, 80)
+    return texto.replace(/[\u0000-\u001F\u007F<>]/gu, '').slice(0, 15);
 }
 
 //Remove espaços excedentes somente quando o formulário é enviado.
 function normalizarNomeCategoria(nome) {
-    return nome
-        .normalize('NFKC')
-        .trim()
-        .replace(/\s+/gu, ' ')
+    return nome.normalize('NFKC').trim().replace(/\s+/gu, ' ');
 }
 
 //Valida e normaliza os dados usados tanto pelo formulário quanto por ações externas.
 function prepararCategoriaParaSalvar(dados) {
-    const nome = typeof dados?.nome === 'string'
-        ? dados.nome
-        : ''
+    const nome = typeof dados?.nome === 'string' ? dados.nome : '';
     const dadosVisiveis = Array.isArray(dados?.dadosVisiveis)
-        ? [
-            ...new Set(
-                dados.dadosVisiveis.filter(
-                    permissao => typeof permissao === 'string'
-                )
-            )
-        ]
-        : []
-    const nomeNormalizado = normalizarNomeCategoria(nome)
+        ? [...new Set(dados.dadosVisiveis.filter((permissao) => typeof permissao === 'string'))]
+        : [];
+    const nomeNormalizado = normalizarNomeCategoria(nome);
 
     if (!nomeNormalizado) {
-        return {erro: ERRO_NOME}
+        return { erro: ERRO_NOME };
+    }
+
+    if ([...nomeNormalizado].length > 15) {
+        return {
+            erro: {
+                codigo: 'NOME_CATEGORIA_INVALIDO',
+                titulo: 'Nome muito longo',
+                mensagem: 'O nome da categoria deve possuir no máximo 15 caracteres.'
+            }
+        };
     }
 
     if (dadosVisiveis.length === 0) {
-        return {erro: ERRO_PERMISSOES}
+        return { erro: ERRO_PERMISSOES };
     }
 
     return {
@@ -71,7 +61,7 @@ function prepararCategoriaParaSalvar(dados) {
             nome: nomeNormalizado,
             dadosVisiveis
         }
-    }
+    };
 }
 
 //Recebe dados controlados, valida o formulário e envia somente os campos permitidos.
@@ -84,146 +74,97 @@ function SupportCategoryForm({
     bloqueado = false,
     exibirAcao = true
 }) {
-    const nome =
-        typeof dados?.nome === 'string'
-            ? dados.nome
-            : ''
+    const nome = typeof dados?.nome === 'string' ? dados.nome : '';
 
-    const dadosVisiveisRecebidos =
-        dados?.dadosVisiveis
+    const dadosVisiveisRecebidos = dados?.dadosVisiveis;
 
     const dadosVisiveis = useMemo(() => {
-        if (
-            !Array.isArray(
-                dadosVisiveisRecebidos
-            )
-        ) {
-            return []
+        if (!Array.isArray(dadosVisiveisRecebidos)) {
+            return [];
         }
 
         return [
-            ...new Set(
-                dadosVisiveisRecebidos.filter(
-                    permissao =>
-                        typeof permissao === 'string'
-                )
-            )
-        ]
-    }, [dadosVisiveisRecebidos])
+            ...new Set(dadosVisiveisRecebidos.filter((permissao) => typeof permissao === 'string'))
+        ];
+    }, [dadosVisiveisRecebidos]);
 
-    const camposDesabilitados =
-        bloqueado || carregando
+    const camposDesabilitados = bloqueado || carregando;
 
-    const possuiAlgumDado =
-        nome.trim().length > 0
-        || dadosVisiveis.length > 0
+    const possuiAlgumDado = nome.trim().length > 0 || dadosVisiveis.length > 0;
 
     const botaoDesativado =
-        camposDesabilitados
-        || !possuiAlgumDado
-        || typeof aoSalvar !== 'function'
+        camposDesabilitados || !possuiAlgumDado || typeof aoSalvar !== 'function';
 
     //Envia somente a alteração do nome para o estado mantido pelo componente pai.
     const alterarNome = useCallback(
-        novoNome => {
-            if (
-                !camposDesabilitados
-                && typeof aoAlterar === 'function'
-            ) {
+        (novoNome) => {
+            if (!camposDesabilitados && typeof aoAlterar === 'function') {
                 aoAlterar({
                     nome: novoNome
-                })
+                });
             }
         },
-        [
-            aoAlterar,
-            camposDesabilitados
-        ]
-    )
+        [aoAlterar, camposDesabilitados]
+    );
 
     //Adiciona ou remove uma permissão geral sem apagar as demais seleções.
     const alterarPermissaoGeral = useCallback(
         (permissaoId, ativa) => {
-            if (
-                camposDesabilitados
-                || typeof aoAlterar !== 'function'
-            ) {
-                return
+            if (camposDesabilitados || typeof aoAlterar !== 'function') {
+                return;
             }
 
-            const novasPermissoes =
-                new Set(dadosVisiveis)
+            const novasPermissoes = new Set(dadosVisiveis);
 
             if (ativa) {
-                novasPermissoes.add(permissaoId)
+                novasPermissoes.add(permissaoId);
             } else {
-                novasPermissoes.delete(permissaoId)
+                novasPermissoes.delete(permissaoId);
             }
 
             aoAlterar({
-                dadosVisiveis: [
-                    ...novasPermissoes
-                ]
-            })
+                dadosVisiveis: [...novasPermissoes]
+            });
         },
-        [
-            aoAlterar,
-            camposDesabilitados,
-            dadosVisiveis
-        ]
-    )
+        [aoAlterar, camposDesabilitados, dadosVisiveis]
+    );
 
     //Recebe a lista completa das permissões de acesso e a envia ao estado do formulário.
     const alterarPermissoesAcesso = useCallback(
-        novasPermissoes => {
+        (novasPermissoes) => {
             if (
-                camposDesabilitados
-                || typeof aoAlterar !== 'function'
-                || !Array.isArray(novasPermissoes)
+                camposDesabilitados ||
+                typeof aoAlterar !== 'function' ||
+                !Array.isArray(novasPermissoes)
             ) {
-                return
+                return;
             }
 
             const permissoesSeguras = [
-                ...new Set(
-                    novasPermissoes.filter(
-                        permissao =>
-                            typeof permissao
-                            === 'string'
-                    )
-                )
-            ]
+                ...new Set(novasPermissoes.filter((permissao) => typeof permissao === 'string'))
+            ];
 
             aoAlterar({
-                dadosVisiveis:
-                    permissoesSeguras
-            })
+                dadosVisiveis: permissoesSeguras
+            });
         },
-        [
-            aoAlterar,
-            camposDesabilitados
-        ]
-    )
+        [aoAlterar, camposDesabilitados]
+    );
 
     //Valida na mesma ordem do backend e mantém os campos preenchidos quando existe erro.
     const salvar = useCallback(() => {
         const resultado = prepararCategoriaParaSalvar({
             nome,
             dadosVisiveis
-        })
+        });
 
         if (resultado.erro) {
-            aoErroValidacao?.(resultado.erro)
-            return
+            aoErroValidacao?.(resultado.erro);
+            return;
         }
 
-        return aoSalvar(resultado.dados)
-    }, [
-        aoErroValidacao,
-        aoSalvar,
-        dadosVisiveis,
-        nome
-    ])
+        return aoSalvar(resultado.dados);
+    }, [aoErroValidacao, aoSalvar, dadosVisiveis, nome]);
 
     return (
         <View style={estilos.container}>
@@ -233,45 +174,25 @@ function SupportCategoryForm({
                     placeholder="Parceiro(a)"
                     value={nome}
                     onChangeText={alterarNome}
-                    sanitizar={
-                        sanitizarNomeCategoria
-                    }
+                    sanitizar={sanitizarNomeCategoria}
                     variante="categoria"
-                    desativado={
-                        camposDesabilitados
-                    }
-                    maxLength={80}
+                    desativado={camposDesabilitados}
+                    maxLength={15}
                     autoCapitalize="sentences"
                     autoCorrect={false}
                     returnKeyType="done"
                 />
 
                 <GeneralPermissions
-                    permissoesSelecionadas={
-                        dadosVisiveis
-                    }
-                    aoAlterar={
-                        alterarPermissaoGeral
-                    }
-                    desabilitado={
-                        camposDesabilitados
-                        || typeof aoAlterar
-                            !== 'function'
-                    }
+                    permissoesSelecionadas={dadosVisiveis}
+                    aoAlterar={alterarPermissaoGeral}
+                    desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
                 />
 
                 <PermissionGroups
-                    permissoesSelecionadas={
-                        dadosVisiveis
-                    }
-                    aoAlterar={
-                        alterarPermissoesAcesso
-                    }
-                    desabilitado={
-                        camposDesabilitados
-                        || typeof aoAlterar
-                            !== 'function'
-                    }
+                    permissoesSelecionadas={dadosVisiveis}
+                    aoAlterar={alterarPermissoesAcesso}
+                    desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
                 />
             </View>
 
@@ -280,16 +201,14 @@ function SupportCategoryForm({
                     <ButtonScreen
                         texto="Salvar"
                         aoPressionar={salvar}
-                        desativado={
-                            botaoDesativado
-                        }
+                        desativado={botaoDesativado}
                         carregando={carregando}
                         variante="laranja"
                     />
                 </View>
             ) : null}
         </View>
-    )
+    );
 }
 
-export {prepararCategoriaParaSalvar, SupportCategoryForm}
+export { prepararCategoriaParaSalvar, SupportCategoryForm };

@@ -6,6 +6,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { ChangePassword } from '../security/ChangePassword';
 import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { contarBytesUtf8 } from '../../../shared/utils/validation/contarBytesUtf8';
 
 const senhasBloqueadas = new Set([
     'senha',
@@ -27,26 +28,6 @@ const codigosSessaoInvalida = new Set([
     'SESSAO_AUSENTE',
     'SESSAO_ATUAL_INVALIDA'
 ]);
-
-function contarBytesUtf8(texto) {
-    let total = 0;
-
-    for (const caractere of texto) {
-        const codigo = caractere.codePointAt(0);
-
-        if (codigo <= 0x7f) {
-            total += 1;
-        } else if (codigo <= 0x7ff) {
-            total += 2;
-        } else if (codigo <= 0xffff) {
-            total += 3;
-        } else {
-            total += 4;
-        }
-    }
-
-    return total;
-}
 
 function validarAlteracaoSenha(senhaAtual, novaSenha, confirmacaoNovaSenha) {
     if (!senhaAtual || !novaSenha || !confirmacaoNovaSenha) {

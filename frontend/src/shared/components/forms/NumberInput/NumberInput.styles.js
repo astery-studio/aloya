@@ -34,7 +34,13 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 4
         },
-        entrada: { ...texto, minWidth: 24, padding: 0, textAlign: 'right' },
+        entrada: {
+            ...texto,
+            minWidth: 32,
+            padding: 0,
+            textAlign: 'center',
+            textAlignVertical: 'center'
+        },
         unidade: { ...texto },
         desativado: { opacity: 0.55 }
     });

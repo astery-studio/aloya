@@ -10,11 +10,24 @@ test('AuthLayout usa ajuste de teclado do iOS', async () => {
     try {
         await renderWithTheme(<AuthLayout titulo="Entrar" />);
         expect(screen.getByText('Entrar')).toBeTruthy();
+        expect(screen.getByTestId('auth-layout-scroll').props.keyboardDismissMode)
+            .toBe('interactive');
     } finally {
         Object.defineProperty(Platform, 'OS', {
             configurable: true,
             value: sistemaOriginal
         });
+    }
+});
+
+test('AuthLayout reduz a área útil acima do teclado no Android', async () => {
+    const sistemaOriginal = Platform.OS;
+    Object.defineProperty(Platform, 'OS', { configurable: true, value: 'android' });
+    try {
+        await renderWithTheme(<AuthLayout titulo="Entrar" />);
+        expect(screen.getByTestId('auth-layout-scroll').props.keyboardDismissMode).toBe('on-drag');
+    } finally {
+        Object.defineProperty(Platform, 'OS', { configurable: true, value: sistemaOriginal });
     }
 });
 

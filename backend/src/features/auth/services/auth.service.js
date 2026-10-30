@@ -105,7 +105,9 @@ function criarAuthService({
 
                 // Gera o token JWT de sessão e seus dados seguros para persistência.
                 const sessao = tokenService.gerarTokenSessao(usuario);
-                const cicloInicial = await criarRegistroInicial(tx, usuario.id, dados);
+                const cicloInicial = dados.dataInicioUltimaMenstruacao
+                    ? await criarRegistroInicial(tx, usuario.id, dados)
+                    : null;
 
                 if (dados.menorDe16 && dados.emailResponsavelLegal) {
                     emailConsentimentoPendente = await parentalConsentService.criarPendente(tx, {
@@ -160,13 +162,14 @@ function criarAuthService({
                     tipo: 'Bearer'
                 },
 
-                cicloInicial: {
-                    id: resultado.cicloInicial.id,
+                cicloInicial: resultado.cicloInicial
+                    ? {
+                          id: resultado.cicloInicial.id,
 
-                    dataInicio: resultado.cicloInicial.dataInicio,
-
-                    dataFim: resultado.cicloInicial.dataFim
-                },
+                          dataInicio: resultado.cicloInicial.dataInicio,
+                          dataFim: resultado.cicloInicial.dataFim
+                      }
+                    : null,
 
                 consentimentoParental: dados.menorDe16
                     ? {

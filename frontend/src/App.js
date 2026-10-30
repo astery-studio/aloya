@@ -2,7 +2,14 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, NativeModules, Text } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    BackHandler,
+    Linking,
+    NativeModules,
+    Text
+} from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
@@ -17,6 +24,7 @@ import { ForgotPasswordScreen } from './features/auth/screens/ForgotPasswordScre
 import LoginScreen from './features/auth/screens/LoginScreen';
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
 import WelcomeScreen from './features/auth/screens/WelcomeScreen';
+import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
@@ -52,16 +60,15 @@ const telasInternas = Object.freeze({
 
 // Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
+    if (process.env.EXPO_PUBLIC_API_URL) {
+        return process.env.EXPO_PUBLIC_API_URL;
+    }
     const script = NativeModules.SourceCode?.scriptURL || '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
 
     if (__DEV__ && host) {
         return `http://${host}:3000`;
-    }
-
-    if (process.env.EXPO_PUBLIC_API_URL) {
-        return process.env.EXPO_PUBLIC_API_URL;
     }
 
     return 'http://10.0.2.2:3000';
@@ -339,6 +346,18 @@ export default function App() {
         };
     }, []);
 
+    useEffect(() => {
+        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (estadoSessao !== 'anonima') return false;
+            const destino = obterDestinoDeRetorno(telaPublica);
+            if (!destino) return false;
+            setTelaPublica(destino);
+            return true;
+        });
+
+        return () => inscricao.remove();
+    }, [estadoSessao, telaPublica]);
+
     function renderizarComTema(conteudo) {
         return (
             <AppThemeRoot
@@ -369,6 +388,11 @@ export default function App() {
         setEstadoSessao('autenticada');
 
         carregarPerfil();
+    }
+
+    function concluirCadastro() {
+        concluirAutenticacao();
+        setTelaInterna(telasInternas.inicio);
     }
 
     function finalizarSessao(resultado = {}) {
@@ -523,7 +547,7 @@ export default function App() {
                     }
                     aoVoltar={() => setTelaPublica('boasVindas')}
                     aoEntrar={() => setTelaPublica('login')}
-                    aoConcluir={concluirAutenticacao}
+                    aoConcluir={concluirCadastro}
                 />
             );
         }

@@ -59,7 +59,6 @@ function Button({
                 ) : null}
 
                 <Text
-                    numberOfLines={1}
                     style={[
                         estilos.texto,
                         tamanhoAtual.texto,

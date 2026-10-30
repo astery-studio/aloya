@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { ButtonSelection } from '../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
@@ -31,7 +32,8 @@ function AlertIntensitySelector({ valor, aberto, onAbrir, onSelecionar, onFechar
                 icone={Bell}
             />
             <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
-                <View style={estilos.telaFluxo}>
+                <SafeAreaView style={estilos.telaFluxo} edges={['top', 'left', 'right', 'bottom']}
+                    testID="intensidade-anticoncepcional-area-segura">
                     <Header
                         titulo="Intensidade do Alerta"
                         variante="comVoltar"
@@ -63,7 +65,7 @@ function AlertIntensitySelector({ valor, aberto, onAbrir, onSelecionar, onFechar
                             aoPressionar={() => onSelecionar(temporario)}
                         />
                     </View>
-                </View>
+                </SafeAreaView>
             </Modal>
         </>
     );

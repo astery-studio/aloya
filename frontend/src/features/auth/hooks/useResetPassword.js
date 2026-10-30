@@ -6,7 +6,7 @@ function useResetPassword({ redefinirSenha, token }) {
     const [carregando, setCarregando] = useState(false);
     const [erro, setErro] = useState(null);
     const [sucesso, setSucesso] = useState(false);
-    const valido = senha.length > 0 && senha === confirmacao;
+    const valido = senha.length >= 8 && senha === confirmacao;
 
     async function enviar() {
         if (!valido) return null;
@@ -17,7 +17,8 @@ function useResetPassword({ redefinirSenha, token }) {
             setSucesso(true);
             return resultado;
         } catch (falha) {
-            setErro(falha.mensagemUsuario || falha.message || 'Não foi possível redefinir a senha.');
+            setErro(falha.mensagemUsuario ||
+                'Não foi possível redefinir a senha. Tente novamente.');
             return null;
         } finally {
             setCarregando(false);

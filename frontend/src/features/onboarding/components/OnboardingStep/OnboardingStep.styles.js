@@ -27,6 +27,11 @@ function criarEstilos(tema) {
             gap: 12,
             maxWidth: 304
         },
+        textosFixos: {
+            alignSelf: 'center',
+            marginTop: espacamentos.extraGrande,
+            paddingHorizontal: espacamentos.pequeno
+        },
         titulo: {
             ...typography.h1,
             color: tema.cores.interface.textoPrincipal,
@@ -37,7 +42,16 @@ function criarEstilos(tema) {
             color: tema.cores.interface.textoSecundario,
             textAlign: 'center'
         },
-        campo: { width: '100%' }
+        campo: { gap: espacamentos.pequeno, width: '100%' },
+        acoes: {
+            gap: espacamentos.pequeno,
+            width: '100%'
+        },
+        erro: {
+            ...typography.caption,
+            color: tema.cores.feedback.erro,
+            textAlign: 'center'
+        }
     });
 }
 

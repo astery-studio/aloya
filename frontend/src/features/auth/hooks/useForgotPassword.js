@@ -20,6 +20,7 @@ function useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao }) {
     const executar = useCallback(async (acao) => {
         setCarregando(true);
         setErro(null);
+        setResultado(null);
 
         try {
             const resposta = await acao({ email: email.trim().toLowerCase() });
@@ -27,8 +28,8 @@ function useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao }) {
             return resposta;
         } catch (falha) {
             if (montado.current) {
-                setErro(falha.mensagemUsuario || falha.message ||
-                    'Não foi possível enviar o e-mail.');
+                setErro(falha.mensagemUsuario ||
+                    'Não foi possível enviar o e-mail. Tente novamente.');
             }
             return null;
         } finally {

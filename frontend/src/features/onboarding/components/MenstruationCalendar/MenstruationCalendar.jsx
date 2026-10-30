@@ -6,9 +6,8 @@
  */
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { CaretDownIcon as CaretDown } from 'phosphor-react-native/src/icons/CaretDown';
-import { CaretLeftIcon as CaretLeft } from 'phosphor-react-native/src/icons/CaretLeft';
-import { CaretRightIcon as CaretRight } from 'phosphor-react-native/src/icons/CaretRight';
+import { CaretDownIcon as CaretDown, CaretLeftIcon as CaretLeft,
+    CaretRightIcon as CaretRight } from '../../../../shared/components/icons/AppIcons';
 import { getMonthDays } from '../../../../shared/utils/getMonthDays';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './MenstruationCalendar.styles';

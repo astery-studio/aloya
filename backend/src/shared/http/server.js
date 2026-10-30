@@ -171,6 +171,21 @@ app.use(
 app.use(rotaNaoEncontrada);
 app.use(tratarErros);
 
-app.listen(env.port, () => {
+const servidor = app.listen(env.port);
+
+servidor.once('listening', () => {
     console.log(`API executando na porta ${env.port}.`);
+});
+
+servidor.once('error', (erro) => {
+    if (erro.code === 'EADDRINUSE') {
+        console.error(`Não foi possível iniciar a API: a porta ${env.port} já está em uso.`);
+        console.error(
+            'Encerre o processo que está usando essa porta ou defina outra porta pela variável PORT.'
+        );
+    } else {
+        console.error('Não foi possível iniciar a API.', erro);
+    }
+
+    process.exitCode = 1;
 });

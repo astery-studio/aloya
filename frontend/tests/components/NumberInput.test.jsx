@@ -11,9 +11,14 @@ test('altera somente o número e mantém a unidade visível', async () => {
 
     const entrada = screen.getByLabelText('Duração em dias');
     expect(entrada.props.value).toBe('28');
+    expect(entrada).toHaveStyle({
+        minWidth: 32,
+        textAlign: 'center',
+        textAlignVertical: 'center'
+    });
     expect(screen.getByText('Dias')).toBeTruthy();
 
-    fireEvent.changeText(entrada, '35 dias');
+    await fireEvent.changeText(entrada, '35 dias');
     expect(aoAlterar).toHaveBeenCalledWith(35);
     expect(screen.getByText('Dias')).toBeTruthy();
 });
@@ -22,6 +27,11 @@ test('converte um campo apagado para valor nulo', async () => {
     const aoAlterar = jest.fn();
     await renderWithTheme(<NumberInput valor={5} aoAlterar={aoAlterar} />);
 
-    fireEvent.changeText(screen.getByLabelText('Duração em dias'), '');
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '');
     expect(aoAlterar).toHaveBeenCalledWith(null);
+});
+
+test('toda a área numérica pode direcionar o foco', async () => {
+    await renderWithTheme(<NumberInput valor={28} aoAlterar={jest.fn()} />);
+    await fireEvent.press(screen.getByTestId('area-campo-numero'));
 });

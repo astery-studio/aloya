@@ -17,6 +17,7 @@ export default function BirthDateStep({
     menorDe16 = false,
     emailResponsavelLegal = '',
     aoAlterarEmailResponsavel,
+    aoValidarEmailResponsavel,
     erroEmailResponsavel
 }) {
     const tema = useTheme();
@@ -31,7 +32,8 @@ export default function BirthDateStep({
             carregando={carregando}
         >
             <View style={{ gap: 12 }}>
-                <DateInput valor={valor} onChangeText={aoAlterar} />
+                <DateInput valor={valor} onChangeText={aoAlterar}
+                    corDestaque={tema.cores.marca.primaria} />
                 {menorDe16 ? (
                     <>
                         <EmailInput
@@ -40,6 +42,7 @@ export default function BirthDateStep({
                             value={emailResponsavelLegal}
                             erro={erroEmailResponsavel}
                             onChangeText={aoAlterarEmailResponsavel}
+                            onBlur={aoValidarEmailResponsavel}
                         />
                         <Text
                             style={{

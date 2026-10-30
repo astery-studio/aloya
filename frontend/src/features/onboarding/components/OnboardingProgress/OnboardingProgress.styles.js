@@ -19,7 +19,7 @@ function criarEstilos(tema) {
             width: '100%'
         },
         progresso: {
-            backgroundColor: tema.cores.interface.destaque,
+            backgroundColor: tema.cores.marca.primaria,
             borderRadius: radius.switch,
             height: 3
         }
