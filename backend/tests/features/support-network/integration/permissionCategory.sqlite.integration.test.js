@@ -328,7 +328,7 @@ test('cria uma categoria pelo endpoint usando SQLite real', async () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    nome: 'Profissionais de saúde',
+                    nome: 'Equipe de saúde',
                     dadosVisiveis: ['geral.fase_atual', 'saude.consultas']
                 })
             }
@@ -336,22 +336,22 @@ test('cria uma categoria pelo endpoint usando SQLite real', async () => {
 
         const corpo = await resposta.json();
 
-        assert.equal(resposta.status, 201);
+        assert.equal(resposta.status, 201, JSON.stringify(corpo));
         assert.equal(corpo.mensagem, 'Categoria criada com sucesso.');
-        assert.equal(corpo.categoria.nome, 'Profissionais de saúde');
+        assert.equal(corpo.categoria.nome, 'Equipe de saúde');
         assert.deepEqual(corpo.categoria.dadosVisiveis, ['geral.fase_atual', 'saude.consultas']);
 
         const categoriaPersistida = await prisma.categoriaPermissao.findUnique({
             where: {
                 titularId_nomeNormalizado: {
                     titularId: 1,
-                    nomeNormalizado: 'profissionais de saúde'
+                    nomeNormalizado: 'equipe de saúde'
                 }
             }
         });
 
         assert.ok(categoriaPersistida);
-        assert.equal(categoriaPersistida.nome, 'Profissionais de saúde');
+        assert.equal(categoriaPersistida.nome, 'Equipe de saúde');
     } finally {
         await prisma.$disconnect();
 
