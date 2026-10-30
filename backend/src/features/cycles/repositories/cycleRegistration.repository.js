@@ -138,3 +138,37 @@ function criarCycleRegistrationRepository({ prisma }) {
                 const atualizado = atualizados.find((item) => item.id === ciclo.id);
                 const resultado = {
                     mensagem: 'Registro de menstruação adicionado com sucesso.',
+                    repetida: false,
+                    chave,
+                    statusSincronizacao: 'sincronizado',
+                    ciclo: {
+                        id: ciclo.id,
+                        dataInicio: formatarData(atualizado.dataInicio),
+                        dataFim: formatarData(atualizado.dataFim),
+                        duracaoMenstruacao,
+                        duracaoCiclo: atualizado.duracaoCiclo,
+                        dias: atualizado.diasMenstruacao.map((dia) => formatarData(dia.data))
+                    },
+                    previsao,
+                    compartilhamento: { notificacoesAgendadas: contatos.length }
+                };
+                await tx.sincronizacaoMenstrual.create({
+                    data: { usuarioId, chave, solicitacao, resultado }
+                });
+                return resultado;
+            });
+        } catch (erro) {
+            if (['P2002', 'P2034', 'P1008', 'P2028'].includes(erro.code)) {
+                throw new AppError(
+                    'Houve uma operação concorrente. Tente sincronizar novamente com a mesma chave.',
+                    409,
+                    'CONCORRENCIA_REGISTRO_MENSTRUAL'
+                );
+            }
+            throw erro;
+        }
+    }
+    return { registrar };
+}
+
+export { criarCycleRegistrationRepository };
