@@ -176,37 +176,38 @@ describe('App — calendário', () => {
         jest.spyOn(Linking, 'addEventListener').mockReturnValue({
             remove: jest.fn()
         });
-        jest.spyOn(Alert, 'alert').mockImplementation(jest.fn())
-    })
+        jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    });
 
     afterEach(() => {
-        jest.restoreAllMocks()
-    })
+        jest.restoreAllMocks();
+    });
 
-    test('abre o calendário pelo ícone do início e retorna à tela inicial', async () => {
-        await render(<App />)
+    test('encaminha o dia da Home e limpa a pré-seleção ao entrar pelo Calendário', async () => {
+        await render(<App />);
 
-        expect(await screen.findByText('Configurações')).toBeOnTheScreen()
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
 
-        await fireEvent.press(
-            screen.getByRole('button', {name: 'Abrir início'})
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir início' }));
 
-        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen()
-        expect(screen.queryByTestId('diario-provisorio')).toBeNull()
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+        expect(screen.queryByTestId('diario-provisorio')).toBeNull();
 
-        await fireEvent.press(
-            screen.getByRole('button', {name: 'Abrir calendário'})
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar pela Home' }));
+        expect(await screen.findByText('Data inicial: 2026-10-27')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
 
-        expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen()
-        await fireEvent.press(screen.getByRole('button', {name: 'Cadastrar Menstruação'}))
-        expect(Alert.alert).toHaveBeenCalledWith(
-            'Cadastro de menstruação',
-            'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
 
-        await fireEvent.press(screen.getByRole('button', {name: 'Voltar ao Início'}))
-        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen()
-    })
-})
+        expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        expect(await screen.findByText('Cadastro conectado')).toBeOnTheScreen();
+        expect(screen.getByText('Data inicial: nenhuma')).toBeOnTheScreen();
+        expect(Alert.alert).not.toHaveBeenCalled();
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
+        expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao Início' }));
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+    });
+});
