@@ -5,6 +5,7 @@ const estilos = StyleSheet.create({
     tela: { flex: 1, backgroundColor: cores.neutras.fundoClaro },
     areaRolagem: { flex: 1 },
     cabecalho: { width: '100%', minHeight: 78, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: espacamentos.medio, paddingTop: espacamentos.extraGrande },
+    acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
     titulo: { ...typography.h2, flexShrink: 1, color: cores.neutras.textoPrincipalClaro, fontWeight: '700', lineHeight: 28 },
     rolagem: { flexGrow: 1, paddingBottom: espacamentos.medio },
     carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },

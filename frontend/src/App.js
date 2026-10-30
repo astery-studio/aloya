@@ -73,6 +73,7 @@ import {
 import {
     CycleTodayContainer
 } from './features/cycles/screens/CycleTodayContainer'
+import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen'
 import {
     criarServicosApp
 } from './app/createAppServices'
@@ -96,6 +97,7 @@ const telasInternas = Object.freeze({
         'anticoncepcionais',
     novaCategoria: 'novaCategoria',
     calendario: 'calendario',
+    parametrosCiclo: 'parametrosCiclo',
     inicio: 'inicio'
 })
 
@@ -179,6 +181,8 @@ export default function App() {
     ] = useState(
         telasInternas.membros
     )
+
+    const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes)
 
     const [
         estadoSessao,
@@ -547,6 +551,11 @@ export default function App() {
         )
     }
 
+    function abrirParametrosCiclo(origem) {
+        setRetornoParametros(origem)
+        setTelaInterna(telasInternas.parametrosCiclo)
+    }
+
     if (
         erroFontes
         || configuracao.erro
@@ -811,6 +820,7 @@ export default function App() {
                             .calendario
                     )
                 }
+                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
                 aoSelecionarAba={
                     selecionarAba
                 }
@@ -955,6 +965,7 @@ export default function App() {
                 onSelecionarAba={
                     selecionarAba
                 }
+                onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
                     setTelaInterna(
                         telasInternas.perfil
@@ -968,6 +979,14 @@ export default function App() {
                         carregarPerfil()
                     }
                 }}
+            />
+        )
+    } else if (telaInterna === telasInternas.parametrosCiclo) {
+        conteudo = (
+            <CycleParametersScreen
+                service={configuracao.servicos.cycleParametersService}
+                onVoltar={() => setTelaInterna(retornoParametros)}
+                onSessaoExpirada={finalizarSessao}
             />
         )
     } else if (

@@ -6,6 +6,7 @@ import { criarAccountService } from '../features/settings/services/accountServic
 import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService'
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService'
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService'
+import { criarCycleParametersService } from '../features/cycles/services/cycleParametersService'
 import { criarApiClient } from '../shared/services/api/apiClient'
 import { criarRequisicaoAutenticada } from '../shared/services/api/authenticatedRequest'
 import { obterToken, removerToken } from '../shared/storage/tokenStorage'
@@ -74,6 +75,10 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         requisicaoAutenticada
     })
 
+    const cycleParametersService = criarCycleParametersService({
+        requisicaoAutenticada
+    })
+
     return Object.freeze({
         authService,
         accountService,
@@ -81,7 +86,8 @@ function criarServicosApp({apiUrl = process.env.EXPO_PUBLIC_API_URL, fetchImpl =
         contraceptiveService,
         cycleHistoryService,
         supportCategoryService,
-        cyclePredictionService
+        cyclePredictionService,
+        cycleParametersService
     })
 }
 
