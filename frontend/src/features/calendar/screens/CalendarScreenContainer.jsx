@@ -1,18 +1,19 @@
 // Conecta a tela ao serviço autenticado e ao estado controlado pelo hook.
-import {useMemo} from 'react'
-import {CalendarScreen} from './CalendarScreen'
-import {obterChaveMes, useCalendar} from '../hooks/useCalendar'
+import { useMemo } from 'react';
+import { CalendarScreen } from './CalendarScreen';
+import { obterChaveMes, useCalendar } from '../hooks/useCalendar';
 
 function CalendarScreenContainer({
     service,
     onSessaoExpirada,
     aoVoltar,
-    aoCadastrarMenstruacao
+    aoCadastrarMenstruacao,
+    aoEditarCiclo
 }) {
-    const estado = useCalendar({service, onSessaoExpirada})
-    const chaveMesAtual = useMemo(() => obterChaveMes(), [])
-    const calendarioAtual = estado.meses.find(mes => mes.mes === chaveMesAtual)
-    const confianca = calendarioAtual?.previsao?.nivelConfianca ?? null
+    const estado = useCalendar({ service, onSessaoExpirada });
+    const chaveMesAtual = useMemo(() => obterChaveMes(), []);
+    const calendarioAtual = estado.meses.find((mes) => mes.mes === chaveMesAtual);
+    const confianca = calendarioAtual?.previsao?.nivelConfianca ?? null;
 
     return (
         <CalendarScreen
@@ -27,9 +28,10 @@ function CalendarScreenContainer({
             aoTentarNovamente={estado.tentarNovamente}
             aoVoltar={aoVoltar}
             aoCadastrarMenstruacao={aoCadastrarMenstruacao}
+            aoEditarCiclo={aoEditarCiclo}
         />
-    )
+    );
 }
 
-export {CalendarScreenContainer}
-export default CalendarScreenContainer
+export { CalendarScreenContainer };
+export default CalendarScreenContainer;

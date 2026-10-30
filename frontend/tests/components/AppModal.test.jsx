@@ -137,4 +137,16 @@ describe('AppModal', () => {
             backgroundColor: 'rgba(0, 0, 0, 0.68)'
         });
     });
+
+    test('expõe o término do fechamento nativo para transições entre modais', async () => {
+        const aoOcultar = jest.fn();
+        const resultado = await renderizarModal({ aoOcultar });
+        const modal = resultado.container.queryAll(
+            (elemento) => elemento.props.animationType === 'fade'
+        )[0];
+
+        modal.props.onDismiss();
+
+        expect(aoOcultar).toHaveBeenCalledTimes(1);
+    });
 });

@@ -255,4 +255,25 @@ describe('BottomSheet', () => {
             backgroundColor: '#2B322E'
         });
     });
+
+    test('notifica uma vez quando o modal termina de ser ocultado', async () => {
+        const onOcultar = jest.fn();
+        const resultado = await renderizarBottomSheet({ onOcultar });
+        const modal = obterModal(resultado.container);
+
+        await resultado.rerender(
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <BottomSheet visivel={false} onOcultar={onOcultar}>
+                    <Text>Conteúdo do painel</Text>
+                </BottomSheet>
+            </ThemeProvider>
+        );
+
+        await act(async () => {
+            modal.props.onDismiss();
+            modal.props.onDismiss();
+        });
+
+        expect(onOcultar).toHaveBeenCalledTimes(1);
+    });
 });

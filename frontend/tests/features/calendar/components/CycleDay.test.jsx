@@ -155,6 +155,34 @@ describe('CycleDay', () => {
         expect(aoPressionarDia).not.toHaveBeenCalled();
     });
 
+    test('abre o ciclo pela parte assumida atual sem anunciá-la como registrada', async () => {
+        const aoPressionarDia = jest.fn();
+
+        await render(
+            <CycleDay
+                dia={criarDia({
+                    tipo: 'menstruacao',
+                    registroCicloId: 18,
+                    menstruacaoRegistrada: false,
+                    inicioSegmento: true,
+                    fimSegmento: true
+                })}
+                aoPressionarDia={aoPressionarDia}
+            />
+        );
+
+        fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Dia 3 de outubro de 2026, menstruação'
+            })
+        );
+
+        expect(aoPressionarDia).toHaveBeenCalledWith({
+            data: '2026-10-03',
+            registroCicloId: 18
+        });
+    });
+
     test('usa textos e fases com contraste próprio do tema escuro', async () => {
         const estilosTemaEscuro = criarEstilosCalendario(temaEscuro);
 

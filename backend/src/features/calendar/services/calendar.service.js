@@ -146,7 +146,13 @@ function projetarPrevisaoDoMes(previsaoBase, parametros, inicioMes) {
     };
 }
 
-function criarPeriodosDoMes(previsaoBase, parametros, inicioMes, ultimoDia) {
+function criarPeriodosDoMes(
+    previsaoBase,
+    parametros,
+    inicioMes,
+    ultimoDia,
+    registroCicloBaseId
+) {
     const periodos = [];
 
     function incluirPeriodo(previsao, previsto) {
@@ -162,7 +168,13 @@ function criarPeriodosDoMes(previsaoBase, parametros, inicioMes, ultimoDia) {
         else periodo.menstruacaoPrevista = null;
 
         if (Object.values(periodo).some(Boolean)) {
-            periodos.push({previsto, ...periodo});
+            periodos.push({
+                previsto,
+                ...periodo,
+                ...(!previsto && Number.isSafeInteger(registroCicloBaseId)
+                    ? {registroCicloId: registroCicloBaseId}
+                    : {})
+            });
         }
     }
 
@@ -209,6 +221,23 @@ function criarPeriodosDoMes(previsaoBase, parametros, inicioMes, ultimoDia) {
     }
 
     return periodos;
+}
+
+function obterRegistroCicloBaseId(registrosCiclo) {
+    const registroBase = registrosCiclo.reduce((maisRecente, registro) => {
+        if (!maisRecente) return registro;
+
+        const dataRegistro = formatarData(registro.dataInicio);
+        const dataMaisRecente = formatarData(maisRecente.dataInicio);
+
+        if (dataRegistro !== dataMaisRecente) {
+            return dataRegistro > dataMaisRecente ? registro : maisRecente;
+        }
+
+        return registro.id > maisRecente.id ? registro : maisRecente;
+    }, null);
+
+    return registroBase && !registroBase.dataFim ? registroBase.id : null;
 }
 
 function criarCalendarService({repository} = {}) {
@@ -288,7 +317,8 @@ function criarCalendarService({repository} = {}) {
                     previsaoBase,
                     parametros,
                     `${mesValidado.chave}-01`,
-                    intervalo.ultimoDia
+                    intervalo.ultimoDia,
+                    obterRegistroCicloBaseId(registrosCiclo)
                 )
             }
         };

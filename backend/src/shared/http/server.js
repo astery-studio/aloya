@@ -14,6 +14,8 @@ import { criarCalendarRoutes } from '../../features/calendar/routes/calendar.rou
 
 import { criarCycleHistoryRoutes } from '../../features/cycles/routes/cycleHistory.routes.js';
 
+import { criarCycleEditRoutes } from '../../features/cycles/routes/cycleEdit.routes.js';
+
 import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
@@ -28,6 +30,8 @@ import { rotaNaoEncontrada, tratarErros } from '../middleware/error.middleware.j
 const app = express();
 const container = criarContainer();
 
+//O Cloudflare Tunnel conecta ao backend por localhost; só confiamos nesse proxy.
+app.set('trust proxy', 'loopback');
 app.disable('x-powered-by');
 app.use(helmet());
 
@@ -109,6 +113,15 @@ app.use(
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         cycleHistoryController: container.cycleHistoryController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleEditRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        controller: container.cycleEditController
     })
 );
 

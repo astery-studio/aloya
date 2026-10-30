@@ -5,7 +5,7 @@ import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } f
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './BottomSheet.style';
 
-function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }) {
+function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechamento = false }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -21,7 +21,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
     const visivelAtual = useRef(visivel);
 
     const modalJaApareceu = useRef(false);
-
+    const ocultamentoNotificado = useRef(false);
     visivelAtual.current = visivel;
 
     const posicaoPainel = useRef(
@@ -32,6 +32,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
     ).current;
 
     function animarEntrada() {
+        ocultamentoNotificado.current = false;
         Animated.timing(progresso, {
             toValue: 1,
             duration: 280,
@@ -39,6 +40,15 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             useNativeDriver: true,
             isInteraction: false
         }).start();
+    }
+
+    function notificarOcultamento() {
+        if (visivelAtual.current || ocultamentoNotificado.current) {
+            return;
+        }
+
+        ocultamentoNotificado.current = true;
+        onOcultar?.();
     }
 
     function animarSaida() {
@@ -51,8 +61,11 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
         }).start(({ finished }) => {
             if (finished && !visivelAtual.current) {
                 montadoAtual.current = false;
-
                 setModalMontado(false);
+
+                if (Platform.OS !== 'ios') {
+                    notificarOcultamento();
+                }
             }
         });
     }
@@ -61,14 +74,11 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
         if (visivel) {
             if (!montadoAtual.current) {
                 montadoAtual.current = true;
-
                 progresso.setValue(0);
-
                 setModalMontado(true);
             } else if (modalJaApareceu.current) {
                 animarEntrada();
             }
-
             return;
         }
 
@@ -101,6 +111,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             transparent
             animationType="none"
             onShow={quandoModalAparecer}
+            onDismiss={notificarOcultamento}
             onRequestClose={solicitarFechamento}
         >
             <KeyboardAvoidingView

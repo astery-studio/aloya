@@ -9,6 +9,7 @@ const larguraTotal = { width: '100%' };
 export default function SimpleModal({
     visivel,
     aoFechar,
+    aoOcultar,
     icone,
     corIcone,
     fundoIcone,
@@ -22,6 +23,7 @@ export default function SimpleModal({
             variante="simples"
             visivel={visivel}
             aoFechar={aoFechar}
+            aoOcultar={aoOcultar}
             icone={icone}
             corIcone={corIcone}
             fundoIcone={fundoIcone}

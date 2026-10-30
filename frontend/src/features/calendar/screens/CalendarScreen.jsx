@@ -132,7 +132,8 @@ function CalendarScreen({
     aoCarregarPosteriores,
     aoTentarNovamente,
     aoVoltar,
-    aoCadastrarMenstruacao
+    aoCadastrarMenstruacao,
+    aoEditarCiclo
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -212,6 +213,7 @@ function CalendarScreen({
                         carregandoPosteriores={carregandoPosteriores}
                         aoCarregarAnteriores={aoCarregarAnteriores}
                         aoCarregarPosteriores={aoCarregarPosteriores}
+                        aoPressionarDia={aoEditarCiclo}
                     />
                 </View>
             </View>

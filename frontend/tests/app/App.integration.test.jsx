@@ -1,7 +1,7 @@
 /**
  * Confere a ligação entre autenticação, sessão persistida e os fluxos internos.
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
@@ -86,19 +86,62 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     };
 });
 
+jest.mock('../../src/features/cycles/CycleEditFlow', () => {
+    const React = require('react');
+    const { Text } = require('react-native');
+
+    return {
+        CycleEditFlow: jest.fn(({ ciclo }) =>
+            React.createElement(Text, null, `Editando ciclo ${ciclo.id}`)
+        )
+    };
+});
+
+jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+
+    return {
+        CalendarScreenContainer: jest.fn(({ aoEditarCiclo }) => {
+            const instancia = React.useId();
+
+            return React.createElement(
+                View,
+                null,
+                React.createElement(Text, { testID: 'instancia-calendario' }, instancia),
+                React.createElement(Text, null, 'Calendário integrado'),
+                React.createElement(Pressable, {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Editar menstruação do calendário',
+                    onPress: () => aoEditarCiclo({ registroCicloId: 9 })
+                })
+            );
+        })
+    };
+});
+
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return {
-        CycleTodayContainer: jest.fn(({ aoAbrirAnticoncepcional }) =>
+        CycleTodayContainer: jest.fn(({ aoAbrirAnticoncepcional, aoAbrirCalendario }) =>
             React.createElement(
-                Pressable,
-                {
+                React.Fragment,
+                null,
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Anticoncepcional',
+                        onPress: aoAbrirAnticoncepcional
+                    },
+                    React.createElement(Text, null, 'Ciclo hoje')
+                ),
+                React.createElement(Pressable, {
                     accessibilityRole: 'button',
-                    accessibilityLabel: 'Anticoncepcional',
-                    onPress: aoAbrirAnticoncepcional
-                },
-                React.createElement(Text, null, 'Ciclo hoje')
+                    accessibilityLabel: 'Calendário',
+                    onPress: aoAbrirCalendario
+                })
             )
         )
     };
@@ -293,6 +336,7 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
+import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
 
@@ -326,7 +370,13 @@ function criarServicos() {
         },
         contraceptiveService: {},
         cycleHistoryService: {
-            listarPagina: jest.fn()
+            listarPagina: jest.fn(),
+            buscar: jest.fn().mockResolvedValue({
+                id: '9',
+                dataInicio: '2026-09-04',
+                dataFim: '2026-09-08'
+            }),
+            editar: jest.fn()
         },
         cycleParametersService: {
             buscar: jest.fn(),
@@ -424,6 +474,29 @@ describe('App integrado', () => {
             }),
             undefined
         );
+    });
+
+    test('abre a edição de menstruação ao tocar no ciclo do calendário', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Calendário' }));
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Editar menstruação do calendário' })
+        );
+
+        expect(servicos.cycleHistoryService.buscar).toHaveBeenCalledWith(9);
+        expect(await screen.findByText('Editando ciclo 9')).toBeOnTheScreen();
+
+        const instanciaAnterior = screen.getByTestId('instancia-calendario').props.children;
+        await act(() => CycleEditFlow.mock.calls.at(-1)[0].onAtualizado());
+        expect(screen.getByTestId('instancia-calendario').props.children).not.toBe(
+            instanciaAnterior
+        );
+
+        await act(() => CycleEditFlow.mock.calls.at(-1)[0].onFechar());
+        expect(screen.queryByText('Editando ciclo 9')).toBeNull();
     });
 
     test('abre membros e inicia a criação de categoria', async () => {

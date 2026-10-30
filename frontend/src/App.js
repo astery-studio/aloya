@@ -25,6 +25,7 @@ import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
+import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
@@ -175,6 +176,10 @@ export default function App() {
     const [carregandoPerfil, setCarregandoPerfil] = useState(false);
 
     const [erroPerfil, setErroPerfil] = useState(false);
+
+    const [cicloCalendarioEditado, setCicloCalendarioEditado] = useState(null);
+
+    const [revisaoCalendario, setRevisaoCalendario] = useState(0);
 
     const requisicaoAtual = useRef(0);
 
@@ -402,6 +407,27 @@ export default function App() {
         }
     }
 
+    async function abrirEdicaoPeloCalendario({ registroCicloId }) {
+        try {
+            const ciclo = await configuracao.servicos.cycleHistoryService.buscar(registroCicloId);
+
+            setCicloCalendarioEditado(ciclo);
+        } catch (falha) {
+            if (falha?.status === 401) {
+                finalizarSessao({
+                    mensagem: 'Sua sessão expirou. Entre novamente.'
+                });
+                return;
+            }
+
+            Alert.alert(
+                'Algo deu errado',
+                falha?.mensagemUsuario ||
+                    'Não foi possível carregar este registro. Tente novamente.'
+            );
+        }
+    }
+
     function abrirNovaCategoria(origem) {
         setOrigemNovaCategoria(origem);
         setTelaInterna(telasInternas.novaCategoria);
@@ -498,24 +524,37 @@ export default function App() {
                 aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                 aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
                 aoSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.calendario) {
         conteudo = (
-            <CalendarScreenContainer
-                service={configuracao.servicos.calendarService}
-                onSessaoExpirada={finalizarSessao}
-                aoVoltar={() => setTelaInterna(telasInternas.inicio)}
-                aoCadastrarMenstruacao={() =>
-                    Alert.alert(
-                        'Cadastro de menstruação',
-                        'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
-                    )
-                }
-            />
+            <>
+                <CalendarScreenContainer
+                    key={revisaoCalendario}
+                    service={configuracao.servicos.calendarService}
+                    onSessaoExpirada={finalizarSessao}
+                    aoVoltar={() => setTelaInterna(telasInternas.inicio)}
+                    aoCadastrarMenstruacao={() =>
+                        Alert.alert(
+                            'Cadastro de menstruação',
+                            'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
+                        )
+                    }
+                    aoEditarCiclo={abrirEdicaoPeloCalendario}
+                />
+                {cicloCalendarioEditado ? (
+                    <CycleEditFlow
+                        key={cicloCalendarioEditado.id}
+                        ciclo={cicloCalendarioEditado}
+                        service={configuracao.servicos.cycleHistoryService}
+                        onFechar={() => setCicloCalendarioEditado(null)}
+                        onAtualizado={() => setRevisaoCalendario((atual) => atual + 1)}
+                        onSessaoExpirada={finalizarSessao}
+                    />
+                ) : null}
+            </>
         );
     } else if (telaInterna === telasInternas.membros) {
         conteudo = (

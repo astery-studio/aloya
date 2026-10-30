@@ -2,8 +2,8 @@
  * Estrutura base dos modais, responsável por apresentação,
  * variantes e conteúdo acionável.
  */
-import { useMemo } from 'react';
-import { Modal, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef } from 'react';
+import { Modal, Platform, Text, View } from 'react-native';
 
 import { useTheme } from '../../../../hooks/useTheme';
 import { criarEstilos } from './AppModal.styles';
@@ -20,20 +20,27 @@ export default function AppModal({
     titulo,
     mensagem,
     destaque,
+    aoOcultar,
     children
 }) {
     const tema = useTheme();
-
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const visivelAnterior = useRef(visivel);
+
+    useEffect(() => {
+        if (Platform.OS !== 'ios' && visivelAnterior.current && !visivel) {
+            aoOcultar?.();
+        }
+
+        visivelAnterior.current = visivel;
+    }, [aoOcultar, visivel]);
 
     if (!VARIANTES_MODAL.has(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
 
-    if (!visivel) {
-        return null;
-    }
-
+    // Mantém o Modal montado enquanto o iOS conclui o fechamento e emite onDismiss.
+    // Desmontá-lo aqui interrompe as ações que aguardam aoOcultar, como salvar.
     const alerta = variante === 'alerta';
 
     const acao = variante === 'acao';
@@ -41,7 +48,13 @@ export default function AppModal({
     const corDoIcone = corIcone || (acao ? tema.cores.feedback.erro : tema.cores.marca.primaria);
 
     return (
-        <Modal visible={visivel} transparent animationType="fade" onRequestClose={aoFechar}>
+        <Modal
+            visible={visivel}
+            transparent
+            animationType="fade"
+            onDismiss={aoOcultar}
+            onRequestClose={aoFechar}
+        >
             <View testID="app-modal-fundo" style={estilos.fundo}>
                 <View
                     testID="app-modal-caixa"
@@ -64,7 +77,6 @@ export default function AppModal({
                             ) : null}
                         </View>
                     ) : null}
-
                     <View
                         style={[
                             estilos.conteudo,
@@ -101,10 +113,8 @@ export default function AppModal({
                                     {mensagem}
                                 </Text>
                             ) : null}
-
                             {destaque ? <Text style={estilos.destaque}>{destaque}</Text> : null}
                         </View>
-
                         {children ? <View style={estilos.acoes}>{children}</View> : null}
                     </View>
                 </View>

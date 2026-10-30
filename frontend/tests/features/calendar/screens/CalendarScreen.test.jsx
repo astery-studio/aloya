@@ -67,10 +67,10 @@ jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModa
 
 jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalendar', () => {
     const ReactInterno = require('react');
-    const { Text, View } = require('react-native');
+    const { Pressable, Text, View } = require('react-native');
 
     return {
-        CycleCalendar: ({ carregando }) =>
+        CycleCalendar: ({ carregando, aoPressionarDia }) =>
             ReactInterno.createElement(
                 View,
                 { testID: 'cycle-calendar' },
@@ -78,7 +78,14 @@ jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalen
                     Text,
                     null,
                     carregando ? 'Carregando calendário' : 'Calendário pronto'
-                )
+                ),
+                aoPressionarDia
+                    ? ReactInterno.createElement(Pressable, {
+                          accessibilityRole: 'button',
+                          accessibilityLabel: 'Dia menstrual registrado',
+                          onPress: () => aoPressionarDia({ data: '2026-10-04', registroCicloId: 9 })
+                      })
+                    : null
             )
     };
 });
@@ -111,6 +118,7 @@ jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLe
 describe('CalendarScreen', () => {
     test('mostra calendário, título e confiança', async () => {
         const aoCadastrarMenstruacao = jest.fn();
+        const aoEditarCiclo = jest.fn();
 
         await render(
             <CalendarScreen
@@ -118,6 +126,7 @@ describe('CalendarScreen', () => {
                 confianca="alta"
                 aoVoltar={jest.fn()}
                 aoCadastrarMenstruacao={aoCadastrarMenstruacao}
+                aoEditarCiclo={aoEditarCiclo}
             />
         );
 
@@ -162,6 +171,11 @@ describe('CalendarScreen', () => {
 
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+        await fireEvent.press(screen.getByRole('button', { name: 'Dia menstrual registrado' }));
+        expect(aoEditarCiclo).toHaveBeenCalledWith({
+            data: '2026-10-04',
+            registroCicloId: 9
+        });
         expect(screen.getByTestId('acao-legenda-calendario')).toHaveStyle({
             padding: 8,
             alignItems: 'center'
@@ -251,5 +265,16 @@ describe('CalendarScreen', () => {
         await rerender(<CalendarScreen {...props} />);
         await rerender(<CalendarScreen {...props} erro={mensagem} />);
         expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+    });
+
+    test('ignora confiança desconhecida', async () => {
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
+                confianca="desconhecida"
+            />
+        );
+
+        expect(screen.queryByTestId('confidence-badge')).toBeNull();
     });
 });
