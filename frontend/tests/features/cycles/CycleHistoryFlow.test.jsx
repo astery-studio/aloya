@@ -143,6 +143,8 @@ test('encaminha o resumo calculado sem sobrescrever seus valores', async () => {
 })
 
 test('conecta a edição do card ao fluxo interno', async () => {
+    const atualizarHistorico = jest.fn().mockResolvedValue(true)
+    useCycleHistory.mockReturnValue(criarEstadoDoHook({tentarNovamente: atualizarHistorico}))
     const aoAbrirCalendario = jest.fn()
     const aoExcluirCiclo = jest.fn()
     const onSelecionarAba = jest.fn()
@@ -178,5 +180,9 @@ test('conecta a edição do card ao fluxo interno', async () => {
         undefined
     )
 
+    await act(async () => {
+        expect(await CycleEditFlow.mock.calls.at(-1)[0].onAtualizado()).toBe(true)
+    })
+    expect(atualizarHistorico).toHaveBeenCalledTimes(1)
     await act(() => CycleEditFlow.mock.calls.at(-1)[0].onFechar())
 })

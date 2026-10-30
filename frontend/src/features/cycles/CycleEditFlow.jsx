@@ -108,14 +108,36 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
         );
     }
 
+    async function atualizarTelas() {
+        try {
+            const atualizado = await onAtualizado?.();
+            if (atualizado === false) throw new Error('A tela não foi atualizada.');
+            setFeedback({ tipo: 'sucesso' });
+        } catch {
+            setFeedback({
+                tipo: 'atualizacao',
+                titulo: 'Registro salvo',
+                mensagem:
+                    'As alterações foram salvas, mas não foi possível atualizar a tela. Tente atualizar novamente.'
+            });
+        }
+    }
+
+    function tentarAtualizar() {
+        setSalvando(true);
+        ocultarFeedback(async () => {
+            await atualizarTelas();
+            setSalvando(false);
+        });
+    }
+
     async function salvar(validacao) {
         try {
             await service.editar(ciclo.id, {
                 dataInicio: validacao.inicio,
                 dataFim: validacao.fim
             });
-            setFeedback({ tipo: 'sucesso' });
-            await onAtualizado?.();
+            await atualizarTelas();
         } catch (falha) {
             if (falha?.status === 401) {
                 onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
@@ -190,30 +212,34 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 acaoPrincipal={{ texto: 'OK', aoPressionar: onFechar }}
             />
             <SimpleModal
-                visivel={['erro', 'validacao'].includes(feedback?.tipo)}
-                aoFechar={voltarAoPainel}
+                visivel={['erro', 'validacao', 'atualizacao'].includes(feedback?.tipo)}
+                aoFechar={feedback?.tipo === 'atualizacao' ? onFechar : voltarAoPainel}
                 aoOcultar={executarAposOcultarFeedback}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.feedback.erro}
                 titulo={feedback?.titulo}
                 mensagem={feedback?.mensagem}
                 acaoPrincipal={
-                    feedback?.tipo === 'erro'
-                        ? {
-                              texto: 'Tentar novamente',
-                              variante: 'preto',
-                              aoPressionar: confirmarSalvamento
-                          }
-                        : { texto: 'OK', aoPressionar: voltarAoPainel }
+                    feedback?.tipo === 'atualizacao'
+                        ? { texto: 'Tentar atualizar', aoPressionar: tentarAtualizar }
+                        : feedback?.tipo === 'erro'
+                          ? {
+                                texto: 'Tentar novamente',
+                                variante: 'preto',
+                                aoPressionar: confirmarSalvamento
+                            }
+                          : { texto: 'OK', aoPressionar: voltarAoPainel }
                 }
                 acaoSecundaria={
-                    feedback?.tipo === 'erro'
-                        ? {
-                              texto: 'Voltar',
-                              variante: 'branco',
-                              aoPressionar: voltarAoPainel
-                          }
-                        : undefined
+                    feedback?.tipo === 'atualizacao'
+                        ? { texto: 'Fechar', aoPressionar: onFechar }
+                        : feedback?.tipo === 'erro'
+                          ? {
+                                texto: 'Voltar',
+                                variante: 'branco',
+                                aoPressionar: voltarAoPainel
+                            }
+                          : undefined
                 }
             />
         </>

@@ -1,7 +1,7 @@
 /**
  * Confere a ligação entre autenticação, sessão persistida e os fluxos internos.
  */
-import {fireEvent, render, screen, waitFor} from '@testing-library/react-native'
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react-native'
 import {Linking} from 'react-native'
 
 jest.mock('expo-font', () => ({useFonts: jest.fn(() => [true, null])}))
@@ -91,16 +91,19 @@ jest.mock('../../src/features/cycles/CycleEditFlow', () => {
 jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     const React = require('react')
     const {Pressable, Text, View} = require('react-native')
-    return {CalendarScreenContainer: jest.fn(({aoEditarCiclo}) => React.createElement(
+    return {CalendarScreenContainer: jest.fn(({aoEditarCiclo}) => {
+        const instancia = React.useId()
+        return React.createElement(
         View,
         null,
+        React.createElement(Text, {testID: 'instancia-calendario'}, instancia),
         React.createElement(Text, null, 'Calendário integrado'),
         React.createElement(Pressable, {
             accessibilityRole: 'button',
             accessibilityLabel: 'Editar menstruação do calendário',
             onPress: () => aoEditarCiclo({registroCicloId: 9})
         })
-    ))}
+    )})}
 })
 
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
@@ -287,6 +290,7 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 import App from '../../src/App'
 import {criarServicosApp} from '../../src/app/createAppServices'
 import {CycleHistoryFlow} from '../../src/features/cycles/CycleHistoryFlow'
+import {CycleEditFlow} from '../../src/features/cycles/CycleEditFlow'
 import {obterToken} from '../../src/shared/storage/tokenStorage'
 
 //Cria os serviços usados pelo App durante os testes de integração.
@@ -440,6 +444,11 @@ describe('App integrado', () => {
 
         expect(servicos.cycleHistoryService.buscar).toHaveBeenCalledWith(9)
         expect(await screen.findByText('Editando ciclo 9')).toBeOnTheScreen()
+        const instanciaAnterior = screen.getByTestId('instancia-calendario').props.children
+        await act(() => CycleEditFlow.mock.calls.at(-1)[0].onAtualizado())
+        expect(screen.getByTestId('instancia-calendario').props.children).not.toBe(instanciaAnterior)
+        await act(() => CycleEditFlow.mock.calls.at(-1)[0].onFechar())
+        expect(screen.queryByText('Editando ciclo 9')).toBeNull()
     })
 
     test('abre membros e inicia a criação de categoria', async () => {

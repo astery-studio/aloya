@@ -33,10 +33,8 @@ export default function AppModal({
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
 
-    if (!visivel) {
-        return null;
-    }
-
+    // Mantém o Modal montado enquanto o iOS conclui o fechamento e emite onDismiss.
+    // Desmontá-lo aqui interrompe as ações que aguardam aoOcultar, como salvar.
     const alerta = variante === 'alerta';
     const acao = variante === 'acao';
     const corDoIcone = corIcone || (acao ? cores.feedback.erro : cores.marca.primaria);
