@@ -72,7 +72,7 @@ function CycleCalendar({
         }
 
         return layouts;
-    }, [carregandoAnteriores, mesesNormalizados]);
+    }, [carregandoAnteriores, estilos, mesesNormalizados]);
 
     const obterLayoutMes = useCallback((_, index) => layoutsMeses[index], [layoutsMeses]);
 

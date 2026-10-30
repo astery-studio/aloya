@@ -426,7 +426,7 @@ function DatePickerSheet({
                 </Pressable>
             );
         },
-        [anoVisivel, mesVisivel, podeMostrarMes, salvando]
+        [anoVisivel, estilos, mesVisivel, podeMostrarMes, salvando]
     );
 
     const renderizarAno = useCallback(
@@ -471,7 +471,7 @@ function DatePickerSheet({
                 </Pressable>
             );
         },
-        [anoVisivel, encontrarMesDisponivel, salvando]
+        [anoVisivel, encontrarMesDisponivel, estilos, salvando]
     );
 
     const anterior = useMemo(
