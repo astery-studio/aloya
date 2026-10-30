@@ -22,7 +22,7 @@ const ERRO_PERMISSOES = Object.freeze({
 
 //Remove caracteres perigosos sem atrapalhar a digitação de letras acentuadas.
 function sanitizarNomeCategoria(texto) {
-    return texto.replace(/[\u0000-\u001F\u007F<>]/gu, '').slice(0, 25);
+    return texto.replace(/[\u0000-\u001F\u007F<>]/gu, '').slice(0, 15);
 }
 
 //Remove espaços excedentes somente quando o formulário é enviado.
@@ -42,12 +42,12 @@ function prepararCategoriaParaSalvar(dados) {
         return { erro: ERRO_NOME };
     }
 
-    if ([...nomeNormalizado].length > 25) {
+    if ([...nomeNormalizado].length > 15) {
         return {
             erro: {
                 codigo: 'NOME_CATEGORIA_INVALIDO',
                 titulo: 'Nome muito longo',
-                mensagem: 'O nome da categoria deve possuir no máximo 25 caracteres.'
+                mensagem: 'O nome da categoria deve possuir no máximo 15 caracteres.'
             }
         };
     }
@@ -177,7 +177,7 @@ function SupportCategoryForm({
                     sanitizar={sanitizarNomeCategoria}
                     variante="categoria"
                     desativado={camposDesabilitados}
-                    maxLength={25}
+                    maxLength={15}
                     autoCapitalize="sentences"
                     autoCorrect={false}
                     returnKeyType="done"
