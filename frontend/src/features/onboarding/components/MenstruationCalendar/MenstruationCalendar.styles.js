@@ -78,7 +78,7 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center'
         },
-        diaSelecionado: { backgroundColor: tema.cores.interface.destaque },
+        diaSelecionado: { backgroundColor: tema.cores.marca.primaria },
         textoDia: {
             color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
@@ -86,7 +86,7 @@ function criarEstilos(tema) {
             lineHeight: 24
         },
         textoSelecionado: {
-            color: tema.cores.interface.textoSobreDestaque,
+            color: '#FFFFFF',
             fontFamily: fontFamilies.bold
         },
         textoDesabilitado: { color: tema.cores.interface.textoDesabilitado },

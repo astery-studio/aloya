@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, within } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import MenstruationCalendar from '../../../src/features/onboarding/components/MenstruationCalendar/MenstruationCalendar';
@@ -10,9 +10,9 @@ import CycleLengthStep from '../../../src/features/onboarding/components/CycleLe
 import { renderWithTheme } from '../../helpers/renderWithTheme';
 
 describe.each([
-    ['claro', '#222222', '#E6E2D8', '#2C4C3B'],
-    ['escuro', '#F4F1EA', '#4A514D', '#9FD6B6']
-])('onboarding no tema %s', (preferencia, textoPrincipal, borda, destaque) => {
+    ['claro', '#222222', '#E6E2D8'],
+    ['escuro', '#F4F1EA', '#4A514D']
+])('onboarding no tema %s', (preferencia, textoPrincipal, borda) => {
     test('aplica a paleta ativa à estrutura e ao progresso', async () => {
         await renderWithTheme(
             <OnboardingStep
@@ -62,7 +62,10 @@ describe.each([
             color: textoPrincipal
         });
         expect(screen.getByLabelText('Selecionar dia 3')).toHaveStyle({
-            backgroundColor: destaque
+            backgroundColor: '#C85A44'
+        });
+        expect(within(screen.getByLabelText('Selecionar dia 3')).getByText('3')).toHaveStyle({
+            color: '#FFFFFF'
         });
         expect(screen.getByText('Dom')).toHaveStyle({
             color: preferencia === 'escuro' ? '#C4C8C5' : '#5C5C59'
