@@ -1,33 +1,48 @@
 /**
  * Campo controlado que mascara horários e oferece remoção opcional.
  */
+import { useMemo, useRef } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import { ClockIcon as Clock } from 'phosphor-react-native/src/icons/Clock';
-import { TrashIcon as Trash } from 'phosphor-react-native/src/icons/Trash';
-import { cores } from '../../../theme';
+import { ClockIcon as Clock, TrashIcon as Trash } from '../../icons/AppIcons';
+import { useTheme } from '../../../hooks/useTheme';
 import { formatTime } from '../../../utils/formatting/formatTime';
-import { estilos } from './TimeInput.styles';
+import { criarEstilos } from './TimeInput.styles';
 
 export default function TimeInput({
-    valor = '', onChangeText, aoRemover, podeRemover = false,
-    desativado = false, estilo
+    valor = '',
+    onChangeText,
+    aoRemover,
+    podeRemover = false,
+    desativado = false,
+    estilo
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const entradaRef = useRef(null);
     return (
         <View style={[estilos.linha, estilo]}>
-            <View style={[estilos.campo, desativado && estilos.desativado]}>
-                <Clock size={18} color={cores.neutras.textoPrincipalClaro} />
+            <Pressable
+                accessible={false}
+                testID="area-campo-horario"
+                disabled={desativado}
+                onPress={() => entradaRef.current?.focus()}
+                style={[estilos.campo, desativado && estilos.desativado]}
+            >
+                <Clock size={18} color={tema.cores.interface.textoPrincipal} />
                 <TextInput
+                    ref={entradaRef}
                     accessibilityLabel="Horário"
                     editable={!desativado}
                     keyboardType="number-pad"
                     maxLength={5}
                     placeholder="HH:MM"
-                    placeholderTextColor={cores.neutras.textoSecundarioClaro}
+                    placeholderTextColor={tema.cores.interface.textoSecundario}
+                    selectionColor={tema.cores.interface.destaque}
                     value={valor}
                     onChangeText={(texto) => onChangeText?.(formatTime(texto))}
                     style={estilos.entrada}
                 />
-            </View>
+            </Pressable>
             {podeRemover && (
                 <Pressable
                     accessibilityRole="button"
@@ -35,11 +50,12 @@ export default function TimeInput({
                     disabled={desativado}
                     onPress={aoRemover}
                     style={({ pressed }) => [
-                        estilos.remover, pressed && estilos.pressionado,
+                        estilos.remover,
+                        pressed && estilos.pressionado,
                         desativado && estilos.desativado
                     ]}
                 >
-                    <Trash size={20} color={cores.feedback.erro} />
+                    <Trash size={20} color={tema.cores.feedback.erro} />
                 </Pressable>
             )}
         </View>

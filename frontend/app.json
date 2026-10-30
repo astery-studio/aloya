@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.aloya.app",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -25,6 +26,7 @@
     "plugins": [
       "expo-font",
       "expo-secure-store",
+      "expo-status-bar",
       [
         "expo-build-properties",
         {

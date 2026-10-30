@@ -1,23 +1,57 @@
 //Testa a inclusão segura do token e a limpeza de sessões inválidas nas requisições privadas.
-import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
+import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
+
+test('não envia operação expirada enquanto aguardava a sessão segura', async () => {
+    let liberar;
+    const controle = new AbortController();
+    const dependencias = criarDependencias();
+    dependencias.obterCredencial.mockReturnValue(
+        new Promise((resolve) => {
+            liberar = resolve;
+        })
+    );
+    const resultado = criarRequisicaoAutenticada(dependencias)({
+        caminho: '/categoria',
+        signal: controle.signal
+    });
+    controle.abort();
+    liberar({ token: 'teste' });
+    await expect(resultado).rejects.toMatchObject({ name: 'AbortError' });
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+});
+
+test('impede que uma operação pendente use credencial de outra conta', async () => {
+    const dependencias = criarDependencias();
+    const requisicao = criarRequisicaoAutenticada(dependencias);
+    await expect(
+        requisicao({ caminho: '/privado', validarCredencial: () => false })
+    ).rejects.toMatchObject({ status: 401 });
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+    expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+    await requisicao({ caminho: '/privado', validarCredencial: () => true });
+    expect(dependencias.requisicao).toHaveBeenCalledWith({
+        caminho: '/privado',
+        token: 'token-seguro'
+    });
+});
 
 function criarDependencias(opcoes = {}) {
     const sessao = Object.hasOwn(opcoes, 'sessao')
         ? opcoes.sessao
         : {
-            token: 'token-seguro'
-        }
+              token: 'token-seguro'
+          };
     const resposta = Object.hasOwn(opcoes, 'resposta')
         ? opcoes.resposta
         : {
-            sucesso: true
-        }
+              sucesso: true
+          };
 
     return {
         requisicao: jest.fn().mockResolvedValue(resposta),
         obterCredencial: jest.fn().mockResolvedValue(sessao),
         removerCredencial: jest.fn().mockResolvedValue(undefined)
-    }
+    };
 }
 
 test.each([
@@ -39,8 +73,8 @@ test.each([
 ])('rejeita dependências obrigatórias inválidas', (dependencias) => {
     expect(() => criarRequisicaoAutenticada(dependencias)).toThrow(
         'Não foi possível configurar as requisições autenticadas.'
-    )
-})
+    );
+});
 
 test.each([
     null,
@@ -61,122 +95,127 @@ test.each([
 ])('rejeita uma sessão sem token válido: %p', async (sessao) => {
     const dependencias = criarDependencias({
         sessao
-    })
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    });
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toMatchObject({
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toMatchObject({
         status: 401,
         codigo: 'SESSAO_AUSENTE',
         mensagemUsuario: 'Sua sessão expirou. Entre novamente.'
-    })
+    });
 
-    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1)
-    expect(dependencias.requisicao).not.toHaveBeenCalled()
-})
+    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+});
 
 test('ignora falha ao limpar uma sessão local sem token', async () => {
     const dependencias = criarDependencias({
         sessao: null
-    })
-    dependencias.removerCredencial.mockRejectedValue(
-        new Error('falha interna do armazenamento')
-    )
+    });
+    dependencias.removerCredencial.mockRejectedValue(new Error('falha interna do armazenamento'));
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toMatchObject({
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toMatchObject({
         status: 401,
         codigo: 'SESSAO_AUSENTE'
-    })
+    });
 
-    expect(dependencias.requisicao).not.toHaveBeenCalled()
-})
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+});
 
 test('envia somente o token obtido do armazenamento seguro', async () => {
-    const dependencias = criarDependencias()
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
-    const controlador = new AbortController()
+    const dependencias = criarDependencias();
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
+    const controlador = new AbortController();
     const corpo = {
         nome: 'Anticoncepcional atualizado'
-    }
+    };
 
-    await expect(requisicaoAutenticada({
-        metodo: 'PUT',
-        caminho: '/api/anticoncepcionais/7',
-        corpo,
-        signal: controlador.signal,
-        token: 'token-injetado'
-    })).resolves.toEqual({
+    await expect(
+        requisicaoAutenticada({
+            metodo: 'PUT',
+            caminho: '/api/anticoncepcionais/7',
+            corpo,
+            signal: controlador.signal,
+            token: 'token-injetado'
+        })
+    ).resolves.toEqual({
         sucesso: true
-    })
+    });
 
-    expect(dependencias.requisicao).toHaveBeenCalledTimes(1)
+    expect(dependencias.requisicao).toHaveBeenCalledTimes(1);
     expect(dependencias.requisicao).toHaveBeenCalledWith({
         metodo: 'PUT',
         caminho: '/api/anticoncepcionais/7',
         corpo,
         signal: controlador.signal,
         token: 'token-seguro'
-    })
-    expect(dependencias.obterCredencial).toHaveBeenCalledTimes(1)
-    expect(dependencias.removerCredencial).not.toHaveBeenCalled()
-})
+    });
+    expect(dependencias.obterCredencial).toHaveBeenCalledTimes(1);
+    expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+});
 
 test('aceita chamada sem objeto de opções', async () => {
-    const dependencias = criarDependencias()
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const dependencias = criarDependencias();
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
     await expect(requisicaoAutenticada()).resolves.toEqual({
         sucesso: true
-    })
+    });
 
     expect(dependencias.requisicao).toHaveBeenCalledWith({
         token: 'token-seguro'
-    })
-})
+    });
+});
 
-test.each([
-    'NAO_AUTENTICADO',
-    'TOKEN_INVALIDO',
-    'SESSAO_INVALIDA'
-])('remove a credencial quando a API rejeita a sessão com %s', async (codigo) => {
-    const dependencias = criarDependencias()
-    const erroSessao = new Error('Sessão inválida.')
-    erroSessao.status = 401
-    erroSessao.codigo = codigo
-    dependencias.requisicao.mockRejectedValue(erroSessao)
+test.each(['NAO_AUTENTICADO', 'TOKEN_INVALIDO', 'SESSAO_INVALIDA'])(
+    'remove a credencial quando a API rejeita a sessão com %s',
+    async (codigo) => {
+        const dependencias = criarDependencias();
+        const erroSessao = new Error('Sessão inválida.');
+        erroSessao.status = 401;
+        erroSessao.codigo = codigo;
+        dependencias.requisicao.mockRejectedValue(erroSessao);
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+        const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe(erroSessao)
+        await expect(
+            requisicaoAutenticada({
+                caminho: '/api/anticoncepcionais'
+            })
+        ).rejects.toBe(erroSessao);
 
-    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1)
-})
+        expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
+    }
+);
 
 test('preserva o erro original quando a limpeza da sessão inválida falha', async () => {
-    const dependencias = criarDependencias()
-    const erroSessao = new Error('Sessão inválida.')
-    erroSessao.status = 401
-    erroSessao.codigo = 'SESSAO_INVALIDA'
-    dependencias.requisicao.mockRejectedValue(erroSessao)
-    dependencias.removerCredencial.mockRejectedValue(
-        new Error('falha interna do armazenamento')
-    )
+    const dependencias = criarDependencias();
+    const erroSessao = new Error('Sessão inválida.');
+    erroSessao.status = 401;
+    erroSessao.codigo = 'SESSAO_INVALIDA';
+    dependencias.requisicao.mockRejectedValue(erroSessao);
+    dependencias.removerCredencial.mockRejectedValue(new Error('falha interna do armazenamento'));
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe(erroSessao)
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toBe(erroSessao);
 
-    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1)
-})
+    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
+});
 
 test.each([
     {
@@ -191,31 +230,38 @@ test.each([
         status: 500,
         codigo: 'ERRO_INTERNO'
     }
-])('não remove a credencial para um erro que não invalida a sessão: %p', async ({status, codigo}) => {
-    const dependencias = criarDependencias()
-    const erro = new Error('Falha controlada.')
-    erro.status = status
-    erro.codigo = codigo
-    dependencias.requisicao.mockRejectedValue(erro)
+])(
+    'não remove a credencial para um erro que não invalida a sessão: %p',
+    async ({ status, codigo }) => {
+        const dependencias = criarDependencias();
+        const erro = new Error('Falha controlada.');
+        erro.status = status;
+        erro.codigo = codigo;
+        dependencias.requisicao.mockRejectedValue(erro);
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+        const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe(erro)
+        await expect(
+            requisicaoAutenticada({
+                caminho: '/api/anticoncepcionais'
+            })
+        ).rejects.toBe(erro);
 
-    expect(dependencias.removerCredencial).not.toHaveBeenCalled()
-})
+        expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+    }
+);
 
 test('preserva falhas que não são objetos Error', async () => {
-    const dependencias = criarDependencias()
-    dependencias.requisicao.mockRejectedValue('falha desconhecida')
+    const dependencias = criarDependencias();
+    dependencias.requisicao.mockRejectedValue('falha desconhecida');
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe('falha desconhecida')
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toBe('falha desconhecida');
 
-    expect(dependencias.removerCredencial).not.toHaveBeenCalled()
-})
+    expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+});

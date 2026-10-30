@@ -1,19 +1,9 @@
 //Mostra uma permissão que pode ser ligada ou desligada pela pessoa usuária.
-import {
-    memo,
-    useCallback,
-    useEffect,
-    useState
-} from 'react'
-import {
-    Animated,
-    Easing,
-    Pressable,
-    Text,
-    View
-} from 'react-native'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { Animated, Easing, Pressable, Text, View } from 'react-native';
 
-import {estilos} from './SwitchField.styles'
+import { useTheme } from '../../../hooks/useTheme';
+import { criarEstilos } from './SwitchField.styles';
 
 //Recebe o estado atual, anima o indicador e informa o novo valor ao componente pai.
 function SwitchField({
@@ -26,61 +16,48 @@ function SwitchField({
     estilo,
     estiloTitulo
 }) {
-    const estaAtivo = ativo === true
-    const estaDesabilitado =
-        desabilitado || typeof aoAlterar !== 'function'
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estaAtivo = ativo === true;
+    const estaDesabilitado = desabilitado || typeof aoAlterar !== 'function';
 
-    const [deslocamento] = useState(
-        () => new Animated.Value(estaAtivo ? 20 : 0)
-    )
+    const [deslocamento] = useState(() => new Animated.Value(estaAtivo ? 20 : 0));
 
-    const rotuloDoInterruptor =
-        rotuloAcessibilidade
-        || titulo
-        || 'Interruptor de permissão'
+    const rotuloDoInterruptor = rotuloAcessibilidade || titulo || 'Interruptor de permissão';
 
     useEffect(() => {
-        const animacao = Animated.timing(
-            deslocamento,
-            {
-                toValue: estaAtivo ? 20 : 0,
-                duration: 160,
-                easing: Easing.out(Easing.cubic),
-                useNativeDriver: true
-            }
-        )
+        const animacao = Animated.timing(deslocamento, {
+            toValue: estaAtivo ? 20 : 0,
+            duration: 160,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true
+        });
 
-        animacao.start()
+        animacao.start();
 
         return () => {
-            animacao.stop()
-        }
-    }, [deslocamento, estaAtivo])
+            animacao.stop();
+        };
+    }, [deslocamento, estaAtivo]);
 
     //Inverte o estado atual e devolve o novo valor ao componente que controla a permissão.
     const alternar = useCallback(() => {
         if (!estaDesabilitado) {
-            aoAlterar(!estaAtivo)
+            aoAlterar(!estaAtivo);
         }
-    }, [
-        aoAlterar,
-        estaAtivo,
-        estaDesabilitado
-    ])
+    }, [aoAlterar, estaAtivo, estaDesabilitado]);
 
     const trilhaDoInterruptor = (
         <View
-            style={[
-                estilos.trilha,
-                estaAtivo
-                    ? estilos.trilhaAtiva
-                    : estilos.trilhaInativa
-            ]}
+            testID="switch-field-track"
+            style={[estilos.trilha, estaAtivo ? estilos.trilhaAtiva : estilos.trilhaInativa]}
             pointerEvents="none"
         >
             <Animated.View
+                testID="switch-field-thumb"
                 style={[
                     estilos.indicador,
+                    estaDesabilitado && estilos.indicadorDesabilitado,
                     {
                         transform: [
                             {
@@ -91,7 +68,7 @@ function SwitchField({
                 ]}
             />
         </View>
-    )
+    );
 
     if (somenteControle) {
         return (
@@ -100,26 +77,21 @@ function SwitchField({
                 disabled={estaDesabilitado}
                 accessibilityRole="switch"
                 accessibilityLabel={rotuloDoInterruptor}
-                accessibilityHint={
-                    'Ativa ou desativa as permissões deste grupo'
-                }
+                accessibilityHint={'Ativa ou desativa as permissões deste grupo'}
                 accessibilityState={{
                     checked: estaAtivo,
                     disabled: estaDesabilitado
                 }}
-                style={({pressed}) => [
+                style={({ pressed }) => [
                     estilos.controle,
-                    pressed
-                        && !estaDesabilitado
-                        && estilos.pressionado,
-                    estaDesabilitado
-                        && estilos.desabilitado,
+                    pressed && !estaDesabilitado && estilos.pressionado,
+                    estaDesabilitado && estilos.desabilitado,
                     estilo
                 ]}
             >
                 {trilhaDoInterruptor}
             </Pressable>
-        )
+        );
     }
 
     return (
@@ -128,26 +100,22 @@ function SwitchField({
             disabled={estaDesabilitado}
             accessibilityRole="switch"
             accessibilityLabel={rotuloDoInterruptor}
-            accessibilityHint={
-                'Ativa ou desativa esta permissão'
-            }
+            accessibilityHint={'Ativa ou desativa esta permissão'}
             accessibilityState={{
                 checked: estaAtivo,
                 disabled: estaDesabilitado
             }}
-            style={({pressed}) => [
+            style={({ pressed }) => [
                 estilos.container,
-                pressed
-                    && !estaDesabilitado
-                    && estilos.pressionado,
-                estaDesabilitado
-                    && estilos.desabilitado,
+                pressed && !estaDesabilitado && estilos.pressionado,
+                estaDesabilitado && estilos.desabilitado,
                 estilo
             ]}
         >
             <Text
                 style={[
                     estilos.titulo,
+                    estaDesabilitado && estilos.tituloDesabilitado,
                     estiloTitulo
                 ]}
                 numberOfLines={2}
@@ -157,7 +125,7 @@ function SwitchField({
 
             {trilhaDoInterruptor}
         </Pressable>
-    )
+    );
 }
 
-export default memo(SwitchField)
+export default memo(SwitchField);

@@ -1,24 +1,38 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import AccountStep from '../../../src/features/onboarding/components/AccountStep/AccountStep';
 import OnboardingStep from '../../../src/features/onboarding/components/OnboardingStep/OnboardingStep';
 import { SelectionSheet } from '../../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
+import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 
 test('etapa compartilhada permite pular e usa valores padrão', async () => {
     const aoPular = jest.fn();
-    await render(<OnboardingStep etapa={1} titulo="Etapa" descricao="Descrição"
-        aoVoltar={jest.fn()} aoPular={aoPular} aoAvancar={jest.fn()}>
-        <Text>Conteúdo</Text>
-    </OnboardingStep>);
+    await render(
+        <OnboardingStep
+            etapa={1}
+            titulo="Etapa"
+            descricao="Descrição"
+            aoVoltar={jest.fn()}
+            aoPular={aoPular}
+            aoAvancar={jest.fn()}
+        >
+            <Text>Conteúdo</Text>
+        </OnboardingStep>
+    );
     await fireEvent.press(screen.getByText('Pular'));
     expect(aoPular).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();
 });
 
 test('conta aceita ausência do mapa de erros', async () => {
-    await render(<AccountStep dados={{ nome: '', email: '', senha: '',
-        confirmacao: '', aceitouTermos: false }} aoAlterar={jest.fn()}
-        aoVoltar={jest.fn()} aoAvancar={jest.fn()} />);
+    await render(
+        <AccountStep
+            dados={{ nome: '', email: '', senha: '', confirmacao: '', aceitouTermos: false }}
+            aoAlterar={jest.fn()}
+            aoVoltar={jest.fn()}
+            aoAvancar={jest.fn()}
+        />
+    );
     expect(screen.queryByRole('alert')).toBeNull();
 });
 

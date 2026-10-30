@@ -1,6 +1,7 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayContainer } from '../../../../src/features/cycles/screens/CycleTodayContainer';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('phosphor-react-native', () => {
     const { Text } = require('react-native');
@@ -36,11 +37,15 @@ function renderizarTela(propriedades) {
 }
 
 test('permite tentar novamente depois de uma falha de carregamento', async () => {
-    const service = { buscar: jest.fn().mockRejectedValueOnce(new Error('falha')).mockResolvedValueOnce(previsao) };
+    const service = {
+        buscar: jest.fn().mockRejectedValueOnce(new Error('falha')).mockResolvedValueOnce(previsao)
+    };
     await renderizarTela({ service, aoVoltar: jest.fn() });
 
     expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
-    await act(async () => fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' })));
+    await act(async () =>
+        fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }))
+    );
     await waitFor(() => expect(screen.getByText('29 de outubro')).toBeOnTheScreen());
     expect(service.buscar).toHaveBeenCalledTimes(2);
 }, 30_000);
@@ -55,8 +60,44 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
     expect(primeiroDia).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'sex, dia 2' })).toBeOnTheScreen();
     await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'qua, dia 14' }).props.accessibilityState).toEqual(
-            expect.objectContaining({ selected: true })
-        );
+        expect(
+            screen.getByRole('button', { name: 'qua, dia 14' }).props.accessibilityState
+        ).toEqual(expect.objectContaining({ selected: true }));
     });
 }, 30_000);
+
+test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não encontra registros', async () => {
+    const service = {
+        buscar: jest.fn().mockResolvedValue({ status: 'DADOS_INSUFICIENTES' })
+    };
+    const aoCadastrarMenstruacao = jest.fn();
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 30, 23, 30));
+    try {
+        await renderizarTela({ service, aoCadastrarMenstruacao });
+
+        expect(await screen.findByText('Conheça seu ciclo')).toBeOnTheScreen();
+        expect(screen.getByLabelText('Datas do ciclo')).toHaveProp('horizontal', true);
+        const inicioDaFaixa = screen.getByLabelText('Datas do ciclo').props.data[0].data;
+        await fireEvent.press(screen.getByRole('button', { name: 'qui, dia 29' }));
+        expect(screen.getByRole('button', { name: 'qui, dia 29' })).toBeSelected();
+        expect(screen.getByLabelText('Datas do ciclo').props.data[0].data).toBe(inicioDaFaixa);
+
+        await fireEvent(screen.getByLabelText('Datas do ciclo'), 'scrollEndDrag', {
+            nativeEvent: {
+                contentOffset: { x: 610, y: 0 },
+                contentSize: { width: 1000, height: 94 },
+                layoutMeasurement: { width: 390, height: 94 }
+            }
+        });
+        const dias = screen.getByLabelText('Datas do ciclo').props.data;
+        expect(dias).toHaveLength(30);
+        expect(dias[0].data).toBe(inicioDaFaixa);
+        expect(dias.every((dia) => dia.fase === 'desconhecida')).toBe(true);
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        expect(aoCadastrarMenstruacao).toHaveBeenCalledWith('2026-10-29');
+        expect(service.buscar).toHaveBeenCalledTimes(1);
+    } finally {
+        jest.useRealTimers();
+    }
+});

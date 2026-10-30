@@ -1,16 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, SectionList, Text, View } from 'react-native';
 import { ArrowLeftIcon } from '../../../shared/components/icons/AppIcons';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { ContraceptiveUsageCard, criarUsos, usoConfirmado } from '../components/ContraceptiveUsageCard';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import {
+    ContraceptiveUsageCard,
+    criarUsos,
+    usoConfirmado
+} from '../components/ContraceptiveUsageCard';
 import { PendingUsesBanner } from '../components/PendingUsesBanner';
-import { estilosAcompanhamento } from './ContraceptiveTrackingScreen.styles';
+import { criarEstilosAcompanhamento } from './ContraceptiveTrackingScreen.styles';
 
-const MENSAGEM_VAZIO = 'Você ainda não cadastrou nenhum anticoncepcional. Toque em "Cadastrar novo anticoncepcional" para começar.';
-const MENSAGEM_ERRO_CARREGAR = 'Não foi possível carregar seus anticoncepcionais no momento. Tente novamente.';
+const MENSAGEM_VAZIO =
+    'Você ainda não cadastrou nenhum anticoncepcional. Toque em "Cadastrar novo anticoncepcional" para começar.';
+const MENSAGEM_ERRO_CARREGAR =
+    'Não foi possível carregar seus anticoncepcionais no momento. Tente novamente.';
 
 function possuiPendente(item) {
     if (item.removido || item.ativo === false) return false;
@@ -21,17 +28,29 @@ function criarSecoes(itens) {
     const secoes = [
         { titulo: 'NÃO USADOS', data: itens.filter(possuiPendente) },
         // Um cartão com duas doses fica em NÃO USADOS até confirmar ambas.
-        { titulo: 'USADOS', data: itens.filter((item) => !item.removido && item.ativo !== false && !possuiPendente(item)) },
+        {
+            titulo: 'USADOS',
+            data: itens.filter(
+                (item) => !item.removido && item.ativo !== false && !possuiPendente(item)
+            )
+        },
         { titulo: 'REMOVIDOS', data: itens.filter((item) => item.removido || item.ativo === false) }
     ];
     return secoes.filter((secao) => secao.data.length);
 }
 
-function SectionLabel({ titulo, primeira }) {
+function SectionLabel({ titulo, primeira, estilosAcompanhamento }) {
     return (
-        <View style={[estilosAcompanhamento.rotuloSecao, !primeira && estilosAcompanhamento.rotuloSecaoSeguinte]}>
+        <View
+            style={[
+                estilosAcompanhamento.rotuloSecao,
+                !primeira && estilosAcompanhamento.rotuloSecaoSeguinte
+            ]}
+        >
             <View style={estilosAcompanhamento.linhaRotulo} />
-            <Text accessibilityRole="header" style={estilosAcompanhamento.textoRotulo}>{titulo}</Text>
+            <Text accessibilityRole="header" style={estilosAcompanhamento.textoRotulo}>
+                {titulo}
+            </Text>
             <View style={estilosAcompanhamento.linhaRotulo} />
         </View>
     );
@@ -49,7 +68,7 @@ function IconeErro() {
     );
 }
 
-function AcaoCadastro({ aoPressionar }) {
+function AcaoCadastro({ aoPressionar, estilosAcompanhamento }) {
     const [largura, setLargura] = useState(350.01);
     // O texto de 18px do botão existente aparece com os 17px do protótipo.
     // Em telas estreitas, o mesmo botão continua inteiro, sem cortar o rótulo.
@@ -95,16 +114,24 @@ function ContraceptiveTrackingScreen({
     aoRemover,
     aoAlternarUso
 }) {
+    const tema = useTheme();
+    const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
     const [usosAtualizados, setUsosAtualizados] = useState({});
     const [larguraCabecalho, setLarguraCabecalho] = useState(393.33);
-    const tamanhoTitulo = Math.min(26, Math.max(18, (larguraCabecalho - 131.32) * 26 / 244));
+    const tamanhoTitulo = Math.min(26, Math.max(18, ((larguraCabecalho - 131.32) * 26) / 244));
     const itens = anticoncepcionais.map((item) => {
         const atualizacao = usosAtualizados[item.id];
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
     });
     const secoes = criarSecoes(itens);
-    const quantidadePendentes = itens.reduce((total, item) => total
-        + (item.removido || item.ativo === false ? 0 : criarUsos(item).filter((uso) => !usoConfirmado(uso)).length), 0);
+    const quantidadePendentes = itens.reduce(
+        (total, item) =>
+            total +
+            (item.removido || item.ativo === false
+                ? 0
+                : criarUsos(item).filter((uso) => !usoConfirmado(uso)).length),
+        0
+    );
 
     function atualizarUsos(item, usos) {
         const origem = anticoncepcionais.find((original) => original.id === item.id);
@@ -114,28 +141,53 @@ function ContraceptiveTrackingScreen({
     }
 
     return (
-        <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={estilosAcompanhamento.tela} testID="anticoncepcionais-area-segura">
-            <View style={estilosAcompanhamento.cabecalho} onLayout={({ nativeEvent }) => {
-                if (nativeEvent.layout.width > 0) setLarguraCabecalho(nativeEvent.layout.width);
-            }}>
-                <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={aoVoltar} hitSlop={10} style={estilosAcompanhamento.botaoVoltar}>
-                    <ArrowLeftIcon size={24} color="#5C5C59" />
+        <SafeAreaView
+            edges={['top', 'left', 'right', 'bottom']}
+            style={estilosAcompanhamento.tela}
+            testID="anticoncepcionais-area-segura"
+        >
+            <View
+                style={estilosAcompanhamento.cabecalho}
+                onLayout={({ nativeEvent }) => {
+                    if (nativeEvent.layout.width > 0) setLarguraCabecalho(nativeEvent.layout.width);
+                }}
+            >
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Voltar"
+                    onPress={aoVoltar}
+                    hitSlop={10}
+                    style={estilosAcompanhamento.botaoVoltar}
+                >
+                    <ArrowLeftIcon size={24} color={tema.cores.interface.textoSecundario} />
                 </Pressable>
-                <Text accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={[estilosAcompanhamento.titulo, { fontSize: tamanhoTitulo }]}>Anticoncepcionais</Text>
+                <Text
+                    accessibilityRole="header"
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
+                    style={[estilosAcompanhamento.titulo, { fontSize: tamanhoTitulo }]}
+                >
+                    Anticoncepcionais
+                </Text>
                 <View style={estilosAcompanhamento.espacoCabecalho} />
             </View>
 
             {carregando ? (
                 <View style={estilosAcompanhamento.estadoCentral}>
-                    <ActivityIndicator size="large" color="#C85A44" />
-                    <Text style={estilosAcompanhamento.mensagemEstado}>Carregando anticoncepcionais...</Text>
+                    <ActivityIndicator size="large" color={tema.escuro ? '#F08A75' : '#C85A44'} />
+                    <Text style={estilosAcompanhamento.mensagemEstado}>
+                        Carregando anticoncepcionais...
+                    </Text>
                 </View>
             ) : !itens.length ? (
                 <View style={estilosAcompanhamento.estadoVazio}>
                     <Text style={estilosAcompanhamento.tituloVazio}>Nenhum anticoncepcional</Text>
                     <Text style={estilosAcompanhamento.mensagemVazio}>
                         {'Você ainda não cadastrou nenhum anticoncepcional. Toque em "'}
-                        <Text style={estilosAcompanhamento.destaqueVazio}>Cadastrar novo anticoncepcional</Text>
+                        <Text style={estilosAcompanhamento.destaqueVazio}>
+                            Cadastrar novo anticoncepcional
+                        </Text>
                         {'" para começar.'}
                     </Text>
                 </View>
@@ -150,7 +202,13 @@ function ContraceptiveTrackingScreen({
                         style={estilosAcompanhamento.rolagem}
                         sections={secoes}
                         keyExtractor={(item) => String(item.id)}
-                        renderSectionHeader={({ section }) => <SectionLabel titulo={section.titulo} primeira={section === secoes[0]} />}
+                        renderSectionHeader={({ section }) => (
+                            <SectionLabel
+                                estilosAcompanhamento={estilosAcompanhamento}
+                                titulo={section.titulo}
+                                primeira={section === secoes[0]}
+                            />
+                        )}
                         renderItem={({ item }) => (
                             <ContraceptiveUsageCard
                                 anticoncepcional={item}
@@ -160,7 +218,9 @@ function ContraceptiveTrackingScreen({
                                 aoAtualizarUsos={atualizarUsos}
                             />
                         )}
-                        ItemSeparatorComponent={() => <View style={estilosAcompanhamento.espacoCartao} />}
+                        ItemSeparatorComponent={() => (
+                            <View style={estilosAcompanhamento.espacoCartao} />
+                        )}
                         contentContainerStyle={estilosAcompanhamento.lista}
                         stickySectionHeadersEnabled={false}
                         showsVerticalScrollIndicator={false}
@@ -171,7 +231,10 @@ function ContraceptiveTrackingScreen({
             {!carregando ? (
                 <View style={estilosAcompanhamento.rodape}>
                     <View style={estilosAcompanhamento.conteudoRodape}>
-                        <AcaoCadastro aoPressionar={aoCadastrarNovo} />
+                        <AcaoCadastro
+                            aoPressionar={aoCadastrarNovo}
+                            estilosAcompanhamento={estilosAcompanhamento}
+                        />
                     </View>
                 </View>
             ) : null}
@@ -184,7 +247,11 @@ function ContraceptiveTrackingScreen({
                 fundoIcone="transparent"
                 titulo="Algo deu errado"
                 mensagem={MENSAGEM_ERRO_CARREGAR.replace('. Tente', '.\nTente')}
-                acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: aoTentarNovamente }}
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: aoTentarNovamente
+                }}
                 acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: aoVoltar }}
             />
 
@@ -195,17 +262,22 @@ function ContraceptiveTrackingScreen({
                 corIcone="#5C5C59"
                 fundoIcone="transparent"
                 titulo="Algo deu errado"
-                mensagem={'Não foi possível marcar o uso do anticoncepcional no momento.\nTente novamente.'}
-                acaoPrincipal={{ texto: 'Tentar novamente', variante: 'preto', aoPressionar: aoDispensarErroUso }}
-                acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: aoDispensarErroUso }}
+                mensagem={
+                    'Não foi possível marcar o uso do anticoncepcional no momento.\nTente novamente.'
+                }
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: aoDispensarErroUso
+                }}
+                acaoSecundaria={{
+                    texto: 'Voltar',
+                    variante: 'branco',
+                    aoPressionar: aoDispensarErroUso
+                }}
             />
         </SafeAreaView>
     );
 }
 
-export {
-    ContraceptiveTrackingScreen,
-    MENSAGEM_ERRO_CARREGAR,
-    MENSAGEM_VAZIO,
-    criarSecoes
-};
+export { ContraceptiveTrackingScreen, MENSAGEM_ERRO_CARREGAR, MENSAGEM_VAZIO, criarSecoes };

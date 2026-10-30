@@ -1,0 +1,84 @@
+import { fireEvent, screen, within } from '@testing-library/react-native';
+import { Text } from 'react-native';
+
+import MenstruationCalendar from '../../../src/features/onboarding/components/MenstruationCalendar/MenstruationCalendar';
+import OnboardingProgress from '../../../src/features/onboarding/components/OnboardingProgress/OnboardingProgress';
+import OnboardingStep from '../../../src/features/onboarding/components/OnboardingStep/OnboardingStep';
+import OnboardingComplete from '../../../src/features/onboarding/components/OnboardingComplete/OnboardingComplete';
+import BirthDateStep from '../../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
+import CycleLengthStep from '../../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
+import { renderWithTheme } from '../../helpers/renderWithTheme';
+
+describe.each([
+    ['claro', '#222222', '#E6E2D8'],
+    ['escuro', '#F4F1EA', '#4A514D']
+])('onboarding no tema %s', (preferencia, textoPrincipal, borda) => {
+    test('aplica a paleta ativa à estrutura e ao progresso', async () => {
+        await renderWithTheme(
+            <OnboardingStep
+                etapa={2}
+                titulo="Dados do ciclo"
+                descricao="Conteúdo adaptado ao tema."
+                aoVoltar={jest.fn()}
+                aoAvancar={jest.fn()}
+            >
+                <Text>Campo</Text>
+            </OnboardingStep>,
+            { preferencia }
+        );
+
+        expect(screen.getByText('Dados do ciclo')).toHaveStyle({
+            color: textoPrincipal
+        });
+        expect(screen.getByTestId('progresso-preenchido')).toHaveStyle({
+            backgroundColor: '#C85A44'
+        });
+    });
+
+    test('preserva laranja nas durações e no foco da data', async () => {
+        const { unmount } = await renderWithTheme(<CycleLengthStep valor={28} />, { preferencia });
+        expect(screen.getByTestId('area-campo-numero')).toHaveStyle({ borderColor: '#C85A44' });
+        await unmount();
+        await renderWithTheme(<BirthDateStep valor="04/01/2000" />, { preferencia });
+        await fireEvent(screen.getByLabelText('Data'), 'focus');
+        expect(screen.getByTestId('campo-data')).toHaveStyle({ borderColor: '#C85A44' });
+    });
+
+    test('preserva o nome ALOYA em laranja na conclusão', async () => {
+        await renderWithTheme(<OnboardingComplete />, { preferencia });
+        expect(screen.getByText('ALOYA')).toHaveStyle({ color: '#C85A44' });
+    });
+
+    test('aplica a paleta ativa ao calendário menstrual', async () => {
+        const { toJSON } = await renderWithTheme(
+            <MenstruationCalendar
+                valor={{ inicio: '2026-08-03', fim: '2026-08-07' }}
+                aoAlterar={jest.fn()}
+            />,
+            { preferencia }
+        );
+
+        expect(screen.getByLabelText('Agosto de 2026')).toHaveStyle({
+            color: textoPrincipal
+        });
+        expect(screen.getByLabelText('Selecionar dia 3')).toHaveStyle({
+            backgroundColor: '#C85A44'
+        });
+        expect(within(screen.getByLabelText('Selecionar dia 3')).getByText('3')).toHaveStyle({
+            color: '#FFFFFF'
+        });
+        expect(screen.getByText('Dom')).toHaveStyle({
+            color: preferencia === 'escuro' ? '#C4C8C5' : '#5C5C59'
+        });
+        expect(JSON.stringify(toJSON())).toContain(borda);
+    });
+});
+
+test('progresso usa a borda escura como trilha', async () => {
+    const { toJSON } = await renderWithTheme(
+        <OnboardingProgress etapaAtual={1} totalEtapas={5} />,
+        { preferencia: 'escuro' }
+    );
+
+    expect(JSON.stringify(toJSON())).toContain('#4A514D');
+});

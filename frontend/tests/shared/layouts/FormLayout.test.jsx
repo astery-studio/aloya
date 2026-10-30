@@ -1,14 +1,11 @@
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import FormLayout from '../../../src/shared/layouts/FormLayout';
+import { renderWithTheme } from '../../helpers/renderWithTheme';
 
 test('renderiza cabeçalho, conteúdo e ações', async () => {
-    await render(
-        <FormLayout
-            cabecalho={<Text>Cabeçalho</Text>}
-            acoes={<Text>Ações</Text>}
-            centralizado
-        >
+    await renderWithTheme(
+        <FormLayout cabecalho={<Text>Cabeçalho</Text>} acoes={<Text>Ações</Text>} centralizado>
             <Text>Conteúdo</Text>
         </FormLayout>
     );
@@ -16,10 +13,19 @@ test('renderiza cabeçalho, conteúdo e ações', async () => {
     expect(screen.getByText('Cabeçalho')).toBeTruthy();
     expect(screen.getByText('Conteúdo')).toBeTruthy();
     expect(screen.getByText('Ações')).toBeTruthy();
+    expect(screen.getByTestId('form-layout-header')).toHaveStyle({ paddingTop: 16 });
+    expect(screen.getByTestId('form-layout-actions')).toHaveStyle({
+        paddingTop: 16,
+        paddingBottom: 24
+    });
+    expect(screen.getByTestId('form-layout-scroll').props).toMatchObject({
+        keyboardShouldPersistTaps: 'handled',
+        showsVerticalScrollIndicator: false
+    });
 });
 
 test('permite omitir regiões opcionais e personalizar o id', async () => {
-    await render(
+    await renderWithTheme(
         <FormLayout testeId="formulario-sem-acoes">
             <Text>Conteúdo mínimo</Text>
         </FormLayout>

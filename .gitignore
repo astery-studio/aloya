@@ -1,9 +1,13 @@
 # Dependências
 node_modules/
 
+# Ferramenta local de túnel
+/cloudflared.exe
+
 # Expo
 .expo/
 dist/
+dist-ci/
 web-build/
 expo-env.d.ts
 

@@ -1,31 +1,34 @@
-import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../../shared/theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    container: {
-        width: '100%',
-        gap: tema.espacamentos.grande
-    },
+import { fontFamilies } from '../../../shared/theme';
 
-    secao: {
-        width: '100%',
-        gap: tema.espacamentos.pequeno
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            gap: tema.espacamentos.grande
+        },
 
-    tituloSecao: {
-        marginLeft: 4,
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.medium,
-        fontSize: 14,
-        fontStyle: 'normal',
-        fontWeight: '500',
-        lineHeight: 21
-    },
+        secao: {
+            width: '100%',
+            gap: tema.espacamentos.pequeno
+        },
 
-    campos: {
-        width: '100%',
-        gap: tema.espacamentos.pequeno
-    }
-})
+        tituloSecao: {
+            marginLeft: 4,
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.medium,
+            fontSize: 14,
+            fontStyle: 'normal',
+            fontWeight: '500',
+            lineHeight: 21
+        },
 
-export { estilos }
+        campos: {
+            width: '100%',
+            gap: tema.espacamentos.pequeno
+        }
+    });
+}
+
+export { criarEstilos };

@@ -3,12 +3,7 @@
  */
 import Button from '../Button';
 
-const variantesPermitidas = [
-    'verde',
-    'branco',
-    'preto',
-    'vermelho'
-];
+const variantesPermitidas = ['verde', 'branco', 'preto', 'vermelho', 'texto'];
 
 export default function ButtonPopup({
     texto,
@@ -20,9 +15,7 @@ export default function ButtonPopup({
     estilo
 }) {
     if (!variantesPermitidas.includes(variante)) {
-        throw new Error(
-            `Variante de ButtonPopup inválida: ${variante}`
-        );
+        throw new Error(`Variante de ButtonPopup inválida: ${variante}`);
     }
 
     return (

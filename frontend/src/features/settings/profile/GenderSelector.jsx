@@ -1,5 +1,5 @@
 //Mostra as identidades de gênero aceitas pelo backend dentro do painel de seleção.
-import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet'
+import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet';
 
 const opcoesIdentidadeGenero = Object.freeze([
     Object.freeze({ id: 'Prefiro não informar', label: 'Prefiro não informar' }),
@@ -9,9 +9,9 @@ const opcoesIdentidadeGenero = Object.freeze([
     Object.freeze({ id: 'Homem Trans', label: 'Homem Trans' }),
     Object.freeze({ id: 'Não-binário', label: 'Não-binário' }),
     Object.freeze({ id: 'Outro', label: 'Outro' })
-])
+]);
 
-function GenderSelector({visivel, valorSelecionado, onSelecionar, onFechar}) {
+function GenderSelector({ visivel, valorSelecionado, onSelecionar, onFechar }) {
     return (
         <SelectionSheet
             visivel={visivel}
@@ -21,7 +21,7 @@ function GenderSelector({visivel, valorSelecionado, onSelecionar, onFechar}) {
             onSelecionar={onSelecionar}
             onFechar={onFechar}
         />
-    )
+    );
 }
 
-export { GenderSelector }
+export { GenderSelector };

@@ -18,8 +18,8 @@ test('normaliza o e-mail e guarda o resultado do envio', async () => {
     expect(result.current).toMatchObject({ carregando: false, erro: null, resultado: resposta });
 });
 
-test('reenvia pelo serviço específico e expõe falhas', async () => {
-    const falha = new Error('Aguarde antes de tentar novamente.');
+test('reenvia pelo serviço específico sem expor falhas internas', async () => {
+    const falha = new Error('detalhe interno');
     const solicitarRecuperacao = jest.fn();
     const reenviarRecuperacao = jest.fn().mockRejectedValue(falha);
     const { result } = await renderHook(() =>
@@ -30,8 +30,26 @@ test('reenvia pelo serviço específico e expõe falhas', async () => {
     await act(async () => result.current.reenviar());
 
     expect(reenviarRecuperacao).toHaveBeenCalledWith({ email: 'pessoa@email.com' });
-    expect(result.current.erro).toBe(falha.message);
+    expect(result.current.erro).toBe(
+        'Não foi possível enviar o e-mail. Tente novamente.'
+    );
     expect(result.current.carregando).toBe(false);
+});
+
+test('remove o sucesso anterior quando o reenvio falha', async () => {
+    const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
+    const reenviarRecuperacao = jest.fn().mockRejectedValue(new Error('falha'));
+    const { result } = await renderHook(() =>
+        useForgotPassword({ solicitarRecuperacao, reenviarRecuperacao })
+    );
+
+    await act(() => result.current.setEmail('pessoa@email.com'));
+    await act(async () => result.current.enviar());
+    expect(result.current.resultado).toBeTruthy();
+
+    await act(async () => result.current.reenviar());
+    expect(result.current.resultado).toBeNull();
+    expect(result.current.erro).toBeTruthy();
 });
 
 test('reenvia pelo serviço original quando não há serviço específico', async () => {
@@ -50,7 +68,7 @@ test('reenvia pelo serviço original quando não há serviço específico', asyn
 
 test.each([
     [{ mensagemUsuario: 'Mensagem pública.' }, 'Mensagem pública.'],
-    [{}, 'Não foi possível enviar o e-mail.']
+    [{}, 'Não foi possível enviar o e-mail. Tente novamente.']
 ])('prioriza mensagens seguras de recuperação', async (falha, mensagem) => {
     const solicitarRecuperacao = jest.fn().mockRejectedValue(falha);
     const { result } = await renderHook(() =>

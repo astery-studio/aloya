@@ -8,6 +8,9 @@ const estilos = StyleSheet.create({
     fundo: { flex: 1 },
     tela: { flex: 1, backgroundColor: 'transparent' },
     flexivel: { flex: 1 },
+    cabecalho: {
+        paddingTop: espacamentos.medio
+    },
     rolagem: {
         flexGrow: 1,
         paddingHorizontal: espacamentos.grande,
@@ -20,8 +23,8 @@ const estilos = StyleSheet.create({
     },
     acoes: {
         paddingHorizontal: espacamentos.grande,
-        paddingTop: 32,
-        paddingBottom: 40,
+        paddingTop: espacamentos.medio,
+        paddingBottom: espacamentos.grande,
         width: '100%'
     }
 });

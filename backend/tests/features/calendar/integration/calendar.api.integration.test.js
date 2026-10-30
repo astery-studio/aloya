@@ -1,18 +1,14 @@
 //Testa calendário, autenticação e isolamento entre usuárias usando SQLite real.
 import assert from 'node:assert/strict';
-import {once} from 'node:events';
-import {
-    mkdtempSync,
-    readFileSync,
-    rmSync
-} from 'node:fs';
-import {tmpdir} from 'node:os';
-import {join} from 'node:path';
+import { once } from 'node:events';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
-import {DatabaseSync as Database} from 'node:sqlite';
-import {fileURLToPath} from 'node:url';
+import { DatabaseSync as Database } from 'node:sqlite';
+import { fileURLToPath } from 'node:url';
 
-import {PrismaBetterSqlite3} from '@prisma/adapter-better-sqlite3';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import prismaPackage from '@prisma/client';
 import express from 'express';
 
@@ -21,7 +17,7 @@ import { criarCalendarRoutes } from '../../../../src/features/calendar/routes/ca
 import { criarAuthMiddleware } from '../../../../src/shared/middleware/auth.middleware.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
-const {PrismaClient} = prismaPackage;
+const { PrismaClient } = prismaPackage;
 
 const CAMINHO_MIGRATION_INICIAL = fileURLToPath(
     new URL(
@@ -31,19 +27,12 @@ const CAMINHO_MIGRATION_INICIAL = fileURLToPath(
 );
 
 function criarBancoTemporario() {
-    const diretorio = mkdtempSync(
-        join(tmpdir(), 'aloya-calendario-')
-    );
+    const diretorio = mkdtempSync(join(tmpdir(), 'aloya-calendario-'));
     const caminhoBanco = join(diretorio, 'teste.db');
     const banco = new Database(caminhoBanco);
 
     banco.exec('PRAGMA foreign_keys = ON');
-    banco.exec(
-        readFileSync(
-            CAMINHO_MIGRATION_INICIAL,
-            'utf8'
-        )
-    );
+    banco.exec(readFileSync(CAMINHO_MIGRATION_INICIAL, 'utf8'));
 
     banco.exec(`
         INSERT INTO usuarios (
@@ -189,10 +178,7 @@ function criarBancoTemporario() {
 }
 
 async function executarComApi(executar) {
-    const {
-        caminhoBanco,
-        diretorio
-    } = criarBancoTemporario();
+    const { caminhoBanco, diretorio } = criarBancoTemporario();
     const adapter = new PrismaBetterSqlite3({
         url: `file:${caminhoBanco.replaceAll('\\', '/')}`
     });
@@ -227,26 +213,20 @@ async function executarComApi(executar) {
         criarCalendarRoutes({
             Router: express.Router,
             authMiddleware,
-            calendarController:
-                calendarModule.calendarController
+            calendarController: calendarModule.calendarController
         })
     );
 
     app.use(tratarErros);
 
-    const servidor = app.listen(
-        0,
-        '127.0.0.1'
-    );
+    const servidor = app.listen(0, '127.0.0.1');
 
     try {
         await once(servidor, 'listening');
 
         const endereco = servidor.address();
 
-        return await executar(
-            `http://127.0.0.1:${endereco.port}/api/cycles/calendar`
-        );
+        return await executar(`http://127.0.0.1:${endereco.port}/api/cycles/calendar`, prisma);
     } finally {
         await new Promise((resolve, reject) => {
             servidor.close((erro) => {
@@ -270,86 +250,56 @@ async function executarComApi(executar) {
 
 test('protege e carrega somente o calendário da usuária autenticada', async () => {
     await executarComApi(async (url) => {
-        const respostaSemToken = await fetch(
-            `${url}?mes=2026-10`
-        );
+        const respostaSemToken = await fetch(`${url}?mes=2026-10`);
         const corpoSemToken = await respostaSemToken.json();
 
         assert.equal(respostaSemToken.status, 401);
-        assert.equal(
-            corpoSemToken.erro.codigo,
-            'NAO_AUTENTICADO'
-        );
+        assert.equal(corpoSemToken.erro.codigo, 'NAO_AUTENTICADO');
 
-        const resposta = await fetch(
-            `${url}?mes=2026-10`,
-            {
-                headers: {
-                    Authorization: 'Bearer token-ana'
-                }
+        const resposta = await fetch(`${url}?mes=2026-10`, {
+            headers: {
+                Authorization: 'Bearer token-ana'
             }
-        );
+        });
         const corpo = await resposta.json();
 
         assert.equal(resposta.status, 200);
-        assert.equal(
-            resposta.headers.get('cache-control'),
-            'private, no-store'
-        );
-        assert.equal(
-            corpo.calendario.mes,
-            '2026-10'
-        );
-        assert.equal(
-            corpo.calendario.possuiCiclos,
-            true
-        );
-        assert.deepEqual(
-            corpo.calendario.diasMenstruacao,
-            [
-                {
-                    data: '2026-10-01',
-                    registroCicloId: 11
-                },
-                {
-                    data: '2026-10-03',
-                    registroCicloId: 11
-                }
-            ]
-        );
-        assert.equal(
-            corpo.calendario.previsao.ovulacao,
-            '2026-10-12'
-        );
-        assert.deepEqual(
-            corpo.calendario.previsao.janelaFertil,
+        assert.equal(resposta.headers.get('cache-control'), 'private, no-store');
+        assert.equal(corpo.calendario.mes, '2026-10');
+        assert.equal(corpo.calendario.possuiCiclos, true);
+        assert.deepEqual(corpo.calendario.diasMenstruacao, [
             {
-                inicio: '2026-10-07',
-                fim: '2026-10-12'
+                data: '2026-10-01',
+                registroCicloId: 11
+            },
+            {
+                data: '2026-10-03',
+                registroCicloId: 11
             }
-        );
+        ]);
+        assert.equal(corpo.calendario.previsao.ovulacao, '2026-10-12');
+        assert.deepEqual(corpo.calendario.previsao.janelaFertil, {
+            inicio: '2026-10-07',
+            fim: '2026-10-12'
+        });
 
-        assert.equal(
-            JSON.stringify(corpo).includes('"registroCicloId":20'),
-            false
-        );
-        assert.equal(
-            JSON.stringify(corpo).includes('2026-10-02'),
-            false
-        );
+        assert.equal(JSON.stringify(corpo).includes('"registroCicloId":20'), false);
+        assert.equal(JSON.stringify(corpo).includes('2026-10-02'), false);
 
         const respostaNovembro = await fetch(`${url}?mes=2026-11`, {
-            headers: {Authorization: 'Bearer token-ana'}
+            headers: { Authorization: 'Bearer token-ana' }
         });
         const novembro = await respostaNovembro.json();
         assert.equal(respostaNovembro.status, 200);
         const ultimoPeriodo = novembro.calendario.previsao.periodos.at(-1);
         assert.equal(ultimoPeriodo.previsto, true);
         assert.deepEqual(ultimoPeriodo.menstruacaoPrevista, {
-            inicio: '2026-11-24', fim: '2026-11-28'
+            inicio: '2026-11-24',
+            fim: '2026-11-28'
         });
         assert.deepEqual(ultimoPeriodo.faseFolicular, {
-            inicio: '2026-11-29', fim: '2026-11-30'
+            inicio: '2026-11-29',
+            fim: '2026-11-30'
         });
         assert.deepEqual(novembro.calendario.diasMenstruacao, []);
     });
@@ -357,24 +307,60 @@ test('protege e carrega somente o calendário da usuária autenticada', async ()
 
 test('rejeita mês inválido pela API sem acessar dados de outro período', async () => {
     await executarComApi(async (url) => {
-        const resposta = await fetch(
-            `${url}?mes=2026-13`,
-            {
-                headers: {
-                    Authorization: 'Bearer token-ana'
-                }
+        const resposta = await fetch(`${url}?mes=2026-13`, {
+            headers: {
+                Authorization: 'Bearer token-ana'
             }
-        );
+        });
         const corpo = await resposta.json();
 
         assert.equal(resposta.status, 422);
-        assert.equal(
-            corpo.erro.codigo,
-            'MES_CALENDARIO_INVALIDO'
-        );
-        assert.equal(
-            corpo.erro.mensagem,
-            'Informe o mês no formato AAAA-MM.'
-        );
+        assert.equal(corpo.erro.codigo, 'MES_CALENDARIO_INVALIDO');
+        assert.equal(corpo.erro.mensagem, 'Informe o mês no formato AAAA-MM.');
+    });
+});
+
+test('corrige fases históricas quando um início real desmente a previsão antiga', async () => {
+    await executarComApi(async (url, prisma) => {
+        await prisma.registroCiclo.createMany({
+            data: [
+                {
+                    usuarioId: 1,
+                    dataInicio: new Date('2026-06-12T00:00:00.000Z'),
+                    dataFim: new Date('2026-06-16T00:00:00.000Z'),
+                    duracaoMenstruacao: 5,
+                    duracaoCiclo: 28,
+                    ehCicloInicial: true
+                },
+                {
+                    usuarioId: 1,
+                    dataInicio: new Date('2026-07-10T00:00:00.000Z'),
+                    dataFim: new Date('2026-07-14T00:00:00.000Z'),
+                    duracaoMenstruacao: 5,
+                    duracaoCiclo: 28
+                }
+            ]
+        });
+
+        const resposta = await fetch(`${url}?mes=2026-08`, {
+            headers: { Authorization: 'Bearer token-ana' }
+        });
+        const corpo = await resposta.json();
+        const previsao = corpo.calendario.previsao;
+
+        assert.equal(resposta.status, 200);
+        assert.deepEqual(corpo.calendario.diasMenstruacao, []);
+        assert.equal(previsao.menstruacaoPrevista, null);
+        assert.deepEqual(previsao.faseFolicular, {
+            inicio: '2026-08-01',
+            fim: '2026-08-16'
+        });
+        assert.equal(previsao.ovulacao, '2026-08-17');
+        assert.deepEqual(previsao.faseLutea, {
+            inicio: '2026-08-18',
+            fim: '2026-08-31'
+        });
+        assert.ok(previsao.periodos.every((periodo) => periodo.previsto === false));
+        assert.ok(previsao.periodos.every((periodo) => periodo.menstruacaoPrevista === null));
     });
 });

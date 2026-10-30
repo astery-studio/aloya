@@ -5,8 +5,15 @@
   "description": "",
   "main": "src/shared/http/server.js",
   "scripts": {
+    "db:validate-migrations": "node scripts/validate-migrations.js",
+    "db:prepare": "prisma generate && prisma migrate deploy",
     "dev": "node --watch src/shared/http/server.js",
+    "format": "prettier --write \"**/*.{js,json,md,ts}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md,ts}\"",
+    "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\" \"../.github/**/*.yml\" \"../docs/ci-cd.md\" \"../package.json\"",
+    "lint": "eslint . --max-warnings=0",
     "start": "node src/shared/http/server.js",
+    "start:prepared": "prisma generate && prisma migrate deploy && node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
     "test:coverage": "node --test --experimental-test-coverage",
@@ -26,16 +33,21 @@
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "nodemailer": "10.0.10",
+    "nodemailer": "10.2.1",
     "prisma": "7.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.9"
   },
   "overrides": {
+    "body-parser": "2.4.0",
     "deepmerge-ts": "8.0.2",
-    "fast-uri": "3.1.8",
-    "ip-address": "10.7.3",
+    "fast-uri": "3.1.9",
+    "ip-address": "10.7.5",
     "mysql2": "3.24.5",
     "qs": "6.16.0"
   }

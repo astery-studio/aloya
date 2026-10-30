@@ -114,3 +114,18 @@ test('rejeita token ausente e senha curta', () => {
         ['token', 'senha']
     );
 });
+
+test('rejeita senha de recuperação acima do limite efetivo do bcrypt', () => {
+    const senha = 'á'.repeat(37);
+    const resultado = criarValidator().validarRedefinicao({
+        token: 'jwt-valido',
+        senha
+    });
+
+    assert.equal(Buffer.byteLength(senha, 'utf8'), 74);
+    assert.equal(resultado.valido, false);
+    assert.deepEqual(resultado.erros, [{
+        campo: 'senha',
+        mensagem: 'A senha ultrapassa o tamanho máximo permitido.'
+    }]);
+});

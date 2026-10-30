@@ -1,124 +1,93 @@
-import {Text} from 'react-native'
-import {fireEvent, render, screen} from '@testing-library/react-native'
+import { Text } from 'react-native';
+import { fireEvent, render as renderRntl, screen } from '@testing-library/react-native';
 
-jest.mock(
-    '../../../../src/shared/components/feedback/BottomSheet/BottomSheet',
-    () => {
-        const React = require('react')
-        const {View} = require('react-native')
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
-        function BottomSheet({
-            children,
-            visivel,
-            onFechar,
-            bloquearFechamento
-        }) {
-            return React.createElement(
-                View,
-                {
-                    testID: 'bottom-sheet',
-                    visivel,
-                    onFechar,
-                    bloquearFechamento
-                },
-                children
-            )
-        }
+jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => {
+    const React = require('react');
+    const { View } = require('react-native');
 
-        return {
-            BottomSheet
-        }
+    function BottomSheet({ children, visivel, onFechar, bloquearFechamento }) {
+        return React.createElement(
+            View,
+            {
+                testID: 'bottom-sheet',
+                visivel,
+                onFechar,
+                bloquearFechamento
+            },
+            children
+        );
     }
-)
 
-jest.mock(
-    '../../../../src/shared/layouts/BottomSheet/BottomSheetLayout',
-    () => {
-        const React = require('react')
-        const {
-            Text: Texto,
-            View
-        } = require('react-native')
+    return {
+        BottomSheet
+    };
+});
 
-        function BottomSheetLayout({
-            children,
-            titulo,
-            onFechar,
-            bloquearFechamento
-        }) {
-            return React.createElement(
-                View,
-                {
-                    testID: 'bottom-sheet-layout',
-                    onFechar,
-                    bloquearFechamento
-                },
-                React.createElement(
-                    Texto,
-                    null,
-                    titulo
-                ),
-                children
-            )
-        }
+jest.mock('../../../../src/shared/layouts/BottomSheet/BottomSheetLayout', () => {
+    const React = require('react');
+    const { Text: Texto, View } = require('react-native');
 
-        return {
-            BottomSheetLayout
-        }
+    function BottomSheetLayout({ children, titulo, onFechar, bloquearFechamento }) {
+        return React.createElement(
+            View,
+            {
+                testID: 'bottom-sheet-layout',
+                onFechar,
+                bloquearFechamento
+            },
+            React.createElement(Texto, null, titulo),
+            children
+        );
     }
-)
 
-import {EditFieldSheet} from '../../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet'
+    return {
+        BottomSheetLayout
+    };
+});
+
+import {
+    EditFieldSheet,
+    obterDataVisivel
+} from '../../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet';
+
+async function renderizar(componente, preferencia = 'claro') {
+    return renderRntl(
+        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+            {componente}
+        </ThemeProvider>
+    );
+}
 
 describe('EditFieldSheet', () => {
     test('renderiza o título, o valor e o botão de salvar', async () => {
-        const onFechar = jest.fn()
+        const onFechar = jest.fn();
 
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar nome"
                 valor="Ana Silva"
                 onAlterar={jest.fn()}
                 onFechar={onFechar}
-                botaoSalvar={
-                    <Text>Salvar alterações</Text>
-                }
+                botaoSalvar={<Text>Salvar alterações</Text>}
             />
-        )
+        );
 
-        expect(
-            screen.getByText('Editar nome')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Editar nome')).toBeOnTheScreen();
 
-        expect(
-            screen.getByLabelText('Nome')
-        ).toHaveProp(
-            'value',
-            'Ana Silva'
-        )
+        expect(screen.getByLabelText('Nome')).toHaveProp('value', 'Ana Silva');
 
-        expect(
-            screen.getByText('Salvar alterações')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Salvar alterações')).toBeOnTheScreen();
 
-        expect(
-            screen.getByTestId('bottom-sheet')
-        ).toHaveProp(
-            'visivel',
-            true
-        )
+        expect(screen.getByTestId('bottom-sheet')).toHaveProp('visivel', true);
 
-        expect(
-            screen.getByTestId('bottom-sheet')
-        ).toHaveProp(
-            'onFechar',
-            onFechar
-        )
-    })
+        expect(screen.getByTestId('bottom-sheet')).toHaveProp('onFechar', onFechar);
+    });
 
     test('configura corretamente o campo de nome', async () => {
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar nome"
@@ -126,41 +95,21 @@ describe('EditFieldSheet', () => {
                 valor="Ana"
                 onAlterar={jest.fn()}
             />
-        )
+        );
 
-        const campo =
-            screen.getByLabelText('Nome')
+        const campo = screen.getByLabelText('Nome');
 
-        expect(campo).toHaveProp(
-            'keyboardType',
-            'default'
-        )
-
-        expect(campo).toHaveProp(
-            'autoCapitalize',
-            'words'
-        )
-
-        expect(campo).toHaveProp(
-            'autoCorrect',
-            true
-        )
-
-        expect(campo).toHaveProp(
-            'maxLength',
-            120
-        )
-
-        expect(campo).toHaveProp(
-            'multiline',
-            false
-        )
-    })
+        expect(campo).toHaveProp('keyboardType', 'default');
+        expect(campo).toHaveProp('autoCapitalize', 'words');
+        expect(campo).toHaveProp('autoCorrect', true);
+        expect(campo).toHaveProp('maxLength', 120);
+        expect(campo).toHaveProp('multiline', false);
+    });
 
     test('remove caracteres de controle do texto', async () => {
-        const onAlterar = jest.fn()
+        const onAlterar = jest.fn();
 
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar nome"
@@ -168,22 +117,16 @@ describe('EditFieldSheet', () => {
                 valor=""
                 onAlterar={onAlterar}
             />
-        )
+        );
 
-        await fireEvent.changeText(
-            screen.getByLabelText('Nome'),
-            'Ana\u0000\nSilva\u007F'
-        )
+        await fireEvent.changeText(screen.getByLabelText('Nome'), 'Ana\u0000\nSilva\u007F');
 
-        expect(onAlterar).toHaveBeenCalledTimes(1)
-
-        expect(onAlterar).toHaveBeenCalledWith(
-            'AnaSilva'
-        )
-    })
+        expect(onAlterar).toHaveBeenCalledTimes(1);
+        expect(onAlterar).toHaveBeenCalledWith('AnaSilva');
+    });
 
     test('configura corretamente o campo de e-mail', async () => {
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar e-mail"
@@ -191,39 +134,19 @@ describe('EditFieldSheet', () => {
                 valor="ana@email.com"
                 onAlterar={jest.fn()}
             />
-        )
+        );
 
-        const campo =
-            screen.getByLabelText('E-mail')
+        const campo = screen.getByLabelText('E-mail');
 
-        expect(campo).toHaveProp(
-            'value',
-            'ana@email.com'
-        )
-
-        expect(campo).toHaveProp(
-            'keyboardType',
-            'email-address'
-        )
-
-        expect(campo).toHaveProp(
-            'autoCapitalize',
-            'none'
-        )
-
-        expect(campo).toHaveProp(
-            'autoCorrect',
-            false
-        )
-
-        expect(campo).toHaveProp(
-            'maxLength',
-            254
-        )
-    })
+        expect(campo).toHaveProp('value', 'ana@email.com');
+        expect(campo).toHaveProp('keyboardType', 'email-address');
+        expect(campo).toHaveProp('autoCapitalize', 'none');
+        expect(campo).toHaveProp('autoCorrect', false);
+        expect(campo).toHaveProp('maxLength', 254);
+    });
 
     test('converte a data da API para o formato visível', async () => {
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar nascimento"
@@ -231,99 +154,46 @@ describe('EditFieldSheet', () => {
                 valor="2000-09-21"
                 onAlterar={jest.fn()}
             />
-        )
+        );
 
-        const campo =
-            screen.getByLabelText(
-                'Data de nascimento'
-            )
+        const campo = screen.getByLabelText('Data de nascimento');
 
-        expect(campo).toHaveProp(
-            'value',
-            '21/09/2000'
-        )
-
-        expect(campo).toHaveProp(
-            'keyboardType',
-            'number-pad'
-        )
-
-        expect(campo).toHaveProp(
-            'placeholder',
-            'DD/MM/AAAA'
-        )
-
-        expect(campo).toHaveProp(
-            'maxLength',
-            10
-        )
-
-        expect(campo).toHaveProp(
-            'autoCapitalize',
-            'none'
-        )
-
-        expect(campo).toHaveProp(
-            'autoCorrect',
-            false
-        )
-    })
+        expect(campo).toHaveProp('value', '21/09/2000');
+        expect(campo).toHaveProp('keyboardType', 'number-pad');
+        expect(campo).toHaveProp('placeholder', 'DD/MM/AAAA');
+        expect(campo).toHaveProp('maxLength', 10);
+        expect(campo).toHaveProp('autoCapitalize', 'none');
+        expect(campo).toHaveProp('autoCorrect', false);
+    });
 
     test.each([
-        [
-            '1',
-            '1'
-        ],
-        [
-            '1234',
-            '12/34'
-        ],
-        [
-            '123',
-            '12/3'
-        ],
-        [
-            '1234',
-            '12/34'
-        ],
-        [
-            '123456789',
-            '12/34/5678'
-        ]
-    ])(
-        'formata a digitação de data %s como %s',
-        async (textoDigitado, resultadoEsperado) => {
-            const onAlterar = jest.fn()
+        ['1', '1'],
+        ['1234', '12/34'],
+        ['123', '12/3'],
+        ['123456789', '12/34/5678']
+    ])('formata a digitação de data %s como %s', async (textoDigitado, resultadoEsperado) => {
+        const onAlterar = jest.fn();
 
-            await render(
-                <EditFieldSheet
-                    visivel
-                    titulo="Editar nascimento"
-                    tipo="data"
-                    valor=""
-                    onAlterar={onAlterar}
-                />
-            )
+        await renderizar(
+            <EditFieldSheet
+                visivel
+                titulo="Editar nascimento"
+                tipo="data"
+                valor=""
+                onAlterar={onAlterar}
+            />
+        );
 
-            await fireEvent.changeText(
-                screen.getByLabelText(
-                    'Data de nascimento'
-                ),
-                textoDigitado
-            )
+        await fireEvent.changeText(screen.getByLabelText('Data de nascimento'), textoDigitado);
 
-            expect(onAlterar).toHaveBeenCalledTimes(1)
-
-            expect(onAlterar).toHaveBeenCalledWith(
-                resultadoEsperado
-            )
-        }
-    )
+        expect(onAlterar).toHaveBeenCalledTimes(1);
+        expect(onAlterar).toHaveBeenCalledWith(resultadoEsperado);
+    });
 
     test('permite apagar a barra final da data', async () => {
-        const onAlterar = jest.fn()
+        const onAlterar = jest.fn();
 
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar nascimento"
@@ -331,22 +201,15 @@ describe('EditFieldSheet', () => {
                 valor="12/"
                 onAlterar={onAlterar}
             />
-        )
+        );
 
-        await fireEvent.changeText(
-            screen.getByLabelText(
-                'Data de nascimento'
-            ),
-            '12'
-        )
+        await fireEvent.changeText(screen.getByLabelText('Data de nascimento'), '12');
 
-        expect(onAlterar).toHaveBeenCalledWith(
-            '12'
-        )
-    })
+        expect(onAlterar).toHaveBeenCalledWith('12');
+    });
 
     test('exibe a mensagem de erro como região dinâmica', async () => {
-        await render(
+        await renderizar(
             <EditFieldSheet
                 visivel
                 titulo="Editar e-mail"
@@ -355,53 +218,85 @@ describe('EditFieldSheet', () => {
                 erro="Informe um e-mail válido."
                 onAlterar={jest.fn()}
             />
-        )
+        );
 
-        const mensagem =
-            screen.getByText(
-                'Informe um e-mail válido.'
-            )
+        const mensagem = screen.getByText('Informe um e-mail válido.');
 
-        expect(mensagem).toBeOnTheScreen()
+        expect(mensagem).toBeOnTheScreen();
 
-        expect(mensagem).toHaveProp(
-            'accessibilityLiveRegion',
-            'polite'
-        )
-    })
+        expect(mensagem).toHaveProp('accessibilityLiveRegion', 'polite');
+    });
 
     test('bloqueia edição e fechamento durante o salvamento', async () => {
-        await render(
+        await renderizar(
+            <EditFieldSheet visivel titulo="Salvando" valor="Ana" salvando onAlterar={jest.fn()} />
+        );
+
+        expect(screen.getByLabelText('Nome')).toHaveProp('editable', false);
+
+        expect(screen.getByTestId('bottom-sheet')).toHaveProp('bloquearFechamento', true);
+
+        expect(screen.getByTestId('bottom-sheet-layout')).toHaveProp('bloquearFechamento', true);
+    });
+
+    test('aplica as cores do modo escuro ao campo', async () => {
+        await renderizar(
+            <EditFieldSheet visivel titulo="Editar nome" valor="Ana" onAlterar={jest.fn()} />,
+            'escuro'
+        );
+
+        const campo = screen.getByLabelText('Nome');
+
+        expect(campo).toHaveStyle({
+            color: '#F4F1EA'
+        });
+
+        expect(campo).toHaveProp('placeholderTextColor', '#A3A8A5');
+
+        expect(campo).toHaveProp('selectionColor', '#9FD6B6');
+    });
+
+    test('aceita edição numérica pelo mesmo campo do sheet', async () => {
+        const onAlterar = jest.fn();
+
+        await renderizar(
             <EditFieldSheet
                 visivel
-                titulo="Salvando"
-                valor="Ana"
-                salvando
-                onAlterar={jest.fn()}
+                titulo="Editar duração"
+                tipo="numero"
+                valor={28}
+                sufixo="dias"
+                onAlterar={onAlterar}
+                rotuloAcessibilidade="Duração do ciclo"
             />
-        )
+        );
 
-        expect(
-            screen.getByLabelText('Nome')
-        ).toHaveProp(
-            'editable',
-            false
-        )
+        const campo = screen.getByLabelText('Duração do ciclo');
+        expect(campo).toHaveProp('keyboardType', 'number-pad');
+        expect(campo).toHaveProp('value', '28');
+        expect(campo).toHaveProp('maxLength', 2);
+        expect(screen.getByText('dias')).toBeOnTheScreen();
 
-        expect(
-            screen.getByTestId('bottom-sheet')
-        ).toHaveProp(
-            'bloquearFechamento',
-            true
-        )
+        await fireEvent.changeText(campo, '30');
+        expect(onAlterar).toHaveBeenCalledWith(30);
 
-        expect(
-            screen.getByTestId(
-                'bottom-sheet-layout'
-            )
-        ).toHaveProp(
-            'bloquearFechamento',
-            true
-        )
-    })
-})
+        await fireEvent.changeText(campo, '');
+        expect(onAlterar).toHaveBeenLastCalledWith(null);
+    });
+});
+
+describe('obterDataVisivel', () => {
+    test('converte uma data ISO válida', () => {
+        expect(obterDataVisivel('2000-09-21')).toBe('21/09/2000');
+    });
+
+    test.each([
+        [null, ''],
+        [undefined, ''],
+        ['', ''],
+        ['21/09/2000', '21/09/2000'],
+        ['data-inválida', 'data-inválida']
+    ])('preserva o valor recebido: %s', (valor, esperado) => {
+        expect(obterDataVisivel(valor)).toBe(esperado);
+    });
+});

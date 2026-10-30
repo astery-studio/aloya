@@ -1,43 +1,42 @@
 //Mostra a confiabilidade dos dados do ciclo nas variantes simples ou composta.
-import {Text, View} from 'react-native'
+import { useMemo } from 'react';
+import { Text, View } from 'react-native';
 
-import {ChartLineUpIcon} from '../../icons/AppIcons'
-import {ConfidenceStatusBar} from './ConfidenceStatusBar'
-import {estilos, variantes} from './ConfidenceBadge.styles'
+import { useTheme } from '../../../hooks/useTheme';
+import { ChartLineUpIcon } from '../../icons/AppIcons';
+import { ConfidenceStatusBar } from './ConfidenceStatusBar';
+import { criarEstilos } from './ConfidenceBadge.styles';
 
-const niveis = Object.freeze({
+const configuracoesNivel = Object.freeze({
     alta: Object.freeze({
-        rotulo: 'Alta',
-        visual: variantes.alta
+        rotulo: 'Alta'
     }),
     media: Object.freeze({
-        rotulo: 'Média',
-        visual: variantes.media
+        rotulo: 'Média'
     }),
     baixa: Object.freeze({
-        rotulo: 'Baixa',
-        visual: variantes.baixa
+        rotulo: 'Baixa'
     })
-})
+});
 
-const variantesPermitidas = Object.freeze([
-    'simples',
-    'composta'
-])
+const variantesPermitidas = Object.freeze(['simples', 'composta']);
 
-function ConfidenceBadge({nivel, variante = 'simples'}) {
-    const configuracao = niveis[nivel]
+function ConfidenceBadge({ nivel, variante = 'simples' }) {
+    const tema = useTheme();
+    const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
+    const configuracao = configuracoesNivel[nivel];
 
     if (!configuracao) {
-        throw new Error(`Nível de confiança inválido: ${nivel}`)
+        throw new Error(`Nível de confiança inválido: ${nivel}`);
     }
 
     if (!variantesPermitidas.includes(variante)) {
-        throw new Error(`Variante de confiança inválida: ${variante}`)
+        throw new Error(`Variante de confiança inválida: ${variante}`);
     }
 
-    const {rotulo, visual} = configuracao
-    const ehComposta = variante === 'composta'
+    const { rotulo } = configuracao;
+    const visual = variantes[nivel];
+    const ehComposta = variante === 'composta';
 
     return (
         <View
@@ -56,11 +55,7 @@ function ConfidenceBadge({nivel, variante = 'simples'}) {
             {ehComposta ? (
                 <>
                     <View style={estilos.linha}>
-                        <ChartLineUpIcon
-                            size={16}
-                            color={visual.cor}
-                            weight="bold"
-                        />
+                        <ChartLineUpIcon size={16} color={visual.cor} weight="bold" />
 
                         <Text
                             numberOfLines={1}
@@ -76,10 +71,7 @@ function ConfidenceBadge({nivel, variante = 'simples'}) {
                     </View>
 
                     <View style={estilos.linha}>
-                        <ConfidenceStatusBar
-                            nivel={nivel}
-                            cor={visual.cor}
-                        />
+                        <ConfidenceStatusBar nivel={nivel} cor={visual.cor} />
 
                         <Text
                             numberOfLines={1}
@@ -119,7 +111,7 @@ function ConfidenceBadge({nivel, variante = 'simples'}) {
                 </>
             )}
         </View>
-    )
+    );
 }
 
-export {ConfidenceBadge}
+export { ConfidenceBadge };

@@ -1,231 +1,219 @@
-import {fireEvent, render, screen} from '@testing-library/react-native'
-import {estilos,corAtiva,corInativa} from '../../../../src/shared/components/navigation/BottomTab/BottomTabItem/BottomTabItem.style'
-import {BottomTabItem} from '../../../../src/shared/components/navigation/BottomTab/BottomTabItem/BottomTabItem'
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
-const IconeTeste = jest.fn(() => null)
+import { BottomTabItem } from '../../../../src/shared/components/navigation/BottomTab/BottomTabItem/BottomTabItem';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
+
+const IconeTeste = jest.fn(() => null);
+
+function renderizarItem(propriedades = {}, preferencia = 'claro') {
+    return render(
+        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+            <BottomTabItem label="Início" icone={IconeTeste} {...propriedades} />
+        </ThemeProvider>
+    );
+}
 
 describe('BottomTabItem', () => {
     beforeEach(() => {
-        IconeTeste.mockClear()
-    })
+        jest.clearAllMocks();
+    });
 
-    test('renderiza o label e a função de aba', async () => {
-        await render(
-            <BottomTabItem
-                label="Início"
-                icone={IconeTeste}
-                onPress={jest.fn()}
-            />
-        )
+    test('renderiza o label como aba', async () => {
+        await renderizarItem({
+            onPress: jest.fn()
+        });
+
+        expect(screen.getByText('Início')).toBeOnTheScreen();
 
         expect(
-            screen.getByText('Início')
-        ).toBeOnTheScreen()
+            screen.getByRole('tab', {
+                name: 'Início'
+            })
+        ).toBeOnTheScreen();
+    });
 
-        expect(
-            screen.getByRole(
-                'tab',
-                {
-                    name: 'Início'
-                }
-            )
-        ).toBeOnTheScreen()
-    })
+    test('executa a ação quando pressionado', async () => {
+        const onPress = jest.fn();
 
-    test('executa a ação quando a aba é pressionada', async () => {
-        const onPress = jest.fn()
-
-        await render(
-            <BottomTabItem
-                label="Diário"
-                icone={IconeTeste}
-                onPress={onPress}
-            />
-        )
+        await renderizarItem({
+            label: 'Diário',
+            onPress
+        });
 
         await fireEvent.press(
-            screen.getByRole(
-                'tab',
-                {
-                    name: 'Diário'
-                }
-            )
-        )
+            screen.getByRole('tab', {
+                name: 'Diário'
+            })
+        );
 
-        expect(onPress).toHaveBeenCalledTimes(1)
-    })
+        expect(onPress).toHaveBeenCalledTimes(1);
+    });
 
-    test('fica desabilitado quando não recebe uma ação', async () => {
-        await render(
-            <BottomTabItem
-                label="Configurações"
-                icone={IconeTeste}
-            />
-        )
+    test('fica desabilitado sem ação', async () => {
+        await renderizarItem({
+            label: 'Configurações'
+        });
 
         expect(
-            screen.getByRole(
-                'tab',
-                {
-                    name: 'Configurações'
-                }
-            )
-        ).toBeDisabled()
-    })
+            screen.getByRole('tab', {
+                name: 'Configurações'
+            })
+        ).toBeDisabled();
+    });
 
-    test('informa que a aba está ativa', async () => {
-        await render(
-            <BottomTabItem
-                label="Início"
-                icone={IconeTeste}
-                ativo
-                onPress={jest.fn()}
-            />
-        )
+    test('informa quando está ativo', async () => {
+        await renderizarItem({
+            ativo: true,
+            onPress: jest.fn()
+        });
 
-        const aba =
-            screen.getByRole(
-                'tab',
-                {
-                    name: 'Início'
-                }
-            )
+        const aba = screen.getByRole('tab', {
+            name: 'Início'
+        });
 
-        expect(aba).toBeSelected()
-        expect(aba).toBeEnabled()
-    })
+        expect(aba).toBeSelected();
+        expect(aba).toBeEnabled();
 
-    test('informa que a aba está inativa por padrão', async () => {
-        await render(
-            <BottomTabItem
-                label="Membros"
-                icone={IconeTeste}
-                onPress={jest.fn()}
-            />
-        )
+        expect(screen.getByTestId('indicador-aba-Início')).toBeOnTheScreen();
+    });
 
-        const aba =
-            screen.getByRole(
-                'tab',
-                {
-                    name: 'Membros'
-                }
-            )
-
-        expect(aba).not.toBeSelected()
-        expect(aba).toBeEnabled()
-    })
-
-    test('renderiza o ícone da aba ativa', async () => {
-        await render(
-            <BottomTabItem
-                label="Início"
-                icone={IconeTeste}
-                ativo
-                onPress={jest.fn()}
-            />
-        )
+    test('não mostra indicador quando está inativo', async () => {
+        await renderizarItem({
+            label: 'Membros',
+            onPress: jest.fn()
+        });
 
         expect(
-            IconeTeste
-        ).toHaveBeenCalledTimes(1)
+            screen.getByRole('tab', {
+                name: 'Membros'
+            })
+        ).not.toBeSelected();
 
-        expect(
-            IconeTeste.mock.calls[0][0]
-        ).toEqual(
+        expect(screen.queryByTestId('indicador-aba-Membros')).toBeNull();
+    });
+
+    test('usa destaque escuro no tema claro', async () => {
+        await renderizarItem({
+            ativo: true,
+            onPress: jest.fn()
+        });
+
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
             expect.objectContaining({
                 size: 26,
-                color: corAtiva,
+                color: '#2C4C3B',
                 weight: 'fill'
             })
-        )
-    })
+        );
 
-    test('renderiza o ícone da aba inativa', async () => {
-        await render(
-            <BottomTabItem
-                label="Ciclos"
-                icone={IconeTeste}
-                onPress={jest.fn()}
-            />
-        )
+        expect(screen.getByText('Início')).toHaveStyle({
+            color: '#2C4C3B'
+        });
 
-        expect(
-            IconeTeste
-        ).toHaveBeenCalledTimes(1)
+        expect(screen.getByTestId('indicador-aba-Início')).toHaveStyle({
+            backgroundColor: '#2C4C3B'
+        });
+    });
 
-        expect(
-            IconeTeste.mock.calls[0][0]
-        ).toEqual(
+    test('usa destaque claro no tema escuro', async () => {
+        await renderizarItem(
+            {
+                label: 'Diário',
+                ativo: true,
+                onPress: jest.fn()
+            },
+            'escuro'
+        );
+
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
             expect.objectContaining({
                 size: 26,
-                color: corInativa,
+                color: '#9FD6B6',
+                weight: 'fill'
+            })
+        );
+
+        expect(screen.getByText('Diário')).toHaveStyle({
+            color: '#9FD6B6'
+        });
+
+        expect(screen.getByTestId('indicador-aba-Diário')).toHaveStyle({
+            backgroundColor: '#9FD6B6'
+        });
+    });
+
+    test('usa texto secundário no item inativo claro', async () => {
+        await renderizarItem({
+            label: 'Ciclos',
+            onPress: jest.fn()
+        });
+
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
+            expect.objectContaining({
+                size: 26,
+                color: '#5C5C59',
                 weight: 'regular'
             })
-        )
-    })
+        );
 
-    test('mantém o label em uma única linha', async () => {
-        await render(
-            <BottomTabItem
-                label="Configurações"
-                icone={IconeTeste}
-                onPress={jest.fn()}
-            />
-        )
+        expect(screen.getByText('Ciclos')).toHaveStyle({
+            color: '#5C5C59'
+        });
+    });
 
-        expect(
-            screen.getByText('Configurações')
-        ).toHaveProp(
-            'numberOfLines',
-            1
-        )
-    })
+    test('usa texto secundário no item inativo escuro', async () => {
+        await renderizarItem(
+            {
+                label: 'Ciclos',
+                onPress: jest.fn()
+            },
+            'escuro'
+        );
 
-    test('aplica o estilo ativo somente ao label selecionado', async () => {
-        const resultado =
-            await render(
-                <BottomTabItem
-                    label="Início"
-                    icone={IconeTeste}
-                    ativo
-                    onPress={jest.fn()}
-                />
-            )
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
+            expect.objectContaining({
+                size: 26,
+                color: '#C4C8C5',
+                weight: 'regular'
+            })
+        );
 
-        expect(
-            screen.getByText('Início')
-        ).toHaveStyle(
-            estilos.labelAtiva
-        )
+        expect(screen.getByText('Ciclos')).toHaveStyle({
+            color: '#C4C8C5'
+        });
+    });
 
-        const pontosAtivos =
-            resultado.container.queryAll(
-                (elemento) =>
-                    elemento.props.style
-                    === estilos.pontoAtivo
-            )
+    test('mantém o label em uma linha', async () => {
+        await renderizarItem({
+            label: 'Configurações',
+            onPress: jest.fn()
+        });
 
-        expect(pontosAtivos).toHaveLength(1)
-    })
+        expect(screen.getByText('Configurações')).toHaveProp('numberOfLines', 1);
+    });
 
-    test('não renderiza o ponto ativo em uma aba inativa', async () => {
-        const resultado =
-            await render(
-                <BottomTabItem
-                    label="Diário"
-                    icone={IconeTeste}
-                    onPress={jest.fn()}
-                />
-            )
+    test('atualiza a cor ativa quando o tema muda', async () => {
+        const resultado = await renderizarItem(
+            {
+                label: 'Início',
+                ativo: true,
+                onPress: jest.fn()
+            },
+            'claro'
+        );
 
-        const pontosAtivos =
-            resultado.container.queryAll(
-                (elemento) =>
-                    elemento.props.style
-                    === estilos.pontoAtivo
-            )
+        expect(screen.getByText('Início')).toHaveStyle({
+            color: '#2C4C3B'
+        });
 
-        expect(pontosAtivos).toHaveLength(0)
-    })
-})
+        await resultado.rerender(
+            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
+                <BottomTabItem label="Início" icone={IconeTeste} ativo onPress={jest.fn()} />
+            </ThemeProvider>
+        );
+
+        expect(screen.getByText('Início')).toHaveStyle({
+            color: '#9FD6B6'
+        });
+    });
+});

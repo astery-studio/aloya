@@ -1,165 +1,165 @@
 //Define a aparência do calendário e das listas de mês e ano
-import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../../theme'
+import { StyleSheet } from 'react-native';
+import { fontFamilies } from '../../../theme';
 
-const estilos = StyleSheet.create({
-    calendario: {
-        width: '100%',
-        alignSelf: 'center',
-        paddingTop: tema.espacamentos.grande,
-        paddingBottom: tema.espacamentos.medio
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        calendario: {
+            width: '100%',
+            alignSelf: 'center',
+            paddingTop: tema.espacamentos.grande,
+            paddingBottom: tema.espacamentos.medio
+        },
 
-    navegacao: {
-        minHeight: 48,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: tema.espacamentos.grande
-    },
+        navegacao: {
+            minHeight: 48,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: tema.espacamentos.grande
+        },
 
-    botaoNavegacao: {
-        width: 48,
-        height: 48,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        botaoNavegacao: {
+            width: 48,
+            height: 48,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    tituloData: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        tituloData: {
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    botaoTitulo: {
-        minHeight: 44,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 4,
-        gap: 3
-    },
+        botaoTitulo: {
+            minHeight: 44,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 4,
+            gap: 3
+        },
 
-    tituloMes: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.bold,
-        fontSize: 18,
-        lineHeight: 27,
-        includeFontPadding: false
-    },
+        tituloMes: {
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 18,
+            lineHeight: 27,
+            includeFontPadding: false
+        },
 
-    linhaSemana: {
-        width: '100%',
-        flexDirection: 'row',
-        marginBottom: tema.espacamentos.pequeno
-    },
+        linhaSemana: {
+            width: '100%',
+            flexDirection: 'row',
+            marginBottom: tema.espacamentos.pequeno
+        },
 
-    casaSemana: {
-        flex: 1,
-        minHeight: 36,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        casaSemana: {
+            flex: 1,
+            minHeight: 36,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    textoSemana: {
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.medium,
-        fontSize: 14,
-        lineHeight: 20,
-        includeFontPadding: false
-    },
+        textoSemana: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.medium,
+            fontSize: 14,
+            lineHeight: 20,
+            includeFontPadding: false
+        },
 
-    grade: {
-        width: '100%'
-    },
+        grade: {
+            width: '100%'
+        },
 
-    linhaCalendario: {
-        width: '100%',
-        flexDirection: 'row'
-    },
+        linhaCalendario: {
+            width: '100%',
+            flexDirection: 'row'
+        },
 
-    casaDia: {
-        flex: 1,
-        height: 48,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        casaDia: {
+            flex: 1,
+            height: 48,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    botaoDia: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        botaoDia: {
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    botaoDiaSelecionado: {
-        backgroundColor: tema.cores.marca.primaria
-    },
+        botaoDiaSelecionado: {
+            backgroundColor: tema.cores.marca.primaria
+        },
 
-    textoDia: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 16,
-        lineHeight: 24,
-        includeFontPadding: false
-    },
+        textoDia: {
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.regular,
+            fontSize: 16,
+            lineHeight: 24,
+            includeFontPadding: false
+        },
 
-    textoDiaSelecionado: {
-        color: tema.cores.neutras.superficieClara,
-        fontFamily: fontFamilies.bold
-    },
+        textoDiaSelecionado: {
+            color: tema.cores.neutras.superficieClara,
+            fontFamily: fontFamilies.bold
+        },
 
-    textoDiaDesabilitado: {
-        color: tema.cores.neutras.bordaTracejada
-    },
+        textoDiaDesabilitado: {
+            color: tema.cores.interface.textoDesabilitado
+        },
 
-    listaOpcoes: {
-        height: 288,
-        flexGrow: 0
-    },
+        listaOpcoes: {
+            height: 288,
+            flexGrow: 0
+        },
 
-    opcaoLista: {
-        height: 48,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+        opcaoLista: {
+            height: 48,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
 
-    textoOpcao: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 16,
-        lineHeight: 24,
-        includeFontPadding: false
-    },
+        textoOpcao: {
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.regular,
+            fontSize: 16,
+            lineHeight: 24,
+            includeFontPadding: false
+        },
 
-    textoOpcaoSelecionada: {
-        color: tema.cores.marca.primaria,
-        fontFamily: fontFamilies.bold
-    },
+        textoOpcaoSelecionada: {
+            color: tema.cores.marca.primaria,
+            fontFamily: fontFamilies.bold
+        },
 
-    textoOpcaoDesabilitada: {
-        color: tema.cores.neutras.bordaTracejada
-    },
+        textoOpcaoDesabilitada: {
+            color: tema.cores.interface.textoDesabilitado
+        },
 
-    mensagem: {
-        marginTop: tema.espacamentos.pequeno,
-        color: tema.cores.neutras.textoSecundarioClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 14,
-        textAlign: 'center'
-    },
+        mensagem: {
+            marginTop: tema.espacamentos.pequeno,
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 14,
+            textAlign: 'center'
+        },
 
-    mensagemErro: {
-        marginTop: tema.espacamentos.pequeno,
-        color: tema.cores.feedback.erro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 14,
-        textAlign: 'center'
-    }
-})
+        mensagemErro: {
+            marginTop: tema.espacamentos.pequeno,
+            color: tema.cores.feedback.erro,
+            fontFamily: fontFamilies.regular,
+            fontSize: 14,
+            textAlign: 'center'
+        }
+    });
+}
 
-const corSeta = tema.cores.neutras.textoPrincipalClaro
-
-export { estilos, corSeta }
+export { criarEstilos };

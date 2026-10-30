@@ -123,6 +123,22 @@ test(
 );
 
 test(
+    'rejeita login com senha acima do limite efetivo do bcrypt',
+    () => {
+        const resultado = criarValidator().validarLogin({
+            email: 'usuario@email.com',
+            senha: 'á'.repeat(37)
+        });
+
+        assert.equal(resultado.valido, false);
+        assert.deepEqual(resultado.erros, [{
+            campo: 'senha',
+            mensagem: 'A senha ultrapassa o tamanho máximo permitido.'
+        }]);
+    }
+);
+
+test(
     'retorna todos os erros quando e-mail e senha não são informados',
     () => {
         const validator = criarValidator();

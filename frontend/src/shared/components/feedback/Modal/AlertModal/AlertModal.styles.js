@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import { cores, fontFamilies } from '../../../../theme'
+import { StyleSheet } from 'react-native';
+import { cores, fontFamilies } from '../../../../theme';
 
 const estilos = StyleSheet.create({
     campoSenha: {
@@ -13,6 +13,6 @@ const estilos = StyleSheet.create({
         fontSize: 12,
         lineHeight: 18
     }
-})
+});
 
-export { estilos }
+export { estilos };

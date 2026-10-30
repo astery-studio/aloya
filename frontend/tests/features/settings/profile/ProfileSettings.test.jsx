@@ -1,93 +1,113 @@
-//Confere os campos, ações e estados do conteúdo das configurações de perfil.
-import { fireEvent, render, screen } from '@testing-library/react-native'
+// Confere os campos, ações, estados e temas do conteúdo das configurações de perfil.
+import { fireEvent, render, screen } from '@testing-library/react-native';
+
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     LockKeyIcon: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/features/settings/profile/ProfileField', () => {
-    const React = require('react')
-    const { Pressable, Text } = require('react-native')
+    const React = require('react');
+    const { Pressable, Text } = require('react-native');
 
     return {
-        ProfileField: jest.fn(({label, valor, onPress, desabilitado}) => React.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: label,
-                onPress,
-                disabled: desabilitado
-            },
-            React.createElement(Text, null, valor ?? 'Não informado')
-        ))
-    }
-})
+        ProfileField: jest.fn(({ label, valor, onPress, desabilitado }) =>
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: label,
+                    onPress,
+                    disabled: desabilitado
+                },
+                React.createElement(Text, null, valor ?? 'Não informado')
+            )
+        )
+    };
+});
 
 jest.mock('../../../../src/shared/components/common/NavigationField/NavigationField', () => {
-    const React = require('react')
-    const { Pressable, Text } = require('react-native')
+    const React = require('react');
+    const { Pressable, Text } = require('react-native');
 
     return {
-        NavigationField: jest.fn(({label, onPress, desabilitado}) => React.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: label,
-                onPress,
-                disabled: desabilitado
-            },
-            React.createElement(Text, null, label)
-        ))
-    }
-})
+        NavigationField: jest.fn(({ label, onPress, desabilitado }) =>
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: label,
+                    onPress,
+                    disabled: desabilitado
+                },
+                React.createElement(Text, null, label)
+            )
+        )
+    };
+});
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => {
-    const React = require('react')
-    const { Pressable, Text } = require('react-native')
+    const React = require('react');
+    const { Pressable, Text } = require('react-native');
 
     return {
         __esModule: true,
-        default: jest.fn(({texto, aoPressionar, desativado, carregando}) => React.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: texto,
-                onPress: aoPressionar,
-                disabled: desativado || carregando
-            },
-            React.createElement(Text, null, texto)
-        ))
-    }
-})
 
-import ButtonScreen from '../../../../src/shared/components/common/Button/ButtonScreen'
-import { NavigationField } from '../../../../src/shared/components/common/NavigationField/NavigationField'
-import { ProfileField } from '../../../../src/features/settings/profile/ProfileField'
-import { ProfileSettings } from '../../../../src/features/settings/profile/ProfileSettings'
+        default: jest.fn(({ texto, aoPressionar, desativado, carregando }) =>
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: texto,
+                    onPress: aoPressionar,
+                    disabled: desativado || carregando
+                },
+                React.createElement(Text, null, texto)
+            )
+        )
+    };
+});
+
+import ButtonScreen from '../../../../src/shared/components/common/Button/ButtonScreen';
+import { NavigationField } from '../../../../src/shared/components/common/NavigationField/NavigationField';
+import { ProfileField } from '../../../../src/features/settings/profile/ProfileField';
+import {
+    formatarDataNascimento,
+    ProfileSettings
+} from '../../../../src/features/settings/profile/ProfileSettings';
 
 const dados = {
     nome: 'Julia',
     email: 'julia@email.com',
     dataNascimento: '1999-04-08',
     identidadeGenero: 'Mulher Cisgênero'
+};
+
+async function renderizar(componente, preferencia = 'claro') {
+    return render(
+        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+            {componente}
+        </ThemeProvider>
+    );
 }
 
 describe('ProfileSettings', () => {
     beforeEach(() => {
-        ProfileField.mockClear()
-        NavigationField.mockClear()
-        ButtonScreen.mockClear()
-    })
+        ProfileField.mockClear();
+        NavigationField.mockClear();
+        ButtonScreen.mockClear();
+    });
 
     test('mostra todos os dados pessoais', async () => {
-        await render(<ProfileSettings dados={dados} onEditarCampo={jest.fn()} />)
+        await renderizar(<ProfileSettings dados={dados} onEditarCampo={jest.fn()} />);
 
-        expect(screen.getByText('Dados Pessoais')).toBeOnTheScreen()
-        expect(screen.getByText('Julia')).toBeOnTheScreen()
-        expect(screen.getByText('julia@email.com')).toBeOnTheScreen()
-        expect(screen.getByText('08/04/1999')).toBeOnTheScreen()
-        expect(screen.getByText('Mulher Cisgênero')).toBeOnTheScreen()
-    })
+        expect(screen.getByText('Dados Pessoais')).toBeOnTheScreen();
+        expect(screen.getByText('Julia')).toBeOnTheScreen();
+        expect(screen.getByText('julia@email.com')).toBeOnTheScreen();
+        expect(screen.getByText('08/04/1999')).toBeOnTheScreen();
+        expect(screen.getByText('Mulher Cisgênero')).toBeOnTheScreen();
+    });
 
     test.each([
         ['Nome', 'nome'],
@@ -95,46 +115,61 @@ describe('ProfileSettings', () => {
         ['Data de Nascimento', 'dataNascimento'],
         ['Identidade de Gênero', 'identidadeGenero']
     ])('informa o campo %s que deve ser editado', async (label, campo) => {
-        const onEditarCampo = jest.fn()
+        const onEditarCampo = jest.fn();
 
-        await render(<ProfileSettings dados={dados} onEditarCampo={onEditarCampo} />)
-        fireEvent.press(screen.getByRole('button', { name: label }))
+        await renderizar(<ProfileSettings dados={dados} onEditarCampo={onEditarCampo} />);
 
-        expect(onEditarCampo).toHaveBeenCalledWith(campo)
-    })
+        fireEvent.press(screen.getByRole('button', { name: label }));
+
+        expect(onEditarCampo).toHaveBeenCalledWith(campo);
+    });
 
     test('abre a alteração de senha', async () => {
-        const onAlterarSenha = jest.fn()
+        const onAlterarSenha = jest.fn();
 
-        await render(<ProfileSettings dados={dados} onAlterarSenha={onAlterarSenha} />)
-        fireEvent.press(screen.getByRole('button', { name: 'Alterar Senha' }))
+        await renderizar(<ProfileSettings dados={dados} onAlterarSenha={onAlterarSenha} />);
 
-        expect(onAlterarSenha).toHaveBeenCalledTimes(1)
-    })
+        fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Alterar Senha'
+            })
+        );
+
+        expect(onAlterarSenha).toHaveBeenCalledTimes(1);
+    });
 
     test('usa a variante verde no botão de salvar', async () => {
-        await render(<ProfileSettings dados={dados} onSalvar={jest.fn()} podeSalvar />)
+        await renderizar(<ProfileSettings dados={dados} onSalvar={jest.fn()} podeSalvar />);
 
-        expect(ButtonScreen.mock.calls[0][0].variante).toBe('verde')
-    })
+        expect(ButtonScreen.mock.calls[0][0].variante).toBe('verde');
+    });
 
     test('desabilita o salvamento sem alterações', async () => {
-        await render(<ProfileSettings dados={dados} onSalvar={jest.fn()} />)
+        await renderizar(<ProfileSettings dados={dados} onSalvar={jest.fn()} />);
 
-        expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled()
-    })
+        expect(
+            screen.getByRole('button', {
+                name: 'Salvar alterações'
+            })
+        ).toBeDisabled();
+    });
 
     test('permite salvar quando existem alterações', async () => {
-        const onSalvar = jest.fn()
+        const onSalvar = jest.fn();
 
-        await render(<ProfileSettings dados={dados} onSalvar={onSalvar} podeSalvar />)
-        fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }))
+        await renderizar(<ProfileSettings dados={dados} onSalvar={onSalvar} podeSalvar />);
 
-        expect(onSalvar).toHaveBeenCalledTimes(1)
-    })
+        fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Salvar alterações'
+            })
+        );
+
+        expect(onSalvar).toHaveBeenCalledTimes(1);
+    });
 
     test('bloqueia todas as ações durante o salvamento', async () => {
-        await render(
+        await renderizar(
             <ProfileSettings
                 dados={dados}
                 onEditarCampo={jest.fn()}
@@ -143,16 +178,58 @@ describe('ProfileSettings', () => {
                 podeSalvar
                 salvando
             />
-        )
+        );
 
-        expect(screen.getByRole('button', { name: 'Nome' })).toBeDisabled()
-        expect(screen.getByRole('button', { name: 'Alterar Senha' })).toBeDisabled()
-        expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled()
-    })
+        expect(screen.getByRole('button', { name: 'Nome' })).toBeDisabled();
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Alterar Senha'
+            })
+        ).toBeDisabled();
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Salvar alterações'
+            })
+        ).toBeDisabled();
+    });
 
     test('trata data inválida como informação ausente', async () => {
-        await render(<ProfileSettings dados={{...dados, dataNascimento: 'data-inválida'}} />)
+        await renderizar(
+            <ProfileSettings
+                dados={{
+                    ...dados,
+                    dataNascimento: 'data-inválida'
+                }}
+            />
+        );
 
-        expect(screen.getByText('Não informado')).toBeOnTheScreen()
-    })
-})
+        expect(screen.getByText('Não informado')).toBeOnTheScreen();
+    });
+
+    test('aplica a cor secundária do tema escuro aos títulos', async () => {
+        await renderizar(<ProfileSettings dados={dados} />, 'escuro');
+
+        expect(screen.getByText('Dados Pessoais')).toHaveStyle({
+            color: '#C4C8C5'
+        });
+
+        expect(screen.getByText('Segurança')).toHaveStyle({
+            color: '#C4C8C5'
+        });
+    });
+});
+
+describe('formatarDataNascimento', () => {
+    test('formata uma data válida', () => {
+        expect(formatarDataNascimento('1999-04-08')).toBe('08/04/1999');
+    });
+
+    test.each([undefined, null, '', '08/04/1999', 'data-inválida'])(
+        'rejeita uma data inválida: %s',
+        (dataNascimento) => {
+            expect(formatarDataNascimento(dataNascimento)).toBeNull();
+        }
+    );
+});

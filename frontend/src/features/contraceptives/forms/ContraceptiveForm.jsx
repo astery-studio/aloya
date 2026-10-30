@@ -1,5 +1,5 @@
 //Mostra o formulário compartilhado pelo cadastro e pela edição de anticoncepcionais.
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { FilePlus, WarningCircle } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
@@ -7,6 +7,7 @@ import FormField from '../../../shared/components/forms/FormField';
 import TextInput from '../../../shared/components/forms/TextInput';
 import { EditFieldSheet } from '../../../shared/components/feedback/EditFieldSheet/EditFieldSheet';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { useContraceptiveForm } from '../hooks/useContraceptiveForm';
 import { AlertIntensitySelector } from './AlertIntensitySelector';
 import { ContraceptiveTypeSelector } from './ContraceptiveTypeSelector';
@@ -14,28 +15,22 @@ import { ExpirationDateField } from './ExpirationDateField';
 import { FrequencySelector } from './FrequencySelector';
 import { SelectorField } from './SelectorField';
 import { UsageTimeSelector } from './UsageTimeSelector';
-import { estilos } from './contraceptiveForms.styles';
+import { criarEstilos } from './contraceptiveForms.styles';
 
 //Recebe os dados e ações do formulário e mostra o modo de cadastro ou edição.
-function ContraceptiveForm({
-    onSubmit,
-    anticoncepcional = null,
-    salvando = false
-}) {
+function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const form = useContraceptiveForm(onSubmit, anticoncepcional);
-    const {
-        dados,
-        painel,
-        alerta,
-        hoje,
-        alterar,
-        enviar
-    } = form;
+    const { dados, painel, alerta, hoje, alterar, enviar } = form;
 
     const [nomeTemporario, setNomeTemporario] = useState(dados.nome);
     const nomeTemporarioNormalizado = nomeTemporario.trim();
     const nomeAtualNormalizado = dados.nome.trim();
-    const podeSalvarNome = Boolean(nomeTemporarioNormalizado) && nomeTemporarioNormalizado !== nomeAtualNormalizado && !salvando;
+    const podeSalvarNome =
+        Boolean(nomeTemporarioNormalizado) &&
+        nomeTemporarioNormalizado !== nomeAtualNormalizado &&
+        !salvando;
 
     //Abre um painel somente quando nenhuma operação de salvamento está acontecendo.
     function abrirPainel(nomePainel) {
@@ -58,9 +53,7 @@ function ContraceptiveForm({
         form.fecharPainel();
     }
 
-    const textoBotao = form.modoEdicao
-        ? 'Atualizar anticoncepcional'
-        : 'Salvar anticoncepcional';
+    const textoBotao = form.modoEdicao ? 'Atualizar anticoncepcional' : 'Salvar anticoncepcional';
 
     return (
         <View style={estilos.formulario}>
@@ -85,7 +78,7 @@ function ContraceptiveForm({
                         onAlterar={setNomeTemporario}
                         onFechar={form.fecharPainel}
                         salvando={salvando}
-                        botaoSalvar={(
+                        botaoSalvar={
                             <ButtonScreen
                                 texto="Salvar"
                                 variante="verde"
@@ -93,13 +86,13 @@ function ContraceptiveForm({
                                 desativado={!podeSalvarNome}
                                 carregando={salvando}
                             />
-                        )}
+                        }
                     />
                 </>
             ) : (
                 <FormField
                     label="Nome da Medicação"
-                    campo={(
+                    campo={
                         <TextInput
                             placeholder="Digite o nome"
                             value={dados.nome}
@@ -108,7 +101,7 @@ function ContraceptiveForm({
                             maxLength={120}
                             desativado={salvando}
                         />
-                    )}
+                    }
                 />
             )}
 
@@ -201,23 +194,31 @@ function ContraceptiveForm({
                 fundoIcone={alerta?.tipo === 'rede' ? '#EDEDED' : '#F5EDE3'}
                 titulo={alerta?.titulo}
                 mensagem={alerta?.mensagem}
-                acaoPrincipal={alerta?.tipo === 'rede' ? {
-                    texto: 'Tentar novamente',
-                    variante: 'preto',
-                    aoPressionar: enviar,
-                    carregando: salvando,
-                    desativado: salvando
-                } : {
-                    texto: 'OK',
-                    variante: 'verde',
-                    aoPressionar: form.fecharAlerta,
-                    desativado: salvando
-                }}
-                acaoSecundaria={alerta?.tipo === 'rede' ? {
-                    texto: 'Voltar',
-                    aoPressionar: form.fecharAlerta,
-                    desativado: salvando
-                } : undefined}
+                acaoPrincipal={
+                    alerta?.tipo === 'rede'
+                        ? {
+                              texto: 'Tentar novamente',
+                              variante: 'preto',
+                              aoPressionar: enviar,
+                              carregando: salvando,
+                              desativado: salvando
+                          }
+                        : {
+                              texto: 'OK',
+                              variante: 'verde',
+                              aoPressionar: form.fecharAlerta,
+                              desativado: salvando
+                          }
+                }
+                acaoSecundaria={
+                    alerta?.tipo === 'rede'
+                        ? {
+                              texto: 'Voltar',
+                              aoPressionar: form.fecharAlerta,
+                              desativado: salvando
+                          }
+                        : undefined
+                }
             />
         </View>
     );

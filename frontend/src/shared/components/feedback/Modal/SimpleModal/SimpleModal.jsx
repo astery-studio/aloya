@@ -7,17 +7,28 @@ import AppModal from '../ModalBase/AppModal';
 const larguraTotal = { width: '100%' };
 
 export default function SimpleModal({
-    visivel, aoFechar, icone, corIcone, fundoIcone,
-    titulo, mensagem, acaoPrincipal, acaoSecundaria
+    visivel,
+    aoFechar,
+    aoOcultar,
+    icone,
+    corIcone,
+    fundoIcone,
+    estiloIcone,
+    titulo,
+    mensagem,
+    acaoPrincipal,
+    acaoSecundaria
 }) {
     return (
         <AppModal
             variante="simples"
             visivel={visivel}
             aoFechar={aoFechar}
+            aoOcultar={aoOcultar}
             icone={icone}
             corIcone={corIcone}
             fundoIcone={fundoIcone}
+            estiloIcone={estiloIcone}
             titulo={titulo}
             mensagem={mensagem}
         >

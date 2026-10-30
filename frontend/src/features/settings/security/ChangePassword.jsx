@@ -1,14 +1,23 @@
 //Mostra os campos e o botão usados para alterar a senha da conta.
-import { memo } from 'react'
-import { View } from 'react-native'
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
-import PasswordInput from '../../../shared/components/forms/PasswordInput'
-import { estilos } from './ChangePassword.style'
+import { memo } from 'react';
+import { View } from 'react-native';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import PasswordInput from '../../../shared/components/forms/PasswordInput';
+import { estilos } from './ChangePassword.style';
 
-function ChangePassword({senhaAtual, novaSenha, confirmacaoNovaSenha, onAlterarSenhaAtual, onAlterarNovaSenha, onAlterarConfirmacao, onSalvar, carregando = false}) {
-    const camposPreenchidos = Boolean(senhaAtual && novaSenha && confirmacaoNovaSenha)
-    const semAcao = typeof onSalvar !== 'function'
-    const bloqueado = carregando || semAcao
+function ChangePassword({
+    senhaAtual,
+    novaSenha,
+    confirmacaoNovaSenha,
+    onAlterarSenhaAtual,
+    onAlterarNovaSenha,
+    onAlterarConfirmacao,
+    onSalvar,
+    carregando = false
+}) {
+    const camposPreenchidos = Boolean(senhaAtual && novaSenha && confirmacaoNovaSenha);
+    const semAcao = typeof onSalvar !== 'function';
+    const bloqueado = carregando || semAcao;
 
     return (
         <View style={estilos.container}>
@@ -56,8 +65,8 @@ function ChangePassword({senhaAtual, novaSenha, confirmacaoNovaSenha, onAlterarS
                 carregando={carregando}
             />
         </View>
-    )
+    );
 }
 
-export default memo(ChangePassword)
-export { ChangePassword }
+export default memo(ChangePassword);
+export { ChangePassword };

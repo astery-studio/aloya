@@ -1,0 +1,56 @@
+name: Mobile Delivery
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Perfil EAS
+        required: true
+        default: preview
+        type: choice
+        options: [development, preview, production]
+      platform:
+        description: Plataforma
+        required: true
+        default: all
+        type: choice
+        options: [all, android, ios]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-delivery-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Quality Gate
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: EAS ${{ inputs.profile }} build
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ inputs.profile }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Configurar Expo e EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: 25.3.0
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Iniciar build
+        run: eas build --platform "${{ inputs.platform }}" --profile "${{ inputs.profile }}" --non-interactive --no-wait

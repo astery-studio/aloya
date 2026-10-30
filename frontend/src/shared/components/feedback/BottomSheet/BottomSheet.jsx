@@ -1,40 +1,63 @@
-//Mostra um painel na parte inferior da tela
-import { useEffect, useRef, useState } from 'react'
-import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native'
-import { estilos } from './BottomSheet.style'
+// Mostra um painel na parte inferior da tela.
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }) {
-    const alturaForaDaTela = useRef(
-        Dimensions.get('screen').height
-    ).current
+import { useTheme } from '../../../hooks/useTheme';
+import { criarEstilos } from './BottomSheet.style';
 
-    const progresso = useRef(
-        new Animated.Value(0)
-    ).current
+function BottomSheet({
+    visivel,
+    onFechar,
+    onOcultar,
+    children,
+    bloquearFechamento = false,
+    corPainel
+}) {
+    const tema = useTheme();
+    const insets = useSafeAreaInsets();
 
-    const [modalMontado, setModalMontado] = useState(visivel)
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const montadoAtual = useRef(visivel)
-    const visivelAtual = useRef(visivel)
-    const modalJaApareceu = useRef(false)
+    const alturaForaDaTela = useRef(Dimensions.get('screen').height).current;
 
-    visivelAtual.current = visivel
+    const progresso = useRef(new Animated.Value(0)).current;
+
+    const [modalMontado, setModalMontado] = useState(visivel);
+
+    const montadoAtual = useRef(visivel);
+
+    const visivelAtual = useRef(visivel);
+
+    const modalJaApareceu = useRef(false);
+    const ocultamentoNotificado = useRef(false);
+    visivelAtual.current = visivel;
 
     const posicaoPainel = useRef(
         progresso.interpolate({
             inputRange: [0, 1],
             outputRange: [alturaForaDaTela, 0]
         })
-    ).current
+    ).current;
 
     function animarEntrada() {
+        ocultamentoNotificado.current = false;
         Animated.timing(progresso, {
             toValue: 1,
             duration: 280,
             easing: Easing.out(Easing.cubic),
             useNativeDriver: true,
             isInteraction: false
-        }).start()
+        }).start();
+    }
+
+    function notificarOcultamento() {
+        if (visivelAtual.current || ocultamentoNotificado.current) {
+            return;
+        }
+
+        ocultamentoNotificado.current = true;
+        onOcultar?.();
     }
 
     function animarSaida() {
@@ -46,40 +69,48 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             isInteraction: false
         }).start(({ finished }) => {
             if (finished && !visivelAtual.current) {
-                montadoAtual.current = false
-                setModalMontado(false)
+                montadoAtual.current = false;
+                setModalMontado(false);
+
+                if (Platform.OS !== 'ios') {
+                    notificarOcultamento();
+                }
             }
-        })
+        });
     }
 
     useEffect(() => {
         if (visivel) {
             if (!montadoAtual.current) {
-                montadoAtual.current = true
-                progresso.setValue(0)
-                setModalMontado(true)
+                montadoAtual.current = true;
+                progresso.setValue(0);
+                setModalMontado(true);
             } else if (modalJaApareceu.current) {
-                animarEntrada()
+                animarEntrada();
             }
-            return
+            return;
         }
 
         if (montadoAtual.current) {
-            animarSaida()
+            animarSaida();
         }
-    }, [visivel])
+
+        // As funções de animação são recriadas durante o render.
+        // Incluí-las reiniciaria a animação sem mudança de visibilidade.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visivel]);
 
     function quandoModalAparecer() {
-        modalJaApareceu.current = true
+        modalJaApareceu.current = true;
 
         if (visivelAtual.current) {
-            animarEntrada()
+            animarEntrada();
         }
     }
 
     function solicitarFechamento() {
         if (!bloquearFechamento) {
-            onFechar?.()
+            onFechar?.();
         }
     }
 
@@ -89,6 +120,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             transparent
             animationType="none"
             onShow={quandoModalAparecer}
+            onDismiss={notificarOcultamento}
             onRequestClose={solicitarFechamento}
         >
             <KeyboardAvoidingView
@@ -96,18 +128,38 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
                 <Animated.View
+                    testID="bottom-sheet-fundo"
                     pointerEvents="none"
-                    style={[estilos.fundo, { opacity: progresso }]}
+                    style={[
+                        estilos.fundo,
+                        {
+                            opacity: progresso
+                        }
+                    ]}
                 />
 
                 <Animated.View
-                    style={[estilos.painel, {transform: [{ translateY: posicaoPainel }]}]}
+                    testID="bottom-sheet-painel"
+                    style={[
+                        estilos.painel,
+                        {
+                            paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom)
+                        },
+                        corPainel ? { backgroundColor: corPainel } : null,
+                        {
+                            transform: [
+                                {
+                                    translateY: posicaoPainel
+                                }
+                            ]
+                        }
+                    ]}
                 >
                     {children}
                 </Animated.View>
             </KeyboardAvoidingView>
         </Modal>
-    )
+    );
 }
 
-export { BottomSheet }
+export { BottomSheet };

@@ -1,25 +1,25 @@
 // Testa conteúdo, variantes e fechamento do painel de legenda.
-import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react-native'
-import {CycleLegendSheet} from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet'
-import {estilos} from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet.styles'
+import React from 'react';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { CycleLegendSheet } from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet';
+import { estilos } from '../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet.styles';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => {
-    const ReactInterno = require('react')
-    const {View} = require('react-native')
+    const ReactInterno = require('react');
+    const { View } = require('react-native');
 
     return {
-        BottomSheet: ({visivel, children}) => (
+        BottomSheet: ({ visivel, children }) =>
             visivel
                 ? ReactInterno.createElement(
-                    View,
-                    {testID: 'bottom-sheet-compartilhado'},
-                    children
-                )
+                      View,
+                      { testID: 'bottom-sheet-compartilhado' },
+                      children
+                  )
                 : null
-        )
-    }
-})
+    };
+});
 
 const itensLegenda = [
     {
@@ -92,96 +92,66 @@ const itensLegenda = [
         descricao: 'Previsão da janela fértil',
         prevista: true
     }
-]
+];
 
 describe('CycleLegendSheet', () => {
     test('não renderiza o painel quando está invisível', async () => {
         await render(
-            <CycleLegendSheet
-                visivel={false}
-                itens={itensLegenda}
-                aoFechar={jest.fn()}
-            />
-        )
+            <CycleLegendSheet visivel={false} itens={itensLegenda} aoFechar={jest.fn()} />
+        );
 
-        expect(screen.queryByTestId('bottom-sheet-compartilhado')).toBeNull()
-    })
+        expect(screen.queryByTestId('bottom-sheet-compartilhado')).toBeNull();
+    });
 
     test('mostra título e os dez itens da legenda', async () => {
-        await render(
-            <CycleLegendSheet
-                visivel
-                itens={itensLegenda}
-                aoFechar={jest.fn()}
-            />
-        )
+        await render(<CycleLegendSheet visivel itens={itensLegenda} aoFechar={jest.fn()} />);
 
-        expect(screen.getByText('Legenda')).toBeOnTheScreen()
+        expect(screen.getByText('Legenda')).toBeOnTheScreen();
 
         for (const item of itensLegenda) {
-            expect(screen.getByText(item.titulo)).toBeOnTheScreen()
-            expect(screen.getByText(item.descricao)).toBeOnTheScreen()
-            expect(screen.getByTestId(`item-legenda-${item.id}`)).toBeOnTheScreen()
+            expect(screen.getByText(item.titulo)).toBeOnTheScreen();
+            expect(screen.getByText(item.descricao)).toBeOnTheScreen();
+            expect(screen.getByTestId(`item-legenda-${item.id}`)).toBeOnTheScreen();
         }
 
         expect(estilos.textos).toMatchObject({
             flex: 1,
             minWidth: 0
-        })
-        expect(estilos.textos).not.toHaveProperty('width')
-    })
+        });
+        expect(estilos.textos).not.toHaveProperty('width');
+    });
 
     test('diferencia marcadores reais e previstos', async () => {
-        await render(
-            <CycleLegendSheet
-                visivel
-                itens={itensLegenda}
-                aoFechar={jest.fn()}
-            />
-        )
+        await render(<CycleLegendSheet visivel itens={itensLegenda} aoFechar={jest.fn()} />);
 
-        expect(
-            screen.getByTestId('marcador-legenda-menstruacao-real')
-        ).toHaveStyle({
+        expect(screen.getByTestId('marcador-legenda-menstruacao-real')).toHaveStyle({
             backgroundColor: 'rgba(200, 90, 68, 0.90)'
-        })
+        });
 
-        expect(
-            screen.getByTestId('marcador-legenda-menstruacao-prevista')
-        ).toHaveStyle({
+        expect(screen.getByTestId('marcador-legenda-menstruacao-prevista')).toHaveStyle({
             backgroundColor: 'rgba(200, 90, 68, 0.58)'
-        })
+        });
 
-        expect(
-            screen.getByTestId('marcador-legenda-janelaFertil-real')
-        ).toHaveStyle({
+        expect(screen.getByTestId('marcador-legenda-janelaFertil-real')).toHaveStyle({
             borderStyle: 'dashed',
             borderColor: 'rgba(34, 34, 34, 0.70)'
-        })
+        });
 
-        expect(
-            screen.getByTestId('marcador-legenda-janelaFertil-prevista')
-        ).toHaveStyle({
+        expect(screen.getByTestId('marcador-legenda-janelaFertil-prevista')).toHaveStyle({
             borderStyle: 'dashed',
             borderColor: 'rgba(34, 34, 34, 0.42)'
-        })
-    })
+        });
+    });
 
     test('fecha pelo botão do cabeçalho', async () => {
-        const aoFechar = jest.fn()
+        const aoFechar = jest.fn();
 
-        await render(
-            <CycleLegendSheet
-                visivel
-                itens={itensLegenda}
-                aoFechar={aoFechar}
-            />
-        )
+        await render(<CycleLegendSheet visivel itens={itensLegenda} aoFechar={aoFechar} />);
 
-        fireEvent.press(screen.getByRole('button', {name: 'Fechar painel'}))
+        fireEvent.press(screen.getByRole('button', { name: 'Fechar painel' }));
 
-        expect(aoFechar).toHaveBeenCalledTimes(1)
-    })
+        expect(aoFechar).toHaveBeenCalledTimes(1);
+    });
 
     test('tolera itens inválidos sem quebrar o painel', async () => {
         await render(
@@ -190,9 +160,9 @@ describe('CycleLegendSheet', () => {
                 itens={[null, {}, ...itensLegenda.slice(0, 1)]}
                 aoFechar={jest.fn()}
             />
-        )
+        );
 
-        expect(screen.getByText('Menstruação')).toBeOnTheScreen()
-        expect(screen.queryByText('undefined')).toBeNull()
-    })
-})
+        expect(screen.getByText('Menstruação')).toBeOnTheScreen();
+        expect(screen.queryByText('undefined')).toBeNull();
+    });
+});

@@ -1,38 +1,43 @@
-//Define a estrutura visual compartilhada pelas telas internas de configurações.
-import { StyleSheet } from 'react-native'
-import { tema } from '../../../../shared/theme'
+// Define a estrutura visual compartilhada pelas telas internas de configurações.
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: tema.cores.neutras.fundoClaro
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: tema.cores.interface.fundo
+        },
 
-    areaInterativa: {
-        flex: 1
-    },
+        areaInterativa: {
+            flex: 1,
+            backgroundColor: tema.cores.interface.fundo
+        },
 
-    conteudo: {
-        flexGrow: 1,
-        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-        paddingBottom: tema.espacamentos.grande
-    },
+        conteudo: {
+            flexGrow: 1,
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+            paddingBottom: tema.espacamentos.grande,
+            backgroundColor: tema.cores.interface.fundo
+        },
 
-    rodape: {
-        width: '100%',
-        alignItems: 'center',
-        marginTop: 128.2,
-        paddingBottom: tema.espacamentos.grande
-    },
+        rodape: {
+            width: '100%',
+            alignItems: 'center',
+            marginTop: 128.2,
+            paddingBottom: tema.espacamentos.grande
+        },
 
-    rodapeFixo: {
-        width: '100%',
-        alignItems: 'center',
-        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-        paddingTop: tema.espacamentos.medio,
-        paddingBottom: tema.espacamentos.grande,
-        backgroundColor: tema.cores.neutras.fundoClaro
-    }
-})
+        rodapeFixo: {
+            width: '100%',
+            alignItems: 'center',
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+            paddingTop: tema.espacamentos.medio,
+            paddingBottom: tema.espacamentos.grande,
+            backgroundColor: tema.cores.interface.fundo,
+            borderTopWidth: 0.7,
+            borderTopColor: tema.cores.interface.separador
+        }
+    });
+}
 
-export { estilos }
+export { criarEstilos };

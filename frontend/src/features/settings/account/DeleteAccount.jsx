@@ -1,93 +1,100 @@
-//Controla a verificação da senha e a exclusão permanente da conta autenticada.
-import { useState } from 'react'
-import { TrashIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
-import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
-import { tema } from '../../../shared/theme'
+// Controla a verificação da senha e a exclusão permanente da conta autenticada.
+import { useState } from 'react';
 
-function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
-    const [etapa, setEtapa] = useState('senha')
-    const [senha, setSenha] = useState('')
-    const [erroSenha, setErroSenha] = useState('')
-    const [acaoComErro, setAcaoComErro] = useState(null)
-    const [carregando, setCarregando] = useState(false)
+import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { TrashIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import { cores } from '../../../shared/theme';
+
+function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida }) {
+    const [etapa, setEtapa] = useState('senha');
+    const [senha, setSenha] = useState('');
+    const [erroSenha, setErroSenha] = useState('');
+    const [acaoComErro, setAcaoComErro] = useState(null);
+    const [carregando, setCarregando] = useState(false);
 
     function limparFluxo() {
-        setEtapa('senha')
-        setSenha('')
-        setErroSenha('')
-        setAcaoComErro(null)
-        setCarregando(false)
+        setEtapa('senha');
+        setSenha('');
+        setErroSenha('');
+        setAcaoComErro(null);
+        setCarregando(false);
     }
 
     function fechar() {
         if (carregando) {
-            return
+            return;
         }
 
-        limparFluxo()
-        onFechar?.()
+        limparFluxo();
+        onFechar?.();
     }
 
     async function continuar() {
         if (!senha || carregando || typeof confirmarSenhaExclusao !== 'function') {
-            return
+            return;
         }
 
-        setCarregando(true)
-        setErroSenha('')
-        setAcaoComErro(null)
+        setCarregando(true);
+        setErroSenha('');
+        setAcaoComErro(null);
 
         try {
-            await confirmarSenhaExclusao({senhaAtual: senha})
-            setEtapa('confirmacao')
+            await confirmarSenhaExclusao({
+                senhaAtual: senha
+            });
+
+            setEtapa('confirmacao');
         } catch (erro) {
             if (erro?.codigo === 'SENHA_ATUAL_INCORRETA') {
-                setErroSenha('A senha atual está incorreta.')
-                setEtapa('senha')
+                setErroSenha('A senha atual está incorreta.');
+                setEtapa('senha');
             } else {
-                setAcaoComErro('validacao')
-                setEtapa('erro')
+                setAcaoComErro('validacao');
+                setEtapa('erro');
             }
         } finally {
-            setCarregando(false)
+            setCarregando(false);
         }
     }
 
     async function confirmarExclusao() {
         if (typeof excluirConta !== 'function' || carregando) {
-            return
+            return;
         }
 
-        setCarregando(true)
-        setErroSenha('')
-        setAcaoComErro(null)
+        setCarregando(true);
+        setErroSenha('');
+        setAcaoComErro(null);
 
         try {
-            const resultado = await excluirConta({senhaAtual: senha})
-            limparFluxo()
-            onFechar?.()
-            onContaExcluida?.(resultado)
+            const resultado = await excluirConta({
+                senhaAtual: senha
+            });
+
+            limparFluxo();
+            onFechar?.();
+            onContaExcluida?.(resultado);
         } catch (erro) {
             if (erro?.codigo === 'SENHA_ATUAL_INCORRETA') {
-                setErroSenha('A senha foi alterada. Digite sua senha atual novamente.')
-                setEtapa('senha')
+                setErroSenha('A senha foi alterada. Digite sua senha atual novamente.');
+                setEtapa('senha');
             } else {
-                setAcaoComErro('exclusao')
-                setEtapa('erro')
+                setAcaoComErro('exclusao');
+                setEtapa('erro');
             }
         } finally {
-            setCarregando(false)
+            setCarregando(false);
         }
     }
 
     function tentarNovamente() {
         if (acaoComErro === 'validacao') {
-            continuar()
-            return
+            continuar();
+            return;
         }
 
-        confirmarExclusao()
+        confirmarExclusao();
     }
 
     return (
@@ -99,9 +106,9 @@ function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onC
                 titulo="Confirme sua identidade"
                 mensagem="Por segurança, insira sua senha atual para continuar com a exclusão da conta."
                 senha={senha}
-                aoAlterarSenha={valor => {
-                    setSenha(valor)
-                    setErroSenha('')
+                aoAlterarSenha={(valor) => {
+                    setSenha(valor);
+                    setErroSenha('');
                 }}
                 erroSenha={erroSenha}
                 acaoPrincipal={{
@@ -138,10 +145,13 @@ function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onC
                 visivel={etapa === 'erro'}
                 aoFechar={fechar}
                 icone={WarningCircleIcon}
-                corIcone={tema.cores.feedback.erro}
-                fundoIcone={tema.cores.neutras.bordaClara}
+                corIcone={cores.feedback.erro}
                 titulo="Algo deu errado"
-                mensagem={acaoComErro === 'exclusao' ? 'Ocorreu um erro ao apagar sua conta.' : 'Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente.'}
+                mensagem={
+                    acaoComErro === 'exclusao'
+                        ? 'Ocorreu um erro ao apagar sua conta.'
+                        : 'Não foi possível concluir esta solicitação. Verifique sua conexão e tente novamente.'
+                }
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
@@ -156,12 +166,18 @@ function FluxoDeleteAccount({onFechar, confirmarSenhaExclusao, excluirConta, onC
                 }}
             />
         </>
-    )
+    );
 }
 
-function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida}) {
+function DeleteAccount({
+    visivel,
+    onFechar,
+    confirmarSenhaExclusao,
+    excluirConta,
+    onContaExcluida
+}) {
     if (!visivel) {
-        return null
+        return null;
     }
 
     return (
@@ -171,7 +187,7 @@ function DeleteAccount({visivel, onFechar, confirmarSenhaExclusao, excluirConta,
             excluirConta={excluirConta}
             onContaExcluida={onContaExcluida}
         />
-    )
+    );
 }
 
-export { DeleteAccount }
+export { DeleteAccount };

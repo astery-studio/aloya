@@ -1,5 +1,6 @@
 //Testa somente a ponte provisória usada para acessar as HU-021 e HU-022.
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { render } from '../mockTheme';
 import { ContraceptiveHuTestAccess } from '../../../../src/features/contraceptives/testing/ContraceptiveHuTestAccess';
 
 const mockEditContraceptiveScreen = jest.fn(() => null);
@@ -9,18 +10,10 @@ jest.mock('../../../../src/features/contraceptives/screens/EditContraceptiveScre
 }));
 
 jest.mock('../../../../src/shared/components/navigation/Header/Header', () => {
-    const {
-        Text
-    } = require('react-native');
+    const { Text } = require('react-native');
 
     return {
-        Header: ({
-            titulo
-        }) => (
-            <Text>
-                {titulo}
-            </Text>
-        )
+        Header: ({ titulo }) => <Text>{titulo}</Text>
     };
 });
 
@@ -48,16 +41,10 @@ beforeEach(() => {
 
 test('carrega os registros reais e oferece acesso à edição', async () => {
     const service = {
-        listar: jest.fn().mockResolvedValue([
-            original
-        ])
+        listar: jest.fn().mockResolvedValue([original])
     };
 
-    await render(
-        <ContraceptiveHuTestAccess
-            service={service}
-        />
-    );
+    await render(<ContraceptiveHuTestAccess service={service} />);
 
     expect(
         await screen.findByRole('button', {
@@ -70,16 +57,10 @@ test('carrega os registros reais e oferece acesso à edição', async () => {
 
 test('abre a tela das HU-021 e HU-022 com o item selecionado', async () => {
     const service = {
-        listar: jest.fn().mockResolvedValue([
-            original
-        ])
+        listar: jest.fn().mockResolvedValue([original])
     };
 
-    await render(
-        <ContraceptiveHuTestAccess
-            service={service}
-        />
-    );
+    await render(<ContraceptiveHuTestAccess service={service} />);
 
     await fireEvent.press(
         await screen.findByRole('button', {
@@ -99,17 +80,11 @@ test('abre a tela das HU-021 e HU-022 com o item selecionado', async () => {
 
 test('atualiza o item sem solicitar novamente a lista completa', async () => {
     const service = {
-        listar: jest.fn().mockResolvedValue([
-            original
-        ]),
+        listar: jest.fn().mockResolvedValue([original]),
         editar: jest.fn().mockResolvedValue(atualizado)
     };
 
-    await render(
-        <ContraceptiveHuTestAccess
-            service={service}
-        />
-    );
+    await render(<ContraceptiveHuTestAccess service={service} />);
 
     await fireEvent.press(
         await screen.findByRole('button', {
@@ -136,19 +111,13 @@ test('atualiza o item sem solicitar novamente a lista completa', async () => {
 
 test('remove o item sem solicitar novamente a lista completa', async () => {
     const service = {
-        listar: jest.fn().mockResolvedValue([
-            original
-        ]),
+        listar: jest.fn().mockResolvedValue([original]),
         remover: jest.fn().mockResolvedValue({
             id: '7'
         })
     };
 
-    await render(
-        <ContraceptiveHuTestAccess
-            service={service}
-        />
-    );
+    await render(<ContraceptiveHuTestAccess service={service} />);
 
     await fireEvent.press(
         await screen.findByRole('button', {
@@ -176,12 +145,9 @@ test('remove o item sem solicitar novamente a lista completa', async () => {
 });
 
 test('encerra o acesso quando a sessão expira no carregamento', async () => {
-    const falha = Object.assign(
-        new Error('Autenticação necessária.'),
-        {
-            status: 401
-        }
-    );
+    const falha = Object.assign(new Error('Autenticação necessária.'), {
+        status: 401
+    });
 
     const onSessaoExpirada = jest.fn();
 
@@ -190,10 +156,7 @@ test('encerra o acesso quando a sessão expira no carregamento', async () => {
     };
 
     await render(
-        <ContraceptiveHuTestAccess
-            service={service}
-            onSessaoExpirada={onSessaoExpirada}
-        />
+        <ContraceptiveHuTestAccess service={service} onSessaoExpirada={onSessaoExpirada} />
     );
 
     await waitFor(() => {

@@ -1,11 +1,12 @@
 //Controla a tela completa de alteração de senha e seus avisos de erro e sucesso.
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react';
 
-import { LockKeyIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
-import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal'
-import { ChangePassword } from '../security/ChangePassword'
-import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout'
-import { tema } from '../../../shared/theme'
+import { LockKeyIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { ChangePassword } from '../security/ChangePassword';
+import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { contarBytesUtf8 } from '../../../shared/utils/validation/contarBytesUtf8';
 
 const senhasBloqueadas = new Set([
     'senha',
@@ -18,7 +19,7 @@ const senhasBloqueadas = new Set([
     'minhasenhasegura',
     'euamoaloya',
     'aloyaaloyaaloya'
-])
+]);
 
 const codigosSessaoInvalida = new Set([
     'NAO_AUTENTICADO',
@@ -26,197 +27,185 @@ const codigosSessaoInvalida = new Set([
     'SESSAO_INVALIDA',
     'SESSAO_AUSENTE',
     'SESSAO_ATUAL_INVALIDA'
-])
-
-function contarBytesUtf8(texto) {
-    let total = 0
-
-    for (const caractere of texto) {
-        const codigo = caractere.codePointAt(0)
-
-        if (codigo <= 0x7F) {
-            total += 1
-        } else if (codigo <= 0x7FF) {
-            total += 2
-        } else if (codigo <= 0xFFFF) {
-            total += 3
-        } else {
-            total += 4
-        }
-    }
-
-    return total
-}
+]);
 
 function validarAlteracaoSenha(senhaAtual, novaSenha, confirmacaoNovaSenha) {
     if (!senhaAtual || !novaSenha || !confirmacaoNovaSenha) {
-        return 'Preencha os três campos de senha.'
+        return 'Preencha os três campos de senha.';
     }
 
     if ([...novaSenha].length < 8) {
-        return 'A nova senha deve ter pelo menos 8 caracteres.'
+        return 'A nova senha deve ter pelo menos 8 caracteres.';
     }
 
     if (contarBytesUtf8(novaSenha) > 72) {
-        return 'A nova senha ultrapassa o tamanho máximo permitido.'
+        return 'A nova senha ultrapassa o tamanho máximo permitido.';
     }
 
     if (senhasBloqueadas.has(novaSenha.toLocaleLowerCase('pt-BR'))) {
-        return 'Essa senha é muito comum. Escolha uma senha diferente.'
+        return 'Essa senha é muito comum. Escolha uma senha diferente.';
     }
 
     if (novaSenha === senhaAtual) {
-        return 'A nova senha deve ser diferente da senha atual.'
+        return 'A nova senha deve ser diferente da senha atual.';
     }
 
     if (novaSenha !== confirmacaoNovaSenha) {
-        return 'As senhas não coincidem.'
+        return 'As senhas não coincidem.';
     }
 
-    return null
+    return null;
 }
 
 function obterMensagemErro(erro) {
     if (erro?.codigo === 'NOVA_SENHA_IGUAL_ATUAL') {
-        return 'A nova senha deve ser diferente da senha atual.'
+        return 'A nova senha deve ser diferente da senha atual.';
     }
 
     if (erro?.codigo === 'SENHA_ALTERADA_CONCORRENTEMENTE') {
-        return 'Sua senha foi alterada em outro acesso. Entre novamente e tente outra vez.'
+        return 'Sua senha foi alterada em outro acesso. Entre novamente e tente outra vez.';
     }
 
     if (erro?.codigo === 'ERRO_VALIDACAO') {
-        const detalhes = Array.isArray(erro.detalhes) ? erro.detalhes : []
-        const camposInvalidos = new Set(detalhes.map(item => item?.campo))
+        const detalhes = Array.isArray(erro.detalhes) ? erro.detalhes : [];
+        const camposInvalidos = new Set(detalhes.map((item) => item?.campo));
 
         if (camposInvalidos.has('confirmacaoNovaSenha')) {
-            return 'As senhas não coincidem.'
+            return 'As senhas não coincidem.';
         }
 
         if (camposInvalidos.has('novaSenha')) {
-            return 'A nova senha não atende aos requisitos de segurança.'
+            return 'A nova senha não atende aos requisitos de segurança.';
         }
 
-        return 'Confira os campos de senha e tente novamente.'
+        return 'Confira os campos de senha e tente novamente.';
     }
 
-    return 'Ocorreu um erro ao alterar a senha. Verifique sua conexão e tente novamente.'
+    return 'Ocorreu um erro ao alterar a senha. Verifique sua conexão e tente novamente.';
 }
 
-function ChangePasswordScreen({alterarSenha, onVoltar, onConcluido, onSessaoExpirada}) {
-    const [senhaAtual, setSenhaAtual] = useState('')
-    const [novaSenha, setNovaSenha] = useState('')
-    const [confirmacaoNovaSenha, setConfirmacaoNovaSenha] = useState('')
-    const [carregando, setCarregando] = useState(false)
-    const [aviso, setAviso] = useState(null)
-    const [mensagemAviso, setMensagemAviso] = useState('')
-    const montado = useRef(true)
-    const operacaoAtual = useRef(null)
+function ChangePasswordScreen({ alterarSenha, onVoltar, onConcluido, onSessaoExpirada }) {
+    const tema = useTheme();
+    const [senhaAtual, setSenhaAtual] = useState('');
+    const [novaSenha, setNovaSenha] = useState('');
+    const [confirmacaoNovaSenha, setConfirmacaoNovaSenha] = useState('');
+    const [carregando, setCarregando] = useState(false);
+    const [aviso, setAviso] = useState(null);
+    const [mensagemAviso, setMensagemAviso] = useState('');
+    const montado = useRef(true);
+    const operacaoAtual = useRef(null);
 
     useEffect(() => {
-        montado.current = true
+        montado.current = true;
 
         return () => {
-            montado.current = false
-        }
-    }, [])
+            montado.current = false;
+        };
+    }, []);
 
     function fecharAviso() {
         if (!carregando) {
-            setAviso(null)
-            setMensagemAviso('')
+            setAviso(null);
+            setMensagemAviso('');
         }
     }
 
     function concluirSucesso() {
-        setAviso(null)
+        setAviso(null);
 
         if (typeof onConcluido === 'function') {
-            onConcluido()
+            onConcluido();
         } else {
-            onVoltar?.()
+            onVoltar?.();
         }
     }
 
     function voltar() {
         if (!carregando) {
-            onVoltar?.()
+            onVoltar?.();
         }
     }
 
     function salvarSenha() {
         if (operacaoAtual.current) {
-            return operacaoAtual.current
+            return operacaoAtual.current;
         }
 
-        const mensagemValidacao = validarAlteracaoSenha(senhaAtual, novaSenha, confirmacaoNovaSenha)
+        const mensagemValidacao = validarAlteracaoSenha(
+            senhaAtual,
+            novaSenha,
+            confirmacaoNovaSenha
+        );
 
         if (mensagemValidacao) {
-            setMensagemAviso(mensagemValidacao)
-            setAviso('validacao')
-            return Promise.resolve(null)
+            setMensagemAviso(mensagemValidacao);
+            setAviso('validacao');
+            return Promise.resolve(null);
         }
 
         if (typeof alterarSenha !== 'function') {
-            setAviso('erro')
-            return Promise.resolve(null)
+            setAviso('erro');
+            return Promise.resolve(null);
         }
 
         const operacao = (async () => {
-            setCarregando(true)
-            setAviso(null)
+            setCarregando(true);
+            setAviso(null);
 
             try {
                 const resultado = await alterarSenha({
                     senhaAtual,
                     novaSenha,
                     confirmacaoNovaSenha
-                })
+                });
 
                 if (montado.current) {
-                    setSenhaAtual('')
-                    setNovaSenha('')
-                    setConfirmacaoNovaSenha('')
-                    setAviso('sucesso')
+                    setSenhaAtual('');
+                    setNovaSenha('');
+                    setConfirmacaoNovaSenha('');
+                    setAviso('sucesso');
                 }
 
-                return resultado
+                return resultado;
             } catch (erro) {
                 if (!montado.current) {
-                    return null
+                    return null;
                 }
 
                 if (codigosSessaoInvalida.has(erro?.codigo)) {
-                    onSessaoExpirada?.()
-                    return null
+                    onSessaoExpirada?.();
+                    return null;
                 }
 
                 if (erro?.codigo === 'SENHA_ATUAL_INCORRETA') {
-                    setSenhaAtual('')
-                    setAviso('credenciais')
-                    return null
+                    setSenhaAtual('');
+                    setAviso('credenciais');
+                    return null;
                 }
 
-                setMensagemAviso(obterMensagemErro(erro))
+                setMensagemAviso(obterMensagemErro(erro));
 
-                if (erro?.codigo === 'ERRO_VALIDACAO' || erro?.codigo === 'NOVA_SENHA_IGUAL_ATUAL') {
-                    setAviso('validacao')
+                if (
+                    erro?.codigo === 'ERRO_VALIDACAO' ||
+                    erro?.codigo === 'NOVA_SENHA_IGUAL_ATUAL'
+                ) {
+                    setAviso('validacao');
                 } else {
-                    setAviso('erro')
+                    setAviso('erro');
                 }
 
-                return null
+                return null;
             } finally {
-                operacaoAtual.current = null
+                operacaoAtual.current = null;
 
                 if (montado.current) {
-                    setCarregando(false)
+                    setCarregando(false);
                 }
             }
-        })()
+        })();
 
-        operacaoAtual.current = operacao
-        return operacao
+        operacaoAtual.current = operacao;
+        return operacao;
     }
 
     return (
@@ -239,10 +228,14 @@ function ChangePasswordScreen({alterarSenha, onVoltar, onConcluido, onSessaoExpi
                 aoFechar={fecharAviso}
                 icone={LockKeyIcon}
                 corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                fundoIcone={
+                    tema.escuro
+                        ? tema.cores.interface.separador
+                        : tema.cores.icones.configuracoes.laranja.caixa
+                }
                 titulo="Não foi possível alterar senha"
                 mensagem="Senha incorreta. Verifique os dados e tente novamente."
-                acaoPrincipal={{texto: 'Tentar novamente', aoPressionar: fecharAviso}}
+                acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: fecharAviso }}
             />
 
             <SimpleModal
@@ -250,22 +243,36 @@ function ChangePasswordScreen({alterarSenha, onVoltar, onConcluido, onSessaoExpi
                 aoFechar={fecharAviso}
                 icone={LockKeyIcon}
                 corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                fundoIcone={
+                    tema.escuro
+                        ? tema.cores.interface.separador
+                        : tema.cores.icones.configuracoes.laranja.caixa
+                }
                 titulo="Não foi possível alterar senha"
                 mensagem={mensagemAviso}
-                acaoPrincipal={{texto: 'Tentar novamente', aoPressionar: fecharAviso}}
+                acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: fecharAviso }}
             />
 
             <SimpleModal
                 visivel={aviso === 'erro'}
                 aoFechar={fecharAviso}
                 icone={WarningCircleIcon}
-                corIcone={tema.cores.neutras.textoSecundarioClaro}
-                fundoIcone={tema.cores.neutras.bordaClara}
+                corIcone={tema.cores.feedback.erro}
+                fundoIcone={tema.cores.interface.separador}
                 titulo="Algo deu errado"
                 mensagem="Ocorreu um erro ao alterar a senha. Verifique sua conexão e tente novamente."
-                acaoPrincipal={{texto: 'Tentar novamente', variante: 'preto', aoPressionar: salvarSenha, carregando}}
-                acaoSecundaria={{texto: 'Voltar', variante: 'branco', aoPressionar: fecharAviso, desativado: carregando}}
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: salvarSenha,
+                    carregando
+                }}
+                acaoSecundaria={{
+                    texto: 'Voltar',
+                    variante: 'branco',
+                    aoPressionar: fecharAviso,
+                    desativado: carregando
+                }}
             />
 
             <SimpleModal
@@ -273,12 +280,16 @@ function ChangePasswordScreen({alterarSenha, onVoltar, onConcluido, onSessaoExpi
                 aoFechar={concluirSucesso}
                 icone={LockKeyIcon}
                 corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                fundoIcone={
+                    tema.escuro
+                        ? tema.cores.interface.separador
+                        : tema.cores.icones.configuracoes.laranja.caixa
+                }
                 titulo="Senha atualizada com sucesso"
-                acaoPrincipal={{texto: 'OK', aoPressionar: concluirSucesso}}
+                acaoPrincipal={{ texto: 'OK', aoPressionar: concluirSucesso }}
             />
         </>
-    )
+    );
 }
 
-export { ChangePasswordScreen, contarBytesUtf8, validarAlteracaoSenha }
+export { ChangePasswordScreen, contarBytesUtf8, validarAlteracaoSenha };
