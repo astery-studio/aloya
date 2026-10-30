@@ -14,6 +14,7 @@ function criarEstilos(tema) {
 
         painel: {
             maxHeight: '90%',
+            overflow: 'hidden',
             paddingBottom: tema.espacamentos.grande,
             backgroundColor: tema.cores.interface.superficieElevada,
             borderTopLeftRadius: tema.radius.bottomSheet,

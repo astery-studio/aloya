@@ -239,7 +239,8 @@ describe('BottomSheet', () => {
         });
 
         expect(screen.getByTestId('bottom-sheet-painel')).toHaveStyle({
-            backgroundColor: '#FFFFFF'
+            backgroundColor: '#FFFFFF',
+            overflow: 'hidden'
         });
     });
 
