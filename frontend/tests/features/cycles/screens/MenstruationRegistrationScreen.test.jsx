@@ -118,3 +118,25 @@ test('seleção controlada de intervalo é conservada após falha e enviada sem 
     expect(retry).toHaveBeenCalledTimes(1);
     await tela.rerender(
         <MenstruationRegistrationScreen meses={meses} hoje="2026-09-25" datasSelecionadas={datas} />
+    );
+    expect(screen.getByTestId('selecao-2026-09-22')).toBeOnTheScreen();
+});
+
+test('primeiro dia mostra orientação, salvamento bloqueia ações e sucesso segue o protótipo', async () => {
+    const fechar = jest.fn();
+    const tela = await montar({
+        datasSelecionadas: ['2026-09-21'],
+        salvando: true,
+        onSalvar: jest.fn()
+    });
+    expect(
+        screen.getByText('Agora toque no último dia para completar o período menstrual.')
+    ).toBeOnTheScreen();
+    expect(
+        screen.getByRole('button', { name: '21 de setembro de 2026, selecionado' })
+    ).toBeDisabled();
+    await tela.rerender(<MenstruationRegistrationScreen sucesso onFecharFeedback={fechar} />);
+    expect(screen.getByText('Menstruação cadastrada')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(fechar).toHaveBeenCalledTimes(1);
+});
