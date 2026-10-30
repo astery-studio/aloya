@@ -1,72 +1,70 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
-import {criarCalendarService} from '../../src/features/calendar/services/calendarService'
-import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService'
-import { criarAuthService } from '../../src/features/auth/services/authService'
-import { criarAccountService } from '../../src/features/settings/services/accountService'
-import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService'
-import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService'
-import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService'
-import {criarCycleRemovalService} from '../../src/features/cycles/services/cycleRemovalService'
-import {criarCycleParametersService} from '../../src/features/cycles/services/cycleParametersService'
-import { criarServicosApp } from '../../src/app/createAppServices'
-import { criarApiClient } from '../../src/shared/services/api/apiClient'
-import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
-import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage'
+import { criarCalendarService } from '../../src/features/calendar/services/calendarService';
+import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService';
+import { criarAuthService } from '../../src/features/auth/services/authService';
+import { criarAccountService } from '../../src/features/settings/services/accountService';
+import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService';
+import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
+import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService';
+import { criarCycleRemovalService } from '../../src/features/cycles/services/cycleRemovalService';
+import { criarCycleParametersService } from '../../src/features/cycles/services/cycleParametersService';
+import { criarServicosApp } from '../../src/app/createAppServices';
+import { criarApiClient } from '../../src/shared/services/api/apiClient';
+import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
+import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage';
 
 jest.mock('../../src/features/auth/services/authService', () => ({
     criarAuthService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/features/settings/services/accountService', () => ({
     criarAccountService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/features/calendar/services/calendarService', () => ({
     criarCalendarService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/features/contraceptives/services/contraceptiveService', () => ({
     criarContraceptiveService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/features/cycles/services/cycleHistoryService', () => ({
     criarCycleHistoryService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/features/support-network/services/supportCategoryService', () => ({
     criarSupportCategoryService: jest.fn()
-}))
+}));
 
-jest.mock(
-    '../../src/features/cycles/services/cyclePredictionService',
-    () => ({
-        criarCyclePredictionService: jest.fn()
-    })
-)
+jest.mock('../../src/features/cycles/services/cyclePredictionService', () => ({
+    criarCyclePredictionService: jest.fn()
+}));
 
 jest.mock('../../src/features/cycles/services/cycleRemovalService', () => ({
     criarCycleRemovalService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/features/cycles/services/cycleParametersService', () => ({
     criarCycleParametersService: jest.fn()
-}))
+}));
 
 jest.mock('../../src/shared/services/api/apiClient', () => ({
     criarApiClient: jest.fn()
-}))
+}));
 
 jest.mock('../../src/shared/services/api/authenticatedRequest', () => ({
     criarRequisicaoAutenticada: jest.fn()
-}))
+}));
 
 jest.mock('../../src/shared/storage/tokenStorage', () => ({
     obterToken: jest.fn(),
     removerToken: jest.fn()
-}))
+}));
 
 describe('createAppServices', () => {
-    let requisicao
+    let requisicao;
+    let requisicaoAutenticada;
     let requisicaoAutenticada
     let authService
     let accountService
