@@ -118,3 +118,50 @@ function MenstruationRegistrationScreen({
                             ? () => onSalvar([...selecionadas])
                             : undefined
                     }
+                    desativado={!podeSalvar || salvando}
+                    carregando={salvando}
+                    estilo={estilos.salvar}
+                />
+            </View>
+            <SimpleModal
+                visivel={Boolean(feedback)}
+                aoFechar={fecharFeedback}
+                icone={
+                    feedback === 'sucesso'
+                        ? DropIcon
+                        : feedback === 'erro'
+                          ? RegistrationErrorIcon
+                          : WarningCircleIcon
+                }
+                estiloIcone={estilos.iconeFeedback}
+                fundoIcone={feedback === 'erro' ? '#EDEDED' : '#F5EDE3'}
+                corIcone={feedback === 'erro' ? '#B43D3D' : '#C85A44'}
+                titulo={
+                    feedback === 'conflito'
+                        ? 'Ciclo existente'
+                        : feedback === 'erro'
+                          ? 'Algo deu errado'
+                          : 'Menstruação cadastrada'
+                }
+                mensagem={
+                    feedback === 'conflito'
+                        ? 'Este dia já pertence a outro ciclo registrado. Para corrigi-lo, edite o ciclo existente em vez de criar um novo registro.'
+                        : feedback === 'erro'
+                          ? 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
+                          : undefined
+                }
+                acaoPrincipal={{
+                    texto: feedback === 'erro' ? 'Tentar novamente' : 'OK',
+                    variante: feedback === 'erro' ? 'preto' : 'verde',
+                    aoPressionar: feedback === 'erro' ? onTentarNovamente : fecharFeedback
+                }}
+                acaoSecundaria={
+                    feedback === 'erro'
+                        ? { texto: 'Voltar', variante: 'branco', aoPressionar: fecharFeedback }
+                        : undefined
+                }
+            />
+        </SafeAreaView>
+    );
+}
+export { MenstruationRegistrationScreen };
