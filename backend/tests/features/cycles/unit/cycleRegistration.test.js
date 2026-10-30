@@ -68,3 +68,66 @@ test('continuidade, preenchimento retroativo e conflitos preservam os ciclos', (
     );
     assert.equal(
         selecionarPeriodo([{ ...registro, dataFim: null }], '2026-10-11', '2026-10-11').registro.id,
+        1
+    );
+});
+
+test('categoria atribuída prevalece sobre permissões individuais e vínculos inativos', () => {
+    const vinculo = {
+        contatoId: 2,
+        status: 'ativo',
+        permissoesIndividuais: ['geral.historico_ciclo']
+    };
+    assert.equal(permiteHistorico(vinculo), true);
+    assert.equal(permiteHistorico({ ...vinculo, categoria: { conjuntoDadosVisiveis: [] } }), false);
+    assert.equal(
+        permiteHistorico({
+            ...vinculo,
+            categoria: { conjuntoDadosVisiveis: ['geral.historico_ciclo'] }
+        }),
+        true
+    );
+    for (const estado of [
+        { status: 'revogado' },
+        { contatoId: null },
+        { permissoesIndividuais: {} }
+    ])
+        assert.equal(permiteHistorico({ ...vinculo, ...estado }), false);
+});
+
+test('service injeta relógio e preserva falhas do repositório', async () => {
+    assert.throws(() => criarCycleRegistrationService({ repository: {} }), TypeError);
+    let recebido;
+    const service = criarCycleRegistrationService({
+        repository: {
+            async registrar(dados) {
+                recebido = dados;
+                return dados;
+            }
+        },
+        agora: () => base.agora
+    });
+    await service.registrar(base);
+    assert.equal(recebido.agora, base.agora);
+    await assert.rejects(() => service.registrar(), { status: 401 });
+});
+
+test('service usa relógio padrão quando não é injetado', async () => {
+    const service = criarCycleRegistrationService({
+        repository: {
+            async registrar(dados) {
+                return dados;
+            }
+        }
+    });
+    assert.equal(
+        (
+            await service.registrar({
+                usuarioId: 1,
+                chave: 'relogio-padrao',
+                corpo: { data: '2020-01-01' }
+            })
+        ).inicio,
+        '2020-01-01'
+    );
+});
