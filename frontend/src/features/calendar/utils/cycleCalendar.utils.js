@@ -12,20 +12,20 @@ const NOMES_MESES = Object.freeze([
     'Outubro',
     'Novembro',
     'Dezembro'
-])
+]);
 
 const TIPOS_DIA = Object.freeze({
     menstruacao: 'menstruacao',
     folicular: 'folicular',
     ovulacao: 'ovulacao',
     lutea: 'lutea'
-})
+});
 
-const FORMATO_MES = /^(\d{4})-(0[1-9]|1[0-2])$/
-const FORMATO_DATA = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
+const FORMATO_MES = /^(\d{4})-(0[1-9]|1[0-2])$/;
+const FORMATO_DATA = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 function preencherNumero(numero, tamanho = 2) {
-    return String(numero).padStart(tamanho, '0')
+    return String(numero).padStart(tamanho, '0');
 }
 
 function obterHojeLocal(data = new Date()) {
@@ -33,61 +33,59 @@ function obterHojeLocal(data = new Date()) {
         preencherNumero(data.getFullYear(), 4),
         preencherNumero(data.getMonth() + 1),
         preencherNumero(data.getDate())
-    ].join('-')
+    ].join('-');
 }
 
 function interpretarMes(chaveMes) {
-    const correspondencia = typeof chaveMes === 'string'
-        ? FORMATO_MES.exec(chaveMes)
-        : null
+    const correspondencia = typeof chaveMes === 'string' ? FORMATO_MES.exec(chaveMes) : null;
 
-    if (!correspondencia) return null
+    if (!correspondencia) return null;
 
     return {
         chave: chaveMes,
         ano: Number(correspondencia[1]),
         mes: Number(correspondencia[2])
-    }
+    };
 }
 
 function criarDataUtc(ano, indiceMes, dia) {
-    const data = new Date(0)
-    data.setUTCHours(0, 0, 0, 0)
-    data.setUTCFullYear(ano, indiceMes, dia)
-    return data
+    const data = new Date(0);
+    data.setUTCHours(0, 0, 0, 0);
+    data.setUTCFullYear(ano, indiceMes, dia);
+    return data;
 }
 
 function obterQuantidadeDias(ano, mes) {
-    const primeiroDiaMesSeguinte = criarDataUtc(ano, mes, 1)
-    const ultimoDia = new Date(primeiroDiaMesSeguinte.getTime() - 86_400_000)
+    const primeiroDiaMesSeguinte = criarDataUtc(ano, mes, 1);
+    const ultimoDia = new Date(primeiroDiaMesSeguinte.getTime() - 86_400_000);
 
-    return ultimoDia.getUTCDate()
+    return ultimoDia.getUTCDate();
 }
 
-function criarCasasDoMes({ano, mes}) {
-    const primeiroDiaDaSemana = criarDataUtc(ano, mes - 1, 1).getUTCDay()
-    const quantidadeDias = obterQuantidadeDias(ano, mes)
-    const casas = Array(primeiroDiaDaSemana).fill(null)
+function criarCasasDoMes({ ano, mes }) {
+    const primeiroDiaDaSemana = criarDataUtc(ano, mes - 1, 1).getUTCDay();
+    const quantidadeDias = obterQuantidadeDias(ano, mes);
+    const casas = Array(primeiroDiaDaSemana).fill(null);
 
     for (let dia = 1; dia <= quantidadeDias; dia += 1) {
         casas.push({
             dia,
             data: `${preencherNumero(ano, 4)}-${preencherNumero(mes)}-${preencherNumero(dia)}`
-        })
+        });
     }
 
-    while (casas.length % 7 !== 0) casas.push(null)
+    while (casas.length % 7 !== 0) casas.push(null);
 
-    return casas
+    return casas;
 }
 
 function validarIntervalo(intervalo) {
-    return (
-        intervalo
-        && typeof intervalo.inicio === 'string'
-        && typeof intervalo.fim === 'string'
-        && FORMATO_DATA.test(intervalo.inicio)
-        && FORMATO_DATA.test(intervalo.fim)
+    return intervalo &&
+        typeof intervalo.inicio === 'string' &&
+        typeof intervalo.fim === 'string' &&
+        FORMATO_DATA.test(intervalo.inicio) &&
+        FORMATO_DATA.test(intervalo.fim)
+        ? intervalo
     ) ? intervalo : null
 }
 
