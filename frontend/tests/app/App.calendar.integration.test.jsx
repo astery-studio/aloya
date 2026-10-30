@@ -74,25 +74,57 @@ jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
 }));
 jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => ({
     ProfileSettingsScreen: jest.fn(() => null)
+}));
+jest.mock('../../src/features/contraceptives/testing/ContraceptiveHuTestAccess', () => ({
+    ContraceptiveHuTestAccess: jest.fn(() => null)
+}));
+jest.mock('../../src/features/support-network/screens/MembersScreen', () => ({
+    MembersScreen: jest.fn(() => null)
+}));
+jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen', () => ({
+    NewSupportCategoryScreen: jest.fn(() => null)
+}));
 
-jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text, View} = require('react-native')
+jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
 
     return {
-        CalendarScreenContainer: ({service, aoVoltar, aoCadastrarMenstruacao}) => ReactInterno.createElement(
-            View,
-            {testID: 'calendar-container'},
+        SettingsScreen: ({ onSelecionarAba }) =>
             ReactInterno.createElement(
-                Text,
+                View,
                 null,
-                typeof service?.buscarMes === 'function'
-                    ? 'Calendário conectado à API'
-                    : 'Serviço do calendário ausente'
-            ),
+                ReactInterno.createElement(Text, null, 'Configurações'),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir início',
+                        onPress: () => onSelecionarAba('inicio')
+                    },
+                    ReactInterno.createElement(Text, null, 'Início')
+                )
+            )
+    };
+});
+
+jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
+
+    return {
+        CalendarScreenContainer: ({ service, aoVoltar, aoCadastrarMenstruacao }) =>
             ReactInterno.createElement(
-                Pressable,
-                {
+                View,
+                { testID: 'calendar-container' },
+                ReactInterno.createElement(
+                    Text,
+                    null,
+                    typeof service?.buscarMes === 'function'
+                        ? 'Calendário conectado à API'
+                        : 'Serviço do calendário ausente'
+                ),
+                ReactInterno.createElement(
                     accessibilityRole: 'button',
                     accessibilityLabel: 'Voltar ao Início',
                     onPress: aoVoltar
