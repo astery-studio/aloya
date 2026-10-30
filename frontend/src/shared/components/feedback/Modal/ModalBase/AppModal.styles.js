@@ -15,7 +15,7 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.sobreposicao
         },
 
-        flexivel: { flex: 1 },
+        flexivel: { flex: 1, width: '100%' },
 
         rolagem: {
             flexGrow: 1,
