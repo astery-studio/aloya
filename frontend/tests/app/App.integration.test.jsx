@@ -71,14 +71,27 @@ jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => {
 
 jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     const React = require('react')
-    const {Text} = require('react-native')
+    const {Pressable, Text, View} = require('react-native')
 
     return {
-        CycleHistoryFlow: jest.fn(() => React.createElement(
-            Text,
+        CycleHistoryFlow: jest.fn(({aoAbrirCalendario}) => React.createElement(
+            View,
             null,
-            'Histórico de ciclos integrado'
+            React.createElement(Text, null, 'Histórico de ciclos integrado'),
+            React.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Abrir Calendário pelo Histórico',
+                onPress: aoAbrirCalendario
+            })
         ))
+    }
+})
+
+jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
+    const React = require('react')
+    const {Text} = require('react-native')
+    return {
+        CalendarScreenContainer: jest.fn(() => React.createElement(Text, null, 'Calendário atualizado'))
     }
 })
 
@@ -241,6 +254,7 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 import App from '../../src/App'
 import {criarServicosApp} from '../../src/app/createAppServices'
 import {CycleHistoryFlow} from '../../src/features/cycles/CycleHistoryFlow'
+import {CalendarScreenContainer} from '../../src/features/calendar/screens/CalendarScreenContainer'
 import {obterToken} from '../../src/shared/storage/tokenStorage'
 
 //Cria os serviços usados pelo App durante os testes de integração.
@@ -270,6 +284,9 @@ function criarServicos() {
         contraceptiveService: {},
         cycleHistoryService: {
             listarPagina: jest.fn()
+        },
+        calendarService: {
+            buscarMes: jest.fn()
         },
         supportCategoryService: {
             criarCategoria: jest.fn()
@@ -360,10 +377,25 @@ describe('App integrado', () => {
                 service: servicos.cycleHistoryService,
                 aoAbrirCalendario: expect.any(Function),
                 aoEditarCiclo: expect.any(Function),
-                aoExcluirCiclo: expect.any(Function),
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),
+            undefined
+        )
+    })
+
+    test('abre o Calendário pelo Histórico para consultar os dados atuais', async () => {
+        obterToken.mockResolvedValue({token: 'token-valido'})
+        await render(<App />)
+
+        await fireEvent.press(await screen.findByRole('button', {name: 'Abrir ciclos'}))
+        await fireEvent.press(
+            await screen.findByRole('button', {name: 'Abrir Calendário pelo Histórico'})
+        )
+
+        expect(await screen.findByText('Calendário atualizado')).toBeOnTheScreen()
+        expect(CalendarScreenContainer).toHaveBeenCalledWith(
+            expect.objectContaining({service: servicos.calendarService}),
             undefined
         )
     })

@@ -174,16 +174,4 @@ describe('useCalendar', () => {
         expect(result.current.meses).toEqual([])
         expect(result.current.erro).toBe('Não foi possível carregar os dados do calendário. Tente novamente.')
     })
-
-    test('recarrega os meses visíveis após a remoção de um registro', async () => {
-        const service = {buscarMes: jest.fn(async ({mes}) => ({mes, possuiCiclos: true, calendario: {dias: []}}))}
-        const {result} = await renderHook(() => useCalendar({service}))
-        await waitFor(() => expect(result.current.meses.length).toBeGreaterThanOrEqual(1))
-        const chamadasAnteriores = service.buscarMes.mock.calls.length
-
-        await act(async () => { await result.current.recarregarMeses() })
-
-        expect(service.buscarMes.mock.calls.length).toBeGreaterThan(chamadasAnteriores)
-        await waitFor(() => expect(result.current.meses.length).toBeGreaterThanOrEqual(1))
-    })
 })

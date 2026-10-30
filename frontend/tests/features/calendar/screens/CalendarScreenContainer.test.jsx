@@ -1,5 +1,5 @@
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react-native'
+import {fireEvent, render, screen} from '@testing-library/react-native'
 import {CalendarScreenContainer} from '../../../../src/features/calendar/screens/CalendarScreenContainer'
 
 const mockUseCalendar = jest.fn()
@@ -46,11 +46,6 @@ jest.mock('../../../../src/features/calendar/screens/CalendarScreen', () => {
                     onPress: props.aoTentarNovamente
                 },
                 ReactInterno.createElement(Text, null, 'Tentar novamente')
-            ),
-            ReactInterno.createElement(
-                Pressable,
-                {accessibilityRole: 'button', accessibilityLabel: 'Remover dia do calendário', onPress: () => props.aoRemoverDia({registroCicloId: '9', data: '2026-10-08'})},
-                ReactInterno.createElement(Text, null, 'Remover dia')
             )
         )
     }
@@ -152,19 +147,5 @@ describe('CalendarScreenContainer', () => {
         )
 
         expect(screen.getByText('Confiança: indisponível')).toBeOnTheScreen()
-    })
-
-    test('encaminha remoção diária para serviço e atualiza os meses', async () => {
-        const recarregarMeses = jest.fn()
-        const service = {buscarMes: jest.fn(), removerDia: jest.fn().mockResolvedValue({mensagem: 'ok'})}
-        mockUseCalendar.mockReturnValue({
-            meses: [], carregando: false, carregandoAnteriores: false, carregandoPosteriores: false,
-            erro: null, carregarAnteriores: jest.fn(), carregarPosteriores: jest.fn(),
-            tentarNovamente: jest.fn(), recarregarMeses
-        })
-        await render(<CalendarScreenContainer service={service} onSessaoExpirada={jest.fn()} />)
-        await fireEvent.press(screen.getByRole('button', {name: 'Remover dia do calendário'}))
-        await waitFor(() => expect(service.removerDia).toHaveBeenCalledWith({cicloId: '9', data: '2026-10-08'}))
-        await waitFor(() => expect(recarregarMeses).toHaveBeenCalledTimes(1))
     })
 })

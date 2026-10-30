@@ -486,9 +486,7 @@ export default function App() {
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
                 calendarService={configuracao.servicos.calendarService}
-                aoAbrirCalendario={() =>
-                    Alert.alert('Calendário', 'O calendário ainda será integrado.')
-                }
+                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                 aoEditarCiclo={(ciclo) => Alert.alert('Editar ciclo', `Ciclo ${ciclo.numero}`)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
