@@ -860,7 +860,6 @@ export default function App() {
                             .calendario
                     )
                 }
-                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
                 aoSelecionarAba={
                     selecionarAba
                 }

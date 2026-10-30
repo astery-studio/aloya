@@ -3,7 +3,7 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { ArrowsClockwiseIcon, CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { cores } from '../../../shared/theme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
@@ -30,7 +30,7 @@ function CycleTodayScreen({
     erro = false, erroPrevisao = false, erroSincronizacao = false,
     dataSelecionada, aoSelecionarData, aoTentarNovamente, aoVoltar,
     aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional,
-    aoAbrirCalendario, aoAbrirParametrosCiclo, aoSelecionarAba
+    aoAbrirCalendario, aoSelecionarAba
 }) {
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const referencia = dataSelecionada || previsao?.dataReferencia || ciclo?.dataReferencia;
@@ -65,9 +65,6 @@ function CycleTodayScreen({
                 <View style={estilos.cabecalho}>
                     <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
                     <View style={estilos.acoesCabecalho}>
-                        <IconButton icone={ArrowsClockwiseIcon}
-                            aoPressionar={aoAbrirParametrosCiclo}
-                            rotuloAcessibilidade="Abrir parâmetros do ciclo" variante="calendario" />
                         <IconButton icone={CalendarBlankIcon}
                             aoPressionar={aoAbrirCalendario}
                             rotuloAcessibilidade="Abrir calendário" variante="calendario" />
