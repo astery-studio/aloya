@@ -68,3 +68,55 @@ test('controller usa a sessão, preserva erros e responde sem cache', async () =
     };
     const result = await controller.registrar(
         { usuario: { id: 7 }, body: { data: '2026-01-01' }, get: () => 'idempotencia' },
+        res,
+        () => assert.fail()
+    );
+    assert.equal(result.repetida, true);
+    assert.equal(recebido.usuarioId, 7);
+    await controller.compartilhar(
+        { usuario: { id: 7 }, params: { titularId: '1' }, query: {} },
+        res,
+        (recebido) => assert.equal(recebido, erro)
+    );
+    assert.ok(erro.mensagemUsuario);
+    const publico = Object.assign(new Error('Conflito'), { status: 409 });
+    const falho = criarCycleRegistrationController({
+        service: {
+            async registrar() {
+                throw publico;
+            }
+        },
+        sharingService: { buscar() {} }
+    });
+    await falho.registrar({ usuario: { id: 7 }, body: {}, get: () => '' }, res, (recebido) =>
+        assert.equal(recebido, publico)
+    );
+    assert.equal(publico.mensagemUsuario, undefined);
+});
+
+test('controllers ocultam falhas inesperadas de gravação e preservam erros públicos de compartilhamento', async () => {
+    const interno = new Error('Detalhe do banco');
+    const publico = Object.assign(new Error('Negado'), { status: 404 });
+    const controller = criarCycleRegistrationController({
+        service: {
+            async registrar() {
+                throw interno;
+            }
+        },
+        sharingService: {
+            async buscar() {
+                throw publico;
+            }
+        }
+    });
+    await controller.registrar({ usuario: { id: 1 }, body: {}, get: () => '' }, {}, (erro) =>
+        assert.equal(erro, interno)
+    );
+    assert.ok(interno.mensagemUsuario);
+    await controller.compartilhar(
+        { usuario: { id: 1 }, params: { titularId: '2' }, query: {} },
+        {},
+        (erro) => assert.equal(erro, publico)
+    );
+    assert.equal(publico.mensagemUsuario, undefined);
+});
