@@ -151,7 +151,10 @@ function criarEstilosCalendario(tema) {
             position: 'absolute',
             top: 0,
             bottom: 0,
-            borderWidth: 1.5,
+            borderTopWidth: 2,
+            borderRightWidth: 2,
+            borderBottomWidth: 2,
+            borderLeftWidth: 2,
             borderStyle: 'dashed',
             borderRadius: 16,
             zIndex: 3
