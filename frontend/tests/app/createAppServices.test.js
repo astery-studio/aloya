@@ -119,90 +119,84 @@ describe('createAppServices', () => {
 
         criarAuthService.mockReturnValue(authService);
 
-        criarAccountService.mockReturnValue(
-            accountService
-        )
+        criarAccountService.mockReturnValue(accountService);
 
-        criarContraceptiveService.mockReturnValue(
-            contraceptiveService
-        )
+        criarContraceptiveService.mockReturnValue(contraceptiveService);
 
-        criarCycleHistoryService.mockReturnValue(
-            cycleHistoryService
-        )
+        criarCycleHistoryService.mockReturnValue(cycleHistoryService);
 
-        criarSupportCategoryService.mockReturnValue(
-            supportCategoryService
-        )
+        criarSupportCategoryService.mockReturnValue(supportCategoryService);
 
-        criarCyclePredictionService.mockReturnValue(
-            cyclePredictionService
-        )
-        criarCycleRemovalService.mockReturnValue(cycleRemovalService)
-        criarCycleParametersService.mockReturnValue(cycleParametersService)
-    })
+        criarCyclePredictionService.mockReturnValue(cyclePredictionService);
+        criarCycleRemovalService.mockReturnValue(cycleRemovalService);
+        criarCycleParametersService.mockReturnValue(cycleParametersService);
+    });
 
     test('monta e congela os serviços da aplicação', () => {
-        const fetchImpl = jest.fn()
+        const fetchImpl = jest.fn();
 
         const servicos = criarServicosApp({
             apiUrl: ' https://api.aloya.com/ ',
             fetchImpl
-        })
+        });
 
         expect(criarApiClient).toHaveBeenCalledWith({
             baseUrl: 'https://api.aloya.com',
             fetchImpl,
             timeoutMs: 15000
-        })
+        });
 
         expect(criarRequisicaoAutenticada).toHaveBeenCalledWith({
             requisicao,
             obterCredencial: obterToken,
             removerCredencial: removerToken
-        })
+        });
 
         expect(criarAuthService).toHaveBeenCalledWith({
             requisicao,
             requisicaoAutenticada,
             removerCredencialLocal: removerToken
-        })
+        });
 
         expect(criarAccountService).toHaveBeenCalledWith({
             requisicaoAutenticada,
             removerCredencialLocal: removerToken
-        })
+        });
 
         expect(criarCalendarService).toHaveBeenCalledWith({
             requisicaoAutenticada
-        })
+        });
 
         expect(criarContraceptiveService).toHaveBeenCalledWith({
             requisicaoAutenticada
-        })
+        });
 
         expect(criarCycleHistoryService).toHaveBeenCalledWith({
             requisicaoAutenticada
-        })
+        });
 
         expect(criarSupportCategoryService).toHaveBeenCalledWith({
             requisicaoAutenticada
-        })
+        });
 
         expect(criarCyclePredictionService).toHaveBeenCalledWith({
             requisicaoAutenticada
-        })
+        });
 
-        expect(criarCycleRemovalService).toHaveBeenCalledWith({requisicaoAutenticada})
+        expect(criarCycleRemovalService).toHaveBeenCalledWith({ requisicaoAutenticada });
 
-        expect(criarCycleParametersService).toHaveBeenCalledWith({requisicaoAutenticada})
+        expect(criarCycleParametersService).toHaveBeenCalledWith({ requisicaoAutenticada });
 
         expect(servicos).toEqual({
             authService,
             accountService,
-            calendarService: expect.objectContaining({nome: 'calendarService', ...cycleRemovalService}),
+            calendarService: expect.objectContaining({
+                nome: 'calendarService',
+                ...cycleRemovalService,
+                buscarMes: expect.any(Function)
+            }),
             contraceptiveService,
-            cycleHistoryService: expect.objectContaining({nome: 'cycleHistoryService', ...cycleRemovalService}),
+            cycleHistoryService: expect.objectContaining({
             supportCategoryService,
             cyclePredictionService,
             cycleParametersService
