@@ -200,16 +200,6 @@ function CalendarScreen({
             </View>
 
             <View style={estilos.conteudo}>
-                {estadoVazio ? (
-                    <View accessibilityRole="alert" style={estilos.avisoVazio}>
-                        <InfoIcon size={20} color={tema.cores.interface.destaque} />
-                        <Text style={estilos.textoVazio}>
-                            Você ainda não possui nenhum ciclo registrado. Toque em um dia no
-                            Calendário para começar.
-                        </Text>
-                    </View>
-                ) : null}
-
                 <View style={estilos.areaCalendario}>
                     <CycleCalendar
                         meses={mesesValidos}
@@ -222,6 +212,16 @@ function CalendarScreen({
                     />
                 </View>
             </View>
+
+            {estadoVazio ? (
+                <View accessibilityRole="alert" style={estilos.avisoVazio}>
+                    <InfoIcon size={18} color={tema.cores.interface.destaque} />
+                    <Text style={estilos.textoVazio}>
+                        Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar
+                        Menstruação’ pra começar.
+                    </Text>
+                </View>
+            ) : null}
 
             <SafeAreaView
                 testID="rodape-calendario"

@@ -217,7 +217,7 @@ describe('CalendarScreen', () => {
 
         expect(
             screen.getByText(
-                'Você ainda não possui nenhum ciclo registrado. Toque em um dia no Calendário para começar.'
+                'Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar Menstruação’ pra começar.'
             )
         ).toBeOnTheScreen();
         expect(screen.queryByTestId('confidence-badge')).toBeNull();
