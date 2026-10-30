@@ -162,6 +162,7 @@ test('data de nascimento futura não solicita responsável legal', async () => {
     )).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     expect(screen.getByText('Data inválida')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Selecionar período' })).toBeNull();
 });
 
 test('valida e-mail do responsável ao sair do campo e durante a correção', async () => {
@@ -272,6 +273,124 @@ test('voltar pelo sistema solicita confirmação sem mudar de etapa', async () =
     await fireEvent.press(screen.getByRole('button', { name: 'Continuar cadastro' }));
     expect(screen.getByLabelText('Data')).toBeTruthy();
     BackHandler.addEventListener.mockRestore();
+});
+
+test.each([
+    ['Nome', 'A'.repeat(121), 'Nome inválido'],
+    ['Email', 'email-invalido', 'E-mail inválido'],
+    ['Email', `${'a'.repeat(245)}@email.com`, 'E-mail inválido'],
+    ['Senha', 'á'.repeat(37), 'Senha inválida'],
+    ['Confirmar senha', 'outrasenha', 'Senhas diferentes']
+])('bloqueia %s inválido na etapa da conta', async (campo, valor, titulo) => {
+    const cadastrar = jest.fn();
+    const verificarEmailDisponivel = jest.fn();
+    await render(<OnboardingScreen cadastrar={cadastrar}
+        verificarEmailDisponivel={verificarEmailDisponivel} />);
+    await preencherConta();
+    await fireEvent.changeText(screen.getByLabelText(campo), valor);
+    if (campo === 'Senha') {
+        await fireEvent.changeText(screen.getByLabelText('Confirmar senha'), valor);
+    }
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByText(titulo)).toBeTruthy();
+    expect(screen.queryByLabelText('Data')).toBeNull();
+    expect(verificarEmailDisponivel).not.toHaveBeenCalled();
+    expect(cadastrar).not.toHaveBeenCalled();
+});
+
+test('bloqueia data inexistente antes da etapa menstrual', async () => {
+    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '31022000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByText('Data inválida')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Selecionar período' })).toBeNull();
+});
+
+test.each(['2026-08-02', '2099-01-01', '2026-02-30'])(
+    'bloqueia término menstrual inválido %s antes das durações', async (fim) => {
+        mockPeriodoMenstrual = { inicio: '2026-08-03', fim };
+        await render(<OnboardingScreen cadastrar={jest.fn()} />);
+        await preencherConta();
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+        await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+        expect(screen.getByRole('alert')).toHaveTextContent('Informe uma data de término válida.');
+        expect(screen.queryByLabelText('Duração em dias')).toBeNull();
+    }
+);
+
+async function chegarAEtapaCiclo() {
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+}
+
+test.each([
+    [3, '0', 'Normalmente quanto tempo dura seu ciclo?'],
+    [3, '', 'Normalmente quanto tempo dura seu ciclo?'],
+    [4, '0', 'Normalmente quanto tempo dura sua menstruação?'],
+    [4, '', 'Normalmente quanto tempo dura sua menstruação?'],
+    [5, '0', 'Normalmente quanto tempo dura sua fase lútea?'],
+    [5, '', 'Normalmente quanto tempo dura sua fase lútea?']
+])('bloqueia duração vazia ou zero na etapa %s (%s)', async (etapa, valor, titulo) => {
+    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await chegarAEtapaCiclo();
+    for (let atual = 3; atual < etapa; atual += 1) {
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    }
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), valor);
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByText(titulo)).toBeTruthy();
+});
+
+test.each([28, 35])('bloqueia menstruação de %s dias antes de avançar para a fase lútea', async (duracao) => {
+    const cadastrar = jest.fn();
+    await render(<OnboardingScreen cadastrar={cadastrar} />);
+    await chegarAEtapaCiclo();
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), String(duracao));
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    const mensagem = 'A duração da menstruação deve ser menor que a duração do ciclo.';
+    expect(screen.getByText('Normalmente quanto tempo dura sua menstruação?')).toBeTruthy();
+    expect(screen.queryByText('Normalmente quanto tempo dura sua fase lútea?')).toBeNull();
+    expect(screen.getByRole('alert')).toHaveTextContent(mensagem);
+    expect(cadastrar).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Entendi' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '5');
+    expect(screen.queryByRole('alert')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByText('Normalmente quanto tempo dura sua fase lútea?')).toBeTruthy();
+});
+
+test('valida somente as durações já preenchidas e permite corrigir a fase lútea', async () => {
+    const cadastrar = jest.fn().mockResolvedValue({ autenticacao: { token: 'jwt', tipo: 'Bearer' } });
+    await render(<OnboardingScreen cadastrar={cadastrar} />);
+    await chegarAEtapaCiclo();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '20');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByText('Normalmente quanto tempo dura sua fase lútea?')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(
+        'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.'
+    );
+    expect(cadastrar).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Entendi' }));
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '4');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(cadastrar).toHaveBeenCalledWith(expect.objectContaining({
+        duracaoMenstruacaoInformada: 20, duracaoLuteaInformada: 4
+    }));
 });
 
 async function chegarAEtapaFinal() {
