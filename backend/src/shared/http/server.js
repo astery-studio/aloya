@@ -1,5 +1,6 @@
 //Configura e inicia a API HTTP da aplicação.
 import express from 'express';
+import { criarCycleRegistrationRoutes } from '../../features/cycles/routes/cycleRegistration.routes.js';
 import helmet from 'helmet';
 
 import { env } from '../config/env.js';
@@ -155,6 +156,15 @@ app.use(
         permissionCategoryDeletionRateLimit: container.permissionCategoryDeletionRateLimit,
         permissionCategoryController: container.permissionCategoryController,
         permissionCategoryDeletionController: container.permissionCategoryDeletionController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleRegistrationRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        controller: container.cycleRegistrationController
     })
 );
 

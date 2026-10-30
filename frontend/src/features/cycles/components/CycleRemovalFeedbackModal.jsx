@@ -47,6 +47,8 @@ function IconeSucesso() {
 }
 
 function CycleRemovalFeedbackModal({
+    visivel = true,
+    onOcultar,
     tipo,
     periodo,
     carregando = false,
@@ -58,7 +60,8 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'confirmacao') {
         return (
             <SimpleModal
-                visivel
+                visivel={visivel}
+                aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onCancelar}
                 icone={IconeConfirmacao}
                 fundoIcone="transparent"
@@ -83,7 +86,8 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'erro') {
         return (
             <SimpleModal
-                visivel
+                visivel={visivel}
+                aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onFechar}
                 icone={IconeErro}
                 fundoIcone="transparent"
@@ -108,7 +112,8 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'sucesso-excluir' || tipo === 'sucesso-atualizar') {
         return (
             <SimpleModal
-                visivel
+                visivel={visivel}
+                aoOcultar={onOcultar}
                 aoFechar={onFechar}
                 icone={IconeSucesso}
                 fundoIcone="transparent"

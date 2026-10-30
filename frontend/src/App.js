@@ -6,7 +6,13 @@ import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text, View
+    ActivityIndicator,
+    Alert,
+    BackHandler,
+    Linking,
+    NativeModules,
+    Text,
+    View
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -31,6 +37,8 @@ import { NewSupportCategoryScreen } from './features/support-network/screens/New
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
+import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
+import { useMenstruationSync } from './features/cycles/hooks/useMenstruationSync';
 import { criarServicosApp } from './app/createAppServices';
 import { obterToken } from './shared/storage/tokenStorage';
 import { cores, fontFamilies } from './shared/theme';
@@ -45,6 +53,7 @@ const telasInternas = Object.freeze({
     anticoncepcionais: 'anticoncepcionais',
     novaCategoria: 'novaCategoria',
     calendario: 'calendario',
+    cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
     inicio: 'inicio'
 });
@@ -102,6 +111,8 @@ export default function App() {
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
+    const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
+    const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -142,6 +153,11 @@ export default function App() {
             };
         }
     }, [apiUrl]);
+
+    const sincronizacaoMenstrual = useMenstruationSync({
+        fila: configuracao.servicos?.menstruationSyncQueue,
+        ativo: estadoSessao === 'autenticada'
+    });
 
     useEffect(() => {
         console.info(`[Aloya] API configurada em ${apiUrl}`);
@@ -495,6 +511,12 @@ export default function App() {
     } else if (telaInterna === telasInternas.inicio) {
         conteudo = (
             <CycleTodayContainer
+                key={sincronizacaoMenstrual.revisao}
+                aoCadastrarMenstruacao={(data) => {
+                    setDataInicialCadastro(data);
+                    setRetornoCadastro(telasInternas.inicio);
+                    setTelaInterna(telasInternas.cadastrarMenstruacao);
+                }}
                 service={configuracao.servicos.cyclePredictionService}
                 aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                 aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
@@ -503,20 +525,31 @@ export default function App() {
                 onSessaoExpirada={finalizarSessao}
             />
         );
+    } else if (telaInterna === telasInternas.cadastrarMenstruacao) {
+        conteudo = (
+            <MenstruationRegistrationContainer
+                dataInicial={dataInicialCadastro}
+                calendarService={configuracao.servicos.calendarService}
+                fila={configuracao.servicos.menstruationSyncQueue}
+                onVoltar={() => setTelaInterna(retornoCadastro)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
     } else if (telaInterna === telasInternas.calendario) {
         conteudo = (
             <>
                 <CalendarScreenContainer
-                    key={revisaoCalendario}
+                    key={`${revisaoCalendario}-${sincronizacaoMenstrual.revisao}`}
+                    statusSincronizacao={sincronizacaoMenstrual.status}
+                    aoTentarSincronizar={sincronizacaoMenstrual.sincronizar}
                     service={configuracao.servicos.calendarService}
                     onSessaoExpirada={finalizarSessao}
                     aoVoltar={() => setTelaInterna(telasInternas.inicio)}
-                    aoCadastrarMenstruacao={() =>
-                        Alert.alert(
-                            'Cadastro de menstruação',
-                            'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
-                        )
-                    }
+                    aoCadastrarMenstruacao={() => {
+                        setDataInicialCadastro(null);
+                        setRetornoCadastro(telasInternas.calendario);
+                        setTelaInterna(telasInternas.cadastrarMenstruacao);
+                    }}
                     aoEditarCiclo={abrirEdicaoPeloCalendario}
                 />
                 {cicloCalendarioEditado ? (

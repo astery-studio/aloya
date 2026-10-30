@@ -12,20 +12,20 @@ const NOMES_MESES = Object.freeze([
     'Outubro',
     'Novembro',
     'Dezembro'
-])
+]);
 
 const TIPOS_DIA = Object.freeze({
     menstruacao: 'menstruacao',
     folicular: 'folicular',
     ovulacao: 'ovulacao',
     lutea: 'lutea'
-})
+});
 
-const FORMATO_MES = /^(\d{4})-(0[1-9]|1[0-2])$/
-const FORMATO_DATA = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
+const FORMATO_MES = /^(\d{4})-(0[1-9]|1[0-2])$/;
+const FORMATO_DATA = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 function preencherNumero(numero, tamanho = 2) {
-    return String(numero).padStart(tamanho, '0')
+    return String(numero).padStart(tamanho, '0');
 }
 
 function obterHojeLocal(data = new Date()) {
@@ -33,119 +33,120 @@ function obterHojeLocal(data = new Date()) {
         preencherNumero(data.getFullYear(), 4),
         preencherNumero(data.getMonth() + 1),
         preencherNumero(data.getDate())
-    ].join('-')
+    ].join('-');
 }
 
 function interpretarMes(chaveMes) {
-    const correspondencia = typeof chaveMes === 'string'
-        ? FORMATO_MES.exec(chaveMes)
-        : null
+    const correspondencia = typeof chaveMes === 'string' ? FORMATO_MES.exec(chaveMes) : null;
 
-    if (!correspondencia) return null
+    if (!correspondencia) return null;
 
     return {
         chave: chaveMes,
         ano: Number(correspondencia[1]),
         mes: Number(correspondencia[2])
-    }
+    };
 }
 
 function criarDataUtc(ano, indiceMes, dia) {
-    const data = new Date(0)
-    data.setUTCHours(0, 0, 0, 0)
-    data.setUTCFullYear(ano, indiceMes, dia)
-    return data
+    const data = new Date(0);
+    data.setUTCHours(0, 0, 0, 0);
+    data.setUTCFullYear(ano, indiceMes, dia);
+    return data;
 }
 
 function obterQuantidadeDias(ano, mes) {
-    const primeiroDiaMesSeguinte = criarDataUtc(ano, mes, 1)
-    const ultimoDia = new Date(primeiroDiaMesSeguinte.getTime() - 86_400_000)
+    const primeiroDiaMesSeguinte = criarDataUtc(ano, mes, 1);
+    const ultimoDia = new Date(primeiroDiaMesSeguinte.getTime() - 86_400_000);
 
-    return ultimoDia.getUTCDate()
+    return ultimoDia.getUTCDate();
 }
 
-function criarCasasDoMes({ano, mes}) {
-    const primeiroDiaDaSemana = criarDataUtc(ano, mes - 1, 1).getUTCDay()
-    const quantidadeDias = obterQuantidadeDias(ano, mes)
-    const casas = Array(primeiroDiaDaSemana).fill(null)
+function criarCasasDoMes({ ano, mes }) {
+    const primeiroDiaDaSemana = criarDataUtc(ano, mes - 1, 1).getUTCDay();
+    const quantidadeDias = obterQuantidadeDias(ano, mes);
+    const casas = Array(primeiroDiaDaSemana).fill(null);
 
     for (let dia = 1; dia <= quantidadeDias; dia += 1) {
         casas.push({
             dia,
             data: `${preencherNumero(ano, 4)}-${preencherNumero(mes)}-${preencherNumero(dia)}`
-        })
+        });
     }
 
-    while (casas.length % 7 !== 0) casas.push(null)
+    while (casas.length % 7 !== 0) casas.push(null);
 
-    return casas
+    return casas;
 }
 
 function validarIntervalo(intervalo) {
-    return (
-        intervalo
-        && typeof intervalo.inicio === 'string'
-        && typeof intervalo.fim === 'string'
-        && FORMATO_DATA.test(intervalo.inicio)
-        && FORMATO_DATA.test(intervalo.fim)
-    ) ? intervalo : null
+    return intervalo &&
+        typeof intervalo.inicio === 'string' &&
+        typeof intervalo.fim === 'string' &&
+        FORMATO_DATA.test(intervalo.inicio) &&
+        FORMATO_DATA.test(intervalo.fim)
+        ? intervalo
+        : null;
 }
 
 function intervaloContem(intervalo, data) {
-    return Boolean(intervalo && data >= intervalo.inicio && data <= intervalo.fim)
+    return Boolean(intervalo && data >= intervalo.inicio && data <= intervalo.fim);
 }
 
 function prepararPrevisao(previsao) {
-    const periodos = Array.isArray(previsao?.periodos) ? previsao.periodos : [previsao]
+    const periodos = Array.isArray(previsao?.periodos) ? previsao.periodos : [previsao];
 
-    return periodos.filter(periodo => periodo && typeof periodo === 'object').map(periodo => ({
-        previsto: periodo.previsto === true,
-        registroCicloId: Number.isSafeInteger(periodo.registroCicloId) && periodo.registroCicloId > 0
-            ? periodo.registroCicloId
-            : null,
-        menstruacaoPrevista: validarIntervalo(periodo.menstruacaoPrevista),
-        faseMenstrual: validarIntervalo(periodo.faseMenstrual),
-        faseFolicular: validarIntervalo(periodo.faseFolicular),
-        faseLutea: validarIntervalo(periodo.faseLutea),
-        janelaFertil: validarIntervalo(periodo.janelaFertil),
-        ovulacao: periodo.ovulacao
-    }))
+    return periodos
+        .filter((periodo) => periodo && typeof periodo === 'object')
+        .map((periodo) => ({
+            previsto: periodo.previsto === true,
+            registroCicloId:
+                Number.isSafeInteger(periodo.registroCicloId) && periodo.registroCicloId > 0
+                    ? periodo.registroCicloId
+                    : null,
+            menstruacaoPrevista: validarIntervalo(periodo.menstruacaoPrevista),
+            faseMenstrual: validarIntervalo(periodo.faseMenstrual),
+            faseFolicular: validarIntervalo(periodo.faseFolicular),
+            faseLutea: validarIntervalo(periodo.faseLutea),
+            janelaFertil: validarIntervalo(periodo.janelaFertil),
+            ovulacao: periodo.ovulacao
+        }));
 }
 
 function criarRegistrosPorData(diasMenstruacao) {
-    const registros = new Map()
+    const registros = new Map();
 
-    if (!Array.isArray(diasMenstruacao)) return registros
+    if (!Array.isArray(diasMenstruacao)) return registros;
 
     for (const dia of diasMenstruacao) {
-        const dataValida = typeof dia?.data === 'string' && FORMATO_DATA.test(dia.data)
-        const idValido = Number.isSafeInteger(dia?.registroCicloId) && dia.registroCicloId > 0
+        const dataValida = typeof dia?.data === 'string' && FORMATO_DATA.test(dia.data);
+        const idValido = Number.isSafeInteger(dia?.registroCicloId) && dia.registroCicloId > 0;
 
-        if (dataValida && idValido) registros.set(dia.data, dia.registroCicloId)
+        if (dataValida && idValido) registros.set(dia.data, dia.registroCicloId);
     }
 
-    return registros
+    return registros;
 }
 
 function obterRegistroEditavel(data, previsao, registrosPorData) {
-    const registroConfirmadoId = registrosPorData.get(data) ?? null
-    if (registroConfirmadoId) return registroConfirmadoId
+    const registroConfirmadoId = registrosPorData.get(data) ?? null;
+    if (registroConfirmadoId) return registroConfirmadoId;
 
-    const periodoMenstrual = previsao.find(periodo => (
-        !periodo.previsto && intervaloContem(periodo.faseMenstrual, data)
-    ))
+    const periodoMenstrual = previsao.find(
+        (periodo) => !periodo.previsto && intervaloContem(periodo.faseMenstrual, data)
+    );
 
-    if (!periodoMenstrual) return null
-    if (periodoMenstrual.registroCicloId) return periodoMenstrual.registroCicloId
+    if (!periodoMenstrual) return null;
+    if (periodoMenstrual.registroCicloId) return periodoMenstrual.registroCicloId;
 
-    const idsDoIntervalo = new Set()
+    const idsDoIntervalo = new Set();
     for (const [dataRegistrada, registroCicloId] of registrosPorData) {
         if (intervaloContem(periodoMenstrual.faseMenstrual, dataRegistrada)) {
-            idsDoIntervalo.add(registroCicloId)
+            idsDoIntervalo.add(registroCicloId);
         }
     }
 
-    return idsDoIntervalo.size === 1 ? [...idsDoIntervalo][0] : null
+    return idsDoIntervalo.size === 1 ? [...idsDoIntervalo][0] : null;
 }
 
 function obterMarcacao(data, previsao, registroCicloId) {
@@ -153,74 +154,78 @@ function obterMarcacao(data, previsao, registroCicloId) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: false
-        }
+        };
     }
 
-    if (previsao.some(periodo => intervaloContem(periodo.menstruacaoPrevista, data))) {
+    if (previsao.some((periodo) => intervaloContem(periodo.menstruacaoPrevista, data))) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: true
-        }
+        };
     }
 
-    const menstrual = previsao.find(periodo => intervaloContem(periodo.faseMenstrual, data))
+    const menstrual = previsao.find((periodo) => intervaloContem(periodo.faseMenstrual, data));
     if (menstrual) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: menstrual.previsto
-        }
+        };
     }
 
-    const folicular = previsao.find(periodo => intervaloContem(periodo.faseFolicular, data))
+    const folicular = previsao.find((periodo) => intervaloContem(periodo.faseFolicular, data));
     if (folicular) {
         return {
             tipo: TIPOS_DIA.folicular,
             previsto: folicular.previsto
-        }
+        };
     }
 
-    const ovulatorio = previsao.find(periodo => periodo.ovulacao === data)
+    const ovulatorio = previsao.find((periodo) => periodo.ovulacao === data);
     if (ovulatorio) {
         return {
             tipo: TIPOS_DIA.ovulacao,
             previsto: ovulatorio.previsto
-        }
+        };
     }
 
-    const luteo = previsao.find(periodo => intervaloContem(periodo.faseLutea, data))
+    const luteo = previsao.find((periodo) => intervaloContem(periodo.faseLutea, data));
     if (luteo) {
         return {
             tipo: TIPOS_DIA.lutea,
             previsto: luteo.previsto
-        }
+        };
     }
 
     return {
         tipo: null,
         previsto: false
-    }
+    };
 }
 
 function criarDia(casa, contexto) {
-    if (!casa) return null
+    if (!casa) return null;
 
-    const registroConfirmadoId = contexto.registrosPorData.get(casa.data) ?? null
-    const registroCicloId = registroConfirmadoId ?? (
-        casa.data <= contexto.hoje
-            ? obterRegistroEditavel(
-                casa.data,
-                contexto.previsao,
-                contexto.registrosPorData
-            )
-            : null
-    )
-    const marcacao = obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId)
-    const futuro = casa.data > contexto.hoje
-    const previsto = Boolean(!registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro))
-    const periodoFertil = contexto.previsao.find(periodo => intervaloContem(periodo.janelaFertil, casa.data))
-    const janelaFertil = Boolean(periodoFertil)
+    const registroConfirmadoId = contexto.registrosPorData.get(casa.data) ?? null;
+    const registroCicloId =
+        registroConfirmadoId ??
+        (casa.data <= contexto.hoje
+            ? obterRegistroEditavel(casa.data, contexto.previsao, contexto.registrosPorData)
+            : null);
+    const local = contexto.datasLocais.has(casa.data);
+    const marcacao = local
+        ? { tipo: TIPOS_DIA.menstruacao, previsto: false }
+        : obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId);
+    const futuro = casa.data > contexto.hoje;
+    const previsto = Boolean(
+        !registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro)
+    );
+    const periodoFertil = contexto.previsao.find((periodo) =>
+        intervaloContem(periodo.janelaFertil, casa.data)
+    );
+    const janelaFertil = Boolean(periodoFertil);
 
     return {
+        ...(local ? { local: true } : {}),
         ...casa,
         tipo: marcacao.tipo,
         previsto,
@@ -229,52 +234,53 @@ function criarDia(casa, contexto) {
         menstruacaoRegistrada: Boolean(registroConfirmadoId),
         janelaFertil,
         janelaFertilPrevista: janelaFertil && (periodoFertil.previsto || futuro)
-    }
+    };
 }
 
 function obterChaveSegmento(dia) {
-    return dia?.tipo ?? null
+    return dia?.tipo ?? null;
 }
 
 function prepararSegmentos(semana) {
     return semana.map((dia, indice) => {
-        if (!dia) return null
+        if (!dia) return null;
 
-        const chave = obterChaveSegmento(dia)
-        const chaveAnterior = obterChaveSegmento(semana[indice - 1])
-        const chaveSeguinte = obterChaveSegmento(semana[indice + 1])
+        const chave = obterChaveSegmento(dia);
+        const chaveAnterior = obterChaveSegmento(semana[indice - 1]);
+        const chaveSeguinte = obterChaveSegmento(semana[indice + 1]);
 
         return {
             ...dia,
             inicioSegmento: Boolean(chave && chave !== chaveAnterior),
             fimSegmento: Boolean(chave && chave !== chaveSeguinte)
-        }
-    })
+        };
+    });
 }
 
 function dividirEmSemanas(dias) {
-    const semanas = []
+    const semanas = [];
 
     for (let indice = 0; indice < dias.length; indice += 7) {
-        semanas.push(prepararSegmentos(dias.slice(indice, indice + 7)))
+        semanas.push(prepararSegmentos(dias.slice(indice, indice + 7)));
     }
 
-    return semanas
+    return semanas;
 }
 
 function normalizarMes(mesRecebido, hoje = obterHojeLocal()) {
-    const mes = mesRecebido?.calendario ?? mesRecebido
-    const periodo = interpretarMes(mes?.mes)
+    const mes = mesRecebido?.calendario ?? mesRecebido;
+    const periodo = interpretarMes(mes?.mes);
 
-    if (!periodo || typeof hoje !== 'string' || !FORMATO_DATA.test(hoje)) return null
+    if (!periodo || typeof hoje !== 'string' || !FORMATO_DATA.test(hoje)) return null;
 
     const contexto = {
         hoje,
         previsao: prepararPrevisao(mes.previsao),
-        registrosPorData: criarRegistrosPorData(mes.diasMenstruacao)
-    }
+        registrosPorData: criarRegistrosPorData(mes.diasMenstruacao),
+        datasLocais: new Set(mes.datasLocais || [])
+    };
 
-    const dias = criarCasasDoMes(periodo).map((casa) => criarDia(casa, contexto))
+    const dias = criarCasasDoMes(periodo).map((casa) => criarDia(casa, contexto));
 
     return {
         chave: periodo.chave,
@@ -283,38 +289,38 @@ function normalizarMes(mesRecebido, hoje = obterHojeLocal()) {
         titulo: `${NOMES_MESES[periodo.mes - 1]} ${periodo.ano}`,
         possuiCiclos: mes.possuiCiclos === true,
         semanas: dividirEmSemanas(dias)
-    }
+    };
 }
 
 function normalizarMeses(meses, hoje = obterHojeLocal(), normalizar = normalizarMes) {
-    if (!Array.isArray(meses)) return []
+    if (!Array.isArray(meses)) return [];
 
-    const mesesNormalizados = new Map()
+    const mesesNormalizados = new Map();
 
     for (const mes of meses) {
-        const normalizado = normalizar(mes, hoje)
-        if (normalizado) mesesNormalizados.set(normalizado.chave, normalizado)
+        const normalizado = normalizar(mes, hoje);
+        if (normalizado) mesesNormalizados.set(normalizado.chave, normalizado);
     }
 
-    return [...mesesNormalizados.values()].sort((a, b) => a.chave.localeCompare(b.chave))
+    return [...mesesNormalizados.values()].sort((a, b) => a.chave.localeCompare(b.chave));
 }
 
 //Cada instância guarda somente entradas ainda alcançáveis pelo chamador.
 //Os dados devem ser atualizados imutavelmente, como as props do React.
 function criarNormalizadorMeses(hoje = obterHojeLocal()) {
-    const cache = new WeakMap()
+    const cache = new WeakMap();
 
     function normalizarComCache(entrada) {
-        const mes = entrada?.calendario ?? entrada
-        if (!mes || typeof mes !== 'object') return normalizarMes(mes, hoje)
-        if (cache.has(mes)) return cache.get(mes)
+        const mes = entrada?.calendario ?? entrada;
+        if (!mes || typeof mes !== 'object') return normalizarMes(mes, hoje);
+        if (cache.has(mes)) return cache.get(mes);
 
-        const normalizado = normalizarMes(mes, hoje)
-        cache.set(mes, normalizado)
-        return normalizado
+        const normalizado = normalizarMes(mes, hoje);
+        cache.set(mes, normalizado);
+        return normalizado;
     }
 
-    return (meses) => normalizarMeses(meses, hoje, normalizarComCache)
+    return (meses) => normalizarMeses(meses, hoje, normalizarComCache);
 }
 
 export {
@@ -324,4 +330,4 @@ export {
     normalizarMes,
     normalizarMeses,
     obterHojeLocal
-}
+};
