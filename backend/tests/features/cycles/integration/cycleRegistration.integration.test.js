@@ -68,3 +68,73 @@ test('registra, estende, inicia novo ciclo, encerra anterior e reflete no calend
     assert.equal(novo.previsao.proximoInicioEstimado, '2026-10-27');
     const calendario = await criarCalendarModule({ prisma }).calendarService.buscarMes({
         usuarioId: 1,
+        mes: '2026-09'
+    });
+    assert.equal(calendario.diasMenstruacao.length, 6);
+    assert.equal(calendario.possuiCiclos, true);
+});
+
+test('reenvio offline é idempotente, isolado por conta e rejeita chave reutilizada', async (t) => {
+    const { prisma, registrar, module } = await cenario(t);
+    const primeiro = await registrar({ data: '2026-10-01' }, 'chave-offline-001');
+    const repetido = await registrar(
+        { dataInicio: '2026-10-01', dataFim: '2026-10-01' },
+        'chave-offline-001'
+    );
+    assert.equal(repetido.repetida, true);
+    assert.deepEqual(repetido.ciclo, primeiro.ciclo);
+    assert.equal(await prisma.diaMenstruacao.count(), 1);
+    await assert.rejects(() => registrar({ data: '2026-10-02' }, 'chave-offline-001'), {
+        codigo: 'CHAVE_SINCRONIZACAO_REUTILIZADA'
+    });
+    await assert.rejects(() => registrar({ data: '2026-10-01' }), {
+        codigo: 'CONFLITO_REGISTRO_MENSTRUAL'
+    });
+    await module.service.registrar({
+        usuarioId: 2,
+        chave: 'chave-offline-001',
+        corpo: { data: '2026-10-01' }
+    });
+    assert.equal(await prisma.registroCiclo.count(), 2);
+});
+
+test('falha no recibo reverte dias, ciclos e notificações; mesma chave permite tentar novamente', async (t) => {
+    const { prisma, registrar } = await cenario(t);
+    await prisma.$executeRawUnsafe(
+        `CREATE TRIGGER falha_recibo BEFORE INSERT ON sincronizacoes_menstruais BEGIN SELECT RAISE(ABORT, 'falha simulada'); END;`
+    );
+    await assert.rejects(() => registrar({ data: '2026-10-01' }, 'operacao-retry'));
+    assert.equal(await prisma.diaMenstruacao.count(), 0);
+    assert.equal(await prisma.registroCiclo.count(), 0);
+    assert.equal(await prisma.notificacao.count(), 0);
+    await prisma.$executeRawUnsafe('DROP TRIGGER falha_recibo');
+    assert.equal((await registrar({ data: '2026-10-01' }, 'operacao-retry')).repetida, false);
+});
+
+test('compartilhamento revalida permissões, não notifica sem autorização e não duplica eventos', async (t) => {
+    const { prisma, registrar, module } = await cenario(t);
+    const vinculo = await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            contatoId: 2,
+            emailConvidado: 'teste2@example.com',
+            status: 'ativo',
+            permissoesIndividuais: ['geral.historico_ciclo']
+        }
+    });
+    await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            contatoId: 3,
+            emailConvidado: 'teste3@example.com',
+            status: 'ativo',
+            permissoesIndividuais: ['geral.fase_atual']
+        }
+    });
+    await registrar({ data: '2026-10-01' }, 'operacao-compartilhada');
+    await registrar({ data: '2026-10-01' }, 'operacao-compartilhada');
+    assert.equal(await prisma.notificacao.count(), 1);
+    assert.equal(
+        (await module.sharingService.buscar({ contatoId: 2, titularId: '1' })).ciclos.length,
+        1
+    );
