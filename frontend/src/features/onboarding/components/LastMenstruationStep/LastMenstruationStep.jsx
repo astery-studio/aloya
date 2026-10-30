@@ -12,7 +12,8 @@ export default function LastMenstruationStep({
             descricao="Selecione o primeiro dia ou todos os dias do período."
             cabecalhoFixo
             aoVoltar={aoVoltar} aoAvancar={aoAvancar}
-            acaoSecundaria={{ texto: 'Não sei', aoPressionar: aoNaoSei }}
+            acaoSecundaria={aoNaoSei
+                ? { texto: 'Não sei', aoPressionar: aoNaoSei } : null}
             podeAvancar={Boolean(valor?.inicio)} carregando={carregando} erro={erro}>
             <MenstruationCalendar valor={valor} aoAlterar={aoAlterar} />
         </OnboardingStep>

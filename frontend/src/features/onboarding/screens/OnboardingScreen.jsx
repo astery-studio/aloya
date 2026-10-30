@@ -189,7 +189,11 @@ export default function OnboardingScreen({
     function avancarMenstruacao() {
         const inicio = paraIso(dados.ultimaMenstruacao?.inicio);
         const hoje = paraIso(new Date());
-        if (!inicio || inicio > hoje) {
+        if (!inicio) {
+            avancarSemMenstruacao();
+            return;
+        }
+        if (inicio > hoje) {
             setErro({ titulo: 'Data inválida', mensagem:
                 'Informe a data de início da sua última menstruação. Ela não pode ser uma data no futuro.' });
             return;
