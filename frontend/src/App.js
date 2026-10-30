@@ -60,16 +60,15 @@ const telasInternas = Object.freeze({
 
 // Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
+    if (process.env.EXPO_PUBLIC_API_URL) {
+        return process.env.EXPO_PUBLIC_API_URL;
+    }
     const script = NativeModules.SourceCode?.scriptURL || '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
 
     if (__DEV__ && host) {
         return `http://${host}:3000`;
-    }
-
-    if (process.env.EXPO_PUBLIC_API_URL) {
-        return process.env.EXPO_PUBLIC_API_URL;
     }
 
     return 'http://10.0.2.2:3000';

@@ -50,6 +50,7 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
                     ? 'A conexão demorou demais. Tente novamente.'
                     : 'Não foi possível conectar ao servidor. Verifique sua conexão.';
             const erro = new Error(mensagem);
+            erro.codigo = tempoEsgotado ? 'TEMPO_CONEXAO_ESGOTADO' : 'FALHA_CONEXAO';
             erro.mensagemUsuario = mensagem;
             throw erro;
         } finally {

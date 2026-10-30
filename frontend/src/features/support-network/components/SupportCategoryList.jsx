@@ -1,6 +1,7 @@
 //Apresenta as categorias de permissão e os estados visuais da coleção.
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
-import { useCallback, useMemo } from 'react';
+import { ActivityIndicator, FlatList, Text, View, useWindowDimensions } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { CategoryTitleMetrics } from './CategoryTitleMetrics';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
@@ -122,6 +123,34 @@ function SupportCategoryList({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const categoriasOrdenadas = useMemo(() => ordenarCategorias(categorias), [categorias]);
+    const { fontScale } = useWindowDimensions();
+    const [medidas, setMedidas] = useState({});
+    const [larguraTitulo, setLarguraTitulo] = useState(0);
+    const medirNome = useCallback(
+        (nome, largura) => {
+            if (largura > 0)
+                setMedidas((atual) =>
+                    atual[`${fontScale}:${nome}`] === largura
+                        ? atual
+                        : { ...atual, [`${fontScale}:${nome}`]: largura }
+                );
+        },
+        [fontScale]
+    );
+    const medirEspaco = useCallback((largura) => {
+        if (largura > 0) setLarguraTitulo(largura);
+    }, []);
+    const maiorNome = Math.max(
+        0,
+        ...categoriasOrdenadas.map((categoria) => medidas[`${fontScale}:${categoria.nome}`] || 0)
+    );
+    const fonteTitulo =
+        maiorNome > 0 && larguraTitulo > 0
+            ? Math.min(
+                  14,
+                  Math.floor(((14 * Math.max(1, larguraTitulo - 2)) / maiorNome) * 100) / 100
+              )
+            : 14;
 
     const possuiCategorias = categoriasOrdenadas.length > 0;
 
@@ -137,6 +166,8 @@ function SupportCategoryList({
 
             return (
                 <SupportCategoryCard
+                    fonteTitulo={fonteTitulo}
+                    onMedirTitulo={medirEspaco}
                     categoria={item}
                     resumoPermissoes={criarResumoPermissoes(item.dadosVisiveis)}
                     quantidadeContatos={item.quantidadeContatos}
@@ -147,7 +178,15 @@ function SupportCategoryList({
                 />
             );
         },
-        [acaoEmAndamento, categoriaEmAndamentoId, desabilitado, onEditar, onExcluir]
+        [
+            acaoEmAndamento,
+            categoriaEmAndamentoId,
+            desabilitado,
+            onEditar,
+            onExcluir,
+            fonteTitulo,
+            medirEspaco
+        ]
     );
 
     const extrairChave = useCallback((categoria) => String(categoria.id), []);
@@ -244,6 +283,11 @@ function SupportCategoryList({
 
     return (
         <View style={estilos.container}>
+            <CategoryTitleMetrics
+                categorias={categoriasOrdenadas}
+                escala={fontScale}
+                onMedir={medirNome}
+            />
             <View style={estilos.conteudo}>{renderizarConteudo()}</View>
 
             {mostrarAcaoCriar ? (

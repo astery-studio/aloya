@@ -94,6 +94,17 @@ async function salvarFormulario() {
 }
 
 describe('NewSupportCategoryScreen', () => {
+    test.each([
+        ['FALHA_CONEXAO', 'Não foi possível conectar ao servidor. Verifique sua conexão.'],
+        ['TEMPO_CONEXAO_ESGOTADO', 'A conexão demorou demais. Tente novamente.']
+    ])('distingue erro de rede do erro interno: %s', async (codigo, mensagemUsuario) => {
+        const erro = Object.assign(new Error('falha'), { codigo, mensagemUsuario });
+        await render(
+            <NewSupportCategoryScreen criarCategoria={jest.fn().mockRejectedValue(erro)} />
+        );
+        await salvarFormulario();
+        expect(await screen.findByText(mensagemUsuario)).toBeOnTheScreen();
+    });
     test('carregamento mantém a bolinha circular sem sombra e libera os controles após falha', async () => {
         let rejeitar;
         const pendente = new Promise((_, reject) => {
@@ -299,9 +310,7 @@ describe('NewSupportCategoryScreen', () => {
         expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
 
         expect(
-            screen.getByText(
-                'Ocorreu um erro ao criar sua categoria. Verifique sua conexão e tente novamente.'
-            )
+            screen.getByText('Não foi possível salvar a categoria. Tente novamente.')
         ).toBeOnTheScreen();
 
         expect(screen.getByLabelText('Nome da categoria')).toHaveProp('value', 'Família');
