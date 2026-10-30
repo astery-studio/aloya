@@ -64,7 +64,6 @@ A Home conserva a apresentação existente e abre o cadastro pela ação já pre
 O adaptador de calendário acrescenta as datas pendentes sem inventar IDs remotos nem alterar
 o cálculo de fases. Após sincronizar, Home e Calendário são recarregados; o Histórico busca
 os dados atuais quando acessado. A seleção permanece após falhas.
-O contrato do backend está em `docs/hu-008-backend.md`.
 
 Ainda é necessária validação em aparelhos Android e iOS e medição do prazo de um segundo
 com rede e banco reais. Testes JavaScript não comprovam esses dois pontos.
