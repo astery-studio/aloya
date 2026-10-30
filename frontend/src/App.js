@@ -8,6 +8,9 @@ import {
     CycleHistoryFlow
 } from './features/cycles/CycleHistoryFlow'
 import {
+    CycleEditFlow
+} from './features/cycles/CycleEditFlow'
+import {
     useCallback,
     useEffect,
     useMemo,
@@ -213,6 +216,16 @@ export default function App() {
         erroPerfil,
         setErroPerfil
     ] = useState(false)
+
+    const [
+        cicloCalendarioEditado,
+        setCicloCalendarioEditado
+    ] = useState(null)
+
+    const [
+        revisaoCalendario,
+        setRevisaoCalendario
+    ] = useState(0)
 
     const requisicaoAtual = useRef(0)
     const controladorPerfilAtual =
@@ -532,6 +545,33 @@ export default function App() {
         }
     }
 
+    async function abrirEdicaoPeloCalendario({
+        registroCicloId
+    }) {
+        try {
+            const ciclo = await configuracao
+                .servicos
+                .cycleHistoryService
+                .buscar(registroCicloId)
+
+            setCicloCalendarioEditado(ciclo)
+        } catch (falha) {
+            if (falha?.status === 401) {
+                finalizarSessao({
+                    mensagem:
+                        'Sua sessão expirou. Entre novamente.'
+                })
+                return
+            }
+
+            Alert.alert(
+                'Algo deu errado',
+                falha?.mensagemUsuario
+                    || 'Não foi possível carregar este registro. Tente novamente.'
+            )
+        }
+    }
+
     function abrirNovaCategoria(
         origem
     ) {
@@ -820,7 +860,6 @@ export default function App() {
                             .calendario
                     )
                 }
-                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
                 aoSelecionarAba={
                     selecionarAba
                 }
@@ -834,27 +873,59 @@ export default function App() {
         === telasInternas.calendario
     ) {
         conteudo = (
-            <CalendarScreenContainer
-                service={
-                    configuracao
-                        .servicos
-                        .calendarService
-                }
-                onSessaoExpirada={
-                    finalizarSessao
-                }
-                aoVoltar={() =>
-                    setTelaInterna(
-                        telasInternas.inicio
-                    )
-                }
-                aoCadastrarMenstruacao={() =>
-                    Alert.alert(
-                        'Cadastro de menstruação',
-                        'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
-                    )
-                }
-            />
+            <>
+                <CalendarScreenContainer
+                    key={revisaoCalendario}
+                    service={
+                        configuracao
+                            .servicos
+                            .calendarService
+                    }
+                    onSessaoExpirada={
+                        finalizarSessao
+                    }
+                    aoVoltar={() =>
+                        setTelaInterna(
+                            telasInternas.inicio
+                        )
+                    }
+                    aoCadastrarMenstruacao={() =>
+                        Alert.alert(
+                            'Cadastro de menstruação',
+                            'Este fluxo será conectado quando o cadastro de ciclos estiver disponível.'
+                        )
+                    }
+                    aoEditarCiclo={
+                        abrirEdicaoPeloCalendario
+                    }
+                />
+                {cicloCalendarioEditado ? (
+                    <CycleEditFlow
+                        key={
+                            cicloCalendarioEditado.id
+                        }
+                        ciclo={
+                            cicloCalendarioEditado
+                        }
+                        service={
+                            configuracao
+                                .servicos
+                                .cycleHistoryService
+                        }
+                        onFechar={() =>
+                            setCicloCalendarioEditado(null)
+                        }
+                        onAtualizado={() =>
+                            setRevisaoCalendario(
+                                atual => atual + 1
+                            )
+                        }
+                        onSessaoExpirada={
+                            finalizarSessao
+                        }
+                    />
+                ) : null}
+            </>
         )
     } else if (
         telaInterna
@@ -933,12 +1004,6 @@ export default function App() {
                     Alert.alert(
                         'Calendário',
                         'O calendário ainda será integrado.'
-                    )
-                }
-                aoEditarCiclo={ciclo =>
-                    Alert.alert(
-                        'Editar ciclo',
-                        `Ciclo ${ciclo.numero}`
                     )
                 }
                 aoExcluirCiclo={ciclo =>

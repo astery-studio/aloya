@@ -26,7 +26,10 @@ function criarRotuloAcessibilidade(dia) {
     const [ano, mes] = dia.data.split('-').map(Number)
     const partes = [`Dia ${dia.dia} de ${NOMES_MESES[mes - 1].toLowerCase()} de ${ano}`]
 
-    if (dia.registroCicloId) partes.push('menstruação registrada')
+    const menstruacaoRegistrada = dia.menstruacaoRegistrada
+        ?? Boolean(dia.registroCicloId && !dia.previsto)
+
+    if (menstruacaoRegistrada) partes.push('menstruação registrada')
     else if (dia.tipo) partes.push(`${dia.previsto ? 'provável ' : ''}${rotulosPorTipo[dia.tipo]}`)
     if (dia.janelaFertil) partes.push(dia.janelaFertilPrevista ? 'provável janela fértil' : 'janela fértil')
     if (dia.futuro && !dia.tipo) partes.push('data futura')
@@ -57,7 +60,6 @@ function CycleDay({dia, aoPressionarDia}) {
     const rotuloAcessibilidade = criarRotuloAcessibilidade(dia)
 
     function pressionar() {
-        if (!interativo) return
         aoPressionarDia({data: dia.data, registroCicloId: dia.registroCicloId})
     }
 

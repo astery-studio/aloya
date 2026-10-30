@@ -212,6 +212,37 @@ test('normaliza dias menstruais e mantém o ciclo disponível para edição', as
     ]);
 });
 
+test('vincula a fase menstrual estimada sem fim ao ciclo que pode ser editado', async () => {
+    const repository = criarRepository({
+        usuario: criarUsuario({
+            quantidadeCiclos: 1,
+            registrosCiclo: [
+                {
+                    id: 18,
+                    dataInicio: new Date('2026-09-29T00:00:00.000Z'),
+                    dataFim: null
+                }
+            ]
+        }),
+        diasMenstruacao: []
+    });
+    const service = criarCalendarService({repository});
+
+    const resultado = await service.buscarMes({
+        usuarioId: 4,
+        mes: '2026-10'
+    });
+    const periodoBase = resultado.previsao.periodos.find(({previsto}) => !previsto);
+    const periodosPrevistos = resultado.previsao.periodos.filter(({previsto}) => previsto);
+
+    assert.deepEqual(periodoBase.faseMenstrual, {
+        inicio: '2026-10-01',
+        fim: '2026-10-03'
+    });
+    assert.equal(periodoBase.registroCicloId, 18);
+    assert.ok(periodosPrevistos.every(periodo => !('registroCicloId' in periodo)));
+});
+
 test('recorta as fases e previsões para o mês solicitado', async () => {
     const repository = criarRepository({
         usuario: criarUsuario({

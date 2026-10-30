@@ -1,5 +1,9 @@
 //Testa paginação, resumo, formatação e validação defensiva do histórico.
-import {criarCycleHistoryService, normalizarCicloHistorico} from '../../../../src/features/cycles/services/cycleHistoryService'
+import {
+    criarCycleHistoryService,
+    normalizarCicloEdicao,
+    normalizarCicloHistorico
+} from '../../../../src/features/cycles/services/cycleHistoryService'
 
 const cicloApi = Object.freeze({
     id: 3,
@@ -154,6 +158,13 @@ test('rejeita datas inexistentes na resposta da API', () => {
     })).toThrow('Não foi possível interpretar o histórico de ciclos.')
 })
 
+test.each([123, 'data inválida'])('rejeita formato de data inválido: %p', dataInicio => {
+    expect(() => normalizarCicloHistorico({
+        ...cicloApi,
+        dataInicio
+    })).toThrow('Não foi possível interpretar o histórico de ciclos.')
+})
+
 test.each([
     {
         resumo: undefined
@@ -202,6 +213,16 @@ test('rejeita resposta malformada sem quebrar a tela silenciosamente', async () 
     })
 })
 
+test('rejeita paginação e quantidades incoerentes', async () => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi({
+        quantidadeCiclos: 0
+    }))
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+    await expect(service.listarPagina()).rejects.toMatchObject({
+        codigo: 'RESPOSTA_HISTORICO_INVALIDA'
+    })
+})
+
 test('preserva erros de autenticação devolvidos pela requisição', async () => {
     const erro = new Error('Sua sessão expirou.')
     erro.status = 401
@@ -211,6 +232,70 @@ test('preserva erros de autenticação devolvidos pela requisição', async () =
     const service = criarCycleHistoryService({requisicaoAutenticada})
 
     await expect(service.listarPagina()).rejects.toBe(erro)
+})
+
+test('busca um ciclo específico para preencher a edição do calendário', async () => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({
+        ciclo: { id: 3, dataInicio: '2026-09-04', dataFim: '2026-09-08' }
+    })
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+
+    await expect(service.buscar('3')).resolves.toEqual({
+        id: '3', dataInicio: '2026-09-04', dataFim: '2026-09-08'
+    })
+    expect(requisicaoAutenticada).toHaveBeenCalledWith({ caminho: '/api/cycles/3' })
+})
+
+test('envia a edição ao endpoint do ciclo', async () => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({
+        mensagem: 'Registro de menstruação atualizado com sucesso.',
+        ciclo: { id: 3 }
+    })
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+
+    await service.editar('3', { dataInicio: '2026-09-03', dataFim: null })
+    expect(requisicaoAutenticada).toHaveBeenCalledWith({
+        metodo: 'PATCH',
+        caminho: '/api/cycles/3',
+        corpo: { dataInicio: '2026-09-03', dataFim: null }
+    })
+})
+
+test('normaliza somente os campos necessários para editar', () => {
+    expect(normalizarCicloEdicao({
+        id: 8,
+        dataInicio: '2026-08-01',
+        dataFim: null,
+        usuarioId: 99
+    })).toEqual({ id: '8', dataInicio: '2026-08-01', dataFim: null })
+})
+
+test.each(['0', '9007199254740992', 'id inválido'])('rejeita identificador inválido: %p', async id => {
+    const requisicaoAutenticada = jest.fn()
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+    await expect(service.buscar(id)).rejects.toThrow('identificador')
+    expect(requisicaoAutenticada).not.toHaveBeenCalled()
+})
+
+test('rejeita datas inválidas e resposta de edição sem confirmação', async () => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({ mensagem: 'outra' })
+    const service = criarCycleHistoryService({requisicaoAutenticada})
+    await expect(service.editar('3', {
+        dataInicio: '2026-02-30',
+        dataFim: null
+    })).rejects.toThrow('datas da edição')
+    await expect(service.editar('3', {
+        dataInicio: '2026-02-20',
+        dataFim: null
+    })).rejects.toMatchObject({ codigo: 'RESPOSTA_HISTORICO_INVALIDA' })
+})
+
+test('rejeita ciclo malformado na consulta de edição', () => {
+    expect(() => normalizarCicloEdicao({
+        id: 0,
+        dataInicio: '2026-09-04',
+        dataFim: null
+    })).toThrow('Não foi possível interpretar o histórico de ciclos.')
 })
 
 test('rejeita criação sem requisição autenticada', () => {
