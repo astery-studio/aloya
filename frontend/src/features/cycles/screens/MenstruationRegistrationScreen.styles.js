@@ -118,3 +118,27 @@ const estilos = StyleSheet.create({
         gap: 12,
         paddingHorizontal: 14,
         paddingVertical: 12,
+        borderWidth: 0.7,
+        borderColor: '#2D5141',
+        borderRadius: 12,
+        backgroundColor: '#EFEFE8'
+    },
+    textoAjuda: {
+        flex: 1,
+        fontFamily: fontFamilies.medium,
+        fontSize: 14,
+        lineHeight: 20,
+        color: '#2D5141'
+    },
+    rodape: {
+        paddingHorizontal: 24,
+        paddingTop: 24,
+        paddingBottom: 20,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderColor: '#EDEAE4'
+    },
+    salvar: { minHeight: 56, borderRadius: 12 },
+    iconeFeedback: { borderRadius: 14 },
+    vazio: { padding: 24, fontFamily: fontFamilies.regular, color: '#5C5C59' }
+});
+export { estilos };
