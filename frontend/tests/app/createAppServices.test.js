@@ -251,33 +251,37 @@ describe('createAppServices', () => {
             criarServicosApp({
                 apiUrl: 'api-invalida',
                 fetchImpl: jest.fn()
-    })
+            })
+        ).toThrow();
+    });
 
     test.each([
         'http://api.aloya.com',
         'https://usuario:senha@api.aloya.com',
         'https://api.aloya.com?ambiente=teste',
         'https://api.aloya.com#configuracao'
-    ])('rejeita uma URL insegura: %s', apiUrl => {
-        expect(() => criarServicosApp({
-            apiUrl,
-            fetchImpl: jest.fn()
-        })).toThrow('A URL da API precisa utilizar HTTPS.')
-    })
+    ])('rejeita uma URL insegura: %s', (apiUrl) => {
+        expect(() =>
+            criarServicosApp({
+                apiUrl,
+                fetchImpl: jest.fn()
+            })
+        ).toThrow('A URL da API precisa utilizar HTTPS.');
+    });
 
     test('permite HTTP somente quando o modo de desenvolvimento é solicitado', () => {
-        const fetchImpl = jest.fn()
+        const fetchImpl = jest.fn();
 
         criarServicosApp({
             apiUrl: 'http://10.0.2.2:3000/',
             fetchImpl,
             permitirHttpDesenvolvimento: true
-        })
+        });
 
         expect(criarApiClient).toHaveBeenCalledWith({
             baseUrl: 'http://10.0.2.2:3000',
             fetchImpl,
             timeoutMs: 15000
-        })
-    })
-})
+        });
+    });
+});
