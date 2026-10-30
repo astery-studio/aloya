@@ -1,15 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+
 import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
-import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { CycleRemovalFeedbackModal } from './CycleRemovalFeedbackModal';
 import { MenstrualDaysCalendar } from './MenstrualDaysCalendar';
-import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { criarEstilos } from './RemoveMenstruationModal.styles';
 
 function formatarData(data) {
-    if (typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data)) return 'data não informada';
+    if (typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+        return 'data não informada';
+    }
+
     const [ano, mes, dia] = data.split('-');
     return `${dia}/${mes}/${ano}`;
 }
@@ -50,6 +54,7 @@ function RemoveMenstruationModal({
     carregandoMeses = false,
     erroMeses,
     carregando = false,
+    diasAlterados = false,
     alerta,
     onRemoverDia,
     onExcluirCiclo,
@@ -64,15 +69,43 @@ function RemoveMenstruationModal({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const fundoSheet = tema.escuro ? '#1F1F1F' : tema.cores.interface.superficieElevada;
     const [larguraCalendario, setLarguraCalendario] = useState(312);
+    const tipoSolicitado = alerta || (modo === 'cicloCompleto' ? 'confirmacao' : null);
+    const [tipoAlerta, setTipoAlerta] = useState(tipoSolicitado);
+    const [superficie, setSuperficie] = useState(() =>
+        tipoSolicitado ? 'feedback' : visivel ? 'sheet' : 'oculto'
+    );
 
-    if (!['dia', 'cicloCompleto'].includes(modo))
+    useEffect(() => {
+        if (superficie === 'sheet' && (!visivel || tipoSolicitado)) {
+            setSuperficie('fechando-sheet');
+        } else if (superficie === 'feedback') {
+            if (!tipoSolicitado) setSuperficie('fechando-feedback');
+            else setTipoAlerta(tipoSolicitado);
+        } else if (superficie === 'oculto') {
+            if (tipoSolicitado) {
+                setTipoAlerta(tipoSolicitado);
+                setSuperficie('feedback');
+            } else if (visivel) {
+                setSuperficie('sheet');
+            }
+        }
+    }, [superficie, tipoSolicitado, visivel]);
+
+    if (!['dia', 'cicloCompleto'].includes(modo)) {
         throw new TypeError('O modo de remoção da menstruação é inválido.');
-    const tipoAlerta = alerta || (modo === 'cicloCompleto' ? 'confirmacao' : null);
+    }
+
+    const feedbackProps = {
+        visivel: superficie === 'feedback',
+        onOcultar: () =>
+            setSuperficie((atual) => (atual === 'fechando-feedback' ? 'oculto' : atual))
+    };
     let modalAlerta = null;
 
     if (tipoAlerta === 'confirmacao') {
         modalAlerta = (
             <CycleRemovalFeedbackModal
+                {...feedbackProps}
                 tipo="confirmacao"
                 periodo={obterPeriodo(ciclo)}
                 carregando={carregando}
@@ -83,6 +116,7 @@ function RemoveMenstruationModal({
     } else if (tipoAlerta === 'erro') {
         modalAlerta = (
             <CycleRemovalFeedbackModal
+                {...feedbackProps}
                 tipo="erro"
                 carregando={carregando}
                 onTentarNovamente={onTentarNovamente}
@@ -90,87 +124,93 @@ function RemoveMenstruationModal({
             />
         );
     } else if (tipoAlerta === 'sucesso-excluir' || tipoAlerta === 'sucesso-atualizar') {
-        modalAlerta = <CycleRemovalFeedbackModal tipo={tipoAlerta} onFechar={onFecharAlerta} />;
+        modalAlerta = (
+            <CycleRemovalFeedbackModal
+                {...feedbackProps}
+                tipo={tipoAlerta}
+                onFechar={onFecharAlerta}
+            />
+        );
     }
 
     return (
         <>
-            {visivel ? (
-                <BottomSheet
-                    visivel={visivel}
-                    onFechar={carregando ? undefined : onFechar}
+            <BottomSheet
+                visivel={superficie === 'sheet'}
+                onOcultar={() =>
+                    setSuperficie((atual) => (atual === 'fechando-sheet' ? 'oculto' : atual))
+                }
+                onFechar={carregando ? undefined : onFechar}
+                bloquearFechamento={carregando}
+                corPainel={fundoSheet}
+            >
+                <BottomSheetLayout
+                    titulo="Remover Menstruação"
+                    onFechar={onFechar}
                     bloquearFechamento={carregando}
-                    corPainel={fundoSheet}
+                    compacto
+                    corFundo={fundoSheet}
                 >
-                    <BottomSheetLayout
-                        titulo="Remover Menstruação"
-                        onFechar={onFechar}
-                        bloquearFechamento={carregando}
-                        compacto
-                        corFundo={fundoSheet}
+                    <ScrollView
+                        style={estilos.conteudoRolavel}
+                        contentContainerStyle={estilos.conteudoRolavelInterno}
+                        showsVerticalScrollIndicator={false}
+                        accessibilityHint={
+                            dataSelecionada ? `Dia selecionado: ${dataSelecionada}` : undefined
+                        }
                     >
-                        <ScrollView
-                            style={estilos.conteudoRolavel}
-                            contentContainerStyle={estilos.conteudoRolavelInterno}
-                            showsVerticalScrollIndicator={false}
-                            accessibilityHint={
-                                dataSelecionada ? `Dia selecionado: ${dataSelecionada}` : undefined
-                            }
-                        >
-                            <View>
-                                <Text style={estilos.instrucao}>
-                                    Toque em um dia preenchido para desmarcá-lo.
-                                </Text>
-                                <View
-                                    style={estilos.calendario}
-                                    onLayout={(evento) => {
-                                        const largura = evento.nativeEvent.layout.width - 30;
-                                        if (largura > 0) {
-                                            setLarguraCalendario(largura);
-                                        }
-                                    }}
-                                >
-                                    {erroMeses ? (
-                                        <Text accessibilityRole="alert" style={estilos.erro}>
-                                            {erroMeses}
-                                        </Text>
-                                    ) : (
-                                        <MenstrualDaysCalendar
-                                            meses={meses}
-                                            desativado={carregando || carregandoMeses}
-                                            carregando={carregandoMeses}
-                                            aoPressionarDia={onRemoverDia}
-                                            larguraMes={larguraCalendario}
-                                        />
-                                    )}
-                                </View>
-                                <View style={estilos.aviso}>
-                                    <Text style={estilos.avisoIcone}>ⓘ</Text>
-                                    <Text style={estilos.avisoTexto}>
-                                        A remoção é imediata e altera somente o dia escolhido.
+                        <View>
+                            <Text style={estilos.instrucao}>
+                                Toque em um dia preenchido para desmarcá-lo.
+                            </Text>
+                            <View
+                                style={estilos.calendario}
+                                onLayout={(evento) => {
+                                    const largura = evento.nativeEvent.layout.width - 30;
+                                    if (largura > 0) setLarguraCalendario(largura);
+                                }}
+                            >
+                                {erroMeses ? (
+                                    <Text accessibilityRole="alert" style={estilos.erro}>
+                                        {erroMeses}
                                     </Text>
-                                </View>
+                                ) : (
+                                    <MenstrualDaysCalendar
+                                        meses={meses}
+                                        desativado={carregando || carregandoMeses}
+                                        carregando={carregandoMeses}
+                                        aoPressionarDia={onRemoverDia}
+                                        larguraMes={larguraCalendario}
+                                    />
+                                )}
                             </View>
-                        </ScrollView>
-                        <View style={estilos.rodape}>
-                            <Botao
-                                texto="Excluir ciclo inteiro"
-                                primaria
-                                grande
-                                desativado={carregando || carregandoMeses || !ciclo}
-                                onPress={onSolicitarExcluirCiclo}
-                                estilos={estilos}
-                            />
-                            <Botao
-                                texto="Concluir"
-                                desativado={carregando || carregandoMeses}
-                                onPress={onConcluir}
-                                estilos={estilos}
-                            />
+                            <View style={estilos.aviso}>
+                                <Text style={estilos.avisoIcone}>ⓘ</Text>
+                                <Text style={estilos.avisoTexto}>
+                                    A remoção é imediata e altera somente o dia escolhido.
+                                </Text>
+                            </View>
                         </View>
-                    </BottomSheetLayout>
-                </BottomSheet>
-            ) : null}
+                    </ScrollView>
+                    <View style={estilos.rodape}>
+                        <Botao
+                            texto="Excluir ciclo inteiro"
+                            primaria={!diasAlterados}
+                            grande
+                            desativado={carregando || carregandoMeses || !ciclo}
+                            onPress={onSolicitarExcluirCiclo}
+                            estilos={estilos}
+                        />
+                        <Botao
+                            texto="Concluir"
+                            primaria={diasAlterados}
+                            desativado={carregando || carregandoMeses}
+                            onPress={onConcluir}
+                            estilos={estilos}
+                        />
+                    </View>
+                </BottomSheetLayout>
+            </BottomSheet>
             {modalAlerta}
         </>
     );

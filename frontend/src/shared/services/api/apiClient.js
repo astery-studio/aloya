@@ -3,7 +3,14 @@
  */
 function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
     //Recebe os dados da requisição e executa uma chamada com timeout e cancelamento seguros.
-    async function requisicao({ caminho, metodo = 'GET', corpo, token, signal: sinalExterno }) {
+    async function requisicao({
+        caminho,
+        metodo = 'GET',
+        corpo,
+        token,
+        chaveIdempotencia,
+        signal: sinalExterno
+    }) {
         const controle = new AbortController();
         let tempoEsgotado = false;
         const cancelarPeloChamador = () => controle.abort();
@@ -27,6 +34,7 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
+                    ...(chaveIdempotencia ? { 'Idempotency-Key': chaveIdempotencia } : {}),
                     ...(token ? { Authorization: `Bearer ${token}` } : {})
                 },
                 signal: controle.signal,
@@ -37,9 +45,10 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
                 throw falha;
             }
 
-            const mensagem = falha?.name === 'AbortError'
-                ? 'A conexão demorou demais. Tente novamente.'
-                : 'Não foi possível conectar ao servidor. Verifique sua conexão.';
+            const mensagem =
+                falha?.name === 'AbortError'
+                    ? 'A conexão demorou demais. Tente novamente.'
+                    : 'Não foi possível conectar ao servidor. Verifique sua conexão.';
             const erro = new Error(mensagem);
             erro.mensagemUsuario = mensagem;
             throw erro;
@@ -51,7 +60,9 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
         const dados = resposta.status === 204 ? null : await resposta.json();
 
         if (!resposta.ok) {
-            const erro = new Error(dados?.erro?.mensagem || 'Não foi possível concluir a solicitação.');
+            const erro = new Error(
+                dados?.erro?.mensagem || 'Não foi possível concluir a solicitação.'
+            );
             erro.mensagemUsuario = erro.message;
             erro.status = resposta.status;
             erro.codigo = dados?.erro?.codigo;

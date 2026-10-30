@@ -8,7 +8,9 @@ function CalendarScreenContainer({
     onSessaoExpirada,
     aoVoltar,
     aoCadastrarMenstruacao,
-    aoEditarCiclo
+    aoEditarCiclo,
+    statusSincronizacao,
+    aoTentarSincronizar
 }) {
     const estado = useCalendar({ service, onSessaoExpirada });
     const chaveMesAtual = useMemo(() => obterChaveMes(), []);
@@ -17,6 +19,8 @@ function CalendarScreenContainer({
 
     return (
         <CalendarScreen
+            statusSincronizacao={statusSincronizacao}
+            aoTentarSincronizar={aoTentarSincronizar}
             meses={estado.meses}
             confianca={confianca}
             carregando={estado.carregando}

@@ -211,7 +211,10 @@ function criarDia(casa, contexto) {
         (casa.data <= contexto.hoje
             ? obterRegistroEditavel(casa.data, contexto.previsao, contexto.registrosPorData)
             : null);
-    const marcacao = obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId);
+    const local = contexto.datasLocais.has(casa.data);
+    const marcacao = local
+        ? { tipo: TIPOS_DIA.menstruacao, previsto: false }
+        : obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId);
     const futuro = casa.data > contexto.hoje;
     const previsto = Boolean(
         !registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro)
@@ -222,6 +225,7 @@ function criarDia(casa, contexto) {
     const janelaFertil = Boolean(periodoFertil);
 
     return {
+        ...(local ? { local: true } : {}),
         ...casa,
         tipo: marcacao.tipo,
         previsto,
@@ -272,7 +276,8 @@ function normalizarMes(mesRecebido, hoje = obterHojeLocal()) {
     const contexto = {
         hoje,
         previsao: prepararPrevisao(mes.previsao),
-        registrosPorData: criarRegistrosPorData(mes.diasMenstruacao)
+        registrosPorData: criarRegistrosPorData(mes.diasMenstruacao),
+        datasLocais: new Set(mes.datasLocais || [])
     };
 
     const dias = criarCasasDoMes(periodo).map((casa) => criarDia(casa, contexto));

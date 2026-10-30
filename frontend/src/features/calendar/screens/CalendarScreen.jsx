@@ -10,6 +10,7 @@ import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { criarEstilos } from './CalendarScreen.styles';
+import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
 
 const ITENS_LEGENDA = Object.freeze([
     {
@@ -133,7 +134,9 @@ function CalendarScreen({
     aoTentarNovamente,
     aoVoltar,
     aoCadastrarMenstruacao,
-    aoEditarCiclo
+    aoEditarCiclo,
+    statusSincronizacao,
+    aoTentarSincronizar
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -219,6 +222,10 @@ function CalendarScreen({
             </View>
 
             <View testID="rodape-calendario" style={estilos.rodape}>
+                <SyncStatusIndicator
+                    status={statusSincronizacao}
+                    onTentarNovamente={aoTentarSincronizar}
+                />
                 <ButtonScreen texto="Cadastrar Menstruação" aoPressionar={aoCadastrarMenstruacao} />
             </View>
 
