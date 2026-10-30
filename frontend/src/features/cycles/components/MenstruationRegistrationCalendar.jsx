@@ -118,3 +118,48 @@ function MenstruationRegistrationCalendar({
                                                     onIniciarFaixa?.(dia.data);
                                             }}
                                             accessibilityState={{
+                                                selected: selecionado,
+                                                disabled: desativado
+                                            }}
+                                            disabled={desativado}
+                                            onPress={() =>
+                                                registrado
+                                                    ? onConflito?.(dia)
+                                                    : tocarData(dia.data, Date.now())
+                                            }
+                                            style={[
+                                                estilos.dia,
+                                                registrado && estilos.registrado,
+                                                ponta && estilos.ponta
+                                            ]}
+                                        >
+                                            {(registrado || ponta) && (
+                                                <DropIcon
+                                                    size={9}
+                                                    weight="fill"
+                                                    color={ponta ? '#FFFFFF' : '#C85A44'}
+                                                />
+                                            )}
+                                            <Text
+                                                style={[
+                                                    estilos.numero,
+                                                    dia.futuro && estilos.futuro,
+                                                    (registrado || selecionado) &&
+                                                        estilos.numeroMarcado,
+                                                    ponta && estilos.numeroPonta
+                                                ]}
+                                            >
+                                                {dia.dia}
+                                            </Text>
+                                        </Pressable>
+                                    </View>
+                                );
+                            })}
+                        </View>
+                    ))}
+                </View>
+            )}
+        />
+    );
+}
+export { MenstruationRegistrationCalendar };
