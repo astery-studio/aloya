@@ -208,3 +208,73 @@ test('rotas autenticadas entregam o resultado síncrono e permitem repetir uma s
     assert.equal(resposta.status, 201);
     assert.equal(resposta.headers.get('cache-control'), 'private, no-store');
     assert.ok(corpo.previsao.proximoInicioEstimado);
+    assert.equal(corpo.ciclo.dias.length, 5);
+    assert.equal((await fetch(`${url}/registrations`, opcoes)).status, 200);
+    assert.equal(await prisma.diaMenstruacao.count(), 5);
+    assert.equal(
+        (await fetch(`${url}/shared/2`, { headers: { Authorization: 'Bearer teste' } })).status,
+        404
+    );
+    assert.equal(
+        (await fetch(`${url}/shared/invalido`, { headers: { Authorization: 'Bearer teste' } }))
+            .status,
+        422
+    );
+});
+
+test('encerra ciclo anterior aberto sem inventar dias de sangramento', async (t) => {
+    const { prisma, registrar } = await cenario(t);
+    const aberto = await prisma.registroCiclo.create({
+        data: {
+            usuarioId: 1,
+            dataInicio: new Date('2026-09-01'),
+            dataFim: null,
+            ehCicloInicial: true,
+            diasMenstruacao: { create: { data: new Date('2026-09-01') } }
+        }
+    });
+    await registrar({ data: '2026-09-29' });
+    const encerrado = await prisma.registroCiclo.findUnique({ where: { id: aberto.id } });
+    assert.equal(encerrado.dataFim.toISOString().slice(0, 10), '2026-09-01');
+    assert.equal(encerrado.duracaoMenstruacao, 1);
+    assert.equal(encerrado.duracaoCiclo, 28);
+    assert.equal(await prisma.diaMenstruacao.count(), 2);
+});
+
+test('categoria e preferência de notificação são respeitadas após a sincronização', async (t) => {
+    const { prisma, registrar, module } = await cenario(t);
+    const categoria = await prisma.categoriaPermissao.create({
+        data: {
+            titularId: 1,
+            nome: 'Familia',
+            nomeNormalizado: 'familia',
+            conjuntoDadosVisiveis: ['geral.historico_ciclo']
+        }
+    });
+    await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            contatoId: 2,
+            emailConvidado: 'teste2@example.com',
+            categoriaId: categoria.id,
+            status: 'ativo',
+            permissoesIndividuais: []
+        }
+    });
+    await prisma.preferenciaNotificacao.create({ data: { usuarioId: 2, redeApoioAtiva: false } });
+    await registrar({ data: '2026-10-01' });
+    assert.equal(await prisma.notificacao.count(), 0);
+    assert.equal(
+        (await module.sharingService.buscar({ contatoId: 2, titularId: '1' })).ciclos.length,
+        1
+    );
+    await prisma.categoriaPermissao.update({
+        where: { id: categoria.id },
+        data: { conjuntoDadosVisiveis: [] }
+    });
+    await assert.rejects(() => module.sharingService.buscar({ contatoId: 2, titularId: '1' }), {
+        status: 404
+    });
+});
+
+test('compartilhamento pagina e apresenta ciclos abertos sem expor outras contas', async (t) => {
