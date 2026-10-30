@@ -1,23 +1,38 @@
 //Testa a inclusão segura do token e a limpeza de sessões inválidas nas requisições privadas.
-import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest'
+import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
+
+test('impede que uma operação pendente use credencial de outra conta', async () => {
+    const dependencias = criarDependencias();
+    const requisicao = criarRequisicaoAutenticada(dependencias);
+    await expect(
+        requisicao({ caminho: '/privado', validarCredencial: () => false })
+    ).rejects.toMatchObject({ status: 401 });
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+    expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+    await requisicao({ caminho: '/privado', validarCredencial: () => true });
+    expect(dependencias.requisicao).toHaveBeenCalledWith({
+        caminho: '/privado',
+        token: 'token-seguro'
+    });
+});
 
 function criarDependencias(opcoes = {}) {
     const sessao = Object.hasOwn(opcoes, 'sessao')
         ? opcoes.sessao
         : {
-            token: 'token-seguro'
-        }
+              token: 'token-seguro'
+          };
     const resposta = Object.hasOwn(opcoes, 'resposta')
         ? opcoes.resposta
         : {
-            sucesso: true
-        }
+              sucesso: true
+          };
 
     return {
         requisicao: jest.fn().mockResolvedValue(resposta),
         obterCredencial: jest.fn().mockResolvedValue(sessao),
         removerCredencial: jest.fn().mockResolvedValue(undefined)
-    }
+    };
 }
 
 test.each([
@@ -39,8 +54,8 @@ test.each([
 ])('rejeita dependências obrigatórias inválidas', (dependencias) => {
     expect(() => criarRequisicaoAutenticada(dependencias)).toThrow(
         'Não foi possível configurar as requisições autenticadas.'
-    )
-})
+    );
+});
 
 test.each([
     null,
@@ -61,30 +76,30 @@ test.each([
 ])('rejeita uma sessão sem token válido: %p', async (sessao) => {
     const dependencias = criarDependencias({
         sessao
-    })
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    });
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toMatchObject({
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toMatchObject({
         status: 401,
         codigo: 'SESSAO_AUSENTE',
         mensagemUsuario: 'Sua sessão expirou. Entre novamente.'
-    })
+    });
 
-    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1)
-    expect(dependencias.requisicao).not.toHaveBeenCalled()
-})
+    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+});
 
 test('ignora falha ao limpar uma sessão local sem token', async () => {
     const dependencias = criarDependencias({
         sessao: null
-    })
-    dependencias.removerCredencial.mockRejectedValue(
-        new Error('falha interna do armazenamento')
-    )
+    });
+    dependencias.removerCredencial.mockRejectedValue(new Error('falha interna do armazenamento'));
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
     await expect(requisicaoAutenticada({
         caminho: '/api/anticoncepcionais'
