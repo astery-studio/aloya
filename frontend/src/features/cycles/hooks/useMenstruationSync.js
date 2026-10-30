@@ -58,3 +58,7 @@ function useMenstruationSync({ fila, ativo }) {
             setStatus(undefined);
             setErro(falha);
         }
+    }, [ativo, fila, sincronizar]);
+    return { status, erro, revisao, sincronizar, registrarHoje };
+}
+export { useMenstruationSync };
