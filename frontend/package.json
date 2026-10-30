@@ -13,9 +13,9 @@
     "expo-secure-store": "~58.0.2",
     "expo-status-bar": "~58.0.4",
     "phosphor-react-native": "^3.0.6",
-    "react": "19.3.0",
+    "react": "19.3.1",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "~5.10.1",
+    "react-native-safe-area-context": "~5.11.0",
     "react-native-svg": "15.16.0"
   },
   "scripts": {
@@ -68,14 +68,14 @@
   },
   "private": true,
   "devDependencies": {
-    "@testing-library/react-native": "^14.0.1",
+    "@testing-library/react-native": "^14.1.0",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~58.0.4",
     "globals": "^17.12.0",
     "jest": "~30.5.2",
     "jest-expo": "~58.0.13",
-    "prettier": "^3.9.9",
-    "react-test-renderer": "^19.3.0"
+    "prettier": "^3.9.10",
+    "react-test-renderer": "^19.3.1"
   },
   "overrides": {
     "uuid": "11.1.1"
