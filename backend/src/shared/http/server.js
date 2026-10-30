@@ -30,6 +30,8 @@ import { rotaNaoEncontrada, tratarErros } from '../middleware/error.middleware.j
 const app = express();
 const container = criarContainer();
 
+//O Cloudflare Tunnel conecta ao backend por localhost; só confiamos nesse proxy.
+app.set('trust proxy', 'loopback');
 app.disable('x-powered-by');
 app.use(helmet());
 
