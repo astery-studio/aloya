@@ -119,7 +119,7 @@ function ErroCalendario({ erro, aoTentarNovamente }) {
             }}
             aoFechar={() => setFechado(true)}
         />
-    )
+    );
 }
 
 function CalendarScreen({
@@ -134,18 +134,19 @@ function CalendarScreen({
     aoTentarNovamente,
     aoVoltar,
     aoCadastrarMenstruacao,
-    aoEditarCiclo
+    aoEditarCiclo,
+    statusSincronizacao,
+    aoTentarSincronizar
 }) {
-    const [legendaVisivel, setLegendaVisivel] = useState(false)
+    const [legendaVisivel, setLegendaVisivel] = useState(false);
 
-    const mesesValidos = Array.isArray(meses) ? meses : []
-    const confiancaValida = normalizarConfianca(confianca)
-    const existeErro = typeof erro === 'string' && erro.trim().length > 0
-    const possuiCiclos = mesesValidos.some(mes => (
-        mes?.possuiCiclos === true
-        || mes?.calendario?.possuiCiclos === true
-    ))
-    const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos
+    const mesesValidos = Array.isArray(meses) ? meses : [];
+    const confiancaValida = normalizarConfianca(confianca);
+    const existeErro = typeof erro === 'string' && erro.trim().length > 0;
+    const possuiCiclos = mesesValidos.some(
+        (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
+    );
+    const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
 
     return (
         <SafeAreaView testID="calendar-safe-area" edges={['bottom']} style={estilos.tela}>
@@ -153,7 +154,7 @@ function CalendarScreen({
                 <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Voltar"
-                    accessibilityState={{disabled: typeof aoVoltar !== 'function'}}
+                    accessibilityState={{ disabled: typeof aoVoltar !== 'function' }}
                     disabled={typeof aoVoltar !== 'function'}
                     onPress={aoVoltar}
                     style={estilos.acaoCabecalho}
@@ -176,10 +177,7 @@ function CalendarScreen({
                                     testID="centralizador-confianca"
                                     style={estilos.centralizadorConfianca}
                                 >
-                                    <ConfidenceBadge
-                                        nivel={confiancaValida}
-                                        variante="simples"
-                                    />
+                                    <ConfidenceBadge nivel={confiancaValida} variante="simples" />
                                 </View>
                             ) : null}
                         </View>
@@ -194,10 +192,7 @@ function CalendarScreen({
                     hitSlop={8}
                     style={estilos.acaoLegenda}
                 >
-                    <InfoIcon
-                        size={21.995}
-                        color={estilos.corIconeCabecalho}
-                    />
+                    <InfoIcon size={21.995} color={estilos.corIconeCabecalho} />
                 </Pressable>
             </View>
 
@@ -205,7 +200,8 @@ function CalendarScreen({
                 {estadoVazio ? (
                     <View accessibilityRole="alert" style={estilos.avisoVazio}>
                         <Text style={estilos.textoVazio}>
-                            Você ainda não possui nenhum ciclo registrado. Toque em um dia no Calendário para começar.
+                            Você ainda não possui nenhum ciclo registrado. Toque em um dia no
+                            Calendário para começar.
                         </Text>
                     </View>
                 ) : null}
@@ -221,14 +217,14 @@ function CalendarScreen({
                         aoPressionarDia={aoEditarCiclo}
                     />
                 </View>
-
             </View>
 
             <View testID="rodape-calendario" style={estilos.rodape}>
-                <ButtonScreen
-                    texto="Cadastrar Menstruação"
-                    aoPressionar={aoCadastrarMenstruacao}
+                <SyncStatusIndicator
+                    status={statusSincronizacao}
+                    onTentarNovamente={aoTentarSincronizar}
                 />
+                <ButtonScreen texto="Cadastrar Menstruação" aoPressionar={aoCadastrarMenstruacao} />
             </View>
 
             <CycleLegendSheet
@@ -241,8 +237,8 @@ function CalendarScreen({
                 <ErroCalendario key={erro} erro={erro} aoTentarNovamente={aoTentarNovamente} />
             ) : null}
         </SafeAreaView>
-    )
+    );
 }
 
-export {CalendarScreen, ITENS_LEGENDA, normalizarConfianca}
-export default CalendarScreen
+export { CalendarScreen, ITENS_LEGENDA, normalizarConfianca };
+export default CalendarScreen;
