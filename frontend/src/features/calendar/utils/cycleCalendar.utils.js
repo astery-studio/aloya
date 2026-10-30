@@ -314,14 +314,13 @@ function criarNormalizadorMeses(hoje = obterHojeLocal()) {
         const mes = entrada?.calendario ?? entrada;
         if (!mes || typeof mes !== 'object') return normalizarMes(mes, hoje);
         if (cache.has(mes)) return cache.get(mes);
-        if (cache.has(mes)) return cache.get(mes)
 
-        const normalizado = normalizarMes(mes, hoje)
-        cache.set(mes, normalizado)
-        return normalizado
+        const normalizado = normalizarMes(mes, hoje);
+        cache.set(mes, normalizado);
+        return normalizado;
     }
 
-    return (meses) => normalizarMeses(meses, hoje, normalizarComCache)
+    return (meses) => normalizarMeses(meses, hoje, normalizarComCache);
 }
 
 export {
@@ -331,4 +330,4 @@ export {
     normalizarMes,
     normalizarMeses,
     obterHojeLocal
-}
+};
