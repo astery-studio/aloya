@@ -101,58 +101,62 @@ test('ignora falha ao limpar uma sessão local sem token', async () => {
 
     const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toMatchObject({
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toMatchObject({
         status: 401,
         codigo: 'SESSAO_AUSENTE'
-    })
+    });
 
-    expect(dependencias.requisicao).not.toHaveBeenCalled()
-})
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+});
 
 test('envia somente o token obtido do armazenamento seguro', async () => {
-    const dependencias = criarDependencias()
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
-    const controlador = new AbortController()
+    const dependencias = criarDependencias();
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
+    const controlador = new AbortController();
     const corpo = {
         nome: 'Anticoncepcional atualizado'
-    }
+    };
 
-    await expect(requisicaoAutenticada({
-        metodo: 'PUT',
-        caminho: '/api/anticoncepcionais/7',
-        corpo,
-        signal: controlador.signal,
-        token: 'token-injetado'
-    })).resolves.toEqual({
+    await expect(
+        requisicaoAutenticada({
+            metodo: 'PUT',
+            caminho: '/api/anticoncepcionais/7',
+            corpo,
+            signal: controlador.signal,
+            token: 'token-injetado'
+        })
+    ).resolves.toEqual({
         sucesso: true
-    })
+    });
 
-    expect(dependencias.requisicao).toHaveBeenCalledTimes(1)
+    expect(dependencias.requisicao).toHaveBeenCalledTimes(1);
     expect(dependencias.requisicao).toHaveBeenCalledWith({
         metodo: 'PUT',
         caminho: '/api/anticoncepcionais/7',
         corpo,
         signal: controlador.signal,
         token: 'token-seguro'
-    })
-    expect(dependencias.obterCredencial).toHaveBeenCalledTimes(1)
-    expect(dependencias.removerCredencial).not.toHaveBeenCalled()
-})
+    });
+    expect(dependencias.obterCredencial).toHaveBeenCalledTimes(1);
+    expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+});
 
 test('aceita chamada sem objeto de opções', async () => {
-    const dependencias = criarDependencias()
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const dependencias = criarDependencias();
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
     await expect(requisicaoAutenticada()).resolves.toEqual({
         sucesso: true
-    })
+    });
 
     expect(dependencias.requisicao).toHaveBeenCalledWith({
         token: 'token-seguro'
-    })
-})
+    });
+});
 
 test.each([
     'NAO_AUTENTICADO',
