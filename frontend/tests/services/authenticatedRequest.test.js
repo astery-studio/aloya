@@ -158,43 +158,45 @@ test('aceita chamada sem objeto de opções', async () => {
     });
 });
 
-test.each([
-    'NAO_AUTENTICADO',
-    'TOKEN_INVALIDO',
-    'SESSAO_INVALIDA'
-])('remove a credencial quando a API rejeita a sessão com %s', async (codigo) => {
-    const dependencias = criarDependencias()
-    const erroSessao = new Error('Sessão inválida.')
-    erroSessao.status = 401
-    erroSessao.codigo = codigo
-    dependencias.requisicao.mockRejectedValue(erroSessao)
+test.each(['NAO_AUTENTICADO', 'TOKEN_INVALIDO', 'SESSAO_INVALIDA'])(
+    'remove a credencial quando a API rejeita a sessão com %s',
+    async (codigo) => {
+        const dependencias = criarDependencias();
+        const erroSessao = new Error('Sessão inválida.');
+        erroSessao.status = 401;
+        erroSessao.codigo = codigo;
+        dependencias.requisicao.mockRejectedValue(erroSessao);
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+        const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe(erroSessao)
+        await expect(
+            requisicaoAutenticada({
+                caminho: '/api/anticoncepcionais'
+            })
+        ).rejects.toBe(erroSessao);
 
-    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1)
-})
+        expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
+    }
+);
 
 test('preserva o erro original quando a limpeza da sessão inválida falha', async () => {
-    const dependencias = criarDependencias()
-    const erroSessao = new Error('Sessão inválida.')
-    erroSessao.status = 401
-    erroSessao.codigo = 'SESSAO_INVALIDA'
-    dependencias.requisicao.mockRejectedValue(erroSessao)
-    dependencias.removerCredencial.mockRejectedValue(
-        new Error('falha interna do armazenamento')
-    )
+    const dependencias = criarDependencias();
+    const erroSessao = new Error('Sessão inválida.');
+    erroSessao.status = 401;
+    erroSessao.codigo = 'SESSAO_INVALIDA';
+    dependencias.requisicao.mockRejectedValue(erroSessao);
+    dependencias.removerCredencial.mockRejectedValue(new Error('falha interna do armazenamento'));
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe(erroSessao)
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toBe(erroSessao);
 
-    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1)
+    expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
+});
 })
 
 test.each([
