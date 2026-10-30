@@ -32,38 +32,6 @@ jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', 
         return visivel ? <View>{children}</View> : null;
     }
 }));
-jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModal', () => {
-    const React = require('react');
-    const { Pressable, Text, View } = require('react-native');
-    return function MockAlertModal({ visivel, titulo, mensagem, acaoPrincipal, acaoSecundaria }) {
-        if (!visivel) return null;
-        return (
-            <View>
-                <Text>{titulo}</Text>
-                {mensagem ? <Text>{mensagem}</Text> : null}
-                {acaoPrincipal ? (
-                    <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel={acaoPrincipal.texto}
-                        onPress={acaoPrincipal.aoPressionar}
-                    >
-                        <Text>{acaoPrincipal.texto}</Text>
-                    </Pressable>
-                ) : null}
-                {acaoSecundaria ? (
-                    <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel={acaoSecundaria.texto}
-                        onPress={acaoSecundaria.aoPressionar}
-                    >
-                        <Text>{acaoSecundaria.texto}</Text>
-                    </Pressable>
-                ) : null}
-            </View>
-        );
-    };
-});
-
 test('renderiza sheet do histórico com instrução, aviso e ações', async () => {
     await render(
         <RemoveMenstruationModal
@@ -94,7 +62,7 @@ test('remove um dia selecionado imediatamente sem abrir confirmação', async ()
     );
     await fireEvent.press(screen.getByLabelText('Dia de teste'));
     expect(onRemoverDia).toHaveBeenCalledWith({ registroCicloId: 3, data: '2026-10-04' });
-    expect(screen.queryByText('Excluir ciclo inteiro?')).toBeNull();
+    expect(screen.queryByText('Apagar ciclo')).toBeNull();
 });
 
 test('desativa seleção de dia durante carregamento e expõe a data que falhou', async () => {
@@ -123,7 +91,7 @@ test('a ação de ciclo inteiro abre confirmação e modo de dia respeita carreg
     );
     await fireEvent.press(screen.getByRole('button', { name: 'Excluir ciclo inteiro' }));
     expect(onSolicitarExcluirCiclo).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText('Excluir ciclo inteiro?')).toBeNull();
+    expect(screen.queryByText('Apagar ciclo')).toBeNull();
 });
 
 test('confirma a exclusão completa e mostra período, irreversibilidade e recálculo', async () => {
@@ -138,11 +106,13 @@ test('confirma a exclusão completa e mostra período, irreversibilidade e recá
             onCancelarExclusao={onCancelarExclusao}
         />
     );
-    expect(screen.getByText('Excluir ciclo inteiro?')).toBeTruthy();
-    expect(screen.getByText(/07\/08\/2026 a 11\/08\/2026/)).toBeTruthy();
-    expect(screen.getByText(/não pode ser desfeita/)).toBeTruthy();
-    expect(screen.getByText(/previsões serão recalculadas/)).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Excluir' }));
+    expect(screen.getByText('Apagar ciclo')).toBeTruthy();
+    expect(
+        screen.getByText(
+            'Tem certeza que deseja excluir todo o período de menstruação de 07/08/2026 a 11/08/2026 do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.'
+        )
+    ).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Apagar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
     expect(onExcluirCiclo).toHaveBeenCalledTimes(1);
     expect(onCancelarExclusao).toHaveBeenCalledTimes(1);
@@ -160,7 +130,7 @@ test('mostra erro com retry e opção de voltar ao sheet', async () => {
         />
     );
     expect(
-        screen.getByText('Ocorreu um erro ao excluir este registro. Tente novamente.')
+        screen.getByText('Ocorreu um erro ao excluir este registro.\nTente novamente.')
     ).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
@@ -177,7 +147,7 @@ test.each([
         <RemoveMenstruationModal visivel={false} alerta={alerta} onFecharAlerta={onFecharAlerta} />
     );
     expect(screen.getByText(titulo)).toBeTruthy();
-    expect(screen.getByText('Registro de menstruação excluído com sucesso.')).toBeTruthy();
+    expect(screen.queryByText('Registro de menstruação excluído com sucesso.')).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
     expect(onFecharAlerta).toHaveBeenCalledTimes(1);
 });
