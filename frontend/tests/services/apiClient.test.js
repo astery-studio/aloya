@@ -3,6 +3,24 @@
  */
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 
+test('envia chave de idempotência preservada nas retentativas', async () => {
+    const fetchImpl = jest
+        .fn()
+        .mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+    const cliente = criarApiClient({ baseUrl: 'https://api', fetchImpl });
+    await cliente.requisicao({
+        caminho: '/registrations',
+        metodo: 'POST',
+        chaveIdempotencia: 'menstrual-123'
+    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+        'https://api/registrations',
+        expect.objectContaining({
+            headers: expect.objectContaining({ 'Idempotency-Key': 'menstrual-123' })
+        })
+    );
+});
+
 test('envia corpo JSON e retorna os dados da API', async () => {
     const fetchImpl = jest.fn().mockResolvedValue({
         ok: true,
@@ -28,11 +46,14 @@ test('envia corpo JSON e retorna os dados da API', async () => {
         corpo
     });
 
-    expect(fetchImpl).toHaveBeenCalledWith('http://api/auth/login', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify(corpo),
-        signal: expect.anything()
-    }));
+    expect(fetchImpl).toHaveBeenCalledWith(
+        'http://api/auth/login',
+        expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify(corpo),
+            signal: expect.anything()
+        })
+    );
     expect(resposta.autenticacao.token).toBe('jwt');
 });
 
@@ -52,9 +73,11 @@ test('converte o erro da API em mensagem segura para a interface', async () => {
         fetchImpl
     });
 
-    await expect(cliente.requisicao({
-        caminho: '/auth/login'
-    })).rejects.toMatchObject({
+    await expect(
+        cliente.requisicao({
+            caminho: '/auth/login'
+        })
+    ).rejects.toMatchObject({
         status: 401,
         codigo: 'CREDENCIAIS_INVALIDAS',
         mensagemUsuario: 'E-mail ou senha incorretos.'
@@ -65,20 +88,23 @@ test('interrompe uma requisição que ultrapassa o tempo limite', async () => {
     jest.useFakeTimers();
 
     try {
-        const fetchImpl = jest.fn((url, opcoes) => new Promise((resolve, reject) => {
-            opcoes.signal.addEventListener('abort', () => {
-                const erro = new Error('cancelada');
-                erro.name = 'AbortError';
-                reject(erro);
-            });
-        }));
+        const fetchImpl = jest.fn(
+            (url, opcoes) =>
+                new Promise((resolve, reject) => {
+                    opcoes.signal.addEventListener('abort', () => {
+                        const erro = new Error('cancelada');
+                        erro.name = 'AbortError';
+                        reject(erro);
+                    });
+                })
+        );
         const cliente = criarApiClient({
             baseUrl: 'http://api',
             fetchImpl,
             timeoutMs: 15000
         });
-        const resultado = expect(cliente.requisicao({
-            caminho: '/auth/login'
+        const resultado = expect(
+            cliente.requisicao({
         })).rejects.toMatchObject({
             message: 'A conexão demorou demais. Tente novamente.',
             mensagemUsuario: 'A conexão demorou demais. Tente novamente.'
