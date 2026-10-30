@@ -348,3 +348,6 @@ test('controller compartilha dados autorizados sem cache e respeita a sessão do
     );
     assert.equal(headers.get('Cache-Control'), 'private, no-store');
     assert.equal(corpo.ciclos.length, 1);
+    assert.equal(corpo.ciclos[0].dataInicio, '2026-10-01');
+    assert.equal(Object.hasOwn(corpo.ciclos[0], 'usuarioId'), false);
+});
