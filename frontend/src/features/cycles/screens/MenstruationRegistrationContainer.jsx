@@ -58,3 +58,63 @@ function MenstruationRegistrationContainer({
         setStatus('sincronizando');
         setErro(undefined);
         try {
+            await fila.sincronizar();
+            setStatus('sincronizado');
+            setSucesso(true);
+        } catch (falha) {
+            setStatus('falha');
+            setErro(falha);
+            if (falha.status === 401) onSessaoExpirada?.();
+        }
+    }
+    useEffect(() => {
+        // A retomada do aplicativo tenta novamente sem descartar o que já foi salvo.
+        const assinatura = AppState.addEventListener('change', (estado) => {
+            if (estado === 'active')
+                fila.sincronizar()
+                    .then(() => setStatus('sincronizado'))
+                    .catch(() => setStatus('pendente'));
+        });
+        return () => assinatura?.remove?.();
+    }, [fila]);
+
+    async function salvar(datas) {
+        if (!datas.length) return;
+        const registradas = new Set(
+            meses.flatMap((mes) => [
+                ...(mes.diasMenstruacao || []).map((dia) => dia.data),
+                ...(mes.datasLocais || [])
+            ])
+        );
+        if (datas.some((data) => registradas.has(data))) {
+            setErro(
+                Object.assign(new Error('Edite o ciclo existente.'), {
+                    codigo: 'CONFLITO_REGISTRO_MENSTRUAL'
+                })
+            );
+            return;
+        }
+        setSalvando(true);
+        setErro(undefined);
+        try {
+            await fila.adicionar(datas[0], datas[datas.length - 1]);
+            setStatus('pendente');
+            await sincronizar();
+        } catch (falha) {
+            setErro(falha);
+        } finally {
+            setSalvando(false);
+        }
+    }
+    return (
+        <MenstruationRegistrationScreen
+            meses={meses}
+            datasSelecionadas={selecao}
+            salvando={salvando}
+            erro={erro}
+            sucesso={sucesso}
+            statusSincronizacao={status}
+            onAlternarData={(data) => setSelecao((atual) => selecionarIntervalo(atual, data, hoje))}
+            onIniciarFaixa={(data) => setSelecao([data])}
+            onSalvar={salvar}
+            onVoltar={onVoltar}
