@@ -234,10 +234,7 @@ test('recorta as fases e previsões para o mês solicitado', async () => {
     assert.deepEqual(previsaoPrincipal, {
         status: 'PREVISAO_ULTRAPASSADA',
         nivelConfianca: 'BAIXA',
-        faseMenstrual: {
-            inicio: '2026-10-01',
-            fim: '2026-10-03'
-        },
+        faseMenstrual: null,
         faseFolicular: {
             inicio: '2026-10-04',
             fim: '2026-10-11'
@@ -353,10 +350,7 @@ test('recalcula fases históricas pelo próximo início real e descarta a previs
 
     assert.deepEqual(resultado.diasMenstruacao, [{ data: '2026-08-01', registroCicloId: 2 }]);
     assert.equal(resultado.previsao.menstruacaoPrevista, null);
-    assert.deepEqual(resultado.previsao.faseMenstrual, {
-        inicio: '2026-08-01',
-        fim: '2026-08-04'
-    });
+    assert.equal(resultado.previsao.faseMenstrual, null);
     assert.deepEqual(resultado.previsao.faseFolicular, {
         inicio: '2026-08-05',
         fim: '2026-08-20'

@@ -79,7 +79,8 @@ test('busca somente os parâmetros, a contagem e sete ciclos necessários', asyn
                 select: {
                     id: true,
                     dataInicio: true,
-                    dataFim: true
+                    dataFim: true,
+                    duracaoMenstruacao: true
                 }
             }
         }

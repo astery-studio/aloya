@@ -34,7 +34,8 @@ function criarCalendarRepository({ prisma } = {}) {
                     select: {
                         id: true,
                         dataInicio: true,
-                        dataFim: true
+                        dataFim: true,
+                        duracaoMenstruacao: true
                     }
                 }
             }

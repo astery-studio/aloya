@@ -79,6 +79,17 @@ function obterFimMenstrualReal(registro, parametros) {
     return adicionarDias(formatarData(registro.dataInicio), duracao - 1);
 }
 
+function preservarDiasRegistrados(previsao, registro) {
+    if (!registro.dataFim || !previsao.fasesEstimadas) return previsao;
+
+    // Em ciclos fechados, o sangramento vem exclusivamente de diasMenstruacao.
+    // O intervalo início/fim não representa os dias removidos no meio do período.
+    return {
+        ...previsao,
+        fasesEstimadas: { ...previsao.fasesEstimadas, menstrual: null }
+    };
+}
+
 function recalcularComProximoInicioReal({ previsaoBase, registro, proximoRegistro, parametros }) {
     const inicioCiclo = formatarData(registro.dataInicio);
     const proximoInicio = formatarData(proximoRegistro.dataInicio);
@@ -89,14 +100,17 @@ function recalcularComProximoInicioReal({ previsaoBase, registro, proximoRegistr
         duracaoLutea: parametros.duracaoLuteaInformada ?? CONFIG_PREVISAO.luteaPadrao
     });
 
-    return {
-        ...previsaoBase,
-        proximoInicioEstimado: proximoInicio,
-        periodoSangramentoEstimado: null,
-        fasesEstimadas: fases.fases,
-        dataOvulacaoEstimada: fases.fases?.ovulatoria?.data ?? null,
-        janelaFertilEstimada: fases.janelaFertil
-    };
+    return preservarDiasRegistrados(
+        {
+            ...previsaoBase,
+            proximoInicioEstimado: proximoInicio,
+            periodoSangramentoEstimado: null,
+            fasesEstimadas: fases.fases,
+            dataOvulacaoEstimada: fases.fases?.ovulatoria?.data ?? null,
+            janelaFertilEstimada: fases.janelaFertil
+        },
+        registro
+    );
 }
 
 function criarPeriodosHistoricosConfirmados({
@@ -292,11 +306,6 @@ function criarCalendarService({ repository } = {}) {
             };
         }
 
-        const previsaoBase = calcularPrevisao({
-            registros: registrosCiclo,
-            parametros,
-            dataReferencia: intervalo.ultimoDia
-        });
         const inicioMes = `${mesValidado.chave}-01`;
         const proximoCicloReal = resultado.proximoCicloReal ?? null;
         const ultimoRegistro = registrosCiclo
@@ -304,6 +313,14 @@ function criarCalendarService({ repository } = {}) {
                 formatarData(a.dataInicio).localeCompare(formatarData(b.dataInicio))
             )
             .at(-1);
+        const previsaoBase = preservarDiasRegistrados(
+            calcularPrevisao({
+                registros: registrosCiclo,
+                parametros,
+                dataReferencia: intervalo.ultimoDia
+            }),
+            ultimoRegistro
+        );
         const previsao = proximoCicloReal
             ? recalcularComProximoInicioReal({
                   previsaoBase,
@@ -312,16 +329,19 @@ function criarCalendarService({ repository } = {}) {
                   parametros
               })
             : projetarPrevisaoDoMes(previsaoBase, parametros, inicioMes);
-        const periodos = proximoCicloReal
-            ? criarPeriodosHistoricosConfirmados({
-                  previsaoBase,
-                  registros: registrosCiclo,
-                  proximoCicloReal,
-                  parametros,
-                  inicioMes,
-                  ultimoDia: intervalo.ultimoDia
-              })
-            : criarPeriodosDoMes(previsaoBase, parametros, inicioMes, intervalo.ultimoDia);
+        const periodos = criarPeriodosHistoricosConfirmados({
+            previsaoBase,
+            registros: registrosCiclo,
+            proximoCicloReal,
+            parametros,
+            inicioMes,
+            ultimoDia: intervalo.ultimoDia
+        });
+        if (!proximoCicloReal) {
+            periodos.push(
+                ...criarPeriodosDoMes(previsaoBase, parametros, inicioMes, intervalo.ultimoDia)
+            );
+        }
 
         return {
             mes: mesValidado.chave,
