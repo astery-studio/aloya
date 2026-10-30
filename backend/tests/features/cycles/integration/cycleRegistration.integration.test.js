@@ -278,3 +278,73 @@ test('categoria e preferência de notificação são respeitadas após a sincron
 });
 
 test('compartilhamento pagina e apresenta ciclos abertos sem expor outras contas', async (t) => {
+    const { prisma, module } = await cenario(t);
+    await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            contatoId: 2,
+            emailConvidado: 'teste2@example.com',
+            status: 'ativo',
+            permissoesIndividuais: ['geral.historico_ciclo']
+        }
+    });
+    await prisma.registroCiclo.createMany({
+        data: Array.from({ length: 51 }, (_, i) => ({
+            id: 100 + i,
+            usuarioId: 1,
+            dataInicio: new Date(Date.UTC(2020, 0, 1 + i * 28)),
+            dataFim: i === 0 ? null : new Date(Date.UTC(2020, 0, 5 + i * 28)),
+            duracaoMenstruacao: i === 0 ? null : 5
+        }))
+    });
+    const pagina = await module.sharingService.buscar({ contatoId: 2, titularId: '1' });
+    assert.equal(pagina.ciclos.length, 50);
+    const ultima = await module.sharingService.buscar({
+        contatoId: 2,
+        titularId: '1',
+        antesDe: String(pagina.proximoCursor)
+    });
+    assert.equal(ultima.ciclos.length, 1);
+    assert.equal(ultima.ciclos[0].dataFim, null);
+    assert.equal(ultima.proximoCursor, null);
+    await assert.rejects(
+        () =>
+            module.service.registrar({
+                usuarioId: 999,
+                chave: 'usuario-inexistente',
+                corpo: { data: '2026-10-01' }
+            }),
+        { status: 404 }
+    );
+});
+
+test('controller compartilha dados autorizados sem cache e respeita a sessão do contato', async (t) => {
+    const { prisma, module, registrar } = await cenario(t);
+    await registrar({ data: '2026-10-01' });
+    await prisma.vinculoRedeApoio.create({
+        data: {
+            titularId: 1,
+            contatoId: 2,
+            emailConvidado: 'teste2@example.com',
+            status: 'ativo',
+            permissoesIndividuais: ['geral.historico_ciclo']
+        }
+    });
+    let corpo;
+    const headers = new Map();
+    await module.controller.compartilhar(
+        { usuario: { id: 2 }, params: { titularId: '1' }, query: {} },
+        {
+            set(nome, valor) {
+                headers.set(nome, valor);
+            },
+            json(valor) {
+                corpo = valor;
+            }
+        },
+        (erro) => {
+            throw erro;
+        }
+    );
+    assert.equal(headers.get('Cache-Control'), 'private, no-store');
+    assert.equal(corpo.ciclos.length, 1);
