@@ -78,7 +78,7 @@ describe('SupportCategoryCard', () => {
 
         const nome = screen.getByTestId('support-category-name');
         expect(nome).toHaveTextContent(nomeLongo);
-        expect(nome).toHaveStyle({ fontSize: 14, lineHeight: 24 });
+        expect(nome).toHaveStyle({ fontSize: 18, lineHeight: 24 });
         expect(nome).toHaveProp('numberOfLines', 1);
         expect(nome).toHaveProp('ellipsizeMode', 'clip');
         expect(resumo).toHaveStyle({ fontSize: 14, lineHeight: 18 });

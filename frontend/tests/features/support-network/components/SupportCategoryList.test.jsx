@@ -95,7 +95,7 @@ describe('SupportCategoryList', () => {
             layout(250)
         );
         for (const nome of screen.getAllByTestId('support-category-name'))
-            expect(nome).toHaveStyle({ fontSize: 14 });
+            expect(nome).toHaveStyle({ fontSize: 18 });
     });
     test('ordena as categorias alfabeticamente', async () => {
         await render(

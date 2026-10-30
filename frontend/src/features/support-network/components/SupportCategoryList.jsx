@@ -147,10 +147,10 @@ function SupportCategoryList({
     const fonteTitulo =
         maiorNome > 0 && larguraTitulo > 0
             ? Math.min(
-                  14,
+                  18,
                   Math.floor(((14 * Math.max(1, larguraTitulo - 2)) / maiorNome) * 100) / 100
               )
-            : 14;
+            : 18;
 
     const possuiCategorias = categoriasOrdenadas.length > 0;
 

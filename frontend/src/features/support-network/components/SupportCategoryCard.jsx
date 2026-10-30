@@ -24,7 +24,7 @@ function SupportCategoryCard({
     categoria,
     resumoPermissoes,
     quantidadeContatos,
-    fonteTitulo = 14,
+    fonteTitulo = 18,
     onMedirTitulo,
     onEditar,
     onExcluir,
