@@ -1,9 +1,12 @@
 //Mostra um painel na parte inferior da tela
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { tema } from '../../../theme';
 import { estilos } from './BottomSheet.style';
 
 function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechamento = false }) {
+    const insets = useSafeAreaInsets();
     const alturaForaDaTela = useRef(Dimensions.get('screen').height).current;
 
     const progresso = useRef(new Animated.Value(0)).current;
@@ -116,7 +119,12 @@ function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechament
                 />
 
                 <Animated.View
-                    style={[estilos.painel, { transform: [{ translateY: posicaoPainel }] }]}
+                    testID="bottom-sheet-panel"
+                    style={[
+                        estilos.painel,
+                        { paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom) },
+                        { transform: [{ translateY: posicaoPainel }] }
+                    ]}
                 >
                     {children}
                 </Animated.View>

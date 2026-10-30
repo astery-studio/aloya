@@ -10,12 +10,17 @@ const parametros = {
 };
 
 test('não cria datas sem um início elegível', () => {
-    assert.deepEqual(calcularPrevisao({
-        registros: [], parametros, dataReferencia: '2026-10-05'
-    }), {
-        status: 'DADOS_INSUFICIENTES',
-        motivos: ['INICIO_ELEGIVEL_AUSENTE']
-    });
+    assert.deepEqual(
+        calcularPrevisao({
+            registros: [],
+            parametros,
+            dataReferencia: '2026-10-05'
+        }),
+        {
+            status: 'DADOS_INSUFICIENTES',
+            motivos: ['INICIO_ELEGIVEL_AUSENTE']
+        }
+    );
 });
 
 test('gera previsão inicial provisória e explicita suas limitações', () => {
@@ -35,6 +40,27 @@ test('gera previsão inicial provisória e explicita suas limitações', () => {
     assert.equal(registros[0].dataFim, null);
 });
 
+test('usa a quantidade de dias menstruais registrados após uma exclusão intermediária', () => {
+    const resultado = calcularPrevisao({
+        registros: [
+            {
+                dataInicio: '2026-10-01',
+                dataFim: '2026-10-05',
+                duracaoMenstruacao: 3
+            }
+        ],
+        parametros,
+        dataReferencia: '2026-10-05'
+    });
+
+    assert.deepEqual(resultado.periodoSangramentoEstimado, {
+        inicio: '2026-10-29',
+        fim: '2026-10-31',
+        tipo: 'FUTURO_PREVISTO',
+        origemDuracao: 'HISTORICO_INDIVIDUAL'
+    });
+});
+
 test('não usa início futuro para calcular a previsão atual', () => {
     const resultado = calcularPrevisao({
         registros: [
@@ -52,10 +78,12 @@ test('não usa início futuro para calcular a previsão atual', () => {
 
 test('mantém previsão vencida sem avançar ciclos fictícios', () => {
     const resultado = calcularPrevisao({
-        registros: [{
-            dataInicio: new Date('2026-09-01T00:00:00Z'),
-            dataFim: new Date('2026-09-05T00:00:00Z')
-        }],
+        registros: [
+            {
+                dataInicio: new Date('2026-09-01T00:00:00Z'),
+                dataFim: new Date('2026-09-05T00:00:00Z')
+            }
+        ],
         parametros: { ...parametros, duracaoCicloInformada: 30 },
         dataReferencia: '2026-11-20'
     });

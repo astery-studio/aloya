@@ -1,4 +1,11 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {
+    act,
+    fireEvent,
+    render as renderSemSafeArea,
+    screen,
+    waitFor
+} from '@testing-library/react-native';
 import { Animated, Platform } from 'react-native';
 
 import { CycleEditFlow } from '../../../src/features/cycles/CycleEditFlow';
@@ -20,6 +27,22 @@ jest.mock('react-native', () => {
     Object.defineProperty(rn, 'Modal', { configurable: true, get: () => NativeModal });
     return rn;
 });
+
+function ContextoSeguro({ children }) {
+    return (
+        <SafeAreaProvider
+            initialMetrics={{
+                frame: { x: 0, y: 0, width: 390, height: 844 },
+                insets: { top: 0, right: 0, bottom: 32, left: 0 }
+            }}
+        >
+            {children}
+        </SafeAreaProvider>
+    );
+}
+function render(elemento) {
+    return renderSemSafeArea(elemento, { wrapper: ContextoSeguro });
+}
 
 const plataformaOriginal = Platform.OS;
 

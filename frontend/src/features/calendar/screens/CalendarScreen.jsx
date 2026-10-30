@@ -1,6 +1,7 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import {useState} from 'react'
 import {Pressable, Text, View} from 'react-native'
+import {SafeAreaView} from 'react-native-safe-area-context'
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen'
 import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
@@ -86,7 +87,7 @@ function CalendarScreen({
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos
 
     return (
-        <View style={estilos.tela}>
+        <SafeAreaView testID="calendar-safe-area" edges={['bottom']} style={estilos.tela}>
             <View testID="cabecalho-calendario" style={estilos.cabecalho}>
                 <Pressable
                     accessibilityRole="button"
@@ -178,7 +179,7 @@ function CalendarScreen({
             {existeErro ? (
                 <ErroCalendario key={erro} erro={erro} aoTentarNovamente={aoTentarNovamente} />
             ) : null}
-        </View>
+        </SafeAreaView>
     )
 }
 

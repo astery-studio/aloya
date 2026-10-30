@@ -26,7 +26,7 @@ function ContraceptiveHomeScreen({
     }
     return (
         <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']} testID="usos-home-area-segura">
-            <MainLayout titulo="Início" abaAtiva="inicio" onSelecionarAba={onSelecionarAba}>
+            <MainLayout titulo="Início" abaAtiva="inicio" onSelecionarAba={onSelecionarAba} usarAreaSeguraInferior={false}>
                 <ScrollView contentContainerStyle={estilos.conteudo} showsVerticalScrollIndicator={false}>
                     <Text style={estilos.titulo} accessibilityRole="header">Anticoncepcionais de hoje</Text>
                     {carregando ? <ActivityIndicator color="#C85A44" /> : (

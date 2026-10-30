@@ -1,35 +1,35 @@
-import React from 'react'
-import {fireEvent, render, screen, waitFor, within} from '@testing-library/react-native'
-import {CalendarScreen, normalizarConfianca} from '../../../../src/features/calendar/screens/CalendarScreen'
-import {estilos} from '../../../../src/features/calendar/screens/CalendarScreen.styles'
+import React from 'react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
+import {
+    CalendarScreen,
+    normalizarConfianca
+} from '../../../../src/features/calendar/screens/CalendarScreen';
+import { estilos } from '../../../../src/features/calendar/screens/CalendarScreen.styles';
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
-    const ReactInterno = require('react')
-    const {Text} = require('react-native')
+    const ReactInterno = require('react');
+    const { Text } = require('react-native');
 
     return {
-        ConfidenceBadge: ({nivel}) => ReactInterno.createElement(
-            Text,
-            {testID: 'confidence-badge'},
-            nivel
-        )
-    }
-})
+        ConfidenceBadge: ({ nivel }) =>
+            ReactInterno.createElement(Text, { testID: 'confidence-badge' }, nivel)
+    };
+});
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     ArrowLeftIcon: () => null,
-    InfoIcon: props => {
-        const ReactInterno = require('react')
-        const {View} = require('react-native')
-        return ReactInterno.createElement(View, {testID: 'icone-legenda', ...props})
+    InfoIcon: (props) => {
+        const ReactInterno = require('react');
+        const { View } = require('react-native');
+        return ReactInterno.createElement(View, { testID: 'icone-legenda', ...props });
     }
-}))
+}));
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text} = require('react-native')
+    const ReactInterno = require('react');
+    const { Pressable, Text } = require('react-native');
 
-    return function ButtonScreenMock({texto, aoPressionar}) {
+    return function ButtonScreenMock({ texto, aoPressionar }) {
         return ReactInterno.createElement(
             Pressable,
             {
@@ -38,20 +38,20 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonSc
                 onPress: aoPressionar
             },
             ReactInterno.createElement(Text, null, texto)
-        )
-    }
-})
+        );
+    };
+});
 
 jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModal', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text, View} = require('react-native')
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
 
-    return function AlertModalMock({visivel, titulo, mensagem, acaoPrincipal, aoFechar}) {
-        if (!visivel) return null
+    return function AlertModalMock({ visivel, titulo, mensagem, acaoPrincipal, aoFechar }) {
+        if (!visivel) return null;
 
         return ReactInterno.createElement(
             View,
-            {testID: 'alert-modal'},
+            { testID: 'alert-modal' },
             ReactInterno.createElement(Text, null, titulo),
             ReactInterno.createElement(Text, null, mensagem),
             ReactInterno.createElement(
@@ -72,240 +72,242 @@ jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModa
                 },
                 ReactInterno.createElement(Text, null, 'Fechar modal')
             )
-        )
-    }
-})
+        );
+    };
+});
 
 jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalendar', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text, View} = require('react-native')
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
 
     return {
-        CycleCalendar: ({carregando, aoPressionarDia}) => ReactInterno.createElement(
-            View,
-            {testID: 'cycle-calendar'},
+        CycleCalendar: ({ carregando, aoPressionarDia }) =>
             ReactInterno.createElement(
-                Text,
-                null,
-                carregando ? 'Carregando calendário' : 'Calendário pronto'
-            ),
-            aoPressionarDia ? ReactInterno.createElement(Pressable, {
-                accessibilityRole: 'button',
-                accessibilityLabel: 'Dia menstrual registrado',
-                onPress: () => aoPressionarDia({data: '2026-10-04', registroCicloId: 9})
-            }) : null
-        )
-    }
-})
+                View,
+                { testID: 'cycle-calendar' },
+                ReactInterno.createElement(
+                    Text,
+                    null,
+                    carregando ? 'Carregando calendário' : 'Calendário pronto'
+                ),
+                aoPressionarDia
+                    ? ReactInterno.createElement(Pressable, {
+                          accessibilityRole: 'button',
+                          accessibilityLabel: 'Dia menstrual registrado',
+                          onPress: () => aoPressionarDia({ data: '2026-10-04', registroCicloId: 9 })
+                      })
+                    : null
+            )
+    };
+});
 
 jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLegendSheet', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text, View} = require('react-native')
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
 
     return {
-        CycleLegendSheet: ({visivel, aoFechar, itens}) => (
+        CycleLegendSheet: ({ visivel, aoFechar, itens }) =>
             visivel
                 ? ReactInterno.createElement(
-                    View,
-                    {testID: 'cycle-legend-sheet'},
-                    ReactInterno.createElement(Text, null, `Itens: ${itens.length}`),
-                    ReactInterno.createElement(
-                        Pressable,
-                        {
-                            accessibilityRole: 'button',
-                            accessibilityLabel: 'Fechar painel',
-                            onPress: aoFechar
-                        },
-                        ReactInterno.createElement(Text, null, 'Fechar')
-                    )
-                )
+                      View,
+                      { testID: 'cycle-legend-sheet' },
+                      ReactInterno.createElement(Text, null, `Itens: ${itens.length}`),
+                      ReactInterno.createElement(
+                          Pressable,
+                          {
+                              accessibilityRole: 'button',
+                              accessibilityLabel: 'Fechar painel',
+                              onPress: aoFechar
+                          },
+                          ReactInterno.createElement(Text, null, 'Fechar')
+                      )
+                  )
                 : null
-        )
-    }
-})
+    };
+});
 
 describe('CalendarScreen', () => {
     test('normaliza confiança acentuada e rejeita valores não textuais', () => {
-        expect(normalizarConfianca()).toBeNull()
-        expect(normalizarConfianca('  MÉDIA ')).toBe('media')
-        expect(normalizarConfianca('ALTA')).toBe('alta')
-    })
+        expect(normalizarConfianca()).toBeNull();
+        expect(normalizarConfianca('  MÉDIA ')).toBe('media');
+        expect(normalizarConfianca('ALTA')).toBe('alta');
+    });
 
     test('tolera lista de meses ausente ou inválida', async () => {
-        const {rerender} = await render(<CalendarScreen />)
-        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen()
-        await rerender(<CalendarScreen meses={{invalido: true}} />)
-        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen()
-    })
+        const { rerender } = await render(<CalendarScreen />);
+        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
+        await rerender(<CalendarScreen meses={{ invalido: true }} />);
+        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
+    });
 
     test('mostra calendário, título e confiança', async () => {
-        const aoCadastrarMenstruacao = jest.fn()
-        const aoEditarCiclo = jest.fn()
+        const aoCadastrarMenstruacao = jest.fn();
+        const aoEditarCiclo = jest.fn();
 
         await render(
             <CalendarScreen
-                meses={[{mes: '2026-10', possuiCiclos: true}]}
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
                 confianca="alta"
                 aoVoltar={jest.fn()}
                 aoCadastrarMenstruacao={aoCadastrarMenstruacao}
                 aoEditarCiclo={aoEditarCiclo}
             />
-        )
+        );
 
-        expect(screen.getByText('Calendário')).toBeOnTheScreen()
-        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen()
-        expect(screen.getByTestId('confidence-badge')).toHaveTextContent('alta')
-        const tituloEConfianca = within(screen.getByTestId('titulo-e-confianca'))
-        expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen()
-        expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen()
+        expect(screen.getByText('Calendário')).toBeOnTheScreen();
+        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
+        expect(screen.getByTestId('confidence-badge')).toHaveTextContent('alta');
+        const tituloEConfianca = within(screen.getByTestId('titulo-e-confianca'));
+        expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen();
+        expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen();
         expect(estilos.centralizadorCabecalho).toMatchObject({
             position: 'absolute',
             left: 0,
             right: 0,
             alignItems: 'center'
-        })
+        });
         expect(estilos.caixaCalendario).toMatchObject({
             width: 288
-        })
+        });
         expect(estilos.tituloEConfianca).toMatchObject({
             flexDirection: 'column',
             alignItems: 'center'
-        })
+        });
         expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
             alignSelf: 'center',
             alignItems: 'center',
             justifyContent: 'center'
-        })
+        });
         //O grupo inteiro precisa caber antes do cabeçalho dos dias da semana.
-        const fimDoGrupo = estilos.centralizadorCabecalho.top + estilos.caixaCalendario.height
+        const fimDoGrupo = estilos.centralizadorCabecalho.top + estilos.caixaCalendario.height;
         expect(fimDoGrupo + estilos.cabecalho.paddingBottom).toBeLessThanOrEqual(
             estilos.cabecalho.height
-        )
-        expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen()
-        expect(screen.queryByRole('button', {name: 'Parâmetros do Ciclo'})).toBeNull()
-        expect(screen.getByRole('button', {name: 'Cadastrar Menstruação'})).toBeOnTheScreen()
-        expect(screen.queryByTestId('bottom-tab-bar')).toBeNull()
+        );
+        expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-safe-area')).toHaveProp('edges', {
+            top: 'off',
+            right: 'off',
+            bottom: 'additive',
+            left: 'off'
+        });
+        expect(screen.queryByRole('button', { name: 'Parâmetros do Ciclo' })).toBeNull();
+        expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
+        expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
         expect(estilos.rodape).toMatchObject({
             flexShrink: 0,
             borderTopWidth: 1,
             paddingLeft: 24,
             paddingRight: 24
-        })
+        });
 
-        await fireEvent.press(screen.getByRole('button', {name: 'Cadastrar Menstruação'}))
-        expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1)
-        await fireEvent.press(screen.getByRole('button', {name: 'Dia menstrual registrado'}))
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+        await fireEvent.press(screen.getByRole('button', { name: 'Dia menstrual registrado' }));
         expect(aoEditarCiclo).toHaveBeenCalledWith({
             data: '2026-10-04',
             registroCicloId: 9
-        })
+        });
         expect(screen.getByTestId('acao-legenda-calendario')).toHaveStyle({
             padding: 8,
             alignItems: 'center'
-        })
-        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 21.995)
-    })
+        });
+        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 21.995);
+    });
 
     test('abre e fecha a legenda pelo botão de informação', async () => {
         await render(
             <CalendarScreen
-                meses={[{mes: '2026-10', possuiCiclos: true}]}
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
                 confianca="media"
                 aoVoltar={jest.fn()}
             />
-        )
+        );
 
-        await fireEvent.press(
-            screen.getByRole('button', {name: 'Abrir legenda do calendário'})
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir legenda do calendário' }));
 
-        expect(await screen.findByText('Itens: 10')).toBeOnTheScreen()
+        expect(await screen.findByText('Itens: 10')).toBeOnTheScreen();
 
-        await fireEvent.press(
-            screen.getByRole('button', {name: 'Fechar painel'})
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar painel' }));
 
         await waitFor(() => {
-            expect(screen.queryByTestId('cycle-legend-sheet')).toBeNull()
-        })
-    })
+            expect(screen.queryByTestId('cycle-legend-sheet')).toBeNull();
+        });
+    });
 
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {
-        const aoCadastrarMenstruacao = jest.fn()
+        const aoCadastrarMenstruacao = jest.fn();
 
         await render(
             <CalendarScreen
-                meses={[{mes: '2026-10', possuiCiclos: false}]}
+                meses={[{ mes: '2026-10', possuiCiclos: false }]}
                 confianca="baixa"
                 aoVoltar={jest.fn()}
                 aoCadastrarMenstruacao={aoCadastrarMenstruacao}
             />
-        )
+        );
 
         expect(
-            screen.getByText('Você ainda não possui nenhum ciclo registrado. Toque em um dia no Calendário para começar.')
-        ).toBeOnTheScreen()
-        expect(screen.queryByTestId('confidence-badge')).toBeNull()
-        expect(screen.getAllByRole('button', {name: 'Cadastrar Menstruação'})).toHaveLength(1)
+            screen.getByText(
+                'Você ainda não possui nenhum ciclo registrado. Toque em um dia no Calendário para começar.'
+            )
+        ).toBeOnTheScreen();
+        expect(screen.queryByTestId('confidence-badge')).toBeNull();
+        expect(screen.getAllByRole('button', { name: 'Cadastrar Menstruação' })).toHaveLength(1);
 
-        await fireEvent.press(
-            screen.getByRole('button', {name: 'Cadastrar Menstruação'})
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
 
-        expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1)
-    })
+        expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    });
 
     test('mostra o erro e tenta carregar novamente', async () => {
-        const aoTentarNovamente = jest.fn()
+        const aoTentarNovamente = jest.fn();
 
         await render(
             <CalendarScreen
-                meses={[{mes: '2026-10', possuiCiclos: true}]}
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
                 confianca="alta"
                 erro="Não foi possível carregar os dados do calendário. Tente novamente."
                 aoVoltar={jest.fn()}
                 aoTentarNovamente={aoTentarNovamente}
             />
-        )
+        );
 
-        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen()
+        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
 
-        await fireEvent.press(
-            screen.getByRole('button', {name: 'Tentar novamente'})
-        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
 
-        expect(aoTentarNovamente).toHaveBeenCalledTimes(1)
-    })
+        expect(aoTentarNovamente).toHaveBeenCalledTimes(1);
+    });
 
     test('reabre o mesmo erro após uma nova falha, sem reabrir o erro já dispensado', async () => {
         const props = {
-            meses: [{mes: '2026-10', possuiCiclos: true}],
+            meses: [{ mes: '2026-10', possuiCiclos: true }],
             confianca: 'alta',
             aoVoltar: jest.fn()
-        }
-        const mensagem = 'Não foi possível carregar os dados do calendário. Tente novamente.'
-        const {rerender} = await render(<CalendarScreen {...props} erro={mensagem} />)
+        };
+        const mensagem = 'Não foi possível carregar os dados do calendário. Tente novamente.';
+        const { rerender } = await render(<CalendarScreen {...props} erro={mensagem} />);
 
-        await fireEvent.press(screen.getByRole('button', {name: 'Fechar'}))
-        expect(screen.queryByTestId('alert-modal')).toBeNull()
-        await rerender(<CalendarScreen {...props} erro={mensagem} />)
-        expect(screen.queryByTestId('alert-modal')).toBeNull()
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar' }));
+        expect(screen.queryByTestId('alert-modal')).toBeNull();
+        await rerender(<CalendarScreen {...props} erro={mensagem} />);
+        expect(screen.queryByTestId('alert-modal')).toBeNull();
 
-        await rerender(<CalendarScreen {...props} />)
-        await rerender(<CalendarScreen {...props} erro={mensagem} />)
-        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen()
-    })
+        await rerender(<CalendarScreen {...props} />);
+        await rerender(<CalendarScreen {...props} erro={mensagem} />);
+        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+    });
 
     test('fecha o erro pelo modal e ignora confiança desconhecida', async () => {
         await render(
             <CalendarScreen
-                meses={[{mes: '2026-10', possuiCiclos: true}]}
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
                 confianca="desconhecida"
                 erro="Falha"
             />
-        )
-        expect(screen.queryByTestId('confidence-badge')).toBeNull()
-        await fireEvent.press(screen.getByRole('button', {name: 'Fechar modal'}))
-        expect(screen.queryByTestId('alert-modal')).toBeNull()
-    })
-})
+        );
+        expect(screen.queryByTestId('confidence-badge')).toBeNull();
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar modal' }));
+        expect(screen.queryByTestId('alert-modal')).toBeNull();
+    });
+});

@@ -21,7 +21,8 @@ function criarPredictionService({ prisma, agora = () => new Date() }) {
                     take: CONFIG_PREVISAO.maximoIntervalos + 1,
                     select: {
                         dataInicio: true,
-                        dataFim: true
+                        dataFim: true,
+                        duracaoMenstruacao: true
                     }
                 }
             }

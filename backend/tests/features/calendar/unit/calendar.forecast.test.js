@@ -13,7 +13,8 @@ function criarCenario({
     duracaoCiclo = 28,
     duracaoMenstruacao = 5,
     duracaoLutea = 14,
-    registrosCiclo
+    registrosCiclo,
+    diasMenstruacao = []
 } = {}) {
     const registros = registrosCiclo ?? [{id: 1, dataInicio: inicio, dataFim: fim}];
     const parametros = {
@@ -32,7 +33,7 @@ function criarCenario({
                         registrosCiclo: registros,
                         _count: {registrosCiclo: registros.length}
                     },
-                    diasMenstruacao: []
+                    diasMenstruacao
                 };
             }
         }
@@ -60,9 +61,9 @@ function recortar(intervalo, mes) {
     };
 }
 
-function verificarCobertura(periodos, mes, inicioEsperado = `${mes}-01`) {
+function verificarCobertura(periodos, mes, inicioEsperado = `${mes}-01`, diasMenstruacao = []) {
     const limites = obterLimites(mes);
-    const diasCobertos = new Set();
+    const diasCobertos = new Set(diasMenstruacao.map(dia => dia.data));
     const camposIntervalo = [
         'faseMenstrual',
         'faseFolicular',
@@ -159,14 +160,19 @@ test('representa dois inícios previstos no mesmo mês sem perder os dias poster
 });
 
 test('mantém o último registro real separado dos períodos projetados', async () => {
-    const {service} = criarCenario();
+    const diasMenstruacao = [4, 5, 6, 7, 8].map(dia => ({
+        data: `2026-09-0${dia}`,
+        registroCicloId: 1
+    }));
+    const {service} = criarCenario({diasMenstruacao});
     const resultado = await service.buscarMes({usuarioId: 7, mes: '2026-09'});
     const periodoReal = resultado.previsao.periodos.find(periodo => periodo.previsto === false);
 
     assert.ok(periodoReal);
-    assert.deepEqual(periodoReal.faseMenstrual, {inicio: '2026-09-04', fim: '2026-09-08'});
+    assert.equal(periodoReal.faseMenstrual, null);
     assert.equal(periodoReal.menstruacaoPrevista, null);
-    verificarCobertura(resultado.previsao.periodos, '2026-09', '2026-09-04');
+    assert.deepEqual(resultado.diasMenstruacao, diasMenstruacao);
+    verificarCobertura(resultado.previsao.periodos, '2026-09', '2026-09-04', resultado.diasMenstruacao);
 });
 
 test('continua as previsões na mudança de dezembro para janeiro', async () => {

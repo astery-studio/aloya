@@ -1,88 +1,86 @@
 //Representa um ciclo registrado e mantém seus estados visuais consistentes no histórico.
-import {Text, View} from 'react-native'
+import { Text, View } from 'react-native';
 
-import {IconButton} from '../../../../shared/components/common/IconButton/IconButton'
-import {ArrowsClockwiseIcon, PencilSimpleIcon, TrashIcon, WarningCircleIcon} from '../../../../shared/components/icons/AppIcons'
-import {estilos} from './CycleHistoryCard.styles'
+import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
+import {
+    ArrowsClockwiseIcon,
+    PencilSimpleIcon,
+    TrashIcon,
+    WarningCircleIcon
+} from '../../../../shared/components/icons/AppIcons';
+import { estilos } from './CycleHistoryCard.styles';
 
-const estadosPermitidos = Object.freeze([
-    'emAndamento',
-    'concluido',
-    'incerto'
-])
+const estadosPermitidos = Object.freeze(['emAndamento', 'concluido', 'incerto']);
 
 const coresDoCiclo = Object.freeze({
     ativa: '#2C4C3B',
     desativada: '#A9A9A6'
-})
+});
 
-const corDoAviso = '#B97D22'
+const corDoAviso = '#B97D22';
 
 function normalizarNumeroDoCiclo(valor) {
     if (!Number.isInteger(valor) || valor <= 0) {
-        return '--'
+        return '--';
     }
 
-    return String(valor).padStart(2, '0')
+    return String(valor).padStart(2, '0');
 }
 
 function normalizarQuantidade(valor) {
     if (!Number.isInteger(valor) || valor < 0) {
-        return null
+        return null;
     }
 
-    return valor
+    return valor;
 }
 
 function normalizarPeriodo(valor) {
     if (typeof valor !== 'string' || !valor.trim()) {
-        return 'Período não informado'
+        return 'Período não informado';
     }
 
-    return valor.trim()
+    return valor.trim();
 }
 
 function obterEstado(valor) {
     if (estadosPermitidos.includes(valor)) {
-        return valor
+        return valor;
     }
 
-    return 'incerto'
+    return 'incerto';
 }
 
 function obterTextoDosDias(quantidade) {
-    return quantidade === 1 ? '1 dia' : `${quantidade} dias`
+    return quantidade === 1 ? '1 dia' : `${quantidade} dias`;
 }
 
-function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
-    const cicloSeguro = ciclo && typeof ciclo === 'object' ? ciclo : {}
-    const numero = normalizarNumeroDoCiclo(cicloSeguro.numero)
-    const periodo = normalizarPeriodo(cicloSeguro.periodo)
-    const diasMenstruais = normalizarQuantidade(cicloSeguro.diasMenstruais)
-    const duracaoDias = normalizarQuantidade(cicloSeguro.duracaoDias)
-    const estado = obterEstado(cicloSeguro.status)
-    const estaEmAndamento = estado === 'emAndamento'
-    const estimativaIncerta = estado === 'incerto'
-    const duracaoDisponivel = !estaEmAndamento && duracaoDias !== null
-    const rotuloDoCiclo = numero === '--' ? 'Ciclo sem número' : `Ciclo ${numero}`
+function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
+    const cicloSeguro = ciclo && typeof ciclo === 'object' ? ciclo : {};
+    const numero = normalizarNumeroDoCiclo(cicloSeguro.numero);
+    const periodo = normalizarPeriodo(cicloSeguro.periodo);
+    const diasMenstruais = normalizarQuantidade(cicloSeguro.diasMenstruais);
+    const duracaoDias = normalizarQuantidade(cicloSeguro.duracaoDias);
+    const estado = obterEstado(cicloSeguro.status);
+    const estaEmAndamento = estado === 'emAndamento';
+    const estimativaIncerta = estado === 'incerto';
+    const duracaoDisponivel = !estaEmAndamento && duracaoDias !== null;
+    const rotuloDoCiclo = numero === '--' ? 'Ciclo sem número' : `Ciclo ${numero}`;
 
     function editar() {
         if (typeof aoEditar === 'function') {
-            aoEditar(ciclo)
+            aoEditar(ciclo);
         }
     }
 
     function excluir() {
         if (typeof aoExcluir === 'function') {
-            aoExcluir(ciclo)
+            aoExcluir(ciclo);
         }
     }
 
     return (
-        <View
-            testID="cycle-history-card"
-            style={estilos.container}
-        >
+        <View testID="cycle-history-card" style={estilos.container}>
             <View style={[estilos.cabecalho, estaEmAndamento && estilos.cabecalhoEmAndamento]}>
                 <View style={estilos.linhaDoCabecalho}>
                     <View style={estilos.identificacao}>
@@ -92,23 +90,16 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
                             accessibilityLabel={rotuloDoCiclo}
                             style={estilos.numero}
                         >
-                            <Text style={estilos.textoDoNumero}>
-                                {numero}
-                            </Text>
+                            <Text style={estilos.textoDoNumero}>{numero}</Text>
                         </View>
 
                         <View style={estilos.textos}>
-                            <Text
-                                numberOfLines={2}
-                                style={estilos.periodo}
-                            >
+                            <Text numberOfLines={2} style={estilos.periodo}>
                                 {periodo}
                             </Text>
 
                             {estaEmAndamento ? (
-                                <Text style={estilos.status}>
-                                    Em andamento
-                                </Text>
+                                <Text style={estilos.status}>Em andamento</Text>
                             ) : null}
                         </View>
                     </View>
@@ -138,7 +129,11 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
                     <View
                         accessible
                         accessibilityRole="text"
-                        accessibilityLabel={diasMenstruais === null ? 'Dias de menstruação não informados' : `${obterTextoDosDias(diasMenstruais)} de menstruação`}
+                        accessibilityLabel={
+                            diasMenstruais === null
+                                ? 'Dias de menstruação não informados'
+                                : `${obterTextoDosDias(diasMenstruais)} de menstruação`
+                        }
                         style={[estilos.indicador, estilos.indicadorMenstruacao]}
                     >
                         <Text
@@ -161,7 +156,11 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
                     <View
                         accessible
                         accessibilityRole="text"
-                        accessibilityLabel={duracaoDisponivel ? `${obterTextoDosDias(duracaoDias)} de ciclo` : 'Duração do ciclo ainda não disponível'}
+                        accessibilityLabel={
+                            duracaoDisponivel
+                                ? `${obterTextoDosDias(duracaoDias)} de ciclo`
+                                : 'Duração do ciclo ainda não disponível'
+                        }
                         style={[
                             estilos.indicador,
                             estilos.indicadorCiclo,
@@ -174,11 +173,13 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
                             weight="regular"
                         />
 
-                        <Text style={[
-                            estilos.valorDoIndicador,
-                            estilos.textoCiclo,
-                            !duracaoDisponivel && estilos.textoIndisponivel
-                        ]}>
+                        <Text
+                            style={[
+                                estilos.valorDoIndicador,
+                                estilos.textoCiclo,
+                                !duracaoDisponivel && estilos.textoIndisponivel
+                            ]}
+                        >
                             {duracaoDisponivel ? obterTextoDosDias(duracaoDias) : '—'}
                         </Text>
 
@@ -202,16 +203,10 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
                         accessibilityLabel="Estimativa incerta. Os dados deste ciclo podem ser imprecisos."
                         style={estilos.aviso}
                     >
-                        <WarningCircleIcon
-                            size={20}
-                            color={corDoAviso}
-                            weight="fill"
-                        />
+                        <WarningCircleIcon size={20} color={corDoAviso} weight="fill" />
 
                         <View style={estilos.textosDoAviso}>
-                            <Text style={estilos.tituloDoAviso}>
-                                Estimativa incerta
-                            </Text>
+                            <Text style={estilos.tituloDoAviso}>Estimativa incerta</Text>
 
                             <Text style={estilos.mensagemDoAviso}>
                                 Os dados deste ciclo podem ser imprecisos.
@@ -221,7 +216,7 @@ function CycleHistoryCard({ciclo, aoEditar, aoExcluir}) {
                 ) : null}
             </View>
         </View>
-    )
+    );
 }
 
-export {CycleHistoryCard}
+export { CycleHistoryCard };

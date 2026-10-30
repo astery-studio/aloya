@@ -70,7 +70,8 @@ test('busca o estado atual sem consultar os dias do calendário', async () => {
                 select: {
                     id: true,
                     dataInicio: true,
-                    dataFim: true
+                    dataFim: true,
+                    duracaoMenstruacao: true
                 }
             }
         }

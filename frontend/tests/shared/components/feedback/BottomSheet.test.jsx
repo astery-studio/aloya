@@ -2,6 +2,10 @@ import { Animated, Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
 import { BottomSheet } from '../../../../src/shared/components/feedback/BottomSheet/BottomSheet';
 
+jest.mock('react-native-safe-area-context', () => ({
+    useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 32, left: 0 })
+}));
+
 function obterModal(container) {
     const modais = container.queryAll(
         (elemento) =>
@@ -26,6 +30,17 @@ describe('BottomSheet', () => {
         );
 
         expect(screen.getByText('Conteúdo do painel')).toBeOnTheScreen();
+    });
+
+    test('reserva a área inferior segura do dispositivo no painel', async () => {
+        await render(
+            <BottomSheet visivel>
+                <Text>Conteúdo</Text>
+            </BottomSheet>
+        );
+
+        const estilosPainel = screen.getByTestId('bottom-sheet-panel').props.style;
+        expect(estilosPainel).toHaveProperty('paddingBottom', 32);
     });
 
     test('configura o modal como transparente e sem animação automática', async () => {
