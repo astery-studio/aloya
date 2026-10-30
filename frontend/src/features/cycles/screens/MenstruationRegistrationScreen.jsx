@@ -58,3 +58,63 @@ function MenstruationRegistrationScreen({
             <View style={estilos.cabecalho}>
                 <Text accessibilityRole="header" style={estilos.titulo}>
                     Cadastrar menstruação
+                </Text>
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Voltar"
+                    disabled={salvando || typeof onVoltar !== 'function'}
+                    onPress={onVoltar}
+                    style={estilos.voltar}
+                >
+                    <ArrowLeftIcon size={24} color="#5C5C59" />
+                </Pressable>
+            </View>
+            <View style={estilos.legenda}>
+                <View style={estilos.itemLegenda}>
+                    <View style={estilos.simboloAnterior} />
+                    <Text style={estilos.textoLegenda}>Ciclo anterior</Text>
+                </View>
+                <View style={estilos.itemLegenda}>
+                    <View style={estilos.simboloSelecionado} />
+                    <Text style={estilos.textoLegenda}>Selecionando agora</Text>
+                </View>
+            </View>
+            <View style={estilos.diasSemana}>
+                {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((dia) => (
+                    <Text key={dia} style={estilos.nomeSemana}>
+                        {dia}
+                    </Text>
+                ))}
+            </View>
+            <MenstruationRegistrationCalendar
+                meses={mesesValidos}
+                datasSelecionadas={selecionadas}
+                hoje={hoje}
+                bloqueado={salvando}
+                onAlternarData={onAlternarData}
+                onIniciarFaixa={onIniciarFaixa}
+                onConflito={() => setConflitoLocal(true)}
+                onCarregarAnteriores={onCarregarAnteriores}
+            />
+            {mesesValidos.length === 0 && <Text style={estilos.vazio}>Nenhum mês disponível.</Text>}
+            {selecionadas.length === 1 && (
+                <View style={estilos.ajuda}>
+                    <InfoIcon size={20} color="#2D5141" />
+                    <Text style={estilos.textoAjuda}>
+                        Agora toque no último dia para completar o período menstrual.
+                    </Text>
+                </View>
+            )}
+            <SyncStatusIndicator
+                status={statusSincronizacao}
+                mensagem={mensagemSincronizacao}
+                onTentarNovamente={onTentarNovamente}
+            />
+            <View style={estilos.rodape}>
+                <ButtonScreen
+                    texto="Salvar"
+                    aoPressionar={
+                        typeof onSalvar === 'function'
+                            ? () => onSalvar([...selecionadas])
+                            : undefined
+                    }
