@@ -1,28 +1,46 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
-import {useState} from 'react'
-import {Pressable, Text, View} from 'react-native'
-import {SafeAreaView} from 'react-native-safe-area-context'
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen'
-import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
-import {ArrowLeftIcon, InfoIcon} from '../../../shared/components/icons/AppIcons'
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
-import {CycleCalendar} from '../components/CycleCalendar/CycleCalendar'
-import {CycleLegendSheet} from '../components/CycleLegendSheet/CycleLegendSheet'
-import {estilos} from './CalendarScreen.styles'
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { ArrowLeftIcon, InfoIcon } from '../../../shared/components/icons/AppIcons';
+import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
+import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
+import { estilos } from './CalendarScreen.styles';
+import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
 
 const ITENS_LEGENDA = Object.freeze([
-    {id: 'menstruacao-real', tipo: 'menstruacao', titulo: 'Menstruação', descricao: 'Dias de menstruação', prevista: false},
-    {id: 'folicular-real', tipo: 'folicular', titulo: 'Fase Folicular', descricao: 'Período de fase folicular', prevista: false},
-    {id: 'ovulacao-real', tipo: 'ovulacao', titulo: 'Ovulação', descricao: 'Período de ovulação', prevista: false},
-    {id: 'lutea-real', tipo: 'lutea', titulo: 'Fase Lútea', descricao: 'Período de fase lútea', prevista: false},
-    {id: 'janela-real', tipo: 'janelaFertil', titulo: 'Janela Fértil', descricao: 'Dias com maior probabilidade de engravidar', prevista: false},
-    {id: 'menstruacao-prevista', tipo: 'menstruacao', titulo: 'Provável Menstruação', descricao: 'Previsão dos dias de menstruação', prevista: true},
-    {id: 'folicular-prevista', tipo: 'folicular', titulo: 'Provável Fase Folicular', descricao: 'Previsão do período de fase folicular', prevista: true},
-    {id: 'ovulacao-prevista', tipo: 'ovulacao', titulo: 'Provável Ovulação', descricao: 'Previsão do período de ovulação', prevista: true},
-    {id: 'lutea-prevista', tipo: 'lutea', titulo: 'Provável Fase Lútea', descricao: 'Previsão de fase lútea', prevista: true},
-    {id: 'janela-prevista', tipo: 'janelaFertil', titulo: 'Provável Janela Fértil', descricao: 'Previsão da janela fértil', prevista: true}
-])
+    {
+        id: 'menstruacao-real',
+        tipo: 'menstruacao',
+        titulo: 'Menstruação',
+        descricao: 'Dias de menstruação',
+        prevista: false
+    },
+    {
+        id: 'folicular-real',
+        tipo: 'folicular',
+        titulo: 'Fase Folicular',
+        descricao: 'Período de fase folicular',
+        prevista: false
+    },
+    {
+        id: 'ovulacao-real',
+        tipo: 'ovulacao',
+        titulo: 'Ovulação',
+        descricao: 'Período de ovulação',
+        prevista: false
+    },
+    {
+        id: 'lutea-real',
+        tipo: 'lutea',
+        titulo: 'Fase Lútea',
+        descricao: 'Período de fase lútea',
+        prevista: false
+    },
 
 function normalizarConfianca(valor) {
     if (typeof valor !== 'string') return null
