@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { CycleForecastPanel } from '../../../../src/features/cycles/components/CycleForecastPanel';
 import { estilos } from '../../../../src/features/cycles/components/CycleForecastPanel.styles';
 import { conteudoPorFase } from '../../../../src/features/cycles/constants/phaseContent';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const previsao = {
     status: 'DISPONIVEL',
@@ -28,10 +29,30 @@ test('mantém o estado sem dados dentro da HU-013', async () => {
 });
 
 test.each([
-    ['menstrual', 'Fase Menstrual', 'O ciclo recomeça. O corpo libera o revestimento uterino e a energia tende a se voltar para dentro. É um bom momento para reduzir o ritmo e observar como você se sente.', 'Sensação de cansaço'],
-    ['folicular', 'Fase Folicular', 'Os níveis hormonais começam a subir e muitas pessoas relatam mais disposição e clareza. É uma janela em que o corpo se prepara gradualmente para a ovulação.', 'Aumento de energia'],
-    ['ovulatoria', 'Fase Ovulatória', 'O óvulo é liberado e o corpo atinge um ponto de maior expansão no ciclo. É a fase em que a fertilidade estimada é mais alta.', 'Pico de energia'],
-    ['lutea', 'Fase Lútea', 'Após a ovulação, o corpo entra em uma fase de transição. A energia costuma diminuir gradualmente conforme o ciclo se aproxima do fim.', 'Retenção de líquidos']
+    [
+        'menstrual',
+        'Fase Menstrual',
+        'O ciclo recomeça. O corpo libera o revestimento uterino e a energia tende a se voltar para dentro. É um bom momento para reduzir o ritmo e observar como você se sente.',
+        'Sensação de cansaço'
+    ],
+    [
+        'folicular',
+        'Fase Folicular',
+        'Os níveis hormonais começam a subir e muitas pessoas relatam mais disposição e clareza. É uma janela em que o corpo se prepara gradualmente para a ovulação.',
+        'Aumento de energia'
+    ],
+    [
+        'ovulatoria',
+        'Fase Ovulatória',
+        'O óvulo é liberado e o corpo atinge um ponto de maior expansão no ciclo. É a fase em que a fertilidade estimada é mais alta.',
+        'Pico de energia'
+    ],
+    [
+        'lutea',
+        'Fase Lútea',
+        'Após a ovulação, o corpo entra em uma fase de transição. A energia costuma diminuir gradualmente conforme o ciclo se aproxima do fim.',
+        'Retenção de líquidos'
+    ]
 ])('exibe conteúdo completo da fase %s', async (fase, titulo, descricao, sintoma) => {
     await render(
         <CycleForecastPanel
@@ -43,12 +64,17 @@ test.each([
     );
 
     expect(screen.getByText(titulo)).toBeOnTheScreen();
-    expect(screen.getByText(titulo)).toHaveStyle({ fontFamily: 'DMSans_700Bold', fontWeight: '700' });
+    expect(screen.getByText(titulo)).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontWeight: '700'
+    });
     expect(screen.getByLabelText(`Símbolo provisório: ${titulo}`)).toBeOnTheScreen();
     expect(screen.getByText(descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
     expect(screen.getByText('Observe como seu corpo está se sentindo hoje.')).toBeOnTheScreen();
-    expect(screen.getByText('Continue registrando suas percepções ao longo do ciclo.')).toBeOnTheScreen();
+    expect(
+        screen.getByText('Continue registrando suas percepções ao longo do ciclo.')
+    ).toBeOnTheScreen();
 });
 
 test('executa as três ações do painel com previsão', async () => {
@@ -147,9 +173,21 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
     expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 62 });
     expect(estilos.textoAvisoBaixa).toMatchObject({ flex: 1, maxWidth: 226 });
     expect(estilos.rotuloPrevisao.letterSpacing).toBe(1.44);
-    expect(estilos.rotuloPrevisaoSecundaria).toMatchObject({ fontFamily: 'DMSans_700Bold', fontSize: 12, letterSpacing: 1.2 });
-    expect(estilos.valorOvulacao).toMatchObject({ fontFamily: 'DMSans_700Bold', fontSize: 18, lineHeight: 27 });
-    expect(estilos.valorSecundario).toMatchObject({ fontFamily: 'DMSans_700Bold', fontSize: 15, lineHeight: 21 });
+    expect(estilos.rotuloPrevisaoSecundaria).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 12,
+        letterSpacing: 1.2
+    });
+    expect(estilos.valorOvulacao).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 18,
+        lineHeight: 27
+    });
+    expect(estilos.valorSecundario).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 15,
+        lineHeight: 21
+    });
     expect(estilos.acoes.gap).toBe(16);
     expect(estilos.acoesSemCiclo.gap).toBe(16);
     expect(estilos.secaoPrevisao.paddingTop).toBe(24);
@@ -167,16 +205,26 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
 
 test('declara os pesos tipográficos especificados para os textos da HU-013', () => {
     expect(estilos).toMatchObject({
-        tituloFase: { fontWeight: '700' }, diaCiclo: { fontWeight: '400' },
-        tituloDestaqueFertil: { fontWeight: '700' }, textoDestaqueFertil: { fontWeight: '400' },
-        rotuloPrevisao: { fontWeight: '700' }, rotuloPrevisaoSecundaria: { fontWeight: '700' },
-        valorPrincipal: { fontWeight: '700' }, valorOvulacao: { fontWeight: '700' },
-        tituloAvisoConfiabilidade: { fontWeight: '700' }, textoAvisoConfiabilidade: { fontWeight: '400' },
-        textoAvisoBaixa: { fontWeight: '400' }, valorSecundario: { fontWeight: '700' },
-        aviso: { fontWeight: '400' }, tituloSecao: { fontWeight: '700' },
-        descricaoFase: { fontWeight: '400' }, textoSintoma: { fontWeight: '500' },
-        textoNumeroDica: { fontWeight: '700' }, textoDica: { fontWeight: '400' },
-        chamadaRecursos: { fontWeight: '700' }, tituloRecurso: { fontWeight: '700' },
+        tituloFase: { fontWeight: '700' },
+        diaCiclo: { fontWeight: '400' },
+        tituloDestaqueFertil: { fontWeight: '700' },
+        textoDestaqueFertil: { fontWeight: '400' },
+        rotuloPrevisao: { fontWeight: '700' },
+        rotuloPrevisaoSecundaria: { fontWeight: '700' },
+        valorPrincipal: { fontWeight: '700' },
+        valorOvulacao: { fontWeight: '700' },
+        tituloAvisoConfiabilidade: { fontWeight: '700' },
+        textoAvisoConfiabilidade: { fontWeight: '400' },
+        textoAvisoBaixa: { fontWeight: '400' },
+        valorSecundario: { fontWeight: '700' },
+        aviso: { fontWeight: '400' },
+        tituloSecao: { fontWeight: '700' },
+        descricaoFase: { fontWeight: '400' },
+        textoSintoma: { fontWeight: '500' },
+        textoNumeroDica: { fontWeight: '700' },
+        textoDica: { fontWeight: '400' },
+        chamadaRecursos: { fontWeight: '700' },
+        tituloRecurso: { fontWeight: '700' },
         descricaoRecurso: { fontWeight: '400' }
     });
 });

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/features/cycles/components/CycleParameterField', () => {
     const { Pressable, Text } = require('react-native');
@@ -67,4 +68,14 @@ test('encaminha alterações e salvamento habilitado', async () => {
 
     expect(onAlterar).toHaveBeenCalledWith('duracaoCicloInformada', 29);
     expect(onSalvar).toHaveBeenCalledTimes(1);
+});
+
+test('aplica a cor secundária do modo escuro ao título', async () => {
+    await render(<CycleParametersForm valores={valores} onAlterar={jest.fn()} />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByText('Dados do Ciclo')).toHaveStyle({
+        color: '#C4C8C5'
+    });
 });

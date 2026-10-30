@@ -3,19 +3,16 @@
  */
 import { memo, useState } from 'react';
 import { Pressable } from 'react-native';
-import { EyeIcon as Eye, EyeSlashIcon as EyeSlash } from '../../icons/AppIcons';
-import { cores } from '../../../theme';
+import { EyeIcon as Eye } from 'phosphor-react-native/src/icons/Eye';
+import { EyeSlashIcon as EyeSlash } from 'phosphor-react-native/src/icons/EyeSlash';
+import { useTheme } from '../../../hooks/useTheme';
 import TextInput from '../TextInput/TextInput';
-import { estilos } from '../TextInput/TextInput.styles';
-
-const IconeVazio = () => null;
 
 // Recebe as opções de senha, permite alternar sua visibilidade e devolve o texto.
-function PasswordInput({
-    label = 'Senha', placeholder = label, desativado = false, ...props
-}) {
+function PasswordInput({ label = 'Senha', placeholder = label, desativado = false, ...props }) {
+    const tema = useTheme();
     const [visivel, definirVisivel] = useState(false);
-    const Icone = (visivel ? Eye : EyeSlash) || IconeVazio;
+    const Icone = visivel ? Eye : EyeSlash;
 
     return (
         <TextInput
@@ -32,9 +29,9 @@ function PasswordInput({
                     accessibilityLabel={visivel ? 'Ocultar senha' : 'Mostrar senha'}
                     disabled={desativado}
                     onPress={() => definirVisivel(!visivel)}
-                    style={estilos.acao}
+                    style={{ padding: 8, marginRight: -8 }}
                 >
-                    <Icone size={22} color={cores.neutras.textoSecundarioClaro} />
+                    <Icone size={22} color={tema.cores.interface.textoSecundario} />
                 </Pressable>
             }
             {...props}

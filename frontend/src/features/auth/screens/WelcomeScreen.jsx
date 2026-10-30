@@ -1,12 +1,17 @@
 /**
  * Tela inicial que encaminha a pessoa para criação de conta ou login.
  */
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../../../shared/components/common/Button/Button';
-import { estilos } from './WelcomeScreen.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './WelcomeScreen.styles';
 
 export default function WelcomeScreen({ aoCriarConta, aoEntrar, logo }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     return (
         <SafeAreaView style={estilos.tela}>
             <View style={estilos.logo}>

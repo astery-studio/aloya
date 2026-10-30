@@ -1,9 +1,12 @@
 /**
  * Testes das validações e transições executadas durante o onboarding.
  */
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { BackHandler } from 'react-native';
 import OnboardingScreen from '../../src/features/onboarding/screens/OnboardingScreen';
+import { renderWithTheme } from '../helpers/renderWithTheme';
+
+const render = renderWithTheme;
 
 jest.mock('../../src/shared/storage/tokenStorage', () => ({ salvarToken: jest.fn() }));
 jest.setTimeout(15000);
@@ -26,7 +29,7 @@ afterEach(() => {
 
 test('cadastro explica quando o nome tem menos de três caracteres', async () => {
     const cadastrar = jest.fn();
-    await render(<OnboardingScreen cadastrar={cadastrar} />);
+    await renderWithTheme(<OnboardingScreen cadastrar={cadastrar} />);
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Al');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'al@email.com');
@@ -39,16 +42,18 @@ test('cadastro explica quando o nome tem menos de três caracteres', async () =>
     await fireEvent.press(avancar);
 
     expect(screen.getByText('Nome inválido')).toBeTruthy();
-    expect(screen.getAllByText(
-        'O nome deve ter pelo menos 3 caracteres.'
-    )).toHaveLength(2);
+    expect(screen.getAllByText('O nome deve ter pelo menos 3 caracteres.')).toHaveLength(2);
     expect(cadastrar).not.toHaveBeenCalled();
 });
 
 test('cadastro não avança quando o e-mail já existe', async () => {
     const verificarEmailDisponivel = jest.fn().mockResolvedValue({ disponivel: false });
-    await render(<OnboardingScreen cadastrar={jest.fn()}
-        verificarEmailDisponivel={verificarEmailDisponivel} />);
+    await renderWithTheme(
+        <OnboardingScreen
+            cadastrar={jest.fn()}
+            verificarEmailDisponivel={verificarEmailDisponivel}
+        />
+    );
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'carla@email.com');
@@ -66,9 +71,14 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
         autenticacao: { token: 'jwt', tipo: 'Bearer' }
     });
     const seletor = () => null;
-    await render(<OnboardingScreen cadastrar={cadastrar}
-        renderizarSeletorCiclo={seletor}
-        renderizarSeletorMenstruacao={seletor} renderizarSeletorLutea={seletor} />);
+    await renderWithTheme(
+        <OnboardingScreen
+            cadastrar={cadastrar}
+            renderizarSeletorCiclo={seletor}
+            renderizarSeletorMenstruacao={seletor}
+            renderizarSeletorLutea={seletor}
+        />
+    );
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'carla@email.com');
@@ -84,14 +94,16 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 
-    expect(cadastrar).toHaveBeenCalledWith(expect.objectContaining({
-        duracaoLuteaInformada: 14
-    }));
+    expect(cadastrar).toHaveBeenCalledWith(
+        expect.objectContaining({
+            duracaoLuteaInformada: 14
+        })
+    );
     expect(() => JSON.stringify(cadastrar.mock.calls[0][0])).not.toThrow();
 });
 
 test('cadastro rejeita senha curta junto ao campo', async () => {
-    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()} />);
 
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'carla@email.com');
@@ -100,13 +112,13 @@ test('cadastro rejeita senha curta junto ao campo', async () => {
     await fireEvent.press(screen.getByRole('checkbox'));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 
-    expect(screen.getAllByText(
-        'A senha deve possuir pelo menos 8 caracteres.'
-    ).length).toBeGreaterThanOrEqual(1);
+    expect(
+        screen.getAllByText('A senha deve possuir pelo menos 8 caracteres.').length
+    ).toBeGreaterThanOrEqual(1);
 });
 
 test('nome remove números e caracteres especiais durante a digitação', async () => {
-    await render(<OnboardingScreen cadastrar={jest.fn()} />);
+    await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()} />);
 
     const nome = screen.getByLabelText('Nome');
     await fireEvent.changeText(nome, 'Carla 123! Cristina');

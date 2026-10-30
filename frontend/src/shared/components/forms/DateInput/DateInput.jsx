@@ -1,18 +1,25 @@
 /**
  * Campo controlado que aplica máscara de data e abre o teclado ao ser pressionado.
  */
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import { CalendarBlankIcon as CalendarBlank } from '../../icons/AppIcons';
-import { cores } from '../../../theme';
+import { CalendarBlankIcon as CalendarBlank } from 'phosphor-react-native/src/icons/CalendarBlank';
+import { useTheme } from '../../../hooks/useTheme';
 import { formatDate } from '../../../utils/date/formatDate';
-import { estilos } from './DateInput.styles';
+import { criarEstilos } from './DateInput.styles';
 
 export default function DateInput({
-    valor = '', onChangeText, desativado = false,
-    estilo, rotuloAcessibilidade = 'Data',
-    onFocus, onBlur, testeId = 'campo-data'
+    valor = '',
+    onChangeText,
+    desativado = false,
+    estilo,
+    rotuloAcessibilidade = 'Data',
+    onFocus,
+    onBlur,
+    testeId = 'campo-data'
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const entradaRef = useRef(null);
     const [focado, setFocado] = useState(false);
     return (
@@ -24,7 +31,7 @@ export default function DateInput({
             style={[estilos.botao, desativado && estilos.desativado, estilo]}
         >
             <View style={[estilos.campo, focado && estilos.focado]} testID={testeId}>
-                <CalendarBlank size={20} color={cores.neutras.textoSecundarioClaro} />
+                <CalendarBlank size={20} color={tema.cores.interface.textoSecundario} />
                 <TextInput
                     ref={entradaRef}
                     accessibilityLabel={rotuloAcessibilidade}
@@ -32,7 +39,8 @@ export default function DateInput({
                     keyboardType="number-pad"
                     maxLength={10}
                     placeholder="DD/MM/AAAA"
-                    placeholderTextColor={cores.neutras.textoSecundarioClaro}
+                    placeholderTextColor={tema.cores.interface.textoSecundario}
+                    selectionColor={tema.cores.interface.destaque}
                     value={valor}
                     onChangeText={(texto) => onChangeText?.(formatDate(texto))}
                     onFocus={(evento) => {

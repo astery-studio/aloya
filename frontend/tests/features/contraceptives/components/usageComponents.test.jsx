@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, within } from '@testing-library/react-native';
+import { fireEvent, screen, within } from '@testing-library/react-native';
+import { render } from '../mockTheme';
 import { PendingUsesBanner } from '../../../../src/features/contraceptives/components/PendingUsesBanner';
 import { UsageCalendar } from '../../../../src/features/contraceptives/components/UsageCalendar';
 import { UsageHistoryPanel } from '../../../../src/features/contraceptives/components/UsageHistoryPanel';
@@ -78,12 +79,14 @@ test('apresenta explicitamente a ausência de confirmação', async () => {
     await render(
         <UsageHistoryPanel
             expandido
-            registros={[{
-                id: '1',
-                data: '04/09/2026',
-                horarioProgramado: '14:00',
-                estado: 'naoConfirmado'
-            }]}
+            registros={[
+                {
+                    id: '1',
+                    data: '04/09/2026',
+                    horarioProgramado: '14:00',
+                    estado: 'naoConfirmado'
+                }
+            ]}
             aoAlternar={jest.fn()}
         />
     );
@@ -111,7 +114,11 @@ test('mapeia todos os estados de histórico para o StatusBadge correto', async (
 });
 
 test('reproduz as medidas exatas do painel e dos registros', () => {
-    expect(estilosUso.cabecalhoPainel).toMatchObject({ width: '100%', minHeight: 28, paddingTop: 10 });
+    expect(estilosUso.cabecalhoPainel).toMatchObject({
+        width: '100%',
+        minHeight: 28,
+        paddingTop: 10
+    });
     expect(estilosUso.botaoPainel).toMatchObject({ minWidth: 124.99, minHeight: 18, gap: 4 });
     expect(estilosUso.tituloPainel).toMatchObject({
         minWidth: 93,
@@ -140,7 +147,10 @@ test('apresenta calendário e permite navegar entre meses', async () => {
     await render(
         <UsageCalendar
             mes="2026-09"
-            dias={[{ dia: 3, estado: 'confirmado' }, { dia: 4, estado: 'foraDoPrazo' }]}
+            dias={[
+                { dia: 3, estado: 'confirmado' },
+                { dia: 4, estado: 'foraDoPrazo' }
+            ]}
             aoMesAnterior={anterior}
             aoProximoMes={proximo}
         />
@@ -206,22 +216,12 @@ test('destaca o dia atual sem depender dos estados de uso', async () => {
 
 test('mantém cinco semanas no protótipo e comporta meses com seis semanas', async () => {
     const { rerender } = await render(
-        <UsageCalendar
-            mes="2026-09"
-            dias={[]}
-            aoMesAnterior={jest.fn()}
-            aoProximoMes={jest.fn()}
-        />
+        <UsageCalendar mes="2026-09" dias={[]} aoMesAnterior={jest.fn()} aoProximoMes={jest.fn()} />
     );
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 256.43 });
 
     await rerender(
-        <UsageCalendar
-            mes="2026-08"
-            dias={[]}
-            aoMesAnterior={jest.fn()}
-            aoProximoMes={jest.fn()}
-        />
+        <UsageCalendar mes="2026-08" dias={[]} aoMesAnterior={jest.fn()} aoProximoMes={jest.fn()} />
     );
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 291.43 });
 });
@@ -236,8 +236,18 @@ test('reproduz as medidas e a tipografia exatas do calendário', () => {
         borderRadius: 12
     });
     expect(estilosUso.cabecalhoCalendario).toMatchObject({ width: '100%', minHeight: 22 });
-    expect(estilosUso.botaoMes).toMatchObject({ width: 26, height: 22, paddingVertical: 4, paddingHorizontal: 6 });
-    expect(estilosUso.tituloMes).toMatchObject({ minHeight: 18, fontWeight: '700', fontSize: 12, lineHeight: 18 });
+    expect(estilosUso.botaoMes).toMatchObject({
+        width: 26,
+        height: 22,
+        paddingVertical: 4,
+        paddingHorizontal: 6
+    });
+    expect(estilosUso.tituloMes).toMatchObject({
+        minHeight: 18,
+        fontWeight: '700',
+        fontSize: 12,
+        lineHeight: 18
+    });
     expect(estilosUso.margemDiasSemana).toMatchObject({ minHeight: 19.49, paddingTop: 6 });
     expect(estilosUso.diaSemana).toMatchObject({
         minHeight: 13.49,
@@ -274,7 +284,12 @@ test('preserva a tipografia e espaçamento da legenda sem limitar a medição na
         height: 5.99,
         borderRadius: 2.99578
     });
-    expect(estilosUso.textoLegenda).toMatchObject({ minHeight: 15, fontSize: 10, lineHeight: 15, includeFontPadding: false });
+    expect(estilosUso.textoLegenda).toMatchObject({
+        minHeight: 15,
+        fontSize: 10,
+        lineHeight: 15,
+        includeFontPadding: false
+    });
     expect(estilosUso.textoLegenda.width).toBeUndefined();
     expect(estilosUso.textoLegenda.height).toBeUndefined();
     expect(estilosUso.legenda.height).toBeUndefined();
@@ -319,17 +334,27 @@ test('reconhece datas brasileiras, timestamps ISO e os estados equivalentes no c
 });
 
 test('a lista apresenta as datas ISO no formato do protótipo', async () => {
-    await render(<UsageHistoryPanel expandido registros={[{ id: '1', data: '2026-09-05', estado: 'confirmado' }]} />);
+    await render(
+        <UsageHistoryPanel
+            expandido
+            registros={[{ id: '1', data: '2026-09-05', estado: 'confirmado' }]}
+        />
+    );
     expect(screen.getByText('05/09/2026')).toBeOnTheScreen();
 });
 
 test('o calendário não esconde uma dose não confirmada quando outra dose do dia foi confirmada', async () => {
-    await render(<UsageCalendar mes="2026-09" dias={[
-        { data: '05/09/2026', estado: 'naoConfirmado' },
-        { data: '05/09/2026', estado: 'confirmado' },
-        { data: '06/09/2026', estado: 'confirmado' },
-        { data: '06/09/2026', estado: 'foraDoPrazo' }
-    ]} />);
+    await render(
+        <UsageCalendar
+            mes="2026-09"
+            dias={[
+                { data: '05/09/2026', estado: 'naoConfirmado' },
+                { data: '05/09/2026', estado: 'confirmado' },
+                { data: '06/09/2026', estado: 'confirmado' },
+                { data: '06/09/2026', estado: 'foraDoPrazo' }
+            ]}
+        />
+    );
     expect(screen.getByLabelText('Dia 5, Não confirmado')).toBeOnTheScreen();
     expect(screen.getByLabelText('Dia 6, Fora do prazo')).toBeOnTheScreen();
 });
@@ -355,19 +380,38 @@ test('cada cor vem do estado real e coincide com a legenda; a borda cinza indica
     jest.useFakeTimers();
     jest.setSystemTime(new Date(2026, 8, 7, 12));
     try {
-        await render(<UsageCalendar mes="2026-09" dias={[
-            { data: '2026-09-03', statusUso: 'nao_confirmado' },
-            { data: '2026-09-04', status: 'confirmado', confirmacaoForaPrazo: true },
-            { data: '2026-09-05', estado: 'confirmado' },
-            { data: '2026-09-06', estado: 'pendente' },
-            { data: '2026-09-07', estado: 'confirmado' }
-        ]} />);
-        for (const [dia, estado, rotulo] of [[3, 'naoConfirmado', 'Não confirmado'], [4, 'foraDoPrazo', 'Fora do prazo'], [5, 'confirmado', 'Confirmado']]) {
+        await render(
+            <UsageCalendar
+                mes="2026-09"
+                dias={[
+                    { data: '2026-09-03', statusUso: 'nao_confirmado' },
+                    { data: '2026-09-04', status: 'confirmado', confirmacaoForaPrazo: true },
+                    { data: '2026-09-05', estado: 'confirmado' },
+                    { data: '2026-09-06', estado: 'pendente' },
+                    { data: '2026-09-07', estado: 'confirmado' }
+                ]}
+            />
+        );
+        for (const [dia, estado, rotulo] of [
+            [3, 'naoConfirmado', 'Não confirmado'],
+            [4, 'foraDoPrazo', 'Fora do prazo'],
+            [5, 'confirmado', 'Confirmado']
+        ]) {
             const celula = screen.getByLabelText(`Dia ${dia}, ${rotulo}`);
-            expect(celula).toHaveStyle({ backgroundColor: estilosUso[`marcador_${estado}`].backgroundColor });
+            expect(celula).toHaveStyle({
+                backgroundColor: estilosUso[`marcador_${estado}`].backgroundColor
+            });
             expect(celula).not.toHaveStyle({ borderColor: '#E6E2D8' });
         }
-        expect(screen.getByLabelText('Dia 6, sem registro')).not.toHaveStyle({ backgroundColor: estilosUso.celula_naoConfirmado.backgroundColor });
-        expect(screen.getByLabelText('Dia 7, Confirmado')).toHaveStyle({ borderWidth: 1, borderColor: '#E6E2D8', backgroundColor: estilosUso.celula_confirmado.backgroundColor });
-    } finally { jest.useRealTimers(); }
+        expect(screen.getByLabelText('Dia 6, sem registro')).not.toHaveStyle({
+            backgroundColor: estilosUso.celula_naoConfirmado.backgroundColor
+        });
+        expect(screen.getByLabelText('Dia 7, Confirmado')).toHaveStyle({
+            borderWidth: 1,
+            borderColor: '#E6E2D8',
+            backgroundColor: estilosUso.celula_confirmado.backgroundColor
+        });
+    } finally {
+        jest.useRealTimers();
+    }
 });

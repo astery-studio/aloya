@@ -2,31 +2,31 @@
  * Define os estilos estruturais de rótulos e conteúdo do FormField.
  */
 import { StyleSheet } from 'react-native';
-import { cores, typography } from '../../../theme';
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            alignSelf: 'stretch',
+            alignItems: 'flex-start'
+        },
+        label: {
+            ...tema.typography.caption,
+            color: tema.cores.interface.textoSecundario,
+            lineHeight: 21,
+            alignSelf: 'stretch'
+        },
+        labelSecao: { paddingLeft: 4 },
+        conteudo: {
+            width: '100%',
+            paddingTop: 8,
+            alignItems: 'flex-start'
+        },
+        mensagemAuxiliar: {
+            ...tema.typography.caption,
+            color: tema.cores.interface.textoSecundario,
+            marginTop: 8
+        }
+    });
+}
 
-const estilos = StyleSheet.create({
-    container: {
-        width: '100%',
-        alignSelf: 'stretch',
-        alignItems: 'flex-start'
-    },
-    label: {
-        ...typography.caption,
-        color: cores.neutras.textoSecundarioClaro,
-        lineHeight: 21,
-        alignSelf: 'stretch'
-    },
-    labelSecao: { paddingLeft: 4 },
-    conteudo: {
-        width: '100%',
-        paddingTop: 8,
-        alignItems: 'flex-start'
-    },
-    mensagemAuxiliar: {
-        ...typography.caption,
-        color: cores.neutras.textoSecundarioClaro,
-        marginTop: 8
-    }
-});
-
-export { estilos };
+export { criarEstilos };

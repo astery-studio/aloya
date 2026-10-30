@@ -1,26 +1,23 @@
 //Representa uma categoria de permissão e encaminha suas ações de edição e exclusão.
-import {ActivityIndicator, Text, View} from 'react-native'
+import { useMemo } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
 
-import {IconButton} from '../../../shared/components/common/IconButton/IconButton'
+import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import {
     PencilSimpleIcon,
     TrashIcon,
     UserCheckIcon,
     UsersIcon
-} from '../../../shared/components/icons/AppIcons'
-import {tema} from '../../../shared/theme'
-import {estilos} from './SupportCategoryCard.styles'
+} from '../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './SupportCategoryCard.styles';
 
 function normalizarQuantidadeContatos(quantidade) {
-    return Number.isSafeInteger(quantidade) && quantidade >= 0
-        ? quantidade
-        : 0
+    return Number.isSafeInteger(quantidade) && quantidade >= 0 ? quantidade : 0;
 }
 
 function criarRotuloContatos(quantidade) {
-    return quantidade === 1
-        ? '1 contato vinculado'
-        : `${quantidade} contatos vinculados`
+    return quantidade === 1 ? '1 contato vinculado' : `${quantidade} contatos vinculados`;
 }
 
 function SupportCategoryCard({
@@ -32,54 +29,50 @@ function SupportCategoryCard({
     desabilitado = false,
     acaoEmAndamento = null
 }) {
-    const nome = typeof categoria?.nome === 'string'
-        ? categoria.nome.trim()
-        : ''
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
+    const nome = typeof categoria?.nome === 'string' ? categoria.nome.trim() : '';
 
     const quantidadeSegura = normalizarQuantidadeContatos(
         quantidadeContatos ?? categoria?.quantidadeContatos
-    )
+    );
 
     const resumoSeguro =
         typeof resumoPermissoes === 'string' && resumoPermissoes.trim()
             ? resumoPermissoes.trim()
-            : 'Permissões não informadas'
+            : 'Permissões não informadas';
 
-    const editando = acaoEmAndamento === 'editar'
-    const excluindo = acaoEmAndamento === 'excluir'
-    const carregando = editando || excluindo
-    const bloqueado = desabilitado || carregando
+    const editando = acaoEmAndamento === 'editar';
+    const excluindo = acaoEmAndamento === 'excluir';
+    const carregando = editando || excluindo;
+    const bloqueado = desabilitado || carregando;
 
-    const edicaoDesabilitada =
-        bloqueado || typeof onEditar !== 'function'
+    const edicaoDesabilitada = bloqueado || typeof onEditar !== 'function';
 
-    const exclusaoDesabilitada =
-        bloqueado || typeof onExcluir !== 'function'
+    const exclusaoDesabilitada = bloqueado || typeof onExcluir !== 'function';
 
     function editar() {
         if (!edicaoDesabilitada) {
-            onEditar(categoria)
+            onEditar(categoria);
         }
     }
 
     function excluir() {
         if (!exclusaoDesabilitada) {
-            onExcluir(categoria)
+            onExcluir(categoria);
         }
     }
 
     if (!nome) {
-        return null
+        return null;
     }
 
     return (
         <View
             testID="support-category-card"
             accessibilityLabel={`Categoria ${nome}`}
-            style={[
-                estilos.cartao,
-                bloqueado && estilos.cartaoDesabilitado
-            ]}
+            style={[estilos.cartao, bloqueado && estilos.cartaoDesabilitado]}
         >
             <View style={estilos.conteudoPrincipal}>
                 <View
@@ -89,7 +82,7 @@ function SupportCategoryCard({
                 >
                     <UserCheckIcon
                         size={18}
-                        color={tema.cores.marca.secundaria}
+                        color={tema.cores.interface.destaque}
                         weight="regular"
                     />
                 </View>
@@ -125,7 +118,7 @@ function SupportCategoryCard({
                         <View style={estilos.areaAcao}>
                             <ActivityIndicator
                                 accessibilityLabel={`Editando categoria ${nome}`}
-                                color={tema.cores.marca.secundaria}
+                                color={tema.cores.interface.destaque}
                                 size="small"
                             />
                         </View>
@@ -164,27 +157,16 @@ function SupportCategoryCard({
                 accessibilityLabel={criarRotuloContatos(quantidadeSegura)}
                 style={estilos.contatos}
             >
-                <UsersIcon
-                    size={22}
-                    color={tema.cores.marca.secundaria}
-                    weight="regular"
-                />
+                <UsersIcon size={22} color={tema.cores.interface.destaque} weight="regular" />
 
                 <Text style={estilos.textoContatos}>
-                    <Text style={estilos.quantidadeContatos}>
-                        {quantidadeSegura}
-                    </Text>
+                    <Text style={estilos.quantidadeContatos}>{quantidadeSegura}</Text>
 
-                    {quantidadeSegura === 1
-                        ? ' contato vinculado'
-                        : ' contatos vinculados'}
+                    {quantidadeSegura === 1 ? ' contato vinculado' : ' contatos vinculados'}
                 </Text>
             </View>
         </View>
-    )
+    );
 }
 
-export {
-    criarRotuloContatos,
-    SupportCategoryCard
-}
+export { criarRotuloContatos, SupportCategoryCard };

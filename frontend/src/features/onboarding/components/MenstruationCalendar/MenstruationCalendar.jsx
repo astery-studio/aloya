@@ -9,11 +9,23 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { CaretDownIcon as CaretDown, CaretLeftIcon as CaretLeft,
     CaretRightIcon as CaretRight } from '../../../../shared/components/icons/AppIcons';
 import { getMonthDays } from '../../../../shared/utils/getMonthDays';
-import { cores } from '../../../../shared/theme';
-import { estilos } from './MenstruationCalendar.styles';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { criarEstilos } from './MenstruationCalendar.styles';
 
-const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+const meses = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+];
 const semana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 function obterMesInicial(valor) {
@@ -22,6 +34,8 @@ function obterMesInicial(valor) {
 }
 
 export default function MenstruationCalendar({ valor, aoAlterar }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [visivel, setVisivel] = useState(() => obterMesInicial(valor));
     const [listaAberta, setListaAberta] = useState(false);
     const hoje = new Date().toISOString().slice(0, 10);
@@ -50,9 +64,7 @@ export default function MenstruationCalendar({ valor, aoAlterar }) {
             aoAlterar({ inicio: data, fim: null });
             return;
         }
-        aoAlterar(data < inicio
-            ? { inicio: data, fim: inicio }
-            : { inicio, fim: data });
+        aoAlterar(data < inicio ? { inicio: data, fim: inicio } : { inicio, fim: data });
     }
 
     function estaSelecionado(data) {
@@ -63,67 +75,113 @@ export default function MenstruationCalendar({ valor, aoAlterar }) {
     return (
         <View style={estilos.calendario}>
             <View style={estilos.cabecalho}>
-                <Pressable accessibilityLabel="Mês anterior" hitSlop={8}
-                    style={estilos.navegacao} onPress={() => moverMes(-1)}>
-                    <CaretLeft size={20} color={cores.neutras.textoPrincipalClaro} />
+                <Pressable
+                    accessibilityLabel="Mês anterior"
+                    hitSlop={8}
+                    style={estilos.navegacao}
+                    onPress={() => moverMes(-1)}
+                >
+                    <CaretLeft size={20} color={tema.cores.interface.textoPrincipal} />
                 </Pressable>
-                <Pressable accessibilityRole="button" accessibilityLabel="Escolher mês"
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Escolher mês"
                     accessibilityState={{ expanded: listaAberta }}
                     onPress={() => setListaAberta((aberta) => !aberta)}
-                    style={estilos.tituloMes}>
-                    <Text accessibilityRole="header"
+                    style={estilos.tituloMes}
+                >
+                    <Text
+                        accessibilityRole="header"
                         accessibilityLabel={`${meses[visivel.mes - 1]} de ${visivel.ano}`}
-                        style={estilos.textoMes}>
+                        style={estilos.textoMes}
+                    >
                         {meses[visivel.mes - 1]} {visivel.ano}
                     </Text>
-                    <CaretDown size={16} color={cores.neutras.textoSecundarioClaro}
-                        style={listaAberta && estilos.setaAberta} />
+                    <CaretDown
+                        size={16}
+                        color={tema.cores.interface.textoSecundario}
+                        style={listaAberta && estilos.setaAberta}
+                    />
                 </Pressable>
-                <Pressable accessibilityLabel="Próximo mês" hitSlop={8}
-                    style={estilos.navegacao} onPress={() => moverMes(1)}>
-                    <CaretRight size={20} color={cores.neutras.textoPrincipalClaro} />
+                <Pressable
+                    accessibilityLabel="Próximo mês"
+                    hitSlop={8}
+                    style={estilos.navegacao}
+                    onPress={() => moverMes(1)}
+                >
+                    <CaretRight size={20} color={tema.cores.interface.textoPrincipal} />
                 </Pressable>
             </View>
             {listaAberta ? (
-                <FlatList data={meses} style={estilos.listaMeses}
+                <FlatList
+                    data={meses}
+                    style={estilos.listaMeses}
                     keyExtractor={(mes) => mes}
                     renderItem={({ item, index }) => (
-                        <Pressable accessibilityRole="button"
+                        <Pressable
+                            accessibilityRole="button"
                             accessibilityLabel={`Selecionar ${item} de ${visivel.ano}`}
                             accessibilityState={{ selected: index + 1 === visivel.mes }}
-                            onPress={() => escolherMes(index)} style={estilos.opcaoMes}>
-                            <Text style={[estilos.textoOpcao,
-                                index + 1 === visivel.mes && estilos.textoOpcaoSelecionada]}>
+                            onPress={() => escolherMes(index)}
+                            style={estilos.opcaoMes}
+                        >
+                            <Text
+                                style={[
+                                    estilos.textoOpcao,
+                                    index + 1 === visivel.mes && estilos.textoOpcaoSelecionada
+                                ]}
+                            >
                                 {item}
                             </Text>
                         </Pressable>
-                    )} />
-            ) : <>
-                <View style={estilos.semana}>
-                    {semana.map((dia) => <Text key={dia} style={estilos.textoSemana}>{dia}</Text>)}
-                </View>
-                <View style={estilos.grade}>
-                {casas.map((casa, indice) => {
-                    const habilitado = Boolean(casa && casa.data <= hoje);
-                    const selecionado = estaSelecionado(casa?.data);
-                    return (
-                        <View key={casa?.data || `vazio-${indice}`} style={estilos.casa}>
-                            {casa ? <Pressable
-                                accessibilityLabel={`Selecionar dia ${casa.dia}`}
-                                accessibilityState={{ selected: selecionado, disabled: !habilitado }}
-                                disabled={!habilitado} onPress={() => selecionar(casa.data)}
-                                style={[estilos.dia, selecionado && estilos.diaSelecionado]}>
-                                <Text style={[estilos.textoDia,
-                                    selecionado && estilos.textoSelecionado,
-                                    !habilitado && estilos.textoDesabilitado]}>
-                                    {casa.dia}
-                                </Text>
-                            </Pressable> : null}
-                        </View>
-                    );
-                })}
-                </View>
-            </>}
+                    )}
+                />
+            ) : (
+                <>
+                    <View style={estilos.semana}>
+                        {semana.map((dia) => (
+                            <Text key={dia} style={estilos.textoSemana}>
+                                {dia}
+                            </Text>
+                        ))}
+                    </View>
+                    <View style={estilos.grade}>
+                        {casas.map((casa, indice) => {
+                            const habilitado = Boolean(casa && casa.data <= hoje);
+                            const selecionado = estaSelecionado(casa?.data);
+                            return (
+                                <View key={casa?.data || `vazio-${indice}`} style={estilos.casa}>
+                                    {casa ? (
+                                        <Pressable
+                                            accessibilityLabel={`Selecionar dia ${casa.dia}`}
+                                            accessibilityState={{
+                                                selected: selecionado,
+                                                disabled: !habilitado
+                                            }}
+                                            disabled={!habilitado}
+                                            onPress={() => selecionar(casa.data)}
+                                            style={[
+                                                estilos.dia,
+                                                selecionado && estilos.diaSelecionado
+                                            ]}
+                                        >
+                                            <Text
+                                                style={[
+                                                    estilos.textoDia,
+                                                    selecionado && estilos.textoSelecionado,
+                                                    !habilitado && estilos.textoDesabilitado
+                                                ]}
+                                            >
+                                                {casa.dia}
+                                            </Text>
+                                        </Pressable>
+                                    ) : null}
+                                </View>
+                            );
+                        })}
+                    </View>
+                </>
+            )}
         </View>
     );
 }

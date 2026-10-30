@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/features/settings/profile/ProfileField', () => {
     const { Pressable, Text } = require('react-native');
@@ -66,7 +67,12 @@ test('restaura o valor original ao cancelar a edição', async () => {
 
 test('fecha o editor ao salvar e apresenta valor inválido com erro', async () => {
     await render(
-        <CycleParameterField label="Duração" valor={null} erro="Campo inválido" onAlterar={jest.fn()} />
+        <CycleParameterField
+            label="Duração"
+            valor={null}
+            erro="Campo inválido"
+            onAlterar={jest.fn()}
+        />
     );
     expect(screen.getByText('Informe a duração')).toBeOnTheScreen();
     expect(screen.getByRole('alert')).toHaveTextContent('Campo inválido');

@@ -32,7 +32,7 @@ const containerUso = {
     borderRadius: 99
 };
 
-const estilos = StyleSheet.create({
+const estilosBase = {
     container: base,
     ponto: {
         width: 9,
@@ -68,7 +68,9 @@ const estilos = StyleSheet.create({
         lineHeight: 14,
         color: cores.aviso
     }
-});
+};
+
+const estilos = StyleSheet.create(estilosBase);
 
 const variantes = Object.freeze({
     pendenteDeUso: {
@@ -269,4 +271,112 @@ const variantes = Object.freeze({
     }
 });
 
-export { estilos, variantes };
+function criarCores(tema) {
+    if (!tema.escuro) return cores;
+
+    return Object.freeze({
+        aviso: '#F2B45F',
+        informacao: '#8FC3DD',
+        sucesso: '#9FD6B6',
+        menstruacao: '#F08A75'
+    });
+}
+
+function criarEstilos(tema) {
+    const coresAtivas = criarCores(tema);
+
+    return StyleSheet.create({
+        ...estilosBase,
+        tituloEstimativa: {
+            ...estilosBase.tituloEstimativa,
+            color: coresAtivas.aviso
+        },
+        descricaoEstimativa: {
+            ...estilosBase.descricaoEstimativa,
+            color: coresAtivas.aviso
+        }
+    });
+}
+
+function combinarVariante(variante, alteracoes = {}) {
+    return {
+        ...variante,
+        container: { ...variante.container, ...alteracoes.container },
+        texto: { ...variante.texto, ...alteracoes.texto },
+        ...(variante.sufixo ? { sufixo: { ...variante.sufixo, ...alteracoes.sufixo } } : {})
+    };
+}
+
+function criarVariantes(tema) {
+    if (!tema.escuro) return variantes;
+
+    const coresAtivas = criarCores(tema);
+    const fundoAviso = 'rgba(242, 180, 95, 0.16)';
+    const fundoInformacao = 'rgba(143, 195, 221, 0.16)';
+    const fundoSucesso = 'rgba(159, 214, 182, 0.14)';
+
+    return Object.freeze({
+        pendenteDeUso: combinarVariante(variantes.pendenteDeUso, {
+            container: { backgroundColor: fundoAviso },
+            texto: { color: coresAtivas.aviso }
+        }),
+        alertaModerado: combinarVariante(variantes.alertaModerado, {
+            container: { backgroundColor: fundoInformacao },
+            texto: { color: coresAtivas.informacao }
+        }),
+        alertaLeve: combinarVariante(variantes.alertaLeve, {
+            container: { backgroundColor: fundoInformacao },
+            texto: { color: coresAtivas.informacao }
+        }),
+        atrasadoProximosHorarios: combinarVariante(variantes.atrasadoProximosHorarios, {
+            container: { backgroundColor: fundoAviso },
+            texto: { color: coresAtivas.aviso }
+        }),
+        confirmado: combinarVariante(variantes.confirmado, {
+            container: { backgroundColor: fundoSucesso },
+            texto: { color: coresAtivas.sucesso }
+        }),
+        alertaCritico: combinarVariante(variantes.alertaCritico, {
+            container: { backgroundColor: fundoInformacao },
+            texto: { color: coresAtivas.informacao }
+        }),
+        confirmadoHistoricoUso: combinarVariante(variantes.confirmadoHistoricoUso, {
+            container: { backgroundColor: fundoSucesso },
+            texto: { color: coresAtivas.sucesso }
+        }),
+        confirmadoForaPrazoHistoricoUso: combinarVariante(
+            variantes.confirmadoForaPrazoHistoricoUso,
+            {
+                container: { backgroundColor: fundoAviso },
+                texto: { color: coresAtivas.aviso }
+            }
+        ),
+        naoConfirmadoHistoricoUso: combinarVariante(variantes.naoConfirmadoHistoricoUso, {
+            container: { backgroundColor: tema.cores.interface.separador },
+            texto: { color: tema.cores.interface.textoSecundario }
+        }),
+        validadeAindaPrazo: combinarVariante(variantes.validadeAindaPrazo, {
+            container: { backgroundColor: fundoSucesso },
+            texto: { color: coresAtivas.sucesso }
+        }),
+        diasMenstruacao: combinarVariante(variantes.diasMenstruacao, {
+            container: { borderColor: 'rgba(240, 138, 117, 0.65)' },
+            texto: { color: coresAtivas.menstruacao },
+            sufixo: { color: coresAtivas.menstruacao }
+        }),
+        diasCiclo: combinarVariante(variantes.diasCiclo, {
+            container: { borderColor: 'rgba(159, 214, 182, 0.65)' },
+            texto: { color: coresAtivas.sucesso },
+            sufixo: { color: coresAtivas.sucesso }
+        }),
+        estimativaIncerta: combinarVariante(variantes.estimativaIncerta, {
+            container: {
+                backgroundColor: fundoAviso,
+                borderColor: 'rgba(242, 180, 95, 0.45)'
+            },
+            texto: { color: coresAtivas.aviso }
+        })
+    });
+}
+
+export { criarEstilos, criarVariantes, estilos, variantes };

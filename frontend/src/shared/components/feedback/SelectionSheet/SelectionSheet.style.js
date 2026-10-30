@@ -1,21 +1,23 @@
-import { StyleSheet } from 'react-native'
-import { tema } from '../../../theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    lista: {
-        flexGrow: 0,
-        marginHorizontal: -8
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        lista: {
+            flexGrow: 0,
+            marginHorizontal: -8,
+            backgroundColor: tema.cores.interface.superficieElevada
+        },
 
-    conteudoLista: {
-        paddingBottom: tema.espacamentos.pequeno
-    },
+        conteudoLista: {
+            paddingBottom: tema.espacamentos.pequeno
+        },
 
-    mensagemVazia: {
-        ...tema.typography.bodyDefault,
-        paddingVertical: tema.espacamentos.grande,
-        color: tema.cores.neutras.textoSecundarioClaro
-    }
-})
+        mensagemVazia: {
+            ...tema.typography.bodyDefault,
+            paddingVertical: tema.espacamentos.grande,
+            color: tema.cores.interface.textoSecundario
+        }
+    });
+}
 
-export { estilos }
+export { criarEstilos };

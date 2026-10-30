@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
-import { cores } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleForecastPanel } from '../components/CycleForecastPanel';
 import { conteudoPorFase } from '../constants/phaseContent';
 import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
-import { estilos } from './CycleTodayScreen.styles';
+import { criarEstilos } from './CycleTodayScreen.styles';
 
 const CONFIGURACOES_ERRO = Object.freeze({
     previsao: Object.freeze({
@@ -44,6 +44,11 @@ function CycleTodayScreen({
     aoAbrirCalendario,
     aoSelecionarAba
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const corCarregamento = tema.escuro
+        ? tema.cores.interface.destaque
+        : tema.cores.marca.secundaria;
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const referencia = dataSelecionada || previsao?.dataReferencia || ciclo?.dataReferencia;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
@@ -100,7 +105,7 @@ function CycleTodayScreen({
             ) : null}
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}>
-                    <ActivityIndicator size="large" color={cores.marca.secundaria} />
+                    <ActivityIndicator size="large" color={corCarregamento} />
                     <Text style={estilos.textoCarregando}>Carregando sua previsão...</Text>
                 </View>
             ) : (
@@ -138,8 +143,8 @@ function CycleTodayScreen({
                 visivel={!carregando && Boolean(tipoErro)}
                 aoFechar={aoVoltar}
                 icone={WarningCircleIcon}
-                corIcone={cores.feedback.erro}
-                fundoIcone={cores.neutras.fundoClaro}
+                corIcone={tema.cores.feedback.erro}
+                fundoIcone={tema.cores.interface.fundo}
                 titulo={configuracaoErro.titulo}
                 mensagem={configuracaoErro.mensagem}
                 acaoPrincipal={{

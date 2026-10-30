@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { MenstruationRegistrationScreen } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const meses = [
     {
@@ -10,19 +10,7 @@ const meses = [
         previsao: null
     }
 ];
-function Provider({ children }) {
-    return (
-        <SafeAreaProvider
-            initialMetrics={{
-                frame: { x: 0, y: 0, width: 393, height: 852 },
-                insets: { top: 44, left: 0, right: 0, bottom: 34 }
-            }}
-        >
-            {children}
-        </SafeAreaProvider>
-    );
-}
-function montar(props = {}) {
+function montar(props = {}, opcoes = {}) {
     return render(
         <MenstruationRegistrationScreen
             meses={meses}
@@ -30,7 +18,7 @@ function montar(props = {}) {
             onVoltar={jest.fn()}
             {...props}
         />,
-        { wrapper: Provider }
+        opcoes
     );
 }
 
@@ -139,4 +127,22 @@ test('primeiro dia mostra orientação, salvamento bloqueia ações e sucesso se
     expect(screen.getByText('Menstruação cadastrada')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
     expect(fechar).toHaveBeenCalledTimes(1);
+});
+
+test('aplica o modo escuro ao fundo, orientação e dias selecionados', async () => {
+    await montar(
+        { datasSelecionadas: ['2026-09-21'] },
+        { preferencia: 'escuro', esquemaDoSistema: 'dark' }
+    );
+
+    expect(screen.getByTestId('tela-cadastro-menstruacao')).toHaveStyle({
+        backgroundColor: '#181C1A'
+    });
+    expect(screen.getByTestId('orientacao-cadastro-menstruacao')).toHaveStyle({
+        backgroundColor: 'transparent',
+        borderColor: '#9FD6B6'
+    });
+    expect(screen.getByTestId('selecao-2026-09-21')).toHaveStyle({
+        backgroundColor: 'rgba(212, 119, 105, 0.28)'
+    });
 });

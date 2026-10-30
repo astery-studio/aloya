@@ -5,7 +5,7 @@ import { ActivityIndicator, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { BellIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
-import { tema } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { CategoryImpactConfirmationModal } from '../components/CategoryImpactConfirmationModal';
 import {
@@ -178,6 +178,7 @@ function EditSupportCategoryScreen({
     onConcluido,
     onSessaoExpirada
 }) {
+    const tema = useTheme();
     const categoriaInicialValida = categoriaEhEditavel(categoria);
 
     const [categoriaBase, definirCategoriaBase] = useState(
@@ -516,12 +517,12 @@ function EditSupportCategoryScreen({
                 icone={WarningCircleIcon}
                 corIcone={
                     alertaErro?.recuperavel
-                        ? tema.cores.neutras.textoSecundarioClaro
+                        ? tema.cores.interface.textoSecundario
                         : tema.cores.marca.primaria
                 }
                 fundoIcone={
                     alertaErro?.recuperavel
-                        ? tema.cores.neutras.bordaClara
+                        ? tema.cores.interface.borda
                         : tema.cores.icones.configuracoes.laranja.caixa
                 }
                 titulo={alertaErro?.titulo}

@@ -1,43 +1,53 @@
-jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
-    NotePencilIcon: jest.fn(() => null)
-}))
-
-import {ProfileField} from '../../../../src/features/settings/profile/ProfileField'
-import {estilos} from '../../../../src/features/settings/profile/ProfileField.style'
+import { obterEstiloCampo } from '../../../../src/features/settings/profile/ProfileField';
+import { criarEstilos } from '../../../../src/features/settings/profile/ProfileField.style';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 describe('ProfileField - interação visual', () => {
-    test('aplica o estilo pressionado durante o toque', () => {
-        const componente = ProfileField({
-            label: 'Nome',
-            valor: 'Julia',
-            onPress: jest.fn()
-        })
+    const estilos = criarEstilos(temaClaro);
 
-        const calcularEstilo = componente.props.style
-        const estiloPressionado = calcularEstilo({
-            pressed: true
-        })
-        const estiloNormal = calcularEstilo({
-            pressed: false
-        })
+    test('aplica estilo pressionado durante o toque', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: true,
+            desabilitado: false
+        });
 
-        expect(estiloPressionado).toContain(estilos.pressionado)
-        expect(estiloNormal).not.toContain(estilos.pressionado)
-    })
+        expect(resultado).toContain(estilos.pressionado);
 
-    test('não aplica o estilo pressionado quando está desabilitado', () => {
-        const componente = ProfileField({
-            label: 'Nome',
-            valor: 'Julia',
-            onPress: jest.fn(),
+        expect(resultado).not.toContain(estilos.desabilitado);
+    });
+
+    test('não aplica pressionado no estado normal', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: false,
+            desabilitado: false
+        });
+
+        expect(resultado).not.toContain(estilos.pressionado);
+
+        expect(resultado).not.toContain(estilos.desabilitado);
+    });
+
+    test('não aplica pressionado quando desabilitado', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: true,
             desabilitado: true
-        })
+        });
 
-        const estiloPressionado = componente.props.style({
-            pressed: true
-        })
+        expect(resultado).not.toContain(estilos.pressionado);
 
-        expect(estiloPressionado).not.toContain(estilos.pressionado)
-        expect(estiloPressionado).toContain(estilos.desabilitado)
-    })
-})
+        expect(resultado).toContain(estilos.desabilitado);
+    });
+
+    test('sempre mantém o estilo estrutural', () => {
+        const resultado = obterEstiloCampo({
+            estilos,
+            pressionado: false,
+            desabilitado: true
+        });
+
+        expect(resultado[0]).toBe(estilos.container);
+    });
+});

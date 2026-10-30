@@ -1,71 +1,97 @@
-import { StyleSheet } from 'react-native'
-import { tema, fontFamilies } from '../../../../theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    container: {
-        minHeight: 52,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: tema.espacamentos.pequeno,
-        marginBottom: 2,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: tema.radius.buttonAndInput
-    },
+import { fontFamilies } from '../../../../theme';
 
-    selecionado: {
-        backgroundColor: `${tema.cores.marca.secundaria}0D`
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            minHeight: 52,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: tema.espacamentos.pequeno,
+            marginBottom: 2,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            borderRadius: tema.radius.buttonAndInput
+        },
 
-    desabilitado: {
-        opacity: 0.5
-    },
+        selecionado: {
+            backgroundColor: tema.cores.interface.destaqueSuave
+        },
 
-    textos: {
-        flex: 1
-    },
+        desabilitado: {
+            opacity: 0.5
+        },
 
-    label: {
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 16,
-        lineHeight: 24
-    },
+        textos: {
+            flex: 1,
+            minWidth: 0
+        },
 
-    labelSelecionado: {
-        color: tema.cores.marca.secundaria,
-        fontFamily: fontFamilies.bold
-    },
+        label: {
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.regular,
+            fontSize: 16,
+            lineHeight: 24
+        },
 
-    descricao: {
-        marginTop: 4,
-        color: tema.cores.neutras.textoSecundarioClaro, ...tema.typography.caption
-    },
+        labelSelecionado: {
+            color: tema.cores.interface.destaque,
+            fontFamily: fontFamilies.bold
+        },
 
-    intensidade: {
-        minHeight: 64,
-        marginBottom: 0,
-        borderWidth: 1.41,
-        borderColor: tema.cores.neutras.bordaClara,
-        backgroundColor: tema.cores.neutras.superficieClara
-    },
+        descricao: {
+            marginTop: 4,
+            color: tema.cores.interface.textoSecundario,
+            ...tema.typography.caption
+        },
 
-    intensidadeSelecionada: {
-        borderWidth: 1.41,
-        borderColor: tema.cores.marca.secundaria,
-        backgroundColor: '#F0F5F2'
-    },
+        intensidade: {
+            minHeight: 64,
+            marginBottom: 0,
+            borderWidth: 1.41,
+            borderColor: tema.cores.interface.borda,
+            backgroundColor: tema.cores.interface.superficie
+        },
 
-    radioVazio: {
-        width: 22,
-        height: 22,
-        borderRadius: 11,
-        borderWidth: 1.41,
-        borderColor: tema.cores.neutras.bordaTracejada
-    }
-})
+        intensidadeSelecionada: {
+            borderWidth: 1.41,
+            borderColor: tema.cores.interface.destaque,
+            backgroundColor: tema.cores.interface.destaqueSuave
+        },
 
-const corIconeNormal = tema.cores.neutras.textoPrincipalClaro
-const corIconeSelecionado = tema.cores.marca.secundaria
+        modoCor: {
+            minHeight: 52,
+            marginBottom: 8,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            borderWidth: 0,
+            backgroundColor: 'transparent'
+        },
 
-export { estilos, corIconeNormal, corIconeSelecionado }
+        modoCorSelecionado: {
+            backgroundColor: tema.cores.interface.destaque
+        },
+
+        labelModoCor: {
+            fontSize: 16,
+            lineHeight: 24
+        },
+
+        labelModoCorSelecionado: {
+            color: tema.cores.interface.textoSobreDestaque,
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
+
+        radioVazio: {
+            width: 22,
+            height: 22,
+            borderRadius: 11,
+            borderWidth: 1.41,
+            borderColor: tema.cores.interface.textoDesabilitado
+        }
+    });
+}
+
+export { criarEstilos };

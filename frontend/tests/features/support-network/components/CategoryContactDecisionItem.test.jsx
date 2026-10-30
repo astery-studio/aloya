@@ -1,6 +1,7 @@
 //Testa as decisões individuais usadas ao excluir uma categoria com contatos.
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 import { CategoryContactDecisionItem } from '../../../../src/features/support-network/components/CategoryContactDecisionItem';
 import { ACOES_EXCLUSAO_CATEGORIA } from '../../../../src/features/support-network/constants/categoryDeletionOptions';

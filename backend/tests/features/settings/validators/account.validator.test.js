@@ -1,182 +1,166 @@
 //Este teste serve para testar o validator de conta, garantindo que as validações relacionadas à conta do usuário funcionem corretamente.
-import test from 'node:test'
-import assert from 'node:assert/strict'
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-import { criarAccountValidator } from '../../../../src/features/settings/validators/account.validator.js'
-import * as dateUtils from '../../../../src/shared/utils/date.utils.js'
+import { criarAccountValidator } from '../../../../src/features/settings/validators/account.validator.js';
+import * as dateUtils from '../../../../src/shared/utils/date.utils.js';
 
 //Funcao para criar um mock do validator de conta
 function criarValidator() {
     return criarAccountValidator({
         dateUtils
-    })
+    });
 }
 
 //Testes para o validator de conta
-test(
-    'normaliza nome e e-mail na atualização',
-    function () {
-        const validator = criarValidator();
+test('normaliza nome e e-mail na atualização', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAtualizacao({
-                nome: '  Carla   Cristina  ',
-                email: ' CARLA@EMAIL.COM '
-            })
+    const resultado = validator.validarAtualizacao({
+        nome: '  Carla   Cristina  ',
+        email: ' CARLA@EMAIL.COM '
+    });
 
-        assert.equal(resultado.valido, true);
+    assert.equal(resultado.valido, true);
 
-        assert.equal(
-            resultado.dados.nome,
-            'Carla Cristina'
-        )
+    assert.equal(resultado.dados.nome, 'Carla Cristina');
 
-        assert.equal(
-            resultado.dados.email,
-            'carla@email.com'
-        )
-    }
-)
+    assert.equal(resultado.dados.email, 'carla@email.com');
+});
 
 //Testes para validação de identidade de gênero
-test(
-    'aceita identidade de gênero permitida',
-    function () {
-        const validator = criarValidator()
+test('aceita identidade de gênero permitida', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAtualizacao({
-                identidadeGenero:
-                    'Mulher Cisgênero'
-            })
+    const resultado = validator.validarAtualizacao({
+        identidadeGenero: 'Mulher Cisgênero'
+    });
 
-        assert.equal(resultado.valido, true);
+    assert.equal(resultado.valido, true);
 
-        assert.equal(
-            resultado.dados.identidadeGenero,
-            'Mulher Cisgênero'
-        )
-    }
-)
+    assert.equal(resultado.dados.identidadeGenero, 'Mulher Cisgênero');
+});
 
 //Teste para rejeitar identidade de gênero arbitrária
-test(
-    'rejeita identidade de gênero arbitrária',
-    function () {
-        const validator = criarValidator();
+test('rejeita identidade de gênero arbitrária', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAtualizacao({
-                identidadeGenero:
-                    'valor não permitido'
-            })
+    const resultado = validator.validarAtualizacao({
+        identidadeGenero: 'valor não permitido'
+    });
 
-        assert.equal(resultado.valido, false)
-    }
-)
+    assert.equal(resultado.valido, false);
+});
 
 //Teste para rejeitar campos que não pertencem à HU-004
-test(
-    'rejeita campos que não pertencem à HU-004',
-    function () {
-        const validator = criarValidator();
+test('rejeita campos que não pertencem à HU-004', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAtualizacao({
-                nome: 'Aloya Teste',
-                papel: 'administrador'
-            })
+    const resultado = validator.validarAtualizacao({
+        nome: 'Aloya Teste',
+        papel: 'administrador'
+    });
 
-        assert.equal(resultado.valido, false);
+    assert.equal(resultado.valido, false);
 
-        assert.equal(
-            resultado.erros[0].campo,
-            'dados'
-        )
-    }
-)
+    assert.equal(resultado.erros[0].campo, 'dados');
+});
 
 //Teste para rejeitar data de nascimento futura
-test(
-    'rejeita data de nascimento futura',
-    function () {
-        const validator = criarValidator()
+test('rejeita data de nascimento futura', function () {
+    const validator = criarValidator();
 
-        const anoFuturo =
-            new Date().getFullYear() + 1
+    const anoFuturo = new Date().getFullYear() + 1;
 
-        const resultado =
-            validator.validarAtualizacao({
-                dataNascimento:
-                    `${anoFuturo}-01-01`
-            })
+    const resultado = validator.validarAtualizacao({
+        dataNascimento: `${anoFuturo}-01-01`
+    });
 
-        assert.equal(resultado.valido, false)
+    assert.equal(resultado.valido, false);
+});
+
+test('aceita as preferências de tema disponíveis', function () {
+    const validator = criarValidator();
+
+    for (const temaVisual of ['claro', 'escuro', 'automatico']) {
+        const resultado = validator.validarAtualizacao({
+            temaVisual
+        });
+
+        assert.equal(resultado.valido, true);
+        assert.equal(resultado.dados.temaVisual, temaVisual);
     }
-)
+});
+
+test('rejeita preferência de tema desconhecida', function () {
+    const validator = criarValidator();
+
+    const resultado = validator.validarAtualizacao({
+        temaVisual: 'contraste_extremo'
+    });
+
+    assert.equal(resultado.valido, false);
+    assert.deepEqual(resultado.erros, [
+        {
+            campo: 'temaVisual',
+            mensagem: 'Informe uma preferência de tema válida.'
+        }
+    ]);
+});
+
+test('rejeita preferência de tema com tipo inválido', function () {
+    const validator = criarValidator();
+
+    const resultado = validator.validarAtualizacao({
+        temaVisual: true
+    });
+
+    assert.equal(resultado.valido, false);
+    assert.equal(resultado.erros[0].campo, 'temaVisual');
+});
 
 //Teste para rejeitar nova senha curta
-test(
-    'rejeita nova senha curta',
-    function () {
-        const validator = criarValidator()
+test('rejeita nova senha curta', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAlteracaoSenha({
-                senhaAtual: 'senha atual',
-                novaSenha: 'curta7',
-                confirmacaoNovaSenha:'curta7'
-            })
+    const resultado = validator.validarAlteracaoSenha({
+        senhaAtual: 'senha atual',
+        novaSenha: 'curta7',
+        confirmacaoNovaSenha: 'curta7'
+    });
 
-        assert.equal(resultado.valido, false)
-    }
-)
+    assert.equal(resultado.valido, false);
+});
 
 //Teste para aceitar exatamente o tamanho mínimo permitido
-test(
-    'aceita nova senha com oito caracteres',
-    function () {
-        const validator = criarValidator()
+test('aceita nova senha com oito caracteres', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAlteracaoSenha({
-                senhaAtual: 'senha atual',
-                novaSenha: 'Nova@123',
-                confirmacaoNovaSenha:
-                    'Nova@123'
-            })
+    const resultado = validator.validarAlteracaoSenha({
+        senhaAtual: 'senha atual',
+        novaSenha: 'Nova@123',
+        confirmacaoNovaSenha: 'Nova@123'
+    });
 
-        assert.equal(resultado.valido, true)
-    }
-)
+    assert.equal(resultado.valido, true);
+});
 
 //Teste para rejeitar confirmação de senha diferente
-test(
-    'rejeita confirmação de senha diferente',
-    function () {
-        const validator = criarValidator();
+test('rejeita confirmação de senha diferente', function () {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarAlteracaoSenha({
-                senhaAtual:
-                    'senha atual',
+    const resultado = validator.validarAlteracaoSenha({
+        senhaAtual: 'senha atual',
 
-                novaSenha:
-                    'uma frase secreta longa',
+        novaSenha: 'uma frase secreta longa',
 
-                confirmacaoNovaSenha:
-                    'outra frase secreta'
-            })
+        confirmacaoNovaSenha: 'outra frase secreta'
+    });
 
-        assert.equal(resultado.valido, false);
+    assert.equal(resultado.valido, false);
 
-        assert.equal(
-            resultado.erros.some(
-                (item) =>
-                    item.campo
-                    === 'confirmacaoNovaSenha'
-            ),
-            true
-        )
-    }
-)
+    assert.equal(
+        resultado.erros.some((item) => item.campo === 'confirmacaoNovaSenha'),
+        true
+    );
+});

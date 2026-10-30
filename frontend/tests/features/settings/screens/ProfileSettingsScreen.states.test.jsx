@@ -1,48 +1,50 @@
 //Testa os estados de carregamento, erro, sincronização e perfil inválido da tela.
-import { fireEvent, render, screen } from '@testing-library/react-native'
+import { fireEvent, screen } from '@testing-library/react-native';
+
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     LockKeyIcon: jest.fn(() => null),
     WarningCircleIcon: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayout', () => {
-    const React = require('react')
+    const React = require('react');
 
-    function SettingsLayout({children}) {
-        return React.createElement(React.Fragment, null, children)
+    function SettingsLayout({ children }) {
+        return React.createElement(React.Fragment, null, children);
     }
 
-    return { SettingsLayout }
-})
+    return { SettingsLayout };
+});
 
 jest.mock('../../../../src/features/settings/profile/ProfileSettings', () => ({
     ProfileSettings: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/features/settings/profile/GenderSelector', () => ({
     GenderSelector: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet', () => ({
     EditFieldSheet: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/features/settings/account/DeleteAccount', () => ({
     DeleteAccount: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/features/settings/account/LogoutConfirmation', () => ({
     LogoutConfirmation: jest.fn(() => null)
-}))
+}));
 
 jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => ({
     __esModule: true,
     default: jest.fn(() => null)
-}))
+}));
 
-import { ProfileSettings } from '../../../../src/features/settings/profile/ProfileSettings'
-import { ProfileSettingsScreen } from '../../../../src/features/settings/screens/ProfileSettingsScreen'
+import { ProfileSettings } from '../../../../src/features/settings/profile/ProfileSettings';
+import { ProfileSettingsScreen } from '../../../../src/features/settings/screens/ProfileSettingsScreen';
 
 const perfilValido = {
     id: 15,
@@ -52,82 +54,94 @@ const perfilValido = {
     identidadeGenero: 'Mulher Cisgênero',
     atualizadoEm: '2026-09-23T10:00:00.000Z',
     consentimentoParentalNecessario: false
-}
+};
 
 describe('ProfileSettingsScreen - estados da tela', () => {
     beforeEach(() => {
-        ProfileSettings.mockClear()
-    })
+        ProfileSettings.mockClear();
+    });
 
     test('mostra o carregamento dos dados', async () => {
-        await render(
-            <ProfileSettingsScreen perfil={perfilValido} carregando />
-        )
+        await render(<ProfileSettingsScreen perfil={perfilValido} carregando />);
 
-        expect(screen.getByText('Carregando seus dados...')).toBeOnTheScreen()
-        expect(screen.queryByText('Ocorreu um erro')).toBeNull()
-    })
+        expect(screen.getByText('Carregando seus dados...')).toBeOnTheScreen();
+        expect(screen.queryByText('Ocorreu um erro')).toBeNull();
+    });
 
     test('prioriza o carregamento quando também existe erro', async () => {
-        await render(
-            <ProfileSettingsScreen perfil={perfilValido} carregando erroCarregamento />
-        )
+        await render(<ProfileSettingsScreen perfil={perfilValido} carregando erroCarregamento />);
 
-        expect(screen.getByText('Carregando seus dados...')).toBeOnTheScreen()
-        expect(screen.queryByText('Não foi possível carregar suas configurações de perfil. Tente novamente.')).toBeNull()
-    })
+        expect(screen.getByText('Carregando seus dados...')).toBeOnTheScreen();
+        expect(
+            screen.queryByText(
+                'Não foi possível carregar suas configurações de perfil. Tente novamente.'
+            )
+        ).toBeNull();
+    });
 
     test('mostra o erro e permite recarregar', async () => {
-        const onRecarregar = jest.fn()
+        const onRecarregar = jest.fn();
 
         await render(
-            <ProfileSettingsScreen perfil={perfilValido} erroCarregamento onRecarregar={onRecarregar} />
-        )
+            <ProfileSettingsScreen
+                perfil={perfilValido}
+                erroCarregamento
+                onRecarregar={onRecarregar}
+            />
+        );
 
-        expect(screen.getByRole('header', {name: 'Ocorreu um erro'})).toBeOnTheScreen()
-        expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar suas configurações de perfil. Tente novamente.')
+        expect(screen.getByRole('header', { name: 'Ocorreu um erro' })).toBeOnTheScreen();
+        expect(screen.getByRole('alert')).toHaveTextContent(
+            'Não foi possível carregar suas configurações de perfil. Tente novamente.'
+        );
 
-        await fireEvent.press(screen.getByRole('button', {name: 'Tentar Novamente'}))
+        await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
 
-        expect(onRecarregar).toHaveBeenCalledTimes(1)
-    })
+        expect(onRecarregar).toHaveBeenCalledTimes(1);
+    });
 
     test('não mostra recarregar sem receber a função', async () => {
-        await render(
-            <ProfileSettingsScreen perfil={perfilValido} erroCarregamento />
-        )
+        await render(<ProfileSettingsScreen perfil={perfilValido} erroCarregamento />);
 
-        expect(screen.getByText('Ocorreu um erro')).toBeOnTheScreen()
-        expect(screen.queryByRole('button', {name: 'Tentar Novamente'})).toBeNull()
-    })
+        expect(screen.getByText('Ocorreu um erro')).toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Tentar Novamente' })).toBeNull();
+    });
 
     test('sincroniza os campos quando recebe um perfil atualizado', async () => {
-        const resultado = await render(
-            <ProfileSettingsScreen perfil={perfilValido} />
-        )
+        const resultado = await render(<ProfileSettingsScreen perfil={perfilValido} />);
 
-        expect(ProfileSettings.mock.lastCall[0].dados.nome).toBe('Julia')
+        expect(ProfileSettings.mock.lastCall[0].dados.nome).toBe('Julia');
 
         await resultado.rerender(
-            <ProfileSettingsScreen perfil={{...perfilValido, nome: 'Julia Atualizada'}} />
-        )
+            <ProfileSettingsScreen perfil={{ ...perfilValido, nome: 'Julia Atualizada' }} />
+        );
 
-        expect(ProfileSettings.mock.lastCall[0].dados.nome).toBe('Julia Atualizada')
-    })
+        expect(ProfileSettings.mock.lastCall[0].dados.nome).toBe('Julia Atualizada');
+    });
 
     test.each([
         ['perfil nulo', null],
         ['valor que não é objeto', 'perfil inválido'],
-        ['nome inválido', {...perfilValido, nome: 123}],
-        ['e-mail inválido', {...perfilValido, email: null}],
-        ['data de nascimento inválida', {...perfilValido, dataNascimento: 19990408}],
-        ['identidade de gênero inválida', {...perfilValido, identidadeGenero: 42}]
+        ['nome inválido', { ...perfilValido, nome: 123 }],
+        ['e-mail inválido', { ...perfilValido, email: null }],
+        ['data de nascimento inválida', { ...perfilValido, dataNascimento: 19990408 }],
+        ['identidade de gênero inválida', { ...perfilValido, identidadeGenero: 42 }]
     ])('rejeita %s', async (descricao, perfil) => {
-        await render(
-            <ProfileSettingsScreen perfil={perfil} />
-        )
+        await render(<ProfileSettingsScreen perfil={perfil} />);
 
-        expect(screen.getByRole('header', {name: 'Ocorreu um erro'})).toBeOnTheScreen()
-        expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar suas configurações de perfil. Tente novamente.')
-    })
-})
+        expect(screen.getByRole('header', { name: 'Ocorreu um erro' })).toBeOnTheScreen();
+        expect(screen.getByRole('alert')).toHaveTextContent(
+            'Não foi possível carregar suas configurações de perfil. Tente novamente.'
+        );
+    });
+
+    test('aplica o tema escuro ao estado de carregamento', async () => {
+        await render(<ProfileSettingsScreen perfil={perfilValido} carregando />, {
+            preferencia: 'escuro'
+        });
+
+        expect(screen.getByText('Carregando seus dados...')).toHaveStyle({
+            color: '#C4C8C5'
+        });
+    });
+});

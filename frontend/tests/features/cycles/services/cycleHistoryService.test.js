@@ -3,7 +3,7 @@ import {
     criarCycleHistoryService,
     normalizarCicloEdicao,
     normalizarCicloHistorico
-} from '../../../../src/features/cycles/services/cycleHistoryService'
+} from '../../../../src/features/cycles/services/cycleHistoryService';
 
 const cicloApi = Object.freeze({
     id: 3,
@@ -16,14 +16,14 @@ const cicloApi = Object.freeze({
     classificacao: 'normal',
     estimativaIncerta: false,
     cicloInicial: false
-})
+});
 
 const resumoApi = Object.freeze({
     cicloMedioDias: 28,
     menstruacaoMediaDias: 5,
     quantidadeCiclos: 3,
     confianca: 'media'
-})
+});
 
 function criarRespostaApi(alteracoes = {}) {
     return {
@@ -36,7 +36,7 @@ function criarRespostaApi(alteracoes = {}) {
             proximoCursor: null
         },
         ...alteracoes
-    }
+    };
 }
 
 test('converte um ciclo em andamento para o formato visual da tela', () => {
@@ -52,8 +52,8 @@ test('converte um ciclo em andamento para o formato visual da tela', () => {
         classificacao: 'normal',
         estimativaIncerta: false,
         cicloInicial: false
-    })
-})
+    });
+});
 
 test('transforma ciclo irregular na variante visual incerta', () => {
     const ciclo = normalizarCicloHistorico({
@@ -65,11 +65,11 @@ test('transforma ciclo irregular na variante visual incerta', () => {
         status: 'concluido',
         classificacao: 'irregular',
         estimativaIncerta: true
-    })
+    });
 
-    expect(ciclo.periodo).toBe('07 Ago até 03 Set')
-    expect(ciclo.status).toBe('incerto')
-})
+    expect(ciclo.periodo).toBe('07 Ago até 03 Set');
+    expect(ciclo.status).toBe('incerto');
+});
 
 test('não altera datas por causa do fuso horário do aparelho', () => {
     const ciclo = normalizarCicloHistorico({
@@ -77,93 +77,97 @@ test('não altera datas por causa do fuso horário do aparelho', () => {
         dataInicio: '2026-01-01',
         dataFim: '2026-01-28',
         status: 'concluido'
-    })
+    });
 
-    expect(ciclo.periodo).toBe('01 Jan até 28 Jan')
-})
+    expect(ciclo.periodo).toBe('01 Jan até 28 Jan');
+});
 
 test('lista a primeira página usando autenticação', async () => {
-    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi())
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi());
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
-    const resultado = await service.listarPagina()
+    const resultado = await service.listarPagina();
 
     expect(requisicaoAutenticada).toHaveBeenCalledWith({
         caminho: '/api/cycles/history?limit=20'
-    })
+    });
 
-    expect(resultado.ciclos).toHaveLength(1)
-    expect(resultado.quantidadeCiclos).toBe(3)
-    expect(resultado.resumo).toEqual(resumoApi)
-    expect(Object.isFrozen(resultado)).toBe(true)
-    expect(Object.isFrozen(resultado.ciclos)).toBe(true)
-    expect(Object.isFrozen(resultado.resumo)).toBe(true)
-    expect(Object.isFrozen(resultado.paginacao)).toBe(true)
-})
+    expect(resultado.ciclos).toHaveLength(1);
+    expect(resultado.quantidadeCiclos).toBe(3);
+    expect(resultado.resumo).toEqual(resumoApi);
+    expect(Object.isFrozen(resultado)).toBe(true);
+    expect(Object.isFrozen(resultado.ciclos)).toBe(true);
+    expect(Object.isFrozen(resultado.resumo)).toBe(true);
+    expect(Object.isFrozen(resultado.paginacao)).toBe(true);
+});
 
 test('envia cursor codificado e sinal de cancelamento', async () => {
-    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi({
-        ciclos: [],
-        paginacao: {
-            limite: 10,
-            temMais: false,
-            proximoCursor: null
-        }
-    }))
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(
+        criarRespostaApi({
+            ciclos: [],
+            paginacao: {
+                limite: 10,
+                temMais: false,
+                proximoCursor: null
+            }
+        })
+    );
 
-    const service = criarCycleHistoryService({requisicaoAutenticada})
-    const controlador = new AbortController()
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
+    const controlador = new AbortController();
 
     await service.listarPagina({
         limite: 10,
         cursor: 'eyJ2IjoxfQ',
         signal: controlador.signal
-    })
+    });
 
     expect(requisicaoAutenticada).toHaveBeenCalledWith({
         caminho: '/api/cycles/history?limit=10&cursor=eyJ2IjoxfQ',
         signal: controlador.signal
-    })
-})
+    });
+});
 
-test.each([
-    0,
-    51,
-    1.5,
-    '20'
-])('rejeita limite inválido antes da requisição: %p', async limite => {
-    const requisicaoAutenticada = jest.fn()
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+test.each([0, 51, 1.5, '20'])('rejeita limite inválido antes da requisição: %p', async (limite) => {
+    const requisicaoAutenticada = jest.fn();
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
-    await expect(service.listarPagina({limite})).rejects.toThrow('O limite deve ser um número inteiro entre 1 e 50.')
-    expect(requisicaoAutenticada).not.toHaveBeenCalled()
-})
+    await expect(service.listarPagina({ limite })).rejects.toThrow(
+        'O limite deve ser um número inteiro entre 1 e 50.'
+    );
+    expect(requisicaoAutenticada).not.toHaveBeenCalled();
+});
 
-test.each([
-    '',
-    'cursor com espaços',
-    'a'.repeat(257)
-])('rejeita cursor inválido antes da requisição', async cursor => {
-    const requisicaoAutenticada = jest.fn()
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+test.each(['', 'cursor com espaços', 'a'.repeat(257)])(
+    'rejeita cursor inválido antes da requisição',
+    async (cursor) => {
+        const requisicaoAutenticada = jest.fn();
+        const service = criarCycleHistoryService({ requisicaoAutenticada });
 
-    await expect(service.listarPagina({cursor})).rejects.toThrow('O cursor do histórico é inválido.')
-    expect(requisicaoAutenticada).not.toHaveBeenCalled()
-})
+        await expect(service.listarPagina({ cursor })).rejects.toThrow(
+            'O cursor do histórico é inválido.'
+        );
+        expect(requisicaoAutenticada).not.toHaveBeenCalled();
+    }
+);
 
 test('rejeita datas inexistentes na resposta da API', () => {
-    expect(() => normalizarCicloHistorico({
-        ...cicloApi,
-        dataInicio: '2026-02-30'
-    })).toThrow('Não foi possível interpretar o histórico de ciclos.')
-})
+    expect(() =>
+        normalizarCicloHistorico({
+            ...cicloApi,
+            dataInicio: '2026-02-30'
+        })
+    ).toThrow('Não foi possível interpretar o histórico de ciclos.');
+});
 
-test.each([123, 'data inválida'])('rejeita formato de data inválido: %p', dataInicio => {
-    expect(() => normalizarCicloHistorico({
-        ...cicloApi,
-        dataInicio
-    })).toThrow('Não foi possível interpretar o histórico de ciclos.')
-})
+test.each([123, 'data inválida'])('rejeita formato de data inválido: %p', (dataInicio) => {
+    expect(() =>
+        normalizarCicloHistorico({
+            ...cicloApi,
+            dataInicio
+        })
+    ).toThrow('Não foi possível interpretar o histórico de ciclos.');
+});
 
 test.each([
     {
@@ -187,15 +191,15 @@ test.each([
             cicloMedioDias: -1
         }
     }
-])('rejeita resumo inválido da API', async alteracoes => {
-    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi(alteracoes))
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+])('rejeita resumo inválido da API', async (alteracoes) => {
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi(alteracoes));
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
     await expect(service.listarPagina()).rejects.toMatchObject({
         codigo: 'RESPOSTA_HISTORICO_INVALIDA',
         mensagemUsuario: 'Não foi possível interpretar o histórico de ciclos.'
-    })
-})
+    });
+});
 
 test('rejeita resposta malformada sem quebrar a tela silenciosamente', async () => {
     const requisicaoAutenticada = jest.fn().mockResolvedValue({
@@ -203,101 +207,118 @@ test('rejeita resposta malformada sem quebrar a tela silenciosamente', async () 
         resumo: resumoApi,
         quantidadeCiclos: 3,
         paginacao: {}
-    })
+    });
 
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
     await expect(service.listarPagina()).rejects.toMatchObject({
         codigo: 'RESPOSTA_HISTORICO_INVALIDA',
         mensagemUsuario: 'Não foi possível interpretar o histórico de ciclos.'
-    })
-})
+    });
+});
 
 test('rejeita paginação e quantidades incoerentes', async () => {
-    const requisicaoAutenticada = jest.fn().mockResolvedValue(criarRespostaApi({
-        quantidadeCiclos: 0
-    }))
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+    const requisicaoAutenticada = jest.fn().mockResolvedValue(
+        criarRespostaApi({
+            quantidadeCiclos: 0
+        })
+    );
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
     await expect(service.listarPagina()).rejects.toMatchObject({
         codigo: 'RESPOSTA_HISTORICO_INVALIDA'
-    })
-})
+    });
+});
 
 test('preserva erros de autenticação devolvidos pela requisição', async () => {
-    const erro = new Error('Sua sessão expirou.')
-    erro.status = 401
-    erro.codigo = 'SESSAO_INVALIDA'
+    const erro = new Error('Sua sessão expirou.');
+    erro.status = 401;
+    erro.codigo = 'SESSAO_INVALIDA';
 
-    const requisicaoAutenticada = jest.fn().mockRejectedValue(erro)
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+    const requisicaoAutenticada = jest.fn().mockRejectedValue(erro);
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
-    await expect(service.listarPagina()).rejects.toBe(erro)
-})
+    await expect(service.listarPagina()).rejects.toBe(erro);
+});
 
 test('busca um ciclo específico para preencher a edição do calendário', async () => {
     const requisicaoAutenticada = jest.fn().mockResolvedValue({
         ciclo: { id: 3, dataInicio: '2026-09-04', dataFim: '2026-09-08' }
-    })
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+    });
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
     await expect(service.buscar('3')).resolves.toEqual({
-        id: '3', dataInicio: '2026-09-04', dataFim: '2026-09-08'
-    })
-    expect(requisicaoAutenticada).toHaveBeenCalledWith({ caminho: '/api/cycles/3' })
-})
+        id: '3',
+        dataInicio: '2026-09-04',
+        dataFim: '2026-09-08'
+    });
+    expect(requisicaoAutenticada).toHaveBeenCalledWith({ caminho: '/api/cycles/3' });
+});
 
 test('envia a edição ao endpoint do ciclo', async () => {
     const requisicaoAutenticada = jest.fn().mockResolvedValue({
         mensagem: 'Registro de menstruação atualizado com sucesso.',
         ciclo: { id: 3 }
-    })
-    const service = criarCycleHistoryService({requisicaoAutenticada})
+    });
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
 
-    await service.editar('3', { dataInicio: '2026-09-03', dataFim: null })
+    await service.editar('3', { dataInicio: '2026-09-03', dataFim: null });
     expect(requisicaoAutenticada).toHaveBeenCalledWith({
         metodo: 'PATCH',
         caminho: '/api/cycles/3',
         corpo: { dataInicio: '2026-09-03', dataFim: null }
-    })
-})
+    });
+});
 
 test('normaliza somente os campos necessários para editar', () => {
-    expect(normalizarCicloEdicao({
-        id: 8,
-        dataInicio: '2026-08-01',
-        dataFim: null,
-        usuarioId: 99
-    })).toEqual({ id: '8', dataInicio: '2026-08-01', dataFim: null })
-})
+    expect(
+        normalizarCicloEdicao({
+            id: 8,
+            dataInicio: '2026-08-01',
+            dataFim: null,
+            usuarioId: 99
+        })
+    ).toEqual({ id: '8', dataInicio: '2026-08-01', dataFim: null });
+});
 
-test.each(['0', '9007199254740992', 'id inválido'])('rejeita identificador inválido: %p', async id => {
-    const requisicaoAutenticada = jest.fn()
-    const service = criarCycleHistoryService({requisicaoAutenticada})
-    await expect(service.buscar(id)).rejects.toThrow('identificador')
-    expect(requisicaoAutenticada).not.toHaveBeenCalled()
-})
+test.each(['0', '9007199254740992', 'id inválido'])(
+    'rejeita identificador inválido: %p',
+    async (id) => {
+        const requisicaoAutenticada = jest.fn();
+        const service = criarCycleHistoryService({ requisicaoAutenticada });
+        await expect(service.buscar(id)).rejects.toThrow('identificador');
+        expect(requisicaoAutenticada).not.toHaveBeenCalled();
+    }
+);
 
 test('rejeita datas inválidas e resposta de edição sem confirmação', async () => {
-    const requisicaoAutenticada = jest.fn().mockResolvedValue({ mensagem: 'outra' })
-    const service = criarCycleHistoryService({requisicaoAutenticada})
-    await expect(service.editar('3', {
-        dataInicio: '2026-02-30',
-        dataFim: null
-    })).rejects.toThrow('datas da edição')
-    await expect(service.editar('3', {
-        dataInicio: '2026-02-20',
-        dataFim: null
-    })).rejects.toMatchObject({ codigo: 'RESPOSTA_HISTORICO_INVALIDA' })
-})
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({ mensagem: 'outra' });
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
+    await expect(
+        service.editar('3', {
+            dataInicio: '2026-02-30',
+            dataFim: null
+        })
+    ).rejects.toThrow('datas da edição');
+    await expect(
+        service.editar('3', {
+            dataInicio: '2026-02-20',
+            dataFim: null
+        })
+    ).rejects.toMatchObject({ codigo: 'RESPOSTA_HISTORICO_INVALIDA' });
+});
 
 test('rejeita ciclo malformado na consulta de edição', () => {
-    expect(() => normalizarCicloEdicao({
-        id: 0,
-        dataInicio: '2026-09-04',
-        dataFim: null
-    })).toThrow('Não foi possível interpretar o histórico de ciclos.')
-})
+    expect(() =>
+        normalizarCicloEdicao({
+            id: 0,
+            dataInicio: '2026-09-04',
+            dataFim: null
+        })
+    ).toThrow('Não foi possível interpretar o histórico de ciclos.');
+});
 
 test('rejeita criação sem requisição autenticada', () => {
-    expect(() => criarCycleHistoryService()).toThrow('Não foi possível configurar o serviço do histórico de ciclos.')
-})
+    expect(() => criarCycleHistoryService()).toThrow(
+        'Não foi possível configurar o serviço do histórico de ciclos.'
+    );
+});

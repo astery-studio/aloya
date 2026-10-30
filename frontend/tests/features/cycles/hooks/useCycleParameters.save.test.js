@@ -2,7 +2,11 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import { useCycleParameters } from '../../../../src/features/cycles/hooks/useCycleParameters';
 
-const parametros = { duracaoCicloInformada: 28, duracaoMenstruacaoInformada: 5, duracaoLuteaInformada: 14 };
+const parametros = {
+    duracaoCicloInformada: 28,
+    duracaoMenstruacaoInformada: 5,
+    duracaoLuteaInformada: 14
+};
 
 async function preparar(atualizar, callbacks = {}) {
     const service = { buscar: jest.fn().mockResolvedValue(parametros), atualizar };

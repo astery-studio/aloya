@@ -1,7 +1,17 @@
 //Mostra a ação principal de uma tela ou formulário.
 import Button from '../Button';
 
-export default function ButtonScreen({texto, aoPressionar, variante = 'laranja', desativado = false, carregando = false, icone, posicaoIcone = 'esquerda', rotuloAcessibilidade, estilo}) {
+export default function ButtonScreen({
+    texto,
+    aoPressionar,
+    variante = 'laranja',
+    desativado = false,
+    carregando = false,
+    icone,
+    posicaoIcone = 'esquerda',
+    rotuloAcessibilidade,
+    estilo
+}) {
     const semAcao = typeof aoPressionar !== 'function';
     const estaDesativado = desativado || semAcao;
 

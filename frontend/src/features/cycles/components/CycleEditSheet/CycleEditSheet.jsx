@@ -1,10 +1,12 @@
+import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import DateInput from '../../../../shared/components/forms/DateInput/DateInput';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { estilos } from './CycleEditSheet.styles';
+import { criarEstilos } from './CycleEditSheet.styles';
 
 function CycleEditSheet({
     visivel,
@@ -18,6 +20,9 @@ function CycleEditSheet({
     onOcultar,
     onSalvar
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     return (
         <BottomSheet
             visivel={visivel}

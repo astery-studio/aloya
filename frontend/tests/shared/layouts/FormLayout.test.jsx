@@ -1,14 +1,11 @@
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import FormLayout from '../../../src/shared/layouts/FormLayout';
+import { renderWithTheme } from '../../helpers/renderWithTheme';
 
 test('renderiza cabeçalho, conteúdo e ações', async () => {
-    await render(
-        <FormLayout
-            cabecalho={<Text>Cabeçalho</Text>}
-            acoes={<Text>Ações</Text>}
-            centralizado
-        >
+    await renderWithTheme(
+        <FormLayout cabecalho={<Text>Cabeçalho</Text>} acoes={<Text>Ações</Text>} centralizado>
             <Text>Conteúdo</Text>
         </FormLayout>
     );
@@ -28,7 +25,7 @@ test('renderiza cabeçalho, conteúdo e ações', async () => {
 });
 
 test('permite omitir regiões opcionais e personalizar o id', async () => {
-    await render(
+    await renderWithTheme(
         <FormLayout testeId="formulario-sem-acoes">
             <Text>Conteúdo mínimo</Text>
         </FormLayout>

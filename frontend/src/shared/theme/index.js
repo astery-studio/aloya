@@ -1,8 +1,8 @@
-import { cores } from './colors'
-import { espacamentos, espacamentosLayout } from './spacing'
-import { fontFamilies, typography } from './typography'
-import { radius } from './radius'
-import { shadows } from './shadows'
+import { cores } from './colors';
+import { espacamentos, espacamentosLayout } from './spacing';
+import { fontFamilies, typography } from './typography';
+import { radius } from './radius';
+import { shadows } from './shadows';
 
 const tema = Object.freeze({
     cores,
@@ -13,13 +13,4 @@ const tema = Object.freeze({
     shadows
 });
 
-export {
-    cores,
-    espacamentos,
-    espacamentosLayout,
-    fontFamilies,
-    typography,
-    radius,
-    shadows,
-    tema
-};
+export { cores, espacamentos, espacamentosLayout, fontFamilies, typography, radius, shadows, tema };

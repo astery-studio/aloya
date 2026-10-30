@@ -1,197 +1,182 @@
 /**
- * Define estilos, tamanhos e variantes visuais compartilhados pelos botões da aplicação.
+ * Define estilos, tamanhos e variantes visuais compartilhados.
  */
 import { StyleSheet } from 'react-native';
-import {
-    cores,
-    fontFamilies,
-    radius,
-    typography
-} from '../../../../theme';
 
-const estilos = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 20,
-        borderRadius: radius.buttonAndInput
-    },
+import { fontFamilies } from '../../../../theme';
 
-    conteudo: {
-        alignItems: 'center',
-        flexShrink: 1,
-        flexDirection: 'row',
-        gap: 8,
-        justifyContent: 'center'
-    },
+const COR_LARANJA_ACESSIVEL = '#B94D38';
 
-    texto: {
-        flexShrink: 1,
-        textAlign: 'center'
-    },
+const COR_LARANJA_BORDA = '#A94734';
 
-    pressionado: {
-        opacity: 0.65,
-        transform: [
-            {
-                scale: 0.98
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            borderRadius: tema.radius.buttonAndInput
+        },
+
+        conteudo: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: 8,
+            justifyContent: 'center'
+        },
+
+        texto: {
+            textAlign: 'center'
+        },
+
+        pressionado: {
+            opacity: 0.65,
+            transform: [
+                {
+                    scale: 0.98
+                }
+            ]
+        },
+
+        desativado: {
+            backgroundColor: tema.cores.interface.separador,
+            borderColor: tema.cores.interface.borda,
+            borderStyle: 'solid'
+        }
+    });
+}
+
+function criarTamanhos(tema) {
+    return {
+        compacto: {
+            container: {
+                height: 52
+            },
+
+            texto: {
+                ...tema.typography.bodyDefault,
+                fontFamily: fontFamilies.medium,
+                fontWeight: '500'
             }
-        ]
-    },
-
-    desativado: {
-        backgroundColor:
-            cores.neutras.bordaClara,
-        borderColor:
-            cores.neutras.bordaClara,
-        borderStyle: 'solid'
-    }
-});
-
-const tamanhos = {
-    compacto: {
-        container: {
-            minHeight: 52,
-            paddingVertical: 12
         },
-        texto: {
-            ...typography.bodyDefault,
-            fontFamily:
-                fontFamilies.medium,
-            fontWeight: '500'
-        }
-    },
 
-    grande: {
-        container: {
-            minHeight: 56,
-            paddingVertical: 14
+        grande: {
+            container: {
+                height: 56
+            },
+
+            texto: {
+                ...tema.typography.bodyLarge,
+                letterSpacing: 0.18
+            }
+        }
+    };
+}
+
+function criarVariantes(tema) {
+    return {
+        laranja: {
+            container: {
+                backgroundColor: COR_LARANJA_ACESSIVEL
+            },
+
+            texto: {
+                color: '#FFFFFF'
+            }
         },
-        texto: {
-            ...typography.bodyLarge,
-            letterSpacing: 0.18
-        }
-    }
-};
 
-const variantes = {
-    laranja: {
-        container: {
-            backgroundColor:
-                cores.marca.primaria
+        verde: {
+            container: {
+                backgroundColor: tema.cores.interface.destaque
+            },
+
+            texto: {
+                color: tema.cores.interface.textoSobreDestaque
+            }
         },
-        texto: {
-            color:
-                cores.neutras.superficieClara
-        }
-    },
 
-    verde: {
-        container: {
-            backgroundColor:
-                cores.marca.secundaria
+        branco: {
+            container: {
+                backgroundColor: tema.cores.interface.superficie,
+                borderColor: tema.cores.interface.borda,
+                borderWidth: 1.41
+            },
+
+            texto: {
+                color: tema.cores.interface.textoSecundario
+            }
         },
-        texto: {
-            color:
-                cores.neutras.superficieClara
-        }
-    },
 
-    branco: {
-        container: {
-            backgroundColor:
-                cores.neutras.superficieClara,
-            borderColor:
-                cores.neutras.bordaClara,
-            borderWidth: 1.41
+        preto: {
+            container: {
+                backgroundColor: tema.escuro ? tema.cores.interface.textoPrincipal : '#222222'
+            },
+
+            texto: {
+                color: tema.escuro ? '#222222' : '#FFFFFF'
+            }
         },
-        texto: {
-            color:
-                cores.neutras
-                    .textoSecundarioClaro
-        }
-    },
 
-    preto: {
-        container: {
-            backgroundColor:
-                cores.neutras
-                    .textoPrincipalClaro
+        vermelho: {
+            container: {
+                backgroundColor: tema.cores.feedback.erro
+            },
+
+            texto: {
+                color: '#FFFFFF'
+            }
         },
-        texto: {
-            color:
-                cores.neutras.superficieClara
-        }
-    },
 
-    vermelho: {
-        container: {
-            backgroundColor:
-                cores.feedback.erro
+        bordaLaranja: {
+            container: {
+                borderColor: tema.escuro ? '#E58E7B' : COR_LARANJA_BORDA,
+                borderWidth: 1.41
+            },
+
+            texto: {
+                color: tema.escuro ? '#EFA18F' : COR_LARANJA_BORDA,
+                fontFamily: fontFamilies.semibold,
+                fontWeight: '600'
+            }
         },
-        texto: {
-            color:
-                cores.neutras.superficieClara
-        }
-    },
 
-    texto: {
-        container: {
-            backgroundColor: 'transparent'
+        bordaVerde: {
+            container: {
+                borderColor: tema.cores.interface.destaque,
+                borderWidth: 1.41
+            },
+
+            texto: {
+                color: tema.cores.interface.destaque
+            }
         },
-        texto: {
-            color: cores.neutras.textoSecundarioClaro,
-            fontFamily: fontFamilies.medium,
-            fontWeight: '500'
-        }
-    },
 
-    bordaLaranja: {
-        container: {
-            borderColor:
-                cores.marca.primaria,
-            borderWidth: 1.41
+        texto: {
+            container: {
+                backgroundColor: 'transparent'
+            },
+
+            texto: {
+                color: tema.cores.interface.textoSecundario,
+                fontFamily: fontFamilies.medium,
+                fontWeight: '500'
+            }
         },
-        texto: {
-            color:
-                cores.marca.primaria,
-            fontFamily:
-                fontFamilies.semibold,
-            fontWeight: '600'
-        }
-    },
 
-    bordaVerde: {
-        container: {
-            borderColor:
-                cores.marca.secundaria,
-            borderWidth: 1.41
-        },
-        texto: {
-            color:
-                cores.marca.secundaria
-        }
-    },
+        tracejado: {
+            container: {
+                borderColor: tema.cores.interface.textoDesabilitado,
+                borderStyle: 'dashed',
+                borderWidth: 1.41
+            },
 
-    tracejado: {
-        container: {
-            borderColor:
-                cores.neutras.bordaTracejada,
-            borderStyle: 'dashed',
-            borderWidth: 1.41
-        },
-        texto: {
-            color:
-                cores.neutras
-                    .textoSecundarioClaro,
-            fontSize: 15,
-            lineHeight: 22.5
+            texto: {
+                color: tema.cores.interface.textoSecundario,
+                fontSize: 15,
+                lineHeight: 22.5
+            }
         }
-    }
-};
+    };
+}
 
-export {
-    estilos,
-    tamanhos,
-    variantes
-};
+export { COR_LARANJA_ACESSIVEL, criarEstilos, criarTamanhos, criarVariantes };

@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { ArrowsClockwiseIcon, WarningCircleIcon } from '../../icons/AppIcons';
-import { estilos, variantes } from './StatusBadge.styles';
+import { useTheme } from '../../../hooks/useTheme';
+import { criarEstilos, criarVariantes } from './StatusBadge.styles';
 
 // Preserva a largura do Figma, limitada pelo espaço disponível, e permite crescer em altura.
 // No Android, o padding tipográfico padrão também excedia as caixas de 15/17px.
@@ -31,7 +33,7 @@ const estados = Object.freeze({
     alertaLeve: { rotulo: 'Alerta Leve', variante: 'alertaLeve', ponto: true },
     alertaModerado: { rotulo: 'Alerta Moderado', variante: 'alertaModerado', ponto: true },
     alertaCritico: { rotulo: 'Alerta Crítico', variante: 'alertaCritico', ponto: true },
-    'alertaCrítico': { rotulo: 'Alerta Crítico', variante: 'alertaCritico', ponto: true },
+    alertaCrítico: { rotulo: 'Alerta Crítico', variante: 'alertaCritico', ponto: true },
     atrasado: { rotulo: 'Atrasado', variante: 'atrasadoProximosHorarios' },
     atrasadoProximosHorarios: { rotulo: 'Atrasado', variante: 'atrasadoProximosHorarios' },
     confirmado: { rotulo: 'Confirmado', variante: 'confirmado', ponto: true },
@@ -53,7 +55,7 @@ const estados = Object.freeze({
         variante: 'diasMenstruacao',
         composto: true
     },
-    'diasMenstruação': {
+    diasMenstruação: {
         rotulo: '6 dias menstruação',
         variante: 'diasMenstruacao',
         composto: true
@@ -75,12 +77,22 @@ const estados = Object.freeze({
 
 // A correção pertence somente às variantes das HU-019/HU-023.
 const variantesDeUso = new Set([
-    'pendenteDeUso', 'alertaLeve', 'alertaModerado', 'alertaCritico',
-    'atrasadoProximosHorarios', 'confirmado', 'confirmadoHistoricoUso',
-    'confirmadoForaPrazoHistoricoUso', 'naoConfirmadoHistoricoUso', 'validadeAindaPrazo'
+    'pendenteDeUso',
+    'alertaLeve',
+    'alertaModerado',
+    'alertaCritico',
+    'atrasadoProximosHorarios',
+    'confirmado',
+    'confirmadoHistoricoUso',
+    'confirmadoForaPrazoHistoricoUso',
+    'naoConfirmadoHistoricoUso',
+    'validadeAindaPrazo'
 ]);
 
 function StatusBadge({ estado, rotulo }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const variantes = useMemo(() => criarVariantes(tema), [tema]);
     const configuracao = estados[estado];
 
     if (!configuracao) {
@@ -90,7 +102,8 @@ function StatusBadge({ estado, rotulo }) {
     const visual = variantes[configuracao.variante];
     const texto = rotulo || configuracao.rotulo;
     const ajustarTextoDeUso = estado !== 'emAndamento' && variantesDeUso.has(configuracao.variante);
-    const confirmadoNoHistorico = configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado';
+    const confirmadoNoHistorico =
+        configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado';
 
     if (configuracao.estimativa) {
         const acessibilidade = `${texto}. ${configuracao.descricao}`;
@@ -104,7 +117,9 @@ function StatusBadge({ estado, rotulo }) {
             >
                 <WarningCircleIcon size={18} color={visual.texto.color} />
                 <View style={estilos.conteudoEstimativa}>
-                    <Text numberOfLines={1} style={estilos.tituloEstimativa}>{texto}</Text>
+                    <Text numberOfLines={1} style={estilos.tituloEstimativa}>
+                        {texto}
+                    </Text>
                     <Text numberOfLines={1} style={estilos.descricaoEstimativa}>
                         {configuracao.descricao}
                     </Text>
@@ -122,17 +137,42 @@ function StatusBadge({ estado, rotulo }) {
             accessible
             accessibilityRole="text"
             accessibilityLabel={texto}
-            style={[estilos.container, visual.container, ajustarTextoDeUso && dimensoesFlexiveis(visual.container), confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width }]}
+            style={[
+                estilos.container,
+                visual.container,
+                ajustarTextoDeUso && dimensoesFlexiveis(visual.container),
+                confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width }
+            ]}
         >
             {configuracao.iconeCiclo ? (
                 <ArrowsClockwiseIcon size={13} color={visual.texto.color} />
             ) : null}
             {configuracao.ponto ? (
-                <Text style={[estilos.ponto, { color: visual.texto.color }, ajustarTextoDeUso && { includeFontPadding: false }]}>●</Text>
+                <Text
+                    style={[
+                        estilos.ponto,
+                        { color: visual.texto.color },
+                        ajustarTextoDeUso && { includeFontPadding: false }
+                    ]}
+                >
+                    ●
+                </Text>
             ) : null}
-            <Text numberOfLines={confirmadoNoHistorico || !ajustarTextoDeUso ? 1 : undefined} style={[estilos.texto, visual.texto, ajustarTextoDeUso && textoFlexivel(visual.texto), confirmadoNoHistorico && { flexShrink: 0 }]}>{valor || texto}</Text>
+            <Text
+                numberOfLines={confirmadoNoHistorico || !ajustarTextoDeUso ? 1 : undefined}
+                style={[
+                    estilos.texto,
+                    visual.texto,
+                    ajustarTextoDeUso && textoFlexivel(visual.texto),
+                    confirmadoNoHistorico && { flexShrink: 0 }
+                ]}
+            >
+                {valor || texto}
+            </Text>
             {sufixo ? (
-                <Text numberOfLines={1} style={[estilos.texto, visual.sufixo]}>{sufixo}</Text>
+                <Text numberOfLines={1} style={[estilos.texto, visual.sufixo]}>
+                    {sufixo}
+                </Text>
             ) : null}
         </View>
     );

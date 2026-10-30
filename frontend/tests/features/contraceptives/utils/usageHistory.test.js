@@ -1,4 +1,8 @@
-import { partesDaDataUso, formatarDataUso, estadoCalendarioUso } from '../../../../src/features/contraceptives/utils/usageHistory';
+import {
+    partesDaDataUso,
+    formatarDataUso,
+    estadoCalendarioUso
+} from '../../../../src/features/contraceptives/utils/usageHistory';
 
 test.each(['2026-09-05', '2026-09-05T02:00:00Z', '05/09/2026'])(
     'interpreta a data programada %s sem deslocamento de fuso',

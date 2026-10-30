@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import {
     CycleEditFlow,
@@ -6,6 +6,7 @@ import {
     formatarDataParaCampo,
     validarEdicao
 } from '../../../src/features/cycles/CycleEditFlow';
+import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 
 jest.mock('../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet', () => {
     const React = require('react');

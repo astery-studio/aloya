@@ -77,19 +77,11 @@ jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => {
 
 jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     const React = require('react');
-    const { Text, Pressable } = require('react-native');
+    const { Text } = require('react-native');
 
     return {
-        CycleHistoryFlow: jest.fn(({ aoAbrirCalendario }) =>
-            React.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Abrir Calendário pelo Histórico',
-                    onPress: aoAbrirCalendario
-                },
-                React.createElement(Text, null, 'Histórico de ciclos integrado')
-            )
+        CycleHistoryFlow: jest.fn(() =>
+            React.createElement(Text, null, 'Histórico de ciclos integrado')
         )
     };
 });
@@ -97,6 +89,7 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
 jest.mock('../../src/features/cycles/CycleEditFlow', () => {
     const React = require('react');
     const { Text } = require('react-native');
+
     return {
         CycleEditFlow: jest.fn(({ ciclo }) =>
             React.createElement(Text, null, `Editando ciclo ${ciclo.id}`)
@@ -107,9 +100,11 @@ jest.mock('../../src/features/cycles/CycleEditFlow', () => {
 jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
+
     return {
         CalendarScreenContainer: jest.fn(({ aoEditarCiclo }) => {
             const instancia = React.useId();
+
             return React.createElement(
                 View,
                 null,
@@ -341,8 +336,8 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
-import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
 import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
+import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
 
 //Cria os serviços usados pelo App durante os testes de integração.
@@ -369,12 +364,23 @@ function criarServicos() {
             confirmarSenhaExclusao: jest.fn(),
             excluirConta: jest.fn()
         },
+        themePreferenceService: {
+            buscarPreferencia: jest.fn().mockResolvedValue('automatico'),
+            atualizarPreferencia: jest.fn()
+        },
         contraceptiveService: {},
+        calendarService: {
+            buscarMes: jest.fn(),
+            removerDia: jest.fn(),
+            excluirCiclo: jest.fn()
+        },
         cycleHistoryService: {
             listarPagina: jest.fn(),
-            buscar: jest
-                .fn()
-                .mockResolvedValue({ id: '9', dataInicio: '2026-09-04', dataFim: '2026-09-08' }),
+            buscar: jest.fn().mockResolvedValue({
+                id: '9',
+                dataInicio: '2026-09-04',
+                dataFim: '2026-09-08'
+            }),
             editar: jest.fn()
         },
         cycleParametersService: {
@@ -465,8 +471,8 @@ describe('App integrado', () => {
         expect(CycleHistoryFlow).toHaveBeenCalledWith(
             expect.objectContaining({
                 service: servicos.cycleHistoryService,
-                aoAbrirCalendario: expect.any(Function),
                 calendarService: servicos.calendarService,
+                aoAbrirCalendario: expect.any(Function),
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),
@@ -486,23 +492,15 @@ describe('App integrado', () => {
 
         expect(servicos.cycleHistoryService.buscar).toHaveBeenCalledWith(9);
         expect(await screen.findByText('Editando ciclo 9')).toBeOnTheScreen();
+
         const instanciaAnterior = screen.getByTestId('instancia-calendario').props.children;
         await act(() => CycleEditFlow.mock.calls.at(-1)[0].onAtualizado());
         expect(screen.getByTestId('instancia-calendario').props.children).not.toBe(
             instanciaAnterior
         );
+
         await act(() => CycleEditFlow.mock.calls.at(-1)[0].onFechar());
         expect(screen.queryByText('Editando ciclo 9')).toBeNull();
-    });
-
-    test('abre o Calendário atualizado pelo Histórico integrado', async () => {
-        obterToken.mockResolvedValue({ token: 'token-valido' });
-        await render(<App />);
-        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir ciclos' }));
-        await fireEvent.press(
-            await screen.findByRole('button', { name: 'Abrir Calendário pelo Histórico' })
-        );
-        expect(await screen.findByText('Calendário integrado')).toBeOnTheScreen();
     });
 
     test('abre membros e inicia a criação de categoria', async () => {

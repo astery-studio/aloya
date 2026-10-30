@@ -1,223 +1,198 @@
-//Confere a apresentação, interação e acessibilidade do campo editável de perfil.
-import {
-    fireEvent,
-    render,
-    screen
-} from '@testing-library/react-native'
+// Confere apresentação, interação, tema e acessibilidade.
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock(
-    '../../../../src/shared/components/icons/AppIcons',
-    () => ({
-        NotePencilIcon:
-            jest.fn(() => null)
-    })
-)
+const mockNotePencilIcon = jest.fn(() => null);
+
+jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
+    NotePencilIcon: (propriedades) => mockNotePencilIcon(propriedades)
+}));
 
 import {
-    NotePencilIcon
-} from '../../../../src/shared/components/icons/AppIcons'
+    ProfileField,
+    obterValorVisivel,
+    valorFoiInformado
+} from '../../../../src/features/settings/profile/ProfileField';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
-import {
-    ProfileField
-} from '../../../../src/features/settings/profile/ProfileField'
-
-import {
-    corIconeEditar
-} from '../../../../src/features/settings/profile/ProfileField.style'
+function renderizarCampo(propriedades = {}, preferencia = 'claro') {
+    return render(
+        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+            <ProfileField label="Nome" valor="Julia" onPress={jest.fn()} {...propriedades} />
+        </ThemeProvider>
+    );
+}
 
 describe('ProfileField', () => {
     beforeEach(() => {
-        NotePencilIcon.mockClear()
-    })
+        jest.clearAllMocks();
+    });
 
-    test('mostra o nome e o valor do campo', async () => {
-        await render(
-            <ProfileField
-                label="Nome"
-                valor="Julia"
-                onPress={jest.fn()}
-            />
-        )
+    test('mostra nome e valor', async () => {
+        await renderizarCampo();
 
-        expect(
-            screen.getByText('Nome')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Nome')).toBeOnTheScreen();
 
-        expect(
-            screen.getByText('Julia')
-        ).toBeOnTheScreen()
-    })
+        expect(screen.getByText('Julia')).toBeOnTheScreen();
+    });
 
-    test('executa a edição ao pressionar o campo', async () => {
-        const onPress = jest.fn()
+    test('executa a edição', async () => {
+        const onPress = jest.fn();
 
-        await render(
-            <ProfileField
-                label="E-mail"
-                valor="julia@email.com"
-                onPress={onPress}
-            />
-        )
+        await renderizarCampo({
+            label: 'E-mail',
+            valor: 'julia@email.com',
+            onPress
+        });
 
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Editar E-mail'
             })
-        )
+        );
 
-        expect(
-            onPress
-        ).toHaveBeenCalledTimes(1)
-    })
+        expect(onPress).toHaveBeenCalledTimes(1);
+    });
 
-    test('mostra valor alternativo quando a informação é nula', async () => {
-        await render(
-            <ProfileField
-                label="Identidade de Gênero"
-                valor={null}
-                onPress={jest.fn()}
-            />
-        )
+    test.each([null, undefined, '', '   ', {}, []])(
+        'mostra valor alternativo para %p',
+        async (valor) => {
+            await renderizarCampo({
+                valor
+            });
 
-        expect(
-            screen.getByText(
-                'Não informado'
-            )
-        ).toBeOnTheScreen()
-    })
+            expect(screen.getByText('Não informado')).toBeOnTheScreen();
 
-    test('mostra valor alternativo quando recebe somente espaços', async () => {
-        await render(
-            <ProfileField
-                label="Nome"
-                valor="   "
-                onPress={jest.fn()}
-            />
-        )
+            expect(
+                screen.getByRole('button', {
+                    name: 'Editar Nome'
+                }).props.accessibilityValue
+            ).toEqual({
+                text: 'Não informado'
+            });
+        }
+    );
 
-        expect(
-            screen.getByText(
-                'Não informado'
-            )
-        ).toBeOnTheScreen()
+    test('aceita número zero', async () => {
+        await renderizarCampo({
+            label: 'Quantidade',
+            valor: 0
+        });
 
-        expect(
-            screen.getByRole('button', {
-                name: 'Editar Nome'
-            }).props.accessibilityValue
-        ).toEqual({
-            text: 'Não informado'
-        })
-    })
+        expect(screen.getByText('0')).toBeOnTheScreen();
 
-    test('aceita um número como valor visível', async () => {
-        await render(
-            <ProfileField
-                label="Quantidade"
-                valor={0}
-                onPress={jest.fn()}
-            />
-        )
+        expect(valorFoiInformado(0)).toBe(true);
 
-        expect(
-            screen.getByText('0')
-        ).toBeOnTheScreen()
+        expect(obterValorVisivel(0)).toBe('0');
+    });
 
-        expect(
-            screen.getByRole('button', {
-                name: 'Editar Quantidade'
-            }).props.accessibilityValue
-        ).toEqual({
-            text: '0'
-        })
-    })
-
-    test('desabilita o campo quando não recebe uma ação', async () => {
-        await render(
-            <ProfileField
-                label="Nome"
-                valor="Julia"
-            />
-        )
+    test('desabilita sem ação', async () => {
+        await renderizarCampo({
+            onPress: undefined
+        });
 
         expect(
             screen.getByRole('button', {
                 name: 'Editar Nome'
             })
-        ).toBeDisabled()
-    })
+        ).toBeDisabled();
+    });
 
-    test('respeita a desabilitação explícita', async () => {
-        const onPress = jest.fn()
+    test('respeita desabilitação explícita', async () => {
+        const onPress = jest.fn();
 
-        await render(
-            <ProfileField
-                label="Nome"
-                valor="Julia"
-                onPress={onPress}
-                desabilitado
-            />
-        )
+        await renderizarCampo({
+            onPress,
+            desabilitado: true
+        });
 
-        const campo =
+        const campo = screen.getByRole('button', {
+            name: 'Editar Nome'
+        });
+
+        expect(campo).toBeDisabled();
+
+        await fireEvent.press(campo);
+
+        expect(onPress).not.toHaveBeenCalled();
+    });
+
+    test('limita valores longos', async () => {
+        const valor = 'email-muito-longo@example.com';
+
+        await renderizarCampo({
+            label: 'E-mail',
+            valor
+        });
+
+        expect(screen.getByText(valor)).toHaveProp('numberOfLines', 1);
+
+        expect(screen.getByText(valor)).toHaveProp('ellipsizeMode', 'tail');
+    });
+
+    test('usa cores claras', async () => {
+        await renderizarCampo();
+
+        expect(
             screen.getByRole('button', {
                 name: 'Editar Nome'
             })
+        ).toHaveStyle({
+            backgroundColor: '#FFFFFF',
+            borderColor: '#E6E2D8'
+        });
 
-        expect(campo).toBeDisabled()
+        expect(screen.getByText('Nome')).toHaveStyle({
+            color: '#5C5C59'
+        });
 
-        await fireEvent.press(campo)
+        expect(screen.getByText('Julia')).toHaveStyle({
+            color: '#222222'
+        });
+    });
 
-        expect(
-            onPress
-        ).not.toHaveBeenCalled()
-    })
-
-    test('limita valores longos a uma linha', async () => {
-        const valor =
-            'email-muito-longo@example.com'
-
-        await render(
-            <ProfileField
-                label="E-mail"
-                valor={valor}
-                onPress={jest.fn()}
-            />
-        )
+    test('usa cores escuras', async () => {
+        await renderizarCampo({}, 'escuro');
 
         expect(
-            screen.getByText(valor)
-        ).toHaveProp(
-            'numberOfLines',
-            1
-        )
+            screen.getByRole('button', {
+                name: 'Editar Nome'
+            })
+        ).toHaveStyle({
+            backgroundColor: '#232926',
+            borderColor: '#4A514D'
+        });
 
-        expect(
-            screen.getByText(valor)
-        ).toHaveProp(
-            'ellipsizeMode',
-            'tail'
-        )
-    })
+        expect(screen.getByText('Nome')).toHaveStyle({
+            color: '#C4C8C5'
+        });
 
-    test('usa o ícone de edição correto', async () => {
-        await render(
-            <ProfileField
-                label="Nome"
-                valor="Julia"
-                onPress={jest.fn()}
-            />
-        )
+        expect(screen.getByText('Julia')).toHaveStyle({
+            color: '#F4F1EA'
+        });
+    });
 
-        expect(
-            NotePencilIcon
-        ).toHaveBeenCalledWith(
+    test('usa texto secundário no valor ausente', async () => {
+        await renderizarCampo(
+            {
+                valor: null
+            },
+            'escuro'
+        );
+
+        expect(screen.getByText('Não informado')).toHaveStyle({
+            color: '#C4C8C5'
+        });
+    });
+
+    test('usa ícone de edição temático', async () => {
+        await renderizarCampo({}, 'escuro');
+
+        expect(mockNotePencilIcon).toHaveBeenCalledWith(
             expect.objectContaining({
                 size: 20,
-                color: corIconeEditar,
+                color: '#A3A8A5',
                 weight: 'regular'
-            }),
-            undefined
-        )
-    })
-})
+            })
+        );
+    });
+});

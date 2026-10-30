@@ -1,6 +1,7 @@
 //Testa as variantes simples e com contatos do modal de exclusão.
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     const React = require('react');

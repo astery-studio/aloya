@@ -1,153 +1,108 @@
 //Apresenta as categorias de permissão e os estados visuais da coleção.
-import {
-    ActivityIndicator,
-    FlatList,
-    Text,
-    View
-} from 'react-native'
-import {
-    useCallback,
-    useMemo
-} from 'react'
+import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { useCallback, useMemo } from 'react';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
-import {EmptyState} from '../../../shared/components/feedback/EmptyState/EmptyState'
-import {tema} from '../../../shared/theme'
-import {
-    gruposPermissoes,
-    permissoesGerais
-} from '../constants/permissionOptions'
-import {SupportCategoryCard} from './SupportCategoryCard'
-import {estilos} from './SupportCategoryList.styles'
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
+import { SupportCategoryCard } from './SupportCategoryCard';
+import { criarEstilos } from './SupportCategoryList.styles';
 
-const MENSAGEM_ERRO =
-    'Não foi possível carregar suas categorias no momento. Tente novamente.'
+const MENSAGEM_ERRO = 'Não foi possível carregar suas categorias no momento. Tente novamente.';
 
 const TODAS_AS_PERMISSOES = Object.freeze([
     ...permissoesGerais,
-    ...gruposPermissoes.flatMap(
-        grupo => grupo.permissoes
-    )
-])
+    ...gruposPermissoes.flatMap((grupo) => grupo.permissoes)
+]);
 
 const ROTULOS_RESUMIDOS = Object.freeze({
     'geral.fase_atual': 'Fase atual',
-    'geral.anticoncepcionais':
-        'Anticoncepcionais',
-    'geral.historico_ciclo':
-        'Histórico de ciclo',
-    'geral.alerta_anticoncepcional':
-        'Alertas de anticoncepcional',
+    'geral.anticoncepcionais': 'Anticoncepcionais',
+    'geral.historico_ciclo': 'Histórico de ciclo',
+    'geral.alerta_anticoncepcional': 'Alertas de anticoncepcional',
     'geral.dicas': 'Dicas',
-    'emocional.sintomas_emocionais':
-        'Humor'
-})
+    'emocional.sintomas_emocionais': 'Humor'
+});
 
-const PERMISSOES_CONHECIDAS = new Set(
-    TODAS_AS_PERMISSOES.map(
-        permissao => permissao.id
-    )
-)
+const PERMISSOES_CONHECIDAS = new Set(TODAS_AS_PERMISSOES.map((permissao) => permissao.id));
 
 const ROTULO_POR_PERMISSAO = new Map(
-    TODAS_AS_PERMISSOES.map(
-        permissao => [
-            permissao.id,
-            ROTULOS_RESUMIDOS[
-                permissao.id
-            ] ?? limparRotulo(
-                permissao.titulo
-            )
-        ]
-    )
-)
+    TODAS_AS_PERMISSOES.map((permissao) => [
+        permissao.id,
+        ROTULOS_RESUMIDOS[permissao.id] ?? limparRotulo(permissao.titulo)
+    ])
+);
 
 function limparRotulo(rotulo) {
     if (typeof rotulo !== 'string') {
-        return ''
+        return '';
     }
 
     return rotulo
-        .replace(
-            /^Acesso (?:à|ao|aos|às?)\s+/iu,
-            ''
-        )
+        .replace(/^Acesso (?:à|ao|aos|às?)\s+/iu, '')
         .replace(/^Receber\s+/iu, '')
-        .trim()
+        .trim();
 }
 
-function normalizarPermissoes(
-    dadosVisiveis
-) {
+function normalizarPermissoes(dadosVisiveis) {
     if (!Array.isArray(dadosVisiveis)) {
-        return []
+        return [];
     }
 
     return [
         ...new Set(
             dadosVisiveis.filter(
-                permissao =>
-                    typeof permissao
-                        === 'string'
-                    && PERMISSOES_CONHECIDAS
-                        .has(permissao)
+                (permissao) => typeof permissao === 'string' && PERMISSOES_CONHECIDAS.has(permissao)
             )
         )
-    ]
+    ];
 }
 
 function criarResumoPermissoes(dadosVisiveis) {
-    const permissoes = normalizarPermissoes(dadosVisiveis)
+    const permissoes = normalizarPermissoes(dadosVisiveis);
 
     if (permissoes.length === TODAS_AS_PERMISSOES.length) {
-        return 'Todos os dados permitidos'
+        return 'Todos os dados permitidos';
     }
 
     if (permissoes.length === 0) {
-        return 'Nenhum dado permitido'
+        return 'Nenhum dado permitido';
     }
 
     if (permissoes.length === 1) {
-        const rotulo = ROTULO_POR_PERMISSAO.get(permissoes[0])
+        const rotulo = ROTULO_POR_PERMISSAO.get(permissoes[0]);
 
-        return `Apenas ${rotulo} permitido`
+        return `Apenas ${rotulo} permitido`;
     }
 
-    return `${permissoes.length} tipos de dado permitidos`
+    return `${permissoes.length} tipos de dado permitidos`;
 }
 
 function categoriaEhValida(categoria) {
-    return categoria !== null
-        && typeof categoria === 'object'
-        && !Array.isArray(categoria)
-        && (
-            typeof categoria.id === 'string'
-            || Number.isSafeInteger(
-                categoria.id
-            )
-        )
-        && typeof categoria.nome
-            === 'string'
-        && categoria.nome.trim().length > 0
+    return (
+        categoria !== null &&
+        typeof categoria === 'object' &&
+        !Array.isArray(categoria) &&
+        (typeof categoria.id === 'string' || Number.isSafeInteger(categoria.id)) &&
+        typeof categoria.nome === 'string' &&
+        categoria.nome.trim().length > 0
+    );
 }
 
 function ordenarCategorias(categorias) {
     if (!Array.isArray(categorias)) {
-        return []
+        return [];
     }
 
     return categorias
         .filter(categoriaEhValida)
         .slice()
         .sort((categoriaA, categoriaB) =>
-            categoriaA.nome.localeCompare(
-                categoriaB.nome,
-                'pt-BR',
-                {
-                    sensitivity: 'base'
-                }
-            )
-        )
+            categoriaA.nome.localeCompare(categoriaB.nome, 'pt-BR', {
+                sensitivity: 'base'
+            })
+        );
 }
 
 function SupportCategoryList({
@@ -163,75 +118,43 @@ function SupportCategoryList({
     acaoEmAndamento = null,
     desabilitado = false
 }) {
-    const categoriasOrdenadas = useMemo(
-        () => ordenarCategorias(categorias),
-        [categorias]
-    )
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const possuiCategorias =
-        categoriasOrdenadas.length > 0
+    const categoriasOrdenadas = useMemo(() => ordenarCategorias(categorias), [categorias]);
 
-    const carregamentoInicial =
-        carregando && !possuiCategorias
+    const possuiCategorias = categoriasOrdenadas.length > 0;
 
-    const erroInicial =
-        Boolean(erro) && !possuiCategorias
+    const carregamentoInicial = carregando && !possuiCategorias;
 
-    const estadoVazio =
-        !carregamentoInicial
-        && !erroInicial
-        && !possuiCategorias
+    const erroInicial = Boolean(erro) && !possuiCategorias;
 
-    const renderizarCategoria =
-        useCallback(
-            ({item}) => {
-                const categoriaCarregando =
-                    item.id
-                    === categoriaEmAndamentoId
+    const estadoVazio = !carregamentoInicial && !erroInicial && !possuiCategorias;
 
-                return (
-                    <SupportCategoryCard
-                        categoria={item}
-                        resumoPermissoes={
-                            criarResumoPermissoes(
-                                item.dadosVisiveis
-                            )
-                        }
-                        quantidadeContatos={
-                            item.quantidadeContatos
-                        }
-                        onEditar={onEditar}
-                        onExcluir={onExcluir}
-                        desabilitado={
-                            desabilitado
-                        }
-                        acaoEmAndamento={
-                            categoriaCarregando
-                                ? acaoEmAndamento
-                                : null
-                        }
-                    />
-                )
-            },
-            [
-                acaoEmAndamento,
-                categoriaEmAndamentoId,
-                desabilitado,
-                onEditar,
-                onExcluir
-            ]
-        )
+    const renderizarCategoria = useCallback(
+        ({ item }) => {
+            const categoriaCarregando = item.id === categoriaEmAndamentoId;
 
-    const extrairChave =
-        useCallback(
-            categoria =>
-                String(categoria.id),
-            []
-        )
+            return (
+                <SupportCategoryCard
+                    categoria={item}
+                    resumoPermissoes={criarResumoPermissoes(item.dadosVisiveis)}
+                    quantidadeContatos={item.quantidadeContatos}
+                    onEditar={onEditar}
+                    onExcluir={onExcluir}
+                    desabilitado={desabilitado}
+                    acaoEmAndamento={categoriaCarregando ? acaoEmAndamento : null}
+                />
+            );
+        },
+        [acaoEmAndamento, categoriaEmAndamentoId, desabilitado, onEditar, onExcluir]
+    );
+
+    const extrairChave = useCallback((categoria) => String(categoria.id), []);
 
     function renderizarAtualizacao() {
         if (!atualizando) {
-            return null
+            return null;
         }
 
         return (
@@ -240,23 +163,11 @@ function SupportCategoryList({
                 accessibilityLiveRegion="polite"
                 style={estilos.atualizacao}
             >
-                <ActivityIndicator
-                    color={
-                        tema.cores.marca
-                            .secundaria
-                    }
-                    size="small"
-                />
+                <ActivityIndicator color={tema.cores.interface.destaque} size="small" />
 
-                <Text
-                    style={
-                        estilos.textoAtualizacao
-                    }
-                >
-                    Atualizando categorias...
-                </Text>
+                <Text style={estilos.textoAtualizacao}>Atualizando categorias...</Text>
             </View>
-        )
+        );
     }
 
     function renderizarConteudo() {
@@ -268,23 +179,11 @@ function SupportCategoryList({
                     accessibilityLiveRegion="polite"
                     style={estilos.estadoCentral}
                 >
-                    <ActivityIndicator
-                        color={
-                            tema.cores.marca
-                                .secundaria
-                        }
-                        size="large"
-                    />
+                    <ActivityIndicator color={tema.cores.interface.destaque} size="large" />
 
-                    <Text
-                        style={
-                            estilos.textoCarregamento
-                        }
-                    >
-                        Carregando categorias...
-                    </Text>
+                    <Text style={estilos.textoCarregamento}>Carregando categorias...</Text>
                 </View>
-            )
+            );
         }
 
         if (erroInicial) {
@@ -297,18 +196,14 @@ function SupportCategoryList({
                         acao={
                             <ButtonScreen
                                 texto="Tentar Novamente"
-                                aoPressionar={
-                                    onTentarNovamente
-                                }
+                                aoPressionar={onTentarNovamente}
                                 variante="preto"
-                                desativado={
-                                    desabilitado
-                                }
+                                desativado={desabilitado}
                             />
                         }
                     />
                 </View>
-            )
+            );
         }
 
         if (estadoVazio) {
@@ -320,7 +215,7 @@ function SupportCategoryList({
                         variante="vazio"
                     />
                 </View>
-            )
+            );
         }
 
         return (
@@ -329,46 +224,27 @@ function SupportCategoryList({
                 data={categoriasOrdenadas}
                 keyExtractor={extrairChave}
                 renderItem={renderizarCategoria}
-                ListHeaderComponent={
-                    renderizarAtualizacao
-                }
-                contentContainerStyle={
-                    estilos.conteudoLista
-                }
-                ItemSeparatorComponent={
-                    Separador
-                }
-                refreshing={
-                    Boolean(atualizando)
-                }
-                onRefresh={
-                    typeof onTentarNovamente
-                        === 'function'
-                        ? onTentarNovamente
-                        : undefined
-                }
+                ListHeaderComponent={renderizarAtualizacao}
+                contentContainerStyle={estilos.conteudoLista}
+                ItemSeparatorComponent={() => <Separador estilo={estilos.separador} />}
+                refreshing={Boolean(atualizando)}
+                onRefresh={typeof onTentarNovamente === 'function' ? onTentarNovamente : undefined}
                 initialNumToRender={6}
                 maxToRenderPerBatch={6}
                 updateCellsBatchingPeriod={50}
                 windowSize={7}
                 removeClippedSubviews
-                showsVerticalScrollIndicator={
-                    false
-                }
+                showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             />
-        )
+        );
     }
 
-    const mostrarAcaoCriar =
-        !carregamentoInicial
-        && !erroInicial
+    const mostrarAcaoCriar = !carregamentoInicial && !erroInicial;
 
     return (
         <View style={estilos.container}>
-            <View style={estilos.conteudo}>
-                {renderizarConteudo()}
-            </View>
+            <View style={estilos.conteudo}>{renderizarConteudo()}</View>
 
             {mostrarAcaoCriar ? (
                 <View style={estilos.acaoFixa}>
@@ -376,28 +252,17 @@ function SupportCategoryList({
                         texto="Criar nova categoria"
                         aoPressionar={onCriar}
                         variante="laranja"
-                        desativado={
-                            desabilitado
-                        }
+                        desativado={desabilitado}
                         rotuloAcessibilidade="Criar nova categoria de permissão"
                     />
                 </View>
             ) : null}
         </View>
-    )
+    );
 }
 
-function Separador() {
-    return (
-        <View
-            importantForAccessibility="no"
-            style={estilos.separador}
-        />
-    )
+function Separador({ estilo }) {
+    return <View importantForAccessibility="no" style={estilo} />;
 }
 
-export {
-    criarResumoPermissoes,
-    ordenarCategorias,
-    SupportCategoryList
-}
+export { criarResumoPermissoes, ordenarCategorias, SupportCategoryList };

@@ -1,64 +1,64 @@
-import { StyleSheet } from 'react-native'
-import { fontFamilies, tema } from '../../../theme'
+import { StyleSheet } from 'react-native';
 
-const setaConfig = tema.cores.neutras.bordaTracejada
-const corSetaBotao = tema.cores.neutras.textoSecundarioClaro
+import { fontFamilies } from '../../../theme';
 
-const estilos = StyleSheet.create({
-    container: {
-        width: '100%',
-        minHeight: 57.4,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 9,
-        backgroundColor: tema.cores.neutras.superficieClara,
-        borderWidth: 0.7,
-        borderColor: tema.cores.neutras.bordaClara,
-        borderRadius: tema.radius.buttonAndInput
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            minHeight: 57.4,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 9,
+            backgroundColor: tema.cores.interface.superficie,
+            borderWidth: 0.7,
+            borderColor: tema.cores.interface.borda,
+            borderRadius: tema.radius.buttonAndInput
+        },
 
-    semBorda: {
-        minHeight: 56,
-        borderWidth: 0,
-        paddingHorizontal: 13
-    },
+        semBorda: {
+            minHeight: 56,
+            borderWidth: 0,
+            paddingHorizontal: 13
+        },
 
-    botao: {
-        minHeight: 56,
-        paddingHorizontal: 14,
-        paddingVertical: 11
-    },
+        botao: {
+            minHeight: 56,
+            paddingHorizontal: 14,
+            paddingVertical: 11
+        },
 
-    desabilitado: {
-        opacity: 0.5
-    },
+        desabilitado: {
+            opacity: 0.5
+        },
 
-    caixaIcone: {
-        width: 36,
-        height: 36,
-        flexShrink: 0,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10
-    },
+        caixaIcone: {
+            width: 36,
+            height: 36,
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 10
+        },
 
-    caixaIconeBotao: {
-        width: 32,
-        height: 32,
-        borderRadius: 8
-    },
+        caixaIconeBotao: {
+            width: 32,
+            height: 32,
+            borderRadius: 8
+        },
 
-    label: {
-        flex: 1,
-        minWidth: 0,
-        color: tema.cores.neutras.textoPrincipalClaro,
-        fontFamily: fontFamilies.regular,
-        fontSize: 16,
-        lineHeight: 24,
-        includeFontPadding: false
-    }
-})
+        label: {
+            flex: 1,
+            minWidth: 0,
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.regular,
+            fontSize: 16,
+            lineHeight: 24,
+            includeFontPadding: false
+        }
+    });
+}
 
-export {estilos, setaConfig, corSetaBotao}
+export { criarEstilos };

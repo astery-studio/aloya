@@ -1,10 +1,11 @@
 /**
  * Testes integrados das telas e interações do fluxo de autenticação.
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import ForgotPasswordScreen from '../../src/features/auth/screens/ForgotPasswordScreen';
 import LoginScreen from '../../src/features/auth/screens/LoginScreen';
 import ResetPasswordScreen from '../../src/features/auth/screens/ResetPasswordScreen';
+import { renderWithTheme } from '../helpers/renderWithTheme';
 
 jest.mock('../../src/shared/storage/tokenStorage', () => ({ salvarToken: jest.fn() }));
 
@@ -12,7 +13,7 @@ test('login inicia desativado e envia as credenciais preenchidas', async () => {
     const realizarLogin = jest.fn().mockResolvedValue({
         autenticacao: { token: 'jwt', tipo: 'Bearer' }
     });
-    await render(<LoginScreen realizarLogin={realizarLogin} />);
+    await renderWithTheme(<LoginScreen realizarLogin={realizarLogin} />);
     expect(screen.getByRole('button', { name: 'Entrar' })).toBeDisabled();
     await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'segredo1');
@@ -24,7 +25,7 @@ test('login inicia desativado e envia as credenciais preenchidas', async () => {
 
 test('login rejeita senha com menos de oito caracteres', async () => {
     const realizarLogin = jest.fn();
-    await render(<LoginScreen realizarLogin={realizarLogin} />);
+    await renderWithTheme(<LoginScreen realizarLogin={realizarLogin} />);
     await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'curta');
     await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
@@ -35,7 +36,7 @@ test('login rejeita senha com menos de oito caracteres', async () => {
 
 test('tentar novamente fecha o erro sem repetir as credenciais', async () => {
     const realizarLogin = jest.fn().mockRejectedValue(new Error('Credenciais inválidas.'));
-    await render(<LoginScreen realizarLogin={realizarLogin} />);
+    await renderWithTheme(<LoginScreen realizarLogin={realizarLogin} />);
     await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'incorreta');
     await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
@@ -49,10 +50,13 @@ test('tentar novamente fecha o erro sem repetir as credenciais', async () => {
 test('login mostra e permite fechar a confirmação de conta excluída', async () => {
     const aoDispensarMensagemSucesso = jest.fn();
 
-    await render(<LoginScreen
-        realizarLogin={jest.fn()}
-        mensagemSucesso="Sua conta foi excluída com sucesso."
-        aoDispensarMensagemSucesso={aoDispensarMensagemSucesso} />);
+    await renderWithTheme(
+        <LoginScreen
+            realizarLogin={jest.fn()}
+            mensagemSucesso="Sua conta foi excluída com sucesso."
+            aoDispensarMensagemSucesso={aoDispensarMensagemSucesso}
+        />
+    );
 
     expect(screen.getByText('Sua conta foi excluída com sucesso.')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
@@ -61,18 +65,20 @@ test('login mostra e permite fechar a confirmação de conta excluída', async (
 
 test('recuperação só permite envio com e-mail válido', async () => {
     const solicitarRecuperacao = jest.fn().mockResolvedValue({ mensagem: 'ok' });
-    await render(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);
+    await renderWithTheme(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);
     expect(screen.getByRole('button', { name: 'Enviar' })).toBeDisabled();
     await fireEvent.changeText(screen.getByLabelText('Email'), 'pessoa@email.com');
     await fireEvent.press(screen.getByRole('button', { name: 'Enviar' }));
-    await waitFor(() => expect(solicitarRecuperacao).toHaveBeenCalledWith({
-        email: 'pessoa@email.com'
-    }));
+    await waitFor(() =>
+        expect(solicitarRecuperacao).toHaveBeenCalledWith({
+            email: 'pessoa@email.com'
+        })
+    );
 });
 
 test('recuperação explica o formato inválido sem enviar', async () => {
     const solicitarRecuperacao = jest.fn();
-    await render(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);
+    await renderWithTheme(<ForgotPasswordScreen solicitarRecuperacao={solicitarRecuperacao} />);
     await fireEvent.changeText(screen.getByLabelText('Email'), 'email-invalido');
     await fireEvent.press(screen.getByRole('button', { name: 'Enviar' }));
     expect(screen.getByText('E-mail inválido')).toBeTruthy();
@@ -81,12 +87,15 @@ test('recuperação explica o formato inválido sem enviar', async () => {
 
 test('redefinição exige senhas iguais antes de confirmar', async () => {
     const redefinirSenha = jest.fn().mockResolvedValue({ mensagem: 'ok' });
-    await render(<ResetPasswordScreen token="token" redefinirSenha={redefinirSenha} />);
+    await renderWithTheme(<ResetPasswordScreen token="token" redefinirSenha={redefinirSenha} />);
     await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'nova-senha');
     expect(screen.getByRole('button', { name: 'Confirmar' })).toBeDisabled();
     await fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'nova-senha');
     await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
-    await waitFor(() => expect(redefinirSenha).toHaveBeenCalledWith({
-        token: 'token', senha: 'nova-senha'
-    }));
+    await waitFor(() =>
+        expect(redefinirSenha).toHaveBeenCalledWith({
+            token: 'token',
+            senha: 'nova-senha'
+        })
+    );
 });

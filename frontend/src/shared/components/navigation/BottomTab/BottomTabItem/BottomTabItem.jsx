@@ -1,43 +1,44 @@
-//Mostra um item individual da navegação inferior
-import { Pressable, Text, View } from 'react-native'
-import { estilos, corAtiva, corInativa } from './BottomTabItem.style'
+// Mostra um item individual da navegação inferior.
+import { useMemo } from 'react';
+import { Pressable, Text, View } from 'react-native';
+
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarEstilos } from './BottomTabItem.style';
 
 function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
-    const corDoItem = ativo ? corAtiva : corInativa
+    const tema = useTheme();
+
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
+    const corAtiva = tema.cores.interface.destaque;
+
+    const corInativa = tema.cores.interface.textoSecundario;
+
+    const corDoItem = ativo ? corAtiva : corInativa;
+
+    const desabilitado = typeof onPress !== 'function';
 
     return (
         <Pressable
             onPress={onPress}
-            disabled={typeof onPress !== 'function'}
+            disabled={desabilitado}
             accessibilityRole="tab"
             accessibilityLabel={label}
             accessibilityState={{
                 selected: ativo,
-                disabled: typeof onPress !== 'function'
+                disabled: desabilitado
             }}
-            style={estilos.item}
+            style={[estilos.item, desabilitado && estilos.desabilitado]}
         >
-            <Icone
-                size={26}
-                color={corDoItem}
-                weight={ativo ? 'fill' : 'regular'}
-            />
+            <Icone size={26} color={corDoItem} weight={ativo ? 'fill' : 'regular'} />
 
-            <Text
-                numberOfLines={1}
-                style={[
-                    estilos.label,
-                    ativo && estilos.labelAtiva
-                ]}
-            >
+            <Text numberOfLines={1} style={[estilos.label, ativo && estilos.labelAtiva]}>
                 {label}
             </Text>
 
-            {ativo ? (
-                <View style={estilos.pontoAtivo} />
-            ) : null}
+            {ativo ? <View testID={`indicador-aba-${label}`} style={estilos.pontoAtivo} /> : null}
         </Pressable>
-    )
+    );
 }
 
-export { BottomTabItem }
+export { BottomTabItem };

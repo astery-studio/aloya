@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider } from '../../../src/shared/theme/ThemeProvider';
 import { BottomSheet } from '../../../src/shared/components/feedback/BottomSheet/BottomSheet';
 import { EditFieldSheet } from '../../../src/shared/components/feedback/EditFieldSheet/EditFieldSheet';
 import AlertModal from '../../../src/shared/components/feedback/Modal/AlertModal/AlertModal';
@@ -15,7 +16,9 @@ function SafeAreaDeTeste({ children }) {
                 insets: { top: 0, right: 0, bottom: 32, left: 0 }
             }}
         >
-            {children}
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                {children}
+            </ThemeProvider>
         </SafeAreaProvider>
     );
 }
@@ -49,7 +52,8 @@ test('ação de fechamento carregando é ignorada com segurança', async () => {
             titulo="Aguarde"
             aoFechar={jest.fn()}
             acaoPrincipal={{ texto: 'Salvar', carregando: true }}
-        />
+        />,
+        { wrapper: SafeAreaDeTeste }
     );
     const modal = view.container.queryAll(
         (elemento) => typeof elemento.props.onRequestClose === 'function'
@@ -62,7 +66,8 @@ test('campos usam padrões e cobrem interações opcionais', async () => {
         <>
             <NumberInput valor={1} />
             <RadioOption titulo="Única" />
-        </>
+        </>,
+        { wrapper: SafeAreaDeTeste }
     );
     await fireEvent.press(screen.getByLabelText('Duração em dias'));
     expect(screen.getByRole('radio', { name: 'Única' })).not.toBeSelected();

@@ -1,23 +1,34 @@
 //Mostra um botão compacto formado apenas por um ícone.
-import {Pressable} from 'react-native'
-import {estilos, variantes} from './IconButton.styles'
+import { useMemo } from 'react';
+import { Pressable } from 'react-native';
+import { useTheme } from '../../../hooks/useTheme';
+import { criarEstilos } from './IconButton.styles';
 
-function IconButton({icone: Icone, aoPressionar, rotuloAcessibilidade, variante = 'neutro', desativado = false}) {
+function IconButton({
+    icone: Icone,
+    aoPressionar,
+    rotuloAcessibilidade,
+    variante = 'neutro',
+    desativado = false
+}) {
+    const tema = useTheme();
+    const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
     if (!Icone) {
-        throw new Error('IconButton precisa receber um ícone.')
+        throw new Error('IconButton precisa receber um ícone.');
     }
 
     if (typeof rotuloAcessibilidade !== 'string' || !rotuloAcessibilidade.trim()) {
-        throw new Error('IconButton precisa de um rótulo de acessibilidade.')
+        throw new Error('IconButton precisa de um rótulo de acessibilidade.');
     }
 
     if (!variantes[variante]) {
-        throw new Error(`Variante de IconButton inválida: ${variante}`)
+        throw new Error(`Variante de IconButton inválida: ${variante}`);
     }
 
-    const estaDesativado = desativado || variante === 'desativado' || typeof aoPressionar !== 'function'
-    const varianteVisual = estaDesativado ? variantes.desativado : variantes[variante]
-    const tamanhoIcone = variantes[variante].tamanhoIcone || 20
+    const estaDesativado =
+        desativado || variante === 'desativado' || typeof aoPressionar !== 'function';
+    const varianteVisual = estaDesativado ? variantes.desativado : variantes[variante];
+    const tamanhoIcone = variantes[variante].tamanhoIcone || 20;
 
     return (
         <Pressable
@@ -30,19 +41,15 @@ function IconButton({icone: Icone, aoPressionar, rotuloAcessibilidade, variante 
                 selected: variante === 'selecionado'
             }}
             hitSlop={4}
-            style={({pressed}) => [
+            style={({ pressed }) => [
                 estilos.container,
                 varianteVisual.container,
                 pressed && !estaDesativado && estilos.pressionado
             ]}
         >
-            <Icone
-                size={tamanhoIcone}
-                color={varianteVisual.icone}
-                weight="regular"
-            />
+            <Icone size={tamanhoIcone} color={varianteVisual.icone} weight="regular" />
         </Pressable>
-    )
+    );
 }
 
-export {IconButton}
+export { IconButton };

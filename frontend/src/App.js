@@ -1,9 +1,6 @@
 /**
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
-import { CalendarScreenContainer } from './features/calendar/screens/CalendarScreenContainer';
-import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
-import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
@@ -14,7 +11,6 @@ import {
     Text,
     View
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
@@ -22,7 +18,10 @@ import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
 import { DMSans_700Bold } from '@expo-google-fonts/dm-sans/700Bold';
 
-import ForgotPasswordScreen from './features/auth/screens/ForgotPasswordScreen';
+import { AppThemeRoot } from './app/AppThemeRoot';
+import { criarServicosApp } from './app/createAppServices';
+import { CalendarScreenContainer } from './features/calendar/screens/CalendarScreenContainer';
+import { ForgotPasswordScreen } from './features/auth/screens/ForgotPasswordScreen';
 import LoginScreen from './features/auth/screens/LoginScreen';
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
 import WelcomeScreen from './features/auth/screens/WelcomeScreen';
@@ -35,13 +34,15 @@ import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
-import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
+import { CycleEditFlow } from './features/cycles/CycleEditFlow';
+import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
+import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
 import { useMenstruationSync } from './features/cycles/hooks/useMenstruationSync';
-import { criarServicosApp } from './app/createAppServices';
+import { useTheme } from './shared/hooks/useTheme';
 import { obterToken } from './shared/storage/tokenStorage';
-import { cores, fontFamilies } from './shared/theme';
+import { fontFamilies } from './shared/theme';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
@@ -58,7 +59,7 @@ const telasInternas = Object.freeze({
     inicio: 'inicio'
 });
 
-//Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
+// Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
     const script = NativeModules.SourceCode?.scriptURL || '';
 
@@ -85,7 +86,7 @@ function obterTokenRecuperacao(url) {
     return token ? decodeURIComponent(token) : null;
 }
 
-//Verifica se o armazenamento seguro retornou uma sessão com token válido.
+// Verifica se o armazenamento seguro retornou uma sessão com token válido.
 function sessaoEhValida(sessao) {
     return (
         sessao !== null &&
@@ -95,7 +96,71 @@ function sessaoEhValida(sessao) {
     );
 }
 
-//Inicializa fontes, sessão, serviços e navegação provisória entre as telas.
+function EstadoErroApp({ mensagem }) {
+    const tema = useTheme();
+
+    return (
+        <SafeAreaView
+            style={{
+                flex: 1,
+                padding: 24,
+                justifyContent: 'center',
+                backgroundColor: tema.cores.interface.fundo
+            }}
+        >
+            <Text
+                style={{
+                    color: tema.cores.interface.textoPrincipal,
+                    fontFamily: fontFamilies.bold,
+                    fontSize: 20,
+                    textAlign: 'center'
+                }}
+            >
+                Ocorreu um erro
+            </Text>
+
+            <Text
+                style={{
+                    color: tema.cores.interface.textoSecundario,
+                    fontFamily: fontFamilies.regular,
+                    marginTop: 12,
+                    textAlign: 'center'
+                }}
+            >
+                {mensagem}
+            </Text>
+        </SafeAreaView>
+    );
+}
+
+function EstadoCarregamentoApp() {
+    const tema = useTheme();
+
+    return (
+        <SafeAreaView
+            style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 16,
+                backgroundColor: tema.cores.interface.fundo
+            }}
+        >
+            <ActivityIndicator color={tema.cores.marca.primaria} size="large" />
+
+            <Text
+                style={{
+                    color: tema.cores.interface.textoPrincipal,
+                    fontFamily: fontFamilies.regular
+                }}
+            >
+                Carregando...
+            </Text>
+        </SafeAreaView>
+    );
+}
+
+// Inicializa fontes, sessão, serviços e navegação provisória entre as telas.
 export default function App() {
     const [fontes, erroFontes] = useFonts({
         DMSans_400Regular,
@@ -131,6 +196,7 @@ export default function App() {
     const [revisaoCalendario, setRevisaoCalendario] = useState(0);
 
     const requisicaoAtual = useRef(0);
+
     const controladorPerfilAtual = useRef(null);
 
     const apiUrl = obterBaseUrl();
@@ -269,7 +335,11 @@ export default function App() {
             }
         }
 
-        Linking.getInitialURL().then((url) => abrirLink({ url }));
+        Linking.getInitialURL().then((url) =>
+            abrirLink({
+                url
+            })
+        );
 
         const inscricao = Linking.addEventListener('url', abrirLink);
 
@@ -289,6 +359,17 @@ export default function App() {
 
         return () => inscricao.remove();
     }, [estadoSessao, telaPublica]);
+
+    function renderizarComTema(conteudo) {
+        return (
+            <AppThemeRoot
+                service={configuracao.servicos?.themePreferenceService}
+                autenticado={estadoSessao === 'autenticada'}
+            >
+                {conteudo}
+            </AppThemeRoot>
+        );
+    }
 
     async function salvarPerfil(alteracoes) {
         const perfilAtualizado =
@@ -341,16 +422,19 @@ export default function App() {
     function selecionarAba(aba) {
         if (aba === 'inicio') {
             setTelaInterna(telasInternas.inicio);
+
             return;
         }
 
         if (aba === 'membros') {
             setTelaInterna(telasInternas.membros);
+
             return;
         }
 
         if (aba === 'ciclos') {
             setTelaInterna(telasInternas.ciclos);
+
             return;
         }
 
@@ -382,7 +466,6 @@ export default function App() {
 
     function abrirNovaCategoria(origem) {
         setOrigemNovaCategoria(origem);
-
         setTelaInterna(telasInternas.novaCategoria);
     }
 
@@ -396,55 +479,17 @@ export default function App() {
     }
 
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
-        return (
-            <SafeAreaView
-                style={{
-                    flex: 1,
-                    padding: 24,
-                    justifyContent: 'center'
-                }}
-            >
-                <Text
-                    style={{
-                        fontFamily: fontFamilies.bold,
-                        fontSize: 20,
-                        textAlign: 'center'
-                    }}
-                >
-                    Ocorreu um erro
-                </Text>
+        const mensagemErro =
+            configuracao.erro ||
+            (erroFontes
+                ? `Não foi possível carregar as fontes: ${erroFontes.message}`
+                : 'Não foi possível acessar a sessão segura deste aparelho.');
 
-                <Text
-                    style={{
-                        fontFamily: fontFamilies.regular,
-                        marginTop: 12,
-                        textAlign: 'center'
-                    }}
-                >
-                    {configuracao.erro ||
-                        (erroFontes
-                            ? `Não foi possível carregar as fontes: ${erroFontes.message}`
-                            : 'Não foi possível acessar a sessão segura deste aparelho.')}
-                </Text>
-            </SafeAreaView>
-        );
+        return renderizarComTema(<EstadoErroApp mensagem={mensagemErro} />);
     }
 
     if (!fontes || estadoSessao === 'verificando') {
-        return (
-            <SafeAreaView
-                style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 16
-                }}
-            >
-                <ActivityIndicator color={cores.marca.primaria} size="large" />
-
-                <Text>Carregando...</Text>
-            </SafeAreaView>
-        );
+        return renderizarComTema(<EstadoCarregamentoApp />);
     }
 
     let conteudo;
@@ -661,11 +706,5 @@ export default function App() {
         );
     }
 
-    return (
-        <View style={{ flex: 1 }}>
-            <StatusBar style="dark" />
-
-            {conteudo}
-        </View>
-    );
+    return renderizarComTema(conteudo);
 }

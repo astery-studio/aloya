@@ -1,30 +1,37 @@
+import { useMemo } from 'react';
 import { View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { DropIcon } from '../../../shared/components/icons/AppIcons';
-import { estilos } from './CycleRemovalFeedbackModal.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './CycleRemovalFeedbackModal.styles';
 
 function IconeAlerta({ erro = false }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const corContorno = erro
+        ? tema.cores.interface.textoSecundario
+        : tema.escuro
+          ? '#EE9297'
+          : '#C85A44';
+    const corAlerta = tema.escuro ? '#F39A9D' : '#B43D3D';
+
     return (
-        <View style={[estilos.areaIcone, erro ? estilos.fundoErro : estilos.fundoConfirmacao]}>
+        <View
+            testID={erro ? 'icone-alerta-erro' : 'icone-alerta-confirmacao'}
+            style={[estilos.areaIcone, erro ? estilos.fundoErro : estilos.fundoConfirmacao]}
+        >
             <Svg width={22} height={22} viewBox="0 0 24 24" accessibilityElementsHidden>
-                <Circle
-                    cx={12}
-                    cy={12}
-                    r={10}
-                    fill="none"
-                    stroke={erro ? '#5C5C59' : '#C85A44'}
-                    strokeWidth={1.5}
-                />
+                <Circle cx={12} cy={12} r={10} fill="none" stroke={corContorno} strokeWidth={1.5} />
                 <Path
                     d="M12 7v6"
                     fill="none"
-                    stroke="#B43D3D"
+                    stroke={corAlerta}
                     strokeLinecap="round"
                     strokeWidth={2}
                 />
-                <Circle cx={12} cy={17} r={1} fill="#B43D3D" />
+                <Circle cx={12} cy={17} r={1} fill={corAlerta} />
             </Svg>
         </View>
     );
@@ -39,9 +46,12 @@ function IconeErro() {
 }
 
 function IconeSucesso() {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     return (
         <View style={[estilos.areaIcone, estilos.fundoConfirmacao]}>
-            <DropIcon size={22} color="#C85A44" weight="regular" />
+            <DropIcon size={22} color={tema.escuro ? '#EE9297' : '#C85A44'} weight="regular" />
         </View>
     );
 }

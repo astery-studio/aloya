@@ -217,21 +217,21 @@ test('vincula a fase menstrual estimada sem fim ao ciclo que pode ser editado', 
         }),
         diasMenstruacao: []
     });
-    const service = criarCalendarService({repository});
+    const service = criarCalendarService({ repository });
 
     const resultado = await service.buscarMes({
         usuarioId: 4,
         mes: '2026-10'
     });
-    const periodoBase = resultado.previsao.periodos.find(({previsto}) => !previsto);
-    const periodosPrevistos = resultado.previsao.periodos.filter(({previsto}) => previsto);
+    const periodoBase = resultado.previsao.periodos.find(({ previsto }) => !previsto);
+    const periodosPrevistos = resultado.previsao.periodos.filter(({ previsto }) => previsto);
 
     assert.deepEqual(periodoBase.faseMenstrual, {
         inicio: '2026-10-01',
         fim: '2026-10-03'
     });
     assert.equal(periodoBase.registroCicloId, 18);
-    assert.ok(periodosPrevistos.every(periodo => !('registroCicloId' in periodo)));
+    assert.ok(periodosPrevistos.every((periodo) => !('registroCicloId' in periodo)));
 });
 
 test('recorta as fases e previsões para o mês solicitado', async () => {

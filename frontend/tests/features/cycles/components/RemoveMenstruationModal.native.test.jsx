@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Animated, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RemoveMenstruationModal } from '../../../../src/features/cycles/components/RemoveMenstruationModal';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
 jest.mock('react-native', () => {
     const React = require('react');
@@ -20,7 +21,9 @@ const metrics = {
 };
 const contexto = (props) => (
     <SafeAreaProvider initialMetrics={metrics}>
-        <RemoveMenstruationModal ciclo={ciclo} {...props} />
+        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+            <RemoveMenstruationModal ciclo={ciclo} {...props} />
+        </ThemeProvider>
     </SafeAreaProvider>
 );
 const modais = (tela) => tela.container.queryAll((node) => node.type === 'NativeModal');

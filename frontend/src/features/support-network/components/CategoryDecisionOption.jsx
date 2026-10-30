@@ -1,9 +1,10 @@
 //Representa uma decisão selecionável de remover ou manter o acesso de um contato.
+import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { CheckIcon } from '../../../shared/components/icons/AppIcons';
-import { cores } from '../../../shared/theme';
-import { estilos } from './CategoryDecisionOption.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './CategoryDecisionOption.styles';
 
 function CategoryDecisionOption({
     titulo,
@@ -16,6 +17,8 @@ function CategoryDecisionOption({
     desabilitado = false,
     rotuloAcessibilidade
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const perigo = variante === 'remover';
 
     const indicadorCheck = tipoIndicador === 'check';
@@ -70,7 +73,11 @@ function CategoryDecisionOption({
             >
                 {selecionado ? (
                     indicadorCheck ? (
-                        <CheckIcon size={14} weight="bold" color={cores.neutras.superficieClara} />
+                        <CheckIcon
+                            size={14}
+                            weight="bold"
+                            color={tema.cores.interface.textoSobreDestaque}
+                        />
                     ) : (
                         <View style={estilos.centroIndicador} />
                     )
