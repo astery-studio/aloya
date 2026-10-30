@@ -3,6 +3,7 @@ import { criarCalendarService } from '../features/calendar/services/calendarServ
 import { criarAuthService } from '../features/auth/services/authService';
 import { criarContraceptiveService } from '../features/contraceptives/services/contraceptiveService';
 import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService';
+import { criarCycleParametersService } from '../features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService';
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
@@ -86,6 +87,10 @@ function criarServicosApp({
         requisicaoAutenticada
     });
 
+    const cycleParametersService = criarCycleParametersService({
+        requisicaoAutenticada
+    });
+
     return Object.freeze({
         authService,
         accountService,
@@ -94,7 +99,8 @@ function criarServicosApp({
         contraceptiveService,
         cycleHistoryService,
         supportCategoryService,
-        cyclePredictionService
+        cyclePredictionService,
+        cycleParametersService
     });
 }
 

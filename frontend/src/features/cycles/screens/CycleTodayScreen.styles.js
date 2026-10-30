@@ -15,6 +15,7 @@ function criarEstilos(tema) {
             paddingHorizontal: espacamentos.medio,
             paddingTop: espacamentos.extraGrande
         },
+        acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
             ...typography.h2,
             flexShrink: 1,

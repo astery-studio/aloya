@@ -4,6 +4,7 @@ import { criarCalendarService } from '../../src/features/calendar/services/calen
 import { criarAuthService } from '../../src/features/auth/services/authService';
 import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService';
 import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService';
+import { criarCycleParametersService } from '../../src/features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService';
 import { criarAccountService } from '../../src/features/settings/services/accountService';
 import { criarThemePreferenceService } from '../../src/features/settings/services/themePreferenceService';
@@ -44,6 +45,10 @@ jest.mock('../../src/features/cycles/services/cyclePredictionService', () => ({
     criarCyclePredictionService: jest.fn()
 }));
 
+jest.mock('../../src/features/cycles/services/cycleParametersService', () => ({
+    criarCycleParametersService: jest.fn()
+}));
+
 jest.mock('../../src/shared/services/api/apiClient', () => ({
     criarApiClient: jest.fn()
 }));
@@ -68,6 +73,7 @@ describe('createAppServices', () => {
     let cycleHistoryService;
     let supportCategoryService;
     let cyclePredictionService;
+    let cycleParametersService;
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -107,6 +113,10 @@ describe('createAppServices', () => {
             nome: 'cyclePredictionService'
         });
 
+        cycleParametersService = Object.freeze({
+            nome: 'cycleParametersService'
+        });
+
         criarApiClient.mockReturnValue({
             requisicao
         });
@@ -128,6 +138,8 @@ describe('createAppServices', () => {
         criarSupportCategoryService.mockReturnValue(supportCategoryService);
 
         criarCyclePredictionService.mockReturnValue(cyclePredictionService);
+
+        criarCycleParametersService.mockReturnValue(cycleParametersService);
     });
 
     test('monta e congela os serviços da aplicação', () => {
@@ -185,6 +197,10 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         });
 
+        expect(criarCycleParametersService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
         expect(servicos).toEqual({
             authService,
             accountService,
@@ -193,7 +209,8 @@ describe('createAppServices', () => {
             contraceptiveService,
             cycleHistoryService,
             supportCategoryService,
-            cyclePredictionService
+            cyclePredictionService,
+            cycleParametersService
         });
 
         expect(Object.isFrozen(servicos)).toBe(true);

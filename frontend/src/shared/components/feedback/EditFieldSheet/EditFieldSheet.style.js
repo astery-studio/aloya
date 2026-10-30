@@ -14,6 +14,12 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.fundo
         },
 
+        caixaCampoNumero: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 4
+        },
+
         campo: {
             ...tema.typography.bodyDefault,
             width: '100%',
@@ -37,6 +43,16 @@ function criarEstilos(tema) {
 
         campoData: {
             textAlign: 'center'
+        },
+
+        campoNumero: {
+            width: 32,
+            textAlign: 'right'
+        },
+
+        sufixoNumero: {
+            ...tema.typography.bodyDefault,
+            color: tema.cores.interface.textoPrincipal
         },
 
         erro: {

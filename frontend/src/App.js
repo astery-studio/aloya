@@ -26,6 +26,7 @@ import { MembersScreen } from './features/support-network/screens/MembersScreen'
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
+import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { useTheme } from './shared/hooks/useTheme';
 import { obterToken } from './shared/storage/tokenStorage';
@@ -41,6 +42,7 @@ const telasInternas = Object.freeze({
     anticoncepcionais: 'anticoncepcionais',
     novaCategoria: 'novaCategoria',
     calendario: 'calendario',
+    parametrosCiclo: 'parametrosCiclo',
     inicio: 'inicio'
 });
 
@@ -159,6 +161,8 @@ export default function App() {
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
+
+    const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -407,6 +411,11 @@ export default function App() {
         setTelaInterna(origemNovaCategoria);
     }
 
+    function abrirParametrosCiclo(origem) {
+        setRetornoParametros(origem);
+        setTelaInterna(telasInternas.parametrosCiclo);
+    }
+
     if (erroFontes || configuracao.erro || estadoSessao === 'erro') {
         const mensagemErro =
             configuracao.erro ||
@@ -489,6 +498,7 @@ export default function App() {
                 aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                 aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
                 aoSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />
@@ -543,6 +553,7 @@ export default function App() {
         conteudo = (
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
+                onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
 
@@ -550,6 +561,14 @@ export default function App() {
                         carregarPerfil();
                     }
                 }}
+            />
+        );
+    } else if (telaInterna === telasInternas.parametrosCiclo) {
+        conteudo = (
+            <CycleParametersScreen
+                service={configuracao.servicos.cycleParametersService}
+                onVoltar={() => setTelaInterna(retornoParametros)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.novaCategoria) {

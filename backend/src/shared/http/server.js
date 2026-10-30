@@ -19,6 +19,7 @@ import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.r
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
+import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
 
 import { criarLogoutRoutes } from '../../features/auth/routes/logout.routes.js';
 
@@ -69,6 +70,16 @@ app.use(
         alteracaoSenhaRateLimit: container.alteracaoSenhaRateLimit,
         accountDeletionController: container.accountDeletionController,
         exclusaoContaRateLimit: container.exclusaoContaRateLimit
+    })
+);
+
+app.use(
+    '/users/me',
+    criarCycleParametersRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        controller: container.cycleParametersController,
+        rateLimit: container.configuracoesContaRateLimit
     })
 );
 

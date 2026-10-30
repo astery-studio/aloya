@@ -3,7 +3,11 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import {
+    ArrowsClockwiseIcon,
+    CalendarBlankIcon,
+    WarningCircleIcon
+} from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
@@ -42,6 +46,7 @@ function CycleTodayScreen({
     aoAbrirDiario,
     aoAbrirAnticoncepcional,
     aoAbrirCalendario,
+    aoAbrirParametrosCiclo,
     aoSelecionarAba
 }) {
     const tema = useTheme();
@@ -93,12 +98,20 @@ function CycleTodayScreen({
             {!carregando ? (
                 <View style={estilos.cabecalho}>
                     <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                    <IconButton
-                        icone={CalendarBlankIcon}
-                        aoPressionar={aoAbrirCalendario}
-                        rotuloAcessibilidade="Abrir calendário"
-                        variante="calendario"
-                    />
+                    <View style={estilos.acoesCabecalho}>
+                        <IconButton
+                            icone={ArrowsClockwiseIcon}
+                            aoPressionar={aoAbrirParametrosCiclo}
+                            rotuloAcessibilidade="Abrir parâmetros do ciclo"
+                            variante="calendario"
+                        />
+                        <IconButton
+                            icone={CalendarBlankIcon}
+                            aoPressionar={aoAbrirCalendario}
+                            rotuloAcessibilidade="Abrir calendário"
+                            variante="calendario"
+                        />
+                    </View>
                 </View>
             ) : null}
             {carregando ? (
