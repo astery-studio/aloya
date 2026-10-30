@@ -5,7 +5,8 @@
     "nodemailer": "^10.0.10"
   },
   "scripts": {
-    "backend": "cd backend && npm start",
+    "backend": "cd backend && npm run dev",
+    "backend:prepare": "cd backend && npm run db:prepare",
     "frontend": "npm --prefix frontend start -- --clear",
     "frontend:dev-client": "npm --prefix frontend run start:dev-client -- --clear",
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
