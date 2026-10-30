@@ -390,14 +390,33 @@ function criarSupportCategoryService({ requisicaoAutenticada } = {}) {
         }
 
         chaveDaCriacao = chaveAtual;
-
-        criacaoEmAndamento = requisicaoAutenticada({
-            metodo: 'POST',
-            caminho: endpoints.categoriasPermissao,
-            corpo: dadosSeguros
-        })
+        const controle = new AbortController();
+        let temporizador;
+        const prazo = new Promise((_, rejeitar) => {
+            temporizador = setTimeout(() => {
+                rejeitar(
+                    criarErroLocal(
+                        'Não foi possível concluir o salvamento a tempo. Tente novamente.',
+                        'TEMPO_SALVAMENTO_ESGOTADO'
+                    )
+                );
+                controle.abort();
+            }, 15000);
+        });
+        const envio = new Promise((resolve) => {
+            resolve(
+                requisicaoAutenticada({
+                    metodo: 'POST',
+                    caminho: endpoints.categoriasPermissao,
+                    corpo: dadosSeguros,
+                    signal: controle.signal
+                })
+            );
+        });
+        criacaoEmAndamento = Promise.race([envio, prazo])
             .then((resposta) => criarSupportCategory(resposta?.categoria))
             .finally(() => {
+                clearTimeout(temporizador);
                 criacaoEmAndamento = null;
                 chaveDaCriacao = null;
             });

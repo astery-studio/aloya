@@ -93,6 +93,9 @@ function erroEhLimiteDeTentativas(erro) {
 
 //Recebe um erro da API e devolve somente uma mensagem permitida para a tela.
 function obterAlertaDoErro(erro) {
+    if (erro?.codigo === 'TEMPO_SALVAMENTO_ESGOTADO') {
+        return { ...ALERTA_INTERNO, mensagem: erro.mensagemUsuario };
+    }
     if (['FALHA_CONEXAO', 'TEMPO_CONEXAO_ESGOTADO'].includes(erro?.codigo)) {
         return { ...ALERTA_INTERNO, mensagem: erro.mensagemUsuario };
     }
