@@ -213,25 +213,27 @@ test('normaliza falha de rede sem vazar o erro técnico', async () => {
     });
 
     await expect(
-        caminho: '/auth'
-    })).rejects.toMatchObject({
+        cliente.requisicao({
+            caminho: '/auth'
+        })
+    ).rejects.toMatchObject({
         message: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
         mensagemUsuario: 'Não foi possível conectar ao servidor. Verifique sua conexão.'
     });
 });
 
 test('normaliza até falhas de rede que não são objetos Error', async () => {
-    const fetchImpl = jest.fn().mockRejectedValue(
-        'falha interna'
-    );
+    const fetchImpl = jest.fn().mockRejectedValue('falha interna');
     const cliente = criarApiClient({
         baseUrl: 'http://api',
         fetchImpl
     });
 
-    await expect(cliente.requisicao({
-        caminho: '/auth'
-    })).rejects.toMatchObject({
+    await expect(
+        cliente.requisicao({
+            caminho: '/auth'
+        })
+    ).rejects.toMatchObject({
         mensagemUsuario: 'Não foi possível conectar ao servidor. Verifique sua conexão.'
     });
 });
@@ -247,9 +249,11 @@ test('usa mensagem genérica quando a API não fornece detalhes', async () => {
         fetchImpl
     });
 
-    await expect(cliente.requisicao({
-        caminho: '/auth'
-    })).rejects.toMatchObject({
+    await expect(
+        cliente.requisicao({
+            caminho: '/auth'
+        })
+    ).rejects.toMatchObject({
         status: 500,
         mensagemUsuario: 'Não foi possível concluir a solicitação.',
         codigo: undefined,
@@ -272,9 +276,11 @@ test('usa o fetch global quando uma implementação não é informada', async ()
             baseUrl: 'http://api'
         });
 
-        await expect(cliente.requisicao({
-            caminho: '/status'
-        })).resolves.toEqual({
+        await expect(
+            cliente.requisicao({
+                caminho: '/status'
+            })
+        ).resolves.toEqual({
             ativo: true
         });
 
