@@ -13,6 +13,7 @@ export default function AppModal({
     icone: Icone,
     corIcone,
     fundoIcone,
+    estiloIcone,
     titulo,
     mensagem,
     destaque,
@@ -82,6 +83,7 @@ export default function AppModal({
                             <View
                                 style={[
                                     estilos.areaIcone,
+                                    estiloIcone,
                                     acao && estilos.areaIconeAcao,
                                     fundoIcone && { backgroundColor: fundoIcone }
                                 ]}
