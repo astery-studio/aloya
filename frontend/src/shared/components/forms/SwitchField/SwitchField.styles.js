@@ -33,7 +33,11 @@ function criarEstilos(tema) {
         },
 
         desabilitado: {
-            opacity: 0.5
+            opacity: 1
+        },
+
+        tituloDesabilitado: {
+            color: tema.cores.interface.textoSecundario
         },
 
         titulo: {
@@ -60,6 +64,11 @@ function criarEstilos(tema) {
 
         trilhaInativa: {
             backgroundColor: tema.cores.interface.switchInativo
+        },
+
+        indicadorDesabilitado: {
+            shadowOpacity: 0,
+            elevation: 0
         },
 
         indicador: {

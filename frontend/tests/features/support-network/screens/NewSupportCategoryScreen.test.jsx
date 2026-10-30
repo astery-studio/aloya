@@ -1,5 +1,5 @@
 //Testa validações, integração, erros, sucesso e proteção contra envio repetido da nova categoria.
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
@@ -94,6 +94,38 @@ async function salvarFormulario() {
 }
 
 describe('NewSupportCategoryScreen', () => {
+    test('carregamento mantém a bolinha circular sem sombra e libera os controles após falha', async () => {
+        let rejeitar;
+        const pendente = new Promise((_, reject) => {
+            rejeitar = reject;
+        });
+        await render(<NewSupportCategoryScreen criarCategoria={() => pendente} />);
+        await preencherFormulario();
+        const acionamento = fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
+        await waitFor(() =>
+            expect(screen.getByRole('switch', { name: 'Acesso à Fase Atual' })).toBeDisabled()
+        );
+        const toggleCarregando = screen.getByRole('switch', { name: 'Acesso à Fase Atual' });
+        expect(toggleCarregando).toBeDisabled();
+        expect(toggleCarregando).toHaveStyle({ opacity: 1 });
+        for (const bolinha of screen.getAllByTestId('switch-field-thumb')) {
+            expect(bolinha).toHaveStyle({
+                width: 22,
+                height: 22,
+                borderRadius: 11,
+                elevation: 0,
+                shadowOpacity: 0
+            });
+        }
+        await act(async () => rejeitar(new Error('offline')));
+        await acionamento;
+        expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
+        await fireEvent.press(screen.getAllByRole('button', { name: 'Voltar' }).at(-1));
+        const toggle = screen.getByRole('switch', { name: 'Acesso à Fase Atual' });
+        expect(toggle).not.toBeDisabled();
+        expect(toggle.props.accessibilityState.checked).toBe(true);
+        expect(screen.getByRole('button', { name: 'Salvar' })).not.toBeDisabled();
+    });
     test('mostra o formulário completo', async () => {
         await render(<NewSupportCategoryScreen criarCategoria={jest.fn()} />);
 

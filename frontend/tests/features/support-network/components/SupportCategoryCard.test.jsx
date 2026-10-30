@@ -65,7 +65,7 @@ describe('SupportCategoryCard', () => {
         expect(screen.getByLabelText('2 contatos vinculados')).toBeOnTheScreen();
     });
 
-    test('mantém nome em uma linha com fonte fixa e resumo legível', async () => {
+    test('mantém nome na posição original, em uma linha e com fonte fixa', async () => {
         const nomeLongo = 'Namoradinho Lindinho Fofinho';
         await render(
             <SupportCategoryCard
@@ -78,13 +78,14 @@ describe('SupportCategoryCard', () => {
 
         const nome = screen.getByTestId('support-category-name');
         expect(nome).toHaveTextContent(nomeLongo);
-        expect(nome).toHaveStyle({ fontSize: 17, lineHeight: 24 });
+        expect(nome).toHaveStyle({ fontSize: 14, lineHeight: 24 });
         expect(nome).toHaveProp('numberOfLines', 1);
         expect(nome).toHaveProp('ellipsizeMode', 'tail');
         expect(resumo).toHaveStyle({ fontSize: 14, lineHeight: 18 });
-        for (const texto of [nome, resumo]) {
-            expect(texto.props.adjustsFontSizeToFit).not.toBe(true);
-        }
+        expect(nome.props.adjustsFontSizeToFit).not.toBe(true);
+        expect(resumo).toHaveProp('numberOfLines', 1);
+        expect(resumo).toHaveProp('adjustsFontSizeToFit', true);
+        expect(nome.parent.parent).toBe(resumo.parent.parent);
     });
 
     test('encaminha edição e exclusão', async () => {

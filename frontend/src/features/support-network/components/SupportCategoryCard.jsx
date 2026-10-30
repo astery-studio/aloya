@@ -74,16 +74,6 @@ function SupportCategoryCard({
             accessibilityLabel={`Categoria ${nome}`}
             style={[estilos.cartao, bloqueado && estilos.cartaoDesabilitado]}
         >
-            <View style={estilos.containerTitulo}>
-                <Text
-                    testID="support-category-name"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    style={estilos.nome}
-                >
-                    {nome}
-                </Text>
-            </View>
             <View style={estilos.conteudoPrincipal}>
                 <View
                     importantForAccessibility="no-hide-descendants"
@@ -98,8 +88,24 @@ function SupportCategoryCard({
                 </View>
 
                 <View style={estilos.textos}>
+                    <View style={estilos.containerTitulo}>
+                        <Text
+                            testID="support-category-name"
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={estilos.nome}
+                        >
+                            {nome}
+                        </Text>
+                    </View>
                     <View style={estilos.containerResumo}>
-                        <Text testID="support-category-summary" style={estilos.resumo}>
+                        <Text
+                            testID="support-category-summary"
+                            numberOfLines={1}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.72}
+                            style={estilos.resumo}
+                        >
                             {resumoSeguro}
                         </Text>
                     </View>

@@ -26,7 +26,7 @@ function criarEstilos(tema) {
             width: '100%',
             minHeight: 44,
             flexDirection: 'row',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: 10
         },
 
@@ -54,7 +54,7 @@ function criarEstilos(tema) {
 
         containerTitulo: {
             width: '100%',
-            minHeight: 24,
+            height: 24,
             alignItems: 'flex-start',
             justifyContent: 'center'
         },
@@ -63,7 +63,7 @@ function criarEstilos(tema) {
             width: '100%',
             color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
-            fontSize: 17,
+            fontSize: 14,
             fontWeight: '700',
             lineHeight: 24,
             includeFontPadding: false
