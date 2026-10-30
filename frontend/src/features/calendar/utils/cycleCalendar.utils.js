@@ -139,14 +139,14 @@ function obterRegistroEditavel(data, previsao, registrosPorData) {
     if (!periodoMenstrual) return null;
     if (periodoMenstrual.registroCicloId) return periodoMenstrual.registroCicloId;
 
-    const idsDoIntervalo = new Set()
+    const idsDoIntervalo = new Set();
     for (const [dataRegistrada, registroCicloId] of registrosPorData) {
         if (intervaloContem(periodoMenstrual.faseMenstrual, dataRegistrada)) {
-            idsDoIntervalo.add(registroCicloId)
+            idsDoIntervalo.add(registroCicloId);
         }
     }
 
-    return idsDoIntervalo.size === 1 ? [...idsDoIntervalo][0] : null
+    return idsDoIntervalo.size === 1 ? [...idsDoIntervalo][0] : null;
 }
 
 function obterMarcacao(data, previsao, registroCicloId) {
@@ -154,71 +154,71 @@ function obterMarcacao(data, previsao, registroCicloId) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: false
-        }
+        };
     }
 
-    if (previsao.some(periodo => intervaloContem(periodo.menstruacaoPrevista, data))) {
+    if (previsao.some((periodo) => intervaloContem(periodo.menstruacaoPrevista, data))) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: true
-        }
+        };
     }
 
-    const menstrual = previsao.find(periodo => intervaloContem(periodo.faseMenstrual, data))
+    const menstrual = previsao.find((periodo) => intervaloContem(periodo.faseMenstrual, data));
     if (menstrual) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: menstrual.previsto
-        }
+        };
     }
 
-    const folicular = previsao.find(periodo => intervaloContem(periodo.faseFolicular, data))
+    const folicular = previsao.find((periodo) => intervaloContem(periodo.faseFolicular, data));
     if (folicular) {
         return {
             tipo: TIPOS_DIA.folicular,
             previsto: folicular.previsto
-        }
+        };
     }
 
-    const ovulatorio = previsao.find(periodo => periodo.ovulacao === data)
+    const ovulatorio = previsao.find((periodo) => periodo.ovulacao === data);
     if (ovulatorio) {
         return {
             tipo: TIPOS_DIA.ovulacao,
             previsto: ovulatorio.previsto
-        }
+        };
     }
 
-    const luteo = previsao.find(periodo => intervaloContem(periodo.faseLutea, data))
+    const luteo = previsao.find((periodo) => intervaloContem(periodo.faseLutea, data));
     if (luteo) {
         return {
             tipo: TIPOS_DIA.lutea,
             previsto: luteo.previsto
-        }
+        };
     }
 
     return {
         tipo: null,
         previsto: false
-    }
+    };
 }
 
 function criarDia(casa, contexto) {
-    if (!casa) return null
+    if (!casa) return null;
 
-    const registroConfirmadoId = contexto.registrosPorData.get(casa.data) ?? null
-    const registroCicloId = registroConfirmadoId ?? (
-        casa.data <= contexto.hoje
-            ? obterRegistroEditavel(
-                casa.data,
-                contexto.previsao,
-                contexto.registrosPorData
-            )
-            : null
-    )
-    const marcacao = obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId)
-    const futuro = casa.data > contexto.hoje
-    const previsto = Boolean(!registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro))
-    const periodoFertil = contexto.previsao.find(periodo => intervaloContem(periodo.janelaFertil, casa.data))
+    const registroConfirmadoId = contexto.registrosPorData.get(casa.data) ?? null;
+    const registroCicloId =
+        registroConfirmadoId ??
+        (casa.data <= contexto.hoje
+            ? obterRegistroEditavel(casa.data, contexto.previsao, contexto.registrosPorData)
+            : null);
+    const local = contexto.datasLocais.has(casa.data);
+    const marcacao = local
+        ? { tipo: TIPOS_DIA.menstruacao, previsto: false }
+        : obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId);
+    const futuro = casa.data > contexto.hoje;
+    const previsto = Boolean(
+        !registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro)
+    );
     const janelaFertil = Boolean(periodoFertil)
 
     return {
