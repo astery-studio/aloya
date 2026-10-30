@@ -60,43 +60,6 @@ const categorias = [
 ];
 
 describe('SupportCategoryList', () => {
-    test('adapta todos os títulos à maior largura medida sem mudar as posições', async () => {
-        await render(<SupportCategoryList categorias={categorias} />);
-        const layout = (width) => ({ nativeEvent: { layout: { width, height: 24, x: 0, y: 0 } } });
-        await fireEvent(
-            screen.getByTestId('category-title-measure-1', { includeHiddenElements: true }),
-            'layout',
-            layout(60)
-        );
-        await fireEvent(
-            screen.getByTestId('category-title-measure-2', { includeHiddenElements: true }),
-            'layout',
-            layout(180)
-        );
-        await fireEvent(
-            screen.getByTestId('category-title-measure-3', { includeHiddenElements: true }),
-            'layout',
-            layout(110)
-        );
-        await fireEvent(
-            screen.getAllByTestId('support-category-name')[0].parent,
-            'layout',
-            layout(160)
-        );
-        for (const nome of screen.getAllByTestId('support-category-name')) {
-            expect(nome).toHaveStyle({ fontSize: 12.28 });
-            expect(nome).toHaveProp('numberOfLines', 1);
-            expect(nome).toHaveProp('ellipsizeMode', 'clip');
-            expect(nome.props.adjustsFontSizeToFit).not.toBe(true);
-        }
-        await fireEvent(
-            screen.getAllByTestId('support-category-name')[0].parent,
-            'layout',
-            layout(250)
-        );
-        for (const nome of screen.getAllByTestId('support-category-name'))
-            expect(nome).toHaveStyle({ fontSize: 18 });
-    });
     test('ordena as categorias alfabeticamente', async () => {
         await render(
             <SupportCategoryList

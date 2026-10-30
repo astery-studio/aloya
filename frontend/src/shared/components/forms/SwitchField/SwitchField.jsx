@@ -57,7 +57,6 @@ function SwitchField({
                 testID="switch-field-thumb"
                 style={[
                     estilos.indicador,
-                    estaDesabilitado && estilos.indicadorDesabilitado,
                     {
                         transform: [
                             {
@@ -112,14 +111,7 @@ function SwitchField({
                 estilo
             ]}
         >
-            <Text
-                style={[
-                    estilos.titulo,
-                    estaDesabilitado && estilos.tituloDesabilitado,
-                    estiloTitulo
-                ]}
-                numberOfLines={2}
-            >
+            <Text style={[estilos.titulo, estiloTitulo]} numberOfLines={2}>
                 {titulo}
             </Text>
 

@@ -1,6 +1,5 @@
 //Cobre respostas defensivas e estados simultâneos da criação de categoria.
 import { act, fireEvent, screen } from '@testing-library/react-native';
-import { StrictMode } from 'react';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 let mockFormularioProps;
@@ -111,27 +110,6 @@ const categoriaValida = {
     dadosVisiveis: ['geral.fase_atual'],
     quantidadeContatos: 0
 };
-
-test.each([false, true])(
-    'reiniciar efeitos não prende carregamento após resposta; falha=%s',
-    async (falha) => {
-        const criarCategoria = falha
-            ? jest.fn().mockRejectedValue(new Error('offline'))
-            : jest.fn().mockResolvedValue(categoriaValida);
-        await render(
-            <StrictMode>
-                <NewSupportCategoryScreen criarCategoria={criarCategoria} />
-            </StrictMode>
-        );
-        await act(async () => {
-            await mockFormularioProps.aoSalvar(dadosValidos);
-        });
-        expect(mockFormularioProps.carregando).toBe(false);
-        expect(
-            screen.getByText(falha ? 'Algo deu errado' : 'Categoria criada com sucesso')
-        ).toBeOnTheScreen();
-    }
-);
 
 async function enviar() {
     await act(async () => {

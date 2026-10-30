@@ -96,7 +96,7 @@ function prepararDadosCategoria(dados) {
     const nome = dados.nome.normalize('NFKC').trim().replace(/\s+/gu, ' ');
 
     const nomeInvalido =
-        nome.length === 0 || [...nome].length > 15 || /[\u0000-\u001F\u007F<>]/u.test(nome);
+        nome.length === 0 || [...nome].length > 80 || /[\u0000-\u001F\u007F<>]/u.test(nome);
 
     const permissoesInvalidas =
         dados.dadosVisiveis.length === 0 ||
@@ -390,33 +390,14 @@ function criarSupportCategoryService({ requisicaoAutenticada } = {}) {
         }
 
         chaveDaCriacao = chaveAtual;
-        const controle = new AbortController();
-        let temporizador;
-        const prazo = new Promise((_, rejeitar) => {
-            temporizador = setTimeout(() => {
-                rejeitar(
-                    criarErroLocal(
-                        'Não foi possível concluir o salvamento a tempo. Tente novamente.',
-                        'TEMPO_SALVAMENTO_ESGOTADO'
-                    )
-                );
-                controle.abort();
-            }, 15000);
-        });
-        const envio = new Promise((resolve) => {
-            resolve(
-                requisicaoAutenticada({
-                    metodo: 'POST',
-                    caminho: endpoints.categoriasPermissao,
-                    corpo: dadosSeguros,
-                    signal: controle.signal
-                })
-            );
-        });
-        criacaoEmAndamento = Promise.race([envio, prazo])
+
+        criacaoEmAndamento = requisicaoAutenticada({
+            metodo: 'POST',
+            caminho: endpoints.categoriasPermissao,
+            corpo: dadosSeguros
+        })
             .then((resposta) => criarSupportCategory(resposta?.categoria))
             .finally(() => {
-                clearTimeout(temporizador);
                 criacaoEmAndamento = null;
                 chaveDaCriacao = null;
             });

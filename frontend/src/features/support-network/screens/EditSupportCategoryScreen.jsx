@@ -221,7 +221,6 @@ function EditSupportCategoryScreen({
     const carregandoInicial = carregando || (categoriaBase === null && categoria === undefined);
 
     useEffect(() => {
-        telaMontada.current = true;
         return () => {
             telaMontada.current = false;
         };

@@ -51,7 +51,7 @@ const ALERTA_LIMITE_TENTATIVAS = Object.freeze({
 const ALERTA_INTERNO = Object.freeze({
     codigo: 'ERRO_CRIACAO_CATEGORIA',
     titulo: 'Algo deu errado',
-    mensagem: 'Não foi possível salvar a categoria. Tente novamente.',
+    mensagem: 'Ocorreu um erro ao criar sua categoria. Verifique sua conexão e tente novamente.',
     recuperavel: true
 });
 
@@ -93,19 +93,6 @@ function erroEhLimiteDeTentativas(erro) {
 
 //Recebe um erro da API e devolve somente uma mensagem permitida para a tela.
 function obterAlertaDoErro(erro) {
-    if (erro?.codigo === 'TEMPO_SALVAMENTO_ESGOTADO') {
-        return { ...ALERTA_INTERNO, mensagem: erro.mensagemUsuario };
-    }
-    if (['FALHA_CONEXAO', 'TEMPO_CONEXAO_ESGOTADO'].includes(erro?.codigo)) {
-        return { ...ALERTA_INTERNO, mensagem: erro.mensagemUsuario };
-    }
-    if (erro?.codigo === 'ACAO_NAO_PERMITIDA') {
-        return {
-            ...ALERTA_INTERNO,
-            mensagem: 'Esta conta não tem permissão para criar categorias.',
-            recuperavel: false
-        };
-    }
     if (erro?.codigo === ALERTA_REDE_APOIO_BLOQUEADA.codigo) {
         return ALERTA_REDE_APOIO_BLOQUEADA;
     }
@@ -182,7 +169,6 @@ function NewSupportCategoryScreen({
     const servicoDisponivel = typeof criarCategoria === 'function';
 
     useEffect(() => {
-        telaMontada.current = true;
         return () => {
             telaMontada.current = false;
         };

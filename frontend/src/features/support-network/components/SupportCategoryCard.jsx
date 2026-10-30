@@ -24,8 +24,6 @@ function SupportCategoryCard({
     categoria,
     resumoPermissoes,
     quantidadeContatos,
-    fonteTitulo = 18,
-    onMedirTitulo,
     onEditar,
     onExcluir,
     desabilitado = false,
@@ -90,19 +88,18 @@ function SupportCategoryCard({
                 </View>
 
                 <View style={estilos.textos}>
-                    <View
-                        style={estilos.containerTitulo}
-                        onLayout={({ nativeEvent }) => onMedirTitulo?.(nativeEvent.layout.width)}
-                    >
+                    <View style={estilos.containerTitulo}>
                         <Text
                             testID="support-category-name"
                             numberOfLines={1}
-                            ellipsizeMode="clip"
-                            style={[estilos.nome, { fontSize: fonteTitulo }]}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.85}
+                            style={estilos.nome}
                         >
                             {nome}
                         </Text>
                     </View>
+
                     <View style={estilos.containerResumo}>
                         <Text
                             testID="support-category-summary"

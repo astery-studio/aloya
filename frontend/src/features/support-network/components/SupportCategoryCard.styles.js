@@ -63,7 +63,7 @@ function criarEstilos(tema) {
             width: '100%',
             color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
-            fontSize: 18,
+            fontSize: 17,
             fontWeight: '700',
             lineHeight: 24,
             includeFontPadding: false
