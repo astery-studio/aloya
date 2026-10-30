@@ -65,64 +65,59 @@ jest.mock('../../src/shared/storage/tokenStorage', () => ({
 describe('createAppServices', () => {
     let requisicao;
     let requisicaoAutenticada;
-    let requisicaoAutenticada
-    let authService
-    let accountService
-    let calendarService
-    let contraceptiveService
-    let cycleHistoryService
-    let supportCategoryService
-    let cyclePredictionService
-    let cycleRemovalService
-    let cycleParametersService
-    let fetchSeguro
+    let authService;
+    let accountService;
+    let calendarService;
+    let contraceptiveService;
+    let cycleHistoryService;
+    let supportCategoryService;
+    let cyclePredictionService;
+    let cycleRemovalService;
+    let cycleParametersService;
+    let fetchSeguro;
 
     beforeEach(() => {
-        jest.clearAllMocks()
+        jest.clearAllMocks();
 
-        requisicao = jest.fn()
-        requisicaoAutenticada = jest.fn()
+        requisicao = jest.fn();
+        requisicaoAutenticada = jest.fn();
 
         authService = Object.freeze({
             nome: 'authService'
-        })
+        });
 
         accountService = Object.freeze({
             nome: 'accountService'
-        })
+        });
         calendarService = Object.freeze({
             nome: 'calendarService'
-        })
+        });
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
-        })
+        });
 
         cycleHistoryService = Object.freeze({
             nome: 'cycleHistoryService'
-        })
+        });
 
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
-        })
+        });
         cyclePredictionService = Object.freeze({
             nome: 'cyclePredictionService'
-        })
-        cycleRemovalService = Object.freeze({removerDia: jest.fn(), excluirCiclo: jest.fn()})
-        cycleParametersService = Object.freeze({nome: 'cycleParametersService'})
-        fetchSeguro = null
+        });
+        cycleRemovalService = Object.freeze({ removerDia: jest.fn(), excluirCiclo: jest.fn() });
+        cycleParametersService = Object.freeze({ nome: 'cycleParametersService' });
+        fetchSeguro = null;
 
         criarApiClient.mockReturnValue({
             requisicao
-        })
+        });
 
-        criarCalendarService.mockReturnValue(calendarService)
-        criarRequisicaoAutenticada.mockReturnValue(
-            requisicaoAutenticada
-        )
+        criarCalendarService.mockReturnValue(calendarService);
+        criarRequisicaoAutenticada.mockReturnValue(requisicaoAutenticada);
 
-        criarAuthService.mockReturnValue(
-            authService
-        )
+        criarAuthService.mockReturnValue(authService);
 
         criarAccountService.mockReturnValue(
             accountService
