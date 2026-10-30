@@ -1,6 +1,25 @@
 //Testa a inclusão segura do token e a limpeza de sessões inválidas nas requisições privadas.
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
 
+test('não envia operação expirada enquanto aguardava a sessão segura', async () => {
+    let liberar;
+    const controle = new AbortController();
+    const dependencias = criarDependencias();
+    dependencias.obterCredencial.mockReturnValue(
+        new Promise((resolve) => {
+            liberar = resolve;
+        })
+    );
+    const resultado = criarRequisicaoAutenticada(dependencias)({
+        caminho: '/categoria',
+        signal: controle.signal
+    });
+    controle.abort();
+    liberar({ token: 'teste' });
+    await expect(resultado).rejects.toMatchObject({ name: 'AbortError' });
+    expect(dependencias.requisicao).not.toHaveBeenCalled();
+});
+
 test('impede que uma operação pendente use credencial de outra conta', async () => {
     const dependencias = criarDependencias();
     const requisicao = criarRequisicaoAutenticada(dependencias);

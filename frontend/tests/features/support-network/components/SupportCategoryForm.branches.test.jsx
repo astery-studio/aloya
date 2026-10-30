@@ -51,7 +51,20 @@ jest.mock('../../../../src/features/support-network/components/PermissionGroups'
     };
 });
 
-import { SupportCategoryForm } from '../../../../src/features/support-network/components/SupportCategoryForm';
+import {
+    SupportCategoryForm,
+    prepararCategoriaParaSalvar
+} from '../../../../src/features/support-network/components/SupportCategoryForm';
+
+test('valida o limite de 15 caracteres mesmo com dados fornecidos externamente', () => {
+    const dadosVisiveis = ['geral.fase_atual'];
+    expect(
+        prepararCategoriaParaSalvar({ nome: 'A'.repeat(15), dadosVisiveis }).dados.nome
+    ).toHaveLength(15);
+    expect(prepararCategoriaParaSalvar({ nome: 'A'.repeat(16), dadosVisiveis }).erro.codigo).toBe(
+        'NOME_CATEGORIA_INVALIDO'
+    );
+});
 
 describe('SupportCategoryForm - proteções internas', () => {
     test('normaliza dados ausentes e bloqueia ações sem callbacks', async () => {
@@ -96,7 +109,8 @@ describe('SupportCategoryForm - proteções internas', () => {
             />
         );
 
-        expect(mockEntradaProps.sanitizar('<Nome>\n'.padEnd(100, 'a'))).toHaveLength(80);
+        expect(mockEntradaProps.sanitizar('<Nome>\n'.padEnd(100, 'a'))).toHaveLength(15);
+        expect(mockEntradaProps.maxLength).toBe(15);
         expect(mockEntradaProps.sanitizar('<Nome>')).toBe('Nome');
 
         await act(async () => {
