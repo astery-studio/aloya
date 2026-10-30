@@ -197,7 +197,6 @@ test('preserva o erro original quando a limpeza da sessão inválida falha', asy
 
     expect(dependencias.removerCredencial).toHaveBeenCalledTimes(1);
 });
-})
 
 test.each([
     {
@@ -212,31 +211,38 @@ test.each([
         status: 500,
         codigo: 'ERRO_INTERNO'
     }
-])('não remove a credencial para um erro que não invalida a sessão: %p', async ({status, codigo}) => {
-    const dependencias = criarDependencias()
-    const erro = new Error('Falha controlada.')
-    erro.status = status
-    erro.codigo = codigo
-    dependencias.requisicao.mockRejectedValue(erro)
+])(
+    'não remove a credencial para um erro que não invalida a sessão: %p',
+    async ({ status, codigo }) => {
+        const dependencias = criarDependencias();
+        const erro = new Error('Falha controlada.');
+        erro.status = status;
+        erro.codigo = codigo;
+        dependencias.requisicao.mockRejectedValue(erro);
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+        const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe(erro)
+        await expect(
+            requisicaoAutenticada({
+                caminho: '/api/anticoncepcionais'
+            })
+        ).rejects.toBe(erro);
 
-    expect(dependencias.removerCredencial).not.toHaveBeenCalled()
-})
+        expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+    }
+);
 
 test('preserva falhas que não são objetos Error', async () => {
-    const dependencias = criarDependencias()
-    dependencias.requisicao.mockRejectedValue('falha desconhecida')
+    const dependencias = criarDependencias();
+    dependencias.requisicao.mockRejectedValue('falha desconhecida');
 
-    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias)
+    const requisicaoAutenticada = criarRequisicaoAutenticada(dependencias);
 
-    await expect(requisicaoAutenticada({
-        caminho: '/api/anticoncepcionais'
-    })).rejects.toBe('falha desconhecida')
+    await expect(
+        requisicaoAutenticada({
+            caminho: '/api/anticoncepcionais'
+        })
+    ).rejects.toBe('falha desconhecida');
 
-    expect(dependencias.removerCredencial).not.toHaveBeenCalled()
-})
+    expect(dependencias.removerCredencial).not.toHaveBeenCalled();
+});
