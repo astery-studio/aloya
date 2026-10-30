@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 
 import { env } from './env.js';
 import { prisma } from './prisma.js';
+import { criarCycleRegistrationModule } from '../../features/cycles/cycleRegistration.module.js';
 
 import * as dateUtils from '../utils/date.utils.js';
 
@@ -378,6 +379,7 @@ function criarContainer() {
 
     return {
         authController,
+        cycleRegistrationController: criarCycleRegistrationModule({ prisma }).controller,
         accountController,
         cycleParametersController,
         accountDeletionController,
