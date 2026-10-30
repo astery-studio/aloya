@@ -105,7 +105,9 @@ test('interrompe uma requisição que ultrapassa o tempo limite', async () => {
         });
         const resultado = expect(
             cliente.requisicao({
-        })).rejects.toMatchObject({
+                caminho: '/auth/login'
+            })
+        ).rejects.toMatchObject({
             message: 'A conexão demorou demais. Tente novamente.',
             mensagemUsuario: 'A conexão demorou demais. Tente novamente.'
         });
@@ -122,13 +124,16 @@ test('interrompe uma requisição que ultrapassa o tempo limite', async () => {
 
 test('preserva o cancelamento solicitado pela tela', async () => {
     const controlador = new AbortController();
-    const fetchImpl = jest.fn((url, opcoes) => new Promise((resolve, reject) => {
-        opcoes.signal.addEventListener('abort', () => {
-            const erro = new Error('cancelada');
-            erro.name = 'AbortError';
-            reject(erro);
-        });
-    }));
+    const fetchImpl = jest.fn(
+        (url, opcoes) =>
+            new Promise((resolve, reject) => {
+                opcoes.signal.addEventListener('abort', () => {
+                    const erro = new Error('cancelada');
+                    erro.name = 'AbortError';
+                    reject(erro);
+                });
+            })
+    );
     const cliente = criarApiClient({
         baseUrl: 'http://api',
         fetchImpl
@@ -161,10 +166,12 @@ test('preserva um sinal que já chegou cancelado', async () => {
         fetchImpl
     });
 
-    await expect(cliente.requisicao({
-        caminho: '/users/me',
-        signal: controlador.signal
-    })).rejects.toMatchObject({
+    await expect(
+        cliente.requisicao({
+            caminho: '/users/me',
+            signal: controlador.signal
+        })
+    ).rejects.toMatchObject({
         name: 'AbortError'
     });
 });
@@ -179,30 +186,33 @@ test('envia token sem serializar corpo ausente e aceita resposta vazia', async (
         fetchImpl
     });
 
-    await expect(cliente.requisicao({
-        caminho: '/sessao',
-        token: 'jwt'
-    })).resolves.toBeNull();
-
-    expect(fetchImpl).toHaveBeenCalledWith('http://api/sessao', expect.objectContaining({
-        method: 'GET',
-        headers: expect.objectContaining({
-            Authorization: 'Bearer jwt'
+    await expect(
+        cliente.requisicao({
+            caminho: '/sessao',
+            token: 'jwt'
         })
-    }));
+    ).resolves.toBeNull();
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+        'http://api/sessao',
+        expect.objectContaining({
+            method: 'GET',
+            headers: expect.objectContaining({
+                Authorization: 'Bearer jwt'
+            })
+        })
+    );
     expect(fetchImpl.mock.calls[0][1]).not.toHaveProperty('body');
 });
 
 test('normaliza falha de rede sem vazar o erro técnico', async () => {
-    const fetchImpl = jest.fn().mockRejectedValue(
-        new Error('detalhe interno da conexão')
-    );
+    const fetchImpl = jest.fn().mockRejectedValue(new Error('detalhe interno da conexão'));
     const cliente = criarApiClient({
         baseUrl: 'http://api',
         fetchImpl
     });
 
-    await expect(cliente.requisicao({
+    await expect(
         caminho: '/auth'
     })).rejects.toMatchObject({
         message: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
