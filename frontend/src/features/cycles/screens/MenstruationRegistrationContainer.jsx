@@ -118,3 +118,13 @@ function MenstruationRegistrationContainer({
             onIniciarFaixa={(data) => setSelecao([data])}
             onSalvar={salvar}
             onVoltar={onVoltar}
+            onTentarNovamente={() => salvar(selecao)}
+            onFecharFeedback={() => {
+                setErro(undefined);
+                if (sucesso) onVoltar();
+                setSucesso(false);
+            }}
+        />
+    );
+}
+export { MenstruationRegistrationContainer };
