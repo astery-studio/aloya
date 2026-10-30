@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Clock } from 'phosphor-react-native';
 import ButtonDashed from '../../../shared/components/common/Button/ButtonDashed';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
@@ -57,7 +58,8 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
                 fundoIcone="#EEF4F0"
             />
             <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
-                <View style={estilos.telaFluxo}>
+                <SafeAreaView style={estilos.telaFluxo} edges={['top', 'left', 'right', 'bottom']}
+                    testID="horarios-anticoncepcional-area-segura">
                     <Header titulo="Horários de Uso" variante="comVoltar" onVoltar={onFechar} />
                     <View style={estilos.conteudoFluxo}>
                         <Text style={estilos.descricaoFluxo}>
@@ -102,7 +104,7 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
                     <View style={estilos.acaoFixa}>
                         <ButtonScreen texto="Confirmar horários" aoPressionar={confirmar} />
                     </View>
-                </View>
+                </SafeAreaView>
             </Modal>
         </>
     );

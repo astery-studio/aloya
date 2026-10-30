@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { Header } from '../../../shared/components/navigation/Header/Header';
@@ -46,7 +47,8 @@ function ContraceptivesScreen({
         );
 
     return (
-        <View style={estilos.tela}>
+        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+            testID="lista-anticoncepcionais-area-segura">
             <Header titulo="Meus Anticoncepcionais" variante="comVoltar" onVoltar={onVoltar} />
             <FlatList
                 data={anticoncepcionais}
@@ -68,7 +70,7 @@ function ContraceptivesScreen({
                     )
                 }
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
