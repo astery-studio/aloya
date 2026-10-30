@@ -36,42 +36,44 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
 jest.mock('../../src/features/cycles/screens/MenstruationRegistrationContainer', () => {
     const ReactInterno = require('react');
     const { Pressable, Text } = require('react-native');
-    ChangePasswordScreen: jest.fn(() => null)
-}))
-jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => ({
-    ProfileSettingsScreen: jest.fn(() => null)
-}))
-jest.mock('../../src/features/contraceptives/testing/ContraceptiveHuTestAccess', () => ({
-    ContraceptiveHuTestAccess: jest.fn(() => null)
-}))
-jest.mock('../../src/features/support-network/screens/MembersScreen', () => ({
-    MembersScreen: jest.fn(() => null)
-}))
-jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen', () => ({
-    NewSupportCategoryScreen: jest.fn(() => null)
-}))
-
-jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
-    const ReactInterno = require('react')
-    const {Pressable, Text, View} = require('react-native')
-
     return {
-        SettingsScreen: ({onSelecionarAba}) => ReactInterno.createElement(
-            View,
-            null,
-            ReactInterno.createElement(Text, null, 'Configurações'),
+        MenstruationRegistrationContainer: ({ onVoltar, dataInicial }) =>
             ReactInterno.createElement(
                 Pressable,
                 {
                     accessibilityRole: 'button',
-                    accessibilityLabel: 'Abrir início',
-                    onPress: () => onSelecionarAba('inicio')
+                    accessibilityLabel: 'Voltar do cadastro',
+                    onPress: onVoltar
                 },
-                ReactInterno.createElement(Text, null, 'Início')
+                ReactInterno.createElement(Text, null, 'Cadastro conectado'),
+                ReactInterno.createElement(Text, null, `Data inicial: ${dataInicial || 'nenhuma'}`)
             )
-        )
-    }
-})
+    };
+});
+
+jest.mock('expo-font', () => ({ useFonts: () => [true, null] }));
+jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
+jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({ DMSans_400Regular: 'regular' }));
+jest.mock('@expo-google-fonts/dm-sans/500Medium', () => ({ DMSans_500Medium: 'medium' }));
+jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({ DMSans_600SemiBold: 'semibold' }));
+jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({ DMSans_700Bold: 'bold' }));
+jest.mock('../../src/app/createAppServices', () => ({
+    criarServicosApp: jest.fn()
+}));
+jest.mock('../../src/shared/storage/tokenStorage', () => ({
+    obterToken: jest.fn()
+}));
+
+jest.mock('../../src/features/auth/screens/ForgotPasswordScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/auth/screens/LoginScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/auth/screens/WelcomeScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
+    ChangePasswordScreen: jest.fn(() => null)
+}));
+jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => ({
+    ProfileSettingsScreen: jest.fn(() => null)
 
 jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     const ReactInterno = require('react')
