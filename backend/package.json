@@ -13,6 +13,7 @@
     "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\" \"../.github/**/*.yml\" \"../docs/ci-cd.md\" \"../package.json\"",
     "lint": "eslint . --max-warnings=0",
     "start": "node src/shared/http/server.js",
+    "start:prepared": "prisma generate && prisma migrate deploy && node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
     "test:coverage": "node --test --experimental-test-coverage",

@@ -7,6 +7,7 @@
   "scripts": {
     "backend": "cd backend && npm run dev",
     "backend:prepare": "cd backend && npm run db:prepare",
+    "backend:start": "cd backend && npm run start:prepared",
     "frontend": "npm --prefix frontend start -- --clear",
     "frontend:dev-client": "npm --prefix frontend run start:dev-client -- --clear",
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
