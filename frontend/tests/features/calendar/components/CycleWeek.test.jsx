@@ -67,6 +67,7 @@ describe('CycleWeek', () => {
         expect(parseFloat(estiloContorno.left)).toBeCloseTo(100 / 7, 10);
         expect(parseFloat(estiloContorno.width)).toBeCloseTo(300 / 7, 10);
         expect(contorno).toHaveStyle(estilos.janelaFertilAtual);
+        expect(contorno).toHaveStyle({ borderWidth: 1.5, borderStyle: 'dashed' });
     });
 
     test('separa a janela fértil atual da parte futura prevista', async () => {
@@ -97,6 +98,10 @@ describe('CycleWeek', () => {
         expect(screen.getByTestId('janela-fertil-2026-10-04-2026-10-05')).toHaveStyle(
             estilos.janelaFertilPrevista
         );
+        expect(screen.getByTestId('janela-fertil-2026-10-04-2026-10-05')).toHaveStyle({
+            borderWidth: 1.5,
+            borderStyle: 'dashed'
+        });
     });
 
     test('não desenha contorno quando a semana não possui janela fértil', async () => {
