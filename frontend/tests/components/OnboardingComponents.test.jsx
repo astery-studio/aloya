@@ -4,6 +4,8 @@
 import { fireEvent, screen, within } from '@testing-library/react-native';
 import BirthDateStep from '../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
 import CycleLengthStep from '../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
+import MenstruationLengthStep from '../../src/features/onboarding/components/MenstruationLengthStep/MenstruationLengthStep';
+import LutealPhaseLengthStep from '../../src/features/onboarding/components/LutealPhaseLengthStep/LutealPhaseLengthStep';
 import LastMenstruationStep from '../../src/features/onboarding/components/LastMenstruationStep/LastMenstruationStep';
 import OnboardingProgress from '../../src/features/onboarding/components/OnboardingProgress/OnboardingProgress';
 import { renderWithTheme } from '../helpers/renderWithTheme';
@@ -71,11 +73,33 @@ test('duração permite digitar o número sem alterar a unidade', async () => {
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
     expect(screen.getByText('dias')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Não sei' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
     expect(aoAlterar).toHaveBeenCalledWith(30);
     expect(screen.queryByRole('button', { name: 'Não sei' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();
+});
+
+test.each([
+    [CycleLengthStep, 28],
+    [MenstruationLengthStep, 5],
+    [LutealPhaseLengthStep, 14]
+])('duração exige edição antes de avançar e permite responder Não sei', async (Etapa, valor) => {
+    const aoAvancar = jest.fn();
+    const aoPular = jest.fn();
+    await renderWithTheme(<Etapa valor={valor} aoAlterar={jest.fn()}
+        aoAvancar={aoAvancar} aoPular={aoPular} />);
+
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(aoAvancar).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    expect(aoPular).toHaveBeenCalledTimes(1);
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), String(valor));
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Não sei' })).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    expect(aoAvancar).toHaveBeenCalledTimes(1);
 });
 
 test('última menstruação seleciona o intervalo no calendário próprio', async () => {

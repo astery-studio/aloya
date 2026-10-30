@@ -1,9 +1,12 @@
-import { screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import MenstruationCalendar from '../../../src/features/onboarding/components/MenstruationCalendar/MenstruationCalendar';
 import OnboardingProgress from '../../../src/features/onboarding/components/OnboardingProgress/OnboardingProgress';
 import OnboardingStep from '../../../src/features/onboarding/components/OnboardingStep/OnboardingStep';
+import OnboardingComplete from '../../../src/features/onboarding/components/OnboardingComplete/OnboardingComplete';
+import BirthDateStep from '../../../src/features/onboarding/components/BirthDateStep/BirthDateStep';
+import CycleLengthStep from '../../../src/features/onboarding/components/CycleLengthStep/CycleLengthStep';
 import { renderWithTheme } from '../../helpers/renderWithTheme';
 
 describe.each([
@@ -28,8 +31,22 @@ describe.each([
             color: textoPrincipal
         });
         expect(screen.getByTestId('progresso-preenchido')).toHaveStyle({
-            backgroundColor: destaque
+            backgroundColor: '#C85A44'
         });
+    });
+
+    test('preserva laranja nas durações e no foco da data', async () => {
+        const { unmount } = await renderWithTheme(<CycleLengthStep valor={28} />, { preferencia });
+        expect(screen.getByTestId('area-campo-numero')).toHaveStyle({ borderColor: '#C85A44' });
+        await unmount();
+        await renderWithTheme(<BirthDateStep valor="04/01/2000" />, { preferencia });
+        await fireEvent(screen.getByLabelText('Data'), 'focus');
+        expect(screen.getByTestId('campo-data')).toHaveStyle({ borderColor: '#C85A44' });
+    });
+
+    test('preserva o nome ALOYA em laranja na conclusão', async () => {
+        await renderWithTheme(<OnboardingComplete />, { preferencia });
+        expect(screen.getByText('ALOYA')).toHaveStyle({ color: '#C85A44' });
     });
 
     test('aplica a paleta ativa ao calendário menstrual', async () => {

@@ -32,7 +32,8 @@ export default function BirthDateStep({
             carregando={carregando}
         >
             <View style={{ gap: 12 }}>
-                <DateInput valor={valor} onChangeText={aoAlterar} />
+                <DateInput valor={valor} onChangeText={aoAlterar}
+                    corDestaque={tema.cores.marca.primaria} />
                 {menorDe16 ? (
                     <>
                         <EmailInput

@@ -14,7 +14,7 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
         marca: {
-            color: tema.cores.interface.destaque,
+            color: tema.cores.marca.primaria,
             fontFamily: fontFamilies.bold,
             fontWeight: '900'
         },

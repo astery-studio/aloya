@@ -13,6 +13,7 @@ export default function DateInput({
     onChangeText,
     desativado = false,
     estilo,
+    corDestaque,
     rotuloAcessibilidade = 'Data',
     onFocus,
     onBlur,
@@ -30,7 +31,8 @@ export default function DateInput({
             onPress={() => entradaRef.current?.focus()}
             style={[estilos.botao, desativado && estilos.desativado, estilo]}
         >
-            <View style={[estilos.campo, focado && estilos.focado]} testID={testeId}>
+            <View style={[estilos.campo, focado && estilos.focado,
+                focado && corDestaque && { borderColor: corDestaque }]} testID={testeId}>
                 <CalendarBlank size={20} color={tema.cores.interface.textoSecundario} />
                 <TextInput
                     ref={entradaRef}
@@ -40,7 +42,7 @@ export default function DateInput({
                     maxLength={10}
                     placeholder="DD/MM/AAAA"
                     placeholderTextColor={tema.cores.interface.textoSecundario}
-                    selectionColor={tema.cores.interface.destaque}
+                    selectionColor={corDestaque || tema.cores.interface.destaque}
                     value={valor}
                     onChangeText={(texto) => onChangeText?.(formatDate(texto))}
                     onFocus={(evento) => {

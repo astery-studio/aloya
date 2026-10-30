@@ -342,6 +342,7 @@ test.each([
     await render(<OnboardingScreen cadastrar={jest.fn()} />);
     await chegarAEtapaCiclo();
     for (let atual = 3; atual < etapa; atual += 1) {
+        await fireEvent.changeText(screen.getByLabelText('Duração em dias'), atual === 3 ? '28' : '5');
         await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     }
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), valor);
@@ -376,10 +377,12 @@ test('valida somente as durações já preenchidas e permite corrigir a fase lú
     const cadastrar = jest.fn().mockResolvedValue({ autenticacao: { token: 'jwt', tipo: 'Bearer' } });
     await render(<OnboardingScreen cadastrar={cadastrar} />);
     await chegarAEtapaCiclo();
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '20');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     expect(screen.getByText('Normalmente quanto tempo dura sua fase lútea?')).toBeTruthy();
+    await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '14');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     expect(screen.getByRole('alert')).toHaveTextContent(
         'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.'
@@ -424,13 +427,19 @@ test('conclui o cadastro sem período menstrual quando a pessoa não sabe a data
 
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    for (let etapa = 3; etapa <= 5; etapa += 1) {
+        expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
+        await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+        expect(cadastrar).not.toHaveBeenCalled();
+        await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    }
 
     await waitFor(() => expect(cadastrar).toHaveBeenCalledWith(expect.objectContaining({
         dataInicioUltimaMenstruacao: null,
-        dataFimUltimaMenstruacao: null
+        dataFimUltimaMenstruacao: null,
+        duracaoCicloInformada: null,
+        duracaoMenstruacaoInformada: null,
+        duracaoLuteaInformada: null
     })));
 });
 
