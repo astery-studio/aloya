@@ -58,3 +58,63 @@ const estilos = StyleSheet.create({
     simboloSelecionado: { width: 18, height: 10, borderRadius: 5, backgroundColor: '#C85A44' },
     diasSemana: {
         flexDirection: 'row',
+        paddingHorizontal: 8,
+        height: 28,
+        alignItems: 'center',
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderColor: '#EDEAE4'
+    },
+    nomeSemana: {
+        flex: 1,
+        textAlign: 'center',
+        fontFamily: fontFamilies.semibold,
+        fontSize: 11,
+        lineHeight: 16,
+        letterSpacing: 0.44,
+        color: '#5C5C59'
+    },
+    mes: {
+        paddingHorizontal: 8,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderColor: '#EDEAE4'
+    },
+    tituloMes: {
+        height: 42,
+        marginHorizontal: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4
+    },
+    nomeMes: { fontFamily: fontFamilies.bold, fontSize: 15, color: '#222222' },
+    ano: { fontFamily: fontFamilies.regular, fontSize: 12, lineHeight: 18, color: '#5C5C59' },
+    semana: { flexDirection: 'row', height: 52 },
+    celula: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    dia: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    numero: { fontFamily: fontFamilies.regular, fontSize: 14, lineHeight: 21, color: '#222222' },
+    futuro: { color: '#CFCFC8' },
+    numeroMarcado: { color: '#AC422E', fontFamily: fontFamilies.semibold },
+    numeroPonta: { color: '#FFFFFF' },
+    registrado: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        backgroundColor: 'rgba(200,90,68,0.1)',
+        borderColor: '#C85A44',
+        borderWidth: 0.7
+    },
+    ponta: { backgroundColor: '#C85A44', width: 42, height: 42, borderRadius: 21 },
+    faixa: { position: 'absolute', height: 42, left: 0, right: 0, backgroundColor: '#F6D8D1' },
+    inicioFaixa: { left: 5, borderTopLeftRadius: 21, borderBottomLeftRadius: 21 },
+    fimFaixa: { right: 5, borderTopRightRadius: 21, borderBottomRightRadius: 21 },
+    ajuda: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
