@@ -5,8 +5,8 @@ import {
     obterPeriodo
 } from '../../../../src/features/cycles/components/RemoveMenstruationModal';
 
-jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalendar', () => ({
-    CycleCalendar: ({ aoPressionarDia, carregando }) => {
+jest.mock('../../../../src/features/cycles/components/MenstrualDaysCalendar', () => ({
+    MenstrualDaysCalendar: ({ aoPressionarDia, carregando, desativado }) => {
         const { Pressable, Text, View } = require('react-native');
         if (carregando)
             return (
@@ -18,6 +18,7 @@ jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalen
             <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Dia de teste"
+                disabled={desativado}
                 onPress={() => aoPressionarDia?.({ registroCicloId: 3, data: '2026-10-04' })}
             >
                 <Text>Dia teste</Text>
@@ -93,7 +94,7 @@ test('remove um dia selecionado imediatamente sem abrir confirmação', async ()
     );
     await fireEvent.press(screen.getByLabelText('Dia de teste'));
     expect(onRemoverDia).toHaveBeenCalledWith({ registroCicloId: 3, data: '2026-10-04' });
-    expect(screen.queryByText('Apagar ciclo')).toBeNull();
+    expect(screen.queryByText('Excluir ciclo inteiro?')).toBeNull();
 });
 
 test('desativa seleção de dia durante carregamento e expõe a data que falhou', async () => {
@@ -122,7 +123,7 @@ test('a ação de ciclo inteiro abre confirmação e modo de dia respeita carreg
     );
     await fireEvent.press(screen.getByRole('button', { name: 'Excluir ciclo inteiro' }));
     expect(onSolicitarExcluirCiclo).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText('Apagar ciclo')).toBeNull();
+    expect(screen.queryByText('Excluir ciclo inteiro?')).toBeNull();
 });
 
 test('confirma a exclusão completa e mostra período, irreversibilidade e recálculo', async () => {
@@ -137,11 +138,11 @@ test('confirma a exclusão completa e mostra período, irreversibilidade e recá
             onCancelarExclusao={onCancelarExclusao}
         />
     );
-    expect(screen.getByText('Apagar ciclo')).toBeTruthy();
+    expect(screen.getByText('Excluir ciclo inteiro?')).toBeTruthy();
     expect(screen.getByText(/07\/08\/2026 a 11\/08\/2026/)).toBeTruthy();
     expect(screen.getByText(/não pode ser desfeita/)).toBeTruthy();
-    expect(screen.getByText(/previsões futuras/)).toBeTruthy();
-    await fireEvent.press(screen.getByRole('button', { name: 'Apagar' }));
+    expect(screen.getByText(/previsões serão recalculadas/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Excluir' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
     expect(onExcluirCiclo).toHaveBeenCalledTimes(1);
     expect(onCancelarExclusao).toHaveBeenCalledTimes(1);

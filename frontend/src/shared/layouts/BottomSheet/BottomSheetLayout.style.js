@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import { tema, fontFamilies } from '../../theme'
+import { StyleSheet } from 'react-native';
+import { tema, fontFamilies } from '../../theme';
 
 const estilos = StyleSheet.create({
     container: {
@@ -13,6 +13,11 @@ const estilos = StyleSheet.create({
         paddingTop: 12,
         paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela
     },
+    cabecalhoCompacto: {
+        height: 54,
+        minHeight: 54,
+        paddingTop: 0
+    },
 
     titulo: {
         flex: 1,
@@ -22,6 +27,10 @@ const estilos = StyleSheet.create({
         fontSize: 18,
         lineHeight: 27
     },
+    tituloCompacto: {
+        fontSize: 17,
+        lineHeight: 26
+    },
 
     botaoFechar: {
         width: 40,
@@ -29,13 +38,18 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
+    botaoFecharCompacto: {
+        width: 36,
+        height: 36,
+        marginRight: -8
+    },
 
     conteudo: {
         flexShrink: 1,
         paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela
     }
-})
+});
 
-const corIconeFechar = tema.cores.neutras.textoSecundarioClaro
+const corIconeFechar = tema.cores.neutras.textoSecundarioClaro;
 
-export { estilos, corIconeFechar }
+export { estilos, corIconeFechar };

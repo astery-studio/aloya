@@ -2,7 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { CycleCalendar } from '../../calendar/components/CycleCalendar/CycleCalendar';
+import { MenstrualDaysCalendar } from './MenstrualDaysCalendar';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { estilos } from './RemoveMenstruationModal.styles';
 
@@ -17,7 +17,7 @@ function obterPeriodo(ciclo) {
     return `${formatarData(ciclo.dataInicio)} a ${formatarData(ciclo.dataFim || obterHojeLocal())}`;
 }
 
-function Botao({ texto, primaria, desativado, onPress }) {
+function Botao({ texto, primaria, grande = false, desativado, onPress }) {
     return (
         <Pressable
             accessibilityRole="button"
@@ -28,6 +28,7 @@ function Botao({ texto, primaria, desativado, onPress }) {
             style={[
                 estilos.botao,
                 primaria ? estilos.botaoPrimario : estilos.botaoSecundario,
+                grande && estilos.botaoGrande,
                 desativado && estilos.desativado
             ]}
         >
@@ -61,19 +62,19 @@ function RemoveMenstruationModal({
     if (!['dia', 'cicloCompleto'].includes(modo))
         throw new TypeError('O modo de remoção da menstruação é inválido.');
     const tipoAlerta = alerta || (modo === 'cicloCompleto' ? 'confirmacao' : null);
-    const mensagemConfirmacao = `Tem certeza que deseja excluir todo o período de menstruação de ${formatarData(ciclo?.dataInicio)} a ${formatarData(ciclo?.dataFim || obterHojeLocal())} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`;
+    const mensagemConfirmacao = `Período: ${obterPeriodo(ciclo)}.\n\nEsta ação não pode ser desfeita. As previsões serão recalculadas.`;
     let modalAlerta = null;
 
     if (tipoAlerta === 'confirmacao') {
         modalAlerta = (
             <AlertModal
                 visivel
-                titulo="Apagar ciclo"
+                titulo="Excluir ciclo inteiro?"
                 mensagem={mensagemConfirmacao}
                 aoFechar={onCancelarExclusao}
                 acaoPrincipal={{
-                    texto: 'Apagar',
-                    variante: 'verde',
+                    texto: 'Excluir',
+                    variante: 'vermelho',
                     aoPressionar: onExcluirCiclo,
                     carregando
                 }}
@@ -124,6 +125,7 @@ function RemoveMenstruationModal({
                         titulo="Remover Menstruação"
                         onFechar={onFechar}
                         bloquearFechamento={carregando}
+                        compacto
                     >
                         <View
                             style={estilos.conteudo}
@@ -140,18 +142,18 @@ function RemoveMenstruationModal({
                                         {erroMeses}
                                     </Text>
                                 ) : (
-                                    <CycleCalendar
+                                    <MenstrualDaysCalendar
                                         meses={meses}
+                                        desativado={carregando || carregandoMeses}
                                         carregando={carregandoMeses}
-                                        aoPressionarDia={
-                                            carregando || carregandoMeses ? undefined : onRemoverDia
-                                        }
+                                        aoPressionarDia={onRemoverDia}
                                     />
                                 )}
                             </View>
                             <View style={estilos.aviso}>
+                                <Text style={estilos.avisoIcone}>ⓘ</Text>
                                 <Text style={estilos.avisoTexto}>
-                                    ⓘ A remoção é imediata e altera somente o dia escolhido.
+                                    A remoção é imediata e altera somente o dia escolhido.
                                 </Text>
                             </View>
                         </View>
@@ -165,6 +167,7 @@ function RemoveMenstruationModal({
                             <Botao
                                 texto="Excluir ciclo inteiro"
                                 primaria={!diasAlterados}
+                                grande
                                 desativado={carregando || carregandoMeses || !ciclo}
                                 onPress={onSolicitarExcluirCiclo}
                             />
