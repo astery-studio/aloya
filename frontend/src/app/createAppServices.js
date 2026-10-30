@@ -68,50 +68,64 @@ function criarServicosApp({
 
     const calendarServiceBase = criarCalendarService({
         requisicaoAutenticada
-    })
+    });
 
     const contraceptiveService = criarContraceptiveService({
         requisicaoAutenticada
-    })
+    });
 
     const cycleHistoryServiceBase = criarCycleHistoryService({
         requisicaoAutenticada
-    })
+    });
 
-    const cycleRemovalService = criarCycleRemovalService({requisicaoAutenticada})
+    const cycleRemovalService = criarCycleRemovalService({ requisicaoAutenticada });
     const calendarService = Object.freeze({
         ...calendarServiceBase,
         removerDia: cycleRemovalService.removerDia,
         excluirCiclo: cycleRemovalService.excluirCiclo
-    })
+    });
     const cycleHistoryService = Object.freeze({
         ...cycleHistoryServiceBase,
         removerDia: cycleRemovalService.removerDia,
         excluirCiclo: cycleRemovalService.excluirCiclo
-    })
+    });
 
     const supportCategoryService = criarSupportCategoryService({
         requisicaoAutenticada
-    })
+    });
 
     const cyclePredictionService = criarCyclePredictionService({
         requisicaoAutenticada
-    })
+    });
 
     const cycleParametersService = criarCycleParametersService({
         requisicaoAutenticada
-    })
+    });
+
+    const cycleRegistrationService = criarCycleRegistrationService({ requisicaoAutenticada });
+    const menstruationSyncQueue = criarMenstruationSyncQueue({
+        ler: lerSeguro,
+        salvar: salvarSeguro,
+        registrar: cycleRegistrationService.registrar,
+        identificar: async () => obterIdentidadeMenstrual(await obterToken()),
+        criarChave: () => `menstrual-${Date.now()}-${Math.random().toString(36).slice(2, 14)}`
+    });
 
     return Object.freeze({
+        cycleRegistrationService,
+        menstruationSyncQueue,
         authService,
         accountService,
-        calendarService,
+        calendarService: comRegistrosPendentes({
+            service: calendarService,
+            fila: menstruationSyncQueue
+        }),
         contraceptiveService,
         cycleHistoryService,
         supportCategoryService,
         cyclePredictionService,
         cycleParametersService
-    })
+    });
 }
 
-export {criarServicosApp}
+export { criarServicosApp };
