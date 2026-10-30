@@ -82,20 +82,25 @@ function criarEstilos(tema) {
             minHeight: 0
         },
         avisoVazio: {
-            marginHorizontal: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            marginHorizontal: 20,
             marginTop: 12,
             marginBottom: 8,
-            paddingHorizontal: 16,
+            paddingHorizontal: 14,
             paddingVertical: 12,
+            borderWidth: 0.7,
+            borderColor: tema.cores.interface.destaque,
             borderRadius: 12,
-            backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.16)' : 'rgba(214, 140, 58, 0.14)'
+            backgroundColor: tema.escuro ? 'transparent' : '#EFEFE8'
         },
         textoVazio: {
-            color: tema.cores.interface.textoPrincipal,
+            flex: 1,
+            color: tema.cores.interface.destaque,
             fontFamily: fontFamilies.medium,
             fontSize: 14,
-            fontWeight: '500',
-            lineHeight: 21
+            lineHeight: 20
         },
         rodape: {
             flexShrink: 0,

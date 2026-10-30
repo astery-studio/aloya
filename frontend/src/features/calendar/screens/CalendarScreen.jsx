@@ -202,6 +202,7 @@ function CalendarScreen({
             <View style={estilos.conteudo}>
                 {estadoVazio ? (
                     <View accessibilityRole="alert" style={estilos.avisoVazio}>
+                        <InfoIcon size={20} color={tema.cores.interface.destaque} />
                         <Text style={estilos.textoVazio}>
                             Você ainda não possui nenhum ciclo registrado. Toque em um dia no
                             Calendário para começar.
