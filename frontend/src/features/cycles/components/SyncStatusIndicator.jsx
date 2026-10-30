@@ -58,3 +58,7 @@ const estilos = StyleSheet.create({
         fontSize: 12,
         lineHeight: 18,
         color: cores.neutras.textoSecundarioClaro
+    },
+    acao: { fontFamily: fontFamilies.semibold, fontSize: 12, color: cores.marca.primaria }
+});
+export { SyncStatusIndicator };
