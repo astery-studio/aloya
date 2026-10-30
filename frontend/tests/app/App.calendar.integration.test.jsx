@@ -1,26 +1,41 @@
-import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react-native'
-import {Alert, Linking} from 'react-native'
+import React from 'react';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Alert, Linking } from 'react-native';
 
-jest.mock('expo-font', () => ({useFonts: () => [true, null]}))
-jest.mock('expo-status-bar', () => ({StatusBar: () => null}))
-jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({DMSans_400Regular: 'regular'}))
-jest.mock('@expo-google-fonts/dm-sans/500Medium', () => ({DMSans_500Medium: 'medium'}))
-jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({DMSans_600SemiBold: 'semibold'}))
-jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({DMSans_700Bold: 'bold'}))
-jest.mock('../../src/app/createAppServices', () => ({
-    criarServicosApp: jest.fn()
-}))
-jest.mock('../../src/shared/storage/tokenStorage', () => ({
-    obterToken: jest.fn()
-}))
+jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        CycleTodayContainer: ({ aoAbrirCalendario, aoCadastrarMenstruacao }) =>
+            ReactInterno.createElement(
+                View,
+                null,
+                ReactInterno.createElement(Text, null, 'Aloya - Seu Ciclo Hoje'),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir calendário',
+                        onPress: aoAbrirCalendario
+                    },
+                    ReactInterno.createElement(Text, null, 'Calendário')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Cadastrar pela Home',
+                        onPress: () => aoCadastrarMenstruacao('2026-10-27')
+                    },
+                    ReactInterno.createElement(Text, null, 'Cadastrar')
+                )
+            )
+    };
+});
 
-jest.mock('../../src/features/auth/screens/ForgotPasswordScreen', () => jest.fn(() => null))
-jest.mock('../../src/features/auth/screens/LoginScreen', () => jest.fn(() => null))
-jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn(() => null))
-jest.mock('../../src/features/auth/screens/WelcomeScreen', () => jest.fn(() => null))
-jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null))
-jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
+jest.mock('../../src/features/cycles/screens/MenstruationRegistrationContainer', () => {
+    const ReactInterno = require('react');
+    const { Pressable, Text } = require('react-native');
     ChangePasswordScreen: jest.fn(() => null)
 }))
 jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => ({
