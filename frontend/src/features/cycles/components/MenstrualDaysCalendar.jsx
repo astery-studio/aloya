@@ -29,7 +29,8 @@ function MenstrualDaysCalendar({
     meses = [],
     aoPressionarDia,
     desativado = false,
-    carregando = false
+    carregando = false,
+    larguraMes = 312
 }) {
     if (carregando) {
         return (
@@ -51,7 +52,11 @@ function MenstrualDaysCalendar({
                 const dias = criarDiasDoMes(mes);
 
                 return (
-                    <View key={mes.mes} style={estilos.mes}>
+                    <View
+                        key={mes.mes}
+                        testID={`mes-calendario-${mes.mes}`}
+                        style={[estilos.mes, { width: larguraMes }]}
+                    >
                         <View style={estilos.tituloMes}>
                             <Text style={estilos.nomeMes}>{NOMES_MESES[numeroMes - 1]}</Text>
                             <Text style={estilos.anoMes}>{ano}</Text>

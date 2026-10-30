@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
 import { CycleRemovalFeedbackModal } from './CycleRemovalFeedbackModal';
@@ -59,6 +60,8 @@ function RemoveMenstruationModal({
     onFecharAlerta,
     onConcluir
 }) {
+    const [larguraCalendario, setLarguraCalendario] = useState(312);
+
     if (!['dia', 'cicloCompleto'].includes(modo))
         throw new TypeError('O modo de remoção da menstruação é inválido.');
     const tipoAlerta = alerta || (modo === 'cicloCompleto' ? 'confirmacao' : null);
@@ -101,36 +104,49 @@ function RemoveMenstruationModal({
                         bloquearFechamento={carregando}
                         compacto
                     >
-                        <View
-                            style={estilos.conteudo}
+                        <ScrollView
+                            style={estilos.conteudoRolavel}
+                            contentContainerStyle={estilos.conteudoRolavelInterno}
+                            showsVerticalScrollIndicator={false}
                             accessibilityHint={
                                 dataSelecionada ? `Dia selecionado: ${dataSelecionada}` : undefined
                             }
                         >
-                            <Text style={estilos.instrucao}>
-                                Toque em um dia preenchido para desmarcá-lo.
-                            </Text>
-                            <View style={estilos.calendario}>
-                                {erroMeses ? (
-                                    <Text accessibilityRole="alert" style={estilos.erro}>
-                                        {erroMeses}
-                                    </Text>
-                                ) : (
-                                    <MenstrualDaysCalendar
-                                        meses={meses}
-                                        desativado={carregando || carregandoMeses}
-                                        carregando={carregandoMeses}
-                                        aoPressionarDia={onRemoverDia}
-                                    />
-                                )}
-                            </View>
-                            <View style={estilos.aviso}>
-                                <Text style={estilos.avisoIcone}>ⓘ</Text>
-                                <Text style={estilos.avisoTexto}>
-                                    A remoção é imediata e altera somente o dia escolhido.
+                            <View>
+                                <Text style={estilos.instrucao}>
+                                    Toque em um dia preenchido para desmarcá-lo.
                                 </Text>
+                                <View
+                                    style={estilos.calendario}
+                                    onLayout={(evento) => {
+                                        const largura = evento.nativeEvent.layout.width - 30;
+                                        if (largura > 0) {
+                                            setLarguraCalendario(largura);
+                                        }
+                                    }}
+                                >
+                                    {erroMeses ? (
+                                        <Text accessibilityRole="alert" style={estilos.erro}>
+                                            {erroMeses}
+                                        </Text>
+                                    ) : (
+                                        <MenstrualDaysCalendar
+                                            meses={meses}
+                                            desativado={carregando || carregandoMeses}
+                                            carregando={carregandoMeses}
+                                            aoPressionarDia={onRemoverDia}
+                                            larguraMes={larguraCalendario}
+                                        />
+                                    )}
+                                </View>
+                                <View style={estilos.aviso}>
+                                    <Text style={estilos.avisoIcone}>ⓘ</Text>
+                                    <Text style={estilos.avisoTexto}>
+                                        A remoção é imediata e altera somente o dia escolhido.
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
+                        </ScrollView>
                         <View style={estilos.rodape}>
                             <Botao
                                 texto="Concluir"

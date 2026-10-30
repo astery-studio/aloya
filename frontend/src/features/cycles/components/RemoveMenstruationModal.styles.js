@@ -2,7 +2,8 @@ import { StyleSheet } from 'react-native';
 import { cores, fontFamilies } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
-    conteudo: { height: 429, paddingTop: 24 },
+    conteudoRolavel: { flexShrink: 1 },
+    conteudoRolavelInterno: { paddingTop: 24, paddingBottom: 8 },
     instrucao: {
         height: 19,
         color: cores.neutras.textoSecundarioClaro,

@@ -160,7 +160,9 @@ test('mostra carregamento e erro de busca do calendário', async () => {
 });
 
 test('valida modo e formata o período para a confirmação', async () => {
-    expect(() => RemoveMenstruationModal({ modo: 'inválido', visivel: true })).toThrow(TypeError);
+    await expect(render(<RemoveMenstruationModal modo="inválido" visivel />)).rejects.toThrow(
+        TypeError
+    );
     expect(obterPeriodo({ dataInicio: '2026-10-01', dataFim: '2026-10-05' })).toBe(
         '01/10/2026 a 05/10/2026'
     );

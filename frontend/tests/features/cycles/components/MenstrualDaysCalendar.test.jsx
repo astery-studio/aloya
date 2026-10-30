@@ -56,3 +56,11 @@ test('mostra o carregamento no espaço do calendário', async () => {
     await render(<MenstrualDaysCalendar carregando />);
     expect(screen.getByLabelText('Carregando calendário')).toBeTruthy();
 });
+
+test('dimensiona o mês conforme a largura disponível no sheet', async () => {
+    await render(<MenstrualDaysCalendar meses={[mes]} larguraMes={276} />);
+
+    expect(screen.getByTestId('mes-calendario-2026-08').props.style).toEqual(
+        expect.arrayContaining([expect.objectContaining({ width: 276 })])
+    );
+});

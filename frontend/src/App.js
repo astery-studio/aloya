@@ -453,7 +453,6 @@ export default function App() {
                 aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                 aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                aoAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.inicio)}
                 aoSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />

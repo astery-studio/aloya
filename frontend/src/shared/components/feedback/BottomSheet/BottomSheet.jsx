@@ -1,31 +1,30 @@
 //Mostra um painel na parte inferior da tela
-import { useEffect, useRef, useState } from 'react'
-import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native'
-import { estilos } from './BottomSheet.style'
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { estilos } from './BottomSheet.style';
+import { tema } from '../../../theme';
 
 function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }) {
-    const alturaForaDaTela = useRef(
-        Dimensions.get('screen').height
-    ).current
+    const insets = useSafeAreaInsets();
+    const alturaForaDaTela = useRef(Dimensions.get('screen').height).current;
 
-    const progresso = useRef(
-        new Animated.Value(0)
-    ).current
+    const progresso = useRef(new Animated.Value(0)).current;
 
-    const [modalMontado, setModalMontado] = useState(visivel)
+    const [modalMontado, setModalMontado] = useState(visivel);
 
-    const montadoAtual = useRef(visivel)
-    const visivelAtual = useRef(visivel)
-    const modalJaApareceu = useRef(false)
+    const montadoAtual = useRef(visivel);
+    const visivelAtual = useRef(visivel);
+    const modalJaApareceu = useRef(false);
 
-    visivelAtual.current = visivel
+    visivelAtual.current = visivel;
 
     const posicaoPainel = useRef(
         progresso.interpolate({
             inputRange: [0, 1],
             outputRange: [alturaForaDaTela, 0]
         })
-    ).current
+    ).current;
 
     function animarEntrada() {
         Animated.timing(progresso, {
@@ -34,7 +33,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             easing: Easing.out(Easing.cubic),
             useNativeDriver: true,
             isInteraction: false
-        }).start()
+        }).start();
     }
 
     function animarSaida() {
@@ -46,43 +45,43 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             isInteraction: false
         }).start(({ finished }) => {
             if (finished && !visivelAtual.current) {
-                montadoAtual.current = false
-                setModalMontado(false)
+                montadoAtual.current = false;
+                setModalMontado(false);
             }
-        })
+        });
     }
 
     useEffect(() => {
         if (visivel) {
             if (!montadoAtual.current) {
-                montadoAtual.current = true
-                progresso.setValue(0)
-                setModalMontado(true)
+                montadoAtual.current = true;
+                progresso.setValue(0);
+                setModalMontado(true);
             } else if (modalJaApareceu.current) {
-                animarEntrada()
+                animarEntrada();
             }
-            return
+            return;
         }
 
         if (montadoAtual.current) {
-            animarSaida()
+            animarSaida();
         }
         // As funções de animação são recriadas durante o render; incluir suas
         // identidades reiniciaria a animação sem alteração de visibilidade.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [visivel])
+    }, [visivel]);
 
     function quandoModalAparecer() {
-        modalJaApareceu.current = true
+        modalJaApareceu.current = true;
 
         if (visivelAtual.current) {
-            animarEntrada()
+            animarEntrada();
         }
     }
 
     function solicitarFechamento() {
         if (!bloquearFechamento) {
-            onFechar?.()
+            onFechar?.();
         }
     }
 
@@ -104,13 +103,18 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
                 />
 
                 <Animated.View
-                    style={[estilos.painel, {transform: [{ translateY: posicaoPainel }]}]}
+                    testID="bottom-sheet-panel"
+                    style={[
+                        estilos.painel,
+                        { paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom) },
+                        { transform: [{ translateY: posicaoPainel }] }
+                    ]}
                 >
                     {children}
                 </Animated.View>
             </KeyboardAvoidingView>
         </Modal>
-    )
+    );
 }
 
-export { BottomSheet }
+export { BottomSheet };
