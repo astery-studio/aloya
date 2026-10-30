@@ -5,16 +5,24 @@ import { criarPredictionService } from '../../../../src/features/cycles/services
 
 test('consulta somente dados da pessoa autenticada e limita o histórico', async () => {
     let consulta;
-    const prisma = { usuario: { findUnique: async (argumento) => {
-        consulta = argumento;
-        return {
-            duracaoCicloInformada: 28, duracaoMenstruacaoInformada: 5,
-            duracaoLuteaInformada: 14,
-            registrosCiclo: [{ dataInicio: new Date('2026-10-01T00:00:00Z'), dataFim: null }]
-        };
-    } } };
+    const prisma = {
+        usuario: {
+            findUnique: async (argumento) => {
+                consulta = argumento;
+                return {
+                    duracaoCicloInformada: 28,
+                    duracaoMenstruacaoInformada: 5,
+                    duracaoLuteaInformada: 14,
+                    registrosCiclo: [
+                        { dataInicio: new Date('2026-10-01T00:00:00Z'), dataFim: null }
+                    ]
+                };
+            }
+        }
+    };
     const service = criarPredictionService({
-        prisma, agora: () => new Date('2026-10-05T12:00:00Z')
+        prisma,
+        agora: () => new Date('2026-10-05T12:00:00Z')
     });
 
     const resultado = await service.buscar(42);
@@ -25,17 +33,25 @@ test('consulta somente dados da pessoa autenticada e limita o histórico', async
         dataInicio: { lte: new Date('2026-10-05T23:59:59.999Z') }
     });
     assert.deepEqual(consulta.select.registrosCiclo.select, {
-        dataInicio: true, dataFim: true
+        dataInicio: true,
+        dataFim: true,
+        duracaoMenstruacao: true
     });
     assert.equal(resultado.proximoInicioEstimado, '2026-10-29');
     assert.equal(resultado.dataGeracao, '2026-10-05T12:00:00.000Z');
 });
 
 test('usa o relógio atual somente quando não há relógio injetado', async () => {
-    const prisma = { usuario: { findUnique: async () => ({
-        duracaoCicloInformada: 28, duracaoMenstruacaoInformada: 5,
-        duracaoLuteaInformada: 14, registrosCiclo: []
-    }) } };
+    const prisma = {
+        usuario: {
+            findUnique: async () => ({
+                duracaoCicloInformada: 28,
+                duracaoMenstruacaoInformada: 5,
+                duracaoLuteaInformada: 14,
+                registrosCiclo: []
+            })
+        }
+    };
 
     const resultado = await criarPredictionService({ prisma }).buscar(1);
 

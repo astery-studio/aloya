@@ -18,6 +18,12 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.superficieElevada
         },
 
+        cabecalhoCompacto: {
+            height: 54,
+            minHeight: 54,
+            paddingTop: 0
+        },
+
         titulo: {
             flex: 1,
             flexShrink: 1,
@@ -27,12 +33,23 @@ function criarEstilos(tema) {
             lineHeight: 27
         },
 
+        tituloCompacto: {
+            fontSize: 17,
+            lineHeight: 26
+        },
+
         botaoFechar: {
             width: 40,
             height: 40,
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 20
+        },
+
+        botaoFecharCompacto: {
+            width: 36,
+            height: 36,
+            marginRight: -8
         },
 
         desabilitado: {

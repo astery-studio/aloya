@@ -369,6 +369,11 @@ function criarServicos() {
             atualizarPreferencia: jest.fn()
         },
         contraceptiveService: {},
+        calendarService: {
+            buscarMes: jest.fn(),
+            removerDia: jest.fn(),
+            excluirCiclo: jest.fn()
+        },
         cycleHistoryService: {
             listarPagina: jest.fn(),
             buscar: jest.fn().mockResolvedValue({
@@ -466,9 +471,8 @@ describe('App integrado', () => {
         expect(CycleHistoryFlow).toHaveBeenCalledWith(
             expect.objectContaining({
                 service: servicos.cycleHistoryService,
+                calendarService: servicos.calendarService,
                 aoAbrirCalendario: expect.any(Function),
-                aoEditarCiclo: expect.any(Function),
-                aoExcluirCiclo: expect.any(Function),
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),

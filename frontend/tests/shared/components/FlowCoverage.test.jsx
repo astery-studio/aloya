@@ -3,11 +3,11 @@ import { Text } from 'react-native';
 import AccountStep from '../../../src/features/onboarding/components/AccountStep/AccountStep';
 import OnboardingStep from '../../../src/features/onboarding/components/OnboardingStep/OnboardingStep';
 import { SelectionSheet } from '../../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
-import { renderWithTheme } from '../../helpers/renderWithTheme';
+import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 
 test('etapa compartilhada permite pular e usa valores padrão', async () => {
     const aoPular = jest.fn();
-    await renderWithTheme(
+    await render(
         <OnboardingStep
             etapa={1}
             titulo="Etapa"
@@ -25,7 +25,7 @@ test('etapa compartilhada permite pular e usa valores padrão', async () => {
 });
 
 test('conta aceita ausência do mapa de erros', async () => {
-    await renderWithTheme(
+    await render(
         <AccountStep
             dados={{ nome: '', email: '', senha: '', confirmacao: '', aceitouTermos: false }}
             aoAlterar={jest.fn()}
@@ -37,6 +37,6 @@ test('conta aceita ausência do mapa de erros', async () => {
 });
 
 test('seletor usa lista vazia por padrão', async () => {
-    await renderWithTheme(<SelectionSheet visivel titulo="Opções" />);
+    await render(<SelectionSheet visivel titulo="Opções" />);
     expect(screen.getByText('Nenhuma opção disponível.')).toBeTruthy();
 });

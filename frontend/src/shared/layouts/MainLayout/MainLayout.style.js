@@ -12,6 +12,12 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0,
             backgroundColor: tema.cores.interface.fundo
+        },
+
+        navegacaoSegura: {
+            width: '100%',
+            flexShrink: 0,
+            backgroundColor: tema.cores.interface.superficieElevada
         }
     });
 }

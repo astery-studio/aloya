@@ -579,11 +579,8 @@ export default function App() {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
-                aoAbrirCalendario={() =>
-                    Alert.alert('Calendário', 'O calendário ainda será integrado.')
-                }
-                aoEditarCiclo={(ciclo) => Alert.alert('Editar ciclo', `Ciclo ${ciclo.numero}`)}
-                aoExcluirCiclo={(ciclo) => Alert.alert('Excluir ciclo', `Ciclo ${ciclo.numero}`)}
+                calendarService={configuracao.servicos.calendarService}
+                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />

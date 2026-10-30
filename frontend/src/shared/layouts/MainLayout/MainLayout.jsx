@@ -1,6 +1,7 @@
 // Organiza o cabeçalho, o conteúdo e a navegação inferior das telas internas.
 import { useMemo } from 'react';
 import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '../../components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { Header } from '../../components/navigation/Header/Header';
@@ -13,11 +14,13 @@ function MainLayout({
     onVoltar,
     abaAtiva,
     onSelecionarAba,
+    usarAreaSeguraInferior = true,
     children
 }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
 
     return (
         <View testID="main-layout" style={estilos.container}>
@@ -27,7 +30,17 @@ function MainLayout({
                 {children}
             </View>
 
-            <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />
+            {usarAreaSeguraInferior ? (
+                <SafeAreaView
+                    testID="navegacao-segura-main-layout"
+                    edges={['bottom']}
+                    style={estilos.navegacaoSegura}
+                >
+                    {navegacaoInferior}
+                </SafeAreaView>
+            ) : (
+                navegacaoInferior
+            )}
         </View>
     );
 }

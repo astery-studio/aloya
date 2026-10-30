@@ -6,6 +6,7 @@ import { criarContraceptiveService } from '../../src/features/contraceptives/ser
 import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService';
 import { criarCycleParametersService } from '../../src/features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService';
+import { criarCycleRemovalService } from '../../src/features/cycles/services/cycleRemovalService';
 import { criarAccountService } from '../../src/features/settings/services/accountService';
 import { criarThemePreferenceService } from '../../src/features/settings/services/themePreferenceService';
 import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
@@ -49,6 +50,10 @@ jest.mock('../../src/features/cycles/services/cycleParametersService', () => ({
     criarCycleParametersService: jest.fn()
 }));
 
+jest.mock('../../src/features/cycles/services/cycleRemovalService', () => ({
+    criarCycleRemovalService: jest.fn()
+}));
+
 jest.mock('../../src/shared/services/api/apiClient', () => ({
     criarApiClient: jest.fn()
 }));
@@ -74,6 +79,7 @@ describe('createAppServices', () => {
     let supportCategoryService;
     let cyclePredictionService;
     let cycleParametersService;
+    let cycleRemovalService;
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -117,6 +123,11 @@ describe('createAppServices', () => {
             nome: 'cycleParametersService'
         });
 
+        cycleRemovalService = Object.freeze({
+            removerDia: jest.fn(),
+            excluirCiclo: jest.fn()
+        });
+
         criarApiClient.mockReturnValue({
             requisicao
         });
@@ -140,6 +151,8 @@ describe('createAppServices', () => {
         criarCyclePredictionService.mockReturnValue(cyclePredictionService);
 
         criarCycleParametersService.mockReturnValue(cycleParametersService);
+
+        criarCycleRemovalService.mockReturnValue(cycleRemovalService);
     });
 
     test('monta e congela os serviços da aplicação', () => {
@@ -189,6 +202,10 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         });
 
+        expect(criarCycleRemovalService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
         expect(criarSupportCategoryService).toHaveBeenCalledWith({
             requisicaoAutenticada
         });
@@ -205,9 +222,17 @@ describe('createAppServices', () => {
             authService,
             accountService,
             themePreferenceService,
-            calendarService,
+            calendarService: {
+                ...calendarService,
+                removerDia: cycleRemovalService.removerDia,
+                excluirCiclo: cycleRemovalService.excluirCiclo
+            },
             contraceptiveService,
-            cycleHistoryService,
+            cycleHistoryService: {
+                ...cycleHistoryService,
+                removerDia: cycleRemovalService.removerDia,
+                excluirCiclo: cycleRemovalService.excluirCiclo
+            },
             supportCategoryService,
             cyclePredictionService,
             cycleParametersService

@@ -172,6 +172,7 @@ test('encaminha todas as interações da tela carregada', async () => {
 
     expect(screen.queryByRole('button', { name: 'Abrir parâmetros do ciclo' })).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
+    expect(screen.queryByRole('button', { name: 'Abrir parâmetros do ciclo' })).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
     await fireEvent.press(screen.getByRole('tab', { name: 'Ciclos' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));

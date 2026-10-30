@@ -6,7 +6,14 @@ import { XIcon } from 'phosphor-react-native/src/icons/X';
 import { useTheme } from '../../hooks/useTheme';
 import { criarEstilos } from './BottomSheetLayout.style';
 
-function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, children }) {
+function BottomSheetLayout({
+    titulo,
+    onFechar,
+    bloquearFechamento = false,
+    compacto = false,
+    corFundo,
+    children
+}) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -18,9 +25,22 @@ function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, child
     }
 
     return (
-        <View testID="bottom-sheet-layout" style={estilos.container}>
-            <View testID="bottom-sheet-cabecalho" style={estilos.cabecalho}>
-                <Text accessibilityRole="header" style={estilos.titulo}>
+        <View
+            testID="bottom-sheet-layout"
+            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+        >
+            <View
+                testID="bottom-sheet-cabecalho"
+                style={[
+                    estilos.cabecalho,
+                    compacto && estilos.cabecalhoCompacto,
+                    corFundo ? { backgroundColor: corFundo } : null
+                ]}
+            >
+                <Text
+                    accessibilityRole="header"
+                    style={[estilos.titulo, compacto && estilos.tituloCompacto]}
+                >
                     {titulo}
                 </Text>
 
@@ -32,7 +52,11 @@ function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, child
                     accessibilityState={{
                         disabled: bloquearFechamento
                     }}
-                    style={[estilos.botaoFechar, bloquearFechamento && estilos.desabilitado]}
+                    style={[
+                        estilos.botaoFechar,
+                        compacto && estilos.botaoFecharCompacto,
+                        bloquearFechamento && estilos.desabilitado
+                    ]}
                 >
                     <XIcon
                         size={24}
@@ -42,7 +66,10 @@ function BottomSheetLayout({ titulo, onFechar, bloquearFechamento = false, child
                 </Pressable>
             </View>
 
-            <View testID="bottom-sheet-conteudo" style={estilos.conteudo}>
+            <View
+                testID="bottom-sheet-conteudo"
+                style={[estilos.conteudo, corFundo ? { backgroundColor: corFundo } : null]}
+            >
                 {children}
             </View>
         </View>

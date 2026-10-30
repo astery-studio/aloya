@@ -1,5 +1,6 @@
 import { Animated, Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '../../../../src/shared/components/feedback/BottomSheet/BottomSheet';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
@@ -14,12 +15,26 @@ function obterModal(container) {
 }
 
 function renderizarBottomSheet(propriedades = {}, preferencia = 'claro') {
+    function AreaSeguraDeTeste({ children }) {
+        return (
+            <SafeAreaProvider
+                initialMetrics={{
+                    frame: { x: 0, y: 0, width: 390, height: 844 },
+                    insets: { top: 0, right: 0, bottom: 32, left: 0 }
+                }}
+            >
+                {children}
+            </SafeAreaProvider>
+        );
+    }
+
     return render(
         <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
             <BottomSheet visivel onFechar={jest.fn()} {...propriedades}>
                 <Text>Conteúdo do painel</Text>
             </BottomSheet>
-        </ThemeProvider>
+        </ThemeProvider>,
+        { wrapper: AreaSeguraDeTeste }
     );
 }
 

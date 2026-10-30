@@ -1,12 +1,21 @@
 // Mostra um painel na parte inferior da tela.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './BottomSheet.style';
 
-function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechamento = false }) {
+function BottomSheet({
+    visivel,
+    onFechar,
+    onOcultar,
+    children,
+    bloquearFechamento = false,
+    corPainel
+}) {
     const tema = useTheme();
+    const insets = useSafeAreaInsets();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
@@ -133,6 +142,10 @@ function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechament
                     testID="bottom-sheet-painel"
                     style={[
                         estilos.painel,
+                        {
+                            paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom)
+                        },
+                        corPainel ? { backgroundColor: corPainel } : null,
                         {
                             transform: [
                                 {

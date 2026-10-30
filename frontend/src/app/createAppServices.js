@@ -5,6 +5,7 @@ import { criarContraceptiveService } from '../features/contraceptives/services/c
 import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService';
 import { criarCycleParametersService } from '../features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService';
+import { criarCycleRemovalService } from '../features/cycles/services/cycleRemovalService';
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService';
@@ -67,7 +68,7 @@ function criarServicosApp({
         requisicaoAutenticada
     });
 
-    const calendarService = criarCalendarService({
+    const calendarServiceBase = criarCalendarService({
         requisicaoAutenticada
     });
 
@@ -75,8 +76,22 @@ function criarServicosApp({
         requisicaoAutenticada
     });
 
-    const cycleHistoryService = criarCycleHistoryService({
+    const cycleHistoryServiceBase = criarCycleHistoryService({
         requisicaoAutenticada
+    });
+
+    const cycleRemovalService = criarCycleRemovalService({ requisicaoAutenticada });
+
+    const calendarService = Object.freeze({
+        ...calendarServiceBase,
+        removerDia: cycleRemovalService.removerDia,
+        excluirCiclo: cycleRemovalService.excluirCiclo
+    });
+
+    const cycleHistoryService = Object.freeze({
+        ...cycleHistoryServiceBase,
+        removerDia: cycleRemovalService.removerDia,
+        excluirCiclo: cycleRemovalService.excluirCiclo
     });
 
     const supportCategoryService = criarSupportCategoryService({

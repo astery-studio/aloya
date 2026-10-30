@@ -19,19 +19,23 @@ import { estimarFases } from './prediction.phases.js';
 const LIMITACAO_ANTICONCEPCIONAIS = 'EFEITOS_DE_ANTICONCEPCIONAIS_NAO_CONSIDERADOS';
 
 function ordenarRegistros(registros) {
-    return [...registros].sort((a, b) => (
+    return [...registros].sort((a, b) =>
         formatarData(a.dataInicio).localeCompare(formatarData(b.dataInicio))
-    ));
+    );
 }
 
 function obterDuracoesSangramento(registrosOrdenados) {
     return registrosOrdenados
-        .filter(({ dataInicio, dataFim }) => (
-            dataFim && diferencaDias(dataInicio, dataFim) >= 0
-        ))
-        .map(({ dataInicio, dataFim }) => (
-            diferencaDias(dataInicio, dataFim) + 1
-        ));
+        .map(({ dataInicio, dataFim, duracaoMenstruacao }) => {
+            if (Number.isSafeInteger(duracaoMenstruacao) && duracaoMenstruacao > 0) {
+                return duracaoMenstruacao;
+            }
+
+            return dataFim && diferencaDias(dataInicio, dataFim) >= 0
+                ? diferencaDias(dataInicio, dataFim) + 1
+                : null;
+        })
+        .filter((duracao) => duracao !== null);
 }
 
 function obterFimMenstrual({ ultimoRegistro, inicioCiclo, duracaoEstimada }) {
@@ -54,10 +58,7 @@ function obterStatusPrevisao(menstrual, fases) {
 }
 
 function obterLimitacoes(fases, ambiguidades) {
-    const limitacoes = [
-        LIMITACAO_ANTICONCEPCIONAIS,
-        'FAIXA_ESTIMADA_NAO_VALIDADA'
-    ];
+    const limitacoes = [LIMITACAO_ANTICONCEPCIONAIS, 'FAIXA_ESTIMADA_NAO_VALIDADA'];
 
     if (fases.motivo) {
         limitacoes.push(fases.motivo);
@@ -73,18 +74,17 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
     if (!registrosElegiveis.length) {
         return {
             status: 'DADOS_INSUFICIENTES',
-            motivos: [
-                'INICIO_ELEGIVEL_AUSENTE',
-                ...historico.ambiguidades
-            ]
+            motivos: ['INICIO_ELEGIVEL_AUSENTE', ...historico.ambiguidades]
         };
     }
 
-    const ambiguidadesEfetivas = [...new Set([
-        ...ambiguidades,
-        ...historico.ambiguidades,
-        ...identificarAmbiguidades(registrosElegiveis)
-    ])];
+    const ambiguidadesEfetivas = [
+        ...new Set([
+            ...ambiguidades,
+            ...historico.ambiguidades,
+            ...identificarAmbiguidades(registrosElegiveis)
+        ])
+    ];
     const intervalos = construirIntervalos(registrosElegiveis);
     const intervalosRecentes = selecionarIntervalosRecentes(intervalos);
     const duracoesCiclo = intervalosRecentes.map(({ duracao }) => duracao);
@@ -110,8 +110,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         parametros.duracaoMenstruacaoInformada
     );
 
-    const duracoesRecentes = duracoesSangramento
-        .slice(-CONFIG_PREVISAO.maximoIntervalos);
+    const duracoesRecentes = duracoesSangramento.slice(-CONFIG_PREVISAO.maximoIntervalos);
     const duracaoAtual = selecionarDuracao(
         duracoesRecentes,
         parametros.duracaoMenstruacaoInformada,
@@ -126,8 +125,7 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         inicioCiclo,
         fimMenstrual,
         proximoInicio: menstrual.proximoInicioEstimado,
-        duracaoLutea: parametros.duracaoLuteaInformada
-            ?? CONFIG_PREVISAO.luteaPadrao
+        duracaoLutea: parametros.duracaoLuteaInformada ?? CONFIG_PREVISAO.luteaPadrao
     });
     const confiabilidade = classificarConfiabilidade({
         intervalos,
@@ -154,7 +152,8 @@ function calcularPrevisao({ registros, parametros, dataReferencia, ambiguidades 
         baseEstimativaOvulacao: {
             status: fases.motivo ? 'INDISPONIVEL' : 'ESTIMATIVA_POR_CALENDARIO',
             origemDuracaoLutea: parametros.duracaoLuteaInformada
-                ? ORIGENS.DECLARADA : ORIGENS.PADRAO,
+                ? ORIGENS.DECLARADA
+                : ORIGENS.PADRAO,
             limitacoes: ['OVULACAO_NAO_OBSERVADA', 'DURACAO_LUTEA_NAO_COMPROVADA']
         },
         quantidadeIntervalosUtilizados: Math.min(
