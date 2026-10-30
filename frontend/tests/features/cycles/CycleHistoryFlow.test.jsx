@@ -78,6 +78,42 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
+test.each([false, true])(
+    'desmarcar todos os dias exclui o ciclo, inclusive após retentativa: %s',
+    async (falharUltimo) => {
+        const removerDia = jest.fn().mockResolvedValueOnce({ cicloRemovido: false });
+        if (falharUltimo) removerDia.mockRejectedValueOnce(new Error('offline'));
+        removerDia.mockResolvedValue({ cicloRemovido: true, quantidadeCiclos: 0 });
+        const service = { removerDia, excluirCiclo: jest.fn() };
+        const estado = criarEstadoDoHook({ tentarNovamente: jest.fn().mockResolvedValue(true) });
+        await montar({ service, estado });
+        await act(() => CycleHistoryScreen.mock.calls.at(-1)[0].aoExcluirCiclo(ciclo));
+        await waitFor(() =>
+            expect(RemoveMenstruationModal.mock.calls.at(-1)[0].carregandoMeses).toBe(false)
+        );
+        await act(() =>
+            RemoveMenstruationModal.mock.calls.at(-1)[0].onRemoverDia({ data: '2026-08-30' })
+        );
+        expect(RemoveMenstruationModal.mock.calls.at(-1)[0].visivel).toBe(true);
+        await act(() =>
+            RemoveMenstruationModal.mock.calls.at(-1)[0].onRemoverDia({ data: '2026-08-29' })
+        );
+        if (falharUltimo) {
+            expect(RemoveMenstruationModal.mock.calls.at(-1)[0].alerta).toBe('erro');
+            await act(() => RemoveMenstruationModal.mock.calls.at(-1)[0].onTentarNovamente());
+        }
+        expect(RemoveMenstruationModal.mock.calls.at(-1)[0]).toMatchObject({
+            visivel: false,
+            ciclo: null,
+            modo: 'dia',
+            alerta: 'sucesso-excluir'
+        });
+        expect(service.excluirCiclo).not.toHaveBeenCalled();
+        await act(() => RemoveMenstruationModal.mock.calls.at(-1)[0].onFecharAlerta());
+        expect(RemoveMenstruationModal.mock.calls.at(-1)[0].alerta).toBeNull();
+    }
+);
+
 test('valida intervalos e lista os meses completos do ciclo', () => {
     expect(listarMesesDoCiclo(ciclo)).toEqual(['2026-08', '2026-09']);
     expect(listarMesesDoCiclo({ dataInicio: '2026-12-30', dataFim: '2027-01-02' })).toEqual([

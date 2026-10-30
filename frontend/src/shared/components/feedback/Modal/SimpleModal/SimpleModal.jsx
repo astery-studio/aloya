@@ -13,6 +13,7 @@ export default function SimpleModal({
     icone,
     corIcone,
     fundoIcone,
+    estiloIcone,
     titulo,
     mensagem,
     acaoPrincipal,
@@ -27,6 +28,7 @@ export default function SimpleModal({
             icone={icone}
             corIcone={corIcone}
             fundoIcone={fundoIcone}
+            estiloIcone={estiloIcone}
             titulo={titulo}
             mensagem={mensagem}
         >

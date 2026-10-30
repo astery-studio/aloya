@@ -1,49 +1,110 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
-import {useState} from 'react'
-import {Pressable, Text, View} from 'react-native'
-import {SafeAreaView} from 'react-native-safe-area-context'
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen'
-import {ConfidenceBadge} from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge'
-import {ArrowLeftIcon, InfoIcon} from '../../../shared/components/icons/AppIcons'
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
-import {CycleCalendar} from '../components/CycleCalendar/CycleCalendar'
-import {CycleLegendSheet} from '../components/CycleLegendSheet/CycleLegendSheet'
-import {estilos} from './CalendarScreen.styles'
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { ArrowLeftIcon, InfoIcon } from '../../../shared/components/icons/AppIcons';
+import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
+import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
+import { estilos } from './CalendarScreen.styles';
+import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
 
 const ITENS_LEGENDA = Object.freeze([
-    {id: 'menstruacao-real', tipo: 'menstruacao', titulo: 'Menstruação', descricao: 'Dias de menstruação', prevista: false},
-    {id: 'folicular-real', tipo: 'folicular', titulo: 'Fase Folicular', descricao: 'Período de fase folicular', prevista: false},
-    {id: 'ovulacao-real', tipo: 'ovulacao', titulo: 'Ovulação', descricao: 'Período de ovulação', prevista: false},
-    {id: 'lutea-real', tipo: 'lutea', titulo: 'Fase Lútea', descricao: 'Período de fase lútea', prevista: false},
-    {id: 'janela-real', tipo: 'janelaFertil', titulo: 'Janela Fértil', descricao: 'Dias com maior probabilidade de engravidar', prevista: false},
-    {id: 'menstruacao-prevista', tipo: 'menstruacao', titulo: 'Provável Menstruação', descricao: 'Previsão dos dias de menstruação', prevista: true},
-    {id: 'folicular-prevista', tipo: 'folicular', titulo: 'Provável Fase Folicular', descricao: 'Previsão do período de fase folicular', prevista: true},
-    {id: 'ovulacao-prevista', tipo: 'ovulacao', titulo: 'Provável Ovulação', descricao: 'Previsão do período de ovulação', prevista: true},
-    {id: 'lutea-prevista', tipo: 'lutea', titulo: 'Provável Fase Lútea', descricao: 'Previsão de fase lútea', prevista: true},
-    {id: 'janela-prevista', tipo: 'janelaFertil', titulo: 'Provável Janela Fértil', descricao: 'Previsão da janela fértil', prevista: true}
-])
+    {
+        id: 'menstruacao-real',
+        tipo: 'menstruacao',
+        titulo: 'Menstruação',
+        descricao: 'Dias de menstruação',
+        prevista: false
+    },
+    {
+        id: 'folicular-real',
+        tipo: 'folicular',
+        titulo: 'Fase Folicular',
+        descricao: 'Período de fase folicular',
+        prevista: false
+    },
+    {
+        id: 'ovulacao-real',
+        tipo: 'ovulacao',
+        titulo: 'Ovulação',
+        descricao: 'Período de ovulação',
+        prevista: false
+    },
+    {
+        id: 'lutea-real',
+        tipo: 'lutea',
+        titulo: 'Fase Lútea',
+        descricao: 'Período de fase lútea',
+        prevista: false
+    },
+    {
+        id: 'janela-real',
+        tipo: 'janelaFertil',
+        titulo: 'Janela Fértil',
+        descricao: 'Dias com maior probabilidade de engravidar',
+        prevista: false
+    },
+    {
+        id: 'menstruacao-prevista',
+        tipo: 'menstruacao',
+        titulo: 'Provável Menstruação',
+        descricao: 'Previsão dos dias de menstruação',
+        prevista: true
+    },
+    {
+        id: 'folicular-prevista',
+        tipo: 'folicular',
+        titulo: 'Provável Fase Folicular',
+        descricao: 'Previsão do período de fase folicular',
+        prevista: true
+    },
+    {
+        id: 'ovulacao-prevista',
+        tipo: 'ovulacao',
+        titulo: 'Provável Ovulação',
+        descricao: 'Previsão do período de ovulação',
+        prevista: true
+    },
+    {
+        id: 'lutea-prevista',
+        tipo: 'lutea',
+        titulo: 'Provável Fase Lútea',
+        descricao: 'Previsão de fase lútea',
+        prevista: true
+    },
+    {
+        id: 'janela-prevista',
+        tipo: 'janelaFertil',
+        titulo: 'Provável Janela Fértil',
+        descricao: 'Previsão da janela fértil',
+        prevista: true
+    }
+]);
 
 function normalizarConfianca(valor) {
-    if (typeof valor !== 'string') return null
+    if (typeof valor !== 'string') return null;
 
-    const nivel = valor.trim().toLocaleLowerCase('pt-BR')
+    const nivel = valor.trim().toLocaleLowerCase('pt-BR');
 
     if (nivel === 'alta' || nivel === 'media' || nivel === 'média' || nivel === 'baixa') {
-        return nivel === 'média' ? 'media' : nivel
+        return nivel === 'média' ? 'media' : nivel;
     }
 
-    return null
+    return null;
 }
 
-function ErroCalendario({erro, aoTentarNovamente}) {
-    const [fechado, setFechado] = useState(false)
+function ErroCalendario({ erro, aoTentarNovamente }) {
+    const [fechado, setFechado] = useState(false);
 
     function tentarNovamente() {
         if (typeof aoTentarNovamente === 'function') {
-            aoTentarNovamente()
+            aoTentarNovamente();
         } else {
-            setFechado(true)
+            setFechado(true);
         }
     }
 
@@ -58,7 +119,7 @@ function ErroCalendario({erro, aoTentarNovamente}) {
             }}
             aoFechar={() => setFechado(true)}
         />
-    )
+    );
 }
 
 function CalendarScreen({
@@ -73,18 +134,19 @@ function CalendarScreen({
     aoTentarNovamente,
     aoVoltar,
     aoCadastrarMenstruacao,
-    aoEditarCiclo
+    aoEditarCiclo,
+    statusSincronizacao,
+    aoTentarSincronizar
 }) {
-    const [legendaVisivel, setLegendaVisivel] = useState(false)
+    const [legendaVisivel, setLegendaVisivel] = useState(false);
 
-    const mesesValidos = Array.isArray(meses) ? meses : []
-    const confiancaValida = normalizarConfianca(confianca)
-    const existeErro = typeof erro === 'string' && erro.trim().length > 0
-    const possuiCiclos = mesesValidos.some(mes => (
-        mes?.possuiCiclos === true
-        || mes?.calendario?.possuiCiclos === true
-    ))
-    const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos
+    const mesesValidos = Array.isArray(meses) ? meses : [];
+    const confiancaValida = normalizarConfianca(confianca);
+    const existeErro = typeof erro === 'string' && erro.trim().length > 0;
+    const possuiCiclos = mesesValidos.some(
+        (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
+    );
+    const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
 
     return (
         <SafeAreaView testID="calendar-safe-area" edges={['bottom']} style={estilos.tela}>
@@ -92,7 +154,7 @@ function CalendarScreen({
                 <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Voltar"
-                    accessibilityState={{disabled: typeof aoVoltar !== 'function'}}
+                    accessibilityState={{ disabled: typeof aoVoltar !== 'function' }}
                     disabled={typeof aoVoltar !== 'function'}
                     onPress={aoVoltar}
                     style={estilos.acaoCabecalho}
@@ -115,10 +177,7 @@ function CalendarScreen({
                                     testID="centralizador-confianca"
                                     style={estilos.centralizadorConfianca}
                                 >
-                                    <ConfidenceBadge
-                                        nivel={confiancaValida}
-                                        variante="simples"
-                                    />
+                                    <ConfidenceBadge nivel={confiancaValida} variante="simples" />
                                 </View>
                             ) : null}
                         </View>
@@ -133,10 +192,7 @@ function CalendarScreen({
                     hitSlop={8}
                     style={estilos.acaoLegenda}
                 >
-                    <InfoIcon
-                        size={21.995}
-                        color={estilos.corIconeCabecalho}
-                    />
+                    <InfoIcon size={21.995} color={estilos.corIconeCabecalho} />
                 </Pressable>
             </View>
 
@@ -144,7 +200,8 @@ function CalendarScreen({
                 {estadoVazio ? (
                     <View accessibilityRole="alert" style={estilos.avisoVazio}>
                         <Text style={estilos.textoVazio}>
-                            Você ainda não possui nenhum ciclo registrado. Toque em um dia no Calendário para começar.
+                            Você ainda não possui nenhum ciclo registrado. Toque em um dia no
+                            Calendário para começar.
                         </Text>
                     </View>
                 ) : null}
@@ -160,14 +217,14 @@ function CalendarScreen({
                         aoPressionarDia={aoEditarCiclo}
                     />
                 </View>
-
             </View>
 
             <View testID="rodape-calendario" style={estilos.rodape}>
-                <ButtonScreen
-                    texto="Cadastrar Menstruação"
-                    aoPressionar={aoCadastrarMenstruacao}
+                <SyncStatusIndicator
+                    status={statusSincronizacao}
+                    onTentarNovamente={aoTentarSincronizar}
                 />
+                <ButtonScreen texto="Cadastrar Menstruação" aoPressionar={aoCadastrarMenstruacao} />
             </View>
 
             <CycleLegendSheet
@@ -180,8 +237,8 @@ function CalendarScreen({
                 <ErroCalendario key={erro} erro={erro} aoTentarNovamente={aoTentarNovamente} />
             ) : null}
         </SafeAreaView>
-    )
+    );
 }
 
-export {CalendarScreen, ITENS_LEGENDA, normalizarConfianca}
-export default CalendarScreen
+export { CalendarScreen, ITENS_LEGENDA, normalizarConfianca };
+export default CalendarScreen;

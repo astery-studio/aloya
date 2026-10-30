@@ -122,6 +122,14 @@ function CycleHistoryFlow({
         setDataSelecionada(dia.data);
         const resultado = await remocao.removerDia(argumentos);
         if (resultado.sucesso) {
+            if (resultado.resultado?.cicloRemovido) {
+                setCicloParaExcluir(null);
+                setModoRemocao('dia');
+                setDataSelecionada(null);
+                setOperacaoFalha(null);
+                setAlerta('sucesso-excluir');
+                return;
+            }
             setDataSelecionada(null);
             setMesesCiclo((atuais) =>
                 atuais.map((mes) => ({
@@ -164,7 +172,7 @@ function CycleHistoryFlow({
                 ? await remocao.removerDia(operacaoFalha.argumentos)
                 : await remocao.excluirCiclo(operacaoFalha.argumentos);
         if (resultado.sucesso) {
-            if (operacaoFalha.tipo === 'dia') {
+            if (operacaoFalha.tipo === 'dia' && !resultado.resultado?.cicloRemovido) {
                 const data = operacaoFalha.argumentos.data;
                 setMesesCiclo((atuais) =>
                     atuais.map((mes) => ({

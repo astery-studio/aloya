@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CycleTodayScreen } from './CycleTodayScreen';
+import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 
 function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
     const [previsao, setPrevisao] = useState(null);
@@ -31,21 +32,40 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
         const atual = new AbortController();
         controlador.current = atual;
 
-        service.buscar({ signal: atual.signal }).then((resultado) => {
-            setPrevisao(resultado);
-            setDataSelecionada(resultado.dataReferencia || null);
-        }).catch((falha) => {
-            if (falha?.name === 'AbortError') return;
-            if (falha?.status === 401) onSessaoExpirada?.();
-            else setErro(true);
-        }).finally(() => {
-            if (controlador.current === atual) setCarregando(false);
-        });
+        service
+            .buscar({ signal: atual.signal })
+            .then((resultado) => {
+                setPrevisao(resultado);
+                setDataSelecionada(resultado.dataReferencia || null);
+            })
+            .catch((falha) => {
+                if (falha?.name === 'AbortError') return;
+                if (falha?.status === 401) onSessaoExpirada?.();
+                else setErro(true);
+            })
+            .finally(() => {
+                if (controlador.current === atual) setCarregando(false);
+            });
 
         return () => atual.abort();
     }, [onSessaoExpirada, service]);
 
-    return <CycleTodayScreen {...acoes} previsao={previsao} carregando={carregando} erro={erro} dataSelecionada={dataSelecionada} aoSelecionarData={setDataSelecionada} aoTentarNovamente={carregar} />;
+    return (
+        <CycleTodayScreen
+            {...acoes}
+            previsao={previsao}
+            carregando={carregando}
+            erro={erro}
+            dataSelecionada={dataSelecionada}
+            aoSelecionarData={setDataSelecionada}
+            aoTentarNovamente={carregar}
+            aoCadastrarMenstruacao={
+                typeof acoes.aoCadastrarMenstruacao === 'function'
+                    ? () => acoes.aoCadastrarMenstruacao(dataSelecionada || obterHojeLocal())
+                    : undefined
+            }
+        />
+    );
 }
 
 export { CycleTodayContainer };

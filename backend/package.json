@@ -11,6 +11,7 @@
     "format:check": "prettier --check \"**/*.{js,json,md,ts}\"",
     "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\" \"../.github/**/*.yml\" \"../docs/ci-cd.md\" \"../package.json\"",
     "lint": "eslint . --max-warnings=0",
+    "prestart": "prisma generate && prisma migrate deploy",
     "start": "node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
