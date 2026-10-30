@@ -39,7 +39,7 @@ test('nascimento habilita avanço apenas com data válida', async () => {
             aoAvancar={aoAvancar}
         />
     );
-    fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     expect(aoAvancar).toHaveBeenCalledTimes(1);
 });
 
@@ -90,12 +90,12 @@ test('última menstruação seleciona o intervalo no calendário próprio', asyn
     expect(within(screen.getByTestId('form-layout-header')).getByTestId(
         'onboarding-step-fixed-texts'
     )).toBeTruthy();
-    fireEvent.press(screen.getByLabelText('Selecionar dia 7'));
+    await fireEvent.press(screen.getByLabelText('Selecionar dia 7'));
     expect(aoAlterar).toHaveBeenCalledWith({
         inicio: '2026-08-03',
         fim: '2026-08-07'
     });
-    fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
     expect(aoNaoSei).toHaveBeenCalledTimes(1);
     await rerender(<LastMenstruationStep valor={null} aoAlterar={jest.fn()}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoNaoSei={aoNaoSei} />);

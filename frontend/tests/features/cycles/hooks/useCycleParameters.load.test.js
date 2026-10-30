@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react-native';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import { useCycleParameters } from '../../../../src/features/cycles/hooks/useCycleParameters';
 
@@ -13,7 +13,7 @@ test('carrega parâmetros e permite tentar novamente', async () => {
     const { result } = await renderHook(() => useCycleParameters({ service }));
     await waitFor(() => expect(result.current.carregando).toBe(false));
     expect(result.current.valores).toEqual(parametros);
-    result.current.tentarNovamente();
+    await act(() => result.current.tentarNovamente());
     await waitFor(() => expect(service.buscar).toHaveBeenCalledTimes(2));
 });
 
