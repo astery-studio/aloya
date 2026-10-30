@@ -171,6 +171,46 @@ function criarCaminhoHistorico(limite, cursor) {
     return cursor === null ? caminho : `${caminho}&cursor=${encodeURIComponent(cursor)}`
 }
 
+function criarCaminhoCiclo(id) {
+    const texto = typeof id === 'number' ? String(id) : id
+
+    if (typeof texto !== 'string' || !/^[1-9]\d*$/.test(texto) || !Number.isSafeInteger(Number(texto))) {
+        throw new TypeError('O identificador do ciclo é inválido.')
+    }
+
+    return `${endpoints.ciclos}/${texto}`
+}
+
+function validarDadosEdicao(dados) {
+    const valido = ehObjetoSimples(dados)
+        && dataIsoEhValida(dados.dataInicio)
+        && (dados.dataFim === null || dataIsoEhValida(dados.dataFim))
+
+    if (!valido) {
+        throw new TypeError('As datas da edição são inválidas.')
+    }
+
+    return {
+        dataInicio: dados.dataInicio,
+        dataFim: dados.dataFim
+    }
+}
+
+function normalizarCicloEdicao(ciclo) {
+    if (!ehObjetoSimples(ciclo)
+        || !Number.isSafeInteger(ciclo.id) || ciclo.id <= 0
+        || !dataIsoEhValida(ciclo.dataInicio)
+        || (ciclo.dataFim !== null && !dataIsoEhValida(ciclo.dataFim))) {
+        throw criarErroResposta()
+    }
+
+    return Object.freeze({
+        id: String(ciclo.id),
+        dataInicio: ciclo.dataInicio,
+        dataFim: ciclo.dataFim
+    })
+}
+
 //Valida o envelope da API e congela a página.
 function normalizarPagina(resposta, limiteSolicitado) {
     if (!ehObjetoSimples(resposta) || !Array.isArray(resposta.ciclos) || !Number.isSafeInteger(resposta.quantidadeCiclos) || resposta.quantidadeCiclos < 0 || !ehObjetoSimples(resposta.paginacao)) {
@@ -219,12 +259,35 @@ function criarCycleHistoryService({requisicaoAutenticada} = {}) {
         return normalizarPagina(resposta, limite)
     }
 
+    async function editar(id, dados) {
+        const resposta = await requisicaoAutenticada({
+            metodo: 'PATCH',
+            caminho: criarCaminhoCiclo(id),
+            corpo: validarDadosEdicao(dados)
+        })
+
+        if (resposta?.mensagem !== 'Registro de menstruação atualizado com sucesso.') {
+            throw criarErroResposta()
+        }
+
+        return resposta.ciclo
+    }
+
+    async function buscar(id) {
+        const resposta = await requisicaoAutenticada({ caminho: criarCaminhoCiclo(id) })
+        return normalizarCicloEdicao(resposta?.ciclo)
+    }
+
     return Object.freeze({
-        listarPagina
+        listarPagina,
+        buscar,
+        editar
     })
 }
 
 export {
     criarCycleHistoryService,
-    normalizarCicloHistorico
+    criarCaminhoCiclo,
+    normalizarCicloHistorico,
+    normalizarCicloEdicao
 }

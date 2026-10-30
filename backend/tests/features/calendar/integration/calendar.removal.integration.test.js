@@ -202,7 +202,7 @@ test('ciclo aberto conserva os dias menstruais assumidos quando ainda não exist
     assert.equal(localizar(grade, 21).tipo, 'menstruacao');
     assert.equal(localizar(grade, 21).registroCicloId, 10);
     assert.equal(localizar(grade, 22).tipo, 'menstruacao');
-    assert.equal(localizar(grade, 22).registroCicloId, null);
+    assert.equal(localizar(grade, 22).registroCicloId, 10);
 });
 
 test('dois ciclos no mesmo mês preservam as fases do primeiro e os dias removidos', async (t) => {

@@ -1,5 +1,6 @@
 //Conecta a tela de histórico aos serviços de remoção e ao calendário do ciclo selecionado.
 import { useCallback, useEffect, useState } from 'react';
+import { CycleEditFlow } from './CycleEditFlow';
 import { useCycleHistory } from './hooks/useCycleHistory';
 import { CycleHistoryScreen } from './screens/CycleHistoryScreen';
 import { RemoveMenstruationModal } from './components/RemoveMenstruationModal';
@@ -47,11 +48,11 @@ function CycleHistoryFlow({
     service,
     calendarService,
     aoAbrirCalendario,
-    aoEditarCiclo,
     onSelecionarAba,
     onSessaoExpirada
 }) {
     const historico = useCycleHistory({ service, onSessaoExpirada });
+    const [cicloEditado, setCicloEditado] = useState(null);
     const [cicloParaExcluir, setCicloParaExcluir] = useState(null);
     const [modoRemocao, setModoRemocao] = useState('dia');
     const [mesesCiclo, setMesesCiclo] = useState([]);
@@ -206,7 +207,7 @@ function CycleHistoryFlow({
                 aoCarregarMais={historico.carregarMais}
                 aoTentarCarregarMais={historico.tentarCarregarMais}
                 aoAbrirCalendario={aoAbrirCalendario}
-                aoEditarCiclo={aoEditarCiclo}
+                aoEditarCiclo={setCicloEditado}
                 aoExcluirCiclo={abrirRemocao}
                 onSelecionarAba={onSelecionarAba}
             />
@@ -236,6 +237,16 @@ function CycleHistoryFlow({
                     setModoRemocao('dia');
                 }}
             />
+            {cicloEditado ? (
+                <CycleEditFlow
+                    key={cicloEditado.id}
+                    ciclo={cicloEditado}
+                    service={service}
+                    onFechar={() => setCicloEditado(null)}
+                    onAtualizado={historico.tentarNovamente}
+                    onSessaoExpirada={onSessaoExpirada}
+                />
+            ) : null}
         </>
     );
 }

@@ -72,7 +72,8 @@ function CalendarScreen({
     aoCarregarPosteriores,
     aoTentarNovamente,
     aoVoltar,
-    aoCadastrarMenstruacao
+    aoCadastrarMenstruacao,
+    aoEditarCiclo
 }) {
     const [legendaVisivel, setLegendaVisivel] = useState(false)
 
@@ -156,6 +157,7 @@ function CalendarScreen({
                         carregandoPosteriores={carregandoPosteriores}
                         aoCarregarAnteriores={aoCarregarAnteriores}
                         aoCarregarPosteriores={aoCarregarPosteriores}
+                        aoPressionarDia={aoEditarCiclo}
                     />
                 </View>
 

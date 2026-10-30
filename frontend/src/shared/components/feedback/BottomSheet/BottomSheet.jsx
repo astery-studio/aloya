@@ -2,10 +2,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { estilos } from './BottomSheet.style';
 import { tema } from '../../../theme';
+import { estilos } from './BottomSheet.style';
 
-function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }) {
+function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechamento = false }) {
     const insets = useSafeAreaInsets();
     const alturaForaDaTela = useRef(Dimensions.get('screen').height).current;
 
@@ -16,6 +16,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
     const montadoAtual = useRef(visivel);
     const visivelAtual = useRef(visivel);
     const modalJaApareceu = useRef(false);
+    const ocultamentoNotificado = useRef(false);
 
     visivelAtual.current = visivel;
 
@@ -27,6 +28,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
     ).current;
 
     function animarEntrada() {
+        ocultamentoNotificado.current = false;
         Animated.timing(progresso, {
             toValue: 1,
             duration: 280,
@@ -34,6 +36,15 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             useNativeDriver: true,
             isInteraction: false
         }).start();
+    }
+
+    function notificarOcultamento() {
+        if (visivelAtual.current || ocultamentoNotificado.current) {
+            return;
+        }
+
+        ocultamentoNotificado.current = true;
+        onOcultar?.();
     }
 
     function animarSaida() {
@@ -47,6 +58,10 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             if (finished && !visivelAtual.current) {
                 montadoAtual.current = false;
                 setModalMontado(false);
+
+                if (Platform.OS !== 'ios') {
+                    notificarOcultamento();
+                }
             }
         });
     }
@@ -91,6 +106,7 @@ function BottomSheet({ visivel, onFechar, children, bloquearFechamento = false }
             transparent
             animationType="none"
             onShow={quandoModalAparecer}
+            onDismiss={notificarOcultamento}
             onRequestClose={solicitarFechamento}
         >
             <KeyboardAvoidingView

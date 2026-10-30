@@ -7,7 +7,8 @@ function CalendarScreenContainer({
     service,
     onSessaoExpirada,
     aoVoltar,
-    aoCadastrarMenstruacao
+    aoCadastrarMenstruacao,
+    aoEditarCiclo
 }) {
     const estado = useCalendar({service, onSessaoExpirada})
     const chaveMesAtual = useMemo(() => obterChaveMes(), [])
@@ -27,6 +28,7 @@ function CalendarScreenContainer({
             aoTentarNovamente={estado.tentarNovamente}
             aoVoltar={aoVoltar}
             aoCadastrarMenstruacao={aoCadastrarMenstruacao}
+            aoEditarCiclo={aoEditarCiclo}
         />
     )
 }

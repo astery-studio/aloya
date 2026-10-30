@@ -15,6 +15,7 @@ import { criarCalendarRoutes } from '../../features/calendar/routes/calendar.rou
 import { criarCycleHistoryRoutes } from '../../features/cycles/routes/cycleHistory.routes.js';
 
 import { criarCycleRemovalRoutes } from '../../features/cycles/routes/cycleRemoval.routes.js';
+import { criarCycleEditRoutes } from '../../features/cycles/routes/cycleEdit.routes.js';
 
 import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
@@ -122,6 +123,15 @@ app.use(
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         cycleRemovalController: container.cycleRemovalController
+    })
+);
+
+app.use(
+    '/api/cycles',
+    criarCycleEditRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        controller: container.cycleEditController
     })
 );
 

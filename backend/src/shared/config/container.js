@@ -69,6 +69,9 @@ import { criarCycleHistoryService } from '../../features/cycles/services/cycleHi
 import { criarCycleHistoryController } from '../../features/cycles/controllers/cycleHistory.controller.js';
 
 import { criarCycleRemovalModule } from '../../features/cycles/cycleRemoval.module.js';
+import { criarCycleEditValidator } from '../../features/cycles/validators/cycleEdit.validator.js';
+import { criarCycleEditService } from '../../features/cycles/services/cycleEdit.service.js';
+import { criarCycleEditController } from '../../features/cycles/controllers/cycleEdit.controller.js';
 
 import { criarPermissionCategoryService } from '../../features/support-network/services/permissionCategory.service.js';
 
@@ -206,7 +209,9 @@ function criarContainer() {
         repository: cycleHistoryRepository
     });
 
-    const cycleRemovalModule = criarCycleRemovalModule({prisma});
+    const cycleRemovalModule = criarCycleRemovalModule({ prisma });
+    const cycleEditValidator = criarCycleEditValidator();
+    const cycleEditService = criarCycleEditService({ prisma });
 
     const predictionService = criarPredictionService({ prisma });
 
@@ -348,6 +353,11 @@ function criarContainer() {
         cycleHistoryService
     });
 
+    const cycleEditController = criarCycleEditController({
+        service: cycleEditService,
+        validator: cycleEditValidator
+    });
+
     const predictionController = criarPredictionController({ predictionService });
 
     const cycleParametersController = criarCycleParametersController({
@@ -377,6 +387,7 @@ function criarContainer() {
         calendarController: calendarModule.calendarController,
         cycleHistoryController,
         cycleRemovalController: cycleRemovalModule.controller,
+        cycleEditController,
 
         predictionController,
         permissionCategoryController,

@@ -1,3 +1,7 @@
+import { CycleEditFlow } from '../../../src/features/cycles/CycleEditFlow';
+jest.mock('../../../src/features/cycles/CycleEditFlow', () => ({
+    CycleEditFlow: jest.fn(() => null)
+}));
 //Testa o fluxo entre histórico, calendário mensal e remoções da HU-010.
 import { act, render, waitFor } from '@testing-library/react-native';
 import {
@@ -416,4 +420,16 @@ test('ignora falha mensal de uma requisição cancelada após fechar o sheet', a
     expect(RemoveMenstruationModal.mock.calls.at(-1)[0]).toEqual(
         expect.objectContaining({ visivel: false, erroMeses: null })
     );
+});
+
+test('integra edição e remoção do mesmo Histórico sem perder a atualização', async () => {
+    const atualizar = jest.fn().mockResolvedValue(true);
+    await montar({ estado: criarEstadoDoHook({ tentarNovamente: atualizar }) });
+    await act(() => CycleHistoryScreen.mock.calls.at(-1)[0].aoEditarCiclo(ciclo));
+    expect(CycleEditFlow).toHaveBeenCalledWith(expect.objectContaining({ ciclo }), undefined);
+    await act(async () => CycleEditFlow.mock.calls.at(-1)[0].onAtualizado());
+    expect(atualizar).toHaveBeenCalledTimes(1);
+    await act(() => CycleEditFlow.mock.calls.at(-1)[0].onFechar());
+    await act(() => CycleHistoryScreen.mock.calls.at(-1)[0].aoExcluirCiclo(ciclo));
+    await waitFor(() => expect(RemoveMenstruationModal.mock.calls.at(-1)[0].visivel).toBe(true));
 });

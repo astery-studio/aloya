@@ -266,4 +266,33 @@ describe('BottomSheet', () => {
 
         expect(screen.getByText('Conteúdo preservado')).toBeOnTheScreen();
     });
+
+    test('notifica quando o modal termina de ser ocultado', async () => {
+        const onOcultar = jest.fn();
+        const resultado = await render(
+            <BottomSheet visivel onOcultar={onOcultar}>
+                <Text>Conteúdo</Text>
+            </BottomSheet>
+        );
+
+        const modal = obterModal(resultado.container);
+
+        await resultado.rerender(
+            <BottomSheet visivel={false} onOcultar={onOcultar}>
+                <Text>Conteúdo</Text>
+            </BottomSheet>
+        );
+
+        await act(async () => {
+            modal.props.onDismiss();
+        });
+
+        expect(onOcultar).toHaveBeenCalledTimes(1);
+
+        await act(async () => {
+            modal.props.onDismiss();
+        });
+
+        expect(onOcultar).toHaveBeenCalledTimes(1);
+    });
 });
