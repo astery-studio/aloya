@@ -1,6 +1,7 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
@@ -221,13 +222,17 @@ function CalendarScreen({
                 </View>
             </View>
 
-            <View testID="rodape-calendario" style={estilos.rodape}>
+            <SafeAreaView
+                testID="rodape-calendario"
+                edges={['bottom']}
+                style={estilos.rodape}
+            >
                 <SyncStatusIndicator
                     status={statusSincronizacao}
                     onTentarNovamente={aoTentarSincronizar}
                 />
                 <ButtonScreen texto="Cadastrar Menstruação" aoPressionar={aoCadastrarMenstruacao} />
-            </View>
+            </SafeAreaView>
 
             <CycleLegendSheet
                 visivel={legendaVisivel}
