@@ -68,3 +68,7 @@ O contrato do backend está em `docs/hu-008-backend.md`.
 
 Ainda é necessária validação em aparelhos Android e iOS e medição do prazo de um segundo
 com rede e banco reais. Testes JavaScript não comprovam esses dois pontos.
+
+Os popups reutilizam `SimpleModal`, os botões compartilhados e a sombra existente. O estilo
+opcional do ícone permite o fundo com cantos de 14px do protótipo sem mudar os outros modais.
+A tela respeita as áreas seguras superior e inferior e usa meses virtualizados.
