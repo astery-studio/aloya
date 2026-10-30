@@ -125,55 +125,57 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
                         : 'Serviço do calendário ausente'
                 ),
                 ReactInterno.createElement(
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Voltar ao Início',
-                    onPress: aoVoltar
-                },
-                ReactInterno.createElement(Text, null, 'Voltar')
-            ),
-            ReactInterno.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Cadastrar Menstruação',
-                    onPress: aoCadastrarMenstruacao
-                },
-                ReactInterno.createElement(Text, null, 'Cadastrar Menstruação')
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Voltar ao Início',
+                        onPress: aoVoltar
+                    },
+                    ReactInterno.createElement(Text, null, 'Voltar')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Cadastrar Menstruação',
+                        onPress: aoCadastrarMenstruacao
+                    },
+                    ReactInterno.createElement(Text, null, 'Cadastrar Menstruação')
+                )
             )
-        )
-    }
-})
+    };
+});
 
-import App from '../../src/App'
-import {criarServicosApp} from '../../src/app/createAppServices'
-import {obterToken} from '../../src/shared/storage/tokenStorage'
+import App from '../../src/App';
+import { criarServicosApp } from '../../src/app/createAppServices';
+import { obterToken } from '../../src/shared/storage/tokenStorage';
 
 describe('App — calendário', () => {
-    let servicos
+    let servicos;
 
     beforeEach(() => {
-        jest.clearAllMocks()
+        jest.clearAllMocks();
 
         servicos = {
             authService: {},
             accountService: {
-                buscarPerfil: jest.fn().mockResolvedValue({nome: 'Kayla'})
+                buscarPerfil: jest.fn().mockResolvedValue({ nome: 'Kayla' })
             },
             cyclePredictionService: {
-                buscar: jest.fn().mockResolvedValue({status: 'DADOS_INSUFICIENTES'})
+                buscar: jest.fn().mockResolvedValue({ status: 'DADOS_INSUFICIENTES' })
             },
             calendarService: {
                 buscarMes: jest.fn()
             }
-        }
+        };
 
-        criarServicosApp.mockReturnValue(servicos)
-        obterToken.mockResolvedValue({token: 'sessao-valida'})
+        criarServicosApp.mockReturnValue(servicos);
+        obterToken.mockResolvedValue({ token: 'sessao-valida' });
 
-        jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null)
+        jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
         jest.spyOn(Linking, 'addEventListener').mockReturnValue({
             remove: jest.fn()
-        })
+        });
         jest.spyOn(Alert, 'alert').mockImplementation(jest.fn())
     })
 
