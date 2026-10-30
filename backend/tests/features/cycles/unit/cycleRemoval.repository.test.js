@@ -57,7 +57,7 @@ const cicloBase = {
     ]
 };
 
-test('remove dia do meio e recalcula datas e duração do ciclo encerrado', async () => {
+test('remove o primeiro dia e recalcula início e duração do ciclo encerrado', async () => {
     const { repository, chamadas } = montar({
         ciclo: cicloBase,
         ciclos: [{ id: 10, dataInicio: dia2, duracaoCiclo: 28, ehCicloInicial: false }],
@@ -69,6 +69,35 @@ test('remove dia do meio e recalcula datas e duração do ciclo encerrado', asyn
     assert.equal(chamadas.update[0].data.dataFim, dia2);
     assert.equal(chamadas.update[0].data.duracaoMenstruacao, 1);
     assert.equal(chamadas.previsao, 1);
+});
+
+test('remover um dia interno preserva o ciclo e conta somente os dias restantes', async () => {
+    const dia3 = new Date('2026-10-03T00:00:00.000Z');
+    const cicloComLacuna = {
+        ...cicloBase,
+        dataFim: dia3,
+        diasMenstruacao: [
+            { id: 1, data: dia1 },
+            { id: 2, data: dia2 },
+            { id: 3, data: dia3 }
+        ]
+    };
+    const { repository, chamadas } = montar({
+        ciclo: cicloComLacuna,
+        ciclos: [{ id: 10, dataInicio: dia1, duracaoCiclo: null, ehCicloInicial: true }],
+        quantidade: 1
+    });
+
+    const resultado = await repository.removerDia({
+        usuarioId: 4,
+        cicloId: 10,
+        data: dia2
+    });
+
+    assert.deepEqual(resultado, { cicloRemovido: false, quantidadeCiclos: 1 });
+    assert.equal(chamadas.update[0].data.dataInicio, dia1);
+    assert.equal(chamadas.update[0].data.dataFim, dia3);
+    assert.equal(chamadas.update[0].data.duracaoMenstruacao, 2);
 });
 
 test('remove o único dia, exclui ciclo e atualiza previsões mesmo sem histórico restante', async () => {

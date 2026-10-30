@@ -131,7 +131,7 @@ function criarCycleRemovalRepository({ prisma } = {}) {
 
                 const dataInicio = diasRestantes[0].data;
                 const dataFim = ciclo.dataFim === null ? null : diasRestantes.at(-1).data;
-                const duracaoMenstruacao = dataFim ? diferencaDias(dataInicio, dataFim) + 1 : null;
+                const duracaoMenstruacao = dataFim ? diasRestantes.length : null;
                 const atualizado = await tx.registroCiclo.updateMany({
                     where: { id: cicloId, usuarioId, atualizadoEm: ciclo.atualizadoEm },
                     data: { dataInicio, dataFim, duracaoMenstruacao }
