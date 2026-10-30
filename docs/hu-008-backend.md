@@ -68,3 +68,9 @@ do usuário e não entrar em repetição automática infinita. Cada item da fila
 não há atomicidade entre múltiplas requisições independentes.
 
 A meta de exibição em um segundo precisa de validação no app e no ambiente de implantação.
+O teste HTTP mede o tempo local da persistência e do recálculo; não é uma garantia de latência
+em rede móvel nem substitui testes de interface ou de armazenamento offline no dispositivo.
+
+Aplicar a migration com o procedimento padrão do projeto (`prisma migrate deploy`) antes de
+iniciar o backend atualizado. Os testes usam bancos temporários; não é necessário alterar
+o banco de desenvolvimento para executá-los.
