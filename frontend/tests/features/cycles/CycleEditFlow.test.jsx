@@ -11,8 +11,16 @@ jest.mock('../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet
     const React = require('react');
     const { Pressable, TextInput, View } = require('react-native');
     return {
-        CycleEditSheet: (props) =>
-            props.visivel
+        CycleEditSheet: (props) => {
+            const { visivel, onOcultar } = props;
+            const visivelAnterior = React.useRef(visivel);
+
+            React.useEffect(() => {
+                if (visivelAnterior.current && !visivel) onOcultar?.();
+                visivelAnterior.current = visivel;
+            }, [onOcultar, visivel]);
+
+            return visivel
                 ? React.createElement(
                       View,
                       null,
@@ -39,7 +47,8 @@ jest.mock('../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet
                           onPress: props.onFechar
                       })
                   )
-                : null
+                : null;
+        }
     };
 });
 
@@ -47,7 +56,15 @@ jest.mock('../../../src/shared/components/feedback/Modal/SimpleModal', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return function Modal(props) {
-        if (!props.visivel) return null;
+        const { visivel, aoOcultar } = props;
+        const visivelAnterior = React.useRef(visivel);
+
+        React.useEffect(() => {
+            if (visivelAnterior.current && !visivel) aoOcultar?.();
+            visivelAnterior.current = visivel;
+        }, [aoOcultar, visivel]);
+
+        if (!visivel) return null;
         return React.createElement(
             View,
             null,
@@ -145,8 +162,11 @@ test('avisa antes de fechar com alterações não salvas', async () => {
 test('fecha imediatamente quando nada foi alterado', async () => {
     const onFechar = jest.fn();
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={{ editar: jest.fn() }} onFechar={onFechar} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={{ editar: jest.fn() }}
+            onFechar={onFechar}
+        />
     );
     await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição' }));
     expect(onFechar).toHaveBeenCalled();
@@ -155,8 +175,10 @@ test('fecha imediatamente quando nada foi alterado', async () => {
 test('apresenta validação antes de chamar o serviço', async () => {
     const service = { editar: jest.fn() };
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={service} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service}
+        />
     );
     await fireEvent.changeText(screen.getByLabelText('Início'), '31/02/2026');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
@@ -169,23 +191,34 @@ test('apresenta validação antes de chamar o serviço', async () => {
 test('cancela a confirmação antes de salvar', async () => {
     const service = { editar: jest.fn() };
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={service} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service}
+        />
     );
     await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    expect(screen.queryByLabelText('Início')).toBeNull();
+    expect(await screen.findByText('Atualizar ciclo')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
     expect(service.editar).not.toHaveBeenCalled();
     expect(screen.queryByText('Atualizar ciclo')).toBeNull();
+    expect(await screen.findByLabelText('Início')).toBeOnTheScreen();
 });
 
 test('apresenta sobreposição e permite tentar novamente', async () => {
-    const service = { editar: jest.fn()
-        .mockRejectedValueOnce({ codigo: 'SOBREPOSICAO_CICLO', mensagemUsuario: 'Já existe' })
-        .mockResolvedValueOnce({}) };
+    const service = {
+        editar: jest
+            .fn()
+            .mockRejectedValueOnce({ codigo: 'SOBREPOSICAO_CICLO', mensagemUsuario: 'Já existe' })
+            .mockResolvedValueOnce({})
+    };
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={service} onAtualizado={jest.fn()} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service}
+            onAtualizado={jest.fn()}
+        />
     );
     await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
@@ -199,22 +232,29 @@ test('encerra o fluxo quando a sessão expira', async () => {
     const onSessaoExpirada = jest.fn();
     const service = { editar: jest.fn().mockRejectedValue({ status: 401 }) };
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={service} onSessaoExpirada={onSessaoExpirada} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service}
+            onSessaoExpirada={onSessaoExpirada}
+        />
     );
     await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
-    await waitFor(() => expect(onSessaoExpirada).toHaveBeenCalledWith({
-        mensagem: 'Sua sessão expirou. Entre novamente.'
-    }));
+    await waitFor(() =>
+        expect(onSessaoExpirada).toHaveBeenCalledWith({
+            mensagem: 'Sua sessão expirou. Entre novamente.'
+        })
+    );
 });
 
 test('usa mensagem segura para erro inesperado e permite voltar', async () => {
     const service = { editar: jest.fn().mockRejectedValue({}) };
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={service} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={service}
+        />
     );
     await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
@@ -226,8 +266,10 @@ test('usa mensagem segura para erro inesperado e permite voltar', async () => {
 
 test('fecha confirmação, descarte e validação pelas ações dos modais', async () => {
     await render(
-        <CycleEditFlow ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
-            service={{ editar: jest.fn() }} />
+        <CycleEditFlow
+            ciclo={{ id: '3', dataInicio: '2026-09-04', dataFim: null }}
+            service={{ editar: jest.fn() }}
+        />
     );
     await fireEvent.changeText(screen.getByLabelText('Início'), '03/09/2026');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));

@@ -15,10 +15,16 @@ function CycleEditSheet({
     onAlterarInicio,
     onAlterarFim,
     onFechar,
+    onOcultar,
     onSalvar
 }) {
     return (
-        <BottomSheet visivel={visivel} onFechar={onFechar} bloquearFechamento={salvando}>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={onFechar}
+            onOcultar={onOcultar}
+            bloquearFechamento={salvando}
+        >
             <BottomSheetLayout
                 titulo="Editar ciclo"
                 onFechar={onFechar}

@@ -1,14 +1,34 @@
 /**
  * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
  */
-import { Modal, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Modal, Platform, Text, View } from 'react-native';
 import { cores } from '../../../../theme';
 import { estilos } from './AppModal.styles';
 
 export default function AppModal({
-    variante = 'simples', visivel, aoFechar, icone: Icone,
-    corIcone, fundoIcone, titulo, mensagem, destaque, children
+    variante = 'simples',
+    visivel,
+    aoFechar,
+    icone: Icone,
+    corIcone,
+    fundoIcone,
+    titulo,
+    mensagem,
+    destaque,
+    aoOcultar,
+    children
 }) {
+    const visivelAnterior = useRef(visivel);
+
+    useEffect(() => {
+        if (Platform.OS !== 'ios' && visivelAnterior.current && !visivel) {
+            aoOcultar?.();
+        }
+
+        visivelAnterior.current = visivel;
+    }, [aoOcultar, visivel]);
+
     if (!['simples', 'alerta', 'acao'].includes(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
@@ -26,13 +46,20 @@ export default function AppModal({
             visible={visivel}
             transparent
             animationType="fade"
+            onDismiss={aoOcultar}
             onRequestClose={aoFechar}
         >
             <View style={estilos.fundo}>
                 <View
                     accessibilityViewIsModal
-                    style={[estilos.caixa, alerta ? estilos.caixaAlerta :
-                        acao ? estilos.caixaAcao : estilos.caixaSimples]}
+                    style={[
+                        estilos.caixa,
+                        alerta
+                            ? estilos.caixaAlerta
+                            : acao
+                              ? estilos.caixaAcao
+                              : estilos.caixaSimples
+                    ]}
                 >
                     {alerta && (
                         <View style={estilos.cabecalhoAlerta}>
@@ -43,11 +70,24 @@ export default function AppModal({
                             )}
                         </View>
                     )}
-                    <View style={[estilos.conteudo, alerta ? estilos.conteudoAlerta :
-                        acao ? estilos.conteudoAcao : estilos.conteudoSimples]}>
+                    <View
+                        style={[
+                            estilos.conteudo,
+                            alerta
+                                ? estilos.conteudoAlerta
+                                : acao
+                                  ? estilos.conteudoAcao
+                                  : estilos.conteudoSimples
+                        ]}
+                    >
                         {!alerta && Icone && (
-                            <View style={[estilos.areaIcone, acao && estilos.areaIconeAcao,
-                                fundoIcone && { backgroundColor: fundoIcone }]}>
+                            <View
+                                style={[
+                                    estilos.areaIcone,
+                                    acao && estilos.areaIconeAcao,
+                                    fundoIcone && { backgroundColor: fundoIcone }
+                                ]}
+                            >
                                 <Icone size={22} color={corDoIcone} />
                             </View>
                         )}
@@ -56,17 +96,13 @@ export default function AppModal({
                                 {titulo}
                             </Text>
                             {mensagem ? (
-                                <Text style={[estilos.mensagem,
-                                    alerta && estilos.mensagemAlerta
-                                ]}>{mensagem}</Text>
+                                <Text style={[estilos.mensagem, alerta && estilos.mensagemAlerta]}>
+                                    {mensagem}
+                                </Text>
                             ) : null}
-                            {destaque ? (
-                                <Text style={estilos.destaque}>{destaque}</Text>
-                            ) : null}
+                            {destaque ? <Text style={estilos.destaque}>{destaque}</Text> : null}
                         </View>
-                        {children ? (
-                            <View style={estilos.acoes}>{children}</View>
-                        ) : null}
+                        {children ? <View style={estilos.acoes}>{children}</View> : null}
                     </View>
                 </View>
             </View>

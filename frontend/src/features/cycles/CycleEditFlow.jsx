@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal';
 import { DropIcon, WarningCircleIcon } from '../../shared/components/icons/AppIcons';
@@ -65,32 +65,55 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     const [painelVisivel, setPainelVisivel] = useState(true);
     const [salvando, setSalvando] = useState(false);
     const [feedback, setFeedback] = useState(null);
+    const acaoAposOcultarPainel = useRef(null);
+    const acaoAposOcultarFeedback = useRef(null);
     const alterado = dataInicio !== inicioOriginal || dataFim !== fimOriginal;
+
+    function abrirFeedback(proximoFeedback) {
+        acaoAposOcultarPainel.current = () => setFeedback(proximoFeedback);
+        setPainelVisivel(false);
+    }
+
+    function executarAposOcultarPainel() {
+        const acao = acaoAposOcultarPainel.current;
+        acaoAposOcultarPainel.current = null;
+        acao?.();
+    }
+
+    function ocultarFeedback(acaoSeguinte) {
+        acaoAposOcultarFeedback.current = acaoSeguinte;
+        setFeedback(null);
+    }
+
+    function executarAposOcultarFeedback() {
+        const acao = acaoAposOcultarFeedback.current;
+        acaoAposOcultarFeedback.current = null;
+        acao?.();
+    }
+
+    function voltarAoPainel() {
+        ocultarFeedback(() => setPainelVisivel(true));
+    }
 
     function solicitarFechamento() {
         if (salvando) return;
-        if (alterado) setFeedback({ tipo: 'saida' });
+        if (alterado) abrirFeedback({ tipo: 'saida' });
         else onFechar?.();
     }
 
     function solicitarSalvamento() {
         const validacao = validarEdicao(dataInicio, dataFim);
-        setFeedback(
+        abrirFeedback(
             validacao.inicio ? { tipo: 'confirmacao' } : { tipo: 'validacao', ...validacao }
         );
     }
 
-    async function confirmarSalvamento() {
-        const validacao = validarEdicao(dataInicio, dataFim);
-        if (!validacao.inicio) return;
-        setFeedback(null);
-        setSalvando(true);
+    async function salvar(validacao) {
         try {
             await service.editar(ciclo.id, {
                 dataInicio: validacao.inicio,
                 dataFim: validacao.fim
             });
-            setPainelVisivel(false);
             setFeedback({ tipo: 'sucesso' });
             await onAtualizado?.();
         } catch (falha) {
@@ -112,6 +135,14 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
         }
     }
 
+    function confirmarSalvamento() {
+        const validacao = validarEdicao(dataInicio, dataFim);
+        if (!validacao.inicio) return;
+
+        setSalvando(true);
+        ocultarFeedback(() => salvar(validacao));
+    }
+
     return (
         <>
             <CycleEditSheet
@@ -123,40 +154,45 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 onAlterarInicio={setDataInicio}
                 onAlterarFim={setDataFim}
                 onFechar={solicitarFechamento}
+                onOcultar={executarAposOcultarPainel}
                 onSalvar={solicitarSalvamento}
             />
             <SimpleModal
                 visivel={feedback?.tipo === 'confirmacao'}
-                aoFechar={() => setFeedback(null)}
+                aoFechar={voltarAoPainel}
+                aoOcultar={executarAposOcultarFeedback}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.feedback.erro}
                 titulo="Atualizar ciclo"
                 mensagem="Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?"
                 acaoPrincipal={{ texto: 'Confirmar', aoPressionar: confirmarSalvamento }}
-                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: () => setFeedback(null) }}
+                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: voltarAoPainel }}
             />
             <SimpleModal
                 visivel={feedback?.tipo === 'saida'}
-                aoFechar={() => setFeedback(null)}
+                aoFechar={voltarAoPainel}
+                aoOcultar={executarAposOcultarFeedback}
                 icone={WarningCircleIcon}
                 titulo="Dados não salvos"
                 mensagem="Deseja descartar as alterações feitas neste registro?"
                 acaoPrincipal={{
                     texto: 'Continuar a editar',
-                    aoPressionar: () => setFeedback(null)
+                    aoPressionar: voltarAoPainel
                 }}
                 acaoSecundaria={{ texto: 'Sair sem salvar', aoPressionar: onFechar }}
             />
             <SimpleModal
                 visivel={feedback?.tipo === 'sucesso'}
                 aoFechar={onFechar}
+                aoOcultar={executarAposOcultarFeedback}
                 icone={DropIcon}
                 titulo="Ciclo atualizado com sucesso"
                 acaoPrincipal={{ texto: 'OK', aoPressionar: onFechar }}
             />
             <SimpleModal
                 visivel={['erro', 'validacao'].includes(feedback?.tipo)}
-                aoFechar={() => setFeedback(null)}
+                aoFechar={voltarAoPainel}
+                aoOcultar={executarAposOcultarFeedback}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.feedback.erro}
                 titulo={feedback?.titulo}
@@ -168,14 +204,14 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                               variante: 'preto',
                               aoPressionar: confirmarSalvamento
                           }
-                        : { texto: 'OK', aoPressionar: () => setFeedback(null) }
+                        : { texto: 'OK', aoPressionar: voltarAoPainel }
                 }
                 acaoSecundaria={
                     feedback?.tipo === 'erro'
                         ? {
                               texto: 'Voltar',
                               variante: 'branco',
-                              aoPressionar: () => setFeedback(null)
+                              aoPressionar: voltarAoPainel
                           }
                         : undefined
                 }
