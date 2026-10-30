@@ -179,6 +179,7 @@ function NewSupportCategoryScreen({
     const servicoDisponivel = typeof criarCategoria === 'function';
 
     useEffect(() => {
+        telaMontada.current = true;
         return () => {
             telaMontada.current = false;
         };
