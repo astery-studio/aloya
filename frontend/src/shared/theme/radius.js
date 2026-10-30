@@ -15,6 +15,4 @@ const radius = {
     switch: 999 //é aquele interruptor
 };
 
-export {
-    radius
-};
+export { radius };

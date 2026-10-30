@@ -1,4 +1,5 @@
 //Representa um ciclo registrado e mantém seus estados visuais consistentes no histórico.
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
@@ -8,16 +9,10 @@ import {
     TrashIcon,
     WarningCircleIcon
 } from '../../../../shared/components/icons/AppIcons';
-import { estilos } from './CycleHistoryCard.styles';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { criarEstilos } from './CycleHistoryCard.styles';
 
 const estadosPermitidos = Object.freeze(['emAndamento', 'concluido', 'incerto']);
-
-const coresDoCiclo = Object.freeze({
-    ativa: '#2C4C3B',
-    desativada: '#A9A9A6'
-});
-
-const corDoAviso = '#B97D22';
 
 function normalizarNumeroDoCiclo(valor) {
     if (!Number.isInteger(valor) || valor <= 0) {
@@ -56,6 +51,13 @@ function obterTextoDosDias(quantidade) {
 }
 
 function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const coresDoCiclo = {
+        ativa: tema.escuro ? tema.cores.interface.destaque : '#2C4C3B',
+        desativada: tema.cores.interface.textoDesabilitado
+    };
+    const corDoAviso = tema.escuro ? '#F2B45F' : '#B97D22';
     const cicloSeguro = ciclo && typeof ciclo === 'object' ? ciclo : {};
     const numero = normalizarNumeroDoCiclo(cicloSeguro.numero);
     const periodo = normalizarPeriodo(cicloSeguro.periodo);

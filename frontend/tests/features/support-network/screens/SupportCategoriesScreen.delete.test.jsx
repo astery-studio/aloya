@@ -1,5 +1,6 @@
 // Testa a integração da exclusão com a listagem de categorias.
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const mockUseSupportCategories = jest.fn();
 

@@ -1,12 +1,24 @@
-//Mostra um painel na parte inferior da tela
-import { useEffect, useRef, useState } from 'react';
+// Mostra um painel na parte inferior da tela.
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { tema } from '../../../theme';
-import { estilos } from './BottomSheet.style';
 
-function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechamento = false }) {
+import { useTheme } from '../../../hooks/useTheme';
+import { criarEstilos } from './BottomSheet.style';
+
+function BottomSheet({
+    visivel,
+    onFechar,
+    onOcultar,
+    children,
+    bloquearFechamento = false,
+    corPainel
+}) {
+    const tema = useTheme();
     const insets = useSafeAreaInsets();
+
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     const alturaForaDaTela = useRef(Dimensions.get('screen').height).current;
 
     const progresso = useRef(new Animated.Value(0)).current;
@@ -14,10 +26,11 @@ function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechament
     const [modalMontado, setModalMontado] = useState(visivel);
 
     const montadoAtual = useRef(visivel);
+
     const visivelAtual = useRef(visivel);
+
     const modalJaApareceu = useRef(false);
     const ocultamentoNotificado = useRef(false);
-
     visivelAtual.current = visivel;
 
     const posicaoPainel = useRef(
@@ -81,8 +94,9 @@ function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechament
         if (montadoAtual.current) {
             animarSaida();
         }
-        // As funções de animação são recriadas durante o render; incluir suas
-        // identidades reiniciaria a animação sem alteração de visibilidade.
+
+        // As funções de animação são recriadas durante o render.
+        // Incluí-las reiniciaria a animação sem mudança de visibilidade.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visivel]);
 
@@ -114,16 +128,31 @@ function BottomSheet({ visivel, onFechar, onOcultar, children, bloquearFechament
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
                 <Animated.View
+                    testID="bottom-sheet-fundo"
                     pointerEvents="none"
-                    style={[estilos.fundo, { opacity: progresso }]}
+                    style={[
+                        estilos.fundo,
+                        {
+                            opacity: progresso
+                        }
+                    ]}
                 />
 
                 <Animated.View
-                    testID="bottom-sheet-panel"
+                    testID="bottom-sheet-painel"
                     style={[
                         estilos.painel,
-                        { paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom) },
-                        { transform: [{ translateY: posicaoPainel }] }
+                        {
+                            paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom)
+                        },
+                        corPainel ? { backgroundColor: corPainel } : null,
+                        {
+                            transform: [
+                                {
+                                    translateY: posicaoPainel
+                                }
+                            ]
+                        }
                     ]}
                 >
                     {children}

@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { NOMES_MESES } from '../../calendar/utils/cycleCalendar.utils';
-import { estilos } from './MenstrualDaysCalendar.styles';
+import { criarEstilos } from './MenstrualDaysCalendar.styles';
 
 const DIAS_DA_SEMANA = Object.freeze(['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB']);
 
@@ -32,10 +34,16 @@ function MenstrualDaysCalendar({
     carregando = false,
     larguraMes = 312
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     if (carregando) {
         return (
             <View style={estilos.carregando}>
-                <ActivityIndicator accessibilityLabel="Carregando calendário" color="#C85A44" />
+                <ActivityIndicator
+                    accessibilityLabel="Carregando calendário"
+                    color={tema.escuro ? '#EE9297' : '#C85A44'}
+                />
             </View>
         );
     }

@@ -1,9 +1,10 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import {
     MenstrualDaysCalendar,
     criarDiasDoMes
 } from '../../../../src/features/cycles/components/MenstrualDaysCalendar';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const mes = {
     mes: '2026-08',

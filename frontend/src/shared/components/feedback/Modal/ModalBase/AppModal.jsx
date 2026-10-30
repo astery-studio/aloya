@@ -1,10 +1,14 @@
 /**
- * Estrutura base dos modais, responsável por apresentação, variantes e conteúdo acionável.
+ * Estrutura base dos modais, responsável por apresentação,
+ * variantes e conteúdo acionável.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Modal, Platform, Text, View } from 'react-native';
-import { cores } from '../../../../theme';
-import { estilos } from './AppModal.styles';
+
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarEstilos } from './AppModal.styles';
+
+const VARIANTES_MODAL = new Set(['simples', 'alerta', 'acao']);
 
 export default function AppModal({
     variante = 'simples',
@@ -20,6 +24,8 @@ export default function AppModal({
     aoOcultar,
     children
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const visivelAnterior = useRef(visivel);
 
     useEffect(() => {
@@ -30,15 +36,17 @@ export default function AppModal({
         visivelAnterior.current = visivel;
     }, [aoOcultar, visivel]);
 
-    if (!['simples', 'alerta', 'acao'].includes(variante)) {
+    if (!VARIANTES_MODAL.has(variante)) {
         throw new Error(`Variante de AppModal inválida: ${variante}`);
     }
 
     // Mantém o Modal montado enquanto o iOS conclui o fechamento e emite onDismiss.
     // Desmontá-lo aqui interrompe as ações que aguardam aoOcultar, como salvar.
     const alerta = variante === 'alerta';
+
     const acao = variante === 'acao';
-    const corDoIcone = corIcone || (acao ? cores.feedback.erro : cores.marca.primaria);
+
+    const corDoIcone = corIcone || (acao ? tema.cores.feedback.erro : tema.cores.marca.primaria);
 
     return (
         <Modal
@@ -48,8 +56,9 @@ export default function AppModal({
             onDismiss={aoOcultar}
             onRequestClose={aoFechar}
         >
-            <View style={estilos.fundo}>
+            <View testID="app-modal-fundo" style={estilos.fundo}>
                 <View
+                    testID="app-modal-caixa"
                     accessibilityViewIsModal
                     style={[
                         estilos.caixa,
@@ -60,15 +69,15 @@ export default function AppModal({
                               : estilos.caixaSimples
                     ]}
                 >
-                    {alerta && (
+                    {alerta ? (
                         <View style={estilos.cabecalhoAlerta}>
-                            {Icone && (
+                            {Icone ? (
                                 <View style={estilos.iconeAlerta}>
-                                    <Icone size={26} color={cores.neutras.superficieClara} />
+                                    <Icone size={26} color={tema.cores.neutras.superficieClara} />
                                 </View>
-                            )}
+                            ) : null}
                         </View>
-                    )}
+                    ) : null}
                     <View
                         style={[
                             estilos.conteudo,
@@ -79,22 +88,28 @@ export default function AppModal({
                                   : estilos.conteudoSimples
                         ]}
                     >
-                        {!alerta && Icone && (
+                        {!alerta && Icone ? (
                             <View
                                 style={[
                                     estilos.areaIcone,
                                     estiloIcone,
                                     acao && estilos.areaIconeAcao,
-                                    fundoIcone && { backgroundColor: fundoIcone }
+                                    fundoIcone
+                                        ? {
+                                              backgroundColor: fundoIcone
+                                          }
+                                        : null
                                 ]}
                             >
                                 <Icone size={22} color={corDoIcone} />
                             </View>
-                        )}
+                        ) : null}
+
                         <View style={estilos.textos}>
                             <Text accessibilityRole="header" style={estilos.titulo}>
                                 {titulo}
                             </Text>
+
                             {mensagem ? (
                                 <Text style={[estilos.mensagem, alerta && estilos.mensagemAlerta]}>
                                     {mensagem}

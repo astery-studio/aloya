@@ -1,33 +1,57 @@
 /**
  * Estrutura compartilhada das etapas com navegação, progresso e ação principal.
  */
+import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { ArrowLeftIcon as ArrowLeft } from 'phosphor-react-native/src/icons/ArrowLeft';
 import Button from '../../../../shared/components/common/Button/ButtonBase/Button';
 import FormLayout from '../../../../shared/layouts/FormLayout/FormLayout';
-import { cores } from '../../../../shared/theme';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import OnboardingProgress from '../OnboardingProgress/OnboardingProgress';
-import { estilos } from './OnboardingStep.styles';
+import { criarEstilos } from './OnboardingStep.styles';
 
 export default function OnboardingStep({
-    etapa, titulo, descricao, children, aoVoltar, aoPular,
-    aoAvancar, podeAvancar = true, carregando = false
+    etapa,
+    titulo,
+    descricao,
+    children,
+    aoVoltar,
+    aoPular,
+    aoAvancar,
+    podeAvancar = true,
+    carregando = false
 }) {
-    const cabecalho = <>
-        <View style={estilos.navegacao}>
-            <Pressable accessibilityLabel="Voltar" onPress={aoVoltar} hitSlop={12}>
-                <ArrowLeft size={24} color={cores.neutras.textoSecundarioClaro} />
-            </Pressable>
-            {aoPular ? <Pressable onPress={aoPular}><Text style={estilos.pular}>Pular</Text></Pressable> : null}
-        </View>
-        <OnboardingProgress etapaAtual={etapa} />
-    </>;
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const cabecalho = (
+        <>
+            <View style={estilos.navegacao}>
+                <Pressable accessibilityLabel="Voltar" onPress={aoVoltar} hitSlop={12}>
+                    <ArrowLeft size={24} color={tema.cores.interface.textoSecundario} />
+                </Pressable>
+                {aoPular ? (
+                    <Pressable onPress={aoPular}>
+                        <Text style={estilos.pular}>Pular</Text>
+                    </Pressable>
+                ) : null}
+            </View>
+            <OnboardingProgress etapaAtual={etapa} />
+        </>
+    );
 
     return (
-        <FormLayout cabecalho={cabecalho} centralizado acoes={
-            <Button texto="Avançar" aoPressionar={aoAvancar}
-                desativado={!podeAvancar} carregando={carregando} />
-        }>
+        <FormLayout
+            cabecalho={cabecalho}
+            centralizado
+            acoes={
+                <Button
+                    texto="Avançar"
+                    aoPressionar={aoAvancar}
+                    desativado={!podeAvancar}
+                    carregando={carregando}
+                />
+            }
+        >
             <View style={estilos.conteudo}>
                 <View style={estilos.textos}>
                     <Text style={estilos.titulo}>{titulo}</Text>

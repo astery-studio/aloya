@@ -1,5 +1,6 @@
 //Testa os modos de cadastro e edição e os modais do formulário de anticoncepcionais.
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
+import { render } from '../mockTheme';
 import { useContraceptiveForm } from '../../../../src/features/contraceptives/hooks/useContraceptiveForm';
 import { ContraceptiveForm } from '../../../../src/features/contraceptives/forms/ContraceptiveForm';
 
@@ -91,15 +92,9 @@ beforeEach(() => {
 test('mantém o botão e o campo de nome do cadastro', async () => {
     useContraceptiveForm.mockReturnValue(base);
 
-    await render(
-        <ContraceptiveForm
-            onSubmit={jest.fn()}
-        />
-    );
+    await render(<ContraceptiveForm onSubmit={jest.fn()} />);
 
-    expect(
-        screen.getByLabelText('Digite o nome')
-    ).toHaveProp('maxLength', 120);
+    expect(screen.getByLabelText('Digite o nome')).toHaveProp('maxLength', 120);
 
     expect(
         screen.getByRole('button', {
@@ -129,17 +124,9 @@ test('preenche o modo de edição e desativa o botão quando nada mudou', async 
         podeEnviar: false
     });
 
-    await render(
-        <ContraceptiveForm
-            anticoncepcional={anticoncepcional}
-            onSubmit={onSubmit}
-        />
-    );
+    await render(<ContraceptiveForm anticoncepcional={anticoncepcional} onSubmit={onSubmit} />);
 
-    expect(useContraceptiveForm).toHaveBeenCalledWith(
-        onSubmit,
-        anticoncepcional
-    );
+    expect(useContraceptiveForm).toHaveBeenCalledWith(onSubmit, anticoncepcional);
 
     expect(
         screen.getByRole('button', {
@@ -179,12 +166,7 @@ test('ativa o botão da edição quando existe alteração real', async () => {
         podeEnviar: true
     });
 
-    await render(
-        <ContraceptiveForm
-            anticoncepcional={anticoncepcional}
-            onSubmit={jest.fn()}
-        />
-    );
+    await render(<ContraceptiveForm anticoncepcional={anticoncepcional} onSubmit={jest.fn()} />);
 
     expect(
         screen.getByRole('button', {
@@ -208,11 +190,7 @@ test('mostra o carregamento e bloqueia o botão durante a atualização', async 
     });
 
     await render(
-        <ContraceptiveForm
-            anticoncepcional={anticoncepcional}
-            onSubmit={jest.fn()}
-            salvando
-        />
+        <ContraceptiveForm anticoncepcional={anticoncepcional} onSubmit={jest.fn()} salvando />
     );
 
     const botao = screen.getByRole('button', {
@@ -239,9 +217,7 @@ test('usa o popup simples para erros de validação', async () => {
         }
     });
 
-    await render(
-        <ContraceptiveForm />
-    );
+    await render(<ContraceptiveForm />);
 
     const propriedades = mockSimpleModal.mock.calls.at(-1)[0];
 
@@ -262,21 +238,21 @@ test('usa o popup de duas ações para erro interno', async () => {
         }
     });
 
-    await render(
-        <ContraceptiveForm
-            anticoncepcional={anticoncepcional}
-        />
-    );
+    await render(<ContraceptiveForm anticoncepcional={anticoncepcional} />);
 
     const propriedades = mockSimpleModal.mock.calls.at(-1)[0];
 
     expect(propriedades.titulo).toBe('Algo deu errado');
-    expect(propriedades.mensagem).toBe('Ocorreu um erro ao atualizar. Verifique sua conexão e tente novamente.');
+    expect(propriedades.mensagem).toBe(
+        'Ocorreu um erro ao atualizar. Verifique sua conexão e tente novamente.'
+    );
     expect(propriedades.fundoIcone).toBe('#EDEDED');
-    expect(propriedades.acaoPrincipal).toEqual(expect.objectContaining({
-        texto: 'Tentar novamente',
-        variante: 'preto'
-    }));
+    expect(propriedades.acaoPrincipal).toEqual(
+        expect.objectContaining({
+            texto: 'Tentar novamente',
+            variante: 'preto'
+        })
+    );
     expect(propriedades.acaoSecundaria.texto).toBe('Voltar');
 });
 
@@ -291,19 +267,16 @@ test('bloqueia as ações do erro enquanto uma nova tentativa está salvando', a
         }
     });
 
-    await render(
-        <ContraceptiveForm
-            anticoncepcional={anticoncepcional}
-            salvando
-        />
-    );
+    await render(<ContraceptiveForm anticoncepcional={anticoncepcional} salvando />);
 
     const propriedades = mockSimpleModal.mock.calls.at(-1)[0];
 
     expect(propriedades.aoFechar).toBeUndefined();
-    expect(propriedades.acaoPrincipal).toEqual(expect.objectContaining({
-        carregando: true,
-        desativado: true
-    }));
+    expect(propriedades.acaoPrincipal).toEqual(
+        expect.objectContaining({
+            carregando: true,
+            desativado: true
+        })
+    );
     expect(propriedades.acaoSecundaria.desativado).toBe(true);
 });

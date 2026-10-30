@@ -1,9 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AccountStep from '../../../src/features/onboarding/components/AccountStep/AccountStep';
 import OnboardingStep from '../../../src/features/onboarding/components/OnboardingStep/OnboardingStep';
 import { SelectionSheet } from '../../../src/shared/components/feedback/SelectionSheet/SelectionSheet';
+import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 
 test('etapa compartilhada permite pular e usa valores padrão', async () => {
     const aoPular = jest.fn();
@@ -37,15 +37,6 @@ test('conta aceita ausência do mapa de erros', async () => {
 });
 
 test('seletor usa lista vazia por padrão', async () => {
-    await render(
-        <SafeAreaProvider
-            initialMetrics={{
-                frame: { x: 0, y: 0, width: 390, height: 844 },
-                insets: { top: 0, right: 0, bottom: 32, left: 0 }
-            }}
-        >
-            <SelectionSheet visivel titulo="Opções" />
-        </SafeAreaProvider>
-    );
+    await render(<SelectionSheet visivel titulo="Opções" />);
     expect(screen.getByText('Nenhuma opção disponível.')).toBeTruthy();
 });

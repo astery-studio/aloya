@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react-native';
+import { fireEvent, screen, within } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayScreen } from '../../../../src/features/cycles/screens/CycleTodayScreen';
 import { estilos } from '../../../../src/features/cycles/screens/CycleTodayScreen.styles';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const previsao = {
     status: 'DISPONIVEL',

@@ -1,6 +1,6 @@
+import { useTheme } from '../../../shared/hooks/useTheme';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { LockKeyIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
-import { tema } from '../../../shared/theme';
 
 function CycleParametersFeedback({
     sucesso,
@@ -13,6 +13,8 @@ function CycleParametersFeedback({
     onContinuarEditando,
     onSairSemSalvar
 }) {
+    const tema = useTheme();
+
     return (
         <>
             <SimpleModal
@@ -27,7 +29,7 @@ function CycleParametersFeedback({
                 aoFechar={onFecharErro}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.feedback.erro}
-                fundoIcone={tema.cores.neutras.bordaClara}
+                fundoIcone={tema.cores.interface.borda}
                 titulo="Algo deu errado"
                 mensagem={erro}
                 acaoPrincipal={{

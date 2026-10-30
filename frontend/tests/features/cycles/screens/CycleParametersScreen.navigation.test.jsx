@@ -7,7 +7,19 @@ jest.mock('../../../../src/features/cycles/hooks/useCycleParameters', () => ({
 }));
 jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayout', () => {
     const { Pressable, Text } = require('react-native');
-    return { SettingsLayout: ({ children, onVoltar }) => <><Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={onVoltar} /><Text>Tela</Text>{children}</> };
+    return {
+        SettingsLayout: ({ children, onVoltar }) => (
+            <>
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Voltar"
+                    onPress={onVoltar}
+                />
+                <Text>Tela</Text>
+                {children}
+            </>
+        )
+    };
 });
 jest.mock('../../../../src/features/cycles/components/CycleParametersStateView', () => ({
     CycleParametersStateView: () => null
@@ -18,13 +30,22 @@ jest.mock('../../../../src/features/cycles/components/CycleParametersForm', () =
 jest.mock('../../../../src/features/cycles/components/CycleParametersFeedback', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        CycleParametersFeedback: ({ saidaSemSalvar, onContinuarEditando, onSairSemSalvar }) => saidaSemSalvar ? (
-            <>
-                <Text>Saída pendente</Text>
-                <Pressable accessibilityRole="button" accessibilityLabel="Continuar" onPress={onContinuarEditando} />
-                <Pressable accessibilityRole="button" accessibilityLabel="Sair" onPress={onSairSemSalvar} />
-            </>
-        ) : null
+        CycleParametersFeedback: ({ saidaSemSalvar, onContinuarEditando, onSairSemSalvar }) =>
+            saidaSemSalvar ? (
+                <>
+                    <Text>Saída pendente</Text>
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Continuar"
+                        onPress={onContinuarEditando}
+                    />
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Sair"
+                        onPress={onSairSemSalvar}
+                    />
+                </>
+            ) : null
     };
 });
 
@@ -32,10 +53,21 @@ import { CycleParametersScreen } from '../../../../src/features/cycles/screens/C
 
 function estado(alteracoes = {}) {
     return {
-        salvando: false, alterado: false, carregando: false, erroCarregamento: false,
-        valores: {}, erros: {}, podeSalvar: false, sucesso: false, erroSalvar: null,
-        tentarNovamente: jest.fn(), alterar: jest.fn(), salvar: jest.fn(),
-        fecharSucesso: jest.fn(), fecharErro: jest.fn(), ...alteracoes
+        salvando: false,
+        alterado: false,
+        carregando: false,
+        erroCarregamento: false,
+        valores: {},
+        erros: {},
+        podeSalvar: false,
+        sucesso: false,
+        erroSalvar: null,
+        tentarNovamente: jest.fn(),
+        alterar: jest.fn(),
+        salvar: jest.fn(),
+        fecharSucesso: jest.fn(),
+        fecharErro: jest.fn(),
+        ...alteracoes
     };
 }
 

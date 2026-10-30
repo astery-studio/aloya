@@ -1,231 +1,210 @@
-import {Text} from 'react-native'
-import {fireEvent,render,screen} from '@testing-library/react-native'
+import { Text } from 'react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock(
-    'phosphor-react-native/src/icons/X',
-    () => ({
-        XIcon: jest.fn(() => null)
-    })
-)
+const mockXIcon = jest.fn(() => null);
 
-import {XIcon} from 'phosphor-react-native/src/icons/X'
-import {estilos, corIconeFechar} from '../../../src/shared/layouts/BottomSheet/BottomSheetLayout.style'
-import {BottomSheetLayout} from '../../../src/shared/layouts/BottomSheet/BottomSheetLayout'
+jest.mock('phosphor-react-native/src/icons/X', () => ({
+    XIcon: (propriedades) => mockXIcon(propriedades)
+}));
+
+import { BottomSheetLayout } from '../../../src/shared/layouts/BottomSheet/BottomSheetLayout';
+import { ThemeProvider } from '../../../src/shared/theme/ThemeProvider';
+
+function renderizarLayout(propriedades = {}, preferencia = 'claro') {
+    return render(
+        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+            <BottomSheetLayout titulo="Selecionar opção" onFechar={jest.fn()} {...propriedades}>
+                <Text>Conteúdo do painel</Text>
+            </BottomSheetLayout>
+        </ThemeProvider>
+    );
+}
 
 describe('BottomSheetLayout', () => {
     beforeEach(() => {
-        XIcon.mockClear()
-    })
+        jest.clearAllMocks();
+    });
 
-    test('renderiza o título e o conteúdo', async () => {
-        await render(
-            <BottomSheetLayout
-                titulo="Selecionar opção"
-                onFechar={jest.fn()}
-            >
-                <Text>
-                    Conteúdo do painel
-                </Text>
-            </BottomSheetLayout>
-        )
+    test('renderiza título e conteúdo', async () => {
+        await renderizarLayout();
 
-        expect(
-            screen.getByText('Selecionar opção')
-        ).toBeOnTheScreen()
+        expect(screen.getByRole('header')).toHaveTextContent('Selecionar opção');
 
-        expect(
-            screen.getByText('Conteúdo do painel')
-        ).toBeOnTheScreen()
-    })
+        expect(screen.getByText('Conteúdo do painel')).toBeOnTheScreen();
+    });
 
-    test('renderiza o botão de fechar com nome acessível', async () => {
-        await render(
-            <BottomSheetLayout
-                titulo="Editar perfil"
-                onFechar={jest.fn()}
-            >
-                <Text>Conteúdo</Text>
-            </BottomSheetLayout>
-        )
+    test('renderiza o botão de fechar acessível', async () => {
+        await renderizarLayout();
 
-        const botaoFechar =
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
+        const botao = screen.getByRole('button', {
+            name: 'Fechar painel'
+        });
 
-        expect(botaoFechar).toBeOnTheScreen()
-        expect(botaoFechar).toBeEnabled()
-    })
+        expect(botao).toBeEnabled();
 
-    test('executa a ação ao pressionar o botão de fechar', async () => {
-        const onFechar = jest.fn()
+        expect(botao.props.accessibilityState).toEqual({
+            disabled: false
+        });
+    });
 
-        await render(
-            <BottomSheetLayout
-                titulo="Editar perfil"
-                onFechar={onFechar}
-            >
-                <Text>Conteúdo</Text>
-            </BottomSheetLayout>
-        )
+    test('executa a ação de fechar', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarLayout({
+            onFechar
+        });
 
         await fireEvent.press(
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
-        )
+            screen.getByRole('button', {
+                name: 'Fechar painel'
+            })
+        );
 
-        expect(onFechar).toHaveBeenCalledTimes(1)
-    })
+        expect(onFechar).toHaveBeenCalledTimes(1);
+    });
 
-    test('não apresenta erro quando não recebe onFechar', async () => {
-        await render(
-            <BottomSheetLayout
-                titulo="Painel sem ação"
-            >
-                <Text>Conteúdo</Text>
-            </BottomSheetLayout>
-        )
+    test('não falha sem callback de fechamento', async () => {
+        await renderizarLayout({
+            onFechar: undefined
+        });
 
-        const botaoFechar =
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
+        const botao = screen.getByRole('button', {
+            name: 'Fechar painel'
+        });
 
-        expect(botaoFechar).toBeEnabled()
+        expect(botao).toBeEnabled();
 
-        await expect(
-            fireEvent.press(botaoFechar)
-        ).resolves.toBeUndefined()
-    })
+        await fireEvent.press(botao);
 
-    test('desabilita o fechamento quando ele está bloqueado', async () => {
-        const onFechar = jest.fn()
+        expect(screen.getByText('Conteúdo do painel')).toBeOnTheScreen();
+    });
 
-        await render(
-            <BottomSheetLayout
-                titulo="Salvando"
-                onFechar={onFechar}
-                bloquearFechamento
-            >
-                <Text>Salvando dados...</Text>
-            </BottomSheetLayout>
-        )
+    test('bloqueia o fechamento durante operação', async () => {
+        const onFechar = jest.fn();
 
-        const botaoFechar =
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
+        await renderizarLayout({
+            onFechar,
+            bloquearFechamento: true
+        });
 
-        expect(botaoFechar).toBeDisabled()
+        const botao = screen.getByRole('button', {
+            name: 'Fechar painel'
+        });
 
-        await fireEvent.press(botaoFechar)
+        expect(botao).toBeDisabled();
 
-        expect(onFechar).not.toHaveBeenCalled()
-    })
+        expect(botao.props.accessibilityState).toEqual({
+            disabled: true
+        });
 
-    test('volta a permitir o fechamento depois do desbloqueio', async () => {
-        const onFechar = jest.fn()
+        await fireEvent.press(botao);
 
-        const resultado =
-            await render(
-                <BottomSheetLayout
-                    titulo="Salvando"
-                    onFechar={onFechar}
-                    bloquearFechamento
-                >
-                    <Text>Conteúdo</Text>
-                </BottomSheetLayout>
-            )
+        expect(onFechar).not.toHaveBeenCalled();
+    });
+
+    test('volta a permitir fechamento após desbloqueio', async () => {
+        const onFechar = jest.fn();
+
+        const resultado = await renderizarLayout({
+            titulo: 'Salvando',
+            onFechar,
+            bloquearFechamento: true
+        });
 
         expect(
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
-        ).toBeDisabled()
+            screen.getByRole('button', {
+                name: 'Fechar painel'
+            })
+        ).toBeDisabled();
 
         await resultado.rerender(
-            <BottomSheetLayout
-                titulo="Edição concluída"
-                onFechar={onFechar}
-                bloquearFechamento={false}
-            >
-                <Text>Conteúdo</Text>
-            </BottomSheetLayout>
-        )
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <BottomSheetLayout
+                    titulo="Concluído"
+                    onFechar={onFechar}
+                    bloquearFechamento={false}
+                >
+                    <Text>Conteúdo do painel</Text>
+                </BottomSheetLayout>
+            </ThemeProvider>
+        );
 
-        const botaoFechar =
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
+        const botao = screen.getByRole('button', {
+            name: 'Fechar painel'
+        });
 
-        expect(botaoFechar).toBeEnabled()
+        expect(botao).toBeEnabled();
 
-        await fireEvent.press(botaoFechar)
+        await fireEvent.press(botao);
 
-        expect(onFechar).toHaveBeenCalledTimes(1)
-    })
+        expect(onFechar).toHaveBeenCalledTimes(1);
+    });
 
-    test('renderiza o ícone de fechar com as propriedades corretas', async () => {
-        await render(
-            <BottomSheetLayout
-                titulo="Selecionar data"
-                onFechar={jest.fn()}
-            >
-                <Text>Conteúdo</Text>
-            </BottomSheetLayout>
-        )
+    test('usa cores claras', async () => {
+        await renderizarLayout({}, 'claro');
 
-        expect(XIcon).toHaveBeenCalledTimes(1)
+        expect(screen.getByTestId('bottom-sheet-layout')).toHaveStyle({
+            backgroundColor: '#FFFFFF'
+        });
 
-        expect(
-            XIcon.mock.calls[0][0]
-        ).toEqual(
+        expect(screen.getByRole('header')).toHaveStyle({
+            color: '#222222'
+        });
+
+        expect(mockXIcon).toHaveBeenCalledWith(
             expect.objectContaining({
                 size: 24,
-                color: corIconeFechar,
+                color: '#5C5C59',
                 weight: 'regular'
             })
-        )
-    })
+        );
+    });
 
-    test('aplica o estilo correto ao botão de fechar', async () => {
-        await render(
-            <BottomSheetLayout
-                titulo="Selecionar data"
-                onFechar={jest.fn()}
-            >
-                <Text>Conteúdo</Text>
-            </BottomSheetLayout>
-        )
+    test('usa cores escuras', async () => {
+        await renderizarLayout({}, 'escuro');
 
-        expect(
-            screen.getByRole(
-                'button',
-                {
-                    name: 'Fechar painel'
-                }
-            )
-        ).toHaveStyle(
-            estilos.botaoFechar
-        )
-    })
-})
+        expect(screen.getByTestId('bottom-sheet-layout')).toHaveStyle({
+            backgroundColor: '#2B322E'
+        });
+
+        expect(screen.getByRole('header')).toHaveStyle({
+            color: '#F4F1EA'
+        });
+
+        expect(mockXIcon).toHaveBeenCalledWith(
+            expect.objectContaining({
+                size: 24,
+                color: '#C4C8C5',
+                weight: 'regular'
+            })
+        );
+    });
+
+    test('mantém o conteúdo com a superfície do tema', async () => {
+        await renderizarLayout({}, 'escuro');
+
+        expect(screen.getByTestId('bottom-sheet-conteudo')).toHaveStyle({
+            backgroundColor: '#2B322E'
+        });
+    });
+
+    test('atualiza as cores quando o tema muda', async () => {
+        const resultado = await renderizarLayout({}, 'claro');
+
+        expect(screen.getByRole('header')).toHaveStyle({
+            color: '#222222'
+        });
+
+        await resultado.rerender(
+            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
+                <BottomSheetLayout titulo="Selecionar opção" onFechar={jest.fn()}>
+                    <Text>Conteúdo do painel</Text>
+                </BottomSheetLayout>
+            </ThemeProvider>
+        );
+
+        expect(screen.getByRole('header')).toHaveStyle({
+            color: '#F4F1EA'
+        });
+    });
+});

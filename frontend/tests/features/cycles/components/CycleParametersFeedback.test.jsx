@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => {
     const { Pressable, Text } = require('react-native');
@@ -8,9 +9,23 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
             <>
                 <Text>{titulo}</Text>
                 {mensagem ? <Text>{mensagem}</Text> : null}
-                <Pressable accessibilityRole="button" accessibilityLabel={acaoPrincipal.texto} onPress={acaoPrincipal.aoPressionar} />
-                {acaoSecundaria ? <Pressable accessibilityRole="button" accessibilityLabel={acaoSecundaria.texto} onPress={acaoSecundaria.aoPressionar} /> : null}
-                <Pressable accessibilityRole="button" accessibilityLabel={`Fechar ${titulo}`} onPress={aoFechar} />
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={acaoPrincipal.texto}
+                    onPress={acaoPrincipal.aoPressionar}
+                />
+                {acaoSecundaria ? (
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={acaoSecundaria.texto}
+                        onPress={acaoSecundaria.aoPressionar}
+                    />
+                ) : null}
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Fechar ${titulo}`}
+                    onPress={aoFechar}
+                />
             </>
         );
     };
@@ -20,9 +35,16 @@ import { CycleParametersFeedback } from '../../../../src/features/cycles/compone
 
 function props(alteracoes = {}) {
     return {
-        sucesso: false, erro: null, saidaSemSalvar: false, salvando: false,
-        onFecharSucesso: jest.fn(), onFecharErro: jest.fn(), onTentarNovamente: jest.fn(),
-        onContinuarEditando: jest.fn(), onSairSemSalvar: jest.fn(), ...alteracoes
+        sucesso: false,
+        erro: null,
+        saidaSemSalvar: false,
+        salvando: false,
+        onFecharSucesso: jest.fn(),
+        onFecharErro: jest.fn(),
+        onTentarNovamente: jest.fn(),
+        onContinuarEditando: jest.fn(),
+        onSairSemSalvar: jest.fn(),
+        ...alteracoes
     };
 }
 

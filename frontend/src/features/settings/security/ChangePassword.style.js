@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native'
-import { tema } from '../../../shared/theme'
+import { StyleSheet } from 'react-native';
+import { tema } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     container: {
@@ -11,6 +11,6 @@ const estilos = StyleSheet.create({
         width: '100%',
         gap: tema.espacamentos.medio
     }
-})
+});
 
-export { estilos }
+export { estilos };

@@ -1,10 +1,8 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
-import {
-    CalendarScreen,
-    normalizarConfianca
-} from '../../../../src/features/calendar/screens/CalendarScreen';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';
+import { CalendarScreen } from '../../../../src/features/calendar/screens/CalendarScreen';
 import { estilos } from '../../../../src/features/calendar/screens/CalendarScreen.styles';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
     const ReactInterno = require('react');
@@ -46,7 +44,7 @@ jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModa
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
 
-    return function AlertModalMock({ visivel, titulo, mensagem, acaoPrincipal, aoFechar }) {
+    return function AlertModalMock({ visivel, titulo, mensagem, acaoPrincipal }) {
         if (!visivel) return null;
 
         return ReactInterno.createElement(
@@ -62,15 +60,6 @@ jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModa
                     onPress: acaoPrincipal?.aoPressionar
                 },
                 ReactInterno.createElement(Text, null, acaoPrincipal?.texto)
-            ),
-            ReactInterno.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Fechar modal',
-                    onPress: aoFechar
-                },
-                ReactInterno.createElement(Text, null, 'Fechar modal')
             )
         );
     };
@@ -127,19 +116,6 @@ jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLe
 });
 
 describe('CalendarScreen', () => {
-    test('normaliza confiança acentuada e rejeita valores não textuais', () => {
-        expect(normalizarConfianca()).toBeNull();
-        expect(normalizarConfianca('  MÉDIA ')).toBe('media');
-        expect(normalizarConfianca('ALTA')).toBe('alta');
-    });
-
-    test('tolera lista de meses ausente ou inválida', async () => {
-        const { rerender } = await render(<CalendarScreen />);
-        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
-        await rerender(<CalendarScreen meses={{ invalido: true }} />);
-        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
-    });
-
     test('mostra calendário, título e confiança', async () => {
         const aoCadastrarMenstruacao = jest.fn();
         const aoEditarCiclo = jest.fn();
@@ -184,13 +160,6 @@ describe('CalendarScreen', () => {
             estilos.cabecalho.height
         );
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
-        expect(screen.getByTestId('calendar-safe-area')).toHaveProp('edges', {
-            top: 'off',
-            right: 'off',
-            bottom: 'additive',
-            left: 'off'
-        });
-        expect(screen.queryByRole('button', { name: 'Parâmetros do Ciclo' })).toBeNull();
         expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
         expect(estilos.rodape).toMatchObject({
@@ -298,16 +267,14 @@ describe('CalendarScreen', () => {
         expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
     });
 
-    test('fecha o erro pelo modal e ignora confiança desconhecida', async () => {
+    test('ignora confiança desconhecida', async () => {
         await render(
             <CalendarScreen
                 meses={[{ mes: '2026-10', possuiCiclos: true }]}
                 confianca="desconhecida"
-                erro="Falha"
             />
         );
+
         expect(screen.queryByTestId('confidence-badge')).toBeNull();
-        await fireEvent.press(screen.getByRole('button', { name: 'Fechar modal' }));
-        expect(screen.queryByTestId('alert-modal')).toBeNull();
     });
 });

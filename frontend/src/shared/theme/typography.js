@@ -77,7 +77,4 @@ const typography = {
     }
 };
 
-export {
-    fontFamilies,
-    typography
-};
+export { fontFamilies, typography };

@@ -1,10 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 
 import {
     CycleRemovalFeedbackModal,
     IconeAlerta
 } from '../../../../src/features/cycles/components/CycleRemovalFeedbackModal';
-import { estilos } from '../../../../src/features/cycles/components/CycleRemovalFeedbackModal.styles';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('confirma exclusão com textos e ações idênticos ao protótipo', async () => {
     const onConfirmar = jest.fn();
@@ -99,11 +99,21 @@ test('bloqueia confirmação e cancelamento durante a exclusão', async () => {
 });
 
 test('usa área quadrada de 48 por 48 e diferencia as cores do alerta', async () => {
-    const confirmacao = await render(<IconeAlerta />);
-    expect(confirmacao.toJSON()).toHaveStyle([estilos.areaIcone, estilos.fundoConfirmacao]);
+    await render(<IconeAlerta />, { preferencia: 'escuro' });
+    expect(screen.getByTestId('icone-alerta-confirmacao')).toHaveStyle({
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: '#4A3737'
+    });
 
-    const erro = await render(<IconeAlerta erro />);
-    expect(erro.toJSON()).toHaveStyle([estilos.areaIcone, estilos.fundoErro]);
+    await render(<IconeAlerta erro />, { preferencia: 'escuro' });
+    expect(screen.getByTestId('icone-alerta-erro')).toHaveStyle({
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: '#343434'
+    });
 });
 
 test('não renderiza tipo desconhecido', async () => {

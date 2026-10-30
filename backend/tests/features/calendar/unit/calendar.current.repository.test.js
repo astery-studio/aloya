@@ -32,10 +32,8 @@ test('busca o estado atual sem consultar os dias do calendário', async () => {
             }
         }
     };
-    const repository = criarCalendarRepository({prisma});
-    const fimReferenciaExclusivo = new Date(
-        '2026-10-08T00:00:00.000Z'
-    );
+    const repository = criarCalendarRepository({ prisma });
+    const fimReferenciaExclusivo = new Date('2026-10-08T00:00:00.000Z');
 
     const resultado = await repository.buscarDadosAtuais({
         usuarioId: 9,
@@ -46,7 +44,7 @@ test('busca o estado atual sem consultar os dias do calendário', async () => {
     assert.equal(chamadas.usuario.length, 1);
     assert.equal(chamadas.registrosCiclo.length, 0);
     assert.deepEqual(chamadas.usuario[0], {
-        where: {id: 9},
+        where: { id: 9 },
         select: {
             duracaoCicloInformada: true,
             duracaoMenstruacaoInformada: true,
@@ -62,10 +60,7 @@ test('busca o estado atual sem consultar os dias do calendário', async () => {
                         lt: fimReferenciaExclusivo
                     }
                 },
-                orderBy: [
-                    {dataInicio: 'desc'},
-                    {id: 'desc'}
-                ],
+                orderBy: [{ dataInicio: 'desc' }, { id: 'desc' }],
                 take: 7,
                 select: {
                     id: true,
@@ -87,19 +82,15 @@ test('devolve null quando a conta autenticada não existe', async () => {
         },
         registroCiclo: {
             async findMany() {
-                assert.fail(
-                    'A consulta mensal não deveria ser executada.'
-                );
+                assert.fail('A consulta mensal não deveria ser executada.');
             }
         }
     };
-    const repository = criarCalendarRepository({prisma});
+    const repository = criarCalendarRepository({ prisma });
 
     const resultado = await repository.buscarDadosAtuais({
         usuarioId: 999,
-        fimReferenciaExclusivo: new Date(
-            '2026-10-08T00:00:00.000Z'
-        )
+        fimReferenciaExclusivo: new Date('2026-10-08T00:00:00.000Z')
     });
 
     assert.equal(resultado, null);

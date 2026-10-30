@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -7,17 +7,18 @@ import { InfoIcon } from 'phosphor-react-native/src/icons/Info';
 import { DropIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal/SimpleModal';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { MenstruationRegistrationCalendar } from '../components/MenstruationRegistrationCalendar';
 import { SyncStatusIndicator } from '../components/SyncStatusIndicator';
-import { estilos } from './MenstruationRegistrationScreen.styles';
+import { criarEstilos } from './MenstruationRegistrationScreen.styles';
 
-function RegistrationErrorIcon({ size = 22 }) {
+function RegistrationErrorIcon({ size = 22, color = '#B43D3D' }) {
     return (
         <Svg width={size} height={size} viewBox="0 0 24 24">
-            <Circle cx="12" cy="12" r="9" fill="none" stroke="#5C5C59" strokeWidth="1.5" />
-            <Path d="M12 7v5" stroke="#B43D3D" strokeWidth="2" strokeLinecap="round" />
-            <Circle cx="12" cy="16" r="1" fill="#B43D3D" />
+            <Circle cx="12" cy="12" r="9" fill="none" stroke={color} strokeWidth="1.5" />
+            <Path d="M12 7v5" stroke={color} strokeWidth="2" strokeLinecap="round" />
+            <Circle cx="12" cy="16" r="1" fill={color} />
         </Svg>
     );
 }
@@ -39,6 +40,8 @@ function MenstruationRegistrationScreen({
     onCarregarAnteriores,
     hoje = obterHojeLocal()
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [conflitoLocal, setConflitoLocal] = useState(false);
     const conflito =
         conflitoLocal ||
@@ -54,7 +57,11 @@ function MenstruationRegistrationScreen({
         selecionadas.length > 0 &&
         selecionadas.every((data) => /^\d{4}-\d{2}-\d{2}$/.test(data) && data <= hoje);
     return (
-        <SafeAreaView edges={['top', 'bottom']} style={estilos.tela}>
+        <SafeAreaView
+            testID="tela-cadastro-menstruacao"
+            edges={['top', 'bottom']}
+            style={estilos.tela}
+        >
             <View style={estilos.cabecalho}>
                 <Text accessibilityRole="header" style={estilos.titulo}>
                     Cadastrar menstruação
@@ -66,7 +73,7 @@ function MenstruationRegistrationScreen({
                     onPress={onVoltar}
                     style={estilos.voltar}
                 >
-                    <ArrowLeftIcon size={24} color="#5C5C59" />
+                    <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
                 </Pressable>
             </View>
             <View style={estilos.legenda}>
@@ -98,8 +105,8 @@ function MenstruationRegistrationScreen({
             />
             {mesesValidos.length === 0 && <Text style={estilos.vazio}>Nenhum mês disponível.</Text>}
             {selecionadas.length === 1 && (
-                <View style={estilos.ajuda}>
-                    <InfoIcon size={20} color="#2D5141" />
+                <View testID="orientacao-cadastro-menstruacao" style={estilos.ajuda}>
+                    <InfoIcon size={20} color={tema.cores.interface.destaque} />
                     <Text style={estilos.textoAjuda}>
                         Agora toque no último dia para completar o período menstrual.
                     </Text>
@@ -134,8 +141,10 @@ function MenstruationRegistrationScreen({
                           : WarningCircleIcon
                 }
                 estiloIcone={estilos.iconeFeedback}
-                fundoIcone={feedback === 'erro' ? '#EDEDED' : '#F5EDE3'}
-                corIcone={feedback === 'erro' ? '#B43D3D' : '#C85A44'}
+                fundoIcone={
+                    feedback === 'erro' ? estilos.fundoIconeErro : estilos.fundoIconeFeedback
+                }
+                corIcone={feedback === 'erro' ? estilos.corIconeErro : estilos.corIconeFeedback}
                 titulo={
                     feedback === 'conflito'
                         ? 'Ciclo existente'

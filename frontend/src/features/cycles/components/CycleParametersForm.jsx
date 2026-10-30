@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleParameterField } from './CycleParameterField';
-import { estilos } from './CycleParametersForm.styles';
+import { criarEstilos } from './CycleParametersForm.styles';
 
 const CAMPOS = Object.freeze([
     { nome: 'duracaoCicloInformada', label: 'Duração do Ciclo' },
@@ -18,6 +20,9 @@ function CycleParametersForm({
     podeSalvar = false,
     salvando = false
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     return (
         <View style={estilos.container}>
             <Text style={estilos.titulo}>Dados do Ciclo</Text>

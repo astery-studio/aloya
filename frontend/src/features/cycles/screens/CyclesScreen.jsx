@@ -1,10 +1,12 @@
 //Mostra provisoriamente o resumo e todas as variantes do histórico de ciclos para validação no Expo.
-import {Alert, FlatList, Text, View} from 'react-native'
+import { useCallback, useMemo } from 'react';
+import { Alert, FlatList, Text, View } from 'react-native';
 
-import {CycleHistoryCard} from '../components/CycleHistoryCard/CycleHistoryCard'
-import {CycleSummaryCard} from '../components/CycleSummaryCard/CycleSummaryCard'
-import {MainLayout} from '../../../shared/layouts/MainLayout/MainLayout'
-import {estilos} from './CyclesScreen.styles'
+import { CycleHistoryCard } from '../components/CycleHistoryCard/CycleHistoryCard';
+import { CycleSummaryCard } from '../components/CycleSummaryCard/CycleSummaryCard';
+import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './CyclesScreen.styles';
 
 const ciclosDeTeste = Object.freeze([
     Object.freeze({
@@ -47,46 +49,37 @@ const ciclosDeTeste = Object.freeze([
         duracaoDias: 28,
         status: 'concluido'
     })
-])
+]);
 
 function mostrarAcao(acao, ciclo) {
-    Alert.alert(
-        `${acao} ciclo`,
-        `${acao} o ciclo ${String(ciclo.numero).padStart(2, '0')}.`
-    )
+    Alert.alert(`${acao} ciclo`, `${acao} o ciclo ${String(ciclo.numero).padStart(2, '0')}.`);
 }
 
 function editarCiclo(ciclo) {
-    mostrarAcao('Editar', ciclo)
+    mostrarAcao('Editar', ciclo);
 }
 
 function excluirCiclo(ciclo) {
-    mostrarAcao('Excluir', ciclo)
+    mostrarAcao('Excluir', ciclo);
 }
 
 function obterChaveDoCiclo(ciclo) {
-    return ciclo.id
+    return ciclo.id;
 }
 
-function renderizarCiclo({item}) {
+function renderizarCiclo({ item }, estilos) {
     return (
         <View style={estilos.item}>
-            <CycleHistoryCard
-                ciclo={item}
-                aoEditar={editarCiclo}
-                aoExcluir={excluirCiclo}
-            />
+            <CycleHistoryCard ciclo={item} aoEditar={editarCiclo} aoExcluir={excluirCiclo} />
         </View>
-    )
+    );
 }
 
-function CabecalhoDaLista() {
+function CabecalhoDaLista({ estilos }) {
     return (
         <View style={estilos.cabecalhoDaLista}>
             <View style={estilos.apresentacao}>
-                <Text style={estilos.titulo}>
-                    Teste do histórico de ciclos
-                </Text>
+                <Text style={estilos.titulo}>Teste do histórico de ciclos</Text>
 
                 <Text style={estilos.descricao}>
                     Confira o resumo e os ciclos em andamento, concluído e com estimativa incerta.
@@ -100,25 +93,27 @@ function CabecalhoDaLista() {
                 confianca="alta"
             />
 
-            <Text style={estilos.tituloDaSecao}>
-                Ciclos registrados
-            </Text>
+            <Text style={estilos.tituloDaSecao}>Ciclos registrados</Text>
         </View>
-    )
+    );
 }
 
-function CyclesScreen({onSelecionarAba}) {
+function CyclesScreen({ onSelecionarAba }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const renderizarItem = useCallback((info) => renderizarCiclo(info, estilos), [estilos]);
+    const renderizarCabecalho = useCallback(
+        () => <CabecalhoDaLista estilos={estilos} />,
+        [estilos]
+    );
+
     return (
-        <MainLayout
-            titulo="Ciclos"
-            abaAtiva="ciclos"
-            onSelecionarAba={onSelecionarAba}
-        >
+        <MainLayout titulo="Ciclos" abaAtiva="ciclos" onSelecionarAba={onSelecionarAba}>
             <FlatList
                 data={ciclosDeTeste}
-                renderItem={renderizarCiclo}
+                renderItem={renderizarItem}
                 keyExtractor={obterChaveDoCiclo}
-                ListHeaderComponent={CabecalhoDaLista}
+                ListHeaderComponent={renderizarCabecalho}
                 contentContainerStyle={estilos.conteudo}
                 showsVerticalScrollIndicator={false}
                 initialNumToRender={5}
@@ -126,7 +121,7 @@ function CyclesScreen({onSelecionarAba}) {
                 windowSize={3}
             />
         </MainLayout>
-    )
+    );
 }
 
-export {CyclesScreen}
+export { CyclesScreen };

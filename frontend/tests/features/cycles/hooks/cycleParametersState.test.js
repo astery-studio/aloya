@@ -1,4 +1,7 @@
-import { cycleParametersReducer, estadoInicial } from '../../../../src/features/cycles/hooks/cycleParametersState';
+import {
+    cycleParametersReducer,
+    estadoInicial
+} from '../../../../src/features/cycles/hooks/cycleParametersState';
 
 const parametros = {
     duracaoCicloInformada: 28,
@@ -19,11 +22,20 @@ test.each([
 
 test('carrega, altera e salva parâmetros', () => {
     const carregado = cycleParametersReducer(estadoInicial, { tipo: 'CARREGADO', parametros });
-    const alterado = cycleParametersReducer(carregado, { tipo: 'ALTERAR', campo: 'duracaoCicloInformada', valor: 30 });
+    const alterado = cycleParametersReducer(carregado, {
+        tipo: 'ALTERAR',
+        campo: 'duracaoCicloInformada',
+        valor: 30
+    });
     const salvo = cycleParametersReducer(alterado, { tipo: 'SALVO', parametros });
     expect(carregado.valores).toBe(parametros);
     expect(alterado.valores.duracaoCicloInformada).toBe(30);
-    expect(salvo).toMatchObject({ valores: parametros, valoresIniciais: parametros, salvando: false, sucesso: true });
+    expect(salvo).toMatchObject({
+        valores: parametros,
+        valoresIniciais: parametros,
+        salvando: false,
+        sucesso: true
+    });
 });
 
 test('ignora ações desconhecidas', () => {

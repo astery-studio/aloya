@@ -1,7 +1,8 @@
 /**
  * Testes dos campos de texto, e-mail e senha e de suas interações.
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../helpers/renderWithTheme';
 import TextInput from '../../src/shared/components/forms/TextInput';
 import EmailInput from '../../src/shared/components/forms/EmailInput';
 import PasswordInput from '../../src/shared/components/forms/PasswordInput';
@@ -35,19 +36,44 @@ test('senha começa oculta e pode ser exibida', async () => {
 
 test('campo categoria exibe rótulo externo e aplica sanitização', async () => {
     const aoMudar = jest.fn();
-    await render(<TextInput label="Categoria" placeholder="Escolha"
-        value="" variante="categoria" onChangeText={aoMudar}
-        sanitizar={(texto) => texto.toUpperCase()} />);
+    await render(
+        <TextInput
+            label="Categoria"
+            placeholder="Escolha"
+            value=""
+            variante="categoria"
+            onChangeText={aoMudar}
+            sanitizar={(texto) => texto.toUpperCase()}
+        />
+    );
     expect(screen.getByText('Categoria')).toBeTruthy();
     await fireEvent.changeText(screen.getByLabelText('Categoria'), 'ciclo');
     expect(aoMudar).toHaveBeenCalledWith('CICLO');
 });
 
 test('campo popup aceita ação lateral e mensagem de erro', async () => {
-    await render(<TextInput placeholder="Código" value=""
-        variante="popup" erro="Código inválido"
-        acaoDireita={<TextInput label="Ação" value="" />} />);
+    await render(
+        <TextInput
+            placeholder="Código"
+            value=""
+            variante="popup"
+            erro="Código inválido"
+            acaoDireita={<TextInput label="Ação" value="" />}
+        />
+    );
     expect(screen.getByLabelText('Código')).toBeTruthy();
     expect(screen.getByLabelText('Ação')).toBeTruthy();
     expect(screen.getByRole('alert')).toHaveTextContent('Código inválido');
+});
+
+test('campos usam as cores do modo escuro', async () => {
+    await render(<TextInput label="Nome" placeholder="Nome" value="Julia" />, {
+        preferencia: 'escuro'
+    });
+
+    const campo = screen.getByLabelText('Nome');
+
+    expect(campo).toHaveStyle({ color: '#F4F1EA' });
+    expect(campo).toHaveProp('placeholderTextColor', '#C4C8C5');
+    expect(campo).toHaveProp('selectionColor', '#9FD6B6');
 });

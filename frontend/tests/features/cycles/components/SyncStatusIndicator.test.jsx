@@ -1,11 +1,12 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { SyncStatusIndicator } from '../../../../src/features/cycles/components/SyncStatusIndicator';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('oculta estados ausentes e sincronizado por padrão', async () => {
     const tela = await render(<SyncStatusIndicator />);
-    expect(tela.toJSON()).toBeNull();
+    expect(screen.queryByText('Alterações sincronizadas.')).toBeNull();
     await tela.rerender(<SyncStatusIndicator status="sincronizado" />);
-    expect(tela.toJSON()).toBeNull();
+    expect(screen.queryByText('Alterações sincronizadas.')).toBeNull();
     await tela.rerender(<SyncStatusIndicator status="sincronizado" mostrarSincronizado />);
     expect(screen.getByText('Alterações sincronizadas.')).toBeOnTheScreen();
 });

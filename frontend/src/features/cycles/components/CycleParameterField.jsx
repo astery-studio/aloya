@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { ProfileField } from '../../settings/profile/ProfileField';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleParameterEditor } from './CycleParameterEditor';
-import { estilos } from './CycleParameterField.styles';
+import { criarEstilos } from './CycleParameterField.styles';
 
 function CycleParameterField({ label, valor, erro, onAlterar, desabilitado = false }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [editando, setEditando] = useState(false);
     const [valorOriginal, setValorOriginal] = useState(valor);
     const valorValido = Number.isSafeInteger(valor) && valor > 0;

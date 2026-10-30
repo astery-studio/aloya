@@ -1,9 +1,10 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import {
     RemoveMenstruationModal,
     obterPeriodo
 } from '../../../../src/features/cycles/components/RemoveMenstruationModal';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/features/cycles/components/MenstrualDaysCalendar', () => ({
     MenstrualDaysCalendar: ({ aoPressionarDia, carregando, desativado }) => {

@@ -1,5 +1,5 @@
 //Apresenta um contato e permite escolher exatamente uma decisão para sua exclusão.
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Text, View } from 'react-native';
 
 import {
@@ -7,7 +7,8 @@ import {
     acaoExclusaoEhValida
 } from '../constants/categoryDeletionOptions';
 import { CategoryDecisionOption } from './CategoryDecisionOption';
-import { estilos } from './CategoryContactDecisionItem.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './CategoryContactDecisionItem.styles';
 
 function CategoryContactDecisionItem({
     contato,
@@ -15,6 +16,9 @@ function CategoryContactDecisionItem({
     onAlterarDecisao,
     desabilitado = false
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     const vinculoId =
         Number.isSafeInteger(contato?.vinculoId) && contato.vinculoId > 0
             ? contato.vinculoId

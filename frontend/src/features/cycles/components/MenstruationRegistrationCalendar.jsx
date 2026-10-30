@@ -2,7 +2,8 @@ import { useMemo, useRef } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { DropIcon } from 'phosphor-react-native/src/icons/Drop';
 import { NOMES_MESES, normalizarMeses } from '../../calendar/utils/cycleCalendar.utils';
-import { estilos } from '../screens/MenstruationRegistrationScreen.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from '../screens/MenstruationRegistrationScreen.styles';
 
 function deslocarDia(data, deslocamento) {
     const valor = new Date(`${data}T00:00:00Z`);
@@ -20,6 +21,8 @@ function MenstruationRegistrationCalendar({
     onConflito,
     onCarregarAnteriores
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const ultimoToque = useRef(null);
     function tocarData(data, agora) {
         const duplo =
@@ -137,7 +140,11 @@ function MenstruationRegistrationCalendar({
                                                 <DropIcon
                                                     size={9}
                                                     weight="fill"
-                                                    color={ponta ? '#FFFFFF' : '#C85A44'}
+                                                    color={
+                                                        ponta
+                                                            ? '#FFFFFF'
+                                                            : estilos.numeroMarcado.color
+                                                    }
                                                 />
                                             )}
                                             <Text

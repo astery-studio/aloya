@@ -1,8 +1,8 @@
-//Um hook é uma função com nome iniciado por "use" que os componentes podem chamar para obter um comportamento ou valor reutilizável
-import { tema } from '../theme'
+//Fornece o tema visual resolvido pelo ThemeProvider.
+import { useThemeContext } from '../theme/ThemeProvider';
 
 function useTheme() {
-    return tema
+    return useThemeContext().tema;
 }
 
-export { useTheme }
+export { useTheme };

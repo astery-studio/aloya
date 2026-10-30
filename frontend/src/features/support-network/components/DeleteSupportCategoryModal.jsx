@@ -7,14 +7,14 @@ import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/Bot
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { tema } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import {
     ACOES_EXCLUSAO_CATEGORIA,
     acaoExclusaoEhValida
 } from '../constants/categoryDeletionOptions';
 import { CategoryContactDecisionItem } from './CategoryContactDecisionItem';
 import { CategoryDecisionOption } from './CategoryDecisionOption';
-import { estilos } from './DeleteSupportCategoryModal.styles';
+import { criarEstilos } from './DeleteSupportCategoryModal.styles';
 
 function contatoEhValido(contato) {
     return (
@@ -49,6 +49,9 @@ function DeleteSupportCategoryModal({
     onCancelar,
     carregando = false
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     const nomeCategoria =
         typeof categoria?.nome === 'string' && categoria.nome.trim().length > 0
             ? categoria.nome.trim()

@@ -111,6 +111,6 @@ const cores = Object.freeze({
             bordaExpandida: 'rgba(74, 88, 153, 0.333)'
         })
     })
-})
+});
 
-export { cores }
+export { cores };

@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal';
 import { DropIcon, WarningCircleIcon } from '../../shared/components/icons/AppIcons';
-import { tema } from '../../shared/theme';
+import { useTheme } from '../../shared/hooks/useTheme';
 import { CycleEditSheet } from './components/CycleEditSheet/CycleEditSheet';
 
 function formatarDataParaCampo(dataIso) {
@@ -58,6 +58,7 @@ function validarEdicao(dataInicio, dataFim) {
 }
 
 function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirada }) {
+    const tema = useTheme();
     const inicioOriginal = formatarDataParaCampo(ciclo.dataInicio);
     const fimOriginal = formatarDataParaCampo(ciclo.dataFim);
     const [dataInicio, setDataInicio] = useState(inicioOriginal);

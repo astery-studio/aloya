@@ -1,58 +1,65 @@
-import { StyleSheet } from 'react-native'
-import { tema, fontFamilies } from '../../../theme'
+import { StyleSheet } from 'react-native';
 
-const estilos = StyleSheet.create({
-    container: {
-        width: '100%'
-    },
+import { fontFamilies } from '../../../theme';
 
-    espacamentoSuperior: {
-        height: 56
-    },
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            backgroundColor: tema.cores.interface.fundo
+        },
 
-    espacamentoSuperiorComVoltar: {
-        height: 48
-    },
+        espacamentoSuperior: {
+            height: 56
+        },
 
-    areaTitulo: {
-        minHeight: 66,
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-        paddingBottom: 32
-    },
+        espacamentoSuperiorComVoltar: {
+            height: 48
+        },
 
-    areaTituloComVoltar: {
-        minHeight: 72,
-        alignItems: 'center',
-        paddingLeft: 12,
-        paddingRight: 60,
-        paddingBottom: 24
-    },
+        areaTitulo: {
+            minHeight: 66,
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+            paddingBottom: 32
+        },
 
-    titulo: {
-        flex: 1,
-        flexShrink: 1,
-        ...tema.typography.h1,
-        color: tema.cores.neutras.textoPrincipalClaro
-    },
+        areaTituloComVoltar: {
+            minHeight: 72,
+            alignItems: 'center',
+            paddingLeft: 12,
+            paddingRight: 60,
+            paddingBottom: 24
+        },
 
-    tituloComVoltar: {
-        fontFamily: fontFamilies.bold,
-        fontSize: 18,
-        fontWeight: '700',
-        lineHeight: 27,
-        textAlign: 'center'
-    },
+        titulo: {
+            flex: 1,
+            flexShrink: 1,
+            ...tema.typography.h1,
+            color: tema.cores.interface.textoPrincipal
+        },
 
-    containerVoltar: {
-        width: 48,
-        height: 48,
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
-})
+        tituloComVoltar: {
+            fontFamily: fontFamilies.bold,
+            fontSize: 18,
+            fontWeight: '700',
+            lineHeight: 27,
+            textAlign: 'center'
+        },
 
-const corIconeVoltar = tema.cores.neutras.textoSecundarioClaro
+        containerVoltar: {
+            width: 48,
+            height: 48,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 24
+        },
 
-export { estilos, corIconeVoltar }
+        desabilitado: {
+            opacity: 0.5
+        }
+    });
+}
+
+export { criarEstilos };

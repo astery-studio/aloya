@@ -6,13 +6,22 @@ import { ShieldPlusIcon } from 'phosphor-react-native/src/icons/ShieldPlus';
 import Button from '../../../shared/components/common/Button/Button';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { StatusBadge } from '../../../shared/components/common/StatusBadge/StatusBadge';
-import { estilos as estilosBadge, variantes as variantesBadge } from '../../../shared/components/common/StatusBadge/StatusBadge.styles';
-import { ArrowsClockwiseIcon, FirstAidKitIcon, PillIcon, TrashIcon } from '../../../shared/components/icons/AppIcons';
+import {
+    estilos as estilosBadge,
+    variantes as variantesBadge
+} from '../../../shared/components/common/StatusBadge/StatusBadge.styles';
+import {
+    ArrowsClockwiseIcon,
+    FirstAidKitIcon,
+    PillIcon,
+    TrashIcon
+} from '../../../shared/components/icons/AppIcons';
 import { horarioValido } from '../../../shared/utils/validation/isValidTime';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { obterTipo } from '../constants/contraceptiveOptions';
 import { estadoRegistroUso } from '../utils/usageHistory';
 import { UsageHistoryPanel } from './UsageHistoryPanel';
-import { estilosCartao } from './ContraceptiveUsageCard.styles';
+import { criarEstilosCartao } from './ContraceptiveUsageCard.styles';
 
 const ESCALA_BOTAO_USO = 13 / 16;
 const ICONES_TIPO = Object.freeze({
@@ -61,7 +70,7 @@ function IconeConfirmacao({ color }) {
     return <CheckIcon size={13 / ESCALA_BOTAO_USO} color={color} weight="bold" />;
 }
 
-function AcaoDeUso({ confirmado, aoPressionar, desativado }) {
+function AcaoDeUso({ confirmado, aoPressionar, desativado, estilosCartao }) {
     const largura = confirmado ? 144 : 119;
     return (
         <View style={[estilosCartao.espacoBotaoUso, { width: largura }]}>
@@ -73,66 +82,104 @@ function AcaoDeUso({ confirmado, aoPressionar, desativado }) {
                     largura={largura / ESCALA_BOTAO_USO}
                     icone={IconeConfirmacao}
                     desativado={desativado}
-                    estilo={[estilosCartao.botaoUso, confirmado && estilosCartao.botaoUsoConfirmado]}
+                    estilo={[
+                        estilosCartao.botaoUso,
+                        confirmado && estilosCartao.botaoUsoConfirmado
+                    ]}
                     aoPressionar={aoPressionar}
                 />
             </View>
-            {confirmado ? <View pointerEvents="none" style={estilosCartao.bordaBotaoConfirmado} /> : null}
+            {confirmado ? (
+                <View pointerEvents="none" style={estilosCartao.bordaBotaoConfirmado} />
+            ) : null}
         </View>
     );
 }
 
-function AcaoDoCartao({ icone, rotulo, aoPressionar }) {
+function AcaoDoCartao({ icone, rotulo, aoPressionar, estilosCartao }) {
     return (
         <View style={estilosCartao.espacoAcao}>
             <View style={estilosCartao.escalaAcao}>
-                <IconButton icone={icone} rotuloAcessibilidade={rotulo} aoPressionar={aoPressionar} />
+                <IconButton
+                    icone={icone}
+                    rotuloAcessibilidade={rotulo}
+                    aoPressionar={aoPressionar}
+                />
             </View>
         </View>
     );
 }
 
 function larguraMinimaDosBadges(estados) {
-    return Math.max(...estados.map((estado) => {
-        const visual = variantesBadge[estado === 'alertaCrítico' ? 'alertaCritico' : estado];
-        if (estado.endsWith('HistoricoUso')) return visual.container.width;
-        return visual.texto.width + visual.container.paddingHorizontal * 2
-            + estilosBadge.ponto.width + visual.container.gap;
-    }));
+    return Math.max(
+        ...estados.map((estado) => {
+            const visual = variantesBadge[estado === 'alertaCrítico' ? 'alertaCritico' : estado];
+            if (estado.endsWith('HistoricoUso')) return visual.container.width;
+            return (
+                visual.texto.width +
+                visual.container.paddingHorizontal * 2 +
+                estilosBadge.ponto.width +
+                visual.container.gap
+            );
+        })
+    );
 }
 
-function BadgeDoCartao({ estado, larguraMinima }) {
+function BadgeDoCartao({ estado, larguraMinima, estilosCartao }) {
     return (
         <View
             testID={`usage-card-badge-${estado}`}
-            style={[estilosCartao.espacoBadge, { minWidth: larguraMinima, flexBasis: larguraMinima }]}
+            style={[
+                estilosCartao.espacoBadge,
+                { minWidth: larguraMinima, flexBasis: larguraMinima }
+            ]}
         >
             <StatusBadge estado={estado} />
         </View>
     );
 }
 
-function ContraceptiveUsageCard({ anticoncepcional, aoEditar, aoRemover, aoAlternarUso, aoAtualizarUsos }) {
+function ContraceptiveUsageCard({
+    anticoncepcional,
+    aoEditar,
+    aoRemover,
+    aoAlternarUso,
+    aoAtualizarUsos
+}) {
+    const tema = useTheme();
+    const estilosCartao = useMemo(() => criarEstilosCartao(tema), [tema]);
     const [historicoExpandido, setHistoricoExpandido] = useState(false);
     const usosRecebidos = useMemo(() => criarUsos(anticoncepcional), [anticoncepcional]);
     const [usos, setUsos] = useState(usosRecebidos);
     const usosAtuais = useRef(usos);
     const operacoesPendentes = useRef(new Set());
     const IconeTipo = ICONES_TIPO[anticoncepcional.tipo] ?? PillIcon;
-    const tipo = ROTULOS_TIPO[anticoncepcional.tipo] ?? obterTipo(anticoncepcional.tipo)?.label ?? anticoncepcional.tipo;
+    const tipo =
+        ROTULOS_TIPO[anticoncepcional.tipo] ??
+        obterTipo(anticoncepcional.tipo)?.label ??
+        anticoncepcional.tipo;
     const historico = anticoncepcional.historico ?? [];
     const removido = Boolean(anticoncepcional.removido || anticoncepcional.ativo === false);
     const possuiUsoPendente = usos.some((uso) => !usoConfirmado(uso));
     const possuiUsoConfirmado = usos.some(usoConfirmado);
     const ultimoEstado = anticoncepcional.statusUltimoUso ?? historico[0]?.estado;
     const estadoUltimoNormalizado = estadoRegistroUso({ estado: ultimoEstado });
-    const estadoUso = usos.length ? (possuiUsoPendente ? 'pendenteDeUso' : 'confirmado')
-        : ultimoEstado === 'pendente' ? 'pendenteDeUso'
-            : estadoUltimoNormalizado === 'naoConfirmado' ? 'naoConfirmadoHistoricoUso'
-                : estadoUltimoNormalizado || anticoncepcional.tipo === 'diu_hormonal' ? 'confirmado' : null;
+    const estadoUso = usos.length
+        ? possuiUsoPendente
+            ? 'pendenteDeUso'
+            : 'confirmado'
+        : ultimoEstado === 'pendente'
+          ? 'pendenteDeUso'
+          : estadoUltimoNormalizado === 'naoConfirmado'
+            ? 'naoConfirmadoHistoricoUso'
+            : estadoUltimoNormalizado || anticoncepcional.tipo === 'diu_hormonal'
+              ? 'confirmado'
+              : null;
     const alerta = estadoAlerta(anticoncepcional.intensidadeAlerta);
     const larguraMinimaBadge = larguraMinimaDosBadges([estadoUso, alerta].filter(Boolean));
-    const permiteHistorico = ['pilula', 'injetavel', 'adesivo', 'anel_vaginal'].includes(anticoncepcional.tipo);
+    const permiteHistorico = ['pilula', 'injetavel', 'adesivo', 'anel_vaginal'].includes(
+        anticoncepcional.tipo
+    );
     const modoHistorico = anticoncepcional.tipo === 'pilula' ? 'calendario' : 'lista';
 
     useEffect(() => {
@@ -149,37 +196,78 @@ function ContraceptiveUsageCard({ anticoncepcional, aoEditar, aoRemover, aoAlter
     }
 
     async function alternarUso(uso) {
-        if (typeof aoAlternarUso !== 'function' || horarioUsoInvalido(uso) || operacoesPendentes.current.has(uso.id)) return;
+        if (
+            typeof aoAlternarUso !== 'function' ||
+            horarioUsoInvalido(uso) ||
+            operacoesPendentes.current.has(uso.id)
+        )
+            return;
         operacoesPendentes.current.add(uso.id);
         const confirmar = !usoConfirmado(uso);
         const agora = new Date();
-        publicarUsos(usosAtuais.current.map((item) => item.id === uso.id ? {
-            ...item,
-            status: confirmar ? 'confirmado' : 'pendente',
-            horarioConfirmacao: confirmar ? `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}` : null,
-            confirmadoEm: confirmar ? agora.toISOString() : null
-        } : item));
+        publicarUsos(
+            usosAtuais.current.map((item) =>
+                item.id === uso.id
+                    ? {
+                          ...item,
+                          status: confirmar ? 'confirmado' : 'pendente',
+                          horarioConfirmacao: confirmar
+                              ? `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`
+                              : null,
+                          confirmadoEm: confirmar ? agora.toISOString() : null
+                      }
+                    : item
+            )
+        );
 
         try {
             const salvo = await aoAlternarUso(anticoncepcional, uso, confirmar);
             // O relógio do servidor e sua avaliação do prazo prevalecem sobre o feedback otimista.
             if (salvo?.data && salvo?.horario) {
-                publicarUsos(usosAtuais.current.map((item) => item.id === uso.id ? { ...item, ...salvo } : item));
+                publicarUsos(
+                    usosAtuais.current.map((item) =>
+                        item.id === uso.id ? { ...item, ...salvo } : item
+                    )
+                );
             }
         } catch {
-            publicarUsos(usosAtuais.current.map((item) => item.id === uso.id ? uso : item));
+            publicarUsos(usosAtuais.current.map((item) => (item.id === uso.id ? uso : item)));
         } finally {
             operacoesPendentes.current.delete(uso.id);
         }
     }
 
     return (
-        <View style={[estilosCartao.card, !possuiUsoPendente && !removido && estilosCartao.cardConfirmado]} accessibilityLabel={`${anticoncepcional.nome}, ${tipo}${removido ? ', removido' : ''}`}>
+        <View
+            style={[
+                estilosCartao.card,
+                !possuiUsoPendente && !removido && estilosCartao.cardConfirmado
+            ]}
+            accessibilityLabel={`${anticoncepcional.nome}, ${tipo}${removido ? ', removido' : ''}`}
+        >
             <View style={estilosCartao.faixaSuperior} />
-            <View style={[estilosCartao.conteudo, !removido && !usos.length && anticoncepcional.dataValidade && estilosCartao.conteudoValidade, removido && estilosCartao.conteudoRemovido]}>
+            <View
+                style={[
+                    estilosCartao.conteudo,
+                    !removido &&
+                        !usos.length &&
+                        anticoncepcional.dataValidade &&
+                        estilosCartao.conteudoValidade,
+                    removido && estilosCartao.conteudoRemovido
+                ]}
+            >
                 <View style={estilosCartao.cabecalho}>
                     <View style={estilosCartao.iconeTipo}>
-                        <IconeTipo size={16} color="#5C5C59" weight={anticoncepcional.tipo === 'anel_vaginal' || anticoncepcional.tipo === 'diu_hormonal' ? 'regular' : 'fill'} />
+                        <IconeTipo
+                            size={16}
+                            color={tema.cores.interface.textoSecundario}
+                            weight={
+                                anticoncepcional.tipo === 'anel_vaginal' ||
+                                anticoncepcional.tipo === 'diu_hormonal'
+                                    ? 'regular'
+                                    : 'fill'
+                            }
+                        />
                     </View>
                     <View style={estilosCartao.identificacao}>
                         <Text style={estilosCartao.nome}>{anticoncepcional.nome}</Text>
@@ -187,48 +275,120 @@ function ContraceptiveUsageCard({ anticoncepcional, aoEditar, aoRemover, aoAlter
                     </View>
                     {!removido ? (
                         <View style={estilosCartao.acoes}>
-                            <AcaoDoCartao icone={PencilSimpleIcon} rotulo={`Editar ${anticoncepcional.nome}`} aoPressionar={aoEditar ? () => aoEditar(anticoncepcional) : undefined} />
-                            <AcaoDoCartao icone={TrashIcon} rotulo={`Remover ${anticoncepcional.nome}`} aoPressionar={aoRemover ? () => aoRemover(anticoncepcional) : undefined} />
+                            <AcaoDoCartao
+                                estilosCartao={estilosCartao}
+                                icone={PencilSimpleIcon}
+                                rotulo={`Editar ${anticoncepcional.nome}`}
+                                aoPressionar={
+                                    aoEditar ? () => aoEditar(anticoncepcional) : undefined
+                                }
+                            />
+                            <AcaoDoCartao
+                                estilosCartao={estilosCartao}
+                                icone={TrashIcon}
+                                rotulo={`Remover ${anticoncepcional.nome}`}
+                                aoPressionar={
+                                    aoRemover ? () => aoRemover(anticoncepcional) : undefined
+                                }
+                            />
                         </View>
                     ) : null}
                 </View>
 
                 {!removido ? (
-                    <View testID="usage-card-badges" style={[estilosCartao.badges, !possuiUsoPendente && estilosCartao.badgesConfirmado]}>
-                        {estadoUso ? <BadgeDoCartao estado={estadoUso} larguraMinima={larguraMinimaBadge} />
-                            : <Text style={estilosCartao.tipo}>Sem usos registrados</Text>}
-                        <BadgeDoCartao estado={alerta} larguraMinima={larguraMinimaBadge} />
+                    <View
+                        testID="usage-card-badges"
+                        style={[
+                            estilosCartao.badges,
+                            !possuiUsoPendente && estilosCartao.badgesConfirmado
+                        ]}
+                    >
+                        {estadoUso ? (
+                            <BadgeDoCartao
+                                estilosCartao={estilosCartao}
+                                estado={estadoUso}
+                                larguraMinima={larguraMinimaBadge}
+                            />
+                        ) : (
+                            <Text style={estilosCartao.tipo}>Sem usos registrados</Text>
+                        )}
+                        <BadgeDoCartao
+                            estilosCartao={estilosCartao}
+                            estado={alerta}
+                            larguraMinima={larguraMinimaBadge}
+                        />
                     </View>
                 ) : null}
 
-                {!removido && anticoncepcional.tipo === 'diu_hormonal' && anticoncepcional.dataValidade ? (
+                {!removido &&
+                anticoncepcional.tipo === 'diu_hormonal' &&
+                anticoncepcional.dataValidade ? (
                     <View style={estilosCartao.validade}>
-                        <ClockIcon size={11} color="#5C5C59" />
-                        <Text style={estilosCartao.textoValidade}><Text style={estilosCartao.rotuloValidade}>Validade: </Text>{formatarValidade(anticoncepcional.dataValidade)}</Text>
-                        {anticoncepcional.validadeRestante ? anticoncepcional.validadeExpirada
-                            ? <Text accessibilityRole="alert" style={estilosCartao.textoValidade}>{anticoncepcional.validadeRestante}</Text>
-                            : <StatusBadge estado="validadeAindaPrazo" rotulo={anticoncepcional.validadeRestante} /> : null}
+                        <ClockIcon size={11} color={tema.cores.interface.textoSecundario} />
+                        <Text style={estilosCartao.textoValidade}>
+                            <Text style={estilosCartao.rotuloValidade}>Validade: </Text>
+                            {formatarValidade(anticoncepcional.dataValidade)}
+                        </Text>
+                        {anticoncepcional.validadeRestante ? (
+                            anticoncepcional.validadeExpirada ? (
+                                <Text accessibilityRole="alert" style={estilosCartao.textoValidade}>
+                                    {anticoncepcional.validadeRestante}
+                                </Text>
+                            ) : (
+                                <StatusBadge
+                                    estado="validadeAindaPrazo"
+                                    rotulo={anticoncepcional.validadeRestante}
+                                />
+                            )
+                        ) : null}
                     </View>
                 ) : null}
 
                 {!removido && usos.length > 0 ? <View style={estilosCartao.divisor} /> : null}
                 {!removido && !usos.length && anticoncepcional.programacao?.proximoUsoPrevisto ? (
-                    <Text style={estilosCartao.confirmadoAs}>Próximo uso: {new Date(anticoncepcional.programacao.proximoUsoPrevisto).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</Text>
+                    <Text style={estilosCartao.confirmadoAs}>
+                        Próximo uso:{' '}
+                        {new Date(anticoncepcional.programacao.proximoUsoPrevisto).toLocaleString(
+                            'pt-BR',
+                            { dateStyle: 'short', timeStyle: 'short' }
+                        )}
+                    </Text>
                 ) : null}
 
                 {!removido && possuiUsoPendente ? (
                     <View style={estilosCartao.blocoUsos}>
                         <Text style={estilosCartao.rotuloSecao}>PRÓXIMOS HORÁRIOS</Text>
-                        {usos.filter((uso) => !usoConfirmado(uso)).map((uso, indice) => (
-                            <View key={uso.id} style={[estilosCartao.linhaUso, indice > 0 && estilosCartao.linhaUsoSeparada]}>
-                                <View style={estilosCartao.horarioComIcone}>
-                                    <ClockIcon size={11} color="#5C5C59" />
-                                    <Text style={estilosCartao.horario}>{uso.horario}</Text>
-                                    {uso.atrasado ? <StatusBadge estado="atrasadoProximosHorarios" /> : null}
+                        {usos
+                            .filter((uso) => !usoConfirmado(uso))
+                            .map((uso, indice) => (
+                                <View
+                                    key={uso.id}
+                                    style={[
+                                        estilosCartao.linhaUso,
+                                        indice > 0 && estilosCartao.linhaUsoSeparada
+                                    ]}
+                                >
+                                    <View style={estilosCartao.horarioComIcone}>
+                                        <ClockIcon
+                                            size={11}
+                                            color={tema.cores.interface.textoSecundario}
+                                        />
+                                        <Text style={estilosCartao.horario}>{uso.horario}</Text>
+                                        {uso.atrasado ? (
+                                            <StatusBadge estado="atrasadoProximosHorarios" />
+                                        ) : null}
+                                    </View>
+                                    <AcaoDeUso
+                                        estilosCartao={estilosCartao}
+                                        confirmado={false}
+                                        desativado={
+                                            typeof aoAlternarUso !== 'function' ||
+                                            horarioUsoInvalido(uso)
+                                        }
+                                        aoPressionar={() => alternarUso(uso)}
+                                    />
                                 </View>
-                                <AcaoDeUso confirmado={false} desativado={typeof aoAlternarUso !== 'function' || horarioUsoInvalido(uso)} aoPressionar={() => alternarUso(uso)} />
-                            </View>
-                        ))}
+                            ))}
                     </View>
                 ) : null}
 
@@ -236,22 +396,51 @@ function ContraceptiveUsageCard({ anticoncepcional, aoEditar, aoRemover, aoAlter
                     <View style={estilosCartao.blocoUsos}>
                         <Text style={estilosCartao.rotuloSecao}>USADOS</Text>
                         {usos.filter(usoConfirmado).map((uso, indice) => (
-                            <View key={uso.id} style={[estilosCartao.linhaUso, indice > 0 && estilosCartao.linhaUsoSeparada]}>
+                            <View
+                                key={uso.id}
+                                style={[
+                                    estilosCartao.linhaUso,
+                                    indice > 0 && estilosCartao.linhaUsoSeparada
+                                ]}
+                            >
                                 <View style={estilosCartao.horarioConfirmado}>
                                     <View style={estilosCartao.horarioComIcone}>
-                                        <ClockIcon size={11} color="#5C5C59" />
+                                        <ClockIcon
+                                            size={11}
+                                            color={tema.cores.interface.textoSecundario}
+                                        />
                                         <Text style={estilosCartao.horario}>{uso.horario}</Text>
                                     </View>
-                                    {uso.horarioConfirmacao ? <Text style={estilosCartao.confirmadoAs}>Confirmado às <Text style={estilosCartao.horaConfirmacao}>{uso.horarioConfirmacao}</Text></Text> : null}
+                                    {uso.horarioConfirmacao ? (
+                                        <Text style={estilosCartao.confirmadoAs}>
+                                            Confirmado às{' '}
+                                            <Text style={estilosCartao.horaConfirmacao}>
+                                                {uso.horarioConfirmacao}
+                                            </Text>
+                                        </Text>
+                                    ) : null}
                                 </View>
-                                <AcaoDeUso confirmado desativado={typeof aoAlternarUso !== 'function' || horarioUsoInvalido(uso)} aoPressionar={() => alternarUso(uso)} />
+                                <AcaoDeUso
+                                    estilosCartao={estilosCartao}
+                                    confirmado
+                                    desativado={
+                                        typeof aoAlternarUso !== 'function' ||
+                                        horarioUsoInvalido(uso)
+                                    }
+                                    aoPressionar={() => alternarUso(uso)}
+                                />
                             </View>
                         ))}
                     </View>
                 ) : null}
 
                 {permiteHistorico ? (
-                    <View style={[estilosCartao.historico, removido && estilosCartao.historicoRemovido]}>
+                    <View
+                        style={[
+                            estilosCartao.historico,
+                            removido && estilosCartao.historicoRemovido
+                        ]}
+                    >
                         <UsageHistoryPanel
                             expandido={historicoExpandido}
                             registros={historico}

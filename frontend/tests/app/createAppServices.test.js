@@ -1,14 +1,15 @@
 //Testa a configuração segura dos serviços usados pela aplicação.
-import { criarCalendarService } from '../../src/features/calendar/services/calendarService';
-import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService';
+import { criarServicosApp } from '../../src/app/createAppServices';
 import { criarAuthService } from '../../src/features/auth/services/authService';
-import { criarAccountService } from '../../src/features/settings/services/accountService';
+import { criarCalendarService } from '../../src/features/calendar/services/calendarService';
 import { criarContraceptiveService } from '../../src/features/contraceptives/services/contraceptiveService';
-import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
+import { criarCycleHistoryService } from '../../src/features/cycles/services/cycleHistoryService';
+import { criarCycleParametersService } from '../../src/features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../../src/features/cycles/services/cyclePredictionService';
 import { criarCycleRemovalService } from '../../src/features/cycles/services/cycleRemovalService';
-import { criarCycleParametersService } from '../../src/features/cycles/services/cycleParametersService';
-import { criarServicosApp } from '../../src/app/createAppServices';
+import { criarAccountService } from '../../src/features/settings/services/accountService';
+import { criarThemePreferenceService } from '../../src/features/settings/services/themePreferenceService';
+import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
 import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage';
@@ -19,6 +20,10 @@ jest.mock('../../src/features/auth/services/authService', () => ({
 
 jest.mock('../../src/features/settings/services/accountService', () => ({
     criarAccountService: jest.fn()
+}));
+
+jest.mock('../../src/features/settings/services/themePreferenceService', () => ({
+    criarThemePreferenceService: jest.fn()
 }));
 
 jest.mock('../../src/features/calendar/services/calendarService', () => ({
@@ -40,7 +45,6 @@ jest.mock('../../src/features/support-network/services/supportCategoryService', 
 jest.mock('../../src/features/cycles/services/cyclePredictionService', () => ({
     criarCyclePredictionService: jest.fn()
 }));
-
 jest.mock('../../src/features/cycles/services/cycleRemovalService', () => ({
     criarCycleRemovalService: jest.fn()
 }));
@@ -67,14 +71,14 @@ describe('createAppServices', () => {
     let requisicaoAutenticada;
     let authService;
     let accountService;
+    let themePreferenceService;
     let calendarService;
     let contraceptiveService;
     let cycleHistoryService;
     let supportCategoryService;
     let cyclePredictionService;
-    let cycleRemovalService;
     let cycleParametersService;
-    let fetchSeguro;
+    let cycleRemovalService;
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -89,6 +93,11 @@ describe('createAppServices', () => {
         accountService = Object.freeze({
             nome: 'accountService'
         });
+
+        themePreferenceService = Object.freeze({
+            nome: 'themePreferenceService'
+        });
+
         calendarService = Object.freeze({
             nome: 'calendarService'
         });
@@ -106,9 +115,15 @@ describe('createAppServices', () => {
         cyclePredictionService = Object.freeze({
             nome: 'cyclePredictionService'
         });
-        cycleRemovalService = Object.freeze({ removerDia: jest.fn(), excluirCiclo: jest.fn() });
-        cycleParametersService = Object.freeze({ nome: 'cycleParametersService' });
-        fetchSeguro = null;
+
+        cycleParametersService = Object.freeze({
+            nome: 'cycleParametersService'
+        });
+
+        cycleRemovalService = Object.freeze({
+            removerDia: jest.fn(),
+            excluirCiclo: jest.fn()
+        });
 
         criarApiClient.mockReturnValue({
             requisicao
@@ -121,6 +136,7 @@ describe('createAppServices', () => {
 
         criarAccountService.mockReturnValue(accountService);
 
+        criarThemePreferenceService.mockReturnValue(themePreferenceService);
         criarContraceptiveService.mockReturnValue(contraceptiveService);
 
         criarCycleHistoryService.mockReturnValue(cycleHistoryService);
@@ -162,6 +178,9 @@ describe('createAppServices', () => {
             requisicaoAutenticada,
             removerCredencialLocal: removerToken
         });
+        expect(criarThemePreferenceService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
 
         expect(criarCalendarService).toHaveBeenCalledWith({
             requisicaoAutenticada
@@ -190,6 +209,7 @@ describe('createAppServices', () => {
         expect(servicos).toEqual({
             authService,
             accountService,
+            themePreferenceService,
             calendarService: expect.objectContaining({
                 nome: 'calendarService',
                 ...cycleRemovalService,
@@ -221,7 +241,9 @@ describe('createAppServices', () => {
         try {
             const fetchImpl = jest.fn();
 
-            criarServicosApp({ fetchImpl });
+            criarServicosApp({
+                fetchImpl
+            });
 
             expect(criarApiClient).toHaveBeenCalledWith({
                 baseUrl: 'https://api.aloya.com',

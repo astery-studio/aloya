@@ -1,15 +1,23 @@
-//Organiza o cabeçalho e o conteúdo dos painéis inferiores. É usado por SelectionSheet e EditFieldSheet
+// Organiza o cabeçalho e o conteúdo dos painéis inferiores.
+import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
-import { estilos, corIconeFechar } from './BottomSheetLayout.style';
+
+import { useTheme } from '../../hooks/useTheme';
+import { criarEstilos } from './BottomSheetLayout.style';
 
 function BottomSheetLayout({
     titulo,
     onFechar,
     bloquearFechamento = false,
     compacto = false,
+    corFundo,
     children
 }) {
+    const tema = useTheme();
+
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     function fecharPeloX() {
         if (!bloquearFechamento) {
             onFechar?.();
@@ -17,22 +25,53 @@ function BottomSheetLayout({
     }
 
     return (
-        <View style={estilos.container}>
-            <View style={[estilos.cabecalho, compacto && estilos.cabecalhoCompacto]}>
-                <Text style={[estilos.titulo, compacto && estilos.tituloCompacto]}>{titulo}</Text>
+        <View
+            testID="bottom-sheet-layout"
+            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+        >
+            <View
+                testID="bottom-sheet-cabecalho"
+                style={[
+                    estilos.cabecalho,
+                    compacto && estilos.cabecalhoCompacto,
+                    corFundo ? { backgroundColor: corFundo } : null
+                ]}
+            >
+                <Text
+                    accessibilityRole="header"
+                    style={[estilos.titulo, compacto && estilos.tituloCompacto]}
+                >
+                    {titulo}
+                </Text>
 
                 <Pressable
                     onPress={fecharPeloX}
                     disabled={bloquearFechamento}
                     accessibilityRole="button"
                     accessibilityLabel="Fechar painel"
-                    style={[estilos.botaoFechar, compacto && estilos.botaoFecharCompacto]}
+                    accessibilityState={{
+                        disabled: bloquearFechamento
+                    }}
+                    style={[
+                        estilos.botaoFechar,
+                        compacto && estilos.botaoFecharCompacto,
+                        bloquearFechamento && estilos.desabilitado
+                    ]}
                 >
-                    <XIcon size={24} color={corIconeFechar} weight="regular" />
+                    <XIcon
+                        size={24}
+                        color={tema.cores.interface.textoSecundario}
+                        weight="regular"
+                    />
                 </Pressable>
             </View>
 
-            <View style={estilos.conteudo}>{children}</View>
+            <View
+                testID="bottom-sheet-conteudo"
+                style={[estilos.conteudo, corFundo ? { backgroundColor: corFundo } : null]}
+            >
+                {children}
+            </View>
         </View>
     );
 }

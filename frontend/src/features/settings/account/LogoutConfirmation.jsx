@@ -1,33 +1,35 @@
-//Confirma o logout e encerra a sessão no servidor e no armazenamento seguro.
-import { useState } from 'react'
-import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons'
-import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup'
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal'
-import AppModal from '../../../shared/components/feedback/Modal/AppModal'
-import { tema } from '../../../shared/theme'
+// Confirma o logout e encerra a sessão no servidor e no armazenamento seguro.
+import { useState } from 'react';
+
+import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup';
+import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import AppModal from '../../../shared/components/feedback/Modal/AppModal';
+import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import { cores } from '../../../shared/theme';
 
 function ignorarFechamento() {}
 
-function LogoutConfirmation({visivel, onFechar, encerrarSessao, onSessaoEncerrada}) {
-    const [carregando, setCarregando] = useState(false)
-    const [erroVisivel, setErroVisivel] = useState(false)
+function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerrada }) {
+    const [carregando, setCarregando] = useState(false);
+    const [erroVisivel, setErroVisivel] = useState(false);
 
     async function confirmarLogout() {
         if (typeof encerrarSessao !== 'function' || carregando) {
-            return
+            return;
         }
 
-        setCarregando(true)
-        setErroVisivel(false)
+        setCarregando(true);
+        setErroVisivel(false);
 
         try {
-            const resultado = await encerrarSessao()
-            onFechar?.()
-            onSessaoEncerrada?.(resultado)
+            const resultado = await encerrarSessao();
+
+            onFechar?.();
+            onSessaoEncerrada?.(resultado);
         } catch {
-            setErroVisivel(true)
+            setErroVisivel(true);
         } finally {
-            setCarregando(false)
+            setCarregando(false);
         }
     }
 
@@ -38,8 +40,7 @@ function LogoutConfirmation({visivel, onFechar, encerrarSessao, onSessaoEncerrad
                 visivel={visivel && !erroVisivel}
                 aoFechar={carregando ? ignorarFechamento : onFechar}
                 icone={WarningCircleIcon}
-                corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                corIcone={cores.marca.primaria}
                 titulo="Sair da Conta"
                 mensagem="Você deverá realizar login novamente para acessar sua conta."
                 destaque="Deseja continuar?"
@@ -49,7 +50,9 @@ function LogoutConfirmation({visivel, onFechar, encerrarSessao, onSessaoEncerrad
                     variante="branco"
                     aoPressionar={confirmarLogout}
                     carregando={carregando}
-                    estilo={{ width: '100%' }}
+                    estilo={{
+                        width: '100%'
+                    }}
                 />
 
                 <ButtonPopup
@@ -57,7 +60,9 @@ function LogoutConfirmation({visivel, onFechar, encerrarSessao, onSessaoEncerrad
                     variante="verde"
                     aoPressionar={onFechar}
                     desativado={carregando}
-                    estilo={{ width: '100%' }}
+                    estilo={{
+                        width: '100%'
+                    }}
                 />
             </AppModal>
 
@@ -80,7 +85,7 @@ function LogoutConfirmation({visivel, onFechar, encerrarSessao, onSessaoEncerrad
                 }}
             />
         </>
-    )
+    );
 }
 
-export { LogoutConfirmation }
+export { LogoutConfirmation };

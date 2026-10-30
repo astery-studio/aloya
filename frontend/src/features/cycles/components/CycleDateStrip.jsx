@@ -1,11 +1,20 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
-import { estilos } from './CycleDateStrip.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './CycleDateStrip.styles';
 
 const LIMITE_CARREGAMENTO = 32;
 const LARGURA_ITEM = 46 + 8;
 
-function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData, aoCarregarAnteriores, aoCarregarPosteriores }) {
+function CycleDateStrip({
+    dias = [],
+    dataSelecionada,
+    aoSelecionarData,
+    aoCarregarAnteriores,
+    aoCarregarPosteriores
+}) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const carregamentos = useRef({ anteriores: false, posteriores: false });
 
     useEffect(() => {
@@ -21,7 +30,10 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData, aoCarreg
             carregamentos.current.anteriores = true;
             aoCarregarAnteriores?.();
         }
-        if (larguraTotal - x - larguraVisivel <= LIMITE_CARREGAMENTO && !carregamentos.current.posteriores) {
+        if (
+            larguraTotal - x - larguraVisivel <= LIMITE_CARREGAMENTO &&
+            !carregamentos.current.posteriores
+        ) {
             carregamentos.current.posteriores = true;
             aoCarregarPosteriores?.();
         }
@@ -32,7 +44,11 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData, aoCarreg
             horizontal
             data={dias}
             keyExtractor={(item) => item.data}
-            getItemLayout={(_, index) => ({ length: LARGURA_ITEM, offset: LARGURA_ITEM * index, index })}
+            getItemLayout={(_, index) => ({
+                length: LARGURA_ITEM,
+                offset: LARGURA_ITEM * index,
+                index
+            })}
             initialNumToRender={16}
             maxToRenderPerBatch={10}
             windowSize={5}
@@ -59,13 +75,39 @@ function CycleDateStrip({ dias = [], dataSelecionada, aoSelecionarData, aoCarreg
                             selecionado && estilos[`diaSelecionado_${item.fase}`]
                         ]}
                     >
-                        <Text style={[estilos.semana, selecionado && estilos.semanaSelecionada, selecionado && item.fase === 'desconhecida' && estilos.textoSelecionadoDesconhecido]}>
+                        <Text
+                            style={[
+                                estilos.semana,
+                                selecionado && estilos.semanaSelecionada,
+                                selecionado &&
+                                    item.fase === 'desconhecida' &&
+                                    estilos.textoSelecionadoDesconhecido
+                            ]}
+                        >
                             {item.semana}
                         </Text>
-                        <Text style={[estilos.textoNumero, selecionado && estilos.numeroSelecionado, selecionado && item.fase === 'desconhecida' && estilos.textoSelecionadoDesconhecido]}>
+                        <Text
+                            style={[
+                                estilos.textoNumero,
+                                selecionado && estilos.numeroSelecionado,
+                                selecionado &&
+                                    item.fase === 'desconhecida' &&
+                                    estilos.textoSelecionadoDesconhecido
+                            ]}
+                        >
                             {item.dia ?? '?'}
                         </Text>
-                        <View testID={`indicador-${item.data}`} style={[estilos.indicador, item.hoje && estilos.indicadorHoje, selecionado && estilos.indicadorSelecionado, selecionado && item.fase === 'desconhecida' && estilos.indicadorSelecionadoDesconhecido]} />
+                        <View
+                            testID={`indicador-${item.data}`}
+                            style={[
+                                estilos.indicador,
+                                item.hoje && estilos.indicadorHoje,
+                                selecionado && estilos.indicadorSelecionado,
+                                selecionado &&
+                                    item.fase === 'desconhecida' &&
+                                    estilos.indicadorSelecionadoDesconhecido
+                            ]}
+                        />
                     </Pressable>
                 );
             }}

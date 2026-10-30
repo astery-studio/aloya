@@ -1,69 +1,54 @@
 //Testa ordenação, resumos e estados da lista de categorias.
-import {
-    fireEvent,
-    render,
-    screen
-} from '@testing-library/react-native'
+import { fireEvent, screen } from '@testing-library/react-native';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
-jest.mock(
-    '../../../../src/shared/components/icons/AppIcons',
-    () => {
-        const React = require('react')
-        const {View} = require('react-native')
+jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
+    const React = require('react');
+    const { View } = require('react-native');
 
-        function criarIcone(nome) {
-            return function IconeFalso(propriedades) {
-                return React.createElement(View, {
-                    ...propriedades,
-                    testID: nome
-                })
-            }
-        }
-
-        return {
-            PencilSimpleIcon: criarIcone('PencilSimpleIcon'),
-            TrashIcon: criarIcone('TrashIcon'),
-            UserCheckIcon: criarIcone('UserCheckIcon'),
-            UsersIcon: criarIcone('UsersIcon')
-        }
+    function criarIcone(nome) {
+        return function IconeFalso(propriedades) {
+            return React.createElement(View, {
+                ...propriedades,
+                testID: nome
+            });
+        };
     }
-)
+
+    return {
+        PencilSimpleIcon: criarIcone('PencilSimpleIcon'),
+        TrashIcon: criarIcone('TrashIcon'),
+        UserCheckIcon: criarIcone('UserCheckIcon'),
+        UsersIcon: criarIcone('UsersIcon')
+    };
+});
 
 import {
     criarResumoPermissoes,
     ordenarCategorias,
     SupportCategoryList
-} from '../../../../src/features/support-network/components/SupportCategoryList'
+} from '../../../../src/features/support-network/components/SupportCategoryList';
 import {
     gruposPermissoes,
     permissoesGerais
-} from '../../../../src/features/support-network/constants/permissionOptions'
+} from '../../../../src/features/support-network/constants/permissionOptions';
 
 const todasAsPermissoes = [
-    ...permissoesGerais.map(permissao => permissao.id),
-    ...gruposPermissoes.flatMap(grupo =>
-        grupo.permissoes.map(permissao => permissao.id)
-    )
-]
+    ...permissoesGerais.map((permissao) => permissao.id),
+    ...gruposPermissoes.flatMap((grupo) => grupo.permissoes.map((permissao) => permissao.id))
+];
 
 const categorias = [
     {
         id: 3,
         nome: 'Rede próxima',
-        dadosVisiveis: [
-            'geral.fase_atual',
-            'emocional.sintomas_emocionais'
-        ],
+        dadosVisiveis: ['geral.fase_atual', 'emocional.sintomas_emocionais'],
         quantidadeContatos: 3
     },
     {
         id: 1,
         nome: 'Família',
-        dadosVisiveis: [
-            'geral.fase_atual',
-            'geral.dicas',
-            'ciclo.fluxo_menstrual'
-        ],
+        dadosVisiveis: ['geral.fase_atual', 'geral.dicas', 'ciclo.fluxo_menstrual'],
         quantidadeContatos: 2
     },
     {
@@ -72,7 +57,7 @@ const categorias = [
         dadosVisiveis: todasAsPermissoes,
         quantidadeContatos: 1
     }
-]
+];
 
 describe('SupportCategoryList', () => {
     test('ordena as categorias alfabeticamente', async () => {
@@ -83,130 +68,74 @@ describe('SupportCategoryList', () => {
                 onEditar={jest.fn()}
                 onExcluir={jest.fn()}
             />
-        )
+        );
 
         const nomes = screen
             .getAllByTestId('support-category-name')
-            .map(elemento => elemento.props.children)
+            .map((elemento) => elemento.props.children);
 
-        expect(nomes).toEqual([
-            'Família',
-            'Parceiro(a)',
-            'Rede próxima'
-        ])
-    })
+        expect(nomes).toEqual(['Família', 'Parceiro(a)', 'Rede próxima']);
+    });
 
     test('mostra o nome somente quando existe uma permissão', () => {
-        expect(
-            criarResumoPermissoes([
-                'emocional.sintomas_emocionais'
-            ])
-        ).toBe('Apenas Humor permitido')
+        expect(criarResumoPermissoes(['emocional.sintomas_emocionais'])).toBe(
+            'Apenas Humor permitido'
+        );
 
-        expect(
-            criarResumoPermissoes([
-                'geral.fase_atual'
-            ])
-        ).toBe('Apenas Fase atual permitido')
-    })
+        expect(criarResumoPermissoes(['geral.fase_atual'])).toBe('Apenas Fase atual permitido');
+    });
 
     test('resume duas ou mais permissões pela quantidade', () => {
-        expect(
-            criarResumoPermissoes([
-                'geral.fase_atual',
-                'emocional.sintomas_emocionais'
-            ])
-        ).toBe('2 tipos de dado permitidos')
+        expect(criarResumoPermissoes(['geral.fase_atual', 'emocional.sintomas_emocionais'])).toBe(
+            '2 tipos de dado permitidos'
+        );
 
         expect(
-            criarResumoPermissoes([
-                'geral.fase_atual',
-                'geral.dicas',
-                'ciclo.fluxo_menstrual'
-            ])
-        ).toBe('3 tipos de dado permitidos')
-    })
+            criarResumoPermissoes(['geral.fase_atual', 'geral.dicas', 'ciclo.fluxo_menstrual'])
+        ).toBe('3 tipos de dado permitidos');
+    });
 
     test('mostra resumo especial quando todos os dados estão permitidos', () => {
-        expect(
-            criarResumoPermissoes(todasAsPermissoes)
-        ).toBe('Todos os dados permitidos')
-    })
+        expect(criarResumoPermissoes(todasAsPermissoes)).toBe('Todos os dados permitidos');
+    });
 
     test('ignora permissões e categorias inválidas', () => {
-        expect(
-            criarResumoPermissoes([
-                'inválida',
-                null
-            ])
-        ).toBe('Nenhum dado permitido')
+        expect(criarResumoPermissoes(['inválida', null])).toBe('Nenhum dado permitido');
 
-        expect(
-            ordenarCategorias([
-                null,
-                {},
-                ...categorias
-            ])
-        ).toHaveLength(3)
-    })
+        expect(ordenarCategorias([null, {}, ...categorias])).toHaveLength(3);
+    });
 
     test('mostra o estado vazio e permite criar', async () => {
-        const onCriar = jest.fn()
+        const onCriar = jest.fn();
 
-        await render(
-            <SupportCategoryList
-                categorias={[]}
-                onCriar={onCriar}
-            />
-        )
+        await render(<SupportCategoryList categorias={[]} onCriar={onCriar} />);
 
-        expect(
-            screen.getByText('Nenhuma categoria registrada')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Nenhuma categoria registrada')).toBeOnTheScreen();
 
-        expect(
-            screen.getByText(
-                /Você ainda não criou nenhuma categoria/
-            )
-        ).toBeOnTheScreen()
+        expect(screen.getByText(/Você ainda não criou nenhuma categoria/)).toBeOnTheScreen();
 
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Criar nova categoria de permissão'
             })
-        )
+        );
 
-        expect(onCriar).toHaveBeenCalledTimes(1)
-    })
+        expect(onCriar).toHaveBeenCalledTimes(1);
+    });
 
     test('mostra carregamento inicial sem apagar dados existentes', async () => {
-        const {rerender} = await render(
-            <SupportCategoryList
-                categorias={[]}
-                carregando
-            />
-        )
+        const { rerender } = await render(<SupportCategoryList categorias={[]} carregando />);
 
-        expect(
-            screen.getByLabelText('Carregando categorias')
-        ).toBeOnTheScreen()
+        expect(screen.getByLabelText('Carregando categorias')).toBeOnTheScreen();
 
         await rerender(
-            <SupportCategoryList
-                categorias={categorias}
-                carregando
-                onCriar={jest.fn()}
-            />
-        )
+            <SupportCategoryList categorias={categorias} carregando onCriar={jest.fn()} />
+        );
 
-        expect(
-            screen.getByText('Família')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Família')).toBeOnTheScreen();
 
-        expect(
-            screen.queryByLabelText('Carregando categorias')
-        ).toBeNull()
-    })
+        expect(screen.queryByLabelText('Carregando categorias')).toBeNull();
+    });
 
     test('preserva a lista durante atualização secundária', async () => {
         await render(
@@ -216,19 +145,15 @@ describe('SupportCategoryList', () => {
                 onTentarNovamente={jest.fn()}
                 onCriar={jest.fn()}
             />
-        )
+        );
 
-        expect(
-            screen.getByText('Família')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Família')).toBeOnTheScreen();
 
-        expect(
-            screen.getByLabelText('Atualizando categorias')
-        ).toBeOnTheScreen()
-    })
+        expect(screen.getByLabelText('Atualizando categorias')).toBeOnTheScreen();
+    });
 
     test('mostra erro inicial e executa nova tentativa', async () => {
-        const onTentarNovamente = jest.fn()
+        const onTentarNovamente = jest.fn();
 
         await render(
             <SupportCategoryList
@@ -236,36 +161,30 @@ describe('SupportCategoryList', () => {
                 erro="ERRO_REDE"
                 onTentarNovamente={onTentarNovamente}
             />
-        )
+        );
 
-        expect(
-            screen.getByText('Ocorreu um erro')
-        ).toBeOnTheScreen()
+        expect(screen.getByText('Ocorreu um erro')).toBeOnTheScreen();
 
         expect(
             screen.getByText(
                 'Não foi possível carregar suas categorias no momento. Tente novamente.'
             )
-        ).toBeOnTheScreen()
+        ).toBeOnTheScreen();
 
-        expect(
-            screen.queryByText('Criar nova categoria')
-        ).toBeNull()
+        expect(screen.queryByText('Criar nova categoria')).toBeNull();
 
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Tentar Novamente'
             })
-        )
+        );
 
-        expect(
-            onTentarNovamente
-        ).toHaveBeenCalledTimes(1)
-    })
+        expect(onTentarNovamente).toHaveBeenCalledTimes(1);
+    });
 
     test('encaminha edição e exclusão da categoria selecionada', async () => {
-        const onEditar = jest.fn()
-        const onExcluir = jest.fn()
+        const onEditar = jest.fn();
+        const onExcluir = jest.fn();
 
         await render(
             <SupportCategoryList
@@ -274,23 +193,23 @@ describe('SupportCategoryList', () => {
                 onExcluir={onExcluir}
                 onCriar={jest.fn()}
             />
-        )
+        );
 
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Editar categoria Família'
             })
-        )
+        );
 
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Excluir categoria Família'
             })
-        )
+        );
 
-        expect(onEditar).toHaveBeenCalledWith(categorias[1])
-        expect(onExcluir).toHaveBeenCalledWith(categorias[1])
-    })
+        expect(onEditar).toHaveBeenCalledWith(categorias[1]);
+        expect(onExcluir).toHaveBeenCalledWith(categorias[1]);
+    });
 
     test('encaminha o estado da operação para a categoria correta', async () => {
         await render(
@@ -302,16 +221,10 @@ describe('SupportCategoryList', () => {
                 onExcluir={jest.fn()}
                 onCriar={jest.fn()}
             />
-        )
+        );
 
-        expect(
-            screen.getByLabelText('Excluindo categoria Família')
-        ).toBeOnTheScreen()
+        expect(screen.getByLabelText('Excluindo categoria Família')).toBeOnTheScreen();
 
-        expect(
-            screen.queryByLabelText(
-                'Excluindo categoria Parceiro(a)'
-            )
-        ).toBeNull()
-    })
-})
+        expect(screen.queryByLabelText('Excluindo categoria Parceiro(a)')).toBeNull();
+    });
+});

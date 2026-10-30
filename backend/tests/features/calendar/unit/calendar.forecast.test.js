@@ -16,7 +16,7 @@ function criarCenario({
     registrosCiclo,
     diasMenstruacao = []
 } = {}) {
-    const registros = registrosCiclo ?? [{id: 1, dataInicio: inicio, dataFim: fim}];
+    const registros = registrosCiclo ?? [{ id: 1, dataInicio: inicio, dataFim: fim }];
     const parametros = {
         duracaoCicloInformada: duracaoCiclo,
         duracaoMenstruacaoInformada: duracaoMenstruacao,
@@ -31,7 +31,7 @@ function criarCenario({
                     usuario: {
                         ...parametros,
                         registrosCiclo: registros,
-                        _count: {registrosCiclo: registros.length}
+                        _count: { registrosCiclo: registros.length }
                     },
                     diasMenstruacao
                 };
@@ -39,7 +39,7 @@ function criarCenario({
         }
     });
 
-    return {service, parametros, registros, chamadas};
+    return { service, parametros, registros, chamadas };
 }
 
 function obterLimites(mes) {
@@ -63,13 +63,8 @@ function recortar(intervalo, mes) {
 
 function verificarCobertura(periodos, mes, inicioEsperado = `${mes}-01`, diasMenstruacao = []) {
     const limites = obterLimites(mes);
-    const diasCobertos = new Set(diasMenstruacao.map(dia => dia.data));
-    const camposIntervalo = [
-        'faseMenstrual',
-        'faseFolicular',
-        'faseLutea',
-        'menstruacaoPrevista'
-    ];
+    const diasCobertos = new Set(diasMenstruacao.map((dia) => dia.data));
+    const camposIntervalo = ['faseMenstrual', 'faseFolicular', 'faseLutea', 'menstruacaoPrevista'];
 
     assert.ok(Array.isArray(periodos), 'A previsão mensal deve incluir seus períodos.');
     for (const periodo of periodos) {
@@ -84,7 +79,11 @@ function verificarCobertura(periodos, mes, inicioEsperado = `${mes}-01`, diasMen
             if (campo === 'janelaFertil') {
                 continue;
             }
-            for (let data = intervalo.inicio; data <= intervalo.fim; data = adicionarDias(data, 1)) {
+            for (
+                let data = intervalo.inicio;
+                data <= intervalo.fim;
+                data = adicionarDias(data, 1)
+            ) {
                 assert.ok(!diasCobertos.has(data), `O dia ${data} recebeu duas fases.`);
                 diasCobertos.add(data);
             }
@@ -102,122 +101,134 @@ function verificarCobertura(periodos, mes, inicioEsperado = `${mes}-01`, diasMen
 }
 
 test('continua as fases após a próxima menstruação começar dentro do mês solicitado', async () => {
-    const {service} = criarCenario();
-    const resultado = await service.buscarMes({usuarioId: 7, mes: '2026-10'});
+    const { service } = criarCenario();
+    const resultado = await service.buscarMes({ usuarioId: 7, mes: '2026-10' });
     const periodos = resultado.previsao.periodos;
-    const projetado = periodos.find(periodo => (
-        periodo.menstruacaoPrevista?.inicio === '2026-10-02'
-    ));
+    const projetado = periodos.find(
+        (periodo) => periodo.menstruacaoPrevista?.inicio === '2026-10-02'
+    );
 
     assert.ok(projetado);
     assert.equal(projetado.previsto, true);
     assert.equal(projetado.faseMenstrual, null);
-    assert.deepEqual(projetado.menstruacaoPrevista, {inicio: '2026-10-02', fim: '2026-10-06'});
-    assert.deepEqual(projetado.faseFolicular, {inicio: '2026-10-07', fim: '2026-10-14'});
+    assert.deepEqual(projetado.menstruacaoPrevista, { inicio: '2026-10-02', fim: '2026-10-06' });
+    assert.deepEqual(projetado.faseFolicular, { inicio: '2026-10-07', fim: '2026-10-14' });
     assert.equal(projetado.ovulacao, '2026-10-15');
-    assert.deepEqual(projetado.faseLutea, {inicio: '2026-10-16', fim: '2026-10-29'});
+    assert.deepEqual(projetado.faseLutea, { inicio: '2026-10-16', fim: '2026-10-29' });
     verificarCobertura(periodos, '2026-10');
 });
 
 test('mantém a menstruação prevista que cruza setembro e outubro e as fases seguintes', async () => {
-    const {service} = criarCenario({
+    const { service } = criarCenario({
         inicio: '2026-09-01',
         fim: '2026-09-07',
         duracaoMenstruacao: 7
     });
-    const setembro = await service.buscarMes({usuarioId: 7, mes: '2026-09'});
-    const outubro = await service.buscarMes({usuarioId: 7, mes: '2026-10'});
+    const setembro = await service.buscarMes({ usuarioId: 7, mes: '2026-09' });
+    const outubro = await service.buscarMes({ usuarioId: 7, mes: '2026-10' });
 
-    assert.ok(setembro.previsao.periodos.some(periodo => (
-        periodo.menstruacaoPrevista?.inicio === '2026-09-29'
-        && periodo.menstruacaoPrevista.fim === '2026-09-30'
-    )));
-    const periodo = outubro.previsao.periodos.find(item => (
-        item.menstruacaoPrevista?.inicio === '2026-10-01'
-    ));
+    assert.ok(
+        setembro.previsao.periodos.some(
+            (periodo) =>
+                periodo.menstruacaoPrevista?.inicio === '2026-09-29' &&
+                periodo.menstruacaoPrevista.fim === '2026-09-30'
+        )
+    );
+    const periodo = outubro.previsao.periodos.find(
+        (item) => item.menstruacaoPrevista?.inicio === '2026-10-01'
+    );
     assert.ok(periodo);
-    assert.deepEqual(periodo.menstruacaoPrevista, {inicio: '2026-10-01', fim: '2026-10-05'});
-    assert.deepEqual(periodo.faseFolicular, {inicio: '2026-10-06', fim: '2026-10-11'});
+    assert.deepEqual(periodo.menstruacaoPrevista, { inicio: '2026-10-01', fim: '2026-10-05' });
+    assert.deepEqual(periodo.faseFolicular, { inicio: '2026-10-06', fim: '2026-10-11' });
     assert.equal(periodo.ovulacao, '2026-10-12');
-    assert.deepEqual(periodo.faseLutea, {inicio: '2026-10-13', fim: '2026-10-26'});
+    assert.deepEqual(periodo.faseLutea, { inicio: '2026-10-13', fim: '2026-10-26' });
     verificarCobertura(outubro.previsao.periodos, '2026-10');
 });
 
 test('representa dois inícios previstos no mesmo mês sem perder os dias posteriores', async () => {
-    const {service} = criarCenario({
+    const { service } = criarCenario({
         inicio: '2026-09-10',
         fim: '2026-09-14',
         duracaoCiclo: 24
     });
-    const resultado = await service.buscarMes({usuarioId: 7, mes: '2026-10'});
+    const resultado = await service.buscarMes({ usuarioId: 7, mes: '2026-10' });
     const periodos = resultado.previsao.periodos;
     const iniciosPrevistos = periodos
-        .filter(periodo => periodo.menstruacaoPrevista)
-        .map(periodo => periodo.menstruacaoPrevista.inicio);
+        .filter((periodo) => periodo.menstruacaoPrevista)
+        .map((periodo) => periodo.menstruacaoPrevista.inicio);
 
     assert.deepEqual(iniciosPrevistos, ['2026-10-04', '2026-10-28']);
     verificarCobertura(periodos, '2026-10');
 });
 
 test('mantém o último registro real separado dos períodos projetados', async () => {
-    const diasMenstruacao = [4, 5, 6, 7, 8].map(dia => ({
+    const diasMenstruacao = [4, 5, 6, 7, 8].map((dia) => ({
         data: `2026-09-0${dia}`,
         registroCicloId: 1
     }));
-    const {service} = criarCenario({diasMenstruacao});
-    const resultado = await service.buscarMes({usuarioId: 7, mes: '2026-09'});
-    const periodoReal = resultado.previsao.periodos.find(periodo => periodo.previsto === false);
+    const { service } = criarCenario({ diasMenstruacao });
+    const resultado = await service.buscarMes({ usuarioId: 7, mes: '2026-09' });
+    const periodoReal = resultado.previsao.periodos.find((periodo) => periodo.previsto === false);
 
     assert.ok(periodoReal);
     assert.equal(periodoReal.faseMenstrual, null);
     assert.equal(periodoReal.menstruacaoPrevista, null);
     assert.deepEqual(resultado.diasMenstruacao, diasMenstruacao);
-    verificarCobertura(resultado.previsao.periodos, '2026-09', '2026-09-04', resultado.diasMenstruacao);
+    verificarCobertura(
+        resultado.previsao.periodos,
+        '2026-09',
+        '2026-09-04',
+        resultado.diasMenstruacao
+    );
 });
 
 test('continua as previsões na mudança de dezembro para janeiro', async () => {
-    const {service} = criarCenario({inicio: '2026-11-20', fim: '2026-11-24'});
-    const dezembro = await service.buscarMes({usuarioId: 7, mes: '2026-12'});
-    const janeiro = await service.buscarMes({usuarioId: 7, mes: '2027-01'});
+    const { service } = criarCenario({ inicio: '2026-11-20', fim: '2026-11-24' });
+    const dezembro = await service.buscarMes({ usuarioId: 7, mes: '2026-12' });
+    const janeiro = await service.buscarMes({ usuarioId: 7, mes: '2027-01' });
 
-    assert.ok(dezembro.previsao.periodos.some(periodo => (
-        periodo.menstruacaoPrevista?.inicio === '2026-12-18'
-    )));
-    assert.ok(janeiro.previsao.periodos.some(periodo => (
-        periodo.menstruacaoPrevista?.inicio === '2027-01-15'
-    )));
+    assert.ok(
+        dezembro.previsao.periodos.some(
+            (periodo) => periodo.menstruacaoPrevista?.inicio === '2026-12-18'
+        )
+    );
+    assert.ok(
+        janeiro.previsao.periodos.some(
+            (periodo) => periodo.menstruacaoPrevista?.inicio === '2027-01-15'
+        )
+    );
     verificarCobertura(janeiro.previsao.periodos, '2027-01');
 });
 
 test('mantém a previsão também em 29 de fevereiro de um ano bissexto', async () => {
-    const {service} = criarCenario({inicio: '2028-01-20', fim: '2028-01-24'});
-    const resultado = await service.buscarMes({usuarioId: 7, mes: '2028-02'});
-    const periodo = resultado.previsao.periodos.find(item => (
-        item.menstruacaoPrevista?.inicio === '2028-02-17'
-    ));
+    const { service } = criarCenario({ inicio: '2028-01-20', fim: '2028-01-24' });
+    const resultado = await service.buscarMes({ usuarioId: 7, mes: '2028-02' });
+    const periodo = resultado.previsao.periodos.find(
+        (item) => item.menstruacaoPrevista?.inicio === '2028-02-17'
+    );
 
     assert.ok(periodo);
-    assert.deepEqual(periodo.faseFolicular, {inicio: '2028-02-22', fim: '2028-02-29'});
+    assert.deepEqual(periodo.faseFolicular, { inicio: '2028-02-22', fim: '2028-02-29' });
     verificarCobertura(resultado.previsao.periodos, '2028-02');
 });
 
 test('consulta um mês distante sem retornar todo o histórico de ciclos projetados', async () => {
-    const {service, chamadas} = criarCenario({inicio: '2026-09-01', fim: '2026-09-05'});
-    const resultado = await service.buscarMes({usuarioId: 7, mes: '2040-07'});
+    const { service, chamadas } = criarCenario({ inicio: '2026-09-01', fim: '2026-09-05' });
+    const resultado = await service.buscarMes({ usuarioId: 7, mes: '2040-07' });
 
     assert.equal(chamadas.length, 1);
     assert.ok(resultado.previsao.periodos.length <= 3);
-    assert.ok(resultado.previsao.periodos.every(periodo => periodo.previsto === true));
+    assert.ok(resultado.previsao.periodos.every((periodo) => periodo.previsto === true));
     verificarCobertura(resultado.previsao.periodos, '2040-07');
 });
 
 test('preserva a duração, a confiança e a janela fértil calculadas pelas regras existentes', async () => {
-    const {service, parametros, registros} = criarCenario({
+    const { service, parametros, registros } = criarCenario({
         registrosCiclo: [
-            {id: 1, dataInicio: '2026-06-01', dataFim: '2026-06-05'},
-            {id: 2, dataInicio: '2026-06-29', dataFim: '2026-07-03'},
-            {id: 3, dataInicio: '2026-07-27', dataFim: '2026-07-31'},
-            {id: 4, dataInicio: '2026-08-24', dataFim: '2026-08-28'}
+            { id: 1, dataInicio: '2026-06-01', dataFim: '2026-06-05' },
+            { id: 2, dataInicio: '2026-06-29', dataFim: '2026-07-03' },
+            { id: 3, dataInicio: '2026-07-27', dataFim: '2026-07-31' },
+            { id: 4, dataInicio: '2026-08-24', dataFim: '2026-08-28' }
         ]
     });
     const mes = '2026-10';
@@ -226,7 +237,7 @@ test('preserva a duração, a confiança e a janela fértil calculadas pelas reg
         parametros,
         dataReferencia: obterLimites(mes).fim
     });
-    const resultado = await service.buscarMes({usuarioId: 7, mes});
+    const resultado = await service.buscarMes({ usuarioId: 7, mes });
     const inicioProjetado = adicionarDias(
         previsaoBase.proximoInicioEstimado,
         previsaoBase.duracaoCicloEstimada
@@ -238,9 +249,9 @@ test('preserva a duração, a confiança e a janela fértil calculadas pelas reg
         proximoInicio: adicionarDias(inicioProjetado, previsaoBase.duracaoCicloEstimada),
         duracaoLutea: parametros.duracaoLuteaInformada
     });
-    const periodo = resultado.previsao.periodos.find(item => (
-        item.menstruacaoPrevista?.inicio === inicioProjetado
-    ));
+    const periodo = resultado.previsao.periodos.find(
+        (item) => item.menstruacaoPrevista?.inicio === inicioProjetado
+    );
 
     assert.ok(periodo);
     assert.equal(resultado.previsao.status, previsaoBase.status);
@@ -259,16 +270,16 @@ test('preserva a duração, a confiança e a janela fértil calculadas pelas reg
 });
 
 test('não fabrica fases ou janela fértil quando os intervalos são incompatíveis', async () => {
-    const {service} = criarCenario({
+    const { service } = criarCenario({
         inicio: '2026-09-01',
         fim: '2026-09-07',
         duracaoCiclo: 10,
         duracaoMenstruacao: 7
     });
-    const resultado = await service.buscarMes({usuarioId: 7, mes: '2026-10'});
+    const resultado = await service.buscarMes({ usuarioId: 7, mes: '2026-10' });
     const periodos = resultado.previsao.periodos;
 
-    assert.ok(periodos.some(periodo => periodo.menstruacaoPrevista));
+    assert.ok(periodos.some((periodo) => periodo.menstruacaoPrevista));
     for (const periodo of periodos) {
         assert.equal(periodo.faseMenstrual, null);
         assert.equal(periodo.faseFolicular, null);

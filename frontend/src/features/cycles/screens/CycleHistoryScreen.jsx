@@ -1,12 +1,13 @@
 //Compõe o resumo, a lista e os estados de carregamento, vazio e erro do histórico de ciclos.
+import { useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
-import { tema } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleHistoryCard } from '../components/CycleHistoryCard/CycleHistoryCard';
 import { CycleSummaryCard } from '../components/CycleSummaryCard/CycleSummaryCard';
-import { estilos } from './CycleHistoryScreen.styles';
+import { criarEstilos } from './CycleHistoryScreen.styles';
 
 const confiancasPermitidas = Object.freeze(['alta', 'media', 'baixa']);
 
@@ -35,7 +36,7 @@ function obterChaveDoCiclo(ciclo, indice) {
     return `ciclo-${indice}`;
 }
 
-function DivisorDaLista() {
+function DivisorDaLista({ estilos }) {
     return (
         <View
             accessible
@@ -52,7 +53,7 @@ function DivisorDaLista() {
     );
 }
 
-function RodapeDaLista({ carregando, erro, aoTentarNovamente }) {
+function RodapeDaLista({ carregando, erro, aoTentarNovamente, estilos, corCarregamento }) {
     if (carregando) {
         return (
             <View
@@ -60,7 +61,7 @@ function RodapeDaLista({ carregando, erro, aoTentarNovamente }) {
                 accessibilityLiveRegion="polite"
                 style={estilos.rodapeDaLista}
             >
-                <ActivityIndicator size="small" color={tema.cores.marca.secundaria} />
+                <ActivityIndicator size="small" color={corCarregamento} />
 
                 <Text style={estilos.textoDoRodape}>Carregando mais ciclos...</Text>
             </View>
@@ -115,6 +116,11 @@ function CycleHistoryScreen({
     aoExcluirCiclo,
     onSelecionarAba
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const corCarregamento = tema.escuro
+        ? tema.cores.interface.destaque
+        : tema.cores.marca.secundaria;
     const ciclosSeguros = Array.isArray(ciclos)
         ? ciclos.filter((ciclo) => ciclo && typeof ciclo === 'object')
         : [];
@@ -162,7 +168,7 @@ function CycleHistoryScreen({
                     accessibilityLiveRegion="polite"
                     style={estilos.estadoCentralizado}
                 >
-                    <ActivityIndicator size="small" color={tema.cores.marca.secundaria} />
+                    <ActivityIndicator size="small" color={corCarregamento} />
 
                     <Text style={estilos.mensagemDoEstado}>Carregando histórico de ciclos...</Text>
                 </View>
@@ -227,7 +233,7 @@ function CycleHistoryScreen({
                 ListHeaderComponent={
                     <View style={estilos.cabecalhoDaLista}>
                         {resumoDosCiclos}
-                        <DivisorDaLista />
+                        <DivisorDaLista estilos={estilos} />
                     </View>
                 }
                 ListFooterComponent={
@@ -235,6 +241,8 @@ function CycleHistoryScreen({
                         carregando={carregandoMais}
                         erro={possuiErroCarregarMais}
                         aoTentarNovamente={aoTentarCarregarMais}
+                        estilos={estilos}
+                        corCarregamento={corCarregamento}
                     />
                 }
                 onEndReached={podeCarregarMais ? aoCarregarMais : undefined}
