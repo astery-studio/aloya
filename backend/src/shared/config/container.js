@@ -94,6 +94,10 @@ import { criarAccountValidator } from '../../features/settings/validators/accoun
 
 import { criarAccountDeletionValidator } from '../../features/settings/validators/accountDeletion.validator.js';
 
+import { criarCycleParametersService } from '../../features/settings/services/cycleParameters.service.js';
+import { criarCycleParametersValidator } from '../../features/settings/validators/cycleParameters.validator.js';
+import { criarCycleParametersController } from '../../features/settings/controllers/cycleParameters.controller.js';
+
 import { criarAccountController } from '../../features/settings/controllers/account.controller.js';
 
 import { criarAccountDeletionController } from '../../features/settings/controllers/accountDeletion.controller.js';
@@ -205,6 +209,13 @@ function criarContainer() {
     const cycleRemovalModule = criarCycleRemovalModule({prisma});
 
     const predictionService = criarPredictionService({ prisma });
+
+    const cycleParametersService = criarCycleParametersService({
+        prisma,
+        recalcularPrevisoes: predictionService.buscar
+    });
+
+    const cycleParametersValidator = criarCycleParametersValidator();
 
     const permissionCategoryService = criarPermissionCategoryService({
         prisma
@@ -339,6 +350,11 @@ function criarContainer() {
 
     const predictionController = criarPredictionController({ predictionService });
 
+    const cycleParametersController = criarCycleParametersController({
+        service: cycleParametersService,
+        validator: cycleParametersValidator
+    });
+
     const permissionCategoryController = criarPermissionCategoryController({
         permissionCategoryService,
         permissionCategoryValidator
@@ -353,6 +369,7 @@ function criarContainer() {
     return {
         authController,
         accountController,
+        cycleParametersController,
         accountDeletionController,
         logoutController,
         contraceptiveController,

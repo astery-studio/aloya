@@ -95,6 +95,22 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     }
 })
 
+jest.mock('../../src/features/cycles/screens/CycleParametersScreen', () => {
+    const React = require('react')
+    const {Pressable, Text} = require('react-native')
+    return {
+        CycleParametersScreen: jest.fn(({onVoltar}) => React.createElement(
+            Pressable,
+            {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Voltar dos parâmetros',
+                onPress: onVoltar
+            },
+            React.createElement(Text, null, 'Parâmetros integrados')
+        ))
+    }
+})
+
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
@@ -123,10 +139,19 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const {Pressable, Text, View} = require('react-native')
 
     return {
-        SettingsScreen: jest.fn(({onAbrirPerfil, onSelecionarAba}) => React.createElement(
+        SettingsScreen: jest.fn(({onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba}) => React.createElement(
             View,
             null,
             React.createElement(Text, null, 'Configurações'),
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Abrir parâmetros',
+                    onPress: onAbrirParametrosCiclo
+                },
+                React.createElement(Text, null, 'Parâmetros')
+            ),
             React.createElement(
                 Pressable,
                 {
@@ -288,6 +313,10 @@ function criarServicos() {
         calendarService: {
             buscarMes: jest.fn()
         },
+        cycleParametersService: {
+            buscar: jest.fn(),
+            atualizar: jest.fn()
+        },
         supportCategoryService: {
             criarCategoria: jest.fn()
         }
@@ -398,6 +427,17 @@ describe('App integrado', () => {
             expect.objectContaining({service: servicos.calendarService}),
             undefined
         )
+    })
+
+    test('abre os parâmetros pela tela de configurações', async () => {
+        obterToken.mockResolvedValue({token: 'token-valido'})
+        await render(<App />)
+
+        await fireEvent.press(await screen.findByRole('button', {name: 'Abrir parâmetros'}))
+        expect(await screen.findByText('Parâmetros integrados')).toBeOnTheScreen()
+
+        await fireEvent.press(screen.getByRole('button', {name: 'Voltar dos parâmetros'}))
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen()
     })
 
     test('abre membros e inicia a criação de categoria', async () => {
