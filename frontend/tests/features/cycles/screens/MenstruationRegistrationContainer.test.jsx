@@ -118,3 +118,18 @@ test('erro de sincronização conserva seleção e nova tentativa inclui a persi
         sincronizar: jest.fn().mockRejectedValueOnce(falha).mockResolvedValue({})
     };
     await render(
+        <MenstruationRegistrationContainer
+            calendarService={calendarService}
+            fila={fila}
+            onVoltar={jest.fn()}
+        />
+    );
+    await waitFor(() => expect(mockProps.meses).toHaveLength(12));
+    await act(() => mockProps.onAlternarData('2026-10-30'));
+    await act(() => mockProps.onSalvar(mockProps.datasSelecionadas));
+    expect(mockProps.erro).toBe(falha);
+    expect(mockProps.datasSelecionadas).toEqual(['2026-10-30']);
+    await act(() => mockProps.onTentarNovamente());
+    expect(mockProps.sucesso).toBe(true);
+    expect(fila.adicionar).toHaveBeenCalledTimes(2);
+});
