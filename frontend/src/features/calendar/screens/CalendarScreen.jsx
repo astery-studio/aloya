@@ -41,27 +41,70 @@ const ITENS_LEGENDA = Object.freeze([
         descricao: 'Período de fase lútea',
         prevista: false
     },
+    {
+        id: 'janela-real',
+        tipo: 'janelaFertil',
+        titulo: 'Janela Fértil',
+        descricao: 'Dias com maior probabilidade de engravidar',
+        prevista: false
+    },
+    {
+        id: 'menstruacao-prevista',
+        tipo: 'menstruacao',
+        titulo: 'Provável Menstruação',
+        descricao: 'Previsão dos dias de menstruação',
+        prevista: true
+    },
+    {
+        id: 'folicular-prevista',
+        tipo: 'folicular',
+        titulo: 'Provável Fase Folicular',
+        descricao: 'Previsão do período de fase folicular',
+        prevista: true
+    },
+    {
+        id: 'ovulacao-prevista',
+        tipo: 'ovulacao',
+        titulo: 'Provável Ovulação',
+        descricao: 'Previsão do período de ovulação',
+        prevista: true
+    },
+    {
+        id: 'lutea-prevista',
+        tipo: 'lutea',
+        titulo: 'Provável Fase Lútea',
+        descricao: 'Previsão de fase lútea',
+        prevista: true
+    },
+    {
+        id: 'janela-prevista',
+        tipo: 'janelaFertil',
+        titulo: 'Provável Janela Fértil',
+        descricao: 'Previsão da janela fértil',
+        prevista: true
+    }
+]);
 
 function normalizarConfianca(valor) {
-    if (typeof valor !== 'string') return null
+    if (typeof valor !== 'string') return null;
 
-    const nivel = valor.trim().toLocaleLowerCase('pt-BR')
+    const nivel = valor.trim().toLocaleLowerCase('pt-BR');
 
     if (nivel === 'alta' || nivel === 'media' || nivel === 'média' || nivel === 'baixa') {
-        return nivel === 'média' ? 'media' : nivel
+        return nivel === 'média' ? 'media' : nivel;
     }
 
-    return null
+    return null;
 }
 
-function ErroCalendario({erro, aoTentarNovamente}) {
-    const [fechado, setFechado] = useState(false)
+function ErroCalendario({ erro, aoTentarNovamente }) {
+    const [fechado, setFechado] = useState(false);
 
     function tentarNovamente() {
         if (typeof aoTentarNovamente === 'function') {
-            aoTentarNovamente()
+            aoTentarNovamente();
         } else {
-            setFechado(true)
+            setFechado(true);
         }
     }
 
