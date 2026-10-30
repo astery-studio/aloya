@@ -56,8 +56,12 @@ test('duração permite digitar o número sem alterar a unidade', async () => {
     await render(<CycleLengthStep valor={28} aoAlterar={aoAlterar}
         aoVoltar={jest.fn()} aoAvancar={jest.fn()} aoPular={jest.fn()} />);
     expect(screen.getByText('dias')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Não sei' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
     fireEvent.changeText(screen.getByLabelText('Duração em dias'), '30');
     expect(aoAlterar).toHaveBeenCalledWith(30);
+    expect(screen.queryByRole('button', { name: 'Não sei' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Avançar' })).toBeEnabled();
 });
 
 test('última menstruação seleciona o intervalo no calendário próprio', async () => {
