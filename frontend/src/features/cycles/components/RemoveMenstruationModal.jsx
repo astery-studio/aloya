@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { CycleRemovalFeedbackModal } from './CycleRemovalFeedbackModal';
 import { MenstrualDaysCalendar } from './MenstrualDaysCalendar';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { estilos } from './RemoveMenstruationModal.styles';
@@ -62,55 +62,29 @@ function RemoveMenstruationModal({
     if (!['dia', 'cicloCompleto'].includes(modo))
         throw new TypeError('O modo de remoção da menstruação é inválido.');
     const tipoAlerta = alerta || (modo === 'cicloCompleto' ? 'confirmacao' : null);
-    const mensagemConfirmacao = `Período: ${obterPeriodo(ciclo)}.\n\nEsta ação não pode ser desfeita. As previsões serão recalculadas.`;
     let modalAlerta = null;
 
     if (tipoAlerta === 'confirmacao') {
         modalAlerta = (
-            <AlertModal
-                visivel
-                titulo="Excluir ciclo inteiro?"
-                mensagem={mensagemConfirmacao}
-                aoFechar={onCancelarExclusao}
-                acaoPrincipal={{
-                    texto: 'Excluir',
-                    variante: 'vermelho',
-                    aoPressionar: onExcluirCiclo,
-                    carregando
-                }}
-                acaoSecundaria={{ texto: 'Cancelar', aoPressionar: onCancelarExclusao }}
+            <CycleRemovalFeedbackModal
+                tipo="confirmacao"
+                periodo={obterPeriodo(ciclo)}
+                carregando={carregando}
+                onConfirmar={onExcluirCiclo}
+                onCancelar={onCancelarExclusao}
             />
         );
     } else if (tipoAlerta === 'erro') {
         modalAlerta = (
-            <AlertModal
-                visivel
-                titulo="Algo deu errado"
-                mensagem="Ocorreu um erro ao excluir este registro. Tente novamente."
-                aoFechar={onFecharAlerta}
-                acaoPrincipal={{
-                    texto: 'Tentar novamente',
-                    variante: 'preto',
-                    aoPressionar: onTentarNovamente,
-                    carregando
-                }}
-                acaoSecundaria={{ texto: 'Voltar', aoPressionar: onFecharAlerta }}
+            <CycleRemovalFeedbackModal
+                tipo="erro"
+                carregando={carregando}
+                onTentarNovamente={onTentarNovamente}
+                onFechar={onFecharAlerta}
             />
         );
     } else if (tipoAlerta === 'sucesso-excluir' || tipoAlerta === 'sucesso-atualizar') {
-        modalAlerta = (
-            <AlertModal
-                visivel
-                titulo={
-                    tipoAlerta === 'sucesso-excluir'
-                        ? 'Ciclo excluído com sucesso'
-                        : 'Ciclo atualizado com sucesso'
-                }
-                mensagem="Registro de menstruação excluído com sucesso."
-                aoFechar={onFecharAlerta}
-                acaoPrincipal={{ texto: 'OK', variante: 'verde', aoPressionar: onFecharAlerta }}
-            />
-        );
+        modalAlerta = <CycleRemovalFeedbackModal tipo={tipoAlerta} onFechar={onFecharAlerta} />;
     }
 
     return (
