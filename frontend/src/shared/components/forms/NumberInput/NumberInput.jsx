@@ -3,7 +3,6 @@
  */
 import { useMemo, useRef } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
-import { CaretDownIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './NumberInput.styles';
 
@@ -47,12 +46,6 @@ export default function NumberInput({
                     style={estilos.entrada}
                 />
                 <Text style={estilos.unidade}>{unidade}</Text>
-                <CaretDownIcon
-                    accessibilityElementsHidden
-                    color={tema.cores.interface.textoSecundario}
-                    size={24}
-                    weight="regular"
-                />
             </View>
         </Pressable>
     );
