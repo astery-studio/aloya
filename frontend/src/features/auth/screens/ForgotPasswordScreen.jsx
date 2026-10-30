@@ -42,8 +42,10 @@ export default function ForgotPasswordScreen({
             titulo="E-mail enviado"
             mensagem="Se este e-mail estiver cadastrado, você receberá as instruções em breve."
             acaoPrincipal={{ texto: 'Entendi', aoPressionar: aoConcluir }}
-            acaoSecundaria={{ texto: 'Enviar Novamente', aoPressionar: fluxo.reenviar,
-                carregando: fluxo.carregando }} />
+            acaoSecundaria={{
+                texto: 'Enviar Novamente', variante: 'texto',
+                aoPressionar: fluxo.reenviar, carregando: fluxo.carregando
+            }} />
         <SimpleModal visivel={Boolean(fluxo.erro || erroValidacao)} aoFechar={limparErro}
             icone={WarningCircle} titulo={erroValidacao ? 'E-mail inválido' : 'Algo deu errado'}
             mensagem={erroValidacao || fluxo.erro}

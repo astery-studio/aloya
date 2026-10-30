@@ -135,6 +135,17 @@ const variantes = {
         }
     },
 
+    texto: {
+        container: {
+            backgroundColor: 'transparent'
+        },
+        texto: {
+            color: cores.neutras.textoSecundarioClaro,
+            fontFamily: fontFamilies.medium,
+            fontWeight: '500'
+        }
+    },
+
     bordaLaranja: {
         container: {
             borderColor:

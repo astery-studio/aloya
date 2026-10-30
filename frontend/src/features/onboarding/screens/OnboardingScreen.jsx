@@ -145,8 +145,8 @@ export default function OnboardingScreen({
             setErro({ titulo: 'Revise este dado', mensagem: detalhe.mensagem });
             return;
         }
-        setErro({ titulo: 'Algo deu errado', mensagem:
-            'Não foi possível criar sua conta agora. Tente novamente em instantes.' });
+        setErro({ interno: true, titulo: 'Algo deu errado', mensagem:
+            'Ocorreu um erro ao criar sua conta. Verifique sua conexão e tente novamente.' });
     }
 
     async function finalizar(sobrescritas = {}) {
@@ -313,13 +313,21 @@ export default function OnboardingScreen({
         aoEntrar?.();
     };
 
+    const erroInterno = erro?.interno;
+    const tentarNovamente = () => {
+        setErro(null);
+        if (erroInterno) finalizar();
+    };
+
     return <>{conteudo}<SimpleModal visivel={Boolean(erro)}
         icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
         titulo={erro?.titulo} mensagem={erro?.mensagem}
         acaoPrincipal={erro?.emailEmUso
             ? { texto: 'Fazer login', aoPressionar: irParaLogin }
-            : { texto: 'Entendi', aoPressionar: () => setErro(null) }}
-        acaoSecundaria={erro?.emailEmUso
+            : erroInterno
+                ? { texto: 'Tentar novamente', variante: 'preto', aoPressionar: tentarNovamente }
+                : { texto: 'Entendi', aoPressionar: () => setErro(null) }}
+        acaoSecundaria={erro?.emailEmUso || erroInterno
             ? { texto: 'Voltar', aoPressionar: () => setErro(null) } : undefined} />
         <SimpleModal visivel={Boolean(destinoSaida)} aoFechar={() => setDestinoSaida(null)}
             icone={WarningCircle} titulo="Sair do cadastro?"

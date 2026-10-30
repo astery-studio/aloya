@@ -7,7 +7,8 @@ const variantesPermitidas = [
     'verde',
     'branco',
     'preto',
-    'vermelho'
+    'vermelho',
+    'texto'
 ];
 
 export default function ButtonPopup({

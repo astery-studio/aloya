@@ -395,7 +395,9 @@ test('erro inesperado usa mensagem segura', async () => {
 
     expect(await screen.findByText('Algo deu errado')).toBeTruthy();
     expect(screen.getByText(
-        'Não foi possível criar sua conta agora. Tente novamente em instantes.'
+        'Ocorreu um erro ao criar sua conta. Verifique sua conexão e tente novamente.'
     )).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Voltar' })).toBeTruthy();
     expect(screen.queryByText('senha do banco exposta')).toBeNull();
 });

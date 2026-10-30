@@ -24,7 +24,7 @@ test.each([['desativado', { desativado: true }], ['carregando', { carregando: tr
     }
 );
 
-test.each(['verde', 'branco', 'preto', 'vermelho'])(
+test.each(['verde', 'branco', 'preto', 'vermelho', 'texto'])(
     'botão de popup aceita a variante %s', async (variante) => {
         await render(<ButtonPopup texto="OK" variante={variante} />);
         expect(screen.getByRole('button', { name: 'OK' })).toBeTruthy();
