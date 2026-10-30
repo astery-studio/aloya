@@ -68,3 +68,73 @@ function criarCycleRegistrationRepository({ prisma }) {
                     }))
                 });
                 const atualizados = await tx.registroCiclo.findMany({
+                    where: { usuarioId },
+                    orderBy: { dataInicio: 'asc' },
+                    include: {
+                        diasMenstruacao: { orderBy: { data: 'asc' } }
+                    }
+                });
+                for (const [indice, item] of atualizados.entries()) {
+                    const proximo = atualizados[indice + 1];
+                    const duracaoCiclo = proximo
+                        ? diferencaDias(item.dataInicio, proximo.dataInicio)
+                        : null;
+                    const encerramento =
+                        proximo && !item.dataFim
+                            ? {
+                                  dataFim: item.diasMenstruacao.at(-1)?.data ?? item.dataInicio,
+                                  duracaoMenstruacao: item.diasMenstruacao.length || 1
+                              }
+                            : {};
+                    if (
+                        item.duracaoCiclo !== duracaoCiclo ||
+                        item.ehCicloInicial !== (indice === 0) ||
+                        Object.keys(encerramento).length
+                    ) {
+                        await tx.registroCiclo.update({
+                            where: { id: item.id },
+                            data: { ...encerramento, duracaoCiclo, ehCicloInicial: indice === 0 }
+                        });
+                    }
+                    Object.assign(item, encerramento, {
+                        duracaoCiclo,
+                        ehCicloInicial: indice === 0
+                    });
+                }
+                await tx.previsao.deleteMany({ where: { usuarioId } });
+                const previsao = calcularPrevisao({
+                    registros: atualizados,
+                    parametros: usuario,
+                    dataReferencia: formatarData(agora)
+                });
+                const vinculos = await tx.vinculoRedeApoio.findMany({
+                    where: {
+                        titularId: usuarioId,
+                        status: 'ativo',
+                        contatoId: { not: null },
+                        contato: {
+                            statusConta: 'ativa',
+                            OR: [
+                                { preferenciaNotificacao: { is: null } },
+                                { preferenciaNotificacao: { is: { redeApoioAtiva: true } } }
+                            ]
+                        }
+                    },
+                    include: { categoria: true }
+                });
+                const contatos = [
+                    ...new Set(vinculos.filter(permiteHistorico).map((v) => v.contatoId))
+                ];
+                if (contatos.length)
+                    await tx.notificacao.createMany({
+                        data: contatos.map((contatoId) => ({
+                            usuarioId: contatoId,
+                            tipoOrigem: 'rede_apoio',
+                            origemId: ciclo.id,
+                            dataHoraProgramada: agora,
+                            statusEnvio: 'agendada'
+                        }))
+                    });
+                const atualizado = atualizados.find((item) => item.id === ciclo.id);
+                const resultado = {
+                    mensagem: 'Registro de menstruação adicionado com sucesso.',
