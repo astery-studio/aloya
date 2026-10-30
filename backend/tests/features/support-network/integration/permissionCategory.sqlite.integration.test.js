@@ -336,7 +336,7 @@ test('cria uma categoria pelo endpoint usando SQLite real', async () => {
 
         const corpo = await resposta.json();
 
-        assert.equal(resposta.status, 201);
+        assert.equal(resposta.status, 201, JSON.stringify(corpo));
         assert.equal(corpo.mensagem, 'Categoria criada com sucesso.');
         assert.equal(corpo.categoria.nome, 'Equipe de saúde');
         assert.deepEqual(corpo.categoria.dadosVisiveis, ['geral.fase_atual', 'saude.consultas']);
