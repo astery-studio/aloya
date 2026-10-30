@@ -307,9 +307,9 @@ test('pular uma etapa já preenchida remove o valor antes de concluir', async ()
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.press(screen.getByLabelText('Voltar'));
 
-    await fireEvent.press(screen.getByText('Pular'));
-    await fireEvent.press(screen.getByText('Pular'));
-    await fireEvent.press(screen.getByText('Pular'));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
 
     expect(cadastrar).toHaveBeenCalledWith(expect.objectContaining({
         duracaoCicloInformada: null,
