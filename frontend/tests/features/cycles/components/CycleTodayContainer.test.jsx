@@ -66,12 +66,38 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
     });
 }, 30_000);
 
-test('apresenta a tela sem ciclo quando a API não encontra registros', async () => {
+test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não encontra registros', async () => {
     const service = {
         buscar: jest.fn().mockResolvedValue({ status: 'DADOS_INSUFICIENTES' })
     };
-    await renderizarTela({ service });
+    const aoCadastrarMenstruacao = jest.fn();
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 30, 23, 30));
+    try {
+        await renderizarTela({ service, aoCadastrarMenstruacao });
 
-    expect(await screen.findByText('Conheça seu ciclo')).toBeOnTheScreen();
-    expect(screen.queryByLabelText('Datas do ciclo')).not.toBeOnTheScreen();
+        expect(await screen.findByText('Conheça seu ciclo')).toBeOnTheScreen();
+        expect(screen.getByLabelText('Datas do ciclo')).toHaveProp('horizontal', true);
+        const inicioDaFaixa = screen.getByLabelText('Datas do ciclo').props.data[0].data;
+        await fireEvent.press(screen.getByRole('button', { name: 'qui, dia 29' }));
+        expect(screen.getByRole('button', { name: 'qui, dia 29' })).toBeSelected();
+        expect(screen.getByLabelText('Datas do ciclo').props.data[0].data).toBe(inicioDaFaixa);
+
+        await fireEvent(screen.getByLabelText('Datas do ciclo'), 'scrollEndDrag', {
+            nativeEvent: {
+                contentOffset: { x: 610, y: 0 },
+                contentSize: { width: 1000, height: 94 },
+                layoutMeasurement: { width: 390, height: 94 }
+            }
+        });
+        const dias = screen.getByLabelText('Datas do ciclo').props.data;
+        expect(dias).toHaveLength(30);
+        expect(dias[0].data).toBe(inicioDaFaixa);
+        expect(dias.every((dia) => dia.fase === 'desconhecida')).toBe(true);
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        expect(aoCadastrarMenstruacao).toHaveBeenCalledWith('2026-10-29');
+        expect(service.buscar).toHaveBeenCalledTimes(1);
+    } finally {
+        jest.useRealTimers();
+    }
 });
