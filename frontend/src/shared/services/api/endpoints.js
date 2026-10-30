@@ -13,6 +13,7 @@ const endpoints = Object.freeze({
     alteracaoSenha: `${caminhoConta}/password`,
     exclusaoConta: caminhoConta,
     verificacaoSenhaExclusao: `${caminhoConta}/account-deletion/verify-password`,
+    parametrosCiclo: `${caminhoConta}/cycle-parameters`,
     logout: '/auth/logout',
     anticoncepcionais: '/api/anticoncepcionais',
     calendario: '/api/cycles/calendar',

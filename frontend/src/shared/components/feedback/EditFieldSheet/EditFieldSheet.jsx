@@ -24,14 +24,17 @@ function obterDataVisivel(valor) {
     return texto
 }
 
-function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar }) {
+function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar, onFechar, erro, salvando = false, botaoSalvar, rotuloAcessibilidade, sufixo }) {
     const campoRef = useRef(null)
     const ehEmail = tipo === 'email'
     const ehData = tipo === 'data'
+    const ehNumero = tipo === 'numero'
 
     const valorVisivel = ehData
         ? obterDataVisivel(valor)
-        : String(valor ?? '')
+        : ehNumero && valor !== null && valor !== undefined
+            ? String(valor)
+            : String(valor ?? '')
 
     function focarCampo() {
         if (!salvando) {
@@ -42,6 +45,12 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
     function tratarMudanca(texto) {
         if (ehData) {
             onAlterar?.(formatDate(texto))
+            return
+        }
+
+        if (ehNumero) {
+            const numeros = texto.replace(/\D/g, '').slice(0, 2)
+            onAlterar?.(numeros ? Number(numeros) : null)
             return
         }
 
@@ -63,7 +72,10 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
             >
                 <Pressable
                     onPress={focarCampo}
-                    style={estilos.caixaCampo}
+                    style={[
+                        estilos.caixaCampo,
+                        ehNumero && estilos.caixaCampoNumero
+                    ]}
                     accessible={false}
                 >
                     <TextInput
@@ -72,25 +84,30 @@ function EditFieldSheet({ visivel, titulo, tipo = 'nome', valor = '', onAlterar,
                         onChangeText={tratarMudanca}
                         editable={!salvando}
                         multiline={false}
-                        maxLength={ehData ? 10 : ehEmail ? 254 : 120 }
-                        keyboardType={ ehData ? 'number-pad' : ehEmail ? 'email-address' : 'default'
+                        maxLength={ehData ? 10 : ehNumero ? 2 : ehEmail ? 254 : 120 }
+                        keyboardType={ ehData || ehNumero ? 'number-pad' : ehEmail ? 'email-address' : 'default'
                         }
+                        selectTextOnFocus={ehNumero}
                         autoCapitalize={
-                            ehEmail || ehData ? 'none' : 'words'
+                            ehEmail || ehData || ehNumero ? 'none' : 'words'
                         }
                         autoCorrect={
-                            !ehEmail && !ehData
+                            !ehEmail && !ehData && !ehNumero
                         }
                         placeholder={
                             ehData ? 'DD/MM/AAAA' : undefined
                         }
                         underlineColorAndroid="transparent"
-                        accessibilityLabel={ ehData ? 'Data de nascimento' : ehEmail ? 'E-mail' : 'Nome' }
+                        accessibilityLabel={rotuloAcessibilidade ?? (ehData ? 'Data de nascimento' : ehEmail ? 'E-mail' : 'Nome')}
                         style={[
                             estilos.campo,
-                            ehData && estilos.campoData
+                            ehData && estilos.campoData,
+                            ehNumero && estilos.campoNumero
                         ]}
                     />
+                    {ehNumero && sufixo ? (
+                        <Text style={estilos.sufixoNumero}>{sufixo}</Text>
+                    ) : null}
                 </Pressable>
 
                 {erro ? (
