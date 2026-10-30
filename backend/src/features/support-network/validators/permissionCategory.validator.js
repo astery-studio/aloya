@@ -5,7 +5,7 @@ import {
     permissoesDaCategoria
 } from '../constants/permissionCategory.constants.js';
 
-const TAMANHO_MAXIMO_NOME = 80;
+const TAMANHO_MAXIMO_NOME = 25;
 const FORMATO_ID = /^[1-9]\d*$/u;
 const CAMPOS_PERMITIDOS = Object.freeze(['nome', 'dadosVisiveis']);
 const CAMPOS_PERMITIDOS_EDICAO = Object.freeze([

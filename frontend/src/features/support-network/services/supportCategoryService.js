@@ -96,7 +96,7 @@ function prepararDadosCategoria(dados) {
     const nome = dados.nome.normalize('NFKC').trim().replace(/\s+/gu, ' ');
 
     const nomeInvalido =
-        nome.length === 0 || [...nome].length > 80 || /[\u0000-\u001F\u007F<>]/u.test(nome);
+        nome.length === 0 || [...nome].length > 25 || /[\u0000-\u001F\u007F<>]/u.test(nome);
 
     const permissoesInvalidas =
         dados.dadosVisiveis.length === 0 ||
