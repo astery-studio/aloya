@@ -86,55 +86,58 @@ function validarIntervalo(intervalo) {
         FORMATO_DATA.test(intervalo.inicio) &&
         FORMATO_DATA.test(intervalo.fim)
         ? intervalo
-    ) ? intervalo : null
+        : null;
 }
 
 function intervaloContem(intervalo, data) {
-    return Boolean(intervalo && data >= intervalo.inicio && data <= intervalo.fim)
+    return Boolean(intervalo && data >= intervalo.inicio && data <= intervalo.fim);
 }
 
 function prepararPrevisao(previsao) {
-    const periodos = Array.isArray(previsao?.periodos) ? previsao.periodos : [previsao]
+    const periodos = Array.isArray(previsao?.periodos) ? previsao.periodos : [previsao];
 
-    return periodos.filter(periodo => periodo && typeof periodo === 'object').map(periodo => ({
-        previsto: periodo.previsto === true,
-        registroCicloId: Number.isSafeInteger(periodo.registroCicloId) && periodo.registroCicloId > 0
-            ? periodo.registroCicloId
-            : null,
-        menstruacaoPrevista: validarIntervalo(periodo.menstruacaoPrevista),
-        faseMenstrual: validarIntervalo(periodo.faseMenstrual),
-        faseFolicular: validarIntervalo(periodo.faseFolicular),
-        faseLutea: validarIntervalo(periodo.faseLutea),
-        janelaFertil: validarIntervalo(periodo.janelaFertil),
-        ovulacao: periodo.ovulacao
-    }))
+    return periodos
+        .filter((periodo) => periodo && typeof periodo === 'object')
+        .map((periodo) => ({
+            previsto: periodo.previsto === true,
+            registroCicloId:
+                Number.isSafeInteger(periodo.registroCicloId) && periodo.registroCicloId > 0
+                    ? periodo.registroCicloId
+                    : null,
+            menstruacaoPrevista: validarIntervalo(periodo.menstruacaoPrevista),
+            faseMenstrual: validarIntervalo(periodo.faseMenstrual),
+            faseFolicular: validarIntervalo(periodo.faseFolicular),
+            faseLutea: validarIntervalo(periodo.faseLutea),
+            janelaFertil: validarIntervalo(periodo.janelaFertil),
+            ovulacao: periodo.ovulacao
+        }));
 }
 
 function criarRegistrosPorData(diasMenstruacao) {
-    const registros = new Map()
+    const registros = new Map();
 
-    if (!Array.isArray(diasMenstruacao)) return registros
+    if (!Array.isArray(diasMenstruacao)) return registros;
 
     for (const dia of diasMenstruacao) {
-        const dataValida = typeof dia?.data === 'string' && FORMATO_DATA.test(dia.data)
-        const idValido = Number.isSafeInteger(dia?.registroCicloId) && dia.registroCicloId > 0
+        const dataValida = typeof dia?.data === 'string' && FORMATO_DATA.test(dia.data);
+        const idValido = Number.isSafeInteger(dia?.registroCicloId) && dia.registroCicloId > 0;
 
-        if (dataValida && idValido) registros.set(dia.data, dia.registroCicloId)
+        if (dataValida && idValido) registros.set(dia.data, dia.registroCicloId);
     }
 
-    return registros
+    return registros;
 }
 
 function obterRegistroEditavel(data, previsao, registrosPorData) {
-    const registroConfirmadoId = registrosPorData.get(data) ?? null
-    if (registroConfirmadoId) return registroConfirmadoId
+    const registroConfirmadoId = registrosPorData.get(data) ?? null;
+    if (registroConfirmadoId) return registroConfirmadoId;
 
-    const periodoMenstrual = previsao.find(periodo => (
-        !periodo.previsto && intervaloContem(periodo.faseMenstrual, data)
-    ))
+    const periodoMenstrual = previsao.find(
+        (periodo) => !periodo.previsto && intervaloContem(periodo.faseMenstrual, data)
+    );
 
-    if (!periodoMenstrual) return null
-    if (periodoMenstrual.registroCicloId) return periodoMenstrual.registroCicloId
+    if (!periodoMenstrual) return null;
+    if (periodoMenstrual.registroCicloId) return periodoMenstrual.registroCicloId;
 
     const idsDoIntervalo = new Set()
     for (const [dataRegistrada, registroCicloId] of registrosPorData) {
