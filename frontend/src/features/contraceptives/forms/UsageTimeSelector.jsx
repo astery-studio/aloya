@@ -63,6 +63,7 @@ function UsageTimeSelector({
                 onPress={onAbrir}
                 navegar
                 icone={Clock}
+                coresNoturnas={{ icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }}
                 corIcone="#2C4C3B"
                 fundoIcone="#EEF4F0"
             />
