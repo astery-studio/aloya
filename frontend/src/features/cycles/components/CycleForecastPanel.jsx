@@ -98,7 +98,8 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
             variante={destaque ? 'laranja' : 'verde'}
             aoPressionar={aoPressionar}
             rotuloAcessibilidade={texto}
-            estilo={estilos.botaoAcao}
+            estilo={[estilos.botaoAcao, destaque && estilos.botaoCadastrarMenstruacao]}
+            estiloTexto={destaque && estilos.textoCadastrarMenstruacao}
         />
     );
 }

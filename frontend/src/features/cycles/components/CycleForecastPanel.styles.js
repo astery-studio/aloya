@@ -112,6 +112,24 @@ function criarEstilos(tema) {
             gap: 10,
             borderRadius: radius.medio
         },
+        botaoCadastrarMenstruacao: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  backgroundColor: '#C26E5F',
+                  boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.04)'
+              }
+            : {},
+        textoCadastrarMenstruacao: tema.escuro
+            ? {
+                  color: '#121212',
+                  textAlign: 'center',
+                  fontFamily: fontFamilies.bold,
+                  fontSize: 15,
+                  fontStyle: 'normal',
+                  fontWeight: '700',
+                  lineHeight: 22.5
+              }
+            : {},
         secaoPrevisao: { paddingHorizontal: 16, paddingTop: 24 },
         cartaoProximoCiclo: {
             minHeight: 135,

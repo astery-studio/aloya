@@ -19,7 +19,8 @@ function Button({
     icone: Icone,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto
 }) {
     const tema = useTheme();
 
@@ -67,7 +68,8 @@ function Button({
                             ? {
                                   color: corConteudo
                               }
-                            : null
+                            : null,
+                        estiloTexto
                     ]}
                 >
                     {texto}
