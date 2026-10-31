@@ -201,8 +201,8 @@ describe('SupportCategoryCard', () => {
         );
 
         expect(screen.getByTestId('support-category-card')).toHaveStyle({
-            backgroundColor: temaEscuro.cores.interface.superficie,
-            borderColor: temaEscuro.cores.interface.borda
+            backgroundColor: '#1E1E1E',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
         });
 
         expect(screen.getByTestId('support-category-name')).toHaveStyle({
