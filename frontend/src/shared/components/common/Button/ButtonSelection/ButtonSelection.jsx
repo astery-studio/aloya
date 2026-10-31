@@ -15,7 +15,9 @@ function ButtonSelection({
     desabilitado = false,
     variante = 'lista',
     estiloSelecionado,
-    estiloTextoSelecionado
+    estiloTextoSelecionado,
+    estiloTexto,
+    estiloDescricao
 }) {
     const tema = useTheme();
 
@@ -54,6 +56,7 @@ function ButtonSelection({
                     style={[
                         estilos.label,
                         modoCor && estilos.labelModoCor,
+                        estiloTexto,
                         selected && estilos.labelSelecionado,
                         modoCor && selected && estilos.labelModoCorSelecionado,
                         selected && estiloTextoSelecionado
@@ -62,7 +65,17 @@ function ButtonSelection({
                     {label}
                 </Text>
 
-                {descricao ? <Text style={estilos.descricao}>{descricao}</Text> : null}
+                {descricao ? (
+                    <Text
+                        style={[
+                            estilos.descricao,
+                            estiloDescricao,
+                            selected && estiloTextoSelecionado
+                        ]}
+                    >
+                        {descricao}
+                    </Text>
+                ) : null}
             </View>
 
             {intensidade ? (
