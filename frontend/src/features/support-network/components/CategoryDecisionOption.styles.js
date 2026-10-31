@@ -32,13 +32,18 @@ function criarEstilos(tema) {
         },
 
         fundoPerigo: {
-            backgroundColor: tema.escuro ? '#3B2525' : '#FDF0F0'
+            backgroundColor: tema.escuro ? '#EF9A9A' : '#FDF0F0'
         },
 
         fundoManter: {
-            backgroundColor: tema.cores.interface.destaqueSuave
+            backgroundColor: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaqueSuave
         },
 
+        todosSelecionados: tema.escuro ? { borderColor: '#121212' } : {},
+        tituloTodosRemover: tema.escuro ? { color: '#EF9A9A' } : {},
+        tituloTodosManter: tema.escuro ? { color: '#A5D6A7' } : {},
+        tituloTodosSelecionados: tema.escuro ? { color: '#121212' } : {},
+        descricaoTodosSelecionados: tema.escuro ? { color: '#5C5C59' } : {},
         textos: {
             flex: 1,
             gap: 2

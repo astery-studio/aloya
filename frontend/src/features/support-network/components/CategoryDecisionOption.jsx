@@ -42,6 +42,7 @@ function CategoryDecisionOption({
                 selecionado &&
                     destacarFundo &&
                     (perigo ? estilos.fundoPerigo : estilos.fundoManter),
+                selecionado && destacarFundo && estilos.todosSelecionados,
                 pressed && !bloqueado && estilos.pressionada,
                 bloqueado && estilos.desabilitada
             ]}
@@ -51,14 +52,23 @@ function CategoryDecisionOption({
                     numberOfLines={3}
                     style={[
                         estilos.titulo,
-                        selecionado && (perigo ? estilos.tituloPerigo : estilos.tituloManter)
+                        selecionado && (perigo ? estilos.tituloPerigo : estilos.tituloManter),
+                        destacarFundo &&
+                            (perigo ? estilos.tituloTodosRemover : estilos.tituloTodosManter),
+                        destacarFundo && selecionado && estilos.tituloTodosSelecionados
                     ]}
                 >
                     {titulo}
                 </Text>
 
                 {descricao ? (
-                    <Text numberOfLines={3} style={estilos.descricao}>
+                    <Text
+                        numberOfLines={3}
+                        style={[
+                            estilos.descricao,
+                            destacarFundo && selecionado && estilos.descricaoTodosSelecionados
+                        ]}
+                    >
                         {descricao}
                     </Text>
                 ) : null}
@@ -76,7 +86,11 @@ function CategoryDecisionOption({
                         <CheckIcon
                             size={14}
                             weight="bold"
-                            color={tema.cores.interface.textoSobreDestaque}
+                            color={
+                                tema.escuro && destacarFundo
+                                    ? '#121212'
+                                    : tema.cores.interface.textoSobreDestaque
+                            }
                         />
                     ) : (
                         <View style={estilos.centroIndicador} />
