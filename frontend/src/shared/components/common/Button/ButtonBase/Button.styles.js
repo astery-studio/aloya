@@ -39,7 +39,7 @@ function criarEstilos(tema) {
         },
 
         desativado: {
-            backgroundColor: tema.cores.interface.separador,
+            backgroundColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.separador,
             borderColor: tema.cores.interface.borda,
             borderStyle: 'solid'
         }
