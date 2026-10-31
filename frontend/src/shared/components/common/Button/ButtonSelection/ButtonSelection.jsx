@@ -59,6 +59,7 @@ function ButtonSelection({
                         estiloTexto,
                         selected && estilos.labelSelecionado,
                         modoCor && selected && estilos.labelModoCorSelecionado,
+                        intensidade && estilos.labelIntensidade,
                         selected && estiloTextoSelecionado
                     ]}
                 >
@@ -69,6 +70,8 @@ function ButtonSelection({
                     <Text
                         style={[
                             estilos.descricao,
+                            intensidade && estilos.descricaoIntensidade,
+                            intensidade && selected && estilos.descricaoIntensidadeSelecionada,
                             estiloDescricao,
                             selected && estiloTextoSelecionado
                         ]}
