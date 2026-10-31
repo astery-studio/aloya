@@ -53,7 +53,7 @@ function criarCoresDaPrevisao(tema) {
             folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.conteudoFolicular
         },
         corAviso: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
-        corIconeEscuro: tema.escuro ? tema.cores.interface.textoPrincipal : cores.ciclo.iconeEscuro
+        corIconeEscuro: tema.escuro ? '#B39DDB' : cores.ciclo.iconeEscuro
     };
 }
 
