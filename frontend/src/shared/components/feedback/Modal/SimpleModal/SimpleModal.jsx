@@ -27,6 +27,9 @@ export default function SimpleModal({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const visualErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
+    const sairSemSalvar = [acaoPrincipal, acaoSecundaria].some(
+        (acao) => acao?.varianteVisual === 'sairSemSalvar'
+    );
 
     return (
         <AppModal
@@ -40,7 +43,7 @@ export default function SimpleModal({
                 visualErro.fundoIcone ?? (tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone)
             }
             estiloIcone={[estiloIcone, estilos.icone, visualErro.icone]}
-            estilo={[estilos.caixa, visualErro.modal]}
+            estilo={[estilos.caixa, visualErro.modal, sairSemSalvar && estilos.caixaSairSemSalvar]}
             titulo={titulo}
             mensagem={mensagem}
         >
