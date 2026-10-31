@@ -81,6 +81,8 @@ function ChangePassword({
                 aoPressionar={onSalvar}
                 desativado={!camposPreenchidos || bloqueado}
                 carregando={carregando}
+                estilo={(!camposPreenchidos || bloqueado) && estilos.botaoSalvarDesativado}
+                estiloTexto={(!camposPreenchidos || bloqueado) && estilos.textoSalvarDesativado}
             />
         </View>
     );

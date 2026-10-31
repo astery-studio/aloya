@@ -18,6 +18,8 @@ function criarEstilos(tema) {
             : {},
         textoSenha: tema.escuro ? { color: '#E3E3E3' } : {},
         labelSenha: tema.escuro ? { color: '#999999' } : {},
+        botaoSalvarDesativado: tema.escuro ? { borderRadius: 12, backgroundColor: '#2C2C2C' } : {},
+        textoSalvarDesativado: tema.escuro ? { color: '#757575' } : {},
         campos: {
             width: '100%',
             gap: tema.espacamentos.medio
