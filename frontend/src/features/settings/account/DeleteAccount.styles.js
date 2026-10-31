@@ -29,6 +29,8 @@ function criarAparencia(tema) {
         },
         textoSecundario: { color: '#E3E3E3' },
         cabecalho: { backgroundColor: '#EF9A9A' },
+        iconeCabecalho: { borderRadius: 26, backgroundColor: 'rgba(18, 18, 18, 0.15)' },
+        corIconeCabecalho: '#FFFFFF',
         modal: {
             borderRadius: 20,
             backgroundColor: '#1E1E1E',
