@@ -7,7 +7,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         tela: {
             flex: 1,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },
         cabecalho: {
             display: 'flex',
@@ -75,7 +75,7 @@ function criarEstilos(tema) {
         conteudo: {
             flex: 1,
             minHeight: 0,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },
         areaCalendario: {
             flex: 1,
@@ -109,7 +109,7 @@ function criarEstilos(tema) {
             paddingLeft: 24,
             borderTopWidth: 1,
             borderTopColor: tema.cores.interface.separador,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         }
     });
 }
