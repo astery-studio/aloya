@@ -30,6 +30,7 @@ function normalizarPermissoes(permissoes) {
 
 //Recebe as permissões selecionadas e devolve todas as alterações ao formulário.
 function PermissionGroups({
+    aparenciaNovaCategoria = false,
     coresInterruptor,
     permissoesSelecionadas = [],
     aoAlterar,
@@ -121,6 +122,7 @@ function PermissionGroups({
             <View style={estilos.lista}>
                 {gruposPermissoes.map((grupo) => (
                     <PermissionGroup
+                        aparenciaNovaCategoria={aparenciaNovaCategoria}
                         coresInterruptor={coresInterruptor}
                         key={grupo.id}
                         titulo={grupo.titulo}

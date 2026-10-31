@@ -18,7 +18,7 @@ import PermissionItem from './PermissionItem';
 import { criarEstilos } from './PermissionGroup.styles';
 
 //Recebe o nome da paleta e devolve somente uma paleta conhecida pelo aplicativo.
-function obterPaleta(paleta, tema) {
+function obterPaleta(paleta, tema, aparenciaNovaCategoria) {
     const paletasDosGrupos = tema.cores.redeApoio;
     const paletaBase = paletasDosGrupos[paleta] ?? paletasDosGrupos.ciclo;
 
@@ -33,13 +33,22 @@ function obterPaleta(paleta, tema) {
         saude: '#AEBBEF'
     };
     const cor = coresEscuras[paleta] ?? coresEscuras.ciclo;
+    const coresCadastro = {
+        ciclo: { icone: '#EF9A9A', fundoIcone: 'rgba(239, 154, 154, 0.16)' },
+        corpo: { icone: '#A5D6A7', fundoIcone: 'rgba(165, 214, 167, 0.16)' },
+        emocional: { icone: '#B39DDB', fundoIcone: 'rgba(179, 157, 219, 0.16)' },
+        energia: { icone: '#FFE082', fundoIcone: 'rgba(255, 224, 130, 0.16)' },
+        vidaIntima: { icone: '#EF9A9A', fundoIcone: 'rgba(239, 154, 154, 0.16)' },
+        saude: { icone: '#90CAF9', fundoIcone: 'rgba(144, 202, 249, 0.20)' }
+    };
 
     return {
         ...paletaBase,
         icone: cor,
         fundoIcone: tema.cores.interface.superficieElevada,
         fundoExpandido: tema.cores.interface.destaqueSuave,
-        bordaExpandida: cor
+        bordaExpandida: cor,
+        ...(aparenciaNovaCategoria ? (coresCadastro[paleta] ?? coresCadastro.ciclo) : {})
     };
 }
 
@@ -69,6 +78,7 @@ function obterTextoDaContagem(quantidade) {
 
 //Recebe as permissões e ações do grupo e controla sua abertura e seus interruptores.
 function PermissionGroup({
+    aparenciaNovaCategoria = false,
     coresInterruptor,
     titulo,
     icone = 'gota',
@@ -81,9 +91,9 @@ function PermissionGroup({
     inicialmenteExpandido = false
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilos = useMemo(() => criarEstilos(tema, aparenciaNovaCategoria), [tema, aparenciaNovaCategoria]);
     const [expandido, definirExpandido] = useState(inicialmenteExpandido === true);
-    const coresDoGrupo = obterPaleta(paleta, tema);
+    const coresDoGrupo = obterPaleta(paleta, tema, aparenciaNovaCategoria);
     const IconeDaExpansao = expandido ? CaretUpIcon : CaretDownIcon;
 
     //Memoização reaproveita os dados calculados enquanto as propriedades recebidas não mudarem.

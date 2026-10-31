@@ -77,10 +77,19 @@ function SupportCategoryForm({
     exibirAcao = true
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema, aparenciaNovaCategoria), [tema, aparenciaNovaCategoria]);
-    const coresInterruptor = tema.escuro && aparenciaNovaCategoria
-        ? { trilhaInativa: '#424242', indicadorInativo: '#9E9E9E', trilhaAtiva: '#A5D6A7', indicadorAtivo: '#121212' }
-        : undefined;
+    const estilos = useMemo(
+        () => criarEstilos(tema, aparenciaNovaCategoria),
+        [tema, aparenciaNovaCategoria]
+    );
+    const coresInterruptor =
+        tema.escuro && aparenciaNovaCategoria
+            ? {
+                  trilhaInativa: '#424242',
+                  indicadorInativo: '#9E9E9E',
+                  trilhaAtiva: '#A5D6A7',
+                  indicadorAtivo: '#121212'
+              }
+            : undefined;
     const nome = typeof dados?.nome === 'string' ? dados.nome : '';
 
     const dadosVisiveisRecebidos = dados?.dadosVisiveis;
@@ -199,6 +208,7 @@ function SupportCategoryForm({
                 />
 
                 <PermissionGroups
+                    aparenciaNovaCategoria={aparenciaNovaCategoria}
                     coresInterruptor={coresInterruptor}
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissoesAcesso}
