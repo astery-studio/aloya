@@ -28,6 +28,7 @@ function criarAparencia(tema) {
             backgroundColor: '#242424'
         },
         textoSecundario: { color: '#E3E3E3' },
+        cabecalho: { backgroundColor: '#EF9A9A' },
         modal: {
             borderRadius: 20,
             backgroundColor: '#1E1E1E',

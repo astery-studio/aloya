@@ -31,7 +31,8 @@ export default function AppModal({
     destaque,
     aoOcultar,
     children,
-    estilo
+    estilo,
+    estiloCabecalho
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -94,7 +95,7 @@ export default function AppModal({
                             ]}
                         >
                             {alerta ? (
-                                <View style={estilos.cabecalhoAlerta}>
+                                <View style={[estilos.cabecalhoAlerta, estiloCabecalho]}>
                                     {Icone ? (
                                         <View style={estilos.iconeAlerta}>
                                             <Icone

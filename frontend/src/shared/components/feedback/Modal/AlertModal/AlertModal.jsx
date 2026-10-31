@@ -74,6 +74,7 @@ export default function AlertModal({
             fundoIcone={aparencia.fundoIcone}
             corIcone={aparencia.corIcone}
             estiloIcone={aparencia.icone}
+            estiloCabecalho={aparencia.cabecalho}
         >
             {comSenha ? (
                 <View style={estilos.campoSenha}>
