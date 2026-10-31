@@ -62,7 +62,8 @@ export default function SimpleModal({
                     variante={acaoSecundaria.variante || 'branco'}
                     desativado={acaoSecundaria.desativado}
                     carregando={acaoSecundaria.carregando}
-                    estilo={larguraTotal}
+                    estilo={[larguraTotal, visualErro.botaoSecundario]}
+                    estiloTexto={visualErro.textoSecundario}
                 />
             )}
         </AppModal>

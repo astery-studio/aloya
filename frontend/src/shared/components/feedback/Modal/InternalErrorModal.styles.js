@@ -13,6 +13,13 @@ function criarAparenciaErroInterno(tema) {
             backgroundColor: 'rgba(255, 255, 255, 0.16)'
         },
         textoPrincipal: { color: '#FFFFFF' },
+        botaoSecundario: {
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.12)',
+            backgroundColor: '#242424'
+        },
+        textoSecundario: { color: '#E3E3E3' },
         modal: {
             borderRadius: 20,
             backgroundColor: '#1E1E1E',
