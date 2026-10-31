@@ -25,7 +25,9 @@ function criarEstilos(tema) {
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: tema.cores.icones.configuracoes.azul.caixa,
+            backgroundColor: tema.escuro
+                ? 'rgba(179, 157, 219, 0.16)'
+                : tema.cores.icones.configuracoes.azul.caixa,
             borderRadius: 10
         },
 
