@@ -6,9 +6,9 @@ function criarEstilos(tema) {
             width: '100%',
             height: 91,
             flexDirection: 'row',
-            backgroundColor: tema.cores.interface.superficie,
-            borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
+            borderTopWidth: tema.escuro ? 0.667 : 1,
+            borderTopColor: tema.escuro ? 'rgba(255, 255, 255, 0.12)' : tema.cores.interface.borda
         }
     });
 }
