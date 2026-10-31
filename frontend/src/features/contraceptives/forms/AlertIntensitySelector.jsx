@@ -38,6 +38,7 @@ function AlertIntensitySelector({
                 onPress={onAbrir}
                 navegar
                 icone={Bell}
+                coresNoturnas={{ icone: '#EF9A9A', caixa: 'rgba(239, 154, 154, 0.16)' }}
             />
             <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
                 <SafeAreaView
