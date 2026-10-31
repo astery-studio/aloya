@@ -45,7 +45,9 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
                 visivel={visivel && !erroVisivel}
                 aoFechar={carregando ? ignorarFechamento : onFechar}
                 icone={WarningCircleIcon}
-                corIcone={cores.marca.primaria}
+                corIcone={tema.escuro ? '#E3E3E3' : cores.marca.primaria}
+                fundoIcone={tema.escuro ? 'rgba(255, 255, 255, 0.08)' : undefined}
+                estiloIcone={estilos.icone}
                 titulo="Sair da Conta"
                 mensagem="Você deverá realizar login novamente para acessar sua conta."
                 destaque="Deseja continuar?"

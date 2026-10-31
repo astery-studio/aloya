@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        icone: tema.escuro ? { borderRadius: 14 } : {},
         caixa: tema.escuro
             ? {
                   borderRadius: 20,
