@@ -163,11 +163,11 @@ describe('ProfileField', () => {
         });
 
         expect(screen.getByText('Nome')).toHaveStyle({
-            color: '#C4C8C5'
+            color: '#999999'
         });
 
         expect(screen.getByText('Julia')).toHaveStyle({
-            color: '#F4F1EA'
+            color: '#E3E3E3'
         });
     });
 
@@ -190,7 +190,7 @@ describe('ProfileField', () => {
         expect(mockNotePencilIcon).toHaveBeenCalledWith(
             expect.objectContaining({
                 size: 20,
-                color: '#A3A8A5',
+                color: '#999999',
                 weight: 'regular'
             })
         );

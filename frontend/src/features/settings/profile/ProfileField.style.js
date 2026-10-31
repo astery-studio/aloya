@@ -32,7 +32,7 @@ function criarEstilos(tema) {
         },
 
         label: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -41,7 +41,7 @@ function criarEstilos(tema) {
 
         valor: {
             ...tema.typography.bodyDefault,
-            color: tema.cores.interface.textoPrincipal
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal
         },
 
         valorNaoInformado: {

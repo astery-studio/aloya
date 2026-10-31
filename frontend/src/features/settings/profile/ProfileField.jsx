@@ -82,7 +82,7 @@ function ProfileField({ label, valor, onPress, desabilitado = false }) {
 
             <NotePencilIcon
                 size={20}
-                color={tema.cores.interface.textoDesabilitado}
+                color={tema.escuro ? '#999999' : tema.cores.interface.textoDesabilitado}
                 weight="regular"
             />
         </Pressable>
