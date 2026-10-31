@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
@@ -124,7 +124,9 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
 }
 
 function GotaPreenchidaIcon(props) {
-    return <DropIcon {...props} weight="fill" />;
+    const { estilos } = useCycleForecastVisual();
+    const corTexto = StyleSheet.flatten(estilos.textoCadastrarMenstruacao)?.color;
+    return <DropIcon {...props} color={corTexto ?? props.color} weight="fill" />;
 }
 
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
