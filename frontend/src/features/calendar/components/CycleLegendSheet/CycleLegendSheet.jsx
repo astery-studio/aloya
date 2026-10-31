@@ -81,8 +81,16 @@ function CycleLegendSheet({ visivel, aoFechar, itens }) {
         : [];
 
     return (
-        <BottomSheet visivel={visivel} onFechar={aoFechar}>
-            <BottomSheetLayout titulo="Legenda" onFechar={aoFechar}>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={aoFechar}
+            corPainel={tema.escuro ? '#1E1E1E' : undefined}
+        >
+            <BottomSheetLayout
+                titulo="Legenda"
+                onFechar={aoFechar}
+                corFundo={tema.escuro ? '#1E1E1E' : undefined}
+            >
                 <ScrollView
                     style={estilos.lista}
                     contentContainerStyle={estilos.listaConteudo}
