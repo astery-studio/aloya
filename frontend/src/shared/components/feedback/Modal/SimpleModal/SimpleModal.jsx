@@ -35,9 +35,11 @@ export default function SimpleModal({
             aoFechar={aoFechar}
             aoOcultar={aoOcultar}
             icone={icone}
-            corIcone={tema.escuro ? '#E3E3E3' : corIcone}
-            fundoIcone={tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone}
-            estiloIcone={[estiloIcone, estilos.icone]}
+            corIcone={visualErro.corIcone ?? (tema.escuro ? '#E3E3E3' : corIcone)}
+            fundoIcone={
+                visualErro.fundoIcone ?? (tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone)
+            }
+            estiloIcone={[estiloIcone, estilos.icone, visualErro.icone]}
             estilo={[estilos.caixa, visualErro.modal]}
             titulo={titulo}
             mensagem={mensagem}
