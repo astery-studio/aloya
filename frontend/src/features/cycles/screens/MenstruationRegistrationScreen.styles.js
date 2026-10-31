@@ -158,8 +158,8 @@ function criarEstilos(tema) {
             paddingTop: 24,
             paddingBottom: 20,
             borderTopWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.separador,
-            backgroundColor: tema.escuro ? '#1D211F' : tema.cores.interface.fundo
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.separador,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
         },
         salvar: { minHeight: 56, borderRadius: 12 },
         iconeFeedback: { borderRadius: 14 },
