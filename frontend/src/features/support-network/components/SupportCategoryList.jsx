@@ -6,6 +6,7 @@ import { CategoryTitleMetrics } from './CategoryTitleMetrics';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
 import { SupportCategoryCard } from './SupportCategoryCard';
 import { criarEstilos } from './SupportCategoryList.styles';
@@ -121,6 +122,7 @@ function SupportCategoryList({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
 
     const categoriasOrdenadas = useMemo(() => ordenarCategorias(categorias), [categorias]);
     const { fontScale } = useWindowDimensions();
@@ -234,6 +236,8 @@ function SupportCategoryList({
                         variante="erro"
                         acao={
                             <ButtonScreen
+                                estilo={estilosErro.botao}
+                                estiloTexto={estilosErro.textoBotao}
                                 texto="Tentar Novamente"
                                 aoPressionar={onTentarNovamente}
                                 variante="preto"

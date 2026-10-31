@@ -11,6 +11,7 @@ import { GenderSelector } from '../profile/GenderSelector';
 import { ProfileSettings } from '../profile/ProfileSettings';
 import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { isValidDate } from '../../../shared/utils/validation/isValidDate';
 import { isValidEmail } from '../../../shared/utils/validation/isValidEmail';
 import { criarEstilos } from './ProfileSettingsScreen.style';
@@ -108,6 +109,7 @@ function ProfileSettingsScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const chavePerfil = obterChavePerfil(perfil);
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil));
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil));
@@ -323,10 +325,11 @@ function ProfileSettingsScreen({
 
                     {typeof onRecarregar === 'function' ? (
                         <ButtonScreen
+                            estiloTexto={estilosErro.textoBotao}
                             texto="Tentar Novamente"
                             variante="preto"
                             aoPressionar={onRecarregar}
-                            estilo={estilos.botaoErro}
+                            estilo={[estilos.botaoErro, estilosErro.botao]}
                         />
                     ) : null}
                 </View>

@@ -6,6 +6,7 @@ import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { fontFamilies } from '../../../shared/theme';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import {
     ContraceptiveUsageCard,
     criarUsos,
@@ -29,6 +30,7 @@ function ContraceptiveHomeScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const [usosAtualizados, setUsosAtualizados] = useState({});
     const ativos = anticoncepcionais
         .filter((item) => item.ativo !== false && !item.removido)
@@ -73,6 +75,8 @@ function ContraceptiveHomeScreen({
                                         {MENSAGEM_ERRO_CARREGAR}
                                     </Text>
                                     <ButtonScreen
+                                        estilo={estilosErro.botao}
+                                        estiloTexto={estilosErro.textoBotao}
                                         texto="Tentar novamente"
                                         variante="preto"
                                         aoPressionar={aoTentarNovamente}

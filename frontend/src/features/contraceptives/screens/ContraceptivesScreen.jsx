@@ -5,6 +5,7 @@ import { Plus } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { ContraceptiveCard } from '../components/ContraceptiveCard';
 import { criarEstilos } from './contraceptiveScreens.styles';
 
@@ -18,6 +19,7 @@ function ContraceptivesScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     let estadoVazio = (
         <View style={estilos.vazio}>
             <Text style={estilos.tituloVazio}>Nenhum anticoncepcional cadastrado</Text>
@@ -39,6 +41,8 @@ function ContraceptivesScreen({
                 <Text style={estilos.tituloVazio}>Não foi possível carregar</Text>
                 <Text style={estilos.textoVazio}>{erro}</Text>
                 <ButtonScreen
+                    estilo={estilosErro.botao}
+                    estiloTexto={estilosErro.textoBotao}
                     texto="Tentar novamente"
                     variante="preto"
                     aoPressionar={onTentarNovamente}

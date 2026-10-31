@@ -3,11 +3,13 @@ import { ActivityIndicator, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { criarEstilos } from '../screens/CycleParametersScreen.styles';
 
 function CycleParametersStateView({ carregando, onTentarNovamente }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const corCarregamento = tema.escuro
         ? tema.cores.interface.destaque
         : tema.cores.marca.secundaria;
@@ -30,6 +32,8 @@ function CycleParametersStateView({ carregando, onTentarNovamente }) {
                 Não foi possível carregar os parâmetros do ciclo.
             </Text>
             <ButtonScreen
+                estilo={estilosErro.botao}
+                estiloTexto={estilosErro.textoBotao}
                 texto="Tentar novamente"
                 variante="preto"
                 aoPressionar={onTentarNovamente}

@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { CycleHistoryCard } from '../components/CycleHistoryCard/CycleHistoryCard';
 import { CycleSummaryCard } from '../components/CycleSummaryCard/CycleSummaryCard';
 import { criarEstilos } from './CycleHistoryScreen.styles';
@@ -118,6 +119,7 @@ function CycleHistoryScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const corCarregamento = tema.escuro
         ? tema.cores.interface.destaque
         : tema.cores.marca.secundaria;
@@ -193,6 +195,8 @@ function CycleHistoryScreen({
 
                     <View style={estilos.botaoDoEstado}>
                         <ButtonScreen
+                            estilo={estilosErro.botao}
+                            estiloTexto={estilosErro.textoBotao}
                             texto="Tentar Novamente"
                             variante="preto"
                             aoPressionar={aoTentarNovamente}
