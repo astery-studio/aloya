@@ -63,7 +63,13 @@ function SettingsLayout({
                 </ScrollView>
 
                 {temRodape && rodapeFixo ? (
-                    <View testID="rodape-fixo-settings-layout" style={estilos.rodapeFixo}>
+                    <View
+                        testID="rodape-fixo-settings-layout"
+                        style={[
+                            estilos.rodapeFixo,
+                            corFundo ? { backgroundColor: corFundo } : null
+                        ]}
+                    >
                         {rodape}
                     </View>
                 ) : null}

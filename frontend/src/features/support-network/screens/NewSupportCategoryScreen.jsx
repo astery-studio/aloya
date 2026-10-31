@@ -331,6 +331,7 @@ function NewSupportCategoryScreen({
         <>
             <SettingsLayout
                 titulo="Nova Categoria"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={voltar}
                 rodapeFixo
                 rodape={
