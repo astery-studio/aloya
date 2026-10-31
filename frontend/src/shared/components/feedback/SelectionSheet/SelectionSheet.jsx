@@ -19,7 +19,9 @@ function SelectionSheet({
     valorSelecionado,
     onSelecionar,
     onFechar,
-    varianteOpcao = 'lista'
+    varianteOpcao = 'lista',
+    corFundo,
+    estiloPainel
 }) {
     const tema = useTheme();
 
@@ -46,8 +48,13 @@ function SelectionSheet({
     }
 
     return (
-        <BottomSheet visivel={visivel} onFechar={onFechar}>
-            <BottomSheetLayout titulo={titulo} onFechar={onFechar}>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={onFechar}
+            corPainel={corFundo}
+            estiloPainel={estiloPainel}
+        >
+            <BottomSheetLayout titulo={titulo} onFechar={onFechar} corFundo={corFundo}>
                 <FlatList
                     testID="selection-sheet-list"
                     data={Array.isArray(opcoes) ? opcoes : []}
@@ -56,7 +63,7 @@ function SelectionSheet({
                     extraData={valorSelecionado}
                     initialNumToRender={7}
                     windowSize={5}
-                    style={estilos.lista}
+                    style={[estilos.lista, corFundo ? { backgroundColor: corFundo } : null]}
                     contentContainerStyle={estilos.conteudoLista}
                     ListEmptyComponent={
                         <Text style={estilos.mensagemVazia}>Nenhuma opção disponível.</Text>
