@@ -189,6 +189,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                 }}
                 acaoSecundaria={{
                     texto: 'Cancelar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: () => setConfirmacaoExclusaoVisivel(false),
                     desativado: excluindo
