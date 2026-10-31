@@ -15,6 +15,30 @@ function criarEstilosCartao(tema) {
             borderColor: interfaceTema.borda,
             borderRadius: 16
         },
+        cardAtivo: tema.escuro
+            ? {
+                  borderRadius: 16,
+                  borderWidth: 1.41,
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
+        iconeTipoAtivo: tema.escuro
+            ? {
+                  borderRadius: 10,
+                  borderWidth: 0.705,
+                  borderColor: '#2C2C2C',
+                  backgroundColor: '#2C2C2C'
+              }
+            : {},
+        badgePendente: tema.escuro
+            ? { borderRadius: 99, backgroundColor: 'rgba(255, 224, 130, 0.16)' }
+            : {},
+        badgeAlerta: tema.escuro
+            ? { borderRadius: 99, backgroundColor: 'rgba(144, 202, 249, 0.20)' }
+            : {},
+        textoBadgePendente: tema.escuro ? { color: '#FFE082' } : {},
+        textoBadgeAlerta: tema.escuro ? { color: '#90CAF9' } : {},
         cardConfirmado: { borderWidth: 0.70489 },
         faixaSuperior: { width: '100%', height: 3, backgroundColor: interfaceTema.separador },
         conteudo: { width: '100%', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 14.41 },
@@ -90,6 +114,7 @@ function criarEstilosCartao(tema) {
             letterSpacing: 0.6,
             marginBottom: 15
         },
+        rotuloProximosHorarios: tema.escuro ? { color: '#999999' } : {},
         linhaUso: {
             width: '100%',
             minHeight: 35.99,
