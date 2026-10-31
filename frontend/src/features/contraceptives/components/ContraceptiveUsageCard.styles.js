@@ -114,6 +114,7 @@ function criarEstilosCartao(tema) {
             letterSpacing: 0.6,
             marginBottom: 15
         },
+        rotuloUsados: tema.escuro ? { color: '#999999' } : {},
         rotuloProximosHorarios: tema.escuro ? { color: '#999999' } : {},
         linhaUso: {
             width: '100%',

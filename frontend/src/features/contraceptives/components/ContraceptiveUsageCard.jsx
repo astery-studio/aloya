@@ -424,7 +424,9 @@ function ContraceptiveUsageCard({
 
                 {!removido && possuiUsoConfirmado ? (
                     <View style={estilosCartao.blocoUsos}>
-                        <Text style={estilosCartao.rotuloSecao}>USADOS</Text>
+                        <Text style={[estilosCartao.rotuloSecao, estilosCartao.rotuloUsados]}>
+                            USADOS
+                        </Text>
                         {usos.filter(usoConfirmado).map((uso, indice) => (
                             <View
                                 key={uso.id}
