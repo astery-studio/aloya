@@ -363,8 +363,8 @@ function criarEstilos(tema) {
             padding: 16,
             borderRadius: radius.grande,
             backgroundColor: tema.escuro ? '#1E1E1E' : cores.ciclo.superficieSuave,
-            borderWidth: 1,
-            borderColor: tema.cores.interface.borda
+            borderWidth: tema.escuro ? 0.667 : 1,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda
         },
         numeroDica: {
             width: 34,
@@ -372,9 +372,9 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: radius.medio,
-            backgroundColor: tema.cores.interface.superficie,
-            borderWidth: 1,
-            borderColor: tema.cores.interface.borda
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.superficie,
+            borderWidth: tema.escuro ? 0.667 : 1,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda
         },
         textoNumeroDica: {
             color: cores.marca.primaria,
@@ -385,7 +385,7 @@ function criarEstilos(tema) {
         },
         textoDica: {
             flex: 1,
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',
