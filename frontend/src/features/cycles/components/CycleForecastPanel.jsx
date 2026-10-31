@@ -350,10 +350,20 @@ function CycleForecastPanel({
                         <View
                             style={[
                                 estilos.destaqueFertil,
-                                { borderColor: visual.coresForma[faseAtual] }
+                                { borderColor: visual.coresForma[faseAtual] },
+                                faseAtual === 'folicular'
+                                    ? estilos.destaqueFertilFolicular
+                                    : estilos.destaqueFertilOvulatoria
                             ]}
                         >
-                            <View style={estilos.iconeDestaqueFertil}>
+                            <View
+                                style={[
+                                    estilos.iconeDestaqueFertil,
+                                    faseAtual === 'folicular'
+                                        ? estilos.iconeDestaqueFertilFolicular
+                                        : estilos.iconeDestaqueFertilOvulatoria
+                                ]}
+                            >
                                 <SparkleIcon
                                     size={22}
                                     color={visual.coresForma[faseAtual]}

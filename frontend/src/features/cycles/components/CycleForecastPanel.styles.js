@@ -89,6 +89,38 @@ function criarEstilos(tema) {
             borderColor: tema.cores.interface.borda,
             borderRadius: radius.medio
         },
+        destaqueFertilFolicular: tema.escuro
+            ? {
+                  borderRadius: 16,
+                  borderWidth: 1.333,
+                  borderColor: '#52665D',
+                  backgroundColor: 'rgba(44, 76, 59, 0.03)'
+              }
+            : {},
+        destaqueFertilOvulatoria: tema.escuro
+            ? {
+                  borderRadius: 16,
+                  borderWidth: 1.333,
+                  borderColor: '#5A7382',
+                  backgroundColor: 'rgba(90, 115, 130, 0.03)'
+              }
+            : {},
+        iconeDestaqueFertilFolicular: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 0.667,
+                  borderColor: '#A5D6A7',
+                  backgroundColor: 'rgba(82, 102, 93, 0.16)'
+              }
+            : {},
+        iconeDestaqueFertilOvulatoria: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 0.667,
+                  borderColor: '#90CAF9',
+                  backgroundColor: 'rgba(90, 115, 130, 0.16)'
+              }
+            : {},
         tituloDestaqueFertil: {
             color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
