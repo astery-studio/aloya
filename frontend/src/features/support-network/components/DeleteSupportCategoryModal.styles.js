@@ -90,6 +90,8 @@ function criarEstilos(tema) {
             backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
+        botaoConfirmarAtivo: tema.escuro ? { backgroundColor: '#EF9A9A' } : {},
+        textoConfirmarAtivo: tema.escuro ? { color: '#121212' } : {},
         botaoConfirmar: {
             width: '100%'
         }
