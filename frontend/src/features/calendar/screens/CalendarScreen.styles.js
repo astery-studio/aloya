@@ -110,7 +110,9 @@ function criarEstilos(tema) {
             paddingBottom: 24,
             paddingLeft: 24,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.separador,
+            borderTopColor: tema.escuro
+                ? 'rgba(255, 255, 255, 0.08)'
+                : tema.cores.interface.separador,
             backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         }
     });
