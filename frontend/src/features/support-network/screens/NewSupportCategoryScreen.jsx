@@ -350,6 +350,7 @@ function NewSupportCategoryScreen({
             >
                 <View style={estilos.conteudo}>
                     <SupportCategoryForm
+                        aparenciaNovaCategoria
                         dados={dados}
                         aoAlterar={alterarDados}
                         aoSalvar={salvarCategoria}
