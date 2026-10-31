@@ -51,12 +51,12 @@ function criarEstilos(tema) {
 
         calendario: Object.freeze({
             container: Object.freeze({
-                backgroundColor: tema.cores.interface.superficie,
-                borderWidth: 1,
-                borderColor: tema.cores.interface.borda,
+                backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
+                borderWidth: tema.escuro ? 0.667 : 1,
+                borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
                 borderRadius: tema.radius.onboardingCalendar
             }),
-            icone: tema.cores.interface.textoSecundario,
+            icone: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             tamanhoIcone: 22
         }),
 

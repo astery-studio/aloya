@@ -246,7 +246,7 @@ describe('IconButton', () => {
 
         expect(IconeTeste).toHaveBeenCalledWith(
             expect.objectContaining({
-                color: '#C4C8C5'
+                color: '#999999'
             }),
             undefined
         );
