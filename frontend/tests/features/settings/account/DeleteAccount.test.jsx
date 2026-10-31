@@ -444,12 +444,12 @@ describe('DeleteAccount', () => {
     });
 });
 
-test('muda a cor da senha somente durante o foco no modo noturno', async () => {
+test('mantém a senha preenchida clara mesmo após perder o foco', async () => {
     await renderizar(<DeleteAccount {...criarProps()} />, 'escuro');
     const campo = screen.getByLabelText('Senha atual');
 
     await fireEvent.changeText(campo, 'senha-segura');
-    expect(campo).toHaveStyle({ color: '#75757580' });
+    expect(campo).toHaveStyle({ color: '#E3E3E3' });
     expect(screen.getByRole('button', { name: 'Continuar' })).toHaveStyle({
         backgroundColor: '#EF9A9A'
     });
@@ -458,5 +458,5 @@ test('muda a cor da senha somente durante o foco no modo noturno', async () => {
     expect(campo).toHaveStyle({ color: '#E3E3E3' });
 
     await fireEvent(campo, 'blur');
-    expect(campo).toHaveStyle({ color: '#75757580' });
+    expect(campo).toHaveStyle({ color: '#E3E3E3' });
 });

@@ -13,6 +13,7 @@ function criarAparencia(tema) {
             },
             campoFocado: { borderColor: '#EF9A9A' },
             textoFocado: { color: '#E3E3E3' },
+            textoPreenchido: { color: '#E3E3E3' },
             texto: { color: '#75757580' },
             corIcone: '#75757580',
             corPlaceholder: '#75757580'

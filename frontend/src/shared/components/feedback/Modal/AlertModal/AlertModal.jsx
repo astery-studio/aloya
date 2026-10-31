@@ -88,7 +88,10 @@ export default function AlertModal({
                         variante="popup"
                         estilo={aparencia.senha?.campo}
                         estiloFocado={aparencia.senha?.campoFocado}
-                        estiloEntrada={aparencia.senha?.texto}
+                        estiloEntrada={[
+                            aparencia.senha?.texto,
+                            senhaAtual.length > 0 && aparencia.senha?.textoPreenchido
+                        ]}
                         estiloEntradaFocada={aparencia.senha?.textoFocado}
                         corIcone={aparencia.senha?.corIcone}
                         {...(aparencia.senha?.corPlaceholder
