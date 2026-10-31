@@ -75,6 +75,7 @@ function criarCoresDaPrevisao(tema) {
             ...coresForma,
             folicular: tema.escuro ? '#52665E' : cores.ciclo.conteudoFolicular
         },
+        corIconePrevisaoOvulacao: tema.escuro ? '#90CAF9' : coresForma.ovulatoria,
         corAviso: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
         corIconeEscuro: tema.escuro ? '#B39DDB' : cores.ciclo.iconeEscuro
     };
@@ -165,7 +166,7 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
 }
 
 function PainelPrevisao({ previsao, janelaFertil }) {
-    const { estilos, corAviso, corIconeEscuro, coresForma, coresConfiabilidade } =
+    const { estilos, corAviso, corIconeEscuro, corIconePrevisaoOvulacao, coresConfiabilidade } =
         useCycleForecastVisual();
     const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
     const janela = janelaFertil ?? previsao.janelaFertilEstimada;
@@ -217,7 +218,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <SunIcon size={18} color={coresForma.ovulatoria} weight="fill" />
+                        <SunIcon size={18} color={corIconePrevisaoOvulacao} weight="fill" />
                         <Text style={estilos.rotuloPrevisaoSecundaria}>Ovulação</Text>
                     </View>
                     <Text style={estilos.valorOvulacao}>
