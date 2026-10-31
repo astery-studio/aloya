@@ -42,8 +42,11 @@ function SelectionSheet({
                 label={item.label}
                 estiloTexto={estilos.textoOpcao}
                 estiloDescricao={estilos.textoOpcao}
-                estiloSelecionado={estiloOpcaoSelecionada}
-                estiloTextoSelecionado={estiloTextoOpcaoSelecionada}
+                estiloSelecionado={[estilos.opcaoSelecionada, estiloOpcaoSelecionada]}
+                estiloTextoSelecionado={[
+                    estilos.textoOpcaoSelecionada,
+                    estiloTextoOpcaoSelecionada
+                ]}
                 descricao={item.descricao}
                 icone={item.icone}
                 selected={item.id === valorSelecionado}

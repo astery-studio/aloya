@@ -2,6 +2,8 @@ import { StyleSheet } from 'react-native';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        opcaoSelecionada: tema.escuro ? { borderRadius: 10, backgroundColor: '#A5D6A7' } : {},
+        textoOpcaoSelecionada: tema.escuro ? { color: '#121212' } : {},
         painel: tema.escuro
             ? {
                   borderTopLeftRadius: 20,
