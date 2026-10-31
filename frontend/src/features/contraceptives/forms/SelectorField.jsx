@@ -20,6 +20,9 @@ function SelectorField({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const Seta = navegar ? CaretRight : CaretDown;
+    const usarCoresNoturnas = tema.escuro && aparenciaCadastro;
+    const corDoIcone = usarCoresNoturnas ? (coresNoturnas?.icone ?? corIcone) : corIcone;
+    const fundoDoIcone = usarCoresNoturnas ? (coresNoturnas?.caixa ?? fundoIcone) : fundoIcone;
     return (
         <FormField
             label={label}
@@ -35,8 +38,8 @@ function SelectorField({
                     ]}
                 >
                     {Icone ? (
-                        <View style={[estilos.caixaIconeCampo, { backgroundColor: fundoIcone }]}>
-                            <Icone size={20} color={corIcone} />
+                        <View style={[estilos.caixaIconeCampo, { backgroundColor: fundoDoIcone }]}>
+                            <Icone size={20} color={corDoIcone} />
                         </View>
                     ) : null}
                     <Text
