@@ -101,6 +101,8 @@ function criarEstilos(tema) {
             fontSize: 13,
             lineHeight: 19
         },
+        botaoCadastrarMenstruacao: tema.escuro ? { backgroundColor: '#C26E5F' } : {},
+        textoCadastrarMenstruacao: tema.escuro ? { color: '#121212' } : {},
         rodape: {
             flexShrink: 0,
             paddingTop: 20,

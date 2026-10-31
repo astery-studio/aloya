@@ -232,7 +232,12 @@ function CalendarScreen({
                     status={statusSincronizacao}
                     onTentarNovamente={aoTentarSincronizar}
                 />
-                <ButtonScreen texto="Cadastrar Menstruação" aoPressionar={aoCadastrarMenstruacao} />
+                <ButtonScreen
+                    texto="Cadastrar Menstruação"
+                    aoPressionar={aoCadastrarMenstruacao}
+                    estilo={estilos.botaoCadastrarMenstruacao}
+                    estiloTexto={estilos.textoCadastrarMenstruacao}
+                />
             </SafeAreaView>
 
             <CycleLegendSheet
