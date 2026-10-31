@@ -10,7 +10,7 @@ import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/Ale
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { criarEstilos } from './CalendarScreen.styles';
+import { coresConfiabilidadeEscuras, criarEstilos } from './CalendarScreen.styles';
 import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
 
 const ITENS_LEGENDA = Object.freeze([
@@ -180,7 +180,15 @@ function CalendarScreen({
                                     testID="centralizador-confianca"
                                     style={estilos.centralizadorConfianca}
                                 >
-                                    <ConfidenceBadge nivel={confiancaValida} variante="simples" />
+                                    <ConfidenceBadge
+                                        nivel={confiancaValida}
+                                        variante="simples"
+                                        coresPersonalizadas={
+                                            tema.escuro
+                                                ? coresConfiabilidadeEscuras[confiancaValida]
+                                                : undefined
+                                        }
+                                    />
                                 </View>
                             ) : null}
                         </View>
