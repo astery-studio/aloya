@@ -132,6 +132,7 @@ function SettingsScreen({
                         <View style={estilos.grupo}>
                             <NavigationField
                                 label="Sobre a aplicação"
+                            coresIcone={tema.escuro ? { icone: '#B39DDB', caixa: 'rgba(179, 157, 219, 0.16)' } : undefined}
                             estilo={estilos.campo}
                                 icone={InfoIcon}
                                 variante="semBorda"
