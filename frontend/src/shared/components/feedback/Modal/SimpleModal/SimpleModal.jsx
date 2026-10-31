@@ -64,12 +64,12 @@ export default function SimpleModal({
                     estilo={[
                         larguraTotal,
                         visualErro.botaoPrincipal,
-                        (acaoPrincipal.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
+                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
                             estilos.botaoSairSemSalvar
                     ]}
                     estiloTexto={[
                         visualErro.textoPrincipal,
-                        (acaoPrincipal.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
+                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
                             estilos.textoSairSemSalvar
                     ]}
                 />
@@ -78,20 +78,18 @@ export default function SimpleModal({
                 <ButtonPopup
                     texto={acaoSecundaria.texto}
                     aoPressionar={acaoSecundaria.aoPressionar}
-                    variante={
-                        sairDaConta && tema.escuro ? 'verde' : acaoSecundaria.variante || 'branco'
-                    }
+                    variante={acaoSecundaria.variante || 'branco'}
                     desativado={acaoSecundaria.desativado}
                     carregando={acaoSecundaria.carregando}
                     estilo={[
                         larguraTotal,
                         visualErro.botaoSecundario,
-                        acaoSecundaria.varianteVisual === 'sairSemSalvar' &&
+                        (acaoSecundaria.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
                             estilos.botaoSairSemSalvar
                     ]}
                     estiloTexto={[
                         visualErro.textoSecundario,
-                        acaoSecundaria.varianteVisual === 'sairSemSalvar' &&
+                        (acaoSecundaria.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
                             estilos.textoSairSemSalvar
                     ]}
                 />
