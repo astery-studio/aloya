@@ -189,7 +189,7 @@ function criarEstilosCartao(tema) {
             gap: 6,
             paddingVertical: 8,
             paddingHorizontal: 12,
-            backgroundColor: interfaceTema.superficieElevada,
+            backgroundColor: tema.escuro ? '#242424' : interfaceTema.superficieElevada,
             borderRadius: 10
         },
         textoValidade: {
