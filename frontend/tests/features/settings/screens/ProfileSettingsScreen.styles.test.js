@@ -46,6 +46,6 @@ describe('ProfileSettingsScreen.style', () => {
         const estilosEscuros = criarEstilos(temaEscuro);
 
         expect(estilosClaros.acaoPerigo.color).toBe(temaClaro.cores.feedback.erro);
-        expect(estilosEscuros.acaoPerigo.color).toBe(temaEscuro.cores.feedback.erro);
+        expect(estilosEscuros.acaoPerigo.color).toBe('#EF9A9A');
     });
 });

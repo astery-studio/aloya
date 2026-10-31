@@ -58,7 +58,7 @@ function criarEstilos(tema) {
         },
 
         acaoPerigo: {
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
