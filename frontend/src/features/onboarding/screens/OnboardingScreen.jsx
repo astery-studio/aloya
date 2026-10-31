@@ -385,6 +385,6 @@ export default function OnboardingScreen({
             mensagem="Se você sair agora, os dados preenchidos serão perdidos."
             acaoPrincipal={{ texto: 'Continuar cadastro',
                 aoPressionar: () => setDestinoSaida(null) }}
-            acaoSecundaria={{ texto: 'Sair e descartar', aoPressionar: confirmarSaida }} />
+            acaoSecundaria={{ texto: 'Sair e descartar', varianteVisual: 'sairSemSalvar', aoPressionar: confirmarSaida }} />
     </>;
 }

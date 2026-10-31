@@ -203,7 +203,11 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                     texto: 'Continuar a editar',
                     aoPressionar: voltarAoPainel
                 }}
-                acaoSecundaria={{ texto: 'Sair sem salvar', aoPressionar: onFechar }}
+                acaoSecundaria={{
+                    texto: 'Sair sem salvar',
+                    varianteVisual: 'sairSemSalvar',
+                    aoPressionar: onFechar
+                }}
             />
             <SimpleModal
                 visivel={feedback?.tipo === 'sucesso'}

@@ -409,7 +409,7 @@ function ProfileSettingsScreen({
                 titulo="Dados não salvos"
                 mensagem="Você tem atualizações não salvas. Deseja mesmo sair?"
                 acaoPrincipal={{
-                    texto: 'Sair sem salvar',
+                    texto: 'Sair sem salvar', varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: sairSemSalvar
                 }}

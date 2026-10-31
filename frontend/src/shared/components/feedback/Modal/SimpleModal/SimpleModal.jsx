@@ -51,8 +51,17 @@ export default function SimpleModal({
                     variante={acaoPrincipal.variante || 'verde'}
                     desativado={acaoPrincipal.desativado}
                     carregando={acaoPrincipal.carregando}
-                    estilo={[larguraTotal, visualErro.botaoPrincipal]}
-                    estiloTexto={visualErro.textoPrincipal}
+                    estilo={[
+                        larguraTotal,
+                        visualErro.botaoPrincipal,
+                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
+                            estilos.botaoSairSemSalvar
+                    ]}
+                    estiloTexto={[
+                        visualErro.textoPrincipal,
+                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
+                            estilos.textoSairSemSalvar
+                    ]}
                 />
             )}
             {acaoSecundaria && (
@@ -62,8 +71,17 @@ export default function SimpleModal({
                     variante={acaoSecundaria.variante || 'branco'}
                     desativado={acaoSecundaria.desativado}
                     carregando={acaoSecundaria.carregando}
-                    estilo={[larguraTotal, visualErro.botaoSecundario]}
-                    estiloTexto={visualErro.textoSecundario}
+                    estilo={[
+                        larguraTotal,
+                        visualErro.botaoSecundario,
+                        acaoSecundaria.varianteVisual === 'sairSemSalvar' &&
+                            estilos.botaoSairSemSalvar
+                    ]}
+                    estiloTexto={[
+                        visualErro.textoSecundario,
+                        acaoSecundaria.varianteVisual === 'sairSemSalvar' &&
+                            estilos.textoSairSemSalvar
+                    ]}
                 />
             )}
         </AppModal>

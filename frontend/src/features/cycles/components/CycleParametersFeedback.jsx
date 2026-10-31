@@ -56,6 +56,7 @@ function CycleParametersFeedback({
                 mensagem="Você tem alterações não salvas. Deseja mesmo sair?"
                 acaoPrincipal={{
                     texto: 'Sair sem salvar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: onSairSemSalvar
                 }}
