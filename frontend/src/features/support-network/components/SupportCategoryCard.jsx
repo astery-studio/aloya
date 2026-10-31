@@ -84,7 +84,7 @@ function SupportCategoryCard({
                 >
                     <UserCheckIcon
                         size={18}
-                        color={tema.cores.interface.destaque}
+                        color={tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque}
                         weight="regular"
                     />
                 </View>

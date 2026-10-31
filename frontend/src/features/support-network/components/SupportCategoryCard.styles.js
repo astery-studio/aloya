@@ -36,7 +36,7 @@ function criarEstilos(tema) {
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: tema.cores.interface.fundo,
+            backgroundColor: tema.escuro ? 'rgba(165, 214, 167, 0.16)' : tema.cores.interface.fundo,
             borderWidth: 0.7,
             borderColor: tema.cores.interface.borda,
             borderRadius: 10
