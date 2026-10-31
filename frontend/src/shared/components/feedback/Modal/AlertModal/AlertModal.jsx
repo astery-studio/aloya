@@ -107,7 +107,7 @@ export default function AlertModal({
                         <Text
                             accessibilityRole="alert"
                             accessibilityLiveRegion="polite"
-                            style={estilos.erroSenha}
+                            style={[estilos.erroSenha, aparencia.erroSenha]}
                         >
                             {erroSenha}
                         </Text>

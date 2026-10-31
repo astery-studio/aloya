@@ -1,6 +1,7 @@
 function criarAparencia(tema) {
     if (!tema.escuro) return {};
     return {
+        erroSenha: { color: '#EF9A9A' },
         fundoIcone: 'rgba(239, 154, 154, 0.12)',
         corIcone: '#EF9A9A',
         icone: { borderRadius: 24 },
