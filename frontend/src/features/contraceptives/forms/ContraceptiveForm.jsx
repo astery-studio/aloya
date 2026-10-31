@@ -119,6 +119,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                 <ExpirationDateField
                     aparenciaCadastro={!form.modoEdicao}
                     valor={dados.dataValidade}
+                    corIconeNoturno="#A5D6A7"
                     aberto={painel === 'validade'}
                     onAbrir={() => abrirPainel('validade')}
                     onSelecionar={async (valor) => {
