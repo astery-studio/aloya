@@ -22,14 +22,15 @@ export default function SimpleModal({
     mensagem,
     acaoPrincipal,
     acaoSecundaria,
+    varianteVisual,
     erroInterno = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const visualErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
-    const sairSemSalvar = [acaoPrincipal, acaoSecundaria].some(
-        (acao) => acao?.varianteVisual === 'sairSemSalvar'
-    );
+    const sairSemSalvar =
+        varianteVisual === 'sairSemSalvar' ||
+        [acaoPrincipal, acaoSecundaria].some((acao) => acao?.varianteVisual === 'sairSemSalvar');
 
     return (
         <AppModal

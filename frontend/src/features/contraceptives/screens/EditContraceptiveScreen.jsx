@@ -172,6 +172,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             </ScrollView>
 
             <SimpleModal
+                varianteVisual="sairSemSalvar"
                 visivel={confirmacaoExclusaoVisivel}
                 aoFechar={excluindo ? undefined : () => setConfirmacaoExclusaoVisivel(false)}
                 icone={WarningCircleIcon}
