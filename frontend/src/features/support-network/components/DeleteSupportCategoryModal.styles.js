@@ -25,9 +25,9 @@ function criarEstilos(tema) {
             paddingTop: 18,
             paddingBottom: 16,
             borderWidth: 1.4,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.04)' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput,
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
             gap: 14
         },
 
