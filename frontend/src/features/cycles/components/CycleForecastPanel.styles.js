@@ -178,6 +178,7 @@ function criarEstilos(tema) {
             borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             ...shadows.cardSuave
         },
+        indicadorConfiabilidade: tema.escuro ? { borderRadius: 16, borderWidth: 0.667 } : {},
         cartaoProximoCicloComAviso: { minHeight: 198 },
         dataProximoCiclo: { flex: 1, minWidth: 140, gap: 4 },
         rotuloPrevisao: {
@@ -361,9 +362,7 @@ function criarEstilos(tema) {
             gap: 12,
             padding: 16,
             borderRadius: radius.grande,
-            backgroundColor: tema.escuro
-                ? '#1E1E1E'
-                : cores.ciclo.superficieSuave,
+            backgroundColor: tema.escuro ? '#1E1E1E' : cores.ciclo.superficieSuave,
             borderWidth: 1,
             borderColor: tema.cores.interface.borda
         },

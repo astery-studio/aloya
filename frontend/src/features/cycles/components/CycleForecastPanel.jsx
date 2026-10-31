@@ -48,6 +48,25 @@ function criarCoresDaPrevisao(tema) {
 
     return {
         coresForma,
+        coresConfiabilidade: tema.escuro
+            ? {
+                  baixa: {
+                      cor: '#EF9A9A',
+                      fundo: 'rgba(239, 154, 154, 0.16)',
+                      borda: 'rgba(239, 154, 154, 0.33)'
+                  },
+                  media: {
+                      cor: '#FFE082',
+                      fundo: 'rgba(255, 224, 130, 0.16)',
+                      borda: 'rgba(255, 224, 130, 0.33)'
+                  },
+                  alta: {
+                      cor: '#A5D6A7',
+                      fundo: 'rgba(165, 214, 167, 0.14)',
+                      borda: 'rgba(165, 214, 167, 0.33)'
+                  }
+              }
+            : null,
         coresConteudo: {
             ...coresForma,
             folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.conteudoFolicular
@@ -140,7 +159,8 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
 }
 
 function PainelPrevisao({ previsao, janelaFertil }) {
-    const { estilos, corAviso, corIconeEscuro, coresForma } = useCycleForecastVisual();
+    const { estilos, corAviso, corIconeEscuro, coresForma, coresConfiabilidade } =
+        useCycleForecastVisual();
     const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
     const janela = janelaFertil ?? previsao.janelaFertilEstimada;
     const incerta = previsao.status === 'PARCIALMENTE_DISPONIVEL';
@@ -159,7 +179,12 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                         {formatarDataLonga(previsao.proximoInicioEstimado)}
                     </Text>
                 </View>
-                <ConfidenceBadge nivel={nivel} variante="composta" />
+                <ConfidenceBadge
+                    nivel={nivel}
+                    variante="composta"
+                    coresPersonalizadas={coresConfiabilidade?.[nivel]}
+                    estilo={estilos.indicadorConfiabilidade}
+                />
                 {incerta ? (
                     <View style={estilos.avisoConfiabilidade}>
                         <WarningIcon size={18} color={corAviso} />
