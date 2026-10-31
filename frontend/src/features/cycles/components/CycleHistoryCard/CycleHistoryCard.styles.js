@@ -5,7 +5,7 @@ import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     const corAviso = tema.escuro ? '#F2B45F' : '#B97D22';
-    const corMenstruacao = tema.escuro ? '#F08A75' : tema.cores.marca.primaria;
+    const corMenstruacao = tema.escuro ? '#EF9A9A' : tema.cores.marca.primaria;
 
     return StyleSheet.create({
         container: {
