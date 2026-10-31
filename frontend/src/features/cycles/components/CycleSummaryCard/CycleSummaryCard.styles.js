@@ -58,7 +58,7 @@ function criarEstilos(tema) {
 
         titulo: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontStyle: 'normal',
