@@ -28,6 +28,7 @@ export default function SimpleModal({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const visualErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
+    const sairDaConta = varianteVisual === 'sairDaConta';
     const sairSemSalvar =
         varianteVisual === 'sairSemSalvar' ||
         [acaoPrincipal, acaoSecundaria].some((acao) => acao?.varianteVisual === 'sairSemSalvar');
@@ -44,7 +45,12 @@ export default function SimpleModal({
                 visualErro.fundoIcone ?? (tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone)
             }
             estiloIcone={[estiloIcone, estilos.icone, visualErro.icone]}
-            estilo={[estilos.caixa, visualErro.modal, sairSemSalvar && estilos.caixaSairSemSalvar]}
+            estilo={[
+                estilos.caixa,
+                visualErro.modal,
+                (sairSemSalvar || sairDaConta) && estilos.caixaSairSemSalvar,
+                sairDaConta && estilos.caixaSairDaConta
+            ]}
             titulo={titulo}
             mensagem={mensagem}
         >
@@ -58,12 +64,12 @@ export default function SimpleModal({
                     estilo={[
                         larguraTotal,
                         visualErro.botaoPrincipal,
-                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
+                        (acaoPrincipal.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
                             estilos.botaoSairSemSalvar
                     ]}
                     estiloTexto={[
                         visualErro.textoPrincipal,
-                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
+                        (acaoPrincipal.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
                             estilos.textoSairSemSalvar
                     ]}
                 />
@@ -72,7 +78,9 @@ export default function SimpleModal({
                 <ButtonPopup
                     texto={acaoSecundaria.texto}
                     aoPressionar={acaoSecundaria.aoPressionar}
-                    variante={acaoSecundaria.variante || 'branco'}
+                    variante={
+                        sairDaConta && tema.escuro ? 'verde' : acaoSecundaria.variante || 'branco'
+                    }
                     desativado={acaoSecundaria.desativado}
                     carregando={acaoSecundaria.carregando}
                     estilo={[

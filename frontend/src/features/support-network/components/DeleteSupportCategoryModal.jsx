@@ -148,6 +148,7 @@ function DeleteSupportCategoryModal({
     if (!possuiContatos) {
         return (
             <SimpleModal
+                varianteVisual="sairDaConta"
                 visivel={Boolean(visivel)}
                 aoFechar={cancelar}
                 icone={WarningCircleIcon}

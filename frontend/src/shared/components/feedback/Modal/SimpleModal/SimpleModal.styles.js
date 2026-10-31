@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        caixaSairDaConta: tema.escuro ? { borderColor: 'transparent' } : {},
         caixaSairSemSalvar: tema.escuro
             ? {
                   borderRadius: 20,
