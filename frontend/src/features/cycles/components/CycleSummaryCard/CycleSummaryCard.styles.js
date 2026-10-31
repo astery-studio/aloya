@@ -4,6 +4,20 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
+const coresConfiabilidadeEscuras = Object.freeze({
+    baixa: {
+        cor: '#EF9A9A',
+        fundo: 'rgba(239, 154, 154, 0.16)',
+        borda: 'rgba(239, 154, 154, 0.33)'
+    },
+    media: {
+        cor: '#FFE082',
+        fundo: 'rgba(255, 224, 130, 0.16)',
+        borda: 'rgba(255, 224, 130, 0.33)'
+    },
+    alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
+});
+
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
@@ -145,4 +159,4 @@ function criarEstilos(tema) {
 
 const estilos = criarEstilos(temaClaro);
 
-export { criarEstilos, estilos };
+export { coresConfiabilidadeEscuras, criarEstilos, estilos };
