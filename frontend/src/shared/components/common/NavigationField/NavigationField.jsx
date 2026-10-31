@@ -33,13 +33,14 @@ function NavigationField({
     variante = 'comBorda',
     paleta = 'corVerde',
     desabilitado = false,
-    estilo
+    estilo,
+    coresIcone
 }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const coresDoIcone = obterPaleta(tema, paleta);
+    const coresDoIcone = coresIcone || obterPaleta(tema, paleta);
 
     const semBorda = variante === 'semBorda';
 

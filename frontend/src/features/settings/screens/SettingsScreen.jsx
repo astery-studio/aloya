@@ -69,6 +69,7 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Configurações de Perfil"
+                            coresIcone={tema.escuro ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' } : undefined}
                             estilo={estilos.campoComBorda}
                             icone={UserIcon}
                             paleta="corVerde"
