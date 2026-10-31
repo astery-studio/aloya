@@ -8,7 +8,13 @@ import { WavesIcon } from 'phosphor-react-native/src/icons/Waves';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { criarEstilos, cores, fundosPrevistos, fundosReais } from './CycleLegendSheet.styles';
+import {
+    criarEstilos,
+    cores,
+    fundosPrevistos,
+    fundosReais,
+    fundosReaisEscuros
+} from './CycleLegendSheet.styles';
 
 const iconesPorTipo = Object.freeze({
     menstruacao: DropIcon,
@@ -19,7 +25,7 @@ const iconesPorTipo = Object.freeze({
 
 function obterCorJanela(prevista, tema) {
     if (tema.escuro) {
-        return prevista ? 'rgba(196, 200, 197, 0.62)' : tema.cores.interface.textoSecundario;
+        return prevista ? 'rgba(196, 200, 197, 0.62)' : '#9E9C96';
     }
 
     return prevista ? cores.janelaFertilPrevista : cores.janelaFertil;
@@ -43,7 +49,7 @@ function MarcadorLegenda({ item, estilos, tema }) {
         );
     }
 
-    const fundos = prevista ? fundosPrevistos : fundosReais;
+    const fundos = prevista ? fundosPrevistos : tema.escuro ? fundosReaisEscuros : fundosReais;
     const fundo = fundos[item.tipo];
 
     return (

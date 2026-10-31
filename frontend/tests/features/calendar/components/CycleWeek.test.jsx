@@ -172,7 +172,7 @@ describe('CycleWeek', () => {
         await render(<CycleWeek semana={semana} estilosTema={estilosTemaEscuro} />);
 
         expect(screen.getByTestId('janela-fertil-2026-10-02-2026-10-04')).toHaveStyle({
-            borderColor: temaEscuro.cores.interface.textoSecundario
+            borderColor: '#9E9C96'
         });
     });
 });

@@ -161,7 +161,7 @@ function criarEstilosCalendario(tema) {
         },
         janelaFertilAtual: {
             borderColor: tema.escuro
-                ? tema.cores.interface.textoSecundario
+                ? '#9E9C96'
                 : 'rgba(34, 34, 34, 0.70)'
         },
         janelaFertilPrevista: {
@@ -176,16 +176,16 @@ function criarEstilosCalendario(tema) {
 
     const estilosTipos = StyleSheet.create({
         menstruacao: {
-            backgroundColor: tema.escuro ? '#A84432' : 'rgba(200, 90, 68, 0.90)'
+            backgroundColor: tema.escuro ? '#A8524A' : 'rgba(200, 90, 68, 0.90)'
         },
         folicular: {
-            backgroundColor: tema.escuro ? '#2C4C3B' : 'rgba(44, 76, 59, 0.90)'
+            backgroundColor: tema.escuro ? '#52665E' : 'rgba(44, 76, 59, 0.90)'
         },
         ovulacao: {
-            backgroundColor: tema.escuro ? '#3E6578' : 'rgba(74, 117, 142, 0.90)'
+            backgroundColor: tema.escuro ? '#5A7382' : 'rgba(74, 117, 142, 0.90)'
         },
         lutea: {
-            backgroundColor: tema.escuro ? '#8A5A12' : 'rgba(214, 140, 58, 0.90)'
+            backgroundColor: tema.escuro ? '#B87550' : 'rgba(214, 140, 58, 0.90)'
         }
     });
 

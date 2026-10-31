@@ -113,3 +113,12 @@ const fundosPrevistos = Object.freeze({
 });
 
 export { cores, criarEstilos, estilos, fundosPrevistos, fundosReais };
+
+const fundosReaisEscuros = Object.freeze({
+    menstruacao: '#A8524A',
+    folicular: '#52665E',
+    ovulacao: '#5A7382',
+    lutea: '#B87550'
+});
+
+export { fundosReaisEscuros };
