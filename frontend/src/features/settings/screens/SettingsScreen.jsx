@@ -116,6 +116,7 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Notificações"
+                            coresIcone={tema.escuro ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' } : undefined}
                             estilo={estilos.campo}
                                 icone={BellIcon}
                                 variante="semBorda"
