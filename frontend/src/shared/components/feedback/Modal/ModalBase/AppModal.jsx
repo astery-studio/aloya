@@ -30,7 +30,8 @@ export default function AppModal({
     mensagem,
     destaque,
     aoOcultar,
-    children
+    children,
+    estilo
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -88,7 +89,8 @@ export default function AppModal({
                                     ? estilos.caixaAlerta
                                     : acao
                                       ? estilos.caixaAcao
-                                      : estilos.caixaSimples
+                                      : estilos.caixaSimples,
+                                estilo
                             ]}
                         >
                             {alerta ? (

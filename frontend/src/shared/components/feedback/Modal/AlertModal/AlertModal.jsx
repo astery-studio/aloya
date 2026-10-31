@@ -22,7 +22,8 @@ export default function AlertModal({
     aoAlterarSenha,
     erroSenha,
     acaoPrincipal,
-    acaoSecundaria
+    acaoSecundaria,
+    aparencia = {}
 }) {
     const comSenha = variante === 'comSenha';
     const senhaAtual = typeof senha === 'string' ? senha : '';
@@ -69,6 +70,7 @@ export default function AlertModal({
             titulo={titulo}
             mensagem={mensagem}
             destaque={destaque}
+            estilo={aparencia.modal}
         >
             {comSenha ? (
                 <View style={estilos.campoSenha}>
