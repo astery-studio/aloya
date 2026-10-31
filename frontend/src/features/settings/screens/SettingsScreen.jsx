@@ -104,6 +104,7 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Tela inicial"
+                            coresIcone={tema.escuro ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' } : undefined}
                             estilo={estilos.campo}
                                 icone={HouseIcon}
                                 variante="semBorda"
