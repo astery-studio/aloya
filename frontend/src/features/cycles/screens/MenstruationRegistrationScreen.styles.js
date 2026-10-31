@@ -7,7 +7,7 @@ function criarEstilos(tema) {
     const faixa = tema.escuro ? 'rgba(212, 119, 105, 0.28)' : '#F6D8D1';
 
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.cores.interface.fundo },
+        tela: { flex: 1, backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo },
         cabecalho: {
             minHeight: 67,
             paddingHorizontal: 20,

@@ -136,7 +136,7 @@ test('aplica o modo escuro ao fundo, orientação e dias selecionados', async ()
     );
 
     expect(screen.getByTestId('tela-cadastro-menstruacao')).toHaveStyle({
-        backgroundColor: '#181C1A'
+        backgroundColor: '#1C1B19'
     });
     expect(screen.getByTestId('orientacao-cadastro-menstruacao')).toHaveStyle({
         backgroundColor: 'transparent',
