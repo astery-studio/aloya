@@ -113,7 +113,7 @@ function criarEstilos(tema) {
             borderTopColor: tema.escuro
                 ? 'rgba(255, 255, 255, 0.08)'
                 : tema.cores.interface.separador,
-            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
         }
     });
 }
