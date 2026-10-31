@@ -55,7 +55,7 @@ export default function TimeInput({
                         desativado && estilos.desativado
                     ]}
                 >
-                    <Trash size={20} color={tema.cores.feedback.erro} />
+                    <Trash size={20} color={tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro} />
                 </Pressable>
             )}
         </View>
