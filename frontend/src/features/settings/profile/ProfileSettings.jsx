@@ -75,6 +75,7 @@ function ProfileSettings({
 
                 <NavigationField
                     label="Alterar Senha"
+                    estilo={estilos.campoAlterarSenha}
                     icone={LockKeyIcon}
                     paleta="corAzul"
                     onPress={onAlterarSenha}

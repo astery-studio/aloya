@@ -24,6 +24,14 @@ function criarEstilos(tema) {
             lineHeight: 21
         },
 
+        campoAlterarSenha: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 0.705,
+                  borderColor: '#2C2C2C',
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
         campos: {
             width: '100%',
             gap: tema.espacamentos.pequeno

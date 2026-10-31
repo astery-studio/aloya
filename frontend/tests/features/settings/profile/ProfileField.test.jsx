@@ -158,8 +158,8 @@ describe('ProfileField', () => {
                 name: 'Editar Nome'
             })
         ).toHaveStyle({
-            backgroundColor: '#232926',
-            borderColor: '#4A514D'
+            backgroundColor: '#1E1E1E',
+            borderColor: '#2C2C2C'
         });
 
         expect(screen.getByText('Nome')).toHaveStyle({

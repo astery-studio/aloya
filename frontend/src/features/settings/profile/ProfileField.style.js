@@ -13,9 +13,9 @@ function criarEstilos(tema) {
             paddingHorizontal: tema.espacamentos.medio,
             paddingVertical: 10,
             borderRadius: 12,
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie
+            borderWidth: tema.escuro ? 0.705 : 0.7,
+            borderColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
         pressionado: {
