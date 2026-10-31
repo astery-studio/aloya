@@ -1,9 +1,10 @@
 //Mostra os campos e o botão usados para alterar a senha da conta.
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import PasswordInput from '../../../shared/components/forms/PasswordInput';
-import { estilos } from './ChangePassword.style';
+import { criarEstilos } from './ChangePassword.style';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 function ChangePassword({
     senhaAtual,
@@ -15,6 +16,8 @@ function ChangePassword({
     onSalvar,
     carregando = false
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const camposPreenchidos = Boolean(senhaAtual && novaSenha && confirmacaoNovaSenha);
     const semAcao = typeof onSalvar !== 'function';
     const bloqueado = carregando || semAcao;
@@ -24,6 +27,11 @@ function ChangePassword({
             <View style={estilos.campos}>
                 <PasswordInput
                     label="Senha atual"
+                    estilo={estilos.campoSenha}
+                    estiloEntrada={estilos.textoSenha}
+                    estiloLabel={estilos.labelSenha}
+                    corIcone={tema.escuro ? '#757575' : undefined}
+                    {...(tema.escuro ? { placeholderTextColor: '#999999' } : {})}
                     value={senhaAtual}
                     onChangeText={onAlterarSenhaAtual}
                     desativado={carregando}
@@ -35,6 +43,11 @@ function ChangePassword({
 
                 <PasswordInput
                     label="Nova senha"
+                    estilo={estilos.campoSenha}
+                    estiloEntrada={estilos.textoSenha}
+                    estiloLabel={estilos.labelSenha}
+                    corIcone={tema.escuro ? '#757575' : undefined}
+                    {...(tema.escuro ? { placeholderTextColor: '#999999' } : {})}
                     value={novaSenha}
                     onChangeText={onAlterarNovaSenha}
                     desativado={carregando}
@@ -46,6 +59,11 @@ function ChangePassword({
 
                 <PasswordInput
                     label="Confirmar nova senha"
+                    estilo={estilos.campoSenha}
+                    estiloEntrada={estilos.textoSenha}
+                    estiloLabel={estilos.labelSenha}
+                    corIcone={tema.escuro ? '#757575' : undefined}
+                    {...(tema.escuro ? { placeholderTextColor: '#999999' } : {})}
                     value={confirmacaoNovaSenha}
                     onChangeText={onAlterarConfirmacao}
                     onSubmitEditing={camposPreenchidos && !bloqueado ? onSalvar : undefined}
