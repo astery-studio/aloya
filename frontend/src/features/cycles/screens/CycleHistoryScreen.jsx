@@ -220,6 +220,8 @@ function CycleHistoryScreen({
                     <View style={estilos.botaoDoEstado}>
                         <ButtonScreen
                             texto="Ir para o Calendário"
+                            estilo={estilos.botaoCadastrarMenstruacao}
+                            estiloTexto={estilos.textoCadastrarMenstruacao}
                             variante="laranja"
                             aoPressionar={aoAbrirCalendario}
                         />
