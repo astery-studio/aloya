@@ -139,8 +139,8 @@ test('aplica o modo escuro ao fundo, orientação e dias selecionados', async ()
         backgroundColor: '#1C1B19'
     });
     expect(screen.getByTestId('orientacao-cadastro-menstruacao')).toHaveStyle({
-        backgroundColor: 'transparent',
-        borderColor: '#9FD6B6'
+        backgroundColor: 'rgba(165, 214, 167, 0.05)',
+        borderColor: '#A5D6A7'
     });
     expect(screen.getByTestId('selecao-2026-09-21')).toHaveStyle({
         backgroundColor: 'rgba(212, 119, 105, 0.28)'

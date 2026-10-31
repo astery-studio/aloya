@@ -142,9 +142,9 @@ function criarEstilos(tema) {
             paddingHorizontal: 14,
             paddingVertical: 12,
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.destaque,
+            borderColor: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque,
             borderRadius: 12,
-            backgroundColor: tema.escuro ? 'transparent' : '#EFEFE8'
+            backgroundColor: tema.escuro ? 'rgba(165, 214, 167, 0.05)' : '#EFEFE8'
         },
         textoAjuda: {
             flex: 1,
