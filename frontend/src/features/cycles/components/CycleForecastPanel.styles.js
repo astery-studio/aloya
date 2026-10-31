@@ -221,35 +221,38 @@ function criarEstilos(tema) {
             gap: 15,
             paddingHorizontal: 12,
             paddingVertical: 9,
-            backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.14)' : cores.ciclo.fundoAviso,
-            borderWidth: 1,
-            borderColor: cores.ciclo.bordaAviso,
+            backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.16)' : cores.ciclo.fundoAviso,
+            borderWidth: tema.escuro ? 0.705 : 1,
+            borderColor: tema.escuro ? 'rgba(255, 224, 130, 0.30)' : cores.ciclo.bordaAviso,
             borderRadius: radius.pequeno
         },
         textosAvisoConfiabilidade: { flex: 1 },
         tituloAvisoConfiabilidade: {
-            color: cores.feedback.aviso,
+            color: tema.escuro ? '#FFE082' : cores.feedback.aviso,
             fontFamily: fontFamilies.bold,
-            fontSize: 13,
+            fontStyle: 'normal',
+            fontSize: tema.escuro ? 11 : 13,
             fontWeight: '700',
-            lineHeight: 17
+            lineHeight: tema.escuro ? 14.3 : 17
         },
         textoAvisoConfiabilidade: {
-            color: tema.escuro ? '#F2B45F' : cores.ciclo.textoAviso,
-            fontFamily: fontFamilies.regular,
+            color: tema.escuro ? '#FFE082' : cores.ciclo.textoAviso,
+            fontFamily: tema.escuro ? fontFamilies.bold : fontFamilies.regular,
+            fontStyle: 'normal',
             fontSize: 11,
-            fontWeight: '400',
-            lineHeight: 14,
+            fontWeight: tema.escuro ? '700' : '400',
+            lineHeight: tema.escuro ? 14.3 : 14,
             paddingTop: 1
         },
         textoAvisoBaixa: {
             flex: 1,
             maxWidth: 226,
-            color: tema.escuro ? '#F2B45F' : cores.ciclo.textoAviso,
-            fontFamily: fontFamilies.regular,
+            color: tema.escuro ? '#FFE082' : cores.ciclo.textoAviso,
+            fontFamily: tema.escuro ? fontFamilies.bold : fontFamilies.regular,
+            fontStyle: 'normal',
             fontSize: 11,
-            fontWeight: '400',
-            lineHeight: 14
+            fontWeight: tema.escuro ? '700' : '400',
+            lineHeight: tema.escuro ? 14.3 : 14
         },
         previsoesSecundarias: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 16 },
         cartaoSecundario: {
