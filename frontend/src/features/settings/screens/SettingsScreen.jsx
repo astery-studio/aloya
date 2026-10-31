@@ -69,7 +69,11 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Configurações de Perfil"
-                            coresIcone={tema.escuro ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' } : undefined}
+                            coresIcone={
+                                tema.escuro
+                                    ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
+                                    : undefined
+                            }
                             estilo={estilos.campoComBorda}
                             icone={UserIcon}
                             paleta="corVerde"
@@ -82,7 +86,11 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Parâmetros do Ciclo"
-                            coresIcone={tema.escuro ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' } : undefined}
+                            coresIcone={
+                                tema.escuro
+                                    ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' }
+                                    : undefined
+                            }
                             estilo={estilos.campoComBorda}
                             icone={ArrowsClockwiseIcon}
                             paleta="corLaranja"
@@ -104,8 +112,12 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Tela inicial"
-                            coresIcone={tema.escuro ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' } : undefined}
-                            estilo={estilos.campo}
+                                coresIcone={
+                                    tema.escuro
+                                        ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={HouseIcon}
                                 variante="semBorda"
                                 paleta="corVerde"
@@ -116,8 +128,12 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Notificações"
-                            coresIcone={tema.escuro ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' } : undefined}
-                            estilo={estilos.campo}
+                                coresIcone={
+                                    tema.escuro
+                                        ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={BellIcon}
                                 variante="semBorda"
                                 paleta="corLaranja"
@@ -132,8 +148,12 @@ function SettingsScreen({
                         <View style={estilos.grupo}>
                             <NavigationField
                                 label="Sobre a aplicação"
-                            coresIcone={tema.escuro ? { icone: '#B39DDB', caixa: 'rgba(179, 157, 219, 0.16)' } : undefined}
-                            estilo={estilos.campo}
+                                coresIcone={
+                                    tema.escuro
+                                        ? { icone: '#B39DDB', caixa: 'rgba(179, 157, 219, 0.16)' }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={InfoIcon}
                                 variante="semBorda"
                                 paleta="corAzul"
@@ -144,7 +164,12 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Políticas de Privacidade"
-                            estilo={estilos.campo}
+                                coresIcone={
+                                    tema.escuro
+                                        ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={ShieldCheckIcon}
                                 variante="semBorda"
                                 paleta="corVerde"
