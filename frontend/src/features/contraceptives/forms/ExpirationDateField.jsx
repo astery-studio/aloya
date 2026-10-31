@@ -20,7 +20,7 @@ function ExpirationDateField({ aparenciaCadastro = false, corIconeNoturno, valor
                 coresNoturnas={corIconeNoturno ? { icone: corIconeNoturno } : undefined}
                 fundoIcone="transparent"
             />
-            <DatePickerSheet visivel={aberto} titulo={titulo} valorSelecionado={valor} dataMinima={dataMinima} onSelecionar={onSelecionar} onFechar={onFechar} />
+            <DatePickerSheet aparenciaCadastro={aparenciaCadastro} visivel={aberto} titulo={titulo} valorSelecionado={valor} dataMinima={dataMinima} onSelecionar={onSelecionar} onFechar={onFechar} />
         </>
     );
 }
