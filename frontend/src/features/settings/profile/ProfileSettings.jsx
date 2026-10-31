@@ -78,6 +78,11 @@ function ProfileSettings({
                     estilo={estilos.campoAlterarSenha}
                     icone={LockKeyIcon}
                     paleta="corAzul"
+                    coresIcone={
+                        tema.escuro
+                            ? { caixa: 'rgba(179, 157, 219, 0.16)', icone: '#B39DDB' }
+                            : undefined
+                    }
                     onPress={onAlterarSenha}
                     desabilitado={camposBloqueados}
                 />
