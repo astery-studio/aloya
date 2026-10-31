@@ -361,6 +361,7 @@ function NewSupportCategoryScreen({
             </SettingsLayout>
 
             <SimpleModal
+                erroInterno={Boolean(alertaErro?.recuperavel)}
                 visivel={alertaErro !== null}
                 aoFechar={fecharAlertaErro}
                 icone={WarningCircleIcon}

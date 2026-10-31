@@ -513,6 +513,7 @@ function EditSupportCategoryScreen({
             />
 
             <SimpleModal
+                erroInterno={Boolean(alertaErro?.recuperavel)}
                 visivel={alertaErro !== null}
                 aoFechar={fecharErro}
                 icone={WarningCircleIcon}

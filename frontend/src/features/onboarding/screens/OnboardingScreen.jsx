@@ -276,7 +276,7 @@ export default function OnboardingScreen({
                 }
                 avancar();
             } catch (falha) {
-                setErro({ titulo: 'Algo deu errado', mensagem:
+                setErro({ aparencia: 'erroInterno', titulo: 'Algo deu errado', mensagem:
                     falha.mensagemUsuario || 'Não foi possível verificar o e-mail.' });
             } finally {
                 setCarregando(false);
@@ -370,7 +370,7 @@ export default function OnboardingScreen({
         if (erroInterno) finalizar();
     };
 
-    return <>{conteudo}<SimpleModal visivel={Boolean(erro)}
+    return <>{conteudo}<SimpleModal erroInterno={Boolean(erroInterno) || erro?.aparencia === 'erroInterno'} visivel={Boolean(erro)}
         icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
         titulo={erro?.titulo} mensagem={erro?.mensagem}
         acaoPrincipal={erro?.emailEmUso

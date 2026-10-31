@@ -421,6 +421,7 @@ function ProfileSettingsScreen({
             />
 
             <SimpleModal
+                erroInterno
                 visivel={erroSalvarVisivel}
                 aoFechar={() => setErroSalvarVisivel(false)}
                 icone={WarningCircleIcon}

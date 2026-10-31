@@ -187,6 +187,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
             />
 
             <SimpleModal
+                erroInterno={alerta?.tipo === 'rede'}
                 visivel={Boolean(alerta)}
                 aoFechar={salvando ? undefined : form.fecharAlerta}
                 icone={WarningCircle}

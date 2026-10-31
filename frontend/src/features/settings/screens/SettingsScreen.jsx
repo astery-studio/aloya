@@ -189,6 +189,7 @@ function SettingsScreen({
             />
 
             <SimpleModal
+                erroInterno
                 visivel={Boolean(erro)}
                 aoFechar={limparErro}
                 icone={WarningCircleIcon}

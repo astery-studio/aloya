@@ -191,6 +191,7 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada,
                         ? <ContraceptiveHomeScreen {...propriedadesLista} aoAbrirLista={() => setTela('lista')} onSelecionarAba={onSelecionarAba} />
                         : <ContraceptiveTrackingScreen {...propriedadesLista} />}
             <SimpleModal
+                erroInterno={Boolean(erroRemocao)}
                 visivel={Boolean(remocao)}
                 aoFechar={removendo ? undefined : () => setRemocao(null)}
                 icone={WarningCircleIcon}

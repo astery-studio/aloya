@@ -258,6 +258,7 @@ function ChangePasswordScreen({ alterarSenha, onVoltar, onConcluido, onSessaoExp
             />
 
             <SimpleModal
+                erroInterno
                 visivel={aviso === 'erro'}
                 aoFechar={fecharAviso}
                 icone={WarningCircleIcon}

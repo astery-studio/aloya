@@ -193,6 +193,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             />
 
             <SimpleModal
+                erroInterno
                 visivel={erroExclusaoVisivel}
                 aoFechar={excluindo ? undefined : () => setErroExclusaoVisivel(false)}
                 icone={WarningCircleIcon}

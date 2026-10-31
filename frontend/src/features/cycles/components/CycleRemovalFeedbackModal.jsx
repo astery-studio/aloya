@@ -11,11 +11,13 @@ function IconeAlerta({ erro = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const corContorno = erro
-        ? tema.cores.interface.textoSecundario
+        ? tema.escuro
+            ? '#EF9A9A'
+            : tema.cores.interface.textoSecundario
         : tema.escuro
           ? '#EE9297'
           : '#C85A44';
-    const corAlerta = tema.escuro ? '#F39A9D' : '#B43D3D';
+    const corAlerta = tema.escuro ? (erro ? '#EF9A9A' : '#F39A9D') : '#B43D3D';
 
     return (
         <View
@@ -96,6 +98,7 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'erro') {
         return (
             <SimpleModal
+                erroInterno
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onFechar}

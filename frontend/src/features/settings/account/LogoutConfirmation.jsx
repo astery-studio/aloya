@@ -73,6 +73,7 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
             </AppModal>
 
             <AlertModal
+                erroInterno
                 visivel={erroVisivel}
                 aoFechar={() => setErroVisivel(false)}
                 titulo="Não foi possível sair"

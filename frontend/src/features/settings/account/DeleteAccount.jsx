@@ -148,6 +148,7 @@ function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, on
             />
 
             <SimpleModal
+                erroInterno
                 visivel={etapa === 'erro'}
                 aoFechar={fechar}
                 icone={WarningCircleIcon}

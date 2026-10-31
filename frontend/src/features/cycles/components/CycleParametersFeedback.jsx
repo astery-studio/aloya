@@ -25,6 +25,7 @@ function CycleParametersFeedback({
                 acaoPrincipal={{ texto: 'OK', aoPressionar: onFecharSucesso }}
             />
             <SimpleModal
+                erroInterno
                 visivel={Boolean(erro)}
                 aoFechar={onFecharErro}
                 icone={WarningCircleIcon}

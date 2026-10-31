@@ -111,6 +111,7 @@ function ErroCalendario({ erro, aoTentarNovamente }) {
 
     return (
         <AlertModal
+            erroInterno
             visivel={!fechado}
             titulo="Não foi possível carregar o calendário"
             mensagem={erro}
