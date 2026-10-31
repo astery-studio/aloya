@@ -353,6 +353,8 @@ function ProfileSettingsScreen({
             </SettingsLayout>
 
             <EditFieldSheet
+                corFundo={tema.escuro ? '#242424' : undefined}
+                estiloPainel={estilos.painelEdicao}
                 visivel={campoEditado !== null}
                 titulo={
                     campoEditado === 'email'
@@ -373,6 +375,8 @@ function ProfileSettingsScreen({
             />
 
             <GenderSelector
+                corFundo={tema.escuro ? '#242424' : undefined}
+                estiloPainel={estilos.painelEdicao}
                 visivel={generoVisivel}
                 valorSelecionado={dadosAtuais.identidadeGenero}
                 onSelecionar={selecionarGenero}

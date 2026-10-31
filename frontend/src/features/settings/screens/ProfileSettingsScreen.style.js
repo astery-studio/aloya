@@ -5,6 +5,15 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        painelEdicao: tema.escuro
+            ? {
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0,
+                  boxShadow: '0 -4px 32px 0 rgba(34, 34, 34, 0.10)'
+              }
+            : {},
         estadoTela: {
             flex: 1,
             minHeight: 440,

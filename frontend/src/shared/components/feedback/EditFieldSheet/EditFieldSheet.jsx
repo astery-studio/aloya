@@ -31,7 +31,9 @@ function EditFieldSheet({
     salvando = false,
     botaoSalvar,
     rotuloAcessibilidade,
-    sufixo
+    sufixo,
+    corFundo,
+    estiloPainel
 }) {
     const tema = useTheme();
 
@@ -75,8 +77,19 @@ function EditFieldSheet({
     }
 
     return (
-        <BottomSheet visivel={visivel} onFechar={onFechar} bloquearFechamento={salvando}>
-            <BottomSheetLayout titulo={titulo} onFechar={onFechar} bloquearFechamento={salvando}>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={onFechar}
+            bloquearFechamento={salvando}
+            corPainel={corFundo}
+            estiloPainel={estiloPainel}
+        >
+            <BottomSheetLayout
+                titulo={titulo}
+                onFechar={onFechar}
+                bloquearFechamento={salvando}
+                corFundo={corFundo}
+            >
                 <Pressable
                     onPress={focarCampo}
                     style={[estilos.caixaCampo, ehNumero && estilos.caixaCampoNumero]}
