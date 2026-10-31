@@ -77,11 +77,11 @@ function criarVariantes(tema) {
     return {
         laranja: {
             container: {
-                backgroundColor: COR_LARANJA_ACESSIVEL
+                backgroundColor: tema.escuro ? '#C26E5F' : COR_LARANJA_ACESSIVEL
             },
 
             texto: {
-                color: '#FFFFFF'
+                color: tema.escuro ? '#121212' : '#FFFFFF'
             }
         },
 
