@@ -7,7 +7,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         tela: {
             flex: 1,
-            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         cabecalho: {
             display: 'flex',
@@ -75,7 +75,7 @@ function criarEstilos(tema) {
         conteudo: {
             flex: 1,
             minHeight: 0,
-            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         areaCalendario: {
             flex: 1,
