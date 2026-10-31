@@ -48,6 +48,10 @@ function criarCoresDaPrevisao(tema) {
 
     return {
         coresForma,
+        coresIconeDestaqueFertil: {
+            folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.formaFolicular,
+            ovulatoria: tema.escuro ? '#8FC4DD' : cores.feedback.informacao
+        },
         coresConfiabilidade: tema.escuro
             ? {
                   baixa: {
@@ -393,7 +397,7 @@ function CycleForecastPanel({
                             >
                                 <SparkleIcon
                                     size={22}
-                                    color={visual.coresForma[faseAtual]}
+                                    color={visual.coresIconeDestaqueFertil[faseAtual]}
                                     weight="fill"
                                 />
                             </View>
