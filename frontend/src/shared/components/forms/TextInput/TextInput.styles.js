@@ -45,7 +45,7 @@ function criarEstilos(tema) {
         desativado: { opacity: 0.55 },
         containerErro: { borderColor: tema.cores.feedback.erro },
         erro: {
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             lineHeight: 18

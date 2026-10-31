@@ -39,7 +39,7 @@ function criarEstilos(tema) {
         listaHorariosFluxo: { gap: 12 },
         erroHorario: {
             ...typography.caption,
-            color: tema.escuro ? '#FF9B88' : tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             marginTop: 8
         },
         acaoFixa: { paddingHorizontal: 24, paddingBottom: 40, paddingTop: 24 },

@@ -49,7 +49,7 @@ function criarEstilos(tema) {
         },
         erro: {
             ...typography.caption,
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             textAlign: 'center'
         }
     });
