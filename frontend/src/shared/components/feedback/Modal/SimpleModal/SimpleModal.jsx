@@ -51,7 +51,8 @@ export default function SimpleModal({
                     variante={acaoPrincipal.variante || 'verde'}
                     desativado={acaoPrincipal.desativado}
                     carregando={acaoPrincipal.carregando}
-                    estilo={larguraTotal}
+                    estilo={[larguraTotal, visualErro.botaoPrincipal]}
+                    estiloTexto={visualErro.textoPrincipal}
                 />
             )}
             {acaoSecundaria && (
