@@ -319,7 +319,10 @@ function ProfileSettingsScreen({
                     <Text accessibilityRole="header" style={estilos.tituloErro}>
                         Ocorreu um erro
                     </Text>
-                    <Text accessibilityRole="alert" style={estilos.mensagemErro}>
+                    <Text
+                        accessibilityRole="alert"
+                        style={[estilos.mensagemErro, estilosErro.mensagem]}
+                    >
                         Não foi possível carregar suas configurações de perfil. Tente novamente.
                     </Text>
 
@@ -412,7 +415,8 @@ function ProfileSettingsScreen({
                 titulo="Dados não salvos"
                 mensagem="Você tem atualizações não salvas. Deseja mesmo sair?"
                 acaoPrincipal={{
-                    texto: 'Sair sem salvar', varianteVisual: 'sairSemSalvar',
+                    texto: 'Sair sem salvar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: sairSemSalvar
                 }}

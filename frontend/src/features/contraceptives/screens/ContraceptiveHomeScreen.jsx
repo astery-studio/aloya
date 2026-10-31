@@ -71,7 +71,10 @@ function ContraceptiveHomeScreen({
                         <>
                             {erro ? (
                                 <View style={estilos.feedback}>
-                                    <Text accessibilityRole="alert" style={estilos.mensagem}>
+                                    <Text
+                                        accessibilityRole="alert"
+                                        style={[estilos.mensagem, estilosErro.mensagem]}
+                                    >
                                         {MENSAGEM_ERRO_CARREGAR}
                                     </Text>
                                     <ButtonScreen
@@ -85,7 +88,10 @@ function ContraceptiveHomeScreen({
                             ) : null}
                             {erroUso ? (
                                 <View style={estilos.feedback}>
-                                    <Text accessibilityRole="alert" style={estilos.mensagem}>
+                                    <Text
+                                        accessibilityRole="alert"
+                                        style={[estilos.mensagem, estilosErro.mensagem]}
+                                    >
                                         Não foi possível atualizar o uso do anticoncepcional no
                                         momento. Tente novamente.
                                     </Text>

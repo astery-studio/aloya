@@ -189,7 +189,7 @@ function CycleHistoryScreen({
                 >
                     <Text style={estilos.tituloDoEstado}>Ocorreu um erro</Text>
 
-                    <Text style={estilos.mensagemDoEstado}>
+                    <Text style={[estilos.mensagemDoEstado, estilosErro.mensagem]}>
                         Não foi possível carregar seu histórico de ciclos. Tente novamente.
                     </Text>
 

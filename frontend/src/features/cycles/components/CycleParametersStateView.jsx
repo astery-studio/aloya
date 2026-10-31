@@ -28,7 +28,7 @@ function CycleParametersStateView({ carregando, onTentarNovamente }) {
             <Text accessibilityRole="alert" style={estilos.tituloErro}>
                 Algo deu errado
             </Text>
-            <Text style={estilos.textoEstado}>
+            <Text style={[estilos.textoEstado, estilosErro.mensagem]}>
                 Não foi possível carregar os parâmetros do ciclo.
             </Text>
             <ButtonScreen

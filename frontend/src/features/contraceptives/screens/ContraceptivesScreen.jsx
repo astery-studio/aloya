@@ -39,7 +39,7 @@ function ContraceptivesScreen({
         estadoVazio = (
             <View style={estilos.vazio}>
                 <Text style={estilos.tituloVazio}>Não foi possível carregar</Text>
-                <Text style={estilos.textoVazio}>{erro}</Text>
+                <Text style={[estilos.textoVazio, estilosErro.mensagem]}>{erro}</Text>
                 <ButtonScreen
                     estilo={estilosErro.botao}
                     estiloTexto={estilosErro.textoBotao}
