@@ -353,6 +353,8 @@ function ProfileSettingsScreen({
             </SettingsLayout>
 
             <EditFieldSheet
+                estiloCaixaCampo={estilos.caixaCampoEdicao}
+                estiloCampo={estilos.textoCampoEdicao}
                 corFundo={tema.escuro ? '#242424' : undefined}
                 estiloPainel={estilos.painelEdicao}
                 visivel={campoEditado !== null}

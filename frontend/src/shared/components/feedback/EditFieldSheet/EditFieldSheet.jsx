@@ -33,7 +33,9 @@ function EditFieldSheet({
     rotuloAcessibilidade,
     sufixo,
     corFundo,
-    estiloPainel
+    estiloPainel,
+    estiloCaixaCampo,
+    estiloCampo
 }) {
     const tema = useTheme();
 
@@ -92,7 +94,11 @@ function EditFieldSheet({
             >
                 <Pressable
                     onPress={focarCampo}
-                    style={[estilos.caixaCampo, ehNumero && estilos.caixaCampoNumero]}
+                    style={[
+                        estilos.caixaCampo,
+                        ehNumero && estilos.caixaCampoNumero,
+                        estiloCaixaCampo
+                    ]}
                     accessible={false}
                 >
                     <TextInput
@@ -123,7 +129,8 @@ function EditFieldSheet({
                         style={[
                             estilos.campo,
                             ehData && estilos.campoData,
-                            ehNumero && estilos.campoNumero
+                            ehNumero && estilos.campoNumero,
+                            estiloCampo
                         ]}
                     />
                     {ehNumero && sufixo ? <Text style={estilos.sufixoNumero}>{sufixo}</Text> : null}

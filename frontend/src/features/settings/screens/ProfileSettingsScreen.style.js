@@ -5,6 +5,15 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        caixaCampoEdicao: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 1.41,
+                  borderColor: '#A5D6A7',
+                  backgroundColor: '#2C2C2C'
+              }
+            : {},
+        textoCampoEdicao: tema.escuro ? { color: '#999999' } : {},
         painelEdicao: tema.escuro
             ? {
                   borderTopLeftRadius: 20,
