@@ -14,10 +14,17 @@ function PasswordInput({
     placeholder = label,
     desativado = false,
     corIcone,
+    estilo,
+    estiloEntrada,
+    estiloFocado,
+    estiloEntradaFocada,
+    onFocus,
+    onBlur,
     ...props
 }) {
     const tema = useTheme();
     const [visivel, definirVisivel] = useState(false);
+    const [focado, definirFocado] = useState(false);
     const Icone = visivel ? Eye : EyeSlash;
 
     return (
@@ -29,6 +36,16 @@ function PasswordInput({
             autoCapitalize="none"
             autoCorrect={false}
             autoComplete="password"
+            estilo={[estilo, focado && estiloFocado]}
+            estiloEntrada={[estiloEntrada, focado && estiloEntradaFocada]}
+            onFocus={(evento) => {
+                definirFocado(true);
+                onFocus?.(evento);
+            }}
+            onBlur={(evento) => {
+                definirFocado(false);
+                onBlur?.(evento);
+            }}
             acaoDireita={
                 <Pressable
                     accessibilityRole="button"

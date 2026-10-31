@@ -11,6 +11,8 @@ function criarAparencia(tema) {
                 borderColor: 'rgba(255, 255, 255, 0.12)',
                 backgroundColor: '#2C2C2C'
             },
+            campoFocado: { borderColor: '#EF9A9A' },
+            textoFocado: { color: '#E3E3E3' },
             texto: { color: '#75757580' },
             corIcone: '#75757580',
             corPlaceholder: '#75757580'

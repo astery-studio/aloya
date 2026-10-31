@@ -84,7 +84,9 @@ export default function AlertModal({
                         onChangeText={aoAlterarSenha}
                         variante="popup"
                         estilo={aparencia.senha?.campo}
+                        estiloFocado={aparencia.senha?.campoFocado}
                         estiloEntrada={aparencia.senha?.texto}
+                        estiloEntradaFocada={aparencia.senha?.textoFocado}
                         corIcone={aparencia.senha?.corIcone}
                         {...(aparencia.senha?.corPlaceholder
                             ? { placeholderTextColor: aparencia.senha.corPlaceholder }
