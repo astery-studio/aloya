@@ -30,7 +30,7 @@ function criarEstilosUso(tema) {
             paddingHorizontal: 14,
             borderRadius: 10,
             backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.16)' : '#FBF3E0',
-            borderWidth: tema.escuro ? 0.705 : 0.70489,
+            borderWidth: 0.70489,
             borderColor: tema.escuro ? 'rgba(255, 224, 130, 0.30)' : '#E8C97A'
         },
         textoBanner: {
@@ -40,10 +40,10 @@ function criarEstilosUso(tema) {
             flexShrink: 1,
             includeFontPadding: false,
             color: tema.escuro ? '#FFE082' : '#B07D2A',
-            fontFamily: tema.escuro ? fontFamilies.bold : fontFamilies.semibold,
-            fontWeight: tema.escuro ? '700' : '600',
-            fontSize: tema.escuro ? 11 : 13,
-            lineHeight: tema.escuro ? 14.3 : 20
+            fontFamily: fontFamilies.semibold,
+            fontWeight: '600',
+            fontSize: 13,
+            lineHeight: 20
         },
         painel: { width: '100%', flexGrow: 0 },
         painelExpandido: { width: 'auto', alignSelf: 'stretch', marginHorizontal: -16 },
