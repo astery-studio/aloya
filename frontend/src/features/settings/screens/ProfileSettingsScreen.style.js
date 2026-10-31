@@ -66,7 +66,7 @@ function criarEstilos(tema) {
         },
 
         acaoNormal: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
