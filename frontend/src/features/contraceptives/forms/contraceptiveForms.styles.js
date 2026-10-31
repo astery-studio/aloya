@@ -6,6 +6,14 @@ function criarEstilos(tema) {
     const interfaceTema = tema.cores.interface;
     return StyleSheet.create({
         formulario: { gap: 20, paddingHorizontal: 24, paddingTop: 0, paddingBottom: 40 },
+        campoCadastro: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 0.705,
+                  borderColor: '#2C2C2C',
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
         campoSeletor: {
             height: 56,
             paddingHorizontal: 14,

@@ -8,10 +8,10 @@ function paraExibicao(iso) {
     return `${dia}/${mes}/${ano}`;
 }
 
-function ExpirationDateField({ valor, aberto, onAbrir, onSelecionar, onFechar, dataMinima, label = 'Data de Validade', titulo = 'Data de Validade' }) {
+function ExpirationDateField({ aparenciaCadastro = false, valor, aberto, onAbrir, onSelecionar, onFechar, dataMinima, label = 'Data de Validade', titulo = 'Data de Validade' }) {
     return (
         <>
-            <SelectorField
+            <SelectorField aparenciaCadastro={aparenciaCadastro}
                 label={label}
                 valor={paraExibicao(valor)}
                 placeholder="DD/MM/AAAA"

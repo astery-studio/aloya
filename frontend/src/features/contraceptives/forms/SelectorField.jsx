@@ -13,7 +13,9 @@ function SelectorField({
     navegar = false,
     icone: Icone,
     corIcone = '#C85A44',
-    fundoIcone = '#FDF0EC'
+    fundoIcone = '#FDF0EC',
+    aparenciaCadastro = false,
+    coresNoturnas
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -26,7 +28,11 @@ function SelectorField({
                     accessibilityRole="button"
                     accessibilityLabel={`${label}: ${valor || placeholder}`}
                     onPress={onPress}
-                    style={({ pressed }) => [estilos.campoSeletor, pressed && estilos.pressionado]}
+                    style={({ pressed }) => [
+                        estilos.campoSeletor,
+                        aparenciaCadastro && estilos.campoCadastro,
+                        pressed && estilos.pressionado
+                    ]}
                 >
                     {Icone ? (
                         <View style={[estilos.caixaIconeCampo, { backgroundColor: fundoIcone }]}>
