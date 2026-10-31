@@ -17,7 +17,9 @@ function GenderSelector({
     onSelecionar,
     onFechar,
     corFundo,
-    estiloPainel
+    estiloPainel,
+    estiloOpcaoSelecionada,
+    estiloTextoOpcaoSelecionada
 }) {
     return (
         <SelectionSheet
@@ -25,6 +27,8 @@ function GenderSelector({
             titulo="Identidade de Gênero"
             corFundo={corFundo}
             estiloPainel={estiloPainel}
+            estiloOpcaoSelecionada={estiloOpcaoSelecionada}
+            estiloTextoOpcaoSelecionada={estiloTextoOpcaoSelecionada}
             opcoes={opcoesIdentidadeGenero}
             valorSelecionado={valorSelecionado}
             onSelecionar={onSelecionar}

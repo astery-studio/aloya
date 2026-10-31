@@ -21,7 +21,9 @@ function SelectionSheet({
     onFechar,
     varianteOpcao = 'lista',
     corFundo,
-    estiloPainel
+    estiloPainel,
+    estiloOpcaoSelecionada,
+    estiloTextoOpcaoSelecionada
 }) {
     const tema = useTheme();
 
@@ -37,6 +39,8 @@ function SelectionSheet({
         return (
             <ButtonSelection
                 label={item.label}
+                estiloSelecionado={estiloOpcaoSelecionada}
+                estiloTextoSelecionado={estiloTextoOpcaoSelecionada}
                 descricao={item.descricao}
                 icone={item.icone}
                 selected={item.id === valorSelecionado}

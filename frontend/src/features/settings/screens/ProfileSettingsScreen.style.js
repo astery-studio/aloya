@@ -14,6 +14,8 @@ function criarEstilos(tema) {
               }
             : {},
         textoCampoEdicao: tema.escuro ? { color: '#999999' } : {},
+        opcaoSelecionada: tema.escuro ? { borderRadius: 10, backgroundColor: '#A5D6A7' } : {},
+        textoOpcaoSelecionada: tema.escuro ? { color: '#121212' } : {},
         painelEdicao: tema.escuro
             ? {
                   borderTopLeftRadius: 20,

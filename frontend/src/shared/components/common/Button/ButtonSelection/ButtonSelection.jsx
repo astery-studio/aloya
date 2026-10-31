@@ -13,7 +13,9 @@ function ButtonSelection({
     icone: Icone,
     descricao,
     desabilitado = false,
-    variante = 'lista'
+    variante = 'lista',
+    estiloSelecionado,
+    estiloTextoSelecionado
 }) {
     const tema = useTheme();
 
@@ -41,7 +43,8 @@ function ButtonSelection({
                 selected && estilos.selecionado,
                 intensidade && selected && estilos.intensidadeSelecionada,
                 modoCor && selected && estilos.modoCorSelecionado,
-                desabilitado && estilos.desabilitado
+                desabilitado && estilos.desabilitado,
+                selected && estiloSelecionado
             ]}
         >
             {Icone ? <Icone size={24} color={corIcone} /> : null}
@@ -52,7 +55,8 @@ function ButtonSelection({
                         estilos.label,
                         modoCor && estilos.labelModoCor,
                         selected && estilos.labelSelecionado,
-                        modoCor && selected && estilos.labelModoCorSelecionado
+                        modoCor && selected && estilos.labelModoCorSelecionado,
+                        selected && estiloTextoSelecionado
                     ]}
                 >
                     {label}

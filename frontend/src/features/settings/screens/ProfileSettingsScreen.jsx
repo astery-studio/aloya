@@ -377,6 +377,8 @@ function ProfileSettingsScreen({
             />
 
             <GenderSelector
+                estiloOpcaoSelecionada={estilos.opcaoSelecionada}
+                estiloTextoOpcaoSelecionada={estilos.textoOpcaoSelecionada}
                 corFundo={tema.escuro ? '#242424' : undefined}
                 estiloPainel={estilos.painelEdicao}
                 visivel={generoVisivel}
