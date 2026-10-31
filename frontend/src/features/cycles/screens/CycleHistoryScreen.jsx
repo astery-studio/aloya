@@ -264,6 +264,7 @@ function CycleHistoryScreen({
     return (
         <MainLayout
             titulo="Histórico de Ciclos"
+            corFundo={tema.escuro ? '#121212' : undefined}
             abaAtiva="ciclos"
             onSelecionarAba={onSelecionarAba}
         >
