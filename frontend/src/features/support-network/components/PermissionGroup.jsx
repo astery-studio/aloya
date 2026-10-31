@@ -42,13 +42,16 @@ function obterPaleta(paleta, tema, aparenciaNovaCategoria) {
         saude: { icone: '#90CAF9', fundoIcone: 'rgba(144, 202, 249, 0.20)' }
     };
 
+    const coresCadastroAtivas = coresCadastro[paleta] ?? coresCadastro.ciclo;
     return {
         ...paletaBase,
         icone: cor,
         fundoIcone: tema.cores.interface.superficieElevada,
         fundoExpandido: tema.cores.interface.destaqueSuave,
         bordaExpandida: cor,
-        ...(aparenciaNovaCategoria ? (coresCadastro[paleta] ?? coresCadastro.ciclo) : {})
+        ...(aparenciaNovaCategoria
+            ? { ...coresCadastroAtivas, fundoExpandido: coresCadastroAtivas.fundoIcone }
+            : {})
     };
 }
 
@@ -91,7 +94,10 @@ function PermissionGroup({
     inicialmenteExpandido = false
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema, aparenciaNovaCategoria), [tema, aparenciaNovaCategoria]);
+    const estilos = useMemo(
+        () => criarEstilos(tema, aparenciaNovaCategoria),
+        [tema, aparenciaNovaCategoria]
+    );
     const [expandido, definirExpandido] = useState(inicialmenteExpandido === true);
     const coresDoGrupo = obterPaleta(paleta, tema, aparenciaNovaCategoria);
     const IconeDaExpansao = expandido ? CaretUpIcon : CaretDownIcon;
@@ -211,7 +217,14 @@ function PermissionGroup({
                         </Text>
 
                         {quantidadeAtiva > 0 ? (
-                            <Text style={estilos.contagem}>
+                            <Text
+                                style={[
+                                    estilos.contagem,
+                                    tema.escuro &&
+                                        aparenciaNovaCategoria &&
+                                        expandido && { color: coresDoGrupo.icone }
+                                ]}
+                            >
                                 {obterTextoDaContagem(quantidadeAtiva)}
                             </Text>
                         ) : null}
@@ -251,6 +264,7 @@ function PermissionGroup({
                             style={[estilos.item, indice > 0 && estilos.itemComSeparador]}
                         >
                             <PermissionItem
+                                aparenciaNovaCategoria={aparenciaNovaCategoria}
                                 coresInterruptor={coresInterruptor}
                                 titulo={permissao.titulo}
                                 ativo={permissoesAtivas.has(permissao.id)}
