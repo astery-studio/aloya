@@ -13,7 +13,8 @@ function SettingsLayout({
     children,
     rodape,
     rodapeFixo = false,
-    testeId = 'settings-layout'
+    testeId = 'settings-layout',
+    corFundo
 }) {
     const tema = useTheme();
 
@@ -22,9 +23,14 @@ function SettingsLayout({
     const temRodape = rodape !== undefined && rodape !== null;
 
     return (
-        <SafeAreaView testID={testeId} edges={['bottom']} style={estilos.container}>
+        <SafeAreaView
+            testID={testeId}
+            edges={['bottom']}
+            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+        >
             <Header
                 titulo={titulo}
+                corFundo={corFundo}
                 variante="comVoltar"
                 onVoltar={onVoltar}
                 usarEspacamentoSuperior
@@ -33,11 +39,15 @@ function SettingsLayout({
             <KeyboardAvoidingView
                 testID="teclado-settings-layout"
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={estilos.areaInterativa}
+                style={[estilos.areaInterativa, corFundo ? { backgroundColor: corFundo } : null]}
             >
                 <ScrollView
                     testID="rolagem-settings-layout"
-                    contentContainerStyle={estilos.conteudo}
+                    contentContainerStyle={
+                        corFundo
+                            ? [estilos.conteudo, { backgroundColor: corFundo }]
+                            : estilos.conteudo
+                    }
                     keyboardShouldPersistTaps="handled"
                     keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                     contentInsetAdjustmentBehavior="never"

@@ -293,7 +293,11 @@ function ProfileSettingsScreen({
 
     if (carregando) {
         return (
-            <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
+            <SettingsLayout
+                titulo="Configurações de Perfil"
+                onVoltar={onVoltar}
+                corFundo={tema.escuro ? '#121212' : undefined}
+            >
                 <View style={estilos.estadoTela}>
                     <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
                     <Text style={estilos.textoEstado}>Carregando seus dados...</Text>
@@ -304,7 +308,11 @@ function ProfileSettingsScreen({
 
     if (erroCarregamento || !perfilEhValido(perfil)) {
         return (
-            <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
+            <SettingsLayout
+                titulo="Configurações de Perfil"
+                onVoltar={onVoltar}
+                corFundo={tema.escuro ? '#121212' : undefined}
+            >
                 <View style={estilos.estadoTela}>
                     <Text accessibilityRole="header" style={estilos.tituloErro}>
                         Ocorreu um erro
@@ -330,6 +338,7 @@ function ProfileSettingsScreen({
         <>
             <SettingsLayout
                 titulo="Configurações de Perfil"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={tentarVoltar}
                 rodape={rodape}
             >
