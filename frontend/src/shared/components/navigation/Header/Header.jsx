@@ -17,7 +17,11 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
     return (
         <View
             testID="header-container"
-            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+            style={[
+                estilos.container,
+                temVoltar && estilos.containerComVoltar,
+                corFundo ? { backgroundColor: corFundo } : null
+            ]}
         >
             <View
                 style={[
