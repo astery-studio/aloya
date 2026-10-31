@@ -57,9 +57,8 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
                     variante="branco"
                     aoPressionar={confirmarLogout}
                     carregando={carregando}
-                    estilo={{
-                        width: '100%'
-                    }}
+                    estilo={[{ width: '100%' }, estilos.botaoSair]}
+                    estiloTexto={estilos.textoSair}
                 />
 
                 <ButtonPopup
