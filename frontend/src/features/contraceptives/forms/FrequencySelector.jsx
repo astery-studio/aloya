@@ -7,7 +7,7 @@ function FrequencySelector({ aparenciaCadastro = false, tipo, valor, aberto, onA
     const opcoes = obterFrequencias(tipo);
     return (
         <>
-            <SelectorField aparenciaCadastro={aparenciaCadastro} label="Frequência de Uso" valor={obterFrequencia(tipo, valor)?.label} placeholder="Selecione a frequência" onPress={onAbrir} icone={ArrowsClockwise} corIcone="#7B5EA7" fundoIcone="#EDE6F8" />
+            <SelectorField aparenciaCadastro={aparenciaCadastro} coresNoturnas={{ icone: '#B39DDB', caixa: 'rgba(179, 157, 219, 0.16)' }} label="Frequência de Uso" valor={obterFrequencia(tipo, valor)?.label} placeholder="Selecione a frequência" onPress={onAbrir} icone={ArrowsClockwise} corIcone="#7B5EA7" fundoIcone="#EDE6F8" />
             <SelectionSheet visivel={aberto} titulo="Frequência de Uso" opcoes={opcoes} valorSelecionado={valor} onSelecionar={onSelecionar} onFechar={onFechar} />
         </>
     );
