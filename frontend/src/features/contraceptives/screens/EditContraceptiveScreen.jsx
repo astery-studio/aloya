@@ -111,7 +111,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
     if (!registroValido) {
         return (
-            <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+            <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
                 testID="edicao-anticoncepcional-area-segura">
                 <Header
                     titulo="Editar o Anticoncepcional"
@@ -133,7 +133,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     }
 
     return (
-        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+        <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
             testID="edicao-anticoncepcional-area-segura">
             <Header
                 titulo="Editar o Anticoncepcional"

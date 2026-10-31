@@ -60,6 +60,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
             {form.modoEdicao ? (
                 <>
                     <SelectorField
+                        aparenciaCadastro
                         label="Nome da Medicação"
                         valor={dados.nome}
                         placeholder="Digite o nome"
@@ -107,7 +108,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
             )}
 
             <ContraceptiveTypeSelector
-                aparenciaCadastro={!form.modoEdicao}
+                aparenciaCadastro
                 valor={dados.tipo}
                 aberto={painel === 'tipo'}
                 onAbrir={() => abrirPainel('tipo')}
@@ -117,7 +118,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
 
             {dados.tipo === 'diu_hormonal' ? (
                 <ExpirationDateField
-                    aparenciaCadastro={!form.modoEdicao}
+                    aparenciaCadastro
                     valor={dados.dataValidade}
                     corIconeNoturno="#A5D6A7"
                     aberto={painel === 'validade'}
@@ -132,7 +133,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
             ) : dados.tipo ? (
                 <>
                     <UsageTimeSelector
-                        aparenciaCadastro={!form.modoEdicao}
+                        aparenciaCadastro
                         horarios={dados.horarios}
                         permiteMultiplos={form.permiteMultiplos}
                         aberto={painel === 'horarios'}
@@ -145,7 +146,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                     />
 
                     <FrequencySelector
-                        aparenciaCadastro={!form.modoEdicao}
+                        aparenciaCadastro
                         tipo={dados.tipo}
                         valor={dados.frequenciaId}
                         aberto={painel === 'frequencia'}
@@ -156,7 +157,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
 
                     {form.exigePrimeiroUso ? (
                         <ExpirationDateField
-                            aparenciaCadastro={!form.modoEdicao}
+                            aparenciaCadastro
                             label="Data do primeiro uso"
                             titulo="Data do primeiro uso"
                             valor={dados.dataPrimeiroUso}
@@ -173,7 +174,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
             ) : null}
 
             <AlertIntensitySelector
-                aparenciaCadastro={!form.modoEdicao}
+                aparenciaCadastro
                 valor={dados.intensidadeAlerta}
                 aberto={painel === 'intensidade'}
                 onAbrir={() => abrirPainel('intensidade')}
