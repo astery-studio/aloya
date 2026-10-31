@@ -335,10 +335,10 @@ function criarEstilos(tema) {
             gap: 8,
             paddingHorizontal: 14,
             paddingVertical: 8,
-            borderRadius: radius.circular,
+            borderRadius: tema.escuro ? 22369600 : radius.circular,
             backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
-            borderWidth: 1,
-            borderColor: tema.cores.interface.borda
+            borderWidth: tema.escuro ? 0.667 : 1,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda
         },
         marcadorSintoma: {
             width: 6,
@@ -348,7 +348,7 @@ function criarEstilos(tema) {
         },
         textoSintoma: {
             flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontSize: 12,
             fontWeight: '500',
