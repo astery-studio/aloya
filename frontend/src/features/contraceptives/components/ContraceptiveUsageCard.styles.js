@@ -10,9 +10,9 @@ function criarEstilosCartao(tema) {
             maxWidth: 350.01,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: interfaceTema.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : interfaceTema.superficie,
             borderWidth: 1.40978,
-            borderColor: interfaceTema.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : interfaceTema.borda,
             borderRadius: 16
         },
         cardAtivo: tema.escuro
@@ -58,9 +58,9 @@ function criarEstilosCartao(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderWidth: 0.70489,
-            borderColor: interfaceTema.borda,
+            borderColor: tema.escuro ? '#2C2C2C' : interfaceTema.borda,
             borderRadius: 10,
-            backgroundColor: interfaceTema.superficieElevada
+            backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.superficieElevada
         },
         identificacao: { flex: 1, minWidth: 0 },
         nome: {

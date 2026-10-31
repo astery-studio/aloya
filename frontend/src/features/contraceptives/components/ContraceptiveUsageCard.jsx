@@ -279,11 +279,7 @@ function ContraceptiveUsageCard({
                     >
                         <IconeTipo
                             size={16}
-                            color={
-                                tema.escuro && !removido
-                                    ? '#E3E3E3'
-                                    : tema.cores.interface.textoSecundario
-                            }
+                            color={tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario}
                             weight={
                                 anticoncepcional.tipo === 'anel_vaginal' ||
                                 anticoncepcional.tipo === 'diu_hormonal'
