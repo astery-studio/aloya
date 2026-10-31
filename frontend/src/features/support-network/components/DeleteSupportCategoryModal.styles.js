@@ -86,8 +86,8 @@ function criarEstilos(tema) {
             paddingTop: 14,
             paddingBottom: 4,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie
+            borderTopColor: tema.escuro ? 'rgba(230, 226, 216, 0.12)' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
         botaoConfirmar: {
