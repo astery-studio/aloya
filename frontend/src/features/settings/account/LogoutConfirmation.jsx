@@ -1,15 +1,19 @@
 // Confirma o logout e encerra a sessão no servidor e no armazenamento seguro.
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import AppModal from '../../../shared/components/feedback/Modal/AppModal';
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { cores } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './LogoutConfirmation.styles';
 
 function ignorarFechamento() {}
 
 function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerrada }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [carregando, setCarregando] = useState(false);
     const [erroVisivel, setErroVisivel] = useState(false);
 
@@ -37,6 +41,7 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
         <>
             <AppModal
                 variante="simples"
+                estilo={estilos.caixa}
                 visivel={visivel && !erroVisivel}
                 aoFechar={carregando ? ignorarFechamento : onFechar}
                 icone={WarningCircleIcon}
