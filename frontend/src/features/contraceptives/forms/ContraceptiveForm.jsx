@@ -67,7 +67,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                         onPress={abrirEdicaoNome}
                         navegar
                         icone={FilePlus}
-                        corIcone="#C85A44"
+                        corIcone={tema.escuro ? '#A5D6A7' : '#C85A44'}
                         fundoIcone="transparent"
                     />
 
