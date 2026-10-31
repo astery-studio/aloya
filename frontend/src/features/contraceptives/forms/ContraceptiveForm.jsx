@@ -72,6 +72,10 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                     />
 
                     <EditFieldSheet
+                        corFundo={tema.escuro ? '#242424' : undefined}
+                        estiloPainel={estilos.painelEdicao}
+                        estiloCaixaCampo={estilos.caixaCampoEdicao}
+                        estiloCampo={estilos.textoCampoEdicao}
                         visivel={painel === 'nome'}
                         titulo="Editar nome do anticoncepcional"
                         tipo="nome"
@@ -84,6 +88,8 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                                 texto="Salvar"
                                 variante="verde"
                                 aoPressionar={salvarNome}
+                                estilo={!podeSalvarNome && estilos.botaoSalvarDesativado}
+                                estiloTexto={!podeSalvarNome && estilos.textoSalvarDesativado}
                                 desativado={!podeSalvarNome}
                                 carregando={salvando}
                             />
