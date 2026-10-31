@@ -12,7 +12,7 @@ function criarEstilos(tema) {
             gap: 12,
             paddingHorizontal: 13,
             paddingVertical: 9,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
         desabilitado: {

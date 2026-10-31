@@ -32,7 +32,8 @@ function NavigationField({
     onPress,
     variante = 'comBorda',
     paleta = 'corVerde',
-    desabilitado = false
+    desabilitado = false,
+    estilo
 }) {
     const tema = useTheme();
 
@@ -66,7 +67,8 @@ function NavigationField({
                 estilos.container,
                 semBorda && estilos.semBorda,
                 ehBotao && estilos.botao,
-                estaDesabilitado && estilos.desabilitado
+                estaDesabilitado && estilos.desabilitado,
+                estilo
             ]}
         >
             {Icone ? (

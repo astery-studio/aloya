@@ -69,6 +69,7 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Configurações de Perfil"
+                            estilo={estilos.campoComBorda}
                             icone={UserIcon}
                             paleta="corVerde"
                             onPress={onAbrirPerfil}
@@ -80,6 +81,7 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Parâmetros do Ciclo"
+                            estilo={estilos.campoComBorda}
                             icone={ArrowsClockwiseIcon}
                             paleta="corLaranja"
                             onPress={onAbrirParametrosCiclo}
@@ -100,6 +102,7 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Tela inicial"
+                            estilo={estilos.campo}
                                 icone={HouseIcon}
                                 variante="semBorda"
                                 paleta="corVerde"
@@ -110,6 +113,7 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Notificações"
+                            estilo={estilos.campo}
                                 icone={BellIcon}
                                 variante="semBorda"
                                 paleta="corLaranja"
@@ -124,6 +128,7 @@ function SettingsScreen({
                         <View style={estilos.grupo}>
                             <NavigationField
                                 label="Sobre a aplicação"
+                            estilo={estilos.campo}
                                 icone={InfoIcon}
                                 variante="semBorda"
                                 paleta="corAzul"
@@ -134,6 +139,7 @@ function SettingsScreen({
 
                             <NavigationField
                                 label="Políticas de Privacidade"
+                            estilo={estilos.campo}
                                 icone={ShieldCheckIcon}
                                 variante="semBorda"
                                 paleta="corVerde"
