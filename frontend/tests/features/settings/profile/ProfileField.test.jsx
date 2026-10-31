@@ -190,7 +190,7 @@ describe('ProfileField', () => {
         expect(mockNotePencilIcon).toHaveBeenCalledWith(
             expect.objectContaining({
                 size: 20,
-                color: '#999999',
+                color: '#757575',
                 weight: 'regular'
             })
         );
