@@ -37,20 +37,20 @@ function criarEstilos(tema) {
             : {},
         diaSelecionado: shadows.cardSuave,
         diaSelecionado_menstrual: {
-            backgroundColor: tema.escuro ? '#A84432' : tema.cores.marca.primaria,
-            borderColor: tema.escuro ? '#A84432' : tema.cores.marca.primaria
+            backgroundColor: tema.escuro ? '#A8524A' : tema.cores.marca.primaria,
+            borderColor: tema.escuro ? '#A8524A' : tema.cores.marca.primaria
         },
         diaSelecionado_folicular: {
-            backgroundColor: tema.escuro ? '#2C4C3B' : tema.cores.marca.secundaria,
-            borderColor: tema.escuro ? '#2C4C3B' : tema.cores.marca.secundaria
+            backgroundColor: tema.escuro ? '#52665E' : tema.cores.marca.secundaria,
+            borderColor: tema.escuro ? '#52665E' : tema.cores.marca.secundaria
         },
         diaSelecionado_ovulatoria: {
-            backgroundColor: tema.escuro ? '#3E6578' : tema.cores.feedback.informacao,
-            borderColor: tema.escuro ? '#3E6578' : tema.cores.feedback.informacao
+            backgroundColor: tema.escuro ? '#5A7382' : tema.cores.feedback.informacao,
+            borderColor: tema.escuro ? '#5A7382' : tema.cores.feedback.informacao
         },
         diaSelecionado_lutea: {
-            backgroundColor: tema.escuro ? '#8A5A12' : tema.cores.feedback.aviso,
-            borderColor: tema.escuro ? '#8A5A12' : tema.cores.feedback.aviso
+            backgroundColor: tema.escuro ? '#B87550' : tema.cores.feedback.aviso,
+            borderColor: tema.escuro ? '#B87550' : tema.cores.feedback.aviso
         },
         diaSelecionado_desconhecida: { backgroundColor: tema.cores.interface.textoSecundario },
         semana: {
