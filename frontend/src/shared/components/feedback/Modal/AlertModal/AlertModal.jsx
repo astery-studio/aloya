@@ -137,7 +137,8 @@ export default function AlertModal({
                     desativado={secundaria.desativado || carregando}
                     carregando={secundaria.carregando}
                     rotuloAcessibilidade={secundaria.rotuloAcessibilidade}
-                    estilo={{ width: '100%' }}
+                    estilo={[{ width: '100%' }, aparencia.botaoSecundario]}
+                    estiloTexto={aparencia.textoSecundario}
                 />
             ) : null}
         </AppModal>

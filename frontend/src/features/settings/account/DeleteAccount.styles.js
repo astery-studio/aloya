@@ -21,6 +21,13 @@ function criarAparencia(tema) {
         textoPrincipalDesativado: { color: '#757575' },
         botaoPrincipal: { borderRadius: 12, backgroundColor: '#EF9A9A' },
         textoPrincipal: { color: '#121212' },
+        botaoSecundario: {
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.12)',
+            backgroundColor: '#242424'
+        },
+        textoSecundario: { color: '#E3E3E3' },
         modal: {
             borderRadius: 20,
             backgroundColor: '#1E1E1E',
