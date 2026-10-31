@@ -45,7 +45,7 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             paddingHorizontal: 20,
             borderBottomWidth: 1.41,
-            borderBottomColor: tema.cores.interface.borda
+            borderBottomColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         cabecalhoCentralizado: {
@@ -73,7 +73,7 @@ function criarEstilos(tema) {
             height: 103.6,
             flexDirection: 'row',
             borderBottomWidth: 1.41,
-            borderBottomColor: tema.cores.interface.borda
+            borderBottomColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         metrica: {
@@ -85,7 +85,7 @@ function criarEstilos(tema) {
 
         metricaComSeparador: {
             borderRightWidth: 0.99,
-            borderRightColor: tema.cores.interface.borda
+            borderRightColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         rotuloMetrica: {
