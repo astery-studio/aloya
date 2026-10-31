@@ -83,6 +83,12 @@ export default function AlertModal({
                         value={senhaAtual}
                         onChangeText={aoAlterarSenha}
                         variante="popup"
+                        estilo={aparencia.senha?.campo}
+                        estiloEntrada={aparencia.senha?.texto}
+                        corIcone={aparencia.senha?.corIcone}
+                        {...(aparencia.senha?.corPlaceholder
+                            ? { placeholderTextColor: aparencia.senha.corPlaceholder }
+                            : {})}
                         desativado={carregando}
                         autoComplete="current-password"
                         textContentType="password"

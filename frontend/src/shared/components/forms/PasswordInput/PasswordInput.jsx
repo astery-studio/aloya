@@ -9,7 +9,13 @@ import { useTheme } from '../../../hooks/useTheme';
 import TextInput from '../TextInput/TextInput';
 
 // Recebe as opções de senha, permite alternar sua visibilidade e devolve o texto.
-function PasswordInput({ label = 'Senha', placeholder = label, desativado = false, ...props }) {
+function PasswordInput({
+    label = 'Senha',
+    placeholder = label,
+    desativado = false,
+    corIcone,
+    ...props
+}) {
     const tema = useTheme();
     const [visivel, definirVisivel] = useState(false);
     const Icone = visivel ? Eye : EyeSlash;
@@ -31,7 +37,7 @@ function PasswordInput({ label = 'Senha', placeholder = label, desativado = fals
                     onPress={() => definirVisivel(!visivel)}
                     style={{ padding: 8, marginRight: -8 }}
                 >
-                    <Icone size={22} color={tema.cores.interface.textoSecundario} />
+                    <Icone size={22} color={corIcone ?? tema.cores.interface.textoSecundario} />
                 </Pressable>
             }
             {...props}

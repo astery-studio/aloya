@@ -19,6 +19,7 @@ function TextInput({
     acaoDireita,
     estilo,
     erro,
+    estiloEntrada,
     sanitizar = manterTexto,
     ...outrasProps
 }) {
@@ -64,7 +65,7 @@ function TextInput({
                         selectionColor={tema.cores.interface.destaque}
                         value={value}
                         onChangeText={(texto) => onChangeText?.(sanitizar(texto))}
-                        style={estilos.entrada}
+                        style={[estilos.entrada, estiloEntrada]}
                         {...outrasProps}
                     />
                 </View>
