@@ -7,6 +7,8 @@ import ButtonPopup from '../../../common/Button/ButtonPopup';
 import PasswordInput from '../../../forms/PasswordInput';
 import AppModal from '../AppModal';
 import { estilos } from './AlertModal.styles';
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarAparenciaErroInterno } from '../InternalErrorModal.styles';
 
 function ignorarFechamento() {}
 
@@ -23,7 +25,8 @@ export default function AlertModal({
     erroSenha,
     acaoPrincipal,
     acaoSecundaria,
-    aparencia = {}
+    aparencia: aparenciaInformada = {},
+    erroInterno = false
 }) {
     const comSenha = variante === 'comSenha';
     const senhaAtual = typeof senha === 'string' ? senha : '';
@@ -60,6 +63,12 @@ export default function AlertModal({
     if (visivel && !possuiAcao) {
         throw new Error('AlertModal precisa de pelo menos uma ação ou de uma função aoFechar.');
     }
+
+    const tema = useTheme();
+    const aparencia = {
+        ...aparenciaInformada,
+        ...(erroInterno ? criarAparenciaErroInterno(tema) : {})
+    };
 
     return (
         <AppModal

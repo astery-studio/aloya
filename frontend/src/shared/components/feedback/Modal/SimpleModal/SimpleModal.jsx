@@ -4,6 +4,7 @@
 import { useMemo } from 'react';
 import { useTheme } from '../../../../hooks/useTheme';
 import { criarEstilos } from './SimpleModal.styles';
+import { criarAparenciaErroInterno } from '../InternalErrorModal.styles';
 import ButtonPopup from '../../../common/Button/ButtonPopup/ButtonPopup';
 import AppModal from '../ModalBase/AppModal';
 
@@ -20,10 +21,12 @@ export default function SimpleModal({
     titulo,
     mensagem,
     acaoPrincipal,
-    acaoSecundaria
+    acaoSecundaria,
+    erroInterno = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const visualErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
 
     return (
         <AppModal
@@ -35,7 +38,7 @@ export default function SimpleModal({
             corIcone={tema.escuro ? '#E3E3E3' : corIcone}
             fundoIcone={tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone}
             estiloIcone={[estiloIcone, estilos.icone]}
-            estilo={estilos.caixa}
+            estilo={[estilos.caixa, visualErro.modal]}
             titulo={titulo}
             mensagem={mensagem}
         >
