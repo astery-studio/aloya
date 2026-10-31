@@ -39,10 +39,10 @@ const ROTULOS = {
 };
 function criarCoresDaPrevisao(tema) {
     const coresForma = {
-        menstrual: tema.escuro ? '#F08A75' : cores.marca.primaria,
-        folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.formaFolicular,
-        ovulatoria: tema.escuro ? '#8FC4DD' : cores.feedback.informacao,
-        lutea: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
+        menstrual: tema.escuro ? '#A8524A' : cores.marca.primaria,
+        folicular: tema.escuro ? '#52665E' : cores.ciclo.formaFolicular,
+        ovulatoria: tema.escuro ? '#5A7382' : cores.feedback.informacao,
+        lutea: tema.escuro ? '#B87550' : cores.feedback.aviso,
         desconhecida: tema.cores.interface.textoSecundario
     };
 
@@ -69,7 +69,7 @@ function criarCoresDaPrevisao(tema) {
             : null,
         coresConteudo: {
             ...coresForma,
-            folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.conteudoFolicular
+            folicular: tema.escuro ? '#52665E' : cores.ciclo.conteudoFolicular
         },
         corAviso: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
         corIconeEscuro: tema.escuro ? '#B39DDB' : cores.ciclo.iconeEscuro
