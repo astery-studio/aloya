@@ -1,6 +1,9 @@
 /**
  * Compõe mensagens simples com até duas ações a partir de AppModal e ButtonPopup.
  */
+import { useMemo } from 'react';
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarEstilos } from './SimpleModal.styles';
 import ButtonPopup from '../../../common/Button/ButtonPopup/ButtonPopup';
 import AppModal from '../ModalBase/AppModal';
 
@@ -19,6 +22,9 @@ export default function SimpleModal({
     acaoPrincipal,
     acaoSecundaria
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     return (
         <AppModal
             variante="simples"
@@ -26,9 +32,10 @@ export default function SimpleModal({
             aoFechar={aoFechar}
             aoOcultar={aoOcultar}
             icone={icone}
-            corIcone={corIcone}
-            fundoIcone={fundoIcone}
-            estiloIcone={estiloIcone}
+            corIcone={tema.escuro ? '#E3E3E3' : corIcone}
+            fundoIcone={tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone}
+            estiloIcone={[estiloIcone, estilos.icone]}
+            estilo={estilos.caixa}
             titulo={titulo}
             mensagem={mensagem}
         >
