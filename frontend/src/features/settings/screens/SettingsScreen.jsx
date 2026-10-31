@@ -54,6 +54,7 @@ function SettingsScreen({
         <>
             <MainLayout
                 titulo="Configurações"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 abaAtiva="configuracoes"
                 onSelecionarAba={onSelecionarAba}
             >

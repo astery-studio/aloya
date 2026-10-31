@@ -10,7 +10,7 @@ function criarEstilos(tema) {
             gap: tema.espacamentos.extraGrande,
             paddingHorizontal: tema.espacamentos.grande,
             paddingBottom: tema.espacamentos.extraGrande,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },
 
         secao: {
