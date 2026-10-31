@@ -174,9 +174,10 @@ function DeleteSupportCategoryModal({
     }
 
     return (
-        <BottomSheet visivel={Boolean(visivel)} onFechar={cancelar} bloquearFechamento={carregando}>
+        <BottomSheet corPainel={tema.escuro ? '#1E1E1E' : undefined} visivel={Boolean(visivel)} onFechar={cancelar} bloquearFechamento={carregando}>
             <BottomSheetLayout
                 titulo="Remover categoria"
+                corFundo={tema.escuro ? '#1E1E1E' : undefined}
                 onFechar={cancelar}
                 bloquearFechamento={carregando}
             >
