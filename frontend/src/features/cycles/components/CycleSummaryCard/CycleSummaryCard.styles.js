@@ -11,9 +11,9 @@ function criarEstilos(tema) {
             maxWidth: 350,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             borderRadius: 16
         },
 
