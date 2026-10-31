@@ -109,6 +109,8 @@ function UsageTimeSelector({
                             {permiteMultiplos ? (
                                 <ButtonDashed
                                     texto="Adicionar horário"
+                                    estilo={estilos.adicionarHorario}
+                                    estiloTexto={estilos.textoAdicionarHorario}
                                     aoPressionar={() => setTemporarios((atuais) => [...atuais, ''])}
                                 />
                             ) : null}

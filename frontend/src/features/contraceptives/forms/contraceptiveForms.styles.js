@@ -44,6 +44,16 @@ function criarEstilos(tema) {
             color: interfaceTema.textoSecundario,
             marginBottom: 8
         },
+        adicionarHorario: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 1.41,
+                  borderStyle: 'dashed',
+                  borderColor: 'rgba(255, 255, 255, 0.24)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)'
+              }
+            : {},
+        textoAdicionarHorario: tema.escuro ? { color: '#999999' } : {},
         listaHorariosFluxo: { gap: 12 },
         erroHorario: {
             ...typography.caption,
