@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './CycleParameterEditor.styles';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { EditFieldSheet } from '../../../shared/components/feedback/EditFieldSheet/EditFieldSheet';
 
@@ -12,10 +15,16 @@ function CycleParameterEditor({
     onCancelar,
     onSalvar
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const valorValido = Number.isSafeInteger(valor) && valor > 0;
 
     return (
         <EditFieldSheet
+            corFundo={tema.escuro ? '#242424' : undefined}
+            estiloPainel={estilos.painel}
+            estiloCaixaCampo={estilos.caixaCampo}
+            estiloCampo={estilos.textoCampo}
             visivel={visivel}
             titulo={`Editar ${label}`}
             tipo="numero"
@@ -32,6 +41,20 @@ function CycleParameterEditor({
                     variante="verde"
                     aoPressionar={onSalvar}
                     desativado={!valorValido || Boolean(erro) || valor === valorOriginal}
+                    estilo={
+                        (!valorValido ||
+                            Boolean(erro) ||
+                            valor === valorOriginal ||
+                            typeof onSalvar !== 'function') &&
+                        estilos.botaoSalvarDesativado
+                    }
+                    estiloTexto={
+                        (!valorValido ||
+                            Boolean(erro) ||
+                            valor === valorOriginal ||
+                            typeof onSalvar !== 'function') &&
+                        estilos.textoSalvarDesativado
+                    }
                 />
             }
         />
