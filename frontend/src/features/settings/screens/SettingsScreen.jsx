@@ -82,6 +82,7 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Parâmetros do Ciclo"
+                            coresIcone={tema.escuro ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' } : undefined}
                             estilo={estilos.campoComBorda}
                             icone={ArrowsClockwiseIcon}
                             paleta="corLaranja"
