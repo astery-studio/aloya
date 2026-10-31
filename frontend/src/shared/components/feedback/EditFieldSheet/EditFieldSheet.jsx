@@ -35,7 +35,8 @@ function EditFieldSheet({
     corFundo,
     estiloPainel,
     estiloCaixaCampo,
-    estiloCampo
+    estiloCampo,
+    estiloSufixo
 }) {
     const tema = useTheme();
 
@@ -133,7 +134,9 @@ function EditFieldSheet({
                             estiloCampo
                         ]}
                     />
-                    {ehNumero && sufixo ? <Text style={estilos.sufixoNumero}>{sufixo}</Text> : null}
+                    {ehNumero && sufixo ? (
+                        <Text style={[estilos.sufixoNumero, estiloSufixo]}>{sufixo}</Text>
+                    ) : null}
                 </Pressable>
 
                 {erro ? (

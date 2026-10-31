@@ -25,6 +25,7 @@ function CycleParameterEditor({
             estiloPainel={estilos.painel}
             estiloCaixaCampo={estilos.caixaCampo}
             estiloCampo={estilos.textoCampo}
+            estiloSufixo={estilos.textoCampo}
             visivel={visivel}
             titulo={`Editar ${label}`}
             tipo="numero"

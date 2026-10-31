@@ -19,7 +19,7 @@ function criarEstilos(tema) {
                   backgroundColor: '#2C2C2C'
               }
             : {},
-        textoCampo: tema.escuro ? { color: '#999999' } : {},
+        textoCampo: tema.escuro ? { color: '#FFFFFF' } : {},
         botaoSalvarDesativado: tema.escuro ? { borderRadius: 12, backgroundColor: '#2C2C2C' } : {},
         textoSalvarDesativado: tema.escuro ? { color: '#757575' } : {}
     });
