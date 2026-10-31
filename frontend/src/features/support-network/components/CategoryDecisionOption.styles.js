@@ -71,6 +71,9 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.destaque
         },
 
+        indicadorTodosSelecionados: tema.escuro
+            ? { backgroundColor: '#121212', borderColor: '#121212' }
+            : {},
         centroIndicador: {
             width: 8,
             height: 8,

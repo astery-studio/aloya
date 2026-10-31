@@ -78,7 +78,8 @@ function CategoryDecisionOption({
                 testID={perigo ? 'indicador-remover' : 'indicador-manter'}
                 style={[
                     estilos.indicador,
-                    selecionado && (perigo ? estilos.indicadorPerigo : estilos.indicadorManter)
+                    selecionado && (perigo ? estilos.indicadorPerigo : estilos.indicadorManter),
+                    selecionado && destacarFundo && estilos.indicadorTodosSelecionados
                 ]}
             >
                 {selecionado ? (
@@ -88,7 +89,9 @@ function CategoryDecisionOption({
                             weight="bold"
                             color={
                                 tema.escuro && destacarFundo
-                                    ? '#121212'
+                                    ? perigo
+                                        ? '#EF9A9A'
+                                        : '#A5D6A7'
                                     : tema.cores.interface.textoSobreDestaque
                             }
                         />
