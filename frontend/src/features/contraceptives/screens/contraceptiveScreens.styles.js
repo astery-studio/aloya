@@ -11,6 +11,8 @@ function criarEstilos(tema) {
             backgroundColor: interfaceTema.fundo
         },
 
+        telaCadastro: tema.escuro ? { backgroundColor: '#121212' } : {},
+
         conteudoFormulario: {
             paddingBottom: espacamentos.grande
         },

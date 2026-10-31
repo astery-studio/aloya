@@ -10,7 +10,7 @@ function NewContraceptiveScreen({ onVoltar, onCadastrar, salvando = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     return (
-        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+        <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
             testID="cadastro-anticoncepcional-area-segura">
             <Header
                 titulo="Cadastro de Anticoncepcional"
