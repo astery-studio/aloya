@@ -9,6 +9,7 @@ import { criarEstilos } from './GeneralPermissions.styles';
 
 //Recebe as permissões selecionadas e informa qual permissão teve o estado alterado.
 function GeneralPermissions({
+    coresInterruptor,
     permissoesSelecionadas = [],
     aoAlterar,
     desabilitado = false,
@@ -45,6 +46,7 @@ function GeneralPermissions({
             <View style={estilos.lista}>
                 {permissoesGerais.map((permissao) => (
                     <SwitchField
+                        cores={coresInterruptor}
                         key={permissao.id}
                         titulo={permissao.titulo}
                         ativo={permissoesAtivas.has(permissao.id)}

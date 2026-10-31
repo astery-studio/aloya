@@ -69,6 +69,7 @@ function obterTextoDaContagem(quantidade) {
 
 //Recebe as permissões e ações do grupo e controla sua abertura e seus interruptores.
 function PermissionGroup({
+    coresInterruptor,
     titulo,
     icone = 'gota',
     paleta = 'ciclo',
@@ -216,6 +217,7 @@ function PermissionGroup({
                 </Pressable>
 
                 <SwitchField
+                    cores={coresInterruptor}
                     ativo={todasAtivas}
                     aoAlterar={alterarGrupo}
                     desabilitado={grupoDesabilitado}
@@ -239,6 +241,7 @@ function PermissionGroup({
                             style={[estilos.item, indice > 0 && estilos.itemComSeparador]}
                         >
                             <PermissionItem
+                                coresInterruptor={coresInterruptor}
                                 titulo={permissao.titulo}
                                 ativo={permissoesAtivas.has(permissao.id)}
                                 aoAlterar={(ativo) => aoAlterarPermissao?.(permissao.id, ativo)}

@@ -78,6 +78,9 @@ function SupportCategoryForm({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema, aparenciaNovaCategoria), [tema, aparenciaNovaCategoria]);
+    const coresInterruptor = tema.escuro && aparenciaNovaCategoria
+        ? { trilhaInativa: '#424242', indicadorInativo: '#9E9E9E' }
+        : undefined;
     const nome = typeof dados?.nome === 'string' ? dados.nome : '';
 
     const dadosVisiveisRecebidos = dados?.dadosVisiveis;
@@ -189,12 +192,14 @@ function SupportCategoryForm({
                 />
 
                 <GeneralPermissions
+                    coresInterruptor={coresInterruptor}
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissaoGeral}
                     desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
                 />
 
                 <PermissionGroups
+                    coresInterruptor={coresInterruptor}
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissoesAcesso}
                     desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
