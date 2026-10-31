@@ -140,10 +140,10 @@ function criarEstilos(tema) {
             rowGap: 16,
             columnGap: 12,
             padding: 20,
-            borderRadius: tema.radius.cartao,
-            backgroundColor: tema.cores.interface.superficie,
-            borderWidth: 1,
-            borderColor: tema.cores.interface.borda,
+            borderRadius: tema.escuro ? 16 : tema.radius.cartao,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
+            borderWidth: tema.escuro ? 0.667 : 1,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             ...shadows.cardSuave
         },
         cartaoProximoCicloComAviso: { minHeight: 198 },
@@ -227,10 +227,10 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 8,
             padding: 16,
-            borderRadius: radius.cartao,
-            backgroundColor: tema.cores.interface.superficie,
-            borderWidth: 1,
-            borderColor: tema.cores.interface.borda,
+            borderRadius: tema.escuro ? 16 : radius.cartao,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
+            borderWidth: tema.escuro ? 0.667 : 1,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             ...shadows.cardSuave
         },
         cabecalhoCartaoSecundario: {
@@ -300,7 +300,7 @@ function criarEstilos(tema) {
             paddingHorizontal: 14,
             paddingVertical: 8,
             borderRadius: radius.circular,
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1,
             borderColor: tema.cores.interface.borda
         },
@@ -327,7 +327,7 @@ function criarEstilos(tema) {
             padding: 16,
             borderRadius: radius.grande,
             backgroundColor: tema.escuro
-                ? tema.cores.interface.superficieElevada
+                ? '#1E1E1E'
                 : cores.ciclo.superficieSuave,
             borderWidth: 1,
             borderColor: tema.cores.interface.borda
