@@ -17,6 +17,8 @@ function criarAparencia(tema) {
             corIcone: '#75757580',
             corPlaceholder: '#75757580'
         },
+        botaoPrincipalDesativado: { borderRadius: 12, backgroundColor: '#2C2C2C' },
+        textoPrincipalDesativado: { color: '#757575' },
         modal: {
             borderRadius: 20,
             backgroundColor: '#1E1E1E',

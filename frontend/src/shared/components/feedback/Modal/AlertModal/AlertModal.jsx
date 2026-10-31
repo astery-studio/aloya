@@ -117,7 +117,11 @@ export default function AlertModal({
                     desativado={principalDesativada}
                     carregando={carregando}
                     rotuloAcessibilidade={principal.rotuloAcessibilidade}
-                    estilo={{ width: '100%' }}
+                    estilo={[
+                        { width: '100%' },
+                        principalDesativada && aparencia.botaoPrincipalDesativado
+                    ]}
+                    estiloTexto={principalDesativada && aparencia.textoPrincipalDesativado}
                 />
             ) : null}
 
