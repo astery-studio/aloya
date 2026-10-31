@@ -201,6 +201,7 @@ function SupportCategoryForm({
                 />
 
                 <GeneralPermissions
+                    aparenciaNovaCategoria={aparenciaNovaCategoria}
                     coresInterruptor={coresInterruptor}
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissaoGeral}
