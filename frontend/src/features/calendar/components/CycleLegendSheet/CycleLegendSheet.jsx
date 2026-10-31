@@ -13,7 +13,8 @@ import {
     cores,
     fundosPrevistos,
     fundosReais,
-    fundosReaisEscuros
+    fundosReaisEscuros,
+    fundosPrevistosEscuros
 } from './CycleLegendSheet.styles';
 
 const iconesPorTipo = Object.freeze({
@@ -25,7 +26,7 @@ const iconesPorTipo = Object.freeze({
 
 function obterCorJanela(prevista, tema) {
     if (tema.escuro) {
-        return prevista ? 'rgba(196, 200, 197, 0.62)' : '#9E9C96';
+        return prevista ? 'rgba(158, 156, 150, 0.40)' : '#9E9C96';
     }
 
     return prevista ? cores.janelaFertilPrevista : cores.janelaFertil;
@@ -49,7 +50,13 @@ function MarcadorLegenda({ item, estilos, tema }) {
         );
     }
 
-    const fundos = prevista ? fundosPrevistos : tema.escuro ? fundosReaisEscuros : fundosReais;
+    const fundos = prevista
+        ? tema.escuro
+            ? fundosPrevistosEscuros
+            : fundosPrevistos
+        : tema.escuro
+          ? fundosReaisEscuros
+          : fundosReais;
     const fundo = fundos[item.tipo];
 
     return (

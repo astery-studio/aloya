@@ -122,3 +122,12 @@ const fundosReaisEscuros = Object.freeze({
 });
 
 export { fundosReaisEscuros };
+
+const fundosPrevistosEscuros = Object.freeze({
+    menstruacao: 'rgba(168, 82, 74, 0.60)',
+    folicular: 'rgba(82, 102, 94, 0.60)',
+    ovulacao: 'rgba(90, 115, 130, 0.60)',
+    lutea: 'rgba(184, 117, 80, 0.60)'
+});
+
+export { fundosPrevistosEscuros };

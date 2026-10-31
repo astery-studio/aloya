@@ -160,14 +160,10 @@ function criarEstilosCalendario(tema) {
             zIndex: 3
         },
         janelaFertilAtual: {
-            borderColor: tema.escuro
-                ? '#9E9C96'
-                : 'rgba(34, 34, 34, 0.70)'
+            borderColor: tema.escuro ? '#9E9C96' : 'rgba(34, 34, 34, 0.70)'
         },
         janelaFertilPrevista: {
-            borderColor: tema.escuro
-                ? tema.cores.interface.textoDesabilitado
-                : 'rgba(34, 34, 34, 0.42)'
+            borderColor: tema.escuro ? 'rgba(158, 156, 150, 0.40)' : 'rgba(34, 34, 34, 0.42)'
         },
         pressionado: {
             opacity: 0.72
@@ -191,16 +187,16 @@ function criarEstilosCalendario(tema) {
 
     const estilosTiposPrevistos = StyleSheet.create({
         menstruacao: {
-            backgroundColor: tema.escuro ? 'rgba(168, 68, 50, 0.78)' : 'rgba(200, 90, 68, 0.58)'
+            backgroundColor: tema.escuro ? 'rgba(168, 82, 74, 0.60)' : 'rgba(200, 90, 68, 0.58)'
         },
         folicular: {
-            backgroundColor: tema.escuro ? 'rgba(44, 76, 59, 0.78)' : 'rgba(44, 76, 59, 0.56)'
+            backgroundColor: tema.escuro ? 'rgba(82, 102, 94, 0.60)' : 'rgba(44, 76, 59, 0.56)'
         },
         ovulacao: {
-            backgroundColor: tema.escuro ? 'rgba(62, 101, 120, 0.78)' : 'rgba(74, 117, 142, 0.56)'
+            backgroundColor: tema.escuro ? 'rgba(90, 115, 130, 0.60)' : 'rgba(74, 117, 142, 0.56)'
         },
         lutea: {
-            backgroundColor: tema.escuro ? 'rgba(138, 90, 18, 0.82)' : 'rgba(214, 140, 58, 0.58)'
+            backgroundColor: tema.escuro ? 'rgba(184, 117, 80, 0.60)' : 'rgba(214, 140, 58, 0.58)'
         }
     });
 
