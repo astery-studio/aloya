@@ -1,67 +1,72 @@
+jest.mock('../../../../src/shared/hooks/useTheme', () => ({
+    useTheme: () => require('../../../../src/shared/theme/themePalettes').temaClaro
+}));
+
 jest.mock('react', () => ({
     ...jest.requireActual('react'),
-    useState: jest.fn()
-}))
+    useState: jest.fn(),
+    useMemo: jest.fn((criarValor) => criarValor())
+}));
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     WarningCircleIcon: jest.fn(() => null)
-}))
+}));
 
-import {useState} from 'react'
-import {LogoutConfirmation} from '../../../../src/features/settings/account/LogoutConfirmation'
+import { useState } from 'react';
+import { LogoutConfirmation } from '../../../../src/features/settings/account/LogoutConfirmation';
 
 describe('LogoutConfirmation - bloqueio de fechamento', () => {
     beforeEach(() => {
-        useState.mockReset()
-    })
+        useState.mockReset();
+    });
 
     test('ignora o fechamento enquanto encerra a sessão', () => {
-        const setCarregando = jest.fn()
-        const setErroVisivel = jest.fn()
-        const onFechar = jest.fn()
+        const setCarregando = jest.fn();
+        const setErroVisivel = jest.fn();
+        const onFechar = jest.fn();
 
         useState
             .mockReturnValueOnce([true, setCarregando])
-            .mockReturnValueOnce([false, setErroVisivel])
+            .mockReturnValueOnce([false, setErroVisivel]);
 
         const componente = LogoutConfirmation({
             visivel: true,
             onFechar,
             encerrarSessao: jest.fn(),
             onSessaoEncerrada: jest.fn()
-        })
+        });
 
-        const [modalConfirmacao] = componente.props.children
+        const [modalConfirmacao] = componente.props.children;
 
-        expect(modalConfirmacao.props.aoFechar).not.toBe(onFechar)
+        expect(modalConfirmacao.props.aoFechar).not.toBe(onFechar);
 
         expect(() => {
-            modalConfirmacao.props.aoFechar()
-        }).not.toThrow()
+            modalConfirmacao.props.aoFechar();
+        }).not.toThrow();
 
-        expect(onFechar).not.toHaveBeenCalled()
-    })
+        expect(onFechar).not.toHaveBeenCalled();
+    });
 
     test('fecha o aviso de erro pela ação do sistema', () => {
-        const setCarregando = jest.fn()
-        const setErroVisivel = jest.fn()
+        const setCarregando = jest.fn();
+        const setErroVisivel = jest.fn();
 
         useState
             .mockReturnValueOnce([false, setCarregando])
-            .mockReturnValueOnce([true, setErroVisivel])
+            .mockReturnValueOnce([true, setErroVisivel]);
 
         const componente = LogoutConfirmation({
             visivel: true,
             onFechar: jest.fn(),
             encerrarSessao: jest.fn(),
             onSessaoEncerrada: jest.fn()
-        })
+        });
 
-        const [, modalErro] = componente.props.children
+        const [, modalErro] = componente.props.children;
 
-        modalErro.props.aoFechar()
+        modalErro.props.aoFechar();
 
-        expect(setErroVisivel).toHaveBeenCalledTimes(1)
-        expect(setErroVisivel).toHaveBeenCalledWith(false)
-    })
-})
+        expect(setErroVisivel).toHaveBeenCalledTimes(1);
+        expect(setErroVisivel).toHaveBeenCalledWith(false);
+    });
+});

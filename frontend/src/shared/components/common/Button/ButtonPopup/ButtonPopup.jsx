@@ -12,7 +12,8 @@ export default function ButtonPopup({
     desativado = false,
     carregando = false,
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto
 }) {
     if (!variantesPermitidas.includes(variante)) {
         throw new Error(`Variante de ButtonPopup inválida: ${variante}`);
@@ -29,6 +30,7 @@ export default function ButtonPopup({
             carregando={carregando}
             rotuloAcessibilidade={rotuloAcessibilidade}
             estilo={estilo}
+            estiloTexto={estiloTexto}
         />
     );
 }

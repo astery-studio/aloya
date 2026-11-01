@@ -165,6 +165,7 @@ function SupportCategoriesScreen({
             />
 
             <SimpleModal
+                erroInterno
                 visivel={exclusao.erro !== null}
                 aoFechar={exclusao.fecharErro}
                 icone={WarningCircleIcon}

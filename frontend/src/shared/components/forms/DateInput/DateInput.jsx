@@ -13,6 +13,10 @@ export default function DateInput({
     onChangeText,
     desativado = false,
     estilo,
+    estiloCampo,
+    estiloEntrada,
+    corIcone,
+    corPlaceholder,
     corDestaque,
     rotuloAcessibilidade = 'Data',
     onFocus,
@@ -32,8 +36,8 @@ export default function DateInput({
             style={[estilos.botao, desativado && estilos.desativado, estilo]}
         >
             <View style={[estilos.campo, focado && estilos.focado,
-                focado && corDestaque && { borderColor: corDestaque }]} testID={testeId}>
-                <CalendarBlank size={20} color={tema.cores.interface.textoSecundario} />
+                estiloCampo, focado && corDestaque && { borderColor: corDestaque }]} testID={testeId}>
+                <CalendarBlank size={20} color={corIcone ?? tema.cores.interface.textoSecundario} />
                 <TextInput
                     ref={entradaRef}
                     accessibilityLabel={rotuloAcessibilidade}
@@ -41,7 +45,7 @@ export default function DateInput({
                     keyboardType="number-pad"
                     maxLength={10}
                     placeholder="DD/MM/AAAA"
-                    placeholderTextColor={tema.cores.interface.textoSecundario}
+                    placeholderTextColor={corPlaceholder ?? tema.cores.interface.textoSecundario}
                     selectionColor={corDestaque || tema.cores.interface.destaque}
                     value={valor}
                     onChangeText={(texto) => onChangeText?.(formatDate(texto))}
@@ -53,7 +57,7 @@ export default function DateInput({
                         setFocado(false);
                         onBlur?.(evento);
                     }}
-                    style={estilos.entrada}
+                    style={[estilos.entrada, estiloEntrada]}
                 />
             </View>
         </Pressable>

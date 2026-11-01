@@ -27,38 +27,51 @@ function criarEstilos(tema) {
             borderWidth: 0.666667,
             borderColor: tema.cores.interface.borda
         },
+        diaNaoSelecionado: tema.escuro
+            ? {
+                  borderRadius: 16,
+                  borderWidth: 0.667,
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
         diaSelecionado: shadows.cardSuave,
         diaSelecionado_menstrual: {
-            backgroundColor: tema.escuro ? '#A84432' : tema.cores.marca.primaria,
-            borderColor: tema.escuro ? '#A84432' : tema.cores.marca.primaria
+            backgroundColor: tema.escuro ? '#A8524A' : tema.cores.marca.primaria,
+            borderColor: tema.escuro ? '#A8524A' : tema.cores.marca.primaria
         },
         diaSelecionado_folicular: {
-            backgroundColor: tema.escuro ? '#2C4C3B' : tema.cores.marca.secundaria,
-            borderColor: tema.escuro ? '#2C4C3B' : tema.cores.marca.secundaria
+            backgroundColor: tema.escuro ? '#52665E' : tema.cores.marca.secundaria,
+            borderColor: tema.escuro ? '#52665E' : tema.cores.marca.secundaria
         },
         diaSelecionado_ovulatoria: {
-            backgroundColor: tema.escuro ? '#3E6578' : tema.cores.feedback.informacao,
-            borderColor: tema.escuro ? '#3E6578' : tema.cores.feedback.informacao
+            backgroundColor: tema.escuro ? '#5A7382' : tema.cores.feedback.informacao,
+            borderColor: tema.escuro ? '#5A7382' : tema.cores.feedback.informacao
         },
         diaSelecionado_lutea: {
-            backgroundColor: tema.escuro ? '#8A5A12' : tema.cores.feedback.aviso,
-            borderColor: tema.escuro ? '#8A5A12' : tema.cores.feedback.aviso
+            backgroundColor: tema.escuro ? '#B87550' : tema.cores.feedback.aviso,
+            borderColor: tema.escuro ? '#B87550' : tema.cores.feedback.aviso
         },
         diaSelecionado_desconhecida: { backgroundColor: tema.cores.interface.textoSecundario },
         semana: {
             ...typography.labelCompact,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#E1E1E1' : tema.cores.interface.textoSecundario,
             textTransform: 'capitalize',
             opacity: 0.7
         },
         textoNumero: {
             ...typography.numberCompact,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#E1E1E1' : tema.cores.interface.textoSecundario,
             marginTop: 2
         },
-        semanaSelecionada: { color: corSelecionada, opacity: 0.85 },
-        numeroSelecionado: { ...typography.numberCompactStrong, color: corSelecionada },
-        textoSelecionadoDesconhecido: { color: tema.cores.interface.superficie },
+        semanaSelecionada: { color: tema.escuro ? '#E3E3E3' : corSelecionada, opacity: 0.85 },
+        numeroSelecionado: {
+            ...typography.numberCompactStrong,
+            color: tema.escuro ? '#E3E3E3' : corSelecionada
+        },
+        textoSelecionadoDesconhecido: {
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.superficie
+        },
         indicador: {
             width: 5,
             height: 5,

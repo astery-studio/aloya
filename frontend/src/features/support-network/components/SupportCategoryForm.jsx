@@ -6,7 +6,8 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
 import TextInput from '../../../shared/components/forms/TextInput';
 import { GeneralPermissions } from './GeneralPermissions';
 import { PermissionGroups } from './PermissionGroups';
-import { estilos } from './SupportCategoryForm.styles';
+import { criarEstilos } from './SupportCategoryForm.styles';
+import { useTheme } from '../../../shared/hooks/useTheme';
 
 const ERRO_NOME = Object.freeze({
     codigo: 'NOME_CATEGORIA_OBRIGATORIO',
@@ -66,6 +67,7 @@ function prepararCategoriaParaSalvar(dados) {
 
 //Recebe dados controlados, valida o formulário e envia somente os campos permitidos.
 function SupportCategoryForm({
+    aparenciaNovaCategoria = false,
     dados,
     aoAlterar,
     aoSalvar,
@@ -74,6 +76,20 @@ function SupportCategoryForm({
     bloqueado = false,
     exibirAcao = true
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(
+        () => criarEstilos(tema, aparenciaNovaCategoria),
+        [tema, aparenciaNovaCategoria]
+    );
+    const coresInterruptor =
+        tema.escuro && aparenciaNovaCategoria
+            ? {
+                  trilhaInativa: '#424242',
+                  indicadorInativo: '#9E9E9E',
+                  trilhaAtiva: '#A5D6A7',
+                  indicadorAtivo: '#121212'
+              }
+            : undefined;
     const nome = typeof dados?.nome === 'string' ? dados.nome : '';
 
     const dadosVisiveisRecebidos = dados?.dadosVisiveis;
@@ -171,6 +187,7 @@ function SupportCategoryForm({
             <View style={estilos.conteudo}>
                 <TextInput
                     label="Nome da categoria"
+                    estilo={estilos.campoNome}
                     placeholder="Parceiro(a)"
                     value={nome}
                     onChangeText={alterarNome}
@@ -184,12 +201,16 @@ function SupportCategoryForm({
                 />
 
                 <GeneralPermissions
+                    aparenciaNovaCategoria={aparenciaNovaCategoria}
+                    coresInterruptor={coresInterruptor}
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissaoGeral}
                     desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
                 />
 
                 <PermissionGroups
+                    aparenciaNovaCategoria={aparenciaNovaCategoria}
+                    coresInterruptor={coresInterruptor}
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissoesAcesso}
                     desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}

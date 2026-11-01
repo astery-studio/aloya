@@ -189,8 +189,9 @@ describe('BottomTabBar', () => {
 
         expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
             height: 91,
-            backgroundColor: '#232926',
-            borderTopColor: '#4A514D'
+            backgroundColor: '#1E1E1E',
+            borderTopWidth: 0.667,
+            borderTopColor: 'rgba(255, 255, 255, 0.12)'
         });
     });
 
@@ -208,7 +209,7 @@ describe('BottomTabBar', () => {
         );
 
         expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            backgroundColor: '#232926'
+            backgroundColor: '#1E1E1E'
         });
     });
 });

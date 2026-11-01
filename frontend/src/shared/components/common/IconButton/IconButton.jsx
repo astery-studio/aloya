@@ -9,7 +9,8 @@ function IconButton({
     aoPressionar,
     rotuloAcessibilidade,
     variante = 'neutro',
-    desativado = false
+    desativado = false,
+    corIcone
 }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
@@ -47,7 +48,7 @@ function IconButton({
                 pressed && !estaDesativado && estilos.pressionado
             ]}
         >
-            <Icone size={tamanhoIcone} color={varianteVisual.icone} weight="regular" />
+            <Icone size={tamanhoIcone} color={corIcone ?? varianteVisual.icone} weight="regular" />
         </Pressable>
     );
 }

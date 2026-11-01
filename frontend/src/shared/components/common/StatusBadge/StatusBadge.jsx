@@ -89,7 +89,7 @@ const variantesDeUso = new Set([
     'validadeAindaPrazo'
 ]);
 
-function StatusBadge({ estado, rotulo }) {
+function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const variantes = useMemo(() => criarVariantes(tema), [tema]);
@@ -141,7 +141,8 @@ function StatusBadge({ estado, rotulo }) {
                 estilos.container,
                 visual.container,
                 ajustarTextoDeUso && dimensoesFlexiveis(visual.container),
-                confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width }
+                confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width },
+                estilo
             ]}
         >
             {configuracao.iconeCiclo ? (
@@ -151,7 +152,7 @@ function StatusBadge({ estado, rotulo }) {
                 <Text
                     style={[
                         estilos.ponto,
-                        { color: visual.texto.color },
+                        { color: corConteudo ?? visual.texto.color },
                         ajustarTextoDeUso && { includeFontPadding: false }
                     ]}
                 >
@@ -164,7 +165,8 @@ function StatusBadge({ estado, rotulo }) {
                     estilos.texto,
                     visual.texto,
                     ajustarTextoDeUso && textoFlexivel(visual.texto),
-                    confirmadoNoHistorico && { flexShrink: 0 }
+                    confirmadoNoHistorico && { flexShrink: 0 },
+                    corConteudo && { color: corConteudo }
                 ]}
             >
                 {valor || texto}

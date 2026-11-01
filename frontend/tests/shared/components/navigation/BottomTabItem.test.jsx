@@ -128,17 +128,17 @@ describe('BottomTabItem', () => {
         expect(IconeTeste.mock.calls[0][0]).toEqual(
             expect.objectContaining({
                 size: 26,
-                color: '#9FD6B6',
+                color: '#A5D6A7',
                 weight: 'fill'
             })
         );
 
         expect(screen.getByText('Diário')).toHaveStyle({
-            color: '#9FD6B6'
+            color: '#A5D6A7'
         });
 
         expect(screen.getByTestId('indicador-aba-Diário')).toHaveStyle({
-            backgroundColor: '#9FD6B6'
+            backgroundColor: '#A5D6A7'
         });
     });
 
@@ -213,7 +213,7 @@ describe('BottomTabItem', () => {
         );
 
         expect(screen.getByText('Início')).toHaveStyle({
-            color: '#9FD6B6'
+            color: '#A5D6A7'
         });
     });
 });

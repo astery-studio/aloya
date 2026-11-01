@@ -228,3 +228,38 @@ test('declara os pesos tipográficos especificados para os textos da HU-013', ()
         descricaoRecurso: { fontWeight: '400' }
     });
 });
+
+test.each([
+    [
+        'BAIXA',
+        'baixa',
+        'Baixa',
+        '#EF9A9A',
+        'rgba(239, 154, 154, 0.16)',
+        'rgba(239, 154, 154, 0.33)'
+    ],
+    [
+        'MEDIA',
+        'média',
+        'Média',
+        '#FFE082',
+        'rgba(255, 224, 130, 0.16)',
+        'rgba(255, 224, 130, 0.33)'
+    ],
+    ['ALTA', 'alta', 'Alta', '#A5D6A7', 'rgba(165, 214, 167, 0.14)', 'rgba(165, 214, 167, 0.33)']
+])(
+    'aplica as cores da confiabilidade %s no modo noturno',
+    async (nivel, acessibilidade, rotulo, cor, fundo, borda) => {
+        await render(
+            <CycleForecastPanel previsao={{ ...previsao, confiabilidadeMenstrual: { nivel } }} />,
+            { preferencia: 'escuro' }
+        );
+        expect(screen.getByLabelText('Confiabilidade ' + acessibilidade)).toHaveStyle({
+            borderRadius: 16,
+            borderWidth: 0.667,
+            backgroundColor: fundo,
+            borderColor: borda
+        });
+        expect(screen.getByText(rotulo)).toHaveStyle({ color: cor });
+    }
+);

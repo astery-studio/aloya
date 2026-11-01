@@ -13,9 +13,9 @@ function criarEstilos(tema) {
             paddingHorizontal: tema.espacamentos.medio,
             paddingVertical: 10,
             borderRadius: 12,
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie
+            borderWidth: tema.escuro ? 0.705 : 0.7,
+            borderColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
         pressionado: {
@@ -32,7 +32,7 @@ function criarEstilos(tema) {
         },
 
         label: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -41,7 +41,7 @@ function criarEstilos(tema) {
 
         valor: {
             ...tema.typography.bodyDefault,
-            color: tema.cores.interface.textoPrincipal
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal
         },
 
         valorNaoInformado: {

@@ -7,6 +7,7 @@ import { criarEstilos } from './SwitchField.styles';
 
 //Recebe o estado atual, anima o indicador e informa o novo valor ao componente pai.
 function SwitchField({
+    cores,
     titulo,
     ativo = false,
     aoAlterar,
@@ -19,6 +20,8 @@ function SwitchField({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const estaAtivo = ativo === true;
+    const corTrilha = estaAtivo ? cores?.trilhaAtiva : cores?.trilhaInativa;
+    const corIndicador = estaAtivo ? cores?.indicadorAtivo : cores?.indicadorInativo;
     const estaDesabilitado = desabilitado || typeof aoAlterar !== 'function';
 
     const [deslocamento] = useState(() => new Animated.Value(estaAtivo ? 20 : 0));
@@ -50,13 +53,18 @@ function SwitchField({
     const trilhaDoInterruptor = (
         <View
             testID="switch-field-track"
-            style={[estilos.trilha, estaAtivo ? estilos.trilhaAtiva : estilos.trilhaInativa]}
+            style={[
+                estilos.trilha,
+                estaAtivo ? estilos.trilhaAtiva : estilos.trilhaInativa,
+                corTrilha && { backgroundColor: corTrilha }
+            ]}
             pointerEvents="none"
         >
             <Animated.View
                 testID="switch-field-thumb"
                 style={[
                     estilos.indicador,
+                    corIndicador && { backgroundColor: corIndicador },
                     estaDesabilitado && estilos.indicadorDesabilitado,
                     {
                         transform: [

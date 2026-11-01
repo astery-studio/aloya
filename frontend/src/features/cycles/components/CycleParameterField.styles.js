@@ -9,7 +9,7 @@ function criarEstilos(tema) {
         },
         erro: {
             paddingHorizontal: tema.espacamentos.medio,
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             lineHeight: 18

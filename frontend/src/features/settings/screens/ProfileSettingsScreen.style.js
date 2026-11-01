@@ -5,6 +5,26 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        caixaCampoEdicao: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 1.41,
+                  borderColor: '#A5D6A7',
+                  backgroundColor: '#2C2C2C'
+              }
+            : {},
+        textoCampoEdicao: tema.escuro ? { color: '#999999' } : {},
+        opcaoSelecionada: tema.escuro ? { borderRadius: 10, backgroundColor: '#A5D6A7' } : {},
+        textoOpcaoSelecionada: tema.escuro ? { color: '#121212' } : {},
+        painelEdicao: tema.escuro
+            ? {
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0,
+                  boxShadow: '0 -4px 32px 0 rgba(34, 34, 34, 0.10)'
+              }
+            : {},
         estadoTela: {
             flex: 1,
             minHeight: 440,
@@ -58,7 +78,7 @@ function criarEstilos(tema) {
         },
 
         acaoPerigo: {
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
@@ -66,7 +86,7 @@ function criarEstilos(tema) {
         },
 
         acaoNormal: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,

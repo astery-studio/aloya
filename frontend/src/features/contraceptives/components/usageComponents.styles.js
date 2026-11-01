@@ -11,6 +11,9 @@ const coresHistorico = Object.freeze({
 
 function criarEstilosUso(tema) {
     const interfaceTema = tema.cores.interface;
+    const coresCalendario = tema.escuro
+        ? { confirmado: '#A5D6A7CC', foraDoPrazo: '#FFE082CC', naoConfirmado: '#EF9A9ACC' }
+        : coresHistorico;
     return StyleSheet.create({
         banner: {
             width: '100%',
@@ -26,9 +29,9 @@ function criarEstilosUso(tema) {
             paddingVertical: 9,
             paddingHorizontal: 14,
             borderRadius: 10,
-            backgroundColor: '#FBF3E0',
+            backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.16)' : '#FBF3E0',
             borderWidth: 0.70489,
-            borderColor: '#E8C97A'
+            borderColor: tema.escuro ? 'rgba(255, 224, 130, 0.30)' : '#E8C97A'
         },
         textoBanner: {
             minWidth: 142,
@@ -36,7 +39,7 @@ function criarEstilosUso(tema) {
             flexGrow: 0,
             flexShrink: 1,
             includeFontPadding: false,
-            color: '#B07D2A',
+            color: tema.escuro ? '#FFE082' : '#B07D2A',
             fontFamily: fontFamilies.semibold,
             fontWeight: '600',
             fontSize: 13,
@@ -171,7 +174,7 @@ function criarEstilosUso(tema) {
             flexGrow: 0,
             flexShrink: 0,
             padding: 8,
-            backgroundColor: tema.escuro ? interfaceTema.superficieElevada : interfaceTema.fundo,
+            backgroundColor: tema.escuro ? '#242424' : interfaceTema.fundo,
             borderRadius: 12
         },
         calendarioSeisSemanas: { minHeight: 291.43 },
@@ -253,9 +256,9 @@ function criarEstilosUso(tema) {
         },
         numeroDiaHoje: { fontFamily: fontFamilies.bold, fontWeight: '900' },
         diaComEstado: { color: '#FFFFFF' },
-        celula_confirmado: { backgroundColor: coresHistorico.confirmado },
-        celula_foraDoPrazo: { backgroundColor: coresHistorico.foraDoPrazo },
-        celula_naoConfirmado: { backgroundColor: coresHistorico.naoConfirmado },
+        celula_confirmado: { backgroundColor: coresCalendario.confirmado },
+        celula_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
+        celula_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
         // Cada item mede seu texto nativo. Se faltar espaço, a legenda cresce por linhas.
         legenda: {
             width: '100%',
@@ -283,9 +286,9 @@ function criarEstilosUso(tema) {
             flexShrink: 0,
             borderRadius: 2.99578
         },
-        marcador_confirmado: { backgroundColor: coresHistorico.confirmado },
-        marcador_foraDoPrazo: { backgroundColor: coresHistorico.foraDoPrazo },
-        marcador_naoConfirmado: { backgroundColor: coresHistorico.naoConfirmado },
+        marcador_confirmado: { backgroundColor: coresCalendario.confirmado },
+        marcador_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
+        marcador_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
         textoLegenda: {
             minHeight: 15,
             flexGrow: 0,

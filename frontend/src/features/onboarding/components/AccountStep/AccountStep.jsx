@@ -23,6 +23,12 @@ export default function AccountStep({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const aparenciaCampo = tema.escuro ? {
+        estilo: estilos.campo,
+        estiloEntrada: estilos.textoCampo,
+        estiloLabel: estilos.labelCampo,
+        placeholderTextColor: '#999999'
+    } : {};
     const alterarNome = useCallback((nome) => aoAlterar({ nome }), [aoAlterar]);
     const alterarEmail = useCallback((email) => aoAlterar({ email }), [aoAlterar]);
     const alterarSenha = useCallback((senha) => aoAlterar({ senha }), [aoAlterar]);
@@ -47,6 +53,8 @@ export default function AccountStep({
             <Button
                 texto="Entrar"
                 variante="bordaLaranja"
+                estilo={estilos.botaoEntrar}
+                estiloTexto={estilos.textoEntrar}
                 tamanho="compacto"
                 aoPressionar={aoEntrar}
             />
@@ -55,6 +63,10 @@ export default function AccountStep({
 
     return (
         <AuthLayout
+            corFundo={tema.escuro ? '#1E1E1E' : undefined}
+            estiloTitulo={estilos.titulo}
+            estiloDescricao={estilos.labelCampo}
+            corIconeVoltar={tema.escuro ? '#999999' : undefined}
             titulo="Bem-vindo(a)!"
             aoVoltar={aoVoltar}
             descricao="Que bom ter você aqui. Crie sua conta para começar."
@@ -62,6 +74,7 @@ export default function AccountStep({
         >
             <View style={estilos.campos}>
                 <TextInput
+                    {...aparenciaCampo}
                     label="Nome"
                     placeholder="Nome"
                     value={dados.nome}
@@ -69,9 +82,11 @@ export default function AccountStep({
                     erro={erros.nome}
                     onChangeText={alterarNome}
                 />
-                <EmailInput value={dados.email} erro={erros.email} onChangeText={alterarEmail} />
-                <PasswordInput value={dados.senha} erro={erros.senha} onChangeText={alterarSenha} />
+                <EmailInput {...aparenciaCampo} value={dados.email} erro={erros.email} onChangeText={alterarEmail} />
+                <PasswordInput {...aparenciaCampo} corIcone={tema.escuro ? '#999999' : undefined} value={dados.senha} erro={erros.senha} onChangeText={alterarSenha} />
                 <PasswordInput
+                    {...aparenciaCampo}
+                    corIcone={tema.escuro ? '#999999' : undefined}
                     label="Confirmar senha"
                     value={dados.confirmacao}
                     erro={erros.confirmacao}
@@ -89,7 +104,7 @@ export default function AccountStep({
                         <Check
                             size={11}
                             weight="bold"
-                            color={tema.cores.interface.textoSobreDestaque}
+                            color={tema.escuro ? '#121212' : tema.cores.interface.textoSobreDestaque}
                         />
                     ) : null}
                 </View>

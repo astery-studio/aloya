@@ -29,6 +29,6 @@ test('aplica as cores do modo escuro ao estado de erro', async () => {
     });
 
     expect(screen.getByText('Não foi possível carregar os parâmetros do ciclo.')).toHaveStyle({
-        color: '#C4C8C5'
+        color: '#99999999'
     });
 });

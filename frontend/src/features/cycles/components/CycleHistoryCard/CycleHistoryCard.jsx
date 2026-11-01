@@ -109,6 +109,7 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
                     <View style={estilos.acoes}>
                         <IconButton
                             icone={PencilSimpleIcon}
+                            corIcone={tema.escuro ? '#999999' : undefined}
                             aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
                             rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
                             variante="neutro"
@@ -116,6 +117,7 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
 
                         <IconButton
                             icone={TrashIcon}
+                            corIcone={tema.escuro ? '#999999' : undefined}
                             aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
                             rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
                             variante="neutro"
