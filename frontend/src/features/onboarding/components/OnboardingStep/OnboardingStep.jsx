@@ -64,6 +64,7 @@ export default function OnboardingStep({
 
     return (
         <FormLayout
+            corFundo={tema.escuro ? '#1E1E1E' : undefined}
             cabecalho={cabecalho}
             centralizado
             acoes={

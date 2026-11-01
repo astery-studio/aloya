@@ -13,6 +13,7 @@ export default function OnboardingComplete({ aoIniciar, logo }) {
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     return (
         <FormLayout
+            corFundo={tema.escuro ? '#1E1E1E' : undefined}
             centralizado
             acoes={<Button texto="Iniciar" variante="verde" aoPressionar={aoIniciar} />}
         >

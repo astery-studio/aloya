@@ -55,6 +55,7 @@ export default function AccountStep({
 
     return (
         <AuthLayout
+            corFundo={tema.escuro ? '#1E1E1E' : undefined}
             titulo="Bem-vindo(a)!"
             aoVoltar={aoVoltar}
             descricao="Que bom ter você aqui. Crie sua conta para começar."

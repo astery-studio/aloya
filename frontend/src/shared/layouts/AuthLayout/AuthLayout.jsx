@@ -17,11 +17,12 @@ export default function AuthLayout({
     children,
     rodape,
     aoVoltar,
-    testeId = 'auth-layout'
+    testeId = 'auth-layout',
+    corFundo
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const coresFundo = tema.escuro
+    const coresFundo = corFundo ? [corFundo, corFundo] : tema.escuro
         ? [tema.cores.interface.superficie, tema.cores.interface.fundo]
         : ['#F5EDE3', '#F7F5F0'];
 
