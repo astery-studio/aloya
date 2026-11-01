@@ -7,6 +7,9 @@ import { fontFamilies } from '../../../../shared/theme';
 function criarEstilos(tema) {
     return StyleSheet.create({
         campos: { gap: 12 },
+        campo: tema.escuro ? { borderColor: '#2C2C2C', backgroundColor: '#1E1E1E' } : {},
+        textoCampo: tema.escuro ? { color: '#E3E3E3' } : {},
+        labelCampo: tema.escuro ? { color: '#999999' } : {},
         termos: { alignItems: 'flex-start', flexDirection: 'row', gap: 10 },
         caixa: {
             alignItems: 'center',

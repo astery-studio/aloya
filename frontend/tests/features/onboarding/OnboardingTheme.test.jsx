@@ -35,13 +35,13 @@ describe.each([
         });
     });
 
-    test('preserva laranja nas durações e no foco da data', async () => {
+    test('aplica as cores dos campos de duração e do foco da data', async () => {
         const { unmount } = await renderWithTheme(<CycleLengthStep valor={28} />, { preferencia });
-        expect(screen.getByTestId('area-campo-numero')).toHaveStyle({ borderColor: '#C85A44' });
+        expect(screen.getByTestId('area-campo-numero')).toHaveStyle({ borderColor: preferencia === 'escuro' ? '#2C2C2C' : '#C85A44' });
         await unmount();
         await renderWithTheme(<BirthDateStep valor="04/01/2000" />, { preferencia });
         await fireEvent(screen.getByLabelText('Data'), 'focus');
-        expect(screen.getByTestId('campo-data')).toHaveStyle({ borderColor: '#C85A44' });
+        expect(screen.getByTestId('campo-data')).toHaveStyle({ borderColor: preferencia === 'escuro' ? '#A5D6A7' : '#C85A44' });
     });
 
     test('preserva o nome ALOYA em laranja na conclusão', async () => {

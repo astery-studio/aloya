@@ -27,7 +27,7 @@ export default function DurationStep({
             podeAvancar={selecionado && Number.isInteger(valor) && valor > 0}
             carregando={carregando} erro={erro}>
             <NumberInput valor={valor} aoAlterar={alterar} unidade="dias"
-                estilo={{ borderColor: tema.cores.marca.primaria }} />
+                estilo={{ borderColor: tema.escuro ? '#2C2C2C' : tema.cores.marca.primaria }} />
         </OnboardingStep>
     );
 }
