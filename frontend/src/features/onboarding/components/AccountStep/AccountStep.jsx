@@ -53,6 +53,8 @@ export default function AccountStep({
             <Button
                 texto="Entrar"
                 variante="bordaLaranja"
+                estilo={estilos.botaoEntrar}
+                estiloTexto={estilos.textoEntrar}
                 tamanho="compacto"
                 aoPressionar={aoEntrar}
             />
@@ -62,6 +64,9 @@ export default function AccountStep({
     return (
         <AuthLayout
             corFundo={tema.escuro ? '#1E1E1E' : undefined}
+            estiloTitulo={estilos.titulo}
+            estiloDescricao={estilos.labelCampo}
+            corIconeVoltar={tema.escuro ? '#999999' : undefined}
             titulo="Bem-vindo(a)!"
             aoVoltar={aoVoltar}
             descricao="Que bom ter você aqui. Crie sua conta para começar."
@@ -99,7 +104,7 @@ export default function AccountStep({
                         <Check
                             size={11}
                             weight="bold"
-                            color={tema.cores.interface.textoSobreDestaque}
+                            color={tema.escuro ? '#121212' : tema.cores.interface.textoSobreDestaque}
                         />
                     ) : null}
                 </View>

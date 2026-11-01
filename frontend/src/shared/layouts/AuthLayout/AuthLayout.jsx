@@ -18,7 +18,10 @@ export default function AuthLayout({
     rodape,
     aoVoltar,
     testeId = 'auth-layout',
-    corFundo
+    corFundo,
+    estiloTitulo,
+    estiloDescricao,
+    corIconeVoltar
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -48,16 +51,16 @@ export default function AuthLayout({
                                 hitSlop={12}
                                 style={estilos.voltar}
                             >
-                                <ArrowLeft size={24} color={tema.cores.interface.textoSecundario} />
+                                <ArrowLeft size={24} color={corIconeVoltar ?? tema.cores.interface.textoSecundario} />
                             </Pressable>
                         ) : null}
                         <View style={estilos.conteudo}>
                             <View style={estilos.cabecalho}>
-                                <Text accessibilityRole="header" style={estilos.titulo}>
+                                <Text accessibilityRole="header" style={[estilos.titulo, estiloTitulo]}>
                                     {titulo}
                                 </Text>
                                 {descricao ? (
-                                    <Text style={estilos.descricao}>{descricao}</Text>
+                                    <Text style={[estilos.descricao, estiloDescricao]}>{descricao}</Text>
                                 ) : null}
                             </View>
                             <View style={estilos.formulario}>{children}</View>

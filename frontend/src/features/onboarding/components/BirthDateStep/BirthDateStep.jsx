@@ -55,7 +55,7 @@ export default function BirthDateStep({
                         <Text
                             style={{
                                 ...typography.caption,
-                                color: tema.cores.interface.textoSecundario
+                                color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario
                             }}
                         >
                             Informe apenas se quiser desbloquear a Rede de Apoio agora. Você também

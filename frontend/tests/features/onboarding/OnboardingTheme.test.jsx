@@ -11,7 +11,7 @@ import { renderWithTheme } from '../../helpers/renderWithTheme';
 
 describe.each([
     ['claro', '#222222', '#E6E2D8'],
-    ['escuro', '#F4F1EA', '#4A514D']
+    ['escuro', '#E3E3E3', 'rgba(255, 255, 255, 0.08)']
 ])('onboarding no tema %s', (preferencia, textoPrincipal, borda) => {
     test('aplica a paleta ativa à estrutura e ao progresso', async () => {
         await renderWithTheme(
@@ -62,13 +62,13 @@ describe.each([
             color: textoPrincipal
         });
         expect(screen.getByLabelText('Selecionar dia 3')).toHaveStyle({
-            backgroundColor: '#C85A44'
+            backgroundColor: preferencia === 'escuro' ? '#A5D6A7' : '#C85A44'
         });
         expect(within(screen.getByLabelText('Selecionar dia 3')).getByText('3')).toHaveStyle({
-            color: '#FFFFFF'
+            color: preferencia === 'escuro' ? '#121212DE' : '#FFFFFF'
         });
         expect(screen.getByText('Dom')).toHaveStyle({
-            color: preferencia === 'escuro' ? '#C4C8C5' : '#5C5C59'
+            color: preferencia === 'escuro' ? '#FFFFFFDE' : '#5C5C59'
         });
         expect(JSON.stringify(toJSON())).toContain(borda);
     });

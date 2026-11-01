@@ -11,8 +11,8 @@ function criarEstilos(tema) {
             maxWidth: 330,
             height: 340,
             alignSelf: 'center',
-            backgroundColor: tema.cores.interface.superficie,
-            borderColor: tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             borderWidth: 0.705,
             borderRadius: radius.onboardingCalendar,
             overflow: 'hidden'
@@ -23,7 +23,7 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottomColor: tema.cores.interface.separador,
+            borderBottomColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.separador,
             borderBottomWidth: 0.705
         },
         navegacao: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
@@ -35,7 +35,7 @@ function criarEstilos(tema) {
             paddingVertical: 6
         },
         textoMes: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             fontWeight: '700',
@@ -51,7 +51,7 @@ function criarEstilos(tema) {
             flex: 1,
             paddingVertical: 4,
             textAlign: 'center',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
             fontSize: 14,
             fontWeight: '500',
@@ -78,29 +78,29 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center'
         },
-        diaSelecionado: { backgroundColor: tema.cores.marca.primaria },
+        diaSelecionado: { backgroundColor: tema.escuro ? '#A5D6A7' : tema.cores.marca.primaria },
         textoDia: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             lineHeight: 24
         },
         textoSelecionado: {
-            color: '#FFFFFF',
+            color: tema.escuro ? '#121212DE' : '#FFFFFF',
             fontFamily: fontFamilies.bold
         },
-        textoDesabilitado: { color: tema.cores.interface.textoDesabilitado },
+        textoDesabilitado: { color: tema.escuro ? '#757575' : tema.cores.interface.textoDesabilitado },
         setaAberta: { transform: [{ rotate: '180deg' }] },
         listaMeses: { height: 279, flexGrow: 0 },
         opcaoMes: { height: 44, alignItems: 'center', justifyContent: 'center' },
         textoOpcao: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             lineHeight: 24
         },
         textoOpcaoSelecionada: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque,
             fontFamily: fontFamilies.bold
         }
     });

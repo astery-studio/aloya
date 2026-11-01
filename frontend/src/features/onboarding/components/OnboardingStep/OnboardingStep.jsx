@@ -45,7 +45,7 @@ export default function OnboardingStep({
                     disabled={carregando}
                     accessibilityState={{ disabled: carregando }}
                 >
-                    <ArrowLeft size={24} color={tema.cores.interface.textoSecundario} />
+                    <ArrowLeft size={24} color={tema.escuro ? '#999999' : tema.cores.interface.textoSecundario} />
                 </Pressable>
                 {aoPular ? (
                     <Pressable
@@ -74,6 +74,8 @@ export default function OnboardingStep({
                             texto={acaoSecundaria.texto}
                             aoPressionar={acaoSecundaria.aoPressionar}
                             variante="bordaLaranja"
+                            estilo={!carregando && !acaoSecundaria.desativada && estilos.acaoSecundaria}
+                            estiloTexto={!carregando && !acaoSecundaria.desativada && estilos.textoAcaoSecundaria}
                             desativado={carregando || acaoSecundaria.desativada}
                         />
                     ) : null}

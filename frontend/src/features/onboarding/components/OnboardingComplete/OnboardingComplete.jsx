@@ -15,7 +15,9 @@ export default function OnboardingComplete({ aoIniciar, logo }) {
         <FormLayout
             corFundo={tema.escuro ? '#1E1E1E' : undefined}
             centralizado
-            acoes={<Button texto="Iniciar" variante="verde" aoPressionar={aoIniciar} />}
+            acoes={<Button texto="Iniciar" variante="verde" aoPressionar={aoIniciar}
+                estilo={tema.escuro ? { backgroundColor: '#A5D6A7' } : undefined}
+                estiloTexto={tema.escuro ? { color: '#121212' } : undefined} />}
         >
             <View style={estilos.conteudo}>
                 <Text style={estilos.titulo}>
