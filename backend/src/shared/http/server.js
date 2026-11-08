@@ -24,6 +24,7 @@ import { criarPermissionCategoryRoutes } from '../../features/support-network/ro
 import { criarContactInvitationRoutes } from '../../features/support-network/routes/contactInvitation.routes.js';
 import { criarSupportContactRoutes } from '../../features/support-network/routes/supportContact.routes.js';
 import { criarContactLinkRoutes } from '../../features/support-network/routes/contactLink.routes.js';
+import { criarSupportContactRemovalRoutes } from '../../features/support-network/routes/supportContactRemoval.routes.js';
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
@@ -194,6 +195,17 @@ app.use(
         parentalConsentMiddleware: container.parentalConsentMiddleware,
         rateLimit: container.contactLinkRateLimit,
         controller: container.contactLinkController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSupportContactRemovalRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.supportContactRemovalRateLimit,
+        controller: container.supportContactRemovalController
     })
 );
 
