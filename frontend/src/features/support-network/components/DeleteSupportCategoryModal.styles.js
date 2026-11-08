@@ -25,9 +25,9 @@ function criarEstilos(tema) {
             paddingTop: 18,
             paddingBottom: 16,
             borderWidth: 1.4,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.04)' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput,
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
             gap: 14
         },
 
@@ -86,10 +86,12 @@ function criarEstilos(tema) {
             paddingTop: 14,
             paddingBottom: 4,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie
+            borderTopColor: tema.escuro ? 'rgba(230, 226, 216, 0.12)' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
+        botaoConfirmarAtivo: tema.escuro ? { backgroundColor: '#EF9A9A' } : {},
+        textoConfirmarAtivo: tema.escuro ? { color: '#121212' } : {},
         botaoConfirmar: {
             width: '100%'
         }

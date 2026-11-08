@@ -10,7 +10,14 @@ import { INTENSIDADES_ALERTA } from '../constants/contraceptiveOptions';
 import { SelectorField } from './SelectorField';
 import { criarEstilos } from './contraceptiveForms.styles';
 
-function AlertIntensitySelector({ valor, aberto, onAbrir, onSelecionar, onFechar }) {
+function AlertIntensitySelector({
+    aparenciaCadastro = false,
+    valor,
+    aberto,
+    onAbrir,
+    onSelecionar,
+    onFechar
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [temporario, setTemporario] = useState(valor || 'critico');
@@ -24,16 +31,21 @@ function AlertIntensitySelector({ valor, aberto, onAbrir, onSelecionar, onFechar
     return (
         <>
             <SelectorField
+                aparenciaCadastro={aparenciaCadastro}
                 label="Intensidade do Alerta"
                 valor={selecionada?.label}
                 placeholder="Crítico"
                 onPress={onAbrir}
                 navegar
                 icone={Bell}
+                coresNoturnas={{ icone: '#EF9A9A', caixa: 'rgba(239, 154, 154, 0.16)' }}
             />
             <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
-                <SafeAreaView style={estilos.telaFluxo} edges={['top', 'left', 'right', 'bottom']}
-                    testID="intensidade-anticoncepcional-area-segura">
+                <SafeAreaView
+                    style={estilos.telaFluxo}
+                    edges={['top', 'left', 'right', 'bottom']}
+                    testID="intensidade-anticoncepcional-area-segura"
+                >
                     <Header
                         titulo="Intensidade do Alerta"
                         variante="comVoltar"

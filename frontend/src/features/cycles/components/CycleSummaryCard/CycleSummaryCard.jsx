@@ -4,7 +4,7 @@ import { Text, View } from 'react-native';
 
 import { ConfidenceBadge } from '../../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { criarEstilos } from './CycleSummaryCard.styles';
+import { coresConfiabilidadeEscuras, criarEstilos } from './CycleSummaryCard.styles';
 
 const confiancasPermitidas = Object.freeze(['alta', 'media', 'baixa']);
 
@@ -106,7 +106,13 @@ function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCicl
                 </Text>
 
                 <View style={estilos.caixaDaTag}>
-                    <ConfidenceBadge nivel={confianca} variante="simples" />
+                    <ConfidenceBadge
+                        nivel={confianca}
+                        variante="simples"
+                        coresPersonalizadas={
+                            tema.escuro ? coresConfiabilidadeEscuras[confianca] : undefined
+                        }
+                    />
                 </View>
             </View>
         </View>

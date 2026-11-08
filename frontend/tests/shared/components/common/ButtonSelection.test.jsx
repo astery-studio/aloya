@@ -183,12 +183,12 @@ describe('ButtonSelection', () => {
         );
 
         expect(screen.getByRole('button')).toHaveStyle({
-            backgroundColor: '#232926',
-            borderColor: '#4A514D'
+            backgroundColor: '#1E1E1E',
+            borderColor: '#2C2C2C'
         });
 
         expect(screen.getByText('Opção mensal')).toHaveStyle({
-            color: '#F4F1EA'
+            color: '#E3E3E3'
         });
     });
 

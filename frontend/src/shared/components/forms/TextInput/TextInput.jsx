@@ -19,6 +19,8 @@ function TextInput({
     acaoDireita,
     estilo,
     erro,
+    estiloEntrada,
+    estiloLabel,
     sanitizar = manterTexto,
     ...outrasProps
 }) {
@@ -41,7 +43,7 @@ function TextInput({
             onPress={() => entradaRef.current?.focus()}
             style={[estilos.grupoCampo, rotuloExterno && estilos.grupo]}
         >
-            {rotuloExterno && <Text style={estilos.rotuloExterno}>{label}</Text>}
+            {rotuloExterno && <Text style={[estilos.rotuloExterno, estiloLabel]}>{label}</Text>}
             <View
                 style={[
                     estilos.container,
@@ -54,7 +56,9 @@ function TextInput({
                 ]}
             >
                 <View style={estilos.conteudo}>
-                    {rotuloInterno && <Text style={estilos.rotuloFlutuante}>{label}</Text>}
+                    {rotuloInterno && (
+                        <Text style={[estilos.rotuloFlutuante, estiloLabel]}>{label}</Text>
+                    )}
                     <EntradaNativa
                         ref={entradaRef}
                         accessibilityLabel={label || placeholder}
@@ -64,7 +68,7 @@ function TextInput({
                         selectionColor={tema.cores.interface.destaque}
                         value={value}
                         onChangeText={(texto) => onChangeText?.(sanitizar(texto))}
-                        style={estilos.entrada}
+                        style={[estilos.entrada, estiloEntrada]}
                         {...outrasProps}
                     />
                 </View>

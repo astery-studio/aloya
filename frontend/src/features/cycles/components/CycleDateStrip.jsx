@@ -71,6 +71,7 @@ function CycleDateStrip({
                         onPress={() => aoSelecionarData?.(item.data)}
                         style={[
                             estilos.dia,
+                            !selecionado && estilos.diaNaoSelecionado,
                             selecionado && estilos.diaSelecionado,
                             selecionado && estilos[`diaSelecionado_${item.fase}`]
                         ]}

@@ -191,6 +191,8 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada,
                         ? <ContraceptiveHomeScreen {...propriedadesLista} aoAbrirLista={() => setTela('lista')} onSelecionarAba={onSelecionarAba} />
                         : <ContraceptiveTrackingScreen {...propriedadesLista} />}
             <SimpleModal
+                varianteVisual={erroRemocao ? undefined : 'sairSemSalvar'}
+                erroInterno={Boolean(erroRemocao)}
                 visivel={Boolean(remocao)}
                 aoFechar={removendo ? undefined : () => setRemocao(null)}
                 icone={WarningCircleIcon}
@@ -199,7 +201,7 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada,
                     ? 'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
                     : 'Tem certeza que deseja remover este anticoncepcional? Os alertas programados para ele serão cancelados.'}
                 acaoPrincipal={{ texto: erroRemocao ? 'Tentar novamente' : 'Remover', variante: erroRemocao ? 'preto' : 'verde', aoPressionar: confirmarRemocao, carregando: removendo, desativado: removendo }}
-                acaoSecundaria={{ texto: 'Cancelar', variante: 'branco', aoPressionar: () => setRemocao(null), desativado: removendo }}
+                acaoSecundaria={{ texto: 'Cancelar', varianteVisual: erroRemocao ? undefined : 'sairSemSalvar', variante: 'branco', aoPressionar: () => setRemocao(null), desativado: removendo }}
             />
             <SimpleModal
                 visivel={Boolean(mensagem)}

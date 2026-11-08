@@ -22,7 +22,12 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
         mensagem_vazio: { paddingTop: 10, fontSize: 15, lineHeight: 22 },
-        mensagem_erro: { paddingTop: 10, fontSize: 15, lineHeight: 22 },
+        mensagem_erro: {
+            paddingTop: 10,
+            fontSize: 15,
+            lineHeight: 22,
+            color: tema.escuro ? '#99999999' : tema.cores.interface.textoSecundario
+        },
         mensagem_apresentacao: { paddingTop: 8, fontSize: 15, lineHeight: 24 },
         acao: { width: '100%' }
     });

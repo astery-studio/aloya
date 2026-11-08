@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
@@ -39,21 +39,45 @@ const ROTULOS = {
 };
 function criarCoresDaPrevisao(tema) {
     const coresForma = {
-        menstrual: tema.escuro ? '#F08A75' : cores.marca.primaria,
-        folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.formaFolicular,
-        ovulatoria: tema.escuro ? '#8FC4DD' : cores.feedback.informacao,
-        lutea: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
+        menstrual: tema.escuro ? '#A8524A' : cores.marca.primaria,
+        folicular: tema.escuro ? '#52665E' : cores.ciclo.formaFolicular,
+        ovulatoria: tema.escuro ? '#5A7382' : cores.feedback.informacao,
+        lutea: tema.escuro ? '#B87550' : cores.feedback.aviso,
         desconhecida: tema.cores.interface.textoSecundario
     };
 
     return {
         coresForma,
+        coresIconeDestaqueFertil: {
+            folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.formaFolicular,
+            ovulatoria: tema.escuro ? '#8FC4DD' : cores.feedback.informacao
+        },
+        coresConfiabilidade: tema.escuro
+            ? {
+                  baixa: {
+                      cor: '#EF9A9A',
+                      fundo: 'rgba(239, 154, 154, 0.16)',
+                      borda: 'rgba(239, 154, 154, 0.33)'
+                  },
+                  media: {
+                      cor: '#FFE082',
+                      fundo: 'rgba(255, 224, 130, 0.16)',
+                      borda: 'rgba(255, 224, 130, 0.33)'
+                  },
+                  alta: {
+                      cor: '#A5D6A7',
+                      fundo: 'rgba(165, 214, 167, 0.14)',
+                      borda: 'rgba(165, 214, 167, 0.33)'
+                  }
+              }
+            : null,
         coresConteudo: {
             ...coresForma,
-            folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.conteudoFolicular
+            folicular: tema.escuro ? '#52665E' : cores.ciclo.conteudoFolicular
         },
+        corIconePrevisaoOvulacao: tema.escuro ? '#90CAF9' : coresForma.ovulatoria,
         corAviso: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
-        corIconeEscuro: tema.escuro ? tema.cores.interface.textoPrincipal : cores.ciclo.iconeEscuro
+        corIconeEscuro: tema.escuro ? '#B39DDB' : cores.ciclo.iconeEscuro
     };
 }
 
@@ -98,13 +122,16 @@ function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
             variante={destaque ? 'laranja' : 'verde'}
             aoPressionar={aoPressionar}
             rotuloAcessibilidade={texto}
-            estilo={estilos.botaoAcao}
+            estilo={[estilos.botaoAcao, destaque && estilos.botaoCadastrarMenstruacao]}
+            estiloTexto={destaque && estilos.textoCadastrarMenstruacao}
         />
     );
 }
 
 function GotaPreenchidaIcon(props) {
-    return <DropIcon {...props} weight="fill" />;
+    const { estilos } = useCycleForecastVisual();
+    const corTexto = StyleSheet.flatten(estilos.textoCadastrarMenstruacao)?.color;
+    return <DropIcon {...props} color={corTexto ?? props.color} weight="fill" />;
 }
 
 function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
@@ -139,7 +166,8 @@ function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
 }
 
 function PainelPrevisao({ previsao, janelaFertil }) {
-    const { estilos, corAviso, corIconeEscuro, coresForma } = useCycleForecastVisual();
+    const { estilos, corAviso, corIconeEscuro, corIconePrevisaoOvulacao, coresConfiabilidade } =
+        useCycleForecastVisual();
     const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
     const janela = janelaFertil ?? previsao.janelaFertilEstimada;
     const incerta = previsao.status === 'PARCIALMENTE_DISPONIVEL';
@@ -158,7 +186,12 @@ function PainelPrevisao({ previsao, janelaFertil }) {
                         {formatarDataLonga(previsao.proximoInicioEstimado)}
                     </Text>
                 </View>
-                <ConfidenceBadge nivel={nivel} variante="composta" />
+                <ConfidenceBadge
+                    nivel={nivel}
+                    variante="composta"
+                    coresPersonalizadas={coresConfiabilidade?.[nivel]}
+                    estilo={estilos.indicadorConfiabilidade}
+                />
                 {incerta ? (
                     <View style={estilos.avisoConfiabilidade}>
                         <WarningIcon size={18} color={corAviso} />
@@ -185,7 +218,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
             <View style={estilos.previsoesSecundarias}>
                 <View style={estilos.cartaoSecundario}>
                     <View style={estilos.cabecalhoCartaoSecundario}>
-                        <SunIcon size={18} color={coresForma.ovulatoria} weight="fill" />
+                        <SunIcon size={18} color={corIconePrevisaoOvulacao} weight="fill" />
                         <Text style={estilos.rotuloPrevisaoSecundaria}>Ovulação</Text>
                     </View>
                     <Text style={estilos.valorOvulacao}>
@@ -349,13 +382,23 @@ function CycleForecastPanel({
                         <View
                             style={[
                                 estilos.destaqueFertil,
-                                { borderColor: visual.coresForma[faseAtual] }
+                                { borderColor: visual.coresForma[faseAtual] },
+                                faseAtual === 'folicular'
+                                    ? estilos.destaqueFertilFolicular
+                                    : estilos.destaqueFertilOvulatoria
                             ]}
                         >
-                            <View style={estilos.iconeDestaqueFertil}>
+                            <View
+                                style={[
+                                    estilos.iconeDestaqueFertil,
+                                    faseAtual === 'folicular'
+                                        ? estilos.iconeDestaqueFertilFolicular
+                                        : estilos.iconeDestaqueFertilOvulatoria
+                                ]}
+                            >
                                 <SparkleIcon
                                     size={22}
-                                    color={visual.coresForma[faseAtual]}
+                                    color={visual.coresIconeDestaqueFertil[faseAtual]}
                                     weight="fill"
                                 />
                             </View>

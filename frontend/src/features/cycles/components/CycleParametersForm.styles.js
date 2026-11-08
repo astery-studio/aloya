@@ -16,6 +16,8 @@ function criarEstilos(tema) {
             fontSize: 14,
             lineHeight: 21
         },
+        botaoSalvarDesativado: tema.escuro ? { borderRadius: 12, backgroundColor: '#2C2C2C' } : {},
+        textoSalvarDesativado: tema.escuro ? { color: '#757575' } : {},
         campos: {
             gap: tema.espacamentos.pequeno
         }

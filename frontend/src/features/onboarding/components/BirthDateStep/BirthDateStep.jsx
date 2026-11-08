@@ -33,10 +33,18 @@ export default function BirthDateStep({
         >
             <View style={{ gap: 12 }}>
                 <DateInput valor={valor} onChangeText={aoAlterar}
-                    corDestaque={tema.cores.marca.primaria} />
+                    estiloCampo={tema.escuro ? { borderColor: '#2C2C2C', backgroundColor: '#1E1E1E' } : undefined}
+                    estiloEntrada={tema.escuro ? { color: '#E3E3E3' } : undefined}
+                    corPlaceholder={tema.escuro ? '#999999' : undefined}
+                    corIcone={tema.escuro ? '#A5D6A7' : undefined}
+                    corDestaque={tema.escuro ? '#A5D6A7' : tema.cores.marca.primaria} />
                 {menorDe16 ? (
                     <>
                         <EmailInput
+                            estilo={tema.escuro ? { borderColor: '#2C2C2C', backgroundColor: '#1E1E1E' } : undefined}
+                            estiloEntrada={tema.escuro ? { color: '#E3E3E3' } : undefined}
+                            estiloLabel={tema.escuro ? { color: '#999999' } : undefined}
+                            {...(tema.escuro ? { placeholderTextColor: '#999999' } : {})}
                             label="E-mail do responsável legal (opcional)"
                             placeholder="E-mail do responsável legal (opcional)"
                             value={emailResponsavelLegal}
@@ -47,7 +55,7 @@ export default function BirthDateStep({
                         <Text
                             style={{
                                 ...typography.caption,
-                                color: tema.cores.interface.textoSecundario
+                                color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario
                             }}
                         >
                             Informe apenas se quiser desbloquear a Rede de Apoio agora. Você também

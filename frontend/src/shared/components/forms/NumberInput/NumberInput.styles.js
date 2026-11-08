@@ -6,7 +6,7 @@ import { fontFamilies } from '../../../theme';
 
 function criarEstilos(tema) {
     const texto = {
-        color: tema.cores.interface.textoPrincipal,
+        color: tema.escuro ? '#FFFFFF' : tema.cores.interface.textoPrincipal,
         fontFamily: fontFamilies.regular,
         fontSize: 16,
         fontWeight: '400',
@@ -26,7 +26,7 @@ function criarEstilos(tema) {
             borderRadius: tema.radius.buttonAndInput,
             borderWidth: 1.41,
             borderColor: tema.cores.interface.destaque,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
         conteudo: {
             flexDirection: 'row',

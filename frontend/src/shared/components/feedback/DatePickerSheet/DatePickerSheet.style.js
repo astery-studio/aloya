@@ -2,8 +2,20 @@
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../theme';
 
-function criarEstilos(tema) {
+function criarEstilos(tema, aparenciaCadastro = false) {
+    const personalizar = tema.escuro && aparenciaCadastro;
     return StyleSheet.create({
+        painelCadastro: personalizar
+            ? {
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0,
+                  boxShadow: '0 -4px 32px 0 rgba(34, 34, 34, 0.10)'
+              }
+            : {},
+        tituloSheetCadastro: personalizar ? { color: '#E3E3E3' } : {},
+        opcaoListaSelecionada: personalizar ? { borderRadius: 10, backgroundColor: '#A5D6A7' } : {},
         calendario: {
             width: '100%',
             alignSelf: 'center',
@@ -43,7 +55,7 @@ function criarEstilos(tema) {
         },
 
         tituloMes: {
-            color: tema.cores.interface.textoPrincipal,
+            color: personalizar ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             lineHeight: 27,
@@ -64,7 +76,7 @@ function criarEstilos(tema) {
         },
 
         textoSemana: {
-            color: tema.cores.interface.textoSecundario,
+            color: personalizar ? '#FFFFFFDE' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
             fontSize: 14,
             lineHeight: 20,
@@ -96,11 +108,11 @@ function criarEstilos(tema) {
         },
 
         botaoDiaSelecionado: {
-            backgroundColor: tema.cores.marca.primaria
+            backgroundColor: personalizar ? '#A5D6A7' : tema.cores.marca.primaria
         },
 
         textoDia: {
-            color: tema.cores.interface.textoPrincipal,
+            color: personalizar ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             lineHeight: 24,
@@ -108,7 +120,7 @@ function criarEstilos(tema) {
         },
 
         textoDiaSelecionado: {
-            color: tema.cores.neutras.superficieClara,
+            color: personalizar ? '#121212DE' : tema.cores.neutras.superficieClara,
             fontFamily: fontFamilies.bold
         },
 
@@ -128,7 +140,7 @@ function criarEstilos(tema) {
         },
 
         textoOpcao: {
-            color: tema.cores.interface.textoPrincipal,
+            color: personalizar ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             lineHeight: 24,
@@ -136,7 +148,7 @@ function criarEstilos(tema) {
         },
 
         textoOpcaoSelecionada: {
-            color: tema.cores.marca.primaria,
+            color: personalizar ? '#121212' : tema.cores.marca.primaria,
             fontFamily: fontFamilies.bold
         },
 
@@ -154,7 +166,7 @@ function criarEstilos(tema) {
 
         mensagemErro: {
             marginTop: tema.espacamentos.pequeno,
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             textAlign: 'center'

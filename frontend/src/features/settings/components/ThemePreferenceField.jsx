@@ -52,7 +52,7 @@ function ThemePreferenceField({
             <View style={estilos.caixaIcone}>
                 <MoonIcon
                     size={24}
-                    color={tema.cores.icones.configuracoes.azul.icone}
+                    color={tema.escuro ? '#B39DDB' : tema.cores.icones.configuracoes.azul.icone}
                     weight="regular"
                 />
             </View>

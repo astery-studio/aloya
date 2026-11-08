@@ -49,10 +49,15 @@ function criarEstilos(tema) {
         intensidade: {
             minHeight: 64,
             marginBottom: 0,
-            borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie
+            borderRadius: tema.escuro ? 12 : tema.radius.buttonAndInput,
+            borderWidth: tema.escuro ? 0.705 : 1.41,
+            borderColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
+
+        labelIntensidade: tema.escuro ? { color: '#E3E3E3' } : {},
+        descricaoIntensidade: tema.escuro ? { color: '#999999' } : {},
+        descricaoIntensidadeSelecionada: tema.escuro ? { color: '#E3E3E3' } : {},
 
         intensidadeSelecionada: {
             borderWidth: 1.41,
