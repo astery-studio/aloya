@@ -43,6 +43,7 @@ test('aceita e recusa convites reais preservando atomicidade e notificações', 
     });
     const tokenAceite = 'a'.repeat(43);
     const tokenRecusa = 'b'.repeat(43);
+    const tokenCadastro = 'c'.repeat(43);
 
     try {
         await prisma.usuario.createMany({
@@ -95,15 +96,33 @@ test('aceita e recusa convites reais preservando atomicidade e notificações', 
                     status: 'pendente',
                     tokenConviteHash: tokenService.calcularHash(tokenRecusa),
                     dataExpiracao: new Date('2026-11-09T12:00:00.000Z')
+                },
+                {
+                    titularId: 1,
+                    emailConvidado: 'nova@email.com',
+                    permissoesIndividuais: ['geral.fase_atual'],
+                    status: 'pendente',
+                    tokenConviteHash: tokenService.calcularHash(tokenCadastro),
+                    dataExpiracao: new Date('2026-11-09T12:00:00.000Z')
                 }
             ]
         });
         const service = criarContactInvitationResponseService({
             prisma,
             tokenService,
+            passwordService: {
+                async gerarHash() {
+                    return { senhaHash: 'hash-da-senha' };
+                }
+            },
             now: () => agora
         });
 
+        await service.cadastrarContato(tokenCadastro, {
+            nome: 'Nova Contato',
+            dataNascimento: new Date('1990-05-10T00:00:00.000Z'),
+            senha: 'senha segura'
+        });
         await service.aceitar({ token: tokenAceite, usuarioId: 2 });
         await service.recusar({ token: tokenRecusa, usuarioId: 3 });
 
@@ -121,14 +140,24 @@ test('aceita e recusa convites reais preservando atomicidade e notificações', 
         });
         assert.equal(vinculos[0].status, 'ativo');
         assert.equal(vinculos[1].status, 'recusado');
+        assert.equal(vinculos[2].status, 'pendente');
+        assert.equal(vinculos[2].contatoId !== null, true);
         assert.equal(
-            vinculos.every((item) => item.tokenConviteHash === null),
+            vinculos.slice(0, 2).every((item) => item.tokenConviteHash === null),
             true
         );
         assert.equal(
-            vinculos.every((item) => item.dataResposta?.getTime() === agora.getTime()),
+            vinculos.slice(0, 2).every((item) => item.dataResposta?.getTime() === agora.getTime()),
             true
         );
+
+        const contaCriada = await prisma.usuario.findUnique({
+            where: { email: 'nova@email.com' }
+        });
+        assert.equal(contaCriada.papel, 'contato_apoio');
+        assert.equal(contaCriada.statusConta, 'ativa');
+        assert.equal(contaCriada.emailConfirmadoEm.getTime(), agora.getTime());
+        assert.equal(contaCriada.senhaHash, 'hash-da-senha');
 
         const notificacoes = await prisma.notificacao.findMany({
             orderBy: { id: 'asc' }
@@ -140,7 +169,7 @@ test('aceita e recusa convites reais preservando atomicidade e notificações', 
         );
         assert.deepEqual(
             notificacoes.map((item) => item.origemId),
-            vinculos.map((item) => item.id)
+            vinculos.slice(0, 2).map((item) => item.id)
         );
     } finally {
         await prisma.$disconnect();
