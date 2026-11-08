@@ -1,3 +1,4 @@
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet';
 import { PREFERENCIAS_TEMA } from '../../../shared/theme/themePreferences';
 
@@ -19,6 +20,8 @@ const OPCOES_TEMA = Object.freeze([
 ]);
 
 function ThemePreferenceSheet({ visivel, preferencia, salvando = false, aoSelecionar, aoFechar }) {
+    const tema = useTheme();
+
     const podeSelecionar = typeof aoSelecionar === 'function' && !salvando;
 
     const podeFechar = typeof aoFechar === 'function' && !salvando;
@@ -53,6 +56,18 @@ function ThemePreferenceSheet({ visivel, preferencia, salvando = false, aoSeleci
             opcoes={OPCOES_TEMA}
             valorSelecionado={preferencia}
             varianteOpcao="modoCor"
+            corFundo={tema.escuro ? '#242424' : undefined}
+            estiloPainel={
+                tema.escuro
+                    ? {
+                          borderTopLeftRadius: 20,
+                          borderTopRightRadius: 20,
+                          borderBottomLeftRadius: 0,
+                          borderBottomRightRadius: 0,
+                          boxShadow: '0 -4px 32px 0 rgba(34, 34, 34, 0.10)'
+                      }
+                    : undefined
+            }
             onSelecionar={selecionarPreferencia}
             onFechar={fechar}
         />

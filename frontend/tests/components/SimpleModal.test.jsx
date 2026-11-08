@@ -65,3 +65,38 @@ test('modal simples mantém texto legível no modo escuro', async () => {
     });
     expect(screen.getByText('Mensagem visível')).toHaveStyle({ color: '#C4C8C5' });
 });
+
+test('aplica o padrão de erro interno sem alterar avisos comuns ou suas ações', async () => {
+    const tentar = jest.fn();
+    const voltar = jest.fn();
+    const modal = (erroInterno) => (
+        <SimpleModal
+            visivel
+            erroInterno={erroInterno}
+            titulo="Falha ao salvar"
+            acaoPrincipal={{ texto: 'Tentar novamente', aoPressionar: tentar }}
+            acaoSecundaria={{ texto: 'Voltar', aoPressionar: voltar }}
+        />
+    );
+    const { rerender } = await renderWithTheme(modal(true), { preferencia: 'escuro' });
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({
+        backgroundColor: '#1E1E1E',
+        borderRadius: 20,
+        boxShadow: '0 8px 40px 0 rgba(34, 34, 34, 0.12)'
+    });
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toHaveStyle({
+        backgroundColor: 'rgba(255, 255, 255, 0.16)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.38)'
+    });
+    expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
+        backgroundColor: '#242424'
+    });
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    expect(tentar).toHaveBeenCalledTimes(1);
+    expect(voltar).toHaveBeenCalledTimes(1);
+
+    await rerender(modal(false));
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({ backgroundColor: '#333333' });
+});

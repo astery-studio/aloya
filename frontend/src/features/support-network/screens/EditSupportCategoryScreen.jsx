@@ -463,6 +463,7 @@ function EditSupportCategoryScreen({
         <>
             <SettingsLayout
                 titulo="Atualizar Categoria"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={voltar}
                 rodapeFixo
                 rodape={
@@ -492,6 +493,7 @@ function EditSupportCategoryScreen({
                         </View>
                     ) : (
                         <SupportCategoryForm
+                            aparenciaNovaCategoria
                             dados={dados}
                             aoAlterar={alterarDados}
                             aoSalvar={executarAtualizacao}
@@ -513,6 +515,7 @@ function EditSupportCategoryScreen({
             />
 
             <SimpleModal
+                erroInterno={Boolean(alertaErro?.recuperavel)}
                 visivel={alertaErro !== null}
                 aoFechar={fecharErro}
                 icone={WarningCircleIcon}

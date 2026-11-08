@@ -4,7 +4,7 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.cores.interface.fundo },
+        tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo },
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',

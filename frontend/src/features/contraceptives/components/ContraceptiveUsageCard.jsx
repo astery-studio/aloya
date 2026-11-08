@@ -134,7 +134,23 @@ function BadgeDoCartao({ estado, larguraMinima, estilosCartao }) {
                 { minWidth: larguraMinima, flexBasis: larguraMinima }
             ]}
         >
-            <StatusBadge estado={estado} />
+            <StatusBadge
+                estado={estado}
+                estilo={
+                    estado === 'pendenteDeUso'
+                        ? estilosCartao.badgePendente
+                        : estado.startsWith('alerta')
+                          ? estilosCartao.badgeAlerta
+                          : undefined
+                }
+                corConteudo={
+                    estado === 'pendenteDeUso'
+                        ? estilosCartao.textoBadgePendente.color
+                        : estado.startsWith('alerta')
+                          ? estilosCartao.textoBadgeAlerta.color
+                          : undefined
+                }
+            />
         </View>
     );
 }
@@ -241,7 +257,8 @@ function ContraceptiveUsageCard({
         <View
             style={[
                 estilosCartao.card,
-                !possuiUsoPendente && !removido && estilosCartao.cardConfirmado
+                !possuiUsoPendente && !removido && estilosCartao.cardConfirmado,
+                !removido && estilosCartao.cardAtivo
             ]}
             accessibilityLabel={`${anticoncepcional.nome}, ${tipo}${removido ? ', removido' : ''}`}
         >
@@ -257,10 +274,12 @@ function ContraceptiveUsageCard({
                 ]}
             >
                 <View style={estilosCartao.cabecalho}>
-                    <View style={estilosCartao.iconeTipo}>
+                    <View
+                        style={[estilosCartao.iconeTipo, !removido && estilosCartao.iconeTipoAtivo]}
+                    >
                         <IconeTipo
                             size={16}
-                            color={tema.cores.interface.textoSecundario}
+                            color={tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario}
                             weight={
                                 anticoncepcional.tipo === 'anel_vaginal' ||
                                 anticoncepcional.tipo === 'diu_hormonal'
@@ -357,7 +376,14 @@ function ContraceptiveUsageCard({
 
                 {!removido && possuiUsoPendente ? (
                     <View style={estilosCartao.blocoUsos}>
-                        <Text style={estilosCartao.rotuloSecao}>PRÓXIMOS HORÁRIOS</Text>
+                        <Text
+                            style={[
+                                estilosCartao.rotuloSecao,
+                                estilosCartao.rotuloProximosHorarios
+                            ]}
+                        >
+                            PRÓXIMOS HORÁRIOS
+                        </Text>
                         {usos
                             .filter((uso) => !usoConfirmado(uso))
                             .map((uso, indice) => (
@@ -394,7 +420,9 @@ function ContraceptiveUsageCard({
 
                 {!removido && possuiUsoConfirmado ? (
                     <View style={estilosCartao.blocoUsos}>
-                        <Text style={estilosCartao.rotuloSecao}>USADOS</Text>
+                        <Text style={[estilosCartao.rotuloSecao, estilosCartao.rotuloUsados]}>
+                            USADOS
+                        </Text>
                         {usos.filter(usoConfirmado).map((uso, indice) => (
                             <View
                                 key={uso.id}

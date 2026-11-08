@@ -21,7 +21,7 @@ function PendingUsesBanner({ quantidade }) {
         >
             <WarningCircleIcon
                 size={14.99}
-                color={tema.escuro ? '#F2B45F' : '#B07D2A'}
+                color={tema.escuro ? '#FFE082' : '#B07D2A'}
                 weight="fill"
             />
             <Text style={estilosUso.textoBanner}>{descricao}</Text>

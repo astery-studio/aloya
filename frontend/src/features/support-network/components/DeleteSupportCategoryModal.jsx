@@ -148,6 +148,7 @@ function DeleteSupportCategoryModal({
     if (!possuiContatos) {
         return (
             <SimpleModal
+                varianteVisual="sairDaConta"
                 visivel={Boolean(visivel)}
                 aoFechar={cancelar}
                 icone={WarningCircleIcon}
@@ -173,9 +174,15 @@ function DeleteSupportCategoryModal({
     }
 
     return (
-        <BottomSheet visivel={Boolean(visivel)} onFechar={cancelar} bloquearFechamento={carregando}>
+        <BottomSheet
+            corPainel={tema.escuro ? '#1E1E1E' : undefined}
+            visivel={Boolean(visivel)}
+            onFechar={cancelar}
+            bloquearFechamento={carregando}
+        >
             <BottomSheetLayout
                 titulo="Remover categoria"
+                corFundo={tema.escuro ? '#1E1E1E' : undefined}
                 onFechar={cancelar}
                 bloquearFechamento={carregando}
             >
@@ -251,7 +258,13 @@ function DeleteSupportCategoryModal({
                             desativado={bloqueado || !todosPreenchidos}
                             carregando={carregando}
                             rotuloAcessibilidade="Confirmar exclusão da categoria"
-                            estilo={estilos.botaoConfirmar}
+                            estilo={[
+                                estilos.botaoConfirmar,
+                                !bloqueado && todosPreenchidos && estilos.botaoConfirmarAtivo
+                            ]}
+                            estiloTexto={
+                                !bloqueado && todosPreenchidos && estilos.textoConfirmarAtivo
+                            }
                         />
                     </View>
                 </View>

@@ -15,15 +15,16 @@ export default function FormLayout({
     children,
     acoes,
     centralizado = false,
-    testeId = 'form-layout'
+    testeId = 'form-layout',
+    corFundo
 }) {
     const tema = useTheme();
     const coresFundo = useMemo(
         () =>
-            tema.escuro
+            corFundo ? [corFundo, corFundo] : tema.escuro
                 ? [tema.cores.interface.superficie, tema.cores.interface.fundo]
                 : ['#F5EDE3', '#F7F5F0'],
-        [tema]
+        [tema, corFundo]
     );
 
     return (

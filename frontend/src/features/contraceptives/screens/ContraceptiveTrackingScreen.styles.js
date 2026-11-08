@@ -5,7 +5,7 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 function criarEstilosAcompanhamento(tema) {
     const interfaceTema = tema.cores.interface;
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: interfaceTema.fundo },
+        tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo },
         cabecalho: {
             width: '100%',
             maxWidth: 393.33,
@@ -101,7 +101,7 @@ function criarEstilosAcompanhamento(tema) {
             flexShrink: 0,
             paddingTop: 12,
             paddingBottom: 2,
-            backgroundColor: interfaceTema.fundo,
+            backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo,
             borderTopWidth: 0.70489,
             borderTopColor: interfaceTema.borda
         },

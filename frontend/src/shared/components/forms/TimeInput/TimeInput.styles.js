@@ -10,10 +10,10 @@ function criarEstilos(tema) {
         campo: {
             flex: 1,
             minHeight: 48,
-            borderRadius: tema.radius.buttonAndInput,
+            borderRadius: tema.escuro ? 12 : tema.radius.buttonAndInput,
             borderWidth: 0.705,
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie,
+            borderColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 12,
@@ -22,7 +22,7 @@ function criarEstilos(tema) {
         },
         entrada: {
             ...typography.bodyDefault,
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal,
             flex: 1,
             padding: 0
         },

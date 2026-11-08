@@ -131,6 +131,7 @@ function MenstruationRegistrationScreen({
                 />
             </View>
             <SimpleModal
+                erroInterno={feedback === 'erro'}
                 visivel={Boolean(feedback)}
                 aoFechar={fecharFeedback}
                 icone={

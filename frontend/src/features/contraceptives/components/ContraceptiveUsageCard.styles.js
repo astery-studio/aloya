@@ -10,11 +10,35 @@ function criarEstilosCartao(tema) {
             maxWidth: 350.01,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: interfaceTema.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : interfaceTema.superficie,
             borderWidth: 1.40978,
-            borderColor: interfaceTema.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : interfaceTema.borda,
             borderRadius: 16
         },
+        cardAtivo: tema.escuro
+            ? {
+                  borderRadius: 16,
+                  borderWidth: 1.41,
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
+        iconeTipoAtivo: tema.escuro
+            ? {
+                  borderRadius: 10,
+                  borderWidth: 0.705,
+                  borderColor: '#2C2C2C',
+                  backgroundColor: '#2C2C2C'
+              }
+            : {},
+        badgePendente: tema.escuro
+            ? { borderRadius: 99, backgroundColor: 'rgba(255, 224, 130, 0.16)' }
+            : {},
+        badgeAlerta: tema.escuro
+            ? { borderRadius: 99, backgroundColor: 'rgba(144, 202, 249, 0.20)' }
+            : {},
+        textoBadgePendente: tema.escuro ? { color: '#FFE082' } : {},
+        textoBadgeAlerta: tema.escuro ? { color: '#90CAF9' } : {},
         cardConfirmado: { borderWidth: 0.70489 },
         faixaSuperior: { width: '100%', height: 3, backgroundColor: interfaceTema.separador },
         conteudo: { width: '100%', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 14.41 },
@@ -34,9 +58,9 @@ function criarEstilosCartao(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderWidth: 0.70489,
-            borderColor: interfaceTema.borda,
+            borderColor: tema.escuro ? '#2C2C2C' : interfaceTema.borda,
             borderRadius: 10,
-            backgroundColor: interfaceTema.superficieElevada
+            backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.superficieElevada
         },
         identificacao: { flex: 1, minWidth: 0 },
         nome: {
@@ -90,6 +114,8 @@ function criarEstilosCartao(tema) {
             letterSpacing: 0.6,
             marginBottom: 15
         },
+        rotuloUsados: tema.escuro ? { color: '#999999' } : {},
+        rotuloProximosHorarios: tema.escuro ? { color: '#999999' } : {},
         linhaUso: {
             width: '100%',
             minHeight: 35.99,
@@ -163,7 +189,7 @@ function criarEstilosCartao(tema) {
             gap: 6,
             paddingVertical: 8,
             paddingHorizontal: 12,
-            backgroundColor: interfaceTema.superficieElevada,
+            backgroundColor: tema.escuro ? '#242424' : interfaceTema.superficieElevada,
             borderRadius: 10
         },
         textoValidade: {

@@ -112,7 +112,7 @@ test('usa área quadrada de 48 por 48 e diferencia as cores do alerta', async ()
         width: 48,
         height: 48,
         borderRadius: 14,
-        backgroundColor: '#343434'
+        backgroundColor: 'transparent'
     });
 });
 

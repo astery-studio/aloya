@@ -64,7 +64,7 @@ function criarEstilos(tema) {
             paddingHorizontal: 20,
             paddingTop: 12,
             paddingBottom: 16,
-            backgroundColor: tema.cores.interface.fundo,
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo,
             borderTopWidth: 1,
             borderTopColor: tema.cores.interface.borda
         }

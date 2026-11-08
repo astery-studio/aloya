@@ -15,7 +15,8 @@ function MainLayout({
     abaAtiva,
     onSelecionarAba,
     usarAreaSeguraInferior = true,
-    children
+    children,
+    corFundo
 }) {
     const tema = useTheme();
 
@@ -23,10 +24,21 @@ function MainLayout({
     const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
 
     return (
-        <View testID="main-layout" style={estilos.container}>
-            <Header titulo={titulo} variante={varianteHeader} onVoltar={onVoltar} />
+        <View
+            testID="main-layout"
+            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+        >
+            <Header
+                titulo={titulo}
+                variante={varianteHeader}
+                onVoltar={onVoltar}
+                corFundo={corFundo}
+            />
 
-            <View testID="conteudo-main-layout" style={estilos.conteudo}>
+            <View
+                testID="conteudo-main-layout"
+                style={[estilos.conteudo, corFundo ? { backgroundColor: corFundo } : null]}
+            >
                 {children}
             </View>
 

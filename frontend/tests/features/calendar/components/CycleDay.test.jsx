@@ -195,7 +195,7 @@ describe('CycleDay', () => {
 
         expect(screen.getByText('3')).toHaveStyle({ color: '#FFFFFF' });
         expect(screen.getByTestId('fundo-dia-2026-10-03')).toHaveStyle({
-            backgroundColor: '#8A5A12'
+            backgroundColor: '#B87550'
         });
     });
 });

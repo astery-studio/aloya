@@ -32,13 +32,15 @@ function NavigationField({
     onPress,
     variante = 'comBorda',
     paleta = 'corVerde',
-    desabilitado = false
+    desabilitado = false,
+    estilo,
+    coresIcone
 }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const coresDoIcone = obterPaleta(tema, paleta);
+    const coresDoIcone = coresIcone || obterPaleta(tema, paleta);
 
     const semBorda = variante === 'semBorda';
 
@@ -66,7 +68,8 @@ function NavigationField({
                 estilos.container,
                 semBorda && estilos.semBorda,
                 ehBotao && estilos.botao,
-                estaDesabilitado && estilos.desabilitado
+                estaDesabilitado && estilos.desabilitado,
+                estilo
             ]}
         >
             {Icone ? (

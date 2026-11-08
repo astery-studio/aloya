@@ -9,7 +9,7 @@ function criarEstilos(tema) {
         conteudo: { alignItems: 'center', gap: 40, width: '100%' },
         titulo: {
             ...typography.h1,
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal,
             maxWidth: 342,
             textAlign: 'center'
         },

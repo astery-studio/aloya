@@ -276,7 +276,7 @@ export default function OnboardingScreen({
                 }
                 avancar();
             } catch (falha) {
-                setErro({ titulo: 'Algo deu errado', mensagem:
+                setErro({ aparencia: 'erroInterno', titulo: 'Algo deu errado', mensagem:
                     falha.mensagemUsuario || 'Não foi possível verificar o e-mail.' });
             } finally {
                 setCarregando(false);
@@ -370,7 +370,7 @@ export default function OnboardingScreen({
         if (erroInterno) finalizar();
     };
 
-    return <>{conteudo}<SimpleModal visivel={Boolean(erro)}
+    return <>{conteudo}<SimpleModal erroInterno={Boolean(erroInterno) || erro?.aparencia === 'erroInterno'} visivel={Boolean(erro)}
         icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
         titulo={erro?.titulo} mensagem={erro?.mensagem}
         acaoPrincipal={erro?.emailEmUso
@@ -385,6 +385,6 @@ export default function OnboardingScreen({
             mensagem="Se você sair agora, os dados preenchidos serão perdidos."
             acaoPrincipal={{ texto: 'Continuar cadastro',
                 aoPressionar: () => setDestinoSaida(null) }}
-            acaoSecundaria={{ texto: 'Sair e descartar', aoPressionar: confirmarSaida }} />
+            acaoSecundaria={{ texto: 'Sair e descartar', varianteVisual: 'sairSemSalvar', aoPressionar: confirmarSaida }} />
     </>;
 }

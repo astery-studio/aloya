@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../theme';
 
 function criarEstilos(tema) {
-    const corAtiva = tema.cores.interface.destaque;
+    const corAtiva = tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque;
 
     return StyleSheet.create({
         item: {

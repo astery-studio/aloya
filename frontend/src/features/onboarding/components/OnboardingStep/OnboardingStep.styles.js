@@ -15,7 +15,7 @@ function criarEstilos(tema) {
         },
         pular: {
             ...typography.caption,
-            color: tema.cores.interface.textoPrincipal
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal
         },
         conteudo: {
             alignItems: 'center',
@@ -34,12 +34,12 @@ function criarEstilos(tema) {
         },
         titulo: {
             ...typography.h1,
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal,
             textAlign: 'center'
         },
         descricao: {
             ...typography.bodyDefault,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             textAlign: 'center'
         },
         campo: { gap: espacamentos.pequeno, width: '100%' },
@@ -47,9 +47,11 @@ function criarEstilos(tema) {
             gap: espacamentos.pequeno,
             width: '100%'
         },
+        acaoSecundaria: tema.escuro ? { borderColor: '#C26E5F' } : {},
+        textoAcaoSecundaria: tema.escuro ? { color: '#C26E5F' } : {},
         erro: {
             ...typography.caption,
-            color: tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             textAlign: 'center'
         }
     });
