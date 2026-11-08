@@ -4,8 +4,13 @@ import { criarPermissionCategoryController } from './controllers/permissionCateg
 import { criarPermissionCategoryDeletionService } from './services/permissionCategoryDeletion.service.js';
 import { criarPermissionCategoryDeletionValidator } from './validators/permissionCategoryDeletion.validator.js';
 import { criarPermissionCategoryDeletionController } from './controllers/permissionCategoryDeletion.controller.js';
+import { criarContactInvitationValidator } from './validators/contactInvitation.validator.js';
+import { criarContactInvitationPermissionService } from './services/contactInvitationPermission.service.js';
+import { criarContactInvitationTokenService } from './services/contactInvitationToken.service.js';
+import { criarContactInvitationService } from './services/contactInvitation.service.js';
+import { criarContactInvitationController } from './controllers/contactInvitation.controller.js';
 
-function criarSupportNetworkModule({ prisma } = {}) {
+function criarSupportNetworkModule({ prisma, crypto, emailService, invitationBaseUrl, now } = {}) {
     const permissionCategoryService = criarPermissionCategoryService({ prisma });
     const permissionCategoryValidator = criarPermissionCategoryValidator();
     const permissionCategoryController = criarPermissionCategoryController({
@@ -19,6 +24,23 @@ function criarSupportNetworkModule({ prisma } = {}) {
         permissionCategoryDeletionValidator,
         permissionCategoryValidator
     });
+    const contactInvitationValidator = criarContactInvitationValidator();
+    const contactInvitationPermissionService = criarContactInvitationPermissionService({ prisma });
+    const contactInvitationTokenService = criarContactInvitationTokenService({
+        crypto,
+        baseUrl: invitationBaseUrl,
+        now
+    });
+    const contactInvitationService = criarContactInvitationService({
+        prisma,
+        permissionService: contactInvitationPermissionService,
+        tokenService: contactInvitationTokenService,
+        emailService
+    });
+    const contactInvitationController = criarContactInvitationController({
+        service: contactInvitationService,
+        validator: contactInvitationValidator
+    });
 
     return Object.freeze({
         permissionCategoryService,
@@ -26,7 +48,12 @@ function criarSupportNetworkModule({ prisma } = {}) {
         permissionCategoryController,
         permissionCategoryDeletionService,
         permissionCategoryDeletionValidator,
-        permissionCategoryDeletionController
+        permissionCategoryDeletionController,
+        contactInvitationValidator,
+        contactInvitationPermissionService,
+        contactInvitationTokenService,
+        contactInvitationService,
+        contactInvitationController
     });
 }
 
