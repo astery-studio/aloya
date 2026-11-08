@@ -21,6 +21,7 @@ import { criarCycleEditRoutes } from '../../features/cycles/routes/cycleEdit.rou
 import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
+import { criarContactInvitationRoutes } from '../../features/support-network/routes/contactInvitation.routes.js';
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
@@ -156,6 +157,17 @@ app.use(
         permissionCategoryDeletionRateLimit: container.permissionCategoryDeletionRateLimit,
         permissionCategoryController: container.permissionCategoryController,
         permissionCategoryDeletionController: container.permissionCategoryDeletionController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarContactInvitationRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactInvitationRateLimit,
+        controller: container.contactInvitationController
     })
 );
 

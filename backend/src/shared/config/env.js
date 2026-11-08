@@ -190,6 +190,10 @@ const env = {
         process.env.PASSWORD_RESET_BASE_URL ||
         'aloya://reset-password',
 
+    supportInvitationBaseUrl:
+        process.env.SUPPORT_INVITATION_BASE_URL ||
+        'aloya://support-network/invitation',
+
     // Agrupa as credenciais de e-mail necessárias
     smtp: {
         host: obterVariavelObrigatoria('SMTP_HOST'),
