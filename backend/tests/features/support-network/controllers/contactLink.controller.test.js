@@ -8,9 +8,18 @@ function resposta() {
     return {
         estado,
         res: {
-            set(nome, valor) { estado.headers[nome] = valor; return this; },
-            status(valor) { estado.status = valor; return this; },
-            json(valor) { estado.body = valor; return this; }
+            set(nome, valor) {
+                estado.headers[nome] = valor;
+                return this;
+            },
+            status(valor) {
+                estado.status = valor;
+                return this;
+            },
+            json(valor) {
+                estado.body = valor;
+                return this;
+            }
         }
     };
 }
@@ -18,12 +27,18 @@ function resposta() {
 function criarController({ service = {}, contactValidator = {}, linkValidator = {} } = {}) {
     return criarContactLinkController({
         service: {
-            async consultar() { return { versao: 'v1' }; },
-            async atualizar() { return { contatoId: 9 }; },
+            async consultar() {
+                return { versao: 'v1' };
+            },
+            async atualizar() {
+                return { contatoId: 9 };
+            },
             ...service
         },
         contactValidator: {
-            validarContatoId() { return { valido: true, contatoId: 9 }; },
+            validarContatoId() {
+                return { valido: true, contatoId: 9 };
+            },
             ...contactValidator
         },
         linkValidator: {
@@ -46,7 +61,12 @@ function criarController({ service = {}, contactValidator = {}, linkValidator = 
 test('consulta vínculo usando somente a identidade autenticada', async () => {
     const chamadas = [];
     const controller = criarController({
-        service: { async consultar(dados) { chamadas.push(dados); return { versao: 'v1' }; } }
+        service: {
+            async consultar(dados) {
+                chamadas.push(dados);
+                return { versao: 'v1' };
+            }
+        }
     });
     const { res, estado } = resposta();
 
@@ -64,7 +84,12 @@ test('consulta vínculo usando somente a identidade autenticada', async () => {
 test('atualiza vínculo validado e responde a mensagem exata', async () => {
     const chamadas = [];
     const controller = criarController({
-        service: { async atualizar(dados) { chamadas.push(dados); return { contatoId: 9 }; } }
+        service: {
+            async atualizar(dados) {
+                chamadas.push(dados);
+                return { contatoId: 9 };
+            }
+        }
     });
     const { res, estado } = resposta();
 
@@ -84,8 +109,12 @@ test('atualiza vínculo validado e responde a mensagem exata', async () => {
 test('não chama o serviço com id ou corpo inválido', async () => {
     let chamadas = 0;
     const service = {
-        async consultar() { chamadas += 1; },
-        async atualizar() { chamadas += 1; }
+        async consultar() {
+            chamadas += 1;
+        },
+        async atualizar() {
+            chamadas += 1;
+        }
     };
     const idInvalido = criarController({
         service,
@@ -132,10 +161,18 @@ test('preserva erro público e mascara falha interna com mensagem amigável', as
     const publico = Object.assign(new Error('Desatualizado'), { status: 409 });
     const interno = new Error('detalhes do banco');
     const controllerPublico = criarController({
-        service: { async atualizar() { throw publico; } }
+        service: {
+            async atualizar() {
+                throw publico;
+            }
+        }
     });
     const controllerInterno = criarController({
-        service: { async consultar() { throw interno; } }
+        service: {
+            async consultar() {
+                throw interno;
+            }
+        }
     });
     let erroPublico;
     let erroInterno;
@@ -143,12 +180,16 @@ test('preserva erro público e mascara falha interna com mensagem amigável', as
     await controllerPublico.atualizar(
         { usuario: { id: 1 }, params: { contatoId: '9' }, body: {} },
         resposta().res,
-        (erro) => { erroPublico = erro; }
+        (erro) => {
+            erroPublico = erro;
+        }
     );
     await controllerInterno.consultar(
         { usuario: { id: 1 }, params: { contatoId: '9' } },
         resposta().res,
-        (erro) => { erroInterno = erro; }
+        (erro) => {
+            erroInterno = erro;
+        }
     );
 
     assert.equal(erroPublico.mensagemUsuario, undefined);

@@ -43,7 +43,11 @@ function criarService(estado) {
         }
     };
     return criarContactLinkService({
-        prisma: { async $transaction(callback) { return callback(tx); } }
+        prisma: {
+            async $transaction(callback) {
+                return callback(tx);
+            }
+        }
     });
 }
 
@@ -95,7 +99,11 @@ test('notificação não detalha permissões adicionadas ou removidas', async ()
 test('não inicia transação para contato de apoio ou sessão inválida', async () => {
     let iniciou = false;
     const service = criarContactLinkService({
-        prisma: { async $transaction() { iniciou = true; } }
+        prisma: {
+            async $transaction() {
+                iniciou = true;
+            }
+        }
     });
 
     await assert.rejects(

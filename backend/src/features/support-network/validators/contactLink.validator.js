@@ -8,12 +8,7 @@ import {
     TIPOS_VINCULO
 } from '../constants/contactLink.constants.js';
 
-const CAMPOS_PERMITIDOS = Object.freeze([
-    'tipo',
-    'categoriaId',
-    'permissoesIndividuais',
-    'versao'
-]);
+const CAMPOS_PERMITIDOS = Object.freeze(['tipo', 'categoriaId', 'permissoesIndividuais', 'versao']);
 
 function objetoSimples(valor) {
     if (valor === null || typeof valor !== 'object' || Array.isArray(valor)) return false;
@@ -98,9 +93,7 @@ function criarContactLinkValidator() {
                     mensagem: 'A seleção contém permissões inválidas.'
                 });
             } else {
-                permissoesIndividuais = ordenarPermissoesCategoria(
-                    body.permissoesIndividuais
-                );
+                permissoesIndividuais = ordenarPermissoesCategoria(body.permissoesIndividuais);
             }
             if (body.categoriaId !== undefined) {
                 erros.push({

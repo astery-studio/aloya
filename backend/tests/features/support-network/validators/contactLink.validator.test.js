@@ -7,18 +7,15 @@ const validator = criarContactLinkValidator();
 const versao = '2026-11-08T12:00:00.000Z';
 
 test('aceita categoria com identificador positivo e versão canônica', () => {
-    assert.deepEqual(
-        validator.validarAtualizacao({ tipo: 'categoria', categoriaId: 3, versao }),
-        {
-            valido: true,
-            dados: {
-                tipo: 'categoria',
-                categoriaId: 3,
-                permissoesIndividuais: null,
-                versao: new Date(versao)
-            }
+    assert.deepEqual(validator.validarAtualizacao({ tipo: 'categoria', categoriaId: 3, versao }), {
+        valido: true,
+        dados: {
+            tipo: 'categoria',
+            categoriaId: 3,
+            permissoesIndividuais: null,
+            versao: new Date(versao)
         }
-    );
+    });
 });
 
 test('aceita permissões individuais e as normaliza pelo catálogo', () => {
@@ -77,7 +74,10 @@ test('rejeita corpo malformado, campos internos e prototype pollution', () => {
         versao
     });
     assert.equal(protegido.valido, false);
-    assert.equal(protegido.erros.some(({ campo }) => campo === 'titularId'), true);
+    assert.equal(
+        protegido.erros.some(({ campo }) => campo === 'titularId'),
+        true
+    );
 
     const poluido = Object.create({ administrador: true });
     poluido.tipo = 'categoria';

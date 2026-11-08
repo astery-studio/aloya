@@ -1,9 +1,6 @@
 const TIPO_VINCULO_CATEGORIA = 'categoria';
 const TIPO_VINCULO_INDIVIDUAL = 'individual';
-const TIPOS_VINCULO = Object.freeze([
-    TIPO_VINCULO_CATEGORIA,
-    TIPO_VINCULO_INDIVIDUAL
-]);
+const TIPOS_VINCULO = Object.freeze([TIPO_VINCULO_CATEGORIA, TIPO_VINCULO_INDIVIDUAL]);
 
 const MENSAGEM_ERRO_ATUALIZACAO_VINCULO =
     'Não foi possível atualizar o vínculo deste contato. Tente novamente.';

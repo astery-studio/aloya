@@ -105,8 +105,16 @@ test('bloqueia papel de contato antes de acessar o banco', async () => {
     let consultou = false;
     const service = criarContactLinkService({
         prisma: {
-            vinculoRedeApoio: { async findFirst() { consultou = true; } },
-            categoriaPermissao: { async findMany() { return []; } }
+            vinculoRedeApoio: {
+                async findFirst() {
+                    consultou = true;
+                }
+            },
+            categoriaPermissao: {
+                async findMany() {
+                    return [];
+                }
+            }
         }
     });
 

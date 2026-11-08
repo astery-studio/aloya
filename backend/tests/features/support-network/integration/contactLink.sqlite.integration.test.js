@@ -83,9 +83,13 @@ function criarApp(prisma) {
                 }
             },
             parentalConsentMiddleware: {
-                exigirAcessoRedeApoio(_req, _res, next) { next(); }
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
             },
-            rateLimit(_req, _res, next) { next(); },
+            rateLimit(_req, _res, next) {
+                next();
+            },
             controller
         })
     );

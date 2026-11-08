@@ -7,7 +7,10 @@ test('limita alterações pela identidade autenticada sem usar dados do corpo', 
     let opcoes;
     const middleware = () => {};
     const resultado = criarContactLinkRateLimit({
-        rateLimit(configuracao) { opcoes = configuracao; return middleware; },
+        rateLimit(configuracao) {
+            opcoes = configuracao;
+            return middleware;
+        },
         janelaMs: 60000,
         limite: 5,
         logger: { warn() {} }
@@ -25,15 +28,28 @@ test('responde 429 e registra somente metadados não sensíveis', () => {
     let opcoes;
     const logs = [];
     criarContactLinkRateLimit({
-        rateLimit(configuracao) { opcoes = configuracao; return () => {}; },
+        rateLimit(configuracao) {
+            opcoes = configuracao;
+            return () => {};
+        },
         janelaMs: 60000,
         limite: 5,
-        logger: { warn(dados) { logs.push(dados); } }
+        logger: {
+            warn(dados) {
+                logs.push(dados);
+            }
+        }
     });
     const estado = {};
     const res = {
-        status(valor) { estado.status = valor; return this; },
-        json(valor) { estado.body = valor; return this; }
+        status(valor) {
+            estado.status = valor;
+            return this;
+        },
+        json(valor) {
+            estado.body = valor;
+            return this;
+        }
     };
     const req = {
         usuario: { id: 42 },
@@ -46,12 +62,14 @@ test('responde 429 e registra somente metadados não sensíveis', () => {
 
     assert.equal(estado.status, 429);
     assert.equal(estado.body.erro.codigo, 'LIMITE_ATUALIZACAO_VINCULO');
-    assert.deepEqual(logs, [{
-        evento: 'limite_alteracao_vinculo_rede_apoio',
-        usuarioId: 42,
-        metodo: 'PATCH',
-        rota: '/support-network/contacts/9/link'
-    }]);
+    assert.deepEqual(logs, [
+        {
+            evento: 'limite_alteracao_vinculo_rede_apoio',
+            usuarioId: 42,
+            metodo: 'PATCH',
+            rota: '/support-network/contacts/9/link'
+        }
+    ]);
     assert.equal(JSON.stringify(logs).includes('saude.consultas'), false);
 });
 

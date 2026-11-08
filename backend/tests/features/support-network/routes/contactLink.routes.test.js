@@ -6,9 +6,15 @@ import { criarContactLinkRoutes } from '../../../../src/features/support-network
 test('protege consulta e atualização antes dos controllers', () => {
     const chamadas = [];
     const router = {
-        use(...args) { chamadas.push(['use', ...args]); },
-        get(...args) { chamadas.push(['get', ...args]); },
-        patch(...args) { chamadas.push(['patch', ...args]); }
+        use(...args) {
+            chamadas.push(['use', ...args]);
+        },
+        get(...args) {
+            chamadas.push(['get', ...args]);
+        },
+        patch(...args) {
+            chamadas.push(['patch', ...args]);
+        }
     };
     function autenticar() {}
     function exigirAcessoRedeApoio() {}

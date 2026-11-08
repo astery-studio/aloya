@@ -184,10 +184,7 @@ function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
                     );
                 }
                 if (
-                    permissoesIguais(
-                        atual.categoria.conjuntoDadosVisiveis,
-                        permissoesIndividuais
-                    )
+                    permissoesIguais(atual.categoria.conjuntoDadosVisiveis, permissoesIndividuais)
                 ) {
                     throw criarErro(
                         'Altere ao menos uma permissão antes de salvar.',

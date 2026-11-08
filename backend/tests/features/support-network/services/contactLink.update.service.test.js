@@ -42,7 +42,11 @@ function criarCenario({ categoriaAtual = null, categoriaDestino = null, updateCo
         }
     };
     const service = criarContactLinkService({
-        prisma: { async $transaction(callback) { return callback(tx); } },
+        prisma: {
+            async $transaction(callback) {
+                return callback(tx);
+            }
+        },
         now: () => agora
     });
     return { atual, estado, service };
