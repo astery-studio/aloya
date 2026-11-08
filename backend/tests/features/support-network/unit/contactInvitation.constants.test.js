@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+    ACOES_RESPOSTA_CONVITE,
+    ACAO_ACEITAR_CONVITE,
+    ACAO_RECUSAR_CONVITE,
     DURACAO_CONVITE_MS,
     papelEhTitular,
     usuarioEhContatoCadastrado
@@ -31,4 +34,11 @@ test('reconhece somente contas ativas com papel de contato', () => {
 
 test('define convites com validade de sete dias', () => {
     assert.equal(DURACAO_CONVITE_MS, 7 * 24 * 60 * 60 * 1000);
+});
+
+test('define somente as decisões explícitas permitidas para o convite', () => {
+    assert.deepEqual(ACOES_RESPOSTA_CONVITE, ['aceitar', 'recusar']);
+    assert.equal(ACAO_ACEITAR_CONVITE, 'aceitar');
+    assert.equal(ACAO_RECUSAR_CONVITE, 'recusar');
+    assert.equal(Object.isFrozen(ACOES_RESPOSTA_CONVITE), true);
 });
