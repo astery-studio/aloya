@@ -29,9 +29,67 @@ function criarResumoEspera(status, dataEnvio, agora) {
     });
 }
 
+function copiarPermissoes(permissoes) {
+    return Array.isArray(permissoes)
+        ? permissoes.filter((permissao) => typeof permissao === 'string')
+        : [];
+}
+
+function resolverVinculo(vinculo) {
+    if (vinculo.categoria) {
+        return Object.freeze({
+            tipo: 'categoria',
+            rotulo: `Categoria: ${vinculo.categoria.nome}`,
+            categoria: Object.freeze({
+                id: vinculo.categoria.id,
+                nome: vinculo.categoria.nome
+            }),
+            permissoes: Object.freeze(
+                copiarPermissoes(vinculo.categoria.conjuntoDadosVisiveis)
+            )
+        });
+    }
+
+    return Object.freeze({
+        tipo: 'individual',
+        rotulo: 'Permissão individual',
+        categoria: null,
+        permissoes: Object.freeze(copiarPermissoes(vinculo.permissoesIndividuais))
+    });
+}
+
+function formatarContato(vinculo, agora = new Date()) {
+    const nome =
+        typeof vinculo?.contato?.nome === 'string' && vinculo.contato.nome.trim().length > 0
+            ? vinculo.contato.nome.trim()
+            : null;
+    const email = vinculo.emailConvidado;
+    const pendente = vinculo.status === STATUS_CONTATO_PENDENTE;
+
+    return Object.freeze({
+        id: vinculo.id,
+        nome,
+        email,
+        identificacao: nome ?? email,
+        status: vinculo.status,
+        statusRotulo: pendente ? 'Pendente' : 'Ativo',
+        vinculo: resolverVinculo(vinculo),
+        dataConvite: vinculo.dataEnvio,
+        dataAtivacao: vinculo.status === STATUS_CONTATO_ATIVO ? vinculo.dataResposta : null,
+        aguardando: criarResumoEspera(vinculo.status, vinculo.dataEnvio, agora),
+        acoes: Object.freeze({
+            podeAlterarVinculo: true,
+            podeRemover: true,
+            podeReenviarConvite: pendente
+        })
+    });
+}
+
 export {
     calcularDiasAguardando,
     criarResumoEspera,
+    formatarContato,
+    resolverVinculo,
     STATUS_CONTATO_ATIVO,
     STATUS_CONTATO_PENDENTE
 };
