@@ -78,6 +78,8 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     const acaoAposOcultarPainel = useRef(null);
     const acaoAposOcultarFeedback = useRef(null);
     const montado = useRef(true);
+    const confirmarOutrosCiclos = useRef(false);
+    const cicloFoiRemovido = useRef(false);
     const painelAtual = useRef(painelVisivel);
     painelAtual.current = painelVisivel;
     const alterado = JSON.stringify(dias) !== JSON.stringify(originais);
@@ -135,14 +137,6 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
             ? dias.filter((dia) => dia !== data)
             : [...dias, data].sort();
         setDias(proximos);
-        if (contarEpisodios(proximos) > 1 && contarEpisodios(proximos) > contarEpisodios(dias)) {
-            abrirFeedback({
-                tipo: 'validacao',
-                titulo: 'Novo ciclo na seleção',
-                mensagem:
-                    'A seleção foi mantida. Intervalos de 3 dias ou mais sem sangramento separam os registros em ciclos diferentes. Ao concluir e confirmar, esses ciclos serão salvos e suas previsões serão recalculadas.'
-            });
-        }
     }
 
     function abrirFeedback(proximoFeedback) {
@@ -186,7 +180,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
         try {
             const atualizado = await onAtualizado?.();
             if (atualizado === false) throw new Error('A tela não foi atualizada.');
-            setFeedback({ tipo: dias.length ? 'sucesso' : 'sucesso-excluir' });
+            setFeedback({ tipo: cicloFoiRemovido.current ? 'sucesso-excluir' : 'sucesso' });
         } catch {
             setFeedback({
                 tipo: 'atualizacao',
@@ -207,11 +201,35 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
 
     async function salvar(validacao) {
         try {
-            await service.editar(ciclo.id, { dias: validacao.dias });
+            const resultado = await service.editar(ciclo.id, {
+                dias: validacao.dias,
+                ...(validacao.confirmarOutrosCiclos ? { confirmarOutrosCiclos: true } : {})
+            });
+            cicloFoiRemovido.current = resultado === null;
             await atualizarTelas();
         } catch (falha) {
             if (falha?.status === 401) {
                 onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
+                return;
+            }
+            if (
+                falha?.codigo === 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS' &&
+                Array.isArray(falha.detalhes)
+            ) {
+                const periodos = falha.detalhes
+                    .map(
+                        (periodo) =>
+                            `${periodo.dias.map(formatarDataParaCampo).join(', ')} no período de ${formatarDataParaCampo(periodo.dataInicio)} a ${formatarDataParaCampo(periodo.dataFim)}`
+                    )
+                    .join('; ');
+                const datasOutrosCiclos = new Set(
+                    falha.detalhes.flatMap((periodo) => periodo.dias)
+                );
+                const excluiAtual = validacao.dias.every((dia) => datasOutrosCiclos.has(dia));
+                setFeedback({
+                    tipo: 'outros-ciclos',
+                    mensagem: `Os seguintes dias serão restaurados em outros ciclos: ${periodos}. Esses dias permanecerão associados aos respectivos ciclos. ${excluiAtual ? 'O ciclo em edição ficará sem dias e será excluído. ' : ''}As demais alterações da seleção serão salvas e as previsões serão recalculadas. Deseja continuar?`
+                });
                 return;
             }
             const conflito = falha?.codigo === 'SOBREPOSICAO_CICLO';
@@ -232,7 +250,9 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     }
 
     function confirmarSalvamento() {
-        const validacao = { dias: [...dias] };
+        if (feedback?.tipo === 'outros-ciclos') confirmarOutrosCiclos.current = true;
+        else if (feedback?.tipo !== 'erro') confirmarOutrosCiclos.current = false;
+        const validacao = { dias: [...dias], confirmarOutrosCiclos: confirmarOutrosCiclos.current };
 
         setSalvando(true);
         ocultarFeedback(() => salvar(validacao));
@@ -253,18 +273,26 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 onSalvar={solicitarSalvamento}
             />
             <SimpleModal
-                visivel={['confirmacao', 'exclusao'].includes(feedback?.tipo)}
+                visivel={['confirmacao', 'exclusao', 'outros-ciclos'].includes(feedback?.tipo)}
                 aoFechar={voltarAoPainel}
                 aoOcultar={executarAposOcultarFeedback}
                 icone={IconeConfirmacaoEdicao}
                 fundoIcone="transparent"
-                titulo={feedback?.tipo === 'exclusao' ? 'Apagar ciclo' : 'Atualizar ciclo'}
-                mensagem={
+                titulo={
                     feedback?.tipo === 'exclusao'
-                        ? `Tem certeza que deseja excluir todo o período de menstruação de ${obterPeriodo(registro)} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`
-                        : contarEpisodios(dias) > 1
-                          ? `A seleção será salva em ${contarEpisodios(dias)} ciclos separados, pois há intervalos de 3 dias ou mais sem sangramento. Suas previsões serão recalculadas. Deseja continuar?`
-                          : 'Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?'
+                        ? 'Apagar ciclo'
+                        : feedback?.tipo === 'outros-ciclos'
+                          ? 'Alterar outro ciclo'
+                          : 'Atualizar ciclo'
+                }
+                mensagem={
+                    feedback?.tipo === 'outros-ciclos'
+                        ? feedback.mensagem
+                        : feedback?.tipo === 'exclusao'
+                          ? `Tem certeza que deseja excluir todo o período de menstruação de ${obterPeriodo(registro)} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`
+                          : contarEpisodios(dias) > 1
+                            ? `A seleção será salva em ${contarEpisodios(dias)} ciclos separados, pois há intervalos de 3 dias ou mais sem sangramento. Suas previsões serão recalculadas. Deseja continuar?`
+                            : 'Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?'
                 }
                 acaoPrincipal={{
                     texto: feedback?.tipo === 'exclusao' ? 'Apagar' : 'Confirmar',

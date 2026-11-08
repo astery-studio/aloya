@@ -175,7 +175,7 @@ test.each(['retorno falso', 'exceção'])(
 );
 
 test.each(['ios', 'android'])(
-    'aviso de novo ciclo mantém seleção e espera fechar o sheet no %s',
+    'aviso de novos ciclos só aparece ao concluir e preserva seleção ao cancelar no %s',
     async (plataforma) => {
         Platform.OS = plataforma;
         const editar = jest.fn();
@@ -187,18 +187,70 @@ test.each(['ios', 'android'])(
         );
         const sheet = modalVisivel(resultado).props.testID;
         await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-12' }));
+        expect(screen.queryByText(/ciclos separados/)).toBeNull();
+        expect(modalVisivel(resultado).props.testID).toBe(sheet);
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
         if (plataforma === 'ios') {
-            expect(screen.queryByText('Novo ciclo na seleção')).toBeNull();
+            expect(screen.queryByText('Atualizar ciclo')).toBeNull();
             await ocultarNoIos(resultado, sheet);
         }
-        expect(await screen.findByText('Novo ciclo na seleção')).toBeOnTheScreen();
-        expect(screen.getByText(/Intervalos de 3 dias ou mais/)).toBeOnTheScreen();
+        expect(await screen.findByText('Atualizar ciclo')).toBeOnTheScreen();
+        expect(screen.getByText(/salva em 2 ciclos separados/)).toBeOnTheScreen();
         const aviso = modalVisivel(resultado).props.testID;
-        await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
         if (plataforma === 'ios') await ocultarNoIos(resultado, aviso);
         expect(screen.getByRole('button', { name: 'Desmarcar dia 2026-09-12' })).toBeOnTheScreen();
         expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
         expect(editar).not.toHaveBeenCalled();
+        modalVisivel(resultado);
+    }
+);
+
+test.each(['ios', 'android'])(
+    'confirma restauração em outro ciclo após dispensar o modal anterior no %s',
+    async (plataforma) => {
+        Platform.OS = plataforma;
+        const editar = jest
+            .fn()
+            .mockRejectedValueOnce({
+                codigo: 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS',
+                detalhes: [
+                    {
+                        cicloId: 4,
+                        dataInicio: '2026-09-10',
+                        dataFim: '2026-09-14',
+                        dias: ['2026-09-12']
+                    }
+                ]
+            })
+            .mockResolvedValue({});
+        const resultado = await render(
+            <CycleEditFlow
+                ciclo={{ id: 3, dataInicio: '2026-09-04', dataFim: '2026-09-08' }}
+                service={{ editar }}
+            />
+        );
+        const sheet = modalVisivel(resultado).props.testID;
+        await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-12' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
+        if (plataforma === 'ios') await ocultarNoIos(resultado, sheet);
+        const confirmacao = modalVisivel(resultado).props.testID;
+        await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+        if (plataforma === 'ios') {
+            expect(editar).not.toHaveBeenCalled();
+            await ocultarNoIos(resultado, confirmacao);
+        }
+        expect(await screen.findByText('Alterar outro ciclo')).toBeOnTheScreen();
+        const outro = modalVisivel(resultado).props.testID;
+        expect(editar).toHaveBeenCalledTimes(1);
+        await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+        if (plataforma === 'ios') {
+            expect(editar).toHaveBeenCalledTimes(1);
+            await ocultarNoIos(resultado, outro);
+        }
+        expect(await screen.findByText('Ciclo atualizado com sucesso')).toBeOnTheScreen();
+        expect(editar).toHaveBeenCalledTimes(2);
+        expect(editar.mock.calls[1][1].confirmarOutrosCiclos).toBe(true);
         modalVisivel(resultado);
     }
 );

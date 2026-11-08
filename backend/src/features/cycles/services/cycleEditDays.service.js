@@ -1,3 +1,7 @@
+import {
+    prepararDiasOutrosCiclos,
+    restaurarDiasOutrosCiclos
+} from './cycleEditAffectedCycles.service.js';
 import { AppError } from '../../../shared/errors/AppError.js';
 import { formatarData } from '../utils/calendar.js';
 import { recalcularCiclos, limparPrevisoes } from '../repositories/cycleRemoval.repository.js';
@@ -12,7 +16,13 @@ function agruparDias(dias) {
     return grupos;
 }
 
-async function editarDiasDoCiclo({ prisma, usuarioId, cicloId, dias }) {
+async function editarDiasDoCiclo({
+    prisma,
+    usuarioId,
+    cicloId,
+    dias,
+    confirmarOutrosCiclos = false
+}) {
     return prisma.$transaction(async (tx) => {
         const atual = await tx.registroCiclo.findFirst({
             where: { id: cicloId, usuarioId },
@@ -30,6 +40,14 @@ async function editarDiasDoCiclo({ prisma, usuarioId, cicloId, dias }) {
         ) {
             throw new AppError('Nenhuma alteração foi identificada.', 422, 'NENHUMA_ALTERACAO');
         }
+        const preparacao = await prepararDiasOutrosCiclos(tx, {
+            usuarioId,
+            cicloId,
+            dias,
+            confirmarOutrosCiclos
+        });
+        dias = preparacao.dias;
+        await restaurarDiasOutrosCiclos(tx, usuarioId, preparacao.alteracoes);
         const where = { id: cicloId, usuarioId, atualizadoEm: atual.atualizadoEm };
         if (!dias.length) {
             const removido = await tx.registroCiclo.deleteMany({ where });
@@ -122,7 +140,10 @@ async function editarDiasDoCiclo({ prisma, usuarioId, cicloId, dias }) {
             dataInicio: formatarData(dataInicio),
             dataFim: formatarData(dataFim),
             dias: primeiroGrupo.map(formatarData),
-            ...(ciclosCriados.length ? { ciclosCriados } : {})
+            ...(ciclosCriados.length ? { ciclosCriados } : {}),
+            ...(preparacao.alteracoes.length
+                ? { ciclosAtualizados: preparacao.alteracoes.map(({ ciclo }) => ciclo.id) }
+                : {})
         };
     });
 }

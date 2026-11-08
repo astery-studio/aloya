@@ -47,12 +47,15 @@ function criarCycleEditController({ service, validator } = {}) {
                 ciclo
             });
         } catch (erro) {
-            if (erro.codigo === 'SOBREPOSICAO_CICLO' && erro.conflito) {
+            if (
+                (erro.codigo === 'SOBREPOSICAO_CICLO' && erro.conflito) ||
+                (erro.codigo === 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS' && erro.outrosCiclos)
+            ) {
                 return res.status(409).json({
                     erro: {
                         codigo: erro.codigo,
                         mensagem: erro.message,
-                        detalhes: erro.conflito
+                        detalhes: erro.outrosCiclos ?? erro.conflito
                     }
                 });
             }

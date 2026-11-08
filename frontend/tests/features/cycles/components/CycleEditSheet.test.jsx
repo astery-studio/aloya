@@ -62,6 +62,7 @@ test.each([false, true])(
             borderStyle: 'dashed',
             borderColor: '#EF9A9A'
         });
+        expect(screen.getByText('23')).toHaveStyle({ color: '#EF9A9A' });
         if (alterado) expect(concluir).toBeEnabled();
         else expect(concluir).toBeDisabled();
     }

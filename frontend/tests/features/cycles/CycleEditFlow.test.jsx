@@ -205,14 +205,14 @@ test('não inicia confirmação nem gravação sem mudança, inclusive após des
     expect(editar).not.toHaveBeenCalled();
 });
 
-test('data distante é mantida e avisa sobre o novo ciclo antes de salvar', async () => {
+test('data distante permanece selecionada e só avisa sobre novos ciclos ao concluir', async () => {
     const editar = jest.fn().mockResolvedValue({});
     await render(<CycleEditFlow ciclo={ciclo} service={{ editar }} />);
     await alternar('2026-08-28');
-    expect(screen.getByText('Novo ciclo na seleção')).toBeOnTheScreen();
-    expect(screen.getByText(/A seleção foi mantida/)).toBeOnTheScreen();
+    expect(screen.queryByText('Novo ciclo na seleção')).toBeNull();
+    expect(screen.queryByText('Atualizar ciclo')).toBeNull();
+    expect(screen.queryByText(/ciclos separados/)).toBeNull();
     expect(editar).not.toHaveBeenCalled();
-    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
     expect(mockSheet.visivel).toBe(true);
     expect(mockSheet.meses.flatMap((mes) => mes.diasMenstruacao.map((dia) => dia.data))).toContain(
         '2026-08-28'
@@ -223,12 +223,80 @@ test('data distante é mantida e avisa sobre o novo ciclo antes de salvar', asyn
     expect(editar).toHaveBeenCalledWith('3', { dias: [...dias, '2026-08-28'] });
 });
 
-test('retirar dias criando três dias de pausa também informa a separação', async () => {
+test('retirar dias só informa a separação ao concluir', async () => {
     const registro = { ...ciclo, dataFim: '2026-08-25', dias: [...dias, '2026-08-25'] };
     await render(<CycleEditFlow ciclo={registro} service={{ editar: jest.fn() }} />);
     await alternar('2026-08-22');
     await alternar('2026-08-23');
     expect(screen.queryByText('Novo ciclo na seleção')).toBeNull();
     await alternar('2026-08-24');
-    expect(screen.getByText('Novo ciclo na seleção')).toBeOnTheScreen();
+    expect(mockSheet.visivel).toBe(true);
+    expect(screen.queryByText(/ciclos separados/)).toBeNull();
+    await act(() => mockSheet.onSalvar());
+    expect(screen.getByText(/salva em 2 ciclos separados/)).toBeOnTheScreen();
+});
+
+test('não avisa de novos ciclos quando a lacuna é preenchida antes de concluir', async () => {
+    await render(<CycleEditFlow ciclo={ciclo} service={{ editar: jest.fn() }} />);
+    for (const data of ['2026-08-28', '2026-08-25']) await alternar(data);
+    expect(mockSheet.visivel).toBe(true);
+    expect(screen.queryByText(/ciclos separados/)).toBeNull();
+    await act(() => mockSheet.onSalvar());
+    expect(screen.queryByText(/ciclos separados/)).toBeNull();
+    expect(
+        screen.getByText(
+            'Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?'
+        )
+    ).toBeOnTheScreen();
+});
+
+const confirmacaoOutroCiclo = {
+    codigo: 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS',
+    detalhes: [
+        { cicloId: 4, dataInicio: '2026-08-27', dataFim: '2026-08-30', dias: ['2026-08-28'] }
+    ]
+};
+test('restaurar dia de outro ciclo informa o período e só grava com confirmação adicional', async () => {
+    const editar = jest.fn().mockRejectedValueOnce(confirmacaoOutroCiclo).mockResolvedValue({});
+    const atualizar = jest.fn().mockResolvedValue(true);
+    await render(<CycleEditFlow ciclo={ciclo} service={{ editar }} onAtualizado={atualizar} />);
+    await alternar('2026-08-28');
+    await act(() => mockSheet.onSalvar());
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(screen.getByText('Alterar outro ciclo')).toBeOnTheScreen();
+    expect(
+        screen.getByText(/28\/08\/2026 no período de 27\/08\/2026 a 30\/08\/2026/)
+    ).toBeOnTheScreen();
+    expect(editar).toHaveBeenCalledTimes(1);
+    expect(atualizar).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(editar).toHaveBeenLastCalledWith('3', {
+        dias: [...dias, '2026-08-28'],
+        confirmarOutrosCiclos: true
+    });
+    expect(atualizar).toHaveBeenCalledTimes(1);
+});
+
+test('cancelar restauração de outro ciclo preserva seleção sem confirmar a gravação', async () => {
+    const editar = jest.fn().mockRejectedValue(confirmacaoOutroCiclo);
+    await render(<CycleEditFlow ciclo={ciclo} service={{ editar }} />);
+    await alternar('2026-08-28');
+    await act(() => mockSheet.onSalvar());
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(mockSheet.visivel).toBe(true);
+    expect(mockSheet.alterado).toBe(true);
+    expect(editar).toHaveBeenCalledTimes(1);
+});
+
+test('informa exclusão do ciclo atual quando só restam dias destinados a outro ciclo', async () => {
+    const editar = jest.fn().mockRejectedValueOnce(confirmacaoOutroCiclo).mockResolvedValue(null);
+    await render(<CycleEditFlow ciclo={ciclo} service={{ editar }} />);
+    for (const data of dias) await alternar(data);
+    await alternar('2026-08-28');
+    await act(() => mockSheet.onSalvar());
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(screen.getByText(/O ciclo em edição ficará sem dias e será excluído/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(screen.getByText('Ciclo excluído com sucesso')).toBeOnTheScreen();
 });

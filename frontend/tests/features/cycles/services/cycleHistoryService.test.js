@@ -322,3 +322,22 @@ test('rejeita criação sem requisição autenticada', () => {
         'Não foi possível configurar o serviço do histórico de ciclos.'
     );
 });
+
+test('encaminha autorização explícita para restaurar dias em outros ciclos', async () => {
+    const requisicaoAutenticada = jest
+        .fn()
+        .mockResolvedValue({
+            mensagem: 'Registro de menstruação atualizado com sucesso.',
+            ciclo: { id: 3 }
+        });
+    const service = criarCycleHistoryService({ requisicaoAutenticada });
+    await service.editar('3', { dias: ['2026-08-10'], confirmarOutrosCiclos: true });
+    expect(requisicaoAutenticada).toHaveBeenCalledWith({
+        metodo: 'PATCH',
+        caminho: '/api/cycles/3',
+        corpo: { dias: ['2026-08-10'], confirmarOutrosCiclos: true }
+    });
+    await expect(service.editar('3', { dias: [], confirmarOutrosCiclos: 'true' })).rejects.toThrow(
+        'dias da edição'
+    );
+});

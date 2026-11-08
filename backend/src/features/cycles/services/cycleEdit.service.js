@@ -58,7 +58,13 @@ function criarCycleEditService({ prisma } = {}) {
 
     async function editar({ usuarioId, cicloId, dados }) {
         if (Object.hasOwn(dados, 'dias'))
-            return editarDiasDoCiclo({ prisma, usuarioId, cicloId, dias: dados.dias });
+            return editarDiasDoCiclo({
+                prisma,
+                usuarioId,
+                cicloId,
+                dias: dados.dias,
+                confirmarOutrosCiclos: dados.confirmarOutrosCiclos
+            });
         return prisma.$transaction(async (tx) => {
             const atual = await tx.registroCiclo.findFirst({
                 where: { id: cicloId, usuarioId },

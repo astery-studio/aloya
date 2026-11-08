@@ -187,7 +187,11 @@ function criarCaminhoCiclo(id) {
 function validarDadosEdicao(dados) {
     if (ehObjetoSimples(dados) && Object.hasOwn(dados, 'dias')) {
         if (
-            Object.keys(dados).length !== 1 ||
+            Object.keys(dados).some(
+                (campo) => !['dias', 'confirmarOutrosCiclos'].includes(campo)
+            ) ||
+            (Object.hasOwn(dados, 'confirmarOutrosCiclos') &&
+                typeof dados.confirmarOutrosCiclos !== 'boolean') ||
             !Array.isArray(dados.dias) ||
             dados.dias.length > 366 ||
             !dados.dias.every(dataIsoEhValida) ||
@@ -195,7 +199,12 @@ function validarDadosEdicao(dados) {
         ) {
             throw new TypeError('Os dias da edição são inválidos.');
         }
-        return { dias: [...dados.dias].sort() };
+        return {
+            dias: [...dados.dias].sort(),
+            ...(Object.hasOwn(dados, 'confirmarOutrosCiclos')
+                ? { confirmarOutrosCiclos: dados.confirmarOutrosCiclos }
+                : {})
+        };
     }
     const valido =
         ehObjetoSimples(dados) &&
