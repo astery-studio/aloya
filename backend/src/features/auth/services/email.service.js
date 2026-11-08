@@ -146,6 +146,7 @@ function criarEmailService({ transporter, remetente }) {
         const orientacao = requerCadastro
             ? 'Crie sua conta de contato no Aloya e, em seguida, aceite o convite.'
             : 'Abra o Aloya e aceite o convite para entrar na Rede de Apoio.';
+        const rotuloAcao = requerCadastro ? 'Criar minha conta' : 'Ver convite';
 
         await transporter.sendMail({
             from: remetente,
@@ -159,7 +160,7 @@ function criarEmailService({ transporter, remetente }) {
                     <p>${escaparHtml(orientacao)}</p>
                     <p style="margin:32px 0;text-align:center;">
                         <a href="${linkSeguro}" style="display:inline-block;padding:14px 24px;border-radius:10px;background:#2C4C3B;color:#FFF;text-decoration:none;font-weight:bold;">
-                            Ver convite
+                            ${rotuloAcao}
                         </a>
                     </p>
                     <p style="font-size:13px;color:#5C5C59;">

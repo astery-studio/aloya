@@ -25,6 +25,7 @@ test('envia convite informando que nenhum acesso foi concedido', async () => {
     assert.match(mensagem.subject, /Rede de Apoio/u);
     assert.match(mensagem.text, /Crie sua conta/u);
     assert.match(mensagem.text, /Nenhum dado será compartilhado/u);
+    assert.match(mensagem.html, /Criar minha conta/u);
     assert.equal(mensagem.html.includes('Ana <script>'), false);
     assert.match(mensagem.html, /Ana &lt;script&gt;/u);
 });
@@ -48,4 +49,5 @@ test('orienta conta cadastrada a aceitar diretamente no aplicativo', async () =>
 
     assert.match(mensagem.text, /Abra o Aloya/u);
     assert.doesNotMatch(mensagem.text, /Crie sua conta/u);
+    assert.match(mensagem.html, /Ver convite/u);
 });
