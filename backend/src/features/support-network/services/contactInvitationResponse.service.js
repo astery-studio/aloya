@@ -29,6 +29,7 @@ function criarContactInvitationResponseService({
             where: { tokenConviteHash: tokenHash },
             select: {
                 id: true,
+                titularId: true,
                 emailConvidado: true,
                 status: true,
                 dataExpiracao: true,
@@ -137,7 +138,78 @@ function criarContactInvitationResponseService({
         }
     }
 
-    return Object.freeze({ buscarConvitePendente, cadastrarContato, consultar });
+    async function aceitar({ token, usuarioId }) {
+        if (typeof prisma?.$transaction !== 'function') {
+            throw new TypeError('Não foi possível aceitar o convite.');
+        }
+        const { convite, tokenHash } = await buscarConvitePendente(token);
+
+        return prisma.$transaction(async (tx) => {
+            const usuario = await tx.usuario.findUnique({
+                where: { id: usuarioId },
+                select: { id: true, email: true, papel: true, statusConta: true }
+            });
+            if (
+                !usuario ||
+                usuario.statusConta !== 'ativa' ||
+                usuario.email !== convite.emailConvidado
+            ) {
+                const erro = new Error('Este convite pertence a outra conta.');
+                erro.status = 403;
+                erro.codigo = 'CONVITE_DE_OUTRA_CONTA';
+                throw erro;
+            }
+
+            const papel =
+                usuario.papel === 'principal'
+                    ? 'principal_e_contato_apoio'
+                    : usuario.papel;
+            if (!['contato_apoio', 'principal_e_contato_apoio'].includes(papel)) {
+                throw criarErroConviteIndisponivel();
+            }
+
+            if (papel !== usuario.papel) {
+                await tx.usuario.update({
+                    where: { id: usuario.id },
+                    data: { papel }
+                });
+            }
+
+            const atualizado = await tx.vinculoRedeApoio.updateMany({
+                where: {
+                    id: convite.id,
+                    tokenConviteHash: tokenHash,
+                    emailConvidado: usuario.email,
+                    status: STATUS_CONVITE_PENDENTE,
+                    dataExpiracao: { gt: now() }
+                },
+                data: {
+                    contatoId: usuario.id,
+                    status: 'ativo',
+                    tokenConviteHash: null,
+                    dataResposta: now()
+                }
+            });
+            if (atualizado.count !== 1) throw criarErroConviteIndisponivel();
+
+            await tx.notificacao.create({
+                data: {
+                    usuarioId: convite.titularId,
+                    tipoOrigem: 'rede_apoio',
+                    origemId: convite.id,
+                    dataHoraProgramada: now(),
+                    statusEnvio: 'agendada'
+                }
+            });
+
+            return Object.freeze({
+                status: 'ativo',
+                mensagem: 'Convite aceito com sucesso.'
+            });
+        });
+    }
+
+    return Object.freeze({ aceitar, buscarConvitePendente, cadastrarContato, consultar });
 }
 
 export {
