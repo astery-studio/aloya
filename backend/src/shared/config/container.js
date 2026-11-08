@@ -101,6 +101,10 @@ import { criarSupportContactService } from '../../features/support-network/servi
 import { criarSupportContactController } from '../../features/support-network/controllers/supportContact.controller.js';
 import { criarSupportContactValidator } from '../../features/support-network/validators/supportContact.validator.js';
 import { criarContactInvitationResendService } from '../../features/support-network/services/contactInvitationResend.service.js';
+import { criarContactLinkService } from '../../features/support-network/services/contactLink.service.js';
+import { criarContactLinkValidator } from '../../features/support-network/validators/contactLink.validator.js';
+import { criarContactLinkController } from '../../features/support-network/controllers/contactLink.controller.js';
+import { criarContactLinkRateLimit } from '../../features/support-network/middleware/contactLinkRateLimit.middleware.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -266,6 +270,7 @@ function criarContainer() {
         tokenService: contactInvitationTokenService,
         emailService
     });
+    const contactLinkService = criarContactLinkService({ prisma });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -284,6 +289,7 @@ function criarContainer() {
     const contactInvitationValidator = criarContactInvitationValidator();
     const contactRegistrationValidator = criarContactRegistrationValidator();
     const supportContactValidator = criarSupportContactValidator();
+    const contactLinkValidator = criarContactLinkValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -350,6 +356,11 @@ function criarContainer() {
         rateLimit,
         janelaMs: env.emailRateLimitJanelaMs,
         limite: env.emailRateLimitMaximo
+    });
+    const contactLinkRateLimit = criarContactLinkRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo
     });
 
     const alteracaoSenhaRateLimit = criarAlteracaoSenhaRateLimit({
@@ -439,6 +450,11 @@ function criarContainer() {
         resendService: contactInvitationResendService,
         validator: supportContactValidator
     });
+    const contactLinkController = criarContactLinkController({
+        service: contactLinkService,
+        contactValidator: supportContactValidator,
+        linkValidator: contactLinkValidator
+    });
 
     return {
         authController,
@@ -460,6 +476,7 @@ function criarContainer() {
         contactInvitationController,
         contactInvitationResponseController,
         supportContactController,
+        contactLinkController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
@@ -472,6 +489,7 @@ function criarContainer() {
         permissionCategoryDeletionRateLimit,
         contactInvitationRateLimit,
         contactInvitationResponseRateLimit,
+        contactLinkRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
