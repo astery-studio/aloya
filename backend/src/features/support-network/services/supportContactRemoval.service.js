@@ -2,11 +2,7 @@ import { STATUS_CONTATOS_VISIVEIS } from '../constants/supportContact.constants.
 import { criarErro, validarTitular } from './supportContact.service.js';
 
 function criarErroContatoNaoEncontrado() {
-    return criarErro(
-        'Contato da Rede de Apoio não encontrado.',
-        404,
-        'CONTATO_NAO_ENCONTRADO'
-    );
+    return criarErro('Contato da Rede de Apoio não encontrado.', 404, 'CONTATO_NAO_ENCONTRADO');
 }
 
 function criarSupportContactRemovalService({ prisma, now = () => new Date() } = {}) {

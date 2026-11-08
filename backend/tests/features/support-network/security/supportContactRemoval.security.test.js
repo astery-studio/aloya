@@ -71,14 +71,12 @@ test('não inicia transação para contato de apoio ou sessão inválida', async
         }
     });
 
-    await assert.rejects(
-        service.remover({ titularId: 2, papel: 'contato_apoio', contatoId: 9 }),
-        { status: 403 }
-    );
-    await assert.rejects(
-        service.remover({ titularId: 0, papel: 'principal', contatoId: 9 }),
-        { status: 401 }
-    );
+    await assert.rejects(service.remover({ titularId: 2, papel: 'contato_apoio', contatoId: 9 }), {
+        status: 403
+    });
+    await assert.rejects(service.remover({ titularId: 0, papel: 'principal', contatoId: 9 }), {
+        status: 401
+    });
     assert.equal(iniciou, false);
 });
 

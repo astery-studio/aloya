@@ -19,7 +19,10 @@ test('aceita somente confirmação explícita da remoção', () => {
 test('rejeita campos internos e objetos com protótipo alterado', () => {
     const protegido = validator.validarConfirmacao({ confirmado: true, titularId: 99 });
     assert.equal(protegido.valido, false);
-    assert.equal(protegido.erros.some(({ campo }) => campo === 'titularId'), true);
+    assert.equal(
+        protegido.erros.some(({ campo }) => campo === 'titularId'),
+        true
+    );
 
     const poluido = Object.create({ administrador: true });
     poluido.confirmado = true;

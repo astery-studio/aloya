@@ -15,22 +15,38 @@ function criarCenario({ vinculo, updateCount = 1, sessoes = 2, alertas = 1 } = {
     };
     const tx = {
         vinculoRedeApoio: {
-            async findFirst(consulta) { estado.consulta = consulta; return vinculo; },
+            async findFirst(consulta) {
+                estado.consulta = consulta;
+                return vinculo;
+            },
             async updateMany(consulta) {
                 estado.vinculo = consulta;
                 return { count: updateCount };
             }
         },
         sessao: {
-            async updateMany(consulta) { estado.sessoes.push(consulta); return { count: sessoes }; }
+            async updateMany(consulta) {
+                estado.sessoes.push(consulta);
+                return { count: sessoes };
+            }
         },
         notificacao: {
-            async updateMany(consulta) { estado.alertas.push(consulta); return { count: alertas }; },
-            async create(consulta) { estado.notificacoes.push(consulta); return { id: 1 }; }
+            async updateMany(consulta) {
+                estado.alertas.push(consulta);
+                return { count: alertas };
+            },
+            async create(consulta) {
+                estado.notificacoes.push(consulta);
+                return { id: 1 };
+            }
         }
     };
     const service = criarSupportContactRemovalService({
-        prisma: { async $transaction(callback) { return callback(tx); } },
+        prisma: {
+            async $transaction(callback) {
+                return callback(tx);
+            }
+        },
         now: () => agora
     });
     return { estado, service };
@@ -109,10 +125,10 @@ test('notifica contato cadastrado mesmo quando o convite ainda está pendente', 
 
 test('não revela contato inexistente, removido ou pertencente a outra titular', async () => {
     const { service } = criarCenario({ vinculo: null });
-    await assert.rejects(
-        service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }),
-        { status: 404, codigo: 'CONTATO_NAO_ENCONTRADO' }
-    );
+    await assert.rejects(service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+        status: 404,
+        codigo: 'CONTATO_NAO_ENCONTRADO'
+    });
 });
 
 test('detecta concorrência e não encerra sessões nem agenda notificação', async () => {
@@ -120,10 +136,10 @@ test('detecta concorrência e não encerra sessões nem agenda notificação', a
         vinculo: { id: 9, contatoId: 22, status: 'ativo', categoriaId: 3 },
         updateCount: 0
     });
-    await assert.rejects(
-        service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }),
-        { status: 409, codigo: 'CONTATO_ALTERADO' }
-    );
+    await assert.rejects(service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+        status: 409,
+        codigo: 'CONTATO_ALTERADO'
+    });
     assert.equal(estado.sessoes.length, 0);
     assert.equal(estado.notificacoes.length, 0);
 });
@@ -132,9 +148,9 @@ test('rejeita vínculo ativo inconsistente antes de aplicar qualquer alteração
     const { estado, service } = criarCenario({
         vinculo: { id: 9, contatoId: null, status: 'ativo', categoriaId: 3 }
     });
-    await assert.rejects(
-        service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }),
-        { status: 409, codigo: 'VINCULO_INCONSISTENTE' }
-    );
+    await assert.rejects(service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+        status: 409,
+        codigo: 'VINCULO_INCONSISTENTE'
+    });
     assert.equal(estado.vinculo, null);
 });

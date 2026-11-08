@@ -8,9 +8,18 @@ function resposta() {
     return {
         estado,
         res: {
-            set(nome, valor) { estado.headers[nome] = valor; return this; },
-            status(valor) { estado.status = valor; return this; },
-            json(valor) { estado.body = valor; return this; }
+            set(nome, valor) {
+                estado.headers[nome] = valor;
+                return this;
+            },
+            status(valor) {
+                estado.status = valor;
+                return this;
+            },
+            json(valor) {
+                estado.body = valor;
+                return this;
+            }
         }
     };
 }
@@ -18,13 +27,19 @@ function resposta() {
 function controllerCom(sobrescritas = {}) {
     return criarSupportContactRemovalController({
         service: sobrescritas.service ?? {
-            async remover() { return { id: 9, status: 'revogado' }; }
+            async remover() {
+                return { id: 9, status: 'revogado' };
+            }
         },
         contactValidator: sobrescritas.contactValidator ?? {
-            validarContatoId() { return { valido: true, contatoId: 9 }; }
+            validarContatoId() {
+                return { valido: true, contatoId: 9 };
+            }
         },
         removalValidator: sobrescritas.removalValidator ?? {
-            validarConfirmacao() { return { valido: true, dados: { confirmado: true } }; }
+            validarConfirmacao() {
+                return { valido: true, dados: { confirmado: true } };
+            }
         }
     });
 }
@@ -59,7 +74,11 @@ test('remove usando somente a identidade autenticada e responde sucesso', async 
 
 test('não chama o serviço sem identificador ou confirmação válidos', async () => {
     let chamadas = 0;
-    const service = { async remover() { chamadas += 1; } };
+    const service = {
+        async remover() {
+            chamadas += 1;
+        }
+    };
     const idInvalido = controllerCom({
         service,
         contactValidator: {
@@ -107,15 +126,31 @@ test('preserva erro público e mascara falha interna', async () => {
     let recebidoPublico;
     let recebidoInterno;
 
-    await controllerCom({ service: { async remover() { throw publico; } } }).remover(
+    await controllerCom({
+        service: {
+            async remover() {
+                throw publico;
+            }
+        }
+    }).remover(
         { usuario: { id: 1 }, params: { contatoId: '9' }, body: { confirmado: true } },
         resposta().res,
-        (erro) => { recebidoPublico = erro; }
+        (erro) => {
+            recebidoPublico = erro;
+        }
     );
-    await controllerCom({ service: { async remover() { throw interno; } } }).remover(
+    await controllerCom({
+        service: {
+            async remover() {
+                throw interno;
+            }
+        }
+    }).remover(
         { usuario: { id: 1 }, params: { contatoId: '9' }, body: { confirmado: true } },
         resposta().res,
-        (erro) => { recebidoInterno = erro; }
+        (erro) => {
+            recebidoInterno = erro;
+        }
     );
 
     assert.equal(recebidoPublico.mensagemUsuario, undefined);
