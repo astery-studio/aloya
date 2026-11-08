@@ -109,6 +109,15 @@ test('aceita e recusa convites reais preservando atomicidade e notificações', 
         await service.aceitar({ token: tokenAceite, usuarioId: 2 });
         await service.recusar({ token: tokenRecusa, usuarioId: 3 });
 
+        await assert.rejects(
+            () => service.aceitar({ token: tokenAceite, usuarioId: 2 }),
+            { status: 410, codigo: 'CONVITE_INDISPONIVEL' }
+        );
+        await assert.rejects(
+            () => service.aceitar({ token: tokenRecusa, usuarioId: 3 }),
+            { status: 410, codigo: 'CONVITE_INDISPONIVEL' }
+        );
+
         const vinculos = await prisma.vinculoRedeApoio.findMany({
             orderBy: { id: 'asc' }
         });
