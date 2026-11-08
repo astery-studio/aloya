@@ -5,6 +5,10 @@ import {
 } from '../constants/supportContact.constants.js';
 
 const MILISSEGUNDOS_POR_DIA = 24 * 60 * 60 * 1000;
+const comparadorNomes = new Intl.Collator('pt-BR', {
+    numeric: true,
+    sensitivity: 'base'
+});
 
 function inicioUtcDoDia(data) {
     return Date.UTC(data.getUTCFullYear(), data.getUTCMonth(), data.getUTCDate());
@@ -85,10 +89,31 @@ function formatarContato(vinculo, agora = new Date()) {
     });
 }
 
+function compararContatos(primeiro, segundo) {
+    const prioridadePrimeiro = primeiro.status === STATUS_CONTATO_PENDENTE ? 0 : 1;
+    const prioridadeSegundo = segundo.status === STATUS_CONTATO_PENDENTE ? 0 : 1;
+
+    if (prioridadePrimeiro !== prioridadeSegundo) {
+        return prioridadePrimeiro - prioridadeSegundo;
+    }
+
+    const porNome = comparadorNomes.compare(
+        primeiro.identificacao,
+        segundo.identificacao
+    );
+    return porNome !== 0 ? porNome : primeiro.id - segundo.id;
+}
+
+function ordenarContatos(contatos) {
+    return [...contatos].sort(compararContatos);
+}
+
 export {
     calcularDiasAguardando,
     criarResumoEspera,
+    compararContatos,
     formatarContato,
+    ordenarContatos,
     resolverVinculo,
     STATUS_CONTATO_ATIVO,
     STATUS_CONTATO_PENDENTE
