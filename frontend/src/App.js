@@ -2,14 +2,7 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    BackHandler,
-    Linking,
-    NativeModules,
-    Text
-} from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
@@ -630,7 +623,6 @@ export default function App() {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
-                calendarService={configuracao.servicos.calendarService}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
