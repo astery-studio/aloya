@@ -99,6 +99,8 @@ import { criarContactInvitationResponseController } from '../../features/support
 import { criarContactInvitationResponseRateLimit } from '../../features/support-network/middleware/contactInvitationResponseRateLimit.middleware.js';
 import { criarSupportContactService } from '../../features/support-network/services/supportContact.service.js';
 import { criarSupportContactController } from '../../features/support-network/controllers/supportContact.controller.js';
+import { criarSupportContactValidator } from '../../features/support-network/validators/supportContact.validator.js';
+import { criarContactInvitationResendService } from '../../features/support-network/services/contactInvitationResend.service.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -259,6 +261,11 @@ function criarContainer() {
         passwordService
     });
     const supportContactService = criarSupportContactService({ prisma });
+    const contactInvitationResendService = criarContactInvitationResendService({
+        prisma,
+        tokenService: contactInvitationTokenService,
+        emailService
+    });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -276,6 +283,7 @@ function criarContainer() {
     const permissionCategoryDeletionValidator = criarPermissionCategoryDeletionValidator();
     const contactInvitationValidator = criarContactInvitationValidator();
     const contactRegistrationValidator = criarContactRegistrationValidator();
+    const supportContactValidator = criarSupportContactValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -427,7 +435,9 @@ function criarContainer() {
         registrationValidator: contactRegistrationValidator
     });
     const supportContactController = criarSupportContactController({
-        service: supportContactService
+        service: supportContactService,
+        resendService: contactInvitationResendService,
+        validator: supportContactValidator
     });
 
     return {

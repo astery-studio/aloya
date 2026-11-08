@@ -180,6 +180,7 @@ app.use(
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactInvitationRateLimit,
         controller: container.supportContactController
     })
 );
