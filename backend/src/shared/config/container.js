@@ -97,6 +97,8 @@ import { criarContactRegistrationValidator } from '../../features/support-networ
 import { criarContactInvitationResponseService } from '../../features/support-network/services/contactInvitationResponse.service.js';
 import { criarContactInvitationResponseController } from '../../features/support-network/controllers/contactInvitationResponse.controller.js';
 import { criarContactInvitationResponseRateLimit } from '../../features/support-network/middleware/contactInvitationResponseRateLimit.middleware.js';
+import { criarSupportContactService } from '../../features/support-network/services/supportContact.service.js';
+import { criarSupportContactController } from '../../features/support-network/controllers/supportContact.controller.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -256,6 +258,7 @@ function criarContainer() {
         tokenService: contactInvitationTokenService,
         passwordService
     });
+    const supportContactService = criarSupportContactService({ prisma });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -423,6 +426,9 @@ function criarContainer() {
         invitationValidator: contactInvitationValidator,
         registrationValidator: contactRegistrationValidator
     });
+    const supportContactController = criarSupportContactController({
+        service: supportContactService
+    });
 
     return {
         authController,
@@ -443,6 +449,7 @@ function criarContainer() {
         permissionCategoryDeletionController,
         contactInvitationController,
         contactInvitationResponseController,
+        supportContactController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
