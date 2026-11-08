@@ -105,6 +105,10 @@ import { criarContactLinkService } from '../../features/support-network/services
 import { criarContactLinkValidator } from '../../features/support-network/validators/contactLink.validator.js';
 import { criarContactLinkController } from '../../features/support-network/controllers/contactLink.controller.js';
 import { criarContactLinkRateLimit } from '../../features/support-network/middleware/contactLinkRateLimit.middleware.js';
+import { criarSupportContactRemovalService } from '../../features/support-network/services/supportContactRemoval.service.js';
+import { criarSupportContactRemovalValidator } from '../../features/support-network/validators/supportContactRemoval.validator.js';
+import { criarSupportContactRemovalController } from '../../features/support-network/controllers/supportContactRemoval.controller.js';
+import { criarSupportContactRemovalRateLimit } from '../../features/support-network/middleware/supportContactRemovalRateLimit.middleware.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -271,6 +275,7 @@ function criarContainer() {
         emailService
     });
     const contactLinkService = criarContactLinkService({ prisma });
+    const supportContactRemovalService = criarSupportContactRemovalService({ prisma });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -290,6 +295,7 @@ function criarContainer() {
     const contactRegistrationValidator = criarContactRegistrationValidator();
     const supportContactValidator = criarSupportContactValidator();
     const contactLinkValidator = criarContactLinkValidator();
+    const supportContactRemovalValidator = criarSupportContactRemovalValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -361,6 +367,11 @@ function criarContainer() {
         rateLimit,
         janelaMs: env.configuracoesContaRateLimitJanelaMs,
         limite: env.configuracoesContaRateLimitMaximo
+    });
+    const supportContactRemovalRateLimit = criarSupportContactRemovalRateLimit({
+        rateLimit,
+        janelaMs: env.exclusaoContaRateLimitJanelaMs,
+        limite: env.exclusaoContaRateLimitMaximo
     });
 
     const alteracaoSenhaRateLimit = criarAlteracaoSenhaRateLimit({
@@ -455,6 +466,11 @@ function criarContainer() {
         contactValidator: supportContactValidator,
         linkValidator: contactLinkValidator
     });
+    const supportContactRemovalController = criarSupportContactRemovalController({
+        service: supportContactRemovalService,
+        contactValidator: supportContactValidator,
+        removalValidator: supportContactRemovalValidator
+    });
 
     return {
         authController,
@@ -477,6 +493,7 @@ function criarContainer() {
         contactInvitationResponseController,
         supportContactController,
         contactLinkController,
+        supportContactRemovalController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
@@ -490,6 +507,7 @@ function criarContainer() {
         contactInvitationRateLimit,
         contactInvitationResponseRateLimit,
         contactLinkRateLimit,
+        supportContactRemovalRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
