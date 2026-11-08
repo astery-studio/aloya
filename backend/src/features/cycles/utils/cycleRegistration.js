@@ -1,5 +1,6 @@
+import { incluirCiclosProximos } from './cycleContinuity.js';
 import { AppError } from '../../../shared/errors/AppError.js';
-import { adicionarDias, formatarData } from './calendar.js';
+import { adicionarDias, diferencaDias, paraDataCalendario, formatarData } from './calendar.js';
 
 function conflitoRegistro() {
     return new AppError(
@@ -13,22 +14,22 @@ function selecionarPeriodo(registros, inicio, fim) {
     const ordenados = [...registros].sort((a, b) =>
         formatarData(a.dataInicio).localeCompare(formatarData(b.dataInicio))
     );
-    let anterior = null;
-    let seguinte = null;
+
     for (const registro of ordenados) {
         const primeiro = formatarData(registro.dataInicio);
         const ultimo = formatarData(
             registro.dataFim ?? registro.diasMenstruacao.at(-1)?.data ?? registro.dataInicio
         );
         if (primeiro <= fim && ultimo >= inicio) throw conflitoRegistro();
-        if (ultimo < inicio) anterior = { registro, ultimo };
-        if (primeiro > fim && !seguinte) seguinte = registro;
     }
-    const continuaAnterior = anterior && adicionarDias(anterior.ultimo, 1) === inicio;
-    const continuaSeguinte =
-        seguinte && adicionarDias(fim, 1) === formatarData(seguinte.dataInicio);
-    if (continuaAnterior && continuaSeguinte) throw conflitoRegistro();
-    return { registro: continuaAnterior ? anterior.registro : continuaSeguinte ? seguinte : null };
+    const dias = Array.from({ length: diferencaDias(inicio, fim) + 1 }, (_, i) =>
+        paraDataCalendario(adicionarDias(inicio, i))
+    );
+    const continuidade = incluirCiclosProximos(dias, ordenados);
+    return {
+        registro: continuidade.registros[0] ?? null,
+        registrosParaUnir: continuidade.registros.slice(1)
+    };
 }
 
 // Uma categoria atribuída define as permissões; as individuais valem sem categoria.
