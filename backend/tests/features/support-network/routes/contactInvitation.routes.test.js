@@ -11,8 +11,12 @@ function criarCenario() {
     const consultarEmail = () => {};
     const criarConvite = () => {};
     const router = {
-        use(...handlers) { registros.push(['use', null, handlers]); },
-        post(path, ...handlers) { registros.push(['post', path, handlers]); }
+        use(...handlers) {
+            registros.push(['use', null, handlers]);
+        },
+        post(path, ...handlers) {
+            registros.push(['post', path, handlers]);
+        }
     };
 
     const resultado = criarContactInvitationRoutes({

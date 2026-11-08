@@ -106,10 +106,7 @@ function validarCriacaoConvite(body) {
 
     const email = validarEmail(body.email, erros);
     const categoriaId = validarCategoriaId(body.categoriaId, erros);
-    const permissoesIndividuais = validarPermissoesIndividuais(
-        body.permissoesIndividuais,
-        erros
-    );
+    const permissoesIndividuais = validarPermissoesIndividuais(body.permissoesIndividuais, erros);
     const informouCategoria = body.categoriaId !== undefined;
     const informouPermissoes = body.permissoesIndividuais !== undefined;
 

@@ -7,7 +7,10 @@ test('limita convites pela identidade autenticada', () => {
     let configuracao;
     const middleware = () => {};
     const resultado = criarContactInvitationRateLimit({
-        rateLimit(valor) { configuracao = valor; return middleware; },
+        rateLimit(valor) {
+            configuracao = valor;
+            return middleware;
+        },
         janelaMs: 900000,
         limite: 3
     });
@@ -21,9 +24,16 @@ test('limita convites pela identidade autenticada', () => {
 test('responde 429 sem registrar e-mail, permissões ou corpo', () => {
     let configuracao;
     let log;
-    const logger = { warn(valor) { log = valor; } };
+    const logger = {
+        warn(valor) {
+            log = valor;
+        }
+    };
     criarContactInvitationRateLimit({
-        rateLimit(valor) { configuracao = valor; return () => {}; },
+        rateLimit(valor) {
+            configuracao = valor;
+            return () => {};
+        },
         janelaMs: 900000,
         limite: 3,
         logger
@@ -31,8 +41,14 @@ test('responde 429 sem registrar e-mail, permissões ou corpo', () => {
     const res = {
         codigo: null,
         corpo: null,
-        status(valor) { this.codigo = valor; return this; },
-        json(valor) { this.corpo = valor; return this; }
+        status(valor) {
+            this.codigo = valor;
+            return this;
+        },
+        json(valor) {
+            this.corpo = valor;
+            return this;
+        }
     };
 
     configuracao.handler(

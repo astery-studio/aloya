@@ -28,7 +28,11 @@ test('resolve somente categoria pertencente à titular autenticada', async () =>
 
 test('não diferencia categoria inexistente de categoria de outra titular', async () => {
     const prisma = {
-        categoriaPermissao: { async findFirst() { return null; } }
+        categoriaPermissao: {
+            async findFirst() {
+                return null;
+            }
+        }
     };
     const service = criarContactInvitationPermissionService({ prisma });
 

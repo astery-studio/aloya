@@ -22,7 +22,10 @@ import { tratarErros } from '../../../../src/shared/middleware/error.middleware.
 
 const { PrismaClient } = prismaPackage;
 const MIGRACAO_INICIAL = fileURLToPath(
-    new URL('../../../../prisma/migrations/20260913221156_estrutura_inicial/migration.sql', import.meta.url)
+    new URL(
+        '../../../../prisma/migrations/20260913221156_estrutura_inicial/migration.sql',
+        import.meta.url
+    )
 );
 const MIGRACAO_NOMES = fileURLToPath(
     new URL(
@@ -38,16 +41,24 @@ function criarBanco() {
     banco.exec('PRAGMA foreign_keys = ON');
     banco.exec(readFileSync(MIGRACAO_INICIAL, 'utf8'));
     banco.exec(readFileSync(MIGRACAO_NOMES, 'utf8'));
-    banco.prepare(`
+    banco
+        .prepare(
+            `
         INSERT INTO usuarios (id, nome, data_nascimento, email, senha_hash, papel, status_conta, criado_em, atualizado_em)
         VALUES
             (1, 'Ana', '2000-01-01T00:00:00.000Z', 'ana@example.com', 'hash', 'principal', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (2, 'Bia', '2000-01-01T00:00:00.000Z', 'bia@example.com', 'hash', 'contato_apoio', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    `).run();
-    banco.prepare(`
+    `
+        )
+        .run();
+    banco
+        .prepare(
+            `
         INSERT INTO categorias_permissao (id, titular_id, nome, nome_normalizado, conjunto_dados_visiveis, criado_em, atualizado_em)
         VALUES (10, 1, 'Família', 'família', '["geral.fase_atual"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    `).run();
+    `
+        )
+        .run();
     banco.close();
     return { diretorio, caminho };
 }
@@ -64,7 +75,9 @@ function criarApp(prisma, emails) {
         permissionService,
         tokenService,
         emailService: {
-            async enviarConviteRedeApoio(dados) { emails.push(dados); }
+            async enviarConviteRedeApoio(dados) {
+                emails.push(dados);
+            }
         }
     });
     const controller = criarContactInvitationController({
@@ -73,17 +86,27 @@ function criarApp(prisma, emails) {
     });
     const app = express();
     app.use(express.json());
-    app.use('/support-network', criarContactInvitationRoutes({
-        Router: express.Router,
-        authMiddleware: {
-            autenticar(req, _res, next) { req.usuario = { id: 1, papel: 'principal' }; next(); }
-        },
-        parentalConsentMiddleware: {
-            exigirAcessoRedeApoio(_req, _res, next) { next(); }
-        },
-        rateLimit(_req, _res, next) { next(); },
-        controller
-    }));
+    app.use(
+        '/support-network',
+        criarContactInvitationRoutes({
+            Router: express.Router,
+            authMiddleware: {
+                autenticar(req, _res, next) {
+                    req.usuario = { id: 1, papel: 'principal' };
+                    next();
+                }
+            },
+            parentalConsentMiddleware: {
+                exigirAcessoRedeApoio(_req, _res, next) {
+                    next();
+                }
+            },
+            rateLimit(_req, _res, next) {
+                next();
+            },
+            controller
+        })
+    );
     app.use(tratarErros);
     return app;
 }

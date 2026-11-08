@@ -33,7 +33,11 @@ test('orienta conta cadastrada a aceitar diretamente no aplicativo', async () =>
     let mensagem;
     const service = criarEmailService({
         remetente: 'no-reply@aloya.test',
-        transporter: { async sendMail(valor) { mensagem = valor; } }
+        transporter: {
+            async sendMail(valor) {
+                mensagem = valor;
+            }
+        }
     });
 
     await service.enviarConviteRedeApoio({

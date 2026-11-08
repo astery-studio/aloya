@@ -58,7 +58,10 @@ test('exige exatamente uma forma de definir as permissões', () => {
     ]) {
         const resultado = validarCriacaoConvite(corpo);
         assert.equal(resultado.valido, false);
-        assert.equal(resultado.erros.some((item) => item.campo === 'permissao'), true);
+        assert.equal(
+            resultado.erros.some((item) => item.campo === 'permissao'),
+            true
+        );
     }
 });
 
@@ -70,8 +73,14 @@ test('rejeita categoria, permissões e campos protegidos inválidos', () => {
     });
 
     assert.equal(resultado.valido, false);
-    assert.equal(resultado.erros.some((item) => item.campo === 'categoriaId'), true);
-    assert.equal(resultado.erros.some((item) => item.campo === 'dados'), true);
+    assert.equal(
+        resultado.erros.some((item) => item.campo === 'categoriaId'),
+        true
+    );
+    assert.equal(
+        resultado.erros.some((item) => item.campo === 'dados'),
+        true
+    );
 });
 
 test('rejeita corpo malformado sem lançar erro interno', () => {

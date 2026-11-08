@@ -3,17 +3,24 @@ import test from 'node:test';
 
 import { criarContactInvitationService } from '../../../../src/features/support-network/services/contactInvitation.service.js';
 
-function criarCenario({ usuarioConvidado = null, vinculoExistente = null, falhaEmail = false } = {}) {
+function criarCenario({
+    usuarioConvidado = null,
+    vinculoExistente = null,
+    falhaEmail = false
+} = {}) {
     const estado = { criado: null, removido: null, email: null };
     const prisma = {
         usuario: {
             async findUnique({ where }) {
-                if (where.id) return { id: where.id, nome: 'Titular', email: 'titular@example.com' };
+                if (where.id)
+                    return { id: where.id, nome: 'Titular', email: 'titular@example.com' };
                 return usuarioConvidado;
             }
         },
         vinculoRedeApoio: {
-            async findFirst() { return vinculoExistente; },
+            async findFirst() {
+                return vinculoExistente;
+            },
             async create({ data }) {
                 estado.criado = data;
                 return {
@@ -24,18 +31,27 @@ function criarCenario({ usuarioConvidado = null, vinculoExistente = null, falhaE
                     dataExpiracao: data.dataExpiracao
                 };
             },
-            async deleteMany({ where }) { estado.removido = where; return { count: 1 }; }
+            async deleteMany({ where }) {
+                estado.removido = where;
+                return { count: 1 };
+            }
         }
     };
     const permissionService = {
         async resolverCategoria() {
             return {
-                tipo: 'categoria', categoriaId: 3, categoriaNome: 'Família', permissoesIndividuais: []
+                tipo: 'categoria',
+                categoriaId: 3,
+                categoriaNome: 'Família',
+                permissoesIndividuais: []
             };
         },
         resolverPermissoesIndividuais(permissoes) {
             return {
-                tipo: 'individual', categoriaId: null, categoriaNome: null, permissoesIndividuais: permissoes
+                tipo: 'individual',
+                categoriaId: null,
+                categoriaNome: null,
+                permissoesIndividuais: permissoes
             };
         }
     };
@@ -57,7 +73,12 @@ function criarCenario({ usuarioConvidado = null, vinculoExistente = null, falhaE
 
     return {
         estado,
-        service: criarContactInvitationService({ prisma, permissionService, tokenService, emailService })
+        service: criarContactInvitationService({
+            prisma,
+            permissionService,
+            tokenService,
+            emailService
+        })
     };
 }
 
@@ -67,7 +88,10 @@ test('cria convite pendente por categoria sem conceder acesso', async () => {
     });
 
     const resultado = await service.criarConvite({
-        titularId: 2, papel: 'principal', email: 'contato@example.com', categoriaId: 3
+        titularId: 2,
+        papel: 'principal',
+        email: 'contato@example.com',
+        categoriaId: 3
     });
 
     assert.equal(estado.criado.status, 'pendente');
@@ -101,7 +125,10 @@ test('remove o vínculo pendente quando o envio do e-mail falha', async () => {
 
     await assert.rejects(
         service.criarConvite({
-            titularId: 2, papel: 'principal', email: 'nova@example.com', categoriaId: 3
+            titularId: 2,
+            papel: 'principal',
+            email: 'nova@example.com',
+            categoriaId: 3
         }),
         /SMTP indisponível/u
     );
@@ -117,7 +144,10 @@ test('impede auto-convite e convite duplicado', async () => {
     const proprio = criarCenario().service;
     await assert.rejects(
         proprio.criarConvite({
-            titularId: 2, papel: 'principal', email: 'titular@example.com', categoriaId: 3
+            titularId: 2,
+            papel: 'principal',
+            email: 'titular@example.com',
+            categoriaId: 3
         }),
         { codigo: 'CONVITE_PARA_PROPRIA_CONTA', status: 422 }
     );
@@ -125,7 +155,10 @@ test('impede auto-convite e convite duplicado', async () => {
     const duplicado = criarCenario({ vinculoExistente: { status: 'pendente' } }).service;
     await assert.rejects(
         duplicado.criarConvite({
-            titularId: 2, papel: 'principal', email: 'contato@example.com', categoriaId: 3
+            titularId: 2,
+            papel: 'principal',
+            email: 'contato@example.com',
+            categoriaId: 3
         }),
         { codigo: 'CONVITE_JA_PENDENTE', status: 409 }
     );

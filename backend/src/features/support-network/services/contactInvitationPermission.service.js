@@ -63,4 +63,3 @@ import {
     permissaoCategoriaEhValida,
     permissoesDaCategoria
 } from '../constants/contactInvitation.constants.js';
-

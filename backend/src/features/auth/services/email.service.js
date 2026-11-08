@@ -48,7 +48,7 @@ function criarEmailService({ transporter, remetente }) {
                 Equipe de Privacidade e Compliance — ALOYA
                             `.trim(),
 
-                            html: `
+            html: `
                 <main style="max-width:600px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#222222;line-height:1.6;background-color:#F7F5F0;border-radius:12px;">
                     <div style="text-align:center;margin-bottom:24px;">
                         <span style="display:inline-block;background-color:#E6E2D8;color:#2C4C3B;font-size:12px;font-weight:bold;padding:6px 12px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;">
@@ -113,10 +113,7 @@ function criarEmailService({ transporter, remetente }) {
         });
     }
 
-    async function enviarEmailRecuperacaoSenha({
-        email,
-        linkRedefinicao
-    }) {
+    async function enviarEmailRecuperacaoSenha({ email, linkRedefinicao }) {
         await transporter.sendMail({
             from: remetente,
             to: email,
@@ -183,6 +180,4 @@ function criarEmailService({ transporter, remetente }) {
     };
 }
 
-export {
-    criarEmailService
-};
+export { criarEmailService };

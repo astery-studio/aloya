@@ -22,10 +22,7 @@ test('reconhece somente contas ativas com papel de contato', () => {
         usuarioEhContatoCadastrado({ papel: 'principal_e_contato_apoio', statusConta: 'ativa' }),
         true
     );
-    assert.equal(
-        usuarioEhContatoCadastrado({ papel: 'principal', statusConta: 'ativa' }),
-        false
-    );
+    assert.equal(usuarioEhContatoCadastrado({ papel: 'principal', statusConta: 'ativa' }), false);
     assert.equal(
         usuarioEhContatoCadastrado({ papel: 'contato_apoio', statusConta: 'suspensa' }),
         false
