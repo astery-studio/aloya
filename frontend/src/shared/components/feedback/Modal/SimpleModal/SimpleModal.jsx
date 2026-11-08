@@ -28,6 +28,8 @@ export default function SimpleModal({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const visualErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
+    const confirmacaoCiclo = varianteVisual === 'confirmacaoCiclo';
+    const feedbackCiclo = confirmacaoCiclo || varianteVisual === 'sucessoCiclo';
     const sairDaConta = varianteVisual === 'sairDaConta';
     const sairSemSalvar =
         varianteVisual === 'sairSemSalvar' ||
@@ -47,6 +49,7 @@ export default function SimpleModal({
             estiloIcone={[estiloIcone, estilos.icone, visualErro.icone]}
             estilo={[
                 estilos.caixa,
+                confirmacaoCiclo && estilos.caixaConfirmacaoCiclo,
                 visualErro.modal,
                 (sairSemSalvar || sairDaConta) && estilos.caixaSairSemSalvar,
                 sairDaConta && estilos.caixaSairDaConta
@@ -64,11 +67,13 @@ export default function SimpleModal({
                     estilo={[
                         larguraTotal,
                         visualErro.botaoPrincipal,
+                        feedbackCiclo && estilos.botaoPrincipalCiclo,
                         acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
                             estilos.botaoSairSemSalvar
                     ]}
                     estiloTexto={[
                         visualErro.textoPrincipal,
+                        feedbackCiclo && estilos.textoPrincipalCiclo,
                         acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
                             estilos.textoSairSemSalvar
                     ]}
@@ -84,11 +89,13 @@ export default function SimpleModal({
                     estilo={[
                         larguraTotal,
                         visualErro.botaoSecundario,
+                        feedbackCiclo && estilos.botaoSecundarioCiclo,
                         (acaoSecundaria.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
                             estilos.botaoSairSemSalvar
                     ]}
                     estiloTexto={[
                         visualErro.textoSecundario,
+                        feedbackCiclo && estilos.textoSecundarioCiclo,
                         (acaoSecundaria.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
                             estilos.textoSairSemSalvar
                     ]}

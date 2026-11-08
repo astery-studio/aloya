@@ -2,6 +2,19 @@ import { StyleSheet } from 'react-native';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        caixaConfirmacaoCiclo: tema.escuro
+            ? { backgroundColor: '#1E1E1E', borderColor: 'transparent' }
+            : {},
+        botaoPrincipalCiclo: tema.escuro ? { backgroundColor: '#A5D6A7', borderWidth: 0 } : {},
+        textoPrincipalCiclo: tema.escuro ? { color: '#121212' } : {},
+        botaoSecundarioCiclo: tema.escuro
+            ? {
+                  backgroundColor: '#242424',
+                  borderWidth: 1,
+                  borderColor: 'rgba(255, 255, 255, 0.12)'
+              }
+            : {},
+        textoSecundarioCiclo: tema.escuro ? { color: '#E3E3E3' } : {},
         caixaSairDaConta: tema.escuro ? { borderColor: 'transparent' } : {},
         caixaSairSemSalvar: tema.escuro
             ? {

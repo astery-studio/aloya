@@ -254,3 +254,40 @@ test.each(['ios', 'android'])(
         modalVisivel(resultado);
     }
 );
+
+test.each(['ios', 'android'])(
+    'encerra edição após separar setembro de outubro e ignora fechamentos atrasados no %s',
+    async (plataforma) => {
+        Platform.OS = plataforma;
+        const editar = jest
+            .fn()
+            .mockResolvedValue({ id: 3, dataInicio: '2026-09-06', dataFim: '2026-09-06' });
+        const fechar = jest.fn();
+        const resultado = await render(
+            <CycleEditFlow
+                ciclo={{ id: 3, dataInicio: '2026-10-25', dataFim: '2026-10-28' }}
+                service={{ editar }}
+                onFechar={fechar}
+                onAtualizado={jest.fn().mockResolvedValue(true)}
+            />
+        );
+        const sheet = modalVisivel(resultado).props.testID;
+        await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-06' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
+        if (plataforma === 'ios') await ocultarNoIos(resultado, sheet);
+        expect(screen.getByText(/salva em 2 ciclos separados/)).toBeOnTheScreen();
+        const confirmacao = modalVisivel(resultado).props.testID;
+        const fecharConfirmacaoAtrasado = modalVisivel(resultado).props.onRequestClose;
+        await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+        if (plataforma === 'ios') await ocultarNoIos(resultado, confirmacao);
+        expect(await screen.findByText('Ciclo atualizado com sucesso')).toBeOnTheScreen();
+        const sucesso = modalVisivel(resultado).props.testID;
+        await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+        if (plataforma === 'ios') await ocultarNoIos(resultado, sucesso);
+        await act(() => fecharConfirmacaoAtrasado?.());
+        expect(fechar).toHaveBeenCalledTimes(1);
+        expect(editar).toHaveBeenCalledTimes(1);
+        expect(modais(resultado).filter((modal) => modal.props.visible)).toHaveLength(0);
+        expect(screen.queryByText('Editar Menstruação')).toBeNull();
+    }
+);

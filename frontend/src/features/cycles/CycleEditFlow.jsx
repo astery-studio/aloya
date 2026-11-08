@@ -80,23 +80,25 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     const montado = useRef(true);
     const confirmarOutrosCiclos = useRef(false);
     const cicloFoiRemovido = useRef(false);
+    const salvo = useRef(false);
+    const finalizado = useRef(false);
     const painelAtual = useRef(painelVisivel);
     painelAtual.current = painelVisivel;
     const alterado = JSON.stringify(dias) !== JSON.stringify(originais);
 
     const carregarRegistro = useCallback(async () => {
-        if (typeof service.buscar !== 'function') return;
+        if (salvo.current || finalizado.current || typeof service.buscar !== 'function') return;
         setCarregando(true);
         try {
             const atual = await service.buscar(ciclo.id);
-            if (!montado.current) return;
+            if (!montado.current || salvo.current || finalizado.current) return;
             setRegistro(atual);
             const datas = diasDoRegistro(atual);
             setOriginais(datas);
             setDias(datas);
             return true;
         } catch (falha) {
-            if (!montado.current) return;
+            if (!montado.current || salvo.current || finalizado.current) return;
             if (falha?.status === 401) {
                 onSessaoExpirada?.();
                 return;
@@ -145,6 +147,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     }
 
     function executarAposOcultarPainel() {
+        if (finalizado.current) return;
         const acao = acaoAposOcultarPainel.current;
         acaoAposOcultarPainel.current = null;
         acao?.();
@@ -156,19 +159,35 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     }
 
     function executarAposOcultarFeedback() {
+        if (finalizado.current) return;
         const acao = acaoAposOcultarFeedback.current;
         acaoAposOcultarFeedback.current = null;
         acao?.();
     }
 
+    function fecharFluxo() {
+        if (finalizado.current) return;
+        finalizado.current = true;
+        acaoAposOcultarFeedback.current = null;
+        acaoAposOcultarPainel.current = null;
+        setFeedback(null);
+        setPainelVisivel(false);
+        onFechar?.();
+    }
     function voltarAoPainel() {
-        ocultarFeedback(() => setPainelVisivel(true));
+        if (salvo.current || finalizado.current) {
+            fecharFluxo();
+            return;
+        }
+        ocultarFeedback(() => {
+            if (!salvo.current && !finalizado.current) setPainelVisivel(true);
+        });
     }
 
     function solicitarFechamento() {
         if (salvando) return;
         if (alterado) abrirFeedback({ tipo: 'saida' });
-        else onFechar?.();
+        else fecharFluxo();
     }
 
     function solicitarSalvamento() {
@@ -205,6 +224,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 dias: validacao.dias,
                 ...(validacao.confirmarOutrosCiclos ? { confirmarOutrosCiclos: true } : {})
             });
+            salvo.current = true;
             cicloFoiRemovido.current = resultado === null;
             await atualizarTelas();
         } catch (falha) {
@@ -216,19 +236,31 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 falha?.codigo === 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS' &&
                 Array.isArray(falha.detalhes)
             ) {
-                const periodos = falha.detalhes
-                    .map(
-                        (periodo) =>
-                            `${periodo.dias.map(formatarDataParaCampo).join(', ')} no período de ${formatarDataParaCampo(periodo.dataInicio)} a ${formatarDataParaCampo(periodo.dataFim)}`
-                    )
-                    .join('; ');
-                const datasOutrosCiclos = new Set(
-                    falha.detalhes.flatMap((periodo) => periodo.dias)
+                const unioes = falha.detalhes.filter((periodo) => periodo.acao === 'unir');
+                const restauracoes = falha.detalhes.filter((periodo) => periodo.acao !== 'unir');
+                const descreverPeriodo = (periodo) =>
+                    `${formatarDataParaCampo(periodo.dataInicio)} a ${periodo.dataFim ? formatarDataParaCampo(periodo.dataFim) : 'em andamento'}`;
+                const mensagens = [];
+                if (unioes.length)
+                    mensagens.push(
+                        `Os períodos ${unioes.map(descreverPeriodo).join('; ')} serão unidos à seleção, pois há no máximo 2 dias de pausa entre os sangramentos. Os dias registrados serão preservados em um único ciclo para cada grupo contínuo.`
+                    );
+                if (restauracoes.length)
+                    mensagens.push(
+                        `Os seguintes dias serão restaurados em outros ciclos: ${restauracoes.map((periodo) => `${periodo.dias.map(formatarDataParaCampo).join(', ')} no período de ${descreverPeriodo(periodo)}`).join('; ')}. Esses dias permanecerão associados aos respectivos ciclos.`
+                    );
+                const datasOutrosCiclos = new Set(restauracoes.flatMap((periodo) => periodo.dias));
+                const excluiAtual =
+                    !unioes.length && validacao.dias.every((dia) => datasOutrosCiclos.has(dia));
+                if (excluiAtual)
+                    mensagens.push('O ciclo em edição ficará sem dias e será excluído.');
+                mensagens.push(
+                    'As demais alterações da seleção serão salvas e as previsões serão recalculadas. Deseja continuar?'
                 );
-                const excluiAtual = validacao.dias.every((dia) => datasOutrosCiclos.has(dia));
                 setFeedback({
                     tipo: 'outros-ciclos',
-                    mensagem: `Os seguintes dias serão restaurados em outros ciclos: ${periodos}. Esses dias permanecerão associados aos respectivos ciclos. ${excluiAtual ? 'O ciclo em edição ficará sem dias e será excluído. ' : ''}As demais alterações da seleção serão salvas e as previsões serão recalculadas. Deseja continuar?`
+                    titulo: unioes.length ? 'Unir ciclos' : 'Alterar outro ciclo',
+                    mensagem: mensagens.join(' ')
                 });
                 return;
             }
@@ -273,6 +305,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 onSalvar={solicitarSalvamento}
             />
             <SimpleModal
+                varianteVisual="confirmacaoCiclo"
                 visivel={['confirmacao', 'exclusao', 'outros-ciclos'].includes(feedback?.tipo)}
                 aoFechar={voltarAoPainel}
                 aoOcultar={executarAposOcultarFeedback}
@@ -282,7 +315,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                     feedback?.tipo === 'exclusao'
                         ? 'Apagar ciclo'
                         : feedback?.tipo === 'outros-ciclos'
-                          ? 'Alterar outro ciclo'
+                          ? (feedback.titulo ?? 'Alterar outro ciclo')
                           : 'Atualizar ciclo'
                 }
                 mensagem={
@@ -315,12 +348,13 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 acaoSecundaria={{
                     texto: 'Sair sem salvar',
                     varianteVisual: 'sairSemSalvar',
-                    aoPressionar: onFechar
+                    aoPressionar: fecharFluxo
                 }}
             />
             <SimpleModal
+                varianteVisual="sucessoCiclo"
                 visivel={['sucesso', 'sucesso-excluir'].includes(feedback?.tipo)}
-                aoFechar={onFechar}
+                aoFechar={fecharFluxo}
                 aoOcultar={executarAposOcultarFeedback}
                 icone={IconeSucesso}
                 fundoIcone="transparent"
@@ -329,7 +363,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                         ? 'Ciclo excluído com sucesso'
                         : 'Ciclo atualizado com sucesso'
                 }
-                acaoPrincipal={{ texto: 'OK', aoPressionar: onFechar }}
+                acaoPrincipal={{ texto: 'OK', aoPressionar: fecharFluxo }}
             />
             <SimpleModal
                 erroInterno={['erro', 'carregamento'].includes(feedback?.tipo)}
@@ -338,7 +372,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 )}
                 aoFechar={
                     ['atualizacao', 'carregamento'].includes(feedback?.tipo)
-                        ? onFechar
+                        ? fecharFluxo
                         : voltarAoPainel
                 }
 
@@ -370,7 +404,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 }
                 acaoSecundaria={
                     feedback?.tipo === 'atualizacao'
-                        ? { texto: 'Fechar', aoPressionar: onFechar }
+                        ? { texto: 'Fechar', aoPressionar: fecharFluxo }
                         : feedback?.tipo === 'erro'
                           ? {
                                 texto: 'Voltar',
@@ -378,7 +412,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                                 aoPressionar: voltarAoPainel
                             }
                           : feedback?.tipo === 'carregamento'
-                            ? { texto: 'Voltar', variante: 'branco', aoPressionar: onFechar }
+                            ? { texto: 'Voltar', variante: 'branco', aoPressionar: fecharFluxo }
                             : undefined
                 }
             />

@@ -17,9 +17,9 @@ function IconeAlerta({ erro = false, cor, fundoTransparente = false }) {
                 ? '#EF9A9A'
                 : tema.cores.interface.textoSecundario
             : tema.escuro
-              ? '#EE9297'
+              ? '#E3E3E3'
               : '#C85A44');
-    const corAlerta = cor ?? (tema.escuro ? (erro ? '#EF9A9A' : '#F39A9D') : '#B43D3D');
+    const corAlerta = cor ?? (tema.escuro ? (erro ? '#EF9A9A' : '#E3E3E3') : '#B43D3D');
 
     return (
         <View
@@ -59,8 +59,8 @@ function IconeSucesso() {
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     return (
-        <View style={[estilos.areaIcone, estilos.fundoConfirmacao]}>
-            <DropIcon size={22} color={tema.escuro ? '#EE9297' : '#C85A44'} weight="regular" />
+        <View testID="icone-sucesso-ciclo" style={[estilos.areaIcone, estilos.fundoSucesso]}>
+            <DropIcon size={22} color={tema.escuro ? '#E3E3E3' : '#C85A44'} weight="regular" />
         </View>
     );
 }
@@ -76,11 +76,10 @@ function CycleRemovalFeedbackModal({
     onTentarNovamente,
     onFechar
 }) {
-    const tema = useTheme();
-
     if (tipo === 'confirmacao') {
         return (
             <SimpleModal
+                varianteVisual="confirmacaoCiclo"
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onCancelar}
@@ -90,14 +89,13 @@ function CycleRemovalFeedbackModal({
                 mensagem={`Tem certeza que deseja excluir todo o período de menstruação de ${periodo} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`}
                 acaoPrincipal={{
                     texto: 'Apagar',
-                    varianteVisual: 'sairSemSalvar',
                     variante: 'verde',
                     aoPressionar: onConfirmar,
                     carregando
                 }}
                 acaoSecundaria={{
                     texto: 'Cancelar',
-                    variante: tema.escuro ? 'verde' : 'branco',
+                    variante: 'branco',
                     aoPressionar: onCancelar,
                     desativado: carregando
                 }}
@@ -135,6 +133,7 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'sucesso-excluir' || tipo === 'sucesso-atualizar') {
         return (
             <SimpleModal
+                varianteVisual="sucessoCiclo"
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={onFechar}

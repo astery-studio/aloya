@@ -300,3 +300,56 @@ test('informa exclusão do ciclo atual quando só restam dias destinados a outro
     await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
     expect(screen.getByText('Ciclo excluído com sucesso')).toBeOnTheScreen();
 });
+
+test('informa restauração em outro ciclo aberto sem apresentar término inexistente', async () => {
+    const editar = jest
+        .fn()
+        .mockRejectedValueOnce({
+            ...confirmacaoOutroCiclo,
+            detalhes: [{ ...confirmacaoOutroCiclo.detalhes[0], dataFim: null }]
+        })
+        .mockResolvedValue({});
+    await render(<CycleEditFlow ciclo={ciclo} service={{ editar }} />);
+    await alternar('2026-08-28');
+    await act(() => mockSheet.onSalvar());
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(screen.getByText(/27\/08\/2026 a em andamento/)).toBeOnTheScreen();
+    expect(editar).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(editar).toHaveBeenLastCalledWith('3', {
+        dias: [...dias, '2026-08-28'],
+        confirmarOutrosCiclos: true
+    });
+});
+
+test('confirma a uniao com outro ciclo antes de salvar e encerra depois do sucesso', async () => {
+    const editar = jest
+        .fn()
+        .mockRejectedValueOnce({
+            codigo: 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS',
+            detalhes: [
+                {
+                    cicloId: 4,
+                    dataInicio: '2026-08-25',
+                    dataFim: '2026-08-28',
+                    dias: ['2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28'],
+                    acao: 'unir'
+                }
+            ]
+        })
+        .mockResolvedValue({});
+    const fechar = jest.fn();
+    await render(<CycleEditFlow ciclo={ciclo} service={{ editar }} onFechar={fechar} />);
+    await alternar('2026-08-25');
+    await act(() => mockSheet.onSalvar());
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(await screen.findByText('Unir ciclos')).toBeOnTheScreen();
+    expect(screen.getByText(/25\/08\/2026 a 28\/08\/2026/)).toBeOnTheScreen();
+    expect(editar).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
+    expect(editar.mock.calls[1][1].confirmarOutrosCiclos).toBe(true);
+    expect(await screen.findByText('Ciclo atualizado com sucesso')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(fechar).toHaveBeenCalledTimes(1);
+    expect(mockSheet.visivel).toBe(false);
+});
