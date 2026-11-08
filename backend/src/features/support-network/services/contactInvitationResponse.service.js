@@ -138,6 +138,24 @@ function criarContactInvitationResponseService({
         }
     }
 
+    async function buscarUsuarioDoConvite(tx, convite, usuarioId) {
+        const usuario = await tx.usuario.findUnique({
+            where: { id: usuarioId },
+            select: { id: true, email: true, papel: true, statusConta: true }
+        });
+        if (
+            !usuario ||
+            usuario.statusConta !== 'ativa' ||
+            usuario.email !== convite.emailConvidado
+        ) {
+            const erro = new Error('Este convite pertence a outra conta.');
+            erro.status = 403;
+            erro.codigo = 'CONVITE_DE_OUTRA_CONTA';
+            throw erro;
+        }
+        return usuario;
+    }
+
     async function aceitar({ token, usuarioId }) {
         if (typeof prisma?.$transaction !== 'function') {
             throw new TypeError('Não foi possível aceitar o convite.');
@@ -145,20 +163,7 @@ function criarContactInvitationResponseService({
         const { convite, tokenHash } = await buscarConvitePendente(token);
 
         return prisma.$transaction(async (tx) => {
-            const usuario = await tx.usuario.findUnique({
-                where: { id: usuarioId },
-                select: { id: true, email: true, papel: true, statusConta: true }
-            });
-            if (
-                !usuario ||
-                usuario.statusConta !== 'ativa' ||
-                usuario.email !== convite.emailConvidado
-            ) {
-                const erro = new Error('Este convite pertence a outra conta.');
-                erro.status = 403;
-                erro.codigo = 'CONVITE_DE_OUTRA_CONTA';
-                throw erro;
-            }
+            const usuario = await buscarUsuarioDoConvite(tx, convite, usuarioId);
 
             const papel =
                 usuario.papel === 'principal'
