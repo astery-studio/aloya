@@ -23,6 +23,7 @@ import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.r
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
 import { criarContactInvitationRoutes } from '../../features/support-network/routes/contactInvitation.routes.js';
 import { criarSupportContactRoutes } from '../../features/support-network/routes/supportContact.routes.js';
+import { criarContactLinkRoutes } from '../../features/support-network/routes/contactLink.routes.js';
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
@@ -182,6 +183,17 @@ app.use(
         parentalConsentMiddleware: container.parentalConsentMiddleware,
         rateLimit: container.contactInvitationRateLimit,
         controller: container.supportContactController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarContactLinkRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactLinkRateLimit,
+        controller: container.contactLinkController
     })
 );
 
