@@ -36,4 +36,7 @@ test('compõe todas as camadas necessárias para convites', () => {
     assert.equal(typeof modulo.contactLinkValidator.validarAtualizacao, 'function');
     assert.equal(typeof modulo.contactLinkController.consultar, 'function');
     assert.equal(typeof modulo.contactLinkController.atualizar, 'function');
+    assert.equal(typeof modulo.supportContactRemovalService.remover, 'function');
+    assert.equal(typeof modulo.supportContactRemovalValidator.validarConfirmacao, 'function');
+    assert.equal(typeof modulo.supportContactRemovalController.remover, 'function');
 });

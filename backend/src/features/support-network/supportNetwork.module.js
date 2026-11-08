@@ -19,6 +19,9 @@ import { criarContactInvitationResendService } from './services/contactInvitatio
 import { criarContactLinkService } from './services/contactLink.service.js';
 import { criarContactLinkValidator } from './validators/contactLink.validator.js';
 import { criarContactLinkController } from './controllers/contactLink.controller.js';
+import { criarSupportContactRemovalService } from './services/supportContactRemoval.service.js';
+import { criarSupportContactRemovalValidator } from './validators/supportContactRemoval.validator.js';
+import { criarSupportContactRemovalController } from './controllers/supportContactRemoval.controller.js';
 
 function criarSupportNetworkModule({
     prisma,
@@ -90,6 +93,13 @@ function criarSupportNetworkModule({
         contactValidator: supportContactValidator,
         linkValidator: contactLinkValidator
     });
+    const supportContactRemovalService = criarSupportContactRemovalService({ prisma, now });
+    const supportContactRemovalValidator = criarSupportContactRemovalValidator();
+    const supportContactRemovalController = criarSupportContactRemovalController({
+        service: supportContactRemovalService,
+        contactValidator: supportContactValidator,
+        removalValidator: supportContactRemovalValidator
+    });
 
     return Object.freeze({
         permissionCategoryService,
@@ -112,7 +122,10 @@ function criarSupportNetworkModule({
         supportContactController,
         contactLinkService,
         contactLinkValidator,
-        contactLinkController
+        contactLinkController,
+        supportContactRemovalService,
+        supportContactRemovalValidator,
+        supportContactRemovalController
     });
 }
 
