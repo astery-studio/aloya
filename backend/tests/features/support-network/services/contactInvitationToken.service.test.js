@@ -30,6 +30,20 @@ test('cada emissão produz credenciais independentes', () => {
     assert.notEqual(service.emitir().tokenHash, service.emitir().tokenHash);
 });
 
+test('calcula o mesmo hash somente para tokens bem formados', () => {
+    const service = criarContactInvitationTokenService({
+        crypto,
+        baseUrl: 'https://aloya.example/invitation'
+    });
+    const emitido = service.emitir();
+    const token = new URL(emitido.link).searchParams.get('token');
+
+    assert.equal(service.calcularHash(token), emitido.tokenHash);
+    assert.equal(service.calcularHash('curto'), null);
+    assert.equal(service.calcularHash('x'.repeat(40) + '!'), null);
+    assert.equal(service.calcularHash(null), null);
+});
+
 test('rejeita configuração incompleta ou URL inválida', () => {
     assert.throws(() => criarContactInvitationTokenService(), {
         name: 'TypeError',

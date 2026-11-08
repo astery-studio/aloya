@@ -21,7 +21,20 @@ function criarContactInvitationTokenService({ crypto, baseUrl, now = () => new D
         return Object.freeze({ tokenHash, dataExpiracao, link: link.toString() });
     }
 
-    return Object.freeze({ emitir });
+    function calcularHash(token) {
+        if (
+            typeof token !== 'string' ||
+            token.length < 32 ||
+            token.length > 256 ||
+            !/^[A-Za-z0-9_-]+$/.test(token)
+        ) {
+            return null;
+        }
+
+        return crypto.createHash('sha256').update(token).digest('hex');
+    }
+
+    return Object.freeze({ calcularHash, emitir });
 }
 
 export { criarContactInvitationTokenService };
