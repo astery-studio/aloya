@@ -396,7 +396,7 @@ for (const simularFalha of [false, true]) {
     });
 }
 
-for (const modo of ['restaurar', 'falhar', 'excluir-atual', 'concorrencia']) {
+for (const modo of ['restaurar', 'falhar', 'excluir-atual', 'concorrencia', 'aberto']) {
     test(`restaura dia ausente em outro ciclo com confirmação e transação: ${modo}`, async () => {
         const { diretorio, caminho } = criarBancoTemporario();
         const prisma = criarPrisma(caminho);
@@ -410,6 +410,11 @@ for (const modo of ['restaurar', 'falhar', 'excluir-atual', 'concorrencia']) {
                 where: { id: 3 },
                 data: { duracaoMenstruacao: 4 }
             });
+            if (modo === 'aberto')
+                await prisma.registroCiclo.update({
+                    where: { id: 3 },
+                    data: { dataFim: null, duracaoMenstruacao: null }
+                });
             const estado = () =>
                 prisma.registroCiclo.findMany({
                     orderBy: { id: 'asc' },
@@ -426,7 +431,7 @@ for (const modo of ['restaurar', 'falhar', 'excluir-atual', 'concorrencia']) {
                 {
                     cicloId: 3,
                     dataInicio: '2026-09-04',
-                    dataFim: '2026-09-08',
+                    dataFim: modo === 'aberto' ? null : '2026-09-08',
                     dias: ['2026-09-06']
                 }
             ]);
@@ -455,7 +460,7 @@ for (const modo of ['restaurar', 'falhar', 'excluir-atual', 'concorrencia']) {
                     where: { id: 3 },
                     include: { diasMenstruacao: true }
                 });
-                assert.equal(cicloB.duracaoMenstruacao, 5);
+                assert.equal(cicloB.duracaoMenstruacao, modo === 'aberto' ? null : 5);
                 assert.equal(cicloB.diasMenstruacao.length, 5);
                 assert.equal(await prisma.diaMenstruacao.count({ where: { data: dia } }), 1);
                 assert.equal(await prisma.previsao.count({ where: { usuarioId: 1 } }), 0);
@@ -475,3 +480,87 @@ for (const modo of ['restaurar', 'falhar', 'excluir-atual', 'concorrencia']) {
         }
     });
 }
+
+for (const pausa of [0, 1, 2, 3])
+    test(`edição une ciclos existentes com pausa de ${pausa} dias`, async () => {
+        const { diretorio, caminho } = criarBancoTemporario();
+        const prisma = criarPrisma(caminho);
+        const servidor = criarAplicacao(prisma).listen(0, '127.0.0.1');
+        try {
+            await once(servidor, 'listening');
+            await popular(prisma);
+            await prisma.registroCiclo.deleteMany({ where: { usuarioId: 1 } });
+            const dt = (dia) => new Date(`2026-10-${dia}T00:00:00Z`);
+            await prisma.registroCiclo.create({
+                data: {
+                    id: 2,
+                    usuarioId: 1,
+                    dataInicio: dt(25),
+                    dataFim: dt(25),
+                    duracaoMenstruacao: 1,
+                    diasMenstruacao: { create: [{ data: dt(25) }] }
+                }
+            });
+            const inicio = 26 + pausa;
+            await prisma.registroCiclo.create({
+                data: {
+                    id: 3,
+                    usuarioId: 1,
+                    dataInicio: dt(inicio),
+                    dataFim: dt(30),
+                    duracaoMenstruacao: 31 - inicio,
+                    diasMenstruacao: {
+                        create: Array.from({ length: 31 - inicio }, (_, i) => ({
+                            data: dt(inicio + i)
+                        }))
+                    }
+                }
+            });
+            const url = `http://127.0.0.1:${servidor.address().port}/api/cycles`;
+            const dias =
+                pausa <= 2 ? ['2026-10-25', `2026-10-${inicio}`] : ['2026-10-24', '2026-10-25'];
+            const resultado = await requisitar(url, 2, { dias });
+            if (pausa <= 2) {
+                assert.equal(resultado.resposta.status, 409);
+                assert.equal(resultado.corpo.erro.codigo, 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS');
+                assert.equal(resultado.corpo.erro.detalhes[0].acao, 'unir');
+                assert.equal(await prisma.registroCiclo.count({ where: { usuarioId: 1 } }), 2);
+                if (pausa === 1) {
+                    const antes = await prisma.registroCiclo.findMany({
+                        orderBy: { id: 'asc' },
+                        include: { diasMenstruacao: { orderBy: { data: 'asc' } } }
+                    });
+                    await prisma.$executeRawUnsafe(
+                        "CREATE TRIGGER falhar_uniao BEFORE INSERT ON dias_menstruacao BEGIN SELECT RAISE(ABORT, 'falha simulada'); END"
+                    );
+                    const falhou = await requisitar(url, 2, { dias, confirmarOutrosCiclos: true });
+                    assert.equal(falhou.resposta.status, 500);
+                    assert.deepEqual(
+                        await prisma.registroCiclo.findMany({
+                            orderBy: { id: 'asc' },
+                            include: { diasMenstruacao: { orderBy: { data: 'asc' } } }
+                        }),
+                        antes
+                    );
+                    await prisma.$executeRawUnsafe('DROP TRIGGER falhar_uniao');
+                }
+                const confirmado = await requisitar(url, 2, { dias, confirmarOutrosCiclos: true });
+                assert.equal(confirmado.resposta.status, 200);
+                assert.equal(confirmado.corpo.ciclo.dataInicio, '2026-10-25');
+                assert.equal(confirmado.corpo.ciclo.dataFim, '2026-10-30');
+                assert.equal(confirmado.corpo.ciclo.duracaoMenstruacao, 6 - pausa);
+                assert.equal(await prisma.registroCiclo.count({ where: { usuarioId: 1 } }), 1);
+                assert.equal(
+                    await prisma.diaMenstruacao.count({ where: { registroCicloId: 2 } }),
+                    6 - pausa
+                );
+            } else {
+                assert.equal(resultado.resposta.status, 200);
+                assert.equal(await prisma.registroCiclo.count({ where: { usuarioId: 1 } }), 2);
+            }
+        } finally {
+            await prisma.$disconnect();
+            await new Promise((resolve) => servidor.close(resolve));
+            rmSync(diretorio, { recursive: true, force: true });
+        }
+    });

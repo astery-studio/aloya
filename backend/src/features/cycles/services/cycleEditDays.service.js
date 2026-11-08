@@ -1,3 +1,5 @@
+import { agruparDias } from '../utils/cycleContinuity.js';
+import { prepararUniao, excluirCiclosUnidos } from './cycleMerge.service.js';
 import {
     prepararDiasOutrosCiclos,
     restaurarDiasOutrosCiclos
@@ -5,16 +7,6 @@ import {
 import { AppError } from '../../../shared/errors/AppError.js';
 import { formatarData } from '../utils/calendar.js';
 import { recalcularCiclos, limparPrevisoes } from '../repositories/cycleRemoval.repository.js';
-
-function agruparDias(dias) {
-    const grupos = [];
-    for (const data of [...dias].sort((a, b) => a - b)) {
-        const grupo = grupos.at(-1);
-        if (!grupo || data - grupo.at(-1) > 3 * 86400000) grupos.push([data]);
-        else grupo.push(data);
-    }
-    return grupos;
-}
 
 async function editarDiasDoCiclo({
     prisma,
@@ -40,12 +32,38 @@ async function editarDiasDoCiclo({
         ) {
             throw new AppError('Nenhuma alteração foi identificada.', 422, 'NENHUMA_ALTERACAO');
         }
+        const uniao = await prepararUniao(tx, { usuarioId, cicloId, dias });
         const preparacao = await prepararDiasOutrosCiclos(tx, {
             usuarioId,
             cicloId,
-            dias,
-            confirmarOutrosCiclos
+            dias: uniao.dias,
+            ignorarCiclos: uniao.registros.map((registro) => registro.id),
+            confirmarOutrosCiclos: true
         });
+        if (!confirmarOutrosCiclos && (uniao.registros.length || preparacao.alteracoes.length)) {
+            const erro = new AppError(
+                'Esta edição afeta outros ciclos. Confirme para continuar.',
+                409,
+                'CONFIRMAR_ALTERACAO_OUTROS_CICLOS'
+            );
+            erro.outrosCiclos = [
+                ...uniao.registros.map((registro) => ({
+                    cicloId: registro.id,
+                    dataInicio: formatarData(registro.dataInicio),
+                    dataFim: registro.dataFim ? formatarData(registro.dataFim) : null,
+                    dias: registro.diasMenstruacao.map((dia) => formatarData(dia.data)),
+                    acao: 'unir'
+                })),
+                ...preparacao.alteracoes.map(({ ciclo, dias: novos }) => ({
+                    cicloId: ciclo.id,
+                    dataInicio: formatarData(ciclo.dataInicio),
+                    dataFim: ciclo.dataFim ? formatarData(ciclo.dataFim) : null,
+                    dias: novos.map(formatarData)
+                }))
+            ];
+            throw erro;
+        }
+        await excluirCiclosUnidos(tx, usuarioId, uniao.registros);
         dias = preparacao.dias;
         await restaurarDiasOutrosCiclos(tx, usuarioId, preparacao.alteracoes);
         const where = { id: cicloId, usuarioId, atualizadoEm: atual.atualizadoEm };
@@ -141,6 +159,9 @@ async function editarDiasDoCiclo({
             dataFim: formatarData(dataFim),
             dias: primeiroGrupo.map(formatarData),
             ...(ciclosCriados.length ? { ciclosCriados } : {}),
+            ...(uniao.registros.length
+                ? { ciclosUnidos: uniao.registros.map((registro) => registro.id) }
+                : {}),
             ...(preparacao.alteracoes.length
                 ? { ciclosAtualizados: preparacao.alteracoes.map(({ ciclo }) => ciclo.id) }
                 : {})

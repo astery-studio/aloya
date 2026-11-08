@@ -9,19 +9,22 @@ function criarConflito(ciclo) {
     );
     erro.conflito = {
         dataInicio: formatarData(ciclo.dataInicio),
-        dataFim: formatarData(ciclo.dataFim)
+        dataFim: ciclo.dataFim ? formatarData(ciclo.dataFim) : null
     };
     return erro;
 }
 
-async function prepararDiasOutrosCiclos(tx, { usuarioId, cicloId, dias, confirmarOutrosCiclos }) {
+async function prepararDiasOutrosCiclos(
+    tx,
+    { usuarioId, cicloId, dias, confirmarOutrosCiclos, ignorarCiclos = [] }
+) {
     if (!dias.length) return { dias, alteracoes: [] };
     const ciclos = await tx.registroCiclo.findMany({
         where: {
             usuarioId,
-            id: { not: cicloId },
+            id: { notIn: [cicloId, ...ignorarCiclos] },
             dataInicio: { lte: dias.at(-1) },
-            dataFim: { gte: dias[0] }
+            OR: [{ dataFim: { gte: dias[0] } }, { dataFim: null }]
         },
         include: { diasMenstruacao: { orderBy: { data: 'asc' } } },
         orderBy: { dataInicio: 'asc' }
@@ -29,9 +32,10 @@ async function prepararDiasOutrosCiclos(tx, { usuarioId, cicloId, dias, confirma
     const restantes = [];
     const porCiclo = new Map();
     for (const dia of dias) {
-        const candidatos = ciclos.filter(
-            (ciclo) => dia >= ciclo.dataInicio && dia <= ciclo.dataFim
-        );
+        const candidatos = ciclos.filter((ciclo) => {
+            const fim = ciclo.dataFim ?? ciclo.diasMenstruacao.at(-1)?.data;
+            return fim && dia >= ciclo.dataInicio && dia <= fim;
+        });
         if (!candidatos.length) {
             restantes.push(dia);
             continue;
@@ -57,7 +61,7 @@ async function prepararDiasOutrosCiclos(tx, { usuarioId, cicloId, dias, confirma
         erro.outrosCiclos = alteracoes.map(({ ciclo, dias: novos }) => ({
             cicloId: ciclo.id,
             dataInicio: formatarData(ciclo.dataInicio),
-            dataFim: formatarData(ciclo.dataFim),
+            dataFim: ciclo.dataFim ? formatarData(ciclo.dataFim) : null,
             dias: novos.map(formatarData)
         }));
         throw erro;
@@ -69,7 +73,11 @@ async function restaurarDiasOutrosCiclos(tx, usuarioId, alteracoes) {
     for (const { ciclo, dias } of alteracoes) {
         const atualizado = await tx.registroCiclo.updateMany({
             where: { id: ciclo.id, usuarioId, atualizadoEm: ciclo.atualizadoEm },
-            data: { duracaoMenstruacao: ciclo.diasMenstruacao.length + dias.length }
+            data: {
+                duracaoMenstruacao: ciclo.dataFim
+                    ? ciclo.diasMenstruacao.length + dias.length
+                    : null
+            }
         });
         if (atualizado.count !== 1)
             throw new AppError(
