@@ -1,4 +1,5 @@
 import {
+    ACOES_RESPOSTA_CONVITE,
     ordenarPermissoesCategoria,
     permissaoCategoriaEhValida,
     permissoesDaCategoria
@@ -8,6 +9,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 const TAMANHO_MAXIMO_EMAIL = 254;
 const CAMPOS_CONSULTA = Object.freeze(['email']);
 const CAMPOS_CONVITE = Object.freeze(['email', 'categoriaId', 'permissoesIndividuais']);
+const CAMPOS_RESPOSTA = Object.freeze(['acao']);
 
 function erro(campo, mensagem) {
     return { campo, mensagem };
@@ -126,8 +128,47 @@ function validarCriacaoConvite(body) {
     };
 }
 
-function criarContactInvitationValidator() {
-    return Object.freeze({ validarConsultaEmail, validarCriacaoConvite });
+function validarTokenConvite(token) {
+    const valido =
+        typeof token === 'string' &&
+        token.length >= 32 &&
+        token.length <= 256 &&
+        /^[A-Za-z0-9_-]+$/.test(token);
+
+    return {
+        valido,
+        erros: valido ? [] : [erro('token', 'Este convite não está mais disponível.')],
+        dados: { token: valido ? token : null }
+    };
 }
 
-export { criarContactInvitationValidator, validarConsultaEmail, validarCriacaoConvite };
+function validarRespostaConvite(body) {
+    if (!ehObjetoSimples(body)) return respostaCorpoInvalido();
+
+    const erros = [];
+    validarCampos(body, CAMPOS_RESPOSTA, erros);
+    const acao = typeof body.acao === 'string' ? body.acao.trim().toLowerCase() : '';
+
+    if (!ACOES_RESPOSTA_CONVITE.includes(acao)) {
+        erros.push(erro('acao', 'Escolha aceitar ou recusar o convite.'));
+    }
+
+    return { valido: erros.length === 0, erros, dados: { acao } };
+}
+
+function criarContactInvitationValidator() {
+    return Object.freeze({
+        validarConsultaEmail,
+        validarCriacaoConvite,
+        validarRespostaConvite,
+        validarTokenConvite
+    });
+}
+
+export {
+    criarContactInvitationValidator,
+    validarConsultaEmail,
+    validarCriacaoConvite,
+    validarRespostaConvite,
+    validarTokenConvite
+};

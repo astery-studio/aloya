@@ -3,7 +3,9 @@ import test from 'node:test';
 
 import {
     validarConsultaEmail,
-    validarCriacaoConvite
+    validarCriacaoConvite,
+    validarRespostaConvite,
+    validarTokenConvite
 } from '../../../../src/features/support-network/validators/contactInvitation.validator.js';
 
 test('normaliza um e-mail válido antes da consulta', () => {
@@ -86,5 +88,25 @@ test('rejeita categoria, permissões e campos protegidos inválidos', () => {
 test('rejeita corpo malformado sem lançar erro interno', () => {
     for (const corpo of [null, [], 'texto']) {
         assert.equal(validarCriacaoConvite(corpo).valido, false);
+    }
+});
+
+test('aceita somente token de convite no formato seguro', () => {
+    const token = 'a'.repeat(43);
+
+    assert.equal(validarTokenConvite(token).valido, true);
+    assert.equal(validarTokenConvite('curto').valido, false);
+    assert.equal(validarTokenConvite(`${token}!`).valido, false);
+    assert.equal(validarTokenConvite(null).valido, false);
+});
+
+test('exige decisão explícita de aceitar ou recusar', () => {
+    assert.deepEqual(validarRespostaConvite({ acao: ' ACEITAR ' }).dados, {
+        acao: 'aceitar'
+    });
+    assert.equal(validarRespostaConvite({ acao: 'recusar' }).valido, true);
+
+    for (const corpo of [{}, { acao: 'talvez' }, { acao: 'aceitar', usuarioId: 2 }, null]) {
+        assert.equal(validarRespostaConvite(corpo).valido, false);
     }
 });
