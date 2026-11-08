@@ -6,6 +6,7 @@ import { PillIcon, WarningCircleIcon } from '../../../shared/components/icons/Ap
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { ContraceptiveForm } from '../forms/ContraceptiveForm';
 import { criarEstilos } from './contraceptiveScreens.styles';
 
@@ -13,6 +14,7 @@ import { criarEstilos } from './contraceptiveScreens.styles';
 function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoVoltar }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const [salvando, setSalvando] = useState(false);
     const [excluindo, setExcluindo] = useState(false);
     const [confirmacaoExclusaoVisivel, setConfirmacaoExclusaoVisivel] = useState(false);
@@ -109,7 +111,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
     if (!registroValido) {
         return (
-            <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+            <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
                 testID="edicao-anticoncepcional-area-segura">
                 <Header
                     titulo="Editar o Anticoncepcional"
@@ -122,7 +124,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                         Anticoncepcional indisponível
                     </Text>
 
-                    <Text accessibilityRole="alert" style={estilos.textoVazio}>
+                    <Text accessibilityRole="alert" style={[estilos.textoVazio, estilosErro.mensagem]}>
                         Não foi possível carregar os dados para edição.
                     </Text>
                 </View>
@@ -131,7 +133,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     }
 
     return (
-        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
+        <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
             testID="edicao-anticoncepcional-area-segura">
             <Header
                 titulo="Editar o Anticoncepcional"
@@ -170,6 +172,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             </ScrollView>
 
             <SimpleModal
+                varianteVisual="sairSemSalvar"
                 visivel={confirmacaoExclusaoVisivel}
                 aoFechar={excluindo ? undefined : () => setConfirmacaoExclusaoVisivel(false)}
                 icone={WarningCircleIcon}
@@ -186,6 +189,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                 }}
                 acaoSecundaria={{
                     texto: 'Cancelar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: () => setConfirmacaoExclusaoVisivel(false),
                     desativado: excluindo
@@ -193,6 +197,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             />
 
             <SimpleModal
+                erroInterno
                 visivel={erroExclusaoVisivel}
                 aoFechar={excluindo ? undefined : () => setErroExclusaoVisivel(false)}
                 icone={WarningCircleIcon}

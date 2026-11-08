@@ -44,6 +44,8 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        botaoCadastrarMenstruacao: tema.escuro ? { backgroundColor: '#C26E5F' } : {},
+        textoCadastrarMenstruacao: tema.escuro ? { color: '#121212' } : {},
         botaoDoEstado: {
             width: '100%',
             marginTop: tema.espacamentos.extraGrande

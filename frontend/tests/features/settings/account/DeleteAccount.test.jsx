@@ -443,3 +443,20 @@ describe('DeleteAccount', () => {
         ).toBeOnTheScreen();
     });
 });
+
+test('mantém a senha preenchida clara mesmo após perder o foco', async () => {
+    await renderizar(<DeleteAccount {...criarProps()} />, 'escuro');
+    const campo = screen.getByLabelText('Senha atual');
+
+    await fireEvent.changeText(campo, 'senha-segura');
+    expect(campo).toHaveStyle({ color: '#E3E3E3' });
+    expect(screen.getByRole('button', { name: 'Continuar' })).toHaveStyle({
+        backgroundColor: '#EF9A9A'
+    });
+
+    await fireEvent(campo, 'focus');
+    expect(campo).toHaveStyle({ color: '#E3E3E3' });
+
+    await fireEvent(campo, 'blur');
+    expect(campo).toHaveStyle({ color: '#E3E3E3' });
+});

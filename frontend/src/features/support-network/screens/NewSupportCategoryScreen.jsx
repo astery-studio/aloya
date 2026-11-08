@@ -331,6 +331,7 @@ function NewSupportCategoryScreen({
         <>
             <SettingsLayout
                 titulo="Nova Categoria"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={voltar}
                 rodapeFixo
                 rodape={
@@ -349,6 +350,7 @@ function NewSupportCategoryScreen({
             >
                 <View style={estilos.conteudo}>
                     <SupportCategoryForm
+                        aparenciaNovaCategoria
                         dados={dados}
                         aoAlterar={alterarDados}
                         aoSalvar={salvarCategoria}
@@ -361,6 +363,7 @@ function NewSupportCategoryScreen({
             </SettingsLayout>
 
             <SimpleModal
+                erroInterno={Boolean(alertaErro?.recuperavel)}
                 visivel={alertaErro !== null}
                 aoFechar={fecharAlertaErro}
                 icone={WarningCircleIcon}

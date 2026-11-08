@@ -210,7 +210,11 @@ function ChangePasswordScreen({ alterarSenha, onVoltar, onConcluido, onSessaoExp
 
     return (
         <>
-            <SettingsLayout titulo="Alterar Senha" onVoltar={voltar}>
+            <SettingsLayout
+                titulo="Alterar Senha"
+                onVoltar={voltar}
+                corFundo={tema.escuro ? '#121212' : undefined}
+            >
                 <ChangePassword
                     senhaAtual={senhaAtual}
                     novaSenha={novaSenha}
@@ -254,6 +258,7 @@ function ChangePasswordScreen({ alterarSenha, onVoltar, onConcluido, onSessaoExp
             />
 
             <SimpleModal
+                erroInterno
                 visivel={aviso === 'erro'}
                 aoFechar={fecharAviso}
                 icone={WarningCircleIcon}

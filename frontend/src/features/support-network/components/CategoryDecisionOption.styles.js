@@ -14,9 +14,9 @@ function criarEstilos(tema) {
             paddingHorizontal: 14,
             paddingVertical: 10,
             borderWidth: 1.4,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.04)' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput,
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -32,13 +32,18 @@ function criarEstilos(tema) {
         },
 
         fundoPerigo: {
-            backgroundColor: tema.escuro ? '#3B2525' : '#FDF0F0'
+            backgroundColor: tema.escuro ? '#EF9A9A' : '#FDF0F0'
         },
 
         fundoManter: {
-            backgroundColor: tema.cores.interface.destaqueSuave
+            backgroundColor: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaqueSuave
         },
 
+        todosSelecionados: tema.escuro ? { borderColor: '#121212' } : {},
+        tituloTodosRemover: tema.escuro ? { color: '#EF9A9A' } : {},
+        tituloTodosManter: tema.escuro ? { color: '#A5D6A7' } : {},
+        tituloTodosSelecionados: tema.escuro ? { color: '#121212' } : {},
+        descricaoTodosSelecionados: tema.escuro ? { color: '#5C5C59' } : {},
         textos: {
             flex: 1,
             gap: 2
@@ -66,6 +71,9 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.destaque
         },
 
+        indicadorTodosSelecionados: tema.escuro
+            ? { backgroundColor: '#121212', borderColor: '#121212' }
+            : {},
         centroIndicador: {
             width: 8,
             height: 8,

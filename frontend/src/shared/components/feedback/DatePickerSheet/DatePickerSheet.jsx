@@ -226,11 +226,13 @@ function DatePickerSheet({
     onSelecionar,
     onFechar,
     dataMinima = null,
-    dataMaxima = null
+    dataMaxima = null,
+    aparenciaCadastro = false
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const corSeta = tema.cores.interface.textoPrincipal;
+    const estilos = useMemo(() => criarEstilos(tema, aparenciaCadastro), [tema, aparenciaCadastro]);
+    const corSeta =
+        tema.escuro && aparenciaCadastro ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal;
     const [dataVisivel, setDataVisivel] = useState(() => obterDataInicial(valorSelecionado));
     const [listaAberta, setListaAberta] = useState(null);
     const [salvando, setSalvando] = useState(false);
@@ -412,7 +414,10 @@ function DatePickerSheet({
                         selected: mes === mesVisivel,
                         disabled: !habilitado || salvando
                     }}
-                    style={estilos.opcaoLista}
+                    style={[
+                        estilos.opcaoLista,
+                        mes === mesVisivel && estilos.opcaoListaSelecionada
+                    ]}
                 >
                     <Text
                         style={[
@@ -457,7 +462,10 @@ function DatePickerSheet({
                         selected: ano === anoVisivel,
                         disabled: !habilitado || salvando
                     }}
-                    style={estilos.opcaoLista}
+                    style={[
+                        estilos.opcaoLista,
+                        ano === anoVisivel && estilos.opcaoListaSelecionada
+                    ]}
                 >
                     <Text
                         style={[
@@ -490,8 +498,20 @@ function DatePickerSheet({
     const chaveDaListaDeAnos = `${anoVisivel}-` + `${mesVisivel}-` + String(salvando);
 
     return (
-        <BottomSheet visivel={visivel} onFechar={onFechar} bloquearFechamento={salvando}>
-            <BottomSheetLayout titulo={titulo} onFechar={onFechar} bloquearFechamento={salvando}>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={onFechar}
+            bloquearFechamento={salvando}
+            corPainel={tema.escuro && aparenciaCadastro ? '#242424' : undefined}
+            estiloPainel={estilos.painelCadastro}
+        >
+            <BottomSheetLayout
+                titulo={titulo}
+                onFechar={onFechar}
+                bloquearFechamento={salvando}
+                corFundo={tema.escuro && aparenciaCadastro ? '#242424' : undefined}
+                estiloTitulo={estilos.tituloSheetCadastro}
+            >
                 <View style={estilos.calendario}>
                     <View style={estilos.navegacao}>
                         <Pressable

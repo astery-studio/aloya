@@ -10,7 +10,8 @@ export default function ButtonScreen({
     icone,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto
 }) {
     const semAcao = typeof aoPressionar !== 'function';
     const estaDesativado = desativado || semAcao;
@@ -28,6 +29,7 @@ export default function ButtonScreen({
             posicaoIcone={posicaoIcone}
             rotuloAcessibilidade={rotuloAcessibilidade}
             estilo={estilo}
+            estiloTexto={estiloTexto}
         />
     );
 }

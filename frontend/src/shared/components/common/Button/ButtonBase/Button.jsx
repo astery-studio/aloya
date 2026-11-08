@@ -19,7 +19,8 @@ function Button({
     icone: Icone,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto
 }) {
     const tema = useTheme();
 
@@ -44,7 +45,9 @@ function Button({
     const bloqueado = desativado || carregando;
 
     const corConteudo = desativado
-        ? tema.cores.interface.textoDesabilitado
+        ? tema.escuro
+            ? '#757575'
+            : tema.cores.interface.textoDesabilitado
         : varianteAtual.texto.color;
 
     function renderizarConteudo() {
@@ -67,7 +70,8 @@ function Button({
                             ? {
                                   color: corConteudo
                               }
-                            : null
+                            : null,
+                        estiloTexto
                     ]}
                 >
                     {texto}

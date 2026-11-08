@@ -30,7 +30,11 @@ export default function AppModal({
     mensagem,
     destaque,
     aoOcultar,
-    children
+    children,
+    estilo,
+    estiloCabecalho,
+    estiloIconeCabecalho,
+    corIconeCabecalho
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -88,16 +92,20 @@ export default function AppModal({
                                     ? estilos.caixaAlerta
                                     : acao
                                       ? estilos.caixaAcao
-                                      : estilos.caixaSimples
+                                      : estilos.caixaSimples,
+                                estilo
                             ]}
                         >
                             {alerta ? (
-                                <View style={estilos.cabecalhoAlerta}>
+                                <View style={[estilos.cabecalhoAlerta, estiloCabecalho]}>
                                     {Icone ? (
-                                        <View style={estilos.iconeAlerta}>
+                                        <View style={[estilos.iconeAlerta, estiloIconeCabecalho]}>
                                             <Icone
                                                 size={26}
-                                                color={tema.cores.neutras.superficieClara}
+                                                color={
+                                                    corIconeCabecalho ??
+                                                    tema.cores.neutras.superficieClara
+                                                }
                                             />
                                         </View>
                                     ) : null}

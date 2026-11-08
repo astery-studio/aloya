@@ -146,6 +146,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
             }
             setFeedback({
                 tipo: 'erro',
+                erroInterno: falha?.codigo !== 'SOBREPOSICAO_CICLO',
                 titulo:
                     falha?.codigo === 'SOBREPOSICAO_CICLO' ? 'Ciclo existente' : 'Algo deu errado',
                 mensagem:
@@ -202,7 +203,11 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                     texto: 'Continuar a editar',
                     aoPressionar: voltarAoPainel
                 }}
-                acaoSecundaria={{ texto: 'Sair sem salvar', aoPressionar: onFechar }}
+                acaoSecundaria={{
+                    texto: 'Sair sem salvar',
+                    varianteVisual: 'sairSemSalvar',
+                    aoPressionar: onFechar
+                }}
             />
             <SimpleModal
                 visivel={feedback?.tipo === 'sucesso'}
@@ -213,6 +218,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 acaoPrincipal={{ texto: 'OK', aoPressionar: onFechar }}
             />
             <SimpleModal
+                erroInterno={Boolean(feedback?.erroInterno)}
                 visivel={['erro', 'validacao', 'atualizacao'].includes(feedback?.tipo)}
                 aoFechar={feedback?.tipo === 'atualizacao' ? onFechar : voltarAoPainel}
                 aoOcultar={executarAposOcultarFeedback}

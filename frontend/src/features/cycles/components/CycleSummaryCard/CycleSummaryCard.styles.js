@@ -4,6 +4,20 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
+const coresConfiabilidadeEscuras = Object.freeze({
+    baixa: {
+        cor: '#EF9A9A',
+        fundo: 'rgba(239, 154, 154, 0.16)',
+        borda: 'rgba(239, 154, 154, 0.33)'
+    },
+    media: {
+        cor: '#FFE082',
+        fundo: 'rgba(255, 224, 130, 0.16)',
+        borda: 'rgba(255, 224, 130, 0.33)'
+    },
+    alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
+});
+
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
@@ -11,9 +25,9 @@ function criarEstilos(tema) {
             maxWidth: 350,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             borderRadius: 16
         },
 
@@ -31,7 +45,7 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             paddingHorizontal: 20,
             borderBottomWidth: 1.41,
-            borderBottomColor: tema.cores.interface.borda
+            borderBottomColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         cabecalhoCentralizado: {
@@ -44,7 +58,7 @@ function criarEstilos(tema) {
 
         titulo: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontStyle: 'normal',
@@ -59,7 +73,7 @@ function criarEstilos(tema) {
             height: 103.6,
             flexDirection: 'row',
             borderBottomWidth: 1.41,
-            borderBottomColor: tema.cores.interface.borda
+            borderBottomColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         metrica: {
@@ -71,7 +85,7 @@ function criarEstilos(tema) {
 
         metricaComSeparador: {
             borderRightWidth: 0.99,
-            borderRightColor: tema.cores.interface.borda
+            borderRightColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         rotuloMetrica: {
@@ -145,4 +159,4 @@ function criarEstilos(tema) {
 
 const estilos = criarEstilos(temaClaro);
 
-export { criarEstilos, estilos };
+export { coresConfiabilidadeEscuras, criarEstilos, estilos };

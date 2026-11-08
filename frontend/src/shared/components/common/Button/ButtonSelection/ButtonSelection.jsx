@@ -13,7 +13,11 @@ function ButtonSelection({
     icone: Icone,
     descricao,
     desabilitado = false,
-    variante = 'lista'
+    variante = 'lista',
+    estiloSelecionado,
+    estiloTextoSelecionado,
+    estiloTexto,
+    estiloDescricao
 }) {
     const tema = useTheme();
 
@@ -41,7 +45,8 @@ function ButtonSelection({
                 selected && estilos.selecionado,
                 intensidade && selected && estilos.intensidadeSelecionada,
                 modoCor && selected && estilos.modoCorSelecionado,
-                desabilitado && estilos.desabilitado
+                desabilitado && estilos.desabilitado,
+                selected && estiloSelecionado
             ]}
         >
             {Icone ? <Icone size={24} color={corIcone} /> : null}
@@ -51,14 +56,29 @@ function ButtonSelection({
                     style={[
                         estilos.label,
                         modoCor && estilos.labelModoCor,
+                        estiloTexto,
                         selected && estilos.labelSelecionado,
-                        modoCor && selected && estilos.labelModoCorSelecionado
+                        modoCor && selected && estilos.labelModoCorSelecionado,
+                        intensidade && estilos.labelIntensidade,
+                        selected && estiloTextoSelecionado
                     ]}
                 >
                     {label}
                 </Text>
 
-                {descricao ? <Text style={estilos.descricao}>{descricao}</Text> : null}
+                {descricao ? (
+                    <Text
+                        style={[
+                            estilos.descricao,
+                            intensidade && estilos.descricaoIntensidade,
+                            intensidade && selected && estilos.descricaoIntensidadeSelecionada,
+                            estiloDescricao,
+                            selected && estiloTextoSelecionado
+                        ]}
+                    >
+                        {descricao}
+                    </Text>
+                ) : null}
             </View>
 
             {intensidade ? (

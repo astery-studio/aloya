@@ -11,12 +11,10 @@ describe('tema escuro de anticoncepcionais', () => {
         const historico = criarEstilosUso(temaEscuro);
 
         expect(cartao.card).toMatchObject({
-            backgroundColor: temaEscuro.cores.interface.superficie,
-            borderColor: temaEscuro.cores.interface.borda
+            backgroundColor: '#1E1E1E',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
         });
-        expect(historico.calendario.backgroundColor).toBe(
-            temaEscuro.cores.interface.superficieElevada
-        );
+        expect(historico.calendario.backgroundColor).toBe('#242424');
         expect(historico.numeroDia.color).toBe(temaEscuro.cores.interface.textoPrincipal);
     });
 
@@ -25,9 +23,9 @@ describe('tema escuro de anticoncepcionais', () => {
         const telas = criarEstilosTelas(temaEscuro);
         const acompanhamento = criarEstilosAcompanhamento(temaEscuro);
 
-        expect(formulario.telaFluxo.backgroundColor).toBe(temaEscuro.cores.interface.fundo);
+        expect(formulario.telaFluxo.backgroundColor).toBe('#121212');
         expect(telas.tela.backgroundColor).toBe(temaEscuro.cores.interface.fundo);
-        expect(acompanhamento.tela.backgroundColor).toBe(temaEscuro.cores.interface.fundo);
+        expect(acompanhamento.tela.backgroundColor).toBe('#121212');
         expect(acompanhamento.titulo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
     });
 });

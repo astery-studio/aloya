@@ -3,11 +3,25 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
+const coresConfiabilidadeEscuras = Object.freeze({
+    baixa: {
+        cor: '#EF9A9A',
+        fundo: 'rgba(239, 154, 154, 0.16)',
+        borda: 'rgba(239, 154, 154, 0.33)'
+    },
+    media: {
+        cor: '#FFE082',
+        fundo: 'rgba(255, 224, 130, 0.16)',
+        borda: 'rgba(255, 224, 130, 0.33)'
+    },
+    alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
+});
+
 function criarEstilos(tema) {
     return StyleSheet.create({
         tela: {
             flex: 1,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         cabecalho: {
             display: 'flex',
@@ -75,7 +89,7 @@ function criarEstilos(tema) {
         conteudo: {
             flex: 1,
             minHeight: 0,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         areaCalendario: {
             flex: 1,
@@ -101,6 +115,8 @@ function criarEstilos(tema) {
             fontSize: 13,
             lineHeight: 19
         },
+        botaoCadastrarMenstruacao: tema.escuro ? { backgroundColor: '#C26E5F' } : {},
+        textoCadastrarMenstruacao: tema.escuro ? { color: '#121212' } : {},
         rodape: {
             flexShrink: 0,
             paddingTop: 20,
@@ -108,12 +124,14 @@ function criarEstilos(tema) {
             paddingBottom: 24,
             paddingLeft: 24,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.separador,
-            backgroundColor: tema.cores.interface.fundo
+            borderTopColor: tema.escuro
+                ? 'rgba(255, 255, 255, 0.08)'
+                : tema.cores.interface.separador,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
         }
     });
 }
 
 const estilos = criarEstilos(temaClaro);
 
-export { criarEstilos, estilos };
+export { coresConfiabilidadeEscuras, criarEstilos, estilos };

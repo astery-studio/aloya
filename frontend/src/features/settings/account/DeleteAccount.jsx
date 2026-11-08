@@ -5,8 +5,12 @@ import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/Ale
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { TrashIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { cores } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarAparencia } from './DeleteAccount.styles';
 
 function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, onContaExcluida }) {
+    const tema = useTheme();
+    const aparencia = criarAparencia(tema);
     const [etapa, setEtapa] = useState('senha');
     const [senha, setSenha] = useState('');
     const [erroSenha, setErroSenha] = useState('');
@@ -101,6 +105,7 @@ function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, on
         <>
             <AlertModal
                 variante="comSenha"
+                aparencia={aparencia}
                 visivel={etapa === 'senha'}
                 aoFechar={fechar}
                 titulo="Confirme sua identidade"
@@ -122,6 +127,7 @@ function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, on
 
             <AlertModal
                 visivel={etapa === 'confirmacao'}
+                aparencia={aparencia}
                 aoFechar={fechar}
                 icone={TrashIcon}
                 titulo="Excluir conta permanentemente?"
@@ -142,6 +148,7 @@ function FluxoDeleteAccount({ onFechar, confirmarSenhaExclusao, excluirConta, on
             />
 
             <SimpleModal
+                erroInterno
                 visivel={etapa === 'erro'}
                 aoFechar={fechar}
                 icone={WarningCircleIcon}

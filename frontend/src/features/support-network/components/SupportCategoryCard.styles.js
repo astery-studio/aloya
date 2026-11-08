@@ -12,9 +12,9 @@ function criarEstilos(tema) {
             paddingTop: 16,
             paddingBottom: 14,
             gap: 14,
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1.5,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             borderRadius: tema.radius.grande
         },
 
@@ -36,7 +36,7 @@ function criarEstilos(tema) {
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: tema.cores.interface.fundo,
+            backgroundColor: tema.escuro ? 'rgba(165, 214, 167, 0.16)' : tema.cores.interface.fundo,
             borderWidth: 0.7,
             borderColor: tema.cores.interface.borda,
             borderRadius: 10

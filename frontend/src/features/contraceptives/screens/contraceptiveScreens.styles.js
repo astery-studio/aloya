@@ -11,6 +11,8 @@ function criarEstilos(tema) {
             backgroundColor: interfaceTema.fundo
         },
 
+        telaCadastro: tema.escuro ? { backgroundColor: '#121212' } : {},
+
         conteudoFormulario: {
             paddingBottom: espacamentos.grande
         },
@@ -59,7 +61,7 @@ function criarEstilos(tema) {
         },
 
         textoExcluir: {
-            color: tema.escuro ? '#FF9B88' : tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
