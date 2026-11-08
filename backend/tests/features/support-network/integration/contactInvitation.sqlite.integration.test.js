@@ -104,7 +104,21 @@ function criarApp(prisma, emails) {
             rateLimit(_req, _res, next) {
                 next();
             },
-            controller
+            responseRateLimit(_req, _res, next) {
+                next();
+            },
+            controller,
+            responseController: {
+                consultar(_req, res) {
+                    res.status(501).end();
+                },
+                cadastrarContato(_req, res) {
+                    res.status(501).end();
+                },
+                responder(_req, res) {
+                    res.status(501).end();
+                }
+            }
         })
     );
     app.use(tratarErros);
