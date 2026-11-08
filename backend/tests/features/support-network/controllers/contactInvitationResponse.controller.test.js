@@ -74,3 +74,32 @@ test('encaminha aceite e recusa usando somente a sessão autenticada', async () 
 test('rejeita configuração incompleta', () => {
     assert.throws(() => criarContactInvitationResponseController(), TypeError);
 });
+
+test('define mensagem amigável específica sem alterar o convite quando a operação falha', async () => {
+    for (const acao of ['aceitar', 'recusar']) {
+        const res = resposta();
+        const erroInterno = new Error('SQLITE_BUSY: detalhe privado');
+        const controllerComFalha = criarContactInvitationResponseController({
+            service: {
+                consultar: async () => ({}),
+                cadastrarContato: async () => ({}),
+                aceitar: async () => { throw erroInterno; },
+                recusar: async () => { throw erroInterno; }
+            },
+            invitationValidator: {
+                validarTokenConvite: (token) => ({ valido: true, erros: [], dados: { token } }),
+                validarRespostaConvite: () => ({ valido: true, erros: [], dados: { acao } })
+            },
+            registrationValidator: { validar: () => ({ valido: true, erros: [], dados: {} }) }
+        });
+        let encaminhado;
+        await controllerComFalha.responder(
+            { params: { token: 'token-seguro' }, body: { acao }, usuario: { id: 25 } },
+            res,
+            (erro) => { encaminhado = erro; }
+        );
+
+        assert.match(encaminhado.mensagemUsuario, new RegExp(acao, 'u'));
+        assert.equal(encaminhado.message.includes('SQLITE_BUSY'), true);
+    }
+});

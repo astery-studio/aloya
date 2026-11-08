@@ -69,20 +69,24 @@ function criarContactInvitationResponseController({
     }
 
     async function responder(req, res, next) {
+        let acao = null;
         try {
             const token = validarToken(req, res);
             if (!token) return undefined;
             const validacao = invitationValidator.validarRespostaConvite(req.body);
             if (!validacao.valido) return responderValidacao(res, validacao);
+            acao = validacao.dados.acao;
             const operacao =
-                validacao.dados.acao === 'aceitar' ? service.aceitar : service.recusar;
+                acao === 'aceitar' ? service.aceitar : service.recusar;
             const resultado = await operacao({ token, usuarioId: req.usuario.id });
             res.set('Cache-Control', 'no-store');
             return res.status(200).json(resultado);
         } catch (erro) {
             if (!erro.status) {
                 erro.mensagemUsuario =
-                    'Ocorreu um erro ao responder ao convite. Verifique sua conexão e tente novamente.';
+                    acao === 'recusar'
+                        ? 'Ocorreu um erro ao recusar convite. Verifique sua conexão e tente novamente.'
+                        : 'Ocorreu um erro ao aceitar convite. Verifique sua conexão e tente novamente.';
             }
             return next(erro);
         }
