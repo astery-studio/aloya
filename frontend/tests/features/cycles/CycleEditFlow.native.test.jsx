@@ -59,6 +59,7 @@ test.each(['ios', 'android'])(
         Platform.OS = plataforma;
         let persistido = { id: 3, dataInicio: '2026-09-04', dataFim: '2026-09-08' };
         const requisicao = jest.fn(async ({ metodo, corpo }) => {
+            if (!metodo || metodo === 'GET') return { ciclo: persistido };
             expect(metodo).toBe('PATCH');
             persistido = { ...persistido, ...corpo };
             return {
@@ -75,22 +76,32 @@ test.each(['ios', 'android'])(
             />
         );
         const sheet = modalVisivel(resultado).props.testID;
-        await fireEvent.changeText(screen.getByLabelText('Data de término do ciclo'), '10/09/2026');
-        await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+        await waitFor(() =>
+            expect(screen.getByRole('button', { name: 'Marcar dia 2026-09-10' })).toBeEnabled()
+        );
+        await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-10' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
         if (plataforma === 'ios') {
             expect(screen.queryByText('Atualizar ciclo')).toBeNull();
             await ocultarNoIos(resultado, sheet);
         }
         const confirmacao = modalVisivel(resultado).props.testID;
-        expect(requisicao).not.toHaveBeenCalled();
+        expect(requisicao.mock.calls.filter(([pedido]) => pedido.metodo === 'PATCH')).toHaveLength(
+            0
+        );
         await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
         if (plataforma === 'ios') {
-            expect(requisicao).not.toHaveBeenCalled();
+            expect(
+                requisicao.mock.calls.filter(([pedido]) => pedido.metodo === 'PATCH')
+            ).toHaveLength(0);
             await ocultarNoIos(resultado, confirmacao);
         }
         await waitFor(() => expect(atualizar).toHaveBeenCalledTimes(1));
-        expect(requisicao).toHaveBeenCalledTimes(1);
-        expect(persistido.dataFim).toBe('2026-09-10');
+        expect(requisicao.mock.calls.filter(([pedido]) => pedido.metodo === 'PATCH')).toHaveLength(
+            1
+        );
+        expect(persistido.dias).toContain('2026-09-10');
+        expect(persistido.dias).not.toContain('2026-09-09');
         expect(await screen.findByText('Ciclo atualizado com sucesso')).toBeOnTheScreen();
         modalVisivel(resultado);
     }
@@ -106,14 +117,18 @@ test('cancelar no iOS espera o fechamento e reabre a edição com os dados digit
         />
     );
     const sheet = modalVisivel(resultado).props.testID;
-    await fireEvent.changeText(screen.getByLabelText('Data de término do ciclo'), '10/09/2026');
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Marcar dia 2026-09-05' })).toBeEnabled()
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-05' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
     await ocultarNoIos(resultado, sheet);
     const confirmacao = modalVisivel(resultado).props.testID;
     await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
-    expect(screen.queryByLabelText('Data de término do ciclo')).toBeNull();
+    expect(screen.queryByText('Editar Menstruação')).toBeNull();
     await ocultarNoIos(resultado, confirmacao);
-    expect(screen.getByLabelText('Data de término do ciclo')).toHaveProp('value', '10/09/2026');
+    expect(screen.getByRole('button', { name: 'Desmarcar dia 2026-09-05' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
     expect(editar).not.toHaveBeenCalled();
     modalVisivel(resultado);
 });
@@ -139,8 +154,11 @@ test.each(['retorno falso', 'exceção'])(
             />
         );
         const sheet = modalVisivel(resultado).props.testID;
-        await fireEvent.changeText(screen.getByLabelText('Data de término do ciclo'), '10/09/2026');
-        await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+        await waitFor(() =>
+            expect(screen.getByRole('button', { name: 'Marcar dia 2026-09-05' })).toBeEnabled()
+        );
+        await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-05' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
         await ocultarNoIos(resultado, sheet);
         const confirmacao = modalVisivel(resultado).props.testID;
         await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
@@ -153,5 +171,34 @@ test.each(['retorno falso', 'exceção'])(
         expect(await screen.findByText('Ciclo atualizado com sucesso')).toBeOnTheScreen();
         expect(atualizar).toHaveBeenCalledTimes(2);
         expect(editar).toHaveBeenCalledTimes(1);
+    }
+);
+
+test.each(['ios', 'android'])(
+    'aviso de novo ciclo mantém seleção e espera fechar o sheet no %s',
+    async (plataforma) => {
+        Platform.OS = plataforma;
+        const editar = jest.fn();
+        const resultado = await render(
+            <CycleEditFlow
+                ciclo={{ id: 3, dataInicio: '2026-09-04', dataFim: '2026-09-08' }}
+                service={{ editar }}
+            />
+        );
+        const sheet = modalVisivel(resultado).props.testID;
+        await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-09-12' }));
+        if (plataforma === 'ios') {
+            expect(screen.queryByText('Novo ciclo na seleção')).toBeNull();
+            await ocultarNoIos(resultado, sheet);
+        }
+        expect(await screen.findByText('Novo ciclo na seleção')).toBeOnTheScreen();
+        expect(screen.getByText(/Intervalos de 3 dias ou mais/)).toBeOnTheScreen();
+        const aviso = modalVisivel(resultado).props.testID;
+        await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+        if (plataforma === 'ios') await ocultarNoIos(resultado, aviso);
+        expect(screen.getByRole('button', { name: 'Desmarcar dia 2026-09-12' })).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Concluir' })).toBeEnabled();
+        expect(editar).not.toHaveBeenCalled();
+        modalVisivel(resultado);
     }
 );

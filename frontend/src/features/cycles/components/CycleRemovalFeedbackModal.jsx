@@ -157,4 +157,4 @@ function CycleRemovalFeedbackModal({
     return null;
 }
 
-export { CycleRemovalFeedbackModal, IconeAlerta };
+export { CycleRemovalFeedbackModal, IconeAlerta, IconeSucesso };

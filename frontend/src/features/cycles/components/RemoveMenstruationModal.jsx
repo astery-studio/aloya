@@ -4,24 +4,10 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
+import { obterPeriodo } from '../utils/cycleRemovalPresentation';
 import { CycleRemovalFeedbackModal } from './CycleRemovalFeedbackModal';
 import { MenstrualDaysCalendar } from './MenstrualDaysCalendar';
 import { criarEstilos } from './RemoveMenstruationModal.styles';
-
-function formatarData(data) {
-    if (typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
-        return 'data não informada';
-    }
-
-    const [ano, mes, dia] = data.split('-');
-    return `${dia}/${mes}/${ano}`;
-}
-
-function obterPeriodo(ciclo) {
-    if (!ciclo?.dataInicio) return 'Período não informado';
-    return `${formatarData(ciclo.dataInicio)} a ${formatarData(ciclo.dataFim || obterHojeLocal())}`;
-}
 
 function Botao({ texto, primaria, grande = false, desativado, onPress, estilos }) {
     return (

@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal';
-import { DropIcon, WarningCircleIcon } from '../../shared/components/icons/AppIcons';
 import { useTheme } from '../../shared/hooks/useTheme';
+import { diasDoRegistro, mesesParaEdicao, contarEpisodios } from './utils/cycleEditSelection';
+import { IconeAlerta, IconeSucesso } from './components/CycleRemovalFeedbackModal';
+import { obterPeriodo } from './utils/cycleRemovalPresentation';
 import { CycleEditSheet } from './components/CycleEditSheet/CycleEditSheet';
 
 function formatarDataParaCampo(dataIso) {
@@ -57,18 +59,91 @@ function validarEdicao(dataInicio, dataFim) {
     return { inicio, fim };
 }
 
-function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirada }) {
+function IconeConfirmacaoEdicao({ color }) {
     const tema = useTheme();
-    const inicioOriginal = formatarDataParaCampo(ciclo.dataInicio);
-    const fimOriginal = formatarDataParaCampo(ciclo.dataFim);
-    const [dataInicio, setDataInicio] = useState(inicioOriginal);
-    const [dataFim, setDataFim] = useState(fimOriginal);
+    return <IconeAlerta cor={tema.escuro ? color : undefined} fundoTransparente={tema.escuro} />;
+}
+function IconeErroEdicao() {
+    return <IconeAlerta erro />;
+}
+
+function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirada }) {
+    const [registro, setRegistro] = useState(ciclo);
+    const [originais, setOriginais] = useState(() => diasDoRegistro(ciclo));
+    const [dias, setDias] = useState(() => diasDoRegistro(ciclo));
+    const [carregando, setCarregando] = useState(false);
     const [painelVisivel, setPainelVisivel] = useState(true);
     const [salvando, setSalvando] = useState(false);
     const [feedback, setFeedback] = useState(null);
     const acaoAposOcultarPainel = useRef(null);
     const acaoAposOcultarFeedback = useRef(null);
-    const alterado = dataInicio !== inicioOriginal || dataFim !== fimOriginal;
+    const montado = useRef(true);
+    const painelAtual = useRef(painelVisivel);
+    painelAtual.current = painelVisivel;
+    const alterado = JSON.stringify(dias) !== JSON.stringify(originais);
+
+    const carregarRegistro = useCallback(async () => {
+        if (typeof service.buscar !== 'function') return;
+        setCarregando(true);
+        try {
+            const atual = await service.buscar(ciclo.id);
+            if (!montado.current) return;
+            setRegistro(atual);
+            const datas = diasDoRegistro(atual);
+            setOriginais(datas);
+            setDias(datas);
+            return true;
+        } catch (falha) {
+            if (!montado.current) return;
+            if (falha?.status === 401) {
+                onSessaoExpirada?.();
+                return;
+            }
+            const erroCarregamento = {
+                tipo: 'carregamento',
+                titulo: 'Algo deu errado',
+                mensagem: 'Ocorreu um erro ao atualizar este registro. Tente novamente.'
+            };
+            if (painelAtual.current) {
+                acaoAposOcultarPainel.current = () => setFeedback(erroCarregamento);
+                setPainelVisivel(false);
+            } else setFeedback(erroCarregamento);
+            return false;
+        } finally {
+            if (montado.current) setCarregando(false);
+        }
+    }, [ciclo.id, service, onSessaoExpirada]);
+    useEffect(() => {
+        montado.current = true;
+        void carregarRegistro();
+        return () => {
+            montado.current = false;
+        };
+    }, [carregarRegistro]);
+
+    function alternarDia({ data }) {
+        if (salvando || carregando) return;
+        if (data > dataAtualIso()) {
+            abrirFeedback({
+                tipo: 'validacao',
+                titulo: 'Data no futuro',
+                mensagem: 'Não é possível registrar menstruação em uma data futura.'
+            });
+            return;
+        }
+        const proximos = dias.includes(data)
+            ? dias.filter((dia) => dia !== data)
+            : [...dias, data].sort();
+        setDias(proximos);
+        if (contarEpisodios(proximos) > 1 && contarEpisodios(proximos) > contarEpisodios(dias)) {
+            abrirFeedback({
+                tipo: 'validacao',
+                titulo: 'Novo ciclo na seleção',
+                mensagem:
+                    'A seleção foi mantida. Intervalos de 3 dias ou mais sem sangramento separam os registros em ciclos diferentes. Ao concluir e confirmar, esses ciclos serão salvos e suas previsões serão recalculadas.'
+            });
+        }
+    }
 
     function abrirFeedback(proximoFeedback) {
         acaoAposOcultarPainel.current = () => setFeedback(proximoFeedback);
@@ -103,17 +178,15 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     }
 
     function solicitarSalvamento() {
-        const validacao = validarEdicao(dataInicio, dataFim);
-        abrirFeedback(
-            validacao.inicio ? { tipo: 'confirmacao' } : { tipo: 'validacao', ...validacao }
-        );
+        if (!alterado || salvando || carregando) return;
+        abrirFeedback({ tipo: dias.length ? 'confirmacao' : 'exclusao' });
     }
 
     async function atualizarTelas() {
         try {
             const atualizado = await onAtualizado?.();
             if (atualizado === false) throw new Error('A tela não foi atualizada.');
-            setFeedback({ tipo: 'sucesso' });
+            setFeedback({ tipo: dias.length ? 'sucesso' : 'sucesso-excluir' });
         } catch {
             setFeedback({
                 tipo: 'atualizacao',
@@ -134,25 +207,24 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
 
     async function salvar(validacao) {
         try {
-            await service.editar(ciclo.id, {
-                dataInicio: validacao.inicio,
-                dataFim: validacao.fim
-            });
+            await service.editar(ciclo.id, { dias: validacao.dias });
             await atualizarTelas();
         } catch (falha) {
             if (falha?.status === 401) {
                 onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
                 return;
             }
+            const conflito = falha?.codigo === 'SOBREPOSICAO_CICLO';
+            const periodo = falha?.detalhes;
+            const intervalo = periodo?.dataInicio
+                ? ` (${formatarDataParaCampo(periodo.dataInicio)} a ${periodo.dataFim ? formatarDataParaCampo(periodo.dataFim) : 'em andamento'})`
+                : '';
             setFeedback({
-                tipo: 'erro',
-                erroInterno: falha?.codigo !== 'SOBREPOSICAO_CICLO',
-                titulo:
-                    falha?.codigo === 'SOBREPOSICAO_CICLO' ? 'Ciclo existente' : 'Algo deu errado',
-                mensagem:
-                    falha?.mensagemUsuario ||
-                    falha?.message ||
-                    'Ocorreu um erro ao atualizar este registro. Tente novamente.'
+                tipo: conflito ? 'validacao' : 'erro',
+                titulo: conflito ? 'Ciclo existente' : 'Algo deu errado',
+                mensagem: conflito
+                    ? `O período informado se sobrepõe a outro ciclo já registrado${intervalo}. Ajuste as datas ou edite o outro ciclo em vez deste.`
+                    : 'Ocorreu um erro ao atualizar este registro. Tente novamente.'
             });
         } finally {
             setSalvando(false);
@@ -160,8 +232,7 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
     }
 
     function confirmarSalvamento() {
-        const validacao = validarEdicao(dataInicio, dataFim);
-        if (!validacao.inicio) return;
+        const validacao = { dias: [...dias] };
 
         setSalvando(true);
         ocultarFeedback(() => salvar(validacao));
@@ -171,32 +242,42 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
         <>
             <CycleEditSheet
                 visivel={painelVisivel}
-                dataInicio={dataInicio}
-                dataFim={dataFim}
+                meses={mesesParaEdicao(registro, dias)}
+                mesInicial={registro.dataInicio.slice(0, 7)}
+                carregando={carregando}
                 alterado={alterado}
                 salvando={salvando}
-                onAlterarInicio={setDataInicio}
-                onAlterarFim={setDataFim}
+                onAlternarDia={alternarDia}
                 onFechar={solicitarFechamento}
                 onOcultar={executarAposOcultarPainel}
                 onSalvar={solicitarSalvamento}
             />
             <SimpleModal
-                visivel={feedback?.tipo === 'confirmacao'}
+                visivel={['confirmacao', 'exclusao'].includes(feedback?.tipo)}
                 aoFechar={voltarAoPainel}
                 aoOcultar={executarAposOcultarFeedback}
-                icone={WarningCircleIcon}
-                corIcone={tema.cores.feedback.erro}
-                titulo="Atualizar ciclo"
-                mensagem="Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?"
-                acaoPrincipal={{ texto: 'Confirmar', aoPressionar: confirmarSalvamento }}
+                icone={IconeConfirmacaoEdicao}
+                fundoIcone="transparent"
+                titulo={feedback?.tipo === 'exclusao' ? 'Apagar ciclo' : 'Atualizar ciclo'}
+                mensagem={
+                    feedback?.tipo === 'exclusao'
+                        ? `Tem certeza que deseja excluir todo o período de menstruação de ${obterPeriodo(registro)} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`
+                        : contarEpisodios(dias) > 1
+                          ? `A seleção será salva em ${contarEpisodios(dias)} ciclos separados, pois há intervalos de 3 dias ou mais sem sangramento. Suas previsões serão recalculadas. Deseja continuar?`
+                          : 'Esta alteração pode recalcular suas previsões futuras de ciclo. Deseja continuar?'
+                }
+                acaoPrincipal={{
+                    texto: feedback?.tipo === 'exclusao' ? 'Apagar' : 'Confirmar',
+                    aoPressionar: confirmarSalvamento
+                }}
                 acaoSecundaria={{ texto: 'Cancelar', aoPressionar: voltarAoPainel }}
             />
             <SimpleModal
                 visivel={feedback?.tipo === 'saida'}
                 aoFechar={voltarAoPainel}
                 aoOcultar={executarAposOcultarFeedback}
-                icone={WarningCircleIcon}
+                icone={IconeConfirmacaoEdicao}
+                fundoIcone="transparent"
                 titulo="Dados não salvos"
                 mensagem="Deseja descartar as alterações feitas neste registro?"
                 acaoPrincipal={{
@@ -210,32 +291,54 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                 }}
             />
             <SimpleModal
-                visivel={feedback?.tipo === 'sucesso'}
+                visivel={['sucesso', 'sucesso-excluir'].includes(feedback?.tipo)}
                 aoFechar={onFechar}
                 aoOcultar={executarAposOcultarFeedback}
-                icone={DropIcon}
-                titulo="Ciclo atualizado com sucesso"
+                icone={IconeSucesso}
+                fundoIcone="transparent"
+                titulo={
+                    feedback?.tipo === 'sucesso-excluir'
+                        ? 'Ciclo excluído com sucesso'
+                        : 'Ciclo atualizado com sucesso'
+                }
                 acaoPrincipal={{ texto: 'OK', aoPressionar: onFechar }}
             />
             <SimpleModal
-                erroInterno={Boolean(feedback?.erroInterno)}
-                visivel={['erro', 'validacao', 'atualizacao'].includes(feedback?.tipo)}
-                aoFechar={feedback?.tipo === 'atualizacao' ? onFechar : voltarAoPainel}
+                erroInterno={['erro', 'carregamento'].includes(feedback?.tipo)}
+                visivel={['erro', 'validacao', 'atualizacao', 'carregamento'].includes(
+                    feedback?.tipo
+                )}
+                aoFechar={
+                    ['atualizacao', 'carregamento'].includes(feedback?.tipo)
+                        ? onFechar
+                        : voltarAoPainel
+                }
+
                 aoOcultar={executarAposOcultarFeedback}
-                icone={WarningCircleIcon}
-                corIcone={tema.cores.feedback.erro}
+                icone={feedback?.tipo === 'validacao' ? IconeConfirmacaoEdicao : IconeErroEdicao}
+                fundoIcone="transparent"
                 titulo={feedback?.titulo}
                 mensagem={feedback?.mensagem}
                 acaoPrincipal={
                     feedback?.tipo === 'atualizacao'
                         ? { texto: 'Tentar atualizar', aoPressionar: tentarAtualizar }
-                        : feedback?.tipo === 'erro'
+                        : feedback?.tipo === 'carregamento'
                           ? {
                                 texto: 'Tentar novamente',
                                 variante: 'preto',
-                                aoPressionar: confirmarSalvamento
+                                aoPressionar: () =>
+                                    ocultarFeedback(async () => {
+                                        const carregou = await carregarRegistro();
+                                        if (carregou && montado.current) setPainelVisivel(true);
+                                    })
                             }
-                          : { texto: 'OK', aoPressionar: voltarAoPainel }
+                          : feedback?.tipo === 'erro'
+                            ? {
+                                  texto: 'Tentar novamente',
+                                  variante: 'preto',
+                                  aoPressionar: confirmarSalvamento
+                              }
+                            : { texto: 'OK', aoPressionar: voltarAoPainel }
                 }
                 acaoSecundaria={
                     feedback?.tipo === 'atualizacao'
@@ -246,7 +349,9 @@ function CycleEditFlow({ ciclo, service, onFechar, onAtualizado, onSessaoExpirad
                                 variante: 'branco',
                                 aoPressionar: voltarAoPainel
                             }
-                          : undefined
+                          : feedback?.tipo === 'carregamento'
+                            ? { texto: 'Voltar', variante: 'branco', aoPressionar: onFechar }
+                            : undefined
                 }
             />
         </>
