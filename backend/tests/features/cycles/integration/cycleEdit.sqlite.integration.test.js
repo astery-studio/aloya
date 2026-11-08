@@ -171,7 +171,8 @@ test('edita o ciclo de forma atômica e recalcula dados derivados', async (t) =>
                 dataInicio: '2026-08-07',
                 dataFim: '2026-08-11',
                 duracaoMenstruacao: 5,
-                duracaoCiclo: 30
+                duracaoCiclo: 30,
+                dias: ['2026-08-07', '2026-08-08', '2026-08-09', '2026-08-10', '2026-08-11']
             });
         });
 
@@ -268,3 +269,129 @@ test('edita o ciclo de forma atômica e recalcula dados derivados', async (t) =>
         rmSync(diretorio, { recursive: true, force: true });
     }
 });
+
+test('edita dias descontínuos, restaura dia removido e exclui seleção vazia', async () => {
+    const { diretorio, caminho } = criarBancoTemporario();
+    const prisma = criarPrisma(caminho);
+    const servidor = criarAplicacao(prisma).listen(0, '127.0.0.1');
+    try {
+        await once(servidor, 'listening');
+        await popular(prisma);
+        const url = `http://127.0.0.1:${servidor.address().port}/api/cycles`;
+        const dias = ['2026-08-07', '2026-08-08', '2026-08-10', '2026-08-11'];
+        let resultado = await requisitar(url, 2, { dias });
+        assert.equal(resultado.resposta.status, 200);
+        assert.deepEqual(resultado.corpo.ciclo.dias, dias);
+        assert.equal(resultado.corpo.ciclo.id, 2);
+        assert.equal(resultado.corpo.ciclo.duracaoMenstruacao, 4);
+        const buscar = async () =>
+            (await (await fetch(`${url}/2`, { headers: { authorization: 'Bearer token' } })).json())
+                .ciclo;
+        assert.deepEqual((await buscar()).dias, dias);
+        assert.equal(await prisma.registroCiclo.count({ where: { usuarioId: 1 } }), 3);
+        const restaurados = [...dias, '2026-08-09'].sort();
+        resultado = await requisitar(url, 2, { dias: restaurados });
+        assert.equal(resultado.resposta.status, 200);
+        assert.deepEqual((await buscar()).dias, restaurados);
+        assert.equal((await buscar()).duracaoMenstruacao, 5);
+        resultado = await requisitar(url, 2, { dias: ['2026-08-08', '2026-08-10'] });
+        assert.equal(resultado.resposta.status, 200);
+        assert.equal(resultado.corpo.ciclo.dataInicio, '2026-08-08');
+        assert.equal(resultado.corpo.ciclo.dataFim, '2026-08-10');
+        assert.equal(resultado.corpo.ciclo.duracaoMenstruacao, 2);
+        const estado = await buscar();
+        resultado = await requisitar(url, 2, { dias: ['2026-09-05'] });
+        assert.equal(resultado.resposta.status, 409);
+        assert.equal(resultado.corpo.erro.codigo, 'SOBREPOSICAO_CICLO');
+        assert.equal(resultado.corpo.erro.detalhes.dataInicio, '2026-09-04');
+        assert.deepEqual(await buscar(), estado);
+        for (const body of [
+            { dias: ['2027-01-01'] },
+            { dias: ['2026-08-08', '2026-08-08'] },
+            { dias: ['2026-02-30'] },
+            { dias: [], dataInicio: '2026-08-08' }
+        ]) {
+            resultado = await requisitar(url, 2, body);
+            assert.equal(resultado.resposta.status, 422);
+        }
+        resultado = await requisitar(url, 4, { dias: ['2026-08-08'] });
+        assert.equal(resultado.resposta.status, 404);
+        resultado = await requisitar(url, 2, { dias: [] });
+        assert.equal(resultado.resposta.status, 200);
+        assert.equal(resultado.corpo.cicloRemovido, true);
+        assert.equal(await prisma.registroCiclo.count({ where: { id: 2 } }), 0);
+        assert.equal(await prisma.diaMenstruacao.count({ where: { registroCicloId: 2 } }), 0);
+    } finally {
+        await prisma.$disconnect();
+        await new Promise((resolve) => servidor.close(resolve));
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
+
+for (const simularFalha of [false, true]) {
+    test(`separa ciclos na edição de forma atômica (falha: ${simularFalha})`, async () => {
+        const { diretorio, caminho } = criarBancoTemporario();
+        const prisma = criarPrisma(caminho);
+        const servidor = criarAplicacao(prisma).listen(0, '127.0.0.1');
+        try {
+            await once(servidor, 'listening');
+            await popular(prisma);
+            const url = `http://127.0.0.1:${servidor.address().port}/api/cycles`;
+            const estado = () =>
+                prisma.registroCiclo.findMany({
+                    orderBy: { id: 'asc' },
+                    include: { diasMenstruacao: { orderBy: { data: 'asc' } } }
+                });
+            const antes = await estado();
+            if (simularFalha)
+                await prisma.$executeRawUnsafe(`
+                CREATE TRIGGER falhar_novo_episodio BEFORE INSERT ON dias_menstruacao
+                WHEN NEW.registro_ciclo_id > 4
+                BEGIN SELECT RAISE(ABORT, 'falha simulada'); END
+            `);
+            const dias = ['2026-08-07', '2026-08-08', '2026-08-11', '2026-08-15', '2026-08-19'];
+            const resultado = await requisitar(url, 2, { dias: [...dias].reverse() });
+            if (simularFalha) {
+                assert.equal(resultado.resposta.status, 500);
+                assert.deepEqual(await estado(), antes);
+                assert.equal(await prisma.previsao.count({ where: { usuarioId: 1 } }), 1);
+            } else {
+                assert.equal(resultado.resposta.status, 200);
+                assert.equal(resultado.corpo.ciclo.ciclosCriados.length, 2);
+                assert.deepEqual(resultado.corpo.ciclo.dias, dias.slice(0, 3));
+                const ciclos = await prisma.registroCiclo.findMany({
+                    where: { usuarioId: 1 },
+                    orderBy: { dataInicio: 'asc' },
+                    include: { diasMenstruacao: { orderBy: { data: 'asc' } } }
+                });
+                assert.equal(ciclos.length, 5);
+                assert.equal(ciclos[1].id, 2);
+                assert.deepEqual(
+                    ciclos.slice(1, 4).map((ciclo) => ciclo.duracaoMenstruacao),
+                    [3, 1, 1]
+                );
+                assert.deepEqual(
+                    ciclos
+                        .slice(1, 4)
+                        .flatMap((ciclo) =>
+                            ciclo.diasMenstruacao.map((dia) => dia.data.toISOString().slice(0, 10))
+                        ),
+                    dias
+                );
+                assert.deepEqual(
+                    ciclos.map((ciclo) => ciclo.duracaoCiclo),
+                    [null, 30, 8, 4, 16]
+                );
+                assert.equal(await prisma.previsao.count({ where: { usuarioId: 1 } }), 0);
+                const depois = await estado();
+                const repetido = await requisitar(url, 2, { dias });
+                assert.equal(repetido.resposta.status, 409);
+                assert.deepEqual(await estado(), depois);
+            }
+        } finally {
+            await prisma.$disconnect();
+            await new Promise((resolve) => servidor.close(resolve));
+            rmSync(diretorio, { recursive: true, force: true });
+        }
+    });
+}
