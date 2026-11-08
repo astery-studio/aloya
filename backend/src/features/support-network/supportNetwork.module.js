@@ -9,8 +9,18 @@ import { criarContactInvitationPermissionService } from './services/contactInvit
 import { criarContactInvitationTokenService } from './services/contactInvitationToken.service.js';
 import { criarContactInvitationService } from './services/contactInvitation.service.js';
 import { criarContactInvitationController } from './controllers/contactInvitation.controller.js';
+import { criarContactInvitationResponseService } from './services/contactInvitationResponse.service.js';
+import { criarContactRegistrationValidator } from './validators/contactRegistration.validator.js';
+import { criarContactInvitationResponseController } from './controllers/contactInvitationResponse.controller.js';
 
-function criarSupportNetworkModule({ prisma, crypto, emailService, invitationBaseUrl, now } = {}) {
+function criarSupportNetworkModule({
+    prisma,
+    crypto,
+    emailService,
+    invitationBaseUrl,
+    passwordService,
+    now
+} = {}) {
     const permissionCategoryService = criarPermissionCategoryService({ prisma });
     const permissionCategoryValidator = criarPermissionCategoryValidator();
     const permissionCategoryController = criarPermissionCategoryController({
@@ -41,6 +51,18 @@ function criarSupportNetworkModule({ prisma, crypto, emailService, invitationBas
         service: contactInvitationService,
         validator: contactInvitationValidator
     });
+    const contactRegistrationValidator = criarContactRegistrationValidator({ now });
+    const contactInvitationResponseService = criarContactInvitationResponseService({
+        prisma,
+        tokenService: contactInvitationTokenService,
+        passwordService,
+        now
+    });
+    const contactInvitationResponseController = criarContactInvitationResponseController({
+        service: contactInvitationResponseService,
+        invitationValidator: contactInvitationValidator,
+        registrationValidator: contactRegistrationValidator
+    });
 
     return Object.freeze({
         permissionCategoryService,
@@ -53,7 +75,10 @@ function criarSupportNetworkModule({ prisma, crypto, emailService, invitationBas
         contactInvitationPermissionService,
         contactInvitationTokenService,
         contactInvitationService,
-        contactInvitationController
+        contactInvitationController,
+        contactRegistrationValidator,
+        contactInvitationResponseService,
+        contactInvitationResponseController
     });
 }
 

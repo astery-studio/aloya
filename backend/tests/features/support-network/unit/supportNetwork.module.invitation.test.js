@@ -5,12 +5,16 @@ import test from 'node:test';
 import { criarSupportNetworkModule } from '../../../../src/features/support-network/supportNetwork.module.js';
 
 test('compõe todas as camadas necessárias para convites', () => {
-    const prisma = {};
+    const prisma = {
+        vinculoRedeApoio: { findUnique: async () => null },
+        $transaction: async (callback) => callback({})
+    };
     const emailService = { enviarConviteRedeApoio: async () => {} };
     const modulo = criarSupportNetworkModule({
         prisma,
         crypto,
         emailService,
+        passwordService: { gerarHash: async () => ({ senhaHash: 'hash' }) },
         invitationBaseUrl: 'aloya://support-network/invitation'
     });
 
@@ -19,4 +23,7 @@ test('compõe todas as camadas necessárias para convites', () => {
     assert.equal(typeof modulo.contactInvitationTokenService.emitir, 'function');
     assert.equal(typeof modulo.contactInvitationService.criarConvite, 'function');
     assert.equal(typeof modulo.contactInvitationController.criarConvite, 'function');
+    assert.equal(typeof modulo.contactRegistrationValidator.validar, 'function');
+    assert.equal(typeof modulo.contactInvitationResponseService.consultar, 'function');
+    assert.equal(typeof modulo.contactInvitationResponseController.responder, 'function');
 });
