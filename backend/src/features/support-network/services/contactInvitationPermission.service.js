@@ -32,7 +32,35 @@ function criarContactInvitationPermissionService({ prisma } = {}) {
         });
     }
 
-    return Object.freeze({ resolverCategoria });
+    function resolverPermissoesIndividuais(permissoesRecebidas) {
+        if (
+            !Array.isArray(permissoesRecebidas) ||
+            permissoesRecebidas.length === 0 ||
+            permissoesRecebidas.length > permissoesDaCategoria.length ||
+            permissoesRecebidas.some((permissao) => !permissaoCategoriaEhValida(permissao))
+        ) {
+            throw criarErro(
+                'Selecione ao menos um tipo de dado para o contato visualizar.',
+                422,
+                'PERMISSOES_INDIVIDUAIS_INVALIDAS'
+            );
+        }
+
+        return Object.freeze({
+            tipo: 'individual',
+            categoriaId: null,
+            categoriaNome: null,
+            permissoesIndividuais: ordenarPermissoesCategoria(permissoesRecebidas)
+        });
+    }
+
+    return Object.freeze({ resolverCategoria, resolverPermissoesIndividuais });
 }
 
 export { criarContactInvitationPermissionService };
+import {
+    ordenarPermissoesCategoria,
+    permissaoCategoriaEhValida,
+    permissoesDaCategoria
+} from '../constants/contactInvitation.constants.js';
+
