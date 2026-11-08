@@ -1,7 +1,14 @@
-import { MENSAGEM_ERRO_LISTAGEM_CONTATOS } from '../constants/supportContact.constants.js';
+import {
+    MENSAGEM_ERRO_LISTAGEM_CONTATOS,
+    MENSAGEM_ERRO_REENVIO_CONVITE
+} from '../constants/supportContact.constants.js';
 
-function criarSupportContactController({ service } = {}) {
-    if (typeof service?.listar !== 'function') {
+function criarSupportContactController({ service, resendService, validator } = {}) {
+    if (
+        typeof service?.listar !== 'function' ||
+        typeof resendService?.reenviar !== 'function' ||
+        typeof validator?.validarContatoId !== 'function'
+    ) {
         throw new TypeError('Não foi possível configurar o controller de contatos.');
     }
 
@@ -20,7 +27,37 @@ function criarSupportContactController({ service } = {}) {
         }
     }
 
-    return Object.freeze({ listar });
+    async function reenviarConvite(req, res, next) {
+        try {
+            const validacao = validator.validarContatoId(req.params.contatoId);
+            if (!validacao.valido) {
+                return res.status(422).json({
+                    erro: {
+                        codigo: 'ERRO_VALIDACAO',
+                        mensagem: validacao.erro.mensagem,
+                        detalhes: [validacao.erro]
+                    }
+                });
+            }
+
+            const convite = await resendService.reenviar({
+                titularId: req.usuario.id,
+                papel: req.usuario.papel,
+                contatoId: validacao.contatoId
+            });
+
+            res.set('Cache-Control', 'no-store');
+            return res.status(200).json({
+                mensagem: 'Convite reenviado com sucesso.',
+                convite
+            });
+        } catch (erro) {
+            if (!erro.status) erro.mensagemUsuario = MENSAGEM_ERRO_REENVIO_CONVITE;
+            return next(erro);
+        }
+    }
+
+    return Object.freeze({ listar, reenviarConvite });
 }
 
 export { criarSupportContactController };
