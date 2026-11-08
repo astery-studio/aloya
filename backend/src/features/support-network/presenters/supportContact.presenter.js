@@ -48,9 +48,7 @@ function resolverVinculo(vinculo) {
                 id: vinculo.categoria.id,
                 nome: vinculo.categoria.nome
             }),
-            permissoes: Object.freeze(
-                copiarPermissoes(vinculo.categoria.conjuntoDadosVisiveis)
-            )
+            permissoes: Object.freeze(copiarPermissoes(vinculo.categoria.conjuntoDadosVisiveis))
         });
     }
 
@@ -97,10 +95,7 @@ function compararContatos(primeiro, segundo) {
         return prioridadePrimeiro - prioridadeSegundo;
     }
 
-    const porNome = comparadorNomes.compare(
-        primeiro.identificacao,
-        segundo.identificacao
-    );
+    const porNome = comparadorNomes.compare(primeiro.identificacao, segundo.identificacao);
     return porNome !== 0 ? porNome : primeiro.id - segundo.id;
 }
 

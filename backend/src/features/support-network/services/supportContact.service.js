@@ -1,9 +1,6 @@
 import { papelEhTitular } from '../constants/contactInvitation.constants.js';
 import { STATUS_CONTATOS_VISIVEIS } from '../constants/supportContact.constants.js';
-import {
-    formatarContato,
-    ordenarContatos
-} from '../presenters/supportContact.presenter.js';
+import { formatarContato, ordenarContatos } from '../presenters/supportContact.presenter.js';
 
 function criarErro(mensagem, status, codigo) {
     const erro = new Error(mensagem);
@@ -39,10 +36,7 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
     async function listar({ titularId, papel } = {}) {
         validarTitular(titularId, papel);
 
-        if (
-            typeof prisma?.vinculoRedeApoio?.findMany !== 'function' ||
-            typeof now !== 'function'
-        ) {
+        if (typeof prisma?.vinculoRedeApoio?.findMany !== 'function' || typeof now !== 'function') {
             throw new TypeError('Não foi possível consultar os contatos da Rede de Apoio.');
         }
 

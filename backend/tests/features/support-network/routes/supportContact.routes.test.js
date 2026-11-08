@@ -6,9 +6,15 @@ import { criarSupportContactRoutes } from '../../../../src/features/support-netw
 function criarRouter() {
     const chamadas = [];
     const router = {
-        use(...args) { chamadas.push(['use', ...args]); },
-        get(...args) { chamadas.push(['get', ...args]); },
-        post(...args) { chamadas.push(['post', ...args]); }
+        use(...args) {
+            chamadas.push(['use', ...args]);
+        },
+        get(...args) {
+            chamadas.push(['get', ...args]);
+        },
+        post(...args) {
+            chamadas.push(['post', ...args]);
+        }
     };
     return { chamadas, Router: () => router, router };
 }

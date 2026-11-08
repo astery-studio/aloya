@@ -143,7 +143,10 @@ test('lista contatos reais com isolamento, ordem, vínculo e espera calculada', 
         ]);
         assert.equal(corpo.contatos[1].aguardando.atrasado, true);
         assert.equal(corpo.contatos[2].acoes.podeReenviarConvite, false);
-        assert.equal(corpo.contatos.some(({ id }) => id === 23 || id === 24), false);
+        assert.equal(
+            corpo.contatos.some(({ id }) => id === 23 || id === 24),
+            false
+        );
     } finally {
         servidor.close();
         await once(servidor, 'close');

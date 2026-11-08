@@ -16,14 +16,11 @@ test('calcula a espera por dias civis UTC sem produzir valores negativos', () =>
 test('marca como atrasado somente após sete dias completos no calendário', () => {
     const agora = new Date('2026-11-08T12:00:00.000Z');
 
-    assert.deepEqual(
-        criarResumoEspera('pendente', new Date('2026-11-01T12:00:00.000Z'), agora),
-        {
-            dias: 7,
-            atrasado: false,
-            rotulo: 'Aguardando há 7 dias'
-        }
-    );
+    assert.deepEqual(criarResumoEspera('pendente', new Date('2026-11-01T12:00:00.000Z'), agora), {
+        dias: 7,
+        atrasado: false,
+        rotulo: 'Aguardando há 7 dias'
+    });
     assert.equal(
         criarResumoEspera('pendente', new Date('2026-10-31T12:00:00.000Z'), agora).atrasado,
         true

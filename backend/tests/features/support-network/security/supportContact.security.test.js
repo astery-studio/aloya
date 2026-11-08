@@ -19,10 +19,10 @@ test('não consulta contatos quando a sessão pertence somente a um contato de a
         }
     });
 
-    await assert.rejects(
-        service.listar({ titularId: 2, papel: 'contato_apoio' }),
-        { status: 403, codigo: 'ACESSO_NEGADO' }
-    );
+    await assert.rejects(service.listar({ titularId: 2, papel: 'contato_apoio' }), {
+        status: 403,
+        codigo: 'ACESSO_NEGADO'
+    });
     assert.equal(consultou, false);
 });
 
@@ -31,18 +31,20 @@ test('não expõe token, titular ou campos internos na resposta da listagem', as
         prisma: {
             vinculoRedeApoio: {
                 async findMany() {
-                    return [{
-                        id: 9,
-                        emailConvidado: 'contato@example.com',
-                        status: 'pendente',
-                        permissoesIndividuais: [],
-                        dataEnvio: agora,
-                        dataResposta: null,
-                        contato: null,
-                        categoria: null,
-                        tokenConviteHash: 'segredo',
-                        titularId: 1
-                    }];
+                    return [
+                        {
+                            id: 9,
+                            emailConvidado: 'contato@example.com',
+                            status: 'pendente',
+                            permissoesIndividuais: [],
+                            dataEnvio: agora,
+                            dataResposta: null,
+                            contato: null,
+                            categoria: null,
+                            tokenConviteHash: 'segredo',
+                            titularId: 1
+                        }
+                    ];
                 }
             }
         },
@@ -114,7 +116,9 @@ test('não envia e-mail se o vínculo mudar entre leitura e atualização', asyn
                         titular: { nome: 'Ana' }
                     };
                 },
-                async updateMany() { return { count: 0 }; }
+                async updateMany() {
+                    return { count: 0 };
+                }
             }
         },
         tokenService: {
@@ -123,13 +127,14 @@ test('não envia e-mail se o vínculo mudar entre leitura e atualização', asyn
             }
         },
         emailService: {
-            async enviarConviteRedeApoio() { enviou = true; }
+            async enviarConviteRedeApoio() {
+                enviou = true;
+            }
         }
     });
 
-    await assert.rejects(
-        service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 }),
-        { codigo: 'CONVITE_ALTERADO' }
-    );
+    await assert.rejects(service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+        codigo: 'CONVITE_ALTERADO'
+    });
     assert.equal(enviou, false);
 });

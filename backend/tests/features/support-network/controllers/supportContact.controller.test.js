@@ -49,10 +49,10 @@ test('lista contatos usando somente a identidade autenticada', async () => {
     const chamadas = [];
     const resultado = { contatos: [], resumo: { total: 0, pendentes: 0, ativos: 0 } };
     const controller = criarController({
-            async listar(dados) {
-                chamadas.push(dados);
-                return resultado;
-            }
+        async listar(dados) {
+            chamadas.push(dados);
+            return resultado;
+        }
     });
     const { res, estado } = criarResposta();
 
@@ -70,13 +70,19 @@ test('lista contatos usando somente a identidade autenticada', async () => {
 
 test('preserva erros públicos do serviço', async () => {
     const erro = Object.assign(new Error('Negado'), { status: 403, codigo: 'ACESSO_NEGADO' });
-    const controller = criarController({ async listar() { throw erro; } });
+    const controller = criarController({
+        async listar() {
+            throw erro;
+        }
+    });
     let recebido;
 
     await controller.listar(
         { usuario: { id: 1, papel: 'contato_apoio' } },
         criarResposta().res,
-        (falha) => { recebido = falha; }
+        (falha) => {
+            recebido = falha;
+        }
     );
 
     assert.equal(recebido, erro);
@@ -85,13 +91,19 @@ test('preserva erros públicos do serviço', async () => {
 
 test('atribui mensagem amigável sem expor a falha interna', async () => {
     const erro = new Error('ECONNRESET interno');
-    const controller = criarController({ async listar() { throw erro; } });
+    const controller = criarController({
+        async listar() {
+            throw erro;
+        }
+    });
     let recebido;
 
     await controller.listar(
         { usuario: { id: 1, papel: 'principal' } },
         criarResposta().res,
-        (falha) => { recebido = falha; }
+        (falha) => {
+            recebido = falha;
+        }
     );
 
     assert.equal(
@@ -115,7 +127,9 @@ test('reenvia convite usando identidade autenticada e id validado', async () => 
             }
         },
         validator: {
-            validarContatoId() { return { valido: true, contatoId: 9 }; }
+            validarContatoId() {
+                return { valido: true, contatoId: 9 };
+            }
         }
     });
     const { res, estado } = criarResposta();
@@ -136,12 +150,20 @@ test('responde erro de validação sem chamar o serviço de reenvio', async () =
     let chamou = false;
     const controller = criarSupportContactController({
         service: { async listar() {} },
-        resendService: { async reenviar() { chamou = true; } },
+        resendService: {
+            async reenviar() {
+                chamou = true;
+            }
+        },
         validator: {
             validarContatoId() {
                 return {
                     valido: false,
-                    erro: { campo: 'contatoId', codigo: 'CONTATO_ID_INVALIDO', mensagem: 'Contato inválido.' }
+                    erro: {
+                        campo: 'contatoId',
+                        codigo: 'CONTATO_ID_INVALIDO',
+                        mensagem: 'Contato inválido.'
+                    }
                 };
             }
         }

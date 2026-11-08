@@ -63,12 +63,14 @@ test('renova credencial e envia novo convite somente para vínculo pendente da t
         status: 'pendente',
         tokenConviteHash: 'hash-antigo'
     });
-    assert.deepEqual(estado.emails, [{
-        email: 'bia@example.com',
-        nomeTitular: 'Ana',
-        linkConvite: 'aloya://novo',
-        requerCadastro: false
-    }]);
+    assert.deepEqual(estado.emails, [
+        {
+            email: 'bia@example.com',
+            nomeTitular: 'Ana',
+            linkConvite: 'aloya://novo',
+            requerCadastro: false
+        }
+    ]);
     assert.deepEqual(resultado, {
         id: 9,
         email: 'bia@example.com',
@@ -88,8 +90,12 @@ test('não reenvia convite inexistente, ativo ou pertencente a outra titular', a
     const indisponivel = criarContactInvitationResendService({
         prisma: {
             vinculoRedeApoio: {
-                async findFirst() { return null; },
-                async updateMany() { return { count: 0 }; }
+                async findFirst() {
+                    return null;
+                },
+                async updateMany() {
+                    return { count: 0 };
+                }
             }
         },
         tokenService: { emitir() {} },
@@ -104,10 +110,10 @@ test('não reenvia convite inexistente, ativo ou pertencente a outra titular', a
 
 test('detecta atualização concorrente antes do envio do e-mail', async () => {
     const { estado, service } = criarCenario({ count: 0 });
-    await assert.rejects(
-        service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 }),
-        { status: 409, codigo: 'CONVITE_ALTERADO' }
-    );
+    await assert.rejects(service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+        status: 409,
+        codigo: 'CONVITE_ALTERADO'
+    });
     assert.equal(estado.emails.length, 0);
 });
 

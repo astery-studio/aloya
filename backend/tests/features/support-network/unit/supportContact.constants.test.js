@@ -10,10 +10,7 @@ import {
 } from '../../../../src/features/support-network/constants/supportContact.constants.js';
 
 test('define somente vínculos pendentes e ativos como contatos visíveis', () => {
-    assert.deepEqual(STATUS_CONTATOS_VISIVEIS, [
-        STATUS_CONTATO_PENDENTE,
-        STATUS_CONTATO_ATIVO
-    ]);
+    assert.deepEqual(STATUS_CONTATOS_VISIVEIS, [STATUS_CONTATO_PENDENTE, STATUS_CONTATO_ATIVO]);
     assert.equal(Object.isFrozen(STATUS_CONTATOS_VISIVEIS), true);
 });
 
