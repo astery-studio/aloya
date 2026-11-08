@@ -93,6 +93,10 @@ import { criarContactInvitationService } from '../../features/support-network/se
 import { criarContactInvitationValidator } from '../../features/support-network/validators/contactInvitation.validator.js';
 import { criarContactInvitationController } from '../../features/support-network/controllers/contactInvitation.controller.js';
 import { criarContactInvitationRateLimit } from '../../features/support-network/middleware/contactInvitationRateLimit.middleware.js';
+import { criarContactRegistrationValidator } from '../../features/support-network/validators/contactRegistration.validator.js';
+import { criarContactInvitationResponseService } from '../../features/support-network/services/contactInvitationResponse.service.js';
+import { criarContactInvitationResponseController } from '../../features/support-network/controllers/contactInvitationResponse.controller.js';
+import { criarContactInvitationResponseRateLimit } from '../../features/support-network/middleware/contactInvitationResponseRateLimit.middleware.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -247,6 +251,11 @@ function criarContainer() {
         tokenService: contactInvitationTokenService,
         emailService
     });
+    const contactInvitationResponseService = criarContactInvitationResponseService({
+        prisma,
+        tokenService: contactInvitationTokenService,
+        passwordService
+    });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -263,6 +272,7 @@ function criarContainer() {
     const permissionCategoryValidator = criarPermissionCategoryValidator();
     const permissionCategoryDeletionValidator = criarPermissionCategoryDeletionValidator();
     const contactInvitationValidator = criarContactInvitationValidator();
+    const contactRegistrationValidator = criarContactRegistrationValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -321,6 +331,11 @@ function criarContainer() {
         limite: env.exclusaoContaRateLimitMaximo
     });
     const contactInvitationRateLimit = criarContactInvitationRateLimit({
+        rateLimit,
+        janelaMs: env.emailRateLimitJanelaMs,
+        limite: env.emailRateLimitMaximo
+    });
+    const contactInvitationResponseRateLimit = criarContactInvitationResponseRateLimit({
         rateLimit,
         janelaMs: env.emailRateLimitJanelaMs,
         limite: env.emailRateLimitMaximo
@@ -403,6 +418,11 @@ function criarContainer() {
         service: contactInvitationService,
         validator: contactInvitationValidator
     });
+    const contactInvitationResponseController = criarContactInvitationResponseController({
+        service: contactInvitationResponseService,
+        invitationValidator: contactInvitationValidator,
+        registrationValidator: contactRegistrationValidator
+    });
 
     return {
         authController,
@@ -422,6 +442,7 @@ function criarContainer() {
         permissionCategoryController,
         permissionCategoryDeletionController,
         contactInvitationController,
+        contactInvitationResponseController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
@@ -433,6 +454,7 @@ function criarContainer() {
         permissionCategoryUpdateRateLimit,
         permissionCategoryDeletionRateLimit,
         contactInvitationRateLimit,
+        contactInvitationResponseRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
