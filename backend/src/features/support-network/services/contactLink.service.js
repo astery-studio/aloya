@@ -68,7 +68,11 @@ function apresentarConfiguracao(vinculo, categorias) {
     });
 }
 
-function criarContactLinkService({ prisma } = {}) {
+function permissoesIguais(primeiras, segundas) {
+    return JSON.stringify(primeiras) === JSON.stringify(segundas);
+}
+
+function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
     async function consultar({ titularId, papel, contatoId } = {}) {
         validarTitular(titularId, papel);
         if (
@@ -118,11 +122,158 @@ function criarContactLinkService({ prisma } = {}) {
         return apresentarConfiguracao(vinculo, [...categorias].sort(compararCategorias));
     }
 
-    return Object.freeze({ consultar });
+    async function atualizar({
+        titularId,
+        papel,
+        contatoId,
+        tipo,
+        categoriaId,
+        permissoesIndividuais,
+        versao
+    } = {}) {
+        validarTitular(titularId, papel);
+        if (
+            !Number.isSafeInteger(contatoId) ||
+            contatoId <= 0 ||
+            !(versao instanceof Date) ||
+            Number.isNaN(versao.getTime()) ||
+            typeof prisma?.$transaction !== 'function' ||
+            typeof now !== 'function'
+        ) {
+            throw new TypeError('Não foi possível atualizar o vínculo deste contato.');
+        }
+
+        return prisma.$transaction(async (tx) => {
+            const atual = await tx.vinculoRedeApoio.findFirst({
+                where: { id: contatoId, titularId, status: 'ativo' },
+                select: {
+                    id: true,
+                    contatoId: true,
+                    emailConvidado: true,
+                    permissoesIndividuais: true,
+                    atualizadoEm: true,
+                    contato: { select: { nome: true } },
+                    categoria: {
+                        select: {
+                            id: true,
+                            nome: true,
+                            conjuntoDadosVisiveis: true
+                        }
+                    }
+                }
+            });
+            if (!atual?.contatoId || !atual.contato) throw criarErroContatoIndisponivel();
+
+            if (atual.atualizadoEm.getTime() !== versao.getTime()) {
+                throw criarErro(
+                    'O vínculo foi alterado. Recarregue os dados e tente novamente.',
+                    409,
+                    'VINCULO_DESATUALIZADO'
+                );
+            }
+
+            let categoriaDestino = null;
+            let dadosAtualizacao;
+
+            if (atual.categoria) {
+                if (tipo !== TIPO_VINCULO_INDIVIDUAL) {
+                    throw criarErro(
+                        'Escolha permissões individuais diferentes das atuais.',
+                        422,
+                        'TIPO_VINCULO_DESTINO_INVALIDO'
+                    );
+                }
+                if (
+                    permissoesIguais(
+                        atual.categoria.conjuntoDadosVisiveis,
+                        permissoesIndividuais
+                    )
+                ) {
+                    throw criarErro(
+                        'Altere ao menos uma permissão antes de salvar.',
+                        422,
+                        'VINCULO_SEM_ALTERACAO'
+                    );
+                }
+                dadosAtualizacao = {
+                    categoriaId: null,
+                    permissoesIndividuais
+                };
+            } else {
+                if (tipo !== TIPO_VINCULO_CATEGORIA) {
+                    throw criarErro(
+                        'Escolha uma categoria para alterar o vínculo.',
+                        422,
+                        'TIPO_VINCULO_DESTINO_INVALIDO'
+                    );
+                }
+                categoriaDestino = await tx.categoriaPermissao.findFirst({
+                    where: { id: categoriaId, titularId },
+                    select: {
+                        id: true,
+                        nome: true,
+                        conjuntoDadosVisiveis: true
+                    }
+                });
+                if (!categoriaDestino) {
+                    throw criarErro(
+                        'A categoria selecionada não está disponível.',
+                        404,
+                        'CATEGORIA_NAO_ENCONTRADA'
+                    );
+                }
+                dadosAtualizacao = {
+                    categoriaId: categoriaDestino.id,
+                    permissoesIndividuais: []
+                };
+            }
+
+            const atualizacao = await tx.vinculoRedeApoio.updateMany({
+                where: {
+                    id: contatoId,
+                    titularId,
+                    contatoId: atual.contatoId,
+                    status: 'ativo',
+                    atualizadoEm: versao
+                },
+                data: dadosAtualizacao
+            });
+            if (atualizacao.count !== 1) {
+                throw criarErro(
+                    'O vínculo foi alterado. Recarregue os dados e tente novamente.',
+                    409,
+                    'VINCULO_DESATUALIZADO'
+                );
+            }
+
+            await tx.notificacao.create({
+                data: {
+                    usuarioId: atual.contatoId,
+                    tipoOrigem: 'rede_apoio',
+                    origemId: atual.id,
+                    dataHoraProgramada: now(),
+                    statusEnvio: 'agendada'
+                }
+            });
+
+            return Object.freeze({
+                contatoId: atual.id,
+                tipo,
+                categoria: categoriaDestino ? apresentarCategoria(categoriaDestino) : null,
+                permissoes:
+                    tipo === TIPO_VINCULO_CATEGORIA
+                        ? Object.freeze(copiarPermissoes(categoriaDestino.conjuntoDadosVisiveis))
+                        : Object.freeze(copiarPermissoes(permissoesIndividuais))
+            });
+        });
+    }
+
+    return Object.freeze({ atualizar, consultar });
 }
 
 export {
     apresentarConfiguracao,
     criarContactLinkService,
-    criarErroContatoIndisponivel
+    criarErroContatoIndisponivel,
+    permissoesIguais
 };
