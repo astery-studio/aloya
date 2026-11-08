@@ -12,6 +12,8 @@ import { criarContactInvitationController } from './controllers/contactInvitatio
 import { criarContactInvitationResponseService } from './services/contactInvitationResponse.service.js';
 import { criarContactRegistrationValidator } from './validators/contactRegistration.validator.js';
 import { criarContactInvitationResponseController } from './controllers/contactInvitationResponse.controller.js';
+import { criarSupportContactService } from './services/supportContact.service.js';
+import { criarSupportContactController } from './controllers/supportContact.controller.js';
 
 function criarSupportNetworkModule({
     prisma,
@@ -63,6 +65,10 @@ function criarSupportNetworkModule({
         invitationValidator: contactInvitationValidator,
         registrationValidator: contactRegistrationValidator
     });
+    const supportContactService = criarSupportContactService({ prisma, now });
+    const supportContactController = criarSupportContactController({
+        service: supportContactService
+    });
 
     return Object.freeze({
         permissionCategoryService,
@@ -78,7 +84,9 @@ function criarSupportNetworkModule({
         contactInvitationController,
         contactRegistrationValidator,
         contactInvitationResponseService,
-        contactInvitationResponseController
+        contactInvitationResponseController,
+        supportContactService,
+        supportContactController
     });
 }
 

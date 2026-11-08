@@ -26,4 +26,6 @@ test('compõe todas as camadas necessárias para convites', () => {
     assert.equal(typeof modulo.contactRegistrationValidator.validar, 'function');
     assert.equal(typeof modulo.contactInvitationResponseService.consultar, 'function');
     assert.equal(typeof modulo.contactInvitationResponseController.responder, 'function');
+    assert.equal(typeof modulo.supportContactService.listar, 'function');
+    assert.equal(typeof modulo.supportContactController.listar, 'function');
 });
