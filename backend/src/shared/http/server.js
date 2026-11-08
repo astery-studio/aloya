@@ -167,7 +167,9 @@ app.use(
         authMiddleware: container.authMiddleware,
         parentalConsentMiddleware: container.parentalConsentMiddleware,
         rateLimit: container.contactInvitationRateLimit,
-        controller: container.contactInvitationController
+        responseRateLimit: container.contactInvitationResponseRateLimit,
+        controller: container.contactInvitationController,
+        responseController: container.contactInvitationResponseController
     })
 );
 
