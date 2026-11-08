@@ -138,9 +138,48 @@ function criarEmailService({ transporter, remetente }) {
         });
     }
 
+    async function enviarConviteRedeApoio({
+        email,
+        nomeTitular,
+        linkConvite,
+        requerCadastro = false
+    }) {
+        const nomeSeguro = escaparHtml(nomeTitular);
+        const linkSeguro = escaparHtml(linkConvite);
+        const orientacao = requerCadastro
+            ? 'Crie sua conta de contato no Aloya e, em seguida, aceite o convite.'
+            : 'Abra o Aloya e aceite o convite para entrar na Rede de Apoio.';
+
+        await transporter.sendMail({
+            from: remetente,
+            to: email,
+            subject: 'Convite para a Rede de Apoio — ALOYA',
+            text: `${nomeTitular} convidou você para participar da Rede de Apoio no Aloya.\n\n${orientacao}\n${linkConvite}\n\nNenhum dado será compartilhado antes da sua aceitação.`,
+            html: `
+                <main style="max-width:600px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#222;background:#F7F5F0;border-radius:12px;line-height:1.6;">
+                    <h1 style="color:#2C4C3B;font-size:24px;">Convite para a Rede de Apoio</h1>
+                    <p><strong>${nomeSeguro}</strong> convidou você para participar da Rede de Apoio no Aloya.</p>
+                    <p>${escaparHtml(orientacao)}</p>
+                    <p style="margin:32px 0;text-align:center;">
+                        <a href="${linkSeguro}" style="display:inline-block;padding:14px 24px;border-radius:10px;background:#2C4C3B;color:#FFF;text-decoration:none;font-weight:bold;">
+                            Ver convite
+                        </a>
+                    </p>
+                    <p style="font-size:13px;color:#5C5C59;">
+                        Nenhum dado será compartilhado antes que você aceite explicitamente este convite.
+                    </p>
+                    <p style="font-size:13px;color:#5C5C59;">
+                        O link expira em 7 dias. Se você não reconhece o convite, ignore esta mensagem.
+                    </p>
+                </main>
+            `
+        });
+    }
+
     return {
         enviarEmailConsentimentoParental,
-        enviarEmailRecuperacaoSenha
+        enviarEmailRecuperacaoSenha,
+        enviarConviteRedeApoio
     };
 }
 
