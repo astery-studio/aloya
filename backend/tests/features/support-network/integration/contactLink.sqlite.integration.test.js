@@ -208,3 +208,37 @@ test('impede consulta e alteração de convite pendente', async () => {
         assert.deepEqual(depois.permissoesIndividuais, antes.permissoesIndividuais);
     });
 });
+
+test('desfaz a permissão quando a notificação não pode ser agendada', async () => {
+    await executarComBanco(async ({ baseUrl, prisma }) => {
+        const consulta = await fetch(`${baseUrl}/contacts/20/link`);
+        const configuracao = await consulta.json();
+        await prisma.$executeRawUnsafe(`
+            CREATE TRIGGER impedir_notificacao_vinculo
+            BEFORE INSERT ON notificacoes
+            BEGIN
+                SELECT RAISE(ABORT, 'falha simulada');
+            END;
+        `);
+
+        const atualizacao = await fetch(`${baseUrl}/contacts/20/link`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: 'individual',
+                permissoesIndividuais: ['geral.fase_atual'],
+                versao: configuracao.versao
+            })
+        });
+        const corpo = await atualizacao.json();
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 20 } });
+
+        assert.equal(atualizacao.status, 500);
+        assert.equal(
+            corpo.erro.mensagem,
+            'Não foi possível atualizar o vínculo deste contato. Tente novamente.'
+        );
+        assert.equal(vinculo.categoriaId, 10);
+        assert.deepEqual(vinculo.permissoesIndividuais, []);
+    });
+});
