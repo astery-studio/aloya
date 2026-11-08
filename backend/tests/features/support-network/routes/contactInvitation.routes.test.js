@@ -57,11 +57,7 @@ test('protege consulta e criação antes de executar os controllers', () => {
     const { registros, handlers } = criarCenario();
 
     assert.deepEqual(registros, [
-        [
-            'get',
-            '/contact-invitations/:token',
-            [handlers.responseRateLimit, handlers.consultar]
-        ],
+        ['get', '/contact-invitations/:token', [handlers.responseRateLimit, handlers.consultar]],
         [
             'post',
             '/contact-invitations/:token/register',

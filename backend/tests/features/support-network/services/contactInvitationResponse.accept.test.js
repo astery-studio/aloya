@@ -5,7 +5,11 @@ import { criarContactInvitationResponseService } from '../../../../src/features/
 
 const token = 'a'.repeat(43);
 
-function criarCenario({ email = 'contato@email.com', papel = 'contato_apoio', atualizados = 1 } = {}) {
+function criarCenario({
+    email = 'contato@email.com',
+    papel = 'contato_apoio',
+    atualizados = 1
+} = {}) {
     const operacoes = { usuarios: [], vinculos: [], notificacoes: [] };
     const convite = {
         id: 8,
@@ -39,8 +43,14 @@ function criarCenario({ email = 'contato@email.com', papel = 'contato_apoio', at
     };
     const service = criarContactInvitationResponseService({
         prisma: {
-            vinculoRedeApoio: { async findUnique() { return convite; } },
-            async $transaction(callback) { return callback(tx); }
+            vinculoRedeApoio: {
+                async findUnique() {
+                    return convite;
+                }
+            },
+            async $transaction(callback) {
+                return callback(tx);
+            }
         },
         tokenService: { calcularHash: () => 'hash-seguro' },
         now: () => new Date('2026-11-08T12:00:00.000Z')

@@ -61,10 +61,7 @@ test('apresenta a lista detalhada de permissões individuais', async () => {
     const resultado = await service.consultar(token);
     assert.equal(resultado.tipoPermissao, 'individual');
     assert.equal(resultado.categoria, null);
-    assert.deepEqual(resultado.permissoesIndividuais, [
-        'geral.fase_atual',
-        'saude.consultas'
-    ]);
+    assert.deepEqual(resultado.permissoesIndividuais, ['geral.fase_atual', 'saude.consultas']);
 });
 
 test('não diferencia convite inexistente, processado ou expirado', async () => {

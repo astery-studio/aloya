@@ -1,9 +1,4 @@
-const CAMPOS_PERMITIDOS = Object.freeze([
-    'nome',
-    'dataNascimento',
-    'senha',
-    'confirmacaoSenha'
-]);
+const CAMPOS_PERMITIDOS = Object.freeze(['nome', 'dataNascimento', 'senha', 'confirmacaoSenha']);
 const REGEX_NOME = /^[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
 const REGEX_DATA = /^(\d{4})-(\d{2})-(\d{2})$/;
 

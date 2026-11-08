@@ -166,9 +166,7 @@ function criarContactInvitationResponseService({
             const usuario = await buscarUsuarioDoConvite(tx, convite, usuarioId);
 
             const papel =
-                usuario.papel === 'principal'
-                    ? 'principal_e_contato_apoio'
-                    : usuario.papel;
+                usuario.papel === 'principal' ? 'principal_e_contato_apoio' : usuario.papel;
             if (!['contato_apoio', 'principal_e_contato_apoio'].includes(papel)) {
                 throw criarErroConviteIndisponivel();
             }
@@ -265,7 +263,4 @@ function criarContactInvitationResponseService({
     });
 }
 
-export {
-    criarContactInvitationResponseService,
-    criarErroConviteIndisponivel
-};
+export { criarContactInvitationResponseService, criarErroConviteIndisponivel };

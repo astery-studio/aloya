@@ -8,26 +8,53 @@ function resposta() {
         statusCode: null,
         body: null,
         headers: {},
-        set(nome, valor) { this.headers[nome] = valor; return this; },
-        status(valor) { this.statusCode = valor; return this; },
-        json(valor) { this.body = valor; return this; }
+        set(nome, valor) {
+            this.headers[nome] = valor;
+            return this;
+        },
+        status(valor) {
+            this.statusCode = valor;
+            return this;
+        },
+        json(valor) {
+            this.body = valor;
+            return this;
+        }
     };
 }
 
 function criarController(chamadas) {
     return criarContactInvitationResponseController({
         service: {
-            async consultar(token) { chamadas.push(['consultar', token]); return { titular: { nome: 'Julia' } }; },
-            async cadastrarContato(token, dados) { chamadas.push(['cadastrar', token, dados]); return { mensagem: 'Conta criada.' }; },
-            async aceitar(dados) { chamadas.push(['aceitar', dados]); return { mensagem: 'Convite aceito com sucesso.' }; },
-            async recusar(dados) { chamadas.push(['recusar', dados]); return { mensagem: 'Convite recusado com sucesso.' }; }
+            async consultar(token) {
+                chamadas.push(['consultar', token]);
+                return { titular: { nome: 'Julia' } };
+            },
+            async cadastrarContato(token, dados) {
+                chamadas.push(['cadastrar', token, dados]);
+                return { mensagem: 'Conta criada.' };
+            },
+            async aceitar(dados) {
+                chamadas.push(['aceitar', dados]);
+                return { mensagem: 'Convite aceito com sucesso.' };
+            },
+            async recusar(dados) {
+                chamadas.push(['recusar', dados]);
+                return { mensagem: 'Convite recusado com sucesso.' };
+            }
         },
         invitationValidator: {
-            validarTokenConvite(token) { return { valido: true, erros: [], dados: { token } }; },
-            validarRespostaConvite(body) { return { valido: true, erros: [], dados: { acao: body.acao } }; }
+            validarTokenConvite(token) {
+                return { valido: true, erros: [], dados: { token } };
+            },
+            validarRespostaConvite(body) {
+                return { valido: true, erros: [], dados: { acao: body.acao } };
+            }
         },
         registrationValidator: {
-            validar(body) { return { valido: true, erros: [], dados: body }; }
+            validar(body) {
+                return { valido: true, erros: [], dados: body };
+            }
         }
     });
 }
@@ -83,8 +110,12 @@ test('define mensagem amigável específica sem alterar o convite quando a opera
             service: {
                 consultar: async () => ({}),
                 cadastrarContato: async () => ({}),
-                aceitar: async () => { throw erroInterno; },
-                recusar: async () => { throw erroInterno; }
+                aceitar: async () => {
+                    throw erroInterno;
+                },
+                recusar: async () => {
+                    throw erroInterno;
+                }
             },
             invitationValidator: {
                 validarTokenConvite: (token) => ({ valido: true, erros: [], dados: { token } }),
@@ -96,7 +127,9 @@ test('define mensagem amigável específica sem alterar o convite quando a opera
         await controllerComFalha.responder(
             { params: { token: 'token-seguro' }, body: { acao }, usuario: { id: 25 } },
             res,
-            (erro) => { encaminhado = erro; }
+            (erro) => {
+                encaminhado = erro;
+            }
         );
 
         assert.match(encaminhado.mensagemUsuario, new RegExp(acao, 'u'));

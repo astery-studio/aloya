@@ -76,8 +76,7 @@ function criarContactInvitationResponseController({
             const validacao = invitationValidator.validarRespostaConvite(req.body);
             if (!validacao.valido) return responderValidacao(res, validacao);
             acao = validacao.dados.acao;
-            const operacao =
-                acao === 'aceitar' ? service.aceitar : service.recusar;
+            const operacao = acao === 'aceitar' ? service.aceitar : service.recusar;
             const resultado = await operacao({ token, usuarioId: req.usuario.id });
             res.set('Cache-Control', 'no-store');
             return res.status(200).json(resultado);

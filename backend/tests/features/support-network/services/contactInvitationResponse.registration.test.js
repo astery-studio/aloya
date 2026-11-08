@@ -39,13 +39,23 @@ function criarCenario({ existente = null, atualizados = 1 } = {}) {
         }
     };
     const prisma = {
-        vinculoRedeApoio: { async findUnique() { return convite; } },
-        async $transaction(callback) { return callback(tx); }
+        vinculoRedeApoio: {
+            async findUnique() {
+                return convite;
+            }
+        },
+        async $transaction(callback) {
+            return callback(tx);
+        }
     };
     const service = criarContactInvitationResponseService({
         prisma,
         tokenService: { calcularHash: () => 'hash-seguro' },
-        passwordService: { async gerarHash() { return { senhaHash: 'senha-hash' }; } },
+        passwordService: {
+            async gerarHash() {
+                return { senhaHash: 'senha-hash' };
+            }
+        },
         now: () => new Date('2026-11-08T12:00:00.000Z')
     });
     return { service, criacoes, atualizacoes };

@@ -14,9 +14,7 @@ import { criarContactInvitationResponseService } from '../../../../src/features/
 import { criarContactInvitationTokenService } from '../../../../src/features/support-network/services/contactInvitationToken.service.js';
 
 const { PrismaClient } = prismaPackage;
-const pastaMigrations = fileURLToPath(
-    new URL('../../../../prisma/migrations/', import.meta.url)
-);
+const pastaMigrations = fileURLToPath(new URL('../../../../prisma/migrations/', import.meta.url));
 
 function criarBanco() {
     const diretorio = mkdtempSync(join(tmpdir(), 'aloya-resposta-convite-'));
@@ -109,28 +107,37 @@ test('aceita e recusa convites reais preservando atomicidade e notificações', 
         await service.aceitar({ token: tokenAceite, usuarioId: 2 });
         await service.recusar({ token: tokenRecusa, usuarioId: 3 });
 
-        await assert.rejects(
-            () => service.aceitar({ token: tokenAceite, usuarioId: 2 }),
-            { status: 410, codigo: 'CONVITE_INDISPONIVEL' }
-        );
-        await assert.rejects(
-            () => service.aceitar({ token: tokenRecusa, usuarioId: 3 }),
-            { status: 410, codigo: 'CONVITE_INDISPONIVEL' }
-        );
+        await assert.rejects(() => service.aceitar({ token: tokenAceite, usuarioId: 2 }), {
+            status: 410,
+            codigo: 'CONVITE_INDISPONIVEL'
+        });
+        await assert.rejects(() => service.aceitar({ token: tokenRecusa, usuarioId: 3 }), {
+            status: 410,
+            codigo: 'CONVITE_INDISPONIVEL'
+        });
 
         const vinculos = await prisma.vinculoRedeApoio.findMany({
             orderBy: { id: 'asc' }
         });
         assert.equal(vinculos[0].status, 'ativo');
         assert.equal(vinculos[1].status, 'recusado');
-        assert.equal(vinculos.every((item) => item.tokenConviteHash === null), true);
-        assert.equal(vinculos.every((item) => item.dataResposta?.getTime() === agora.getTime()), true);
+        assert.equal(
+            vinculos.every((item) => item.tokenConviteHash === null),
+            true
+        );
+        assert.equal(
+            vinculos.every((item) => item.dataResposta?.getTime() === agora.getTime()),
+            true
+        );
 
         const notificacoes = await prisma.notificacao.findMany({
             orderBy: { id: 'asc' }
         });
         assert.equal(notificacoes.length, 2);
-        assert.equal(notificacoes.every((item) => item.usuarioId === 1), true);
+        assert.equal(
+            notificacoes.every((item) => item.usuarioId === 1),
+            true
+        );
         assert.deepEqual(
             notificacoes.map((item) => item.origemId),
             vinculos.map((item) => item.id)

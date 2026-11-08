@@ -31,8 +31,14 @@ test('rejeita data inexistente, futura e senhas diferentes', () => {
         });
 
         assert.equal(resultado.valido, false);
-        assert.equal(resultado.erros.some((item) => item.campo === 'dataNascimento'), true);
-        assert.equal(resultado.erros.some((item) => item.campo === 'confirmacaoSenha'), true);
+        assert.equal(
+            resultado.erros.some((item) => item.campo === 'dataNascimento'),
+            true
+        );
+        assert.equal(
+            resultado.erros.some((item) => item.campo === 'confirmacaoSenha'),
+            true
+        );
     }
 });
 

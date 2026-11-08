@@ -23,11 +23,7 @@ function criarContactInvitationRoutes({
     }
 
     const router = Router();
-    router.get(
-        '/contact-invitations/:token',
-        responseRateLimit,
-        responseController.consultar
-    );
+    router.get('/contact-invitations/:token', responseRateLimit, responseController.consultar);
     router.post(
         '/contact-invitations/:token/register',
         responseRateLimit,

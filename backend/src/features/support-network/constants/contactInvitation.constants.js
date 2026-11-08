@@ -12,10 +12,7 @@ const STATUS_VINCULO_ATIVO = 'ativo';
 const STATUS_CONVITE_RECUSADO = 'recusado';
 const ACAO_ACEITAR_CONVITE = 'aceitar';
 const ACAO_RECUSAR_CONVITE = 'recusar';
-const ACOES_RESPOSTA_CONVITE = Object.freeze([
-    ACAO_ACEITAR_CONVITE,
-    ACAO_RECUSAR_CONVITE
-]);
+const ACOES_RESPOSTA_CONVITE = Object.freeze([ACAO_ACEITAR_CONVITE, ACAO_RECUSAR_CONVITE]);
 const DURACAO_CONVITE_MS = 7 * 24 * 60 * 60 * 1000;
 
 function papelEhTitular(papel) {
