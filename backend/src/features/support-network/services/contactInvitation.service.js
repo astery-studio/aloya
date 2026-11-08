@@ -1,5 +1,7 @@
 import {
     papelEhTitular,
+    STATUS_CONVITE_PENDENTE,
+    STATUS_VINCULO_ATIVO,
     usuarioEhContatoCadastrado
 } from '../constants/contactInvitation.constants.js';
 
@@ -24,7 +26,29 @@ function validarTitular(titularId, papel) {
     }
 }
 
-function criarContactInvitationService({ prisma } = {}) {
+function formatarConvite(convite, permissao) {
+    return Object.freeze({
+        id: convite.id,
+        email: convite.emailConvidado,
+        status: convite.status,
+        tipoPermissao: permissao.tipo,
+        categoria:
+            permissao.tipo === 'categoria'
+                ? { id: permissao.categoriaId, nome: permissao.categoriaNome }
+                : null,
+        permissoesIndividuais:
+            permissao.tipo === 'individual' ? permissao.permissoesIndividuais : [],
+        dataEnvio: convite.dataEnvio,
+        dataExpiracao: convite.dataExpiracao
+    });
+}
+
+function criarContactInvitationService({
+    prisma,
+    permissionService,
+    tokenService,
+    emailService
+} = {}) {
     async function consultarEmail({ titularId, papel, email } = {}) {
         validarTitular(titularId, papel);
 
@@ -42,7 +66,132 @@ function criarContactInvitationService({ prisma } = {}) {
         return Object.freeze({ email, contaContatoCadastrada });
     }
 
-    return Object.freeze({ consultarEmail });
+    async function criarConvite({
+        titularId,
+        papel,
+        email,
+        categoriaId,
+        permissoesIndividuais
+    } = {}) {
+        validarTitular(titularId, papel);
+
+        if (
+            typeof prisma?.usuario?.findUnique !== 'function' ||
+            typeof prisma?.vinculoRedeApoio?.findFirst !== 'function' ||
+            typeof prisma?.vinculoRedeApoio?.create !== 'function' ||
+            typeof prisma?.vinculoRedeApoio?.deleteMany !== 'function' ||
+            typeof permissionService?.resolverCategoria !== 'function' ||
+            typeof permissionService?.resolverPermissoesIndividuais !== 'function' ||
+            typeof tokenService?.emitir !== 'function' ||
+            typeof emailService?.enviarConviteRedeApoio !== 'function'
+        ) {
+            throw new TypeError('Não foi possível criar o convite de contato.');
+        }
+
+        const titular = await prisma.usuario.findUnique({
+            where: { id: titularId },
+            select: { id: true, nome: true, email: true }
+        });
+
+        if (!titular) {
+            throw criarErro('Sessão inválida.', 401, 'SESSAO_INVALIDA');
+        }
+
+        if (titular.email === email) {
+            throw criarErro(
+                'Você não pode convidar seu próprio e-mail.',
+                422,
+                'CONVITE_PARA_PROPRIA_CONTA'
+            );
+        }
+
+        const [usuarioConvidado, vinculoExistente] = await Promise.all([
+            prisma.usuario.findUnique({
+                where: { email },
+                select: { id: true, papel: true, statusConta: true }
+            }),
+            prisma.vinculoRedeApoio.findFirst({
+                where: {
+                    titularId,
+                    emailConvidado: email,
+                    status: { in: [STATUS_CONVITE_PENDENTE, STATUS_VINCULO_ATIVO] }
+                },
+                select: { status: true }
+            })
+        ]);
+
+        if (vinculoExistente) {
+            const pendente = vinculoExistente.status === STATUS_CONVITE_PENDENTE;
+            throw criarErro(
+                pendente
+                    ? 'Já existe um convite pendente para este e-mail.'
+                    : 'Este contato já faz parte da sua Rede de Apoio.',
+                409,
+                pendente ? 'CONVITE_JA_PENDENTE' : 'CONTATO_JA_VINCULADO'
+            );
+        }
+
+        const permissao = categoriaId
+            ? await permissionService.resolverCategoria({ titularId, categoriaId })
+            : permissionService.resolverPermissoesIndividuais(permissoesIndividuais);
+        const contaContatoCadastrada = usuarioEhContatoCadastrado(usuarioConvidado);
+        const credencial = tokenService.emitir();
+        let convite;
+
+        try {
+            convite = await prisma.vinculoRedeApoio.create({
+                data: {
+                    titularId,
+                    contatoId: contaContatoCadastrada ? usuarioConvidado.id : null,
+                    emailConvidado: email,
+                    categoriaId: permissao.categoriaId,
+                    permissoesIndividuais: permissao.permissoesIndividuais,
+                    status: STATUS_CONVITE_PENDENTE,
+                    tokenConviteHash: credencial.tokenHash,
+                    dataExpiracao: credencial.dataExpiracao
+                },
+                select: {
+                    id: true,
+                    emailConvidado: true,
+                    status: true,
+                    dataEnvio: true,
+                    dataExpiracao: true
+                }
+            });
+        } catch (erro) {
+            if (erro?.code === 'P2002') {
+                throw criarErro(
+                    'Já existe um convite pendente para este e-mail.',
+                    409,
+                    'CONVITE_JA_PENDENTE'
+                );
+            }
+            throw erro;
+        }
+
+        try {
+            await emailService.enviarConviteRedeApoio({
+                email,
+                nomeTitular: titular.nome,
+                linkConvite: credencial.link,
+                requerCadastro: !usuarioConvidado
+            });
+        } catch (erro) {
+            await prisma.vinculoRedeApoio.deleteMany({
+                where: {
+                    id: convite.id,
+                    titularId,
+                    status: STATUS_CONVITE_PENDENTE,
+                    tokenConviteHash: credencial.tokenHash
+                }
+            });
+            throw erro;
+        }
+
+        return formatarConvite(convite, permissao);
+    }
+
+    return Object.freeze({ consultarEmail, criarConvite });
 }
 
-export { criarContactInvitationService, criarErro, validarTitular };
+export { criarContactInvitationService, criarErro, formatarConvite, validarTitular };
