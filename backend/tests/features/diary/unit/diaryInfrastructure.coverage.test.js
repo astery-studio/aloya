@@ -96,4 +96,48 @@ function registro(id, dia) {
     };
 }
 
+test('histórico valida sessão, filtros, cursores e paginação', async () => {
+    assert.throws(() => criarDiaryHistoryService(), TypeError);
+    let cursorExiste = true;
+    const consultas = [];
+    const prisma = {
+        preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+        preferenciaCategoriaDiario: { findMany: async () => [] },
+        registroDiario: {
+            findFirst: async () => (cursorExiste ? { id: 1 } : null),
+            findMany: async (consulta) => {
+                consultas.push(consulta);
+                return [registro(3, '2026-11-03'), registro(2, '2026-11-02')];
+            }
+        }
+    };
+    const service = criarDiaryHistoryService({ prisma });
+    const filtros = { dataInicio: null, dataFim: null, categorias: [], fases: [] };
+    await assert.rejects(() => service.listar(0, { limite: 1, cursor: null, filtros }), {
+        codigo: 'SESSAO_INVALIDA'
+    });
+    const pagina = await service.listar(1, { limite: 1, cursor: null, filtros });
+    assert.equal(pagina.itens.length, 1);
+    assert.ok(pagina.proximoCursor);
+    const cursor = codificarCursor({ data: '2026-11-03', id: 3 }, filtros);
+    const comCursor = await service.listar(1, { limite: 2, cursor, filtros });
+    assert.equal(comCursor.proximoCursor, null);
+    cursorExiste = false;
+    await assert.rejects(() => service.listar(1, { limite: 2, cursor, filtros }), {
+        codigo: 'CURSOR_DIARIO_INVALIDO'
+    });
 
+    prisma.preferenciaCategoriaDiario.findMany = async () => [
+        { categoriaId: 'peso', ativa: false }
+    ];
+    await assert.rejects(
+        () =>
+            service.listar(1, {
+                limite: 2,
+                cursor: null,
+                filtros: { ...filtros, categorias: ['peso'] }
+            }),
+        { codigo: 'CATEGORIA_FILTRO_INATIVA' }
+    );
+    assert.ok(consultas.length >= 2);
+});
