@@ -98,6 +98,41 @@ const vidaIntimaESocial = {
                     ]
                 }
             ]
+        },
+        {
+            id: 'vida_social',
+            nome: 'Vida social',
+            grupos: [
+                {
+                    id: 'interacao',
+                    opcoes: ['Sociável', 'Buscando companhia', 'Reservado', 'Evitando interações']
+                },
+                {
+                    id: 'experiencia',
+                    opcoes: [
+                        'Agradáveis',
+                        'Boa conexão',
+                        'Compreensão',
+                        'Acolhimento',
+                        'Conflitos',
+                        'Desentendimentos',
+                        'Exclusão',
+                        'Pertencimento',
+                        'Dificuldade de comunicação',
+                        'Sobrecarga social'
+                    ]
+                },
+                {
+                    id: 'relacionamentos',
+                    opcoes: [
+                        'Aproximação',
+                        'Distanciamento',
+                        'Saudade',
+                        'Conexão',
+                        'Conversa significativa'
+                    ]
+                }
+            ]
         }
     ]
 };
