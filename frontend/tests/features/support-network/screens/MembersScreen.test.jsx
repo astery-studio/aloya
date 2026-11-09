@@ -1,9 +1,11 @@
 //Testa o conteúdo e as ações da tela principal de membros.
 import { fireEvent, screen } from '@testing-library/react-native';
+
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => {
     const React = require('react');
+
     const { Pressable, Text } = require('react-native');
 
     function ButtonScreen({ texto, aoPressionar, rotuloAcessibilidade }) {
@@ -32,6 +34,7 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
 
 jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
     const React = require('react');
+
     const { Pressable, Text, View } = require('react-native');
 
     function MainLayout({ titulo, abaAtiva, onSelecionarAba, children }) {
@@ -54,7 +57,9 @@ jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
         );
     }
 
-    return { MainLayout };
+    return {
+        MainLayout
+    };
 });
 
 import { MembersScreen } from '../../../../src/features/support-network/screens/MembersScreen';
@@ -64,12 +69,30 @@ describe('MembersScreen', () => {
         await render(<MembersScreen />);
 
         expect(screen.getByText('Membros')).toBeOnTheScreen();
-        expect(screen.getByText('Categorias de membros')).toBeOnTheScreen();
-        expect(
-            screen.getByText(/Crie categorias para definir quais informações/)
-        ).toBeOnTheScreen();
+
+        expect(screen.getByText('Rede de Apoio')).toBeOnTheScreen();
+
+        expect(screen.getByText(/Convide pessoas de confiança/)).toBeOnTheScreen();
+
         expect(screen.getByText('Aba ativa: membros')).toBeOnTheScreen();
+
+        expect(screen.getByText('Adicionar novo contato')).toBeOnTheScreen();
+
         expect(screen.getByText('Categorias de Permissão')).toBeOnTheScreen();
+    });
+
+    test('abre o cadastro de novo contato', async () => {
+        const onAdicionarContato = jest.fn();
+
+        await render(<MembersScreen onAdicionarContato={onAdicionarContato} />);
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Adicionar novo contato à Rede de Apoio'
+            })
+        );
+
+        expect(onAdicionarContato).toHaveBeenCalledTimes(1);
     });
 
     test('abre a listagem de categorias', async () => {
@@ -86,8 +109,14 @@ describe('MembersScreen', () => {
         expect(onAbrirCategorias).toHaveBeenCalledTimes(1);
     });
 
-    test('desabilita o acesso quando a ação não foi fornecida', async () => {
+    test('desabilita ações que não foram fornecidas', async () => {
         await render(<MembersScreen />);
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Adicionar novo contato à Rede de Apoio'
+            })
+        ).toBeDisabled();
 
         expect(
             screen.getByRole('button', {
@@ -108,6 +137,7 @@ describe('MembersScreen', () => {
         );
 
         expect(onSelecionarAba).toHaveBeenCalledTimes(1);
+
         expect(onSelecionarAba).toHaveBeenCalledWith('configuracoes');
     });
 });
