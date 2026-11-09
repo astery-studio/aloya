@@ -29,8 +29,12 @@ function validarTemperatura(entrada, decimal) {
     return {
         ...decimal,
         medicaoTemperatura: {
+            valorOriginal: String(entrada.valor),
+            unidade: 'celsius',
+            precisaoCasas: decimal.casasDecimais,
             perturbada,
-            motivoPerturbacao: motivo ?? null
+            motivoPerturbacao: motivo ?? null,
+            estadoUtilizacao: perturbada ? 'nao_utilizada_interferencia' : 'elegivel'
         }
     };
 }

@@ -20,8 +20,12 @@ test('normaliza opções, decimal, duração e texto do protótipo', () => {
     assert.equal(resultado.categorias[1].valorEscalado, 367);
     assert.equal(resultado.categorias[1].casasDecimais, 1);
     assert.deepEqual(resultado.categorias[1].medicaoTemperatura, {
+        valorOriginal: '36,7',
+        unidade: 'celsius',
+        precisaoCasas: 1,
         perturbada: false,
-        motivoPerturbacao: null
+        motivoPerturbacao: null,
+        estadoUtilizacao: 'elegivel'
     });
     assert.equal(resultado.categorias[2].valorDuracaoMinutos, 480);
     assert.equal(resultado.categorias[3].valorTexto, 'Sem alterações.');
@@ -41,6 +45,10 @@ test('valida faixa técnica e perturbação da temperatura', () => {
         ]
     });
     assert.equal(resultado.categorias[0].medicaoTemperatura.perturbada, true);
+    assert.equal(
+        resultado.categorias[0].medicaoTemperatura.estadoUtilizacao,
+        'nao_utilizada_interferencia'
+    );
     for (const valor of ['31,9', '42,1']) {
         assert.throws(
             () =>
