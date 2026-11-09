@@ -57,4 +57,5 @@ test('protege todas as rotas e impede cache de dados sensíveis', () => {
     );
     assert.equal(headers['Cache-Control'], 'private, no-store');
     assert.equal(rotas.length, 9);
+    assert.ok(rotas.every(([, caminho]) => !caminho.includes('termic')));
 });
