@@ -318,3 +318,23 @@ Se o projeto futuramente migrar para outro banco, serão necessários:
 - revisão das instruções de implantação.
 
 Até que essa migração aconteça, toda a documentação deve identificar SQLite como o banco utilizado.
+
+## 15. Persistência do Diário
+
+O Diário usa um modelo híbrido e normalizado:
+
+- `MacrocategoriaDiario`, `CategoriaDiario` e `OpcaoDiario` formam o catálogo;
+- `ConfiguracaoDiario` e as tabelas de preferência guardam ativações por pessoa;
+- `RegistroDiario` identifica um dia e guarda a fase do ciclo como snapshot;
+- `RegistroDiarioCategoria` armazena o valor tipado e os nomes exibidos na época;
+- `RegistroDiarioOpcao` relaciona as opções de seleção múltipla.
+- `MedicaoTemperaturaBasal` preserva qualidade e motivo de perturbação;
+- `AnaliseTermicaCiclo` guarda resultados experimentais versionados por ciclo.
+
+Valores decimais são persistidos como inteiros escalados, evitando imprecisão
+de ponto flutuante. A restrição composta de pessoa e data impede dois registros
+para o mesmo dia. Exclusões em cascata removem os valores dependentes, e a
+coluna `versao` oferece concorrência otimista para edição e exclusão.
+
+As migrations do Diário são aditivas e separadas em catálogo, preferências e
+valores. O seed usa `upsert`; não apaga preferências nem registros existentes.
