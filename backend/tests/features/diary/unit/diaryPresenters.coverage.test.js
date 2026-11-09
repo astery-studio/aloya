@@ -76,4 +76,50 @@ test('apresenta todos os formatos, ordenações e metadados térmicos', () => {
     assert.equal(detalhe.categorias.find((item) => item.texto).quantidadeCaracteres, 7);
 });
 
+test('apresenta valores ausentes e ordenação desconhecida', () => {
+    const opcao = [...OPCOES_POR_ID.values()].find(
+        (item) => item.categoriaId === 'sintomas_fisicos'
+    );
+    const registro = {
+        id: 1,
+        dataRegistro: instante,
+        faseCicloAssociada: null,
+        versao: 0,
+        criadoEm: instante,
+        atualizadoEm: instante,
+        categorias: []
+    };
+    const semMotivo = apresentarDetalheRegistro({
+        ...registro,
+        categorias: [
+            categoria({
+                categoriaId: 'temperatura_basal',
+                valorEscalado: 360,
+                casasDecimais: 1,
+                medicaoTemperatura: null
+            })
+        ]
+    });
+    assert.equal(semMotivo.categorias[0].perturbada, false);
+    assert.equal('motivoPerturbacao' in semMotivo.categorias[0], false);
+
+    apresentarDetalheRegistro({
+        ...registro,
+        categorias: [
+            categoria({ categoriaId: 'desconhecida_a', opcoes: undefined }),
+            categoria({ categoriaId: 'desconhecida_b', opcoes: undefined }),
+            categoria({ categoriaId: 'peso' }),
+            categoria({ categoriaId: 'temperatura_basal' }),
+            categoria({
+                categoriaId: 'sintomas_fisicos',
+                opcoes: [
+                    { opcaoId: opcao.id, grupo: null, opcaoNome: 'Conhecida' },
+                    { opcaoId: 'desconhecida_a', grupo: null, opcaoNome: 'A' },
+                    { opcaoId: 'desconhecida_b', grupo: null, opcaoNome: 'B' }
+                ]
+            })
+        ]
+    });
+});
+
 
