@@ -252,4 +252,12 @@ test('montagem cobre opções e assinaturas opcionais', () => {
     assert.equal(montarCategorias([temperatura])[0].medicaoTemperatura.create.perturbada, true);
 });
 
+test('catálogo rejeita cada dependência ausente', () => {
+    assert.throws(() => criarDiaryCatalogService(), TypeError);
+    assert.throws(
+        () => criarDiaryCatalogService({ prisma: { configuracaoDiario: {} } }),
+        TypeError
+    );
+});
+
 
