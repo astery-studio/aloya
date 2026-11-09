@@ -85,9 +85,15 @@ enum TipoValorDiario {
 
 enum EstadoAnaliseTermica {
   elevacao_detectada
-  nenhuma_elevacao_detectada
-  padrao_termico_ambiguo
+  inconclusivo
+  medicao_nao_utilizada
+  nenhuma_elevacao_identificada
   dados_insuficientes
+}
+
+enum EstadoUsoMedicaoTermica {
+  elegivel
+  nao_utilizada_interferencia
 }
 
 enum TipoAnticoncepcional {
@@ -524,8 +530,12 @@ model RegistroDiarioOpcao {
 model MedicaoTemperaturaBasal {
   registroCategoriaId Int                     @id @map("registro_categoria_id")
   registroCategoria   RegistroDiarioCategoria @relation(fields: [registroCategoriaId], references: [id], onDelete: Cascade)
+  valorOriginal       String                  @default("") @map("valor_original")
+  unidade             String                  @default("celsius")
+  precisaoCasas       Int                     @default(1) @map("precisao_casas")
   perturbada          Boolean                 @default(false)
   motivoPerturbacao   String?                 @map("motivo_perturbacao")
+  estadoUtilizacao    EstadoUsoMedicaoTermica @default(elegivel) @map("estado_utilizacao")
   criadoEm            DateTime                @default(now()) @map("criado_em")
   atualizadoEm        DateTime                @updatedAt @map("atualizado_em")
 
