@@ -72,4 +72,15 @@ test('exclusão cobre configuração, ausência e conflitos do Prisma', async ()
     await assert.rejects(() => service.excluir(1, 1, 0), /prisma/);
 });
 
+test('detalhe cobre configuração, ausência e apresentação', async () => {
+    assert.throws(() => criarDiaryDetailService(), TypeError);
+    let valor = null;
+    const service = criarDiaryDetailService({
+        prisma: { registroDiario: { findFirst: async () => valor } }
+    });
+    await assert.rejects(() => service.buscar(1, 1), { codigo: 'REGISTRO_DIARIO_NAO_ENCONTRADO' });
+    valor = registro();
+    assert.equal((await service.buscar(1, 1)).id, 1);
+});
+
 
