@@ -11,6 +11,11 @@ const CONFIGURACAO_TERMICA_SOMBRA = Object.freeze({
     quantidadeElevada: 3,
     execucaoHabilitada: true,
     exposicaoHabilitada: false,
+    retornoLinhaBase: Object.freeze({
+        habilitado: true,
+        quantidadeConsecutiva: 3,
+        margemDecimos: 0
+    }),
     aplicarEvidenciaNaConfianca: false
 });
 
