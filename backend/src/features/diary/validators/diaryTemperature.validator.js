@@ -11,11 +11,7 @@ function validarTemperatura(entrada, decimal) {
     const perturbada = entrada.perturbada ?? false;
     const motivo = entrada.motivoPerturbacao;
     if (typeof perturbada !== 'boolean') {
-        throw new AppError(
-            'Informe se a medição foi perturbada.',
-            422,
-            'MEDICAO_TERMICA_INVALIDA'
-        );
+        throw new AppError('Informe se a medição foi perturbada.', 422, 'MEDICAO_TERMICA_INVALIDA');
     }
     if (
         motivo !== undefined &&
