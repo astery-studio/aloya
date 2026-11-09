@@ -206,4 +206,50 @@ test('valida formatos rejeitados de preferências', () => {
     }
 });
 
+test('montagem cobre opções e assinaturas opcionais', () => {
+    const categoria = CATEGORIAS_POR_ID.get('sintomas_fisicos');
+    const entrada = validarCategoriaPreenchida({
+        categoriaId: categoria.id,
+        opcoes: [categoria.opcoes[0].id]
+    });
+    const montada = montarCategorias([entrada])[0];
+    assert.equal(montada.opcoes.create.length, 1);
+    validarCategoriasAtivas([entrada], [], []);
+    assert.ok(assinaturaNova(entrada));
+    assert.ok(
+        assinaturaAtual({
+            categoriaId: entrada.categoriaId,
+            opcoes: [{ opcaoId: categoria.opcoes[0].id }],
+            valorEscalado: null,
+            casasDecimais: null,
+            valorDuracaoMinutos: null,
+            valorTexto: null,
+            medicaoTemperatura: null
+        })
+    );
+    assert.equal(assinaturaCategorias([], assinaturaNova), '');
+    const completa = {
+        categoriaId: 'temperatura_basal',
+        opcoes: [{ id: 'x' }],
+        valorEscalado: 365,
+        casasDecimais: 1,
+        valorDuracaoMinutos: 10,
+        valorTexto: 'x',
+        medicaoTemperatura: { perturbada: true, motivoPerturbacao: 'sono' }
+    };
+    assert.ok(assinaturaNova(completa));
+    assert.ok(
+        assinaturaAtual({
+            ...completa,
+            opcoes: [{ opcaoId: 'x' }]
+        })
+    );
+    const temperatura = validarCategoriaPreenchida({
+        categoriaId: 'temperatura_basal',
+        valor: '36.5',
+        perturbada: true
+    });
+    assert.equal(montarCategorias([temperatura])[0].medicaoTemperatura.create.perturbada, true);
+});
+
 
