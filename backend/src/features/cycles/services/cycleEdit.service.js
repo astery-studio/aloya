@@ -20,7 +20,7 @@ function criarErroDatas() {
     );
 }
 
-function criarCycleEditService({ prisma } = {}) {
+function criarCycleEditService({ prisma, thermalRecalculation } = {}) {
     if (!prisma || typeof prisma.$transaction !== 'function') {
         throw new TypeError('O Prisma da edição de ciclos é inválido.');
     }
@@ -177,6 +177,8 @@ function criarCycleEditService({ prisma } = {}) {
                     duracaoCiclo: true
                 }
             });
+
+            await thermalRecalculation?.recalcularTodos(usuarioId, tx);
 
             return {
                 ...editado,

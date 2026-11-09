@@ -2,8 +2,8 @@ import { criarCycleRemovalController } from './controllers/cycleRemoval.controll
 import { criarCycleRemovalRepository } from './repositories/cycleRemoval.repository.js';
 import { criarCycleRemovalService } from './services/cycleRemoval.service.js';
 
-function criarCycleRemovalModule({ prisma } = {}) {
-    const repository = criarCycleRemovalRepository({ prisma });
+function criarCycleRemovalModule({ prisma, thermalRecalculation } = {}) {
+    const repository = criarCycleRemovalRepository({ prisma, thermalRecalculation });
     const service = criarCycleRemovalService({ repository });
     const controller = criarCycleRemovalController({ cycleRemovalService: service });
 
