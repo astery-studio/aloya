@@ -280,10 +280,16 @@ test('motor térmico rejeita datas, duplicatas e valores inválidos', () => {
 test('recálculo térmico cobre entrada vazia, perturbação ausente e estados', async () => {
     const estados = [
         'ELEVACAO_DETECTADA',
-        'NENHUMA_ELEVACAO_DETECTADA',
-        'PADRAO_TERMICO_AMBIGUO',
+        'NENHUMA_ELEVACAO_IDENTIFICADA',
+        'INCONCLUSIVO',
         'DADOS_INSUFICIENTES'
     ];
+    const config = {
+        algoritmo: 'motor',
+        versao: '1',
+        variante: 'A1',
+        disponibilidade: 'B1'
+    };
     const gravados = [];
     const tx = {
         registroCiclo: { findMany: async () => [{ id: 1, dataInicio: new Date('2026-01-01Z') }] },
@@ -301,7 +307,9 @@ test('recálculo térmico cobre entrada vazia, perturbação ausente e estados',
     assert.equal(gravados.length, 0);
     for (const estado of estados) {
         const service = criarThermalRecalculationService({
-            detectar: () => ({ estado, janelasAvaliaveis: 0, sequencias: [] })
+            executar: () => [
+                { config, resultado: { estado, janelasAvaliaveis: 0, sequencias: [] } }
+            ]
         });
         await service.recalcularPorDatas(1, ['2026-01-01', '2026-01-01'], tx);
     }

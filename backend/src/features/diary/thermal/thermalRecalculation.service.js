@@ -1,11 +1,11 @@
 import { formatarData } from '../../cycles/utils/calendar.js';
-import { CONFIGURACAO_TERMICA_SOMBRA } from './thermal.config.js';
-import { detectarPadraoTermico } from './thermal.engine.js';
+import { adicionarDias } from './thermal.dates.js';
+import { executarMatrizTermica } from './thermal.matrix.js';
 import { persistirAnaliseTermica } from './thermal.persistence.js';
 import { localizarCiclosAfetados } from './thermalCycle.lookup.js';
 function criarThermalRecalculationService({
-    config = CONFIGURACAO_TERMICA_SOMBRA,
-    detectar = detectarPadraoTermico
+    executar = executarMatrizTermica,
+    execucaoHabilitada = true
 } = {}) {
     async function recalcularPorDatas(usuarioId, datas, tx) {
         const unicas = [...new Set(datas.filter(Boolean))];
@@ -48,17 +48,19 @@ function criarThermalRecalculationService({
                 valorDecimos: registro.categorias[0].valorEscalado,
                 perturbada: registro.categorias[0].medicaoTemperatura?.perturbada ?? false
             }));
-            const resultado = detectar(medicoes, config);
             const avaliadoAte = registros.at(-1)?.dataRegistro ?? null;
-            await persistirAnaliseTermica(
-                tx,
-                ciclo,
-                usuarioId,
-                config,
-                resultado,
-                !proximo,
-                avaliadoAte
-            );
+            const resultados = executar(medicoes, {
+                execucaoHabilitada,
+                cicloConcluido: Boolean(proximo),
+                dataFimCiclo: proximo
+                    ? adicionarDias(formatarData(proximo.dataInicio), -1)
+                    : undefined
+            });
+            for (const { config, resultado } of resultados) {
+                await persistirAnaliseTermica(
+                    tx, ciclo, usuarioId, config, resultado, !proximo, avaliadoAte
+                );
+            }
         }
     }
     async function recalcularTodos(usuarioId, tx) {

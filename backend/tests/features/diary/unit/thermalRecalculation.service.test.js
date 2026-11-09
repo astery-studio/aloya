@@ -59,7 +59,7 @@ test('recalcula ciclo afetado e persiste resultado versionado sem aplicar evidê
     assert.equal(consultaRegistros.where.usuarioId, 7);
     assert.equal(consultaRegistros.where.dataRegistro.gte.valueOf(), data('2026-01-01').valueOf());
     assert.equal(consultaRegistros.where.dataRegistro.lt.valueOf(), data('2026-02-01').valueOf());
-    assert.equal(gravacoes.length, 1);
+    assert.equal(gravacoes.length, 8);
     assert.equal(gravacoes[0].create.estado, 'elevacao_detectada');
     assert.equal(gravacoes[0].create.evidenciaAplicada, false);
     assert.equal(gravacoes[0].create.provisorio, false);
@@ -91,10 +91,9 @@ test('recalcula todos os ciclos quando uma fronteira menstrual muda', async () =
 
     await service.recalcularTodos(7, tx);
 
-    assert.deepEqual(
-        gravacoes.map((operacao) => operacao.create.registroCicloId),
-        [10, 20]
-    );
-    assert.equal(gravacoes[0].create.provisorio, false);
-    assert.equal(gravacoes[1].create.provisorio, true);
+    assert.equal(gravacoes.length, 14);
+    assert.ok(gravacoes.slice(0, 8).every(({ create }) => create.registroCicloId === 10));
+    assert.ok(gravacoes.slice(8).every(({ create }) => create.registroCicloId === 20));
+    assert.ok(gravacoes.slice(0, 8).every(({ create }) => create.provisorio === false));
+    assert.ok(gravacoes.slice(8).every(({ create }) => create.provisorio === true));
 });
