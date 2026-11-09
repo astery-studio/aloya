@@ -11,6 +11,9 @@ function criarService() {
         dataNascimento: new Date('2000-01-01')
     };
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: { findUnique: async () => titular },
         consentimentoParental: {
             updateMany: async () => ({ count: 1 }),

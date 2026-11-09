@@ -42,8 +42,8 @@ function criarParentalConsentService({
     }
 
     // Busca somente os dados necessários da titular para aplicar as regras de consentimento.
-    async function buscarTitular(titularMenorId) {
-        const titular = await prisma.usuario.findUnique({
+    async function buscarTitular(titularMenorId, db = prisma) {
+        const titular = await db.usuario.findUnique({
             where: {
                 id: titularMenorId
             },
@@ -91,14 +91,14 @@ function criarParentalConsentService({
     }
 
     // Encerra links pendentes quando a titular já possui 16 anos completos.
-    async function encerrarPendenciaSeMaiorDe16(titular) {
+    async function encerrarPendenciaSeMaiorDe16(titular, db = prisma) {
         const idade = dateUtils.calcularIdade(titular.dataNascimento, now());
 
         if (idade === null || idade < 16) {
             return false;
         }
 
-        await prisma.consentimentoParental.updateMany({
+        await db.consentimentoParental.updateMany({
             where: {
                 titularMenorId: titular.id,
                 statusConsentimento: 'pendente'
@@ -342,90 +342,105 @@ function criarParentalConsentService({
     async function confirmar(tokenPuro) {
         const tokenHash = crypto.createHash('sha256').update(tokenPuro).digest('hex');
 
-        const consentimento = await prisma.consentimentoParental.findFirst({
-            where: {
-                tokenConfirmacaoHash: tokenHash
-            },
-
-            select: {
-                id: true,
-                titularMenorId: true,
-                statusConsentimento: true,
-                validadeLink: true
-            }
-        });
-
-        if (!consentimento) {
-            const erro = new Error('O link de consentimento é inválido.');
-
-            erro.status = 400;
-            erro.codigo = 'LINK_CONSENTIMENTO_INVALIDO';
-
-            throw erro;
-        }
-
-        const titular = await buscarTitular(consentimento.titularMenorId);
-        validarTitular(titular);
-
-        if (await encerrarPendenciaSeMaiorDe16(titular)) {
-            return {
-                acessoRedeApoioLiberado: true,
-                mensagem: 'A Rede de Apoio já está liberada para esta titular.'
-            };
-        }
-
-        // Evita erro caso o responsável abra novamente um link já utilizado.
-        if (consentimento.statusConsentimento === 'liberado') {
-            return {
-                acessoRedeApoioLiberado: true,
-                mensagem: 'A autorização já havia sido confirmada.'
-            };
-        }
-
-        if (consentimento.statusConsentimento !== 'pendente') {
-            const erro = new Error('Este link de consentimento não está mais disponível.');
-
-            erro.status = 410;
-            erro.codigo = 'LINK_CONSENTIMENTO_INDISPONIVEL';
-
-            throw erro;
-        }
-
-        if (consentimento.validadeLink < now()) {
-            await prisma.consentimentoParental.update({
-                where: {
-                    id: consentimento.id
-                },
-
-                data: {
-                    statusConsentimento: 'expirado'
+        const resultado = await prisma.$transaction(async (tx) => {
+            const instante = now();
+            const consentimento = await tx.consentimentoParental.findFirst({
+                where: { tokenConfirmacaoHash: tokenHash },
+                select: {
+                    id: true,
+                    titularMenorId: true,
+                    statusConsentimento: true,
+                    validadeLink: true
                 }
             });
 
-            const erro = new Error('Este link de consentimento expirou. Solicite um novo envio.');
+            if (!consentimento) {
+                const erro = new Error('O link de consentimento é inválido.');
+                erro.status = 400;
+                erro.codigo = 'LINK_CONSENTIMENTO_INVALIDO';
+                throw erro;
+            }
 
+            const titular = await buscarTitular(consentimento.titularMenorId, tx);
+            validarTitular(titular);
+
+            if (await encerrarPendenciaSeMaiorDe16(titular, tx)) {
+                return {
+                    acessoRedeApoioLiberado: true,
+                    mensagem: 'A Rede de Apoio já está liberada para esta titular.'
+                };
+            }
+
+            if (consentimento.statusConsentimento === 'liberado') {
+                return {
+                    acessoRedeApoioLiberado: true,
+                    mensagem: 'A autorização já havia sido confirmada.'
+                };
+            }
+
+            if (consentimento.statusConsentimento !== 'pendente') {
+                const erro = new Error('Este link de consentimento não está mais disponível.');
+                erro.status = 410;
+                erro.codigo = 'LINK_CONSENTIMENTO_INDISPONIVEL';
+                throw erro;
+            }
+
+            if (consentimento.validadeLink < instante) {
+                await tx.consentimentoParental.updateMany({
+                    where: {
+                        id: consentimento.id,
+                        tokenConfirmacaoHash: tokenHash,
+                        statusConsentimento: 'pendente'
+                    },
+                    data: { statusConsentimento: 'expirado' }
+                });
+                return { linkExpirado: true };
+            }
+
+            const atualizacao = await tx.consentimentoParental.updateMany({
+                where: {
+                    id: consentimento.id,
+                    tokenConfirmacaoHash: tokenHash,
+                    statusConsentimento: 'pendente',
+                    validadeLink: { gte: instante }
+                },
+                data: {
+                    statusConsentimento: 'liberado',
+                    respondidoEm: instante
+                }
+            });
+            if (atualizacao.count !== 1) {
+                const erro = new Error('Este link de consentimento não está mais disponível.');
+                erro.status = 409;
+                erro.codigo = 'CONSENTIMENTO_JA_PROCESSADO';
+                throw erro;
+            }
+
+            await tx.notificacao.create({
+                data: {
+                    usuarioId: titular.id,
+                    tipoOrigem: 'rede_apoio',
+                    origemId: consentimento.id,
+                    dataHoraProgramada: instante,
+                    statusEnvio: 'agendada'
+                }
+            });
+
+            return {
+                acessoRedeApoioLiberado: true,
+                nomeTitular: titular.nome,
+                mensagem: MENSAGEM_CONSENTIMENTO_CONFIRMADO
+            };
+        });
+
+        if (resultado.linkExpirado) {
+            const erro = new Error('Este link de consentimento expirou. Solicite um novo envio.');
             erro.status = 410;
             erro.codigo = 'LINK_CONSENTIMENTO_EXPIRADO';
-
             throw erro;
         }
 
-        await prisma.consentimentoParental.update({
-            where: {
-                id: consentimento.id
-            },
-
-            data: {
-                statusConsentimento: 'liberado',
-                respondidoEm: now()
-            }
-        });
-
-        return {
-            acessoRedeApoioLiberado: true,
-            nomeTitular: titular.nome,
-            mensagem: MENSAGEM_CONSENTIMENTO_CONFIRMADO
-        };
+        return resultado;
     }
 
     return {

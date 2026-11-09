@@ -154,9 +154,13 @@ test('substitui e-mail e token ao reenviar o consentimento', async () => {
 
 test('libera a Rede de Apoio ao confirmar token válido', async () => {
     const atualizacoes = [];
+    const notificacoes = [];
     const { crypto, tokenPuro } = criarCrypto();
     const agora = new Date('2026-09-14T12:00:00.000Z');
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -171,8 +175,14 @@ test('libera a Rede de Apoio ao confirmar token válido', async () => {
                     validadeLink: new Date('2026-09-14T13:00:00.000Z')
                 };
             },
-            async update(argumentos) {
+            async updateMany(argumentos) {
                 atualizacoes.push(argumentos);
+                return { count: 1 };
+            }
+        },
+        notificacao: {
+            async create(argumentos) {
+                notificacoes.push(argumentos);
             }
         }
     };
@@ -193,12 +203,22 @@ test('libera a Rede de Apoio ao confirmar token válido', async () => {
     });
     assert.equal(resultado.acessoRedeApoioLiberado, true);
     assert.equal(resultado.mensagem, 'Autorização concluída com sucesso.');
+    assert.deepEqual(notificacoes[0].data, {
+        usuarioId: 1,
+        tipoOrigem: 'rede_apoio',
+        origemId: 10,
+        dataHoraProgramada: agora,
+        statusEnvio: 'agendada'
+    });
 });
 
 test('marca o link como expirado e rejeita a confirmação', async () => {
     const atualizacoes = [];
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -213,8 +233,9 @@ test('marca o link como expirado e rejeita a confirmação', async () => {
                     validadeLink: new Date('2026-09-14T11:00:00.000Z')
                 };
             },
-            async update(argumentos) {
+            async updateMany(argumentos) {
                 atualizacoes.push(argumentos);
+                return { count: 1 };
             }
         }
     };
@@ -423,6 +444,9 @@ test('rejeita reenvio quando consentimento não está pendente', async () => {
 test('rejeita token de consentimento inexistente', async () => {
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         consentimentoParental: {
             async findFirst() {
                 return null;
@@ -446,6 +470,9 @@ test('rejeita token de consentimento inexistente', async () => {
 test('rejeita token de consentimento revogado', async () => {
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -479,6 +506,9 @@ test('rejeita token de consentimento revogado', async () => {
 test('trata confirmação repetida de forma idempotente', async () => {
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
