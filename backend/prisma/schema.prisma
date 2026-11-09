@@ -368,6 +368,47 @@ model Previsao {
 // DIÁRIO
 // ============================================================
 
+model MacrocategoriaDiario {
+  id           String  @id
+  nome         String
+  nomeCompacto String? @map("nome_compacto")
+  ordem        Int     @unique
+  sensivel     Boolean @default(false)
+
+  categorias CategoriaDiario[]
+
+  @@map("macrocategorias_diario")
+}
+
+model CategoriaDiario {
+  id               String               @id
+  macrocategoriaId String               @map("macrocategoria_id")
+  macrocategoria   MacrocategoriaDiario @relation(fields: [macrocategoriaId], references: [id], onDelete: Restrict)
+  nome             String
+  ordem            Int
+  tipoValor        TipoValorDiario      @default(opcoes) @map("tipo_valor")
+  sensivel         Boolean              @default(false)
+
+  opcoes OpcaoDiario[]
+
+  @@unique([macrocategoriaId, ordem])
+  @@index([macrocategoriaId])
+  @@map("categorias_diario")
+}
+
+model OpcaoDiario {
+  id          String          @id
+  categoriaId String          @map("categoria_id")
+  categoria   CategoriaDiario @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  grupo       String?
+  nome        String
+  ordem       Int
+
+  @@unique([categoriaId, ordem])
+  @@index([categoriaId])
+  @@map("opcoes_diario")
+}
+
 model RegistroDiario {
   id        Int     @id @default(autoincrement())
   usuarioId Int     @map("usuario_id")
