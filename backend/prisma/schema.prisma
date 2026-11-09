@@ -499,7 +499,8 @@ model RegistroDiarioCategoria {
   valorDuracaoMinutos Int?    @map("valor_duracao_minutos")
   valorTexto          String? @map("valor_texto")
 
-  opcoes RegistroDiarioOpcao[]
+  opcoes             RegistroDiarioOpcao[]
+  medicaoTemperatura MedicaoTemperaturaBasal?
 
   @@unique([registroId, categoriaId])
   @@index([categoriaId, registroId])
@@ -518,6 +519,42 @@ model RegistroDiarioOpcao {
   @@unique([registroCategoriaId, opcaoId])
   @@index([opcaoId])
   @@map("registros_diario_opcoes")
+}
+
+model MedicaoTemperaturaBasal {
+  registroCategoriaId Int                     @id @map("registro_categoria_id")
+  registroCategoria   RegistroDiarioCategoria @relation(fields: [registroCategoriaId], references: [id], onDelete: Cascade)
+  perturbada          Boolean                 @default(false)
+  motivoPerturbacao   String?                 @map("motivo_perturbacao")
+  criadoEm            DateTime                @default(now()) @map("criado_em")
+  atualizadoEm        DateTime                @updatedAt @map("atualizado_em")
+
+  @@map("medicoes_temperatura_basal")
+}
+
+model AnaliseTermicaCiclo {
+  id                Int                  @id @default(autoincrement())
+  usuarioId         Int                  @map("usuario_id")
+  usuario           Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  registroCicloId   Int                  @map("registro_ciclo_id")
+  registroCiclo     RegistroCiclo        @relation(fields: [registroCicloId], references: [id], onDelete: Cascade)
+  algoritmo         String
+  versaoAlgoritmo   String               @map("versao_algoritmo")
+  variante          String
+  disponibilidade   String
+  estado            EstadoAnaliseTermica
+  provisorio        Boolean              @default(true)
+  janelasAvaliaveis Int                  @default(0) @map("janelas_avaliaveis")
+  configuracao      Json
+  sequencias        Json
+  evidenciaAplicada Boolean              @default(false) @map("evidencia_aplicada")
+  avaliadoAte       DateTime?            @map("avaliado_ate")
+  criadoEm          DateTime             @default(now()) @map("criado_em")
+  atualizadoEm      DateTime             @updatedAt @map("atualizado_em")
+
+  @@unique([registroCicloId, versaoAlgoritmo, variante, disponibilidade])
+  @@index([usuarioId, registroCicloId])
+  @@map("analises_termicas_ciclo")
 }
 
 // ============================================================
