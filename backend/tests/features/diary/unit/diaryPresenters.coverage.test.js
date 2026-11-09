@@ -24,4 +24,56 @@ function categoria(base) {
     };
 }
 
+test('apresenta todos os formatos, ordenações e metadados térmicos', () => {
+    assert.equal(apresentarDecimal(null, 1), null);
+    assert.equal(apresentarDecimal(12, null), null);
+    assert.equal(apresentarDecimal(-12, 1), '-1.2');
+    assert.equal(apresentarDecimal(12, 0), '12');
+
+    const opcao = [...OPCOES_POR_ID.values()].find(
+        (item) => item.categoriaId === 'sintomas_fisicos'
+    );
+    const registro = {
+        id: 1,
+        dataRegistro: instante,
+        faseCicloAssociada: 'lutea',
+        versao: 2,
+        criadoEm: instante,
+        atualizadoEm: instante,
+        categorias: [
+            categoria({
+                categoriaId: 'tempo_sono',
+                categoriaNome: 'Tempo',
+                valorDuracaoMinutos: 480
+            }),
+            categoria({
+                categoriaId: 'temperatura_basal',
+                categoriaNome: 'Temperatura',
+                valorEscalado: 367,
+                casasDecimais: 1,
+                medicaoTemperatura: { perturbada: true, motivoPerturbacao: 'Febre' }
+            }),
+            categoria({
+                categoriaId: 'sintomas_fisicos',
+                categoriaNome: 'Sintomas',
+                opcoes: [
+                    { opcaoId: 'desconhecida', grupo: null, opcaoNome: 'Z' },
+                    { opcaoId: opcao.id, grupo: opcao.grupo, opcaoNome: opcao.nome }
+                ]
+            }),
+            categoria({ valorTexto: '😀 texto' }),
+            categoria({ categoriaId: 'desconhecida', categoriaNome: 'Desconhecida' })
+        ]
+    };
+
+    const detalhe = apresentarDetalheRegistro(registro);
+    assert.equal(detalhe.categorias.find((item) => item.id === 'temperatura_basal').valor, '36.7');
+    assert.equal(
+        detalhe.categorias.find((item) => item.id === 'temperatura_basal').motivoPerturbacao,
+        'Febre'
+    );
+    assert.equal(detalhe.categorias.find((item) => item.id === 'tempo_sono').duracaoMinutos, 480);
+    assert.equal(detalhe.categorias.find((item) => item.texto).quantidadeCaracteres, 7);
+});
+
 
