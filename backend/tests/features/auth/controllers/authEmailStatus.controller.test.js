@@ -5,8 +5,19 @@ function resposta() {
     return {
         statusCode: null,
         body: null,
-        status(codigo) { this.statusCode = codigo; return this; },
-        json(body) { this.body = body; return this; }
+        headers: {},
+        set(nome, valor) {
+            this.headers[nome] = valor;
+            return this;
+        },
+        status(codigo) {
+            this.statusCode = codigo;
+            return this;
+        },
+        json(body) {
+            this.body = body;
+            return this;
+        }
     };
 }
 function controller({ validacao, service }) {
@@ -44,14 +55,19 @@ test('rejeita e-mail inválido sem consultar o serviço', async () => {
 test('consulta estado do consentimento e encaminha falhas', async () => {
     const erro = new Error('falha');
     const service = {
-        verificarEmailDisponivel: async () => { throw erro; },
+        verificarEmailDisponivel: async () => {
+            throw erro;
+        },
         verificarAcessoRedeApoio: async () => ({ acessoLiberado: false })
     };
     const instancia = controller({ validacao: { valido: true, dados: {} }, service });
     const res = resposta();
     await instancia.consultarStatusConsentimento({ usuario: { id: 7 } }, res, () => {});
     assert.deepEqual(res.body, { acessoLiberado: false });
+    assert.equal(res.headers['Cache-Control'], 'no-store');
     let recebido;
-    await instancia.verificarEmail({ body: {} }, resposta(), (e) => { recebido = e; });
+    await instancia.verificarEmail({ body: {} }, resposta(), (e) => {
+        recebido = e;
+    });
     assert.equal(recebido, erro);
 });

@@ -5,8 +5,14 @@ function res() {
     return {
         statusCode: null,
         body: null,
-        status(codigo) { this.statusCode = codigo; return this; },
-        json(body) { this.body = body; return this; }
+        status(codigo) {
+            this.statusCode = codigo;
+            return this;
+        },
+        json(body) {
+            this.body = body;
+            return this;
+        }
     };
 }
 test('rejeita solicitação e reenvio parentais inválidos', async () => {
@@ -23,11 +29,47 @@ test('rejeita solicitação e reenvio parentais inválidos', async () => {
         await controller[metodo]({ body: {} }, resposta, () => {});
         assert.equal(resposta.statusCode, 422);
         assert.deepEqual(resposta.body.erro.detalhes, erros);
+        assert.equal(resposta.body.erro.mensagem, 'Inválido.');
+    }
+});
+
+test('mascara falha interna no envio ou reenvio com a mensagem da HU-001.1', async () => {
+    const controller = criarAuthController({
+        authService: {},
+        authValidator: {},
+        parentalConsentService: {
+            solicitar: async () => {
+                throw new Error('detalhe interno');
+            },
+            reenviar: async () => {
+                throw new Error('detalhe interno');
+            }
+        },
+        parentalConsentValidator: {
+            validarSolicitacao: () => ({
+                valido: true,
+                dados: { emailResponsavelLegal: 'responsavel@email.com' }
+            }),
+            validarReenvio: () => ({ valido: true, dados: { emailResponsavelLegal: null } })
+        }
+    });
+
+    for (const metodo of ['solicitarConsentimento', 'reenviarConsentimento']) {
+        let recebido;
+        await controller[metodo]({ body: {}, usuario: { id: 1 } }, res(), (erro) => {
+            recebido = erro;
+        });
+        assert.equal(
+            recebido.mensagemUsuario,
+            'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
+        );
     }
 });
 test('encaminha falhas de cadastro e consentimento', async () => {
     const erro = new Error('falha');
-    const falhar = async () => { throw erro; };
+    const falhar = async () => {
+        throw erro;
+    };
     const valida = () => ({ valido: true, erros: [], dados: { token: 't' } });
     const controller = criarAuthController({
         authService: { cadastrar: falhar },
@@ -53,7 +95,9 @@ test('encaminha falhas de cadastro e consentimento', async () => {
     ];
     for (const [metodo, req] of casos) {
         let recebido;
-        await controller[metodo](req, res(), (e) => { recebido = e; });
+        await controller[metodo](req, res(), (e) => {
+            recebido = e;
+        });
         assert.equal(recebido, erro);
     }
 });
