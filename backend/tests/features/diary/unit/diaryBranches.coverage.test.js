@@ -149,4 +149,38 @@ test('valida temperaturas e valores decimais rejeitados', () => {
     erroCodigo(() => normalizarDecimal(Number.MAX_SAFE_INTEGER), 'VALOR_DECIMAL_INVALIDO');
 });
 
+test('valida formatos rejeitados de entrada e histórico', () => {
+    for (const fuso of [null, '', 'a'.repeat(101)]) {
+        erroCodigo(() => validarFusoHorario(fuso), 'FUSO_HORARIO_INVALIDO');
+    }
+    for (const corpo of [null, [], 'x']) {
+        erroCodigo(() => validarCriacaoRegistro(corpo), 'REGISTRO_DIARIO_INVALIDO');
+    }
+    const base = { data: '2026-11-08', fusoHorario: 'UTC', categorias: [] };
+    erroCodigo(() => validarCriacaoRegistro(base), 'CONTEUDO_DIARIO_OBRIGATORIO');
+    erroCodigo(
+        () =>
+            validarCriacaoRegistro({
+                ...base,
+                categorias: new Array(CATEGORIAS_POR_ID.size + 1).fill({})
+            }),
+        'CONTEUDO_DIARIO_OBRIGATORIO'
+    );
+
+    for (const query of [null, [], { extra: 1 }]) {
+        erroCodigo(() => validarHistorico(query), 'FILTRO_DIARIO_INVALIDO');
+    }
+    for (const query of [
+        { categorias: '' },
+        { categorias: 1 },
+        { categorias: 'peso,peso' },
+        { categorias: `${'peso,'.repeat(CATEGORIAS_POR_ID.size)}peso` },
+        { fases: 'lutea,' },
+        { dataInicio: 'x' },
+        { dataFim: 'x' }
+    ]) {
+        assert.throws(() => validarHistorico(query));
+    }
+});
+
 
