@@ -71,7 +71,7 @@ describe('ContactCard', () => {
             />
         );
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Aceitar convite de Julia'
             })
@@ -92,7 +92,7 @@ describe('ContactCard', () => {
             />
         );
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Recusar convite de Julia'
             })
@@ -113,7 +113,7 @@ describe('ContactCard', () => {
             />
         );
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Abrir resumo de permissões de Julia'
             })
@@ -140,13 +140,13 @@ describe('ContactCard', () => {
             />
         );
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Alterar vínculo de Ana'
             })
         );
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Remover Ana'
             })
@@ -169,7 +169,7 @@ describe('ContactCard', () => {
             />
         );
 
-        fireEvent.press(
+        await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Reenviar convite para Julia'
             })
@@ -193,19 +193,22 @@ describe('ContactCard', () => {
 
         expect(
             screen.getByRole('button', {
-                name: 'Aceitar convite de Julia'
+                name: 'Aceitar convite de Julia',
+                includeHiddenElements: true
             })
         ).toBeDisabled();
 
         expect(
             screen.getByRole('button', {
-                name: 'Recusar convite de Julia'
+                name: 'Recusar convite de Julia',
+                includeHiddenElements: true
             })
         ).toBeDisabled();
 
         expect(
             screen.getByRole('button', {
-                name: 'Abrir resumo de permissões de Julia'
+                name: 'Abrir resumo de permissões de Julia',
+                includeHiddenElements: true
             })
         ).toBeDisabled();
 
