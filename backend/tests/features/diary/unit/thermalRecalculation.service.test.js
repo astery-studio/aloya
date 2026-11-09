@@ -63,7 +63,7 @@ test('recalcula ciclo afetado e persiste resultado versionado sem aplicar evidê
     assert.equal(gravacoes[0].create.estado, 'elevacao_detectada');
     assert.equal(gravacoes[0].create.evidenciaAplicada, false);
     assert.equal(gravacoes[0].create.provisorio, false);
-    assert.equal(gravacoes[0].create.versaoAlgoritmo, '0.4.0-experimental');
+    assert.equal(gravacoes[0].create.versaoAlgoritmo, '0.5.0-experimental');
 });
 
 test('recalcula todos os ciclos quando uma fronteira menstrual muda', async () => {
