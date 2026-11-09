@@ -1,12 +1,8 @@
-has_updates=0
+updates=$(cat)
 
-while IFS= read -r update; do
-    has_updates=1
-done
-
-if [ "$has_updates" -eq 0 ]; then
+if [ -z "$updates" ]; then
     echo "Nenhuma atualização para enviar; testes ignorados."
     exit 0
 fi
 
-npm run prepush
+printf '%s\n' "$updates" | npm run prepush
