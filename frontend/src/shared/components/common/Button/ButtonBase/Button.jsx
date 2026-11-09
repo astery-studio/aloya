@@ -58,10 +58,15 @@ function Button({
         return (
             <View style={estilos.conteudo}>
                 {Icone && posicaoIcone === 'esquerda' ? (
-                    <Icone color={corConteudo} size={18} />
+                    <View style={estilos.caixaIcone}>
+                        <Icone color={corConteudo} size={18} />
+                    </View>
                 ) : null}
 
                 <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.72}
                     style={[
                         estilos.texto,
                         tamanhoAtual.texto,
@@ -78,7 +83,9 @@ function Button({
                 </Text>
 
                 {Icone && posicaoIcone === 'direita' ? (
-                    <Icone color={corConteudo} size={18} />
+                    <View style={estilos.caixaIcone}>
+                        <Icone color={corConteudo} size={18} />
+                    </View>
                 ) : null}
             </View>
         );
