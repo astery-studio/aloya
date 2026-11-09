@@ -363,11 +363,19 @@ test('consulta conta e persiste convites pendentes com aparência', async () => 
 
         assert.equal(vinculos[1].corId, 'coral');
 
-        assert.equal(emails.length, 2);
+        assert.equal(emails.length, 1);
 
-        assert.equal(emails[0].requerCadastro, false);
+        assert.equal(emails[0].requerCadastro, true);
 
-        assert.equal(emails[1].requerCadastro, true);
+        const notificacaoContato = await prisma.notificacao.findFirst({
+            where: {
+                usuarioId: 2,
+                origemId: vinculos[0].id,
+                tipoOrigem: 'rede_apoio'
+            }
+        });
+
+        assert.ok(notificacaoContato);
     } finally {
         servidor.close();
 

@@ -14,12 +14,14 @@ const APARENCIA_VALIDA = Object.freeze({
 function criarCenario({
     usuarioConvidado = null,
     vinculoExistente = null,
-    falhaEmail = false
+    falhaEmail = false,
+    falhaNotificacao = false
 } = {}) {
     const estado = {
         criado: null,
         removido: null,
-        email: null
+        email: null,
+        notificacao: null
     };
 
     const prisma = {
@@ -62,6 +64,14 @@ function criarCenario({
                 return {
                     count: 1
                 };
+            }
+        },
+
+        notificacao: {
+            async create(dados) {
+                estado.notificacao = dados;
+                if (falhaNotificacao) throw new Error('Notificações indisponíveis');
+                return { id: 1 };
             }
         }
     };
@@ -154,6 +164,9 @@ test('cria convite pendente por categoria sem conceder acesso', async () => {
 
     assert.equal(resultado.iconeId, 'lotus');
     assert.equal(resultado.corId, 'verde');
+    assert.equal(estado.email, null);
+    assert.equal(estado.notificacao.data.usuarioId, 9);
+    assert.equal(estado.notificacao.data.origemId, 20);
 });
 
 test('cria convite com permissões individuais para e-mail sem conta', async () => {
@@ -177,6 +190,7 @@ test('cria convite com permissões individuais para e-mail sem conta', async () 
     assert.equal(estado.criado.corId, 'coral');
 
     assert.equal(estado.email.requerCadastro, true);
+    assert.equal(estado.notificacao, null);
 
     assert.equal(resultado.tipoPermissao, 'individual');
 
@@ -265,6 +279,31 @@ test('remove o vínculo pendente quando o envio do e-mail falha', async () => {
         status: 'pendente',
         tokenConviteHash: 'hash-seguro'
     });
+});
+
+test('remove o vínculo pendente quando a notificação interna falha', async () => {
+    const { service, estado } = criarCenario({
+        usuarioConvidado: {
+            id: 9,
+            papel: 'contato_apoio',
+            statusConta: 'ativa'
+        },
+        falhaNotificacao: true
+    });
+
+    await assert.rejects(
+        service.criarConvite({
+            titularId: 2,
+            papel: 'principal',
+            email: 'contato@example.com',
+            categoriaId: 3,
+            ...APARENCIA_VALIDA
+        }),
+        /Notificações indisponíveis/u
+    );
+
+    assert.equal(estado.email, null);
+    assert.equal(estado.removido.id, 20);
 });
 
 test('impede auto-convite e convite duplicado', async () => {

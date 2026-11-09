@@ -124,6 +124,7 @@ function criarContactInvitationService({
             typeof prisma?.vinculoRedeApoio?.findFirst !== 'function' ||
             typeof prisma?.vinculoRedeApoio?.create !== 'function' ||
             typeof prisma?.vinculoRedeApoio?.deleteMany !== 'function' ||
+            typeof prisma?.notificacao?.create !== 'function' ||
             typeof permissionService?.resolverCategoria !== 'function' ||
             typeof permissionService?.resolverPermissoesIndividuais !== 'function' ||
             typeof tokenService?.emitir !== 'function' ||
@@ -243,12 +244,24 @@ function criarContactInvitationService({
         }
 
         try {
-            await emailService.enviarConviteRedeApoio({
-                email,
-                nomeTitular: titular.nome,
-                linkConvite: credencial.link,
-                requerCadastro: !usuarioConvidado
-            });
+            if (contaContatoCadastrada) {
+                await prisma.notificacao.create({
+                    data: {
+                        usuarioId: usuarioConvidado.id,
+                        tipoOrigem: 'rede_apoio',
+                        origemId: convite.id,
+                        dataHoraProgramada: convite.dataEnvio,
+                        statusEnvio: 'agendada'
+                    }
+                });
+            } else {
+                await emailService.enviarConviteRedeApoio({
+                    email,
+                    nomeTitular: titular.nome,
+                    linkConvite: credencial.link,
+                    requerCadastro: true
+                });
+            }
         } catch (erro) {
             await prisma.vinculoRedeApoio.deleteMany({
                 where: {
