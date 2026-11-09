@@ -133,4 +133,40 @@ test('controllers de entrada e histórico respondem e encaminham falhas', async 
     assert.equal(erros.length, 3);
 });
 
+test('controller de mutação responde e encaminha falhas', async () => {
+    const falha = new Error('falha');
+    const erros = [];
+    const next = (erro) => erros.push(erro);
+    let falhar = false;
+    const mutationController = criarDiaryMutationController({
+        editService: {
+            editar: async () => {
+                if (falhar) throw falha;
+                return { versao: 4 };
+            }
+        },
+        deletionService: {
+            excluir: async () => {
+                if (falhar) throw falha;
+            }
+        },
+        validarEdicao: (corpo) => corpo
+    });
+    const reqMutation = {
+        usuario: { id: 1 },
+        params: { id: '1' },
+        headers: { 'if-match': '"0"' },
+        body: {}
+    };
+    const resEdit = resposta();
+    await mutationController.editar(reqMutation, resEdit, next);
+    assert.equal(resEdit.headers.ETag, '"4"');
+    assert.equal((await mutationController.excluir(reqMutation, resposta(), next)).statusCode, 204);
+    falhar = true;
+    await mutationController.editar(reqMutation, resposta(), next);
+    await mutationController.excluir(reqMutation, resposta(), next);
+
+    assert.equal(erros.length, 2);
+});
+
 
