@@ -2,7 +2,7 @@
 
 ## 1. Visão geral
 
-A API do Aloya permite que o aplicativo mobile se comunique com o backend para realizar autenticação, gerenciamento da conta, recuperação de senha, consentimento parental e gerenciamento de anticoncepcionais.
+A API do Aloya permite que o aplicativo mobile se comunique com o backend para realizar autenticação, gerenciamento da conta, recuperação de senha, consentimento parental, gerenciamento de anticoncepcionais e registros do Diário.
 
 A aplicação utiliza:
 
@@ -1064,7 +1064,43 @@ Status: `404 Not Found`
 }
 ```
 
-# 15. Recursos ainda não expostos pela API
+# 15. Diário multivariado
+
+Todas as rotas abaixo exigem autenticação e retornam
+`Cache-Control: private, no-store`.
+
+| Método | Rota | Resultado |
+|---|---|---|
+| `GET` | `/api/diario/catalogo` | Catálogo e preferências efetivas |
+| `PATCH` | `/api/diario/preferencias` | Atualização atômica em lote |
+| `PATCH` | `/api/diario/preferencias/macrocategorias/:id` | Ativa ou desativa uma macrocategoria |
+| `PATCH` | `/api/diario/preferencias/categorias/:id` | Ativa ou desativa uma categoria |
+| `POST` | `/api/diario/registros` | Cria um registro diário |
+| `GET` | `/api/diario/registros` | Histórico filtrado e paginado por cursor |
+| `GET` | `/api/diario/registros/:id` | Detalhes de um registro |
+| `PUT` | `/api/diario/registros/:id` | Substitui um registro |
+| `DELETE` | `/api/diario/registros/:id` | Exclui um registro |
+
+Criação e edição recebem `data`, `fusoHorario` e ao menos uma categoria
+em `categorias`. O servidor valida os valores pelo tipo definido no catálogo,
+associa sempre a pessoa autenticada e registra a fase do ciclo na data.
+
+Para `temperatura_basal`, `valor` aceita uma casa decimal entre `32,0` e
+`42,0`. A entrada também aceita `perturbada` e, quando verdadeira,
+`motivoPerturbacao` com até 200 caracteres. O intervalo é técnico e não
+representa normalidade clínica.
+
+O motor térmico experimental executa em modo sombra. Seus resultados não são
+retornados pela API e não alteram a confiança ou as datas da previsão.
+
+As respostas de criação, detalhe e edição incluem `ETag`. Edição e
+exclusão exigem o mesmo valor no cabeçalho `If-Match`; uma versão antiga
+retorna conflito, impedindo sobrescrita acidental. O histórico aceita `inicio`,
+`fim`, `categorias`, `fases`, `limite` e `cursor`.
+
+Os nomes efetivos dos filtros de período são `dataInicio` e `dataFim`.
+
+# 16. Recursos ainda não expostos pela API
 
 O esquema do Prisma possui outras entidades do domínio, mas nem todas possuem endpoints registrados na versão atual.
 
@@ -1072,7 +1108,6 @@ No momento, não estão disponíveis rotas HTTP para:
 
 - ciclos menstruais;
 - previsões;
-- diário;
 - sintomas;
 - histórico do ciclo;
 - notificações;
