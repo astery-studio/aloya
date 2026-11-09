@@ -1,6 +1,6 @@
-import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Text, View } from 'react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
+
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const mockUseReceivedContacts = jest.fn();
 
@@ -8,75 +8,101 @@ jest.mock('../../../../src/features/support-network/hooks/useReceivedContacts', 
     useReceivedContacts: (propriedades) => mockUseReceivedContacts(propriedades)
 }));
 
-jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => ({
-    MainLayout: ({ titulo, children }) => (
-        <View testID="main-layout">
-            <Text>{titulo}</Text>
-            {children}
-        </View>
-    )
-}));
+jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
+    const { Text, View } = require('react-native');
 
-jest.mock('../../../../src/features/support-network/components/ContactList/ContactList', () => ({
-    ContactList: ({ aoAcao, aoAbrirResumo, aoTentarNovamente }) => (
-        <View testID="contact-list">
-            <Text
-                accessibilityRole="button"
-                accessibilityLabel="Aceitar teste"
-                onPress={() => aoAcao('aceitar', contato)}
-            >
-                Aceitar
-            </Text>
+    return {
+        MainLayout: ({ titulo, children }) => (
+            <View testID="main-layout">
+                <Text>{titulo}</Text>
+                {children}
+            </View>
+        )
+    };
+});
 
-            <Text
-                accessibilityRole="button"
-                accessibilityLabel="Recusar teste"
-                onPress={() => aoAcao('recusar', contato)}
-            >
-                Recusar
-            </Text>
+jest.mock('../../../../src/features/support-network/components/ContactList/ContactList', () => {
+    const { Text, View } = require('react-native');
 
-            <Text
-                accessibilityRole="button"
-                accessibilityLabel="Abrir resumo teste"
-                onPress={() => aoAbrirResumo(contato)}
-            >
-                Resumo
-            </Text>
+    const contatoRecebido = {
+        id: 7,
+        identificacao: 'Julia',
+        email: 'julia@exemplo.com',
+        status: 'pendente',
+        vinculo: {
+            tipo: 'categoria',
+            nomeCategoria: 'Profissional',
+            permissoes: ['consultas']
+        }
+    };
 
-            <Text
-                accessibilityRole="button"
-                accessibilityLabel="Tentar listar novamente"
-                onPress={aoTentarNovamente}
-            >
-                Tentar novamente
-            </Text>
-        </View>
-    )
-}));
+    return {
+        ContactList: ({ aoAcao, aoAbrirResumo, aoTentarNovamente }) => (
+            <View testID="contact-list">
+                <Text
+                    accessibilityRole="button"
+                    accessibilityLabel="Aceitar teste"
+                    onPress={() => aoAcao('aceitar', contatoRecebido)}
+                >
+                    Aceitar
+                </Text>
+
+                <Text
+                    accessibilityRole="button"
+                    accessibilityLabel="Recusar teste"
+                    onPress={() => aoAcao('recusar', contatoRecebido)}
+                >
+                    Recusar
+                </Text>
+
+                <Text
+                    accessibilityRole="button"
+                    accessibilityLabel="Abrir resumo teste"
+                    onPress={() => aoAbrirResumo(contatoRecebido)}
+                >
+                    Resumo
+                </Text>
+
+                <Text
+                    accessibilityRole="button"
+                    accessibilityLabel="Tentar listar novamente"
+                    onPress={aoTentarNovamente}
+                >
+                    Tentar novamente
+                </Text>
+            </View>
+        )
+    };
+});
 
 jest.mock(
     '../../../../src/features/support-network/components/ContactPermissionsSummaryModal/ContactPermissionsSummaryModal',
-    () => ({
-        ContactPermissionsSummaryModal: ({ visivel, nomeContato, aoFechar }) =>
-            visivel ? (
-                <View testID="permissions-summary">
-                    <Text>{nomeContato}</Text>
+    () => {
+        const { Text, View } = require('react-native');
 
-                    <Text
-                        accessibilityRole="button"
-                        accessibilityLabel="Fechar resumo"
-                        onPress={aoFechar}
-                    >
-                        Fechar
-                    </Text>
-                </View>
-            ) : null
-    })
+        return {
+            ContactPermissionsSummaryModal: ({ visivel, nomeContato, aoFechar }) =>
+                visivel ? (
+                    <View testID="permissions-summary">
+                        <Text>{nomeContato}</Text>
+
+                        <Text
+                            accessibilityRole="button"
+                            accessibilityLabel="Fechar resumo"
+                            onPress={aoFechar}
+                        >
+                            Fechar
+                        </Text>
+                    </View>
+                ) : null
+        };
+    }
 );
 
 jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => {
-    return function SimpleModal({ visivel, titulo, mensagem, acaoPrincipal, acaoSecundaria }) {
+    const { Text, View } = require('react-native');
+
+    function SimpleModal({ visivel, titulo, mensagem, acaoPrincipal, acaoSecundaria }) {
         if (!visivel) {
             return null;
         }
@@ -91,6 +117,9 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
                     <Text
                         accessibilityRole="button"
                         accessibilityLabel={acaoPrincipal.texto}
+                        accessibilityState={{
+                            disabled: Boolean(acaoPrincipal.desativado)
+                        }}
                         onPress={acaoPrincipal.aoPressionar}
                     >
                         {acaoPrincipal.texto}
@@ -101,6 +130,9 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
                     <Text
                         accessibilityRole="button"
                         accessibilityLabel={acaoSecundaria.texto}
+                        accessibilityState={{
+                            disabled: Boolean(acaoSecundaria.desativado)
+                        }}
                         onPress={acaoSecundaria.aoPressionar}
                     >
                         {acaoSecundaria.texto}
@@ -108,30 +140,13 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
                 ) : null}
             </View>
         );
+    }
+
+    return {
+        __esModule: true,
+        default: SimpleModal
     };
 });
-
-jest.mock('../../../../src/shared/hooks/useTheme', () => ({
-    useTheme: () => ({
-        escuro: false,
-        cores: {
-            marca: {
-                primaria: '#C85A44'
-            },
-            interface: {
-                fundo: '#F7F5F0',
-                textoSecundario: '#5C5C59'
-            },
-            icones: {
-                configuracoes: {
-                    laranja: {
-                        caixa: '#F7E8DA'
-                    }
-                }
-            }
-        }
-    })
-}));
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     BellIcon: () => null,
@@ -184,8 +199,8 @@ beforeEach(() => {
     mockUseReceivedContacts.mockReturnValue(criarEstado());
 });
 
-test('apresenta a tela e a lista recebida', () => {
-    render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+test('apresenta a tela e a lista recebida', async () => {
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
 
     expect(screen.getByText('Contatos')).toBeOnTheScreen();
 
@@ -197,14 +212,14 @@ test('apresenta a tela e a lista recebida', () => {
     });
 });
 
-test('aceita o convite sem confirmação intermediária', () => {
+test('aceita o convite sem confirmação intermediária', async () => {
     const estado = criarEstado();
 
     mockUseReceivedContacts.mockReturnValue(estado);
 
-    render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
 
-    fireEvent.press(
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Aceitar teste'
         })
@@ -215,26 +230,30 @@ test('aceita o convite sem confirmação intermediária', () => {
     expect(screen.queryByLabelText('Recusar Convite')).toBeNull();
 });
 
-test('solicita confirmação antes de recusar', () => {
+test('solicita confirmação antes de recusar', async () => {
     const estado = criarEstado();
 
     mockUseReceivedContacts.mockReturnValue(estado);
 
-    render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
 
-    fireEvent.press(
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Recusar teste'
         })
     );
 
-    expect(screen.getByLabelText('Recusar Convite')).toHaveTextContent(
-        'Você tem certeza que deseja recusar o convite de Julia?'
-    );
+    expect(screen.getByLabelText('Recusar Convite')).toBeOnTheScreen();
+
+    expect(
+        screen.getByText(
+            'Você tem certeza que deseja recusar o convite de Julia? Esta ação não pode ser desfeita.'
+        )
+    ).toBeOnTheScreen();
 
     expect(estado.responder).not.toHaveBeenCalled();
 
-    fireEvent.press(
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Recusar'
         })
@@ -243,18 +262,44 @@ test('solicita confirmação antes de recusar', () => {
     expect(estado.responder).toHaveBeenCalledWith(7, 'recusar');
 });
 
-test('abre e fecha o resumo de permissões', () => {
-    render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+test('cancela a recusa sem responder o convite', async () => {
+    const estado = criarEstado();
 
-    fireEvent.press(
+    mockUseReceivedContacts.mockReturnValue(estado);
+
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+
+    await fireEvent.press(
+        screen.getByRole('button', {
+            name: 'Recusar teste'
+        })
+    );
+
+    await fireEvent.press(
+        screen.getByRole('button', {
+            name: 'Cancelar'
+        })
+    );
+
+    expect(screen.queryByLabelText('Recusar Convite')).toBeNull();
+
+    expect(estado.responder).not.toHaveBeenCalled();
+});
+
+test('abre e fecha o resumo de permissões', async () => {
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Abrir resumo teste'
         })
     );
 
-    expect(screen.getByTestId('permissions-summary')).toHaveTextContent('Julia');
+    expect(screen.getByTestId('permissions-summary')).toBeOnTheScreen();
 
-    fireEvent.press(
+    expect(screen.getByText('Julia')).toBeOnTheScreen();
+
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Fechar resumo'
         })
@@ -263,7 +308,7 @@ test('abre e fecha o resumo de permissões', () => {
     expect(screen.queryByTestId('permissions-summary')).toBeNull();
 });
 
-test('apresenta o resultado da resposta', () => {
+test('apresenta o resultado da resposta', async () => {
     const estado = criarEstado({
         resultadoAcao: {
             status: 'ativo',
@@ -273,11 +318,11 @@ test('apresenta o resultado da resposta', () => {
 
     mockUseReceivedContacts.mockReturnValue(estado);
 
-    render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
 
     expect(screen.getByLabelText('Convite aceito com sucesso.')).toBeOnTheScreen();
 
-    fireEvent.press(
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'OK'
         })
@@ -286,26 +331,44 @@ test('apresenta o resultado da resposta', () => {
     expect(estado.limparResultado).toHaveBeenCalledTimes(1);
 });
 
-test('apresenta erro amigável da operação', () => {
+test('apresenta erro amigável da operação', async () => {
+    const mensagem = 'Não foi possível responder ao convite no momento. Tente novamente.';
+
     const estado = criarEstado({
-        erroAcao: 'Não foi possível responder ao convite no momento. Tente novamente.'
+        erroAcao: mensagem
     });
 
     mockUseReceivedContacts.mockReturnValue(estado);
 
-    render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
 
-    expect(screen.getByLabelText('Algo deu errado')).toHaveTextContent(
-        'Não foi possível responder ao convite no momento. Tente novamente.'
-    );
+    expect(screen.getByLabelText('Algo deu errado')).toBeOnTheScreen();
 
-    fireEvent.press(
+    expect(screen.getByText(mensagem)).toBeOnTheScreen();
+
+    await fireEvent.press(
         screen.getByRole('button', {
             name: 'Voltar'
         })
     );
 
     expect(estado.limparResultado).toHaveBeenCalledTimes(1);
+});
+
+test('encaminha a nova tentativa da listagem', async () => {
+    const estado = criarEstado();
+
+    mockUseReceivedContacts.mockReturnValue(estado);
+
+    await render(<ReceivedContactsScreen service={{}} onSelecionarAba={jest.fn()} />);
+
+    await fireEvent.press(
+        screen.getByRole('button', {
+            name: 'Tentar listar novamente'
+        })
+    );
+
+    expect(estado.tentarNovamente).toHaveBeenCalledTimes(1);
 });
 
 test.each([
