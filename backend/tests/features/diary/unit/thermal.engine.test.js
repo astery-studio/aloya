@@ -72,6 +72,13 @@ test('detecção causal permanece igual quando temperaturas futuras chegam', () 
     assert.deepEqual(posterior.sequencias[0], inicial.sequencias[0]);
 });
 
+test('detecção causal só existe no terceiro dia elevado disponível', () => {
+    const medicoes = serie([364, 364, 364, 364, 364, 364, 366, 366, 366]);
+    assert.equal(detectarPadraoTermico(medicoes.slice(0, 7), config('A1')).estado, 'DADOS_INSUFICIENTES');
+    assert.equal(detectarPadraoTermico(medicoes.slice(0, 8), config('A1')).estado, 'DADOS_INSUFICIENTES');
+    assert.equal(detectarPadraoTermico(medicoes, config('A1')).estado, 'ELEVACAO_DETECTADA');
+});
+
 test('ausência ou perturbação interrompe a sequência', () => {
     const ausente = serie([364, 364, 364, 364, 364, 364, 366, 366, 366]);
     ausente.splice(7, 1);
