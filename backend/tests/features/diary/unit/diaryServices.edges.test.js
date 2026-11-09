@@ -156,4 +156,31 @@ function dependenciasEdicao() {
     };
 }
 
+test('edição cobre configuração, ausência, versão e no-op', async () => {
+    const base = dependenciasEdicao();
+    for (const alteracao of [
+        { prisma: null },
+        { bootstrap: null },
+        { phaseService: null },
+        { thermalRecalculation: null }
+    ]) {
+        assert.throws(() => criarDiaryEditService({ ...base, ...alteracao }), TypeError);
+    }
+    const dados = { data: '2026-11-08', fusoHorario: 'UTC', categorias: [categoriaNova()] };
+    await assert.rejects(
+        () => criarDiaryEditService(base).editar(1, 1, 0, { ...dados, data: '2026-11-09' }),
+        { codigo: 'DATA_REGISTRO_FUTURA' }
+    );
+    base.tx.registroDiario.findFirst = async () => null;
+    await assert.rejects(() => criarDiaryEditService(base).editar(1, 1, 0, dados), {
+        codigo: 'REGISTRO_DIARIO_NAO_ENCONTRADO'
+    });
+    base.tx.registroDiario.findFirst = async () => ({ ...registro(), versao: 2 });
+    await assert.rejects(() => criarDiaryEditService(base).editar(1, 1, 0, dados), {
+        codigo: 'CONFLITO_DIARIO'
+    });
+    base.tx.registroDiario.findFirst = async () => registro();
+    assert.equal((await criarDiaryEditService(base).editar(1, 1, 0, dados)).versao, 0);
+});
+
 
