@@ -65,6 +65,35 @@ test('mascara falha interna no envio ou reenvio com a mensagem da HU-001.1', asy
         );
     }
 });
+
+test('mascara falha interna durante a confirmação pública', async () => {
+    const controller = criarAuthController({
+        authService: {},
+        authValidator: {},
+        parentalConsentService: {
+            confirmar: async () => {
+                throw new Error('detalhe do banco');
+            }
+        },
+        parentalConsentValidator: {
+            validarToken: () => ({ valido: true, dados: { token: 't'.repeat(43) } })
+        }
+    });
+    let recebido;
+
+    await controller.confirmarConsentimento(
+        { params: { token: 't'.repeat(43) } },
+        res(),
+        (erro) => {
+            recebido = erro;
+        }
+    );
+
+    assert.equal(
+        recebido.mensagemUsuario,
+        'Não foi possível concluir a autorização no momento. Tente novamente.'
+    );
+});
 test('encaminha falhas de cadastro e consentimento', async () => {
     const erro = new Error('falha');
     const falhar = async () => {

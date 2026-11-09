@@ -1,7 +1,10 @@
 /**
  * Controller HTTP que valida entradas e delega cadastro, login e consentimento aos serviços.
  */
-import { MENSAGEM_ERRO_ENVIO_CONSENTIMENTO } from '../constants/parentalConsent.constants.js';
+import {
+    MENSAGEM_ERRO_CONFIRMACAO_CONSENTIMENTO,
+    MENSAGEM_ERRO_ENVIO_CONSENTIMENTO
+} from '../constants/parentalConsent.constants.js';
 
 function criarAuthController({
     authService,
@@ -195,6 +198,7 @@ function criarAuthController({
                 </html>
             `);
         } catch (erro) {
+            if (!erro.status) erro.mensagemUsuario = MENSAGEM_ERRO_CONFIRMACAO_CONSENTIMENTO;
             return next(erro);
         }
     }
