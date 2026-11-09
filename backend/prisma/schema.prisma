@@ -76,6 +76,20 @@ enum FaseCiclo {
   lutea
 }
 
+enum TipoValorDiario {
+  opcoes
+  decimal_escalado
+  duracao_minutos
+  texto
+}
+
+enum EstadoAnaliseTermica {
+  elevacao_detectada
+  nenhuma_elevacao_detectada
+  padrao_termico_ambiguo
+  dados_insuficientes
+}
+
 enum TipoAnticoncepcional {
   pilula
   injetavel
@@ -168,19 +182,23 @@ model Usuario {
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
-  confirmacoesEmail        ConfirmacaoEmail[]
-  sessoes                  Sessao[]
-  recuperacoesSenha        RecuperacaoSenha[]
-  consentimentoParental    ConsentimentoParental?
-  registrosCiclo           RegistroCiclo[]
-  sincronizacoesMenstruais SincronizacaoMenstrual[]
-  previsao                 Previsao?
-  registrosDiario          RegistroDiario[]
-  anticoncepcionais        Anticoncepcional[]
-  categoriasPermissao      CategoriaPermissao[]
-  preferenciaNotificacao   PreferenciaNotificacao?
-  notificacoes             Notificacao[]
-  conversaSuporte          Conversa?
+  confirmacoesEmail           ConfirmacaoEmail[]
+  sessoes                     Sessao[]
+  recuperacoesSenha           RecuperacaoSenha[]
+  consentimentoParental       ConsentimentoParental?
+  registrosCiclo              RegistroCiclo[]
+  analisesTermicas            AnaliseTermicaCiclo[]
+  sincronizacoesMenstruais    SincronizacaoMenstrual[]
+  previsao                    Previsao?
+  registrosDiario             RegistroDiario[]
+  configuracaoDiario          ConfiguracaoDiario?
+  preferenciasMacroDiario     PreferenciaMacrocategoriaDiario[]
+  preferenciasCategoriaDiario PreferenciaCategoriaDiario[]
+  anticoncepcionais           Anticoncepcional[]
+  categoriasPermissao         CategoriaPermissao[]
+  preferenciaNotificacao      PreferenciaNotificacao?
+  notificacoes                Notificacao[]
+  conversaSuporte             Conversa?
 
   vinculosComoTitular VinculoRedeApoio[] @relation("VinculoTitular")
   vinculosComoContato VinculoRedeApoio[] @relation("VinculoContato")
@@ -278,7 +296,8 @@ model RegistroCiclo {
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
   diasMenstruacao   DiaMenstruacao[]
-  previsoesBaseadas Previsao[]       @relation("PrevisaoBaseadaNoCiclo")
+  previsoesBaseadas Previsao[]            @relation("PrevisaoBaseadaNoCiclo")
+  analisesTermicas  AnaliseTermicaCiclo[]
 
   @@unique([usuarioId, dataInicio])
   @@map("registros_ciclo")
