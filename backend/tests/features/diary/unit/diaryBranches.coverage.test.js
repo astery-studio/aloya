@@ -260,4 +260,21 @@ test('catálogo rejeita cada dependência ausente', () => {
     );
 });
 
+test('motor térmico rejeita datas, duplicatas e valores inválidos', () => {
+    assert.throws(() => adicionarDias('2026-02-30', 0), TypeError);
+    assert.throws(() => detectarPadraoTermico([{ data: 'x', valorDecimos: 360 }]), TypeError);
+    assert.throws(
+        () =>
+            detectarPadraoTermico([
+                { data: '2026-01-01', valorDecimos: 360 },
+                { data: '2026-01-01', valorDecimos: 361 }
+            ]),
+        /duplicada/
+    );
+    assert.throws(
+        () => detectarPadraoTermico([{ data: '2026-01-01', valorDecimos: 36.5 }]),
+        /Valor térmico/
+    );
+});
+
 
