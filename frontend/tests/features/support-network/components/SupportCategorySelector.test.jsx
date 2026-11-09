@@ -134,7 +134,7 @@ describe('SupportCategorySelector', () => {
         expect(aoSelecionar).toHaveBeenCalledWith(2);
     });
 
-    test('não repete a seleção da categoria atual', async () => {
+    test('desmarca a categoria atual ao pressioná-la novamente', async () => {
         const aoSelecionar = jest.fn();
 
         await render(
@@ -152,7 +152,8 @@ describe('SupportCategorySelector', () => {
             })
         );
 
-        expect(aoSelecionar).not.toHaveBeenCalled();
+        expect(aoSelecionar).toHaveBeenCalledTimes(1);
+        expect(aoSelecionar).toHaveBeenCalledWith(null);
     });
 
     test('mostra o estado de carregamento', async () => {

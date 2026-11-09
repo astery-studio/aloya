@@ -321,11 +321,13 @@ describe('ContactForm', () => {
             />
         );
 
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name: 'Salvar novo contato'
-            })
-        );
+        const botaoSalvar = screen.getByRole('button', {
+            name: 'Salvar novo contato'
+        });
+
+        expect(botaoSalvar).not.toBeDisabled();
+
+        await fireEvent.press(botaoSalvar);
 
         expect(aoSalvar).toHaveBeenCalledWith({
             email: 'maria@gmail.com',

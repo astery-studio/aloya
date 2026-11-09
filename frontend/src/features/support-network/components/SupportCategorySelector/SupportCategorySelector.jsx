@@ -91,9 +91,11 @@ function SupportCategorySelector({
     }
 
     function selecionarCategoria(id) {
-        if (!selecaoBloqueada && !idsIguais(id, categoriaId)) {
-            aoSelecionar(id);
+        if (selecaoBloqueada) {
+            return;
         }
+
+        aoSelecionar(idsIguais(id, categoriaId) ? null : id);
     }
 
     function tentarNovamente() {

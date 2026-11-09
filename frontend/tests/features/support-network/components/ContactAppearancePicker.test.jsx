@@ -33,10 +33,37 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
 
 import {
     ContactAppearancePicker,
+    calcularTamanhosAparencia,
+    dividirEmLinhas,
     obterCorMarcador
 } from '../../../../src/features/support-network/components/ContactAppearancePicker/ContactAppearancePicker';
 
 describe('ContactAppearancePicker', () => {
+    test('organiza exatamente cinco ícones em cada linha', () => {
+        const linhas = dividirEmLinhas(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+
+        expect(linhas).toEqual([
+            ['1', '2', '3', '4', '5'],
+            ['6', '7', '8', '9', '10']
+        ]);
+    });
+
+    test('mantém quadro de 34 e ícone de 18 em telas comuns', () => {
+        expect(calcularTamanhosAparencia(390)).toEqual({
+            tamanhoQuadroIcone: 34,
+            tamanhoQuadroCor: 34,
+            tamanhoIcone: 18
+        });
+    });
+
+    test('reduz proporcionalmente somente em telas muito estreitas', () => {
+        expect(calcularTamanhosAparencia(160)).toEqual({
+            tamanhoQuadroIcone: 24,
+            tamanhoQuadroCor: 22,
+            tamanhoIcone: 13
+        });
+    });
+
     test('mostra todas as opções de ícone e cor', async () => {
         await render(<ContactAppearancePicker aoAlterar={jest.fn()} />);
 
@@ -44,6 +71,13 @@ describe('ContactAppearancePicker', () => {
         expect(screen.getByText('Cor do Ícone')).toBeOnTheScreen();
 
         expect(screen.getAllByRole('radio')).toHaveLength(17);
+
+        expect(screen.getByTestId('linha-icones-contato-1').children).toHaveLength(5);
+        expect(screen.getByTestId('linha-icones-contato-2').children).toHaveLength(5);
+
+        expect(screen.getByTestId('linha-cores-contato')).toHaveStyle({
+            flexDirection: 'row'
+        });
 
         expect(
             screen.getByRole('radio', {
@@ -56,6 +90,34 @@ describe('ContactAppearancePicker', () => {
                 name: 'Roxo'
             })
         ).toBeOnTheScreen();
+
+        expect(screen.getByTestId('opcao-icone-contato-pessoa')).toHaveStyle({
+            width: 34,
+            height: 34
+        });
+
+        expect(screen.getByTestId('icone-opcao-contato-pessoa')).toHaveProp('size', 18);
+
+        const opcaoBranca = screen.getByTestId('opcao-cor-contato-branco');
+        const opcaoCoral = screen.getByTestId('opcao-cor-contato-coral');
+
+        expect(opcaoBranca).toHaveStyle({
+            width: 34,
+            height: 34,
+            minWidth: 34,
+            minHeight: 34,
+            maxWidth: 34,
+            maxHeight: 34
+        });
+
+        expect(opcaoCoral).toHaveStyle({
+            width: 34,
+            height: 34,
+            minWidth: 34,
+            minHeight: 34,
+            maxWidth: 34,
+            maxHeight: 34
+        });
     });
 
     test('indica o ícone e a cor selecionados', async () => {

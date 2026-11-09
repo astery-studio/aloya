@@ -26,15 +26,20 @@ function criarEstilos(tema) {
 
         gradeIcones: {
             width: '100%',
+            gap: 16
+        },
+
+        linhaIcones: {
+            width: '100%',
             flexDirection: 'row',
-            flexWrap: 'wrap',
+            alignItems: 'center',
             justifyContent: 'space-between',
             rowGap: 16
         },
 
         opcaoIcone: {
-            width: 36,
-            height: 36,
+            width: 34,
+            height: 34,
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
@@ -57,8 +62,8 @@ function criarEstilos(tema) {
         },
 
         opcaoCor: {
-            width: 36,
-            height: 36,
+            width: 34,
+            height: 34,
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
@@ -67,7 +72,7 @@ function criarEstilos(tema) {
         },
 
         opcaoCorSelecionada: {
-            borderWidth: 2
+            borderWidth: 1
         },
 
         opcaoPressionada: {
