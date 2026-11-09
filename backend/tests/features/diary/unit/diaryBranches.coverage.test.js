@@ -102,4 +102,51 @@ test('valida formatos gerais de categorias rejeitados', () => {
     }
 });
 
+test('valida temperaturas e valores decimais rejeitados', () => {
+    for (const perturbada of ['sim', 1]) {
+        erroCodigo(
+            () =>
+                validarCategoriaPreenchida({
+                    categoriaId: 'temperatura_basal',
+                    valor: '36.5',
+                    perturbada
+                }),
+            'MEDICAO_TERMICA_INVALIDA'
+        );
+    }
+    for (const motivoPerturbacao of ['', 'a'.repeat(201), 1]) {
+        erroCodigo(
+            () =>
+                validarCategoriaPreenchida({
+                    categoriaId: 'temperatura_basal',
+                    valor: '36.5',
+                    perturbada: true,
+                    motivoPerturbacao
+                }),
+            'MEDICAO_TERMICA_INVALIDA'
+        );
+    }
+    erroCodigo(
+        () =>
+            validarCategoriaPreenchida({
+                categoriaId: 'temperatura_basal',
+                valor: '36.5',
+                perturbada: false,
+                motivoPerturbacao: 'x'
+            }),
+        'MEDICAO_TERMICA_INVALIDA'
+    );
+    assert.equal(
+        validarCategoriaPreenchida({ categoriaId: 'peso', valor: '60.0' }).valorEscalado,
+        600
+    );
+
+    assert.deepEqual(normalizarDecimal('2'), { valorEscalado: 20, casasDecimais: 1 });
+    assert.deepEqual(normalizarDecimal(-2.5), { valorEscalado: -25, casasDecimais: 1 });
+    for (const valor of [Number.NaN, Number.POSITIVE_INFINITY]) {
+        erroCodigo(() => normalizarDecimal(valor), 'VALOR_DECIMAL_INVALIDO');
+    }
+    erroCodigo(() => normalizarDecimal(Number.MAX_SAFE_INTEGER), 'VALOR_DECIMAL_INVALIDO');
+});
+
 
