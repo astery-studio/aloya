@@ -308,4 +308,33 @@ test('recálculo térmico cobre entrada vazia, perturbação ausente e estados',
     assert.equal(gravados.length, 4);
 });
 
-
+test('serviços usam relógio padrão quando não é injetado', async () => {
+    const categoria = validarCategoriaPreenchida({ categoriaId: 'anotacao_livre', texto: 'x' });
+    const persistida = {
+        id: 1,
+        dataRegistro: new Date('2020-01-01Z'),
+        faseCicloAssociada: null,
+        versao: 0,
+        criadoEm: new Date('2020-01-01Z'),
+        atualizadoEm: new Date('2020-01-01Z'),
+        categorias: []
+    };
+    const tx = {
+        preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+        preferenciaCategoriaDiario: { findMany: async () => [] },
+        registroDiario: {
+            create: async () => persistida,
+            findFirst: async () => persistida,
+            update: async () => ({ ...persistida, categorias: [] })
+        }
+    };
+    const deps = {
+        prisma: { $transaction: async (callback) => callback(tx) },
+        bootstrap: { garantir: async () => {} },
+        phaseService: { resolver: async () => null },
+        thermalRecalculation: { recalcularPorDatas: async () => {} }
+    };
+    const dados = { data: '2020-01-01', fusoHorario: 'UTC', categorias: [categoria] };
+    assert.equal((await criarDiaryEntryService(deps).criar(1, dados)).id, 1);
+    assert.equal((await criarDiaryEditService(deps).editar(1, 1, 0, dados)).id, 1);
+});
