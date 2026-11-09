@@ -61,6 +61,49 @@ const corpoESintomas = {
                     ]
                 }
             ]
+        },
+        {
+            id: 'cabelo',
+            nome: 'Cabelo',
+            grupos: [
+                {
+                    id: 'caracteristicas',
+                    opcoes: [
+                        'Sem alterações',
+                        'Macio',
+                        'Oleoso',
+                        'Volumoso',
+                        'Ressecado',
+                        'Frágil',
+                        'Frizz',
+                        'Quebradiço',
+                        'Queda',
+                        'Descamação'
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'digestao',
+            nome: 'Digestão',
+            grupos: [
+                {
+                    id: 'sintomas',
+                    opcoes: [
+                        'Sem alterações',
+                        'Gases',
+                        'Arrotos',
+                        'Azia',
+                        'Refluxo',
+                        'Vômitos',
+                        'Perda de apetite',
+                        'Aumento do apetite',
+                        'Saciedade',
+                        'Fome frequente',
+                        'Inchaço'
+                    ]
+                }
+            ]
         }
     ]
 };
