@@ -183,4 +183,27 @@ test('valida formatos rejeitados de entrada e histórico', () => {
     }
 });
 
+test('valida formatos rejeitados de preferências', () => {
+    for (const corpo of [null, []]) {
+        erroCodigo(() => validarAtualizacaoPreferencia(corpo), 'PREFERENCIA_INVALIDA');
+    }
+    for (const corpo of [
+        null,
+        [],
+        { versao: 0, categorias: [], macrocategorias: [], extra: true }
+    ]) {
+        erroCodigo(() => validarLotePreferencias(corpo), 'PREFERENCIAS_INVALIDAS');
+    }
+    erroCodigo(
+        () => validarLotePreferencias({ versao: -1, categorias: [{ id: 'peso', ativa: true }] }),
+        'VERSAO_PREFERENCIAS_INVALIDA'
+    );
+    for (const itens of [null, new Array(CATEGORIAS_POR_ID.size + 1).fill({})]) {
+        erroCodigo(
+            () => validarLotePreferencias({ versao: 0, categorias: itens }),
+            'PREFERENCIAS_INVALIDAS'
+        );
+    }
+});
+
 
