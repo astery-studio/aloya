@@ -83,4 +83,54 @@ test('controller do catálogo responde e encaminha falhas', async () => {
     assert.equal(erros.length, 4);
 });
 
+test('controllers de entrada e histórico respondem e encaminham falhas', async () => {
+    const falha = new Error('falha');
+    const erros = [];
+    const next = (erro) => erros.push(erro);
+    let falhar = false;
+    const entryController = criarDiaryEntryController({
+        service: {
+            criar: async (_id, dados) => {
+                if (falhar) throw falha;
+                return { ...dados, versao: 2 };
+            }
+        },
+        validarCriacao: (corpo) => corpo
+    });
+    const reqEntry = { usuario: { id: 1 }, body: { data: '2026-11-08' } };
+    const resEntry = resposta();
+    await entryController.criar(reqEntry, resEntry, next);
+    assert.equal(resEntry.statusCode, 201);
+    assert.equal(resEntry.headers.ETag, '"2"');
+    falhar = true;
+    await entryController.criar(reqEntry, resposta(), next);
+    falhar = false;
+
+    const historyController = criarDiaryHistoryController({
+        historyService: {
+            listar: async () => {
+                if (falhar) throw falha;
+                return { itens: [] };
+            }
+        },
+        detailService: {
+            buscar: async () => {
+                if (falhar) throw falha;
+                return { versao: 3 };
+            }
+        },
+        validarHistorico: (query) => query
+    });
+    const reqHistory = { usuario: { id: 1 }, query: {}, params: { id: '1' } };
+    assert.equal((await historyController.listar(reqHistory, resposta(), next)).statusCode, 200);
+    const resDetail = resposta();
+    await historyController.buscar(reqHistory, resDetail, next);
+    assert.equal(resDetail.headers.ETag, '"3"');
+    falhar = true;
+    await historyController.listar(reqHistory, resposta(), next);
+    await historyController.buscar(reqHistory, resposta(), next);
+
+    assert.equal(erros.length, 3);
+});
+
 
