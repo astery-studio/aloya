@@ -10,6 +10,7 @@ import { criarCycleRemovalService } from '../../src/features/cycles/services/cyc
 import { criarAccountService } from '../../src/features/settings/services/accountService';
 import { criarThemePreferenceService } from '../../src/features/settings/services/themePreferenceService';
 import { criarContactInvitationService } from '../../src/features/support-network/services/contactInvitationService';
+import { criarReceivedContactsService } from '../../src/features/support-network/services/receivedContactsService';
 import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
@@ -45,6 +46,10 @@ jest.mock('../../src/features/support-network/services/supportCategoryService', 
 
 jest.mock('../../src/features/support-network/services/contactInvitationService', () => ({
     criarContactInvitationService: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/services/receivedContactsService', () => ({
+    criarReceivedContactsService: jest.fn()
 }));
 
 jest.mock('../../src/features/cycles/services/cyclePredictionService', () => ({
@@ -83,6 +88,7 @@ describe('createAppServices', () => {
     let cycleHistoryService;
     let supportCategoryService;
     let contactInvitationService;
+    let receivedContactsService;
     let cyclePredictionService;
     let cycleParametersService;
     let cycleRemovalService;
@@ -125,6 +131,10 @@ describe('createAppServices', () => {
             nome: 'contactInvitationService'
         });
 
+        receivedContactsService = Object.freeze({
+            nome: 'receivedContactsService'
+        });
+
         cyclePredictionService = Object.freeze({
             nome: 'cyclePredictionService'
         });
@@ -159,6 +169,8 @@ describe('createAppServices', () => {
         criarSupportCategoryService.mockReturnValue(supportCategoryService);
 
         criarContactInvitationService.mockReturnValue(contactInvitationService);
+
+        criarReceivedContactsService.mockReturnValue(receivedContactsService);
 
         criarCyclePredictionService.mockReturnValue(cyclePredictionService);
 
@@ -222,6 +234,10 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         });
 
+        expect(criarReceivedContactsService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
         expect(criarCyclePredictionService).toHaveBeenCalledWith({
             requisicaoAutenticada
         });
@@ -250,6 +266,7 @@ describe('createAppServices', () => {
             }),
             supportCategoryService,
             contactInvitationService,
+            receivedContactsService,
             cyclePredictionService,
             cycleParametersService,
             cycleRegistrationService: {

@@ -24,6 +24,9 @@ const endpoints = Object.freeze({
     categoriasPermissao: '/support-network/permission-categories',
     convitesContato: caminhoConvitesContato,
     consultaEmailContato: `${caminhoConvitesContato}/lookup`,
+    contatosRecebidos: '/support-network/received-contacts',
+    responderContatoRecebido: (conviteId) =>
+        `/support-network/received-contacts/${conviteId}/respond`,
     previsaoCiclo: '/cycles/prediction'
 });
 
