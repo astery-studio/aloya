@@ -292,4 +292,42 @@ test('preferências cobrem lote e sessão inválida', async () => {
     );
 });
 
-
+test('preferências cobrem conflitos de versão e Prisma', async () => {
+    const deps = dependenciasPreferencias();
+    const service = criarDiaryPreferencesService(deps);
+    deps.tx.configuracaoDiario.updateMany = async () => ({ count: 0 });
+    await assert.rejects(
+        () =>
+            service.atualizar({
+                usuarioId: 1,
+                tipo: 'categoria',
+                id: 'peso',
+                ativa: true,
+                versao: 0
+            }),
+        { codigo: 'CONFLITO_PREFERENCIAS' }
+    );
+    await assert.rejects(
+        () =>
+            service.atualizarLote({ usuarioId: 1, versao: 0, macrocategorias: [], categorias: [] }),
+        { codigo: 'CONFLITO_PREFERENCIAS' }
+    );
+    for (const metodo of ['atualizar', 'atualizarLote']) {
+        const base = dependenciasPreferencias();
+        base.prisma.$transaction = async () => {
+            const erro = new Error('concorrência');
+            erro.code = 'P2034';
+            throw erro;
+        };
+        const outro = criarDiaryPreferencesService(base);
+        const argumentos =
+            metodo === 'atualizar'
+                ? { usuarioId: 1, tipo: 'categoria', id: 'peso', ativa: true, versao: 0 }
+                : { usuarioId: 1, versao: 0, macrocategorias: [], categorias: [] };
+        await assert.rejects(() => outro[metodo](argumentos), { codigo: 'CONFLITO_PREFERENCIAS' });
+        base.prisma.$transaction = async () => {
+            throw new Error('outro');
+        };
+        await assert.rejects(() => outro[metodo](argumentos), /outro/);
+    }
+});
