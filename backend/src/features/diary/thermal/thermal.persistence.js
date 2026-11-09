@@ -1,6 +1,7 @@
 const ESTADOS_BANCO = Object.freeze({
     ELEVACAO_DETECTADA: 'elevacao_detectada',
     INCONCLUSIVO: 'inconclusivo',
+    MEDICAO_NAO_UTILIZADA: 'medicao_nao_utilizada',
     NENHUMA_ELEVACAO_IDENTIFICADA: 'nenhuma_elevacao_identificada',
     DADOS_INSUFICIENTES: 'dados_insuficientes'
 });

@@ -10,6 +10,7 @@ test('persiste cada estado sem aplicar evidência na HU-013', async () => {
     const esperados = {
         ELEVACAO_DETECTADA: 'elevacao_detectada',
         INCONCLUSIVO: 'inconclusivo',
+        MEDICAO_NAO_UTILIZADA: 'medicao_nao_utilizada',
         NENHUMA_ELEVACAO_IDENTIFICADA: 'nenhuma_elevacao_identificada',
         DADOS_INSUFICIENTES: 'dados_insuficientes'
     };
