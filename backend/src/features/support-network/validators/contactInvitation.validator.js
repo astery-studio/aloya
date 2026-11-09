@@ -4,11 +4,24 @@ import {
     permissaoCategoriaEhValida,
     permissoesDaCategoria
 } from '../constants/contactInvitation.constants.js';
+import {
+    corContatoEhValida,
+    iconeContatoEhValido
+} from '../constants/contactAppearance.constants.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 const TAMANHO_MAXIMO_EMAIL = 254;
+
 const CAMPOS_CONSULTA = Object.freeze(['email']);
-const CAMPOS_CONVITE = Object.freeze(['email', 'categoriaId', 'permissoesIndividuais']);
+
+const CAMPOS_CONVITE = Object.freeze([
+    'email',
+    'categoriaId',
+    'permissoesIndividuais',
+    'iconeId',
+    'corId'
+]);
+
 const CAMPOS_RESPOSTA = Object.freeze(['acao']);
 
 function erro(campo, mensagem) {
@@ -21,6 +34,7 @@ function ehObjetoSimples(valor) {
     }
 
     const prototipo = Object.getPrototypeOf(valor);
+
     return prototipo === Object.prototype || prototipo === null;
 }
 
@@ -49,6 +63,7 @@ function validarCategoriaId(categoriaId, erros) {
 
     if (!Number.isSafeInteger(categoriaId) || categoriaId <= 0) {
         erros.push(erro('categoriaId', 'Selecione uma categoria válida.'));
+
         return null;
     }
 
@@ -72,10 +87,31 @@ function validarPermissoesIndividuais(permissoes, erros) {
                 'Selecione ao menos um tipo de dado para o contato visualizar.'
             )
         );
+
         return [];
     }
 
     return ordenarPermissoesCategoria(permissoes);
+}
+
+function validarIconeContato(iconeId, erros) {
+    if (!iconeContatoEhValido(iconeId)) {
+        erros.push(erro('iconeId', 'Selecione um ícone válido para o contato.'));
+
+        return null;
+    }
+
+    return iconeId;
+}
+
+function validarCorContato(corId, erros) {
+    if (!corContatoEhValida(corId)) {
+        erros.push(erro('corId', 'Selecione uma cor válida para o contato.'));
+
+        return null;
+    }
+
+    return corId;
 }
 
 function respostaCorpoInvalido() {
@@ -92,10 +128,16 @@ function validarConsultaEmail(body) {
     }
 
     const erros = [];
+
     validarCampos(body, CAMPOS_CONSULTA, erros);
+
     const email = validarEmail(body.email, erros);
 
-    return { valido: erros.length === 0, erros, dados: { email } };
+    return {
+        valido: erros.length === 0,
+        erros,
+        dados: { email }
+    };
 }
 
 function validarCriacaoConvite(body) {
@@ -104,12 +146,21 @@ function validarCriacaoConvite(body) {
     }
 
     const erros = [];
+
     validarCampos(body, CAMPOS_CONVITE, erros);
 
     const email = validarEmail(body.email, erros);
+
     const categoriaId = validarCategoriaId(body.categoriaId, erros);
+
     const permissoesIndividuais = validarPermissoesIndividuais(body.permissoesIndividuais, erros);
+
+    const iconeId = validarIconeContato(body.iconeId, erros);
+
+    const corId = validarCorContato(body.corId, erros);
+
     const informouCategoria = body.categoriaId !== undefined;
+
     const informouPermissoes = body.permissoesIndividuais !== undefined;
 
     if (informouCategoria === informouPermissoes) {
@@ -124,7 +175,13 @@ function validarCriacaoConvite(body) {
     return {
         valido: erros.length === 0,
         erros,
-        dados: { email, categoriaId, permissoesIndividuais }
+        dados: {
+            email,
+            categoriaId,
+            permissoesIndividuais,
+            iconeId,
+            corId
+        }
     };
 }
 
@@ -138,22 +195,32 @@ function validarTokenConvite(token) {
     return {
         valido,
         erros: valido ? [] : [erro('token', 'Este convite não está mais disponível.')],
-        dados: { token: valido ? token : null }
+        dados: {
+            token: valido ? token : null
+        }
     };
 }
 
 function validarRespostaConvite(body) {
-    if (!ehObjetoSimples(body)) return respostaCorpoInvalido();
+    if (!ehObjetoSimples(body)) {
+        return respostaCorpoInvalido();
+    }
 
     const erros = [];
+
     validarCampos(body, CAMPOS_RESPOSTA, erros);
+
     const acao = typeof body.acao === 'string' ? body.acao.trim().toLowerCase() : '';
 
     if (!ACOES_RESPOSTA_CONVITE.includes(acao)) {
         erros.push(erro('acao', 'Escolha aceitar ou recusar o convite.'));
     }
 
-    return { valido: erros.length === 0, erros, dados: { acao } };
+    return {
+        valido: erros.length === 0,
+        erros,
+        dados: { acao }
+    };
 }
 
 function criarContactInvitationValidator() {
