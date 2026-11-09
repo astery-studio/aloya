@@ -30,6 +30,9 @@ function criarController(service = {}) {
             async listar() {
                 return { contatos: [], resumo: { total: 0, pendentes: 0, ativos: 0 } };
             },
+            async listarRecebidos() {
+                return { contatos: [], resumo: { total: 0, pendentes: 0, ativos: 0 } };
+            },
             ...service
         },
         resendService: {
@@ -37,9 +40,23 @@ function criarController(service = {}) {
                 return { id: 9, status: 'pendente' };
             }
         },
+        responseService: {
+            async responderRecebido({ acao }) {
+                return {
+                    status: acao === 'aceitar' ? 'ativo' : 'recusado',
+                    mensagem:
+                        acao === 'aceitar'
+                            ? 'Convite aceito com sucesso.'
+                            : 'Convite recusado com sucesso.'
+                };
+            }
+        },
         validator: {
             validarContatoId(valor) {
                 return { valido: true, contatoId: Number(valor) };
+            },
+            validarRespostaConvite(valor) {
+                return { valido: true, acao: valor.acao };
             }
         }
     });
@@ -119,16 +136,20 @@ test('rejeita configuração sem serviço de listagem', () => {
 test('reenvia convite usando identidade autenticada e id validado', async () => {
     const chamadas = [];
     const controller = criarSupportContactController({
-        service: { async listar() {} },
+        service: { async listar() {}, async listarRecebidos() {} },
         resendService: {
             async reenviar(dados) {
                 chamadas.push(dados);
                 return { id: 9, status: 'pendente' };
             }
         },
+        responseService: { async responderRecebido() {} },
         validator: {
             validarContatoId() {
                 return { valido: true, contatoId: 9 };
+            },
+            validarRespostaConvite() {
+                return { valido: true, acao: 'aceitar' };
             }
         }
     });
@@ -149,12 +170,13 @@ test('reenvia convite usando identidade autenticada e id validado', async () => 
 test('responde erro de validação sem chamar o serviço de reenvio', async () => {
     let chamou = false;
     const controller = criarSupportContactController({
-        service: { async listar() {} },
+        service: { async listar() {}, async listarRecebidos() {} },
         resendService: {
             async reenviar() {
                 chamou = true;
             }
         },
+        responseService: { async responderRecebido() {} },
         validator: {
             validarContatoId() {
                 return {
@@ -165,6 +187,9 @@ test('responde erro de validação sem chamar o serviço de reenvio', async () =
                         mensagem: 'Contato inválido.'
                     }
                 };
+            },
+            validarRespostaConvite() {
+                return { valido: true, acao: 'aceitar' };
             }
         }
     });
@@ -179,4 +204,63 @@ test('responde erro de validação sem chamar o serviço de reenvio', async () =
     assert.equal(chamou, false);
     assert.equal(estado.status, 422);
     assert.equal(estado.body.erro.mensagem, 'Contato inválido.');
+});
+
+test('lista convites recebidos usando a identidade do contato autenticado', async () => {
+    const chamadas = [];
+    const controller = criarController({
+        async listarRecebidos(dados) {
+            chamadas.push(dados);
+            return { contatos: [], resumo: { total: 0, pendentes: 0, ativos: 0 } };
+        }
+    });
+    const { res, estado } = criarResposta();
+
+    await controller.listarRecebidos(
+        { usuario: { id: 18, papel: 'contato_apoio' } },
+        res,
+        assert.fail
+    );
+
+    assert.deepEqual(chamadas, [{ usuarioId: 18, papel: 'contato_apoio' }]);
+    assert.equal(estado.status, 200);
+    assert.equal(estado.headers['Cache-Control'], 'private, no-store');
+});
+
+test('aceita convite recebido pelo identificador sem depender do token do e-mail', async () => {
+    const chamadas = [];
+    const controller = criarSupportContactController({
+        service: { async listar() {}, async listarRecebidos() {} },
+        resendService: { async reenviar() {} },
+        responseService: {
+            async responderRecebido(dados) {
+                chamadas.push(dados);
+                return { status: 'ativo', mensagem: 'Convite aceito com sucesso.' };
+            }
+        },
+        validator: {
+            validarContatoId() {
+                return { valido: true, contatoId: 31 };
+            },
+            validarRespostaConvite() {
+                return { valido: true, acao: 'aceitar' };
+            }
+        }
+    });
+    const { res, estado } = criarResposta();
+
+    await controller.responderRecebido(
+        {
+            usuario: { id: 18, papel: 'contato_apoio' },
+            params: { conviteId: '31' },
+            body: { acao: 'aceitar' }
+        },
+        res,
+        assert.fail
+    );
+
+    assert.deepEqual(chamadas, [{ conviteId: 31, usuarioId: 18, acao: 'aceitar' }]);
+    assert.equal(estado.status, 200);
+    assert.equal(estado.body.status, 'ativo');
+    assert.equal(estado.headers['Cache-Control'], 'no-store');
 });

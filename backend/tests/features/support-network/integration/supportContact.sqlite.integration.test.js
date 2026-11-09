@@ -15,6 +15,7 @@ import express from 'express';
 import { criarSupportContactController } from '../../../../src/features/support-network/controllers/supportContact.controller.js';
 import { criarSupportContactRoutes } from '../../../../src/features/support-network/routes/supportContact.routes.js';
 import { criarContactInvitationResendService } from '../../../../src/features/support-network/services/contactInvitationResend.service.js';
+import { criarContactInvitationResponseService } from '../../../../src/features/support-network/services/contactInvitationResponse.service.js';
 import { criarContactInvitationTokenService } from '../../../../src/features/support-network/services/contactInvitationToken.service.js';
 import { criarSupportContactService } from '../../../../src/features/support-network/services/supportContact.service.js';
 import { criarSupportContactValidator } from '../../../../src/features/support-network/validators/supportContact.validator.js';
@@ -64,7 +65,7 @@ function criarBanco() {
             (id, titular_id, contato_id, email_convidado, categoria_id, permissoes_individuais, status, token_convite_hash, data_envio, data_expiracao, data_resposta, criado_em, atualizado_em)
         VALUES
             (20, 1, 2, 'zelia@example.com', NULL, '["geral.historico_ciclo"]', 'ativo', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (21, 1, 3, 'rafael@example.com', 10, '[]', 'pendente', 'hash-antigo', '2026-10-30T12:00:00.000Z', '2026-11-06T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (21, 1, 3, 'rafael@example.com', 10, '[]', 'pendente', 'hash-antigo', '2026-10-30T12:00:00.000Z', '2026-11-15T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (22, 1, NULL, 'ana@email.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-ana', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (23, 1, NULL, 'recusado@email.com', NULL, '[]', 'recusado', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (24, 4, NULL, 'alheio@email.com', NULL, '[]', 'pendente', 'hash-alheio', '2026-10-01T12:00:00.000Z', '2026-10-08T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -73,7 +74,7 @@ function criarBanco() {
     return { diretorio, caminho };
 }
 
-function criarApp(prisma, emails) {
+function criarApp(prisma, emails, usuario = { id: 1, papel: 'principal' }) {
     const tokenService = criarContactInvitationTokenService({
         crypto,
         baseUrl: 'aloya://support-network/invitation',
@@ -90,19 +91,26 @@ function criarApp(prisma, emails) {
         },
         now: () => AGORA
     });
+    const responseService = criarContactInvitationResponseService({
+        prisma,
+        tokenService,
+        now: () => AGORA
+    });
     const controller = criarSupportContactController({
         service,
         resendService,
+        responseService,
         validator: criarSupportContactValidator()
     });
     const app = express();
+    app.use(express.json({ limit: '16kb' }));
     app.use(
         '/support-network',
         criarSupportContactRoutes({
             Router: express.Router,
             authMiddleware: {
                 autenticar(req, _res, next) {
-                    req.usuario = { id: 1, papel: 'principal' };
+                    req.usuario = usuario;
                     next();
                 }
             },
@@ -112,6 +120,9 @@ function criarApp(prisma, emails) {
                 }
             },
             rateLimit(_req, _res, next) {
+                next();
+            },
+            responseRateLimit(_req, _res, next) {
                 next();
             },
             controller
@@ -188,6 +199,51 @@ test('reenvia convite pendente e persiste a nova janela sem criar outro vínculo
         assert.notEqual(vinculos[0].tokenConviteHash, 'hash-antigo');
         assert.equal(emails.length, 1);
         assert.equal(emails[0].email, 'rafael@example.com');
+    } finally {
+        servidor.close();
+        await once(servidor, 'close');
+        await prisma.$disconnect();
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
+
+test('contato autenticado lista e aceita convite recebido sem token do e-mail', async () => {
+    const { diretorio, caminho } = criarBanco();
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({ url: `file:${caminho.replaceAll('\\', '/')}` })
+    });
+    const servidor = criarApp(prisma, [], { id: 3, papel: 'contato_apoio' }).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const baseUrl = `http://127.0.0.1:${servidor.address().port}/support-network`;
+        const respostaLista = await fetch(`${baseUrl}/received-contacts`);
+        const lista = await respostaLista.json();
+
+        assert.equal(respostaLista.status, 200);
+        assert.deepEqual(lista.resumo, { total: 1, pendentes: 1, ativos: 0 });
+        assert.equal(lista.contatos[0].identificacao, 'Titular Ana');
+        assert.equal(lista.contatos[0].vinculo.rotulo, 'Categoria: Profissional');
+
+        const respostaAceite = await fetch(`${baseUrl}/received-contacts/21/respond`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ acao: 'aceitar' })
+        });
+        const aceite = await respostaAceite.json();
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 21 } });
+        const notificacao = await prisma.notificacao.findFirst({
+            where: { usuarioId: 1, origemId: 21, tipoOrigem: 'rede_apoio' }
+        });
+
+        assert.equal(respostaAceite.status, 200);
+        assert.deepEqual(aceite, {
+            status: 'ativo',
+            mensagem: 'Convite aceito com sucesso.'
+        });
+        assert.equal(vinculo.status, 'ativo');
+        assert.equal(vinculo.tokenConviteHash, null);
+        assert.ok(notificacao);
     } finally {
         servidor.close();
         await once(servidor, 'close');

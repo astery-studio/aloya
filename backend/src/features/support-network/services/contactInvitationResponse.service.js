@@ -54,6 +54,45 @@ function criarContactInvitationResponseService({
         return { convite, tokenHash };
     }
 
+    async function buscarConviteRecebidoPendente(conviteId, usuarioId) {
+        if (
+            typeof prisma?.vinculoRedeApoio?.findFirst !== 'function' ||
+            !Number.isSafeInteger(conviteId) ||
+            conviteId <= 0 ||
+            !Number.isSafeInteger(usuarioId) ||
+            usuarioId <= 0
+        ) {
+            throw criarErroConviteIndisponivel();
+        }
+
+        const convite = await prisma.vinculoRedeApoio.findFirst({
+            where: {
+                id: conviteId,
+                contatoId: usuarioId,
+                status: STATUS_CONVITE_PENDENTE,
+                dataExpiracao: { gt: now() }
+            },
+            select: {
+                id: true,
+                titularId: true,
+                contatoId: true,
+                emailConvidado: true,
+                status: true,
+                dataExpiracao: true,
+                categoriaId: true,
+                permissoesIndividuais: true,
+                titular: { select: { nome: true } },
+                categoria: {
+                    select: { nome: true, conjuntoDadosVisiveis: true }
+                }
+            }
+        });
+
+        if (!convite) throw criarErroConviteIndisponivel();
+
+        return convite;
+    }
+
     async function consultar(token) {
         const { convite } = await buscarConvitePendente(token);
         const porCategoria = Boolean(convite.categoriaId && convite.categoria);
@@ -156,17 +195,19 @@ function criarContactInvitationResponseService({
         return usuario;
     }
 
-    async function aceitar({ token, usuarioId }) {
+    async function processarResposta({ convite, usuarioId, filtro, acao }) {
         if (typeof prisma?.$transaction !== 'function') {
-            throw new TypeError('Não foi possível aceitar o convite.');
+            throw new TypeError('Não foi possível responder ao convite.');
         }
-        const { convite, tokenHash } = await buscarConvitePendente(token);
 
         return prisma.$transaction(async (tx) => {
             const usuario = await buscarUsuarioDoConvite(tx, convite, usuarioId);
-
+            const aceitando = acao === 'aceitar';
             const papel =
-                usuario.papel === 'principal' ? 'principal_e_contato_apoio' : usuario.papel;
+                aceitando && usuario.papel === 'principal'
+                    ? 'principal_e_contato_apoio'
+                    : usuario.papel;
+
             if (!['contato_apoio', 'principal_e_contato_apoio'].includes(papel)) {
                 throw criarErroConviteIndisponivel();
             }
@@ -178,21 +219,23 @@ function criarContactInvitationResponseService({
                 });
             }
 
+            const instanteResposta = now();
+            const status = aceitando ? 'ativo' : 'recusado';
             const atualizado = await tx.vinculoRedeApoio.updateMany({
                 where: {
-                    id: convite.id,
-                    tokenConviteHash: tokenHash,
+                    ...filtro,
                     emailConvidado: usuario.email,
                     status: STATUS_CONVITE_PENDENTE,
-                    dataExpiracao: { gt: now() }
+                    dataExpiracao: { gt: instanteResposta }
                 },
                 data: {
                     contatoId: usuario.id,
-                    status: 'ativo',
+                    status,
                     tokenConviteHash: null,
-                    dataResposta: now()
+                    dataResposta: instanteResposta
                 }
             });
+
             if (atualizado.count !== 1) throw criarErroConviteIndisponivel();
 
             await tx.notificacao.create({
@@ -200,66 +243,63 @@ function criarContactInvitationResponseService({
                     usuarioId: convite.titularId,
                     tipoOrigem: 'rede_apoio',
                     origemId: convite.id,
-                    dataHoraProgramada: now(),
+                    dataHoraProgramada: instanteResposta,
                     statusEnvio: 'agendada'
                 }
             });
 
             return Object.freeze({
-                status: 'ativo',
-                mensagem: 'Convite aceito com sucesso.'
+                status,
+                mensagem: aceitando
+                    ? 'Convite aceito com sucesso.'
+                    : 'Convite recusado com sucesso.'
             });
         });
     }
 
-    async function recusar({ token, usuarioId }) {
-        if (typeof prisma?.$transaction !== 'function') {
-            throw new TypeError('Não foi possível recusar o convite.');
-        }
+    async function aceitar({ token, usuarioId }) {
         const { convite, tokenHash } = await buscarConvitePendente(token);
+        return processarResposta({
+            convite,
+            usuarioId,
+            filtro: { id: convite.id, tokenConviteHash: tokenHash },
+            acao: 'aceitar'
+        });
+    }
 
-        return prisma.$transaction(async (tx) => {
-            const usuario = await buscarUsuarioDoConvite(tx, convite, usuarioId);
-            const atualizado = await tx.vinculoRedeApoio.updateMany({
-                where: {
-                    id: convite.id,
-                    tokenConviteHash: tokenHash,
-                    emailConvidado: usuario.email,
-                    status: STATUS_CONVITE_PENDENTE,
-                    dataExpiracao: { gt: now() }
-                },
-                data: {
-                    contatoId: usuario.id,
-                    status: 'recusado',
-                    tokenConviteHash: null,
-                    dataResposta: now()
-                }
-            });
-            if (atualizado.count !== 1) throw criarErroConviteIndisponivel();
+    async function recusar({ token, usuarioId }) {
+        const { convite, tokenHash } = await buscarConvitePendente(token);
+        return processarResposta({
+            convite,
+            usuarioId,
+            filtro: { id: convite.id, tokenConviteHash: tokenHash },
+            acao: 'recusar'
+        });
+    }
 
-            await tx.notificacao.create({
-                data: {
-                    usuarioId: convite.titularId,
-                    tipoOrigem: 'rede_apoio',
-                    origemId: convite.id,
-                    dataHoraProgramada: now(),
-                    statusEnvio: 'agendada'
-                }
-            });
+    async function responderRecebido({ conviteId, usuarioId, acao }) {
+        if (!['aceitar', 'recusar'].includes(acao)) {
+            throw criarErroConviteIndisponivel();
+        }
 
-            return Object.freeze({
-                status: 'recusado',
-                mensagem: 'Convite recusado com sucesso.'
-            });
+        const convite = await buscarConviteRecebidoPendente(conviteId, usuarioId);
+
+        return processarResposta({
+            convite,
+            usuarioId,
+            filtro: { id: convite.id, contatoId: usuarioId },
+            acao
         });
     }
 
     return Object.freeze({
         aceitar,
         buscarConvitePendente,
+        buscarConviteRecebidoPendente,
         cadastrarContato,
         consultar,
-        recusar
+        recusar,
+        responderRecebido
     });
 }
 

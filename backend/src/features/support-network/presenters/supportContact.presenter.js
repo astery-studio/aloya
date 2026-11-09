@@ -87,6 +87,35 @@ function formatarContato(vinculo, agora = new Date()) {
     });
 }
 
+function formatarContatoRecebido(vinculo, agora = new Date()) {
+    const nome =
+        typeof vinculo?.titular?.nome === 'string' && vinculo.titular.nome.trim().length > 0
+            ? vinculo.titular.nome.trim()
+            : null;
+    const email = typeof vinculo?.titular?.email === 'string' ? vinculo.titular.email.trim() : '';
+    const pendente = vinculo.status === STATUS_CONTATO_PENDENTE;
+
+    return Object.freeze({
+        id: vinculo.id,
+        nome,
+        email,
+        identificacao: nome ?? email,
+        iconeId: vinculo.iconeId,
+        corId: vinculo.corId,
+        status: vinculo.status,
+        statusRotulo: pendente ? 'Pendente' : 'Ativo',
+        vinculo: resolverVinculo(vinculo),
+        dataConvite: vinculo.dataEnvio,
+        dataAtivacao: vinculo.status === STATUS_CONTATO_ATIVO ? vinculo.dataResposta : null,
+        aguardando: criarResumoEspera(vinculo.status, vinculo.dataEnvio, agora),
+        acoes: Object.freeze({
+            podeAceitar: pendente,
+            podeRecusar: pendente,
+            podeAbrirResumo: true
+        })
+    });
+}
+
 function compararContatos(primeiro, segundo) {
     const prioridadePrimeiro = primeiro.status === STATUS_CONTATO_PENDENTE ? 0 : 1;
     const prioridadeSegundo = segundo.status === STATUS_CONTATO_PENDENTE ? 0 : 1;
@@ -108,6 +137,7 @@ export {
     criarResumoEspera,
     compararContatos,
     formatarContato,
+    formatarContatoRecebido,
     ordenarContatos,
     resolverVinculo,
     STATUS_CONTATO_ATIVO,

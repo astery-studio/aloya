@@ -467,6 +467,7 @@ function criarContainer() {
     const supportContactController = criarSupportContactController({
         service: supportContactService,
         resendService: contactInvitationResendService,
+        responseService: contactInvitationResponseService,
         validator: supportContactValidator
     });
     const contactLinkController = criarContactLinkController({

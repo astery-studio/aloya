@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
     criarSupportContactService,
+    validarContatoAutenticado,
     validarTitular
 } from '../../../../src/features/support-network/services/supportContact.service.js';
 
@@ -110,4 +111,60 @@ test('falha de forma controlada com dependência ou retorno inválido', async ()
         service.listar({ titularId: 1, papel: 'principal' }),
         /listagem de contatos.*inválida/i
     );
+});
+
+test('valida o papel antes de listar convites recebidos', () => {
+    assert.doesNotThrow(() => validarContatoAutenticado(8, 'contato_apoio'));
+    assert.doesNotThrow(() => validarContatoAutenticado(8, 'principal_e_contato_apoio'));
+    assert.throws(() => validarContatoAutenticado(8, 'principal'), {
+        status: 403,
+        codigo: 'ACESSO_NEGADO'
+    });
+});
+
+test('lista somente convites recebidos pendentes válidos e vínculos ativos', async () => {
+    const { prisma, estado } = criarPrisma([
+        {
+            id: 7,
+            status: 'pendente',
+            iconeId: 'lotus',
+            corId: 'verde',
+            permissoesIndividuais: ['geral.fase_atual'],
+            dataEnvio: new Date('2026-11-08T10:00:00.000Z'),
+            dataResposta: null,
+            titular: { nome: 'Ana', email: 'ana@example.com' },
+            categoria: null
+        }
+    ]);
+    const service = criarSupportContactService({ prisma, now: () => agora });
+
+    const resultado = await service.listarRecebidos({
+        usuarioId: 44,
+        papel: 'contato_apoio'
+    });
+
+    assert.deepEqual(estado.consulta.where, {
+        contatoId: 44,
+        OR: [{ status: 'ativo' }, { status: 'pendente', dataExpiracao: { gt: agora } }]
+    });
+    assert.deepEqual(resultado.contatos[0], {
+        id: 7,
+        nome: 'Ana',
+        email: 'ana@example.com',
+        identificacao: 'Ana',
+        iconeId: 'lotus',
+        corId: 'verde',
+        status: 'pendente',
+        statusRotulo: 'Pendente',
+        vinculo: {
+            tipo: 'individual',
+            rotulo: 'Permissão individual',
+            categoria: null,
+            permissoes: ['geral.fase_atual']
+        },
+        dataConvite: new Date('2026-11-08T10:00:00.000Z'),
+        dataAtivacao: null,
+        aguardando: { dias: 0, atrasado: false, rotulo: 'Aguardando há 0 dias' },
+        acoes: { podeAceitar: true, podeRecusar: true, podeAbrirResumo: true }
+    });
 });

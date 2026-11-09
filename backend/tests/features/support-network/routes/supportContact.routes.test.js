@@ -24,7 +24,10 @@ test('protege a listagem antes de executar o controller', () => {
     function autenticar() {}
     function exigirAcessoRedeApoio() {}
     function rateLimit() {}
+    function responseRateLimit() {}
     function listar() {}
+    function listarRecebidos() {}
+    function responderRecebido() {}
     function reenviarConvite() {}
 
     const resultado = criarSupportContactRoutes({
@@ -32,12 +35,15 @@ test('protege a listagem antes de executar o controller', () => {
         authMiddleware: { autenticar },
         parentalConsentMiddleware: { exigirAcessoRedeApoio },
         rateLimit,
-        controller: { listar, reenviarConvite }
+        responseRateLimit,
+        controller: { listar, listarRecebidos, responderRecebido, reenviarConvite }
     });
 
     assert.equal(resultado, router);
     assert.deepEqual(chamadas, [
         ['use', autenticar],
+        ['get', '/received-contacts', listarRecebidos],
+        ['post', '/received-contacts/:conviteId/respond', responseRateLimit, responderRecebido],
         ['use', exigirAcessoRedeApoio],
         ['get', '/contacts', listar],
         ['post', '/contacts/:contatoId/resend-invitation', rateLimit, reenviarConvite]
@@ -59,6 +65,7 @@ test('rejeita dependências incompletas sem criar rota parcialmente protegida', 
             authMiddleware: { autenticar() {} },
             parentalConsentMiddleware: { exigirAcessoRedeApoio() {} },
             rateLimit() {},
+            responseRateLimit() {},
             controller: { listar() {} }
         }
     ];

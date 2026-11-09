@@ -1,6 +1,10 @@
-import { papelEhTitular } from '../constants/contactInvitation.constants.js';
+import { PAPEIS_CONTATO, papelEhTitular } from '../constants/contactInvitation.constants.js';
 import { STATUS_CONTATOS_VISIVEIS } from '../constants/supportContact.constants.js';
-import { formatarContato, ordenarContatos } from '../presenters/supportContact.presenter.js';
+import {
+    formatarContato,
+    formatarContatoRecebido,
+    ordenarContatos
+} from '../presenters/supportContact.presenter.js';
 
 function criarErro(mensagem, status, codigo) {
     const erro = new Error(mensagem);
@@ -30,6 +34,20 @@ function criarResumo(contatos) {
         pendentes,
         ativos: contatos.length - pendentes
     });
+}
+
+function validarContatoAutenticado(usuarioId, papel) {
+    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
+        throw criarErro('Sessão inválida.', 401, 'SESSAO_INVALIDA');
+    }
+
+    if (!PAPEIS_CONTATO.includes(papel)) {
+        throw criarErro(
+            'Somente contatos convidados podem visualizar convites recebidos.',
+            403,
+            'ACESSO_NEGADO'
+        );
+    }
 }
 
 function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
@@ -82,7 +100,70 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
         });
     }
 
-    return Object.freeze({ listar });
+    async function listarRecebidos({ usuarioId, papel } = {}) {
+        validarContatoAutenticado(usuarioId, papel);
+
+        if (typeof prisma?.vinculoRedeApoio?.findMany !== 'function' || typeof now !== 'function') {
+            throw new TypeError('Não foi possível consultar os convites recebidos.');
+        }
+
+        const instante = now();
+        const vinculos = await prisma.vinculoRedeApoio.findMany({
+            where: {
+                contatoId: usuarioId,
+                OR: [
+                    { status: 'ativo' },
+                    {
+                        status: 'pendente',
+                        dataExpiracao: { gt: instante }
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                status: true,
+                iconeId: true,
+                corId: true,
+                permissoesIndividuais: true,
+                dataEnvio: true,
+                dataResposta: true,
+                titular: {
+                    select: {
+                        nome: true,
+                        email: true
+                    }
+                },
+                categoria: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        conjuntoDadosVisiveis: true
+                    }
+                }
+            }
+        });
+
+        if (!Array.isArray(vinculos)) {
+            throw new TypeError('A listagem de convites recebidos é inválida.');
+        }
+
+        const contatos = ordenarContatos(
+            vinculos.map((vinculo) => formatarContatoRecebido(vinculo, instante))
+        );
+
+        return Object.freeze({
+            contatos: Object.freeze(contatos),
+            resumo: criarResumo(contatos)
+        });
+    }
+
+    return Object.freeze({ listar, listarRecebidos });
 }
 
-export { criarErro, criarResumo, criarSupportContactService, validarTitular };
+export {
+    criarErro,
+    criarResumo,
+    criarSupportContactService,
+    validarContatoAutenticado,
+    validarTitular
+};

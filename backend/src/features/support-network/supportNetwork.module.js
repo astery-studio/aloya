@@ -84,6 +84,7 @@ function criarSupportNetworkModule({
     const supportContactController = criarSupportContactController({
         service: supportContactService,
         resendService: contactInvitationResendService,
+        responseService: contactInvitationResponseService,
         validator: supportContactValidator
     });
     const contactLinkService = criarContactLinkService({ prisma, now });

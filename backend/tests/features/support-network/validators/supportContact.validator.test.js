@@ -17,3 +17,20 @@ test('rejeita identificadores ambíguos, negativos ou fora do limite seguro', ()
         assert.equal(resultado.erro.mensagem, 'Contato inválido.');
     }
 });
+
+test('aceita somente ações explícitas de resposta ao convite', () => {
+    assert.deepEqual(validator.validarRespostaConvite({ acao: 'aceitar' }), {
+        valido: true,
+        acao: 'aceitar'
+    });
+    assert.deepEqual(validator.validarRespostaConvite({ acao: 'recusar' }), {
+        valido: true,
+        acao: 'recusar'
+    });
+
+    for (const valor of [null, {}, { acao: 'ignorar' }, { acao: 'aceitar', id: 1 }]) {
+        const resultado = validator.validarRespostaConvite(valor);
+        assert.equal(resultado.valido, false);
+        assert.equal(resultado.erro.codigo, 'ACAO_CONVITE_INVALIDA');
+    }
+});
