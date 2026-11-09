@@ -157,7 +157,36 @@ const corpoESintomas = {
                     ]
                 }
             ]
-        }
+        },
+        {
+            id: 'torax_peito',
+            nome: 'Tórax/peito',
+            grupos: [
+                {
+                    id: 'sintomas',
+                    opcoes: [
+                        'Sem alterações',
+                        'Dor',
+                        'Inchaço',
+                        'Sensibilidade',
+                        'Dor nos mamilos',
+                        'Sensibilidade nos mamilos',
+                        'Coceira'
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'temperatura_basal',
+            nome: 'Temperatura basal',
+            tipoValor: 'decimal_escalado',
+            unidade: '°C',
+            casasDecimais: 1,
+            valorMinimo: '32.0',
+            valorMaximo: '42.0',
+            aceitaPerturbacao: true
+        },
+        { id: 'peso', nome: 'Peso', tipoValor: 'decimal_escalado', unidade: 'kg', casasDecimais: 1 }
     ]
 };
 
