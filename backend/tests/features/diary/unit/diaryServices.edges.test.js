@@ -83,4 +83,19 @@ test('detalhe cobre configuração, ausência e apresentação', async () => {
     assert.equal((await service.buscar(1, 1)).id, 1);
 });
 
+function dependenciasEntrada() {
+    const tx = {
+        preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+        preferenciaCategoriaDiario: { findMany: async () => [] },
+        registroDiario: { create: async () => registro() }
+    };
+    return {
+        prisma: { $transaction: async (callback) => callback(tx) },
+        bootstrap: { garantir: async () => {} },
+        phaseService: { resolver: async () => 'lutea' },
+        thermalRecalculation: { recalcularPorDatas: async () => {} },
+        agora: () => data('2026-11-08')
+    };
+}
+
 
