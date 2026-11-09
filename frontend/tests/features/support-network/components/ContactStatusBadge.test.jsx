@@ -91,12 +91,10 @@ describe('ContactStatusBadge', () => {
         );
     });
 
-    test('rejeita um estado desconhecido', () => {
-        expect(() => {
-            ContactStatusBadge({
-                estado: 'desconhecido'
-            });
-        }).toThrow('Estado de ContactStatusBadge inválido: desconhecido');
+    test('rejeita um estado desconhecido', async () => {
+        await expect(render(<ContactStatusBadge estado="desconhecido" />)).rejects.toThrow(
+            'Estado de ContactStatusBadge inválido: desconhecido'
+        );
     });
 
     test('mantém o catálogo de estados fechado', () => {
