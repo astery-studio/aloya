@@ -1,9 +1,18 @@
 // Mostra um painel na parte inferior da tela.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, KeyboardAvoidingView, Modal, Platform } from 'react-native';
+import {
+    Animated,
+    Dimensions,
+    Easing,
+    KeyboardAvoidingView,
+    Modal,
+    PanResponder,
+    Platform
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '../../../hooks/useTheme';
+import { deveFecharPorArraste, deveIniciarArraste } from './bottomSheetGesture';
 import { criarEstilos } from './BottomSheet.style';
 
 function BottomSheet({
@@ -13,7 +22,8 @@ function BottomSheet({
     children,
     bloquearFechamento = false,
     corPainel,
-    estiloPainel
+    estiloPainel,
+    permitirDeslizarParaFechar = false
 }) {
     const tema = useTheme();
     const insets = useSafeAreaInsets();
@@ -23,6 +33,7 @@ function BottomSheet({
     const alturaForaDaTela = useRef(Dimensions.get('screen').height).current;
 
     const progresso = useRef(new Animated.Value(0)).current;
+    const deslocamentoArraste = useRef(new Animated.Value(0)).current;
 
     const [modalMontado, setModalMontado] = useState(visivel);
 
@@ -43,6 +54,7 @@ function BottomSheet({
 
     function animarEntrada() {
         ocultamentoNotificado.current = false;
+        deslocamentoArraste.setValue(0);
         Animated.timing(progresso, {
             toValue: 1,
             duration: 280,
@@ -115,6 +127,33 @@ function BottomSheet({
         }
     }
 
+    const responderArraste = useMemo(
+        () =>
+            PanResponder.create({
+                onMoveShouldSetPanResponder: (_, gesto) =>
+                    permitirDeslizarParaFechar &&
+                    deveIniciarArraste(gesto, bloquearFechamento),
+                onPanResponderMove: (_, gesto) =>
+                    deslocamentoArraste.setValue(Math.max(0, gesto.dy)),
+                onPanResponderRelease: (_, gesto) => {
+                    if (deveFecharPorArraste(gesto)) {
+                        solicitarFechamento();
+                        return;
+                    }
+                    Animated.spring(deslocamentoArraste, {
+                        toValue: 0,
+                        useNativeDriver: true
+                    }).start();
+                },
+                onPanResponderTerminate: () =>
+                    Animated.spring(deslocamentoArraste, {
+                        toValue: 0,
+                        useNativeDriver: true
+                    }).start()
+            }),
+        [bloquearFechamento, deslocamentoArraste, permitirDeslizarParaFechar]
+    );
+
     return (
         <Modal
             visible={modalMontado}
@@ -141,6 +180,8 @@ function BottomSheet({
 
                 <Animated.View
                     testID="bottom-sheet-painel"
+                    onAccessibilityEscape={solicitarFechamento}
+                    {...responderArraste.panHandlers}
                     style={[
                         estilos.painel,
                         {
@@ -151,7 +192,7 @@ function BottomSheet({
                         {
                             transform: [
                                 {
-                                    translateY: posicaoPainel
+                                    translateY: Animated.add(posicaoPainel, deslocamentoArraste)
                                 }
                             ]
                         }
