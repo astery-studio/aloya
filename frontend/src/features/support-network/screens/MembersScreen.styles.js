@@ -1,4 +1,6 @@
+//Define a apresentação e as ações principais da Rede de Apoio.
 import { StyleSheet } from 'react-native';
+
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
@@ -31,6 +33,11 @@ function criarEstilos(tema) {
             fontSize: 16,
             lineHeight: 24,
             includeFontPadding: false
+        },
+
+        acoes: {
+            width: '100%',
+            gap: tema.espacamentos.medio
         }
     });
 }

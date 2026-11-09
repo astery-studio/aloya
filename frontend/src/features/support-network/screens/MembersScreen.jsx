@@ -1,15 +1,17 @@
-//Mostra a área de membros da Rede de Apoio e permite iniciar a criação de categorias.
+//Mostra a área de membros da Rede de Apoio e seus principais pontos de entrada.
 import { useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
-import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { criarEstilos } from './MembersScreen.styles';
 
-function MembersScreen({ onAbrirCategorias, onSelecionarAba }) {
+function MembersScreen({ onAbrirCategorias, onAdicionarContato, onSelecionarAba }) {
     const tema = useTheme();
+
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     return (
         <MainLayout titulo="Membros" abaAtiva="membros" onSelecionarAba={onSelecionarAba}>
             <ScrollView
@@ -18,20 +20,29 @@ function MembersScreen({ onAbrirCategorias, onSelecionarAba }) {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={estilos.apresentacao}>
-                    <Text style={estilos.titulo}>Categorias de membros</Text>
+                    <Text style={estilos.titulo}>Rede de Apoio</Text>
 
                     <Text style={estilos.descricao}>
-                        Crie categorias para definir quais informações cada membro da sua Rede de
-                        Apoio poderá visualizar.
+                        Convide pessoas de confiança e escolha quais informações cada contato poderá
+                        visualizar.
                     </Text>
                 </View>
 
-                <ButtonScreen
-                    texto="Categorias de Permissão"
-                    aoPressionar={onAbrirCategorias}
-                    variante="laranja"
-                    rotuloAcessibilidade="Abrir categorias de permissão"
-                />
+                <View style={estilos.acoes}>
+                    <ButtonScreen
+                        texto="Adicionar novo contato"
+                        aoPressionar={onAdicionarContato}
+                        variante="laranja"
+                        rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
+                    />
+
+                    <ButtonScreen
+                        texto="Categorias de Permissão"
+                        aoPressionar={onAbrirCategorias}
+                        variante="verde"
+                        rotuloAcessibilidade="Abrir categorias de permissão"
+                    />
+                </View>
             </ScrollView>
         </MainLayout>
     );
