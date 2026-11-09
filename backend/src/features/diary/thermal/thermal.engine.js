@@ -1,6 +1,7 @@
 import { CONFIGURACAO_TERMICA_SOMBRA } from './thermal.config.js';
 import { adicionarDias } from './thermal.dates.js';
 import { obterReferencia } from './thermal.reference.js';
+import { encontrarRetorno } from './thermal.return.js';
 import { atingiuLimiar } from './thermal.threshold.js';
 
 function indexarMedicoes(medicoes) {
@@ -39,6 +40,7 @@ function avaliarJanela(medicoes, porData, data, config) {
     return {
         avaliavel: true,
         confirmou,
+        referencia,
         sequencia: confirmou
             ? {
                   dataInicioElevacao: data,
@@ -63,16 +65,27 @@ function detectarPadraoTermico(medicoes, config = CONFIGURACAO_TERMICA_SOMBRA) {
         const janela = avaliarJanela(ordenadas, porData, data, config);
         if (janela.avaliavel) janelasAvaliaveis += 1;
         if (janela.confirmou) {
+            const retorno = encontrarRetorno(
+                porData,
+                janela.sequencia.dataConfirmacao,
+                ultimaData,
+                janela.referencia,
+                config.retornoLinhaBase
+            );
+            janela.sequencia.retornoLinhaBase = retorno;
             sequencias.push(janela.sequencia);
-            break;
+            if (!retorno) break;
+            data = retorno.dataConfirmacao;
         }
     }
 
     const estado =
-        sequencias.length === 1
+        sequencias.length > 1
+            ? 'INCONCLUSIVO'
+            : sequencias.length === 1
             ? 'ELEVACAO_DETECTADA'
             : janelasAvaliaveis > 0
-              ? 'NENHUMA_ELEVACAO_DETECTADA'
+              ? 'NENHUMA_ELEVACAO_IDENTIFICADA'
               : 'DADOS_INSUFICIENTES';
     return {
         algoritmo: config.algoritmo,

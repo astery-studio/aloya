@@ -37,7 +37,7 @@ test('média não inteira rejeita 36,6 e aceita 36,7', () => {
     const rejeitada = detectarPadraoTermico(serie([...referencia, 366, 366, 366]));
     const aceita = detectarPadraoTermico(serie([...referencia, 367, 367, 367]));
 
-    assert.equal(rejeitada.estado, 'NENHUMA_ELEVACAO_DETECTADA');
+    assert.equal(rejeitada.estado, 'NENHUMA_ELEVACAO_IDENTIFICADA');
     assert.equal(aceita.estado, 'ELEVACAO_DETECTADA');
 });
 
@@ -46,7 +46,7 @@ test('A1 e A2 mantêm limiares independentes', () => {
     assert.equal(detectarPadraoTermico(medicoes, config('A1')).estado, 'ELEVACAO_DETECTADA');
     assert.equal(
         detectarPadraoTermico(medicoes, config('A2')).estado,
-        'NENHUMA_ELEVACAO_DETECTADA'
+        'NENHUMA_ELEVACAO_IDENTIFICADA'
     );
 });
 
@@ -54,7 +54,7 @@ test('A4-C compara com a maior das seis temperaturas anteriores', () => {
     const medicoes = serie([360, 361, 362, 363, 364, 365, 366, 366, 366]);
     assert.equal(
         detectarPadraoTermico(medicoes, config('A4-C')).estado,
-        'NENHUMA_ELEVACAO_DETECTADA'
+        'NENHUMA_ELEVACAO_IDENTIFICADA'
     );
 });
 
@@ -94,7 +94,7 @@ test('ausência ou perturbação interrompe a sequência', () => {
 test('distingue janela sem elevação de dados insuficientes', () => {
     assert.equal(
         detectarPadraoTermico(serie([364, 364, 364, 364, 364, 364, 365, 365, 365])).estado,
-        'NENHUMA_ELEVACAO_DETECTADA'
+        'NENHUMA_ELEVACAO_IDENTIFICADA'
     );
     assert.equal(
         detectarPadraoTermico(serie([364, 364, 364, 364, 364, 364, 366, 366])).estado,
@@ -111,15 +111,15 @@ test('subida em degraus sem retorno produz uma única sequência', () => {
     assert.equal(resultado.sequencias.length, 1);
 });
 
-test('não rearma uma segunda linha de base dentro do mesmo ciclo', () => {
+test('registra duas elevações somente quando existe retorno caracterizado', () => {
     const resultado = detectarPadraoTermico(
         serie([
             364, 364, 364, 364, 364, 364, 366, 366, 366, 364, 364, 364, 364, 364, 364, 366, 366, 366
         ])
     );
 
-    assert.equal(resultado.estado, 'ELEVACAO_DETECTADA');
-    assert.equal(resultado.sequencias.length, 1);
+    assert.equal(resultado.estado, 'INCONCLUSIVO');
+    assert.equal(resultado.sequencias.length, 2);
     assert.equal(resultado.sequencias[0].dataInicioElevacao, '2026-01-07');
 });
 
@@ -132,5 +132,5 @@ test('resultado independe da ordem de cadastro e é recalculado do zero', () => 
     );
 
     assert.deepEqual(invertido, ordenado);
-    assert.equal(editado.estado, 'NENHUMA_ELEVACAO_DETECTADA');
+    assert.equal(editado.estado, 'NENHUMA_ELEVACAO_IDENTIFICADA');
 });
