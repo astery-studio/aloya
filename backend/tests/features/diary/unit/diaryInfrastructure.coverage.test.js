@@ -37,4 +37,29 @@ test('bootstrap sincroniza catálogo uma vez e permite tentar novamente após fa
     assert.ok(contagem.macros > 0 && contagem.categorias > 0 && contagem.opcoes > 0);
 });
 
+test('where do histórico cobre todos os filtros, cursor e consulta vazia', () => {
+    assert.deepEqual(
+        criarWhereHistorico(
+            1,
+            { dataInicio: null, dataFim: null, categorias: [], fases: [] },
+            null
+        ),
+        { usuarioId: 1 }
+    );
+    const where = criarWhereHistorico(
+        1,
+        {
+            dataInicio: '2026-11-01',
+            dataFim: '2026-11-08',
+            categorias: ['peso'],
+            fases: ['lutea']
+        },
+        { data: '2026-11-07', id: 8 }
+    );
+    assert.equal(where.AND.length, 4);
+    assert.equal(where.AND[0].dataRegistro.gte.valueOf(), data('2026-11-01').valueOf());
+    assert.equal(where.AND[0].dataRegistro.lt.valueOf(), data('2026-11-09').valueOf());
+    assert.deepEqual(where.AND[1].categorias.some.categoriaId.in, ['peso']);
+});
+
 
