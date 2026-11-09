@@ -122,4 +122,67 @@ test('apresenta valores ausentes e ordenação desconhecida', () => {
     });
 });
 
+test('resumo cobre decimal, duração, ausência de valor e desempates', () => {
+    const opcao = [...OPCOES_POR_ID.values()].find(
+        (item) => item.categoriaId === 'sintomas_fisicos'
+    );
+    const base = {
+        id: 1,
+        dataRegistro: instante,
+        faseCicloAssociada: null,
+        versao: 0,
+        atualizadoEm: instante
+    };
+    const resumo = apresentarResumoRegistro(
+        {
+            ...base,
+            categorias: [
+                categoria({
+                    categoriaId: 'peso',
+                    categoriaNome: 'Peso',
+                    valorEscalado: 605,
+                    casasDecimais: 1
+                }),
+                categoria({
+                    categoriaId: 'tempo_sono',
+                    categoriaNome: 'Sono',
+                    valorDuracaoMinutos: 450
+                }),
+                categoria({
+                    categoriaId: 'sintomas_fisicos',
+                    categoriaNome: 'Sintomas',
+                    opcoes: [{ opcaoId: opcao.id, opcaoNome: opcao.nome }]
+                }),
+                categoria({ categoriaId: 'anotacao_livre', valorTexto: '' }),
+                categoria({ categoriaId: 'peso', categoriaNome: 'Peso vazio' }),
+                categoria({ categoriaId: 'desconhecida' })
+            ]
+        },
+        new Set(['peso', 'tempo_sono', 'sintomas_fisicos', 'anotacao_livre', 'desconhecida'])
+    );
+    assert.equal(resumo.principais.length, 3);
+    assert.equal(resumo.maisQuantidade, 0);
+    assert.equal(resumo.trechoAnotacao, null);
 
+    const opcoes = [...OPCOES_POR_ID.values()]
+        .filter((item) => item.categoriaId === 'sintomas_fisicos')
+        .slice(0, 2);
+    const somenteOpcoes = apresentarResumoRegistro(
+        {
+            ...base,
+            categorias: [
+                categoria({
+                    categoriaId: 'sintomas_fisicos',
+                    categoriaNome: 'Sintomas',
+                    opcoes: [
+                        ...opcoes.map((item) => ({ opcaoId: item.id, opcaoNome: item.nome })),
+                        { opcaoId: 'inexistente', opcaoNome: 'Outro' }
+                    ]
+                }),
+                categoria({ categoriaId: 'peso' })
+            ]
+        },
+        new Set(['sintomas_fisicos', 'peso'])
+    );
+    assert.equal(somenteOpcoes.principais.length, 3);
+});
