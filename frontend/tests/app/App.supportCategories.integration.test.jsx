@@ -114,13 +114,24 @@ jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactF
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        ContactFormScreen: ({ service, categoriasService, onVoltar, onSalvo, onCriarCategoria }) =>
+        ContactFormScreen: ({
+            dadosIniciais,
+            emailUsuario,
+            service,
+            categoriasService,
+            onVoltar,
+            onSalvo,
+            onCriarCategoria,
+            onRascunhoAlterado
+        }) =>
             React.createElement(
                 View,
                 {
                     testID: 'formulario-novo-contato'
                 },
                 React.createElement(Text, null, 'Novo contato'),
+                React.createElement(Text, null, `Rascunho: ${dadosIniciais?.email ?? 'vazio'}`),
+                React.createElement(Text, null, `Titular: ${emailUsuario ?? 'sem e-mail'}`),
                 React.createElement(
                     Text,
                     null,
@@ -132,6 +143,22 @@ jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactF
                     categoriasService?.listarCategorias
                         ? 'Categorias conectadas'
                         : 'Categorias ausentes'
+                ),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Preencher rascunho do contato',
+                        onPress: () =>
+                            onRascunhoAlterado?.({
+                                email: 'rascunho@example.com',
+                                iconeId: 'lotus',
+                                corId: 'verde',
+                                categoriaId: 1,
+                                permissoesIndividuais: []
+                            })
+                    },
+                    React.createElement(Text, null, 'Preencher')
                 ),
                 React.createElement(
                     Pressable,
@@ -268,7 +295,8 @@ function criarServicos() {
         authService: {},
         accountService: {
             buscarPerfil: jest.fn().mockResolvedValue({
-                nome: 'Usuária'
+                nome: 'Usuária',
+                email: 'titular@example.com'
             })
         },
         themePreferenceService: {
@@ -473,6 +501,14 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
+                name: 'Preencher rascunho do contato'
+            })
+        );
+
+        expect(screen.getByText('Rascunho: rascunho@example.com')).toBeOnTheScreen();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
                 name: 'Criar categoria pelo contato'
             })
         );
@@ -488,5 +524,6 @@ describe('fluxos da Rede de Apoio no App', () => {
         expect(await screen.findByText('Novo contato')).toBeOnTheScreen();
 
         expect(screen.getByText('Categorias conectadas')).toBeOnTheScreen();
+        expect(screen.getByText('Rascunho: rascunho@example.com')).toBeOnTheScreen();
     });
 });

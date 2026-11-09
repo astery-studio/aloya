@@ -2,14 +2,7 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    BackHandler,
-    Linking,
-    NativeModules,
-    Text
-} from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
@@ -31,6 +24,7 @@ import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettin
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
+import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
@@ -46,6 +40,7 @@ import { fontFamilies } from './shared/theme';
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     membros: 'membros',
+    novoContato: 'novoContato',
     categoriasPermissao: 'categoriasPermissao',
     ciclos: 'ciclos',
     perfil: 'perfil',
@@ -63,6 +58,7 @@ function obterBaseUrl() {
     if (process.env.EXPO_PUBLIC_API_URL) {
         return process.env.EXPO_PUBLIC_API_URL;
     }
+
     const script = NativeModules.SourceCode?.scriptURL || '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
@@ -174,8 +170,12 @@ export default function App() {
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
+
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
+
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
+
+    const [rascunhoNovoContato, setRascunhoNovoContato] = useState(null);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -348,10 +348,18 @@ export default function App() {
 
     useEffect(() => {
         const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (estadoSessao !== 'anonima') return false;
+            if (estadoSessao !== 'anonima') {
+                return false;
+            }
+
             const destino = obterDestinoDeRetorno(telaPublica);
-            if (!destino) return false;
+
+            if (!destino) {
+                return false;
+            }
+
             setTelaPublica(destino);
+
             return true;
         });
 
@@ -392,6 +400,7 @@ export default function App() {
 
     function concluirCadastro() {
         concluirAutenticacao();
+
         setTelaInterna(telasInternas.inicio);
     }
 
@@ -409,6 +418,7 @@ export default function App() {
         setTelaInterna(telasInternas.configuracoes);
 
         setOrigemNovaCategoria(telasInternas.membros);
+        setRascunhoNovoContato(null);
 
         setTelaPublica('login');
 
@@ -451,6 +461,7 @@ export default function App() {
                 finalizarSessao({
                     mensagem: 'Sua sessão expirou. Entre novamente.'
                 });
+
                 return;
             }
 
@@ -464,6 +475,7 @@ export default function App() {
 
     function abrirNovaCategoria(origem) {
         setOrigemNovaCategoria(origem);
+
         setTelaInterna(telasInternas.novaCategoria);
     }
 
@@ -473,6 +485,7 @@ export default function App() {
 
     function abrirParametrosCiclo(origem) {
         setRetornoParametros(origem);
+
         setTelaInterna(telasInternas.parametrosCiclo);
     }
 
@@ -595,6 +608,7 @@ export default function App() {
                     }}
                     aoEditarCiclo={abrirEdicaoPeloCalendario}
                 />
+
                 {cicloCalendarioEditado ? (
                     <CycleEditFlow
                         key={cicloCalendarioEditado.id}
@@ -611,8 +625,31 @@ export default function App() {
         conteudo = (
             <MembersScreen
                 onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
-                onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
+                onAdicionarContato={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.novoContato);
+                }}
                 onSelecionarAba={selecionarAba}
+            />
+        );
+    } else if (telaInterna === telasInternas.novoContato) {
+        conteudo = (
+            <ContactFormScreen
+                dadosIniciais={rascunhoNovoContato}
+                emailUsuario={perfil?.email}
+                service={configuracao.servicos.contactInvitationService}
+                categoriasService={configuracao.servicos.supportCategoryService}
+                onRascunhoAlterado={setRascunhoNovoContato}
+                onVoltar={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onSalvo={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.novoContato)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.categoriasPermissao) {
