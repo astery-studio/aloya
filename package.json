@@ -13,7 +13,7 @@
     "format": "npm --prefix backend run format && npm --prefix frontend run format",
     "format:check": "npm --prefix backend run format:check:ci && npm --prefix frontend run format:check:ci",
     "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
-    "precommit": "npm run format:check && npm run lint",
+    "precommit": "lint-staged",
     "prepush": "npm test",
     "preview:hu013": "cd frontend && npm run preview:hu013",
     "quality": "npm run format:check && npm run lint && npm test",
@@ -23,8 +23,27 @@
     "tunnel": "cd \"$env:USERPROFILE\\Downloads\" && .\\cloudflared.exe tunnel --url http://localhost:3000",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "backend/**/*.{js,mjs,cjs}": [
+      "npm --prefix backend exec -- eslint --fix --max-warnings=0",
+      "npm --prefix backend exec -- prettier --write"
+    ],
+    "frontend/src/**/*.{js,jsx}": [
+      "npm --prefix frontend exec -- eslint --fix --max-warnings=0",
+      "npm --prefix frontend exec -- prettier --write"
+    ],
+    "frontend/tests/**/*.{js,jsx}": [
+      "npm --prefix frontend exec -- eslint --fix --max-warnings=0",
+      "npm --prefix frontend exec -- prettier --write"
+    ],
+    "**/*.{json,md}": "npm --prefix backend exec -- prettier --write",
+    ".prettierrc.json": "npm --prefix backend exec -- prettier --write",
+    "frontend/{app.config.js,app.config.test.cjs,eslint.config.js}": "npm --prefix backend exec -- prettier --write",
+    ".github/**/*.{yml,yaml}": "npm --prefix backend exec -- prettier --write"
+  },
   "devDependencies": {
     "concurrently": "^10.0.6",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0"
   }
 }
