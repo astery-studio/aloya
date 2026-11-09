@@ -43,6 +43,7 @@ function criarCenario() {
         thermalRecalculation: {
             recalcularPorDatas: async (...argumentos) => chamadasTermicas.push(argumentos)
         },
+        tx,
         chamadas,
         chamadasTermicas
     };
@@ -81,4 +82,23 @@ test('compara data futura no fuso informado', async () => {
         codigo: 'DATA_REGISTRO_FUTURA'
     });
     assert.deepEqual(cenario.chamadas, []);
+});
+
+test('falha térmica impede a conclusão da transação de criação', async () => {
+    const cenario = criarCenario();
+    let concluida = false;
+    cenario.prisma.$transaction = async (operacao) => {
+        const resultado = await operacao(cenario.tx);
+        concluida = true;
+        return resultado;
+    };
+    cenario.thermalRecalculation.recalcularPorDatas = async () => {
+        throw new Error('falha térmica');
+    };
+    const service = criarDiaryEntryService({
+        ...cenario,
+        agora: () => new Date('2026-11-08T12:00:00Z')
+    });
+    await assert.rejects(() => service.criar(7, dados('2026-11-08')), /falha térmica/);
+    assert.equal(concluida, false);
 });
