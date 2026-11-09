@@ -169,4 +169,11 @@ test('controller de mutação responde e encaminha falhas', async () => {
     assert.equal(erros.length, 2);
 });
 
-
+test('controllers rejeitam configuração e identificadores inválidos', () => {
+    assert.throws(() => criarDiaryEntryController(), TypeError);
+    assert.throws(() => criarDiaryCatalogController(), TypeError);
+    for (const valor of ['x', '0', '9007199254740992']) {
+        assert.throws(() => validarId(valor), { codigo: 'REGISTRO_DIARIO_NAO_ENCONTRADO' });
+    }
+    assert.equal(validarId('42'), 42);
+});
