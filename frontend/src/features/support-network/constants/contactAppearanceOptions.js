@@ -48,7 +48,7 @@ const OPCOES_COR_CONTATO = Object.freeze([
     Object.freeze({
         id: 'branco',
         rotulo: 'Branco',
-        cor: '#FFFFFF',
+        cor: COR_ICONE_NAO_SELECIONADO,
         fundo: '#FFFFFF',
         borda: '#E6E2D8'
     }),
