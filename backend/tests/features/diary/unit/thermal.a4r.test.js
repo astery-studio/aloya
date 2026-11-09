@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { detectarA4R } from '../../../../src/features/diary/thermal/thermal.a4r.js';
-import { CONFIGURACOES_TERMICAS_RETROSPECTIVAS } from '../../../../src/features/diary/thermal/thermal.config.js';
+import {
+    CONFIGURACOES_TERMICAS_CAUSAIS,
+    CONFIGURACOES_TERMICAS_RETROSPECTIVAS
+} from '../../../../src/features/diary/thermal/thermal.config.js';
+import { detectarPadraoTermico } from '../../../../src/features/diary/thermal/thermal.engine.js';
 
 const config = CONFIGURACOES_TERMICAS_RETROSPECTIVAS.find(({ variante }) => variante === 'A4-R');
 const serie = (valores) =>
@@ -38,4 +42,17 @@ test('A4-R tolera uma ausência nas seis posições de referência', () => {
         dataFimCiclo: '2026-01-19'
     });
     assert.equal(resultado.estado, 'ELEVACAO_DETECTADA');
+});
+
+test('classificação retrospectiva pode divergir da detecção causal', () => {
+    const medicoes = serie(Array(6).fill(364).concat([366, 366, 366], Array(21).fill(364)));
+    const causal = CONFIGURACOES_TERMICAS_CAUSAIS.find(
+        ({ variante, disponibilidade }) => variante === 'A4-C' && disponibilidade === 'B1'
+    );
+    const retrospectiva = detectarA4R(medicoes, config, {
+        cicloConcluido: true,
+        dataFimCiclo: '2026-01-30'
+    });
+    assert.equal(detectarPadraoTermico(medicoes, causal).estado, 'ELEVACAO_DETECTADA');
+    assert.equal(retrospectiva.estado, 'NENHUMA_ELEVACAO_IDENTIFICADA');
 });
