@@ -32,6 +32,12 @@ const MIGRACAO_NOMES = fileURLToPath(
         import.meta.url
     )
 );
+const MIGRACAO_APARENCIA_CONTATO = fileURLToPath(
+    new URL(
+        '../../../../prisma/migrations/20261108020000_adicionar_aparencia_contato/migration.sql',
+        import.meta.url
+    )
+);
 
 function criarBanco() {
     const diretorio = mkdtempSync(join(tmpdir(), 'aloya-vinculo-'));
@@ -40,6 +46,7 @@ function criarBanco() {
     banco.exec('PRAGMA foreign_keys = ON');
     banco.exec(readFileSync(MIGRACAO_INICIAL, 'utf8'));
     banco.exec(readFileSync(MIGRACAO_NOMES, 'utf8'));
+    banco.exec(readFileSync(MIGRACAO_APARENCIA_CONTATO, 'utf8'));
     banco.exec(`
         INSERT INTO usuarios (id, nome, data_nascimento, email, senha_hash, papel, status_conta, criado_em, atualizado_em)
         VALUES
