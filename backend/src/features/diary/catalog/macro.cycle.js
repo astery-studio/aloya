@@ -47,6 +47,49 @@ const cicloESangramento = {
                     ]
                 }
             ]
+        },
+        {
+            id: 'secrecao_corrimento',
+            nome: 'Secreção/corrimento',
+            grupos: [
+                { id: 'presenca', opcoes: ['Nenhuma', 'Pouca', 'Moderada', 'Abundante'] },
+                {
+                    id: 'consistencia',
+                    opcoes: [
+                        'Aquosa',
+                        'Elástica',
+                        'Viscosa',
+                        'Pastosa',
+                        'Cremosa',
+                        'Grumosa',
+                        'Clara de ovo (elástica e transparente)'
+                    ]
+                },
+                {
+                    id: 'cor',
+                    opcoes: [
+                        'Transparente',
+                        'Branca',
+                        'Cinza',
+                        'Branco-amarelada',
+                        'Amarelada',
+                        'Rosada',
+                        'Marrom',
+                        'Esverdeada'
+                    ]
+                },
+                {
+                    id: 'caracteristicas',
+                    opcoes: [
+                        'Sem odor',
+                        'Odor diferente do habitual',
+                        'Odor forte',
+                        'Aspecto espumoso',
+                        'Presença de sangue',
+                        'Pequenos grumos'
+                    ]
+                }
+            ]
         }
     ]
 };
