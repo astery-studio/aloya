@@ -18,4 +18,15 @@ function traduzirErroMutacao(erro) {
     return erro;
 }
 
-export { traduzirErroMutacao };
+function validarDependenciasEdicao({ prisma, bootstrap, phaseService, thermalRecalculation }) {
+    if (
+        typeof prisma?.$transaction !== 'function' ||
+        !bootstrap?.garantir ||
+        !phaseService?.resolver ||
+        !thermalRecalculation?.recalcularPorDatas
+    ) {
+        throw new TypeError('Não foi possível configurar a edição do Diário.');
+    }
+}
+
+export { traduzirErroMutacao, validarDependenciasEdicao };
