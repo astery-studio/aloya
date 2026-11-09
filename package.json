@@ -10,11 +10,11 @@
     "backend:start": "cd backend && npm run start:prepared",
     "frontend": "npm --prefix frontend start -- --clear",
     "frontend:dev-client": "npm --prefix frontend run start:dev-client -- --clear",
-    "format": "npm --prefix backend run format && npm --prefix frontend run format",
-    "format:check": "npm --prefix backend run format:check:ci && npm --prefix frontend run format:check:ci",
-    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "format": "npm --prefix backend run format && npm --prefix frontend run format && npm --prefix backend exec -- prettier --write \"scripts/**/*.mjs\"",
+    "format:check": "npm --prefix backend run format:check:ci && npm --prefix frontend run format:check:ci && npm --prefix backend exec -- prettier --check \"scripts/**/*.mjs\"",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint && npm --prefix backend exec -- eslint --config backend/eslint.config.js scripts --max-warnings=0",
     "precommit": "lint-staged",
-    "prepush": "npm test",
+    "prepush": "node scripts/run-affected-tests.mjs",
     "preview:hu013": "cd frontend && npm run preview:hu013",
     "quality": "npm run format:check && npm run lint && npm test",
     "test:backend": "cd backend && npm test",
@@ -35,6 +35,10 @@
     "frontend/tests/**/*.{js,jsx}": [
       "npm --prefix frontend exec -- eslint --fix --max-warnings=0",
       "npm --prefix frontend exec -- prettier --write"
+    ],
+    "scripts/**/*.{js,mjs,cjs}": [
+      "npm --prefix backend exec -- eslint --config backend/eslint.config.js --max-warnings=0",
+      "npm --prefix backend exec -- prettier --write"
     ],
     "**/*.{json,md}": "npm --prefix backend exec -- prettier --write",
     ".prettierrc.json": "npm --prefix backend exec -- prettier --write",
