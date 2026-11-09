@@ -226,4 +226,44 @@ function dependenciasPreferencias() {
     };
 }
 
+test('preferências cobrem configuração e operações individuais', async () => {
+    assert.throws(() => criarDiaryPreferencesService(), TypeError);
+    const deps = dependenciasPreferencias();
+    const service = criarDiaryPreferencesService(deps);
+    await assert.rejects(() => service.atualizar({ usuarioId: 0 }), { codigo: 'SESSAO_INVALIDA' });
+    await assert.rejects(
+        () => service.atualizar({ usuarioId: 1, tipo: 'x', id: 'x', ativa: true, versao: 0 }),
+        TypeError
+    );
+    await assert.rejects(
+        () =>
+            service.atualizar({ usuarioId: 1, tipo: 'categoria', id: 'x', ativa: true, versao: 0 }),
+        { codigo: 'ITEM_CATALOGO_NAO_ENCONTRADO' }
+    );
+    assert.equal(
+        (
+            await service.atualizar({
+                usuarioId: 1,
+                tipo: 'categoria',
+                id: 'peso',
+                ativa: false,
+                versao: 0
+            })
+        ).versao,
+        1
+    );
+    assert.equal(
+        (
+            await service.atualizar({
+                usuarioId: 1,
+                tipo: 'macrocategoria',
+                id: 'energia_sono',
+                ativa: true,
+                versao: 1
+            })
+        ).versao,
+        2
+    );
+});
+
 
