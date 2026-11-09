@@ -10,7 +10,7 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const corAtiva = tema.cores.interface.destaque;
+    const corAtiva = tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque;
 
     const corInativa = tema.cores.interface.textoSecundario;
 

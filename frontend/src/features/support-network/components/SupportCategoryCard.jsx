@@ -84,7 +84,7 @@ function SupportCategoryCard({
                 >
                     <UserCheckIcon
                         size={18}
-                        color={tema.cores.interface.destaque}
+                        color={tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque}
                         weight="regular"
                     />
                 </View>
@@ -128,6 +128,7 @@ function SupportCategoryCard({
                     ) : (
                         <IconButton
                             icone={PencilSimpleIcon}
+                            corIcone={tema.escuro ? '#999999' : undefined}
                             aoPressionar={editar}
                             rotuloAcessibilidade={`Editar categoria ${nome}`}
                             desativado={edicaoDesabilitada}
@@ -145,6 +146,7 @@ function SupportCategoryCard({
                     ) : (
                         <IconButton
                             icone={TrashIcon}
+                            corIcone={tema.escuro ? '#999999' : undefined}
                             aoPressionar={excluir}
                             rotuloAcessibilidade={`Excluir categoria ${nome}`}
                             variante="perigo"

@@ -12,7 +12,8 @@ function BottomSheetLayout({
     bloquearFechamento = false,
     compacto = false,
     corFundo,
-    children
+    children,
+    estiloTitulo
 }) {
     const tema = useTheme();
 
@@ -39,7 +40,7 @@ function BottomSheetLayout({
             >
                 <Text
                     accessibilityRole="header"
-                    style={[estilos.titulo, compacto && estilos.tituloCompacto]}
+                    style={[estilos.titulo, compacto && estilos.tituloCompacto, estiloTitulo]}
                 >
                     {titulo}
                 </Text>

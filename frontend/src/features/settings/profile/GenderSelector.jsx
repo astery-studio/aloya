@@ -11,11 +11,24 @@ const opcoesIdentidadeGenero = Object.freeze([
     Object.freeze({ id: 'Outro', label: 'Outro' })
 ]);
 
-function GenderSelector({ visivel, valorSelecionado, onSelecionar, onFechar }) {
+function GenderSelector({
+    visivel,
+    valorSelecionado,
+    onSelecionar,
+    onFechar,
+    corFundo,
+    estiloPainel,
+    estiloOpcaoSelecionada,
+    estiloTextoOpcaoSelecionada
+}) {
     return (
         <SelectionSheet
             visivel={visivel}
             titulo="Identidade de Gênero"
+            corFundo={corFundo}
+            estiloPainel={estiloPainel}
+            estiloOpcaoSelecionada={estiloOpcaoSelecionada}
+            estiloTextoOpcaoSelecionada={estiloTextoOpcaoSelecionada}
             opcoes={opcoesIdentidadeGenero}
             valorSelecionado={valorSelecionado}
             onSelecionar={onSelecionar}

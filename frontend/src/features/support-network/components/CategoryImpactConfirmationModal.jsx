@@ -46,6 +46,7 @@ function CategoryImpactConfirmationModal({
 
     return (
         <SimpleModal
+            varianteVisual="sairDaConta"
             visivel={Boolean(visivel)}
             aoFechar={carregando ? ignorarAcao : cancelar}
             icone={WarningCircleIcon}

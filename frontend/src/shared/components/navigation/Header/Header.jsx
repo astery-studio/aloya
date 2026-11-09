@@ -5,7 +5,7 @@ import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './Header.style';
 
-function Header({ titulo, variante = 'padrao', onVoltar }) {
+function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -15,7 +15,14 @@ function Header({ titulo, variante = 'padrao', onVoltar }) {
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
     return (
-        <View testID="header-container" style={estilos.container}>
+        <View
+            testID="header-container"
+            style={[
+                estilos.container,
+                temVoltar && estilos.containerComVoltar,
+                corFundo ? { backgroundColor: corFundo } : null
+            ]}
+        >
             <View
                 style={[
                     estilos.espacamentoSuperior,

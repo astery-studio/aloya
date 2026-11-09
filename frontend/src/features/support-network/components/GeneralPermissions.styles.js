@@ -5,6 +5,7 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        cartao: tema.escuro ? { backgroundColor: '#1E1E1E' } : {},
         container: {
             width: '100%',
             alignSelf: 'stretch'

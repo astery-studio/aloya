@@ -21,7 +21,7 @@ const configuracoesNivel = Object.freeze({
 
 const variantesPermitidas = Object.freeze(['simples', 'composta']);
 
-function ConfidenceBadge({ nivel, variante = 'simples' }) {
+function ConfidenceBadge({ nivel, variante = 'simples', coresPersonalizadas, estilo }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
     const configuracao = configuracoesNivel[nivel];
@@ -35,7 +35,7 @@ function ConfidenceBadge({ nivel, variante = 'simples' }) {
     }
 
     const { rotulo } = configuracao;
-    const visual = variantes[nivel];
+    const visual = coresPersonalizadas || variantes[nivel];
     const ehComposta = variante === 'composta';
 
     return (
@@ -49,7 +49,8 @@ function ConfidenceBadge({ nivel, variante = 'simples' }) {
                 {
                     backgroundColor: visual.fundo,
                     borderColor: visual.borda
-                }
+                },
+                estilo
             ]}
         >
             {ehComposta ? (

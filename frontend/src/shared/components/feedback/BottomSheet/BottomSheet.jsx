@@ -12,7 +12,8 @@ function BottomSheet({
     onOcultar,
     children,
     bloquearFechamento = false,
-    corPainel
+    corPainel,
+    estiloPainel
 }) {
     const tema = useTheme();
     const insets = useSafeAreaInsets();
@@ -146,6 +147,7 @@ function BottomSheet({
                             paddingBottom: Math.max(tema.espacamentos.grande, insets.bottom)
                         },
                         corPainel ? { backgroundColor: corPainel } : null,
+                        estiloPainel,
                         {
                             transform: [
                                 {

@@ -9,6 +9,8 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.fundo
         },
 
+        containerComVoltar: tema.escuro ? { backgroundColor: '#121212' } : {},
+
         espacamentoSuperior: {
             height: 56
         },

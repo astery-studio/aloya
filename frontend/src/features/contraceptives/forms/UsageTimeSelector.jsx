@@ -11,7 +11,15 @@ import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { SelectorField } from './SelectorField';
 import { criarEstilos } from './contraceptiveForms.styles';
 
-function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConfirmar, onFechar }) {
+function UsageTimeSelector({
+    aparenciaCadastro = false,
+    horarios,
+    permiteMultiplos,
+    aberto,
+    onAbrir,
+    onConfirmar,
+    onFechar
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [temporarios, setTemporarios] = useState(horarios.length ? horarios : ['']);
@@ -48,18 +56,23 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
     return (
         <>
             <SelectorField
+                aparenciaCadastro={aparenciaCadastro}
                 label="Horário"
                 valor={resumo}
                 placeholder="Defina o horário"
                 onPress={onAbrir}
                 navegar
                 icone={Clock}
+                coresNoturnas={{ icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }}
                 corIcone="#2C4C3B"
                 fundoIcone="#EEF4F0"
             />
             <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
-                <SafeAreaView style={estilos.telaFluxo} edges={['top', 'left', 'right', 'bottom']}
-                    testID="horarios-anticoncepcional-area-segura">
+                <SafeAreaView
+                    style={estilos.telaFluxo}
+                    edges={['top', 'left', 'right', 'bottom']}
+                    testID="horarios-anticoncepcional-area-segura"
+                >
                     <Header titulo="Horários de Uso" variante="comVoltar" onVoltar={onFechar} />
                     <View style={estilos.conteudoFluxo}>
                         <Text style={estilos.descricaoFluxo}>
@@ -96,6 +109,8 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
                             {permiteMultiplos ? (
                                 <ButtonDashed
                                     texto="Adicionar horário"
+                                    estilo={estilos.adicionarHorario}
+                                    estiloTexto={estilos.textoAdicionarHorario}
                                     aoPressionar={() => setTemporarios((atuais) => [...atuais, ''])}
                                 />
                             ) : null}

@@ -81,7 +81,7 @@ export default function MenstruationCalendar({ valor, aoAlterar }) {
                     style={estilos.navegacao}
                     onPress={() => moverMes(-1)}
                 >
-                    <CaretLeft size={20} color={tema.cores.interface.textoPrincipal} />
+                    <CaretLeft size={20} color={tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal} />
                 </Pressable>
                 <Pressable
                     accessibilityRole="button"
@@ -99,7 +99,7 @@ export default function MenstruationCalendar({ valor, aoAlterar }) {
                     </Text>
                     <CaretDown
                         size={16}
-                        color={tema.cores.interface.textoSecundario}
+                        color={tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoSecundario}
                         style={listaAberta && estilos.setaAberta}
                     />
                 </Pressable>
@@ -109,7 +109,7 @@ export default function MenstruationCalendar({ valor, aoAlterar }) {
                     style={estilos.navegacao}
                     onPress={() => moverMes(1)}
                 >
-                    <CaretRight size={20} color={tema.cores.interface.textoPrincipal} />
+                    <CaretRight size={20} color={tema.escuro ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal} />
                 </Pressable>
             </View>
             {listaAberta ? (

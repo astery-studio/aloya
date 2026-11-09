@@ -10,7 +10,7 @@ function criarEstilos(tema) {
             gap: tema.espacamentos.extraGrande,
             paddingHorizontal: tema.espacamentos.grande,
             paddingBottom: tema.espacamentos.extraGrande,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },
 
         secao: {
@@ -26,12 +26,21 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        campo: tema.escuro ? { backgroundColor: '#1E1E1E' } : {},
+        campoComBorda: tema.escuro
+            ? {
+                  backgroundColor: '#1E1E1E',
+                  borderRadius: 12,
+                  borderWidth: tema.escuro ? 0.705 : 0.705,
+                  borderColor: '#2C2C2C'
+              }
+            : {},
         grupo: {
             width: '100%',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput
         },
 

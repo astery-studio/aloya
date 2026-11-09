@@ -13,7 +13,7 @@ function criarEstilos(tema) {
             backgroundColor: tema.escuro ? '#4A3737' : '#F5EDE3'
         },
         fundoErro: {
-            backgroundColor: tema.escuro ? '#343434' : '#EDEDED'
+            backgroundColor: tema.escuro ? 'transparent' : '#EDEDED'
         }
     });
 }

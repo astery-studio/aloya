@@ -58,12 +58,25 @@ function SectionLabel({ titulo, primeira, estilosAcompanhamento }) {
 
 // O modal compartilhado permanece intacto; apenas o ícone desta tela é composto.
 function IconeErro() {
+    const tema = useTheme();
     return (
         <Svg width={48} height={48} viewBox="0 0 48 48">
-            <Rect width="48" height="48" rx="14" fill="#EEEEEE" />
-            <Circle cx="24" cy="24" r="9" fill="none" stroke="#5C5C59" strokeWidth="1.5" />
-            <Path d="M24 19.5v6" stroke="#C85A44" strokeWidth="2" strokeLinecap="round" />
-            <Circle cx="24" cy="30" r="0.8" fill="#C85A44" />
+            <Rect width="48" height="48" rx="14" fill={tema.escuro ? 'transparent' : '#EEEEEE'} />
+            <Circle
+                cx="24"
+                cy="24"
+                r="9"
+                fill="none"
+                stroke={tema.escuro ? '#EF9A9A' : '#5C5C59'}
+                strokeWidth="1.5"
+            />
+            <Path
+                d="M24 19.5v6"
+                stroke={tema.escuro ? '#EF9A9A' : '#C85A44'}
+                strokeWidth="2"
+                strokeLinecap="round"
+            />
+            <Circle cx="24" cy="30" r="0.8" fill={tema.escuro ? '#EF9A9A' : '#C85A44'} />
         </Svg>
     );
 }
@@ -240,6 +253,7 @@ function ContraceptiveTrackingScreen({
             ) : null}
 
             <SimpleModal
+                erroInterno
                 visivel={Boolean(erro)}
                 aoFechar={aoVoltar}
                 icone={IconeErro}
@@ -256,6 +270,7 @@ function ContraceptiveTrackingScreen({
             />
 
             <SimpleModal
+                erroInterno
                 visivel={Boolean(erroUso)}
                 aoFechar={aoDispensarErroUso}
                 icone={IconeErro}

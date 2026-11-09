@@ -3,13 +3,14 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
-function criarEstilos(tema) {
+function criarEstilos(tema, aparenciaNovaCategoria = false) {
     return StyleSheet.create({
         container: {
             width: '100%',
             alignSelf: 'stretch',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor:
+                tema.escuro && aparenciaNovaCategoria ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1.41,
             borderColor: tema.cores.interface.borda,
             borderRadius: 14
@@ -22,7 +23,8 @@ function criarEstilos(tema) {
             alignItems: 'center',
             paddingHorizontal: 14,
             gap: 10,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor:
+                tema.escuro && aparenciaNovaCategoria ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
         areaExpansao: {
@@ -73,6 +75,7 @@ function criarEstilos(tema) {
 
         lista: {
             width: '100%',
+            ...(tema.escuro && aparenciaNovaCategoria ? { backgroundColor: '#1A1A1A' } : {}),
             borderTopWidth: 0.7
         },
 

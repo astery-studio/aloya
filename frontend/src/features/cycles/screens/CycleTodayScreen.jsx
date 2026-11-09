@@ -141,6 +141,7 @@ function CycleTodayScreen({
                 <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
             </SafeAreaView>
             <SimpleModal
+                erroInterno
                 visivel={!carregando && Boolean(tipoErro)}
                 aoFechar={aoVoltar}
                 icone={WarningCircleIcon}

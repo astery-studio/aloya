@@ -50,9 +50,13 @@ async function iniciarPressao(elemento) {
     return { evento };
 }
 
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => {
+    jest.restoreAllMocks();
+    jest.useRealTimers();
+});
 
 test('API → normalizador → tela: confirma, atualiza histórico/calendário e desmarca sem recarregar', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
     const confirmadoEm = '2026-10-09T12:34:56.789Z';
     const requisicaoAutenticada = jest
         .fn()

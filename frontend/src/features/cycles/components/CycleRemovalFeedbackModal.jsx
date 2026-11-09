@@ -7,20 +7,28 @@ import { DropIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { criarEstilos } from './CycleRemovalFeedbackModal.styles';
 
-function IconeAlerta({ erro = false }) {
+function IconeAlerta({ erro = false, cor, fundoTransparente = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const corContorno = erro
-        ? tema.cores.interface.textoSecundario
-        : tema.escuro
-          ? '#EE9297'
-          : '#C85A44';
-    const corAlerta = tema.escuro ? '#F39A9D' : '#B43D3D';
+    const corContorno =
+        cor ??
+        (erro
+            ? tema.escuro
+                ? '#EF9A9A'
+                : tema.cores.interface.textoSecundario
+            : tema.escuro
+              ? '#EE9297'
+              : '#C85A44');
+    const corAlerta = cor ?? (tema.escuro ? (erro ? '#EF9A9A' : '#F39A9D') : '#B43D3D');
 
     return (
         <View
             testID={erro ? 'icone-alerta-erro' : 'icone-alerta-confirmacao'}
-            style={[estilos.areaIcone, erro ? estilos.fundoErro : estilos.fundoConfirmacao]}
+            style={[
+                estilos.areaIcone,
+                erro ? estilos.fundoErro : estilos.fundoConfirmacao,
+                fundoTransparente && { backgroundColor: 'transparent' }
+            ]}
         >
             <Svg width={22} height={22} viewBox="0 0 24 24" accessibilityElementsHidden>
                 <Circle cx={12} cy={12} r={10} fill="none" stroke={corContorno} strokeWidth={1.5} />
@@ -37,8 +45,9 @@ function IconeAlerta({ erro = false }) {
     );
 }
 
-function IconeConfirmacao() {
-    return <IconeAlerta />;
+function IconeConfirmacao({ color }) {
+    const tema = useTheme();
+    return <IconeAlerta cor={tema.escuro ? color : undefined} fundoTransparente={tema.escuro} />;
 }
 
 function IconeErro() {
@@ -67,6 +76,8 @@ function CycleRemovalFeedbackModal({
     onTentarNovamente,
     onFechar
 }) {
+    const tema = useTheme();
+
     if (tipo === 'confirmacao') {
         return (
             <SimpleModal
@@ -79,13 +90,14 @@ function CycleRemovalFeedbackModal({
                 mensagem={`Tem certeza que deseja excluir todo o período de menstruação de ${periodo} do seu histórico? Esta ação não pode ser desfeita e recalculará suas previsões futuras.`}
                 acaoPrincipal={{
                     texto: 'Apagar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'verde',
                     aoPressionar: onConfirmar,
                     carregando
                 }}
                 acaoSecundaria={{
                     texto: 'Cancelar',
-                    variante: 'branco',
+                    variante: tema.escuro ? 'verde' : 'branco',
                     aoPressionar: onCancelar,
                     desativado: carregando
                 }}
@@ -96,6 +108,7 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'erro') {
         return (
             <SimpleModal
+                erroInterno
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onFechar}

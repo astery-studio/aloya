@@ -7,6 +7,8 @@ import { criarEstilos, criarFundosAtivos } from './PermissionItem.styles';
 
 //Recebe o nome, o estado e a paleta da permissão e devolve o novo estado ao componente pai.
 function PermissionItem({
+    aparenciaNovaCategoria = false,
+    coresInterruptor,
     titulo,
     ativo = false,
     aoAlterar,
@@ -21,11 +23,16 @@ function PermissionItem({
 
     return (
         <SwitchField
+            cores={coresInterruptor}
             titulo={titulo}
             ativo={estaAtiva}
             aoAlterar={aoAlterar}
             desabilitado={desabilitado}
-            estilo={[estilos.container, estaAtiva && fundoAtivo]}
+            estilo={[
+                estilos.container,
+                estaAtiva && fundoAtivo,
+                tema.escuro && aparenciaNovaCategoria && { backgroundColor: '#1A1A1A' }
+            ]}
             estiloTitulo={[estilos.titulo, estaAtiva ? estilos.tituloAtivo : estilos.tituloInativo]}
         />
     );
