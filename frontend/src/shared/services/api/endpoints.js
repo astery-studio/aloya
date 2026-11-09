@@ -1,6 +1,7 @@
 //Guarda os caminhos das operações disponíveis na API.
 
-const caminhoConta = '/users/me'
+const caminhoConta = '/users/me';
+const caminhoConvitesContato = '/support-network/contact-invitations';
 
 const endpoints = Object.freeze({
     cadastro: '/auth/register',
@@ -21,7 +22,9 @@ const endpoints = Object.freeze({
     historicoCiclos: '/api/cycles/history',
     ciclos: '/api/cycles',
     categoriasPermissao: '/support-network/permission-categories',
+    convitesContato: caminhoConvitesContato,
+    consultaEmailContato: `${caminhoConvitesContato}/lookup`,
     previsaoCiclo: '/cycles/prediction'
-})
+});
 
-export {endpoints}
+export { endpoints };
