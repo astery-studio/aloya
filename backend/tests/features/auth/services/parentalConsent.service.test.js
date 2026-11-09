@@ -280,6 +280,37 @@ test('libera o acesso e revoga pendências aos 16 anos', async () => {
     assert.equal(resultado.consentimentoNecessario, false);
 });
 
+test('informa que o consentimento não é mais necessário depois da autorização', async () => {
+    const { crypto } = criarCrypto();
+    const service = criarParentalConsentService({
+        prisma: {
+            usuario: {
+                async findUnique() {
+                    return criarTitular();
+                }
+            },
+            consentimentoParental: {
+                async findUnique() {
+                    return {
+                        emailResponsavelLegal: 'responsavel@email.com',
+                        statusConsentimento: 'liberado'
+                    };
+                }
+            }
+        },
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    const resultado = await service.verificarAcessoRedeApoio(1);
+
+    assert.equal(resultado.acessoLiberado, true);
+    assert.equal(resultado.consentimentoNecessario, false);
+    assert.equal(resultado.statusConsentimento, 'liberado');
+});
+
 test('rejeita solicitação para usuário inexistente', async () => {
     const { crypto } = criarCrypto();
     const prisma = {

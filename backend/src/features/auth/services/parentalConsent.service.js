@@ -191,7 +191,7 @@ function criarParentalConsentService({
 
             motivo: acessoLiberado ? 'CONSENTIMENTO_LIBERADO' : 'CONSENTIMENTO_NECESSARIO',
 
-            consentimentoNecessario: true,
+            consentimentoNecessario: !acessoLiberado,
 
             emailResponsavelInformado: Boolean(consentimento?.emailResponsavelLegal),
 
