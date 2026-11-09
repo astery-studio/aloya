@@ -290,7 +290,13 @@ function criarContactInvitationService({ requisicaoAutenticada } = {}) {
     }
 
     function enviarConvite(dados) {
-        const corpo = prepararConvite(dados);
+        let corpo;
+
+        try {
+            corpo = prepararConvite(dados);
+        } catch (erro) {
+            return Promise.reject(erro);
+        }
         const chave = JSON.stringify(corpo);
 
         if (envioAtual) {
