@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { CONFIGURACOES_TERMICAS_CAUSAIS } from '../../../../src/features/diary/thermal/thermal.config.js';
 import { detectarPadraoTermico } from '../../../../src/features/diary/thermal/thermal.engine.js';
 
 function serie(valores, inicio = '2026-01-01') {
@@ -15,6 +16,11 @@ function serie(valores, inicio = '2026-01-01') {
         };
     });
 }
+
+const config = (variante, disponibilidade = 'B1') =>
+    CONFIGURACOES_TERMICAS_CAUSAIS.find(
+        (item) => item.variante === variante && item.disponibilidade === disponibilidade
+    );
 
 test('A1/B1 confirma igualdade no limite exato sem arredondar', () => {
     const resultado = detectarPadraoTermico(serie([364, 364, 364, 364, 364, 364, 366, 366, 366]));
@@ -33,6 +39,37 @@ test('média não inteira rejeita 36,6 e aceita 36,7', () => {
 
     assert.equal(rejeitada.estado, 'NENHUMA_ELEVACAO_DETECTADA');
     assert.equal(aceita.estado, 'ELEVACAO_DETECTADA');
+});
+
+test('A1 e A2 mantêm limiares independentes', () => {
+    const medicoes = serie([364, 364, 364, 364, 364, 364, 366, 366, 366]);
+    assert.equal(detectarPadraoTermico(medicoes, config('A1')).estado, 'ELEVACAO_DETECTADA');
+    assert.equal(
+        detectarPadraoTermico(medicoes, config('A2')).estado,
+        'NENHUMA_ELEVACAO_DETECTADA'
+    );
+});
+
+test('A4-C compara com a maior das seis temperaturas anteriores', () => {
+    const medicoes = serie([360, 361, 362, 363, 364, 365, 366, 366, 366]);
+    assert.equal(
+        detectarPadraoTermico(medicoes, config('A4-C')).estado,
+        'NENHUMA_ELEVACAO_DETECTADA'
+    );
+});
+
+test('B2 tolera lacunas somente dentro da janela de nove dias', () => {
+    const medicoes = serie([364, 364, 364, 364, 364, 364, 364, 366, 366, 366]);
+    medicoes.splice(2, 1);
+    assert.equal(detectarPadraoTermico(medicoes, config('A1', 'B1')).estado, 'DADOS_INSUFICIENTES');
+    assert.equal(detectarPadraoTermico(medicoes, config('A1', 'B2')).estado, 'ELEVACAO_DETECTADA');
+});
+
+test('detecção causal permanece igual quando temperaturas futuras chegam', () => {
+    const base = serie([364, 364, 364, 364, 364, 364, 366, 366, 366]);
+    const inicial = detectarPadraoTermico(base, config('A1'));
+    const posterior = detectarPadraoTermico([...base, ...serie([350, 350], '2026-01-10')], config('A1'));
+    assert.deepEqual(posterior.sequencias[0], inicial.sequencias[0]);
 });
 
 test('ausência ou perturbação interrompe a sequência', () => {
