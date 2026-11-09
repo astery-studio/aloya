@@ -29,3 +29,13 @@ test('A4-R aplica filtro retrospectivo sem consultar o ciclo seguinte', () => {
     assert.equal(resultado.estado, 'ELEVACAO_DETECTADA');
     assert.equal(resultado.sequencias[0].dataInicioElevacao, '2026-01-17');
 });
+
+test('A4-R tolera uma ausência nas seis posições de referência', () => {
+    const medicoes = serie(Array(16).fill(364).concat([366, 366, 366]));
+    medicoes.splice(12, 1);
+    const resultado = detectarA4R(medicoes, config, {
+        cicloConcluido: true,
+        dataFimCiclo: '2026-01-19'
+    });
+    assert.equal(resultado.estado, 'ELEVACAO_DETECTADA');
+});

@@ -53,8 +53,10 @@ const CONFIGURACOES_TERMICAS_RETROSPECTIVAS = Object.freeze([
     Object.freeze({
         ...CONFIGURACAO_TERMICA_SOMBRA,
         variante: 'A4-R',
+        disponibilidade: 'B2',
         modo: 'retrospectivo',
         referencia: 'maxima',
+        quantidadeReferencia: 5,
         filtrarUltimosDiasCiclo: 14
     })
 ]);
