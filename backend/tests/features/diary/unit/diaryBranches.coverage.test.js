@@ -32,4 +32,42 @@ function erroCodigo(funcao, codigo) {
     assert.throws(funcao, { codigo });
 }
 
+test('rotas cobrem falhas de configuração e executam os middlewares próprios', () => {
+    assert.throws(() => criarDiaryRoutes(), TypeError);
+    assert.throws(() => criarDiaryRoutes({ Router: () => ({}) }), TypeError);
+    const usos = [];
+    const router = {
+        use: (funcao) => usos.push(funcao),
+        get() {},
+        post() {},
+        patch() {},
+        put() {},
+        delete() {}
+    };
+    const validarPreferencia = () => {};
+    criarDiaryRoutes({
+        Router: () => router,
+        autenticar: () => {},
+        catalogController: {},
+        entryController: {},
+        historyController: {},
+        mutationController: {},
+        validarPreferencia,
+        rateLimit: () => {}
+    });
+    const res = {
+        headers: {},
+        set(nome, valor) {
+            this.headers[nome] = valor;
+        }
+    };
+    let avancou = 0;
+    usos[1]({}, res, () => (avancou += 1));
+    const req = {};
+    usos[2](req, {}, () => (avancou += 1));
+    assert.equal(res.headers['Cache-Control'], 'private, no-store');
+    assert.equal(req.validarPreferencia, validarPreferencia);
+    assert.equal(avancou, 2);
+});
+
 
