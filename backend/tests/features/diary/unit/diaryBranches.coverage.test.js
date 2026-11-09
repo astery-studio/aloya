@@ -70,4 +70,36 @@ test('rotas cobrem falhas de configuração e executam os middlewares próprios'
     assert.equal(avancou, 2);
 });
 
+test('valida formatos gerais de categorias rejeitados', () => {
+    for (const entrada of [null, [], {}, { categoriaId: 1 }]) {
+        erroCodigo(() => validarCategoriaPreenchida(entrada), 'CATEGORIA_DIARIO_INVALIDA');
+    }
+    erroCodigo(
+        () => validarCategoriaPreenchida({ categoriaId: 'inexistente' }),
+        'CATEGORIA_DIARIO_INVALIDA'
+    );
+    erroCodigo(
+        () => validarCategoriaPreenchida({ categoriaId: 'peso', valor: '60', extra: true }),
+        'CAMPO_DESCONHECIDO'
+    );
+    for (const opcoes of [null, [], new Array(100).fill('x')]) {
+        erroCodigo(
+            () => validarCategoriaPreenchida({ categoriaId: 'sintomas_fisicos', opcoes }),
+            'OPCOES_DIARIO_INVALIDAS'
+        );
+    }
+    const opcao = CATEGORIAS_POR_ID.get('sintomas_fisicos').opcoes[0].id;
+    erroCodigo(
+        () =>
+            validarCategoriaPreenchida({ categoriaId: 'sintomas_fisicos', opcoes: [opcao, opcao] }),
+        'OPCOES_DIARIO_INVALIDAS'
+    );
+    for (const duracaoMinutos of [1.5, -1]) {
+        erroCodigo(
+            () => validarCategoriaPreenchida({ categoriaId: 'tempo_sono', duracaoMinutos }),
+            'DURACAO_DIARIO_INVALIDA'
+        );
+    }
+});
+
 
