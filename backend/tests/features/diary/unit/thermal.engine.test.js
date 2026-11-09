@@ -68,14 +68,23 @@ test('B2 tolera lacunas somente dentro da janela de nove dias', () => {
 test('detecção causal permanece igual quando temperaturas futuras chegam', () => {
     const base = serie([364, 364, 364, 364, 364, 364, 366, 366, 366]);
     const inicial = detectarPadraoTermico(base, config('A1'));
-    const posterior = detectarPadraoTermico([...base, ...serie([350, 350], '2026-01-10')], config('A1'));
+    const posterior = detectarPadraoTermico(
+        [...base, ...serie([350, 350], '2026-01-10')],
+        config('A1')
+    );
     assert.deepEqual(posterior.sequencias[0], inicial.sequencias[0]);
 });
 
 test('detecção causal só existe no terceiro dia elevado disponível', () => {
     const medicoes = serie([364, 364, 364, 364, 364, 364, 366, 366, 366]);
-    assert.equal(detectarPadraoTermico(medicoes.slice(0, 7), config('A1')).estado, 'DADOS_INSUFICIENTES');
-    assert.equal(detectarPadraoTermico(medicoes.slice(0, 8), config('A1')).estado, 'DADOS_INSUFICIENTES');
+    assert.equal(
+        detectarPadraoTermico(medicoes.slice(0, 7), config('A1')).estado,
+        'DADOS_INSUFICIENTES'
+    );
+    assert.equal(
+        detectarPadraoTermico(medicoes.slice(0, 8), config('A1')).estado,
+        'DADOS_INSUFICIENTES'
+    );
     assert.equal(detectarPadraoTermico(medicoes, config('A1')).estado, 'ELEVACAO_DETECTADA');
 });
 

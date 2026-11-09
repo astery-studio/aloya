@@ -15,7 +15,11 @@ const serie = (valores) =>
 
 test('encontra três temperaturas acima da referência fixa', () => {
     const resultado = encontrarSequenciaFixa(
-        serie([362, 363, 363, 363]), '2026-01-10', '2026-01-13', referencia, config
+        serie([362, 363, 363, 363]),
+        '2026-01-10',
+        '2026-01-13',
+        referencia,
+        config
     );
     assert.equal(resultado.janelasAvaliaveis, 2);
     assert.deepEqual(resultado.sequencia, {
@@ -27,7 +31,10 @@ test('encontra três temperaturas acima da referência fixa', () => {
 test('lacuna e perturbação impedem sequência fixa', () => {
     const resultado = encontrarSequenciaFixa(
         serie([363, { valor: 363, perturbada: true }, 363]),
-        '2026-01-10', '2026-01-12', referencia, config
+        '2026-01-10',
+        '2026-01-12',
+        referencia,
+        config
     );
     assert.deepEqual(resultado, { janelasAvaliaveis: 0, sequencia: null });
 });

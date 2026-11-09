@@ -33,7 +33,9 @@ test('A3 distingue referência insuficiente, ausência e elevação', () => {
         'NENHUMA_ELEVACAO_IDENTIFICADA'
     );
     const detectada = detectarA3(
-        serie([360, 360, 360, 360, 360, 360, 363, 363, 363]), config, contexto
+        serie([360, 360, 360, 360, 360, 360, 363, 363, 363]),
+        config,
+        contexto
     );
     assert.equal(detectada.estado, 'ELEVACAO_DETECTADA');
     assert.equal(detectada.referencia.length, 6);
