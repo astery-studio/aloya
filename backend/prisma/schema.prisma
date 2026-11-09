@@ -392,6 +392,7 @@ model CategoriaDiario {
 
   opcoes       OpcaoDiario[]
   preferencias PreferenciaCategoriaDiario[]
+  registros    RegistroDiarioCategoria[]
 
   @@unique([macrocategoriaId, ordem])
   @@index([macrocategoriaId])
@@ -405,6 +406,8 @@ model OpcaoDiario {
   grupo       String?
   nome        String
   ordem       Int
+
+  registros RegistroDiarioOpcao[]
 
   @@unique([categoriaId, ordem])
   @@index([categoriaId])
@@ -470,12 +473,51 @@ model RegistroDiario {
   // Snapshot histórico: não deve ser recalculado quando a previsão mudar.
   faseCicloAssociada         FaseCiclo? @map("fase_ciclo_associada")
   possivelOvulacaoConfirmada Boolean    @default(false) @map("possivel_ovulacao_confirmada")
+  versao                     Int        @default(0)
 
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
+  categorias RegistroDiarioCategoria[]
+
   @@unique([usuarioId, dataRegistro])
+  @@index([usuarioId, dataRegistro, id])
   @@map("registros_diario")
+}
+
+model RegistroDiarioCategoria {
+  id          Int             @id @default(autoincrement())
+  registroId  Int             @map("registro_id")
+  registro    RegistroDiario  @relation(fields: [registroId], references: [id], onDelete: Cascade)
+  categoriaId String          @map("categoria_id")
+  categoria   CategoriaDiario @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+
+  macrocategoriaNome  String  @map("macrocategoria_nome")
+  categoriaNome       String  @map("categoria_nome")
+  valorEscalado       Int?    @map("valor_escalado")
+  casasDecimais       Int?    @map("casas_decimais")
+  valorDuracaoMinutos Int?    @map("valor_duracao_minutos")
+  valorTexto          String? @map("valor_texto")
+
+  opcoes RegistroDiarioOpcao[]
+
+  @@unique([registroId, categoriaId])
+  @@index([categoriaId, registroId])
+  @@map("registros_diario_categorias")
+}
+
+model RegistroDiarioOpcao {
+  id                  Int                     @id @default(autoincrement())
+  registroCategoriaId Int                     @map("registro_categoria_id")
+  registroCategoria   RegistroDiarioCategoria @relation(fields: [registroCategoriaId], references: [id], onDelete: Cascade)
+  opcaoId             String                  @map("opcao_id")
+  opcao               OpcaoDiario             @relation(fields: [opcaoId], references: [id], onDelete: Restrict)
+  grupo               String?
+  opcaoNome           String                  @map("opcao_nome")
+
+  @@unique([registroCategoriaId, opcaoId])
+  @@index([opcaoId])
+  @@map("registros_diario_opcoes")
 }
 
 // ============================================================
