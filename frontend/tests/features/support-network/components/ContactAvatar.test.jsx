@@ -33,7 +33,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
 import {
     ContactAvatar,
     normalizarTamanho
-} from '../../../../src/features/support-network/components/ContactAvatar';
+} from '../../../../src/features/support-network/components/ContactAvatar/ContactAvatar';
 
 describe('ContactAvatar', () => {
     test.each([
@@ -148,10 +148,11 @@ describe('ContactAvatar', () => {
 
         expect(screen.queryByRole('image')).toBeNull();
 
-        expect(screen.getByTestId('contact-avatar')).toHaveProp(
-            'importantForAccessibility',
-            'no-hide-descendants'
-        );
+        expect(
+            screen.getByTestId('contact-avatar', {
+                includeHiddenElements: true
+            })
+        ).toHaveProp('importantForAccessibility', 'no-hide-descendants');
     });
 
     test('preserva a identidade visual no modo escuro', async () => {
