@@ -11,6 +11,7 @@ function criarUsuario(alteracoes = {}) {
         id: 1,
         nome: 'Aloya Teste',
         email: 'aloya@email.com',
+        papel: 'principal',
         genero: 'Mulher Cisgênero',
         temaVisual: 'automatico',
 
@@ -85,6 +86,8 @@ test('retorna somente os campos das configurações', async function () {
 
     assert.equal(resultado.id, 1);
     assert.equal(resultado.email, 'aloya@email.com');
+
+    assert.equal(resultado.papel, 'principal');
 
     assert.equal(resultado.temaVisual, 'automatico');
 

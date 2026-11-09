@@ -9,6 +9,7 @@ function criarAccountService({
         id: true,
         nome: true,
         email: true,
+        papel: true,
         genero: true,
         dataNascimento: true,
         temaVisual: true,
@@ -36,6 +37,8 @@ function criarAccountService({
             id: usuario.id,
             nome: usuario.nome,
             email: usuario.email,
+
+            papel: usuario.papel,
 
             identidadeGenero: usuario.genero,
 
