@@ -4,7 +4,7 @@ Data da verificação: 9 de novembro de 2026.
 
 ## Resultado
 
-O backend do Diário está concluído para o escopo da Sprint 4. O motor térmico está
+O backend do Diário está concluído para o escopo funcional definido. O motor térmico está
 integrado somente em modo sombra e não produz efeito clínico ou visual.
 
 | Área verificada | Evidência encontrada | Situação |
