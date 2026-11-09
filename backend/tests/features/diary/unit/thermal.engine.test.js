@@ -111,6 +111,26 @@ test('subida em degraus sem retorno produz uma única sequência', () => {
     assert.equal(resultado.sequencias.length, 1);
 });
 
+test('primeira elevação preserva retorno confirmado sem fabricar outra sequência', () => {
+    const resultado = detectarPadraoTermico(
+        serie([364, 364, 364, 364, 364, 364, 366, 366, 366, 364, 364, 364])
+    );
+    assert.equal(resultado.sequencias.length, 1);
+    assert.deepEqual(resultado.sequencias[0].retornoLinhaBase, {
+        dataInicio: '2026-01-10',
+        dataConfirmacao: '2026-01-12'
+    });
+});
+
+test('elevação posterior sem retorno completo não vira segunda sequência', () => {
+    const resultado = detectarPadraoTermico(
+        serie([364, 364, 364, 364, 364, 364, 366, 366, 366, 364, 364, 367, 367, 367])
+    );
+    assert.equal(resultado.estado, 'ELEVACAO_DETECTADA');
+    assert.equal(resultado.sequencias.length, 1);
+    assert.equal(resultado.sequencias[0].retornoLinhaBase, null);
+});
+
 test('registra duas elevações somente quando existe retorno caracterizado', () => {
     const resultado = detectarPadraoTermico(
         serie([
