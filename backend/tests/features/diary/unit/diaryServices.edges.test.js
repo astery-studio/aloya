@@ -98,4 +98,43 @@ function dependenciasEntrada() {
     };
 }
 
+test('criação cobre validações e todos os erros concorrentes', async () => {
+    const base = dependenciasEntrada();
+    for (const alteracao of [
+        { prisma: null },
+        { bootstrap: null },
+        { phaseService: null },
+        { thermalRecalculation: null }
+    ]) {
+        assert.throws(() => criarDiaryEntryService({ ...base, ...alteracao }), TypeError);
+    }
+    const dados = { data: '2026-11-08', fusoHorario: 'UTC', categorias: [categoriaNova()] };
+    const service = criarDiaryEntryService(base);
+    for (const id of [null, 0]) {
+        await assert.rejects(() => service.criar(id, dados), { codigo: 'SESSAO_INVALIDA' });
+    }
+    await assert.rejects(() => service.criar(1, { ...dados, data: '2026-11-09' }), {
+        codigo: 'DATA_REGISTRO_FUTURA'
+    });
+    for (const [codigo, esperado] of [
+        ['P2002', 'REGISTRO_DIARIO_DUPLICADO'],
+        ['P2034', 'CONFLITO_DIARIO']
+    ]) {
+        const deps = dependenciasEntrada();
+        deps.prisma.$transaction = async () => {
+            const erro = new Error(codigo);
+            erro.code = codigo;
+            throw erro;
+        };
+        await assert.rejects(() => criarDiaryEntryService(deps).criar(1, dados), {
+            codigo: esperado
+        });
+    }
+    const deps = dependenciasEntrada();
+    deps.prisma.$transaction = async () => {
+        throw new Error('outro');
+    };
+    await assert.rejects(() => criarDiaryEntryService(deps).criar(1, dados), /outro/);
+});
+
 
