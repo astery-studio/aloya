@@ -1,3 +1,25 @@
+function* diasDoIntervalo({ inicio, fim }) {
+    const primeiroDia = Date.parse(inicio + 'T00:00:00Z');
+    const ultimoDia = Date.parse(fim + 'T00:00:00Z');
+    for (let dia = primeiroDia; dia <= ultimoDia; dia += 86400000) {
+        yield new Date(dia).toISOString().slice(0, 10);
+    }
+}
+
+async function registroJaConfirmado({ service, inicio, fim, validarCredencial }) {
+    const dias = [...diasDoIntervalo({ inicio, fim })];
+    if (!dias.length) return false;
+
+    const meses = new Set(dias.map((data) => data.slice(0, 7)));
+    const calendarios = await Promise.all(
+        [...meses].map((mes) => service.buscarMes({ mes, validarCredencial }))
+    );
+    const confirmadas = new Set(
+        calendarios.flatMap((mes) => mes.diasMenstruacao.map((dia) => dia.data))
+    );
+    return dias.every((data) => confirmadas.has(data));
+}
+
 function comRegistrosPendentes({ service, fila }) {
     return Object.freeze({
         ...service,
@@ -19,10 +41,7 @@ function comRegistrosPendentes({ service, fila }) {
             const pendentes = await fila.listar().catch(() => []);
             const datasLocais = [];
             for (const item of pendentes) {
-                const inicio = Date.parse(`${item.inicio}T00:00:00Z`);
-                const fim = Date.parse(`${item.fim}T00:00:00Z`);
-                for (let dia = inicio; dia <= fim; dia += 86400000) {
-                    const data = new Date(dia).toISOString().slice(0, 10);
+                for (const data of diasDoIntervalo(item)) {
                     if (data.startsWith(opcoes.mes)) datasLocais.push(data);
                 }
             }
@@ -30,4 +49,4 @@ function comRegistrosPendentes({ service, fila }) {
         }
     });
 }
-export { comRegistrosPendentes };
+export { comRegistrosPendentes, registroJaConfirmado };

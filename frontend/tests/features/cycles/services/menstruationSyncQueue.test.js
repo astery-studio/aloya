@@ -3,7 +3,9 @@ import { obterIdentidadeMenstrual } from '../../../../src/features/cycles/servic
 import { selecionarIntervalo } from '../../../../src/features/cycles/utils/menstruationSelection';
 import { criarCycleRegistrationService } from '../../../../src/features/cycles/services/cycleRegistrationService';
 
-function montar() {
+import { registroJaConfirmado } from '../../../../src/features/cycles/services/pendingCalendarService';
+
+function montar(jaConfirmado) {
     const dados = new Map();
     let identidade = '1';
     let indice = 0;
@@ -13,6 +15,7 @@ function montar() {
         ler: async (chave) => dados.get(chave),
         salvar,
         registrar,
+        jaConfirmado,
         identificar: async () => identidade,
         criarChave: () => `operacao-${++indice}`
     };
@@ -110,3 +113,46 @@ test('envia data única e intervalo com a mesma chave de idempotência', async (
         expect.objectContaining({ corpo: { dataInicio: '2026-09-01', dataFim: '2026-09-03' } })
     );
 });
+
+test.each([true, false])(
+    'após conflito, remove da fila somente se todos os dias estão confirmados (%s)',
+    async (completo) => {
+        const service = {
+            buscarMes: jest.fn(async ({ mes }) => ({
+                diasMenstruacao:
+                    mes === '2026-10'
+                        ? [{ data: '2026-10-31', registroCicloId: 8 }]
+                        : completo
+                          ? [{ data: '2026-11-01', registroCicloId: 8 }]
+                          : [],
+                datasLocais: ['2026-11-01']
+            }))
+        };
+        const c = montar(({ inicio, fim }) => registroJaConfirmado({ service, inicio, fim }));
+        await c.fila.adicionar('2026-10-31', '2026-11-01');
+        const conflito = Object.assign(new Error('Período em conflito'), {
+            status: 409,
+            codigo: 'CONFLITO_REGISTRO_MENSTRUAL'
+        });
+        c.registrar.mockRejectedValueOnce(conflito);
+        if (completo) {
+            await c.fila.adicionar('2026-11-04', '2026-11-04');
+            await c.fila.sincronizar();
+            expect(c.registrar).toHaveBeenCalledTimes(2);
+            expect(await c.fila.listar()).toEqual([]);
+        } else {
+            await expect(c.fila.sincronizar()).rejects.toBe(conflito);
+            expect(await c.fila.listar()).toEqual([
+                expect.objectContaining({
+                    inicio: '2026-10-31',
+                    fim: '2026-11-01',
+                    status: 'falha'
+                })
+            ]);
+        }
+        expect(service.buscarMes.mock.calls.map(([pedido]) => pedido.mes)).toEqual([
+            '2026-10',
+            '2026-11'
+        ]);
+    }
+);

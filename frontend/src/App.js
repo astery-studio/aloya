@@ -577,6 +577,7 @@ export default function App() {
                 <CalendarScreenContainer
                     key={`${revisaoCalendario}-${sincronizacaoMenstrual.revisao}`}
                     statusSincronizacao={sincronizacaoMenstrual.status}
+                    erroSincronizacao={sincronizacaoMenstrual.erro}
                     aoTentarSincronizar={sincronizacaoMenstrual.sincronizar}
                     service={configuracao.servicos.calendarService}
                     onSessaoExpirada={finalizarSessao}
