@@ -266,4 +266,30 @@ test('preferências cobrem configuração e operações individuais', async () =
     );
 });
 
+test('preferências cobrem lote e sessão inválida', async () => {
+    const deps = dependenciasPreferencias();
+    const service = criarDiaryPreferencesService(deps);
+    assert.equal(
+        (
+            await service.atualizarLote({
+                usuarioId: 1,
+                versao: 2,
+                macrocategorias: [{ id: 'energia_sono', ativa: false }],
+                categorias: [{ id: 'peso', ativa: false }]
+            })
+        ).versao,
+        3
+    );
+    await assert.rejects(
+        () =>
+            service.atualizarLote({
+                usuarioId: null,
+                versao: 0,
+                macrocategorias: [],
+                categorias: []
+            }),
+        { codigo: 'SESSAO_INVALIDA' }
+    );
+});
+
 
