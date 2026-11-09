@@ -46,6 +46,58 @@ const vidaIntimaESocial = {
                     ]
                 }
             ]
+        },
+        {
+            id: 'autoerotismo',
+            nome: 'Autoerotismo',
+            sensivel: true,
+            grupos: [
+                {
+                    id: 'praticas',
+                    opcoes: [
+                        'Vibradores',
+                        'Brinquedos eróticos',
+                        'Acessórios íntimos',
+                        'Fantasias',
+                        'Masturbação',
+                        'Exploração'
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'desejo_libido',
+            nome: 'Desejo/Libido',
+            sensivel: true,
+            grupos: [
+                {
+                    id: 'desejo',
+                    opcoes: [
+                        'Sem desejo',
+                        'Libido baixa',
+                        'Libido habitual',
+                        'Libido elevada',
+                        'Desejo espontâneo',
+                        'Desejo variável',
+                        'Pensamentos sexuais frequentes',
+                        'Fantasias'
+                    ]
+                },
+                {
+                    id: 'resposta_sexual',
+                    opcoes: [
+                        'Excitação',
+                        'Orgasmo',
+                        'Orgasmos múltiplos',
+                        'Sem orgasmo',
+                        'Satisfação sexual',
+                        'Insatisfação sexual',
+                        'Sensibilidade genital aumentada',
+                        'Sensibilidade genital reduzida',
+                        'Lubrificação aumentada'
+                    ]
+                }
+            ]
         }
     ]
 };
