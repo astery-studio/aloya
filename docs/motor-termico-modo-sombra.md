@@ -6,7 +6,8 @@ usadas pela pessoa.
 ## O que o backend faz
 
 - recebe e preserva a temperatura e os metadados de perturbação;
-- executa a regra A1/B1 de forma determinística;
+- executa A1, A2 e A4-C com B1/B2 em todo ciclo elegível;
+- acrescenta A3 e A4-R somente depois que o ciclo termina;
 - guarda estado, sequência, configuração e versão do algoritmo;
 - marca como provisório o ciclo que ainda não possui ciclo seguinte;
 - recalcula quando medições ou fronteiras menstruais mudam.
@@ -47,3 +48,17 @@ resultados ou aplicar evidência exige, em conjunto:
 Sem ultrassom, LH, progesterona ou PdG independentes, o modo sombra permite
 avaliar disponibilidade, estabilidade e qualidade dos dados, mas não permite
 estimar sensibilidade, especificidade ou acurácia clínica.
+
+## Controles implementados
+
+- `execucaoHabilitada = false` impede cálculo e persistência;
+- `exposicaoHabilitada = false` permanece fixo na configuração experimental;
+- não existe endpoint público de análise térmica;
+- a persistência escreve apenas em `analises_termicas_ciclo`;
+- `evidenciaAplicada` é sempre falsa;
+- o módulo de ciclos não recebe resultado térmico nem altera previsão,
+  confiança, fase ou snapshot.
+
+Os testes exercitam a flag ligada e desligada, persistência interna, isolamento
+por `usuarioId` e ausência de efeito na HU-013. Essa evidência arquitetural não
+equivale a validação clínica.
