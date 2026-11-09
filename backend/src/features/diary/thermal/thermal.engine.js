@@ -64,11 +64,7 @@ function detectarPadraoTermico(medicoes, config = CONFIGURACAO_TERMICA_SOMBRA) {
     const sequencias = [];
     let janelasAvaliaveis = 0;
 
-    for (
-        let data = ordenadas[0]?.data;
-        data && data <= ultimaData;
-        data = adicionarDias(data, 1)
-    ) {
+    for (let data = ordenadas[0]?.data; data && data <= ultimaData; data = adicionarDias(data, 1)) {
         const janela = avaliarJanela(porData, data, config);
         if (janela.avaliavel) janelasAvaliaveis += 1;
         if (janela.confirmou) {
