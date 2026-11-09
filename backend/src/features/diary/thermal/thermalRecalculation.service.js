@@ -58,7 +58,13 @@ function criarThermalRecalculationService({
             });
             for (const { config, resultado } of resultados) {
                 await persistirAnaliseTermica(
-                    tx, ciclo, usuarioId, config, resultado, !proximo, avaliadoAte
+                    tx,
+                    ciclo,
+                    usuarioId,
+                    config,
+                    resultado,
+                    !proximo,
+                    avaliadoAte
                 );
             }
         }

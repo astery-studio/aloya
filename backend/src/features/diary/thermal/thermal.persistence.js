@@ -6,7 +6,15 @@ const ESTADOS_BANCO = Object.freeze({
     DADOS_INSUFICIENTES: 'dados_insuficientes'
 });
 
-async function persistirAnaliseTermica(tx, ciclo, usuarioId, config, resultado, provisorio, avaliadoAte) {
+async function persistirAnaliseTermica(
+    tx,
+    ciclo,
+    usuarioId,
+    config,
+    resultado,
+    provisorio,
+    avaliadoAte
+) {
     const chave = {
         registroCicloId: ciclo.id,
         versaoAlgoritmo: config.versao,

@@ -83,10 +83,10 @@ function detectarPadraoTermico(medicoes, config = CONFIGURACAO_TERMICA_SOMBRA) {
         sequencias.length > 1
             ? 'INCONCLUSIVO'
             : sequencias.length === 1
-            ? 'ELEVACAO_DETECTADA'
-            : janelasAvaliaveis > 0
-              ? 'NENHUMA_ELEVACAO_IDENTIFICADA'
-              : 'DADOS_INSUFICIENTES';
+              ? 'ELEVACAO_DETECTADA'
+              : janelasAvaliaveis > 0
+                ? 'NENHUMA_ELEVACAO_IDENTIFICADA'
+                : 'DADOS_INSUFICIENTES';
     return {
         algoritmo: config.algoritmo,
         versao: config.versao,
