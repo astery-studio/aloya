@@ -185,6 +185,10 @@ function criarApp(prisma, emails) {
                 }
             },
 
+            lookupRateLimit(_req, _res, next) {
+                next();
+            },
+
             rateLimit(_req, _res, next) {
                 next();
             },

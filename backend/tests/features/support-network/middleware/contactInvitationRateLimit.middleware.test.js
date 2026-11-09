@@ -67,6 +67,55 @@ test('responde 429 sem registrar e-mail, permissões ou corpo', () => {
     assert.equal(JSON.stringify(log).includes('privado@example.com'), false);
 });
 
+test('permite configurar um limite independente para consulta de contato', () => {
+    let configuracao;
+    let log;
+
+    criarContactInvitationRateLimit({
+        rateLimit(valor) {
+            configuracao = valor;
+            return () => {};
+        },
+        janelaMs: 900000,
+        limite: 20,
+        codigo: 'LIMITE_CONSULTAS_CONTATO',
+        mensagem: 'Muitas consultas de contato. Aguarde alguns minutos e tente novamente.',
+        evento: 'limite_consulta_contato_rede_apoio',
+        logger: {
+            warn(valor) {
+                log = valor;
+            }
+        }
+    });
+
+    const res = {
+        statusCode: null,
+        body: null,
+        status(valor) {
+            this.statusCode = valor;
+            return this;
+        },
+        json(valor) {
+            this.body = valor;
+            return this;
+        }
+    };
+
+    configuracao.handler(
+        {
+            usuario: { id: 42 },
+            method: 'POST',
+            originalUrl: '/support-network/contact-invitations/lookup'
+        },
+        res
+    );
+
+    assert.equal(configuracao.limit, 20);
+    assert.equal(res.statusCode, 429);
+    assert.equal(res.body.erro.codigo, 'LIMITE_CONSULTAS_CONTATO');
+    assert.equal(log.evento, 'limite_consulta_contato_rede_apoio');
+});
+
 test('rejeita configuração inválida', () => {
     assert.throws(() => criarContactInvitationRateLimit(), {
         name: 'TypeError',

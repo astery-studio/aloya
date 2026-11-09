@@ -169,6 +169,7 @@ app.use(
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         parentalConsentMiddleware: container.parentalConsentMiddleware,
+        lookupRateLimit: container.contactInvitationLookupRateLimit,
         rateLimit: container.contactInvitationRateLimit,
         responseRateLimit: container.contactInvitationResponseRateLimit,
         controller: container.contactInvitationController,

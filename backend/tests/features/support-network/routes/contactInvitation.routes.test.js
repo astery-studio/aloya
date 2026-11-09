@@ -7,6 +7,7 @@ function criarCenario() {
     const registros = [];
     const autenticar = () => {};
     const exigirAcessoRedeApoio = () => {};
+    const lookupRateLimit = () => {};
     const rateLimit = () => {};
     const responseRateLimit = () => {};
     const consultarEmail = () => {};
@@ -30,6 +31,7 @@ function criarCenario() {
         Router: () => router,
         authMiddleware: { autenticar },
         parentalConsentMiddleware: { exigirAcessoRedeApoio },
+        lookupRateLimit,
         rateLimit,
         responseRateLimit,
         controller: { consultarEmail, criarConvite },
@@ -42,6 +44,7 @@ function criarCenario() {
         handlers: {
             autenticar,
             exigirAcessoRedeApoio,
+            lookupRateLimit,
             rateLimit,
             responseRateLimit,
             consultarEmail,
@@ -70,7 +73,11 @@ test('protege consulta e criação antes de executar os controllers', () => {
             [handlers.responseRateLimit, handlers.responder]
         ],
         ['use', null, [handlers.exigirAcessoRedeApoio]],
-        ['post', '/contact-invitations/lookup', [handlers.rateLimit, handlers.consultarEmail]],
+        [
+            'post',
+            '/contact-invitations/lookup',
+            [handlers.lookupRateLimit, handlers.consultarEmail]
+        ],
         ['post', '/contact-invitations', [handlers.rateLimit, handlers.criarConvite]]
     ]);
 });

@@ -2,6 +2,7 @@ function criarContactInvitationRoutes({
     Router,
     authMiddleware,
     parentalConsentMiddleware,
+    lookupRateLimit,
     rateLimit,
     responseRateLimit,
     controller,
@@ -11,6 +12,7 @@ function criarContactInvitationRoutes({
         typeof Router !== 'function' ||
         typeof authMiddleware?.autenticar !== 'function' ||
         typeof parentalConsentMiddleware?.exigirAcessoRedeApoio !== 'function' ||
+        typeof lookupRateLimit !== 'function' ||
         typeof rateLimit !== 'function' ||
         typeof responseRateLimit !== 'function' ||
         typeof controller?.consultarEmail !== 'function' ||
@@ -36,7 +38,7 @@ function criarContactInvitationRoutes({
         responseController.responder
     );
     router.use(parentalConsentMiddleware.exigirAcessoRedeApoio);
-    router.post('/contact-invitations/lookup', rateLimit, controller.consultarEmail);
+    router.post('/contact-invitations/lookup', lookupRateLimit, controller.consultarEmail);
     router.post('/contact-invitations', rateLimit, controller.criarConvite);
     return router;
 }

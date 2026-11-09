@@ -353,6 +353,14 @@ function criarContainer() {
         janelaMs: env.exclusaoContaRateLimitJanelaMs,
         limite: env.exclusaoContaRateLimitMaximo
     });
+    const contactInvitationLookupRateLimit = criarContactInvitationRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo,
+        codigo: 'LIMITE_CONSULTAS_CONTATO',
+        mensagem: 'Muitas consultas de contato. Aguarde alguns minutos e tente novamente.',
+        evento: 'limite_consulta_contato_rede_apoio'
+    });
     const contactInvitationRateLimit = criarContactInvitationRateLimit({
         rateLimit,
         janelaMs: env.emailRateLimitJanelaMs,
@@ -504,6 +512,7 @@ function criarContainer() {
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,
         permissionCategoryDeletionRateLimit,
+        contactInvitationLookupRateLimit,
         contactInvitationRateLimit,
         contactInvitationResponseRateLimit,
         contactLinkRateLimit,
