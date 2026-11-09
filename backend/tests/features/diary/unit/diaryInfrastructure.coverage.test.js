@@ -62,4 +62,38 @@ test('where do histórico cobre todos os filtros, cursor e consulta vazia', () =
     assert.deepEqual(where.AND[1].categorias.some.categoriaId.in, ['peso']);
 });
 
+test('serviço de fase cobre configuração, ausência e resolução', async () => {
+    assert.throws(() => criarDiaryPhaseService(), TypeError);
+    let usuario = null;
+    const prisma = { usuario: { findUnique: async () => usuario } };
+    const service = criarDiaryPhaseService({ prisma });
+    await assert.rejects(() => service.resolver(1, '2026-11-08'), {
+        codigo: 'USUARIO_NAO_ENCONTRADO'
+    });
+    usuario = {
+        duracaoCicloInformada: 28,
+        duracaoMenstruacaoInformada: 5,
+        duracaoLuteaInformada: 14,
+        registrosCiclo: []
+    };
+    assert.equal(await service.resolver(1, '2026-11-08'), null);
+    usuario.registrosCiclo = [
+        { dataInicio: data('2026-11-01'), dataFim: data('2026-11-05'), duracaoMenstruacao: 5 }
+    ];
+    const fase = await service.resolver(1, '2026-11-03');
+    assert.equal(fase, 'menstrual');
+    assert.equal(await service.resolver(1, '2030-01-01'), null);
+});
+
+function registro(id, dia) {
+    return {
+        id,
+        dataRegistro: data(dia),
+        faseCicloAssociada: 'lutea',
+        versao: 0,
+        atualizadoEm: data(dia),
+        categorias: []
+    };
+}
+
 
