@@ -35,11 +35,12 @@ Para cada ciclo afetado, o motor:
 1. consulta novamente as temperaturas originais;
 2. ordena por data civil;
 3. exclui do cálculo, sem apagar, medições perturbadas;
-4. procura seis dias anteriores consecutivos e válidos;
-5. avalia o candidato sem incluí-lo na própria média;
+4. executa separadamente cada combinação causal A/B;
+5. avalia o candidato sem incluí-lo na própria referência;
 6. congela a referência durante os três dias elevados;
-7. encerra a busca após a primeira sequência confirmada;
-8. classifica o ciclo e grava o resultado versionado.
+7. procura novo padrão somente após retorno parametrizado à linha de base;
+8. em ciclo concluído, executa A3 e A4-R em processadores separados;
+9. substitui o resultado derivado da mesma chave, sem acumular deltas.
 
 Cadastro retroativo e cadastro cronológico geram o mesmo resultado. Editar e
 depois restaurar uma medição também restaura o resultado correspondente.
@@ -53,3 +54,7 @@ de análise antiga.
 Cada resultado é identificado por ciclo, versão, variante e disponibilidade.
 Reexecutar a mesma versão atualiza o mesmo resultado. Uma versão futura cria
 outro resultado e preserva a rastreabilidade da regra anterior.
+
+A criação, edição, exclusão e mudança de interferência chamam o recálculo
+dentro da mesma transação. Uma falha aborta tanto a medição quanto a análise.
+Repetir o processamento produz o mesmo conteúdo para a mesma versão.
