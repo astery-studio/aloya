@@ -1,13 +1,8 @@
 import { formatarData } from '../../cycles/utils/calendar.js';
 import { CONFIGURACAO_TERMICA_SOMBRA } from './thermal.config.js';
-import { localizarCiclosAfetados } from './thermalCycle.lookup.js';
 import { detectarPadraoTermico } from './thermal.engine.js';
-const ESTADOS_BANCO = {
-    ELEVACAO_DETECTADA: 'elevacao_detectada',
-    NENHUMA_ELEVACAO_DETECTADA: 'nenhuma_elevacao_detectada',
-    PADRAO_TERMICO_AMBIGUO: 'padrao_termico_ambiguo',
-    DADOS_INSUFICIENTES: 'dados_insuficientes'
-};
+import { persistirAnaliseTermica } from './thermal.persistence.js';
+import { localizarCiclosAfetados } from './thermalCycle.lookup.js';
 function criarThermalRecalculationService({
     config = CONFIGURACAO_TERMICA_SOMBRA,
     detectar = detectarPadraoTermico
@@ -55,30 +50,15 @@ function criarThermalRecalculationService({
             }));
             const resultado = detectar(medicoes, config);
             const avaliadoAte = registros.at(-1)?.dataRegistro ?? null;
-            const chave = {
-                registroCicloId: ciclo.id,
-                versaoAlgoritmo: config.versao,
-                variante: config.variante,
-                disponibilidade: config.disponibilidade
-            };
-            const dados = {
+            await persistirAnaliseTermica(
+                tx,
+                ciclo,
                 usuarioId,
-                algoritmo: config.algoritmo,
-                estado: ESTADOS_BANCO[resultado.estado],
-                provisorio: !proximo,
-                janelasAvaliaveis: resultado.janelasAvaliaveis,
-                configuracao: config,
-                sequencias: resultado.sequencias,
-                evidenciaAplicada: false,
+                config,
+                resultado,
+                !proximo,
                 avaliadoAte
-            };
-            await tx.analiseTermicaCiclo.upsert({
-                where: {
-                    registroCicloId_versaoAlgoritmo_variante_disponibilidade: chave
-                },
-                create: { ...chave, ...dados },
-                update: dados
-            });
+            );
         }
     }
     async function recalcularTodos(usuarioId, tx) {
