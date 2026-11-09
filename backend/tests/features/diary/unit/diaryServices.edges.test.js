@@ -183,4 +183,34 @@ test('edição cobre configuração, ausência, versão e no-op', async () => {
     assert.equal((await criarDiaryEditService(base).editar(1, 1, 0, dados)).versao, 0);
 });
 
+test('edição persiste alterações e trata erros Prisma', async () => {
+    const base = dependenciasEdicao();
+    const dados = { data: '2026-11-08', fusoHorario: 'UTC', categorias: [categoriaNova()] };
+    const alterado = {
+        ...dados,
+        categorias: [validarCategoriaPreenchida({ categoriaId: 'anotacao_livre', texto: 'Novo' })]
+    };
+    assert.equal((await criarDiaryEditService(base).editar(1, 1, 0, alterado)).versao, 1);
+    for (const [codigo, esperado] of [
+        ['P2002', 'REGISTRO_DIARIO_DUPLICADO'],
+        ['P2025', 'CONFLITO_DIARIO'],
+        ['P2034', 'CONFLITO_DIARIO']
+    ]) {
+        const deps = dependenciasEdicao();
+        deps.prisma.$transaction = async () => {
+            const erro = new Error(codigo);
+            erro.code = codigo;
+            throw erro;
+        };
+        await assert.rejects(() => criarDiaryEditService(deps).editar(1, 1, 0, dados), {
+            codigo: esperado
+        });
+    }
+    const deps = dependenciasEdicao();
+    deps.prisma.$transaction = async () => {
+        throw new Error('outro');
+    };
+    await assert.rejects(() => criarDiaryEditService(deps).editar(1, 1, 0, dados), /outro/);
+});
+
 
