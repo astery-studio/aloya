@@ -277,4 +277,35 @@ test('motor térmico rejeita datas, duplicatas e valores inválidos', () => {
     );
 });
 
+test('recálculo térmico cobre entrada vazia, perturbação ausente e estados', async () => {
+    const estados = [
+        'ELEVACAO_DETECTADA',
+        'NENHUMA_ELEVACAO_DETECTADA',
+        'PADRAO_TERMICO_AMBIGUO',
+        'DADOS_INSUFICIENTES'
+    ];
+    const gravados = [];
+    const tx = {
+        registroCiclo: { findMany: async () => [{ id: 1, dataInicio: new Date('2026-01-01Z') }] },
+        registroDiario: {
+            findMany: async () => [
+                {
+                    dataRegistro: new Date('2026-01-01Z'),
+                    categorias: [{ valorEscalado: 360, medicaoTemperatura: null }]
+                }
+            ]
+        },
+        analiseTermicaCiclo: { upsert: async (valor) => gravados.push(valor) }
+    };
+    await criarThermalRecalculationService().recalcularPorDatas(1, [null, '', undefined], tx);
+    assert.equal(gravados.length, 0);
+    for (const estado of estados) {
+        const service = criarThermalRecalculationService({
+            detectar: () => ({ estado, janelasAvaliaveis: 0, sequencias: [] })
+        });
+        await service.recalcularPorDatas(1, ['2026-01-01', '2026-01-01'], tx);
+    }
+    assert.equal(gravados.length, 4);
+});
+
 
