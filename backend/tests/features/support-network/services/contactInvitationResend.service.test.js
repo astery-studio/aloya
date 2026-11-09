@@ -6,7 +6,12 @@ import { criarContactInvitationResendService } from '../../../../src/features/su
 const agora = new Date('2026-11-08T12:00:00.000Z');
 const expiracao = new Date('2026-11-15T12:00:00.000Z');
 
-function criarCenario({ convite = {}, falharEmail = false, count = 1 } = {}) {
+function criarCenario({
+    convite = {},
+    falharEmail = false,
+    falharNotificacao = false,
+    count = 1
+} = {}) {
     const original = {
         id: 9,
         contatoId: 2,
@@ -17,7 +22,7 @@ function criarCenario({ convite = {}, falharEmail = false, count = 1 } = {}) {
         titular: { nome: 'Ana' },
         ...convite
     };
-    const estado = { consultas: [], atualizacoes: [], emails: [] };
+    const estado = { consultas: [], atualizacoes: [], emails: [], notificacoes: [] };
     const service = criarContactInvitationResendService({
         prisma: {
             vinculoRedeApoio: {
@@ -28,6 +33,12 @@ function criarCenario({ convite = {}, falharEmail = false, count = 1 } = {}) {
                 async updateMany(consulta) {
                     estado.atualizacoes.push(consulta);
                     return { count };
+                }
+            },
+            notificacao: {
+                async create(dados) {
+                    estado.notificacoes.push(dados);
+                    if (falharNotificacao) throw new Error('Notificações indisponíveis');
                 }
             }
         },
@@ -47,7 +58,7 @@ function criarCenario({ convite = {}, falharEmail = false, count = 1 } = {}) {
     return { estado, original, service };
 }
 
-test('renova credencial e envia novo convite somente para vínculo pendente da titular', async () => {
+test('renova credencial e notifica no app quando o contato já possui conta', async () => {
     const { estado, service } = criarCenario();
 
     const resultado = await service.reenviar({
@@ -63,14 +74,9 @@ test('renova credencial e envia novo convite somente para vínculo pendente da t
         status: 'pendente',
         tokenConviteHash: 'hash-antigo'
     });
-    assert.deepEqual(estado.emails, [
-        {
-            email: 'bia@example.com',
-            nomeTitular: 'Ana',
-            linkConvite: 'aloya://novo',
-            requerCadastro: false
-        }
-    ]);
+    assert.deepEqual(estado.emails, []);
+    assert.equal(estado.notificacoes[0].data.usuarioId, 2);
+    assert.equal(estado.notificacoes[0].data.origemId, 9);
     assert.deepEqual(resultado, {
         id: 9,
         email: 'bia@example.com',
@@ -84,6 +90,7 @@ test('indica cadastro no novo e-mail quando o convite ainda não tem contato', a
     const { estado, service } = criarCenario({ convite: { contatoId: null } });
     await service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 });
     assert.equal(estado.emails[0].requerCadastro, true);
+    assert.equal(estado.notificacoes.length, 0);
 });
 
 test('não reenvia convite inexistente, ativo ou pertencente a outra titular', async () => {
@@ -96,7 +103,8 @@ test('não reenvia convite inexistente, ativo ou pertencente a outra titular', a
                 async updateMany() {
                     return { count: 0 };
                 }
-            }
+            },
+            notificacao: { create() {} }
         },
         tokenService: { emitir() {} },
         emailService: { enviarConviteRedeApoio() {} }
@@ -118,11 +126,30 @@ test('detecta atualização concorrente antes do envio do e-mail', async () => {
 });
 
 test('restaura a credencial anterior quando o envio do e-mail falha', async () => {
-    const { estado, original, service } = criarCenario({ falharEmail: true });
+    const { estado, original, service } = criarCenario({
+        convite: { contatoId: null },
+        falharEmail: true
+    });
 
     await assert.rejects(
         service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 }),
         /SMTP indisponível/
+    );
+
+    assert.equal(estado.atualizacoes.length, 2);
+    assert.deepEqual(estado.atualizacoes[1].data, {
+        tokenConviteHash: original.tokenConviteHash,
+        dataEnvio: original.dataEnvio,
+        dataExpiracao: original.dataExpiracao
+    });
+});
+
+test('restaura a credencial anterior quando a notificação interna falha', async () => {
+    const { estado, original, service } = criarCenario({ falharNotificacao: true });
+
+    await assert.rejects(
+        service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 }),
+        /Notificações indisponíveis/u
     );
 
     assert.equal(estado.atualizacoes.length, 2);

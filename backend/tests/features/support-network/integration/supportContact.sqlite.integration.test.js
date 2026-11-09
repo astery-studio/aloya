@@ -197,8 +197,12 @@ test('reenvia convite pendente e persiste a nova janela sem criar outro vínculo
         assert.equal(vinculos.length, 1);
         assert.equal(vinculos[0].dataEnvio.toISOString(), AGORA.toISOString());
         assert.notEqual(vinculos[0].tokenConviteHash, 'hash-antigo');
-        assert.equal(emails.length, 1);
-        assert.equal(emails[0].email, 'rafael@example.com');
+        assert.equal(emails.length, 0);
+
+        const notificacao = await prisma.notificacao.findFirst({
+            where: { usuarioId: 3, origemId: 21, tipoOrigem: 'rede_apoio' }
+        });
+        assert.ok(notificacao);
     } finally {
         servidor.close();
         await once(servidor, 'close');
