@@ -104,6 +104,59 @@ const corpoESintomas = {
                     ]
                 }
             ]
+        },
+        {
+            id: 'banheiro',
+            nome: 'Banheiro',
+            grupos: [
+                {
+                    id: 'intestino',
+                    opcoes: [
+                        'Normal',
+                        'Dor',
+                        'Prisão de ventre',
+                        'Diarreia',
+                        'Urgência para evacuar',
+                        'Dificuldade para evacuar',
+                        'Evacuação frequente'
+                    ]
+                },
+                {
+                    id: 'urina',
+                    opcoes: [
+                        'Normal',
+                        'Vazamento',
+                        'Ardência',
+                        'Dificuldade para iniciar a micção',
+                        'Dor',
+                        'Alteração na cor',
+                        'Urgência para urinar',
+                        'Odor diferente',
+                        'Micção frequente',
+                        'Sensação de esvaziamento incompleto'
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'regiao_genital',
+            nome: 'Região genital',
+            grupos: [
+                {
+                    id: 'sintomas',
+                    opcoes: [
+                        'Sem alterações',
+                        'Dor',
+                        'Coceira',
+                        'Ressecamento',
+                        'Ardência',
+                        'Vermelhidão',
+                        'Inchaço',
+                        'Irritação',
+                        'Sensibilidade'
+                    ]
+                }
+            ]
         }
     ]
 };
