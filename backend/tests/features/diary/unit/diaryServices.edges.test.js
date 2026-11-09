@@ -137,4 +137,23 @@ test('criação cobre validações e todos os erros concorrentes', async () => {
     await assert.rejects(() => criarDiaryEntryService(deps).criar(1, dados), /outro/);
 });
 
+function dependenciasEdicao() {
+    const tx = {
+        registroDiario: {
+            findFirst: async () => registro(),
+            update: async () => ({ ...registro(), versao: 1 })
+        },
+        preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+        preferenciaCategoriaDiario: { findMany: async () => [] }
+    };
+    return {
+        tx,
+        prisma: { $transaction: async (callback) => callback(tx) },
+        bootstrap: { garantir: async () => {} },
+        phaseService: { resolver: async () => 'folicular' },
+        thermalRecalculation: { recalcularPorDatas: async () => {} },
+        agora: () => data('2026-11-08')
+    };
+}
+
 
