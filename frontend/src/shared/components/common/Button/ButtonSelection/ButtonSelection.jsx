@@ -14,6 +14,9 @@ function ButtonSelection({
     descricao,
     desabilitado = false,
     variante = 'lista',
+    cor,
+    fundo,
+    iconeProps,
     estiloSelecionado,
     estiloTextoSelecionado,
     estiloTexto,
@@ -26,8 +29,15 @@ function ButtonSelection({
     const intensidade = variante === 'intensidade';
 
     const modoCor = variante === 'modoCor';
+    const compacto = variante === 'compacto';
 
-    const corIcone = selected ? tema.cores.interface.destaque : tema.cores.interface.textoPrincipal;
+    const corIcone = compacto
+        ? selected
+            ? tema.cores.neutras.superficieClara
+            : cor
+        : selected
+          ? tema.cores.interface.destaque
+          : tema.cores.interface.textoPrincipal;
 
     return (
         <Pressable
@@ -42,16 +52,18 @@ function ButtonSelection({
                 estilos.container,
                 intensidade && estilos.intensidade,
                 modoCor && estilos.modoCor,
+                compacto && estilos.compacto,
                 selected && estilos.selecionado,
                 intensidade && selected && estilos.intensidadeSelecionada,
                 modoCor && selected && estilos.modoCorSelecionado,
+                compacto && { backgroundColor: selected ? cor : fundo },
                 desabilitado && estilos.desabilitado,
                 selected && estiloSelecionado
             ]}
         >
-            {Icone ? <Icone size={24} color={corIcone} /> : null}
+            {Icone ? <Icone size={compacto ? 18 : 24} color={corIcone} {...iconeProps} /> : null}
 
-            <View style={estilos.textos}>
+            <View style={[estilos.textos, compacto && estilos.textosCompactos]}>
                 <Text
                     style={[
                         estilos.label,
@@ -60,6 +72,8 @@ function ButtonSelection({
                         selected && estilos.labelSelecionado,
                         modoCor && selected && estilos.labelModoCorSelecionado,
                         intensidade && estilos.labelIntensidade,
+                        compacto && estilos.labelCompacto,
+                        compacto && { color: selected ? '#FFFFFF' : cor },
                         selected && estiloTextoSelecionado
                     ]}
                 >
