@@ -64,10 +64,16 @@ test('recalcula ciclo afetado e persiste resultado versionado sem aplicar evidê
     assert.equal(gravacoes[0].create.evidenciaAplicada, false);
     assert.equal(gravacoes[0].create.provisorio, false);
     assert.equal(gravacoes[0].create.versaoAlgoritmo, '0.5.0-experimental');
+    await service.recalcularPorDatas(7, ['2026-01-08'], tx);
+    assert.equal(gravacoes.length, 16);
+    assert.deepEqual(
+        gravacoes.slice(8).map(({ where }) => where),
+        gravacoes.slice(0, 8).map(({ where }) => where)
+    );
     await criarThermalRecalculationService({ execucaoHabilitada: false }).recalcularPorDatas(
         7, ['2026-01-08'], tx
     );
-    assert.equal(gravacoes.length, 8);
+    assert.equal(gravacoes.length, 16);
 });
 
 test('recalcula todos os ciclos quando uma fronteira menstrual muda', async () => {
