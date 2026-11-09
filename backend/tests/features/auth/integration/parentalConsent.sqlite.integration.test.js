@@ -199,3 +199,36 @@ test('rejeita e-mail inválido e o próprio e-mail sem criar solicitação', asy
         assert.equal(emails.length, 0);
     });
 });
+
+test('mantém o consentimento pendente quando a notificação da titular falha', async () => {
+    await executarComBanco(async ({ baseUrl, prisma, emails }) => {
+        await fetch(`${baseUrl}/parental-consent/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emailResponsavelLegal: 'responsavel@email.com' })
+        });
+        const token = extrairToken(emails[0].linkConfirmacao);
+        await prisma.$executeRawUnsafe(`
+            CREATE TRIGGER impedir_notificacao_consentimento
+            BEFORE INSERT ON notificacoes
+            BEGIN
+                SELECT RAISE(ABORT, 'falha simulada');
+            END;
+        `);
+
+        const confirmacao = await fetch(`${baseUrl}/parental-consent/${token}`);
+        const corpo = await confirmacao.json();
+        const consentimento = await prisma.consentimentoParental.findUnique({
+            where: { titularMenorId: 1 }
+        });
+
+        assert.equal(confirmacao.status, 500);
+        assert.equal(
+            corpo.erro.mensagem,
+            'Não foi possível concluir a autorização no momento. Tente novamente.'
+        );
+        assert.equal(consentimento.statusConsentimento, 'pendente');
+        assert.equal(consentimento.respondidoEm, null);
+        assert.equal(await prisma.notificacao.count(), 0);
+    });
+});
