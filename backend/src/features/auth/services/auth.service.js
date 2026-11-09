@@ -46,6 +46,7 @@ function criarAuthService({
         });
     }
     async function cadastrar(dados, dispositivo) {
+        const papel = dados.tipoUsuario === 'contato_apoio' ? 'contato_apoio' : 'principal';
         const usuarioExistente = await prisma.usuario.findUnique({
             where: {
                 email: dados.email
@@ -82,7 +83,7 @@ function criarAuthService({
 
                         senhaHash,
 
-                        papel: 'principal',
+                        papel,
                         statusConta: 'ativa',
 
                         duracaoCicloInformada: dados.duracaoCicloInformada,
@@ -105,11 +106,24 @@ function criarAuthService({
 
                 // Gera o token JWT de sessão e seus dados seguros para persistência.
                 const sessao = tokenService.gerarTokenSessao(usuario);
-                const cicloInicial = dados.dataInicioUltimaMenstruacao
-                    ? await criarRegistroInicial(tx, usuario.id, dados)
-                    : null;
+                const cicloInicial =
+                    papel === 'principal' && dados.dataInicioUltimaMenstruacao
+                        ? await criarRegistroInicial(tx, usuario.id, dados)
+                        : null;
 
-                if (dados.menorDe16 && dados.emailResponsavelLegal) {
+                if (papel === 'contato_apoio') {
+                    await tx.vinculoRedeApoio.updateMany({
+                        where: {
+                            emailConvidado: usuario.email,
+                            contatoId: null,
+                            status: 'pendente',
+                            dataExpiracao: { gt: new Date() }
+                        },
+                        data: { contatoId: usuario.id }
+                    });
+                }
+
+                if (papel === 'principal' && dados.menorDe16 && dados.emailResponsavelLegal) {
                     emailConsentimentoPendente = await parentalConsentService.criarPendente(tx, {
                         titularMenorId: usuario.id,
                         nomeTitular: usuario.nome,
@@ -171,25 +185,26 @@ function criarAuthService({
                       }
                     : null,
 
-                consentimentoParental: dados.menorDe16
-                    ? {
-                          exigidoParaRedeApoio: true,
-                          solicitado: solicitouConsentimento,
-                          redeApoioBloqueada: true,
-                          emailEnviado,
+                consentimentoParental:
+                    papel === 'principal' && dados.menorDe16
+                        ? {
+                              exigidoParaRedeApoio: true,
+                              solicitado: solicitouConsentimento,
+                              redeApoioBloqueada: true,
+                              emailEnviado,
 
-                          mensagemEnvio:
-                              emailConsentimentoPendente && !emailEnviado
-                                  ? 'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
-                                  : null
-                      }
-                    : {
-                          exigidoParaRedeApoio: false,
-                          solicitado: false,
-                          redeApoioBloqueada: false,
-                          emailEnviado: false,
-                          mensagemEnvio: null
-                      },
+                              mensagemEnvio:
+                                  emailConsentimentoPendente && !emailEnviado
+                                      ? 'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
+                                      : null
+                          }
+                        : {
+                              exigidoParaRedeApoio: false,
+                              solicitado: false,
+                              redeApoioBloqueada: false,
+                              emailEnviado: false,
+                              mensagemEnvio: null
+                          },
 
                 mensagem: `Boas-vindas ao ALOYA, ${resultado.usuario.nome}.`
             };
