@@ -14,6 +14,7 @@ test('A3 escolhe as seis menores medições foliculares válidas', () => {
         medicao('2026-01-05', 363),
         medicao('2026-01-06', 364),
         medicao('2026-01-07', 350, true),
+        medicao('2026-01-08', 365),
         medicao('2026-01-20', 350)
     ];
     const referencia = obterReferenciaFolicular(medicoes, '2026-01-10', 6);
