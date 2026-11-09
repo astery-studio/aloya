@@ -213,4 +213,17 @@ test('edição persiste alterações e trata erros Prisma', async () => {
     await assert.rejects(() => criarDiaryEditService(deps).editar(1, 1, 0, dados), /outro/);
 });
 
+function dependenciasPreferencias() {
+    const tx = {
+        configuracaoDiario: { upsert: async () => {}, updateMany: async () => ({ count: 1 }) },
+        preferenciaMacrocategoriaDiario: { upsert: async () => {} },
+        preferenciaCategoriaDiario: { upsert: async () => {} }
+    };
+    return {
+        tx,
+        prisma: { $transaction: async (callback) => callback(tx) },
+        bootstrap: { garantir: async () => {} }
+    };
+}
+
 
