@@ -119,8 +119,15 @@ function SupportCategorySelector({
 
         if (mensagemErro) {
             return (
-                <View accessibilityRole="alert" style={estilos.estado}>
-                    <Text style={estilos.textoErro}>{mensagemErro}</Text>
+                <View style={estilos.estado}>
+                    <Text
+                        accessible
+                        accessibilityRole="alert"
+                        accessibilityLabel={mensagemErro}
+                        style={estilos.textoErro}
+                    >
+                        {mensagemErro}
+                    </Text>
 
                     {typeof aoTentarNovamente === 'function' ? (
                         <Pressable
