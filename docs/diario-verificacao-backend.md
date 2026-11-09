@@ -1,13 +1,13 @@
-# Auditoria da Sprint 4 — Diário Multivariado
+# Verificação do backend do Diário Multivariado
 
-Data da auditoria: 9 de novembro de 2026.
+Data da verificação: 9 de novembro de 2026.
 
 ## Resultado
 
 O backend do Diário está concluído para o escopo da Sprint 4. O motor térmico está
 integrado somente em modo sombra e não produz efeito clínico ou visual.
 
-| Área auditada | Evidência encontrada | Situação |
+| Área verificada | Evidência encontrada | Situação |
 | --- | --- | --- |
 | Catálogo | Seis macrocategorias, opções, ordem e tipos preservados | Concluída |
 | Preferências | Leitura, alteração individual e lote com versão otimista | Concluída |
