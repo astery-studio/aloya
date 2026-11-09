@@ -16,11 +16,19 @@ test('persiste cada estado sem aplicar evidência na HU-013', async () => {
     };
     for (const [estado, persistido] of Object.entries(esperados)) {
         await persistirAnaliseTermica(
-            tx, { id: 7 }, 3, config,
-            { estado, janelasAvaliaveis: 0, sequencias: [] }, true, null
+            tx,
+            { id: 7 },
+            3,
+            config,
+            { estado, janelasAvaliaveis: 0, sequencias: [] },
+            true,
+            null
         );
         assert.equal(gravacoes.at(-1).create.estado, persistido);
         assert.equal(gravacoes.at(-1).create.evidenciaAplicada, false);
     }
-    assert.equal(gravacoes[0].where.registroCicloId_versaoAlgoritmo_variante_disponibilidade.registroCicloId, 7);
+    assert.equal(
+        gravacoes[0].where.registroCicloId_versaoAlgoritmo_variante_disponibilidade.registroCicloId,
+        7
+    );
 });

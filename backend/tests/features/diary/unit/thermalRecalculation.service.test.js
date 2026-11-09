@@ -71,7 +71,9 @@ test('recalcula ciclo afetado e persiste resultado versionado sem aplicar evidê
         gravacoes.slice(0, 8).map(({ where }) => where)
     );
     await criarThermalRecalculationService({ execucaoHabilitada: false }).recalcularPorDatas(
-        7, ['2026-01-08'], tx
+        7,
+        ['2026-01-08'],
+        tx
     );
     assert.equal(gravacoes.length, 16);
 });

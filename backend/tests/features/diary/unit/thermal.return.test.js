@@ -14,7 +14,13 @@ const mapa = (valores) =>
     );
 
 test('confirma retorno após três medições consecutivas na linha de base', () => {
-    const retorno = encontrarRetorno(mapa([366, 364, 364, 364]), '2026-01-09', '2026-01-13', referencia, regra);
+    const retorno = encontrarRetorno(
+        mapa([366, 364, 364, 364]),
+        '2026-01-09',
+        '2026-01-13',
+        referencia,
+        regra
+    );
     assert.deepEqual(retorno, { dataInicio: '2026-01-11', dataConfirmacao: '2026-01-13' });
 });
 
