@@ -1,6 +1,6 @@
-# Auditoria da matriz térmica experimental
+# Verificação da matriz térmica experimental
 
-Data da auditoria: 9 de novembro de 2026.
+Data da verificação: 9 de novembro de 2026.
 
 ## Matriz implementada
 
