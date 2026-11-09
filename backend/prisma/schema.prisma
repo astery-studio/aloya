@@ -375,7 +375,8 @@ model MacrocategoriaDiario {
   ordem        Int     @unique
   sensivel     Boolean @default(false)
 
-  categorias CategoriaDiario[]
+  categorias   CategoriaDiario[]
+  preferencias PreferenciaMacrocategoriaDiario[]
 
   @@map("macrocategorias_diario")
 }
@@ -389,7 +390,8 @@ model CategoriaDiario {
   tipoValor        TipoValorDiario      @default(opcoes) @map("tipo_valor")
   sensivel         Boolean              @default(false)
 
-  opcoes OpcaoDiario[]
+  opcoes       OpcaoDiario[]
+  preferencias PreferenciaCategoriaDiario[]
 
   @@unique([macrocategoriaId, ordem])
   @@index([macrocategoriaId])
@@ -407,6 +409,43 @@ model OpcaoDiario {
   @@unique([categoriaId, ordem])
   @@index([categoriaId])
   @@map("opcoes_diario")
+}
+
+model ConfiguracaoDiario {
+  usuarioId Int     @id @map("usuario_id")
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  versao    Int     @default(0)
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@map("configuracoes_diario")
+}
+
+model PreferenciaMacrocategoriaDiario {
+  usuarioId        Int                  @map("usuario_id")
+  usuario          Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  macrocategoriaId String               @map("macrocategoria_id")
+  macrocategoria   MacrocategoriaDiario @relation(fields: [macrocategoriaId], references: [id], onDelete: Restrict)
+  ativa            Boolean              @default(true)
+  atualizadoEm     DateTime             @updatedAt @map("atualizado_em")
+
+  @@id([usuarioId, macrocategoriaId])
+  @@index([macrocategoriaId])
+  @@map("preferencias_macrocategorias_diario")
+}
+
+model PreferenciaCategoriaDiario {
+  usuarioId   Int             @map("usuario_id")
+  usuario     Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  categoriaId String          @map("categoria_id")
+  categoria   CategoriaDiario @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  ativa       Boolean         @default(true)
+  atualizadoEm DateTime       @updatedAt @map("atualizado_em")
+
+  @@id([usuarioId, categoriaId])
+  @@index([categoriaId])
+  @@map("preferencias_categorias_diario")
 }
 
 model RegistroDiario {
