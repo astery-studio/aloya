@@ -61,6 +61,18 @@ function idsIguais(primeiroId, segundoId) {
     );
 }
 
+function calcularAlturaSelector({ expandido, quantidadeCategorias, possuiEstado = false }) {
+    if (!expandido) {
+        return 60;
+    }
+
+    if (possuiEstado || !Number.isSafeInteger(quantidadeCategorias) || quantidadeCategorias <= 0) {
+        return 156;
+    }
+
+    return 60 + Math.min(quantidadeCategorias, 4) * 52;
+}
+
 function SupportCategorySelector({
     categorias = [],
     categoriaId = null,
@@ -79,6 +91,12 @@ function SupportCategorySelector({
     const categoriasValidas = useMemo(() => normalizarCategorias(categorias), [categorias]);
 
     const mensagemErro = typeof erro === 'string' && erro.trim().length > 0 ? erro.trim() : null;
+
+    const altura = calcularAlturaSelector({
+        expandido,
+        quantidadeCategorias: categoriasValidas.length,
+        possuiEstado: carregando || Boolean(mensagemErro)
+    });
 
     const selecaoBloqueada = desabilitado || carregando || typeof aoSelecionar !== 'function';
 
@@ -227,6 +245,9 @@ function SupportCategorySelector({
             testID="support-category-selector"
             style={[
                 estilos.container,
+                {
+                    height: altura
+                },
                 expandido && estilos.containerExpandido,
                 desabilitado && estilos.desabilitado
             ]}
@@ -280,4 +301,10 @@ function SupportCategorySelector({
     );
 }
 
-export { SupportCategorySelector, idCategoriaEhValido, idsIguais, normalizarCategorias };
+export {
+    SupportCategorySelector,
+    calcularAlturaSelector,
+    idCategoriaEhValido,
+    idsIguais,
+    normalizarCategorias
+};

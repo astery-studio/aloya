@@ -27,6 +27,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
 
 import {
     SupportCategorySelector,
+    calcularAlturaSelector,
     idsIguais,
     normalizarCategorias
 } from '../../../../src/features/support-network/components/SupportCategorySelector/SupportCategorySelector';
@@ -61,7 +62,10 @@ describe('SupportCategorySelector', () => {
 
         expect(screen.getByTestId('support-category-selector')).toHaveStyle({
             width: '100%',
-            height: 68
+            maxWidth: 342,
+            height: 60,
+            borderWidth: 1.41,
+            borderRadius: 14
         });
 
         expect(screen.getByTestId('icone-categorias-cadastradas')).toHaveProp('size', 18);
@@ -82,7 +86,7 @@ describe('SupportCategorySelector', () => {
         expect(screen.getByTestId('icone-recolher-categorias')).toBeOnTheScreen();
 
         expect(screen.getByTestId('support-category-selector')).toHaveStyle({
-            height: 272,
+            height: 164,
             borderWidth: 1.41
         });
 
@@ -300,5 +304,18 @@ describe('SupportCategorySelector', () => {
         ['', '', false]
     ])('compara os identificadores %p e %p', (primeiroId, segundoId, esperado) => {
         expect(idsIguais(primeiroId, segundoId)).toBe(esperado);
+    });
+
+    test.each([
+        [{ expandido: false, quantidadeCategorias: 10 }, 60],
+        [{ expandido: true, quantidadeCategorias: 1 }, 112],
+        [{ expandido: true, quantidadeCategorias: 2 }, 164],
+        [{ expandido: true, quantidadeCategorias: 3 }, 216],
+        [{ expandido: true, quantidadeCategorias: 4 }, 268],
+        [{ expandido: true, quantidadeCategorias: 8 }, 268],
+        [{ expandido: true, quantidadeCategorias: 0 }, 156],
+        [{ expandido: true, quantidadeCategorias: 2, possuiEstado: true }, 156]
+    ])('calcula a altura responsiva do seletor %#', (entrada, esperado) => {
+        expect(calcularAlturaSelector(entrada)).toBe(esperado);
     });
 });

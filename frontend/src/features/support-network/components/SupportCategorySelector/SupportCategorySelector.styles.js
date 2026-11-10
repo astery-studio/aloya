@@ -7,21 +7,23 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
             width: '100%',
-            height: 68,
+            maxWidth: 342,
+            height: 60,
+            alignSelf: 'center',
             overflow: 'hidden',
             backgroundColor: tema.cores.interface.superficie,
+            borderWidth: 1.41,
+            borderColor: tema.cores.interface.borda,
             borderRadius: 14
         },
 
         containerExpandido: {
-            height: 272,
-            borderWidth: 1.41,
             borderColor: tema.escuro ? tema.cores.interface.destaque : 'rgba(44, 76, 59, 0.33)'
         },
 
         cabecalho: {
             width: '100%',
-            height: 68,
+            height: 60,
             minHeight: 60,
             paddingHorizontal: 14,
             flexDirection: 'row',
