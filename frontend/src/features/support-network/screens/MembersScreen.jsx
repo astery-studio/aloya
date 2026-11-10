@@ -6,8 +6,9 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import {
-    BellIcon,
     FunnelIcon,
+    LockKeyIcon,
+    PaperPlaneTiltIcon,
     UserCircleGearIcon,
     WarningCircleIcon
 } from '../../../shared/components/icons/AppIcons';
@@ -145,6 +146,8 @@ function MembersScreen({
     const [contatoResumo, setContatoResumo] = useState(null);
 
     const [contatoUltimoReenvio, setContatoUltimoReenvio] = useState(null);
+    const [confirmacaoContato, setConfirmacaoContato] = useState(null);
+    const [ultimaAcaoContato, setUltimaAcaoContato] = useState(null);
 
     const possuiFiltros = filtrosPossuemSelecao(filtros);
 
@@ -189,6 +192,7 @@ function MembersScreen({
 
     function reenviarConvite(contato) {
         setContatoUltimoReenvio(contato);
+        setUltimaAcaoContato(null);
 
         return estado.reenviarConvite(contato.id);
     }
@@ -209,11 +213,7 @@ function MembersScreen({
         }
 
         if (acao === 'arquivar') {
-            Alert.alert(
-                'Arquivar contato',
-                `${obterNomeContato(contato)} será arquivado pelo fluxo de gerenciamento da Rede de Apoio.`
-            );
-
+            setConfirmacaoContato({ tipo: 'desativar', contato });
             return;
         }
 
@@ -226,23 +226,43 @@ function MembersScreen({
         }
 
         if (acao === 'remover') {
-            Alert.alert(
-                contato?.status === 'pendente' ? 'Cancelar convite' : 'Remover contato',
-                contato?.status === 'pendente'
-                    ? `O convite de ${obterNomeContato(
-                          contato
-                      )} será cancelado pelo fluxo da HU-031.`
-                    : `${obterNomeContato(contato)} será removido pelo fluxo da HU-031.`
-            );
+            setConfirmacaoContato({
+                tipo: contato?.status === 'pendente' ? 'cancelar' : 'remover',
+                contato
+            });
         }
+    }
+
+    function fecharConfirmacao() {
+        if (!estado.acaoEmAndamento) setConfirmacaoContato(null);
+    }
+
+    function executarAcaoConfirmada(tipo, contato) {
+        setConfirmacaoContato(null);
+        setUltimaAcaoContato({ tipo, contato });
+
+        return tipo === 'desativar'
+            ? estado.desativarContato(contato.id)
+            : estado.removerContato(contato.id);
+    }
+
+    function confirmarAcaoContato() {
+        if (!confirmacaoContato) return;
+        executarAcaoConfirmada(confirmacaoContato.tipo, confirmacaoContato.contato);
     }
 
     function fecharResultado() {
         setContatoUltimoReenvio(null);
+        setUltimaAcaoContato(null);
         estado.limparResultadoAcao();
     }
 
     function repetirReenvio() {
+        if (ultimaAcaoContato) {
+            executarAcaoConfirmada(ultimaAcaoContato.tipo, ultimaAcaoContato.contato);
+            return;
+        }
+
         if (!contatoUltimoReenvio) {
             fecharResultado();
             return;
@@ -250,6 +270,29 @@ function MembersScreen({
 
         reenviarConvite(contatoUltimoReenvio);
     }
+
+    const configuracaoConfirmacao = confirmacaoContato
+        ? confirmacaoContato.tipo === 'cancelar'
+            ? {
+                  titulo: 'Cancelar Convite',
+                  mensagem:
+                      'Tem certeza que deseja cancelar este convite? Esta ação não pode ser desfeita.',
+                  acao: 'Continuar'
+              }
+            : confirmacaoContato.tipo === 'desativar'
+              ? {
+                    titulo: 'Desativar Contato',
+                    mensagem:
+                        'Ao desativar este contato, ele deixará de visualizar qualquer informação sua imediatamente. E para ativar você terá que reenviar um convite.',
+                    acao: 'Desativar'
+                }
+              : {
+                    titulo: 'Remover Contato',
+                    mensagem:
+                        'Ao remover este contato, ele deixará de visualizar qualquer informação sua imediatamente.',
+                    acao: 'Remover'
+                }
+        : null;
 
     const acoesCabecalho = (
         <>
@@ -355,9 +398,31 @@ function MembersScreen({
             />
 
             <SimpleModal
+                visivel={confirmacaoContato !== null}
+                aoFechar={fecharConfirmacao}
+                icone={WarningCircleIcon}
+                corIcone={tema.cores.marca.primaria}
+                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                titulo={configuracaoConfirmacao?.titulo ?? ''}
+                mensagem={configuracaoConfirmacao?.mensagem ?? ''}
+                acaoPrincipal={{
+                    texto: configuracaoConfirmacao?.acao ?? '',
+                    variante: 'verde',
+                    aoPressionar: confirmarAcaoContato,
+                    carregando: Boolean(estado.acaoEmAndamento)
+                }}
+                acaoSecundaria={{
+                    texto: 'Cancelar',
+                    variante: 'branco',
+                    aoPressionar: fecharConfirmacao,
+                    desativado: Boolean(estado.acaoEmAndamento)
+                }}
+            />
+
+            <SimpleModal
                 visivel={estado.resultadoAcao !== null}
                 aoFechar={fecharResultado}
-                icone={BellIcon}
+                icone={estado.resultadoAcao?.tipo === 'reenviar' ? PaperPlaneTiltIcon : LockKeyIcon}
                 corIcone={tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo={estado.resultadoAcao?.mensagem ?? ''}

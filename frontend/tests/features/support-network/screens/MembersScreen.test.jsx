@@ -152,7 +152,9 @@ function criarEstado(substituicoes = {}) {
         contatoEmAndamentoId: null,
         acaoEmAndamento: null,
         atualizarLista: jest.fn(),
+        desativarContato: jest.fn(),
         reenviarConvite: jest.fn(),
+        removerContato: jest.fn(),
         limparResultadoAcao: jest.fn(),
         ...substituicoes
     };
@@ -391,7 +393,7 @@ describe('MembersScreen', () => {
         });
     });
 
-    test('mostra alertas provisórios de edição, arquivamento e remoção', async () => {
+    test('mantém apenas o alerta provisório da edição de vínculo', async () => {
         jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
         await render(<MembersScreen />);
@@ -406,25 +408,63 @@ describe('MembersScreen', () => {
             expect.stringContaining('HU-030')
         );
 
+        expect(Alert.alert).toHaveBeenCalledTimes(1);
+    });
+
+    test('confirma a desativação antes de chamar o serviço', async () => {
+        const desativarContato = jest.fn();
+        mockUseSupportContacts.mockReturnValue(criarEstado({ desativarContato }));
+
+        await render(<MembersScreen />);
+
         await act(async () => {
             mockContactListProps.aoAcao('arquivar', contatos[1]);
             await Promise.resolve();
         });
 
-        expect(Alert.alert).toHaveBeenCalledWith(
-            'Arquivar contato',
-            expect.stringContaining('será arquivado')
-        );
+        expect(screen.getByText('Desativar Contato')).toBeOnTheScreen();
+        expect(desativarContato).not.toHaveBeenCalled();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Desativar' }));
+
+        expect(desativarContato).toHaveBeenCalledWith(2);
+    });
+
+    test('confirma o cancelamento do convite antes de remover', async () => {
+        const removerContato = jest.fn();
+        mockUseSupportContacts.mockReturnValue(criarEstado({ removerContato }));
+
+        await render(<MembersScreen />);
 
         await act(async () => {
             mockContactListProps.aoAcao('remover', contatos[0]);
             await Promise.resolve();
         });
 
-        expect(Alert.alert).toHaveBeenCalledWith(
-            'Cancelar convite',
-            expect.stringContaining('HU-031')
-        );
+        expect(screen.getByText('Cancelar Convite')).toBeOnTheScreen();
+        expect(removerContato).not.toHaveBeenCalled();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+
+        expect(removerContato).toHaveBeenCalledWith(1);
+    });
+
+    test('confirma a remoção de contato ativo', async () => {
+        const removerContato = jest.fn();
+        mockUseSupportContacts.mockReturnValue(criarEstado({ removerContato }));
+
+        await render(<MembersScreen />);
+
+        await act(async () => {
+            mockContactListProps.aoAcao('remover', contatos[1]);
+            await Promise.resolve();
+        });
+
+        expect(screen.getByText('Remover Contato')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Remover' }));
+
+        expect(removerContato).toHaveBeenCalledWith(2);
     });
 
     test('abre o resumo com as permissões do contato', async () => {
