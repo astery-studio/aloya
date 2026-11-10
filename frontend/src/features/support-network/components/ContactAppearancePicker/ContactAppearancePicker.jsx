@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
-import { CheckIcon } from '../../../../shared/components/icons/AppIcons';
+import { ChecksIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import {
     COR_ICONE_NAO_SELECIONADO,
@@ -197,7 +197,7 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                 ]}
                             >
                                 {selecionada ? (
-                                    <CheckIcon
+                                    <ChecksIcon
                                         testID={`marcador-cor-contato-${opcao.id}`}
                                         size={Math.min(18, tamanhos.tamanhoQuadroCor - 8)}
                                         color={obterCorMarcador(opcao.id)}

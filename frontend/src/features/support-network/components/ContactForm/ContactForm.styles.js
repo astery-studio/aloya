@@ -25,6 +25,19 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        botaoPermissao: {
+            width: '100%'
+        },
+
+        textoBotaoPermissao: {
+            color: '#FFFFFF',
+            fontFamily: fontFamilies.semibold,
+            fontSize: 15,
+            fontStyle: 'normal',
+            fontWeight: '600',
+            lineHeight: 21
+        },
+
         erro: {
             width: '100%',
             marginTop: -18,

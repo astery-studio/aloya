@@ -17,7 +17,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     }
 
     return {
-        CheckIcon: criarIcone('CheckIcon'),
+        ChecksIcon: criarIcone('ChecksIcon'),
         FlowerLotusIcon: criarIcone('FlowerLotusIcon'),
         FlowerTulipIcon: criarIcone('FlowerTulipIcon'),
         HandshakeIcon: criarIcone('HandshakeIcon'),
@@ -107,7 +107,11 @@ describe('ContactAppearancePicker', () => {
             minWidth: 34,
             minHeight: 34,
             maxWidth: 34,
-            maxHeight: 34
+            maxHeight: 34,
+            borderWidth: 0.7,
+            borderRadius: 9,
+            borderColor: '#E6E2D8',
+            backgroundColor: '#FFFFFF'
         });
 
         expect(opcaoCoral).toHaveStyle({
@@ -144,6 +148,7 @@ describe('ContactAppearancePicker', () => {
         });
 
         expect(screen.getByTestId('marcador-cor-contato-roxo')).toHaveProp('color', '#FFFFFF');
+        expect(screen.getByTestId('marcador-cor-contato-roxo')).toHaveProp('weight', 'bold');
     });
 
     test('altera somente o ícone e preserva a cor', async () => {

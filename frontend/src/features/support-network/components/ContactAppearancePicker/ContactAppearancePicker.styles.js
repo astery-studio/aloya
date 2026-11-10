@@ -44,9 +44,9 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: tema.cores.interface.superficie,
-            borderWidth: 1,
+            borderWidth: 0.7,
             borderColor: tema.cores.interface.borda,
-            borderRadius: 10
+            borderRadius: 9
         },
 
         opcaoIconeSelecionada: {
@@ -67,12 +67,12 @@ function criarEstilos(tema) {
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            borderWidth: 1,
-            borderRadius: 10
+            borderWidth: 0.7,
+            borderRadius: 9
         },
 
         opcaoCorSelecionada: {
-            borderWidth: 1
+            borderWidth: 0.7
         },
 
         opcaoPressionada: {

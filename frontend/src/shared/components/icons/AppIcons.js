@@ -12,6 +12,8 @@ import { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 import { ChartLineUpIcon } from 'phosphor-react-native/src/icons/ChartLineUp';
 import { CheckIcon } from 'phosphor-react-native/src/icons/Check';
 import { CheckCircleIcon } from 'phosphor-react-native/src/icons/CheckCircle';
+import { ChecksIcon } from 'phosphor-react-native/src/icons/Checks';
+import { CircleIcon } from 'phosphor-react-native/src/icons/Circle';
 import { ClockIcon } from 'phosphor-react-native/src/icons/Clock';
 import { ClockCounterClockwiseIcon } from 'phosphor-react-native/src/icons/ClockCounterClockwise';
 import { DropIcon } from 'phosphor-react-native/src/icons/Drop';
@@ -45,8 +47,10 @@ import { SparkleIcon } from 'phosphor-react-native/src/icons/Sparkle';
 import { SunIcon } from 'phosphor-react-native/src/icons/Sun';
 import { TrashIcon } from 'phosphor-react-native/src/icons/Trash';
 import { UserCheckIcon } from 'phosphor-react-native/src/icons/UserCheck';
+import { UserGearIcon } from 'phosphor-react-native/src/icons/UserGear';
 import { UserIcon } from 'phosphor-react-native/src/icons/User';
 import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
+import { UsersThreeIcon } from 'phosphor-react-native/src/icons/UsersThree';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
@@ -66,6 +70,8 @@ export {
     ChartLineUpIcon,
     CheckCircleIcon,
     CheckIcon,
+    ChecksIcon,
+    CircleIcon,
     ClockCounterClockwiseIcon,
     ClockIcon,
     DropIcon,
@@ -99,8 +105,10 @@ export {
     SunIcon,
     TrashIcon,
     UserCheckIcon,
+    UserGearIcon,
     UserIcon,
     UsersIcon,
+    UsersThreeIcon,
     WarningCircleIcon,
     WarningIcon,
     XCircleIcon,

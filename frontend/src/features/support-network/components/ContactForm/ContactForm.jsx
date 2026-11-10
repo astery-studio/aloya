@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
-import { UserCheckIcon, UsersIcon } from '../../../../shared/components/icons/AppIcons';
+import { UserGearIcon, UsersIcon } from '../../../../shared/components/icons/AppIcons';
 import EmailInput from '../../../../shared/components/forms/EmailInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { corContatoEhValida, iconeContatoEhValido } from '../../constants/contactAppearanceOptions';
@@ -201,19 +201,25 @@ function ContactForm({
                 <ButtonScreen
                     texto="Cadastrar Permissões Individuais"
                     rotuloAcessibilidade="Cadastrar permissões individuais"
-                    icone={UserCheckIcon}
+                    icone={UserGearIcon}
+                    tamanhoIcone={18}
                     variante="laranja"
                     aoPressionar={abrirPermissoes}
                     desativado={carregando || typeof aoAbrirPermissoes !== 'function'}
+                    estilo={estilos.botaoPermissao}
+                    estiloTexto={estilos.textoBotaoPermissao}
                 />
 
                 <ButtonScreen
                     texto="Cadastrar Categoria Nova"
                     rotuloAcessibilidade="Cadastrar categoria nova"
                     icone={UsersIcon}
+                    tamanhoIcone={18}
                     variante="verde"
                     aoPressionar={criarCategoria}
                     desativado={carregando || typeof aoCriarCategoria !== 'function'}
+                    estilo={estilos.botaoPermissao}
+                    estiloTexto={estilos.textoBotaoPermissao}
                 />
 
                 <SupportCategorySelector

@@ -122,7 +122,10 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
         rotuloAcessibilidade,
         aoPressionar,
         desativado,
-        carregando
+        carregando,
+        icone: Icone,
+        tamanhoIcone,
+        estiloTexto
     }) {
         return React.createElement(
             Pressable,
@@ -136,7 +139,8 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
                 disabled: desativado || carregando,
                 onPress: aoPressionar
             },
-            React.createElement(Text, null, texto)
+            Icone ? React.createElement(Icone, { size: tamanhoIcone }) : null,
+            React.createElement(Text, { style: estiloTexto }, texto)
         );
     };
 });
@@ -146,8 +150,10 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     const { View } = require('react-native');
 
     return {
-        UserCheckIcon: (propriedades) => React.createElement(View, propriedades),
-        UsersIcon: (propriedades) => React.createElement(View, propriedades)
+        UserGearIcon: (propriedades) =>
+            React.createElement(View, { ...propriedades, testID: 'UserGearIcon' }),
+        UsersIcon: (propriedades) =>
+            React.createElement(View, { ...propriedades, testID: 'UsersIcon' })
     };
 });
 
@@ -199,6 +205,15 @@ describe('ContactForm', () => {
         ).toBeOnTheScreen();
 
         expect(screen.getByText('Categorias Cadastradas')).toBeOnTheScreen();
+
+        expect(screen.getByTestId('UserGearIcon')).toHaveProp('size', 18);
+
+        expect(screen.getByText('Cadastrar Permissões Individuais')).toHaveStyle({
+            color: '#FFFFFF',
+            fontSize: 15,
+            fontWeight: '600',
+            lineHeight: 21
+        });
     });
 
     test('encaminha alteração de e-mail', async () => {
