@@ -6,12 +6,25 @@ import {
     MENSAGEM_ERRO_LISTAGEM_CONTATOS,
     STATUS_CONTATO_ATIVO,
     STATUS_CONTATO_PENDENTE,
+    STATUS_CONTATO_RECUSADO,
+    STATUS_CONTATO_REVOGADO,
+    STATUS_CONTATOS_LISTAVEIS,
     STATUS_CONTATOS_VISIVEIS
 } from '../../../../src/features/support-network/constants/supportContact.constants.js';
 
 test('define somente vínculos pendentes e ativos como contatos visíveis', () => {
     assert.deepEqual(STATUS_CONTATOS_VISIVEIS, [STATUS_CONTATO_PENDENTE, STATUS_CONTATO_ATIVO]);
     assert.equal(Object.isFrozen(STATUS_CONTATOS_VISIVEIS), true);
+});
+
+test('mantém o histórico recusado e inativo disponível para a listagem', () => {
+    assert.deepEqual(STATUS_CONTATOS_LISTAVEIS, [
+        STATUS_CONTATO_PENDENTE,
+        STATUS_CONTATO_ATIVO,
+        STATUS_CONTATO_REVOGADO,
+        STATUS_CONTATO_RECUSADO
+    ]);
+    assert.equal(Object.isFrozen(STATUS_CONTATOS_LISTAVEIS), true);
 });
 
 test('considera atrasado somente o convite com mais de sete dias', () => {

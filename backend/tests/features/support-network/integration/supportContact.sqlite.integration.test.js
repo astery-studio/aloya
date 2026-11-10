@@ -150,10 +150,16 @@ test('lista contatos reais com isolamento, ordem, vínculo e espera calculada', 
 
         assert.equal(resposta.status, 200);
         assert.equal(resposta.headers.get('cache-control'), 'private, no-store');
-        assert.deepEqual(corpo.resumo, { total: 3, pendentes: 2, ativos: 1 });
+        assert.deepEqual(corpo.resumo, {
+            total: 4,
+            pendentes: 2,
+            ativos: 1,
+            inativos: 0,
+            recusados: 1
+        });
         assert.deepEqual(
             corpo.contatos.map(({ id }) => id),
-            [22, 21, 20]
+            [22, 21, 20, 23]
         );
         assert.equal(corpo.contatos[0].identificacao, 'ana@email.com');
         assert.equal(corpo.contatos[1].vinculo.rotulo, 'Categoria: Profissional');
@@ -163,8 +169,10 @@ test('lista contatos reais com isolamento, ordem, vínculo e espera calculada', 
         ]);
         assert.equal(corpo.contatos[1].aguardando.atrasado, true);
         assert.equal(corpo.contatos[2].acoes.podeReenviarConvite, false);
+        assert.equal(corpo.contatos[3].status, 'recusado');
+        assert.equal(corpo.contatos[3].aguardando.rotulo, 'Recusado há 37 dias');
         assert.equal(
-            corpo.contatos.some(({ id }) => id === 23 || id === 24),
+            corpo.contatos.some(({ id }) => id === 24),
             false
         );
     } finally {

@@ -1,5 +1,5 @@
 import { PAPEIS_CONTATO, papelEhTitular } from '../constants/contactInvitation.constants.js';
-import { STATUS_CONTATOS_VISIVEIS } from '../constants/supportContact.constants.js';
+import { STATUS_CONTATOS_LISTAVEIS } from '../constants/supportContact.constants.js';
 import {
     formatarContato,
     formatarContatoRecebido,
@@ -27,13 +27,19 @@ function validarTitular(titularId, papel) {
     }
 }
 
-function criarResumo(contatos) {
-    const pendentes = contatos.filter(({ status }) => status === 'pendente').length;
-    return Object.freeze({
+function criarResumo(contatos, incluirHistorico = false) {
+    const resumo = {
         total: contatos.length,
-        pendentes,
-        ativos: contatos.length - pendentes
-    });
+        pendentes: contatos.filter(({ status }) => status === 'pendente').length,
+        ativos: contatos.filter(({ status }) => status === 'ativo').length
+    };
+
+    if (incluirHistorico) {
+        resumo.inativos = contatos.filter(({ status }) => status === 'inativo').length;
+        resumo.recusados = contatos.filter(({ status }) => status === 'recusado').length;
+    }
+
+    return Object.freeze(resumo);
 }
 
 function validarContatoAutenticado(usuarioId, papel) {
@@ -61,7 +67,7 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
         const vinculos = await prisma.vinculoRedeApoio.findMany({
             where: {
                 titularId,
-                status: { in: STATUS_CONTATOS_VISIVEIS }
+                status: { in: STATUS_CONTATOS_LISTAVEIS }
             },
             select: {
                 id: true,
@@ -96,7 +102,7 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
 
         return Object.freeze({
             contatos: Object.freeze(contatos),
-            resumo: criarResumo(contatos)
+            resumo: criarResumo(contatos, true)
         });
     }
 

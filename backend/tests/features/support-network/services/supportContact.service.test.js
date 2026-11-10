@@ -62,7 +62,7 @@ test('valida sessão e restringe a listagem à titular', () => {
     assert.doesNotThrow(() => validarTitular(1, 'principal_e_contato_apoio'));
 });
 
-test('consulta apenas vínculos pendentes ou ativos pertencentes à titular', async () => {
+test('consulta vínculos atuais e históricos pertencentes à titular', async () => {
     const { prisma, estado } = criarPrisma([]);
     const service = criarSupportContactService({ prisma, now: () => agora });
 
@@ -70,7 +70,7 @@ test('consulta apenas vínculos pendentes ou ativos pertencentes à titular', as
 
     assert.deepEqual(estado.consulta.where, {
         titularId: 27,
-        status: { in: ['pendente', 'ativo'] }
+        status: { in: ['pendente', 'ativo', 'revogado', 'recusado'] }
     });
     assert.deepEqual(estado.consulta.select.contato.select, { nome: true });
     assert.deepEqual(estado.consulta.select.categoria.select, {
@@ -94,7 +94,13 @@ test('ordena, apresenta e resume a lista sem consultar dados desnecessários', a
         resultado.contatos.map(({ id }) => id),
         [2, 1, 3]
     );
-    assert.deepEqual(resultado.resumo, { total: 3, pendentes: 1, ativos: 2 });
+    assert.deepEqual(resultado.resumo, {
+        total: 3,
+        pendentes: 1,
+        ativos: 2,
+        inativos: 0,
+        recusados: 0
+    });
     assert.equal(Object.isFrozen(resultado.contatos), true);
 });
 
@@ -106,7 +112,7 @@ test('representa corretamente o estado vazio', async () => {
 
     assert.deepEqual(resultado, {
         contatos: [],
-        resumo: { total: 0, pendentes: 0, ativos: 0 }
+        resumo: { total: 0, pendentes: 0, ativos: 0, inativos: 0, recusados: 0 }
     });
 });
 

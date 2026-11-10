@@ -89,3 +89,53 @@ test('usa e-mail quando ainda não existe nome e habilita somente o reenvio pend
     assert.equal(contato.aguardando.rotulo, 'Aguardando há 3 dias');
     assert.equal(contato.acoes.podeReenviarConvite, true);
 });
+
+test('apresenta vínculo revogado como contato inativo', () => {
+    const dataResposta = new Date('2026-11-05T10:00:00.000Z');
+    const contato = formatarContato(
+        {
+            id: 21,
+            contato: { nome: 'Luan' },
+            emailConvidado: 'luan@email.com',
+            status: 'revogado',
+            categoria: null,
+            permissoesIndividuais: [],
+            dataEnvio: new Date('2026-10-01T10:00:00.000Z'),
+            dataResposta
+        },
+        agora
+    );
+
+    assert.equal(contato.status, 'inativo');
+    assert.equal(contato.statusRotulo, 'Inativo');
+    assert.equal(contato.dataDesativacao, dataResposta);
+    assert.equal(contato.aguardando.rotulo, 'Desativado há 3 dias');
+    assert.deepEqual(contato.acoes, {
+        podeAlterarVinculo: false,
+        podeRemover: true,
+        podeReenviarConvite: true
+    });
+});
+
+test('mantém convite recusado no histórico', () => {
+    const dataResposta = new Date('2026-11-06T10:00:00.000Z');
+    const contato = formatarContato(
+        {
+            id: 22,
+            contato: { nome: 'Maria' },
+            emailConvidado: 'maria@email.com',
+            status: 'recusado',
+            categoria: null,
+            permissoesIndividuais: [],
+            dataEnvio: new Date('2026-11-01T10:00:00.000Z'),
+            dataResposta
+        },
+        agora
+    );
+
+    assert.equal(contato.status, 'recusado');
+    assert.equal(contato.statusRotulo, 'Recusado');
+    assert.equal(contato.dataRecusa, dataResposta);
+    assert.equal(contato.aguardando.rotulo, 'Recusado há 2 dias');
+    assert.equal(contato.acoes.podeReenviarConvite, true);
+});
