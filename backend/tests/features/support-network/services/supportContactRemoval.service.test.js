@@ -73,7 +73,8 @@ test('revoga contato ativo, encerra sessões, cancela alertas e notifica', async
         categoriaId: null,
         permissoesIndividuais: [],
         tokenConviteHash: null,
-        dataExpiracao: null
+        dataExpiracao: null,
+        dataResposta: agora
     });
     assert.deepEqual(estado.sessoes[0], {
         where: {

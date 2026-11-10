@@ -53,7 +53,7 @@ function criarSupportContactRemovalService({ prisma, now = () => new Date() } = 
                     permissoesIndividuais: [],
                     tokenConviteHash: null,
                     dataExpiracao: null,
-                    ...(vinculo.status === 'pendente' ? { dataResposta: instante } : {})
+                    dataResposta: instante
                 }
             });
             if (resultado.count !== 1) {
