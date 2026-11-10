@@ -4,27 +4,23 @@ import { fontFamilies } from '../../../../shared/theme';
 
 const CORES_CLARAS = Object.freeze({
     categoria: Object.freeze({
-        conteudo: '#A66314',
-        fundo: 'rgba(214, 140, 58, 0.18)',
-        borda: 'rgba(214, 140, 58, 0.34)'
+        conteudo: '#D68C3A',
+        fundo: 'rgba(214, 140, 58, 0.20)'
     }),
     individual: Object.freeze({
-        conteudo: '#2C4C3B',
-        fundo: 'rgba(44, 76, 59, 0.14)',
-        borda: 'rgba(44, 76, 59, 0.32)'
+        conteudo: '#4A758E',
+        fundo: 'rgba(74, 117, 142, 0.20)'
     })
 });
 
 const CORES_ESCURAS = Object.freeze({
     categoria: Object.freeze({
         conteudo: '#F2B45F',
-        fundo: 'rgba(242, 180, 95, 0.16)',
-        borda: 'rgba(242, 180, 95, 0.42)'
+        fundo: 'rgba(242, 180, 95, 0.20)'
     }),
     individual: Object.freeze({
-        conteudo: '#9FD6B6',
-        fundo: 'rgba(159, 214, 182, 0.14)',
-        borda: 'rgba(159, 214, 182, 0.4)'
+        conteudo: '#8FC4DF',
+        fundo: 'rgba(143, 196, 223, 0.20)'
     })
 });
 
@@ -32,16 +28,14 @@ function criarEstilos() {
     return StyleSheet.create({
         container: {
             minWidth: 0,
-            maxWidth: '100%',
-            minHeight: 32,
-            alignSelf: 'flex-start',
+            width: '100%',
+            height: 36,
+            alignSelf: 'stretch',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 7,
-            paddingVertical: 5,
-            paddingHorizontal: 12,
-            borderWidth: 1,
+            gap: 6,
+            paddingHorizontal: 14,
             borderRadius: 10
         },
 
@@ -51,7 +45,7 @@ function criarEstilos() {
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             fontWeight: '600',
-            lineHeight: 20,
+            lineHeight: 19.5,
             includeFontPadding: false
         }
     });
@@ -66,8 +60,7 @@ function criarVariantes(tema) {
                 tipo,
                 Object.freeze({
                     container: Object.freeze({
-                        backgroundColor: paleta.fundo,
-                        borderColor: paleta.borda
+                        backgroundColor: paleta.fundo
                     }),
                     conteudo: Object.freeze({
                         color: paleta.conteudo

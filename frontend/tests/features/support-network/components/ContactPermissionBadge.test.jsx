@@ -107,13 +107,13 @@ describe('ContactPermissionBadge', () => {
         );
 
         expect(screen.getByTestId('contact-permission-badge')).toHaveStyle({
-            minHeight: 32,
-            backgroundColor: 'rgba(214, 140, 58, 0.18)',
-            borderColor: 'rgba(214, 140, 58, 0.34)'
+            width: '100%',
+            height: 36,
+            backgroundColor: 'rgba(214, 140, 58, 0.20)'
         });
 
         expect(screen.getByText('Profissional')).toHaveStyle({
-            color: '#A66314'
+            color: '#D68C3A'
         });
     });
 
@@ -130,12 +130,11 @@ describe('ContactPermissionBadge', () => {
         );
 
         expect(screen.getByTestId('contact-permission-badge')).toHaveStyle({
-            backgroundColor: 'rgba(159, 214, 182, 0.14)',
-            borderColor: 'rgba(159, 214, 182, 0.4)'
+            backgroundColor: 'rgba(143, 196, 223, 0.20)'
         });
 
         expect(screen.getByText('Permissões Individuais')).toHaveStyle({
-            color: '#9FD6B6'
+            color: '#8FC4DF'
         });
     });
 

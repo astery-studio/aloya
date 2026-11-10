@@ -76,7 +76,7 @@ function ContactPermissionBadge({ vinculo }) {
                 testID={`contact-permission-badge-icon-${vinculoNormalizado.tipo}`}
                 accessibilityElementsHidden
                 importantForAccessibility="no-hide-descendants"
-                size={16}
+                size={13}
                 color={variante.conteudo.color}
                 weight="regular"
             />

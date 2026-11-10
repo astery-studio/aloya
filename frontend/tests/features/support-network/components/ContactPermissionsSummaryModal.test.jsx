@@ -56,13 +56,23 @@ describe('ContactPermissionsSummaryModal', () => {
 
         expect(screen.getByText('Resumo de Permissões')).toBeOnTheScreen();
 
-        expect(screen.getByText('Acesso à Fase Atual')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Você possui as seguintes permissões de acesso aos dados de Julia:')
+        ).toBeOnTheScreen();
 
-        expect(screen.getByText('Receber dicas')).toBeOnTheScreen();
+        expect(screen.getByText('Acesso à Fase Atual: ')).toBeOnTheScreen();
 
-        expect(screen.getByText(/Saúde e Acompanhamento: consultas\./iu)).toBeOnTheScreen();
+        expect(screen.getByText('Você terá acesso à fase em que Julia está.')).toBeOnTheScreen();
 
-        expect(screen.getByText(/Ciclo e Sangramento: fluxo menstrual\./iu)).toBeOnTheScreen();
+        expect(screen.getByText('Receber dicas: ')).toBeOnTheScreen();
+
+        expect(screen.getByText('Saúde e Acompanhamento: ')).toBeOnTheScreen();
+
+        expect(screen.getByText('consultas')).toBeOnTheScreen();
+
+        expect(screen.getByText('Ciclo e Sangramento: ')).toBeOnTheScreen();
+
+        expect(screen.getByText('fluxo menstrual')).toBeOnTheScreen();
 
         expect(screen.getByText('Profissional')).toBeOnTheScreen();
     });
@@ -85,7 +95,9 @@ describe('ContactPermissionsSummaryModal', () => {
             screen.getByText('Você não possui acesso direto aos dados de permissões gerais.')
         ).toBeOnTheScreen();
 
-        expect(screen.getByText('Você não possui acesso aos dados do diário.')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Você não possui acesso direto ao diário de Julia.')
+        ).toBeOnTheScreen();
 
         expect(screen.getByText('Permissões Individuais')).toBeOnTheScreen();
     });
@@ -188,7 +200,7 @@ describe('ContactPermissionsSummaryModal', () => {
     test('cria as mensagens vazias da perspectiva recebida', () => {
         expect(criarMensagensVazias('recebido', 'Julia')).toEqual({
             gerais: 'Você não possui acesso direto aos dados de permissões gerais.',
-            diario: 'Você não possui acesso aos dados do diário.'
+            diario: 'Você não possui acesso direto ao diário de Julia.'
         });
     });
 

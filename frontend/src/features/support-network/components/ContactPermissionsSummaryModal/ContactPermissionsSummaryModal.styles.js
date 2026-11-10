@@ -5,25 +5,29 @@ import { fontFamilies } from '../../../../shared/theme';
 function criarEstilos(tema) {
     return StyleSheet.create({
         modal: {
-            maxWidth: 390
+            width: '100%',
+            maxWidth: 342,
+            borderRadius: 20,
+            boxShadow: '0 8px 40px 0 rgba(34, 34, 34, 0.12)'
         },
 
         conteudo: {
             width: '100%',
-            gap: 20
+            alignItems: 'center',
+            gap: 12
         },
 
         secao: {
             width: '100%',
             alignItems: 'center',
-            gap: 10
+            gap: 8
         },
 
         tituloSecao: {
             width: '100%',
             color: tema.escuro ? '#F08A75' : tema.cores.marca.primaria,
             fontFamily: fontFamilies.bold,
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: '700',
             lineHeight: 18,
             letterSpacing: 0.6,
@@ -32,7 +36,8 @@ function criarEstilos(tema) {
         },
 
         descricao: {
-            width: '100%',
+            width: 294,
+            maxWidth: '100%',
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
@@ -43,7 +48,8 @@ function criarEstilos(tema) {
         },
 
         mensagemVazia: {
-            width: '100%',
+            width: 294,
+            maxWidth: '100%',
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
@@ -54,25 +60,34 @@ function criarEstilos(tema) {
         },
 
         lista: {
-            width: '100%',
-            gap: 9
+            width: 294,
+            maxWidth: '100%',
+            paddingVertical: 8,
+            paddingHorizontal: 5,
+            alignItems: 'center',
+            gap: 5
         },
 
         item: {
             width: '100%',
             minWidth: 0,
             flexDirection: 'row',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: 10
         },
 
         marcador: {
-            width: 7,
-            height: 7,
+            width: 9,
             flexShrink: 0,
-            marginTop: 7,
-            borderRadius: 3.5,
-            backgroundColor: tema.escuro ? '#F08A75' : tema.cores.marca.primaria
+            color: tema.escuro ? '#F08A75' : '#C85A44',
+            fontFamily: fontFamilies.regular,
+            fontSize: 9,
+            fontWeight: '400',
+            lineHeight: 13.5
+        },
+
+        marcadorAlternado: {
+            color: tema.escuro ? '#9FD6B6' : '#2C4C3B'
         },
 
         textoItem: {
@@ -80,25 +95,37 @@ function criarEstilos(tema) {
             flex: 1,
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: '400',
-            lineHeight: 20,
+            lineHeight: 16.5,
             includeFontPadding: false
         },
 
         textoItemDestaque: {
-            color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.semibold,
-            fontWeight: '600'
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
+
+        textoItemComplemento: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontWeight: '400'
         },
 
         vinculo: {
             width: '100%',
+            paddingTop: 8,
             alignItems: 'center'
         },
 
         botao: {
-            width: '100%'
+            width: '100%',
+            backgroundColor: '#C85A44'
+        },
+
+        textoBotao: {
+            color: '#FFFFFF'
         }
     });
 }
