@@ -4,6 +4,12 @@ const MENSAGEM_ERRO_LISTAGEM =
     'Não foi possível carregar sua Rede de Apoio no momento. Tente novamente.';
 
 const MENSAGEM_ERRO_REENVIO = 'Não foi possível reenviar o convite no momento. Tente novamente.';
+const MENSAGEM_ERRO_REMOCAO =
+    'Ocorreu um erro ao remover contato. Verifique sua conexão e tente novamente.';
+const MENSAGEM_ERRO_CANCELAMENTO =
+    'Ocorreu um erro ao cancelar seu convite. Verifique sua conexão e tente novamente.';
+const MENSAGEM_ERRO_DESATIVACAO =
+    'Ocorreu um erro ao desativar contato. Verifique sua conexão e tente novamente.';
 
 const STATUS_CONTATO = Object.freeze(['pendente', 'ativo', 'inativo', 'recusado']);
 
@@ -231,12 +237,46 @@ function normalizarConviteReenviado(resposta) {
     });
 }
 
+function normalizarResultadoContato(resposta, tipo) {
+    const remocao = resposta?.remocao;
+    const mensagens = {
+        cancelar: 'Convite cancelado com sucesso.',
+        desativar: 'Contato desativado com sucesso.',
+        remover: 'Contato removido com sucesso.'
+    };
+    const statusEsperado = tipo === 'desativar' ? 'revogado' : 'removido';
+
+    if (
+        !ehObjeto(resposta) ||
+        resposta.mensagem !== mensagens[tipo] ||
+        !ehObjeto(remocao) ||
+        !Number.isSafeInteger(remocao.id) ||
+        remocao.id <= 0 ||
+        remocao.status !== statusEsperado
+    ) {
+        const mensagemErro =
+            tipo === 'cancelar'
+                ? MENSAGEM_ERRO_CANCELAMENTO
+                : tipo === 'desativar'
+                  ? MENSAGEM_ERRO_DESATIVACAO
+                  : MENSAGEM_ERRO_REMOCAO;
+
+        throw criarErroLocal(mensagemErro, 'RESPOSTA_ACAO_CONTATO_INVALIDA');
+    }
+
+    return Object.freeze({
+        mensagem: resposta.mensagem,
+        remocao: Object.freeze({ ...remocao })
+    });
+}
+
 function criarSupportContactService({ requisicaoAutenticada } = {}) {
     if (typeof requisicaoAutenticada !== 'function') {
         throw new Error('Não foi possível configurar o serviço de contatos.');
     }
 
     const reenviosEmAndamento = new Map();
+    const acoesEmAndamento = new Map();
 
     async function listar({ signal } = {}) {
         const opcoes = {
@@ -283,17 +323,63 @@ function criarSupportContactService({ requisicaoAutenticada } = {}) {
         return requisicao;
     }
 
+    function executarAcao(contatoId, tipo, metodo, caminho) {
+        let id;
+
+        try {
+            id = validarContatoId(contatoId);
+        } catch (erro) {
+            return Promise.reject(erro);
+        }
+
+        const chave = `${tipo}:${id}`;
+        if (acoesEmAndamento.has(chave)) return acoesEmAndamento.get(chave);
+
+        const requisicao = Promise.resolve()
+            .then(() =>
+                requisicaoAutenticada({
+                    metodo,
+                    caminho: caminho(id),
+                    corpo: { confirmado: true }
+                })
+            )
+            .then((resposta) => normalizarResultadoContato(resposta, tipo))
+            .finally(() => acoesEmAndamento.delete(chave));
+
+        acoesEmAndamento.set(chave, requisicao);
+        return requisicao;
+    }
+
+    function removerContato(contatoId, { convitePendente = false } = {}) {
+        return executarAcao(
+            contatoId,
+            convitePendente ? 'cancelar' : 'remover',
+            'DELETE',
+            endpoints.removerContatoRedeApoio
+        );
+    }
+
+    function desativarContato(contatoId) {
+        return executarAcao(contatoId, 'desativar', 'PATCH', endpoints.desativarContatoRedeApoio);
+    }
+
     return Object.freeze({
+        desativarContato,
         listar,
-        reenviarConvite
+        reenviarConvite,
+        removerContato
     });
 }
 
 export {
     MENSAGEM_ERRO_LISTAGEM,
+    MENSAGEM_ERRO_CANCELAMENTO,
+    MENSAGEM_ERRO_DESATIVACAO,
+    MENSAGEM_ERRO_REMOCAO,
     MENSAGEM_ERRO_REENVIO,
     STATUS_CONTATO,
     criarSupportContactService,
     normalizarContato,
-    normalizarListagem
+    normalizarListagem,
+    normalizarResultadoContato
 };

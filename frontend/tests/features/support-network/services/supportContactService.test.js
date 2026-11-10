@@ -419,4 +419,62 @@ describe('supportContactService', () => {
             mensagemUsuario: MENSAGEM_ERRO_REENVIO
         });
     });
+
+    test('remove contato confirmado pelo endpoint protegido', async () => {
+        const requisicaoAutenticada = jest.fn().mockResolvedValue({
+            mensagem: 'Contato removido com sucesso.',
+            remocao: {
+                id: 19,
+                status: 'removido',
+                statusAnterior: 'ativo'
+            }
+        });
+        const service = criarSupportContactService({ requisicaoAutenticada });
+
+        await expect(service.removerContato(19)).resolves.toMatchObject({
+            mensagem: 'Contato removido com sucesso.'
+        });
+        expect(requisicaoAutenticada).toHaveBeenCalledWith({
+            metodo: 'DELETE',
+            caminho: '/support-network/contacts/19',
+            corpo: { confirmado: true }
+        });
+    });
+
+    test('cancela convite pendente com a mensagem específica', async () => {
+        const requisicaoAutenticada = jest.fn().mockResolvedValue({
+            mensagem: 'Convite cancelado com sucesso.',
+            remocao: {
+                id: 19,
+                status: 'removido',
+                statusAnterior: 'pendente'
+            }
+        });
+        const service = criarSupportContactService({ requisicaoAutenticada });
+
+        await expect(service.removerContato(19, { convitePendente: true })).resolves.toMatchObject({
+            mensagem: 'Convite cancelado com sucesso.'
+        });
+    });
+
+    test('desativa contato pelo endpoint específico', async () => {
+        const requisicaoAutenticada = jest.fn().mockResolvedValue({
+            mensagem: 'Contato desativado com sucesso.',
+            remocao: {
+                id: 19,
+                status: 'revogado',
+                statusAnterior: 'ativo'
+            }
+        });
+        const service = criarSupportContactService({ requisicaoAutenticada });
+
+        await expect(service.desativarContato(19)).resolves.toMatchObject({
+            mensagem: 'Contato desativado com sucesso.'
+        });
+        expect(requisicaoAutenticada).toHaveBeenCalledWith({
+            metodo: 'PATCH',
+            caminho: '/support-network/contacts/19/deactivate',
+            corpo: { confirmado: true }
+        });
+    });
 });

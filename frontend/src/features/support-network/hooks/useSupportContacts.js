@@ -4,6 +4,12 @@ const MENSAGEM_ERRO_LISTAGEM =
     'Não foi possível carregar sua Rede de Apoio no momento. Tente novamente.';
 
 const MENSAGEM_ERRO_REENVIO = 'Não foi possível reenviar o convite no momento. Tente novamente.';
+const MENSAGEM_ERRO_REMOCAO =
+    'Ocorreu um erro ao remover contato. Verifique sua conexão e tente novamente.';
+const MENSAGEM_ERRO_CANCELAMENTO =
+    'Ocorreu um erro ao cancelar seu convite. Verifique sua conexão e tente novamente.';
+const MENSAGEM_ERRO_DESATIVACAO =
+    'Ocorreu um erro ao desativar contato. Verifique sua conexão e tente novamente.';
 
 const MENSAGEM_SESSAO_EXPIRADA = 'Sua sessão expirou. Entre novamente.';
 
@@ -50,6 +56,16 @@ function atualizarContatoAposReenvio(contato, convite) {
     });
 }
 
+function calcularResumoLocal(contatos) {
+    return Object.freeze({
+        total: contatos.length,
+        pendentes: contatos.filter(({ status }) => status === 'pendente').length,
+        ativos: contatos.filter(({ status }) => status === 'ativo').length,
+        inativos: contatos.filter(({ status }) => status === 'inativo').length,
+        recusados: contatos.filter(({ status }) => status === 'recusado').length
+    });
+}
+
 function useSupportContacts({ service, onSessaoExpirada } = {}) {
     const [contatos, setContatos] = useState(() => Object.freeze([]));
 
@@ -73,6 +89,7 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
     const requisicaoRef = useRef(null);
     const controladorRef = useRef(null);
     const reenvioRef = useRef(null);
+    const acaoContatoRef = useRef(null);
 
     useEffect(() => {
         contatosRef.current = contatos;
@@ -172,6 +189,7 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
             controladorRef.current = null;
             requisicaoRef.current = null;
             reenvioRef.current = null;
+            acaoContatoRef.current = null;
         };
     }, [carregar]);
 
@@ -251,6 +269,101 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
         setResultadoAcao(null);
     }, []);
 
+    const executarAcaoContato = useCallback(
+        (tipo, contatoId) => {
+            if (acaoContatoRef.current) return Promise.resolve(false);
+
+            const contato = contatosRef.current.find(
+                (item) => String(item.id) === String(contatoId)
+            );
+            const convitePendente = contato?.status === 'pendente';
+            const metodo =
+                tipo === 'desativar' ? service?.desativarContato : service?.removerContato;
+
+            if (typeof metodo !== 'function') return Promise.resolve(false);
+
+            setErroAcao(null);
+            setResultadoAcao(null);
+            setContatoEmAndamentoId(contatoId);
+            setAcaoEmAndamento(tipo);
+
+            const requisicao = (async () => {
+                try {
+                    const resultado =
+                        tipo === 'desativar'
+                            ? await metodo.call(service, contatoId)
+                            : await metodo.call(service, contatoId, { convitePendente });
+
+                    if (!montadoRef.current) return false;
+
+                    const atualizados =
+                        tipo === 'desativar'
+                            ? contatosRef.current.map((item) =>
+                                  item.id === contatoId
+                                      ? Object.freeze({
+                                            ...item,
+                                            status: 'inativo',
+                                            statusRotulo: 'Inativo',
+                                            dataDesativacao: new Date().toISOString(),
+                                            aguardando: Object.freeze({
+                                                dias: 0,
+                                                atrasado: false,
+                                                rotulo: 'Desativado há 0 dias'
+                                            }),
+                                            acoes: Object.freeze({
+                                                podeAlterarVinculo: false,
+                                                podeRemover: true,
+                                                podeReenviarConvite: false
+                                            })
+                                        })
+                                      : item
+                              )
+                            : contatosRef.current.filter((item) => item.id !== contatoId);
+
+                    const congelados = Object.freeze(atualizados);
+                    contatosRef.current = congelados;
+                    setContatos(congelados);
+                    setResumo(calcularResumoLocal(congelados));
+
+                    setResultadoAcao(
+                        Object.freeze({
+                            tipo,
+                            mensagem: resultado.mensagem,
+                            contatoId
+                        })
+                    );
+                    return true;
+                } catch (falha) {
+                    if (!montadoRef.current) return false;
+
+                    if (erroEhSessaoInvalida(falha)) {
+                        onSessaoExpirada?.({ mensagem: MENSAGEM_SESSAO_EXPIRADA });
+                        return false;
+                    }
+
+                    setErroAcao(
+                        tipo === 'desativar'
+                            ? MENSAGEM_ERRO_DESATIVACAO
+                            : convitePendente
+                              ? MENSAGEM_ERRO_CANCELAMENTO
+                              : MENSAGEM_ERRO_REMOCAO
+                    );
+                    return false;
+                } finally {
+                    if (acaoContatoRef.current === requisicao) acaoContatoRef.current = null;
+                    if (montadoRef.current) {
+                        setContatoEmAndamentoId(null);
+                        setAcaoEmAndamento(null);
+                    }
+                }
+            })();
+
+            acaoContatoRef.current = requisicao;
+            return requisicao;
+        },
+        [onSessaoExpirada, service]
+    );
+
     return {
         contatos,
         resumo,
@@ -263,17 +376,23 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
         acaoEmAndamento,
         tentarNovamente: carregar,
         atualizarLista: carregar,
+        desativarContato: (contatoId) => executarAcaoContato('desativar', contatoId),
         reenviarConvite,
+        removerContato: (contatoId) => executarAcaoContato('remover', contatoId),
         limparResultadoAcao
     };
 }
 
 export {
     MENSAGEM_ERRO_LISTAGEM,
+    MENSAGEM_ERRO_CANCELAMENTO,
+    MENSAGEM_ERRO_DESATIVACAO,
+    MENSAGEM_ERRO_REMOCAO,
     MENSAGEM_ERRO_REENVIO,
     MENSAGEM_SESSAO_EXPIRADA,
     RESUMO_VAZIO,
     atualizarContatoAposReenvio,
+    calcularResumoLocal,
     erroEhSessaoInvalida,
     useSupportContacts
 };

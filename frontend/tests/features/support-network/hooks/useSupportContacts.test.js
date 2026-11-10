@@ -297,6 +297,68 @@ describe('useSupportContacts', () => {
         expect(result.current.erroAcao).toBe(MENSAGEM_ERRO_REENVIO);
     });
 
+    test('remove imediatamente o contato após confirmação do servidor', async () => {
+        const service = {
+            listar: jest.fn().mockResolvedValue(criarListagem()),
+            removerContato: jest.fn().mockResolvedValue({
+                mensagem: 'Convite cancelado com sucesso.',
+                remocao: { id: 1, status: 'removido', statusAnterior: 'pendente' }
+            })
+        };
+        const { result } = await renderHook(() => useSupportContacts({ service }));
+
+        await waitFor(() => expect(result.current.carregando).toBe(false));
+
+        await act(async () => {
+            await result.current.removerContato(1);
+        });
+
+        expect(service.removerContato).toHaveBeenCalledWith(1, { convitePendente: true });
+        expect(result.current.contatos).toEqual([]);
+        expect(result.current.resumo.total).toBe(0);
+        expect(result.current.resultadoAcao.mensagem).toBe('Convite cancelado com sucesso.');
+    });
+
+    test('transforma contato ativo em inativo após desativação', async () => {
+        const service = {
+            listar: jest.fn().mockResolvedValue(criarListagem([criarContato({ status: 'ativo' })])),
+            desativarContato: jest.fn().mockResolvedValue({
+                mensagem: 'Contato desativado com sucesso.',
+                remocao: { id: 1, status: 'revogado', statusAnterior: 'ativo' }
+            })
+        };
+        const { result } = await renderHook(() => useSupportContacts({ service }));
+
+        await waitFor(() => expect(result.current.carregando).toBe(false));
+
+        await act(async () => {
+            await result.current.desativarContato(1);
+        });
+
+        expect(result.current.contatos[0].status).toBe('inativo');
+        expect(result.current.resumo.ativos).toBe(0);
+        expect(result.current.resumo.inativos).toBe(1);
+    });
+
+    test('mantém o contato visível quando a remoção falha', async () => {
+        const service = {
+            listar: jest.fn().mockResolvedValue(criarListagem()),
+            removerContato: jest.fn().mockRejectedValue(new Error('falha privada'))
+        };
+        const { result } = await renderHook(() => useSupportContacts({ service }));
+
+        await waitFor(() => expect(result.current.carregando).toBe(false));
+
+        await act(async () => {
+            await result.current.removerContato(1);
+        });
+
+        expect(result.current.contatos).toHaveLength(1);
+        expect(result.current.erroAcao).toBe(
+            'Ocorreu um erro ao cancelar seu convite. Verifique sua conexão e tente novamente.'
+        );
+    });
+
     test('apresenta erro controlado sem serviço válido', async () => {
         const { result } = await renderHook(() => useSupportContacts());
 
