@@ -86,6 +86,12 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     };
 });
 
+jest.mock('../../src/features/diary/DiaryFlow', () => {
+    const React = require('react');
+    const { Text } = require('react-native');
+    return { DiaryFlow: jest.fn(() => React.createElement(Text, null, 'Diário integrado')) };
+});
+
 jest.mock('../../src/features/cycles/CycleEditFlow', () => {
     const React = require('react');
     const { Text } = require('react-native');
@@ -238,6 +244,15 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                         onPress: () => onSelecionarAba?.('inicio')
                     },
                     React.createElement(Text, null, 'Início')
+                ),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir Diário',
+                        onPress: () => onSelecionarAba?.('diario')
+                    },
+                    React.createElement(Text, null, 'Diário')
                 )
             )
         )
@@ -338,6 +353,7 @@ import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
 import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
+import { DiaryFlow } from '../../src/features/diary/DiaryFlow';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
 
 //Cria os serviços usados pelo App durante os testes de integração.
@@ -389,7 +405,8 @@ function criarServicos() {
         },
         supportCategoryService: {
             criarCategoria: jest.fn()
-        }
+        },
+        diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() }
     };
 }
 
@@ -473,6 +490,22 @@ describe('App integrado', () => {
                 service: servicos.cycleHistoryService,
                 calendarService: servicos.calendarService,
                 aoAbrirCalendario: expect.any(Function),
+                onSelecionarAba: expect.any(Function),
+                onSessaoExpirada: expect.any(Function)
+            }),
+            undefined
+        );
+    });
+
+    test('abre o Diário integrado pelo menu', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir Diário' }));
+
+        expect(await screen.findByText('Diário integrado')).toBeOnTheScreen();
+        expect(DiaryFlow).toHaveBeenCalledWith(
+            expect.objectContaining({
+                service: servicos.diaryService,
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),
