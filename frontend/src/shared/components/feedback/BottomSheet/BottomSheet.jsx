@@ -1,5 +1,5 @@
 // Mostra um painel na parte inferior da tela.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Animated,
     Dimensions,
@@ -121,11 +121,11 @@ function BottomSheet({
         }
     }
 
-    function solicitarFechamento() {
+    const solicitarFechamento = useCallback(() => {
         if (!bloquearFechamento) {
             onFechar?.();
         }
-    }
+    }, [bloquearFechamento, onFechar]);
 
     const responderArraste = useMemo(
         () =>
@@ -151,7 +151,7 @@ function BottomSheet({
                         useNativeDriver: true
                     }).start()
             }),
-        [bloquearFechamento, deslocamentoArraste, permitirDeslizarParaFechar]
+        [bloquearFechamento, deslocamentoArraste, permitirDeslizarParaFechar, solicitarFechamento]
     );
 
     return (
