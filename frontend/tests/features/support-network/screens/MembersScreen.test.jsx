@@ -30,6 +30,7 @@ jest.mock('../../../../src/features/support-network/components/ContactList/Conta
                 {
                     testID: 'contact-list-mock'
                 },
+                propriedades.cabecalho,
                 ...propriedades.contatos.map((contato) =>
                     React.createElement(
                         Text,
@@ -199,6 +200,12 @@ describe('MembersScreen', () => {
         expect(screen.getByText('Ana')).toBeOnTheScreen();
 
         expect(screen.getByText('Beatriz')).toBeOnTheScreen();
+
+        expect(
+            screen.getByText('Pessoas que fazem parte da sua rede de cuidado e apoio.')
+        ).toBeOnTheScreen();
+
+        expect(mockContactListProps.cabecalho).not.toBeNull();
     });
 
     test('aplica E entre estado e tipo de permissão', () => {

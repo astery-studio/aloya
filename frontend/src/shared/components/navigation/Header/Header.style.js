@@ -23,6 +23,10 @@ function criarEstilos(tema) {
             height: 48
         },
 
+        espacamentoSuperiorRedeApoio: {
+            height: 55.99
+        },
+
         areaTitulo: {
             minHeight: 66,
             flexDirection: 'row',
@@ -39,6 +43,14 @@ function criarEstilos(tema) {
             paddingBottom: 24
         },
 
+        areaTituloRedeApoio: {
+            minHeight: 56,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 16,
+            paddingBottom: 12
+        },
+
         titulo: {
             flex: 1,
             flexShrink: 1,
@@ -52,6 +64,22 @@ function criarEstilos(tema) {
             fontWeight: '700',
             lineHeight: 27,
             textAlign: 'center'
+        },
+
+        containerTituloRedeApoio: {
+            flex: 1,
+            alignSelf: 'stretch',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'center'
+        },
+
+        tituloRedeApoio: {
+            flex: 0,
+            fontFamily: fontFamilies.bold,
+            fontSize: 28,
+            fontWeight: '700',
+            lineHeight: 27.5
         },
 
         acoes: {

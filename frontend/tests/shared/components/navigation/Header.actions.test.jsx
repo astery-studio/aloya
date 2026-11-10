@@ -56,4 +56,27 @@ describe('Header com ações', () => {
 
         expect(screen.queryByText('Ação incompatível')).toBeNull();
     });
+
+    test('aplica o cabeçalho específico da Rede de Apoio', async () => {
+        await renderizarHeader({
+            variante: 'redeApoio',
+            acoes: (
+                <Pressable accessibilityRole="button" accessibilityLabel="Ação da Rede de Apoio">
+                    <Text>Ação</Text>
+                </Pressable>
+            )
+        });
+
+        expect(screen.getByTestId('header-title-container')).toHaveStyle({
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            alignSelf: 'stretch'
+        });
+
+        expect(screen.getByRole('header')).toHaveStyle({
+            fontSize: 28,
+            fontWeight: '700',
+            lineHeight: 27.5
+        });
+    });
 });

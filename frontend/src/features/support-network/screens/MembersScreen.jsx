@@ -8,7 +8,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import {
     BellIcon,
     FunnelIcon,
-    UserGearIcon,
+    UserCircleGearIcon,
     WarningCircleIcon
 } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
@@ -218,15 +218,15 @@ function MembersScreen({
                 icone={FunnelIcon}
                 aoPressionar={abrirFiltros}
                 rotuloAcessibilidade="Filtrar contatos"
-                variante="selecionado"
+                variante="redeApoio"
                 corIcone={tema.cores.interface.destaque}
             />
 
             <IconButton
-                icone={UserGearIcon}
+                icone={UserCircleGearIcon}
                 aoPressionar={onAbrirCategorias}
                 rotuloAcessibilidade="Abrir categorias de permissão"
-                variante="selecionado"
+                variante="redeApoio"
                 corIcone={tema.cores.marca.primaria}
             />
         </>
@@ -236,28 +236,12 @@ function MembersScreen({
         <>
             <MainLayout
                 titulo="Rede de Apoio"
+                varianteHeader="redeApoio"
                 acoesHeader={acoesCabecalho}
                 abaAtiva="membros"
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="members-screen" style={estilos.container}>
-                    <View style={estilos.apresentacao}>
-                        <Text style={estilos.descricao}>
-                            Pessoas que fazem parte da sua rede de cuidado e apoio.
-                        </Text>
-
-                        {possuiFiltros ? (
-                            <ButtonScreen
-                                texto="Limpar filtros"
-                                variante="bordaLaranja"
-                                aoPressionar={limparFiltros}
-                                rotuloAcessibilidade="Limpar filtros de contatos"
-                                estilo={estilos.botaoLimpar}
-                                estiloTexto={estilos.textoBotaoLimpar}
-                            />
-                        ) : null}
-                    </View>
-
                     <View style={estilos.areaLista}>
                         <ContactList
                             contatos={contatosVisiveis}
@@ -272,6 +256,24 @@ function MembersScreen({
                             contatoEmAndamentoId={estado.contatoEmAndamentoId}
                             acaoEmAndamento={estado.acaoEmAndamento}
                             desabilitado={Boolean(estado.acaoEmAndamento)}
+                            cabecalho={
+                                <View style={estilos.apresentacao}>
+                                    <Text style={estilos.descricao}>
+                                        Pessoas que fazem parte da sua rede de cuidado e apoio.
+                                    </Text>
+
+                                    {possuiFiltros ? (
+                                        <ButtonScreen
+                                            texto="Limpar filtros"
+                                            variante="bordaLaranja"
+                                            aoPressionar={limparFiltros}
+                                            rotuloAcessibilidade="Limpar filtros de contatos"
+                                            estilo={estilos.botaoLimpar}
+                                            estiloTexto={estilos.textoBotaoLimpar}
+                                        />
+                                    ) : null}
+                                </View>
+                            }
                         />
                     </View>
 

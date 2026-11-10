@@ -47,6 +47,7 @@ import { SparkleIcon } from 'phosphor-react-native/src/icons/Sparkle';
 import { SunIcon } from 'phosphor-react-native/src/icons/Sun';
 import { TrashIcon } from 'phosphor-react-native/src/icons/Trash';
 import { UserCheckIcon } from 'phosphor-react-native/src/icons/UserCheck';
+import { UserCircleGearIcon } from 'phosphor-react-native/src/icons/UserCircleGear';
 import { UserGearIcon } from 'phosphor-react-native/src/icons/UserGear';
 import { UserIcon } from 'phosphor-react-native/src/icons/User';
 import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
@@ -106,6 +107,7 @@ export {
     SunIcon,
     TrashIcon,
     UserCheckIcon,
+    UserCircleGearIcon,
     UserGearIcon,
     UserIcon,
     UsersIcon,

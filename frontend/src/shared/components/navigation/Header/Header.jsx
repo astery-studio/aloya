@@ -12,6 +12,8 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
 
     const temVoltar = variante === 'comVoltar';
 
+    const ehRedeApoio = variante === 'redeApoio';
+
     const temAcoes = !temVoltar && Boolean(acoes);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
@@ -32,11 +34,18 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
             <View
                 style={[
                     estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar
+                    temVoltar && estilos.espacamentoSuperiorComVoltar,
+                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio
                 ]}
             />
 
-            <View style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}>
+            <View
+                style={[
+                    estilos.areaTitulo,
+                    temVoltar && estilos.areaTituloComVoltar,
+                    ehRedeApoio && estilos.areaTituloRedeApoio
+                ]}
+            >
                 {temVoltar ? (
                     <Pressable
                         onPress={onVoltar}
@@ -59,12 +68,23 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
                     </Pressable>
                 ) : null}
 
-                <Text
-                    style={[estilos.titulo, temVoltar && estilos.tituloComVoltar]}
-                    accessibilityRole="header"
-                >
-                    {titulo}
-                </Text>
+                {ehRedeApoio ? (
+                    <View testID="header-title-container" style={estilos.containerTituloRedeApoio}>
+                        <Text
+                            style={[estilos.titulo, estilos.tituloRedeApoio]}
+                            accessibilityRole="header"
+                        >
+                            {titulo}
+                        </Text>
+                    </View>
+                ) : (
+                    <Text
+                        style={[estilos.titulo, temVoltar && estilos.tituloComVoltar]}
+                        accessibilityRole="header"
+                    >
+                        {titulo}
+                    </Text>
+                )}
 
                 {temAcoes ? (
                     <View

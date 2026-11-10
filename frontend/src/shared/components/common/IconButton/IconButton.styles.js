@@ -60,6 +60,17 @@ function criarEstilos(tema) {
             tamanhoIcone: 22
         }),
 
+        redeApoio: Object.freeze({
+            container: Object.freeze({
+                backgroundColor: tema.cores.interface.superficie,
+                borderWidth: 0.667,
+                borderColor: tema.cores.interface.borda,
+                borderRadius: 16
+            }),
+            icone: tema.cores.interface.destaque,
+            tamanhoIcone: 32
+        }),
+
         desativado: Object.freeze({
             container: Object.freeze({
                 backgroundColor: 'transparent',

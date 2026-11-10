@@ -13,18 +13,22 @@ function criarEstilos(tema) {
 
         apresentacao: {
             width: '100%',
-            flexShrink: 0,
+            maxWidth: 350.011,
+            alignSelf: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
             gap: 18,
-            paddingHorizontal: 20,
-            paddingBottom: 12
+            paddingTop: 8,
+            paddingBottom: 20
         },
 
         descricao: {
+            width: '100%',
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: '400',
-            lineHeight: 24,
+            lineHeight: 22.5,
             includeFontPadding: false
         },
 
