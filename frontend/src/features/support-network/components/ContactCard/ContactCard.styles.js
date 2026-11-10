@@ -26,27 +26,38 @@ function criarEstilos(tema) {
         cabecalho: {
             width: '100%',
             minHeight: 36,
+            position: 'relative',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center'
         },
 
-        identidade: {
-            minWidth: 0,
-            flex: 1,
+        avatarCabecalho: {
+            width: 36,
+            height: 36,
             flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10
+            alignItems: 'center'
+        },
+
+        containerNomeCentralizado: {
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            paddingHorizontal: 82,
+            justifyContent: 'center',
+            alignItems: 'center'
         },
 
         nome: {
-            minWidth: 0,
-            flex: 1,
+            maxWidth: '100%',
             color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
             lineHeight: 24,
+            textAlign: 'center',
             includeFontPadding: false
         },
 

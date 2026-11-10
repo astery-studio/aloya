@@ -169,14 +169,20 @@ function ContactCard({
             style={[estilos.cartao, bloqueado && estilos.cartaoDesabilitado]}
         >
             <View style={estilos.cabecalho}>
-                <View style={estilos.identidade}>
+                <View style={estilos.avatarCabecalho}>
                     <ContactAvatar
                         iconeId={contato?.iconeId ?? 'pessoa'}
                         corId={contato?.corId ?? 'branco'}
                         tamanho="pequeno"
                         rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
                     />
+                </View>
 
+                <View
+                    testID="contact-card-centered-name"
+                    pointerEvents="none"
+                    style={estilos.containerNomeCentralizado}
+                >
                     <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nome}>
                         {identificacao}
                     </Text>

@@ -60,6 +60,17 @@ describe('ContactCard', () => {
 
         expect(screen.getByText('CONVITE PENDENTE')).toBeOnTheScreen();
 
+        expect(screen.getByTestId('contact-card-centered-name')).toHaveStyle({
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            alignItems: 'center'
+        });
+
+        expect(screen.getByText('Julia')).toHaveStyle({
+            textAlign: 'center'
+        });
+
         expect(screen.getByTestId('contact-card')).toHaveStyle({
             width: '100%',
             maxWidth: 350,
