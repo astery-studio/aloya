@@ -141,7 +141,8 @@ function ContactList({
     contatoEmAndamentoId = null,
     acaoEmAndamento = null,
     desabilitado = false,
-    cabecalho = null
+    cabecalho = null,
+    aoAdicionarContato
 }) {
     const tema = useTheme();
 
@@ -255,22 +256,26 @@ function ContactList({
 
     if (erroInicial) {
         return (
-            <View style={estilos.estadoCentral}>
-                <EmptyState
-                    titulo="Ocorreu um erro"
-                    mensagem={MENSAGEM_ERRO}
-                    variante="erro"
-                    acao={
-                        <ButtonScreen
-                            estilo={estilosErro.botao}
-                            estiloTexto={estilosErro.textoBotao}
-                            texto="Tentar Novamente"
-                            aoPressionar={aoTentarNovamente}
-                            variante="preto"
-                            desativado={desabilitado}
-                        />
-                    }
-                />
+            <View style={estilos.estadoComCabecalho}>
+                {cabecalho}
+
+                <View style={estilos.estadoCentral}>
+                    <EmptyState
+                        titulo="Ocorreu um erro"
+                        mensagem={MENSAGEM_ERRO}
+                        variante="erro"
+                        acao={
+                            <ButtonScreen
+                                estilo={[estilos.botaoEstado, estilosErro.botao]}
+                                estiloTexto={estilosErro.textoBotao}
+                                texto="Tentar novamente"
+                                aoPressionar={aoTentarNovamente}
+                                variante="preto"
+                                desativado={desabilitado}
+                            />
+                        }
+                    />
+                </View>
             </View>
         );
     }
@@ -291,12 +296,41 @@ function ContactList({
         const recebido = perspectiva === 'recebido';
 
         return (
-            <View style={estilos.estadoCentral}>
-                <EmptyState
-                    titulo={recebido ? 'Nenhum convite recebido' : 'Nenhum contato adicionado'}
-                    mensagem={recebido ? MENSAGEM_VAZIA_RECEBIDA : MENSAGEM_VAZIA_ENVIADA}
-                    variante="vazio"
-                />
+            <View style={estilos.estadoComCabecalho}>
+                {cabecalho}
+
+                <View style={estilos.estadoCentral}>
+                    <EmptyState
+                        titulo={recebido ? 'Nenhum convite recebido' : 'Nenhum contato'}
+                        mensagem={
+                            recebido ? (
+                                MENSAGEM_VAZIA_RECEBIDA
+                            ) : (
+                                <>
+                                    Você ainda não adicionou nenhum contato à sua Rede de Apoio.
+                                    Toque em{' '}
+                                    <Text style={estilos.textoDestaque}>
+                                        {"'Adicionar novo contato'"}
+                                    </Text>{' '}
+                                    para convidar alguém de confiança.
+                                </>
+                            )
+                        }
+                        variante="vazio"
+                        acao={
+                            !recebido && typeof aoAdicionarContato === 'function' ? (
+                                <ButtonScreen
+                                    texto="Adicionar novo contato"
+                                    variante="laranja"
+                                    aoPressionar={aoAdicionarContato}
+                                    rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
+                                    estilo={estilos.botaoEstado}
+                                    estiloTexto={estilos.textoBotaoEstado}
+                                />
+                            ) : null
+                        }
+                    />
+                </View>
             </View>
         );
     }

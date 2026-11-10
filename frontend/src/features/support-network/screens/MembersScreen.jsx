@@ -153,6 +153,8 @@ function MembersScreen({
         [estado.contatos, filtros]
     );
 
+    const possuiContatosRegistrados = Array.isArray(estado.contatos) && estado.contatos.length > 0;
+
     function abrirFiltros() {
         setFiltrosAbertos(true);
     }
@@ -293,6 +295,7 @@ function MembersScreen({
                             contatoEmAndamentoId={estado.contatoEmAndamentoId}
                             acaoEmAndamento={estado.acaoEmAndamento}
                             desabilitado={Boolean(estado.acaoEmAndamento)}
+                            aoAdicionarContato={onAdicionarContato}
                             cabecalho={
                                 <View style={estilos.apresentacao}>
                                     <Text style={estilos.descricao}>
@@ -314,16 +317,18 @@ function MembersScreen({
                         />
                     </View>
 
-                    <View style={estilos.acaoPrincipal}>
-                        <ButtonScreen
-                            texto="Adicionar novo contato"
-                            variante="laranja"
-                            aoPressionar={onAdicionarContato}
-                            rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
-                            estilo={estilos.botaoAdicionar}
-                            estiloTexto={estilos.textoBotaoAdicionar}
-                        />
-                    </View>
+                    {possuiContatosRegistrados ? (
+                        <View style={estilos.acaoPrincipal}>
+                            <ButtonScreen
+                                texto="Adicionar novo contato"
+                                variante="laranja"
+                                aoPressionar={onAdicionarContato}
+                                rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
+                                estilo={estilos.botaoAdicionar}
+                                estiloTexto={estilos.textoBotaoAdicionar}
+                            />
+                        </View>
+                    ) : null}
                 </View>
             </MainLayout>
 

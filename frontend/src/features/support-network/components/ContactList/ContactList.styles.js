@@ -14,14 +14,38 @@ function criarEstilos(tema) {
             height: 14
         },
 
+        estadoComCabecalho: {
+            width: '100%',
+            flex: 1,
+            minHeight: 0,
+            paddingHorizontal: 20,
+            paddingTop: 18
+        },
+
         estadoCentral: {
             width: '100%',
-            minHeight: 320,
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
-            paddingHorizontal: 28,
-            paddingVertical: 40
+            paddingBottom: 76
+        },
+
+        botaoEstado: {
+            width: '100%',
+            height: 56,
+            borderRadius: 12
+        },
+
+        textoBotaoEstado: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 17,
+            fontWeight: '600',
+            lineHeight: 24
+        },
+
+        textoDestaque: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
         },
 
         textoCarregamento: {

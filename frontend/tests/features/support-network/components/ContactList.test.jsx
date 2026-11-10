@@ -6,7 +6,6 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 import {
     ContactList,
     MENSAGEM_ERRO,
-    MENSAGEM_VAZIA_ENVIADA,
     MENSAGEM_VAZIA_RECEBIDA,
     contatoEhValido,
     criarItensAgrupados,
@@ -262,7 +261,7 @@ describe('ContactList', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Tentar Novamente'
+                name: 'Tentar novamente'
             })
         );
 
@@ -279,9 +278,31 @@ describe('ContactList', () => {
             />
         );
 
-        expect(screen.getByText('Nenhum contato adicionado')).toBeOnTheScreen();
+        expect(screen.getByText('Nenhum contato')).toBeOnTheScreen();
 
-        expect(screen.getByText(MENSAGEM_VAZIA_ENVIADA)).toBeOnTheScreen();
+        expect(screen.getByText(/Você ainda não adicionou nenhum contato/u)).toBeOnTheScreen();
+    });
+
+    test('abre o cadastro pelo estado vazio da rede enviada', async () => {
+        const aoAdicionarContato = jest.fn();
+
+        await render(
+            <ContactList
+                contatos={[]}
+                perspectiva="enviado"
+                aoAcao={jest.fn()}
+                aoAbrirResumo={jest.fn()}
+                aoAdicionarContato={aoAdicionarContato}
+            />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Adicionar novo contato à Rede de Apoio'
+            })
+        );
+
+        expect(aoAdicionarContato).toHaveBeenCalledTimes(1);
     });
 
     test('mostra o estado vazio dos convites recebidos', async () => {
