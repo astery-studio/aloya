@@ -22,7 +22,7 @@ describe('DiaryMacrocategorySection', () => {
             </DiaryMacrocategorySection>
         );
         const cabecalho = screen.getByRole('button', { name: 'Emocional' });
-        expect(cabecalho).toHaveAccessibilityState({ expanded: true, disabled: false });
+        expect(cabecalho).toHaveProp('accessibilityState', { expanded: true, disabled: false });
         expect(screen.getByText('Conteúdo emocional')).toBeOnTheScreen();
         expect(screen.getByText('Acessório')).toBeOnTheScreen();
         await fireEvent.press(cabecalho);
@@ -45,7 +45,7 @@ describe('DiaryMacrocategorySection', () => {
         );
         const cabecalho = screen.getByRole('button', { name: 'Vida Íntima e Social' });
         expect(cabecalho).toBeDisabled();
-        expect(cabecalho).toHaveAccessibilityState({ expanded: false, disabled: true });
+        expect(cabecalho).toHaveProp('accessibilityState', { expanded: false, disabled: true });
         expect(screen.queryByText('Conteúdo íntimo')).toBeNull();
         await fireEvent.press(cabecalho);
         expect(aoAlternar).not.toHaveBeenCalled();

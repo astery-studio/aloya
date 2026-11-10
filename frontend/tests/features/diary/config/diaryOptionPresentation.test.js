@@ -18,7 +18,7 @@ describe('apresentação das opções do Diário', () => {
         );
         expect(apresentacoes).toHaveLength(305);
         expect(apresentacoes).not.toContain(null);
-        expect(new Set(apresentacoes.map(({ iconeId }) => iconeId))).toHaveSize(305);
+        expect(new Set(apresentacoes.map(({ iconeId }) => iconeId)).size).toBe(305);
         for (const { iconeId } of apresentacoes) expect(diaryIcons[iconeId]).toBeDefined();
     });
 
