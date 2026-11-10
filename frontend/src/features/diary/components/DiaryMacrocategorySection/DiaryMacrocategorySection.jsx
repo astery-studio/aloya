@@ -5,6 +5,14 @@ import { CaretDown, CaretUp } from 'phosphor-react-native';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './DiaryMacrocategorySection.styles';
 
+function montarEstiloCabecalho(estilos, expandido, cores, pressionado) {
+    return [
+        estilos.cabecalho,
+        expandido && { backgroundColor: cores.fundoExpandido },
+        pressionado && estilos.pressionado
+    ];
+}
+
 function DiaryMacrocategorySection({
     titulo,
     icone: Icone,
@@ -34,11 +42,9 @@ function DiaryMacrocategorySection({
                 accessibilityState={{ expanded: expandido, disabled: desabilitado }}
                 disabled={desabilitado}
                 onPress={aoAlternar}
-                style={({ pressed }) => [
-                    estilos.cabecalho,
-                    expandido && { backgroundColor: cores.fundoExpandido },
-                    pressed && estilos.pressionado
-                ]}
+                style={({ pressed }) =>
+                    montarEstiloCabecalho(estilos, expandido, cores, pressed)
+                }
             >
                 <View style={[estilos.caixaIcone, { backgroundColor: cores.fundoIcone }]}>
                     <Icone size={18} color={cores.icone} />
@@ -60,3 +66,4 @@ function DiaryMacrocategorySection({
 }
 
 export default memo(DiaryMacrocategorySection);
+export { montarEstiloCabecalho };
