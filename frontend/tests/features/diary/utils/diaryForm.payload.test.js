@@ -64,4 +64,15 @@ describe('payload do formulário do Diário', () => {
             ]
         });
     });
+
+    test('inclui o erro da data no resultado completo', () => {
+        const resultado = prepararFormularioDiario({
+            catalogo,
+            valores: { sintomas: ['colica'] },
+            data: '2026-11-10',
+            hoje: '2026-11-09'
+        });
+        expect(resultado.valido).toBe(false);
+        expect(resultado.erros.data).toBe('A data do registro não pode ser no futuro.');
+    });
 });
