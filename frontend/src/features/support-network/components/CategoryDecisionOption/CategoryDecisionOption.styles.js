@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies } from '../../../shared/theme';
+import { fontFamilies } from '../../../../shared/theme';
 
 const COR_PERIGO = '#BD3E3E';
 

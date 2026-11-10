@@ -5,9 +5,9 @@ import { Text, View } from 'react-native';
 import {
     ACOES_EXCLUSAO_CATEGORIA,
     acaoExclusaoEhValida
-} from '../constants/categoryDeletionOptions';
-import { CategoryDecisionOption } from './CategoryDecisionOption';
-import { useTheme } from '../../../shared/hooks/useTheme';
+} from '../../constants/categoryDeletionOptions';
+import { CategoryDecisionOption } from '../CategoryDecisionOption/CategoryDecisionOption';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './CategoryContactDecisionItem.styles';
 
 function CategoryContactDecisionItem({

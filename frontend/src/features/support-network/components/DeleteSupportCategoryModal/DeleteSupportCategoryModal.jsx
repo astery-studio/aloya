@@ -2,18 +2,18 @@
 import { useCallback, useMemo } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup';
-import { BottomSheet } from '../../../shared/components/feedback/BottomSheet/BottomSheet';
-import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
-import { BottomSheetLayout } from '../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { useTheme } from '../../../shared/hooks/useTheme';
+import ButtonPopup from '../../../../shared/components/common/Button/ButtonPopup';
+import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
+import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
+import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import {
     ACOES_EXCLUSAO_CATEGORIA,
     acaoExclusaoEhValida
-} from '../constants/categoryDeletionOptions';
-import { CategoryContactDecisionItem } from './CategoryContactDecisionItem';
-import { CategoryDecisionOption } from './CategoryDecisionOption';
+} from '../../constants/categoryDeletionOptions';
+import { CategoryContactDecisionItem } from '../CategoryContactDecisionItem/CategoryContactDecisionItem';
+import { CategoryDecisionOption } from '../CategoryDecisionOption/CategoryDecisionOption';
 import { criarEstilos } from './DeleteSupportCategoryModal.styles';
 
 function contatoEhValido(contato) {

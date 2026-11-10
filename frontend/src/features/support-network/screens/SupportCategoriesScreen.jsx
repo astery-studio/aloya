@@ -6,7 +6,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { BellIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { DeleteSupportCategoryModal } from '../components/DeleteSupportCategoryModal';
+import { DeleteSupportCategoryModal } from '../components/DeleteSupportCategoryModal/DeleteSupportCategoryModal';
 import { SupportCategoryList } from '../components/SupportCategoryList/SupportCategoryList';
 import { useDeleteSupportCategory } from '../hooks/useDeleteSupportCategory';
 import { useSupportCategories } from '../hooks/useSupportCategories';

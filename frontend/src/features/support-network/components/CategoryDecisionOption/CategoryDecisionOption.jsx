@@ -2,8 +2,8 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { CheckIcon } from '../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../shared/hooks/useTheme';
+import { CheckIcon } from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './CategoryDecisionOption.styles';
 
 function CategoryDecisionOption({
