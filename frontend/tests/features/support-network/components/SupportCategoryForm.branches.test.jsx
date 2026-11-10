@@ -60,7 +60,7 @@ jest.mock(
 import {
     SupportCategoryForm,
     prepararCategoriaParaSalvar
-} from '../../../../src/features/support-network/components/SupportCategoryForm';
+} from '../../../../src/features/support-network/components/SupportCategoryForm/SupportCategoryForm';
 
 test('valida o limite de 15 caracteres mesmo com dados fornecidos externamente', () => {
     const dadosVisiveis = ['geral.fase_atual'];

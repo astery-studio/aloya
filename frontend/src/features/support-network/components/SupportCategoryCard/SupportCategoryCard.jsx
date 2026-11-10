@@ -2,14 +2,14 @@
 import { useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
-import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
+import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
     PencilSimpleIcon,
     TrashIcon,
     UserCheckIcon,
     UsersIcon
-} from '../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../shared/hooks/useTheme';
+} from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './SupportCategoryCard.styles';
 
 function normalizarQuantidadeContatos(quantidade) {

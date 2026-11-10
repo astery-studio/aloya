@@ -1,9 +1,9 @@
 //Confirma uma alteração que será propagada aos contatos vinculados à categoria.
 import { useCallback, useMemo } from 'react';
 
-import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../shared/hooks/useTheme';
+import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
+import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 
 function ignorarAcao() {}
 

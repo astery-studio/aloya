@@ -2,12 +2,12 @@
 import { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
-import TextInput from '../../../shared/components/forms/TextInput';
-import { GeneralPermissions } from './GeneralPermissions/GeneralPermissions';
-import { PermissionGroups } from './PermissionGroups/PermissionGroups';
+import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
+import TextInput from '../../../../shared/components/forms/TextInput';
+import { GeneralPermissions } from '../GeneralPermissions/GeneralPermissions';
+import { PermissionGroups } from '../PermissionGroups/PermissionGroups';
 import { criarEstilos } from './SupportCategoryForm.styles';
-import { useTheme } from '../../../shared/hooks/useTheme';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 
 const ERRO_NOME = Object.freeze({
     codigo: 'NOME_CATEGORIA_OBRIGATORIO',

@@ -7,7 +7,7 @@ import { BellIcon, WarningCircleIcon } from '../../../shared/components/icons/Ap
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { DeleteSupportCategoryModal } from '../components/DeleteSupportCategoryModal';
-import { SupportCategoryList } from '../components/SupportCategoryList';
+import { SupportCategoryList } from '../components/SupportCategoryList/SupportCategoryList';
 import { useDeleteSupportCategory } from '../hooks/useDeleteSupportCategory';
 import { useSupportCategories } from '../hooks/useSupportCategories';
 import { EditSupportCategoryScreen } from './EditSupportCategoryScreen';

@@ -8,7 +8,7 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
 import {
     prepararCategoriaParaSalvar,
     SupportCategoryForm
-} from '../components/SupportCategoryForm';
+} from '../components/SupportCategoryForm/SupportCategoryForm';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { estilos } from './NewSupportCategoryScreen.styles';

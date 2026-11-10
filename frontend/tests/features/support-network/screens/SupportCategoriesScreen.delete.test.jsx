@@ -53,27 +53,34 @@ jest.mock('../../../../src/shared/components/navigation/Header/Header', () => {
     };
 });
 
-jest.mock('../../../../src/features/support-network/components/SupportCategoryList', () => {
-    const React = require('react');
-    const { Pressable, Text, View } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/SupportCategoryList/SupportCategoryList',
+    () => {
+        const React = require('react');
+        const { Pressable, Text, View } = require('react-native');
 
-    return {
-        SupportCategoryList: (propriedades) => {
-            return React.createElement(
-                View,
-                {
-                    testID: 'lista-categorias'
-                },
-                React.createElement(Text, null, propriedades.categorias[0]?.nome || 'Lista vazia'),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Excluir categoria de teste',
-                    onPress: () => propriedades.onExcluir(mockCategoria)
-                })
-            );
-        }
-    };
-});
+        return {
+            SupportCategoryList: (propriedades) => {
+                return React.createElement(
+                    View,
+                    {
+                        testID: 'lista-categorias'
+                    },
+                    React.createElement(
+                        Text,
+                        null,
+                        propriedades.categorias[0]?.nome || 'Lista vazia'
+                    ),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Excluir categoria de teste',
+                        onPress: () => propriedades.onExcluir(mockCategoria)
+                    })
+                );
+            }
+        };
+    }
+);
 
 jest.mock('../../../../src/features/support-network/components/DeleteSupportCategoryModal', () => {
     const React = require('react');

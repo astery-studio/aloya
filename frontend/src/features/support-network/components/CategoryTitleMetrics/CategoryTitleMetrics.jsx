@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { fontFamilies } from '../../../shared/theme';
+import { fontFamilies } from '../../../../shared/theme';
 
 // Mede os nomes com a fonte real, sem participar do layout visível ou da acessibilidade.
 function CategoryTitleMetrics({ categorias, escala, onMedir }) {

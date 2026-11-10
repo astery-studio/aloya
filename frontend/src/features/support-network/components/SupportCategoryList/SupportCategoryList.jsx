@@ -1,14 +1,14 @@
 //Apresenta as categorias de permissão e os estados visuais da coleção.
 import { ActivityIndicator, FlatList, Text, View, useWindowDimensions } from 'react-native';
 import { useCallback, useMemo, useState } from 'react';
-import { CategoryTitleMetrics } from './CategoryTitleMetrics';
+import { CategoryTitleMetrics } from '../CategoryTitleMetrics/CategoryTitleMetrics';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
-import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
-import { useTheme } from '../../../shared/hooks/useTheme';
-import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
-import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
-import { SupportCategoryCard } from './SupportCategoryCard';
+import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
+import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../../shared/theme/errorStateStyles';
+import { gruposPermissoes, permissoesGerais } from '../../constants/permissionOptions';
+import { SupportCategoryCard } from '../SupportCategoryCard/SupportCategoryCard';
 import { criarEstilos } from './SupportCategoryList.styles';
 
 const MENSAGEM_ERRO = 'Não foi possível carregar suas categorias no momento. Tente novamente.';

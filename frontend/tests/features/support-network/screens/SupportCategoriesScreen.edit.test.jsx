@@ -33,32 +33,35 @@ jest.mock('../../../../src/shared/components/navigation/Header/Header', () => {
     };
 });
 
-jest.mock('../../../../src/features/support-network/components/SupportCategoryList', () => {
-    const React = require('react');
-    const { Pressable, Text, View } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/SupportCategoryList/SupportCategoryList',
+    () => {
+        const React = require('react');
+        const { Pressable, Text, View } = require('react-native');
 
-    return {
-        SupportCategoryList: ({ categorias, onEditar }) =>
-            React.createElement(
-                View,
-                {
-                    testID: 'lista-categorias'
-                },
-                React.createElement(Text, null, categorias[0]?.nome || 'Lista vazia'),
-                categorias[0]
-                    ? React.createElement(
-                          Pressable,
-                          {
-                              accessibilityRole: 'button',
-                              accessibilityLabel: 'Editar categoria de teste',
-                              onPress: () => onEditar(categorias[0])
-                          },
-                          React.createElement(Text, null, 'Editar')
-                      )
-                    : null
-            )
-    };
-});
+        return {
+            SupportCategoryList: ({ categorias, onEditar }) =>
+                React.createElement(
+                    View,
+                    {
+                        testID: 'lista-categorias'
+                    },
+                    React.createElement(Text, null, categorias[0]?.nome || 'Lista vazia'),
+                    categorias[0]
+                        ? React.createElement(
+                              Pressable,
+                              {
+                                  accessibilityRole: 'button',
+                                  accessibilityLabel: 'Editar categoria de teste',
+                                  onPress: () => onEditar(categorias[0])
+                              },
+                              React.createElement(Text, null, 'Editar')
+                          )
+                        : null
+                )
+        };
+    }
+);
 
 jest.mock('../../../../src/features/support-network/screens/EditSupportCategoryScreen', () => {
     const React = require('react');
