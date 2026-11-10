@@ -363,8 +363,8 @@ function criarContainer() {
     });
     const contactInvitationRateLimit = criarContactInvitationRateLimit({
         rateLimit,
-        janelaMs: env.emailRateLimitJanelaMs,
-        limite: env.emailRateLimitMaximo
+        janelaMs: env.supportInvitationRateLimitJanelaMs,
+        limite: env.supportInvitationRateLimitMaximo
     });
     const contactInvitationResponseRateLimit = criarContactInvitationResponseRateLimit({
         rateLimit,

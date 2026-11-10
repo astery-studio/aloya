@@ -1,3 +1,5 @@
+import { ipKeyGenerator } from 'express-rate-limit';
+
 function criarContactInvitationResponseRateLimit({
     rateLimit,
     janelaMs,
@@ -19,7 +21,8 @@ function criarContactInvitationResponseRateLimit({
         limit: limite,
         standardHeaders: true,
         legacyHeaders: false,
-        keyGenerator: (req) => (req.usuario?.id ? `usuario:${req.usuario.id}` : `ip:${req.ip}`),
+        keyGenerator: (req) =>
+            req.usuario?.id ? `usuario:${req.usuario.id}` : `ip:${ipKeyGenerator(req.ip)}`,
         handler: (req, res) => {
             logger.warn({
                 evento: 'limite_resposta_convite_rede_apoio',

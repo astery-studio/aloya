@@ -32,6 +32,14 @@ const emailRateLimitJanelaMs = Number(process.env.EMAIL_RATE_LIMIT_JANELA_MS || 
 
 const emailRateLimitMaximo = Number(process.env.EMAIL_RATE_LIMIT_MAXIMO || 3);
 
+const supportInvitationRateLimitJanelaMs = Number(
+    process.env.SUPPORT_INVITATION_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const supportInvitationRateLimitMaximo = Number(
+    process.env.SUPPORT_INVITATION_RATE_LIMIT_MAXIMO || 10
+);
+
 const configuracoesContaRateLimitJanelaMs = Number(
     process.env.CONFIGURACOES_CONTA_RATE_LIMIT_JANELA_MS || 900000
 );
@@ -95,6 +103,8 @@ if (!Number.isInteger(emailRateLimitMaximo) || emailRateLimitMaximo <= 0) {
 const limitesAdicionais = [
     ['CONFIGURACOES_CONTA_RATE_LIMIT_JANELA_MS', configuracoesContaRateLimitJanelaMs],
     ['CONFIGURACOES_CONTA_RATE_LIMIT_MAXIMO', configuracoesContaRateLimitMaximo],
+    ['SUPPORT_INVITATION_RATE_LIMIT_JANELA_MS', supportInvitationRateLimitJanelaMs],
+    ['SUPPORT_INVITATION_RATE_LIMIT_MAXIMO', supportInvitationRateLimitMaximo],
     ['ALTERACAO_SENHA_RATE_LIMIT_JANELA_MS', alteracaoSenhaRateLimitJanelaMs],
     ['ALTERACAO_SENHA_RATE_LIMIT_MAXIMO', alteracaoSenhaRateLimitMaximo],
     ['EXCLUSAO_CONTA_RATE_LIMIT_JANELA_MS', exclusaoContaRateLimitJanelaMs],
@@ -117,6 +127,8 @@ const env = {
     cadastroRateLimitMaximo,
     emailRateLimitJanelaMs,
     emailRateLimitMaximo,
+    supportInvitationRateLimitJanelaMs,
+    supportInvitationRateLimitMaximo,
     configuracoesContaRateLimitJanelaMs,
     configuracoesContaRateLimitMaximo,
     alteracaoSenhaRateLimitJanelaMs,
