@@ -15,6 +15,10 @@ function criarService(estado) {
             async updateMany(consulta) {
                 estado.vinculo = consulta;
                 return { count: 1 };
+            },
+            async deleteMany(consulta) {
+                estado.exclusao = consulta;
+                return { count: 1 };
             }
         },
         sessao: {
@@ -54,11 +58,11 @@ test('amarra leitura e revogação ao titular autenticado e ao vínculo solicita
     assert.deepEqual(estado.consulta.where, {
         id: 9,
         titularId: 42,
-        status: { in: ['pendente', 'ativo'] }
+        status: { in: ['pendente', 'ativo', 'revogado', 'recusado'] }
     });
-    assert.equal(estado.vinculo.where.id, 9);
-    assert.equal(estado.vinculo.where.titularId, 42);
-    assert.equal(estado.vinculo.where.status, 'ativo');
+    assert.equal(estado.exclusao.where.id, 9);
+    assert.equal(estado.exclusao.where.titularId, 42);
+    assert.equal(estado.exclusao.where.status, 'ativo');
 });
 
 test('não inicia transação para contato de apoio ou sessão inválida', async () => {

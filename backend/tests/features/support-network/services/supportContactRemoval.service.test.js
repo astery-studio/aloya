@@ -5,10 +5,17 @@ import { criarSupportContactRemovalService } from '../../../../src/features/supp
 
 const agora = new Date('2026-11-10T12:00:00.000Z');
 
-function criarCenario({ vinculo, updateCount = 1, sessoes = 2, alertas = 1 } = {}) {
+function criarCenario({
+    vinculo,
+    updateCount = 1,
+    deleteCount = 1,
+    sessoes = 2,
+    alertas = 1
+} = {}) {
     const estado = {
         consulta: null,
         vinculo: null,
+        exclusao: null,
         sessoes: [],
         alertas: [],
         notificacoes: []
@@ -22,6 +29,10 @@ function criarCenario({ vinculo, updateCount = 1, sessoes = 2, alertas = 1 } = {
             async updateMany(consulta) {
                 estado.vinculo = consulta;
                 return { count: updateCount };
+            },
+            async deleteMany(consulta) {
+                estado.exclusao = consulta;
+                return { count: deleteCount };
             }
         },
         sessao: {
@@ -57,7 +68,7 @@ test('revoga contato ativo, encerra sessões, cancela alertas e notifica', async
         vinculo: { id: 9, contatoId: 22, status: 'ativo', categoriaId: 3 }
     });
 
-    const resultado = await service.remover({
+    const resultado = await service.desativar({
         titularId: 1,
         papel: 'principal',
         contatoId: 9
@@ -66,7 +77,7 @@ test('revoga contato ativo, encerra sessões, cancela alertas e notifica', async
     assert.deepEqual(estado.consulta.where, {
         id: 9,
         titularId: 1,
-        status: { in: ['pendente', 'ativo'] }
+        status: 'ativo'
     });
     assert.deepEqual(estado.vinculo.data, {
         status: 'revogado',
@@ -89,12 +100,13 @@ test('revoga contato ativo, encerra sessões, cancela alertas e notifica', async
     assert.deepEqual(resultado, {
         id: 9,
         status: 'revogado',
+        statusAnterior: 'ativo',
         sessoesEncerradas: 2,
         alertasCancelados: 1
     });
 });
 
-test('cancela convite pendente sem tentar encerrar sessão inexistente', async () => {
+test('cancela convite pendente removendo o vínculo sem tentar encerrar sessão', async () => {
     const { estado, service } = criarCenario({
         vinculo: { id: 10, contatoId: null, status: 'pendente', categoriaId: 3 }
     });
@@ -105,11 +117,16 @@ test('cancela convite pendente sem tentar encerrar sessão inexistente', async (
         contatoId: 10
     });
 
-    assert.equal(estado.vinculo.data.status, 'revogado');
-    assert.equal(estado.vinculo.data.dataResposta, agora);
+    assert.deepEqual(estado.exclusao.where, {
+        id: 10,
+        titularId: 1,
+        status: 'pendente'
+    });
     assert.equal(estado.sessoes.length, 0);
     assert.equal(estado.notificacoes.length, 0);
     assert.equal(resultado.sessoesEncerradas, 0);
+    assert.equal(resultado.status, 'removido');
+    assert.equal(resultado.statusAnterior, 'pendente');
 });
 
 test('notifica contato cadastrado mesmo quando o convite ainda está pendente', async () => {
@@ -132,12 +149,12 @@ test('não revela contato inexistente, removido ou pertencente a outra titular',
     });
 });
 
-test('detecta concorrência e não encerra sessões nem agenda notificação', async () => {
+test('detecta concorrência na desativação e não encerra sessões nem agenda notificação', async () => {
     const { estado, service } = criarCenario({
         vinculo: { id: 9, contatoId: 22, status: 'ativo', categoriaId: 3 },
         updateCount: 0
     });
-    await assert.rejects(service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+    await assert.rejects(service.desativar({ titularId: 1, papel: 'principal', contatoId: 9 }), {
         status: 409,
         codigo: 'CONTATO_ALTERADO'
     });
@@ -149,7 +166,7 @@ test('rejeita vínculo ativo inconsistente antes de aplicar qualquer alteração
     const { estado, service } = criarCenario({
         vinculo: { id: 9, contatoId: null, status: 'ativo', categoriaId: 3 }
     });
-    await assert.rejects(service.remover({ titularId: 1, papel: 'principal', contatoId: 9 }), {
+    await assert.rejects(service.desativar({ titularId: 1, papel: 'principal', contatoId: 9 }), {
         status: 409,
         codigo: 'VINCULO_INCONSISTENTE'
     });
