@@ -191,6 +191,34 @@ jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactF
     };
 });
 
+jest.mock(
+    '../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen',
+    () => {
+        const React = require('react');
+
+        const { Text, View } = require('react-native');
+
+        return {
+            ReceivedContactsScreen: jest.fn(({ service }) =>
+                React.createElement(
+                    View,
+                    {
+                        testID: 'contatos-recebidos'
+                    },
+                    React.createElement(Text, null, 'Contatos recebidos'),
+                    React.createElement(
+                        Text,
+                        null,
+                        service?.listarRecebidos
+                            ? 'Convites recebidos conectados'
+                            : 'Convites recebidos ausentes'
+                    )
+                )
+            )
+        };
+    }
+);
+
 jest.mock('../../src/features/support-network/screens/SupportCategoriesScreen', () => {
     const React = require('react');
 
@@ -310,6 +338,10 @@ function criarServicos() {
         contactInvitationService: {
             enviarConvite: jest.fn()
         },
+        receivedContactsService: {
+            listarRecebidos: jest.fn(),
+            responderConvite: jest.fn()
+        },
         supportCategoryService: {
             listarCategorias: jest.fn(),
             criarCategoria: jest.fn()
@@ -374,6 +406,26 @@ describe('fluxos da Rede de Apoio no App', () => {
         await abrirCategorias();
 
         expect(await screen.findByText('Serviço conectado')).toBeOnTheScreen();
+    });
+
+    test('abre os convites recebidos para uma conta de contato', async () => {
+        const servicos = criarServicos();
+
+        servicos.accountService.buscarPerfil.mockResolvedValue({
+            nome: 'Contato',
+            email: 'contato@example.com',
+            papel: 'contato_apoio'
+        });
+
+        criarServicosApp.mockReturnValue(servicos);
+
+        await render(<App />);
+
+        await abrirMembros();
+
+        expect(await screen.findByText('Contatos recebidos')).toBeOnTheScreen();
+        expect(screen.getByText('Convites recebidos conectados')).toBeOnTheScreen();
+        expect(screen.queryByText('Tela de Membros')).toBeNull();
     });
 
     test('volta da listagem de categorias para membros', async () => {

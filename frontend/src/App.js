@@ -25,6 +25,7 @@ import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { MembersScreen } from './features/support-network/screens/MembersScreen';
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
+import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
@@ -622,16 +623,23 @@ export default function App() {
             </>
         );
     } else if (telaInterna === telasInternas.membros) {
-        conteudo = (
-            <MembersScreen
-                onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
-                onAdicionarContato={() => {
-                    setRascunhoNovoContato(null);
-                    setTelaInterna(telasInternas.novoContato);
-                }}
-                onSelecionarAba={selecionarAba}
-            />
-        );
+        conteudo =
+            perfil?.papel === 'contato_apoio' ? (
+                <ReceivedContactsScreen
+                    service={configuracao.servicos.receivedContactsService}
+                    onSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            ) : (
+                <MembersScreen
+                    onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
+                    onAdicionarContato={() => {
+                        setRascunhoNovoContato(null);
+                        setTelaInterna(telasInternas.novoContato);
+                    }}
+                    onSelecionarAba={selecionarAba}
+                />
+            );
     } else if (telaInterna === telasInternas.novoContato) {
         conteudo = (
             <ContactFormScreen
