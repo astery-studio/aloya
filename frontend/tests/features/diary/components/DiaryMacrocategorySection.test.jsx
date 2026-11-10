@@ -1,6 +1,8 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
+jest.mock('phosphor-react-native', () => ({ CaretDown: () => null, CaretUp: () => null }));
+
 import DiaryMacrocategorySection from '../../../../src/features/diary/components/DiaryMacrocategorySection/DiaryMacrocategorySection';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -49,5 +51,21 @@ describe('DiaryMacrocategorySection', () => {
         expect(screen.queryByText('Conteúdo íntimo')).toBeNull();
         await fireEvent.press(cabecalho);
         expect(aoAlternar).not.toHaveBeenCalled();
+    });
+
+    test('usa a paleta padrão e apresenta o estado pressionado', async () => {
+        await render(
+            <DiaryMacrocategorySection
+                titulo="Ciclo"
+                icone={Icone}
+                expandido
+                aoAlternar={jest.fn()}
+            >
+                <Text>Conteúdo</Text>
+            </DiaryMacrocategorySection>
+        );
+        const cabecalho = screen.getByRole('button', { name: 'Ciclo' });
+        await fireEvent(cabecalho, 'pressIn');
+        expect(screen.getByText('Conteúdo')).toBeOnTheScreen();
     });
 });
