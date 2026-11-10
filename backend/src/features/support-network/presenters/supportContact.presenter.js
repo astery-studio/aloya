@@ -113,6 +113,8 @@ function formatarContato(vinculo, agora = new Date()) {
         nome,
         email,
         identificacao: nome ?? email,
+        iconeId: vinculo.iconeId,
+        corId: vinculo.corId,
         status,
         statusRotulo: ROTULOS_STATUS[status],
         vinculo: resolverVinculo(vinculo),

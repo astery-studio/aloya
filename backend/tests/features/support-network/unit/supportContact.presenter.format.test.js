@@ -48,6 +48,8 @@ test('formata contato ativo com nome, ativação e ações permitidas', () => {
             id: 19,
             contato: { nome: '  Anna  ' },
             emailConvidado: 'anna@email.com',
+            iconeId: 'coracao',
+            corId: 'coral',
             status: 'ativo',
             categoria: null,
             permissoesIndividuais: ['geral.fase_atual'],
@@ -58,6 +60,8 @@ test('formata contato ativo com nome, ativação e ações permitidas', () => {
     );
 
     assert.equal(contato.identificacao, 'Anna');
+    assert.equal(contato.iconeId, 'coracao');
+    assert.equal(contato.corId, 'coral');
     assert.equal(contato.statusRotulo, 'Ativo');
     assert.equal(contato.dataAtivacao, dataResposta);
     assert.equal(contato.aguardando, null);

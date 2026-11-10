@@ -72,6 +72,8 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
             select: {
                 id: true,
                 emailConvidado: true,
+                iconeId: true,
+                corId: true,
                 status: true,
                 permissoesIndividuais: true,
                 dataEnvio: true,
