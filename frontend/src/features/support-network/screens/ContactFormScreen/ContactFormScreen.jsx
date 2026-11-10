@@ -281,30 +281,27 @@ function ContactFormScreen({
         };
     }, [carregarCategorias]);
 
-    const alterarDados = useCallback(
-        (alteracoes) => {
-            if (
-                requisicaoEmAndamento.current ||
-                alteracoes === null ||
-                typeof alteracoes !== 'object' ||
-                Array.isArray(alteracoes)
-            ) {
-                return;
-            }
+    useEffect(() => {
+        onRascunhoAlterado?.(dados);
+    }, [dados, onRascunhoAlterado]);
 
-            definirDados((atuais) => {
-                const atualizados = {
-                    ...atuais,
-                    ...alteracoes
-                };
+    const alterarDados = useCallback((alteracoes) => {
+        if (
+            requisicaoEmAndamento.current ||
+            alteracoes === null ||
+            typeof alteracoes !== 'object' ||
+            Array.isArray(alteracoes)
+        ) {
+            return;
+        }
 
-                onRascunhoAlterado?.(atualizados);
-
-                return atualizados;
-            });
-        },
-        [onRascunhoAlterado]
-    );
+        definirDados((atuais) => {
+            return {
+                ...atuais,
+                ...alteracoes
+            };
+        });
+    }, []);
 
     const processarConvite = useCallback(
         async (dadosValidados, consultarPrimeiro = true) => {

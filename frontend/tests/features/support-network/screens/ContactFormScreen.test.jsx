@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Text } from 'react-native';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -365,6 +367,45 @@ describe('ContactFormScreen', () => {
                 categoriaId: 10
             })
         );
+    });
+
+    test('sincroniza o rascunho com o componente pai após a renderização', async () => {
+        const servicos = criarServicos();
+        const erroConsole = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        function TelaPai() {
+            const [rascunho, definirRascunho] = useState(null);
+
+            return (
+                <>
+                    <Text testID="rascunho-sincronizado">{rascunho?.email ?? 'sem rascunho'}</Text>
+                    <ContactFormScreen {...servicos} onRascunhoAlterado={definirRascunho} />
+                </>
+            );
+        }
+
+        try {
+            await render(<TelaPai />);
+            await esperarFormulario();
+
+            await fireEvent.press(
+                screen.getByRole('button', {
+                    name: 'Alterar dados do contato'
+                })
+            );
+
+            await waitFor(() => {
+                expect(screen.getByTestId('rascunho-sincronizado')).toHaveTextContent(
+                    'rascunho@example.com'
+                );
+            });
+
+            expect(erroConsole.mock.calls.flat().join(' ')).not.toContain(
+                'Cannot update a component'
+            );
+        } finally {
+            erroConsole.mockRestore();
+        }
     });
 
     test('pede confirmação antes de convidar contato não cadastrado', async () => {
