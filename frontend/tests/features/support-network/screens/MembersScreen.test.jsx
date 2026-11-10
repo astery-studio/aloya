@@ -205,6 +205,12 @@ describe('MembersScreen', () => {
             screen.getByText('Pessoas que fazem parte da sua rede de cuidado e apoio.')
         ).toBeOnTheScreen();
 
+        expect(
+            screen.getByText('Pessoas que fazem parte da sua rede de cuidado e apoio.').parent
+        ).toHaveStyle({
+            paddingBottom: 20
+        });
+
         expect(mockContactListProps.cabecalho).not.toBeNull();
     });
 
