@@ -6,18 +6,33 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
     ArrowsClockwiseIcon,
+    CheckCircleIcon,
+    ClockIcon,
+    EnvelopeIcon,
+    HandshakeIcon,
+    HourglassLowIcon,
+    InfoIcon,
     PencilSimpleIcon,
-    TrashIcon
+    TrashIcon,
+    XCircleIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { ContactAvatar } from '../ContactAvatar/ContactAvatar';
-import { ContactPermissionBadge } from '../ContactPermissionBadge/ContactPermissionBadge';
 import { ContactStatusBadge } from '../ContactStatusBadge/ContactStatusBadge';
 import { criarEstilos } from './ContactCard.styles';
 
 const PERSPECTIVAS = Object.freeze(['enviado', 'recebido']);
 
 const ESTADOS_SUPORTADOS = new Set(['pendente', 'ativo', 'inativo', 'recusado']);
+
+const TAMANHO_ICONE_INFORMACAO = 13;
+
+const CORES_INFORMACOES = Object.freeze({
+    email: '#B07D2A',
+    vinculo: '#C85A44',
+    data: '#2C4C3B',
+    aguardando: '#4A758E'
+});
 
 function normalizarPerspectiva(perspectiva) {
     return PERSPECTIVAS.includes(perspectiva) ? perspectiva : 'enviado';
@@ -62,6 +77,36 @@ function formatarDataConvite(valor) {
     }).format(data);
 }
 
+function obterRotuloVinculo(vinculo) {
+    if (vinculo?.tipo === 'categoria') {
+        const nome = vinculo.nomeCategoria ?? vinculo.categoria?.nome;
+
+        if (typeof nome === 'string' && nome.trim().length > 0) {
+            return nome.trim();
+        }
+    }
+
+    return 'Permissões Individuais';
+}
+
+function LinhaInformacao({ icone: Icone, corIcone, identificador, rotulo, valor, estilos }) {
+    return (
+        <View style={estilos.linhaInformacao}>
+            <Icone
+                testID={`contact-info-icon-${identificador}`}
+                color={corIcone}
+                size={TAMANHO_ICONE_INFORMACAO}
+                weight="regular"
+            />
+
+            <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.textoInformacao}>
+                <Text style={estilos.rotuloInformacao}>{rotulo}: </Text>
+                <Text style={estilos.valorInformacao}>{valor}</Text>
+            </Text>
+        </View>
+    );
+}
+
 function ContactCard({
     contato,
     perspectiva = 'enviado',
@@ -81,6 +126,8 @@ function ContactCard({
     const identificacao = obterIdentificacao(contato);
 
     const vinculo = obterVinculoSeguro(contato?.vinculo);
+
+    const rotuloVinculo = obterRotuloVinculo(vinculo);
 
     const email = typeof contato?.email === 'string' ? contato.email.trim() : '';
 
@@ -122,16 +169,18 @@ function ContactCard({
             style={[estilos.cartao, bloqueado && estilos.cartaoDesabilitado]}
         >
             <View style={estilos.cabecalho}>
-                <ContactAvatar
-                    iconeId={contato?.iconeId ?? 'pessoa'}
-                    corId={contato?.corId ?? 'branco'}
-                    tamanho="pequeno"
-                    rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
-                />
+                <View style={estilos.identidade}>
+                    <ContactAvatar
+                        iconeId={contato?.iconeId ?? 'pessoa'}
+                        corId={contato?.corId ?? 'branco'}
+                        tamanho="pequeno"
+                        rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
+                    />
 
-                <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nome}>
-                    {identificacao}
-                </Text>
+                    <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nome}>
+                        {identificacao}
+                    </Text>
+                </View>
 
                 {perspectivaSegura === 'enviado' ? (
                     <View style={estilos.acoesCompactas}>
@@ -164,81 +213,63 @@ function ContactCard({
                 ) : null}
             </View>
 
-            <View style={estilos.divisor} />
-
             <View style={estilos.informacoes}>
-                <Text style={estilos.tituloSecao}>INFORMAÇÕES DO CONTATO</Text>
-
-                {email ? (
-                    <View style={estilos.linhaInformacao}>
-                        <Text
-                            importantForAccessibility="no-hide-descendants"
-                            style={estilos.iconeInformacao}
-                        >
-                            ✉
-                        </Text>
-
-                        <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={estilos.textoInformacao}
-                        >
-                            <Text style={estilos.rotuloInformacao}>E-mail: </Text>
-
-                            {email}
-                        </Text>
-                    </View>
-                ) : null}
-
-                <View style={estilos.linhaInformacao}>
-                    <Text
-                        importantForAccessibility="no-hide-descendants"
-                        style={estilos.iconeInformacao}
-                    >
-                        ◇
-                    </Text>
-
-                    <Text style={estilos.rotuloInformacao}>Vínculo solicitado:</Text>
+                <View style={estilos.containerTituloSecao}>
+                    <Text style={estilos.tituloSecao}>INFORMAÇÕES DO CONTATO</Text>
                 </View>
 
-                <View style={estilos.recuoInformacao}>
-                    <ContactPermissionBadge vinculo={vinculo} />
+                <View style={estilos.caixaInformacoes}>
+                    {email ? (
+                        <LinhaInformacao
+                            icone={EnvelopeIcon}
+                            corIcone={CORES_INFORMACOES.email}
+                            identificador="email"
+                            rotulo="E-mail"
+                            valor={email}
+                            estilos={estilos}
+                        />
+                    ) : null}
+
+                    <LinhaInformacao
+                        icone={HandshakeIcon}
+                        corIcone={CORES_INFORMACOES.vinculo}
+                        identificador="vinculo"
+                        rotulo="Vínculo solicitado"
+                        valor={rotuloVinculo}
+                        estilos={estilos}
+                    />
+
+                    <LinhaInformacao
+                        icone={ClockIcon}
+                        corIcone={CORES_INFORMACOES.data}
+                        identificador="data"
+                        rotulo="Data de envio"
+                        valor={dataConvite}
+                        estilos={estilos}
+                    />
+
+                    {rotuloEspera ? (
+                        <LinhaInformacao
+                            icone={HourglassLowIcon}
+                            corIcone={CORES_INFORMACOES.aguardando}
+                            identificador="aguardando"
+                            rotulo="Aguardando"
+                            valor={rotuloEspera.replace(/^Aguardando\s*/u, '')}
+                            estilos={estilos}
+                        />
+                    ) : null}
                 </View>
-
-                <View style={estilos.linhaInformacao}>
-                    <Text
-                        importantForAccessibility="no-hide-descendants"
-                        style={estilos.iconeInformacao}
-                    >
-                        ◷
-                    </Text>
-
-                    <Text style={estilos.textoInformacao}>
-                        <Text style={estilos.rotuloInformacao}>Data de envio do convite: </Text>
-
-                        {dataConvite}
-                    </Text>
-                </View>
-
-                {rotuloEspera ? (
-                    <View style={estilos.linhaInformacao}>
-                        <Text
-                            importantForAccessibility="no-hide-descendants"
-                            style={estilos.iconeInformacao}
-                        >
-                            ⧖
-                        </Text>
-
-                        <Text style={estilos.textoEspera}>{rotuloEspera}</Text>
-                    </View>
-                ) : null}
             </View>
 
-            <View style={estilos.divisor} />
-
-            <View style={estilos.estado}>
-                <ContactStatusBadge estado={estado} />
-            </View>
+            {estado === 'pendente' ? (
+                <View style={estilos.containerTituloPendente}>
+                    <Text style={estilos.tituloPendente}>CONVITE PENDENTE</Text>
+                </View>
+            ) : (
+                <View style={estilos.estado}>
+                    <ContactStatusBadge estado={estado} compacto />
+                </View>
+            )}
 
             {conviteRecebidoPendente ? (
                 <View style={estilos.acoesRecebidas}>
@@ -247,11 +278,15 @@ function ContactCard({
                             <ButtonScreen
                                 texto="Aceitar"
                                 variante="verde"
+                                icone={CheckCircleIcon}
+                                tamanhoIcone={16}
+                                corConteudo="#FFFFFF"
                                 aoPressionar={() => executarAcao('aceitar')}
                                 rotuloAcessibilidade={`Aceitar convite de ${identificacao}`}
                                 carregando={acaoEmAndamento === 'aceitar'}
                                 desativado={bloqueado}
                                 estilo={estilos.botaoRecebido}
+                                estiloTexto={estilos.textoBotao}
                             />
                         </View>
 
@@ -259,11 +294,15 @@ function ContactCard({
                             <ButtonScreen
                                 texto="Recusar"
                                 variante="verde"
+                                icone={XCircleIcon}
+                                tamanhoIcone={16}
+                                corConteudo="#FFFFFF"
                                 aoPressionar={() => executarAcao('recusar')}
                                 rotuloAcessibilidade={`Recusar convite de ${identificacao}`}
                                 carregando={acaoEmAndamento === 'recusar'}
                                 desativado={bloqueado}
                                 estilo={estilos.botaoRecebido}
+                                estiloTexto={estilos.textoBotao}
                             />
                         </View>
                     </View>
@@ -273,20 +312,27 @@ function ContactCard({
             <ButtonScreen
                 texto="Resumo de Permissões"
                 variante="laranja"
+                icone={InfoIcon}
+                tamanhoIcone={13}
+                corConteudo="#FFFFFF"
                 aoPressionar={abrirResumo}
                 rotuloAcessibilidade={`Abrir resumo de permissões de ${identificacao}`}
                 desativado={bloqueado || typeof aoAbrirResumo !== 'function'}
                 estilo={estilos.botaoResumo}
+                estiloTexto={estilos.textoBotao}
             />
         </View>
     );
 }
 
 export {
+    CORES_INFORMACOES,
     ContactCard,
+    TAMANHO_ICONE_INFORMACAO,
     formatarDataConvite,
     normalizarEstado,
     normalizarPerspectiva,
     obterIdentificacao,
+    obterRotuloVinculo,
     obterVinculoSeguro
 };

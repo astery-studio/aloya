@@ -36,7 +36,7 @@ const ICONES_POR_ID = Object.freeze({
 const TAMANHOS = Object.freeze({
     pequeno: Object.freeze({
         estilo: estilos.pequeno,
-        tamanhoIcone: 18
+        tamanhoIcone: 16
     }),
     medio: Object.freeze({
         estilo: estilos.medio,
@@ -56,6 +56,13 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', rotuloAcessibilidade
     const Icone = ICONES_POR_ID[iconeSeguro];
     const opcaoCor = obterOpcaoCorContato(corSegura);
     const configuracaoTamanho = TAMANHOS[tamanhoSeguro];
+    const corPequena =
+        tamanhoSeguro === 'pequeno' && corSegura !== 'branco'
+            ? {
+                  backgroundColor: `${opcaoCor.cor}33`,
+                  borderColor: opcaoCor.cor
+              }
+            : null;
 
     const rotulo =
         typeof rotuloAcessibilidade === 'string' && rotuloAcessibilidade.trim().length > 0
@@ -76,7 +83,8 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', rotuloAcessibilidade
                 {
                     backgroundColor: opcaoCor.fundo,
                     borderColor: opcaoCor.borda
-                }
+                },
+                corPequena
             ]}
         >
             <Icone

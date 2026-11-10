@@ -17,6 +17,8 @@ function Button({
     desativado = false,
     carregando = false,
     icone: Icone,
+    tamanhoIcone = 18,
+    corConteudo: corConteudoPersonalizada,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
     estilo,
@@ -48,7 +50,7 @@ function Button({
         ? tema.escuro
             ? '#757575'
             : tema.cores.interface.textoDesabilitado
-        : varianteAtual.texto.color;
+        : corConteudoPersonalizada || varianteAtual.texto.color;
 
     function renderizarConteudo() {
         if (carregando) {
@@ -59,7 +61,7 @@ function Button({
             <View style={estilos.conteudo}>
                 {Icone && posicaoIcone === 'esquerda' ? (
                     <View style={estilos.caixaIcone}>
-                        <Icone color={corConteudo} size={18} />
+                        <Icone color={corConteudo} size={tamanhoIcone} />
                     </View>
                 ) : null}
 
@@ -84,7 +86,7 @@ function Button({
 
                 {Icone && posicaoIcone === 'direita' ? (
                     <View style={estilos.caixaIcone}>
-                        <Icone color={corConteudo} size={18} />
+                        <Icone color={corConteudo} size={tamanhoIcone} />
                     </View>
                 ) : null}
             </View>

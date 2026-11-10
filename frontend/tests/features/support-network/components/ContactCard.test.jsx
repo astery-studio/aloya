@@ -3,7 +3,9 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 import {
+    CORES_INFORMACOES,
     ContactCard,
+    TAMANHO_ICONE_INFORMACAO,
     formatarDataConvite,
     normalizarEstado,
     normalizarPerspectiva,
@@ -54,9 +56,37 @@ describe('ContactCard', () => {
 
         expect(screen.getByText(/30\/10\/2026/u)).toBeOnTheScreen();
 
-        expect(screen.getByText('Aguardando há 3 dias')).toBeOnTheScreen();
+        expect(screen.getByText('há 3 dias')).toBeOnTheScreen();
 
-        expect(screen.getByText('Pendente')).toBeOnTheScreen();
+        expect(screen.getByText('CONVITE PENDENTE')).toBeOnTheScreen();
+
+        expect(screen.getByTestId('contact-card')).toHaveStyle({
+            width: '100%',
+            maxWidth: 350,
+            borderRadius: 16,
+            borderWidth: 0.705
+        });
+    });
+
+    test.each([
+        ['email', '#B07D2A'],
+        ['vinculo', '#C85A44'],
+        ['data', '#2C4C3B'],
+        ['aguardando', '#4A758E']
+    ])('usa o ícone correto para a informação %s', async (identificador, cor) => {
+        await render(
+            <ContactCard
+                contato={conviteRecebido}
+                perspectiva="recebido"
+                aoAcao={jest.fn()}
+                aoAbrirResumo={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId(`contact-info-icon-${identificador}`)).toBeOnTheScreen();
+
+        expect(CORES_INFORMACOES[identificador]).toBe(cor);
+        expect(TAMANHO_ICONE_INFORMACAO).toBe(13);
     });
 
     test('encaminha o aceite do convite recebido', async () => {

@@ -11,11 +11,13 @@ import { CaretUpIcon } from 'phosphor-react-native/src/icons/CaretUp';
 import { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 import { ChartLineUpIcon } from 'phosphor-react-native/src/icons/ChartLineUp';
 import { CheckIcon } from 'phosphor-react-native/src/icons/Check';
+import { CheckCircleIcon } from 'phosphor-react-native/src/icons/CheckCircle';
 import { ClockIcon } from 'phosphor-react-native/src/icons/Clock';
 import { ClockCounterClockwiseIcon } from 'phosphor-react-native/src/icons/ClockCounterClockwise';
 import { DropIcon } from 'phosphor-react-native/src/icons/Drop';
 import { EggIcon } from 'phosphor-react-native/src/icons/Egg';
 import { EnvelopeSimpleIcon } from 'phosphor-react-native/src/icons/EnvelopeSimple';
+import { EnvelopeIcon } from 'phosphor-react-native/src/icons/Envelope';
 import { EyeIcon } from 'phosphor-react-native/src/icons/Eye';
 import { EyeSlashIcon } from 'phosphor-react-native/src/icons/EyeSlash';
 import { FirstAidKitIcon } from 'phosphor-react-native/src/icons/FirstAidKit';
@@ -25,6 +27,7 @@ import { HandshakeIcon } from 'phosphor-react-native/src/icons/Handshake';
 import { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
 import { HeartbeatIcon } from 'phosphor-react-native/src/icons/Heartbeat';
 import { HouseIcon } from 'phosphor-react-native/src/icons/House';
+import { HourglassLowIcon } from 'phosphor-react-native/src/icons/HourglassLow';
 import { InfoIcon } from 'phosphor-react-native/src/icons/Info';
 import { LightningIcon } from 'phosphor-react-native/src/icons/Lightning';
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey';
@@ -47,6 +50,7 @@ import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
+import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
 export {
     ArrowLeftIcon,
@@ -60,11 +64,13 @@ export {
     CaretUpIcon,
     ChartBarIcon,
     ChartLineUpIcon,
+    CheckCircleIcon,
     CheckIcon,
     ClockCounterClockwiseIcon,
     ClockIcon,
     DropIcon,
     EggIcon,
+    EnvelopeIcon,
     EnvelopeSimpleIcon,
     EyeIcon,
     EyeSlashIcon,
@@ -75,6 +81,7 @@ export {
     HeartIcon,
     HeartbeatIcon,
     HouseIcon,
+    HourglassLowIcon,
     InfoIcon,
     LightningIcon,
     LockKeyIcon,
@@ -96,5 +103,6 @@ export {
     UsersIcon,
     WarningCircleIcon,
     WarningIcon,
+    XCircleIcon,
     XIcon
 };

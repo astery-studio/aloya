@@ -89,10 +89,12 @@ describe('ContactAvatar', () => {
         expect(screen.getByTestId('contact-avatar')).toHaveStyle({
             width: 36,
             height: 36,
-            borderRadius: 10
+            borderRadius: 10,
+            backgroundColor: '#2C4C3B33',
+            borderColor: '#2C4C3B'
         });
 
-        expect(screen.getByTestId('contact-avatar-icon-lotus')).toHaveProp('size', 18);
+        expect(screen.getByTestId('contact-avatar-icon-lotus')).toHaveProp('size', 16);
     });
 
     test('usa a variante média por padrão', async () => {

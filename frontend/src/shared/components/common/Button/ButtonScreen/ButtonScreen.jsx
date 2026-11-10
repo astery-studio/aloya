@@ -8,6 +8,8 @@ export default function ButtonScreen({
     desativado = false,
     carregando = false,
     icone,
+    tamanhoIcone,
+    corConteudo,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
     estilo,
@@ -26,6 +28,8 @@ export default function ButtonScreen({
             desativado={estaDesativado}
             carregando={carregando}
             icone={icone}
+            tamanhoIcone={tamanhoIcone}
+            corConteudo={corConteudo}
             posicaoIcone={posicaoIcone}
             rotuloAcessibilidade={rotuloAcessibilidade}
             estilo={estilo}
