@@ -9,7 +9,11 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.fundo
         },
 
-        containerComVoltar: tema.escuro ? { backgroundColor: '#121212' } : {},
+        containerComVoltar: tema.escuro
+            ? {
+                  backgroundColor: '#121212'
+              }
+            : {},
 
         espacamentoSuperior: {
             height: 56
@@ -48,6 +52,14 @@ function criarEstilos(tema) {
             fontWeight: '700',
             lineHeight: 27,
             textAlign: 'center'
+        },
+
+        acoes: {
+            flexShrink: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            marginLeft: 16
         },
 
         containerVoltar: {

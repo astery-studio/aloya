@@ -12,6 +12,7 @@ function MainLayout({
     titulo,
     varianteHeader = 'padrao',
     onVoltar,
+    acoesHeader = null,
     abaAtiva,
     onSelecionarAba,
     usarAreaSeguraInferior = true,
@@ -21,23 +22,39 @@ function MainLayout({
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
     const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
 
     return (
         <View
             testID="main-layout"
-            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+            style={[
+                estilos.container,
+                corFundo
+                    ? {
+                          backgroundColor: corFundo
+                      }
+                    : null
+            ]}
         >
             <Header
                 titulo={titulo}
                 variante={varianteHeader}
                 onVoltar={onVoltar}
+                acoes={acoesHeader}
                 corFundo={corFundo}
             />
 
             <View
                 testID="conteudo-main-layout"
-                style={[estilos.conteudo, corFundo ? { backgroundColor: corFundo } : null]}
+                style={[
+                    estilos.conteudo,
+                    corFundo
+                        ? {
+                              backgroundColor: corFundo
+                          }
+                        : null
+                ]}
             >
                 {children}
             </View>

@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 
+import { ArrowLeftIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './Header.style';
 
-function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
+function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
+
+    const temAcoes = !temVoltar && Boolean(acoes);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
@@ -20,7 +22,11 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
-                corFundo ? { backgroundColor: corFundo } : null
+                corFundo
+                    ? {
+                          backgroundColor: corFundo
+                      }
+                    : null
             ]}
         >
             <View
@@ -59,6 +65,17 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
                 >
                     {titulo}
                 </Text>
+
+                {temAcoes ? (
+                    <View
+                        testID="header-actions"
+                        accessibilityRole="toolbar"
+                        accessibilityLabel="Ações da tela"
+                        style={estilos.acoes}
+                    >
+                        {acoes}
+                    </View>
+                ) : null}
             </View>
         </View>
     );
