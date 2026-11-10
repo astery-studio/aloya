@@ -60,11 +60,13 @@ describe('campos tipados do Diário', () => {
 
     test('renderiza anotação longa com contador em tempo real', async () => {
         const aoAlterar = jest.fn();
-        await render(
+        const resultado = await render(
             <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} desabilitado />
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota...');
         expect(screen.getByText('3 / 5000')).toBeOnTheScreen();
         await fireEvent.changeText(entrada, 'Nova nota');
+        await resultado.rerender(<DiaryCategoryField categoria={nota} valor={null} />);
+        expect(screen.getByText('0 / 5000')).toBeOnTheScreen();
     });
 });

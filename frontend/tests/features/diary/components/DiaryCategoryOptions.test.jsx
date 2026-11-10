@@ -74,4 +74,16 @@ describe('opções de DiaryCategoryField', () => {
         expect(screen.getByRole('button', { name: 'Grandes' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Muitos' })).toBeDisabled();
     });
+
+    test('aceita grupo sem título e sem callback de alteração', async () => {
+        const semTitulo = {
+            id: 'categoria_nova',
+            nome: 'Categoria nova',
+            tipoValor: 'opcoes',
+            opcoes: [{ id: 'opcao_nova', grupo: 'grupo_novo', nome: 'Opção nova' }]
+        };
+        await render(<DiaryCategoryField categoria={semTitulo} valor={[]} />);
+        await fireEvent.press(screen.getByRole('button', { name: 'Opção nova' }));
+        expect(screen.getByRole('header', { name: 'Categoria nova' })).toBeOnTheScreen();
+    });
 });
