@@ -27,12 +27,9 @@ function criarDadosDaConfiguracao(configuracao, dadosIniciais) {
 
     return {
         email: configuracao.contato.email,
-        iconeId: dadosIniciais?.iconeId ?? null,
-        corId: dadosIniciais?.corId ?? null,
-        categoriaId:
-            configuracao.vinculoAtual.tipo === 'individual'
-                ? categoriaInicial
-                : (categoriaAtual?.id ?? null),
+        iconeId: configuracao.contato.iconeId ?? dadosIniciais?.iconeId ?? null,
+        corId: configuracao.contato.corId ?? dadosIniciais?.corId ?? null,
+        categoriaId: categoriaInicial ?? categoriaAtual?.id ?? null,
         permissoesIndividuais:
             configuracao.vinculoAtual.tipo === 'individual'
                 ? [...configuracao.vinculoAtual.permissoes]
@@ -43,11 +40,30 @@ function criarDadosDaConfiguracao(configuracao, dadosIniciais) {
 function houveAlteracaoReal(configuracao, dados) {
     if (!configuracao || !dados) return false;
 
+    const aparenciaAlterada =
+        dados.iconeId !== configuracao.contato.iconeId ||
+        dados.corId !== configuracao.contato.corId;
+
+    const vinculoAlterado =
+        configuracao.vinculoAtual.tipo === 'categoria'
+            ? dados.categoriaId !== configuracao.vinculoAtual.categoria?.id ||
+              (dados.categoriaId === null &&
+                  assinaturaPermissoes(dados.permissoesIndividuais) !==
+                      assinaturaPermissoes(configuracao.vinculoAtual.permissoes))
+            : Number.isSafeInteger(dados.categoriaId) && dados.categoriaId > 0;
+
+    return aparenciaAlterada || vinculoAlterado;
+}
+
+function vinculoFoiAlterado(configuracao, dados) {
+    if (!configuracao || !dados) return false;
+
     if (configuracao.vinculoAtual.tipo === 'categoria') {
         return (
-            dados.categoriaId === null &&
-            assinaturaPermissoes(dados.permissoesIndividuais) !==
-                assinaturaPermissoes(configuracao.vinculoAtual.permissoes)
+            dados.categoriaId !== configuracao.vinculoAtual.categoria?.id ||
+            (dados.categoriaId === null &&
+                assinaturaPermissoes(dados.permissoesIndividuais) !==
+                    assinaturaPermissoes(configuracao.vinculoAtual.permissoes))
         );
     }
 
@@ -55,17 +71,20 @@ function houveAlteracaoReal(configuracao, dados) {
 }
 
 function criarAlteracao(configuracao, dados) {
-    if (configuracao.vinculoAtual.tipo === 'categoria') {
-        return {
-            tipo: 'individual',
-            permissoesIndividuais: [...dados.permissoesIndividuais],
-            versao: configuracao.versao
-        };
-    }
+    const alteracao = Number.isSafeInteger(dados.categoriaId)
+        ? {
+              tipo: 'categoria',
+              categoriaId: dados.categoriaId
+          }
+        : {
+              tipo: 'individual',
+              permissoesIndividuais: [...dados.permissoesIndividuais]
+          };
 
     return {
-        tipo: 'categoria',
-        categoriaId: dados.categoriaId,
+        ...alteracao,
+        iconeId: dados.iconeId,
+        corId: dados.corId,
         versao: configuracao.versao
     };
 }
@@ -85,7 +104,7 @@ function ContactLinkEditFlow({
     const [carregando, definirCarregando] = useState(true);
     const [salvando, definirSalvando] = useState(false);
     const [erro, definirErro] = useState(null);
-    const [confirmando, definirConfirmando] = useState(false);
+    const [confirmacaoTroca, definirConfirmacaoTroca] = useState(null);
     const [sucesso, definirSucesso] = useState(false);
     const [permissoesVisiveis, definirPermissoesVisiveis] = useState(false);
     const [rascunhoPermissoes, definirRascunhoPermissoes] = useState([]);
@@ -142,44 +161,76 @@ function ContactLinkEditFlow({
 
     const alterado = useMemo(() => houveAlteracaoReal(configuracao, dados), [configuracao, dados]);
 
-    const categorias = useMemo(() => {
-        if (!configuracao) return [];
-        if (configuracao.vinculoAtual.tipo === 'categoria') {
-            return configuracao.vinculoAtual.categoria ? [configuracao.vinculoAtual.categoria] : [];
-        }
-        return configuracao.proximoVinculo.categorias;
-    }, [configuracao]);
+    const categorias = useMemo(() => configuracao?.proximoVinculo.categorias ?? [], [configuracao]);
 
-    const alterarDados = useCallback((alteracoes) => {
-        if (atualizando.current || !alteracoes || typeof alteracoes !== 'object') return;
-        definirDados((atuais) => ({ ...atuais, ...alteracoes }));
-    }, []);
+    const alterarDados = useCallback(
+        (alteracoes) => {
+            if (atualizando.current || !alteracoes || typeof alteracoes !== 'object') return;
+
+            if (Object.prototype.hasOwnProperty.call(alteracoes, 'categoriaId')) {
+                if (!Number.isSafeInteger(alteracoes.categoriaId)) return;
+                if (alteracoes.categoriaId === dados?.categoriaId) return;
+                definirConfirmacaoTroca({
+                    tipo: 'categoria',
+                    categoriaId: alteracoes.categoriaId
+                });
+                return;
+            }
+
+            definirDados((atuais) => ({ ...atuais, ...alteracoes }));
+        },
+        [dados?.categoriaId]
+    );
 
     const abrirPermissoes = useCallback(() => {
-        if (configuracao?.vinculoAtual.tipo !== 'categoria' || salvando) return;
-        definirRascunhoPermissoes([...configuracao.proximoVinculo.permissoesPreenchidas]);
+        if (salvando) return;
+
+        if (Number.isSafeInteger(dados?.categoriaId)) {
+            definirConfirmacaoTroca({ tipo: 'individual' });
+            return;
+        }
+
+        definirRascunhoPermissoes([...dados.permissoesIndividuais]);
         definirPermissoesVisiveis(true);
-    }, [configuracao, salvando]);
+    }, [dados, salvando]);
 
     const salvarPermissoes = useCallback(
         (permissoes) => {
             if (!Array.isArray(permissoes) || permissoes.length === 0 || salvando) return;
-            alterarDados({ categoriaId: null, permissoesIndividuais: [...permissoes] });
+            definirDados((atuais) => ({
+                ...atuais,
+                categoriaId: null,
+                permissoesIndividuais: [...permissoes]
+            }));
             definirPermissoesVisiveis(false);
         },
-        [alterarDados, salvando]
+        [salvando]
     );
 
-    const solicitarSalvamento = useCallback(() => {
-        if (alterado && !salvando) definirConfirmando(true);
-    }, [alterado, salvando]);
+    const confirmarTrocaLocal = useCallback(() => {
+        if (confirmacaoTroca?.tipo === 'individual') {
+            definirConfirmacaoTroca(null);
+            definirRascunhoPermissoes([]);
+            definirPermissoesVisiveis(true);
+            return;
+        }
 
-    const confirmar = useCallback(async () => {
+        if (confirmacaoTroca?.tipo === 'categoria') {
+            definirDados((atuais) => ({
+                ...atuais,
+                categoriaId: confirmacaoTroca.categoriaId,
+                permissoesIndividuais: []
+            }));
+        }
+
+        definirConfirmacaoTroca(null);
+    }, [confirmacaoTroca]);
+
+    const salvar = useCallback(async () => {
         if (!alterado || atualizando.current || !serviceDisponivel) return;
 
         atualizando.current = true;
         definirSalvando(true);
-        definirConfirmando(false);
         definirErro(null);
 
         try {
@@ -207,8 +258,10 @@ function ContactLinkEditFlow({
         onSalvo?.(resultado);
     }, [onSalvo, sucesso]);
 
-    const categoriaDestino = categorias.find((categoria) => categoria.id === dados?.categoriaId);
-    const partindoDeCategoria = configuracao?.vinculoAtual.tipo === 'categoria';
+    const categoriaConfirmada = categorias.find(
+        (categoria) => categoria.id === confirmacaoTroca?.categoriaId
+    );
+    const destinoIndividual = dados?.categoriaId === null;
 
     return (
         <>
@@ -232,14 +285,13 @@ function ContactLinkEditFlow({
                             categorias={categorias}
                             modo="edicao"
                             aoAlterar={alterarDados}
-                            aoSalvar={solicitarSalvamento}
-                            aoAbrirPermissoes={partindoDeCategoria ? abrirPermissoes : undefined}
-                            aoCriarCategoria={partindoDeCategoria ? undefined : onCriarCategoria}
+                            aoSalvar={salvar}
+                            aoAbrirPermissoes={abrirPermissoes}
+                            aoCriarCategoria={onCriarCategoria}
                             carregando={salvando}
                             alterado={alterado}
-                            bloquearAparencia
-                            permitirPermissoes={partindoDeCategoria}
-                            permitirCriarCategoria={!partindoDeCategoria}
+                            permitirPermissoes
+                            permitirCriarCategoria
                         />
                     )}
                 </View>
@@ -259,27 +311,31 @@ function ContactLinkEditFlow({
             />
 
             <SimpleModal
-                visivel={confirmando}
-                aoFechar={() => !salvando && definirConfirmando(false)}
+                visivel={confirmacaoTroca !== null}
+                aoFechar={() => !salvando && definirConfirmacaoTroca(null)}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
-                titulo={partindoDeCategoria ? 'Desvincular categoria' : 'Vincular a categoria'}
+                titulo={
+                    confirmacaoTroca?.tipo === 'individual'
+                        ? 'Desvincular categoria'
+                        : 'Vincular a categoria'
+                }
                 mensagem={
-                    partindoDeCategoria
+                    confirmacaoTroca?.tipo === 'individual'
                         ? 'Esta ação remove o contato da categoria cadastrada e torna as permissões individuais.'
-                        : `Esta ação remove as permissões individuais cadastradas e vincula o contato a categoria ‘${categoriaDestino?.nome ?? ''}’`
+                        : `Esta ação remove as permissões individuais cadastradas e vincula o contato a categoria ‘${categoriaConfirmada?.nome ?? ''}’`
                 }
                 acaoPrincipal={{
                     texto: 'Continuar',
                     variante: 'verde',
-                    aoPressionar: confirmar,
+                    aoPressionar: confirmarTrocaLocal,
                     carregando: salvando
                 }}
                 acaoSecundaria={{
                     texto: 'Cancelar',
                     variante: 'branco',
-                    aoPressionar: () => definirConfirmando(false),
+                    aoPressionar: () => definirConfirmacaoTroca(null),
                     desativado: salvando
                 }}
             />
@@ -291,7 +347,7 @@ function ContactLinkEditFlow({
                 corIcone={tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo={
-                    partindoDeCategoria
+                    destinoIndividual
                         ? 'Permissões atualizadas com sucesso'
                         : 'Vínculo atualizado com sucesso'
                 }
@@ -308,7 +364,7 @@ function ContactLinkEditFlow({
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
-                    aoPressionar: configuracao ? confirmar : carregar,
+                    aoPressionar: configuracao ? salvar : carregar,
                     carregando: carregando || salvando
                 }}
                 acaoSecundaria={{
@@ -327,5 +383,6 @@ export {
     assinaturaPermissoes,
     criarAlteracao,
     criarDadosDaConfiguracao,
-    houveAlteracaoReal
+    houveAlteracaoReal,
+    vinculoFoiAlterado
 };

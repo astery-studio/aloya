@@ -1,4 +1,5 @@
 import { endpoints } from '../../../shared/services/api/endpoints';
+import { corContatoEhValida, iconeContatoEhValido } from '../constants/contactAppearanceOptions';
 
 const MENSAGEM_ERRO_ATUALIZACAO =
     'Não foi possível atualizar o vínculo deste contato. Tente novamente.';
@@ -55,6 +56,8 @@ function normalizarConfiguracao(resposta) {
         !Number.isSafeInteger(resposta.contato.id) ||
         resposta.contato.id <= 0 ||
         !ehTexto(resposta.contato.email) ||
+        !iconeContatoEhValido(resposta.contato.iconeId) ||
+        !corContatoEhValida(resposta.contato.corId) ||
         !ehObjeto(atual) ||
         !TIPOS_VINCULO.includes(atual.tipo) ||
         !ehObjeto(proximo) ||
@@ -83,7 +86,9 @@ function normalizarConfiguracao(resposta) {
         contato: Object.freeze({
             id: resposta.contato.id,
             nome: ehTexto(resposta.contato.nome) ? resposta.contato.nome.trim() : null,
-            email: resposta.contato.email.trim()
+            email: resposta.contato.email.trim(),
+            iconeId: resposta.contato.iconeId,
+            corId: resposta.contato.corId
         }),
         vinculoAtual: Object.freeze({
             tipo: atual.tipo,

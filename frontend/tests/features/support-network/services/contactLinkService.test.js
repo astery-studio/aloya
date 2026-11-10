@@ -9,7 +9,9 @@ const configuracaoValida = {
     contato: {
         id: 20,
         nome: 'Ana',
-        email: 'ana@example.com'
+        email: 'ana@example.com',
+        iconeId: 'coracao',
+        corId: 'coral'
     },
     vinculoAtual: {
         tipo: 'categoria',

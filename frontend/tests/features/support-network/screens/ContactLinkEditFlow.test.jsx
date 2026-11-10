@@ -69,6 +69,15 @@ jest.mock('../../../../src/features/support-network/components/ContactForm/Conta
                     Pressable,
                     {
                         accessibilityRole: 'button',
+                        accessibilityLabel: 'Alterar aparência',
+                        onPress: () => props.aoAlterar({ iconeId: 'sol', corId: 'azul' })
+                    },
+                    React.createElement(Text, null, 'Aparência')
+                ),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
                         accessibilityLabel: 'Salvar edição',
                         onPress: props.aoSalvar
                     },
@@ -149,7 +158,13 @@ import {
 } from '../../../../src/features/support-network/screens/ContactFormScreen/ContactLinkEditFlow';
 
 const configuracaoCategoria = {
-    contato: { id: 20, nome: 'Ana', email: 'ana@example.com' },
+    contato: {
+        id: 20,
+        nome: 'Ana',
+        email: 'ana@example.com',
+        iconeId: 'coracao',
+        corId: 'coral'
+    },
     vinculoAtual: {
         tipo: 'categoria',
         categoria: { id: 10, nome: 'Família', permissoes: ['geral.fase_atual', 'saude.consultas'] },
@@ -157,14 +172,23 @@ const configuracaoCategoria = {
     },
     proximoVinculo: {
         tipo: 'individual',
-        permissoesPreenchidas: ['geral.fase_atual', 'saude.consultas'],
-        categorias: []
+        permissoesPreenchidas: [],
+        categorias: [
+            { id: 10, nome: 'Família', permissoes: ['geral.fase_atual', 'saude.consultas'] },
+            { id: 11, nome: 'Profissional', permissoes: ['geral.historico_ciclo'] }
+        ]
     },
     versao: '2026-11-08T12:00:00.000Z'
 };
 
 const configuracaoIndividual = {
-    contato: { id: 21, nome: 'Bia', email: 'bia@example.com' },
+    contato: {
+        id: 21,
+        nome: 'Bia',
+        email: 'bia@example.com',
+        iconeId: 'coracao',
+        corId: 'coral'
+    },
     vinculoAtual: {
         tipo: 'individual',
         categoria: null,
@@ -198,7 +222,12 @@ beforeEach(() => {
 test('carrega o vínculo e preserva a aparência do contato', async () => {
     const service = criarService();
     await render(
-        <ContactLinkEditFlow contatoId={20} dadosIniciais={dadosIniciais} service={service} />
+        <ContactLinkEditFlow
+            contatoId={20}
+            dadosIniciais={dadosIniciais}
+            service={service}
+            onCriarCategoria={jest.fn()}
+        />
     );
 
     await screen.findByTestId('formulario-edicao');
@@ -211,7 +240,8 @@ test('carrega o vínculo e preserva a aparência do contato', async () => {
         categoriaId: 10
     });
     expect(propriedadesFormulario.alterado).toBe(false);
-    expect(propriedadesFormulario.bloquearAparencia).toBe(true);
+    expect(propriedadesFormulario.bloquearAparencia).toBeUndefined();
+    expect(propriedadesFormulario.permitirCriarCategoria).toBe(true);
 });
 
 test('converte categoria em permissões individuais somente após confirmação', async () => {
@@ -222,23 +252,22 @@ test('converte categoria em permissões individuais somente após confirmação'
     await screen.findByTestId('formulario-edicao');
 
     await fireEvent.press(screen.getByRole('button', { name: 'Abrir permissões' }));
-    expect(propriedadesPermissoes.permissoesSelecionadas).toEqual([
-        'geral.fase_atual',
-        'saude.consultas'
-    ]);
+    expect(screen.getByText('Desvincular categoria')).toBeOnTheScreen();
+    expect(screen.queryByTestId('permissoes-individuais')).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+    expect(propriedadesPermissoes.permissoesSelecionadas).toEqual([]);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Alterar e salvar permissões' }));
     expect(propriedadesFormulario.alterado).toBe(true);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
-    expect(screen.getByText('Desvincular categoria')).toBeOnTheScreen();
-    expect(service.atualizar).not.toHaveBeenCalled();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
     await waitFor(() => {
         expect(service.atualizar).toHaveBeenCalledWith(20, {
             tipo: 'individual',
             permissoesIndividuais: ['geral.fase_atual'],
+            iconeId: 'coracao',
+            corId: 'coral',
             versao: configuracaoCategoria.versao
         });
     });
@@ -252,23 +281,56 @@ test('substitui permissões individuais por uma categoria', async () => {
     );
     await screen.findByTestId('formulario-edicao');
 
-    expect(propriedadesFormulario.permitirPermissoes).toBe(false);
+    expect(propriedadesFormulario.permitirPermissoes).toBe(true);
     expect(propriedadesFormulario.categorias).toHaveLength(1);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar Família' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
-
     expect(screen.getByText('Vincular a categoria')).toBeOnTheScreen();
     expect(screen.getByText(/vincula o contato a categoria ‘Família’/u)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
     await waitFor(() => {
         expect(service.atualizar).toHaveBeenCalledWith(21, {
             tipo: 'categoria',
             categoriaId: 10,
+            iconeId: 'coracao',
+            corId: 'coral',
             versao: configuracaoIndividual.versao
         });
     });
+});
+
+test('salva ícone e cor mantendo o vínculo e o e-mail bloqueado', async () => {
+    const service = criarService();
+    await render(
+        <ContactLinkEditFlow
+            contatoId={20}
+            dadosIniciais={dadosIniciais}
+            service={service}
+            onCriarCategoria={jest.fn()}
+        />
+    );
+    await screen.findByTestId('formulario-edicao');
+
+    expect(propriedadesFormulario.modo).toBe('edicao');
+    expect(propriedadesFormulario.aoCriarCategoria).toBeDefined();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Alterar aparência' }));
+    expect(propriedadesFormulario.alterado).toBe(true);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
+
+    await waitFor(() => {
+        expect(service.atualizar).toHaveBeenCalledWith(20, {
+            tipo: 'categoria',
+            categoriaId: 10,
+            iconeId: 'sol',
+            corId: 'azul',
+            versao: configuracaoCategoria.versao
+        });
+    });
+    expect(screen.queryByText('Desvincular categoria')).toBeNull();
 });
 
 test('mantém a tela e permite repetir quando a atualização falha', async () => {
@@ -282,8 +344,8 @@ test('mantém a tela e permite repetir quando a atualização falha', async () =
     );
     await screen.findByTestId('formulario-edicao');
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar Família' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
 
     expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
     expect(
@@ -315,27 +377,52 @@ test('cancela a consulta ao desmontar', async () => {
 test('detecta somente mudanças reais do vínculo', () => {
     expect(
         houveAlteracaoReal(configuracaoCategoria, {
-            categoriaId: null,
-            permissoesIndividuais: ['saude.consultas', 'geral.fase_atual']
+            iconeId: 'coracao',
+            corId: 'coral',
+            categoriaId: 10,
+            permissoesIndividuais: []
         })
     ).toBe(false);
     expect(
         houveAlteracaoReal(configuracaoCategoria, {
+            iconeId: 'coracao',
+            corId: 'coral',
             categoriaId: null,
             permissoesIndividuais: ['geral.fase_atual']
         })
     ).toBe(true);
     expect(
-        houveAlteracaoReal(configuracaoIndividual, { categoriaId: 10, permissoesIndividuais: [] })
+        houveAlteracaoReal(configuracaoIndividual, {
+            iconeId: 'coracao',
+            corId: 'coral',
+            categoriaId: 10,
+            permissoesIndividuais: []
+        })
+    ).toBe(true);
+
+    expect(
+        houveAlteracaoReal(configuracaoIndividual, {
+            iconeId: 'sol',
+            corId: 'azul',
+            categoriaId: null,
+            permissoesIndividuais: ['geral.fase_atual']
+        })
     ).toBe(true);
 });
 
 test('monta alteração sem mesclar categoria e permissões individuais', () => {
     expect(
-        criarAlteracao(configuracaoIndividual, { categoriaId: 10, permissoesIndividuais: ['x'] })
+        criarAlteracao(configuracaoIndividual, {
+            categoriaId: 10,
+            permissoesIndividuais: ['x'],
+            iconeId: 'sol',
+            corId: 'azul'
+        })
     ).toEqual({
         tipo: 'categoria',
         categoriaId: 10,
+        iconeId: 'sol',
+        corId: 'azul',
         versao: configuracaoIndividual.versao
     });
 });

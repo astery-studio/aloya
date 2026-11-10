@@ -500,6 +500,7 @@ describe('ContactForm', () => {
         ).toBeDisabled();
 
         expect(screen.getByLabelText('E-mail do Contato')).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Alterar aparência' })).toBeEnabled();
     });
 
     test('bloqueia o formulário durante carregamento', async () => {
