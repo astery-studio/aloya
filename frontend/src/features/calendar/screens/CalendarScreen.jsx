@@ -138,6 +138,7 @@ function CalendarScreen({
     aoCadastrarMenstruacao,
     aoEditarCiclo,
     statusSincronizacao,
+    erroSincronizacao,
     aoTentarSincronizar
 }) {
     const tema = useTheme();
@@ -239,6 +240,11 @@ function CalendarScreen({
             >
                 <SyncStatusIndicator
                     status={statusSincronizacao}
+                    mensagem={
+                        statusSincronizacao === 'falha' && erroSincronizacao?.status
+                            ? erroSincronizacao.mensagemUsuario
+                            : undefined
+                    }
                     onTentarNovamente={aoTentarSincronizar}
                 />
                 <ButtonScreen

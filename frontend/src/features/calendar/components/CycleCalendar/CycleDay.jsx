@@ -29,7 +29,8 @@ function criarRotuloAcessibilidade(dia) {
     const menstruacaoRegistrada =
         dia.menstruacaoRegistrada ?? Boolean(dia.registroCicloId && !dia.previsto);
 
-    if (menstruacaoRegistrada) partes.push('menstruação registrada');
+    if (dia.local) partes.push('menstruação aguardando sincronização');
+    else if (menstruacaoRegistrada) partes.push('menstruação registrada');
     else if (dia.tipo) partes.push(`${dia.previsto ? 'provável ' : ''}${rotulosPorTipo[dia.tipo]}`);
     if (dia.janelaFertil)
         partes.push(dia.janelaFertilPrevista ? 'provável janela fértil' : 'janela fértil');
@@ -48,7 +49,9 @@ function ConteudoDia({ dia, estilos, corIconeMarcado }) {
                     <Icone
                         color={corIconeMarcado}
                         size={10.992}
-                        weight={dia.tipo === TIPOS_DIA.menstruacao ? 'fill' : 'regular'}
+                        weight={
+                            dia.tipo === TIPOS_DIA.menstruacao && !dia.local ? 'fill' : 'regular'
+                        }
                     />
                 </View>
             ) : null}

@@ -146,3 +146,24 @@ test('aplica o modo escuro ao fundo, orientação e dias selecionados', async ()
         backgroundColor: 'rgba(212, 119, 105, 0.28)'
     });
 });
+
+test('dia 4 salvo localmente orienta a sincronizar e não informa ciclo existente', async () => {
+    const sincronizar = jest.fn();
+    const alternar = jest.fn();
+    await montar({
+        meses: [{ mes: '2026-11', diasMenstruacao: [], datasLocais: ['2026-11-04'] }],
+        hoje: '2026-11-09',
+        onAlternarData: alternar,
+        onSincronizarPendentes: sincronizar
+    });
+    await fireEvent.press(
+        screen.getByRole('button', {
+            name: '4 de novembro de 2026, menstruação aguardando sincronização'
+        })
+    );
+    expect(screen.getByText('Registro aguardando sincronização')).toBeOnTheScreen();
+    expect(screen.queryByText('Ciclo existente')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Sincronizar' }));
+    expect(sincronizar).toHaveBeenCalledTimes(1);
+    expect(alternar).not.toHaveBeenCalled();
+});

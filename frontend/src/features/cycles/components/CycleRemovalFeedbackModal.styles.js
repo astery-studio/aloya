@@ -10,8 +10,9 @@ function criarEstilos(tema) {
             justifyContent: 'center'
         },
         fundoConfirmacao: {
-            backgroundColor: tema.escuro ? '#4A3737' : '#F5EDE3'
+            backgroundColor: tema.escuro ? '#333333' : '#F5EDE3'
         },
+        fundoSucesso: { backgroundColor: tema.escuro ? '#444444' : '#F5EDE3' },
         fundoErro: {
             backgroundColor: tema.escuro ? 'transparent' : '#EDEDED'
         }

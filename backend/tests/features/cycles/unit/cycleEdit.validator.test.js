@@ -77,3 +77,19 @@ test('valida identificadores positivos sem aceitar sufixos', () => {
         codigo: 'ID_CICLO_INVALIDO'
     });
 });
+
+test('confirmação de outros ciclos exige booleano e lista de dias', () => {
+    assert.equal(
+        validator.validarCorpo({ dias: ['2026-08-10'], confirmarOutrosCiclos: true })
+            .confirmarOutrosCiclos,
+        true
+    );
+    for (const body of [
+        { confirmarOutrosCiclos: true },
+        { dias: [], confirmarOutrosCiclos: 'true' },
+        { dias: [], confirmarOutrosCiclos: 1 },
+        { dias: [], confirmarOutrosCiclos: [], dataFim: null }
+    ]) {
+        assert.throws(() => validator.validarCorpo(body), { codigo: 'DIAS_CICLO_INVALIDOS' });
+    }
+});

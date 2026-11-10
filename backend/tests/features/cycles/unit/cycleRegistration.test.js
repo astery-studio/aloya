@@ -55,9 +55,13 @@ test('continuidade, preenchimento retroativo e conflitos preservam os ciclos', (
     assert.equal(selecionarPeriodo([registro], '2026-10-18', '2026-10-18').registro, null);
     assert.throws(() => selecionarPeriodo([registro], '2026-10-12', '2026-10-12'), { status: 409 });
     const seguinte = { ...registro, id: 2, dataInicio: '2026-10-17', dataFim: '2026-10-20' };
-    assert.throws(() => selecionarPeriodo([seguinte, registro], '2026-10-15', '2026-10-16'), {
-        status: 409
-    });
+    const unidos = selecionarPeriodo([seguinte, registro], '2026-10-15', '2026-10-16');
+    assert.equal(unidos.registro.id, 1);
+    assert.deepEqual(
+        unidos.registrosParaUnir.map((ciclo) => ciclo.id),
+        [2]
+    );
+    assert.equal(selecionarPeriodo([registro], '2026-10-17', '2026-10-17').registro.id, 1);
     assert.equal(
         selecionarPeriodo(
             [{ ...registro, dataFim: null, diasMenstruacao: [{ data: '2026-10-11' }] }],

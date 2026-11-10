@@ -149,7 +149,7 @@ function obterRegistroEditavel(data, previsao, registrosPorData) {
     return idsDoIntervalo.size === 1 ? [...idsDoIntervalo][0] : null;
 }
 
-function obterMarcacao(data, previsao, registroCicloId) {
+function obterMarcacao(data, previsao, registroCicloId, passou) {
     if (registroCicloId) {
         return {
             tipo: TIPOS_DIA.menstruacao,
@@ -157,14 +157,15 @@ function obterMarcacao(data, previsao, registroCicloId) {
         };
     }
 
-    if (previsao.some((periodo) => intervaloContem(periodo.menstruacaoPrevista, data))) {
+    if (!passou && previsao.some((periodo) => intervaloContem(periodo.menstruacaoPrevista, data))) {
         return {
             tipo: TIPOS_DIA.menstruacao,
             previsto: true
         };
     }
 
-    const menstrual = previsao.find((periodo) => intervaloContem(periodo.faseMenstrual, data));
+    const menstrual =
+        !passou && previsao.find((periodo) => intervaloContem(periodo.faseMenstrual, data));
     if (menstrual) {
         return {
             tipo: TIPOS_DIA.menstruacao,
@@ -206,20 +207,22 @@ function criarDia(casa, contexto) {
     if (!casa) return null;
 
     const registroConfirmadoId = contexto.registrosPorData.get(casa.data) ?? null;
+    const passou = casa.data < contexto.hoje;
+    const previsao = passou ? contexto.periodosComRegistro : contexto.previsao;
     const registroCicloId =
         registroConfirmadoId ??
-        (casa.data <= contexto.hoje
-            ? obterRegistroEditavel(casa.data, contexto.previsao, contexto.registrosPorData)
+        (casa.data === contexto.hoje
+            ? obterRegistroEditavel(casa.data, previsao, contexto.registrosPorData)
             : null);
-    const local = contexto.datasLocais.has(casa.data);
+    const local = !registroConfirmadoId && contexto.datasLocais.has(casa.data);
     const marcacao = local
         ? { tipo: TIPOS_DIA.menstruacao, previsto: false }
-        : obterMarcacao(casa.data, contexto.previsao, registroConfirmadoId);
+        : obterMarcacao(casa.data, previsao, registroConfirmadoId, passou);
     const futuro = casa.data > contexto.hoje;
     const previsto = Boolean(
         !registroConfirmadoId && marcacao.tipo && (marcacao.previsto || futuro)
     );
-    const periodoFertil = contexto.previsao.find((periodo) =>
+    const periodoFertil = previsao.find((periodo) =>
         intervaloContem(periodo.janelaFertil, casa.data)
     );
     const janelaFertil = Boolean(periodoFertil);
@@ -273,9 +276,11 @@ function normalizarMes(mesRecebido, hoje = obterHojeLocal()) {
 
     if (!periodo || typeof hoje !== 'string' || !FORMATO_DATA.test(hoje)) return null;
 
+    const previsao = prepararPrevisao(mes.previsao);
     const contexto = {
         hoje,
-        previsao: prepararPrevisao(mes.previsao),
+        previsao,
+        periodosComRegistro: previsao.filter((periodo) => !periodo.previsto),
         registrosPorData: criarRegistrosPorData(mes.diasMenstruacao),
         datasLocais: new Set(mes.datasLocais || [])
     };

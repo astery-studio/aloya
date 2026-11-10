@@ -178,4 +178,4 @@ function criarCycleRemovalRepository({ prisma } = {}) {
     return Object.freeze({ removerDia, excluirCiclo });
 }
 
-export { criarCycleRemovalRepository };
+export { criarCycleRemovalRepository, recalcularCiclos, limparPrevisoes };

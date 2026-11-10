@@ -32,10 +32,12 @@ function MenstrualDaysCalendar({
     aoPressionarDia,
     desativado = false,
     carregando = false,
-    larguraMes = 312
+    larguraMes = 312,
+    editavel = false,
+    mesInicial
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilos = useMemo(() => criarEstilos(tema, editavel), [tema, editavel]);
 
     if (carregando) {
         return (
@@ -50,7 +52,20 @@ function MenstrualDaysCalendar({
 
     return (
         <ScrollView
+            key={editavel ? `${mesInicial}:${larguraMes}` : 'remocao'}
             horizontal
+            contentOffset={
+                editavel
+                    ? {
+                          x:
+                              Math.max(
+                                  0,
+                                  meses.findIndex((mes) => mes.mes === mesInicial)
+                              ) * larguraMes,
+                          y: 0
+                      }
+                    : undefined
+            }
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             accessibilityHint="Deslize para alternar entre os meses do ciclo"
@@ -77,16 +92,43 @@ function MenstrualDaysCalendar({
                             ))}
                             {dias.map((dia, indice) => (
                                 <View key={dia?.data || `vazio-${indice}`} style={estilos.celula}>
-                                    {dia?.marcado ? (
+                                    {dia && (dia.marcado || editavel) ? (
                                         <Pressable
                                             accessibilityRole="button"
-                                            accessibilityLabel={`Desmarcar dia ${dia.dia}`}
-                                            accessibilityState={{ disabled: desativado }}
+                                            accessibilityLabel={
+                                                editavel
+                                                    ? `${dia.marcado ? 'Desmarcar' : 'Marcar'} dia ${dia.data}`
+                                                    : `Desmarcar dia ${dia.dia}`
+                                            }
+                                            accessibilityState={{
+                                                disabled: desativado,
+                                                ...(editavel ? { selected: dia.marcado } : {})
+                                            }}
                                             disabled={desativado}
                                             onPress={() => aoPressionarDia?.({ data: dia.data })}
-                                            style={estilos.diaMarcado}
+                                            style={
+                                                editavel
+                                                    ? [
+                                                          estilos.diaEditavel,
+                                                          dia.marcado &&
+                                                              estilos.diaSelecionadoEdicao
+                                                      ]
+                                                    : estilos.diaMarcado
+                                            }
                                         >
-                                            <Text style={estilos.numeroMarcado}>{dia.dia}</Text>
+                                            <Text
+                                                style={
+                                                    editavel
+                                                        ? [
+                                                              estilos.numeroDia,
+                                                              dia.marcado &&
+                                                                  estilos.numeroSelecionadoEdicao
+                                                          ]
+                                                        : estilos.numeroMarcado
+                                                }
+                                            >
+                                                {dia.dia}
+                                            </Text>
                                         </Pressable>
                                     ) : dia ? (
                                         <Text style={estilos.numeroDia}>{dia.dia}</Text>

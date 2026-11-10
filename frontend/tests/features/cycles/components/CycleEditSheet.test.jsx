@@ -1,78 +1,69 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
+import { CycleEditSheet } from '../../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet';
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => ({
     BottomSheet: ({ visivel, children }) => (visivel ? children : null)
 }));
-jest.mock('../../../../src/shared/layouts/BottomSheet/BottomSheetLayout', () => ({
-    BottomSheetLayout: ({ children }) => children
-}));
-jest.mock('../../../../src/shared/components/forms/DateInput/DateInput', () => {
-    const { TextInput } = require('react-native');
-    return function DateInputMock({ valor, onChangeText, rotuloAcessibilidade }) {
-        return (
-            <TextInput
-                accessibilityLabel={rotuloAcessibilidade}
-                value={valor}
-                onChangeText={onChangeText}
-            />
-        );
-    };
+const props = {
+    visivel: true,
+    mesInicial: '2026-08',
+    meses: [{ mes: '2026-08', diasMenstruacao: [{ data: '2026-08-23' }] }],
+    onAlternarDia: jest.fn(),
+    onSalvar: jest.fn(),
+    onFechar: jest.fn()
+};
+test('segue o protótipo com calendário, instrução e Concluir desativado inicialmente', async () => {
+    await render(<CycleEditSheet {...props} alterado={false} />);
+    expect(screen.getByText('Editar Menstruação')).toBeOnTheScreen();
+    expect(screen.getByText('Clique em um dia para alterar seu estado.')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Descartar Alterações' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Desmarcar dia 2026-08-23' })).toHaveProp(
+        'accessibilityState',
+        { disabled: false, selected: true }
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Marcar dia 2026-08-22' }));
+    expect(props.onAlternarDia).toHaveBeenCalledWith({ data: '2026-08-22' });
 });
-jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
-    const { Pressable } = require('react-native');
-    return function ButtonScreenMock({ texto, aoPressionar, desativado }) {
-        return (
-            <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={texto}
-                disabled={desativado}
-                onPress={aoPressionar}
-            />
-        );
-    };
-});
-
-import { CycleEditSheet } from '../../../../src/features/cycles/components/CycleEditSheet/CycleEditSheet';
-import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
-
-function criarProps(alteracoes = {}) {
-    return {
-        visivel: true,
-        dataInicio: '01/10/2026',
-        dataFim: '05/10/2026',
-        alterado: false,
-        salvando: false,
-        onAlterarInicio: jest.fn(),
-        onAlterarFim: jest.fn(),
-        onFechar: jest.fn(),
-        onSalvar: jest.fn(),
-        ...alteracoes
-    };
-}
-
-test('edita e limpa as datas do ciclo', async () => {
-    const props = criarProps({ alterado: true });
-    await render(<CycleEditSheet {...props} />);
-    await fireEvent.changeText(screen.getByLabelText('Data de início do ciclo'), '02/10/2026');
-    await fireEvent.changeText(screen.getByLabelText('Data de término do ciclo'), '');
-    await fireEvent.press(screen.getByRole('button', { name: 'Limpar data de término' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
-    expect(props.onAlterarInicio).toHaveBeenCalledWith('02/10/2026');
-    expect(props.onAlterarFim).toHaveBeenCalledWith('');
+test('Concluir ativo após mudança e bloqueado durante gravação', async () => {
+    const tela = await render(<CycleEditSheet {...props} alterado />);
+    await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
     expect(props.onSalvar).toHaveBeenCalled();
+    await tela.rerender(<CycleEditSheet {...props} alterado salvando />);
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Marcar dia 2026-08-22' })).toBeDisabled();
 });
 
-test('oculta a limpeza e bloqueia salvamento sem alteração', async () => {
-    await render(<CycleEditSheet {...criarProps({ dataFim: '', alterado: false })} />);
-    expect(screen.queryByRole('button', { name: 'Limpar data de término' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
+test('Concluir fica bloqueado enquanto carrega a seleção persistida', async () => {
+    const onSalvar = jest.fn();
+    await render(<CycleEditSheet {...props} alterado carregando onSalvar={onSalvar} />);
+    expect(screen.getByRole('button', { name: 'Concluir' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Concluir' }));
+    expect(onSalvar).not.toHaveBeenCalled();
 });
 
-test('usa textos com contraste do tema escuro', async () => {
-    await render(<CycleEditSheet {...criarProps()} />, { preferencia: 'escuro' });
-
-    expect(screen.getByText('Data de Início')).toHaveStyle({ color: '#C4C8C5' });
-    expect(screen.getByText('Deixe em branco se o ciclo ainda estiver em andamento.')).toHaveStyle({
-        color: '#C4C8C5'
-    });
-});
+test.each([false, true])(
+    'editor noturno preserva seleção e estado de Concluir (alterado: %s)',
+    async (alterado) => {
+        await render(<CycleEditSheet {...props} alterado={alterado} />, { preferencia: 'escuro' });
+        const concluir = screen.getByRole('button', { name: 'Concluir' });
+        expect(concluir).toHaveStyle({
+            backgroundColor: alterado ? '#C26E5F' : '#2C2C2C',
+            height: 48
+        });
+        expect(screen.getByText('Concluir')).toHaveStyle({
+            color: alterado ? '#121212' : '#757575'
+        });
+        expect(screen.getByRole('button', { name: 'Descartar Alterações' })).toHaveStyle({
+            backgroundColor: '#242424',
+            height: 54
+        });
+        expect(screen.getByRole('button', { name: 'Desmarcar dia 2026-08-23' })).toHaveStyle({
+            borderStyle: 'dashed',
+            borderColor: '#EF9A9A'
+        });
+        expect(screen.getByText('23')).toHaveStyle({ color: '#EF9A9A' });
+        if (alterado) expect(concluir).toBeEnabled();
+        else expect(concluir).toBeDisabled();
+    }
+);

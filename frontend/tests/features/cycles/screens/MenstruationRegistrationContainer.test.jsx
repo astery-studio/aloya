@@ -106,7 +106,7 @@ test('salva primeiro no aparelho, sincroniza sem confirmação intermediária e 
     expect(onVoltar).toHaveBeenCalledTimes(1);
 });
 
-test('erro de sincronização conserva seleção e nova tentativa inclui a persistência local', async () => {
+test('erro de sincronização conserva seleção e nova tentativa sincroniza o mesmo registro local', async () => {
     const falha = new Error('offline');
     const calendarService = {
         buscarMes: async () => {
@@ -131,5 +131,6 @@ test('erro de sincronização conserva seleção e nova tentativa inclui a persi
     expect(mockProps.datasSelecionadas).toEqual(['2026-10-30']);
     await act(() => mockProps.onTentarNovamente());
     expect(mockProps.sucesso).toBe(true);
-    expect(fila.adicionar).toHaveBeenCalledTimes(2);
+    expect(fila.adicionar).toHaveBeenCalledTimes(1);
+    expect(fila.sincronizar).toHaveBeenCalledTimes(2);
 });

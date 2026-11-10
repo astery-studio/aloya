@@ -1,3 +1,4 @@
+import { editarDiasDoCiclo } from './cycleEditDays.service.js';
 import { AppError } from '../../../shared/errors/AppError.js';
 import { diferencaDias, formatarData } from '../utils/calendar.js';
 
@@ -33,7 +34,8 @@ function criarCycleEditService({ prisma } = {}) {
                 dataInicio: true,
                 dataFim: true,
                 duracaoMenstruacao: true,
-                duracaoCiclo: true
+                duracaoCiclo: true,
+                diasMenstruacao: { orderBy: { data: 'asc' }, select: { data: true } }
             }
         });
 
@@ -45,14 +47,24 @@ function criarCycleEditService({ prisma } = {}) {
             );
         }
 
+        const { diasMenstruacao, ...campos } = ciclo;
         return {
-            ...ciclo,
+            ...campos,
+            dias: (diasMenstruacao || []).map((dia) => formatarData(dia.data)),
             dataInicio: formatarData(ciclo.dataInicio),
             dataFim: ciclo.dataFim ? formatarData(ciclo.dataFim) : null
         };
     }
 
     async function editar({ usuarioId, cicloId, dados }) {
+        if (Object.hasOwn(dados, 'dias'))
+            return editarDiasDoCiclo({
+                prisma,
+                usuarioId,
+                cicloId,
+                dias: dados.dias,
+                confirmarOutrosCiclos: dados.confirmarOutrosCiclos
+            });
         return prisma.$transaction(async (tx) => {
             const atual = await tx.registroCiclo.findFirst({
                 where: { id: cicloId, usuarioId },

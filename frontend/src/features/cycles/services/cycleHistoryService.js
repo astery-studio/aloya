@@ -185,6 +185,27 @@ function criarCaminhoCiclo(id) {
 }
 
 function validarDadosEdicao(dados) {
+    if (ehObjetoSimples(dados) && Object.hasOwn(dados, 'dias')) {
+        if (
+            Object.keys(dados).some(
+                (campo) => !['dias', 'confirmarOutrosCiclos'].includes(campo)
+            ) ||
+            (Object.hasOwn(dados, 'confirmarOutrosCiclos') &&
+                typeof dados.confirmarOutrosCiclos !== 'boolean') ||
+            !Array.isArray(dados.dias) ||
+            dados.dias.length > 366 ||
+            !dados.dias.every(dataIsoEhValida) ||
+            new Set(dados.dias).size !== dados.dias.length
+        ) {
+            throw new TypeError('Os dias da edição são inválidos.');
+        }
+        return {
+            dias: [...dados.dias].sort(),
+            ...(Object.hasOwn(dados, 'confirmarOutrosCiclos')
+                ? { confirmarOutrosCiclos: dados.confirmarOutrosCiclos }
+                : {})
+        };
+    }
     const valido =
         ehObjetoSimples(dados) &&
         dataIsoEhValida(dados.dataInicio) &&
@@ -214,7 +235,8 @@ function normalizarCicloEdicao(ciclo) {
     return Object.freeze({
         id: String(ciclo.id),
         dataInicio: ciclo.dataInicio,
-        dataFim: ciclo.dataFim
+        dataFim: ciclo.dataFim,
+        ...(Array.isArray(ciclo.dias) ? { dias: [...ciclo.dias] } : {})
     });
 }
 
@@ -287,6 +309,11 @@ function criarCycleHistoryService({ requisicaoAutenticada } = {}) {
             corpo: validarDadosEdicao(dados)
         });
 
+        if (
+            resposta?.cicloRemovido === true &&
+            resposta.mensagem === 'Registro de menstruação excluído com sucesso.'
+        )
+            return null;
         if (resposta?.mensagem !== 'Registro de menstruação atualizado com sucesso.') {
             throw criarErroResposta();
         }

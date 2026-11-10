@@ -105,7 +105,7 @@ describe('cycleCalendar.utils', () => {
         });
     });
 
-    test('mantém editável a fase menstrual estimada que atravessa o mês', () => {
+    test('oculta menstruação estimada passada e mantém o vínculo do ciclo para hoje', () => {
         const mes = normalizarMes(
             {
                 mes: '2026-10',
@@ -129,8 +129,8 @@ describe('cycleCalendar.utils', () => {
         );
 
         expect(localizarDia(mes, 1)).toMatchObject({
-            tipo: TIPOS_DIA.menstruacao,
-            registroCicloId: 18,
+            tipo: null,
+            registroCicloId: null,
             menstruacaoRegistrada: false
         });
         expect(localizarDia(mes, 3)).toMatchObject({
@@ -224,7 +224,7 @@ describe('cycleCalendar.utils', () => {
         });
     });
 
-    test('mostra todas as fases de múltiplos períodos sem transformar previsão passada em registro', () => {
+    test('oculta projeções vencidas e preserva o registro e as previsões atuais e futuras', () => {
         const mes = normalizarMes(
             {
                 mes: '2026-10',
@@ -256,25 +256,51 @@ describe('cycleCalendar.utils', () => {
             previsto: false,
             registroCicloId: 18
         });
-        expect(localizarDia(mes, 6)).toMatchObject({
+        expect(localizarDia(mes, 1)).toMatchObject({ tipo: null, previsto: false });
+        expect(localizarDia(mes, 6)).toMatchObject({ tipo: null, previsto: false });
+        expect(localizarDia(mes, 7)).toMatchObject({ janelaFertil: false });
+        expect(localizarDia(mes, 9)).toMatchObject({
             tipo: 'folicular',
             previsto: true,
-            futuro: false
-        });
-        expect(localizarDia(mes, 7)).toMatchObject({
-            janelaFertil: true,
+            futuro: false,
             janelaFertilPrevista: true
         });
         expect(localizarDia(mes, 12)).toMatchObject({ tipo: 'ovulacao', previsto: true });
         expect(localizarDia(mes, 13)).toMatchObject({ tipo: 'lutea', previsto: true });
         expect(localizarDia(mes, 27)).toMatchObject({ tipo: 'menstruacao', previsto: true });
         expect(localizarDia(mes, 30)).toMatchObject({ tipo: 'folicular', previsto: true });
-        expect(
-            mes.semanas
-                .flat()
-                .filter(Boolean)
-                .every((dia) => dia.tipo !== null)
-        ).toBe(true);
+    });
+
+    test('retira a projeção de 31/10 a 03/11 e preserva apenas o dia 04/11 confirmado', () => {
+        const previsao = {
+            menstruacaoPrevista: { inicio: '2026-10-31', fim: '2026-11-04' }
+        };
+        const hoje = '2026-11-09';
+        const outubro = normalizarMes({ mes: '2026-10', previsao }, hoje);
+        const novembro = normalizarMes(
+            {
+                mes: '2026-11',
+                previsao,
+                diasMenstruacao: [{ data: '2026-11-04', registroCicloId: 18 }],
+                datasLocais: ['2026-11-04']
+            },
+            hoje
+        );
+
+        expect(localizarDia(outubro, 31)).toMatchObject({ tipo: null, registroCicloId: null });
+        for (const dia of [1, 2, 3]) {
+            expect(localizarDia(novembro, dia)).toMatchObject({
+                tipo: null,
+                registroCicloId: null
+            });
+        }
+        expect(localizarDia(novembro, 4)).toMatchObject({
+            tipo: 'menstruacao',
+            previsto: false,
+            registroCicloId: 18,
+            menstruacaoRegistrada: true
+        });
+        expect(localizarDia(novembro, 4).local).toBeUndefined();
     });
 
     test('ignora períodos malformados e não reaproveita intervalos antigos quando a lista vem vazia', () => {
