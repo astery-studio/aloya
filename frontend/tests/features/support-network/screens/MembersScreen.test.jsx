@@ -333,7 +333,7 @@ describe('MembersScreen', () => {
         expect(reenviarConvite).toHaveBeenCalledWith(1);
     });
 
-    test('mostra alertas provisórios de edição e remoção', async () => {
+    test('mostra alertas provisórios de edição, arquivamento e remoção', async () => {
         jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
         await render(<MembersScreen />);
@@ -346,6 +346,16 @@ describe('MembersScreen', () => {
         expect(Alert.alert).toHaveBeenCalledWith(
             'Alterar vínculo',
             expect.stringContaining('HU-030')
+        );
+
+        await act(async () => {
+            mockContactListProps.aoAcao('arquivar', contatos[1]);
+            await Promise.resolve();
+        });
+
+        expect(Alert.alert).toHaveBeenCalledWith(
+            'Arquivar contato',
+            expect.stringContaining('será arquivado')
         );
 
         await act(async () => {

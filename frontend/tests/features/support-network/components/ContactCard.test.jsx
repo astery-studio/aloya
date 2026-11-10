@@ -169,7 +169,8 @@ describe('ContactCard', () => {
         const contatoAtivo = {
             ...conviteRecebido,
             status: 'ativo',
-            identificacao: 'Ana'
+            identificacao: 'Ana',
+            dataAtivacao: '2026-11-02T12:00:00.000Z'
         };
 
         await render(
@@ -189,13 +190,29 @@ describe('ContactCard', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
+                name: 'Arquivar Ana'
+            })
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', {
                 name: 'Remover Ana'
             })
         );
 
         expect(aoAcao).toHaveBeenNthCalledWith(1, 'alterar_vinculo', contatoAtivo);
 
-        expect(aoAcao).toHaveBeenNthCalledWith(2, 'remover', contatoAtivo);
+        expect(aoAcao).toHaveBeenNthCalledWith(2, 'arquivar', contatoAtivo);
+
+        expect(aoAcao).toHaveBeenNthCalledWith(3, 'remover', contatoAtivo);
+
+        expect(screen.getByText(/Data de Ativação:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/02\/11\/2026/u)).toBeOnTheScreen();
+
+        expect(screen.queryByText(/Vínculo solicitado:/u)).toBeNull();
+        expect(screen.queryByText(/Aguardando:/u)).toBeNull();
+
+        expect(screen.getByTestId('contact-permission-badge')).toBeOnTheScreen();
     });
 
     test('mostra reenvio para convite enviado pendente', async () => {

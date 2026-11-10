@@ -111,6 +111,25 @@ describe('ContactAvatar', () => {
         expect(screen.getByTestId('contact-avatar-icon-sol')).toHaveProp('size', 24);
     });
 
+    test('permite ajustar apenas o tamanho do ícone para o contexto do card', async () => {
+        await render(
+            <ContactAvatar
+                iconeId="pessoa"
+                corId="verde"
+                tamanho="pequeno"
+                tamanhoIcone={18}
+                rotuloAcessibilidade="Avatar ativo"
+            />
+        );
+
+        expect(screen.getByTestId('contact-avatar')).toHaveStyle({
+            width: 36,
+            height: 36
+        });
+
+        expect(screen.getByTestId('contact-avatar-icon-pessoa')).toHaveProp('size', 18);
+    });
+
     test('aplica fallback seguro para identificadores inválidos', async () => {
         await render(
             <ContactAvatar

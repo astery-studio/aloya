@@ -186,6 +186,15 @@ function MembersScreen({
             return;
         }
 
+        if (acao === 'arquivar') {
+            Alert.alert(
+                'Arquivar contato',
+                `${obterNomeContato(contato)} será arquivado pelo fluxo de gerenciamento da Rede de Apoio.`
+            );
+
+            return;
+        }
+
         if (acao === 'remover') {
             Alert.alert(
                 contato?.status === 'pendente' ? 'Cancelar convite' : 'Remover contato',

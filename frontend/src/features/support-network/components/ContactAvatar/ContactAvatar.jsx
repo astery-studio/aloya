@@ -48,7 +48,7 @@ function normalizarTamanho(tamanho) {
     return Object.hasOwn(TAMANHOS, tamanho) ? tamanho : 'medio';
 }
 
-function ContactAvatar({ iconeId, corId, tamanho = 'medio', rotuloAcessibilidade }) {
+function ContactAvatar({ iconeId, corId, tamanho = 'medio', tamanhoIcone, rotuloAcessibilidade }) {
     const iconeSeguro = iconeContatoEhValido(iconeId) ? iconeId : 'pessoa';
     const corSegura = corContatoEhValida(corId) ? corId : 'branco';
     const tamanhoSeguro = normalizarTamanho(tamanho);
@@ -56,6 +56,10 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', rotuloAcessibilidade
     const Icone = ICONES_POR_ID[iconeSeguro];
     const opcaoCor = obterOpcaoCorContato(corSegura);
     const configuracaoTamanho = TAMANHOS[tamanhoSeguro];
+    const tamanhoIconeSeguro =
+        Number.isFinite(tamanhoIcone) && tamanhoIcone > 0
+            ? tamanhoIcone
+            : configuracaoTamanho.tamanhoIcone;
     const corPequena =
         tamanhoSeguro === 'pequeno' && corSegura !== 'branco'
             ? {
@@ -90,7 +94,7 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', rotuloAcessibilidade
             <Icone
                 testID={`contact-avatar-icon-${iconeSeguro}`}
                 accessibilityLabel={undefined}
-                size={configuracaoTamanho.tamanhoIcone}
+                size={tamanhoIconeSeguro}
                 color={opcaoCor.cor}
                 weight="regular"
             />

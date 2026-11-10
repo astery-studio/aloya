@@ -5,6 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
+    ArchiveIcon,
     CheckCircleIcon,
     ClockIcon,
     EnvelopeIcon,
@@ -18,6 +19,7 @@ import {
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { ContactAvatar } from '../ContactAvatar/ContactAvatar';
+import { ContactPermissionBadge } from '../ContactPermissionBadge/ContactPermissionBadge';
 import { ContactStatusBadge } from '../ContactStatusBadge/ContactStatusBadge';
 import { criarEstilos } from './ContactCard.styles';
 
@@ -107,6 +109,28 @@ function LinhaInformacao({ icone: Icone, corIcone, identificador, rotulo, valor,
     );
 }
 
+function BotaoAcaoCabecalho({ icone: Icone, rotulo, aoPressionar, desabilitado, estilos }) {
+    return (
+        <Pressable
+            onPress={aoPressionar}
+            disabled={desabilitado}
+            accessibilityRole="button"
+            accessibilityLabel={rotulo}
+            accessibilityState={{
+                disabled: desabilitado
+            }}
+            hitSlop={4}
+            style={({ pressed }) => [
+                estilos.botaoAcaoAtivo,
+                pressed && !desabilitado && estilos.acaoPressionada,
+                desabilitado && estilos.acaoDesabilitada
+            ]}
+        >
+            <Icone size={17.997} color="#5C5C59" weight="regular" />
+        </Pressable>
+    );
+}
+
 function ContactCard({
     contato,
     perspectiva = 'enviado',
@@ -132,6 +156,8 @@ function ContactCard({
     const email = typeof contato?.email === 'string' ? contato.email.trim() : '';
 
     const dataConvite = formatarDataConvite(contato?.dataConvite ?? contato?.dataEnvio);
+
+    const dataAtivacao = formatarDataConvite(contato?.dataAtivacao);
 
     const rotuloEspera =
         typeof contato?.aguardando?.rotulo === 'string' ? contato.aguardando.rotulo.trim() : '';
@@ -169,13 +195,15 @@ function ContactCard({
             style={[
                 estilos.cartao,
                 conviteEnviadoPendente && estilos.cartaoPendenteEnviado,
+                contatoEnviadoAtivo && estilos.cartaoAtivoEnviado,
                 bloqueado && estilos.cartaoDesabilitado
             ]}
         >
             <View
                 style={[
                     estilos.cabecalho,
-                    conviteEnviadoPendente && estilos.cabecalhoPendenteEnviado
+                    conviteEnviadoPendente && estilos.cabecalhoPendenteEnviado,
+                    contatoEnviadoAtivo && estilos.cabecalhoAtivoEnviado
                 ]}
             >
                 {conviteEnviadoPendente ? (
@@ -214,6 +242,50 @@ function ContactCard({
                             />
                         </Pressable>
                     </>
+                ) : contatoEnviadoAtivo ? (
+                    <>
+                        <View style={estilos.avatarCabecalho}>
+                            <ContactAvatar
+                                iconeId={contato?.iconeId ?? 'pessoa'}
+                                corId={contato?.corId ?? 'branco'}
+                                tamanho="pequeno"
+                                tamanhoIcone={18}
+                                rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
+                            />
+                        </View>
+
+                        <View style={estilos.containerNomeAtivo}>
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nomeAtivo}>
+                                {identificacao}
+                            </Text>
+                        </View>
+
+                        <View style={estilos.acoesAtivo}>
+                            <BotaoAcaoCabecalho
+                                icone={PencilSimpleIcon}
+                                rotulo={`Alterar vínculo de ${identificacao}`}
+                                aoPressionar={() => executarAcao('alterar_vinculo')}
+                                desabilitado={bloqueado}
+                                estilos={estilos}
+                            />
+
+                            <BotaoAcaoCabecalho
+                                icone={ArchiveIcon}
+                                rotulo={`Arquivar ${identificacao}`}
+                                aoPressionar={() => executarAcao('arquivar')}
+                                desabilitado={bloqueado}
+                                estilos={estilos}
+                            />
+
+                            <BotaoAcaoCabecalho
+                                icone={TrashIcon}
+                                rotulo={`Remover ${identificacao}`}
+                                aoPressionar={() => executarAcao('remover')}
+                                desabilitado={bloqueado}
+                                estilos={estilos}
+                            />
+                        </View>
+                    </>
                 ) : (
                     <>
                         <View style={estilos.avatarCabecalho}>
@@ -237,7 +309,9 @@ function ContactCard({
                     </>
                 )}
 
-                {perspectivaSegura === 'enviado' && !conviteEnviadoPendente ? (
+                {perspectivaSegura === 'enviado' &&
+                !conviteEnviadoPendente &&
+                !contatoEnviadoAtivo ? (
                     <View style={estilos.acoesCompactas}>
                         {contatoEnviadoAtivo ? (
                             <IconButton
@@ -276,25 +350,35 @@ function ContactCard({
                         />
                     ) : null}
 
-                    <LinhaInformacao
-                        icone={HandshakeIcon}
-                        corIcone={CORES_INFORMACOES.vinculo}
-                        identificador="vinculo"
-                        rotulo={conviteEnviadoPendente ? 'Tipo de Vínculo' : 'Vínculo solicitado'}
-                        valor={rotuloVinculo}
-                        estilos={estilos}
-                    />
+                    {!contatoEnviadoAtivo ? (
+                        <LinhaInformacao
+                            icone={HandshakeIcon}
+                            corIcone={CORES_INFORMACOES.vinculo}
+                            identificador="vinculo"
+                            rotulo={
+                                conviteEnviadoPendente ? 'Tipo de Vínculo' : 'Vínculo solicitado'
+                            }
+                            valor={rotuloVinculo}
+                            estilos={estilos}
+                        />
+                    ) : null}
 
                     <LinhaInformacao
                         icone={ClockIcon}
                         corIcone={CORES_INFORMACOES.data}
                         identificador="data"
-                        rotulo={conviteEnviadoPendente ? 'Data de Convite' : 'Data de envio'}
-                        valor={dataConvite}
+                        rotulo={
+                            contatoEnviadoAtivo
+                                ? 'Data de Ativação'
+                                : conviteEnviadoPendente
+                                  ? 'Data de Convite'
+                                  : 'Data de envio'
+                        }
+                        valor={contatoEnviadoAtivo ? dataAtivacao : dataConvite}
                         estilos={estilos}
                     />
 
-                    {rotuloEspera ? (
+                    {rotuloEspera && !contatoEnviadoAtivo ? (
                         <LinhaInformacao
                             icone={HourglassLowIcon}
                             corIcone={CORES_INFORMACOES.aguardando}
@@ -313,6 +397,10 @@ function ContactCard({
             {estado === 'pendente' ? (
                 <View style={estilos.containerTituloPendente}>
                     <Text style={estilos.tituloPendente}>CONVITE PENDENTE</Text>
+                </View>
+            ) : contatoEnviadoAtivo ? (
+                <View style={estilos.containerTagAtivo}>
+                    <ContactPermissionBadge vinculo={vinculo} />
                 </View>
             ) : (
                 <View style={estilos.estado}>
@@ -376,18 +464,25 @@ function ContactCard({
                 </View>
             ) : null}
 
-            <ButtonScreen
-                texto="Resumo de Permissões"
-                variante="laranja"
-                icone={InfoIcon}
-                tamanhoIcone={13}
-                corConteudo="#FFFFFF"
-                aoPressionar={abrirResumo}
-                rotuloAcessibilidade={`Abrir resumo de permissões de ${identificacao}`}
-                desativado={bloqueado || typeof aoAbrirResumo !== 'function'}
-                estilo={estilos.botaoResumo}
-                estiloTexto={estilos.textoBotao}
-            />
+            <View
+                style={[
+                    estilos.containerBotaoResumo,
+                    contatoEnviadoAtivo && estilos.containerBotaoResumoAtivo
+                ]}
+            >
+                <ButtonScreen
+                    texto="Resumo de Permissões"
+                    variante="laranja"
+                    icone={InfoIcon}
+                    tamanhoIcone={13}
+                    corConteudo="#FFFFFF"
+                    aoPressionar={abrirResumo}
+                    rotuloAcessibilidade={`Abrir resumo de permissões de ${identificacao}`}
+                    desativado={bloqueado || typeof aoAbrirResumo !== 'function'}
+                    estilo={estilos.botaoResumo}
+                    estiloTexto={estilos.textoBotao}
+                />
+            </View>
         </View>
     );
 }

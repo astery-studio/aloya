@@ -1,5 +1,6 @@
 //Centraliza os ícones usados pela interface sem carregar o catálogo inteiro do pacote.
 import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
+import { ArchiveIcon } from 'phosphor-react-native/src/icons/Archive';
 import { ArrowsClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
 import { BellIcon } from 'phosphor-react-native/src/icons/Bell';
 import { CalendarBlankIcon } from 'phosphor-react-native/src/icons/CalendarBlank';
@@ -60,6 +61,7 @@ import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 
 export {
     ArrowLeftIcon,
+    ArchiveIcon,
     ArrowsClockwiseIcon,
     BellIcon,
     CalendarBlankIcon,

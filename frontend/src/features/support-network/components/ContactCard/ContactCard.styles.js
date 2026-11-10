@@ -30,6 +30,13 @@ function criarEstilos(tema) {
             paddingLeft: 16
         },
 
+        cartaoAtivoEnviado: {
+            paddingTop: 14,
+            paddingRight: 16,
+            paddingBottom: 18,
+            paddingLeft: 16
+        },
+
         cabecalho: {
             width: '100%',
             minHeight: 36,
@@ -40,6 +47,11 @@ function criarEstilos(tema) {
         },
 
         cabecalhoPendenteEnviado: {
+            justifyContent: 'flex-start',
+            gap: 10
+        },
+
+        cabecalhoAtivoEnviado: {
             justifyContent: 'flex-start',
             gap: 10
         },
@@ -76,6 +88,40 @@ function criarEstilos(tema) {
         },
 
         botaoCancelarPendente: {
+            width: 35.993,
+            height: 35.993,
+            flexShrink: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+
+        containerNomeAtivo: {
+            minWidth: 0,
+            height: 23.999,
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            alignSelf: 'stretch',
+            justifyContent: 'center'
+        },
+
+        nomeAtivo: {
+            maxWidth: '100%',
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 16,
+            fontWeight: '700',
+            lineHeight: 24,
+            includeFontPadding: false
+        },
+
+        acoesAtivo: {
+            flexShrink: 0,
+            flexDirection: 'row',
+            alignItems: 'center'
+        },
+
+        botaoAcaoAtivo: {
             width: 35.993,
             height: 35.993,
             flexShrink: 0,
@@ -222,6 +268,13 @@ function criarEstilos(tema) {
             alignItems: 'center'
         },
 
+        containerTagAtivo: {
+            alignSelf: 'stretch',
+            paddingTop: 8,
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+
         acoesRecebidas: {
             width: '100%'
         },
@@ -279,6 +332,17 @@ function criarEstilos(tema) {
             paddingHorizontal: 14,
             borderRadius: 10,
             backgroundColor: '#C85A44'
+        },
+
+        containerBotaoResumo: {
+            width: '100%'
+        },
+
+        containerBotaoResumoAtivo: {
+            alignSelf: 'stretch',
+            paddingTop: 8,
+            flexDirection: 'column',
+            alignItems: 'center'
         },
 
         textoBotao: {
