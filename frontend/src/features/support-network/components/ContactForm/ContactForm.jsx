@@ -90,6 +90,11 @@ function ContactForm({
 
     const email = typeof dados?.email === 'string' ? dados.email : '';
 
+    const erroEmailLocal =
+        email.trim().length > 0 && !emailContatoEhValido(email)
+            ? 'Informe um e-mail válido.'
+            : null;
+
     const iconeId = typeof dados?.iconeId === 'string' ? dados.iconeId : null;
 
     const corId = typeof dados?.corId === 'string' ? dados.corId : null;
@@ -169,7 +174,7 @@ function ContactForm({
                 placeholder="Digite o e-mail do contato convidado"
                 value={email}
                 onChangeText={alterarEmail}
-                erro={errosSeguros.email}
+                erro={errosSeguros.email ?? erroEmailLocal}
                 desativado={camposBloqueados || editando}
                 variante="categoria"
                 maxLength={TAMANHO_MAXIMO_EMAIL}

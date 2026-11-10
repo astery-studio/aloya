@@ -239,6 +239,40 @@ describe('ContactForm', () => {
         });
     });
 
+    test('mostra validação abaixo do campo quando o e-mail preenchido é inválido', async () => {
+        await render(
+            <ContactForm
+                dados={{
+                    ...dadosCategoria,
+                    email: 'email-invalido'
+                }}
+                aoAlterar={jest.fn()}
+                aoSalvar={jest.fn()}
+                aoAbrirPermissoes={jest.fn()}
+                aoCriarCategoria={jest.fn()}
+            />
+        );
+
+        expect(screen.getByText('Informe um e-mail válido.')).toBeOnTheScreen();
+    });
+
+    test('não mostra validação de formato enquanto o e-mail está vazio', async () => {
+        await render(
+            <ContactForm
+                dados={{
+                    ...dadosCategoria,
+                    email: ''
+                }}
+                aoAlterar={jest.fn()}
+                aoSalvar={jest.fn()}
+                aoAbrirPermissoes={jest.fn()}
+                aoCriarCategoria={jest.fn()}
+            />
+        );
+
+        expect(screen.queryByText('Informe um e-mail válido.')).toBeNull();
+    });
+
     test('encaminha alteração de aparência', async () => {
         const aoAlterar = jest.fn();
 
