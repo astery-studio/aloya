@@ -42,6 +42,7 @@ const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     membros: 'membros',
     novoContato: 'novoContato',
+    editarContato: 'editarContato',
     categoriasPermissao: 'categoriasPermissao',
     ciclos: 'ciclos',
     perfil: 'perfil',
@@ -177,6 +178,8 @@ export default function App() {
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
 
     const [rascunhoNovoContato, setRascunhoNovoContato] = useState(null);
+
+    const [contatoEdicao, setContatoEdicao] = useState(null);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -428,6 +431,7 @@ export default function App() {
 
         setOrigemNovaCategoria(telasInternas.membros);
         setRascunhoNovoContato(null);
+        setContatoEdicao(null);
 
         setTelaPublica('login');
 
@@ -501,9 +505,19 @@ export default function App() {
             Number.isSafeInteger(categoria?.id) ||
             (typeof categoria?.id === 'string' && categoria.id.trim().length > 0);
 
-        if (origemNovaCategoria !== telasInternas.novoContato || !identificadorValido) {
+        if (!identificadorValido) {
             return;
         }
+
+        if (origemNovaCategoria === telasInternas.editarContato) {
+            setContatoEdicao((contatoAtual) => ({
+                ...(contatoAtual && typeof contatoAtual === 'object' ? contatoAtual : {}),
+                categoriaId: categoria.id
+            }));
+            return;
+        }
+
+        if (origemNovaCategoria !== telasInternas.novoContato) return;
 
         setRascunhoNovoContato((rascunhoAtual) => ({
             ...(rascunhoAtual && typeof rascunhoAtual === 'object' ? rascunhoAtual : {}),
@@ -667,6 +681,10 @@ export default function App() {
                         setRascunhoNovoContato(dadosIniciais);
                         setTelaInterna(telasInternas.novoContato);
                     }}
+                    onAlterarVinculo={(contato) => {
+                        setContatoEdicao(contato);
+                        setTelaInterna(telasInternas.editarContato);
+                    }}
                     onSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />
@@ -688,6 +706,24 @@ export default function App() {
                     setTelaInterna(telasInternas.membros);
                 }}
                 onCriarCategoria={() => abrirNovaCategoria(telasInternas.novoContato)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.editarContato) {
+        conteudo = (
+            <ContactFormScreen
+                contatoId={contatoEdicao?.id}
+                dadosIniciais={contatoEdicao}
+                service={configuracao.servicos.contactLinkService}
+                onVoltar={() => {
+                    setContatoEdicao(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onSalvo={() => {
+                    setContatoEdicao(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.editarContato)}
                 onSessaoExpirada={finalizarSessao}
             />
         );

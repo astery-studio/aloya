@@ -21,12 +21,18 @@ function assinaturaPermissoes(permissoes) {
 
 function criarDadosDaConfiguracao(configuracao, dadosIniciais) {
     const categoriaAtual = configuracao.vinculoAtual.categoria;
+    const categoriaInicial = Number.isSafeInteger(dadosIniciais?.categoriaId)
+        ? dadosIniciais.categoriaId
+        : null;
 
     return {
         email: configuracao.contato.email,
         iconeId: dadosIniciais?.iconeId ?? null,
         corId: dadosIniciais?.corId ?? null,
-        categoriaId: categoriaAtual?.id ?? null,
+        categoriaId:
+            configuracao.vinculoAtual.tipo === 'individual'
+                ? categoriaInicial
+                : (categoriaAtual?.id ?? null),
         permissoesIndividuais:
             configuracao.vinculoAtual.tipo === 'individual'
                 ? [...configuracao.vinculoAtual.permissoes]

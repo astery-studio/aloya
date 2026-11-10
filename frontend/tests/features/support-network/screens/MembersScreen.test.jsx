@@ -1,5 +1,4 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -393,22 +392,18 @@ describe('MembersScreen', () => {
         });
     });
 
-    test('mantém apenas o alerta provisório da edição de vínculo', async () => {
-        jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    test('abre a edição de vínculo do contato ativo', async () => {
+        const onAlterarVinculo = jest.fn();
 
-        await render(<MembersScreen />);
+        await render(<MembersScreen onAlterarVinculo={onAlterarVinculo} />);
 
         await act(async () => {
             mockContactListProps.aoAcao('alterar_vinculo', contatos[1]);
             await Promise.resolve();
         });
 
-        expect(Alert.alert).toHaveBeenCalledWith(
-            'Alterar vínculo',
-            expect.stringContaining('HU-030')
-        );
-
-        expect(Alert.alert).toHaveBeenCalledTimes(1);
+        expect(onAlterarVinculo).toHaveBeenCalledWith(contatos[1]);
+        expect(onAlterarVinculo).toHaveBeenCalledTimes(1);
     });
 
     test('confirma a desativação antes de chamar o serviço', async () => {

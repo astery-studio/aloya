@@ -1,6 +1,6 @@
 //Apresenta e gerencia a lista de contatos da Rede de Apoio.
 import { useMemo, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
@@ -122,6 +122,7 @@ function MembersScreen({
     categoriasService,
     onAbrirCategorias,
     onAdicionarContato,
+    onAlterarVinculo,
     onSelecionarAba,
     onSessaoExpirada
 }) {
@@ -204,10 +205,7 @@ function MembersScreen({
         }
 
         if (acao === 'alterar_vinculo') {
-            Alert.alert(
-                'Alterar vínculo',
-                `O vínculo de ${obterNomeContato(contato)} será alterado pelo fluxo da HU-030.`
-            );
+            onAlterarVinculo?.(contato);
 
             return;
         }

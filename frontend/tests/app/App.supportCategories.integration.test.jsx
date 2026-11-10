@@ -86,6 +86,7 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
             categoriasService,
             onAbrirCategorias,
             onAdicionarContato,
+            onAlterarVinculo,
             onSessaoExpirada
         }) =>
             React.createElement(
@@ -126,6 +127,21 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
                         onPress: onAbrirCategorias
                     },
                     React.createElement(Text, null, 'Categorias')
+                ),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Alterar vínculo de Ana',
+                        onPress: () =>
+                            onAlterarVinculo?.({
+                                id: 20,
+                                email: 'ana@example.com',
+                                iconeId: 'coracao',
+                                corId: 'coral'
+                            })
+                    },
+                    React.createElement(Text, null, 'Alterar vínculo')
                 )
             )
     };
@@ -138,6 +154,7 @@ jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactF
 
     return {
         ContactFormScreen: ({
+            contatoId,
             dadosIniciais,
             emailUsuario,
             service,
@@ -150,9 +167,10 @@ jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactF
             React.createElement(
                 View,
                 {
-                    testID: 'formulario-novo-contato'
+                    testID: contatoId ? 'formulario-editar-contato' : 'formulario-novo-contato'
                 },
-                React.createElement(Text, null, 'Novo contato'),
+                React.createElement(Text, null, contatoId ? 'Editar contato' : 'Novo contato'),
+                contatoId ? React.createElement(Text, null, `Contato: ${contatoId}`) : null,
                 React.createElement(Text, null, `Rascunho: ${dadosIniciais?.email ?? 'vazio'}`),
                 React.createElement(
                     Text,
@@ -394,6 +412,10 @@ function criarServicos() {
         contactInvitationService: {
             enviarConvite: jest.fn()
         },
+        contactLinkService: {
+            consultar: jest.fn(),
+            atualizar: jest.fn()
+        },
         receivedContactsService: {
             listarRecebidos: jest.fn(),
             responderConvite: jest.fn()
@@ -437,6 +459,16 @@ async function abrirNovoContato() {
     );
 }
 
+async function abrirEdicaoContato() {
+    await abrirMembros();
+
+    await fireEvent.press(
+        screen.getByRole('button', {
+            name: 'Alterar vínculo de Ana'
+        })
+    );
+}
+
 describe('fluxos da Rede de Apoio no App', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -476,6 +508,20 @@ describe('fluxos da Rede de Apoio no App', () => {
         expect(screen.getByText('Contatos conectados')).toBeOnTheScreen();
         expect(screen.getByText('Categorias dos filtros conectadas')).toBeOnTheScreen();
         expect(screen.getByText('Sessão conectada')).toBeOnTheScreen();
+    });
+
+    test('abre a alteração de vínculo e retorna para a lista', async () => {
+        await render(<App />);
+
+        await abrirEdicaoContato();
+
+        expect(screen.getByTestId('formulario-editar-contato')).toBeOnTheScreen();
+        expect(screen.getByText('Contato: 20')).toBeOnTheScreen();
+        expect(screen.getByText('Rascunho: ana@example.com')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir novo contato' }));
+
+        expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
     });
 
     test('abre os convites recebidos para uma conta de contato', async () => {
