@@ -196,10 +196,10 @@ jest.mock(
     () => {
         const React = require('react');
 
-        const { Text, View } = require('react-native');
+        const { Pressable, Text, View } = require('react-native');
 
         return {
-            ReceivedContactsScreen: jest.fn(({ service }) =>
+            ReceivedContactsScreen: jest.fn(({ service, onSelecionarAba }) =>
                 React.createElement(
                     View,
                     {
@@ -212,6 +212,24 @@ jest.mock(
                         service?.listarRecebidos
                             ? 'Convites recebidos conectados'
                             : 'Convites recebidos ausentes'
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Contato tenta abrir ciclos',
+                            onPress: () => onSelecionarAba('ciclos')
+                        },
+                        React.createElement(Text, null, 'Abrir ciclos')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Contato abre configurações',
+                            onPress: () => onSelecionarAba('configuracoes')
+                        },
+                        React.createElement(Text, null, 'Abrir configurações')
                     )
                 )
             )
@@ -421,11 +439,54 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
-        await abrirMembros();
-
         expect(await screen.findByText('Contatos recebidos')).toBeOnTheScreen();
         expect(screen.getByText('Convites recebidos conectados')).toBeOnTheScreen();
         expect(screen.queryByText('Tela de Membros')).toBeNull();
+    });
+
+    test('bloqueia funcionalidades do titular para uma conta somente contato', async () => {
+        const servicos = criarServicos();
+
+        servicos.accountService.buscarPerfil.mockResolvedValue({
+            nome: 'Contato',
+            email: 'contato@example.com',
+            papel: 'contato_apoio'
+        });
+
+        criarServicosApp.mockReturnValue(servicos);
+
+        await render(<App />);
+
+        await fireEvent.press(
+            await screen.findByRole('button', {
+                name: 'Contato tenta abrir ciclos'
+            })
+        );
+
+        expect(screen.getByText('Contatos recebidos')).toBeOnTheScreen();
+        expect(screen.queryByTestId('cycle-history-flow')).toBeNull();
+    });
+
+    test('mantém configurações acessíveis para uma conta somente contato', async () => {
+        const servicos = criarServicos();
+
+        servicos.accountService.buscarPerfil.mockResolvedValue({
+            nome: 'Contato',
+            email: 'contato@example.com',
+            papel: 'contato_apoio'
+        });
+
+        criarServicosApp.mockReturnValue(servicos);
+
+        await render(<App />);
+
+        await fireEvent.press(
+            await screen.findByRole('button', {
+                name: 'Contato abre configurações'
+            })
+        );
+
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
     });
 
     test('volta da listagem de categorias para membros', async () => {

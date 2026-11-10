@@ -253,6 +253,10 @@ export default function App() {
 
             if (requisicaoAtual.current === identificador) {
                 setPerfil(perfilRecebido);
+
+                if (perfilRecebido.papel === 'contato_apoio') {
+                    setTelaInterna(telasInternas.membros);
+                }
             }
         } catch (erro) {
             if (erro?.name === 'AbortError') {
@@ -429,6 +433,10 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
+        if (perfil?.papel === 'contato_apoio' && !['membros', 'configuracoes'].includes(aba)) {
+            return;
+        }
+
         if (aba === 'inicio') {
             setTelaInterna(telasInternas.inicio);
 
