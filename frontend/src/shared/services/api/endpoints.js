@@ -2,6 +2,7 @@
 
 const caminhoConta = '/users/me';
 const caminhoConvitesContato = '/support-network/contact-invitations';
+const caminhoContatosRedeApoio = '/support-network/contacts';
 
 const endpoints = Object.freeze({
     cadastro: '/auth/register',
@@ -24,6 +25,9 @@ const endpoints = Object.freeze({
     categoriasPermissao: '/support-network/permission-categories',
     convitesContato: caminhoConvitesContato,
     consultaEmailContato: `${caminhoConvitesContato}/lookup`,
+    contatosRedeApoio: caminhoContatosRedeApoio,
+    reenviarConviteContato: (contatoId) =>
+        `${caminhoContatosRedeApoio}/${contatoId}/resend-invitation`,
     contatosRecebidos: '/support-network/received-contacts',
     responderContatoRecebido: (conviteId) =>
         `/support-network/received-contacts/${conviteId}/respond`,
