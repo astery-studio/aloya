@@ -81,6 +81,9 @@ test('vincula consulta e atualização do reenvio ao mesmo titular autenticado',
                     atualizacoes.push(consulta);
                     return { count: 1 };
                 }
+            },
+            notificacao: {
+                async create() {}
             }
         },
         tokenService: {
@@ -119,6 +122,9 @@ test('não envia e-mail se o vínculo mudar entre leitura e atualização', asyn
                 async updateMany() {
                     return { count: 0 };
                 }
+            },
+            notificacao: {
+                async create() {}
             }
         },
         tokenService: {
