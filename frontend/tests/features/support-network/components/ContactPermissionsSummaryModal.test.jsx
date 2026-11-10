@@ -95,13 +95,13 @@ describe('ContactPermissionsSummaryModal', () => {
         });
 
         expect(marcadores[0]).toHaveStyle({
-            width: 9,
-            height: 14,
+            width: 11,
+            height: 16,
             color: '#C85A44',
-            fontSize: 9,
+            fontSize: 11,
             fontStyle: 'normal',
             fontWeight: '400',
-            lineHeight: 13.5
+            lineHeight: 16
         });
 
         expect(marcadores[1]).toHaveStyle({
@@ -149,10 +149,94 @@ describe('ContactPermissionsSummaryModal', () => {
         );
 
         expect(
-            screen.getByText('Anna não possui acesso direto aos dados de permissões gerais.')
+            screen.getByText('Este contato não possuí acesso direto aos seus dados.')
         ).toBeOnTheScreen();
 
-        expect(screen.getByText('Anna não possui acesso aos dados do diário.')).toBeOnTheScreen();
+        expect(screen.getByText('Este contato não possuí acesso ao seu diário.')).toBeOnTheScreen();
+    });
+
+    test('mostra ao usuário principal os textos definidos para permissões gerais', async () => {
+        await render(
+            <ContactPermissionsSummaryModal
+                visivel
+                perspectiva="enviado"
+                nomeContato="Anna"
+                permissoes={[
+                    'geral.fase_atual',
+                    'geral.anticoncepcionais',
+                    'geral.historico_ciclo',
+                    'geral.alerta_anticoncepcional',
+                    'geral.dicas'
+                ]}
+                vinculo={vinculoCategoria}
+                aoFechar={jest.fn()}
+            />
+        );
+
+        expect(
+            screen.getByText(
+                'Este contato possuí as seguintes permissões de acesso dos seus dados:'
+            )
+        ).toBeOnTheScreen();
+        expect(screen.getByText('Este contato terá acesso a fase você está.')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Este contato terá acesso a lista e ao histórico de uso.')
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByText(
+                'Este contato terá acesso ao ciclos, menstruação e previsões de ciclo.'
+            )
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByText(
+                'Este contato será afetado pelas configurações de alarme do anticoncepcional.'
+            )
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByText(
+                'Este contato receberá notificações e dicas práticas sobre a fase atual.'
+            )
+        ).toBeOnTheScreen();
+    });
+
+    test('mostra ao usuário principal os textos definidos para categorias do diário', async () => {
+        await render(
+            <ContactPermissionsSummaryModal
+                visivel
+                perspectiva="enviado"
+                nomeContato="Anna"
+                permissoes={[
+                    'ciclo.fluxo_menstrual',
+                    'corpo.sintomas_fisicos',
+                    'emocional.sintomas_emocionais',
+                    'vida_intima.atividade_sexual',
+                    'energia.energia',
+                    'saude.testes'
+                ]}
+                vinculo={vinculoCategoria}
+                aoFechar={jest.fn()}
+            />
+        );
+
+        expect(
+            screen.getByText('Este contato possuí acesso as seguintes categorias do seu diário:')
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByText('Fluxo Menstrual, sangramento de escape e secreção/corrimento.')
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByText(
+                'Sintomas físicos, pele, cabelo, digestão, banheiro, região genital, tórax/peito, temperatura basal e peso.'
+            )
+        ).toBeOnTheScreen();
+        expect(screen.getByText('sintomas emocionais, sintomas pré-menstruais.')).toBeOnTheScreen();
+        expect(
+            screen.getByText(
+                'Atividade sexual(com parceiro(a), autoerotismo, desejo/libido, vida social.'
+            )
+        ).toBeOnTheScreen();
+        expect(screen.getByText('energia, qualidade de sono e tempo de sono.')).toBeOnTheScreen();
+        expect(screen.getByText('testes, consultas e anotação livre.')).toBeOnTheScreen();
     });
 
     test('fecha pelo botão OK', async () => {

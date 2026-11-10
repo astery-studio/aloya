@@ -27,6 +27,25 @@ const DESCRICOES_PERMISSOES_GERAIS = Object.freeze({
         `Você receberá notificações e dicas práticas sobre a fase atual de ${nome}.`
 });
 
+const DESCRICOES_PERMISSOES_GERAIS_PRINCIPAL = Object.freeze({
+    'geral.fase_atual': 'Este contato terá acesso a fase você está.',
+    'geral.anticoncepcionais': 'Este contato terá acesso a lista e ao histórico de uso.',
+    'geral.historico_ciclo':
+        'Este contato terá acesso ao ciclos, menstruação e previsões de ciclo.',
+    'geral.alerta_anticoncepcional':
+        'Este contato será afetado pelas configurações de alarme do anticoncepcional.',
+    'geral.dicas': 'Este contato receberá notificações e dicas práticas sobre a fase atual.'
+});
+
+const DESCRICOES_GRUPOS_DIARIO_PRINCIPAL = Object.freeze({
+    ciclo: 'Fluxo Menstrual, sangramento de escape e secreção/corrimento.',
+    corpo: 'Sintomas físicos, pele, cabelo, digestão, banheiro, região genital, tórax/peito, temperatura basal e peso.',
+    emocional: 'sintomas emocionais, sintomas pré-menstruais.',
+    vidaIntima: 'Atividade sexual(com parceiro(a), autoerotismo, desejo/libido, vida social.',
+    energia: 'energia, qualidade de sono e tempo de sono.',
+    saude: 'testes, consultas e anotação livre.'
+});
+
 const ESPACO_VERTICAL_EXTERNO = 32;
 const ALTURA_CONTEUDO_FIXO = 210;
 
@@ -111,21 +130,36 @@ function criarMensagensVazias(perspectiva, nomeContato) {
     }
 
     return Object.freeze({
-        gerais: `${nomeContato} não possui acesso direto aos dados de permissões gerais.`,
-        diario: `${nomeContato} não possui acesso aos dados do diário.`
+        gerais: 'Este contato não possuí acesso direto aos seus dados.',
+        diario: 'Este contato não possuí acesso ao seu diário.'
     });
 }
 
 function criarDescricaoGerais(perspectiva, nomeContato) {
     return perspectiva === 'recebido'
         ? `Você possui as seguintes permissões de acesso aos dados de ${nomeContato}:`
-        : `${nomeContato} possui as seguintes permissões de acesso aos seus dados:`;
+        : 'Este contato possuí as seguintes permissões de acesso dos seus dados:';
 }
 
-function criarDescricaoPermissaoGeral(id, nomeContato) {
+function criarDescricaoPermissaoGeral(id, nomeContato, perspectiva = 'recebido') {
+    if (perspectiva === 'enviado') {
+        return DESCRICOES_PERMISSOES_GERAIS_PRINCIPAL[id] ?? '';
+    }
+
     const criarDescricao = DESCRICOES_PERMISSOES_GERAIS[id];
 
     return typeof criarDescricao === 'function' ? criarDescricao(nomeContato) : '';
+}
+
+function criarDescricaoGrupoDiario(grupo, perspectiva) {
+    if (perspectiva === 'enviado') {
+        return DESCRICOES_GRUPOS_DIARIO_PRINCIPAL[grupo.id] ?? '';
+    }
+
+    return grupo.permissoes
+        .map((permissao) => permissao.titulo)
+        .join(', ')
+        .toLocaleLowerCase('pt-BR');
 }
 
 function ContactPermissionsSummaryModal({
@@ -158,7 +192,7 @@ function ContactPermissionsSummaryModal({
     const descricaoDiario =
         perspectivaSegura === 'recebido'
             ? `Você possui acesso às seguintes categorias do diário de ${nomeSeguro}:`
-            : `${nomeSeguro} possui acesso às seguintes categorias do seu diário:`;
+            : 'Este contato possuí acesso as seguintes categorias do seu diário:';
 
     const descricaoGerais = criarDescricaoGerais(perspectivaSegura, nomeSeguro);
 
@@ -213,7 +247,11 @@ function ContactPermissionsSummaryModal({
                                 key={permissao.id}
                                 indice={indice}
                                 titulo={permissao.titulo}
-                                complemento={criarDescricaoPermissaoGeral(permissao.id, nomeSeguro)}
+                                complemento={criarDescricaoPermissaoGeral(
+                                    permissao.id,
+                                    nomeSeguro,
+                                    perspectivaSegura
+                                )}
                                 estilos={estilos}
                             />
                         ))}
@@ -231,10 +269,7 @@ function ContactPermissionsSummaryModal({
                                 key={grupo.id}
                                 indice={indice}
                                 titulo={grupo.titulo}
-                                complemento={grupo.permissoes
-                                    .map((permissao) => permissao.titulo)
-                                    .join(', ')
-                                    .toLocaleLowerCase('pt-BR')}
+                                complemento={criarDescricaoGrupoDiario(grupo, perspectivaSegura)}
                                 estilos={estilos}
                             />
                         ))}
@@ -294,9 +329,12 @@ function ItemPermissao({ indice, titulo, complemento, estilos }) {
 
 export {
     DESCRICOES_PERMISSOES_GERAIS,
+    DESCRICOES_PERMISSOES_GERAIS_PRINCIPAL,
+    DESCRICOES_GRUPOS_DIARIO_PRINCIPAL,
     ContactPermissionsSummaryModal,
     calcularLimitesModal,
     criarDescricaoGerais,
+    criarDescricaoGrupoDiario,
     criarDescricaoPermissaoGeral,
     criarMensagensVazias,
     criarResumoPermissoes,
