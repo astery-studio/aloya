@@ -96,6 +96,26 @@ function obterNomeContato(contato) {
     return nome?.trim() ?? 'Contato';
 }
 
+function criarRascunhoDeContatoInativo(contato) {
+    const vinculo = contato?.vinculo;
+
+    const rascunho = {
+        email: typeof contato?.email === 'string' ? contato.email : '',
+        iconeId: typeof contato?.iconeId === 'string' ? contato.iconeId : null,
+        corId: typeof contato?.corId === 'string' ? contato.corId : null,
+        categoriaId: null,
+        permissoesIndividuais: []
+    };
+
+    if (vinculo?.tipo === 'categoria' && Number.isSafeInteger(vinculo?.categoria?.id)) {
+        rascunho.categoriaId = vinculo.categoria.id;
+    } else if (Array.isArray(vinculo?.permissoes)) {
+        rascunho.permissoesIndividuais = [...vinculo.permissoes];
+    }
+
+    return rascunho;
+}
+
 function MembersScreen({
     service,
     categoriasService,
@@ -191,6 +211,14 @@ function MembersScreen({
                 'Arquivar contato',
                 `${obterNomeContato(contato)} será arquivado pelo fluxo de gerenciamento da Rede de Apoio.`
             );
+
+            return;
+        }
+
+        if (acao === 'convidar_novamente') {
+            if (typeof onAdicionarContato === 'function') {
+                onAdicionarContato(criarRascunhoDeContatoInativo(contato));
+            }
 
             return;
         }
@@ -367,5 +395,6 @@ export {
     filtrarContatos,
     filtrosPossuemSelecao,
     idsIguais,
-    obterNomeContato
+    obterNomeContato,
+    criarRascunhoDeContatoInativo
 };

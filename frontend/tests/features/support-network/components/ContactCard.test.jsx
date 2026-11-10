@@ -284,6 +284,78 @@ describe('ContactCard', () => {
         expect(aoAcao).toHaveBeenCalledWith('remover', conviteRecebido);
     });
 
+    test('apresenta e reconvida um contato inativo arquivado', async () => {
+        const aoAcao = jest.fn();
+
+        const contatoInativo = {
+            ...conviteRecebido,
+            status: 'inativo',
+            identificacao: 'Clara',
+            dataDesativacao: '2026-11-08T12:00:00.000Z',
+            aguardando: {
+                dias: 2,
+                atrasado: false,
+                rotulo: 'Desativado há 2 dias'
+            }
+        };
+
+        await render(
+            <ContactCard
+                contato={contatoInativo}
+                perspectiva="enviado"
+                aoAcao={aoAcao}
+                aoAbrirResumo={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('contact-card')).toHaveStyle({
+            width: '100%',
+            maxWidth: 350,
+            borderRadius: 16,
+            opacity: 0.8,
+            paddingTop: 14,
+            paddingRight: 16,
+            paddingBottom: 18,
+            paddingLeft: 16
+        });
+
+        expect(screen.getByText('Clara')).toBeOnTheScreen();
+        expect(screen.getByText('CONTATO INATIVO')).toBeOnTheScreen();
+        expect(screen.getByText(/Tipo de Vínculo:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/Data de Desativação:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/08\/11\/2026/u)).toBeOnTheScreen();
+        expect(screen.getByText(/Desativado há:/u)).toBeOnTheScreen();
+
+        expect(
+            screen.queryByRole('button', {
+                name: 'Alterar vínculo de Clara'
+            })
+        ).toBeNull();
+        expect(
+            screen.queryByRole('button', {
+                name: 'Arquivar Clara'
+            })
+        ).toBeNull();
+        expect(
+            screen.getByRole('button', {
+                name: 'Remover Clara'
+            })
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByRole('button', {
+                name: 'Abrir resumo de permissões de Clara'
+            })
+        ).toBeOnTheScreen();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Convidar Clara novamente'
+            })
+        );
+
+        expect(aoAcao).toHaveBeenCalledWith('convidar_novamente', contatoInativo);
+    });
+
     test('bloqueia ações concorrentes', async () => {
         const aoAcao = jest.fn();
 

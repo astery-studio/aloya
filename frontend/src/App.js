@@ -663,8 +663,8 @@ export default function App() {
                     service={configuracao.servicos.supportContactService}
                     categoriasService={configuracao.servicos.supportCategoryService}
                     onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
-                    onAdicionarContato={() => {
-                        setRascunhoNovoContato(null);
+                    onAdicionarContato={(dadosIniciais = null) => {
+                        setRascunhoNovoContato(dadosIniciais);
                         setTelaInterna(telasInternas.novoContato);
                     }}
                     onSelecionarAba={selecionarAba}

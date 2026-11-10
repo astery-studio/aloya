@@ -333,6 +333,41 @@ describe('MembersScreen', () => {
         expect(reenviarConvite).toHaveBeenCalledWith(1);
     });
 
+    test('abre um novo convite preenchido para contato inativo', async () => {
+        const onAdicionarContato = jest.fn();
+
+        await render(<MembersScreen onAdicionarContato={onAdicionarContato} />);
+
+        const contatoInativo = {
+            id: 9,
+            email: 'clara@example.com',
+            iconeId: 'lotus',
+            corId: 'roxo',
+            status: 'inativo',
+            vinculo: {
+                tipo: 'categoria',
+                categoria: {
+                    id: 10,
+                    nome: 'Família'
+                },
+                permissoes: ['geral.fase_atual']
+            }
+        };
+
+        await act(async () => {
+            mockContactListProps.aoAcao('convidar_novamente', contatoInativo);
+            await Promise.resolve();
+        });
+
+        expect(onAdicionarContato).toHaveBeenCalledWith({
+            email: 'clara@example.com',
+            iconeId: 'lotus',
+            corId: 'roxo',
+            categoriaId: 10,
+            permissoesIndividuais: []
+        });
+    });
+
     test('mostra alertas provisórios de edição, arquivamento e remoção', async () => {
         jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 

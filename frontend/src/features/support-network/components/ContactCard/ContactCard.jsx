@@ -172,6 +172,8 @@ function ContactCard({
 
     const contatoEnviadoAtivo = perspectivaSegura === 'enviado' && estado === 'ativo';
 
+    const contatoEnviadoInativo = perspectivaSegura === 'enviado' && estado === 'inativo';
+
     function executarAcao(acao) {
         if (bloqueado || typeof aoAcao !== 'function') {
             return;
@@ -196,6 +198,7 @@ function ContactCard({
                 estilos.cartao,
                 conviteEnviadoPendente && estilos.cartaoPendenteEnviado,
                 contatoEnviadoAtivo && estilos.cartaoAtivoEnviado,
+                contatoEnviadoInativo && estilos.cartaoInativoEnviado,
                 bloqueado && estilos.cartaoDesabilitado
             ]}
         >
@@ -203,7 +206,8 @@ function ContactCard({
                 style={[
                     estilos.cabecalho,
                     conviteEnviadoPendente && estilos.cabecalhoPendenteEnviado,
-                    contatoEnviadoAtivo && estilos.cabecalhoAtivoEnviado
+                    contatoEnviadoAtivo && estilos.cabecalhoAtivoEnviado,
+                    contatoEnviadoInativo && estilos.cabecalhoInativoEnviado
                 ]}
             >
                 {conviteEnviadoPendente ? (
@@ -286,6 +290,32 @@ function ContactCard({
                             />
                         </View>
                     </>
+                ) : contatoEnviadoInativo ? (
+                    <>
+                        <View style={estilos.avatarCabecalho}>
+                            <ContactAvatar
+                                iconeId={contato?.iconeId ?? 'pessoa'}
+                                corId={contato?.corId ?? 'branco'}
+                                tamanho="pequeno"
+                                tamanhoIcone={18}
+                                rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
+                            />
+                        </View>
+
+                        <View style={estilos.containerNomeAtivo}>
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nomeAtivo}>
+                                {identificacao}
+                            </Text>
+                        </View>
+
+                        <BotaoAcaoCabecalho
+                            icone={TrashIcon}
+                            rotulo={`Remover ${identificacao}`}
+                            aoPressionar={() => executarAcao('remover')}
+                            desabilitado={bloqueado}
+                            estilos={estilos}
+                        />
+                    </>
                 ) : (
                     <>
                         <View style={estilos.avatarCabecalho}>
@@ -311,7 +341,8 @@ function ContactCard({
 
                 {perspectivaSegura === 'enviado' &&
                 !conviteEnviadoPendente &&
-                !contatoEnviadoAtivo ? (
+                !contatoEnviadoAtivo &&
+                !contatoEnviadoInativo ? (
                     <View style={estilos.acoesCompactas}>
                         {contatoEnviadoAtivo ? (
                             <IconButton
@@ -356,7 +387,9 @@ function ContactCard({
                             corIcone={CORES_INFORMACOES.vinculo}
                             identificador="vinculo"
                             rotulo={
-                                conviteEnviadoPendente ? 'Tipo de Vínculo' : 'Vínculo solicitado'
+                                conviteEnviadoPendente || contatoEnviadoInativo
+                                    ? 'Tipo de Vínculo'
+                                    : 'Vínculo solicitado'
                             }
                             valor={rotuloVinculo}
                             estilos={estilos}
@@ -370,11 +403,19 @@ function ContactCard({
                         rotulo={
                             contatoEnviadoAtivo
                                 ? 'Data de Ativação'
-                                : conviteEnviadoPendente
-                                  ? 'Data de Convite'
-                                  : 'Data de envio'
+                                : contatoEnviadoInativo
+                                  ? 'Data de Desativação'
+                                  : conviteEnviadoPendente
+                                    ? 'Data de Convite'
+                                    : 'Data de envio'
                         }
-                        valor={contatoEnviadoAtivo ? dataAtivacao : dataConvite}
+                        valor={
+                            contatoEnviadoAtivo
+                                ? dataAtivacao
+                                : contatoEnviadoInativo
+                                  ? formatarDataConvite(contato?.dataDesativacao)
+                                  : dataConvite
+                        }
                         estilos={estilos}
                     />
 
@@ -383,9 +424,19 @@ function ContactCard({
                             icone={HourglassLowIcon}
                             corIcone={CORES_INFORMACOES.aguardando}
                             identificador="aguardando"
-                            rotulo={conviteEnviadoPendente ? 'Aguardando há' : 'Aguardando'}
+                            rotulo={
+                                conviteEnviadoPendente
+                                    ? 'Aguardando há'
+                                    : contatoEnviadoInativo
+                                      ? 'Desativado há'
+                                      : 'Aguardando'
+                            }
                             valor={rotuloEspera.replace(
-                                conviteEnviadoPendente ? /^Aguardando\s+há\s*/u : /^Aguardando\s*/u,
+                                conviteEnviadoPendente
+                                    ? /^Aguardando\s+há\s*/u
+                                    : contatoEnviadoInativo
+                                      ? /^Desativado\s+há\s*/u
+                                      : /^Aguardando\s*/u,
                                 ''
                             )}
                             estilos={estilos}
@@ -401,6 +452,10 @@ function ContactCard({
             ) : contatoEnviadoAtivo ? (
                 <View style={estilos.containerTagAtivo}>
                     <ContactPermissionBadge vinculo={vinculo} />
+                </View>
+            ) : contatoEnviadoInativo ? (
+                <View style={estilos.containerTituloInativo}>
+                    <Text style={estilos.tituloInativo}>CONTATO INATIVO</Text>
                 </View>
             ) : (
                 <View style={estilos.estado}>
@@ -457,6 +512,23 @@ function ContactCard({
                         aoPressionar={() => executarAcao('reenviar')}
                         rotuloAcessibilidade={`Reenviar convite para ${identificacao}`}
                         carregando={acaoEmAndamento === 'reenviar'}
+                        desativado={bloqueado}
+                        estilo={estilos.botaoReenvio}
+                        estiloTexto={estilos.textoBotao}
+                    />
+                </View>
+            ) : null}
+
+            {contatoEnviadoInativo ? (
+                <View style={estilos.containerReenvio}>
+                    <ButtonScreen
+                        texto="Convidar Contato"
+                        variante="verde"
+                        icone={PaperPlaneTiltIcon}
+                        tamanhoIcone={13}
+                        corConteudo="#FFFFFF"
+                        aoPressionar={() => executarAcao('convidar_novamente')}
+                        rotuloAcessibilidade={`Convidar ${identificacao} novamente`}
                         desativado={bloqueado}
                         estilo={estilos.botaoReenvio}
                         estiloTexto={estilos.textoBotao}

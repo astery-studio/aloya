@@ -37,6 +37,14 @@ function criarEstilos(tema) {
             paddingLeft: 16
         },
 
+        cartaoInativoEnviado: {
+            paddingTop: 14,
+            paddingRight: 16,
+            paddingBottom: 18,
+            paddingLeft: 16,
+            opacity: 0.8
+        },
+
         cabecalho: {
             width: '100%',
             minHeight: 36,
@@ -52,6 +60,11 @@ function criarEstilos(tema) {
         },
 
         cabecalhoAtivoEnviado: {
+            justifyContent: 'flex-start',
+            gap: 10
+        },
+
+        cabecalhoInativoEnviado: {
             justifyContent: 'flex-start',
             gap: 10
         },
@@ -273,6 +286,26 @@ function criarEstilos(tema) {
             paddingTop: 8,
             flexDirection: 'column',
             alignItems: 'center'
+        },
+
+        containerTituloInativo: {
+            alignSelf: 'stretch',
+            paddingTop: 10,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+
+        tituloInativo: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.bold,
+            fontSize: 10,
+            fontWeight: '700',
+            lineHeight: 15,
+            letterSpacing: 0.6,
+            textAlign: 'center',
+            textTransform: 'uppercase',
+            includeFontPadding: false
         },
 
         acoesRecebidas: {
