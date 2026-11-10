@@ -101,7 +101,7 @@ function criarEstilos(tema) {
             flex: 1,
             flexDirection: 'column',
             alignItems: 'flex-start',
-            alignSelf: 'stretch',
+            alignSelf: 'center',
             justifyContent: 'center'
         },
 

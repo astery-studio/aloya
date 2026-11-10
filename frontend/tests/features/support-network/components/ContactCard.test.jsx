@@ -213,6 +213,12 @@ describe('ContactCard', () => {
         expect(screen.queryByText(/Aguardando:/u)).toBeNull();
 
         expect(screen.getByTestId('contact-permission-badge')).toBeOnTheScreen();
+
+        expect(screen.getByText('Ana').parent).toHaveStyle({
+            height: 23.999,
+            alignSelf: 'center',
+            justifyContent: 'center'
+        });
     });
 
     test('mostra reenvio para convite enviado pendente', async () => {
