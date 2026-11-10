@@ -10,6 +10,7 @@ import { criarCycleParametersService } from '../features/cycles/services/cyclePa
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService';
 import { criarCycleRegistrationService } from '../features/cycles/services/cycleRegistrationService';
 import { criarCycleRemovalService } from '../features/cycles/services/cycleRemovalService';
+import { criarDiaryService } from '../features/diary/services/diaryService';
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService';
@@ -70,6 +71,7 @@ function criarServicosApp({
     const contraceptiveService = criarContraceptiveService({ requisicaoAutenticada });
     const cycleHistoryServiceBase = criarCycleHistoryService({ requisicaoAutenticada });
     const cycleRemovalService = criarCycleRemovalService({ requisicaoAutenticada });
+    const diaryService = criarDiaryService({ requisicaoAutenticada });
 
     const calendarServiceComRemocao = Object.freeze({
         ...calendarServiceBase,
@@ -105,6 +107,7 @@ function criarServicosApp({
         calendarService,
         contraceptiveService,
         cycleHistoryService,
+        diaryService,
         supportCategoryService,
         cyclePredictionService,
         cycleParametersService,
