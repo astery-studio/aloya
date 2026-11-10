@@ -19,6 +19,8 @@ function TextInput({
     acaoDireita,
     estilo,
     erro,
+    destacarErro = true,
+    estiloErro,
     estiloEntrada,
     estiloLabel,
     sanitizar = manterTexto,
@@ -45,13 +47,14 @@ function TextInput({
         >
             {rotuloExterno && <Text style={[estilos.rotuloExterno, estiloLabel]}>{label}</Text>}
             <View
+                testID="container-campo-texto"
                 style={[
                     estilos.container,
                     preenchido && variante === 'padrao' && estilos.preenchido,
                     variante === 'categoria' && estilos.categoria,
                     variante === 'popup' && estilos.popup,
                     desativado && estilos.desativado,
-                    erro && estilos.containerErro,
+                    erro && destacarErro && estilos.containerErro,
                     estilo
                 ]}
             >
@@ -75,7 +78,7 @@ function TextInput({
                 {acaoDireita}
             </View>
             {erro ? (
-                <Text accessibilityRole="alert" style={estilos.erro}>
+                <Text accessibilityRole="alert" style={[estilos.erro, estiloErro]}>
                     {erro}
                 </Text>
             ) : null}

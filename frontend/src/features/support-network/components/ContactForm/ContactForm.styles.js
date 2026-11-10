@@ -49,6 +49,13 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        erroEmail: {
+            width: '100%',
+            alignSelf: 'stretch',
+            color: '#C85A44',
+            textAlign: 'left'
+        },
+
         acao: {
             width: '100%',
             paddingTop: 18

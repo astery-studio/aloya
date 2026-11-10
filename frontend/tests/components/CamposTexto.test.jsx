@@ -81,6 +81,26 @@ test('campo popup aceita ação lateral e mensagem de erro', async () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Código inválido');
 });
 
+test('pode mostrar a mensagem de erro sem alterar a borda do campo', async () => {
+    await render(
+        <TextInput
+            label="E-mail"
+            value="email-invalido"
+            erro="Informe um e-mail válido."
+            destacarErro={false}
+            estiloErro={{ color: '#C85A44', textAlign: 'left' }}
+        />
+    );
+
+    expect(screen.getByTestId('container-campo-texto')).not.toHaveStyle({
+        borderColor: '#C85A44'
+    });
+    expect(screen.getByRole('alert')).toHaveStyle({
+        color: '#C85A44',
+        textAlign: 'left'
+    });
+});
+
 test('campos usam as cores do modo escuro', async () => {
     await render(<TextInput label="Nome" placeholder="Nome" value="Julia" />, {
         preferencia: 'escuro'

@@ -175,6 +175,8 @@ function ContactForm({
                 value={email}
                 onChangeText={alterarEmail}
                 erro={errosSeguros.email ?? erroEmailLocal}
+                destacarErro={false}
+                estiloErro={estilos.erroEmail}
                 desativado={camposBloqueados || editando}
                 variante="categoria"
                 maxLength={TAMANHO_MAXIMO_EMAIL}

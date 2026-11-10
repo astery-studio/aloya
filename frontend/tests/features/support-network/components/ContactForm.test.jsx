@@ -7,7 +7,15 @@ jest.mock('../../../../src/shared/components/forms/EmailInput', () => {
     const React = require('react');
     const { Text, TextInput, View } = require('react-native');
 
-    return function EmailInput({ label, value, onChangeText, erro, desativado }) {
+    return function EmailInput({
+        label,
+        value,
+        onChangeText,
+        erro,
+        destacarErro,
+        estiloErro,
+        desativado
+    }) {
         return React.createElement(
             View,
             null,
@@ -21,7 +29,12 @@ jest.mock('../../../../src/shared/components/forms/EmailInput', () => {
                 ? React.createElement(
                       Text,
                       {
-                          accessibilityRole: 'alert'
+                          testID: 'erro-email-contato',
+                          accessibilityRole: 'alert',
+                          accessibilityState: {
+                              selected: destacarErro
+                          },
+                          style: estiloErro
                       },
                       erro
                   )
@@ -254,6 +267,15 @@ describe('ContactForm', () => {
         );
 
         expect(screen.getByText('Informe um e-mail válido.')).toBeOnTheScreen();
+        expect(screen.getByTestId('erro-email-contato')).toHaveStyle({
+            width: '100%',
+            alignSelf: 'stretch',
+            color: '#C85A44',
+            textAlign: 'left'
+        });
+        expect(screen.getByTestId('erro-email-contato')).toHaveProp('accessibilityState', {
+            selected: false
+        });
     });
 
     test('não mostra validação de formato enquanto o e-mail está vazio', async () => {
