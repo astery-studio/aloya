@@ -215,6 +215,7 @@ function ContactFiltersModal({ visivel, filtros, categorias = [], aoAplicar, aoF
             variante="simples"
             visivel={Boolean(visivel)}
             aoFechar={fechar}
+            fecharAoTocarFora
             titulo="Filtrar Contatos"
             estilo={estilos.modal}
         >

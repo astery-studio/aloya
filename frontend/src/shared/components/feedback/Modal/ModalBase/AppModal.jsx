@@ -8,6 +8,7 @@ import {
     KeyboardAvoidingView,
     Modal,
     Platform,
+    Pressable,
     ScrollView,
     Text,
     View
@@ -35,7 +36,8 @@ export default function AppModal({
     estiloCabecalho,
     estiloIconeCabecalho,
     corIconeCabecalho,
-    rolagemExternaHabilitada = true
+    rolagemExternaHabilitada = true,
+    fecharAoTocarFora = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -74,6 +76,15 @@ export default function AppModal({
             onShow={focarTitulo}
         >
             <SafeAreaView testID="app-modal-fundo" style={estilos.fundo}>
+                <Pressable
+                    testID="app-modal-fundo-interativo"
+                    accessibilityRole={fecharAoTocarFora ? 'button' : undefined}
+                    accessibilityLabel={fecharAoTocarFora ? 'Fechar modal' : undefined}
+                    disabled={!fecharAoTocarFora}
+                    onPress={fecharAoTocarFora ? aoFechar : undefined}
+                    style={estilos.fundoInterativo}
+                />
+
                 <KeyboardAvoidingView
                     style={estilos.flexivel}
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

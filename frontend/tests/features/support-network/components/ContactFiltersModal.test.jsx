@@ -222,6 +222,30 @@ describe('ContactFiltersModal', () => {
         });
     });
 
+    test('fecha sem aplicar ao tocar fora do modal', async () => {
+        const aoAplicar = jest.fn();
+        const aoFechar = jest.fn();
+
+        await render(
+            <ContactFiltersModal
+                visivel
+                filtros={{}}
+                categorias={categorias}
+                aoAplicar={aoAplicar}
+                aoFechar={aoFechar}
+            />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Fechar modal'
+            })
+        );
+
+        expect(aoFechar).toHaveBeenCalledTimes(1);
+        expect(aoAplicar).not.toHaveBeenCalled();
+    });
+
     test('ordena e remove categorias inválidas', () => {
         expect(
             normalizarCategorias([

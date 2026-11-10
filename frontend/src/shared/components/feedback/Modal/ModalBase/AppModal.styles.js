@@ -15,6 +15,10 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.sobreposicao
         },
 
+        fundoInterativo: {
+            ...StyleSheet.absoluteFillObject
+        },
+
         flexivel: { flex: 1, width: '100%' },
 
         rolagem: {
