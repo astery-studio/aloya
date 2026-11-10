@@ -7,6 +7,13 @@ import { fontFamilies } from '../../../../shared/theme';
 function criarEstilos(tema) {
     return StyleSheet.create({
         campos: { gap: 12 },
+        tiposConta: { gap: 8, marginBottom: 4 },
+        tituloTiposConta: {
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.semibold,
+            fontSize: 15,
+            lineHeight: 22.5
+        },
         campo: tema.escuro ? { borderColor: '#2C2C2C', backgroundColor: '#1E1E1E' } : {},
         textoCampo: tema.escuro ? { color: '#E3E3E3' } : {},
         labelCampo: tema.escuro ? { color: '#999999' } : {},
@@ -35,11 +42,21 @@ function criarEstilos(tema) {
             fontSize: 13,
             lineHeight: 19.5
         },
-        linkTermos: { color: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque, fontFamily: fontFamilies.semibold },
+        linkTermos: {
+            color: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque,
+            fontFamily: fontFamilies.semibold
+        },
         rodape: { gap: 24, width: '100%' },
         separador: { alignItems: 'center', flexDirection: 'row', gap: 12 },
-        linha: { backgroundColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda, flex: 1, height: 1 },
-        legenda: { color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario, fontSize: 13 }
+        linha: {
+            backgroundColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda,
+            flex: 1,
+            height: 1
+        },
+        legenda: {
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
+            fontSize: 13
+        }
     });
 }
 

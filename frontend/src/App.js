@@ -403,10 +403,14 @@ export default function App() {
         carregarPerfil();
     }
 
-    function concluirCadastro() {
+    function concluirCadastro(dadosCadastro = {}) {
         concluirAutenticacao();
 
-        setTelaInterna(telasInternas.inicio);
+        setTelaInterna(
+            dadosCadastro.tipoUsuario === 'contato_apoio'
+                ? telasInternas.membros
+                : telasInternas.inicio
+        );
     }
 
     function finalizarSessao(resultado = {}) {
