@@ -35,6 +35,7 @@ import { NewSupportCategoryScreen } from './features/support-network/screens/New
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
+import { DiaryFlow } from './features/diary/DiaryFlow';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
@@ -55,6 +56,7 @@ const telasInternas = Object.freeze({
     calendario: 'calendario',
     cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
+    diario: 'diario',
     inicio: 'inicio'
 });
 
@@ -436,6 +438,12 @@ export default function App() {
             return;
         }
 
+        if (aba === 'diario') {
+            setTelaInterna(telasInternas.diario);
+
+            return;
+        }
+
         if (aba === 'configuracoes') {
             setTelaInterna(telasInternas.configuracoes);
         }
@@ -632,6 +640,14 @@ export default function App() {
                 service={configuracao.servicos.cycleHistoryService}
                 calendarService={configuracao.servicos.calendarService}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                onSelecionarAba={selecionarAba}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.diario) {
+        conteudo = (
+            <DiaryFlow
+                service={configuracao.servicos.diaryService}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />
