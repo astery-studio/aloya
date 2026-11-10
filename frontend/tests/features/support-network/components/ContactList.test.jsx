@@ -67,15 +67,57 @@ const contatos = [
             tipo: 'individual',
             permissoes: ['geral.fase_atual']
         }
+    },
+    {
+        id: 5,
+        identificacao: 'Ester',
+        email: 'ester@example.com',
+        status: 'recusado',
+        iconeId: 'escudo',
+        corId: 'azul',
+        dataConvite: '2026-10-10T10:00:00.000Z',
+        aguardando: {
+            dias: 2,
+            atrasado: false,
+            rotulo: 'Recusado há 2 dias'
+        },
+        vinculo: {
+            tipo: 'individual',
+            permissoes: []
+        }
+    },
+    {
+        id: 4,
+        identificacao: 'Daniela',
+        email: 'daniela@example.com',
+        status: 'inativo',
+        iconeId: 'sol',
+        corId: 'laranja',
+        dataConvite: '2026-10-12T10:00:00.000Z',
+        aguardando: {
+            dias: 5,
+            atrasado: false,
+            rotulo: 'Desativado há 5 dias'
+        },
+        vinculo: {
+            tipo: 'categoria',
+            categoria: {
+                id: 3,
+                nome: 'Família'
+            },
+            permissoes: []
+        }
     }
 ];
 
 describe('ContactList', () => {
-    test('ordena pendentes antes dos ativos e alfabeticamente', () => {
+    test('ordena os quatro estados e alfabeticamente', () => {
         expect(ordenarContatos(contatos).map((contato) => contato.identificacao)).toEqual([
             'Ana',
             'Carlos',
-            'Beatriz'
+            'Beatriz',
+            'Daniela',
+            'Ester'
         ]);
     });
 
@@ -84,14 +126,24 @@ describe('ContactList', () => {
 
         expect(
             itens.map((item) => (item.tipo === 'cabecalho' ? item.id : item.contato.identificacao))
-        ).toEqual(['cabecalho-pendente', 'Ana', 'Carlos', 'cabecalho-ativo', 'Beatriz']);
+        ).toEqual([
+            'cabecalho-pendente',
+            'Ana',
+            'Carlos',
+            'cabecalho-ativo',
+            'Beatriz',
+            'cabecalho-inativo',
+            'Daniela',
+            'cabecalho-recusado',
+            'Ester'
+        ]);
     });
 
-    test('mostra os cabeçalhos e os contatos', async () => {
+    test('mostra os quatro agrupamentos', async () => {
         await render(
             <ContactList
                 contatos={contatos}
-                perspectiva="recebido"
+                perspectiva="enviado"
                 aoAcao={jest.fn()}
                 aoAbrirResumo={jest.fn()}
             />
@@ -101,18 +153,18 @@ describe('ContactList', () => {
 
         expect(screen.getByText('CONTATOS ATIVOS (1 CONTATO)')).toBeOnTheScreen();
 
-        expect(screen.getByText('Ana')).toBeOnTheScreen();
+        expect(screen.getByText('CONTATOS INATIVOS (1 CONTATO)')).toBeOnTheScreen();
 
-        expect(screen.getByText('Carlos')).toBeOnTheScreen();
+        expect(screen.getByText('CONVITES RECUSADOS (1 CONTATO)')).toBeOnTheScreen();
 
-        expect(screen.getByText('Beatriz')).toBeOnTheScreen();
+        expect(screen.getByText('Daniela')).toBeOnTheScreen();
     });
 
-    test('mantém o conteúdo introdutório dentro da rolagem da lista', async () => {
+    test('mantém o conteúdo introdutório dentro da rolagem', async () => {
         await render(
             <ContactList
                 contatos={contatos}
-                perspectiva="recebido"
+                perspectiva="enviado"
                 cabecalho={<Text>Introdução rolável</Text>}
                 aoAcao={jest.fn()}
                 aoAbrirResumo={jest.fn()}
@@ -120,6 +172,7 @@ describe('ContactList', () => {
         );
 
         expect(screen.getByTestId('contact-list')).toBeOnTheScreen();
+
         expect(screen.getByText('Introdução rolável')).toBeOnTheScreen();
     });
 
@@ -179,7 +232,7 @@ describe('ContactList', () => {
         await render(
             <ContactList
                 contatos={contatos}
-                perspectiva="recebido"
+                perspectiva="enviado"
                 atualizando
                 aoAcao={jest.fn()}
                 aoAbrirResumo={jest.fn()}
@@ -246,7 +299,7 @@ describe('ContactList', () => {
         expect(screen.getByText(MENSAGEM_VAZIA_RECEBIDA)).toBeOnTheScreen();
     });
 
-    test('diferencia filtro sem resultados de uma rede vazia', async () => {
+    test('diferencia filtro sem resultados de rede vazia', async () => {
         await render(
             <ContactList contatos={[]} filtroAtivo aoAcao={jest.fn()} aoAbrirResumo={jest.fn()} />
         );
@@ -258,31 +311,15 @@ describe('ContactList', () => {
         ).toBeOnTheScreen();
     });
 
-    test('remove contatos recusados e inativos da visualização', () => {
-        const itens = criarItensAgrupados([
-            ...contatos,
-            {
-                id: 4,
-                identificacao: 'Recusado',
-                status: 'recusado'
-            },
-            {
-                id: 5,
-                identificacao: 'Inativo',
-                status: 'inativo'
-            }
-        ]);
+    test('preserva contatos inativos e recusados na visualização', () => {
+        const itens = criarItensAgrupados(contatos);
 
-        expect(
-            itens.some(
-                (item) =>
-                    item.contato?.identificacao === 'Recusado' ||
-                    item.contato?.identificacao === 'Inativo'
-            )
-        ).toBe(false);
+        expect(itens.some((item) => item.contato?.identificacao === 'Daniela')).toBe(true);
+
+        expect(itens.some((item) => item.contato?.identificacao === 'Ester')).toBe(true);
     });
 
-    test('encaminha o processamento somente ao contato correto', async () => {
+    test('encaminha processamento somente ao contato correto', async () => {
         await render(
             <ContactList
                 contatos={contatos}
@@ -308,13 +345,27 @@ describe('ContactList', () => {
         ).toBeEnabled();
     });
 
-    test('valida contatos e quantidades', () => {
+    test('valida estados e quantidades', () => {
         expect(contatoEhValido(contatos[0])).toBe(true);
 
         expect(
             contatoEhValido({
                 id: 99,
                 status: 'recusado'
+            })
+        ).toBe(true);
+
+        expect(
+            contatoEhValido({
+                id: 100,
+                status: 'inativo'
+            })
+        ).toBe(true);
+
+        expect(
+            contatoEhValido({
+                id: 101,
+                status: 'desconhecido'
             })
         ).toBe(false);
 

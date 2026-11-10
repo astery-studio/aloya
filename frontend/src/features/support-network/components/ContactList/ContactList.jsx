@@ -1,4 +1,4 @@
-//Apresenta contatos pendentes e ativos em uma lista virtualizada.
+//Apresenta os contatos agrupados por estado em uma lista virtualizada.
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { useCallback, useMemo } from 'react';
 
@@ -19,8 +19,29 @@ const MENSAGEM_VAZIA_RECEBIDA =
 
 const ORDEM_STATUS = Object.freeze({
     pendente: 0,
-    ativo: 1
+    ativo: 1,
+    inativo: 2,
+    recusado: 3
 });
+
+const GRUPOS_CONTATOS = Object.freeze([
+    Object.freeze({
+        status: 'pendente',
+        titulo: 'CONVITES'
+    }),
+    Object.freeze({
+        status: 'ativo',
+        titulo: 'CONTATOS ATIVOS'
+    }),
+    Object.freeze({
+        status: 'inativo',
+        titulo: 'CONTATOS INATIVOS'
+    }),
+    Object.freeze({
+        status: 'recusado',
+        titulo: 'CONVITES RECUSADOS'
+    })
+]);
 
 function contatoEhValido(contato) {
     return (
@@ -84,18 +105,7 @@ function criarRotuloQuantidade(quantidade) {
 function criarItensAgrupados(contatos) {
     const contatosOrdenados = ordenarContatos(contatos);
 
-    const grupos = [
-        {
-            status: 'pendente',
-            titulo: 'CONVITES'
-        },
-        {
-            status: 'ativo',
-            titulo: 'CONTATOS ATIVOS'
-        }
-    ];
-
-    return grupos.flatMap((grupo) => {
+    return GRUPOS_CONTATOS.flatMap((grupo) => {
         const itensDoGrupo = contatosOrdenados.filter((contato) => contato.status === grupo.status);
 
         if (itensDoGrupo.length === 0) {
@@ -158,7 +168,9 @@ function ContactList({
                 return (
                     <View
                         accessibilityRole="header"
-                        accessibilityLabel={`${item.titulo}, ${criarRotuloQuantidade(item.quantidade)}`}
+                        accessibilityLabel={`${item.titulo}, ${criarRotuloQuantidade(
+                            item.quantidade
+                        )}`}
                         style={estilos.cabecalhoGrupo}
                     >
                         <View style={estilos.linhaGrupo} />
@@ -316,6 +328,8 @@ function Separador({ estilo }) {
 }
 
 export {
+    GRUPOS_CONTATOS,
+    ORDEM_STATUS,
     ContactList,
     MENSAGEM_ERRO,
     MENSAGEM_VAZIA_ENVIADA,
