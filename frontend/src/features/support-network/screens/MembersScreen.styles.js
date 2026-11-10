@@ -17,9 +17,7 @@ function criarEstilos(tema) {
             alignSelf: 'center',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: 18,
-            paddingTop: 8,
-            paddingBottom: 20
+            gap: 18
         },
 
         descricao: {
