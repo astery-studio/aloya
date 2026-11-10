@@ -20,6 +20,8 @@ const endpoints = Object.freeze({
     estadoAtualCiclo: '/api/cycles/current',
     historicoCiclos: '/api/cycles/history',
     ciclos: '/api/cycles',
+    catalogoDiario: '/api/diario/catalogo',
+    registrosDiario: '/api/diario/registros',
     categoriasPermissao: '/support-network/permission-categories',
     previsaoCiclo: '/cycles/prediction'
 })
