@@ -243,8 +243,9 @@ function ContactCard({
                             ]}
                         >
                             <XCircleIcon
+                                testID="pending-cancel-icon"
                                 size={18}
-                                color={tema.cores.feedback.erro}
+                                color="#5C5C59"
                                 weight="regular"
                             />
                         </Pressable>

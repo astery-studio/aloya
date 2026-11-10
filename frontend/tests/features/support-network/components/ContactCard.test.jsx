@@ -235,6 +235,12 @@ describe('ContactCard', () => {
 
         expect(screen.getByText('Pendente')).toBeOnTheScreen();
 
+        expect(screen.getByText('Pendente').parent).toHaveStyle({
+            height: 23.999,
+            alignSelf: 'center',
+            justifyContent: 'center'
+        });
+
         expect(screen.getByTestId('pending-contact-icon')).toHaveStyle({
             width: 35.993,
             height: 35.993,
@@ -243,6 +249,8 @@ describe('ContactCard', () => {
             borderColor: '#5C5C59',
             backgroundColor: 'rgba(92, 92, 89, 0.20)'
         });
+
+        expect(screen.getByTestId('pending-cancel-icon')).toHaveProp('color', '#5C5C59');
 
         expect(screen.getByText(/Tipo de Vínculo:/u)).toBeOnTheScreen();
         expect(screen.getByText(/Data de Convite:/u)).toBeOnTheScreen();
