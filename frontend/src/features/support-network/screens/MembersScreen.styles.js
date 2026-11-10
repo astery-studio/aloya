@@ -1,47 +1,75 @@
-//Define a apresentação e as ações principais da Rede de Apoio.
+//Define a estrutura visual da listagem da Rede de Apoio.
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../shared/theme';
-import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        conteudo: {
-            flexGrow: 1,
-            gap: tema.espacamentos.extraGrande,
-            paddingHorizontal: tema.espacamentos.grande,
-            paddingTop: tema.espacamentos.grande,
-            paddingBottom: tema.espacamentos.extraGrande
+        container: {
+            flex: 1,
+            minHeight: 0,
+            backgroundColor: tema.cores.interface.fundo
         },
 
         apresentacao: {
             width: '100%',
-            gap: tema.espacamentos.pequeno
-        },
-
-        titulo: {
-            color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.bold,
-            fontSize: 22,
-            lineHeight: 29,
-            includeFontPadding: false
+            flexShrink: 0,
+            gap: 18,
+            paddingHorizontal: 20,
+            paddingBottom: 12
         },
 
         descricao: {
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
+            fontWeight: '400',
             lineHeight: 24,
             includeFontPadding: false
         },
 
-        acoes: {
+        botaoLimpar: {
             width: '100%',
-            gap: tema.espacamentos.medio
+            height: 48,
+            borderRadius: 10
+        },
+
+        textoBotaoLimpar: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 15,
+            fontWeight: '600',
+            lineHeight: 21
+        },
+
+        areaLista: {
+            flex: 1,
+            minHeight: 0
+        },
+
+        acaoPrincipal: {
+            width: '100%',
+            flexShrink: 0,
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 18,
+            borderTopWidth: 1,
+            borderTopColor: tema.cores.interface.separador,
+            backgroundColor: tema.cores.interface.fundo
+        },
+
+        botaoAdicionar: {
+            width: '100%',
+            height: 56,
+            borderRadius: 12
+        },
+
+        textoBotaoAdicionar: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 17,
+            fontWeight: '600',
+            lineHeight: 24
         }
     });
 }
 
-const estilos = criarEstilos(temaClaro);
-
-export { criarEstilos, estilos };
+export { criarEstilos };

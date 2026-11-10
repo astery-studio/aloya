@@ -55,6 +55,7 @@ import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle
 import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
+import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 
 export {
     ArrowLeftIcon,
@@ -112,5 +113,6 @@ export {
     WarningCircleIcon,
     WarningIcon,
     XCircleIcon,
-    XIcon
+    XIcon,
+    FunnelIcon
 };
