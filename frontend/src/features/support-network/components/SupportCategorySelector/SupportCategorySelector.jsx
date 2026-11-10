@@ -1,12 +1,13 @@
 //Apresenta um acordeão para selecionar uma categoria de permissão existente.
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 
-import RadioOption from '../../../../shared/components/forms/RadioOption';
 import {
     CaretDownIcon,
     CaretUpIcon,
-    UsersIcon
+    CheckCircleIcon,
+    CircleIcon,
+    UsersThreeIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './SupportCategorySelector.styles';
@@ -159,22 +160,65 @@ function SupportCategorySelector({
         }
 
         return (
-            <View
+            <ScrollView
+                testID="support-category-options-scroll"
                 accessibilityRole="radiogroup"
                 accessibilityLabel="Categorias disponíveis"
                 style={estilos.lista}
+                contentContainerStyle={estilos.conteudoLista}
+                nestedScrollEnabled
+                bounces={false}
+                showsVerticalScrollIndicator={categoriasValidas.length > 4}
             >
-                {categoriasValidas.map((categoria) => (
-                    <RadioOption
-                        key={String(categoria.id)}
-                        titulo={categoria.nome}
-                        selecionado={idsIguais(categoria.id, categoriaId)}
-                        aoPressionar={() => selecionarCategoria(categoria.id)}
-                        desativado={selecaoBloqueada}
-                        estilo={estilos.opcaoCategoria}
-                    />
-                ))}
-            </View>
+                {categoriasValidas.map((categoria) => {
+                    const selecionada = idsIguais(categoria.id, categoriaId);
+
+                    return (
+                        <Pressable
+                            key={String(categoria.id)}
+                            accessibilityRole="radio"
+                            accessibilityLabel={categoria.nome}
+                            accessibilityState={{
+                                selected: selecionada,
+                                disabled: selecaoBloqueada
+                            }}
+                            disabled={selecaoBloqueada}
+                            onPress={() => selecionarCategoria(categoria.id)}
+                            style={({ pressed }) => [
+                                estilos.opcaoCategoria,
+                                pressed && !selecaoBloqueada && estilos.pressionado,
+                                selecaoBloqueada && estilos.desabilitado
+                            ]}
+                        >
+                            <View style={estilos.containerTextoOpcao}>
+                                <Text
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                    style={estilos.textoOpcao}
+                                >
+                                    {categoria.nome}
+                                </Text>
+                            </View>
+
+                            {selecionada ? (
+                                <CheckCircleIcon
+                                    testID={`categoria-selecionada-${categoria.id}`}
+                                    size={22}
+                                    color="#2C4C3B"
+                                    weight="fill"
+                                />
+                            ) : (
+                                <CircleIcon
+                                    testID={`categoria-nao-selecionada-${categoria.id}`}
+                                    size={22}
+                                    color="#D8D4CC"
+                                    weight="regular"
+                                />
+                            )}
+                        </Pressable>
+                    );
+                })}
+            </ScrollView>
         );
     }
 
@@ -208,7 +252,12 @@ function SupportCategorySelector({
                 ]}
             >
                 <View style={estilos.caixaIcone}>
-                    <UsersIcon size={21} color={tema.cores.interface.destaque} weight="regular" />
+                    <UsersThreeIcon
+                        testID="icone-categorias-cadastradas"
+                        size={18}
+                        color={tema.cores.interface.destaque}
+                        weight="regular"
+                    />
                 </View>
 
                 <Text
@@ -220,7 +269,7 @@ function SupportCategorySelector({
 
                 <IconeExpansao
                     testID={expandido ? 'icone-recolher-categorias' : 'icone-expandir-categorias'}
-                    size={21}
+                    size={18}
                     color={tema.cores.interface.destaque}
                     weight="regular"
                 />

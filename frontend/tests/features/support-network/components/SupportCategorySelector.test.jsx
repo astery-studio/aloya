@@ -19,7 +19,9 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     return {
         CaretDownIcon: criarIcone('CaretDownIcon'),
         CaretUpIcon: criarIcone('CaretUpIcon'),
-        UsersIcon: criarIcone('UsersIcon')
+        CheckCircleIcon: criarIcone('CheckCircleIcon'),
+        CircleIcon: criarIcone('CircleIcon'),
+        UsersThreeIcon: criarIcone('UsersThreeIcon')
     };
 });
 
@@ -56,6 +58,13 @@ describe('SupportCategorySelector', () => {
         expect(screen.queryByText('Família')).toBeNull();
 
         expect(screen.getByTestId('icone-expandir-categorias')).toBeOnTheScreen();
+
+        expect(screen.getByTestId('support-category-selector')).toHaveStyle({
+            width: '100%',
+            height: 68
+        });
+
+        expect(screen.getByTestId('icone-categorias-cadastradas')).toHaveProp('size', 18);
     });
 
     test('expande e recolhe as categorias pelo cabeçalho', async () => {
@@ -71,6 +80,11 @@ describe('SupportCategorySelector', () => {
         expect(screen.getByText('Parceiro')).toBeOnTheScreen();
 
         expect(screen.getByTestId('icone-recolher-categorias')).toBeOnTheScreen();
+
+        expect(screen.getByTestId('support-category-selector')).toHaveStyle({
+            height: 272,
+            borderWidth: 1.41
+        });
 
         await fireEvent.press(cabecalho);
 
@@ -111,6 +125,9 @@ describe('SupportCategorySelector', () => {
             selected: true,
             disabled: false
         });
+
+        expect(screen.getByTestId('categoria-selecionada-1')).toHaveProp('weight', 'fill');
+        expect(screen.getByTestId('categoria-selecionada-1')).toHaveProp('color', '#2C4C3B');
     });
 
     test('encaminha o identificador original da categoria', async () => {
