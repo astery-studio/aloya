@@ -80,6 +80,9 @@ function ContactForm({
     aoCriarCategoria,
     carregando = false,
     alterado = false,
+    bloquearAparencia = false,
+    permitirPermissoes = true,
+    permitirCriarCategoria = true,
     erros = {}
 }) {
     const tema = useTheme();
@@ -187,8 +190,8 @@ function ContactForm({
             <ContactAppearancePicker
                 iconeId={iconeId}
                 corId={corId}
-                aoAlterar={camposBloqueados ? undefined : alterarAparencia}
-                desabilitado={camposBloqueados}
+                aoAlterar={camposBloqueados || bloquearAparencia ? undefined : alterarAparencia}
+                desabilitado={camposBloqueados || bloquearAparencia}
             />
 
             {errosSeguros.aparencia ? (
@@ -212,7 +215,9 @@ function ContactForm({
                     tamanhoIcone={18}
                     variante="laranja"
                     aoPressionar={abrirPermissoes}
-                    desativado={carregando || typeof aoAbrirPermissoes !== 'function'}
+                    desativado={
+                        carregando || !permitirPermissoes || typeof aoAbrirPermissoes !== 'function'
+                    }
                     estilo={estilos.botaoPermissao}
                     estiloTexto={estilos.textoBotaoPermissao}
                 />
@@ -224,7 +229,11 @@ function ContactForm({
                     tamanhoIcone={18}
                     variante="verde"
                     aoPressionar={criarCategoria}
-                    desativado={carregando || typeof aoCriarCategoria !== 'function'}
+                    desativado={
+                        carregando ||
+                        !permitirCriarCategoria ||
+                        typeof aoCriarCategoria !== 'function'
+                    }
                     estilo={estilos.botaoPermissao}
                     estiloTexto={estilos.textoBotaoPermissao}
                 />

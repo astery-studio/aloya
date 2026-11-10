@@ -11,6 +11,7 @@ import { useTheme } from '../../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../../settings/layouts/SettingsLayout/SettingsLayout';
 import { ContactForm } from '../../components/ContactForm/ContactForm';
 import { IndividualPermissionsForm } from '../../components/IndividualPermissionsForm/IndividualPermissionsForm';
+import { ContactLinkEditFlow } from './ContactLinkEditFlow';
 import { estilos } from './ContactFormScreen.styles';
 
 const ALERTA_EMAIL = Object.freeze({
@@ -180,8 +181,7 @@ function obterAlertaDoErro(erro) {
     return ALERTA_INTERNO;
 }
 
-function ContactFormScreen({
-    contatoId = null,
+function NewContactFormScreen({
     dadosIniciais,
     emailUsuario,
     service,
@@ -483,7 +483,7 @@ function ContactFormScreen({
     return (
         <>
             <SettingsLayout
-                titulo={contatoId === null ? 'Novo Contato' : 'Editar Contato'}
+                titulo="Novo Contato"
                 onVoltar={voltar}
                 corFundo={tema.escuro ? tema.cores.interface.fundo : undefined}
             >
@@ -500,7 +500,7 @@ function ContactFormScreen({
                         <ContactForm
                             dados={dados}
                             categorias={categorias}
-                            modo={contatoId === null ? 'cadastro' : 'edicao'}
+                            modo="cadastro"
                             aoAlterar={alterarDados}
                             aoSalvar={serviceDisponivel ? salvarContato : undefined}
                             aoAbrirPermissoes={abrirPermissoes}
@@ -596,6 +596,14 @@ function ContactFormScreen({
             />
         </>
     );
+}
+
+function ContactFormScreen(props) {
+    if (props.contatoId !== null && props.contatoId !== undefined) {
+        return <ContactLinkEditFlow {...props} />;
+    }
+
+    return <NewContactFormScreen {...props} />;
 }
 
 export { ContactFormScreen, criarDadosIniciais, emailsCorrespondem, obterAlertaDoErro };
