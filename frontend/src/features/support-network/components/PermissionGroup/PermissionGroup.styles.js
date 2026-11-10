@@ -1,7 +1,7 @@
 //Define a aparência fechada e expandida dos grupos de permissões.
 import { StyleSheet } from 'react-native';
-import { fontFamilies } from '../../../shared/theme';
-import { temaClaro } from '../../../shared/theme/themePalettes';
+import { fontFamilies } from '../../../../shared/theme';
+import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema, aparenciaNovaCategoria = false) {
     return StyleSheet.create({

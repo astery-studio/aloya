@@ -27,29 +27,35 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
     };
 });
 
-jest.mock('../../../../src/features/support-network/components/GeneralPermissions', () => {
-    const React = require('react');
-    const { View } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/GeneralPermissions/GeneralPermissions',
+    () => {
+        const React = require('react');
+        const { View } = require('react-native');
 
-    return {
-        GeneralPermissions: (props) => {
-            mockGeraisProps = props;
-            return React.createElement(View, { testID: 'gerais-falsas' });
-        }
-    };
-});
+        return {
+            GeneralPermissions: (props) => {
+                mockGeraisProps = props;
+                return React.createElement(View, { testID: 'gerais-falsas' });
+            }
+        };
+    }
+);
 
-jest.mock('../../../../src/features/support-network/components/PermissionGroups', () => {
-    const React = require('react');
-    const { View } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/PermissionGroups/PermissionGroups',
+    () => {
+        const React = require('react');
+        const { View } = require('react-native');
 
-    return {
-        PermissionGroups: (props) => {
-            mockGruposProps = props;
-            return React.createElement(View, { testID: 'grupos-falsos' });
-        }
-    };
-});
+        return {
+            PermissionGroups: (props) => {
+                mockGruposProps = props;
+                return React.createElement(View, { testID: 'grupos-falsos' });
+            }
+        };
+    }
+);
 
 import {
     SupportCategoryForm,

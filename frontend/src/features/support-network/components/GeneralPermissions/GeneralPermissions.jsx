@@ -2,9 +2,9 @@
 import { useCallback, useMemo } from 'react';
 import { Text, View } from 'react-native';
 
-import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
-import { useTheme } from '../../../shared/hooks/useTheme';
-import { permissoesGerais } from '../constants/permissionOptions';
+import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchField';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { permissoesGerais } from '../../constants/permissionOptions';
 import { criarEstilos } from './GeneralPermissions.styles';
 
 //Recebe as permissões selecionadas e informa qual permissão teve o estado alterado.

@@ -2,10 +2,10 @@
 import { useCallback, useMemo } from 'react';
 import { Text, View } from 'react-native';
 
-import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
-import { useTheme } from '../../../shared/hooks/useTheme';
-import PermissionGroup from './PermissionGroup';
-import PermissionCounter from './PermissionCounter';
+import { gruposPermissoes, permissoesGerais } from '../../constants/permissionOptions';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import PermissionGroup from '../PermissionGroup/PermissionGroup';
+import PermissionCounter from '../PermissionCounter/PermissionCounter';
 import { criarEstilos } from './PermissionGroups.styles';
 
 const idsPermitidos = new Set([

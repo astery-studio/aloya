@@ -81,47 +81,54 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
     };
 });
 
-jest.mock('../../../../src/features/support-network/components/GeneralPermissions', () => {
-    const React = require('react');
-    const { Pressable, Text } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/GeneralPermissions/GeneralPermissions',
+    () => {
+        const React = require('react');
+        const { Pressable, Text } = require('react-native');
 
-    return {
-        GeneralPermissions({ permissoesSelecionadas, aoAlterar, desabilitado }) {
-            const ativa = permissoesSelecionadas.includes('geral.fase_atual');
+        return {
+            GeneralPermissions({ permissoesSelecionadas, aoAlterar, desabilitado }) {
+                const ativa = permissoesSelecionadas.includes('geral.fase_atual');
 
-            return React.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Alterar permissão geral',
-                    disabled: desabilitado,
-                    onPress: () => aoAlterar('geral.fase_atual', !ativa)
-                },
-                React.createElement(Text, null, 'Permissões Gerais')
-            );
-        }
-    };
-});
+                return React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Alterar permissão geral',
+                        disabled: desabilitado,
+                        onPress: () => aoAlterar('geral.fase_atual', !ativa)
+                    },
+                    React.createElement(Text, null, 'Permissões Gerais')
+                );
+            }
+        };
+    }
+);
 
-jest.mock('../../../../src/features/support-network/components/PermissionGroups', () => {
-    const React = require('react');
-    const { Pressable, Text } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/PermissionGroups/PermissionGroups',
+    () => {
+        const React = require('react');
+        const { Pressable, Text } = require('react-native');
 
-    return {
-        PermissionGroups({ permissoesSelecionadas, aoAlterar, desabilitado }) {
-            return React.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Alterar permissões de acesso',
-                    disabled: desabilitado,
-                    onPress: () => aoAlterar([...permissoesSelecionadas, 'ciclo.fluxo_menstrual'])
-                },
-                React.createElement(Text, null, 'Permissões de Acesso')
-            );
-        }
-    };
-});
+        return {
+            PermissionGroups({ permissoesSelecionadas, aoAlterar, desabilitado }) {
+                return React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Alterar permissões de acesso',
+                        disabled: desabilitado,
+                        onPress: () =>
+                            aoAlterar([...permissoesSelecionadas, 'ciclo.fluxo_menstrual'])
+                    },
+                    React.createElement(Text, null, 'Permissões de Acesso')
+                );
+            }
+        };
+    }
+);
 
 jest.mock(
     '../../../../src/features/support-network/components/PermissionBulkSelector/PermissionBulkSelector',

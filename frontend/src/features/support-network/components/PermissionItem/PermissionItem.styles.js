@@ -1,7 +1,7 @@
 //Define o visual das permissões individuais exibidas dentro dos grupos.
 import { StyleSheet } from 'react-native';
-import { fontFamilies } from '../../../shared/theme';
-import { temaClaro } from '../../../shared/theme/themePalettes';
+import { fontFamilies } from '../../../../shared/theme';
+import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({

@@ -6,8 +6,8 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { GeneralPermissions } from '../GeneralPermissions';
-import { PermissionGroups } from '../PermissionGroups';
+import { GeneralPermissions } from '../GeneralPermissions/GeneralPermissions';
+import { PermissionGroups } from '../PermissionGroups/PermissionGroups';
 import {
     PermissionBulkSelector,
     normalizarPermissoesSelecionadas

@@ -1,7 +1,7 @@
 //Define a organização da seção que reúne todos os grupos de permissões.
 import { StyleSheet } from 'react-native';
-import { fontFamilies } from '../../../shared/theme';
-import { temaClaro } from '../../../shared/theme/themePalettes';
+import { fontFamilies } from '../../../../shared/theme';
+import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({

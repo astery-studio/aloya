@@ -2,7 +2,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
+import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchField';
 import {
     CaretDownIcon,
     CaretUpIcon,
@@ -12,9 +12,9 @@ import {
     LightningIcon,
     PersonArmsSpreadIcon,
     UsersIcon
-} from '../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../shared/hooks/useTheme';
-import PermissionItem from './PermissionItem';
+} from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import PermissionItem from '../PermissionItem/PermissionItem';
 import { criarEstilos } from './PermissionGroup.styles';
 
 //Recebe o nome da paleta e devolve somente uma paleta conhecida pelo aplicativo.

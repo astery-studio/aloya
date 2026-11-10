@@ -2,7 +2,7 @@
 import { memo, useMemo } from 'react';
 import { Text, View } from 'react-native';
 
-import { useTheme } from '../../../shared/hooks/useTheme';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './PermissionCounter.styles';
 
 //Recebe qualquer valor e devolve somente um número inteiro igual ou maior que zero.
