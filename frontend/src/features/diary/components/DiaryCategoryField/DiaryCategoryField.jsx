@@ -27,8 +27,12 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 aoAlterar={aoAlterar}
                 unidade={categoria.unidade}
                 casasDecimais={categoria.casasDecimais}
-                valorMinimo={Number(categoria.valorMinimo)}
-                valorMaximo={Number(categoria.valorMaximo)}
+                valorMinimo={
+                    categoria.valorMinimo === null ? undefined : Number(categoria.valorMinimo)
+                }
+                valorMaximo={
+                    categoria.valorMaximo === null ? undefined : Number(categoria.valorMaximo)
+                }
                 desativado={desabilitado}
                 rotuloAcessibilidade={categoria.nome}
             />
