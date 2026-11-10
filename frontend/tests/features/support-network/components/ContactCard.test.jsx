@@ -210,6 +210,27 @@ describe('ContactCard', () => {
             />
         );
 
+        expect(screen.getByText('Pendente')).toBeOnTheScreen();
+
+        expect(screen.getByTestId('pending-contact-icon')).toHaveStyle({
+            width: 35.993,
+            height: 35.993,
+            borderRadius: 10,
+            borderWidth: 0.705,
+            borderColor: '#5C5C59',
+            backgroundColor: 'rgba(92, 92, 89, 0.20)'
+        });
+
+        expect(screen.getByText(/Tipo de Vínculo:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/Data de Convite:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/Aguardando há:/u)).toBeOnTheScreen();
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Abrir resumo de permissões de Julia'
+            })
+        ).toBeOnTheScreen();
+
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Reenviar convite para Julia'
@@ -217,6 +238,27 @@ describe('ContactCard', () => {
         );
 
         expect(aoAcao).toHaveBeenCalledWith('reenviar', conviteRecebido);
+    });
+
+    test('cancela o convite enviado pendente pelo cabeçalho', async () => {
+        const aoAcao = jest.fn();
+
+        await render(
+            <ContactCard
+                contato={conviteRecebido}
+                perspectiva="enviado"
+                aoAcao={aoAcao}
+                aoAbrirResumo={jest.fn()}
+            />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Cancelar convite de Julia'
+            })
+        );
+
+        expect(aoAcao).toHaveBeenCalledWith('remover', conviteRecebido);
     });
 
     test('bloqueia ações concorrentes', async () => {

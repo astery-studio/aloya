@@ -23,6 +23,13 @@ function criarEstilos(tema) {
             opacity: 0.68
         },
 
+        cartaoPendenteEnviado: {
+            paddingTop: 14,
+            paddingRight: 16,
+            paddingBottom: 18,
+            paddingLeft: 16
+        },
+
         cabecalho: {
             width: '100%',
             minHeight: 36,
@@ -30,6 +37,58 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center'
+        },
+
+        cabecalhoPendenteEnviado: {
+            justifyContent: 'flex-start',
+            gap: 10
+        },
+
+        iconePendente: {
+            width: 35.993,
+            height: 35.993,
+            flexShrink: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 0.705,
+            borderColor: '#5C5C59',
+            borderRadius: 10,
+            backgroundColor: 'rgba(92, 92, 89, 0.20)'
+        },
+
+        containerNomePendente: {
+            minWidth: 0,
+            height: 23.999,
+            flex: 1,
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            alignSelf: 'stretch',
+            justifyContent: 'center'
+        },
+
+        nomePendente: {
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 16,
+            fontWeight: '700',
+            lineHeight: 24,
+            includeFontPadding: false
+        },
+
+        botaoCancelarPendente: {
+            width: 35.993,
+            height: 35.993,
+            flexShrink: 0,
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+
+        acaoPressionada: {
+            opacity: 0.65
+        },
+
+        acaoDesabilitada: {
+            opacity: 0.4
         },
 
         avatarCabecalho: {
@@ -188,6 +247,25 @@ function criarEstilos(tema) {
         botaoRecebido: {
             height: 36,
             minHeight: 36,
+            flex: 1,
+            paddingHorizontal: 14,
+            borderRadius: 10,
+            backgroundColor: '#2C4C3B'
+        },
+
+        containerReenvio: {
+            width: '100%',
+            height: 55.993,
+            paddingTop: 8,
+            paddingBottom: 6,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10
+        },
+
+        botaoReenvio: {
+            height: 35.993,
+            minHeight: 35.993,
             flex: 1,
             paddingHorizontal: 14,
             borderRadius: 10,

@@ -1,17 +1,17 @@
 //Apresenta identificação, vínculo, status e ações de um contato.
 import { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
-    ArrowsClockwiseIcon,
     CheckCircleIcon,
     ClockIcon,
     EnvelopeIcon,
     HandshakeIcon,
     HourglassLowIcon,
     InfoIcon,
+    PaperPlaneTiltIcon,
     PencilSimpleIcon,
     TrashIcon,
     XCircleIcon
@@ -166,44 +166,84 @@ function ContactCard({
         <View
             testID="contact-card"
             accessible={false}
-            style={[estilos.cartao, bloqueado && estilos.cartaoDesabilitado]}
+            style={[
+                estilos.cartao,
+                conviteEnviadoPendente && estilos.cartaoPendenteEnviado,
+                bloqueado && estilos.cartaoDesabilitado
+            ]}
         >
-            <View style={estilos.cabecalho}>
-                <View style={estilos.avatarCabecalho}>
-                    <ContactAvatar
-                        iconeId={contato?.iconeId ?? 'pessoa'}
-                        corId={contato?.corId ?? 'branco'}
-                        tamanho="pequeno"
-                        rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
-                    />
-                </View>
+            <View
+                style={[
+                    estilos.cabecalho,
+                    conviteEnviadoPendente && estilos.cabecalhoPendenteEnviado
+                ]}
+            >
+                {conviteEnviadoPendente ? (
+                    <>
+                        <View
+                            testID="pending-contact-icon"
+                            importantForAccessibility="no"
+                            style={estilos.iconePendente}
+                        >
+                            <EnvelopeIcon size={16} color="#5C5C59" weight="regular" />
+                        </View>
 
-                <View
-                    testID="contact-card-centered-name"
-                    pointerEvents="none"
-                    style={estilos.containerNomeCentralizado}
-                >
-                    <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nome}>
-                        {identificacao}
-                    </Text>
-                </View>
+                        <View style={estilos.containerNomePendente}>
+                            <Text style={estilos.nomePendente}>Pendente</Text>
+                        </View>
 
-                {perspectivaSegura === 'enviado' ? (
+                        <Pressable
+                            onPress={() => executarAcao('remover')}
+                            disabled={bloqueado}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Cancelar convite de ${identificacao}`}
+                            accessibilityState={{
+                                disabled: bloqueado
+                            }}
+                            hitSlop={4}
+                            style={({ pressed }) => [
+                                estilos.botaoCancelarPendente,
+                                pressed && !bloqueado && estilos.acaoPressionada,
+                                bloqueado && estilos.acaoDesabilitada
+                            ]}
+                        >
+                            <XCircleIcon
+                                size={18}
+                                color={tema.cores.feedback.erro}
+                                weight="regular"
+                            />
+                        </Pressable>
+                    </>
+                ) : (
+                    <>
+                        <View style={estilos.avatarCabecalho}>
+                            <ContactAvatar
+                                iconeId={contato?.iconeId ?? 'pessoa'}
+                                corId={contato?.corId ?? 'branco'}
+                                tamanho="pequeno"
+                                rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
+                            />
+                        </View>
+
+                        <View
+                            testID="contact-card-centered-name"
+                            pointerEvents="none"
+                            style={estilos.containerNomeCentralizado}
+                        >
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nome}>
+                                {identificacao}
+                            </Text>
+                        </View>
+                    </>
+                )}
+
+                {perspectivaSegura === 'enviado' && !conviteEnviadoPendente ? (
                     <View style={estilos.acoesCompactas}>
                         {contatoEnviadoAtivo ? (
                             <IconButton
                                 icone={PencilSimpleIcon}
                                 aoPressionar={() => executarAcao('alterar_vinculo')}
                                 rotuloAcessibilidade={`Alterar vínculo de ${identificacao}`}
-                                desativado={bloqueado}
-                            />
-                        ) : null}
-
-                        {conviteEnviadoPendente ? (
-                            <IconButton
-                                icone={ArrowsClockwiseIcon}
-                                aoPressionar={() => executarAcao('reenviar')}
-                                rotuloAcessibilidade={`Reenviar convite para ${identificacao}`}
                                 desativado={bloqueado}
                             />
                         ) : null}
@@ -240,7 +280,7 @@ function ContactCard({
                         icone={HandshakeIcon}
                         corIcone={CORES_INFORMACOES.vinculo}
                         identificador="vinculo"
-                        rotulo="Vínculo solicitado"
+                        rotulo={conviteEnviadoPendente ? 'Tipo de Vínculo' : 'Vínculo solicitado'}
                         valor={rotuloVinculo}
                         estilos={estilos}
                     />
@@ -249,7 +289,7 @@ function ContactCard({
                         icone={ClockIcon}
                         corIcone={CORES_INFORMACOES.data}
                         identificador="data"
-                        rotulo="Data de envio"
+                        rotulo={conviteEnviadoPendente ? 'Data de Convite' : 'Data de envio'}
                         valor={dataConvite}
                         estilos={estilos}
                     />
@@ -259,8 +299,11 @@ function ContactCard({
                             icone={HourglassLowIcon}
                             corIcone={CORES_INFORMACOES.aguardando}
                             identificador="aguardando"
-                            rotulo="Aguardando"
-                            valor={rotuloEspera.replace(/^Aguardando\s*/u, '')}
+                            rotulo={conviteEnviadoPendente ? 'Aguardando há' : 'Aguardando'}
+                            valor={rotuloEspera.replace(
+                                conviteEnviadoPendente ? /^Aguardando\s+há\s*/u : /^Aguardando\s*/u,
+                                ''
+                            )}
                             estilos={estilos}
                         />
                     ) : null}
@@ -312,6 +355,24 @@ function ContactCard({
                             />
                         </View>
                     </View>
+                </View>
+            ) : null}
+
+            {conviteEnviadoPendente ? (
+                <View style={estilos.containerReenvio}>
+                    <ButtonScreen
+                        texto="Reenviar Convite"
+                        variante="verde"
+                        icone={PaperPlaneTiltIcon}
+                        tamanhoIcone={13}
+                        corConteudo="#FFFFFF"
+                        aoPressionar={() => executarAcao('reenviar')}
+                        rotuloAcessibilidade={`Reenviar convite para ${identificacao}`}
+                        carregando={acaoEmAndamento === 'reenviar'}
+                        desativado={bloqueado}
+                        estilo={estilos.botaoReenvio}
+                        estiloTexto={estilos.textoBotao}
+                    />
                 </View>
             ) : null}
 

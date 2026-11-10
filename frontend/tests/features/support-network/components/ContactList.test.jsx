@@ -240,7 +240,7 @@ describe('ContactList', () => {
             />
         );
 
-        expect(screen.getByText('Ana')).toBeOnTheScreen();
+        expect(screen.getByText(/ana@example\.com/u)).toBeOnTheScreen();
 
         expect(screen.getByLabelText('Atualizando contatos')).toBeOnTheScreen();
     });
