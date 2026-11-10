@@ -110,7 +110,7 @@ const contatos = [
 ];
 
 describe('ContactList', () => {
-    test('ordena os quatro estados e alfabeticamente', () => {
+    test('ordena os grupos e apresenta convites mais recentes primeiro', () => {
         expect(ordenarContatos(contatos).map((contato) => contato.identificacao)).toEqual([
             'Ana',
             'Carlos',
@@ -118,6 +118,75 @@ describe('ContactList', () => {
             'Daniela',
             'Ester'
         ]);
+    });
+
+    test('ordena convites pela data mesmo quando o nome sugere outra ordem', () => {
+        const convites = [
+            {
+                id: 10,
+                identificacao: 'Ana',
+                status: 'pendente',
+                dataConvite: '2026-10-01T10:00:00.000Z'
+            },
+            {
+                id: 11,
+                identificacao: 'Zuleica',
+                status: 'pendente',
+                dataConvite: '2026-11-01T10:00:00.000Z'
+            },
+            {
+                id: 12,
+                identificacao: 'Beatriz',
+                status: 'recusado',
+                dataConvite: '2026-09-01T10:00:00.000Z'
+            },
+            {
+                id: 13,
+                identificacao: 'Yara',
+                status: 'recusado',
+                dataConvite: '2026-10-01T10:00:00.000Z'
+            }
+        ];
+
+        expect(ordenarContatos(convites).map((contato) => contato.identificacao)).toEqual([
+            'Zuleica',
+            'Ana',
+            'Yara',
+            'Beatriz'
+        ]);
+    });
+
+    test('mantém a ordenação alfabética de contatos ativos e inativos', () => {
+        const contatosSemConvite = [
+            {
+                id: 20,
+                identificacao: 'Zuleica',
+                status: 'ativo',
+                dataConvite: '2026-11-01T10:00:00.000Z'
+            },
+            {
+                id: 21,
+                identificacao: 'Ana',
+                status: 'ativo',
+                dataConvite: '2026-10-01T10:00:00.000Z'
+            },
+            {
+                id: 22,
+                identificacao: 'Yara',
+                status: 'inativo',
+                dataConvite: '2026-11-01T10:00:00.000Z'
+            },
+            {
+                id: 23,
+                identificacao: 'Beatriz',
+                status: 'inativo',
+                dataConvite: '2026-10-01T10:00:00.000Z'
+            }
+        ];
+
+        expect(ordenarContatos(contatosSemConvite).map((contato) => contato.identificacao)).toEqual(
+            ['Ana', 'Zuleica', 'Beatriz', 'Yara']
+        );
     });
 
     test('agrupa os contatos por estado', () => {

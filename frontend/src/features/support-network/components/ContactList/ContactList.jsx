@@ -24,6 +24,8 @@ const ORDEM_STATUS = Object.freeze({
     recusado: 3
 });
 
+const STATUS_ORDENADOS_POR_DATA = new Set(['pendente', 'recusado']);
+
 const GRUPOS_CONTATOS = Object.freeze([
     Object.freeze({
         status: 'pendente',
@@ -64,6 +66,12 @@ function obterIdentificacaoOrdenacao(contato) {
     return identificacao?.trim() ?? '';
 }
 
+function obterDataConviteOrdenacao(contato) {
+    const data = Date.parse(contato?.dataConvite ?? contato?.dataEnvio ?? '');
+
+    return Number.isFinite(data) ? data : null;
+}
+
 function ordenarContatos(contatos) {
     if (!Array.isArray(contatos)) {
         return [];
@@ -77,6 +85,15 @@ function ordenarContatos(contatos) {
 
             if (prioridade !== 0) {
                 return prioridade;
+            }
+
+            if (STATUS_ORDENADOS_POR_DATA.has(primeiro.status)) {
+                const dataPrimeiro = obterDataConviteOrdenacao(primeiro);
+                const dataSegundo = obterDataConviteOrdenacao(segundo);
+
+                if (dataPrimeiro !== null && dataSegundo !== null && dataPrimeiro !== dataSegundo) {
+                    return dataSegundo - dataPrimeiro;
+                }
             }
 
             const porNome = obterIdentificacaoOrdenacao(primeiro).localeCompare(
@@ -364,6 +381,7 @@ function Separador({ estilo }) {
 export {
     GRUPOS_CONTATOS,
     ORDEM_STATUS,
+    STATUS_ORDENADOS_POR_DATA,
     ContactList,
     MENSAGEM_ERRO,
     MENSAGEM_VAZIA_ENVIADA,
