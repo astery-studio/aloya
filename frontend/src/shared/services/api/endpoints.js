@@ -30,6 +30,7 @@ const endpoints = Object.freeze({
         `${caminhoContatosRedeApoio}/${contatoId}/resend-invitation`,
     removerContatoRedeApoio: (contatoId) => `${caminhoContatosRedeApoio}/${contatoId}`,
     desativarContatoRedeApoio: (contatoId) => `${caminhoContatosRedeApoio}/${contatoId}/deactivate`,
+    vinculoContatoRedeApoio: (contatoId) => `${caminhoContatosRedeApoio}/${contatoId}/link`,
     contatosRecebidos: '/support-network/received-contacts',
     responderContatoRecebido: (conviteId) =>
         `/support-network/received-contacts/${conviteId}/respond`,

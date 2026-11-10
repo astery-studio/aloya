@@ -13,6 +13,7 @@ import { criarCycleRemovalService } from '../features/cycles/services/cycleRemov
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
 import { criarContactInvitationService } from '../features/support-network/services/contactInvitationService';
+import { criarContactLinkService } from '../features/support-network/services/contactLinkService';
 import { criarReceivedContactsService } from '../features/support-network/services/receivedContactsService';
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService';
 import { criarSupportContactService } from '../features/support-network/services/supportContactService';
@@ -112,6 +113,10 @@ function criarServicosApp({
         requisicaoAutenticada
     });
 
+    const contactLinkService = criarContactLinkService({
+        requisicaoAutenticada
+    });
+
     const supportContactService = criarSupportContactService({
         requisicaoAutenticada
     });
@@ -154,6 +159,7 @@ function criarServicosApp({
         cycleHistoryService,
         supportCategoryService,
         contactInvitationService,
+        contactLinkService,
         supportContactService,
         receivedContactsService,
         cyclePredictionService,
