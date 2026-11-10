@@ -1,24 +1,20 @@
-//Define os estados visuais dos filtros compactos de contatos.
+//Define a aparência dos chips de estado e permissão.
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
 
-function criarEstilos(tema) {
+function criarEstilos() {
     return StyleSheet.create({
         container: {
             minHeight: 36,
             maxWidth: '100%',
             paddingVertical: 7,
-            paddingHorizontal: 14,
+            paddingHorizontal: 12,
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            borderWidth: 1,
+            gap: 5,
             borderRadius: 999
-        },
-
-        containerNaoSelecionado: {
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.superficie
         },
 
         texto: {
@@ -30,10 +26,6 @@ function criarEstilos(tema) {
             lineHeight: 19.5,
             includeFontPadding: false,
             textAlign: 'center'
-        },
-
-        textoNaoSelecionado: {
-            color: tema.cores.interface.textoSecundario
         },
 
         pressionado: {
@@ -50,25 +42,27 @@ function criarEstilos(tema) {
 function criarVariantes(tema) {
     return Object.freeze({
         estado: Object.freeze({
-            containerSelecionado: Object.freeze({
-                borderColor: tema.cores.interface.destaque,
-                backgroundColor: tema.cores.interface.destaque
+            container: Object.freeze({
+                backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.14)' : '#F7F0E6'
             }),
 
-            textoSelecionado: Object.freeze({
-                color: tema.cores.interface.textoSobreDestaque
-            })
+            texto: Object.freeze({
+                color: tema.escuro ? '#F2B45F' : '#B07D2A'
+            }),
+
+            corIndicador: tema.escuro ? '#F2B45F' : '#B07D2A'
         }),
 
         permissao: Object.freeze({
-            containerSelecionado: Object.freeze({
-                borderColor: tema.escuro ? '#F08A75' : '#C85A44',
-                backgroundColor: tema.escuro ? '#F08A75' : '#C85A44'
+            container: Object.freeze({
+                backgroundColor: tema.escuro ? 'rgba(159, 214, 182, 0.14)' : '#EDF0EE'
             }),
 
-            textoSelecionado: Object.freeze({
-                color: tema.escuro ? '#181C1A' : '#FFFFFF'
-            })
+            texto: Object.freeze({
+                color: tema.escuro ? '#9FD6B6' : '#2C4C3B'
+            }),
+
+            corIndicador: tema.escuro ? '#9FD6B6' : '#2C4C3B'
         })
     });
 }

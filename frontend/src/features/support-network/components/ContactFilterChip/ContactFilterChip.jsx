@@ -2,6 +2,7 @@
 import { useMemo } from 'react';
 import { Pressable, Text } from 'react-native';
 
+import { CheckCircleIcon, CircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos, criarVariantes } from './ContactFilterChip.styles';
 
@@ -39,7 +40,9 @@ function ContactFilterChip({
     const rotuloSeguro = normalizarRotulo(rotulo);
 
     const bloqueado = desabilitado || typeof aoPressionar !== 'function';
+
     const variante = variantes[grupoSeguro];
+    const IconeEstado = selecionado ? CheckCircleIcon : CircleIcon;
 
     function alternarSelecao() {
         if (!bloqueado) {
@@ -49,10 +52,10 @@ function ContactFilterChip({
 
     return (
         <Pressable
-            testID={`contact-filter-chip-${grupoSeguro}`}
+            testID={`contact-filter-chip-${grupoSeguro}-${rotuloSeguro}`}
             accessibilityRole="checkbox"
             accessibilityLabel={`${rotuloSeguro}, filtro de ${
-                grupoSeguro === 'estado' ? 'estado' : 'permissão'
+                grupoSeguro === 'estado' ? 'tipo de contato' : 'tipo de permissão'
             }`}
             accessibilityState={{
                 checked: Boolean(selecionado),
@@ -63,18 +66,19 @@ function ContactFilterChip({
             onPress={alternarSelecao}
             style={({ pressed }) => [
                 estilos.container,
-                selecionado ? variante.containerSelecionado : estilos.containerNaoSelecionado,
+                variante.container,
                 pressed && !bloqueado && estilos.pressionado,
                 bloqueado && estilos.desabilitado
             ]}
         >
-            <Text
-                numberOfLines={1}
-                style={[
-                    estilos.texto,
-                    selecionado ? variante.textoSelecionado : estilos.textoNaoSelecionado
-                ]}
-            >
+            <IconeEstado
+                testID={`contact-filter-indicator-${grupoSeguro}-${rotuloSeguro}`}
+                size={22}
+                color={variante.corIndicador}
+                weight={selecionado ? 'fill' : 'regular'}
+            />
+
+            <Text numberOfLines={1} style={[estilos.texto, variante.texto]}>
                 {rotuloSeguro}
             </Text>
         </Pressable>
