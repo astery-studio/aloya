@@ -22,10 +22,12 @@ test('envia convite informando que nenhum acesso foi concedido', async () => {
     });
 
     assert.equal(mensagem.to, 'contato@example.com');
-    assert.match(mensagem.subject, /Rede de Apoio/u);
-    assert.match(mensagem.text, /Crie sua conta/u);
+    assert.equal(mensagem.subject, 'Você foi convidado(a) para uma Rede de Apoio');
+    assert.match(mensagem.text, /criar seu cadastro gratuitamente/u);
     assert.match(mensagem.text, /Nenhum dado será compartilhado/u);
-    assert.match(mensagem.html, /Criar minha conta/u);
+    assert.match(mensagem.html, /CRIAR MINHA CONTA/u);
+    assert.match(mensagem.html, /background:#C85A44/u);
+    assert.match(mensagem.html, /Equipe ALOYA/u);
     assert.equal(mensagem.html.includes('Ana <script>'), false);
     assert.match(mensagem.html, /Ana &lt;script&gt;/u);
 });
@@ -48,6 +50,6 @@ test('orienta conta cadastrada a aceitar diretamente no aplicativo', async () =>
     });
 
     assert.match(mensagem.text, /Abra o Aloya/u);
-    assert.doesNotMatch(mensagem.text, /Crie sua conta/u);
-    assert.match(mensagem.html, /Ver convite/u);
+    assert.doesNotMatch(mensagem.text, /criar seu cadastro gratuitamente/u);
+    assert.match(mensagem.html, /VER CONVITE/u);
 });

@@ -144,30 +144,41 @@ function criarEmailService({ transporter, remetente }) {
         const nomeSeguro = escaparHtml(nomeTitular);
         const linkSeguro = escaparHtml(linkConvite);
         const orientacao = requerCadastro
-            ? 'Crie sua conta de contato no Aloya e, em seguida, aceite o convite.'
+            ? 'Para participar, é necessário possuir uma conta em nosso aplicativo. Caso ainda não tenha uma, você poderá criar seu cadastro gratuitamente e, em seguida, aceitar o convite para integrar essa Rede de Apoio.'
             : 'Abra o Aloya e aceite o convite para entrar na Rede de Apoio.';
-        const rotuloAcao = requerCadastro ? 'Criar minha conta' : 'Ver convite';
+        const rotuloAcao = requerCadastro ? 'CRIAR MINHA CONTA' : 'VER CONVITE';
+        const introducao = `${nomeTitular} convidou você para fazer parte de sua Rede de Apoio no Aloya.`;
 
         await transporter.sendMail({
             from: remetente,
             to: email,
-            subject: 'Convite para a Rede de Apoio — ALOYA',
-            text: `${nomeTitular} convidou você para participar da Rede de Apoio no Aloya.\n\n${orientacao}\n${linkConvite}\n\nNenhum dado será compartilhado antes da sua aceitação.`,
+            subject: 'Você foi convidado(a) para uma Rede de Apoio',
+            text: `Olá!\n\n${introducao}\n\nA Rede de Apoio é um recurso que permite que pessoas de confiança façam parte de uma rede de cuidado e suporte, oferecendo acolhimento e acompanhando o titular em sua jornada de autocuidado.\n\n${orientacao}\n\nPara começar, acesse:\n${linkConvite}\n\nApós concluir o cadastro, você poderá acessar o convite e decidir se deseja aceitar a participação na Rede de Apoio.\n\nNenhum dado será compartilhado antes que você aceite explicitamente este convite.\n\nAgradecemos pela disposição em fazer parte dessa rede de cuidado, confiança e acolhimento!\n\nAtenciosamente,\nEquipe ALOYA`,
             html: `
-                <main style="max-width:600px;margin:auto;padding:32px;font-family:Arial,sans-serif;color:#222;background:#F7F5F0;border-radius:12px;line-height:1.6;">
-                    <h1 style="color:#2C4C3B;font-size:24px;">Convite para a Rede de Apoio</h1>
-                    <p><strong>${nomeSeguro}</strong> convidou você para participar da Rede de Apoio no Aloya.</p>
-                    <p>${escaparHtml(orientacao)}</p>
-                    <p style="margin:32px 0;text-align:center;">
-                        <a href="${linkSeguro}" style="display:inline-block;padding:14px 24px;border-radius:10px;background:#2C4C3B;color:#FFF;text-decoration:none;font-weight:bold;">
+                <main style="max-width:640px;margin:0 auto;padding:32px 24px;font-family:Arial,Helvetica,sans-serif;color:#222;background:#FFF;font-size:16px;line-height:1.65;">
+                    <p style="margin:0 0 42px;">Olá!</p>
+                    <p style="margin:0 0 24px;">
+                        Você recebeu este e-mail porque <strong>${nomeSeguro}</strong>, que utiliza nosso aplicativo, convidou você para fazer parte de sua <strong>Rede de Apoio!</strong>
+                    </p>
+                    <p style="margin:0 0 24px;">
+                        A Rede de Apoio é um recurso que permite que pessoas de confiança façam parte de uma rede de cuidado e suporte, oferecendo acolhimento e acompanhando o titular em sua jornada de autocuidado.
+                    </p>
+                    <p style="margin:0 0 24px;">${escaparHtml(orientacao)}</p>
+                    <p style="margin:0 0 20px;">Para começar, clique no botão abaixo e ${requerCadastro ? 'crie sua conta' : 'veja seu convite'}:</p>
+                    <p style="margin:0 0 28px;">
+                        <a href="${linkSeguro}" style="display:block;box-sizing:border-box;width:100%;padding:15px 24px;border-radius:10px;background:#C85A44;color:#FFF;text-align:center;text-decoration:none;font-size:16px;font-weight:700;">
                             ${rotuloAcao}
                         </a>
                     </p>
-                    <p style="font-size:13px;color:#5C5C59;">
-                        Nenhum dado será compartilhado antes que você aceite explicitamente este convite.
+                    <p style="margin:0 0 24px;">
+                        Após concluir ${requerCadastro ? 'o cadastro' : 'o acesso'}, você poderá acessar o convite e decidir se deseja aceitar a participação na Rede de Apoio.
                     </p>
-                    <p style="font-size:13px;color:#5C5C59;">
-                        O link expira em 7 dias. Se você não reconhece o convite, ignore esta mensagem.
+                    <p style="margin:0 0 24px;">
+                        Agradecemos pela disposição em fazer parte dessa rede de cuidado, confiança e acolhimento!
+                    </p>
+                    <p style="margin:0;">Atenciosamente,<br><strong>Equipe ALOYA</strong></p>
+                    <p style="margin:28px 0 0;color:#5C5C59;font-size:13px;">
+                        Nenhum dado será compartilhado antes que você aceite explicitamente este convite. O link expira em 7 dias.
                     </p>
                 </main>
             `
