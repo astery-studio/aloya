@@ -34,7 +34,6 @@ function useDiaryCatalog({ ativo, service, onSessaoExpirada }) {
                 if (controleAtual.current === controle) controleAtual.current = null;
             });
 
-        return () => controle.abort();
     }, [ativo, onSessaoExpirada, service]);
 
     useEffect(() => {
