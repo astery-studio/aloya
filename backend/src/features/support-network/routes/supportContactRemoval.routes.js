@@ -16,9 +16,13 @@ function criarSupportContactRemovalRoutes({
     }
 
     const router = Router();
-    router.use(authMiddleware.autenticar);
-    router.use(parentalConsentMiddleware.exigirAcessoRedeApoio);
-    router.delete('/contacts/:contatoId', rateLimit, controller.remover);
+    router.delete(
+        '/contacts/:contatoId',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        rateLimit,
+        controller.remover
+    );
     return router;
 }
 

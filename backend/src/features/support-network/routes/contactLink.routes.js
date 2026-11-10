@@ -17,10 +17,19 @@ function criarContactLinkRoutes({
     }
 
     const router = Router();
-    router.use(authMiddleware.autenticar);
-    router.use(parentalConsentMiddleware.exigirAcessoRedeApoio);
-    router.get('/contacts/:contatoId/link', controller.consultar);
-    router.patch('/contacts/:contatoId/link', rateLimit, controller.atualizar);
+    router.get(
+        '/contacts/:contatoId/link',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        controller.consultar
+    );
+    router.patch(
+        '/contacts/:contatoId/link',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        rateLimit,
+        controller.atualizar
+    );
     return router;
 }
 

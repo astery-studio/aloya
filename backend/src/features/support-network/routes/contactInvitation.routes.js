@@ -31,15 +31,26 @@ function criarContactInvitationRoutes({
         responseRateLimit,
         responseController.cadastrarContato
     );
-    router.use(authMiddleware.autenticar);
     router.post(
         '/contact-invitations/:token/respond',
+        authMiddleware.autenticar,
         responseRateLimit,
         responseController.responder
     );
-    router.use(parentalConsentMiddleware.exigirAcessoRedeApoio);
-    router.post('/contact-invitations/lookup', lookupRateLimit, controller.consultarEmail);
-    router.post('/contact-invitations', rateLimit, controller.criarConvite);
+    router.post(
+        '/contact-invitations/lookup',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        lookupRateLimit,
+        controller.consultarEmail
+    );
+    router.post(
+        '/contact-invitations',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        rateLimit,
+        controller.criarConvite
+    );
     return router;
 }
 

@@ -66,19 +66,31 @@ test('protege consulta e criação antes de executar os controllers', () => {
             '/contact-invitations/:token/register',
             [handlers.responseRateLimit, handlers.cadastrarContato]
         ],
-        ['use', null, [handlers.autenticar]],
         [
             'post',
             '/contact-invitations/:token/respond',
-            [handlers.responseRateLimit, handlers.responder]
+            [handlers.autenticar, handlers.responseRateLimit, handlers.responder]
         ],
-        ['use', null, [handlers.exigirAcessoRedeApoio]],
         [
             'post',
             '/contact-invitations/lookup',
-            [handlers.lookupRateLimit, handlers.consultarEmail]
+            [
+                handlers.autenticar,
+                handlers.exigirAcessoRedeApoio,
+                handlers.lookupRateLimit,
+                handlers.consultarEmail
+            ]
         ],
-        ['post', '/contact-invitations', [handlers.rateLimit, handlers.criarConvite]]
+        [
+            'post',
+            '/contact-invitations',
+            [
+                handlers.autenticar,
+                handlers.exigirAcessoRedeApoio,
+                handlers.rateLimit,
+                handlers.criarConvite
+            ]
+        ]
     ]);
 });
 

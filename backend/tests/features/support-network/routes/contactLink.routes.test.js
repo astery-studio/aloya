@@ -32,10 +32,15 @@ test('protege consulta e atualização antes dos controllers', () => {
 
     assert.equal(resultado, router);
     assert.deepEqual(chamadas, [
-        ['use', autenticar],
-        ['use', exigirAcessoRedeApoio],
-        ['get', '/contacts/:contatoId/link', consultar],
-        ['patch', '/contacts/:contatoId/link', rateLimit, atualizar]
+        ['get', '/contacts/:contatoId/link', autenticar, exigirAcessoRedeApoio, consultar],
+        [
+            'patch',
+            '/contacts/:contatoId/link',
+            autenticar,
+            exigirAcessoRedeApoio,
+            rateLimit,
+            atualizar
+        ]
     ]);
 });
 

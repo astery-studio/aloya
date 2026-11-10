@@ -41,12 +41,23 @@ test('protege a listagem antes de executar o controller', () => {
 
     assert.equal(resultado, router);
     assert.deepEqual(chamadas, [
-        ['use', autenticar],
-        ['get', '/received-contacts', listarRecebidos],
-        ['post', '/received-contacts/:conviteId/respond', responseRateLimit, responderRecebido],
-        ['use', exigirAcessoRedeApoio],
-        ['get', '/contacts', listar],
-        ['post', '/contacts/:contatoId/resend-invitation', rateLimit, reenviarConvite]
+        ['get', '/received-contacts', autenticar, listarRecebidos],
+        [
+            'post',
+            '/received-contacts/:conviteId/respond',
+            autenticar,
+            responseRateLimit,
+            responderRecebido
+        ],
+        ['get', '/contacts', autenticar, exigirAcessoRedeApoio, listar],
+        [
+            'post',
+            '/contacts/:contatoId/resend-invitation',
+            autenticar,
+            exigirAcessoRedeApoio,
+            rateLimit,
+            reenviarConvite
+        ]
     ]);
 });
 

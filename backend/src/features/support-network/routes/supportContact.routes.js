@@ -21,16 +21,26 @@ function criarSupportContactRoutes({
     }
 
     const router = Router();
-    router.use(authMiddleware.autenticar);
-    router.get('/received-contacts', controller.listarRecebidos);
+    router.get('/received-contacts', authMiddleware.autenticar, controller.listarRecebidos);
     router.post(
         '/received-contacts/:conviteId/respond',
+        authMiddleware.autenticar,
         responseRateLimit,
         controller.responderRecebido
     );
-    router.use(parentalConsentMiddleware.exigirAcessoRedeApoio);
-    router.get('/contacts', controller.listar);
-    router.post('/contacts/:contatoId/resend-invitation', rateLimit, controller.reenviarConvite);
+    router.get(
+        '/contacts',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        controller.listar
+    );
+    router.post(
+        '/contacts/:contatoId/resend-invitation',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        rateLimit,
+        controller.reenviarConvite
+    );
     return router;
 }
 

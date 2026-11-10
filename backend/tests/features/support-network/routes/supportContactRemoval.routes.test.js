@@ -28,9 +28,7 @@ test('protege a remoção antes de executar o controller', () => {
 
     assert.equal(resultado, router);
     assert.deepEqual(chamadas, [
-        ['use', autenticar],
-        ['use', exigirAcessoRedeApoio],
-        ['delete', '/contacts/:contatoId', rateLimit, remover]
+        ['delete', '/contacts/:contatoId', autenticar, exigirAcessoRedeApoio, rateLimit, remover]
     ]);
 });
 
