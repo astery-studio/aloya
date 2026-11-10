@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
+import DurationInput from '../../../../shared/components/forms/DurationInput/DurationInput';
+import NumberInput from '../../../../shared/components/forms/NumberInput/NumberInput';
+import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { diaryGroupPresentation } from '../../config/diaryGroupPresentation';
 import { obterApresentacaoOpcao } from '../../config/diaryOptionPresentation';
@@ -10,11 +13,54 @@ import { agruparOpcoes } from '../../utils/diaryOptionGroups';
 import { DiaryOptionIcon } from '../DiaryOptionIcon/DiaryOptionIcon';
 import { criarEstilos } from './DiaryCategoryField.styles';
 
-function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado }) {
+function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
     const selecionadas = Array.isArray(valor) ? valor : [];
+    let controle;
+
+    if (categoria.tipoValor === 'decimal_escalado') {
+        controle = (
+            <NumberInput
+                valor={valor}
+                aoAlterar={aoAlterar}
+                unidade={categoria.unidade}
+                casasDecimais={categoria.casasDecimais}
+                valorMinimo={Number(categoria.valorMinimo)}
+                valorMaximo={Number(categoria.valorMaximo)}
+                desativado={desabilitado}
+                rotuloAcessibilidade={categoria.nome}
+            />
+        );
+    } else if (categoria.tipoValor === 'duracao_minutos') {
+        controle = (
+            <DurationInput
+                valorMinutos={valor}
+                aoAlterar={aoAlterar}
+                desabilitado={desabilitado}
+                erro={erro}
+            />
+        );
+    } else if (categoria.tipoValor === 'texto') {
+        const limite = categoria.limiteCaracteres;
+        controle = (
+            <>
+                <TextInput
+                    value={valor ?? ''}
+                    onChangeText={aoAlterar}
+                    placeholder="Digite aqui sua nota..."
+                    multiline
+                    maxLength={limite}
+                    desativado={desabilitado}
+                    estiloEntrada={{ minHeight: 120, textAlignVertical: 'top' }}
+                />
+                <Text style={estilos.contador}>
+                    {[...(valor ?? '')].length} / {limite}
+                </Text>
+            </>
+        );
+    }
 
     function renderizarOpcao(opcao) {
         const apresentacao = obterApresentacaoOpcao(categoria.id, opcao);
@@ -63,6 +109,12 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     </View>
                 );
             })}
+            {controle}
+            {erro && categoria.tipoValor !== 'duracao_minutos' ? (
+                <Text accessibilityRole="alert" style={estilos.erro}>
+                    {erro}
+                </Text>
+            ) : null}
         </View>
     );
 }
