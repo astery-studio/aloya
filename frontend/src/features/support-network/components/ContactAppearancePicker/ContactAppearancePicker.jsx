@@ -189,7 +189,7 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                         maxHeight: tamanhos.tamanhoQuadroCor,
                                         backgroundColor:
                                             opcao.id === 'branco' ? opcao.fundo : opcao.cor,
-                                        borderColor: opcao.borda
+                                        borderColor: tema.cores.interface.borda
                                     },
                                     selecionada && estilos.opcaoCorSelecionada,
                                     pressed && !bloqueado && estilos.opcaoPressionada,

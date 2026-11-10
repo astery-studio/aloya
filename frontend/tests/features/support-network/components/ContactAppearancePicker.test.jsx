@@ -98,30 +98,30 @@ describe('ContactAppearancePicker', () => {
 
         expect(screen.getByTestId('icone-opcao-contato-pessoa')).toHaveProp('size', 18);
 
-        const opcaoBranca = screen.getByTestId('opcao-cor-contato-branco');
-        const opcaoCoral = screen.getByTestId('opcao-cor-contato-coral');
+        const coresEsperadas = {
+            branco: '#FFFFFF',
+            coral: '#C85A44',
+            verde: '#2C4C3B',
+            laranja: '#D68C3A',
+            azul: '#4A758E',
+            roxo: '#7B5EA7',
+            cinza: '#999999'
+        };
 
-        expect(opcaoBranca).toHaveStyle({
-            width: 34,
-            height: 34,
-            minWidth: 34,
-            minHeight: 34,
-            maxWidth: 34,
-            maxHeight: 34,
-            borderWidth: 0.7,
-            borderRadius: 9,
-            borderColor: '#E6E2D8',
-            backgroundColor: '#FFFFFF'
-        });
-
-        expect(opcaoCoral).toHaveStyle({
-            width: 34,
-            height: 34,
-            minWidth: 34,
-            minHeight: 34,
-            maxWidth: 34,
-            maxHeight: 34
-        });
+        for (const [corId, backgroundColor] of Object.entries(coresEsperadas)) {
+            expect(screen.getByTestId(`opcao-cor-contato-${corId}`)).toHaveStyle({
+                width: 34,
+                height: 34,
+                minWidth: 34,
+                minHeight: 34,
+                maxWidth: 34,
+                maxHeight: 34,
+                borderWidth: 0.7,
+                borderRadius: 9,
+                borderColor: '#E6E2D8',
+                backgroundColor
+            });
+        }
     });
 
     test('indica o ícone e a cor selecionados', async () => {
