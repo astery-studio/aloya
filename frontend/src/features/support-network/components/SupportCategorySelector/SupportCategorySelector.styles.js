@@ -68,11 +68,9 @@ function criarEstilos(tema) {
         conteudo: {
             width: '100%',
             flex: 1,
+            borderTopWidth: 0.705,
+            borderTopColor: tema.escuro ? tema.cores.interface.separador : 'rgba(44, 76, 59, 0.20)',
             backgroundColor: tema.cores.interface.superficie
-        },
-
-        lista: {
-            width: '100%'
         },
 
         conteudoLista: {
@@ -88,6 +86,11 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 12
+        },
+
+        opcaoCategoriaComDivisoria: {
+            borderTopWidth: 0.705,
+            borderTopColor: tema.escuro ? tema.cores.interface.separador : '#F0EDE8'
         },
 
         containerTextoOpcao: {

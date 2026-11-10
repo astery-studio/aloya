@@ -1,6 +1,6 @@
 //Apresenta um acordeão para selecionar uma categoria de permissão existente.
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import {
     CaretDownIcon,
@@ -70,7 +70,7 @@ function calcularAlturaSelector({ expandido, quantidadeCategorias, possuiEstado 
         return 156;
     }
 
-    return 60 + Math.min(quantidadeCategorias, 4) * 52;
+    return 60 + quantidadeCategorias * 52;
 }
 
 function SupportCategorySelector({
@@ -178,17 +178,13 @@ function SupportCategorySelector({
         }
 
         return (
-            <ScrollView
-                testID="support-category-options-scroll"
+            <View
+                testID="support-category-options"
                 accessibilityRole="radiogroup"
                 accessibilityLabel="Categorias disponíveis"
-                style={estilos.lista}
-                contentContainerStyle={estilos.conteudoLista}
-                nestedScrollEnabled
-                bounces={false}
-                showsVerticalScrollIndicator={categoriasValidas.length > 4}
+                style={estilos.conteudoLista}
             >
-                {categoriasValidas.map((categoria) => {
+                {categoriasValidas.map((categoria, indiceCategoria) => {
                     const selecionada = idsIguais(categoria.id, categoriaId);
 
                     return (
@@ -204,6 +200,7 @@ function SupportCategorySelector({
                             onPress={() => selecionarCategoria(categoria.id)}
                             style={({ pressed }) => [
                                 estilos.opcaoCategoria,
+                                indiceCategoria > 0 && estilos.opcaoCategoriaComDivisoria,
                                 pressed && !selecaoBloqueada && estilos.pressionado,
                                 selecaoBloqueada && estilos.desabilitado
                             ]}
@@ -236,7 +233,7 @@ function SupportCategorySelector({
                         </Pressable>
                     );
                 })}
-            </ScrollView>
+            </View>
         );
     }
 
@@ -296,7 +293,11 @@ function SupportCategorySelector({
                 />
             </Pressable>
 
-            {expandido ? <View style={estilos.conteudo}>{renderizarConteudo()}</View> : null}
+            {expandido ? (
+                <View testID="support-category-selector-content" style={estilos.conteudo}>
+                    {renderizarConteudo()}
+                </View>
+            ) : null}
         </View>
     );
 }

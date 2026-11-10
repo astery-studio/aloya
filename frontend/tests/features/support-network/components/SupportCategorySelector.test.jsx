@@ -85,6 +85,11 @@ describe('SupportCategorySelector', () => {
 
         expect(screen.getByTestId('icone-recolher-categorias')).toBeOnTheScreen();
 
+        expect(screen.getByTestId('support-category-selector-content')).toHaveStyle({
+            borderTopWidth: 0.705,
+            borderTopColor: 'rgba(44, 76, 59, 0.20)'
+        });
+
         expect(screen.getByTestId('support-category-selector')).toHaveStyle({
             height: 164,
             borderWidth: 1.41
@@ -109,6 +114,15 @@ describe('SupportCategorySelector', () => {
         expect(opcoes).toHaveLength(2);
         expect(opcoes[0]).toHaveAccessibleName('Família');
         expect(opcoes[1]).toHaveAccessibleName('Parceiro');
+
+        expect(opcoes[0]).not.toHaveStyle({
+            borderTopWidth: 0.705
+        });
+
+        expect(opcoes[1]).toHaveStyle({
+            borderTopWidth: 0.705,
+            borderTopColor: '#F0EDE8'
+        });
     });
 
     test('indica a categoria selecionada', async () => {
@@ -312,10 +326,32 @@ describe('SupportCategorySelector', () => {
         [{ expandido: true, quantidadeCategorias: 2 }, 164],
         [{ expandido: true, quantidadeCategorias: 3 }, 216],
         [{ expandido: true, quantidadeCategorias: 4 }, 268],
-        [{ expandido: true, quantidadeCategorias: 8 }, 268],
+        [{ expandido: true, quantidadeCategorias: 8 }, 476],
         [{ expandido: true, quantidadeCategorias: 0 }, 156],
         [{ expandido: true, quantidadeCategorias: 2, possuiEstado: true }, 156]
     ])('calcula a altura responsiva do seletor %#', (entrada, esperado) => {
         expect(calcularAlturaSelector(entrada)).toBe(esperado);
+    });
+
+    test('expande o contêiner para exibir todas as categorias sem rolagem interna', async () => {
+        const muitasCategorias = Array.from({ length: 6 }, (_, indice) => ({
+            id: indice + 1,
+            nome: `Categoria ${indice + 1}`
+        }));
+
+        await render(
+            <SupportCategorySelector
+                categorias={muitasCategorias}
+                aoSelecionar={jest.fn()}
+                inicialmenteExpandido
+            />
+        );
+
+        expect(screen.getAllByRole('radio')).toHaveLength(6);
+        expect(screen.getByTestId('support-category-selector')).toHaveStyle({
+            height: 372
+        });
+        expect(screen.getByTestId('support-category-options')).toBeOnTheScreen();
+        expect(screen.queryByTestId('support-category-options-scroll')).toBeNull();
     });
 });
