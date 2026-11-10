@@ -15,6 +15,7 @@ import { criarThemePreferenceService } from '../features/settings/services/theme
 import { criarContactInvitationService } from '../features/support-network/services/contactInvitationService';
 import { criarReceivedContactsService } from '../features/support-network/services/receivedContactsService';
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService';
+import { criarSupportContactService } from '../features/support-network/services/supportContactService';
 import { criarApiClient } from '../shared/services/api/apiClient';
 import { criarRequisicaoAutenticada } from '../shared/services/api/authenticatedRequest';
 import { lerSeguro, salvarSeguro } from '../shared/storage/secureStorage';
@@ -111,6 +112,10 @@ function criarServicosApp({
         requisicaoAutenticada
     });
 
+    const supportContactService = criarSupportContactService({
+        requisicaoAutenticada
+    });
+
     const receivedContactsService = criarReceivedContactsService({
         requisicaoAutenticada
     });
@@ -149,6 +154,7 @@ function criarServicosApp({
         cycleHistoryService,
         supportCategoryService,
         contactInvitationService,
+        supportContactService,
         receivedContactsService,
         cyclePredictionService,
         cycleParametersService,
