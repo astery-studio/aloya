@@ -57,8 +57,6 @@ test('reinicia os valores sempre que o modal abre', async () => {
 });
 
 test('não salva sem serviço configurado', async () => {
-    const { result } = await renderHook(() =>
-        useDiaryEntryForm({ ativo: true, catalogo })
-    );
+    const { result } = await renderHook(() => useDiaryEntryForm({ ativo: true, catalogo }));
     await expect(result.current.salvar()).resolves.toBe(false);
 });

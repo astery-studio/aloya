@@ -8,12 +8,18 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonSc
         </Pressable>
     );
 });
-jest.mock('../../../../src/features/diary/components/DiaryDateNavigator/DiaryDateNavigator', () => ({
-    DiaryDateNavigator: () => null
-}));
-jest.mock('../../../../src/features/diary/components/DiaryMacrocategoryList/DiaryMacrocategoryList', () => ({
-    DiaryMacrocategoryList: () => null
-}));
+jest.mock(
+    '../../../../src/features/diary/components/DiaryDateNavigator/DiaryDateNavigator',
+    () => ({
+        DiaryDateNavigator: () => null
+    })
+);
+jest.mock(
+    '../../../../src/features/diary/components/DiaryMacrocategoryList/DiaryMacrocategoryList',
+    () => ({
+        DiaryMacrocategoryList: () => null
+    })
+);
 
 import { NewDiaryEntryContent } from '../../../../src/features/diary/components/NewDiaryEntryModal/NewDiaryEntryContent';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';

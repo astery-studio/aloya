@@ -17,9 +17,16 @@ describe('DiaryOptionIcon', () => {
     beforeEach(() => jest.clearAllMocks());
 
     test('renderiza componente React com propriedades visuais', async () => {
-        await render(<DiaryOptionIcon iconeId="componente" tamanho={20} cor="#123456" weight="fill" />);
+        await render(
+            <DiaryOptionIcon iconeId="componente" tamanho={20} cor="#123456" weight="fill" />
+        );
         expect(mockIcone.mock.calls[0][0]).toEqual(
-            expect.objectContaining({ accessible: false, size: 20, color: '#123456', weight: 'fill' })
+            expect.objectContaining({
+                accessible: false,
+                size: 20,
+                color: '#123456',
+                weight: 'fill'
+            })
         );
     });
 

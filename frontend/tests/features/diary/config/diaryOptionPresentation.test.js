@@ -39,7 +39,9 @@ describe('apresentação das opções do Diário', () => {
     });
 
     test('rejeita associação desconhecida sem fallback silencioso', () => {
-        expect(obterApresentacaoOpcao('inexistente', { id: 'x', grupo: 'x', nome: 'X' })).toBeNull();
+        expect(
+            obterApresentacaoOpcao('inexistente', { id: 'x', grupo: 'x', nome: 'X' })
+        ).toBeNull();
         expect(criarSlug('  Óleo / Água  ')).toBe('oleo-agua');
     });
 });

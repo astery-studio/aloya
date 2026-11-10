@@ -1,4 +1,7 @@
-import { ERRO_CONTEUDO, prepararFormularioDiario } from '../../../../src/features/diary/utils/diaryForm';
+import {
+    ERRO_CONTEUDO,
+    prepararFormularioDiario
+} from '../../../../src/features/diary/utils/diaryForm';
 
 const catalogo = {
     macrocategorias: [

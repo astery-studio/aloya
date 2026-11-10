@@ -1,6 +1,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
-import { MENSAGEM_ERRO, useDiaryCatalog } from '../../../../src/features/diary/hooks/useDiaryCatalog';
+import {
+    MENSAGEM_ERRO,
+    useDiaryCatalog
+} from '../../../../src/features/diary/hooks/useDiaryCatalog';
 
 test('apresenta erro amigável e encerra sessão expirada', async () => {
     const onSessaoExpirada = jest.fn();
