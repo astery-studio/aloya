@@ -99,10 +99,10 @@ export default function AppModal({
                             keyboardShouldPersistTaps="handled"
                             contentContainerStyle={estilos.rolagem}
                         >
-                            <Pressable
+                            <View
                                 testID="app-modal-caixa"
                                 accessibilityViewIsModal
-                                onPress={impedirFechamentoPeloConteudo}
+                                onTouchEnd={impedirFechamentoPeloConteudo}
                                 style={[
                                     estilos.caixa,
                                     alerta
@@ -179,7 +179,7 @@ export default function AppModal({
                                         <View style={estilos.acoes}>{children}</View>
                                     ) : null}
                                 </View>
-                            </Pressable>
+                            </View>
                         </ScrollView>
                     </KeyboardAvoidingView>
                 </Pressable>

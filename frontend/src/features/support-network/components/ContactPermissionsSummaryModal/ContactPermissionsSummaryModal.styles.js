@@ -19,6 +19,7 @@ function criarEstilos(tema) {
 
         rolagemPermissoes: {
             width: '100%',
+            minHeight: 0,
             flexGrow: 0,
             flexShrink: 1
         },

@@ -80,7 +80,8 @@ describe('ContactPermissionsSummaryModal', () => {
         const rolagem = screen.getByTestId('contact-permissions-scroll');
 
         expect(screen.getByTestId('app-modal-scroll')).toHaveProp('scrollEnabled', false);
-        expect(rolagem).not.toHaveProp('scrollEnabled', false);
+        expect(rolagem).toHaveProp('scrollEnabled', true);
+        expect(rolagem).toHaveProp('nestedScrollEnabled', true);
 
         expect(within(rolagem).getByText('PERMISSÕES GERAIS')).toBeOnTheScreen();
         expect(within(rolagem).queryByText('Profissional')).toBeNull();

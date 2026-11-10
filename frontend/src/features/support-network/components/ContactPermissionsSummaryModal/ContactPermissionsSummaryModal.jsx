@@ -231,6 +231,7 @@ function ContactPermissionsSummaryModal({
                         }
                     ]}
                     contentContainerStyle={estilos.conteudoRolagem}
+                    scrollEnabled
                     nestedScrollEnabled
                     bounces={false}
                     showsVerticalScrollIndicator
