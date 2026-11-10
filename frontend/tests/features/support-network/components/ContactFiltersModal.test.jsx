@@ -246,6 +246,24 @@ describe('ContactFiltersModal', () => {
         expect(aoAplicar).not.toHaveBeenCalled();
     });
 
+    test('não fecha ao interagir com o conteúdo do modal', async () => {
+        const aoFechar = jest.fn();
+
+        await render(
+            <ContactFiltersModal
+                visivel
+                filtros={{}}
+                categorias={categorias}
+                aoAplicar={jest.fn()}
+                aoFechar={aoFechar}
+            />
+        );
+
+        await fireEvent.press(screen.getByTestId('app-modal-caixa'));
+
+        expect(aoFechar).not.toHaveBeenCalled();
+    });
+
     test('ordena e remove categorias inválidas', () => {
         expect(
             normalizarCategorias([

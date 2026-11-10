@@ -66,6 +66,10 @@ export default function AppModal({
         if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
     }
 
+    function impedirFechamentoPeloConteudo(evento) {
+        evento.stopPropagation();
+    }
+
     return (
         <Modal
             visible={visivel}
@@ -83,97 +87,102 @@ export default function AppModal({
                     disabled={!fecharAoTocarFora}
                     onPress={fecharAoTocarFora ? aoFechar : undefined}
                     style={estilos.fundoInterativo}
-                />
-
-                <KeyboardAvoidingView
-                    style={estilos.flexivel}
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
-                    <ScrollView
-                        testID="app-modal-scroll"
-                        scrollEnabled={rolagemExternaHabilitada}
-                        bounces={false}
-                        keyboardShouldPersistTaps="handled"
-                        contentContainerStyle={estilos.rolagem}
+                    <KeyboardAvoidingView
+                        style={estilos.flexivel}
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     >
-                        <View
-                            testID="app-modal-caixa"
-                            accessibilityViewIsModal
-                            style={[
-                                estilos.caixa,
-                                alerta
-                                    ? estilos.caixaAlerta
-                                    : acao
-                                      ? estilos.caixaAcao
-                                      : estilos.caixaSimples,
-                                estilo
-                            ]}
+                        <ScrollView
+                            testID="app-modal-scroll"
+                            scrollEnabled={rolagemExternaHabilitada}
+                            bounces={false}
+                            keyboardShouldPersistTaps="handled"
+                            contentContainerStyle={estilos.rolagem}
                         >
-                            {alerta ? (
-                                <View style={[estilos.cabecalhoAlerta, estiloCabecalho]}>
-                                    {Icone ? (
-                                        <View style={[estilos.iconeAlerta, estiloIconeCabecalho]}>
-                                            <Icone
-                                                size={26}
-                                                color={
-                                                    corIconeCabecalho ??
-                                                    tema.cores.neutras.superficieClara
-                                                }
-                                            />
-                                        </View>
-                                    ) : null}
-                                </View>
-                            ) : null}
-                            <View
+                            <Pressable
+                                testID="app-modal-caixa"
+                                accessibilityViewIsModal
+                                onPress={impedirFechamentoPeloConteudo}
                                 style={[
-                                    estilos.conteudo,
+                                    estilos.caixa,
                                     alerta
-                                        ? estilos.conteudoAlerta
+                                        ? estilos.caixaAlerta
                                         : acao
-                                          ? estilos.conteudoAcao
-                                          : estilos.conteudoSimples
+                                          ? estilos.caixaAcao
+                                          : estilos.caixaSimples,
+                                    estilo
                                 ]}
                             >
-                                {!alerta && Icone ? (
-                                    <View
-                                        style={[
-                                            estilos.areaIcone,
-                                            estiloIcone,
-                                            acao && estilos.areaIconeAcao,
-                                            fundoIcone ? { backgroundColor: fundoIcone } : null
-                                        ]}
-                                    >
-                                        <Icone size={22} color={corDoIcone} />
+                                {alerta ? (
+                                    <View style={[estilos.cabecalhoAlerta, estiloCabecalho]}>
+                                        {Icone ? (
+                                            <View
+                                                style={[estilos.iconeAlerta, estiloIconeCabecalho]}
+                                            >
+                                                <Icone
+                                                    size={26}
+                                                    color={
+                                                        corIconeCabecalho ??
+                                                        tema.cores.neutras.superficieClara
+                                                    }
+                                                />
+                                            </View>
+                                        ) : null}
                                     </View>
                                 ) : null}
-                                <View style={estilos.textos}>
-                                    <Text
-                                        ref={referenciaTitulo}
-                                        accessible
-                                        accessibilityRole="header"
-                                        style={estilos.titulo}
-                                    >
-                                        {titulo}
-                                    </Text>
-                                    {mensagem ? (
-                                        <Text
+                                <View
+                                    style={[
+                                        estilos.conteudo,
+                                        alerta
+                                            ? estilos.conteudoAlerta
+                                            : acao
+                                              ? estilos.conteudoAcao
+                                              : estilos.conteudoSimples
+                                    ]}
+                                >
+                                    {!alerta && Icone ? (
+                                        <View
                                             style={[
-                                                estilos.mensagem,
-                                                alerta && estilos.mensagemAlerta
+                                                estilos.areaIcone,
+                                                estiloIcone,
+                                                acao && estilos.areaIconeAcao,
+                                                fundoIcone ? { backgroundColor: fundoIcone } : null
                                             ]}
                                         >
-                                            {mensagem}
-                                        </Text>
+                                            <Icone size={22} color={corDoIcone} />
+                                        </View>
                                     ) : null}
-                                    {destaque ? (
-                                        <Text style={estilos.destaque}>{destaque}</Text>
+                                    <View style={estilos.textos}>
+                                        <Text
+                                            ref={referenciaTitulo}
+                                            accessible
+                                            accessibilityRole="header"
+                                            style={estilos.titulo}
+                                        >
+                                            {titulo}
+                                        </Text>
+                                        {mensagem ? (
+                                            <Text
+                                                style={[
+                                                    estilos.mensagem,
+                                                    alerta && estilos.mensagemAlerta
+                                                ]}
+                                            >
+                                                {mensagem}
+                                            </Text>
+                                        ) : null}
+                                        {destaque ? (
+                                            <Text style={estilos.destaque}>{destaque}</Text>
+                                        ) : null}
+                                    </View>
+                                    {children ? (
+                                        <View style={estilos.acoes}>{children}</View>
                                     ) : null}
                                 </View>
-                                {children ? <View style={estilos.acoes}>{children}</View> : null}
-                            </View>
-                        </View>
-                    </ScrollView>
-                </KeyboardAvoidingView>
+                            </Pressable>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                </Pressable>
             </SafeAreaView>
         </Modal>
     );
