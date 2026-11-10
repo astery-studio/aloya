@@ -1,6 +1,7 @@
 //Apresenta, somente para leitura, as permissões efetivas de um vínculo.
 import { useMemo } from 'react';
 import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ButtonPopup from '../../../../shared/components/common/Button/ButtonPopup/ButtonPopup';
 import AppModal from '../../../../shared/components/feedback/Modal/ModalBase/AppModal';
@@ -29,9 +30,13 @@ const DESCRICOES_PERMISSOES_GERAIS = Object.freeze({
 const ESPACO_VERTICAL_EXTERNO = 32;
 const ALTURA_CONTEUDO_FIXO = 210;
 
-function calcularLimitesModal(alturaTela) {
+function calcularLimitesModal(alturaTela, margemSuperior = 0, margemInferior = 0) {
     const alturaSegura = Number.isFinite(alturaTela) && alturaTela > 0 ? alturaTela : 640;
-    const alturaMaximaModal = Math.max(280, alturaSegura - ESPACO_VERTICAL_EXTERNO);
+    const areaSegura =
+        alturaSegura -
+        Math.max(0, Number(margemSuperior) || 0) -
+        Math.max(0, Number(margemInferior) || 0);
+    const alturaMaximaModal = Math.max(280, areaSegura - ESPACO_VERTICAL_EXTERNO);
 
     return Object.freeze({
         alturaMaximaModal,
@@ -133,6 +138,8 @@ function ContactPermissionsSummaryModal({
 }) {
     const { height: alturaTela } = useWindowDimensions();
 
+    const areasSeguras = useSafeAreaInsets();
+
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -155,7 +162,10 @@ function ContactPermissionsSummaryModal({
 
     const descricaoGerais = criarDescricaoGerais(perspectivaSegura, nomeSeguro);
 
-    const limites = useMemo(() => calcularLimitesModal(alturaTela), [alturaTela]);
+    const limites = useMemo(
+        () => calcularLimitesModal(alturaTela, areasSeguras.top, areasSeguras.bottom),
+        [alturaTela, areasSeguras.bottom, areasSeguras.top]
+    );
 
     function fechar() {
         if (typeof aoFechar === 'function') {

@@ -95,6 +95,8 @@ describe('ContactPermissionsSummaryModal', () => {
         });
 
         expect(marcadores[0]).toHaveStyle({
+            width: 9,
+            height: 14,
             color: '#C85A44',
             fontSize: 9,
             fontStyle: 'normal',
@@ -236,6 +238,11 @@ describe('ContactPermissionsSummaryModal', () => {
         expect(calcularLimitesModal(undefined)).toEqual({
             alturaMaximaModal: 608,
             alturaMaximaRolagem: 398
+        });
+
+        expect(calcularLimitesModal(800, 44, 34)).toEqual({
+            alturaMaximaModal: 690,
+            alturaMaximaRolagem: 480
         });
     });
 

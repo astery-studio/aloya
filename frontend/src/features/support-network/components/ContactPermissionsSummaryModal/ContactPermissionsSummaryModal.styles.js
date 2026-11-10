@@ -91,13 +91,15 @@ function criarEstilos(tema) {
 
         marcador: {
             width: 9,
+            height: 14,
             flexShrink: 0,
             color: tema.escuro ? '#F08A75' : '#C85A44',
             fontFamily: fontFamilies.regular,
             fontSize: 9,
             fontStyle: 'normal',
             fontWeight: '400',
-            lineHeight: 13.5
+            lineHeight: 13.5,
+            textAlign: 'center'
         },
 
         marcadorAlternado: {
