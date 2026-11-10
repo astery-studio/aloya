@@ -174,6 +174,8 @@ function ContactCard({
 
     const contatoEnviadoInativo = perspectivaSegura === 'enviado' && estado === 'inativo';
 
+    const conviteEnviadoRecusado = perspectivaSegura === 'enviado' && estado === 'recusado';
+
     function executarAcao(acao) {
         if (bloqueado || typeof aoAcao !== 'function') {
             return;
@@ -198,7 +200,7 @@ function ContactCard({
                 estilos.cartao,
                 conviteEnviadoPendente && estilos.cartaoPendenteEnviado,
                 contatoEnviadoAtivo && estilos.cartaoAtivoEnviado,
-                contatoEnviadoInativo && estilos.cartaoInativoEnviado,
+                (contatoEnviadoInativo || conviteEnviadoRecusado) && estilos.cartaoInativoEnviado,
                 bloqueado && estilos.cartaoDesabilitado
             ]}
         >
@@ -207,7 +209,8 @@ function ContactCard({
                     estilos.cabecalho,
                     conviteEnviadoPendente && estilos.cabecalhoPendenteEnviado,
                     contatoEnviadoAtivo && estilos.cabecalhoAtivoEnviado,
-                    contatoEnviadoInativo && estilos.cabecalhoInativoEnviado
+                    (contatoEnviadoInativo || conviteEnviadoRecusado) &&
+                        estilos.cabecalhoInativoEnviado
                 ]}
             >
                 {conviteEnviadoPendente ? (
@@ -290,7 +293,7 @@ function ContactCard({
                             />
                         </View>
                     </>
-                ) : contatoEnviadoInativo ? (
+                ) : contatoEnviadoInativo || conviteEnviadoRecusado ? (
                     <>
                         <View style={estilos.avatarCabecalho}>
                             <ContactAvatar
@@ -342,7 +345,8 @@ function ContactCard({
                 {perspectivaSegura === 'enviado' &&
                 !conviteEnviadoPendente &&
                 !contatoEnviadoAtivo &&
-                !contatoEnviadoInativo ? (
+                !contatoEnviadoInativo &&
+                !conviteEnviadoRecusado ? (
                     <View style={estilos.acoesCompactas}>
                         {contatoEnviadoAtivo ? (
                             <IconButton
@@ -387,7 +391,9 @@ function ContactCard({
                             corIcone={CORES_INFORMACOES.vinculo}
                             identificador="vinculo"
                             rotulo={
-                                conviteEnviadoPendente || contatoEnviadoInativo
+                                conviteEnviadoPendente ||
+                                contatoEnviadoInativo ||
+                                conviteEnviadoRecusado
                                     ? 'Tipo de Vínculo'
                                     : 'Vínculo solicitado'
                             }
@@ -405,9 +411,11 @@ function ContactCard({
                                 ? 'Data de Ativação'
                                 : contatoEnviadoInativo
                                   ? 'Data de Desativação'
-                                  : conviteEnviadoPendente
+                                  : conviteEnviadoRecusado
                                     ? 'Data de Convite'
-                                    : 'Data de envio'
+                                    : conviteEnviadoPendente
+                                      ? 'Data de Convite'
+                                      : 'Data de envio'
                         }
                         valor={
                             contatoEnviadoAtivo
@@ -429,14 +437,18 @@ function ContactCard({
                                     ? 'Aguardando há'
                                     : contatoEnviadoInativo
                                       ? 'Desativado há'
-                                      : 'Aguardando'
+                                      : conviteEnviadoRecusado
+                                        ? 'Recusado há'
+                                        : 'Aguardando'
                             }
                             valor={rotuloEspera.replace(
                                 conviteEnviadoPendente
                                     ? /^Aguardando\s+há\s*/u
                                     : contatoEnviadoInativo
                                       ? /^Desativado\s+há\s*/u
-                                      : /^Aguardando\s*/u,
+                                      : conviteEnviadoRecusado
+                                        ? /^Recusado\s+há\s*/u
+                                        : /^Aguardando\s*/u,
                                 ''
                             )}
                             estilos={estilos}
@@ -456,6 +468,10 @@ function ContactCard({
             ) : contatoEnviadoInativo ? (
                 <View style={estilos.containerTituloInativo}>
                     <Text style={estilos.tituloInativo}>CONTATO INATIVO</Text>
+                </View>
+            ) : conviteEnviadoRecusado ? (
+                <View style={estilos.containerTituloInativo}>
+                    <Text style={estilos.tituloInativo}>CONVITE RECUSADO</Text>
                 </View>
             ) : (
                 <View style={estilos.estado}>
@@ -529,6 +545,23 @@ function ContactCard({
                         corConteudo="#FFFFFF"
                         aoPressionar={() => executarAcao('convidar_novamente')}
                         rotuloAcessibilidade={`Convidar ${identificacao} novamente`}
+                        desativado={bloqueado}
+                        estilo={estilos.botaoReenvio}
+                        estiloTexto={estilos.textoBotao}
+                    />
+                </View>
+            ) : null}
+
+            {conviteEnviadoRecusado ? (
+                <View style={estilos.containerReenvio}>
+                    <ButtonScreen
+                        texto="Reenviar Convite"
+                        variante="verde"
+                        icone={PaperPlaneTiltIcon}
+                        tamanhoIcone={13}
+                        corConteudo="#FFFFFF"
+                        aoPressionar={() => executarAcao('convidar_novamente')}
+                        rotuloAcessibilidade={`Reenviar convite para ${identificacao}`}
                         desativado={bloqueado}
                         estilo={estilos.botaoReenvio}
                         estiloTexto={estilos.textoBotao}

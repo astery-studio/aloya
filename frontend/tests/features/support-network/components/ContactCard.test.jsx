@@ -356,6 +356,74 @@ describe('ContactCard', () => {
         expect(aoAcao).toHaveBeenCalledWith('convidar_novamente', contatoInativo);
     });
 
+    test('apresenta e reenvia um convite recusado', async () => {
+        const aoAcao = jest.fn();
+
+        const contatoRecusado = {
+            ...conviteRecebido,
+            status: 'recusado',
+            identificacao: 'Marina',
+            aguardando: {
+                dias: 4,
+                atrasado: false,
+                rotulo: 'Recusado há 4 dias'
+            }
+        };
+
+        await render(
+            <ContactCard
+                contato={contatoRecusado}
+                perspectiva="enviado"
+                aoAcao={aoAcao}
+                aoAbrirResumo={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('contact-card')).toHaveStyle({
+            opacity: 0.8,
+            paddingTop: 14,
+            paddingRight: 16,
+            paddingBottom: 18,
+            paddingLeft: 16
+        });
+
+        expect(screen.getByText('Marina')).toBeOnTheScreen();
+        expect(screen.getByText('CONVITE RECUSADO')).toBeOnTheScreen();
+        expect(screen.getByText(/Tipo de Vínculo:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/Data de Convite:/u)).toBeOnTheScreen();
+        expect(screen.getByText(/30\/10\/2026/u)).toBeOnTheScreen();
+        expect(screen.getByText(/Recusado há:/u)).toBeOnTheScreen();
+
+        expect(
+            screen.queryByRole('button', {
+                name: 'Alterar vínculo de Marina'
+            })
+        ).toBeNull();
+        expect(
+            screen.queryByRole('button', {
+                name: 'Arquivar Marina'
+            })
+        ).toBeNull();
+        expect(
+            screen.getByRole('button', {
+                name: 'Remover Marina'
+            })
+        ).toBeOnTheScreen();
+        expect(
+            screen.getByRole('button', {
+                name: 'Abrir resumo de permissões de Marina'
+            })
+        ).toBeOnTheScreen();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Reenviar convite para Marina'
+            })
+        );
+
+        expect(aoAcao).toHaveBeenCalledWith('convidar_novamente', contatoRecusado);
+    });
+
     test('bloqueia ações concorrentes', async () => {
         const aoAcao = jest.fn();
 
