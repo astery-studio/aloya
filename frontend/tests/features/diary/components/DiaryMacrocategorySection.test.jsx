@@ -3,10 +3,27 @@ import { Text } from 'react-native';
 
 jest.mock('phosphor-react-native', () => ({ CaretDown: () => null, CaretUp: () => null }));
 
-import DiaryMacrocategorySection from '../../../../src/features/diary/components/DiaryMacrocategorySection/DiaryMacrocategorySection';
+import DiaryMacrocategorySection, {
+    montarEstiloCabecalho
+} from '../../../../src/features/diary/components/DiaryMacrocategorySection/DiaryMacrocategorySection';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const Icone = () => null;
+
+test('monta o estado visual pressionado e expandido', () => {
+    const estilos = { cabecalho: {}, pressionado: { opacity: 0.8 } };
+    const cores = { fundoExpandido: '#fff' };
+    expect(montarEstiloCabecalho(estilos, true, cores, true)).toEqual([
+        estilos.cabecalho,
+        { backgroundColor: '#fff' },
+        estilos.pressionado
+    ]);
+    expect(montarEstiloCabecalho(estilos, false, cores, false)).toEqual([
+        estilos.cabecalho,
+        false,
+        false
+    ]);
+});
 
 describe('DiaryMacrocategorySection', () => {
     test('expõe expansão, conteúdo e ação do cabeçalho', async () => {
