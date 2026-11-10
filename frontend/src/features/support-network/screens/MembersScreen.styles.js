@@ -33,15 +33,24 @@ function criarEstilos(tema) {
 
         botaoLimpar: {
             width: '100%',
-            height: 48,
+            maxWidth: 350.011,
+            height: 35.99,
+            flexShrink: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 8,
+            borderWidth: 1,
+            borderColor: '#C85A44',
             borderRadius: 10
         },
 
         textoBotaoLimpar: {
+            color: '#C85A44',
             fontFamily: fontFamilies.semibold,
-            fontSize: 15,
+            fontSize: 13,
             fontWeight: '600',
-            lineHeight: 21
+            lineHeight: 25.5,
+            textAlign: 'center'
         },
 
         areaLista: {

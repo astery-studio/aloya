@@ -263,7 +263,14 @@ describe('MembersScreen', () => {
             screen.getByRole('button', {
                 name: 'Limpar filtros de contatos'
             })
-        ).toBeOnTheScreen();
+        ).toHaveStyle({
+            width: '100%',
+            maxWidth: 350.011,
+            height: 35.99,
+            borderWidth: 1,
+            borderColor: '#C85A44',
+            borderRadius: 10
+        });
     });
 
     test('limpa os filtros aplicados', async () => {
