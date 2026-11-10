@@ -496,6 +496,22 @@ export default function App() {
         setTelaInterna(origemNovaCategoria);
     }
 
+    function selecionarCategoriaCriadaNoContato(categoria) {
+        const identificadorValido =
+            Number.isSafeInteger(categoria?.id) ||
+            (typeof categoria?.id === 'string' && categoria.id.trim().length > 0);
+
+        if (origemNovaCategoria !== telasInternas.novoContato || !identificadorValido) {
+            return;
+        }
+
+        setRascunhoNovoContato((rascunhoAtual) => ({
+            ...(rascunhoAtual && typeof rascunhoAtual === 'object' ? rascunhoAtual : {}),
+            categoriaId: categoria.id,
+            permissoesIndividuais: []
+        }));
+    }
+
     function abrirParametrosCiclo(origem) {
         setRetornoParametros(origem);
 
@@ -720,6 +736,7 @@ export default function App() {
             <NewSupportCategoryScreen
                 criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
                 onVoltar={retornarDaNovaCategoria}
+                onCategoriaCriada={selecionarCategoriaCriadaNoContato}
                 onConcluido={retornarDaNovaCategoria}
                 onSessaoExpirada={finalizarSessao}
             />

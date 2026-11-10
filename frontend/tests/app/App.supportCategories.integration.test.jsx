@@ -131,6 +131,11 @@ jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactF
                 },
                 React.createElement(Text, null, 'Novo contato'),
                 React.createElement(Text, null, `Rascunho: ${dadosIniciais?.email ?? 'vazio'}`),
+                React.createElement(
+                    Text,
+                    null,
+                    `Categoria selecionada: ${dadosIniciais?.categoriaId ?? 'nenhuma'}`
+                ),
                 React.createElement(Text, null, `Titular: ${emailUsuario ?? 'sem e-mail'}`),
                 React.createElement(
                     Text,
@@ -309,7 +314,7 @@ jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen',
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        NewSupportCategoryScreen: ({ onVoltar, onConcluido }) =>
+        NewSupportCategoryScreen: ({ onVoltar, onCategoriaCriada, onConcluido }) =>
             React.createElement(
                 View,
                 null,
@@ -328,7 +333,17 @@ jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen',
                     {
                         accessibilityRole: 'button',
                         accessibilityLabel: 'Concluir criação',
-                        onPress: onConcluido
+                        onPress: () => {
+                            const categoria = {
+                                id: 99,
+                                nome: 'Nova categoria',
+                                dadosVisiveis: ['geral.fase_atual'],
+                                quantidadeContatos: 0
+                            };
+
+                            onCategoriaCriada?.(categoria);
+                            onConcluido?.(categoria);
+                        }
                     },
                     React.createElement(Text, null, 'Concluir')
                 )
@@ -638,5 +653,6 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         expect(screen.getByText('Categorias conectadas')).toBeOnTheScreen();
         expect(screen.getByText('Rascunho: rascunho@example.com')).toBeOnTheScreen();
+        expect(screen.getByText('Categoria selecionada: 99')).toBeOnTheScreen();
     });
 });

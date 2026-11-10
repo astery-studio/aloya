@@ -207,7 +207,10 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
     };
 });
 
-import { ContactFormScreen } from '../../../../src/features/support-network/screens/ContactFormScreen/ContactFormScreen';
+import {
+    ContactFormScreen,
+    criarDadosIniciais
+} from '../../../../src/features/support-network/screens/ContactFormScreen/ContactFormScreen';
 
 const categorias = [
     {
@@ -253,6 +256,16 @@ async function esperarFormulario() {
 }
 
 describe('ContactFormScreen', () => {
+    test('inicia sem aparência ou vínculo pré-selecionados', () => {
+        expect(criarDadosIniciais()).toEqual({
+            email: '',
+            iconeId: null,
+            corId: null,
+            categoriaId: null,
+            permissoesIndividuais: []
+        });
+    });
+
     test('carrega categorias e mostra o formulário', async () => {
         const servicos = criarServicos();
 

@@ -86,8 +86,8 @@ function criarDadosIniciais(dadosIniciais) {
 
     return {
         email: typeof dadosSeguros.email === 'string' ? dadosSeguros.email : '',
-        iconeId: typeof dadosSeguros.iconeId === 'string' ? dadosSeguros.iconeId : 'pessoa',
-        corId: typeof dadosSeguros.corId === 'string' ? dadosSeguros.corId : 'branco',
+        iconeId: typeof dadosSeguros.iconeId === 'string' ? dadosSeguros.iconeId : null,
+        corId: typeof dadosSeguros.corId === 'string' ? dadosSeguros.corId : null,
         categoriaId:
             Number.isSafeInteger(dadosSeguros.categoriaId) && dadosSeguros.categoriaId > 0
                 ? dadosSeguros.categoriaId
