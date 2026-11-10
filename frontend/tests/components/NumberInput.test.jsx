@@ -31,6 +31,11 @@ test('converte um campo apagado para valor nulo', async () => {
     expect(aoAlterar).toHaveBeenCalledWith(null);
 });
 
+test('não anuncia zero quando o campo está vazio', async () => {
+    await renderWithTheme(<NumberInput valor={null} />);
+    expect(screen.getByLabelText('Duração em dias')).toHaveProp('accessibilityValue', {});
+});
+
 test('toda a área numérica pode direcionar o foco', async () => {
     await renderWithTheme(<NumberInput valor={28} aoAlterar={jest.fn()} />);
     await fireEvent.press(screen.getByTestId('area-campo-numero'));

@@ -26,7 +26,7 @@ export default function NumberInput({
         valor === null || valor === undefined
             ? ''
             : String(valor).replace('.', casasDecimais > 0 ? ',' : '.');
-    const numeroAtual = Number(texto.replace(',', '.'));
+    const numeroAtual = texto ? Number(texto.replace(',', '.')) : Number.NaN;
     const comprimentoMaximo = maximoDigitosInteiros + (casasDecimais > 0 ? casasDecimais + 1 : 0);
 
     function alterar(novoTexto) {
