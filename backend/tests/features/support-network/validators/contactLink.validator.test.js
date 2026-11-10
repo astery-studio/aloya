@@ -32,6 +32,37 @@ test('aceita permissões individuais e as normaliza pelo catálogo', () => {
     ]);
 });
 
+test('aceita ícone e cor válidos quando enviados juntos', () => {
+    const resultado = validator.validarAtualizacao({
+        tipo: 'categoria',
+        categoriaId: 3,
+        iconeId: 'sol',
+        corId: 'azul',
+        versao
+    });
+
+    assert.equal(resultado.valido, true);
+    assert.equal(resultado.dados.iconeId, 'sol');
+    assert.equal(resultado.dados.corId, 'azul');
+});
+
+test('rejeita aparência parcial ou fora do catálogo', () => {
+    for (const body of [
+        { tipo: 'categoria', categoriaId: 3, iconeId: 'sol', versao },
+        { tipo: 'categoria', categoriaId: 3, corId: 'azul', versao },
+        {
+            tipo: 'categoria',
+            categoriaId: 3,
+            iconeId: 'desconhecido',
+            corId: 'azul',
+            versao
+        },
+        { tipo: 'categoria', categoriaId: 3, iconeId: 'sol', corId: '#4A758E', versao }
+    ]) {
+        assert.equal(validator.validarAtualizacao(body).valido, false);
+    }
+});
+
 test('exige exatamente os dados compatíveis com o tipo escolhido', () => {
     const categoria = validator.validarAtualizacao({
         tipo: 'categoria',

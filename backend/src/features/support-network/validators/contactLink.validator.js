@@ -7,8 +7,19 @@ import {
     TIPO_VINCULO_INDIVIDUAL,
     TIPOS_VINCULO
 } from '../constants/contactLink.constants.js';
+import {
+    corContatoEhValida,
+    iconeContatoEhValido
+} from '../constants/contactAppearance.constants.js';
 
-const CAMPOS_PERMITIDOS = Object.freeze(['tipo', 'categoriaId', 'permissoesIndividuais', 'versao']);
+const CAMPOS_PERMITIDOS = Object.freeze([
+    'tipo',
+    'categoriaId',
+    'permissoesIndividuais',
+    'iconeId',
+    'corId',
+    'versao'
+]);
 
 function objetoSimples(valor) {
     if (valor === null || typeof valor !== 'object' || Array.isArray(valor)) return false;
@@ -104,6 +115,26 @@ function criarContactLinkValidator() {
         }
 
         const versao = validarVersao(body.versao, erros);
+        const possuiIcone = body.iconeId !== undefined;
+        const possuiCor = body.corId !== undefined;
+
+        if (possuiIcone !== possuiCor) {
+            erros.push({
+                campo: possuiIcone ? 'corId' : 'iconeId',
+                mensagem: 'Informe o ícone e a cor do contato juntos.'
+            });
+        }
+
+        const iconeId = possuiIcone && iconeContatoEhValido(body.iconeId) ? body.iconeId : null;
+        const corId = possuiCor && corContatoEhValida(body.corId) ? body.corId : null;
+
+        if (possuiIcone && iconeId === null) {
+            erros.push({ campo: 'iconeId', mensagem: 'Selecione um ícone válido para o contato.' });
+        }
+
+        if (possuiCor && corId === null) {
+            erros.push({ campo: 'corId', mensagem: 'Selecione uma cor válida para o contato.' });
+        }
         if (erros.length > 0) {
             return Object.freeze({
                 valido: false,
@@ -113,7 +144,13 @@ function criarContactLinkValidator() {
 
         return Object.freeze({
             valido: true,
-            dados: Object.freeze({ tipo, categoriaId, permissoesIndividuais, versao })
+            dados: Object.freeze({
+                tipo,
+                categoriaId,
+                permissoesIndividuais,
+                ...(possuiIcone ? { iconeId, corId } : {}),
+                versao
+            })
         });
     }
 

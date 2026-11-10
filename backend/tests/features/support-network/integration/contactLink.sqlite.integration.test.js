@@ -141,10 +141,7 @@ test('consulta categoria ativa e a converte em permissão individual alterada', 
 
         assert.equal(consulta.status, 200);
         assert.equal(configuracao.vinculoAtual.tipo, 'categoria');
-        assert.deepEqual(configuracao.proximoVinculo.permissoesPreenchidas, [
-            'geral.fase_atual',
-            'saude.consultas'
-        ]);
+        assert.deepEqual(configuracao.proximoVinculo.permissoesPreenchidas, []);
 
         const atualizacao = await fetch(`${baseUrl}/contacts/20/link`, {
             method: 'PATCH',
@@ -166,6 +163,34 @@ test('consulta categoria ativa e a converte em permissão individual alterada', 
         assert.equal(notificacoes.length, 1);
         assert.equal(notificacoes[0].tipoOrigem, 'rede_apoio');
         assert.equal(notificacoes[0].origemId, 20);
+    });
+});
+
+test('persiste ícone e cor sem alterar a categoria nem notificar acesso', async () => {
+    await executarComBanco(async ({ baseUrl, prisma }) => {
+        const consulta = await fetch(`${baseUrl}/contacts/20/link`);
+        const configuracao = await consulta.json();
+
+        const atualizacao = await fetch(`${baseUrl}/contacts/20/link`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: 'categoria',
+                categoriaId: 10,
+                iconeId: 'sol',
+                corId: 'azul',
+                versao: configuracao.versao
+            })
+        });
+        const corpo = await atualizacao.json();
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 20 } });
+        const notificacoes = await prisma.notificacao.findMany({ where: { usuarioId: 2 } });
+
+        assert.equal(atualizacao.status, 200, JSON.stringify(corpo));
+        assert.equal(vinculo.categoriaId, 10);
+        assert.equal(vinculo.iconeId, 'sol');
+        assert.equal(vinculo.corId, 'azul');
+        assert.equal(notificacoes.length, 0);
     });
 });
 

@@ -11,6 +11,8 @@ function criarCenario({ categoriaAtual = null, categoriaDestino = null, updateCo
         id: 9,
         contatoId: 22,
         emailConvidado: 'ana@example.com',
+        iconeId: 'coracao',
+        corId: 'coral',
         permissoesIndividuais: ['geral.fase_atual'],
         atualizadoEm: versao,
         contato: { nome: 'Ana' },
@@ -86,7 +88,9 @@ test('move categoria para permissões individuais alteradas e agenda notificaç�
         contatoId: 9,
         tipo: 'individual',
         categoria: null,
-        permissoes: ['geral.fase_atual']
+        permissoes: ['geral.fase_atual'],
+        iconeId: 'coracao',
+        corId: 'coral'
     });
 });
 
@@ -116,7 +120,66 @@ test('move individual para categoria substituindo integralmente as permissões',
     assert.deepEqual(resultado.permissoes, ['saude.consultas']);
 });
 
-test('rejeita categoria para categoria e individual para individual', async () => {
+test('atualiza ícone e cor sem trocar vínculo nem notificar acesso', async () => {
+    const categoriaAtual = {
+        id: 3,
+        nome: 'Família',
+        conjuntoDadosVisiveis: ['geral.fase_atual']
+    };
+    const { estado, service } = criarCenario({ categoriaAtual });
+
+    const resultado = await service.atualizar({
+        titularId: 1,
+        papel: 'principal',
+        contatoId: 9,
+        tipo: 'categoria',
+        categoriaId: 3,
+        iconeId: 'sol',
+        corId: 'azul',
+        versao
+    });
+
+    assert.deepEqual(estado.atualizacoes[0].data, {
+        categoriaId: 3,
+        permissoesIndividuais: [],
+        iconeId: 'sol',
+        corId: 'azul'
+    });
+    assert.equal(estado.notificacoes.length, 0);
+    assert.equal(resultado.iconeId, 'sol');
+    assert.equal(resultado.corId, 'azul');
+});
+
+test('troca uma categoria por outra e agenda notificação de acesso', async () => {
+    const categoriaAtual = {
+        id: 3,
+        nome: 'Família',
+        conjuntoDadosVisiveis: ['geral.fase_atual']
+    };
+    const categoriaDestino = {
+        id: 7,
+        nome: 'Profissional',
+        conjuntoDadosVisiveis: ['saude.consultas']
+    };
+    const { estado, service } = criarCenario({ categoriaAtual, categoriaDestino });
+
+    await service.atualizar({
+        titularId: 1,
+        papel: 'principal',
+        contatoId: 9,
+        tipo: 'categoria',
+        categoriaId: 7,
+        versao
+    });
+
+    assert.deepEqual(estado.atualizacoes[0].data, {
+        categoriaId: 7,
+        permissoesIndividuais: []
+    });
+    assert.equal(estado.notificacoes.length, 1);
+});
+
+test('rejeita vínculo e aparência sem alteração', async () => {
     const categoria = {
         id: 3,
         nome: 'Família',
@@ -134,7 +197,7 @@ test('rejeita categoria para categoria e individual para individual', async () =
             categoriaId: 3,
             versao
         }),
-        { status: 422, codigo: 'TIPO_VINCULO_DESTINO_INVALIDO' }
+        { status: 422, codigo: 'VINCULO_SEM_ALTERACAO' }
     );
     await assert.rejects(
         individual.atualizar({
@@ -145,7 +208,7 @@ test('rejeita categoria para categoria e individual para individual', async () =
             permissoesIndividuais: ['geral.fase_atual'],
             versao
         }),
-        { status: 422, codigo: 'TIPO_VINCULO_DESTINO_INVALIDO' }
+        { status: 422, codigo: 'VINCULO_SEM_ALTERACAO' }
     );
 });
 

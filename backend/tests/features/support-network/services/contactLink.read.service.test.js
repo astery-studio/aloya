@@ -26,19 +26,30 @@ function criarPrisma(vinculo, categorias = []) {
     };
 }
 
-test('pré-preenche permissões da categoria para conversão em individual', async () => {
-    const { prisma, estado } = criarPrisma({
-        id: 9,
-        emailConvidado: 'ana@example.com',
-        permissoesIndividuais: [],
-        atualizadoEm,
-        contato: { nome: 'Ana' },
-        categoria: {
-            id: 3,
-            nome: 'Família',
-            conjuntoDadosVisiveis: ['geral.fase_atual', 'saude.consultas']
-        }
-    });
+test('inicia permissões vazias e lista categorias para trocar o vínculo', async () => {
+    const categoriaAtual = {
+        id: 3,
+        nome: 'Família',
+        conjuntoDadosVisiveis: ['geral.fase_atual', 'saude.consultas']
+    };
+    const { prisma, estado } = criarPrisma(
+        {
+            id: 9,
+            emailConvidado: 'ana@example.com',
+            permissoesIndividuais: [],
+            atualizadoEm,
+            contato: { nome: 'Ana' },
+            categoria: categoriaAtual
+        },
+        [
+            categoriaAtual,
+            {
+                id: 4,
+                nome: 'Profissional',
+                conjuntoDadosVisiveis: ['geral.historico_ciclo']
+            }
+        ]
+    );
     const service = criarContactLinkService({ prisma });
 
     const resultado = await service.consultar({
@@ -48,13 +59,14 @@ test('pré-preenche permissões da categoria para conversão em individual', asy
     });
 
     assert.deepEqual(estado.vinculo.where, { id: 9, titularId: 1, status: 'ativo' });
-    assert.equal(estado.categorias.length, 0);
+    assert.equal(estado.categorias.length, 1);
     assert.equal(resultado.vinculoAtual.tipo, 'categoria');
     assert.equal(resultado.proximoVinculo.tipo, 'individual');
-    assert.deepEqual(resultado.proximoVinculo.permissoesPreenchidas, [
-        'geral.fase_atual',
-        'saude.consultas'
-    ]);
+    assert.deepEqual(resultado.proximoVinculo.permissoesPreenchidas, []);
+    assert.deepEqual(
+        resultado.proximoVinculo.categorias.map(({ nome }) => nome),
+        ['Família', 'Profissional']
+    );
     assert.equal(resultado.versao, atualizadoEm.toISOString());
 });
 
