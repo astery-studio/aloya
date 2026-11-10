@@ -240,6 +240,16 @@ describe('MembersScreen', () => {
         ).toEqual([]);
     });
 
+    test('aplica OU dentro de cada grupo de filtros', () => {
+        expect(
+            filtrarContatos(contatos, {
+                estados: ['pendente', 'ativo'],
+                categoriaIds: [10],
+                permissaoIndividual: true
+            }).map(({ id }) => id)
+        ).toEqual([1, 2]);
+    });
+
     test('abre e aplica os filtros', async () => {
         await render(<MembersScreen />);
 
