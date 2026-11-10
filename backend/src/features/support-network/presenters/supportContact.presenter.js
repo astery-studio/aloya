@@ -106,7 +106,6 @@ function formatarContato(vinculo, agora = new Date()) {
     const status = normalizarStatusContato(vinculo.status);
     const pendente = status === STATUS_CONTATO_PENDENTE;
     const ativo = status === STATUS_CONTATO_ATIVO;
-    const podeReenviar = pendente || status === 'inativo' || status === 'recusado';
 
     return Object.freeze({
         id: vinculo.id,
@@ -126,7 +125,7 @@ function formatarContato(vinculo, agora = new Date()) {
         acoes: Object.freeze({
             podeAlterarVinculo: ativo,
             podeRemover: true,
-            podeReenviarConvite: podeReenviar
+            podeReenviarConvite: pendente
         })
     });
 }

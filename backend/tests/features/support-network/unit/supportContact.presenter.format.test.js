@@ -117,7 +117,7 @@ test('apresenta vínculo revogado como contato inativo', () => {
     assert.deepEqual(contato.acoes, {
         podeAlterarVinculo: false,
         podeRemover: true,
-        podeReenviarConvite: true
+        podeReenviarConvite: false
     });
 });
 
@@ -141,5 +141,5 @@ test('mantém convite recusado no histórico', () => {
     assert.equal(contato.statusRotulo, 'Recusado');
     assert.equal(contato.dataRecusa, dataResposta);
     assert.equal(contato.aguardando.rotulo, 'Recusado há 2 dias');
-    assert.equal(contato.acoes.podeReenviarConvite, true);
+    assert.equal(contato.acoes.podeReenviarConvite, false);
 });
