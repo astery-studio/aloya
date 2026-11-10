@@ -1,6 +1,6 @@
 //Apresenta, somente para leitura, as permissões efetivas de um vínculo.
 import { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, useWindowDimensions, View } from 'react-native';
 
 import ButtonPopup from '../../../../shared/components/common/Button/ButtonPopup/ButtonPopup';
 import AppModal from '../../../../shared/components/feedback/Modal/ModalBase/AppModal';
@@ -25,6 +25,19 @@ const DESCRICOES_PERMISSOES_GERAIS = Object.freeze({
     'geral.dicas': (nome) =>
         `Você receberá notificações e dicas práticas sobre a fase atual de ${nome}.`
 });
+
+const ESPACO_VERTICAL_EXTERNO = 32;
+const ALTURA_CONTEUDO_FIXO = 210;
+
+function calcularLimitesModal(alturaTela) {
+    const alturaSegura = Number.isFinite(alturaTela) && alturaTela > 0 ? alturaTela : 640;
+    const alturaMaximaModal = Math.max(280, alturaSegura - ESPACO_VERTICAL_EXTERNO);
+
+    return Object.freeze({
+        alturaMaximaModal,
+        alturaMaximaRolagem: Math.max(120, alturaMaximaModal - ALTURA_CONTEUDO_FIXO)
+    });
+}
 
 function normalizarPerspectiva(perspectiva) {
     return perspectiva === 'recebido' ? 'recebido' : 'enviado';
@@ -118,6 +131,8 @@ function ContactPermissionsSummaryModal({
     vinculo,
     aoFechar
 }) {
+    const { height: alturaTela } = useWindowDimensions();
+
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -140,6 +155,8 @@ function ContactPermissionsSummaryModal({
 
     const descricaoGerais = criarDescricaoGerais(perspectivaSegura, nomeSeguro);
 
+    const limites = useMemo(() => calcularLimitesModal(alturaTela), [alturaTela]);
+
     function fechar() {
         if (typeof aoFechar === 'function') {
             aoFechar();
@@ -152,47 +169,67 @@ function ContactPermissionsSummaryModal({
             visivel={Boolean(visivel)}
             aoFechar={fechar}
             titulo="Resumo de Permissões"
-            estilo={estilos.modal}
+            rolagemExternaHabilitada={false}
+            estilo={[
+                estilos.modal,
+                {
+                    maxHeight: limites.alturaMaximaModal
+                }
+            ]}
         >
             <View testID="contact-permissions-summary" style={estilos.conteudo}>
-                <Secao
-                    titulo="PERMISSÕES GERAIS"
-                    vazio={resumo.gerais.length === 0}
-                    mensagemVazia={mensagensVazias.gerais}
-                    descricao={resumo.gerais.length > 0 ? descricaoGerais : null}
-                    estilos={estilos}
+                <ScrollView
+                    testID="contact-permissions-scroll"
+                    style={[
+                        estilos.rolagemPermissoes,
+                        {
+                            maxHeight: limites.alturaMaximaRolagem
+                        }
+                    ]}
+                    contentContainerStyle={estilos.conteudoRolagem}
+                    nestedScrollEnabled
+                    bounces={false}
+                    showsVerticalScrollIndicator
                 >
-                    {resumo.gerais.map((permissao, indice) => (
-                        <ItemPermissao
-                            key={permissao.id}
-                            indice={indice}
-                            titulo={permissao.titulo}
-                            complemento={criarDescricaoPermissaoGeral(permissao.id, nomeSeguro)}
-                            estilos={estilos}
-                        />
-                    ))}
-                </Secao>
+                    <Secao
+                        titulo="PERMISSÕES GERAIS"
+                        vazio={resumo.gerais.length === 0}
+                        mensagemVazia={mensagensVazias.gerais}
+                        descricao={resumo.gerais.length > 0 ? descricaoGerais : null}
+                        estilos={estilos}
+                    >
+                        {resumo.gerais.map((permissao, indice) => (
+                            <ItemPermissao
+                                key={permissao.id}
+                                indice={indice}
+                                titulo={permissao.titulo}
+                                complemento={criarDescricaoPermissaoGeral(permissao.id, nomeSeguro)}
+                                estilos={estilos}
+                            />
+                        ))}
+                    </Secao>
 
-                <Secao
-                    titulo="PERMISSÕES DE ACESSO AO DIÁRIO"
-                    vazio={resumo.diario.length === 0}
-                    mensagemVazia={mensagensVazias.diario}
-                    descricao={resumo.diario.length > 0 ? descricaoDiario : null}
-                    estilos={estilos}
-                >
-                    {resumo.diario.map((grupo, indice) => (
-                        <ItemPermissao
-                            key={grupo.id}
-                            indice={indice}
-                            titulo={grupo.titulo}
-                            complemento={grupo.permissoes
-                                .map((permissao) => permissao.titulo)
-                                .join(', ')
-                                .toLocaleLowerCase('pt-BR')}
-                            estilos={estilos}
-                        />
-                    ))}
-                </Secao>
+                    <Secao
+                        titulo="PERMISSÕES DE ACESSO AO DIÁRIO"
+                        vazio={resumo.diario.length === 0}
+                        mensagemVazia={mensagensVazias.diario}
+                        descricao={resumo.diario.length > 0 ? descricaoDiario : null}
+                        estilos={estilos}
+                    >
+                        {resumo.diario.map((grupo, indice) => (
+                            <ItemPermissao
+                                key={grupo.id}
+                                indice={indice}
+                                titulo={grupo.titulo}
+                                complemento={grupo.permissoes
+                                    .map((permissao) => permissao.titulo)
+                                    .join(', ')
+                                    .toLocaleLowerCase('pt-BR')}
+                                estilos={estilos}
+                            />
+                        ))}
+                    </Secao>
+                </ScrollView>
 
                 <View style={estilos.vinculo}>
                     <ContactPermissionBadge vinculo={vinculo} />
@@ -234,7 +271,7 @@ function ItemPermissao({ indice, titulo, complemento, estilos }) {
                 importantForAccessibility="no-hide-descendants"
                 style={[estilos.marcador, indice % 2 === 1 && estilos.marcadorAlternado]}
             >
-                •
+                ●
             </Text>
 
             <Text style={estilos.textoItem}>
@@ -248,6 +285,7 @@ function ItemPermissao({ indice, titulo, complemento, estilos }) {
 export {
     DESCRICOES_PERMISSOES_GERAIS,
     ContactPermissionsSummaryModal,
+    calcularLimitesModal,
     criarDescricaoGerais,
     criarDescricaoPermissaoGeral,
     criarMensagensVazias,

@@ -34,7 +34,8 @@ export default function AppModal({
     estilo,
     estiloCabecalho,
     estiloIconeCabecalho,
-    corIconeCabecalho
+    corIconeCabecalho,
+    rolagemExternaHabilitada = true
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -79,6 +80,7 @@ export default function AppModal({
                 >
                     <ScrollView
                         testID="app-modal-scroll"
+                        scrollEnabled={rolagemExternaHabilitada}
                         bounces={false}
                         keyboardShouldPersistTaps="handled"
                         contentContainerStyle={estilos.rolagem}

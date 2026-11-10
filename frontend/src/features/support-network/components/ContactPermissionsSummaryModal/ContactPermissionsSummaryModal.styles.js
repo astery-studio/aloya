@@ -17,6 +17,19 @@ function criarEstilos(tema) {
             gap: 12
         },
 
+        rolagemPermissoes: {
+            width: '100%',
+            flexGrow: 0,
+            flexShrink: 1
+        },
+
+        conteudoRolagem: {
+            width: '100%',
+            alignItems: 'center',
+            gap: 12,
+            paddingBottom: 4
+        },
+
         secao: {
             width: '100%',
             alignItems: 'center',
@@ -82,6 +95,7 @@ function criarEstilos(tema) {
             color: tema.escuro ? '#F08A75' : '#C85A44',
             fontFamily: fontFamilies.regular,
             fontSize: 9,
+            fontStyle: 'normal',
             fontWeight: '400',
             lineHeight: 13.5
         },

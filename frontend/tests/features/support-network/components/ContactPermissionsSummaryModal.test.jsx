@@ -1,9 +1,10 @@
 //Testa agrupamento e apresentação do resumo de permissões.
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, within } from '@testing-library/react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 import {
     ContactPermissionsSummaryModal,
+    calcularLimitesModal,
     criarMensagensVazias,
     criarResumoPermissoes,
     normalizarNome,
@@ -75,6 +76,35 @@ describe('ContactPermissionsSummaryModal', () => {
         expect(screen.getByText('fluxo menstrual')).toBeOnTheScreen();
 
         expect(screen.getByText('Profissional')).toBeOnTheScreen();
+
+        const rolagem = screen.getByTestId('contact-permissions-scroll');
+
+        expect(screen.getByTestId('app-modal-scroll')).toHaveProp('scrollEnabled', false);
+        expect(rolagem).not.toHaveProp('scrollEnabled', false);
+
+        expect(within(rolagem).getByText('PERMISSÕES GERAIS')).toBeOnTheScreen();
+        expect(within(rolagem).queryByText('Profissional')).toBeNull();
+        expect(
+            within(rolagem).queryByRole('button', {
+                name: 'Fechar resumo de permissões'
+            })
+        ).toBeNull();
+
+        const marcadores = screen.getAllByText('●', {
+            includeHiddenElements: true
+        });
+
+        expect(marcadores[0]).toHaveStyle({
+            color: '#C85A44',
+            fontSize: 9,
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 13.5
+        });
+
+        expect(marcadores[1]).toHaveStyle({
+            color: '#2C4C3B'
+        });
     });
 
     test('mostra mensagens quando não existem permissões', async () => {
@@ -195,6 +225,18 @@ describe('ContactPermissionsSummaryModal', () => {
         expect(normalizarNome(' Julia ')).toBe('Julia');
 
         expect(normalizarNome('')).toBe('Contato');
+    });
+
+    test('limita o modal e reserva a área rolável', () => {
+        expect(calcularLimitesModal(800)).toEqual({
+            alturaMaximaModal: 768,
+            alturaMaximaRolagem: 558
+        });
+
+        expect(calcularLimitesModal(undefined)).toEqual({
+            alturaMaximaModal: 608,
+            alturaMaximaRolagem: 398
+        });
     });
 
     test('cria as mensagens vazias da perspectiva recebida', () => {
