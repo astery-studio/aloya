@@ -37,8 +37,10 @@ jest.mock('../../../../src/features/support-network/components/ContactList/Conta
     };
 
     return {
-        ContactList: ({ aoAcao, aoAbrirResumo, aoTentarNovamente }) => (
+        ContactList: ({ aoAcao, aoAbrirResumo, aoTentarNovamente, cabecalho }) => (
             <View testID="contact-list">
+                {cabecalho}
+
                 <Text
                     accessibilityRole="button"
                     accessibilityLabel="Aceitar teste"
@@ -205,6 +207,10 @@ test('apresenta a tela e a lista recebida', async () => {
     expect(screen.getByText('Contatos')).toBeOnTheScreen();
 
     expect(screen.getByTestId('contact-list')).toBeOnTheScreen();
+
+    expect(
+        screen.getByText('Pessoas que contam com você como parte da sua rede de cuidado e apoio.')
+    ).toBeOnTheScreen();
 
     expect(mockUseReceivedContacts).toHaveBeenCalledWith({
         service: {},

@@ -13,9 +13,7 @@ function criarEstilos(tema) {
 
         apresentacao: {
             width: '100%',
-            paddingHorizontal: 20,
-            paddingTop: 18,
-            paddingBottom: 14
+            paddingBottom: 18
         },
 
         descricao: {

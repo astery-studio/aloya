@@ -130,12 +130,6 @@ function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoEx
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="received-contacts-screen" style={estilos.tela}>
-                    <View style={estilos.apresentacao}>
-                        <Text style={estilos.descricao}>
-                            Pessoas que contam com você como parte da sua rede de cuidado e apoio.
-                        </Text>
-                    </View>
-
                     <View style={estilos.lista}>
                         <ContactList
                             contatos={estado.contatos}
@@ -149,6 +143,14 @@ function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoEx
                             contatoEmAndamentoId={estado.contatoEmAndamentoId}
                             acaoEmAndamento={estado.acaoEmAndamento}
                             desabilitado={Boolean(estado.acaoEmAndamento)}
+                            cabecalho={
+                                <View style={estilos.apresentacao}>
+                                    <Text style={estilos.descricao}>
+                                        Pessoas que contam com você como parte da sua rede de
+                                        cuidado e apoio.
+                                    </Text>
+                                </View>
+                            }
                         />
                     </View>
                 </View>

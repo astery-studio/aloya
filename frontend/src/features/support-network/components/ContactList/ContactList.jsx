@@ -130,7 +130,8 @@ function ContactList({
     aoTentarNovamente,
     contatoEmAndamentoId = null,
     acaoEmAndamento = null,
-    desabilitado = false
+    desabilitado = false,
+    cabecalho = null
 }) {
     const tema = useTheme();
 
@@ -215,6 +216,16 @@ function ContactList({
         );
     }, [atualizando, estilos, tema.cores.interface.destaque]);
 
+    const renderizarCabecalho = useCallback(
+        () => (
+            <>
+                {cabecalho}
+                {renderizarAtualizacao()}
+            </>
+        ),
+        [cabecalho, renderizarAtualizacao]
+    );
+
     if (carregamentoInicial) {
         return (
             <View
@@ -284,7 +295,7 @@ function ContactList({
             data={itens}
             keyExtractor={extrairChave}
             renderItem={renderizarItem}
-            ListHeaderComponent={renderizarAtualizacao}
+            ListHeaderComponent={renderizarCabecalho}
             contentContainerStyle={estilos.conteudoLista}
             ItemSeparatorComponent={() => <Separador estilo={estilos.separador} />}
             refreshing={Boolean(atualizando)}

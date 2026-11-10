@@ -1,5 +1,6 @@
 //Testa agrupamento, estados e encaminhamento da lista de contatos.
 import { fireEvent, screen } from '@testing-library/react-native';
+import { Text } from 'react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 import {
@@ -105,6 +106,21 @@ describe('ContactList', () => {
         expect(screen.getByText('Carlos')).toBeOnTheScreen();
 
         expect(screen.getByText('Beatriz')).toBeOnTheScreen();
+    });
+
+    test('mantém o conteúdo introdutório dentro da rolagem da lista', async () => {
+        await render(
+            <ContactList
+                contatos={contatos}
+                perspectiva="recebido"
+                cabecalho={<Text>Introdução rolável</Text>}
+                aoAcao={jest.fn()}
+                aoAbrirResumo={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('contact-list')).toBeOnTheScreen();
+        expect(screen.getByText('Introdução rolável')).toBeOnTheScreen();
     });
 
     test('encaminha uma ação do cartão', async () => {
