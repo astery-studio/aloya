@@ -81,11 +81,34 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        MembersScreen: ({ onAbrirCategorias, onAdicionarContato }) =>
+        MembersScreen: ({
+            service,
+            categoriasService,
+            onAbrirCategorias,
+            onAdicionarContato,
+            onSessaoExpirada
+        }) =>
             React.createElement(
                 View,
                 null,
                 React.createElement(Text, null, 'Tela de Membros'),
+                React.createElement(
+                    Text,
+                    null,
+                    service?.listar ? 'Contatos conectados' : 'Contatos ausentes'
+                ),
+                React.createElement(
+                    Text,
+                    null,
+                    categoriasService?.listarCategorias
+                        ? 'Categorias dos filtros conectadas'
+                        : 'Categorias dos filtros ausentes'
+                ),
+                React.createElement(
+                    Text,
+                    null,
+                    typeof onSessaoExpirada === 'function' ? 'Sessão conectada' : 'Sessão ausente'
+                ),
                 React.createElement(
                     Pressable,
                     {
@@ -378,6 +401,10 @@ function criarServicos() {
         supportCategoryService: {
             listarCategorias: jest.fn(),
             criarCategoria: jest.fn()
+        },
+        supportContactService: {
+            listar: jest.fn(),
+            reenviarConvite: jest.fn()
         }
     };
 }
@@ -439,6 +466,16 @@ describe('fluxos da Rede de Apoio no App', () => {
         await abrirCategorias();
 
         expect(await screen.findByText('Serviço conectado')).toBeOnTheScreen();
+    });
+
+    test('conecta serviços e sessão à tela de contatos', async () => {
+        await render(<App />);
+
+        await abrirMembros();
+
+        expect(screen.getByText('Contatos conectados')).toBeOnTheScreen();
+        expect(screen.getByText('Categorias dos filtros conectadas')).toBeOnTheScreen();
+        expect(screen.getByText('Sessão conectada')).toBeOnTheScreen();
     });
 
     test('abre os convites recebidos para uma conta de contato', async () => {

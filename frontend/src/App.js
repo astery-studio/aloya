@@ -660,12 +660,15 @@ export default function App() {
                 />
             ) : (
                 <MembersScreen
+                    service={configuracao.servicos.supportContactService}
+                    categoriasService={configuracao.servicos.supportCategoryService}
                     onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
                     onAdicionarContato={() => {
                         setRascunhoNovoContato(null);
                         setTelaInterna(telasInternas.novoContato);
                     }}
                     onSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
                 />
             );
     } else if (telaInterna === telasInternas.novoContato) {
