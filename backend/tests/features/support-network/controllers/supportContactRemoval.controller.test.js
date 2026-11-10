@@ -27,8 +27,11 @@ function resposta() {
 function controllerCom(sobrescritas = {}) {
     return criarSupportContactRemovalController({
         service: sobrescritas.service ?? {
-            async remover() {
+            async desativar() {
                 return { id: 9, status: 'revogado' };
+            },
+            async remover() {
+                return { id: 9, status: 'removido', statusAnterior: 'ativo' };
             }
         },
         contactValidator: sobrescritas.contactValidator ?? {
@@ -48,9 +51,15 @@ test('remove usando somente a identidade autenticada e responde sucesso', async 
     const chamadas = [];
     const controller = controllerCom({
         service: {
+            async desativar() {},
             async remover(dados) {
                 chamadas.push(dados);
-                return { id: 9, status: 'revogado', sessoesEncerradas: 1 };
+                return {
+                    id: 9,
+                    status: 'removido',
+                    statusAnterior: 'ativo',
+                    sessoesEncerradas: 1
+                };
             }
         }
     });
@@ -72,9 +81,40 @@ test('remove usando somente a identidade autenticada e responde sucesso', async 
     assert.equal(estado.headers['Cache-Control'], 'no-store');
 });
 
+test('desativa o contato pelo fluxo específico', async () => {
+    const chamadas = [];
+    const controller = controllerCom({
+        service: {
+            async remover() {},
+            async desativar(dados) {
+                chamadas.push(dados);
+                return { id: 9, status: 'revogado', statusAnterior: 'ativo' };
+            }
+        }
+    });
+    const { res, estado } = resposta();
+
+    await controller.desativar(
+        {
+            usuario: { id: 1, papel: 'principal' },
+            params: { contatoId: '9' },
+            body: { confirmado: true }
+        },
+        res,
+        assert.fail
+    );
+
+    assert.deepEqual(chamadas, [{ titularId: 1, papel: 'principal', contatoId: 9 }]);
+    assert.equal(estado.status, 200);
+    assert.equal(estado.body.mensagem, 'Contato desativado com sucesso.');
+});
+
 test('não chama o serviço sem identificador ou confirmação válidos', async () => {
     let chamadas = 0;
     const service = {
+        async desativar() {
+            chamadas += 1;
+        },
         async remover() {
             chamadas += 1;
         }
@@ -128,6 +168,7 @@ test('preserva erro público e mascara falha interna', async () => {
 
     await controllerCom({
         service: {
+            async desativar() {},
             async remover() {
                 throw publico;
             }
@@ -141,6 +182,7 @@ test('preserva erro público e mascara falha interna', async () => {
     );
     await controllerCom({
         service: {
+            async desativar() {},
             async remover() {
                 throw interno;
             }

@@ -10,6 +10,7 @@ function criarSupportContactRemovalRoutes({
         typeof authMiddleware?.autenticar !== 'function' ||
         typeof parentalConsentMiddleware?.exigirAcessoRedeApoio !== 'function' ||
         typeof rateLimit !== 'function' ||
+        typeof controller?.desativar !== 'function' ||
         typeof controller?.remover !== 'function'
     ) {
         throw new TypeError('Não foi possível configurar as rotas de remoção de contato.');
@@ -22,6 +23,13 @@ function criarSupportContactRemovalRoutes({
         parentalConsentMiddleware.exigirAcessoRedeApoio,
         rateLimit,
         controller.remover
+    );
+    router.patch(
+        '/contacts/:contatoId/deactivate',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        rateLimit,
+        controller.desativar
     );
     return router;
 }

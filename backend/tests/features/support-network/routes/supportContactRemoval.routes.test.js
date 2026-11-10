@@ -11,24 +11,36 @@ test('protege a remoção antes de executar o controller', () => {
         },
         delete(...args) {
             chamadas.push(['delete', ...args]);
+        },
+        patch(...args) {
+            chamadas.push(['patch', ...args]);
         }
     };
     function autenticar() {}
     function exigirAcessoRedeApoio() {}
     function rateLimit() {}
     function remover() {}
+    function desativar() {}
 
     const resultado = criarSupportContactRemovalRoutes({
         Router: () => router,
         authMiddleware: { autenticar },
         parentalConsentMiddleware: { exigirAcessoRedeApoio },
         rateLimit,
-        controller: { remover }
+        controller: { desativar, remover }
     });
 
     assert.equal(resultado, router);
     assert.deepEqual(chamadas, [
-        ['delete', '/contacts/:contatoId', autenticar, exigirAcessoRedeApoio, rateLimit, remover]
+        ['delete', '/contacts/:contatoId', autenticar, exigirAcessoRedeApoio, rateLimit, remover],
+        [
+            'patch',
+            '/contacts/:contatoId/deactivate',
+            autenticar,
+            exigirAcessoRedeApoio,
+            rateLimit,
+            desativar
+        ]
     ]);
 });
 
@@ -38,7 +50,7 @@ test('rejeita configuração incompleta', () => {
         authMiddleware: { autenticar() {} },
         parentalConsentMiddleware: { exigirAcessoRedeApoio() {} },
         rateLimit() {},
-        controller: { remover() {} }
+        controller: { desativar() {}, remover() {} }
     };
 
     for (const chave of Object.keys(completas)) {
