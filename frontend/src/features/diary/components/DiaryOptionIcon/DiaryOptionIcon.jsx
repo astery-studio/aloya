@@ -11,13 +11,7 @@ function DiaryOptionIcon({ iconeId, tamanho = 18, cor, weight = 'regular' }) {
 
     if (typeof icone === 'string') {
         return (
-            <SvgXml
-                accessible={false}
-                xml={icone}
-                width={tamanho}
-                height={tamanho}
-                color={cor}
-            />
+            <SvgXml accessible={false} xml={icone} width={tamanho} height={tamanho} color={cor} />
         );
     }
 

@@ -21,20 +21,44 @@ const diaryGroupPresentation = Object.freeze({
     'torax_peito:sintomas': [null, 'corpo-torax-peito-'],
     'sintomas_emocionais:agradaveis': ['AGRADÁVEIS', 'emocional-sintomas-emocionais-agradaveis-'],
     'sintomas_emocionais:neutros': ['NEUTROS', 'emocional-sintomas-emocionais-neutros-'],
-    'sintomas_emocionais:desagradaveis': ['DESAGRADÁVEIS', 'emocional-sintomas-emocionais-desagradaveis-'],
-    'sintomas_pre_menstruais:sintomas': [null, 'emocional-sintomas-emocionais-sintomas-pre-menstruais-'],
+    'sintomas_emocionais:desagradaveis': [
+        'DESAGRADÁVEIS',
+        'emocional-sintomas-emocionais-desagradaveis-'
+    ],
+    'sintomas_pre_menstruais:sintomas': [
+        null,
+        'emocional-sintomas-emocionais-sintomas-pre-menstruais-'
+    ],
     'energia:estado': [null, 'energia-sono-energia-'],
     'qualidade_sono:tipo': ['TIPO DE SONO', 'energia-sono-qualidade-do-sono-tipo-de-sono-'],
-    'qualidade_sono:alteracoes': ['ALTERAÇÕES NO SONO', 'energia-sono-qualidade-do-sono-alteracoes-no-sono-'],
-    'atividade_sexual:tipo': ['TIPO DE ATIVIDADE', 'vida-intima-social-atividade-sexual-tipo-de-atividade-'],
-    'atividade_sexual:contracepcao': ['CONTRACEPÇÃO', 'vida-intima-social-atividade-sexual-contracepcao-'],
-    'atividade_sexual:experiencia': ['EXPERIÊNCIA', 'vida-intima-social-atividade-sexual-experiencia-'],
+    'qualidade_sono:alteracoes': [
+        'ALTERAÇÕES NO SONO',
+        'energia-sono-qualidade-do-sono-alteracoes-no-sono-'
+    ],
+    'atividade_sexual:tipo': [
+        'TIPO DE ATIVIDADE',
+        'vida-intima-social-atividade-sexual-tipo-de-atividade-'
+    ],
+    'atividade_sexual:contracepcao': [
+        'CONTRACEPÇÃO',
+        'vida-intima-social-atividade-sexual-contracepcao-'
+    ],
+    'atividade_sexual:experiencia': [
+        'EXPERIÊNCIA',
+        'vida-intima-social-atividade-sexual-experiencia-'
+    ],
     'autoerotismo:praticas': [null, 'vida-intima-social-autoerotismo-'],
     'desejo_libido:desejo': ['DESEJO', 'vida-intima-social-libido-desejo-'],
-    'desejo_libido:resposta_sexual': ['RESPOSTA SEXUAL', 'vida-intima-social-libido-resposta-sexual-'],
+    'desejo_libido:resposta_sexual': [
+        'RESPOSTA SEXUAL',
+        'vida-intima-social-libido-resposta-sexual-'
+    ],
     'vida_social:interacao': ['INTERAÇÃO', 'vida-intima-social-vida-social-interacao-'],
     'vida_social:experiencia': ['EXPERIÊNCIA', 'vida-intima-social-vida-social-experiencia-'],
-    'vida_social:relacionamentos': ['RELACIONAMENTOS', 'vida-intima-social-vida-social-relacionamentos-'],
+    'vida_social:relacionamentos': [
+        'RELACIONAMENTOS',
+        'vida-intima-social-vida-social-relacionamentos-'
+    ],
     'testes:teste': ['TESTE', 'saude-testes-'],
     'testes:resultado': ['RESULTADO', 'saude-testes-resultado-'],
     'consultas:consulta': ['CONSULTA', 'saude-consultas-consulta-'],

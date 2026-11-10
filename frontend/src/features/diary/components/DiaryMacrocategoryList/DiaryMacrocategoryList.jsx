@@ -10,13 +10,7 @@ function criarEstadoExpandido(macrocategorias) {
     );
 }
 
-function DiaryMacrocategoryList({
-    macrocategorias,
-    valores,
-    erros,
-    aoAlterar,
-    desabilitado
-}) {
+function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, desabilitado }) {
     const [expandidas, setExpandidas] = useState(() => criarEstadoExpandido(macrocategorias));
 
     useEffect(() => {

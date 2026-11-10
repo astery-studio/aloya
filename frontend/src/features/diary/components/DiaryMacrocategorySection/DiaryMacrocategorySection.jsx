@@ -42,9 +42,7 @@ function DiaryMacrocategorySection({
                 accessibilityState={{ expanded: expandido, disabled: desabilitado }}
                 disabled={desabilitado}
                 onPress={aoAlternar}
-                style={({ pressed }) =>
-                    montarEstiloCabecalho(estilos, expandido, cores, pressed)
-                }
+                style={({ pressed }) => montarEstiloCabecalho(estilos, expandido, cores, pressed)}
             >
                 <View style={[estilos.caixaIcone, { backgroundColor: cores.fundoIcone }]}>
                     <Icone size={18} color={cores.icone} />

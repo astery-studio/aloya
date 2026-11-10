@@ -33,7 +33,6 @@ function useDiaryCatalog({ ativo, service, onSessaoExpirada }) {
                 if (requisicao.current === id) setCarregando(false);
                 if (controleAtual.current === controle) controleAtual.current = null;
             });
-
     }, [ativo, onSessaoExpirada, service]);
 
     useEffect(() => {
