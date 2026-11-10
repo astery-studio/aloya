@@ -2,11 +2,13 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const { Pressable, Text } = require('react-native');
-    return ({ texto, aoPressionar }) => (
-        <Pressable accessibilityRole="button" onPress={aoPressionar}>
-            <Text>{texto}</Text>
-        </Pressable>
-    );
+    return function MockButtonScreen({ texto, aoPressionar }) {
+        return (
+            <Pressable accessibilityRole="button" onPress={aoPressionar}>
+                <Text>{texto}</Text>
+            </Pressable>
+        );
+    };
 });
 jest.mock('../../../../src/features/diary/components/DiaryDateNavigator/DiaryDateNavigator', () => {
     const { Pressable, Text, View } = require('react-native');

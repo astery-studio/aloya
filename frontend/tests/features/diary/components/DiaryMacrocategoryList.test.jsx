@@ -6,14 +6,16 @@ jest.mock(
     '../../../../src/features/diary/components/DiaryMacrocategorySection/DiaryMacrocategorySection',
     () => {
         const { Pressable, Text, View } = require('react-native');
-        return ({ titulo, expandido, aoAlternar, children }) => (
-            <View>
-                <Pressable accessibilityRole="button" onPress={aoAlternar}>
-                    <Text>{`${titulo}:${expandido}`}</Text>
-                </Pressable>
-                {expandido ? children : null}
-            </View>
-        );
+        return function MockMacrocategorySection({ titulo, expandido, aoAlternar, children }) {
+            return (
+                <View>
+                    <Pressable accessibilityRole="button" onPress={aoAlternar}>
+                        <Text>{`${titulo}:${expandido}`}</Text>
+                    </Pressable>
+                    {expandido ? children : null}
+                </View>
+            );
+        };
     }
 );
 jest.mock('../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField', () => {
