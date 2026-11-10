@@ -103,11 +103,41 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
     async function listarRecebidos({ usuarioId, papel } = {}) {
         validarContatoAutenticado(usuarioId, papel);
 
-        if (typeof prisma?.vinculoRedeApoio?.findMany !== 'function' || typeof now !== 'function') {
+        if (
+            typeof prisma?.usuario?.findUnique !== 'function' ||
+            typeof prisma?.vinculoRedeApoio?.findMany !== 'function' ||
+            typeof prisma?.vinculoRedeApoio?.updateMany !== 'function' ||
+            typeof now !== 'function'
+        ) {
             throw new TypeError('Não foi possível consultar os convites recebidos.');
         }
 
         const instante = now();
+        const usuario = await prisma.usuario.findUnique({
+            where: { id: usuarioId },
+            select: {
+                email: true,
+                statusConta: true
+            }
+        });
+
+        if (!usuario || usuario.statusConta !== 'ativa') {
+            throw criarErro('Sessão inválida.', 401, 'SESSAO_INVALIDA');
+        }
+
+        // Reassocia convites criados antes do cadastro ou mantidos por uma
+        // versão antiga do fluxo. A operação é idempotente e limitada ao
+        // e-mail autenticado, a convites pendentes e ainda válidos.
+        await prisma.vinculoRedeApoio.updateMany({
+            where: {
+                contatoId: null,
+                emailConvidado: usuario.email,
+                status: 'pendente',
+                dataExpiracao: { gt: instante }
+            },
+            data: { contatoId: usuarioId }
+        });
+
         const vinculos = await prisma.vinculoRedeApoio.findMany({
             where: {
                 contatoId: usuarioId,

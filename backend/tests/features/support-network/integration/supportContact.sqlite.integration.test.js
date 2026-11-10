@@ -56,7 +56,8 @@ function criarBanco() {
             (1, 'Titular Ana', '2000-01-01T00:00:00.000Z', 'titular@example.com', 'hash', 'principal', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (2, 'Zélia', '1990-01-01T00:00:00.000Z', 'zelia@example.com', 'hash', 'contato_apoio', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (3, 'Rafael', '1991-01-01T00:00:00.000Z', 'rafael@example.com', 'hash', 'contato_apoio', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (4, 'Outro Titular', '1992-01-01T00:00:00.000Z', 'outro@example.com', 'hash', 'principal', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            (4, 'Outro Titular', '1992-01-01T00:00:00.000Z', 'outro@example.com', 'hash', 'principal', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (5, 'Contato Legado', '1993-01-01T00:00:00.000Z', 'legado@example.com', 'hash', 'contato_apoio', 'ativa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
         INSERT INTO categorias_permissao (id, titular_id, nome, nome_normalizado, conjunto_dados_visiveis, criado_em, atualizado_em)
         VALUES (10, 1, 'Profissional', 'profissional', '["geral.fase_atual","saude.consultas"]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -68,7 +69,8 @@ function criarBanco() {
             (21, 1, 3, 'rafael@example.com', 10, '[]', 'pendente', 'hash-antigo', '2026-10-30T12:00:00.000Z', '2026-11-15T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (22, 1, NULL, 'ana@email.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-ana', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (23, 1, NULL, 'recusado@email.com', NULL, '[]', 'recusado', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (24, 4, NULL, 'alheio@email.com', NULL, '[]', 'pendente', 'hash-alheio', '2026-10-01T12:00:00.000Z', '2026-10-08T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            (24, 4, NULL, 'alheio@email.com', NULL, '[]', 'pendente', 'hash-alheio', '2026-10-01T12:00:00.000Z', '2026-10-08T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (25, 4, NULL, 'legado@example.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-legado', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     `);
     banco.close();
     return { diretorio, caminho };
@@ -248,6 +250,33 @@ test('contato autenticado lista e aceita convite recebido sem token do e-mail', 
         assert.equal(vinculo.status, 'ativo');
         assert.equal(vinculo.tokenConviteHash, null);
         assert.ok(notificacao);
+    } finally {
+        servidor.close();
+        await once(servidor, 'close');
+        await prisma.$disconnect();
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
+
+test('reassocia convite pendente legado pelo e-mail da conta autenticada', async () => {
+    const { diretorio, caminho } = criarBanco();
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({ url: `file:${caminho.replaceAll('\\', '/')}` })
+    });
+    const servidor = criarApp(prisma, [], { id: 5, papel: 'contato_apoio' }).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const resposta = await fetch(
+            `http://127.0.0.1:${servidor.address().port}/support-network/received-contacts`
+        );
+        const corpo = await resposta.json();
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 25 } });
+
+        assert.equal(resposta.status, 200);
+        assert.deepEqual(corpo.resumo, { total: 1, pendentes: 1, ativos: 0 });
+        assert.equal(corpo.contatos[0].id, 25);
+        assert.equal(vinculo.contatoId, 5);
     } finally {
         servidor.close();
         await once(servidor, 'close');
