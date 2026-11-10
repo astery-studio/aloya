@@ -1,5 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
+jest.mock('../../../../src/features/diary/config/diaryOptionPresentation', () => ({
+    obterApresentacaoOpcao: (categoriaId, opcao) => ({
+        iconeId: `${categoriaId}-${opcao.id}`,
+        iconeProps: {}
+    })
+}));
+jest.mock('../../../../src/features/diary/components/DiaryOptionIcon/DiaryOptionIcon', () => ({
+    DiaryOptionIcon: () => null
+}));
+
 import { DiaryCategoryField } from '../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField';
 import { agruparOpcoes } from '../../../../src/features/diary/utils/diaryOptionGroups';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
