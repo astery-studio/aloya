@@ -149,13 +149,13 @@ describe('ContactList', () => {
             />
         );
 
-        expect(screen.getByText('CONVITES (2 CONTATOS)')).toBeOnTheScreen();
+        expect(screen.getByText('PENDENTES (2 CONTATOS)')).toBeOnTheScreen();
 
-        expect(screen.getByText('CONTATOS ATIVOS (1 CONTATO)')).toBeOnTheScreen();
+        expect(screen.getByText('ATIVOS (1 CONTATO)')).toBeOnTheScreen();
 
-        expect(screen.getByText('CONTATOS INATIVOS (1 CONTATO)')).toBeOnTheScreen();
+        expect(screen.getByText('INATIVOS (1 CONTATO)')).toBeOnTheScreen();
 
-        expect(screen.getByText('CONVITES RECUSADOS (1 CONTATO)')).toBeOnTheScreen();
+        expect(screen.getByText('RECUSADOS (1 CONTATO)')).toBeOnTheScreen();
 
         expect(screen.getByText('Daniela')).toBeOnTheScreen();
     });

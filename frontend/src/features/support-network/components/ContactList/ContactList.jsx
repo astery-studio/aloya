@@ -27,19 +27,19 @@ const ORDEM_STATUS = Object.freeze({
 const GRUPOS_CONTATOS = Object.freeze([
     Object.freeze({
         status: 'pendente',
-        titulo: 'CONVITES'
+        titulo: 'PENDENTES'
     }),
     Object.freeze({
         status: 'ativo',
-        titulo: 'CONTATOS ATIVOS'
+        titulo: 'ATIVOS'
     }),
     Object.freeze({
         status: 'inativo',
-        titulo: 'CONTATOS INATIVOS'
+        titulo: 'INATIVOS'
     }),
     Object.freeze({
         status: 'recusado',
-        titulo: 'CONVITES RECUSADOS'
+        titulo: 'RECUSADOS'
     })
 ]);
 
