@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { deslocarDataDiario, obterHojeDiario } from '../../utils/diaryDate';
 import { listarMacrocategoriasAtivas } from '../../utils/diaryForm';
 import { DiaryDateNavigator } from '../DiaryDateNavigator/DiaryDateNavigator';
 import { DiaryMacrocategoryList } from '../DiaryMacrocategoryList/DiaryMacrocategoryList';
@@ -42,8 +43,10 @@ function NewDiaryEntryContent({ catalogo, carregando, erroCatalogo, recarregar, 
             >
                 <DiaryDateNavigator
                     data={formulario.data}
-                    dataMaxima={formulario.hoje}
-                    aoAlterar={formulario.setData}
+                    aoAnterior={() => formulario.setData(deslocarDataDiario(formulario.data, -1))}
+                    aoProximo={() => formulario.setData(deslocarDataDiario(formulario.data, 1))}
+                    proximoDisponivel={formulario.data < obterHojeDiario()}
+                    desabilitado={formulario.salvando}
                 />
                 <DiaryMacrocategoryList
                     macrocategorias={macrocategorias}
