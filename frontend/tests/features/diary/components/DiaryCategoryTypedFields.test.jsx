@@ -75,6 +75,7 @@ describe('campos tipados do Diário', () => {
             <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} paleta="saude" />
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota...');
+        expect(screen.getByTestId('divisor-anotacao-livre')).toBeOnTheScreen();
         expect(entrada).toHaveProp('scrollEnabled', false);
         expect(entrada).toHaveStyle({
             minHeight: 24,

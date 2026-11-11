@@ -5,6 +5,11 @@ import { fontFamilies } from '../../../../shared/theme';
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: { width: '100%', gap: 8 },
+        divisorCategoria: {
+            width: '100%',
+            height: 0.7,
+            backgroundColor: tema.cores.interface.borda
+        },
         faixaTitulo: {
             width: '100%',
             height: 36,

@@ -166,6 +166,9 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     }
     return (
         <View style={estilos.container}>
+            {categoria.id === 'anotacao_livre' ? (
+                <View testID="divisor-anotacao-livre" style={estilos.divisorCategoria} />
+            ) : null}
             <View style={[estilos.faixaTitulo, { backgroundColor: cores.fundoCategoria }]}>
                 <Text accessibilityRole="header" style={[estilos.titulo, { color: cores.icone }]}>
                     {categoria.nome}
