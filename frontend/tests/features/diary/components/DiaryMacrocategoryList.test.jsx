@@ -51,7 +51,7 @@ const macros = [
 ];
 
 test('define a discrição inicial de cada macrocategoria', () => {
-    expect(criarEstadoExpandido(macros)).toEqual({ corpo: true, vida: false });
+    expect(criarEstadoExpandido(macros)).toEqual({ corpo: false, vida: false });
 });
 
 test('expande a seção sensível e encaminha alterações', async () => {
@@ -64,7 +64,7 @@ test('expande a seção sensível e encaminha alterações', async () => {
             aoAlterar={aoAlterar}
         />
     );
-    expect(screen.getByText('Corpo:true')).toBeOnTheScreen();
+    expect(screen.getByText('Corpo:false')).toBeOnTheScreen();
     expect(screen.queryByText('Intimidade')).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByText('Vida íntima:false'));
     await fireEvent.press(screen.getByText('Intimidade'));

@@ -5,9 +5,7 @@ import { DiaryCategoryField } from '../DiaryCategoryField/DiaryCategoryField';
 import DiaryMacrocategorySection from '../DiaryMacrocategorySection/DiaryMacrocategorySection';
 
 function criarEstadoExpandido(macrocategorias) {
-    return Object.fromEntries(
-        macrocategorias.map((macro) => [macro.id, !macro.recolhidaPorPadrao])
-    );
+    return Object.fromEntries(macrocategorias.map((macro) => [macro.id, false]));
 }
 
 function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, desabilitado }) {
@@ -26,7 +24,7 @@ function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, de
         return (
             <DiaryMacrocategorySection
                 key={macro.id}
-                titulo={macro.nome}
+                titulo={macro.nomeCompacto ?? macro.nome}
                 icone={apresentacao.icone}
                 paleta={apresentacao.paleta}
                 expandido={Boolean(expandidas[macro.id])}
