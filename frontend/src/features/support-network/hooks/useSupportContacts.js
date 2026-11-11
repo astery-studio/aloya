@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
+
+const INTERVALO_ATUALIZACAO_CONTATOS_MS = 5000;
 
 const MENSAGEM_ERRO_LISTAGEM =
     'Não foi possível carregar sua Rede de Apoio no momento. Tente novamente.';
@@ -95,94 +98,130 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
         contatosRef.current = contatos;
     }, [contatos]);
 
-    const carregar = useCallback(() => {
-        if (requisicaoRef.current) {
-            return requisicaoRef.current;
-        }
+    const carregar = useCallback(
+        ({ silencioso = false } = {}) => {
+            if (requisicaoRef.current) {
+                return requisicaoRef.current;
+            }
 
-        if (typeof service?.listar !== 'function') {
-            setCarregando(false);
-            setAtualizando(false);
-            setErro(MENSAGEM_ERRO_LISTAGEM);
-
-            return Promise.resolve(false);
-        }
-
-        const controlador = new AbortController();
-
-        controladorRef.current = controlador;
-        setErro(null);
-
-        if (contatosRef.current.length > 0) {
-            setAtualizando(true);
-        } else {
-            setCarregando(true);
-        }
-
-        const requisicao = (async () => {
-            try {
-                const resultado = await service.listar({
-                    signal: controlador.signal
-                });
-
-                if (!montadoRef.current || controlador.signal.aborted) {
-                    return false;
-                }
-
-                setContatos(resultado.contatos);
-                setResumo(resultado.resumo);
-                setErro(null);
-
-                return true;
-            } catch (falha) {
-                if (
-                    !montadoRef.current ||
-                    controlador.signal.aborted ||
-                    falha?.name === 'AbortError'
-                ) {
-                    return false;
-                }
-
-                if (erroEhSessaoInvalida(falha)) {
-                    setErro(null);
-
-                    onSessaoExpirada?.({
-                        mensagem: MENSAGEM_SESSAO_EXPIRADA
-                    });
-
-                    return false;
-                }
-
+            if (typeof service?.listar !== 'function') {
+                setCarregando(false);
+                setAtualizando(false);
                 setErro(MENSAGEM_ERRO_LISTAGEM);
 
-                return false;
-            } finally {
-                if (requisicaoRef.current === requisicao) {
-                    requisicaoRef.current = null;
-                }
-
-                if (controladorRef.current === controlador) {
-                    controladorRef.current = null;
-                }
-
-                if (montadoRef.current) {
-                    setCarregando(false);
-                    setAtualizando(false);
-                }
+                return Promise.resolve(false);
             }
-        })();
 
-        requisicaoRef.current = requisicao;
+            const controlador = new AbortController();
 
-        return requisicao;
-    }, [onSessaoExpirada, service]);
+            controladorRef.current = controlador;
+            setErro(null);
+
+            if (contatosRef.current.length > 0 && !silencioso) {
+                setAtualizando(true);
+            } else if (contatosRef.current.length === 0 && !silencioso) {
+                setCarregando(true);
+            }
+
+            const requisicao = (async () => {
+                try {
+                    const resultado = await service.listar({
+                        signal: controlador.signal
+                    });
+
+                    if (!montadoRef.current || controlador.signal.aborted) {
+                        return false;
+                    }
+
+                    setContatos(resultado.contatos);
+                    setResumo(resultado.resumo);
+                    setErro(null);
+
+                    return true;
+                } catch (falha) {
+                    if (
+                        !montadoRef.current ||
+                        controlador.signal.aborted ||
+                        falha?.name === 'AbortError'
+                    ) {
+                        return false;
+                    }
+
+                    if (erroEhSessaoInvalida(falha)) {
+                        setErro(null);
+
+                        onSessaoExpirada?.({
+                            mensagem: MENSAGEM_SESSAO_EXPIRADA
+                        });
+
+                        return false;
+                    }
+
+                    setErro(MENSAGEM_ERRO_LISTAGEM);
+
+                    return false;
+                } finally {
+                    if (requisicaoRef.current === requisicao) {
+                        requisicaoRef.current = null;
+                    }
+
+                    if (controladorRef.current === controlador) {
+                        controladorRef.current = null;
+                    }
+
+                    if (montadoRef.current) {
+                        setCarregando(false);
+                        setAtualizando(false);
+                    }
+                }
+            })();
+
+            requisicaoRef.current = requisicao;
+
+            return requisicao;
+        },
+        [onSessaoExpirada, service]
+    );
 
     useEffect(() => {
         montadoRef.current = true;
         carregar();
 
+        let intervalo = null;
+
+        const pararAtualizacaoAutomatica = () => {
+            if (intervalo !== null) {
+                clearInterval(intervalo);
+                intervalo = null;
+            }
+        };
+
+        const iniciarAtualizacaoAutomatica = () => {
+            if (intervalo === null) {
+                intervalo = setInterval(
+                    () => carregar({ silencioso: true }),
+                    INTERVALO_ATUALIZACAO_CONTATOS_MS
+                );
+            }
+        };
+
+        if (!AppState.currentState || AppState.currentState === 'active') {
+            iniciarAtualizacaoAutomatica();
+        }
+
+        const assinatura = AppState.addEventListener('change', (proximoEstado) => {
+            if (proximoEstado === 'active') {
+                carregar({ silencioso: true });
+                iniciarAtualizacaoAutomatica();
+            } else {
+                pararAtualizacaoAutomatica();
+            }
+        });
+
         return () => {
             montadoRef.current = false;
+            pararAtualizacaoAutomatica();
+            assinatura.remove();
 
             controladorRef.current?.abort();
 
@@ -384,6 +423,7 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
 }
 
 export {
+    INTERVALO_ATUALIZACAO_CONTATOS_MS,
     MENSAGEM_ERRO_LISTAGEM,
     MENSAGEM_ERRO_CANCELAMENTO,
     MENSAGEM_ERRO_DESATIVACAO,
