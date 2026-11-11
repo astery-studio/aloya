@@ -255,8 +255,14 @@ test('carrega o vínculo e preserva a aparência do contato', async () => {
 
 test('converte categoria em permissões individuais somente após confirmação', async () => {
     const service = criarService();
+    const onSalvo = jest.fn();
     await render(
-        <ContactLinkEditFlow contatoId={20} dadosIniciais={dadosIniciais} service={service} />
+        <ContactLinkEditFlow
+            contatoId={20}
+            dadosIniciais={dadosIniciais}
+            service={service}
+            onSalvo={onSalvo}
+        />
     );
     await screen.findByTestId('formulario-edicao');
 
@@ -280,7 +286,7 @@ test('converte categoria em permissões individuais somente após confirmação'
             versao: configuracaoCategoria.versao
         });
     });
-    expect(await screen.findByText('Permissões atualizadas com sucesso')).toBeOnTheScreen();
+    await waitFor(() => expect(onSalvo).toHaveBeenCalledTimes(1));
 });
 
 test('substitui permissões individuais por uma categoria', async () => {
@@ -312,12 +318,14 @@ test('substitui permissões individuais por uma categoria', async () => {
 
 test('salva ícone e cor mantendo o vínculo e o e-mail bloqueado', async () => {
     const service = criarService();
+    const onSalvo = jest.fn();
     await render(
         <ContactLinkEditFlow
             contatoId={20}
             dadosIniciais={dadosIniciais}
             service={service}
             onCriarCategoria={jest.fn()}
+            onSalvo={onSalvo}
         />
     );
     await screen.findByTestId('formulario-edicao');
@@ -340,6 +348,7 @@ test('salva ícone e cor mantendo o vínculo e o e-mail bloqueado', async () => 
         });
     });
     expect(screen.queryByText('Desvincular categoria')).toBeNull();
+    expect(onSalvo).toHaveBeenCalledTimes(1);
 });
 
 test('confirma antes de abrir o cadastro de uma categoria nova', async () => {

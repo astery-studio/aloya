@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
-import { LockKeyIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../../settings/layouts/SettingsLayout/SettingsLayout';
 import { ContactForm } from '../../components/ContactForm/ContactForm';
@@ -105,7 +105,6 @@ function ContactLinkEditFlow({
     const [salvando, definirSalvando] = useState(false);
     const [erro, definirErro] = useState(null);
     const [confirmacaoTroca, definirConfirmacaoTroca] = useState(null);
-    const [sucesso, definirSucesso] = useState(false);
     const [permissoesVisiveis, definirPermissoesVisiveis] = useState(false);
     const [rascunhoPermissoes, definirRascunhoPermissoes] = useState([]);
     const controleConsulta = useRef(null);
@@ -250,7 +249,7 @@ function ContactLinkEditFlow({
                 contatoId,
                 criarAlteracao(configuracao, dados)
             );
-            if (montada.current) definirSucesso(resultado);
+            if (montada.current) onSalvo?.(resultado);
         } catch (falha) {
             if (!montada.current) return;
             if (CODIGOS_SESSAO_INVALIDA.has(falha?.codigo)) {
@@ -262,18 +261,20 @@ function ContactLinkEditFlow({
             atualizando.current = false;
             if (montada.current) definirSalvando(false);
         }
-    }, [alterado, configuracao, contatoId, dados, onSessaoExpirada, service, serviceDisponivel]);
-
-    const concluir = useCallback(() => {
-        const resultado = sucesso;
-        definirSucesso(false);
-        onSalvo?.(resultado);
-    }, [onSalvo, sucesso]);
+    }, [
+        alterado,
+        configuracao,
+        contatoId,
+        dados,
+        onSalvo,
+        onSessaoExpirada,
+        service,
+        serviceDisponivel
+    ]);
 
     const categoriaConfirmada = categorias.find(
         (categoria) => categoria.id === confirmacaoTroca?.categoriaId
     );
-    const destinoIndividual = dados?.categoriaId === null;
 
     return (
         <>
@@ -352,20 +353,6 @@ function ContactLinkEditFlow({
                     aoPressionar: () => definirConfirmacaoTroca(null),
                     desativado: salvando
                 }}
-            />
-
-            <SimpleModal
-                visivel={Boolean(sucesso)}
-                aoFechar={concluir}
-                icone={LockKeyIcon}
-                corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
-                titulo={
-                    destinoIndividual
-                        ? 'Permissões atualizadas com sucesso'
-                        : 'Vínculo atualizado com sucesso'
-                }
-                acaoPrincipal={{ texto: 'OK', variante: 'verde', aoPressionar: concluir }}
             />
 
             <SimpleModal
