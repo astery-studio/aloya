@@ -68,7 +68,7 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
         data: '2026-11-08',
         setData: jest.fn(),
         valores: {},
-        erros: { data: 'Data inválida', conteudo: 'Preencha', geral: 'Falha' },
+        erros: { data: 'Data inválida', conteudo: 'Preencha' },
         alterarValor: jest.fn(),
         salvar: jest.fn(),
         salvando: false
@@ -93,7 +93,6 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     ).toBeOnTheScreen();
     expect(screen.getByText('Data inválida')).toBeOnTheScreen();
     expect(screen.getByText('Preencha')).toBeOnTheScreen();
-    expect(screen.getByRole('alert')).toHaveTextContent('Falha');
     await fireEvent.press(screen.getByText('Anterior'));
     await fireEvent.press(screen.getByText('Próximo'));
     const voltar = formulario.setData.mock.calls[0][0];

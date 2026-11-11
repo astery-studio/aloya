@@ -70,7 +70,7 @@ function NewDiaryEntryModal({
             <SimpleModal
                 erroInterno
                 visivel={Boolean(formulario.erroSalvamento)}
-                aoFechar={formulario.salvando ? undefined : formulario.limparErroSalvamento}
+                aoFechar={formulario.limparErroSalvamento}
                 icone={WarningCircleIcon}
                 corIcone="#5C5C59"
                 fundoIcone="#EDEDED"
