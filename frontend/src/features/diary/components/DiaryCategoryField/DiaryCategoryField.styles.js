@@ -6,6 +6,8 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         container: { width: '100%', gap: 8 },
         faixaTitulo: {
+            width: '100%',
+            height: 36,
             minHeight: 36,
             alignItems: 'center',
             justifyContent: 'center',
@@ -20,9 +22,14 @@ function criarEstilos(tema) {
         },
         grupo: { width: '100%', gap: 8 },
         tituloGrupoLinha: {
+            width: '100%',
+            maxWidth: 280,
+            height: 39,
+            alignSelf: 'center',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12
+            justifyContent: 'center',
+            gap: 10
         },
         linha: { flex: 1, height: 1, backgroundColor: tema.cores.interface.borda },
         tituloGrupo: {

@@ -6,7 +6,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         painel: { height: '92%', maxHeight: '92%', backgroundColor: '#FFFFFF' },
         rolagem: { flex: 1 },
-        conteudo: {},
+        conteudo: { alignItems: 'center', paddingHorizontal: 16 },
         carregamento: { minHeight: 240, alignItems: 'center', justifyContent: 'center', gap: 12 },
         mensagem: {
             fontFamily: fontFamilies.regular,
@@ -22,7 +22,9 @@ function criarEstilos(tema) {
             color: tema.cores.interface.erro
         },
         cartaoRegistro: {
-            marginHorizontal: 24,
+            width: '100%',
+            maxWidth: 342,
+            alignSelf: 'center',
             marginTop: 20,
             marginBottom: 24,
             padding: 16,
@@ -61,7 +63,10 @@ function criarEstilos(tema) {
             color: '#5C5C59'
         },
         listaMacros: {
-            marginTop: 14
+            width: '100%',
+            maxWidth: 308,
+            alignSelf: 'center',
+            paddingTop: 14
         },
         botaoSalvar: {
             minHeight: 54,

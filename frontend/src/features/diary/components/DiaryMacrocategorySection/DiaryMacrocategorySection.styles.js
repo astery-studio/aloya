@@ -6,6 +6,8 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
             width: '100%',
+            maxWidth: 308,
+            alignSelf: 'center',
             overflow: 'hidden',
             borderWidth: 0.7,
             borderColor: tema.cores.interface.borda,
@@ -13,6 +15,8 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.superficie
         },
         cabecalho: {
+            width: '100%',
+            height: 60,
             minHeight: 60,
             flexDirection: 'row',
             alignItems: 'center',
@@ -36,7 +40,7 @@ function criarEstilos(tema) {
         conteudo: {
             width: '100%',
             gap: 16,
-            paddingHorizontal: 10,
+            paddingHorizontal: 0,
             paddingTop: 12,
             paddingBottom: 16,
             borderTopWidth: 1
