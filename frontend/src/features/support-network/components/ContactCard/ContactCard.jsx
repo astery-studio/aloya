@@ -296,15 +296,25 @@ function ContactCard({
                     </>
                 ) : contatoEnviadoInativo || conviteEnviadoRecusado ? (
                     <>
-                        <View style={estilos.avatarCabecalho}>
-                            <ContactAvatar
-                                iconeId={contato?.iconeId ?? 'pessoa'}
-                                corId={contato?.corId ?? 'branco'}
-                                tamanho="pequeno"
-                                tamanhoIcone={18}
-                                rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
-                            />
-                        </View>
+                        {conviteEnviadoRecusado ? (
+                            <View
+                                testID="rejected-contact-icon"
+                                importantForAccessibility="no"
+                                style={estilos.iconePendente}
+                            >
+                                <EnvelopeIcon size={16} color="#5C5C59" weight="regular" />
+                            </View>
+                        ) : (
+                            <View style={estilos.avatarCabecalho}>
+                                <ContactAvatar
+                                    iconeId={contato?.iconeId ?? 'pessoa'}
+                                    corId={contato?.corId ?? 'branco'}
+                                    tamanho="pequeno"
+                                    tamanhoIcone={18}
+                                    rotuloAcessibilidade={`Identificação visual de ${identificacao}`}
+                                />
+                            </View>
+                        )}
 
                         <View style={estilos.containerNomeAtivo}>
                             <Text numberOfLines={1} ellipsizeMode="tail" style={estilos.nomeAtivo}>

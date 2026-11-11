@@ -397,6 +397,14 @@ describe('ContactCard', () => {
 
         expect(screen.getByText('Marina')).toBeOnTheScreen();
         expect(screen.getByText('CONVITE RECUSADO')).toBeOnTheScreen();
+        expect(screen.getByTestId('rejected-contact-icon')).toHaveStyle({
+            width: 35.993,
+            height: 35.993,
+            borderRadius: 10,
+            borderWidth: 0.705,
+            borderColor: '#5C5C59',
+            backgroundColor: 'rgba(92, 92, 89, 0.20)'
+        });
         expect(screen.getByText(/Tipo de Vínculo:/u)).toBeOnTheScreen();
         expect(screen.getByText(/Data de Convite:/u)).toBeOnTheScreen();
         expect(screen.getByText(/30\/10\/2026/u)).toBeOnTheScreen();
