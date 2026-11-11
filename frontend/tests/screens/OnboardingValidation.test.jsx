@@ -97,6 +97,7 @@ test('cadastro envia a duração lútea como número, sem o evento do botão', a
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
@@ -126,12 +127,6 @@ test('cadastro de contato encerra após o nascimento sem coletar dados menstruai
         />
     );
 
-    await fireEvent.press(
-        screen.getByRole('radio', {
-            name: 'Participar de uma Rede de Apoio'
-        })
-    );
-
     await fireEvent.changeText(screen.getByLabelText('Nome'), 'Carla');
     await fireEvent.changeText(screen.getByLabelText('Email'), 'carla@email.com');
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'segredo1');
@@ -140,6 +135,7 @@ test('cadastro de contato encerra após o nascimento sem coletar dados menstruai
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário da rede de apoio' }));
 
     await waitFor(() =>
         expect(cadastrar).toHaveBeenCalledWith({
@@ -155,20 +151,23 @@ test('cadastro de contato encerra após o nascimento sem coletar dados menstruai
     expect(await screen.findByText(/Esperamos que sua experiência/u)).toBeOnTheScreen();
 });
 
-test('cadastro principal permanece selecionado por padrão', async () => {
+test('cadastro da Carla permanece sem seleção de tipo de usuário', async () => {
     await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()} />);
 
-    expect(
-        screen.getByRole('radio', {
-            name: 'Acompanhar meu ciclo'
-        }).props.accessibilityState
-    ).toEqual({ selected: true, disabled: false });
+    expect(screen.queryByText('Qual tipo de usuário você é?')).toBeNull();
+    expect(screen.queryByRole('radio')).toBeNull();
+});
 
-    expect(
-        screen.getByRole('radio', {
-            name: 'Participar de uma Rede de Apoio'
-        }).props.accessibilityState
-    ).toEqual({ selected: false, disabled: false });
+test('escolha do tipo aparece em uma tela própria depois do nascimento', async () => {
+    await renderWithTheme(<OnboardingScreen cadastrar={jest.fn()} />);
+    await preencherConta();
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
+    await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+
+    expect(screen.getByText('Qual tipo de usuário você é?')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Usuário da rede de apoio' })).toBeEnabled();
 });
 
 test('cadastro rejeita senha curta junto ao campo', async () => {
@@ -252,6 +251,7 @@ test('rejeita menstruação futura considerando a data local', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
 
@@ -272,6 +272,7 @@ test('remove o e-mail do responsável quando a pessoa informa idade adulta', asy
     );
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
@@ -386,6 +387,7 @@ test.each(['2026-08-02', '2099-01-01', '2026-02-30'])(
         await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
         await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
         await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
         expect(screen.getByRole('alert')).toHaveTextContent('Informe uma data de término válida.');
@@ -398,6 +400,7 @@ async function chegarAEtapaCiclo() {
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
 }
 
@@ -482,6 +485,7 @@ async function chegarAEtapaFinal() {
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');
@@ -505,6 +509,7 @@ test('conclui o cadastro sem período menstrual quando a pessoa não sabe a data
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
 
     expect(screen.getByRole('button', { name: 'Avançar' })).toBeDisabled();
     await fireEvent.press(screen.getByRole('button', { name: 'Não sei' }));
@@ -537,6 +542,7 @@ test('pular uma etapa já preenchida remove o valor antes de concluir', async ()
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Data'), '04012000');
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usuário que vivencia o ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar período' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Avançar' }));
     await fireEvent.changeText(screen.getByLabelText('Duração em dias'), '28');

@@ -15,6 +15,8 @@ import LastMenstruationStep from '../components/LastMenstruationStep/LastMenstru
 import LutealPhaseLengthStep from '../components/LutealPhaseLengthStep/LutealPhaseLengthStep';
 import MenstruationLengthStep from '../components/MenstruationLengthStep/MenstruationLengthStep';
 import OnboardingComplete from '../components/OnboardingComplete/OnboardingComplete';
+import SupportContactOnboardingComplete from '../components/SupportContactOnboardingComplete/SupportContactOnboardingComplete';
+import UserTypeStep from '../components/UserTypeStep/UserTypeStep';
 import { salvarToken } from '../../../shared/storage/tokenStorage';
 import { isValidDate } from '../../../shared/utils/validation/isValidDate';
 import { isValidEmail } from '../../../shared/utils/validation/isValidEmail';
@@ -26,7 +28,7 @@ const iniciais = {
     senha: '',
     confirmacao: '',
     aceitouTermos: false,
-    tipoUsuario: 'principal',
+    tipoUsuario: null,
     dataNascimento: '',
     emailResponsavelLegal: '',
     ultimaMenstruacao: null,
@@ -123,6 +125,8 @@ export default function OnboardingScreen({
     const voltar = () => {
         if (carregando || etapa === 6) return;
         if (etapa === 0) solicitarSaida();
+        else if (etapa === 'tipoUsuario') setEtapa(1);
+        else if (etapa === 2) setEtapa('tipoUsuario');
         else setEtapa(etapa - 1);
     };
     const avancar = () => setEtapa(etapa + 1);
@@ -361,7 +365,7 @@ export default function OnboardingScreen({
             });
             return;
         }
-        if (dados.tipoUsuario === 'principal' && ehMenorDe16(dados.dataNascimento)) {
+        if (ehMenorDe16(dados.dataNascimento)) {
             const mensagem = validarEmailResponsavel(dados.emailResponsavelLegal);
             if (mensagem) {
                 setErro({ titulo: 'E-mail inválido', mensagem });
@@ -372,12 +376,18 @@ export default function OnboardingScreen({
         }
         setErrosCampos({});
 
-        if (dados.tipoUsuario === 'contato_apoio') {
-            void finalizar();
+        setEtapa('tipoUsuario');
+    }
+
+    function selecionarTipoUsuario(tipoUsuario) {
+        alterar({ tipoUsuario });
+
+        if (tipoUsuario === 'contato_apoio') {
+            void finalizar({ tipoUsuario });
             return;
         }
 
-        avancar();
+        setEtapa(2);
     }
 
     function validarEmailResponsavel(valor) {
@@ -416,7 +426,7 @@ export default function OnboardingScreen({
                 {...comum}
                 valor={dados.dataNascimento}
                 aoAlterar={(dataNascimento) => alterarCampo('dataNascimento', dataNascimento)}
-                menorDe16={dados.tipoUsuario === 'principal' && ehMenorDe16(dados.dataNascimento)}
+                menorDe16={ehMenorDe16(dados.dataNascimento)}
                 emailResponsavelLegal={dados.emailResponsavelLegal}
                 aoAlterarEmailResponsavel={alterarEmailResponsavel}
                 aoValidarEmailResponsavel={() =>
@@ -424,6 +434,15 @@ export default function OnboardingScreen({
                 }
                 erroEmailResponsavel={errosCampos.emailResponsavelLegal}
                 aoAvancar={avancarNascimento}
+            />
+        );
+    if (etapa === 'tipoUsuario')
+        conteudo = (
+            <UserTypeStep
+                tipoUsuario={dados.tipoUsuario}
+                aoSelecionar={selecionarTipoUsuario}
+                aoVoltar={voltar}
+                carregando={carregando}
             />
         );
     if (etapa === 2)
@@ -488,7 +507,15 @@ export default function OnboardingScreen({
             />
         );
     if (etapa === 6)
-        conteudo = <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />;
+        conteudo =
+            dados.tipoUsuario === 'contato_apoio' ? (
+                <SupportContactOnboardingComplete
+                    logo={logo}
+                    aoIniciar={() => aoConcluir?.(dados)}
+                />
+            ) : (
+                <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />
+            );
 
     const irParaLogin = () => {
         setDados({ ...iniciais });
