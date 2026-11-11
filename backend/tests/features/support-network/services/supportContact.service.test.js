@@ -136,7 +136,8 @@ test('falha de forma controlada com dependência ou retorno inválido', async ()
 test('valida o papel antes de listar convites recebidos', () => {
     assert.doesNotThrow(() => validarContatoAutenticado(8, 'contato_apoio'));
     assert.doesNotThrow(() => validarContatoAutenticado(8, 'principal_e_contato_apoio'));
-    assert.throws(() => validarContatoAutenticado(8, 'principal'), {
+    assert.doesNotThrow(() => validarContatoAutenticado(8, 'principal'));
+    assert.throws(() => validarContatoAutenticado(8, 'administrador'), {
         status: 403,
         codigo: 'ACESSO_NEGADO'
     });

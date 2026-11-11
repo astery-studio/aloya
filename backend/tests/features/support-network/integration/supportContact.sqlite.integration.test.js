@@ -70,7 +70,8 @@ function criarBanco() {
             (22, 1, NULL, 'ana@email.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-ana', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (23, 1, NULL, 'recusado@email.com', NULL, '[]', 'recusado', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (24, 4, NULL, 'alheio@email.com', NULL, '[]', 'pendente', 'hash-alheio', '2026-10-01T12:00:00.000Z', '2026-10-08T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-            (25, 4, NULL, 'legado@example.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-legado', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+            (25, 4, NULL, 'legado@example.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-legado', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (26, 4, 1, 'titular@example.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-principal', '2026-11-08T10:00:00.000Z', '2026-11-15T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
     `);
     banco.close();
     return { diretorio, caminho };
@@ -285,6 +286,78 @@ test('reassocia convite pendente legado pelo e-mail da conta autenticada', async
         assert.deepEqual(corpo.resumo, { total: 1, pendentes: 1, ativos: 0 });
         assert.equal(corpo.contatos[0].id, 25);
         assert.equal(vinculo.contatoId, 5);
+    } finally {
+        servidor.close();
+        await once(servidor, 'close');
+        await prisma.$disconnect();
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
+
+test('conta principal lista e aceita o primeiro convite recebido com promoção de papel', async () => {
+    const { diretorio, caminho } = criarBanco();
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({ url: `file:${caminho.replaceAll('\\', '/')}` })
+    });
+    const servidor = criarApp(prisma, [], { id: 1, papel: 'principal' }).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const baseUrl = `http://127.0.0.1:${servidor.address().port}/support-network`;
+        const respostaLista = await fetch(`${baseUrl}/received-contacts`);
+        const lista = await respostaLista.json();
+
+        assert.equal(respostaLista.status, 200);
+        assert.deepEqual(lista.resumo, { total: 1, pendentes: 1, ativos: 0 });
+        assert.equal(lista.contatos[0].id, 26);
+
+        const respostaAceite = await fetch(`${baseUrl}/received-contacts/26/respond`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ acao: 'aceitar' })
+        });
+        const usuario = await prisma.usuario.findUnique({ where: { id: 1 } });
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 26 } });
+
+        assert.equal(respostaAceite.status, 200);
+        assert.equal(usuario.papel, 'principal_e_contato_apoio');
+        assert.equal(vinculo.status, 'ativo');
+    } finally {
+        servidor.close();
+        await once(servidor, 'close');
+        await prisma.$disconnect();
+        rmSync(diretorio, { recursive: true, force: true });
+    }
+});
+
+test('conta principal recusa convite próprio sem promoção e não responde convite alheio', async () => {
+    const { diretorio, caminho } = criarBanco();
+    const prisma = new PrismaClient({
+        adapter: new PrismaBetterSqlite3({ url: `file:${caminho.replaceAll('\\', '/')}` })
+    });
+    const servidor = criarApp(prisma, [], { id: 1, papel: 'principal' }).listen(0, '127.0.0.1');
+
+    try {
+        await once(servidor, 'listening');
+        const baseUrl = `http://127.0.0.1:${servidor.address().port}/support-network`;
+        const respostaAlheia = await fetch(`${baseUrl}/received-contacts/25/respond`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ acao: 'recusar' })
+        });
+        assert.equal(respostaAlheia.status, 410);
+
+        const respostaRecusa = await fetch(`${baseUrl}/received-contacts/26/respond`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ acao: 'recusar' })
+        });
+        const usuario = await prisma.usuario.findUnique({ where: { id: 1 } });
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 26 } });
+
+        assert.equal(respostaRecusa.status, 200);
+        assert.equal(usuario.papel, 'principal');
+        assert.equal(vinculo.status, 'recusado');
     } finally {
         servidor.close();
         await once(servidor, 'close');

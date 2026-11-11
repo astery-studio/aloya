@@ -208,7 +208,7 @@ function criarContactInvitationResponseService({
                     ? 'principal_e_contato_apoio'
                     : usuario.papel;
 
-            if (!['contato_apoio', 'principal_e_contato_apoio'].includes(papel)) {
+            if (!['principal', 'contato_apoio', 'principal_e_contato_apoio'].includes(papel)) {
                 throw criarErroConviteIndisponivel();
             }
 

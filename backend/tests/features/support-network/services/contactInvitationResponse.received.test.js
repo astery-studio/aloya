@@ -5,8 +5,8 @@ import { criarContactInvitationResponseService } from '../../../../src/features/
 
 const AGORA = new Date('2026-11-08T12:00:00.000Z');
 
-function criarCenario({ convite = {}, atualizados = 1 } = {}) {
-    const operacoes = { consulta: null, vinculos: [], notificacoes: [] };
+function criarCenario({ convite = {}, atualizados = 1, papel = 'contato_apoio' } = {}) {
+    const operacoes = { consulta: null, vinculos: [], notificacoes: [], usuarios: [] };
     const conviteEncontrado = {
         id: 31,
         titularId: 3,
@@ -24,11 +24,13 @@ function criarCenario({ convite = {}, atualizados = 1 } = {}) {
                 return {
                     id: 25,
                     email: 'contato@email.com',
-                    papel: 'contato_apoio',
+                    papel,
                     statusConta: 'ativa'
                 };
             },
-            async update() {}
+            async update(dados) {
+                operacoes.usuarios.push(dados);
+            }
         },
         vinculoRedeApoio: {
             async updateMany(dados) {
@@ -106,6 +108,37 @@ test('recusa o convite definitivamente sem registrar motivo', async () => {
         status: 'recusado',
         mensagem: 'Convite recusado com sucesso.'
     });
+});
+
+test('promove a conta principal somente quando ela aceita o convite', async () => {
+    const { service, operacoes } = criarCenario({ papel: 'principal' });
+
+    await service.responderRecebido({
+        conviteId: 31,
+        usuarioId: 25,
+        acao: 'aceitar'
+    });
+
+    assert.deepEqual(operacoes.usuarios, [
+        {
+            where: { id: 25 },
+            data: { papel: 'principal_e_contato_apoio' }
+        }
+    ]);
+});
+
+test('permite que a conta principal recuse o próprio convite sem mudar de papel', async () => {
+    const { service, operacoes } = criarCenario({ papel: 'principal' });
+
+    const resultado = await service.responderRecebido({
+        conviteId: 31,
+        usuarioId: 25,
+        acao: 'recusar'
+    });
+
+    assert.deepEqual(operacoes.usuarios, []);
+    assert.equal(operacoes.vinculos[0].data.status, 'recusado');
+    assert.equal(resultado.status, 'recusado');
 });
 
 test('não processa convite inexistente ou alterado concorrentemente', async () => {

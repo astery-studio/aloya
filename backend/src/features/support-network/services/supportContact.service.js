@@ -47,7 +47,7 @@ function validarContatoAutenticado(usuarioId, papel) {
         throw criarErro('Sessão inválida.', 401, 'SESSAO_INVALIDA');
     }
 
-    if (!PAPEIS_CONTATO.includes(papel)) {
+    if (!PAPEIS_CONTATO.includes(papel) && papel !== 'principal') {
         throw criarErro(
             'Somente contatos convidados podem visualizar convites recebidos.',
             403,
