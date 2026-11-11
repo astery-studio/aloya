@@ -39,6 +39,7 @@ function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) 
                         editable={!desabilitado}
                         keyboardType="number-pad"
                         maxLength={2}
+                        selectTextOnFocus
                         value={duracao.horas}
                         onChangeText={(texto) => alterar('horas', texto)}
                         style={estilos.entrada}
@@ -51,6 +52,7 @@ function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) 
                         editable={!desabilitado}
                         keyboardType="number-pad"
                         maxLength={2}
+                        selectTextOnFocus
                         value={duracao.minutos}
                         onChangeText={(texto) => alterar('minutos', texto)}
                         style={estilos.entrada}

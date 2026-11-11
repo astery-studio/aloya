@@ -15,6 +15,7 @@ describe('DurationInput', () => {
     test('edita horas e preserva minutos', async () => {
         const aoAlterar = jest.fn();
         await render(<DurationInput valorMinutos={100} aoAlterar={aoAlterar} />);
+        expect(screen.getByLabelText('Horas de sono')).toHaveProp('selectTextOnFocus', true);
         await fireEvent.changeText(screen.getByLabelText('Horas de sono'), '2h');
         expect(aoAlterar).toHaveBeenCalledWith(160);
         expect(screen.getByText('hora')).toHaveStyle({ fontFamily: 'DMSans_600SemiBold' });
@@ -27,6 +28,9 @@ describe('DurationInput', () => {
         const resultado = await render(<DurationInput valorMinutos={60} aoAlterar={aoAlterar} />);
         await fireEvent.changeText(screen.getByLabelText('Minutos de sono'), '99');
         expect(aoAlterar).toHaveBeenLastCalledWith(119);
+        expect(screen.getByLabelText('Minutos de sono')).toHaveProp('selectTextOnFocus', true);
+        await fireEvent.changeText(screen.getByLabelText('Minutos de sono'), '5');
+        expect(aoAlterar).toHaveBeenLastCalledWith(65);
         await resultado.rerender(<DurationInput valorMinutos={null} aoAlterar={aoAlterar} />);
         await fireEvent.changeText(screen.getByLabelText('Horas de sono'), '');
         expect(aoAlterar).toHaveBeenLastCalledWith(null);
