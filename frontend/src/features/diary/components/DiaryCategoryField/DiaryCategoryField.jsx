@@ -13,6 +13,10 @@ import { agruparOpcoes } from '../../utils/diaryOptionGroups';
 import { DiaryOptionIcon } from '../DiaryOptionIcon/DiaryOptionIcon';
 import { criarEstilos } from './DiaryCategoryField.styles';
 
+function IconeOpcao(props) {
+    return <DiaryOptionIcon {...props} />;
+}
+
 function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -69,21 +73,20 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     function renderizarOpcao(opcao) {
         const apresentacao = obterApresentacaoOpcao(categoria.id, opcao);
         const selecionada = selecionadas.includes(opcao.id);
-        const Icone = (props) => (
-            <DiaryOptionIcon
-                {...props}
-                {...apresentacao.iconeProps}
-                iconeId={apresentacao.iconeId}
-                selecionado={selecionada}
-                color={selecionada ? props.color : (apresentacao.iconeProps.color ?? props.color)}
-            />
-        );
         return (
             <ButtonSelection
                 key={opcao.id}
                 variante="compacto"
                 label={opcao.nome}
-                icone={Icone}
+                icone={IconeOpcao}
+                iconeProps={{
+                    ...apresentacao.iconeProps,
+                    iconeId: apresentacao.iconeId,
+                    selecionado: selecionada,
+                    ...(apresentacao.iconeProps.color && !selecionada
+                        ? { color: apresentacao.iconeProps.color }
+                        : {})
+                }}
                 selected={selecionada}
                 desabilitado={desabilitado}
                 cor={cores.icone}

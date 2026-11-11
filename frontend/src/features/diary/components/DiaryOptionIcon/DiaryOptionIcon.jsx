@@ -1,12 +1,12 @@
+import { memo } from 'react';
 import { SvgXml } from 'react-native-svg';
 
 import { diaryIcons } from '../../../../shared/components/icons/DiaryIcons';
 
-function colorirSvg(xml, cor, selecionado) {
+function colorirSvg(xml, cor) {
+    if (!cor) return xml;
     let colorido = xml.replaceAll('currentColor', cor);
-    if (selecionado) {
-        colorido = colorido.replace(/(fill|stroke)="(?!none|currentColor)[^"]+"/gu, `$1="${cor}"`);
-    }
+    colorido = colorido.replace(/(fill|stroke)="(?!none|currentColor)[^"]+"/gu, `$1="${cor}"`);
     return colorido.replace(/<svg\b(?![^>]*\bfill=)/u, `<svg fill="${cor}"`);
 }
 
@@ -26,7 +26,7 @@ function DiaryOptionIcon({
     }
 
     if (typeof icone === 'string') {
-        const xml = colorirSvg(icone, corResolvida, selecionado);
+        const xml = colorirSvg(icone, corResolvida);
         return (
             <SvgXml
                 accessible={false}
@@ -42,4 +42,6 @@ function DiaryOptionIcon({
     return <Icone accessible={false} size={tamanho} color={corResolvida} weight={weight} />;
 }
 
-export { DiaryOptionIcon };
+const MemoizedDiaryOptionIcon = memo(DiaryOptionIcon);
+
+export { MemoizedDiaryOptionIcon as DiaryOptionIcon };
