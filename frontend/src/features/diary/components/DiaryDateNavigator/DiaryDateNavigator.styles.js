@@ -25,7 +25,7 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 8,
+            gap: 10,
             paddingHorizontal: 8
         },
         texto: {

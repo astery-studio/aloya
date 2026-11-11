@@ -37,7 +37,7 @@ function DiaryDateNavigator({
             >
                 <Text style={estilos.texto}>{dataFormatada}</Text>
                 {aoAbrirSeletor ? (
-                    <CaretDown size={15} color={tema.cores.interface.textoPrincipal} />
+                    <CaretDown size={15} color="#000000" />
                 ) : null}
             </Pressable>
             <DiaryDateArrow
