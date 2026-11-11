@@ -72,7 +72,7 @@ describe('campos tipados do Diário', () => {
     test('renderiza anotação longa com contador em tempo real', async () => {
         const aoAlterar = jest.fn();
         const resultado = await render(
-            <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} />
+            <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} paleta="saude" />
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota...');
         expect(entrada).toHaveProp('scrollEnabled', false);
@@ -92,6 +92,7 @@ describe('campos tipados do Diário', () => {
         expect(screen.getByText('3 / 5000')).toHaveStyle({ color: '#4A5899' });
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar anotação livre' }));
         expect(aoAlterar).toHaveBeenLastCalledWith('');
+        expect(entrada).toHaveStyle({ height: 24 });
         await fireEvent.changeText(entrada, 'Nova nota');
         await resultado.rerender(<DiaryCategoryField categoria={nota} valor={null} />);
         expect(screen.getByLabelText('Digite aqui sua nota...')).toHaveStyle({

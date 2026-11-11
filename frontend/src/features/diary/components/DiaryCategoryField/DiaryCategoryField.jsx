@@ -34,6 +34,7 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     let controle;
 
     function limparAnotacao() {
+        setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
         Keyboard.dismiss();
         aoAlterar?.('');
     }
