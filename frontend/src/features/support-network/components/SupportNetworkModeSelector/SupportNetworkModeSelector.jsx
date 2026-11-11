@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './SupportNetworkModeSelector.styles';
@@ -14,16 +14,27 @@ function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     return (
-        <View
+        <ScrollView
             accessibilityRole="tablist"
             accessibilityLabel="Tipo de contato da Rede de Apoio"
+            contentContainerStyle={estilos.conteudo}
+            horizontal
+            showsHorizontalScrollIndicator={false}
             style={estilos.container}
         >
             {OPCOES.map((opcao) => {
                 const estaSelecionado = selecionado === opcao.id;
 
                 return (
-                    <View key={opcao.id} style={estilos.containerOpcao}>
+                    <View
+                        key={opcao.id}
+                        style={[
+                            estilos.containerOpcao,
+                            opcao.id === 'acompanhados'
+                                ? estilos.opcaoAcompanhados
+                                : estilos.opcaoApoio
+                        ]}
+                    >
                         <Pressable
                             accessibilityRole="tab"
                             accessibilityLabel={opcao.rotulo}
@@ -39,6 +50,7 @@ function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
                             ]}
                         >
                             <Text
+                                numberOfLines={1}
                                 style={[
                                     estilos.texto,
                                     estaSelecionado
@@ -52,7 +64,7 @@ function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
                     </View>
                 );
             })}
-        </View>
+        </ScrollView>
     );
 }
 

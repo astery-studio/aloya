@@ -7,19 +7,27 @@ function criarEstilos(tema) {
         container: {
             width: '100%',
             maxWidth: 350.01,
-            paddingBottom: 20,
+            paddingBottom: 20
+        },
+        conteudo: {
+            minWidth: '100%',
             flexDirection: 'row',
-            justifyContent: 'space-between',
             alignItems: 'center',
-            gap: 16
+            gap: 10
         },
         containerOpcao: {
-            minWidth: 0,
             height: 30,
             paddingHorizontal: 5,
-            flex: 1,
+            flexGrow: 1,
+            flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center'
+        },
+        opcaoApoio: {
+            minWidth: 140
+        },
+        opcaoAcompanhados: {
+            minWidth: 200
         },
         botao: {
             width: '100%',
@@ -44,7 +52,6 @@ function criarEstilos(tema) {
             opacity: 0.72
         },
         texto: {
-            width: '100%',
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             fontWeight: '600',

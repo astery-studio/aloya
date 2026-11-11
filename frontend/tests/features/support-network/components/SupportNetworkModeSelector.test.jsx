@@ -27,4 +27,17 @@ describe('SupportNetworkModeSelector', () => {
         expect(aoSelecionar).toHaveBeenCalledWith('acompanhados');
         expect(aoSelecionar).toHaveBeenCalledTimes(1);
     });
+
+    test('mantém os nomes completos e permite rolagem em telas estreitas', async () => {
+        await render(<SupportNetworkModeSelector selecionado="apoio" aoSelecionar={jest.fn()} />);
+
+        const seletor = screen.getByLabelText('Tipo de contato da Rede de Apoio');
+        const apoio = screen.getByText('Contatos de Apoio');
+        const acompanhados = screen.getByText('Contatos Acompanhados');
+
+        expect(seletor.props.horizontal).toBe(true);
+        expect(seletor.props.showsHorizontalScrollIndicator).toBe(false);
+        expect(apoio.props.numberOfLines).toBe(1);
+        expect(acompanhados.props.numberOfLines).toBe(1);
+    });
 });
