@@ -96,7 +96,8 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
 
                         <ProfileField
                             label="E-mail"
-                            valor={email || 'Digite aqui o e-mail'}
+                            valor={email}
+                            placeholder="Digite aqui o e-mail"
                             onPress={abrirEdicao}
                             desabilitado={confirmado || consentimento.enviando}
                         />

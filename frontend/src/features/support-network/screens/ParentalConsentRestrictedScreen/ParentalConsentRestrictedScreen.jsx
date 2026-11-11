@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { ShieldWarningIcon } from '../../../../shared/components/icons/AppIcons';
@@ -19,12 +19,13 @@ function ParentalConsentRestrictedScreen({
 
     return (
         <MainLayout titulo="Rede de Apoio" abaAtiva="membros" onSelecionarAba={aoSelecionarAba}>
-            <View testID="parental-consent-restricted" style={estilos.container}>
-                <Text style={estilos.descricao}>
-                    Pessoas que fazem parte da sua rede de cuidado e apoio.
-                </Text>
-
-                <View style={estilos.cartao}>
+            <ScrollView
+                testID="parental-consent-restricted"
+                style={estilos.rolagem}
+                contentContainerStyle={estilos.container}
+                showsVerticalScrollIndicator={false}
+            >
+                <View testID="parental-consent-card" style={estilos.cartao}>
                     <View style={estilos.cabecalhoCartao}>
                         <View style={estilos.caixaIcone}>
                             <ShieldWarningIcon size={28} color="#FFFFFF" weight="regular" />
@@ -63,7 +64,7 @@ function ParentalConsentRestrictedScreen({
                         <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
                     </View>
                 ) : null}
-            </View>
+            </ScrollView>
         </MainLayout>
     );
 }

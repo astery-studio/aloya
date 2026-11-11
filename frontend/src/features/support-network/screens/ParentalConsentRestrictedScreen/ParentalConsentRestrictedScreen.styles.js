@@ -4,25 +4,22 @@ import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        container: {
+        rolagem: {
             flex: 1,
-            paddingHorizontal: 20,
             backgroundColor: tema.cores.interface.fundo
         },
-        descricao: {
+        container: {
+            flexGrow: 1,
             width: '100%',
-            maxWidth: 350,
-            alignSelf: 'center',
-            color: tema.cores.interface.textoSecundario,
-            fontFamily: fontFamilies.regular,
-            fontSize: 15,
-            lineHeight: 22.5
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingVertical: 24
         },
         cartao: {
             width: '100%',
             maxWidth: 350,
             alignSelf: 'center',
-            marginTop: 86,
             overflow: 'hidden',
             borderWidth: 1,
             borderColor: tema.cores.interface.borda,
