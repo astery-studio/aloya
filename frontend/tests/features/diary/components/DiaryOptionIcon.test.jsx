@@ -7,7 +7,8 @@ const mockIcone = jest.fn(() => null);
 jest.mock('../../../../src/shared/components/icons/DiaryIcons', () => ({
     diaryIcons: {
         componente: (props) => mockIcone(props),
-        svg: '<svg fill="#C85A44" />'
+        svg: '<svg fill="#C85A44" />',
+        material: '<svg><path /></svg>'
     }
 }));
 
@@ -46,6 +47,12 @@ describe('DiaryOptionIcon', () => {
         mockSvgXml.mockClear();
         await render(<DiaryOptionIcon iconeId="svg" color="#FFFFFF" selecionado />);
         expect(mockSvgXml.mock.calls[0][0].xml).toBe('<svg fill="#FFFFFF" />');
+    });
+
+    test('aplica a cor do texto a SVG sem cor explícita', async () => {
+        mockSvgXml.mockClear();
+        await render(<DiaryOptionIcon iconeId="material" color="#C85A44" />);
+        expect(mockSvgXml.mock.calls[0][0].xml).toBe('<svg fill="#C85A44"><path /></svg>');
     });
 
     test('falha explicitamente para identificador desconhecido', async () => {
