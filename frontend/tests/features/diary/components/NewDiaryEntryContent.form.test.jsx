@@ -14,7 +14,7 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonSc
 jest.mock('../../../../src/features/diary/components/DiaryDateNavigator/DiaryDateNavigator', () => {
     const { Pressable, Text, View } = require('react-native');
     return {
-        DiaryDateNavigator: ({ aoAnterior, aoProximo }) => (
+        DiaryDateNavigator: ({ aoAnterior, aoProximo, aoAbrirSeletor }) => (
             <View>
                 <Pressable onPress={aoAnterior}>
                     <Text>Anterior</Text>
@@ -22,8 +22,22 @@ jest.mock('../../../../src/features/diary/components/DiaryDateNavigator/DiaryDat
                 <Pressable onPress={aoProximo}>
                     <Text>Próximo</Text>
                 </Pressable>
+                <Pressable onPress={aoAbrirSeletor}>
+                    <Text>Abrir seletor</Text>
+                </Pressable>
             </View>
         )
+    };
+});
+jest.mock('../../../../src/shared/components/feedback/DatePickerSheet/DatePickerSheet', () => {
+    const { Pressable, Text } = require('react-native');
+    return {
+        DatePickerSheet: ({ visivel, onSelecionar }) =>
+            visivel ? (
+                <Pressable onPress={() => onSelecionar('2026-11-06')}>
+                    <Text>Escolher data</Text>
+                </Pressable>
+            ) : null
     };
 });
 jest.mock(
@@ -69,6 +83,9 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     await fireEvent.press(screen.getByText('Próximo'));
     expect(formulario.setData).toHaveBeenNthCalledWith(1, '2026-11-07');
     expect(formulario.setData).toHaveBeenNthCalledWith(2, '2026-11-09');
+    await fireEvent.press(screen.getByText('Abrir seletor'));
+    await fireEvent.press(screen.getByText('Escolher data'));
+    expect(formulario.setData).toHaveBeenNthCalledWith(3, '2026-11-06');
     await fireEvent.press(screen.getByText('Macros:1;desabilitado:false'));
     expect(formulario.alterarValor).toHaveBeenCalledWith('dor', ['leve']);
     await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));

@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { DatePickerSheet } from '../../../../shared/components/feedback/DatePickerSheet/DatePickerSheet';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { deslocarDataDiario, obterHojeDiario } from '../../utils/diaryDate';
 import {
@@ -25,6 +26,7 @@ function NewDiaryEntryContent({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const [seletorAberto, setSeletorAberto] = useState(false);
 
     if (carregando) {
         return (
@@ -47,12 +49,13 @@ function NewDiaryEntryContent({
     }
 
     const macrocategorias = listarMacrocategoriasAtivas(catalogo);
+    const hoje = obterHojeDiario();
     const totalPreenchidas = contarMacrocategoriasPreenchidas(catalogo, formulario.valores);
     const preparacao = prepararFormularioDiario({
         catalogo,
         valores: formulario.valores,
         data: formulario.data,
-        hoje: obterHojeDiario()
+        hoje
     });
     const salvarDesativado = formulario.salvando || !preparacao.valido;
     return (
@@ -66,8 +69,9 @@ function NewDiaryEntryContent({
                     data={formulario.data}
                     aoAnterior={() => formulario.setData(deslocarDataDiario(formulario.data, -1))}
                     aoProximo={() => formulario.setData(deslocarDataDiario(formulario.data, 1))}
-                    proximoDisponivel={formulario.data < obterHojeDiario()}
+                    proximoDisponivel={formulario.data < hoje}
                     desabilitado={formulario.salvando}
+                    aoAbrirSeletor={() => setSeletorAberto(true)}
                 />
                 <DiaryPhaseBadge fase={fase} carregando={carregandoFase} />
                 <View style={estilos.cartaoRegistro}>
@@ -104,6 +108,17 @@ function NewDiaryEntryContent({
                     }
                 />
             </View>
+            <DatePickerSheet
+                visivel={seletorAberto}
+                titulo="Data do registro"
+                valorSelecionado={formulario.data}
+                dataMaxima={hoje}
+                onSelecionar={(data) => {
+                    formulario.setData(data);
+                    return true;
+                }}
+                onFechar={() => setSeletorAberto(false)}
+            />
         </>
     );
 }
