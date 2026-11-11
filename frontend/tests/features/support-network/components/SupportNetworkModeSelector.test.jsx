@@ -40,4 +40,26 @@ describe('SupportNetworkModeSelector', () => {
         expect(apoio.props.numberOfLines).toBe(1);
         expect(acompanhados.props.numberOfLines).toBe(1);
     });
+
+    test('reduz o espaço entre as opções somente quando a largura é pequena', async () => {
+        await render(<SupportNetworkModeSelector selecionado="apoio" aoSelecionar={jest.fn()} />);
+
+        const seletor = screen.getByLabelText('Tipo de contato da Rede de Apoio');
+
+        expect(seletor.props.contentContainerStyle).toEqual(
+            expect.arrayContaining([expect.objectContaining({ gap: 10 })])
+        );
+
+        await fireEvent(seletor, 'layout', {
+            nativeEvent: {
+                layout: {
+                    width: 349
+                }
+            }
+        });
+
+        expect(seletor.props.contentContainerStyle).toEqual(
+            expect.arrayContaining([expect.objectContaining({ gap: 5 })])
+        );
+    });
 });

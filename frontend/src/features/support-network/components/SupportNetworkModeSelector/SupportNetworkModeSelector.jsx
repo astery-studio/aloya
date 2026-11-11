@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -9,16 +9,28 @@ const OPCOES = Object.freeze([
     Object.freeze({ id: 'acompanhados', rotulo: 'Contatos Acompanhados' })
 ]);
 
+const LARGURA_SELETOR_COMPLETO = 350;
+
 function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const [compacto, setCompacto] = useState(false);
+
+    const medirSeletor = useCallback((evento) => {
+        const largura = evento?.nativeEvent?.layout?.width;
+
+        if (Number.isFinite(largura)) {
+            setCompacto(largura < LARGURA_SELETOR_COMPLETO);
+        }
+    }, []);
 
     return (
         <ScrollView
             accessibilityRole="tablist"
             accessibilityLabel="Tipo de contato da Rede de Apoio"
-            contentContainerStyle={estilos.conteudo}
+            contentContainerStyle={[estilos.conteudo, compacto && estilos.conteudoCompacto]}
             horizontal
+            onLayout={medirSeletor}
             showsHorizontalScrollIndicator={false}
             style={estilos.container}
         >
@@ -68,4 +80,4 @@ function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
     );
 }
 
-export { OPCOES, SupportNetworkModeSelector };
+export { LARGURA_SELETOR_COMPLETO, OPCOES, SupportNetworkModeSelector };

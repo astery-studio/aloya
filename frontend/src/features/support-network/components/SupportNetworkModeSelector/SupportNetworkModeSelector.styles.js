@@ -15,6 +15,9 @@ function criarEstilos(tema) {
             alignItems: 'center',
             gap: 10
         },
+        conteudoCompacto: {
+            gap: 5
+        },
         containerOpcao: {
             height: 30,
             paddingHorizontal: 5,
