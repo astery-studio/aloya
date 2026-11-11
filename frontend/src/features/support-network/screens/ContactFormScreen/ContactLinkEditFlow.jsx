@@ -89,6 +89,25 @@ function criarAlteracao(configuracao, dados) {
     };
 }
 
+function obterMensagemConfirmacao({ confirmacao, configuracao, categoriaDestino }) {
+    if (confirmacao?.tipo === 'individual') {
+        return 'Esta ação remove o contato da categoria cadastrada e torna as permissões individuais.';
+    }
+
+    const parteDeCategoria = configuracao?.vinculoAtual.tipo === 'categoria';
+    const categoriaAtual = configuracao?.vinculoAtual.categoria?.nome;
+
+    if (confirmacao?.tipo === 'criar_categoria') {
+        return parteDeCategoria
+            ? `Esta ação permite substituir a categoria ‘${categoriaAtual ?? ''}’ por uma nova categoria.`
+            : 'Esta ação remove as permissões individuais cadastradas e permite vincular o contato à nova categoria.';
+    }
+
+    return parteDeCategoria
+        ? `Esta ação remove o contato da categoria ‘${categoriaAtual ?? ''}’ e o vincula à categoria ‘${categoriaDestino?.nome ?? ''}’.`
+        : `Esta ação remove as permissões individuais cadastradas e vincula o contato à categoria ‘${categoriaDestino?.nome ?? ''}’.`;
+}
+
 function ContactLinkEditFlow({
     contatoId,
     dadosIniciais,
@@ -275,6 +294,11 @@ function ContactLinkEditFlow({
     const categoriaConfirmada = categorias.find(
         (categoria) => categoria.id === confirmacaoTroca?.categoriaId
     );
+    const mensagemConfirmacao = obterMensagemConfirmacao({
+        confirmacao: confirmacaoTroca,
+        configuracao,
+        categoriaDestino: categoriaConfirmada
+    });
 
     return (
         <>
@@ -334,13 +358,7 @@ function ContactLinkEditFlow({
                         ? 'Desvincular categoria'
                         : 'Vincular a categoria'
                 }
-                mensagem={
-                    confirmacaoTroca?.tipo === 'individual'
-                        ? 'Esta ação remove o contato da categoria cadastrada e torna as permissões individuais.'
-                        : confirmacaoTroca?.tipo === 'criar_categoria'
-                          ? 'Esta ação substitui o vínculo atual e permite vincular o contato à nova categoria.'
-                          : `Esta ação remove as permissões individuais cadastradas e vincula o contato a categoria ‘${categoriaConfirmada?.nome ?? ''}’`
-                }
+                mensagem={mensagemConfirmacao}
                 acaoPrincipal={{
                     texto: 'Continuar',
                     variante: 'verde',
@@ -385,5 +403,6 @@ export {
     criarAlteracao,
     criarDadosDaConfiguracao,
     houveAlteracaoReal,
+    obterMensagemConfirmacao,
     vinculoFoiAlterado
 };

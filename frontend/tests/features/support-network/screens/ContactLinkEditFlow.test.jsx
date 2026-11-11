@@ -163,7 +163,8 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
 import {
     ContactLinkEditFlow,
     criarAlteracao,
-    houveAlteracaoReal
+    houveAlteracaoReal,
+    obterMensagemConfirmacao
 } from '../../../../src/features/support-network/screens/ContactFormScreen/ContactLinkEditFlow';
 
 const configuracaoCategoria = {
@@ -301,7 +302,7 @@ test('substitui permissões individuais por uma categoria', async () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Selecionar Família' }));
     expect(screen.getByText('Vincular a categoria')).toBeOnTheScreen();
-    expect(screen.getByText(/vincula o contato a categoria ‘Família’/u)).toBeOnTheScreen();
+    expect(screen.getByText(/vincula o contato à categoria ‘Família’/u)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
@@ -370,7 +371,7 @@ test('confirma antes de abrir o cadastro de uma categoria nova', async () => {
     expect(screen.getByText('Vincular a categoria')).toBeOnTheScreen();
     expect(
         screen.getByText(
-            'Esta ação substitui o vínculo atual e permite vincular o contato à nova categoria.'
+            'Esta ação remove as permissões individuais cadastradas e permite vincular o contato à nova categoria.'
         )
     ).toBeOnTheScreen();
     expect(onCriarCategoria).not.toHaveBeenCalled();
@@ -378,6 +379,31 @@ test('confirma antes de abrir o cadastro de uma categoria nova', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
 
     expect(onCriarCategoria).toHaveBeenCalledTimes(1);
+});
+
+test('não menciona permissões individuais ao trocar uma categoria por outra', () => {
+    const mensagem = obterMensagemConfirmacao({
+        confirmacao: { tipo: 'categoria', categoriaId: 11 },
+        configuracao: configuracaoCategoria,
+        categoriaDestino: { id: 11, nome: 'Profissional' }
+    });
+
+    expect(mensagem).toBe(
+        'Esta ação remove o contato da categoria ‘Família’ e o vincula à categoria ‘Profissional’.'
+    );
+    expect(mensagem).not.toContain('permissões individuais');
+});
+
+test('não menciona permissões individuais ao criar categoria a partir de outra categoria', () => {
+    const mensagem = obterMensagemConfirmacao({
+        confirmacao: { tipo: 'criar_categoria' },
+        configuracao: configuracaoCategoria,
+        categoriaDestino: null
+    });
+
+    expect(mensagem).toBe(
+        'Esta ação permite substituir a categoria ‘Família’ por uma nova categoria.'
+    );
 });
 
 test('mantém a tela e permite repetir quando a atualização falha', async () => {
