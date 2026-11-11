@@ -78,6 +78,15 @@ jest.mock('../../../../src/features/support-network/components/ContactForm/Conta
                     Pressable,
                     {
                         accessibilityRole: 'button',
+                        accessibilityLabel: 'Cadastrar categoria nova',
+                        onPress: props.aoCriarCategoria
+                    },
+                    React.createElement(Text, null, 'Nova categoria')
+                ),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
                         accessibilityLabel: 'Salvar edição',
                         onPress: props.aoSalvar
                     },
@@ -331,6 +340,35 @@ test('salva ícone e cor mantendo o vínculo e o e-mail bloqueado', async () => 
         });
     });
     expect(screen.queryByText('Desvincular categoria')).toBeNull();
+});
+
+test('confirma antes de abrir o cadastro de uma categoria nova', async () => {
+    const service = criarService(configuracaoIndividual);
+    const onCriarCategoria = jest.fn();
+
+    await render(
+        <ContactLinkEditFlow
+            contatoId={21}
+            dadosIniciais={dadosIniciais}
+            service={service}
+            onCriarCategoria={onCriarCategoria}
+        />
+    );
+    await screen.findByTestId('formulario-edicao');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar categoria nova' }));
+
+    expect(screen.getByText('Vincular a categoria')).toBeOnTheScreen();
+    expect(
+        screen.getByText(
+            'Esta ação substitui o vínculo atual e permite vincular o contato à nova categoria.'
+        )
+    ).toBeOnTheScreen();
+    expect(onCriarCategoria).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+
+    expect(onCriarCategoria).toHaveBeenCalledTimes(1);
 });
 
 test('mantém a tela e permite repetir quando a atualização falha', async () => {

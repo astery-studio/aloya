@@ -194,6 +194,12 @@ function ContactLinkEditFlow({
         definirPermissoesVisiveis(true);
     }, [dados, salvando]);
 
+    const solicitarCriacaoCategoria = useCallback(() => {
+        if (!salvando && typeof onCriarCategoria === 'function') {
+            definirConfirmacaoTroca({ tipo: 'criar_categoria' });
+        }
+    }, [onCriarCategoria, salvando]);
+
     const salvarPermissoes = useCallback(
         (permissoes) => {
             if (!Array.isArray(permissoes) || permissoes.length === 0 || salvando) return;
@@ -208,6 +214,12 @@ function ContactLinkEditFlow({
     );
 
     const confirmarTrocaLocal = useCallback(() => {
+        if (confirmacaoTroca?.tipo === 'criar_categoria') {
+            definirConfirmacaoTroca(null);
+            onCriarCategoria?.();
+            return;
+        }
+
         if (confirmacaoTroca?.tipo === 'individual') {
             definirConfirmacaoTroca(null);
             definirRascunhoPermissoes([]);
@@ -224,7 +236,7 @@ function ContactLinkEditFlow({
         }
 
         definirConfirmacaoTroca(null);
-    }, [confirmacaoTroca]);
+    }, [confirmacaoTroca, onCriarCategoria]);
 
     const salvar = useCallback(async () => {
         if (!alterado || atualizando.current || !serviceDisponivel) return;
@@ -287,7 +299,7 @@ function ContactLinkEditFlow({
                             aoAlterar={alterarDados}
                             aoSalvar={salvar}
                             aoAbrirPermissoes={abrirPermissoes}
-                            aoCriarCategoria={onCriarCategoria}
+                            aoCriarCategoria={solicitarCriacaoCategoria}
                             carregando={salvando}
                             alterado={alterado}
                             permitirPermissoes
@@ -324,7 +336,9 @@ function ContactLinkEditFlow({
                 mensagem={
                     confirmacaoTroca?.tipo === 'individual'
                         ? 'Esta ação remove o contato da categoria cadastrada e torna as permissões individuais.'
-                        : `Esta ação remove as permissões individuais cadastradas e vincula o contato a categoria ‘${categoriaConfirmada?.nome ?? ''}’`
+                        : confirmacaoTroca?.tipo === 'criar_categoria'
+                          ? 'Esta ação substitui o vínculo atual e permite vincular o contato à nova categoria.'
+                          : `Esta ação remove as permissões individuais cadastradas e vincula o contato a categoria ‘${categoriaConfirmada?.nome ?? ''}’`
                 }
                 acaoPrincipal={{
                     texto: 'Continuar',
