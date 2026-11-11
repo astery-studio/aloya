@@ -1,5 +1,7 @@
 function sanitizarEntradaNumerica(texto, casasDecimais = 0, maximoDigitosInteiros = 2) {
-    const entrada = String(texto ?? '').replace('.', ',').replace(/[^\d,]/g, '');
+    const entrada = String(texto ?? '')
+        .replace('.', ',')
+        .replace(/[^\d,]/g, '');
     const separador = entrada.indexOf(',');
     const inteiroBruto = separador < 0 ? entrada : entrada.slice(0, separador);
     const inteiro = inteiroBruto.slice(0, maximoDigitosInteiros);
