@@ -4,7 +4,12 @@ import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        painel: { height: '92%', maxHeight: '92%', backgroundColor: '#FFFFFF' },
+        painel: {
+            height: '92%',
+            maxHeight: '92%',
+            paddingBottom: 0,
+            backgroundColor: '#FFFFFF'
+        },
         rolagem: { flex: 1 },
         conteudo: { alignItems: 'center', paddingHorizontal: 16 },
         carregamento: { minHeight: 240, alignItems: 'center', justifyContent: 'center', gap: 12 },
