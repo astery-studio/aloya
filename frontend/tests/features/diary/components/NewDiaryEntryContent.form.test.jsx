@@ -88,8 +88,12 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Falha');
     await fireEvent.press(screen.getByText('Anterior'));
     await fireEvent.press(screen.getByText('Próximo'));
-    expect(formulario.setData).toHaveBeenNthCalledWith(1, '2026-11-07');
-    expect(formulario.setData).toHaveBeenNthCalledWith(2, '2026-11-09');
+    const voltar = formulario.setData.mock.calls[0][0];
+    const avancar = formulario.setData.mock.calls[1][0];
+    expect(voltar('2026-11-08')).toBe('2026-11-07');
+    expect(avancar('2026-11-08')).toBe('2026-11-09');
+    expect(voltar('inválida')).toBe('inválida');
+    expect(avancar('inválida')).toBe('inválida');
     await fireEvent.press(screen.getByText('Abrir seletor'));
     await fireEvent.press(screen.getByText('Escolher data'));
     expect(formulario.setData).toHaveBeenNthCalledWith(3, '2026-11-06');

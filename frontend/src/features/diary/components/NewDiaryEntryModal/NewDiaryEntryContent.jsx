@@ -62,8 +62,12 @@ function NewDiaryEntryContent({
         <>
             <DiaryDateNavigator
                 data={formulario.data}
-                aoAnterior={() => formulario.setData(deslocarDataDiario(formulario.data, -1))}
-                aoProximo={() => formulario.setData(deslocarDataDiario(formulario.data, 1))}
+                aoAnterior={() =>
+                    formulario.setData((atual) => deslocarDataDiario(atual, -1) ?? atual)
+                }
+                aoProximo={() =>
+                    formulario.setData((atual) => deslocarDataDiario(atual, 1) ?? atual)
+                }
                 proximoDisponivel={formulario.data < hoje}
                 desabilitado={formulario.salvando}
                 aoAbrirSeletor={() => setSeletorAberto(true)}
