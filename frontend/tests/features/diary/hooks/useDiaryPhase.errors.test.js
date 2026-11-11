@@ -41,8 +41,6 @@ test('cancela a consulta ao desmontar', async () => {
 });
 
 test('ignora serviço ausente', async () => {
-    const { result } = await renderHook(() =>
-        useDiaryPhase({ ativo: true, data: '2026-11-03' })
-    );
+    const { result } = await renderHook(() => useDiaryPhase({ ativo: true, data: '2026-11-03' }));
     expect(result.current).toEqual({ fase: null, carregando: false });
 });

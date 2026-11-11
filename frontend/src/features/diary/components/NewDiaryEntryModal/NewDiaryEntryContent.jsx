@@ -102,7 +102,10 @@ function NewDiaryEntryContent({
                     aoPressionar={formulario.salvar}
                     carregando={formulario.salvando}
                     desativado={salvarDesativado}
-                    estilo={[estilos.botaoSalvar, salvarDesativado && estilos.botaoSalvarDesativado]}
+                    estilo={[
+                        estilos.botaoSalvar,
+                        salvarDesativado && estilos.botaoSalvarDesativado
+                    ]}
                     estiloTexto={
                         salvarDesativado ? estilos.textoBotaoDesativado : estilos.textoBotaoSalvar
                     }

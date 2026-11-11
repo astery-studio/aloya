@@ -25,9 +25,7 @@ function validarDataRegistro(data, hoje) {
 
 function contarMacrocategoriasPreenchidas(catalogo, valores = {}) {
     return listarMacrocategoriasAtivas(catalogo).filter((macro) =>
-        macro.categorias.some((categoria) =>
-            categoriaPreenchida(categoria, valores[categoria.id])
-        )
+        macro.categorias.some((categoria) => categoriaPreenchida(categoria, valores[categoria.id]))
     ).length;
 }
 

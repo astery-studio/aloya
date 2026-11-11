@@ -50,13 +50,15 @@ describe('regras do formulário do Diário', () => {
 
     test('conta cada macrocategoria preenchida uma única vez', () => {
         const catalogo = {
-            macrocategorias: [{
-                ativa: true,
-                categorias: [
-                    { id: 'um', tipoValor: 'opcoes', ativaEfetiva: true },
-                    { id: 'dois', tipoValor: 'texto', ativaEfetiva: true }
-                ]
-            }]
+            macrocategorias: [
+                {
+                    ativa: true,
+                    categorias: [
+                        { id: 'um', tipoValor: 'opcoes', ativaEfetiva: true },
+                        { id: 'dois', tipoValor: 'texto', ativaEfetiva: true }
+                    ]
+                }
+            ]
         };
         expect(contarMacrocategoriasPreenchidas(catalogo, { um: ['x'], dois: 'nota' })).toBe(1);
         expect(contarMacrocategoriasPreenchidas(catalogo)).toBe(0);

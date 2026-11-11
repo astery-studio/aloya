@@ -80,7 +80,9 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(screen.getByText('Macros:1;desabilitado:false')).toBeOnTheScreen();
     expect(screen.getByText('Registro no Diário')).toBeOnTheScreen();
     expect(screen.getByText('0 / 1 marcados')).toBeOnTheScreen();
-    expect(screen.getByText('Selecione pelo menos uma opção para salvar no diário.')).toBeOnTheScreen();
+    expect(
+        screen.getByText('Selecione pelo menos uma opção para salvar no diário.')
+    ).toBeOnTheScreen();
     expect(screen.getByText('Data inválida')).toBeOnTheScreen();
     expect(screen.getByText('Preencha')).toBeOnTheScreen();
     expect(screen.getByRole('alert')).toHaveTextContent('Falha');
