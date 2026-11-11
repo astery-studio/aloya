@@ -20,7 +20,6 @@ function IconeOpcao(props) {
 }
 
 const ALTURA_MINIMA_ANOTACAO = 36;
-const ALTURA_RECOLHIDA_ANOTACAO = 240;
 
 function calcularAlturaAnotacao(alturaConteudo) {
     return Math.max(ALTURA_MINIMA_ANOTACAO, alturaConteudo + 12);
@@ -32,16 +31,10 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
     const selecionadas = Array.isArray(valor) ? valor : [];
     const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
-    const [anotacaoExpandida, setAnotacaoExpandida] = useState(false);
-    const podeAlternarAnotacao = alturaAnotacao > ALTURA_RECOLHIDA_ANOTACAO;
-    const alturaExibida = anotacaoExpandida
-        ? alturaAnotacao
-        : Math.min(alturaAnotacao, ALTURA_RECOLHIDA_ANOTACAO);
     let controle;
 
     function limparAnotacao() {
         setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
-        setAnotacaoExpandida(false);
         Keyboard.dismiss();
         aoAlterar?.('');
     }
@@ -86,13 +79,13 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     desativado={desabilitado}
                     estilo={[
                         estilos.campoAnotacao,
-                        { borderColor: cores.icone, height: alturaExibida }
+                        { borderColor: cores.icone, height: alturaAnotacao }
                     ]}
                     estiloEntrada={[
                         estilos.entradaAnotacao,
                         {
                             color: cores.icone,
-                            height: alturaExibida - 12,
+                            height: alturaAnotacao - 12,
                             textAlign: valor ? 'justify' : 'center'
                         }
                     ]}
@@ -115,26 +108,9 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                         ) : null
                     }
                 />
-                <View style={estilos.rodapeAnotacao}>
-                    {podeAlternarAnotacao ? (
-                        <Pressable
-                            accessibilityRole="button"
-                            accessibilityLabel={
-                                anotacaoExpandida
-                                    ? 'Recolher anotação livre'
-                                    : 'Expandir anotação livre'
-                            }
-                            onPress={() => setAnotacaoExpandida((atual) => !atual)}
-                        >
-                            <Text style={[estilos.alternarAnotacao, { color: cores.icone }]}>
-                                {anotacaoExpandida ? 'Recolher' : 'Expandir'}
-                            </Text>
-                        </Pressable>
-                    ) : null}
-                    <Text style={[estilos.contador, { color: cores.icone }]}>
-                        {[...(valor ?? '')].length} / {limite}
-                    </Text>
-                </View>
+                <Text style={[estilos.contador, { color: cores.icone }]}>
+                    {[...(valor ?? '')].length} / {limite}
+                </Text>
             </>
         );
     }

@@ -78,19 +78,7 @@ function criarEstilos(tema) {
             borderRadius: 9,
             backgroundColor: tema.cores.interface.superficie
         },
-        rodapeAnotacao: {
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-        },
-        alternarAnotacao: {
-            fontFamily: fontFamilies.semibold,
-            fontSize: 10,
-            lineHeight: 19
-        },
         contador: {
-            marginLeft: 'auto',
             alignSelf: 'flex-end',
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
