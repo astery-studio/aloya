@@ -145,7 +145,7 @@ async function desativar(baseUrl, contatoId, body = { confirmado: true }) {
     });
 }
 
-test('remove contato ativo, encerra sessões e preserva os demais vínculos da categoria', async () => {
+test('remove contato ativo, preserva a sessão e os demais vínculos da categoria', async () => {
     await executarComBanco(async ({ baseUrl, prisma }) => {
         const resposta = await remover(baseUrl, 20);
         const corpo = await resposta.json();
@@ -167,13 +167,13 @@ test('remove contato ativo, encerra sessões e preserva os demais vínculos da c
             id: 20,
             status: 'removido',
             statusAnterior: 'ativo',
-            sessoesEncerradas: 1,
+            sessoesEncerradas: 0,
             alertasCancelados: 1
         });
         assert.equal(removido, null);
         assert.equal(preservado.status, 'ativo');
         assert.equal(preservado.categoriaId, 10);
-        assert.equal(sessoesAna[0].revogadaEm.toISOString(), AGORA.toISOString());
+        assert.equal(sessoesAna[0].revogadaEm, null);
         assert.equal(sessoesAna[1].revogadaEm, null);
         assert.equal(sessaoBia.revogadaEm, null);
         assert.equal(notificacoes[0].statusEnvio, 'cancelada');
@@ -205,7 +205,7 @@ test('desativa contato ativo e o preserva como inativo', async () => {
         assert.equal(resposta.status, 200, JSON.stringify(corpo));
         assert.equal(corpo.mensagem, 'Contato desativado com sucesso.');
         assert.equal(vinculo.status, 'revogado');
-        assert.equal(vinculo.categoriaId, null);
+        assert.equal(vinculo.categoriaId, 10);
         assert.deepEqual(vinculo.permissoesIndividuais, []);
     });
 });

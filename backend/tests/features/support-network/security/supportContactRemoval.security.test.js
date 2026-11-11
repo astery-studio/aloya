@@ -84,20 +84,13 @@ test('não inicia transação para contato de apoio ou sessão inválida', async
     assert.equal(iniciou, false);
 });
 
-test('revoga somente sessões vivas do usuário associado ao vínculo', async () => {
+test('preserva a sessão global e revoga somente o acesso pelo vínculo', async () => {
     const estado = {};
     const service = criarService(estado);
 
     await service.remover({ titularId: 42, papel: 'principal', contatoId: 9 });
 
-    assert.deepEqual(estado.sessoes, {
-        where: {
-            usuarioId: 22,
-            revogadaEm: null,
-            validadeSessao: { gt: AGORA }
-        },
-        data: { revogadaEm: AGORA }
-    });
+    assert.equal(estado.sessoes, undefined);
 });
 
 test('notificação de revogação não expõe motivo, categoria ou permissões', async () => {

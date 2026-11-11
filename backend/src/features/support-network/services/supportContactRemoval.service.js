@@ -23,24 +23,16 @@ function criarSupportContactRemovalService({ prisma, now = () => new Date() } = 
     }
 
     async function aplicarRevogacaoDeAcesso(tx, vinculo, instante) {
-        let sessoesEncerradas = 0;
+        const sessoesEncerradas = 0;
         let alertasCancelados = 0;
 
         if (!vinculo.contatoId) {
             return { sessoesEncerradas, alertasCancelados };
         }
 
-        if (vinculo.status === STATUS_CONTATO_ATIVO) {
-            const sessoes = await tx.sessao.updateMany({
-                where: {
-                    usuarioId: vinculo.contatoId,
-                    revogadaEm: null,
-                    validadeSessao: { gt: instante }
-                },
-                data: { revogadaEm: instante }
-            });
-            sessoesEncerradas = sessoes.count;
-        }
+        // A sessão pertence à conta do contato, não a um vínculo específico.
+        // Revogá-la aqui desconectaria a pessoa de todas as redes das quais participa.
+        // O acesso a esta titular é encerrado pelo próprio status/remoção do vínculo.
 
         const alertas = await tx.notificacao.updateMany({
             where: {
@@ -160,8 +152,6 @@ function criarSupportContactRemovalService({ prisma, now = () => new Date() } = 
                 },
                 data: {
                     status: 'revogado',
-                    categoriaId: null,
-                    permissoesIndividuais: [],
                     tokenConviteHash: null,
                     dataExpiracao: null,
                     dataResposta: instante

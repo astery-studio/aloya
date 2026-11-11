@@ -63,7 +63,7 @@ function criarCenario({
     return { estado, service };
 }
 
-test('revoga contato ativo, encerra sessões, cancela alertas e notifica', async () => {
+test('revoga somente o vínculo, preserva a sessão, cancela alertas e notifica', async () => {
     const { estado, service } = criarCenario({
         vinculo: { id: 9, contatoId: 22, status: 'ativo', categoriaId: 3 }
     });
@@ -81,27 +81,18 @@ test('revoga contato ativo, encerra sessões, cancela alertas e notifica', async
     });
     assert.deepEqual(estado.vinculo.data, {
         status: 'revogado',
-        categoriaId: null,
-        permissoesIndividuais: [],
         tokenConviteHash: null,
         dataExpiracao: null,
         dataResposta: agora
     });
-    assert.deepEqual(estado.sessoes[0], {
-        where: {
-            usuarioId: 22,
-            revogadaEm: null,
-            validadeSessao: { gt: agora }
-        },
-        data: { revogadaEm: agora }
-    });
+    assert.equal(estado.sessoes.length, 0);
     assert.equal(estado.alertas[0].where.origemId, 9);
     assert.equal(estado.notificacoes[0].data.usuarioId, 22);
     assert.deepEqual(resultado, {
         id: 9,
         status: 'revogado',
         statusAnterior: 'ativo',
-        sessoesEncerradas: 2,
+        sessoesEncerradas: 0,
         alertasCancelados: 1
     });
 });
