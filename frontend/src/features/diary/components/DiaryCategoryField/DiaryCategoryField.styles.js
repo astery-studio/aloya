@@ -59,7 +59,6 @@ function criarEstilos(tema) {
         entradaAnotacao: {
             minHeight: 24,
             paddingVertical: 0,
-            paddingRight: 22,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 24,
