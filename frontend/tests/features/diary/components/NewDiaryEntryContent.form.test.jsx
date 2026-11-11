@@ -92,3 +92,29 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(screen.getByText('desativado:true')).toBeOnTheScreen();
     expect(formulario.salvar).not.toHaveBeenCalled();
 });
+
+test('habilita o salvamento e atualiza o contador quando há conteúdo válido', async () => {
+    const formulario = {
+        data: '2026-11-08',
+        setData: jest.fn(),
+        valores: { dor: '1' },
+        erros: {},
+        alterarValor: jest.fn(),
+        salvar: jest.fn(),
+        salvando: false
+    };
+
+    await render(
+        <NewDiaryEntryContent
+            catalogo={catalogo}
+            carregando={false}
+            fase="menstruacao"
+            formulario={formulario}
+        />
+    );
+
+    expect(screen.getByText('1 / 1 marcados')).toBeOnTheScreen();
+    expect(screen.getByText('desativado:false')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));
+    expect(formulario.salvar).toHaveBeenCalledTimes(1);
+});
