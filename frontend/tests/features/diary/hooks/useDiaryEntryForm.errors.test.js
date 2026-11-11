@@ -23,16 +23,19 @@ async function formularioPreenchido(service, extras = {}) {
     return hook;
 }
 
-test.each([
-    [{ mensagemUsuario: 'Falha conhecida.' }, 'Falha conhecida.'],
-    [new Error('interno'), MENSAGEM_SALVAMENTO]
-])('apresenta falha de salvamento %#', async (falha, mensagem) => {
-    const service = { criarRegistro: jest.fn().mockRejectedValue(falha) };
-    const { result } = await formularioPreenchido(service);
-    await act(async () => expect(await result.current.salvar()).toBe(false));
-    expect(result.current.erros).toEqual({ geral: mensagem });
-    expect(result.current.salvando).toBe(false);
-});
+test.each([{ mensagemUsuario: 'Falha conhecida.' }, new Error('interno')])(
+    'apresenta falha de salvamento %#',
+    async (falha) => {
+        const service = { criarRegistro: jest.fn().mockRejectedValue(falha) };
+        const { result } = await formularioPreenchido(service);
+        await act(async () => expect(await result.current.salvar()).toBe(false));
+        expect(result.current.erros).toEqual({});
+        expect(result.current.erroSalvamento).toBe(MENSAGEM_SALVAMENTO);
+        expect(result.current.salvando).toBe(false);
+        await act(() => result.current.limparErroSalvamento());
+        expect(result.current.erroSalvamento).toBeNull();
+    }
+);
 
 test('encerra a sessão ao receber erro 401', async () => {
     const onSessaoExpirada = jest.fn();

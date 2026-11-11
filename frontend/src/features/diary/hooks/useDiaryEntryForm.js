@@ -3,12 +3,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { obterHojeDiario } from '../utils/diaryDate';
 import { prepararFormularioDiario } from '../utils/diaryForm';
 
-const MENSAGEM_SALVAMENTO = 'Não foi possível salvar o registro. Tente novamente.';
+const MENSAGEM_SALVAMENTO =
+    'Ocorreu um erro ao salvar registro. Verifique sua conexão e tente novamente.';
 
 function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirada }) {
     const [data, setData] = useState(() => obterHojeDiario());
     const [valores, setValores] = useState({});
     const [erros, setErros] = useState({});
+    const [erroSalvamento, setErroSalvamento] = useState(null);
     const [salvando, setSalvando] = useState(false);
 
     useEffect(() => {
@@ -16,6 +18,7 @@ function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirad
         setData(obterHojeDiario());
         setValores({});
         setErros({});
+        setErroSalvamento(null);
         setSalvando(false);
     }, [ativo]);
 
@@ -30,6 +33,8 @@ function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirad
         });
     }, []);
 
+    const limparErroSalvamento = useCallback(() => setErroSalvamento(null), []);
+
     const salvar = useCallback(async () => {
         if (salvando || typeof service?.criarRegistro !== 'function') return false;
         const formulario = prepararFormularioDiario({
@@ -42,20 +47,31 @@ function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirad
         if (!formulario.valido) return false;
 
         setSalvando(true);
+        setErroSalvamento(null);
         try {
             const registro = await service.criarRegistro(formulario.dados);
             onCriado?.(registro);
             return true;
         } catch (erro) {
             if (erro?.status === 401) onSessaoExpirada?.();
-            setErros({ geral: erro?.mensagemUsuario ?? MENSAGEM_SALVAMENTO });
+            setErroSalvamento(MENSAGEM_SALVAMENTO);
             return false;
         } finally {
             setSalvando(false);
         }
     }, [catalogo, data, onCriado, onSessaoExpirada, salvando, service, valores]);
 
-    return { data, setData, valores, erros, salvando, alterarValor, salvar };
+    return {
+        data,
+        setData,
+        valores,
+        erros,
+        erroSalvamento,
+        salvando,
+        alterarValor,
+        limparErroSalvamento,
+        salvar
+    };
 }
 
 export { MENSAGEM_SALVAMENTO, useDiaryEntryForm };

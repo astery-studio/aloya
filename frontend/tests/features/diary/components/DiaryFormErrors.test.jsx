@@ -11,7 +11,7 @@ test('omite mensagens que não existem', async () => {
     expect(resultado.toJSON()).not.toBeNull();
 });
 
-test('apresenta todas as mensagens existentes', async () => {
+test('apresenta somente os erros de validação do formulário', async () => {
     await render(
         <DiaryFormErrors
             erros={{ data: 'Data', conteudo: 'Conteúdo', geral: 'Geral' }}
@@ -20,5 +20,5 @@ test('apresenta todas as mensagens existentes', async () => {
     );
     expect(screen.getByText('Data')).toBeOnTheScreen();
     expect(screen.getByText('Conteúdo')).toBeOnTheScreen();
-    expect(screen.getByRole('alert')).toHaveTextContent('Geral');
+    expect(screen.queryByText('Geral')).not.toBeOnTheScreen();
 });
