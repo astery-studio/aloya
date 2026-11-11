@@ -1,4 +1,8 @@
-import { STATUS_CONTATO_PENDENTE } from '../constants/supportContact.constants.js';
+import {
+    STATUS_CONTATO_PENDENTE,
+    STATUS_CONTATO_RECUSADO,
+    STATUS_CONTATO_REVOGADO
+} from '../constants/supportContact.constants.js';
 import { criarErro, validarTitular } from './supportContact.service.js';
 
 function criarContactInvitationResendService({
@@ -27,15 +31,19 @@ function criarContactInvitationResendService({
             where: {
                 id: contatoId,
                 titularId,
-                status: STATUS_CONTATO_PENDENTE
+                status: {
+                    in: [STATUS_CONTATO_PENDENTE, STATUS_CONTATO_REVOGADO, STATUS_CONTATO_RECUSADO]
+                }
             },
             select: {
                 id: true,
                 contatoId: true,
                 emailConvidado: true,
+                status: true,
                 tokenConviteHash: true,
                 dataEnvio: true,
                 dataExpiracao: true,
+                dataResposta: true,
                 titular: {
                     select: {
                         nome: true
@@ -58,13 +66,15 @@ function criarContactInvitationResendService({
             where: {
                 id: convite.id,
                 titularId,
-                status: STATUS_CONTATO_PENDENTE,
+                status: convite.status,
                 tokenConviteHash: convite.tokenConviteHash
             },
             data: {
+                status: STATUS_CONTATO_PENDENTE,
                 tokenConviteHash: credencial.tokenHash,
                 dataEnvio,
-                dataExpiracao: credencial.dataExpiracao
+                dataExpiracao: credencial.dataExpiracao,
+                dataResposta: null
             }
         });
 
@@ -105,9 +115,11 @@ function criarContactInvitationResendService({
                         tokenConviteHash: credencial.tokenHash
                     },
                     data: {
+                        status: convite.status,
                         tokenConviteHash: convite.tokenConviteHash,
                         dataEnvio: convite.dataEnvio,
-                        dataExpiracao: convite.dataExpiracao
+                        dataExpiracao: convite.dataExpiracao,
+                        dataResposta: convite.dataResposta
                     }
                 });
             } catch {

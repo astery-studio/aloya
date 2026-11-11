@@ -16,9 +16,11 @@ function criarCenario({
         id: 9,
         contatoId: 2,
         emailConvidado: 'bia@example.com',
+        status: 'pendente',
         tokenConviteHash: 'hash-antigo',
         dataEnvio: new Date('2026-10-30T12:00:00.000Z'),
         dataExpiracao: new Date('2026-11-06T12:00:00.000Z'),
+        dataResposta: null,
         titular: { nome: 'Ana' },
         ...convite
     };
@@ -67,12 +69,23 @@ test('renova credencial e notifica no app quando o contato já possui conta', as
         contatoId: 9
     });
 
-    assert.deepEqual(estado.consultas[0].where, { id: 9, titularId: 1, status: 'pendente' });
+    assert.deepEqual(estado.consultas[0].where, {
+        id: 9,
+        titularId: 1,
+        status: { in: ['pendente', 'revogado', 'recusado'] }
+    });
     assert.deepEqual(estado.atualizacoes[0].where, {
         id: 9,
         titularId: 1,
         status: 'pendente',
         tokenConviteHash: 'hash-antigo'
+    });
+    assert.deepEqual(estado.atualizacoes[0].data, {
+        status: 'pendente',
+        tokenConviteHash: 'hash-novo',
+        dataEnvio: agora,
+        dataExpiracao: expiracao,
+        dataResposta: null
     });
     assert.deepEqual(estado.emails, []);
     assert.equal(estado.notificacoes[0].data.usuarioId, 2);
@@ -84,6 +97,23 @@ test('renova credencial e notifica no app quando o contato já possui conta', as
         dataEnvio: agora,
         dataExpiracao: expiracao
     });
+});
+
+test('reativa convite inativo sem alterar as permissões preservadas', async () => {
+    const { estado, service } = criarCenario({
+        convite: {
+            status: 'revogado',
+            tokenConviteHash: null,
+            dataExpiracao: null,
+            dataResposta: new Date('2026-11-01T12:00:00.000Z')
+        }
+    });
+
+    await service.reenviar({ titularId: 1, papel: 'principal', contatoId: 9 });
+
+    assert.equal(estado.atualizacoes[0].where.status, 'revogado');
+    assert.equal(estado.atualizacoes[0].data.status, 'pendente');
+    assert.equal(estado.notificacoes.length, 1);
 });
 
 test('indica cadastro no novo e-mail quando o convite ainda não tem contato', async () => {
@@ -138,9 +168,11 @@ test('restaura a credencial anterior quando o envio do e-mail falha', async () =
 
     assert.equal(estado.atualizacoes.length, 2);
     assert.deepEqual(estado.atualizacoes[1].data, {
+        status: original.status,
         tokenConviteHash: original.tokenConviteHash,
         dataEnvio: original.dataEnvio,
-        dataExpiracao: original.dataExpiracao
+        dataExpiracao: original.dataExpiracao,
+        dataResposta: original.dataResposta
     });
 });
 
@@ -154,8 +186,10 @@ test('restaura a credencial anterior quando a notificação interna falha', asyn
 
     assert.equal(estado.atualizacoes.length, 2);
     assert.deepEqual(estado.atualizacoes[1].data, {
+        status: original.status,
         tokenConviteHash: original.tokenConviteHash,
         dataEnvio: original.dataEnvio,
-        dataExpiracao: original.dataExpiracao
+        dataExpiracao: original.dataExpiracao,
+        dataResposta: original.dataResposta
     });
 });
