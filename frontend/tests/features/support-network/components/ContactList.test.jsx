@@ -288,9 +288,16 @@ describe('ContactList', () => {
 
     test('mostra carregamento inicial', async () => {
         await render(
-            <ContactList contatos={[]} carregando aoAcao={jest.fn()} aoAbrirResumo={jest.fn()} />
+            <ContactList
+                contatos={[]}
+                carregando
+                aoAcao={jest.fn()}
+                aoAbrirResumo={jest.fn()}
+                cabecalho={<Text>Seletor mantido no carregamento</Text>}
+            />
         );
 
+        expect(screen.getByText('Seletor mantido no carregamento')).toBeOnTheScreen();
         expect(screen.getByLabelText('Carregando contatos')).toBeOnTheScreen();
 
         expect(screen.getByText('Carregando contatos...')).toBeOnTheScreen();

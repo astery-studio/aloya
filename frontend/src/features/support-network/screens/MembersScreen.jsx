@@ -17,6 +17,7 @@ import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { ContactFiltersModal } from '../components/ContactFiltersModal/ContactFiltersModal';
 import { ContactList } from '../components/ContactList/ContactList';
 import { ContactPermissionsSummaryModal } from '../components/ContactPermissionsSummaryModal/ContactPermissionsSummaryModal';
+import { SupportNetworkModeSelector } from '../components/SupportNetworkModeSelector/SupportNetworkModeSelector';
 import { useSupportCategories } from '../hooks/useSupportCategories';
 import { useSupportContacts } from '../hooks/useSupportContacts';
 import { criarEstilos } from './MembersScreen.styles';
@@ -158,6 +159,8 @@ function MembersScreen({
     onAbrirCategorias,
     onAdicionarContato,
     onAlterarVinculo,
+    modoRede = 'apoio',
+    onSelecionarModoRede,
     onSelecionarAba,
     onSessaoExpirada
 }) {
@@ -380,6 +383,13 @@ function MembersScreen({
                                     <Text style={estilos.descricao}>
                                         Pessoas que fazem parte da sua rede de cuidado e apoio.
                                     </Text>
+
+                                    {typeof onSelecionarModoRede === 'function' ? (
+                                        <SupportNetworkModeSelector
+                                            selecionado={modoRede}
+                                            aoSelecionar={onSelecionarModoRede}
+                                        />
+                                    ) : null}
 
                                     {possuiFiltros ? (
                                         <ButtonScreen

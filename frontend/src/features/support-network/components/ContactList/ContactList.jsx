@@ -282,15 +282,19 @@ function ContactList({
 
     if (carregamentoInicial) {
         return (
-            <View
-                testID="contact-list-loading"
-                accessibilityLabel="Carregando contatos"
-                accessibilityLiveRegion="polite"
-                style={estilos.estadoCentral}
-            >
-                <ActivityIndicator color={tema.cores.interface.destaque} size="large" />
+            <View style={estilos.estadoComCabecalho}>
+                {cabecalho}
 
-                <Text style={estilos.textoCarregamento}>Carregando contatos...</Text>
+                <View
+                    testID="contact-list-loading"
+                    accessibilityLabel="Carregando contatos"
+                    accessibilityLiveRegion="polite"
+                    style={estilos.estadoCentral}
+                >
+                    <ActivityIndicator color={tema.cores.interface.destaque} size="large" />
+
+                    <Text style={estilos.textoCarregamento}>Carregando contatos...</Text>
+                </View>
             </View>
         );
     }

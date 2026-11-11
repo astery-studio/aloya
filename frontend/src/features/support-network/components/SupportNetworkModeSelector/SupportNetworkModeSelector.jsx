@@ -1,0 +1,59 @@
+import { useMemo } from 'react';
+import { Pressable, Text, View } from 'react-native';
+
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { criarEstilos } from './SupportNetworkModeSelector.styles';
+
+const OPCOES = Object.freeze([
+    Object.freeze({ id: 'apoio', rotulo: 'Contatos de Apoio' }),
+    Object.freeze({ id: 'acompanhados', rotulo: 'Contatos Acompanhados' })
+]);
+
+function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+
+    return (
+        <View
+            accessibilityRole="tablist"
+            accessibilityLabel="Tipo de contato da Rede de Apoio"
+            style={estilos.container}
+        >
+            {OPCOES.map((opcao) => {
+                const estaSelecionado = selecionado === opcao.id;
+
+                return (
+                    <View key={opcao.id} style={estilos.containerOpcao}>
+                        <Pressable
+                            accessibilityRole="tab"
+                            accessibilityLabel={opcao.rotulo}
+                            accessibilityState={{ selected: estaSelecionado }}
+                            disabled={estaSelecionado || typeof aoSelecionar !== 'function'}
+                            onPress={() => aoSelecionar(opcao.id)}
+                            style={({ pressed }) => [
+                                estilos.botao,
+                                estaSelecionado
+                                    ? estilos.botaoSelecionado
+                                    : estilos.botaoNaoSelecionado,
+                                pressed && !estaSelecionado ? estilos.botaoPressionado : null
+                            ]}
+                        >
+                            <Text
+                                style={[
+                                    estilos.texto,
+                                    estaSelecionado
+                                        ? estilos.textoSelecionado
+                                        : estilos.textoNaoSelecionado
+                                ]}
+                            >
+                                {opcao.rotulo}
+                            </Text>
+                        </Pressable>
+                    </View>
+                );
+            })}
+        </View>
+    );
+}
+
+export { OPCOES, SupportNetworkModeSelector };

@@ -207,13 +207,19 @@ describe('MembersScreen', () => {
             screen.getByText('Pessoas que fazem parte da sua rede de cuidado e apoio.')
         ).toBeOnTheScreen();
 
-        expect(
-            screen.getByText('Pessoas que fazem parte da sua rede de cuidado e apoio.').parent
-        ).toHaveStyle({
-            paddingBottom: 20
-        });
-
         expect(mockContactListProps.cabecalho).not.toBeNull();
+    });
+
+    test('alterna para os contatos acompanhados pelo seletor', async () => {
+        const onSelecionarModoRede = jest.fn();
+
+        await render(
+            <MembersScreen modoRede="apoio" onSelecionarModoRede={onSelecionarModoRede} />
+        );
+
+        await fireEvent.press(screen.getByRole('tab', { name: 'Contatos Acompanhados' }));
+
+        expect(onSelecionarModoRede).toHaveBeenCalledWith('acompanhados');
     });
 
     test('aplica E entre estado e tipo de permissão', () => {
