@@ -63,15 +63,33 @@ describe('ParentalConsentScreen', () => {
 
         expect(screen.getAllByRole('button', { name: 'Salvar' })[0]).toBeDisabled();
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Editar E-mail' }));
-        await fireEvent.changeText(screen.getByLabelText('E-mail'), 'responsavel@exemplo.com');
-        await fireEvent.press(screen.getAllByRole('button', { name: 'Salvar' }).at(-1));
+        expect(screen.queryByRole('button', { name: 'Editar E-mail' })).toBeNull();
+        await fireEvent.changeText(
+            screen.getByLabelText('E-mail do responsável legal'),
+            'responsavel@exemplo.com'
+        );
         await fireEvent.press(screen.getAllByRole('button', { name: 'Salvar' })[0]);
 
         await waitFor(() => {
             expect(mockSolicitar).toHaveBeenCalledWith('responsavel@exemplo.com');
         });
         expect(mockReenviar).not.toHaveBeenCalled();
+    });
+
+    test('usa o sheet de edição apenas quando já existe e-mail cadastrado', async () => {
+        mockUseParentalConsent.mockReturnValue(
+            criarEstado({
+                status: {
+                    emailResponsavelLegal: 'responsavel@exemplo.com',
+                    statusConsentimento: 'pendente'
+                }
+            })
+        );
+
+        await renderizar();
+        await fireEvent.press(screen.getByRole('button', { name: 'Editar E-mail' }));
+
+        expect(screen.getByLabelText('E-mail')).toBeOnTheScreen();
     });
 
     test('bloqueia a edição depois da autorização', async () => {

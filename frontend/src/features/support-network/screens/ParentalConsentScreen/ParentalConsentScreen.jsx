@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { EditFieldSheet } from '../../../../shared/components/feedback/EditFieldSheet/EditFieldSheet';
@@ -94,13 +94,32 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
                     <View style={estilos.secao}>
                         <Text style={estilos.tituloSecao}>Responsável legal cadastrado</Text>
 
-                        <ProfileField
-                            label="E-mail"
-                            valor={email}
-                            placeholder="Digite aqui o e-mail"
-                            onPress={abrirEdicao}
-                            desabilitado={confirmado || consentimento.enviando}
-                        />
+                        {emailOriginal ? (
+                            <ProfileField
+                                label="E-mail"
+                                valor={email}
+                                onPress={abrirEdicao}
+                                desabilitado={confirmado || consentimento.enviando}
+                            />
+                        ) : (
+                            <View style={estilos.campoCadastro}>
+                                <Text style={estilos.labelCampo}>E-mail</Text>
+                                <TextInput
+                                    accessibilityLabel="E-mail do responsável legal"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    editable={!consentimento.enviando}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    maxLength={254}
+                                    placeholder="Digite aqui o e-mail"
+                                    placeholderTextColor="#5C5C59"
+                                    selectionColor={tema.cores.interface.destaque}
+                                    style={estilos.entradaCadastro}
+                                />
+                            </View>
+                        )}
                     </View>
 
                     <ButtonScreen
@@ -115,27 +134,29 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
                 </View>
             </SettingsLayout>
 
-            <EditFieldSheet
-                visivel={editando}
-                titulo="Editar E-mail"
-                tipo="email"
-                valor={rascunho}
-                onAlterar={setRascunho}
-                onFechar={() => setEditando(false)}
-                salvando={consentimento.enviando}
-                estiloCaixaCampo={estilos.caixaCampoEdicao}
-                estiloCampo={estilos.textoCampoEdicao}
-                corFundo={tema.escuro ? '#242424' : undefined}
-                estiloPainel={estilos.painelEdicao}
-                botaoSalvar={
-                    <ButtonScreen
-                        texto="Salvar"
-                        variante="verde"
-                        aoPressionar={aplicarEdicao}
-                        desativado={!rascunho.trim()}
-                    />
-                }
-            />
+            {emailOriginal ? (
+                <EditFieldSheet
+                    visivel={editando}
+                    titulo="Editar E-mail"
+                    tipo="email"
+                    valor={rascunho}
+                    onAlterar={setRascunho}
+                    onFechar={() => setEditando(false)}
+                    salvando={consentimento.enviando}
+                    estiloCaixaCampo={estilos.caixaCampoEdicao}
+                    estiloCampo={estilos.textoCampoEdicao}
+                    corFundo={tema.escuro ? '#242424' : undefined}
+                    estiloPainel={estilos.painelEdicao}
+                    botaoSalvar={
+                        <ButtonScreen
+                            texto="Salvar"
+                            variante="verde"
+                            aoPressionar={aplicarEdicao}
+                            desativado={!rascunho.trim()}
+                        />
+                    }
+                />
+            ) : null}
 
             <SimpleModal
                 visivel={modal === 'emailInvalido'}
