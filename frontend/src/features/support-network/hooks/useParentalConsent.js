@@ -6,6 +6,8 @@ import { MENSAGEM_ERRO_ENVIO } from '../services/parentalConsentService';
 const MENSAGEM_ERRO_STATUS =
     'Não foi possível verificar a autorização da Rede de Apoio. Tente novamente.';
 
+const INTERVALO_ATUALIZACAO_CONSENTIMENTO_MS = 2000;
+
 const CODIGOS_SESSAO_INVALIDA = new Set([
     'NAO_AUTENTICADO',
     'TOKEN_INVALIDO',
@@ -49,74 +51,117 @@ function useParentalConsent({ service, onSessaoExpirada } = {}) {
         statusRef.current = status;
     }, [status]);
 
-    const carregar = useCallback(() => {
-        if (requisicaoRef.current) return requisicaoRef.current;
+    const carregar = useCallback(
+        ({ silencioso = false } = {}) => {
+            if (requisicaoRef.current) return requisicaoRef.current;
 
-        if (typeof service?.consultarStatus !== 'function') {
-            setCarregando(false);
-            setAtualizando(false);
-            setErro(MENSAGEM_ERRO_STATUS);
-            return Promise.resolve(false);
-        }
+            if (typeof service?.consultarStatus !== 'function') {
+                setCarregando(false);
+                setAtualizando(false);
+                setErro(MENSAGEM_ERRO_STATUS);
+                return Promise.resolve(false);
+            }
 
-        const controlador = new AbortController();
-        controladorRef.current = controlador;
-        setErro(null);
+            const controlador = new AbortController();
+            controladorRef.current = controlador;
+            if (!silencioso) setErro(null);
 
-        if (statusRef.current) setAtualizando(true);
-        else setCarregando(true);
+            if (!silencioso) {
+                if (statusRef.current) setAtualizando(true);
+                else setCarregando(true);
+            }
 
-        const requisicao = Promise.resolve()
-            .then(() => service.consultarStatus({ signal: controlador.signal }))
-            .then((statusRecebido) => {
-                if (!montadoRef.current || controlador.signal.aborted) return false;
-                statusRef.current = statusRecebido;
-                setStatus(statusRecebido);
-                return true;
-            })
-            .catch((falha) => {
-                if (
-                    !montadoRef.current ||
-                    controlador.signal.aborted ||
-                    falha?.name === 'AbortError'
-                ) {
+            const requisicao = Promise.resolve()
+                .then(() => service.consultarStatus({ signal: controlador.signal }))
+                .then((statusRecebido) => {
+                    if (!montadoRef.current || controlador.signal.aborted) return false;
+                    statusRef.current = statusRecebido;
+                    setStatus(statusRecebido);
+                    setErro(null);
+                    return true;
+                })
+                .catch((falha) => {
+                    if (
+                        !montadoRef.current ||
+                        controlador.signal.aborted ||
+                        falha?.name === 'AbortError'
+                    ) {
+                        return false;
+                    }
+
+                    if (erroEhSessaoInvalida(falha)) {
+                        onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
+                    } else if (!silencioso) {
+                        setErro(MENSAGEM_ERRO_STATUS);
+                    }
+
                     return false;
-                }
+                })
+                .finally(() => {
+                    if (requisicaoRef.current === requisicao) requisicaoRef.current = null;
+                    if (controladorRef.current === controlador) controladorRef.current = null;
 
-                if (erroEhSessaoInvalida(falha)) {
-                    onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
-                } else {
-                    setErro(MENSAGEM_ERRO_STATUS);
-                }
+                    if (montadoRef.current) {
+                        setCarregando(false);
+                        setAtualizando(false);
+                    }
+                });
 
-                return false;
-            })
-            .finally(() => {
-                if (requisicaoRef.current === requisicao) requisicaoRef.current = null;
-                if (controladorRef.current === controlador) controladorRef.current = null;
-
-                if (montadoRef.current) {
-                    setCarregando(false);
-                    setAtualizando(false);
-                }
-            });
-
-        requisicaoRef.current = requisicao;
-        return requisicao;
-    }, [onSessaoExpirada, service]);
+            requisicaoRef.current = requisicao;
+            return requisicao;
+        },
+        [onSessaoExpirada, service]
+    );
 
     useEffect(() => {
         montadoRef.current = true;
         carregar();
 
+        let intervalo = null;
+
+        const pararAtualizacaoAutomatica = () => {
+            if (intervalo !== null) {
+                clearInterval(intervalo);
+                intervalo = null;
+            }
+        };
+
+        const atualizarEnquantoPendente = () => {
+            if (statusRef.current?.acessoLiberado) {
+                pararAtualizacaoAutomatica();
+                return;
+            }
+
+            carregar({ silencioso: true });
+        };
+
+        const iniciarAtualizacaoAutomatica = () => {
+            if (intervalo === null && !statusRef.current?.acessoLiberado) {
+                intervalo = setInterval(
+                    atualizarEnquantoPendente,
+                    INTERVALO_ATUALIZACAO_CONSENTIMENTO_MS
+                );
+            }
+        };
+
+        if (!['background', 'inactive'].includes(AppState.currentState)) {
+            iniciarAtualizacaoAutomatica();
+        }
+
         const assinatura = AppState.addEventListener('change', (proximoEstado) => {
-            if (proximoEstado === 'active') carregar();
+            if (proximoEstado === 'active') {
+                atualizarEnquantoPendente();
+                iniciarAtualizacaoAutomatica();
+            } else {
+                pararAtualizacaoAutomatica();
+            }
         });
 
         return () => {
             montadoRef.current = false;
+            pararAtualizacaoAutomatica();
             controladorRef.current?.abort();
-            assinatura.remove();
+            assinatura?.remove?.();
             requisicaoRef.current = null;
             envioRef.current = null;
         };
@@ -192,4 +237,10 @@ function useParentalConsent({ service, onSessaoExpirada } = {}) {
     };
 }
 
-export { MENSAGEM_ERRO_STATUS, criarStatusPendente, erroEhSessaoInvalida, useParentalConsent };
+export {
+    INTERVALO_ATUALIZACAO_CONSENTIMENTO_MS,
+    MENSAGEM_ERRO_STATUS,
+    criarStatusPendente,
+    erroEhSessaoInvalida,
+    useParentalConsent
+};

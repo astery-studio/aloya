@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { AppState } from 'react-native';
 
 import { useParentalConsent } from '../../../../src/features/support-network/hooks/useParentalConsent';
 
@@ -67,6 +68,53 @@ describe('useParentalConsent', () => {
         expect(result.current.erroEnvio).toBe(
             'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
         );
+    });
+
+    test('remove a restrição automaticamente quando o responsável confirma', async () => {
+        let tratarMudancaEstado;
+        const estadoAtual = AppState.currentState;
+        AppState.currentState = 'background';
+        const ouvirEstado = jest
+            .spyOn(AppState, 'addEventListener')
+            .mockImplementation((_evento, callback) => {
+                tratarMudancaEstado = callback;
+                return { remove: jest.fn() };
+            });
+
+        try {
+            const statusLiberado = {
+                ...statusPendente,
+                acessoLiberado: true,
+                consentimentoNecessario: false,
+                statusConsentimento: 'liberado'
+            };
+            const service = {
+                consultarStatus: jest
+                    .fn()
+                    .mockResolvedValueOnce(statusPendente)
+                    .mockResolvedValue(statusLiberado),
+                solicitar: jest.fn(),
+                reenviar: jest.fn()
+            };
+            const { result, unmount } = await renderHook(() => useParentalConsent({ service }));
+
+            await waitFor(() => expect(result.current.status).toEqual(statusPendente));
+
+            await act(async () => {
+                tratarMudancaEstado('active');
+                await Promise.resolve();
+                await Promise.resolve();
+            });
+
+            await waitFor(() => expect(result.current.status).toEqual(statusLiberado));
+            expect(service.consultarStatus).toHaveBeenCalledTimes(2);
+            expect(result.current.atualizando).toBe(false);
+
+            unmount();
+        } finally {
+            AppState.currentState = estadoAtual;
+            ouvirEstado.mockRestore();
+        }
     });
 
     test('cancela a consulta pendente ao desmontar', async () => {
