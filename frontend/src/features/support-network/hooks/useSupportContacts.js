@@ -251,13 +251,15 @@ function useSupportContacts({ service, onSessaoExpirada } = {}) {
                         return false;
                     }
 
-                    setContatos((contatosAtuais) =>
-                        Object.freeze(
-                            contatosAtuais.map((contato) =>
-                                atualizarContatoAposReenvio(contato, resultado.convite)
-                            )
+                    const contatosAtualizados = Object.freeze(
+                        contatosRef.current.map((contato) =>
+                            atualizarContatoAposReenvio(contato, resultado.convite)
                         )
                     );
+
+                    contatosRef.current = contatosAtualizados;
+                    setContatos(contatosAtualizados);
+                    setResumo(calcularResumoLocal(contatosAtualizados));
 
                     setResultadoAcao(
                         Object.freeze({

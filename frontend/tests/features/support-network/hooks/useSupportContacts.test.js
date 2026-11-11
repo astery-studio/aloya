@@ -217,6 +217,47 @@ describe('useSupportContacts', () => {
         });
     });
 
+    test('move imediatamente o contato inativo para pendentes ao convidar novamente', async () => {
+        const contatoInativo = criarContato({ status: 'inativo' });
+        const service = {
+            listar: jest.fn().mockResolvedValue(criarListagem([contatoInativo])),
+            reenviarConvite: jest.fn().mockResolvedValue({
+                mensagem: 'Convite reenviado com sucesso.',
+                convite: {
+                    id: contatoInativo.id,
+                    email: contatoInativo.email,
+                    status: 'pendente',
+                    dataEnvio: '2026-11-11T12:00:00.000Z',
+                    dataExpiracao: '2026-11-18T12:00:00.000Z'
+                }
+            })
+        };
+
+        const { result } = await renderHook(() => useSupportContacts({ service }));
+
+        await waitFor(() => expect(result.current.carregando).toBe(false));
+
+        expect(result.current.resumo.inativos).toBe(1);
+
+        await act(async () => {
+            await result.current.reenviarConvite(contatoInativo.id);
+        });
+
+        expect(result.current.contatos).toHaveLength(1);
+        expect(result.current.contatos[0]).toMatchObject({
+            id: contatoInativo.id,
+            status: 'pendente',
+            statusRotulo: 'Pendente'
+        });
+        expect(result.current.resumo).toEqual({
+            total: 1,
+            pendentes: 1,
+            ativos: 0,
+            inativos: 0,
+            recusados: 0
+        });
+    });
+
     test('impede dois reenvios simultâneos', async () => {
         let concluirReenvio;
 
