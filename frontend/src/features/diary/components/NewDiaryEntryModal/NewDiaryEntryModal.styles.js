@@ -69,7 +69,10 @@ function criarEstilos(tema) {
             paddingTop: 14
         },
         botaoSalvar: {
-            minHeight: 54,
+            width: '100%',
+            maxWidth: 342,
+            height: 54,
+            alignSelf: 'center',
             borderRadius: 10,
             backgroundColor: '#C85A44'
         },
@@ -87,7 +90,7 @@ function criarEstilos(tema) {
         rodape: {
             paddingHorizontal: 24,
             paddingTop: 12,
-            paddingBottom: 12,
+            paddingBottom: 20,
             borderTopWidth: 1,
             borderColor: '#E6E2D8',
             backgroundColor: '#FFFFFF'
