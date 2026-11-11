@@ -68,11 +68,14 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
 
     function renderizarOpcao(opcao) {
         const apresentacao = obterApresentacaoOpcao(categoria.id, opcao);
+        const selecionada = selecionadas.includes(opcao.id);
         const Icone = (props) => (
             <DiaryOptionIcon
                 {...props}
                 {...apresentacao.iconeProps}
                 iconeId={apresentacao.iconeId}
+                selecionado={selecionada}
+                color={selecionada ? props.color : (apresentacao.iconeProps.color ?? props.color)}
             />
         );
         return (
@@ -81,7 +84,7 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 variante="compacto"
                 label={opcao.nome}
                 icone={Icone}
-                selected={selecionadas.includes(opcao.id)}
+                selected={selecionada}
                 desabilitado={desabilitado}
                 cor={cores.icone}
                 fundo={cores.fundoOpcao}
