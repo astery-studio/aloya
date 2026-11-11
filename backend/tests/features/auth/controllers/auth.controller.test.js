@@ -567,6 +567,9 @@ test('retorna página HTML após confirmar o consentimento', async () => {
     assert.match(res.body, /Autorização concluída/u);
     assert.match(res.body, /Sua participação como Responsável Legal/u);
     assert.match(res.body, /Esta autorização não concede acesso à conta/u);
+    assert.match(res.body, /Você já pode fechar esta página\./u);
+    assert.match(res.body, /max-width: 19\.5416875rem/u);
+    assert.match(res.body, /min-height: 2\.8125rem/u);
     assert.match(res.body, /font-family: "DM Sans"/u);
     assert.match(res.body, /width: min\(100%, 25\.125rem\)/u);
     assert.match(res.body, /min-height: min\(54\.625rem, 100svh\)/u);

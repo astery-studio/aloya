@@ -155,6 +155,27 @@ function criarPaginaConfirmacaoConsentimento() {
                         line-height: 1.35625rem;
                     }
 
+                    .container-fechamento {
+                        display: flex;
+                        width: 100%;
+                        max-width: 19.5416875rem;
+                        min-height: 2.8125rem;
+                        padding-top: 1.5rem;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+
+                    .texto-fechamento {
+                        margin: 0;
+                        color: #2c4c3b;
+                        color: color(srgb 0.1725 0.298 0.2314);
+                        text-align: center;
+                        font-size: 0.875rem;
+                        font-style: normal;
+                        font-weight: 700;
+                        line-height: 1.3125rem;
+                    }
+
                     .rodape {
                         display: flex;
                         min-height: 4rem;
@@ -234,6 +255,10 @@ function criarPaginaConfirmacaoConsentimento() {
                                     Esta autorização não concede acesso à conta ou às informações privadas do titular.
                                 </p>
                             </div>
+                        </div>
+
+                        <div class="container-fechamento">
+                            <p class="texto-fechamento">Você já pode fechar esta página.</p>
                         </div>
                     </main>
 
