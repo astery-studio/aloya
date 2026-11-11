@@ -11,6 +11,13 @@ function criarResposta() {
         statusCode: null,
         body: null,
         contentType: null,
+        headers: {},
+
+        set(nome, valor) {
+            this.headers[nome] = valor;
+
+            return this;
+        },
 
         status(codigo) {
             this.statusCode = codigo;
@@ -564,6 +571,7 @@ test('retorna página HTML após confirmar o consentimento', async () => {
 
     assert.equal(res.statusCode, 200);
     assert.equal(res.contentType, 'html');
+    assert.equal(res.headers['Cache-Control'], 'no-store');
     assert.match(res.body, /Autorização concluída/u);
     assert.match(res.body, /Sua participação como Responsável Legal/u);
     assert.match(res.body, /Esta autorização não concede acesso à conta/u);

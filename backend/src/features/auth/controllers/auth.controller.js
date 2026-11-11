@@ -440,6 +440,7 @@ function criarAuthController({
 
             await parentalConsentService.confirmar(validacao.dados.token);
 
+            res.set?.('Cache-Control', 'no-store');
             return res.status(200).type('html').send(criarPaginaConfirmacaoConsentimento());
         } catch (erro) {
             if (!erro.status) erro.mensagemUsuario = MENSAGEM_ERRO_CONFIRMACAO_CONSENTIMENTO;
