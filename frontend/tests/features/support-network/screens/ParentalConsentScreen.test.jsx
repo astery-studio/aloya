@@ -63,9 +63,7 @@ describe('ParentalConsentScreen', () => {
 
         expect(screen.getAllByRole('button', { name: 'Salvar' })[0]).toBeDisabled();
 
-        await fireEvent.press(
-            screen.getByRole('button', { name: 'Editar e-mail do responsável legal' })
-        );
+        await fireEvent.press(screen.getByRole('button', { name: 'Editar E-mail' }));
         await fireEvent.changeText(screen.getByLabelText('E-mail'), 'responsavel@exemplo.com');
         await fireEvent.press(screen.getAllByRole('button', { name: 'Salvar' }).at(-1));
         await fireEvent.press(screen.getAllByRole('button', { name: 'Salvar' })[0]);
@@ -88,9 +86,7 @@ describe('ParentalConsentScreen', () => {
 
         await renderizar();
 
-        expect(
-            screen.getByRole('button', { name: 'Editar e-mail do responsável legal' })
-        ).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Editar E-mail' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
     });
 });

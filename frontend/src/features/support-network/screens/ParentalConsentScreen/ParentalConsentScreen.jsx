@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { EditFieldSheet } from '../../../../shared/components/feedback/EditFieldSheet/EditFieldSheet';
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
-import {
-    EnvelopeIcon,
-    NotePencilIcon,
-    WarningCircleIcon
-} from '../../../../shared/components/icons/AppIcons';
+import { EnvelopeIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../../settings/layouts/SettingsLayout/SettingsLayout';
+import { ProfileField } from '../../../settings/profile/ProfileField';
 import { useParentalConsent } from '../../hooks/useParentalConsent';
 import { validarEmail } from '../../services/parentalConsentService';
 import { criarEstilos } from './ParentalConsentScreen.styles';
@@ -92,53 +89,28 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
 
     return (
         <>
-            <SettingsLayout
-                titulo="Responsável Legal"
-                onVoltar={onVoltar}
-                rodape={
-                    <View style={estilos.rodape}>
-                        <ButtonScreen
-                            texto="Salvar"
-                            variante="verde"
-                            aoPressionar={salvar}
-                            desativado={!podeSalvar}
-                            carregando={consentimento.enviando}
+            <SettingsLayout titulo="Responsável Legal" onVoltar={onVoltar}>
+                <View style={estilos.container}>
+                    <View style={estilos.secao}>
+                        <Text style={estilos.tituloSecao}>Responsável legal cadastrado</Text>
+
+                        <ProfileField
+                            label="E-mail"
+                            valor={email || 'Digite aqui o e-mail'}
+                            onPress={abrirEdicao}
+                            desabilitado={confirmado || consentimento.enviando}
                         />
                     </View>
-                }
-            >
-                <View style={estilos.secao}>
-                    <Text style={estilos.tituloSecao}>Responsável legal cadastrado</Text>
 
-                    <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel="Editar e-mail do responsável legal"
-                        accessibilityState={{ disabled: confirmado }}
-                        disabled={confirmado}
-                        onPress={abrirEdicao}
-                        style={estilos.campo}
-                    >
-                        <View style={estilos.textos}>
-                            <Text style={estilos.label}>E-mail</Text>
-                            <Text style={[estilos.valor, !email && estilos.valorVazio]}>
-                                {email || 'Digite aqui o e-mail'}
-                            </Text>
-                        </View>
-
-                        {!confirmado ? (
-                            <View style={estilos.icone}>
-                                <NotePencilIcon
-                                    size={20}
-                                    color={tema.cores.interface.textoSecundario}
-                                    weight="regular"
-                                />
-                            </View>
-                        ) : null}
-                    </Pressable>
-
-                    <Text style={estilos.descricao}>
-                        O responsável receberá um e-mail para autorizar seu acesso à Rede de Apoio.
-                    </Text>
+                    <ButtonScreen
+                        texto="Salvar"
+                        variante="verde"
+                        aoPressionar={salvar}
+                        desativado={!podeSalvar}
+                        carregando={consentimento.enviando}
+                        estilo={!podeSalvar && estilos.botaoSalvarDesativado}
+                        estiloTexto={!podeSalvar && estilos.textoSalvarDesativado}
+                    />
                 </View>
             </SettingsLayout>
 
@@ -150,6 +122,10 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
                 onAlterar={setRascunho}
                 onFechar={() => setEditando(false)}
                 salvando={consentimento.enviando}
+                estiloCaixaCampo={estilos.caixaCampoEdicao}
+                estiloCampo={estilos.textoCampoEdicao}
+                corFundo={tema.escuro ? '#242424' : undefined}
+                estiloPainel={estilos.painelEdicao}
                 botaoSalvar={
                     <ButtonScreen
                         texto="Salvar"

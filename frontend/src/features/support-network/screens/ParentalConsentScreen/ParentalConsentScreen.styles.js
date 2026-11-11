@@ -4,65 +4,42 @@ import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
+        container: {
+            width: '100%',
+            gap: tema.espacamentos.grande
+        },
         secao: {
             width: '100%',
-            gap: 12
+            gap: tema.espacamentos.pequeno
         },
         tituloSecao: {
+            marginLeft: 4,
             color: tema.cores.interface.textoSecundario,
-            fontFamily: fontFamilies.bold,
-            fontSize: 12,
-            fontWeight: '700',
-            lineHeight: 18,
-            letterSpacing: 0.72,
-            textTransform: 'uppercase'
-        },
-        campo: {
-            minHeight: 72,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 16,
-            borderWidth: 1,
-            borderColor: tema.cores.interface.borda,
-            borderRadius: 14,
-            backgroundColor: tema.cores.interface.superficie
-        },
-        textos: {
-            flex: 1,
-            gap: 3
-        },
-        label: {
-            color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontSize: 14,
             fontWeight: '500',
             lineHeight: 21
         },
-        valor: {
-            color: tema.cores.interface.textoSecundario,
-            fontFamily: fontFamilies.regular,
-            fontSize: 14,
-            lineHeight: 21
-        },
-        valorVazio: {
-            color: tema.cores.interface.textoDesabilitado
-        },
-        icone: {
-            width: 40,
-            height: 40,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        descricao: {
-            color: tema.cores.interface.textoSecundario,
-            fontFamily: fontFamilies.regular,
-            fontSize: 14,
-            lineHeight: 21
-        },
-        rodape: {
-            width: '100%'
-        }
+        botaoSalvarDesativado: tema.escuro ? { borderRadius: 12, backgroundColor: '#2C2C2C' } : {},
+        textoSalvarDesativado: tema.escuro ? { color: '#757575' } : {},
+        caixaCampoEdicao: tema.escuro
+            ? {
+                  borderRadius: 12,
+                  borderWidth: 1.41,
+                  borderColor: '#A5D6A7',
+                  backgroundColor: '#2C2C2C'
+              }
+            : {},
+        textoCampoEdicao: tema.escuro ? { color: '#999999' } : {},
+        painelEdicao: tema.escuro
+            ? {
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                  borderBottomLeftRadius: 0,
+                  borderBottomRightRadius: 0,
+                  boxShadow: '0 -4px 32px 0 rgba(34, 34, 34, 0.10)'
+              }
+            : {}
     });
 }
 
