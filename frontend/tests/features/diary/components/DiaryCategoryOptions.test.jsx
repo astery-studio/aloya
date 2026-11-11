@@ -82,7 +82,7 @@ describe('opções de DiaryCategoryField', () => {
         await resultado.rerender(
             <DiaryCategoryField
                 categoria={categoria}
-                valor={['fluxo_menstrual_coagulos_grandes', 'fluxo_menstrual_coagulos_muitos']}
+                valor={['fluxo_menstrual_coagulos_muitos']}
                 aoAlterar={aoAlterar}
             />
         );

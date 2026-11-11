@@ -122,6 +122,7 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     function renderizarOpcao(opcao) {
         const apresentacao = obterApresentacaoOpcao(categoria.id, opcao);
         const selecionada = selecionadas.includes(opcao.id);
+        const { color: corEspecifica, ...propriedadesIcone } = apresentacao.iconeProps;
         return (
             <ButtonSelection
                 key={opcao.id}
@@ -129,12 +130,10 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 label={opcao.nome}
                 icone={IconeOpcao}
                 iconeProps={{
-                    ...apresentacao.iconeProps,
+                    ...propriedadesIcone,
                     iconeId: apresentacao.iconeId,
                     selecionado: selecionada,
-                    ...(apresentacao.iconeProps.color && !selecionada
-                        ? { color: apresentacao.iconeProps.color }
-                        : {})
+                    ...(corEspecifica && !selecionada ? { color: corEspecifica } : {})
                 }}
                 selected={selecionada}
                 desabilitado={desabilitado}
