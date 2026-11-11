@@ -37,6 +37,13 @@ test('não anuncia zero quando o campo está vazio', async () => {
     expect(screen.getByLabelText('Duração em dias')).toHaveProp('accessibilityValue', {});
 });
 
+test('bloqueia e atenua o campo desativado', async () => {
+    await renderWithTheme(<NumberInput valor={5} desativado />);
+    expect(screen.getByTestId('area-campo-numero')).toBeDisabled();
+    expect(screen.getByTestId('area-campo-numero')).toHaveStyle({ opacity: 0.55 });
+    expect(screen.getByLabelText('Duração em dias')).toHaveProp('editable', false);
+});
+
 test('toda a área numérica pode direcionar o foco', async () => {
     await renderWithTheme(<NumberInput valor={28} aoAlterar={jest.fn()} />);
     await fireEvent.press(screen.getByTestId('area-campo-numero'));

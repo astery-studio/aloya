@@ -174,6 +174,20 @@ describe('ButtonSelection', () => {
         );
     });
 
+    test('combina estilos da descrição na intensidade selecionada', async () => {
+        await renderizarBotao({
+            variante: 'intensidade',
+            selected: true,
+            descricao: 'Descrição selecionada',
+            estiloDescricao: { letterSpacing: 2 },
+            estiloTextoSelecionado: { textTransform: 'uppercase' }
+        });
+        expect(screen.getByText('Descrição selecionada')).toHaveStyle({
+            letterSpacing: 2,
+            textTransform: 'uppercase'
+        });
+    });
+
     test('usa superfície escura na variante intensidade', async () => {
         await renderizarBotao(
             {
