@@ -10,6 +10,7 @@ import { diaryGroupPresentation } from '../../config/diaryGroupPresentation';
 import { obterApresentacaoOpcao } from '../../config/diaryOptionPresentation';
 import { alternarOpcaoCategoria } from '../../utils/diaryFormValue';
 import { agruparOpcoes } from '../../utils/diaryOptionGroups';
+import { organizarOpcoesEmLinhas } from '../../utils/diaryOptionRows';
 import { DiaryOptionIcon } from '../DiaryOptionIcon/DiaryOptionIcon';
 import { criarEstilos } from './DiaryCategoryField.styles';
 
@@ -116,7 +117,11 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                             </View>
                         ) : null}
                         <View accessibilityRole="list" style={estilos.opcoes}>
-                            {opcoes.map(renderizarOpcao)}
+                            {organizarOpcoesEmLinhas(opcoes).map((linhaOpcoes) => (
+                                <View key={linhaOpcoes[0].id} style={estilos.linhaOpcoes}>
+                                    {linhaOpcoes.map(renderizarOpcao)}
+                                </View>
+                            ))}
                         </View>
                     </View>
                 );

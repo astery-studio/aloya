@@ -79,12 +79,12 @@ function criarEstilos(tema) {
         },
 
         compacto: {
-            minHeight: 28,
+            height: 28,
             alignSelf: 'flex-start',
             marginBottom: 0,
-            paddingVertical: 3,
-            paddingHorizontal: 8,
-            gap: 3,
+            paddingVertical: 0,
+            paddingHorizontal: 5,
+            gap: 10,
             borderRadius: 99
         },
 

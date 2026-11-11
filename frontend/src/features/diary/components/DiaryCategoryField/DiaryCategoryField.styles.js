@@ -34,8 +34,13 @@ function criarEstilos(tema) {
         },
         opcoes: {
             width: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16
+        },
+        linhaOpcoes: {
             flexDirection: 'row',
-            flexWrap: 'wrap',
+            alignItems: 'center',
             justifyContent: 'center',
             gap: 5
         },
