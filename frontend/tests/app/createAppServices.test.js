@@ -12,6 +12,7 @@ import { criarThemePreferenceService } from '../../src/features/settings/service
 import { criarContactInvitationService } from '../../src/features/support-network/services/contactInvitationService';
 import { criarContactLinkService } from '../../src/features/support-network/services/contactLinkService';
 import { criarReceivedContactsService } from '../../src/features/support-network/services/receivedContactsService';
+import { criarParentalConsentService } from '../../src/features/support-network/services/parentalConsentService';
 import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
 import { criarSupportContactService } from '../../src/features/support-network/services/supportContactService';
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
@@ -58,6 +59,10 @@ jest.mock('../../src/features/support-network/services/receivedContactsService',
     criarReceivedContactsService: jest.fn()
 }));
 
+jest.mock('../../src/features/support-network/services/parentalConsentService', () => ({
+    criarParentalConsentService: jest.fn()
+}));
+
 jest.mock('../../src/features/support-network/services/supportContactService', () => ({
     criarSupportContactService: jest.fn()
 }));
@@ -101,6 +106,7 @@ describe('createAppServices', () => {
     let contactLinkService;
     let supportContactService;
     let receivedContactsService;
+    let parentalConsentService;
     let cyclePredictionService;
     let cycleParametersService;
     let cycleRemovalService;
@@ -155,6 +161,10 @@ describe('createAppServices', () => {
             nome: 'receivedContactsService'
         });
 
+        parentalConsentService = Object.freeze({
+            nome: 'parentalConsentService'
+        });
+
         cyclePredictionService = Object.freeze({
             nome: 'cyclePredictionService'
         });
@@ -195,6 +205,8 @@ describe('createAppServices', () => {
         criarSupportContactService.mockReturnValue(supportContactService);
 
         criarReceivedContactsService.mockReturnValue(receivedContactsService);
+
+        criarParentalConsentService.mockReturnValue(parentalConsentService);
 
         criarCyclePredictionService.mockReturnValue(cyclePredictionService);
 
@@ -270,6 +282,10 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         });
 
+        expect(criarParentalConsentService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
         expect(criarCyclePredictionService).toHaveBeenCalledWith({
             requisicaoAutenticada
         });
@@ -301,6 +317,7 @@ describe('createAppServices', () => {
             contactLinkService,
             supportContactService,
             receivedContactsService,
+            parentalConsentService,
             cyclePredictionService,
             cycleParametersService,
             cycleRegistrationService: {
