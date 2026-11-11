@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
+const mockDiaryOptionIcon = jest.fn(() => null);
 jest.mock('../../../../src/features/diary/config/diaryOptionPresentation', () => ({
     obterApresentacaoOpcao: (categoriaId, opcao) => ({
         iconeId: `${categoriaId}-${opcao.id}`,
@@ -7,7 +8,7 @@ jest.mock('../../../../src/features/diary/config/diaryOptionPresentation', () =>
     })
 }));
 jest.mock('../../../../src/features/diary/components/DiaryOptionIcon/DiaryOptionIcon', () => ({
-    DiaryOptionIcon: () => null
+    DiaryOptionIcon: (props) => mockDiaryOptionIcon(props)
 }));
 
 import { DiaryCategoryField } from '../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField';
@@ -33,6 +34,8 @@ const categoria = {
 };
 
 describe('opções de DiaryCategoryField', () => {
+    beforeEach(() => mockDiaryOptionIcon.mockClear());
+
     test('agrupa opções preservando a ordem recebida', () => {
         expect(agruparOpcoes()).toEqual([]);
         expect(agruparOpcoes(categoria.opcoes)).toEqual([['coagulos', categoria.opcoes]]);
@@ -59,6 +62,9 @@ describe('opções de DiaryCategoryField', () => {
                 valor={['fluxo_menstrual_coagulos_grandes']}
                 aoAlterar={aoAlterar}
             />
+        );
+        expect(mockDiaryOptionIcon).toHaveBeenCalledWith(
+            expect.objectContaining({ selecionado: true, color: '#FFFFFF' })
         );
         await fireEvent.press(screen.getByRole('button', { name: 'Muitos' }));
         expect(aoAlterar).toHaveBeenLastCalledWith([
