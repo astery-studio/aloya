@@ -5,10 +5,12 @@ import { CaretDown, CaretUp } from 'phosphor-react-native';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './DiaryMacrocategorySection.styles';
 
+const COR_ICONE_RECOLHIDO = '#A8A49C';
+
 function montarEstiloCabecalho(estilos, expandido, cores, pressionado) {
     return [
         estilos.cabecalho,
-        expandido && { backgroundColor: cores.fundoExpandido },
+        expandido && { backgroundColor: cores.fundoDiarioExpandido },
         pressionado && estilos.pressionado
     ];
 }
@@ -51,7 +53,7 @@ function DiaryMacrocategorySection({
                 {acessorioCabecalho}
                 <IconeExpansao
                     size={18}
-                    color={expandido ? cores.icone : tema.cores.interface.textoSecundario}
+                    color={expandido ? cores.icone : COR_ICONE_RECOLHIDO}
                 />
             </Pressable>
             {expandido ? (
@@ -64,4 +66,4 @@ function DiaryMacrocategorySection({
 }
 
 export default memo(DiaryMacrocategorySection);
-export { montarEstiloCabecalho };
+export { COR_ICONE_RECOLHIDO, montarEstiloCabecalho };

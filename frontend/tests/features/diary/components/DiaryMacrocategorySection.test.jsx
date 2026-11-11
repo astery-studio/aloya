@@ -4,6 +4,7 @@ import { Text } from 'react-native';
 jest.mock('phosphor-react-native', () => ({ CaretDown: () => null, CaretUp: () => null }));
 
 import DiaryMacrocategorySection, {
+    COR_ICONE_RECOLHIDO,
     montarEstiloCabecalho
 } from '../../../../src/features/diary/components/DiaryMacrocategorySection/DiaryMacrocategorySection';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -12,7 +13,8 @@ const Icone = () => null;
 
 test('monta o estado visual pressionado e expandido', () => {
     const estilos = { cabecalho: {}, pressionado: { opacity: 0.8 } };
-    const cores = { fundoExpandido: '#fff' };
+    const cores = { fundoDiarioExpandido: '#fff' };
+    expect(COR_ICONE_RECOLHIDO).toBe('#A8A49C');
     expect(montarEstiloCabecalho(estilos, true, cores, true)).toEqual([
         estilos.cabecalho,
         { backgroundColor: '#fff' },

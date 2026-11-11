@@ -7,7 +7,7 @@ function criarEstilos(tema) {
         container: {
             width: '100%',
             overflow: 'hidden',
-            borderWidth: 1,
+            borderWidth: 0.7,
             borderColor: tema.cores.interface.borda,
             borderRadius: 14,
             backgroundColor: tema.cores.interface.superficie
@@ -17,7 +17,7 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10,
-            paddingHorizontal: 12
+            paddingHorizontal: 14
         },
         caixaIcone: {
             width: 34,
