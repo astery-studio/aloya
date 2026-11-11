@@ -1,8 +1,9 @@
-import { fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 
 const mockUseDiaryCatalog = jest.fn();
 const mockUseDiaryEntryForm = jest.fn();
 const mockUseDiaryPhase = jest.fn();
+const mockSimpleModal = jest.fn(() => null);
 jest.mock('../../../../src/features/diary/hooks/useDiaryCatalog', () => ({
     useDiaryCatalog: (...args) => mockUseDiaryCatalog(...args)
 }));
@@ -11,6 +12,10 @@ jest.mock('../../../../src/features/diary/hooks/useDiaryEntryForm', () => ({
 }));
 jest.mock('../../../../src/features/diary/hooks/useDiaryPhase', () => ({
     useDiaryPhase: (...args) => mockUseDiaryPhase(...args)
+}));
+jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => ({
+    __esModule: true,
+    default: (props) => mockSimpleModal(props)
 }));
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => ({
     BottomSheet: require('./newDiaryEntryModalDoubles').MockBottomSheet
@@ -38,7 +43,14 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
         erro: null,
         recarregar: jest.fn()
     });
-    mockUseDiaryEntryForm.mockReturnValue({ salvando: false });
+    const salvar = jest.fn();
+    const limparErroSalvamento = jest.fn();
+    mockUseDiaryEntryForm.mockReturnValue({
+        salvando: false,
+        erroSalvamento: 'Falha ao salvar.',
+        salvar,
+        limparErroSalvamento
+    });
     mockUseDiaryPhase.mockReturnValue({ fase: 'menstruacao', carregando: false });
 
     await render(
@@ -66,7 +78,13 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
         service,
         onSessaoExpirada
     });
-    parametrosFormulario.onCriado({ id: 1 });
+    await act(async () => parametrosFormulario.onCriado({ id: 1 }));
+    const popups = mockSimpleModal.mock.calls.map(([props]) => props);
+    const sucesso = popups.filter((props) => props.titulo === 'Registro salvo com sucesso.').at(-1);
+    const erro = popups.find((props) => props.titulo === 'Algo deu errado');
+    expect(sucesso.visivel).toBe(true);
+    expect(erro).toMatchObject({ visivel: true, mensagem: 'Falha ao salvar.' });
+    await act(async () => sucesso.acaoPrincipal.aoPressionar());
     expect(onCriado).toHaveBeenCalledWith({ id: 1 });
     expect(onFechar).toHaveBeenCalledTimes(1);
     expect(screen.getByText('bloqueado:false;deslize:true')).toBeOnTheScreen();
