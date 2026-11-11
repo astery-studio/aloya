@@ -79,7 +79,11 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     desativado={desabilitado}
                     estilo={[
                         estilos.campoAnotacao,
-                        { borderColor: cores.icone, height: alturaAnotacao }
+                        {
+                            borderColor: cores.icone,
+                            height: alturaAnotacao + (valor ? 18 : 0),
+                            paddingTop: valor ? 18 : 0
+                        }
                     ]}
                     estiloEntrada={[
                         estilos.entradaAnotacao,

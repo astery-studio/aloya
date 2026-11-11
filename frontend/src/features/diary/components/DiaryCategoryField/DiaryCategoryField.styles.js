@@ -72,11 +72,10 @@ function criarEstilos(tema) {
         },
         limparAnotacao: {
             position: 'absolute',
-            top: -9,
-            right: 10,
+            top: 8,
+            right: 8,
             zIndex: 1,
-            borderRadius: 9,
-            backgroundColor: tema.cores.interface.superficie
+            borderRadius: 9
         },
         contador: {
             alignSelf: 'flex-end',
