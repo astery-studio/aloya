@@ -40,10 +40,10 @@ const nota = {
 };
 
 describe('campos tipados do Diário', () => {
-    test('limita a expansão vertical da anotação', () => {
+    test('expande a anotação sem criar rolagem interna', () => {
         expect(calcularAlturaAnotacao(10)).toBe(36);
         expect(calcularAlturaAnotacao(100)).toBe(112);
-        expect(calcularAlturaAnotacao(500)).toBe(240);
+        expect(calcularAlturaAnotacao(500)).toBe(512);
     });
 
     test('renderiza temperatura com limites do backend', async () => {
@@ -75,6 +75,7 @@ describe('campos tipados do Diário', () => {
             <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} />
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota...');
+        expect(entrada).toHaveProp('scrollEnabled', false);
         expect(entrada).toHaveStyle({
             minHeight: 24,
             height: 24,

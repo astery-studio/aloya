@@ -20,10 +20,9 @@ function IconeOpcao(props) {
 }
 
 const ALTURA_MINIMA_ANOTACAO = 36;
-const ALTURA_MAXIMA_ANOTACAO = 240;
 
 function calcularAlturaAnotacao(alturaConteudo) {
-    return Math.min(ALTURA_MAXIMA_ANOTACAO, Math.max(ALTURA_MINIMA_ANOTACAO, alturaConteudo + 12));
+    return Math.max(ALTURA_MINIMA_ANOTACAO, alturaConteudo + 12);
 }
 
 function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
@@ -89,7 +88,7 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                             textAlign: valor ? 'justify' : 'center'
                         }
                     ]}
-                    scrollEnabled={alturaAnotacao === ALTURA_MAXIMA_ANOTACAO}
+                    scrollEnabled={false}
                     onContentSizeChange={({ nativeEvent }) =>
                         setAlturaAnotacao(calcularAlturaAnotacao(nativeEvent.contentSize.height))
                     }
