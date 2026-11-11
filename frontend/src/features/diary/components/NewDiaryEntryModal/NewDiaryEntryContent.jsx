@@ -74,9 +74,11 @@ function NewDiaryEntryContent({
             />
             <DiaryPhaseBadge fase={fase} carregando={carregandoFase} />
             <ScrollView
+                testID="rolagem-registro-diario"
                 style={estilos.rolagem}
                 contentContainerStyle={estilos.conteudo}
-                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="never"
             >
                 <View style={estilos.cartaoRegistro}>
                     <Text style={estilos.tituloCartao}>Registro no Diário</Text>

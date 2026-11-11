@@ -78,6 +78,14 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     );
 
     expect(screen.getByText('Macros:1;desabilitado:false')).toBeOnTheScreen();
+    expect(screen.getByTestId('rolagem-registro-diario')).toHaveProp(
+        'keyboardShouldPersistTaps',
+        'never'
+    );
+    expect(screen.getByTestId('rolagem-registro-diario')).toHaveProp(
+        'keyboardDismissMode',
+        'on-drag'
+    );
     expect(screen.getByText('Registro no Diário')).toBeOnTheScreen();
     expect(screen.getByText('0 / 1 marcados')).toBeOnTheScreen();
     expect(
