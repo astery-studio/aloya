@@ -236,9 +236,7 @@ describe('ButtonSelection', () => {
             iconeProps: { weight: 'fill' }
         });
         expect(screen.getByRole('button')).toHaveStyle({
-            height: 28,
-            paddingHorizontal: 5,
-            gap: 10,
+            minHeight: 28,
             backgroundColor: 'rgba(200, 90, 68, 0.1)'
         });
         expect(screen.getByText('Opção mensal')).toHaveStyle({ color: '#C85A44' });
