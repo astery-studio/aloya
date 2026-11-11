@@ -52,10 +52,13 @@ function criarEmailService({ transporter, remetente }) {
                             `.trim(),
 
             html: `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
+                </style>
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#FFFFFF;">
                     <tr>
                         <td align="center" valign="top" style="padding:28px 18px;vertical-align:top;">
-                <main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:28px;font-family:Arial,Helvetica,sans-serif;color:#222222;background:#FFFFFF;font-size:16px;line-height:1.55;text-align:left;">
+                <main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:0;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#222222;background:#FFFFFF;font-size:16px;line-height:1.55;text-align:left;">
                     <p style="margin:0 0 34px;">Olá!</p>
 
                     <p style="margin:0 0 24px;">

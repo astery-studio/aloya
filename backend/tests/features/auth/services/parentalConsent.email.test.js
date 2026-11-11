@@ -37,6 +37,8 @@ test('explica integralmente a autorização parental no próprio e-mail', async 
     assert.match(mensagem.text, /https:\/\/aloya\.test\/consentimento\/token/u);
     assert.match(mensagem.html, /CONFIRMAR AUTORIZAÇÃO/u);
     assert.match(mensagem.html, /background:#FFF3EF/u);
+    assert.match(mensagem.html, /family=DM\+Sans:wght@400;700/u);
+    assert.match(mensagem.html, /max-width:640px;margin:0 auto;padding:0;font-family:'DM Sans'/u);
     assert.match(mensagem.html, /Equipe Astery/u);
     assert.match(mensagem.text, /expira em 60 minutos/iu);
     assert.match(
