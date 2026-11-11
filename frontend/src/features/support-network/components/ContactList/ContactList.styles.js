@@ -101,6 +101,23 @@ function criarEstilos(tema) {
             letterSpacing: 0.7,
             textAlign: 'center',
             includeFontPadding: false
+        },
+
+        resultadoFiltroVazio: {
+            width: '100%',
+            alignItems: 'center'
+        },
+
+        mensagemFiltroVazio: {
+            width: '100%',
+            paddingTop: 18,
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 15,
+            fontWeight: '400',
+            lineHeight: 22.5,
+            textAlign: 'left',
+            includeFontPadding: false
         }
     });
 }

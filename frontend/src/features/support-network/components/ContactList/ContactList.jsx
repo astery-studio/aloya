@@ -159,6 +159,7 @@ function ContactList({
     acaoEmAndamento = null,
     desabilitado = false,
     cabecalho = null,
+    rotuloFiltro = 'FILTROS APLICADOS',
     aoAdicionarContato
 }) {
     const tema = useTheme();
@@ -256,6 +257,29 @@ function ContactList({
         [cabecalho, renderizarAtualizacao]
     );
 
+    const renderizarEstadoSemResultado = useCallback(
+        () => (
+            <View style={estilos.resultadoFiltroVazio}>
+                <View
+                    accessibilityRole="header"
+                    accessibilityLabel={`${rotuloFiltro}, 0 registros`}
+                    style={estilos.cabecalhoGrupo}
+                >
+                    <View style={estilos.linhaGrupo} />
+
+                    <Text style={estilos.tituloGrupo}>{rotuloFiltro} (0)</Text>
+
+                    <View style={estilos.linhaGrupo} />
+                </View>
+
+                <Text style={estilos.mensagemFiltroVazio}>
+                    Nenhum registro encontrado para os filtros aplicados.
+                </Text>
+            </View>
+        ),
+        [estilos, rotuloFiltro]
+    );
+
     if (carregamentoInicial) {
         return (
             <View
@@ -293,18 +317,6 @@ function ContactList({
                         }
                     />
                 </View>
-            </View>
-        );
-    }
-
-    if (estadoSemResultado) {
-        return (
-            <View style={estilos.estadoCentral}>
-                <EmptyState
-                    titulo="Nenhum contato encontrado"
-                    mensagem="Nenhum contato corresponde aos filtros selecionados."
-                    variante="vazio"
-                />
             </View>
         );
     }
@@ -359,6 +371,7 @@ function ContactList({
             keyExtractor={extrairChave}
             renderItem={renderizarItem}
             ListHeaderComponent={renderizarCabecalho}
+            ListEmptyComponent={estadoSemResultado ? renderizarEstadoSemResultado : null}
             contentContainerStyle={estilos.conteudoLista}
             ItemSeparatorComponent={() => <Separador estilo={estilos.separador} />}
             refreshing={Boolean(atualizando)}

@@ -391,14 +391,27 @@ describe('ContactList', () => {
 
     test('diferencia filtro sem resultados de rede vazia', async () => {
         await render(
-            <ContactList contatos={[]} filtroAtivo aoAcao={jest.fn()} aoAbrirResumo={jest.fn()} />
+            <ContactList
+                contatos={[]}
+                filtroAtivo
+                rotuloFiltro="ATIVO E PARCEIRO"
+                cabecalho={<Text>Frase mantida com filtro vazio</Text>}
+                aoAcao={jest.fn()}
+                aoAbrirResumo={jest.fn()}
+            />
         );
 
-        expect(screen.getByText('Nenhum contato encontrado')).toBeOnTheScreen();
+        expect(screen.getByTestId('contact-list')).toBeOnTheScreen();
+
+        expect(screen.getByText('Frase mantida com filtro vazio')).toBeOnTheScreen();
+
+        expect(screen.getByText('ATIVO E PARCEIRO (0)')).toBeOnTheScreen();
 
         expect(
-            screen.getByText('Nenhum contato corresponde aos filtros selecionados.')
+            screen.getByText('Nenhum registro encontrado para os filtros aplicados.')
         ).toBeOnTheScreen();
+
+        expect(screen.queryByText('Nenhum contato encontrado')).toBeNull();
     });
 
     test('preserva contatos inativos e recusados na visualização', () => {

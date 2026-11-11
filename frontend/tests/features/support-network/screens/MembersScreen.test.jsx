@@ -111,6 +111,7 @@ jest.mock(
 
 import {
     MembersScreen,
+    criarRotuloFiltros,
     filtrarContatos
 } from '../../../../src/features/support-network/screens/MembersScreen';
 
@@ -241,6 +242,19 @@ describe('MembersScreen', () => {
         ).toEqual([]);
     });
 
+    test('descreve os filtros aplicados no divisor da lista', () => {
+        expect(
+            criarRotuloFiltros(
+                {
+                    estados: ['ativo'],
+                    categoriaIds: [10],
+                    permissaoIndividual: false
+                },
+                [{ id: 10, nome: 'Parceiro' }]
+            )
+        ).toBe('ATIVO E PARCEIRO');
+    });
+
     test('aplica OU dentro de cada grupo de filtros', () => {
         expect(
             filtrarContatos(contatos, {
@@ -269,6 +283,8 @@ describe('MembersScreen', () => {
         );
 
         expect(mockContactListProps.contatos.map(({ id }) => id)).toEqual([2]);
+
+        expect(mockContactListProps.rotuloFiltro).toBe('ATIVO E PERMISSÕES INDIVIDUAIS');
 
         expect(
             screen.getByRole('button', {

@@ -89,6 +89,41 @@ function filtrarContatos(contatos, filtros) {
     );
 }
 
+const ROTULOS_STATUS_FILTRO = Object.freeze({
+    pendente: 'PENDENTE',
+    ativo: 'ATIVO',
+    inativo: 'INATIVO',
+    recusado: 'RECUSADO'
+});
+
+function criarRotuloFiltros(filtros, categorias) {
+    const rotulos = [];
+
+    const estadoSelecionado = Array.isArray(filtros?.estados) ? filtros.estados[0] : null;
+
+    if (ROTULOS_STATUS_FILTRO[estadoSelecionado]) {
+        rotulos.push(ROTULOS_STATUS_FILTRO[estadoSelecionado]);
+    }
+
+    const categoriaIds = Array.isArray(filtros?.categoriaIds) ? filtros.categoriaIds : [];
+
+    for (const categoriaId of categoriaIds) {
+        const categoria = Array.isArray(categorias)
+            ? categorias.find((item) => idsIguais(item?.id, categoriaId))
+            : null;
+
+        if (typeof categoria?.nome === 'string' && categoria.nome.trim().length > 0) {
+            rotulos.push(categoria.nome.trim().toLocaleUpperCase('pt-BR'));
+        }
+    }
+
+    if (filtros?.permissaoIndividual === true) {
+        rotulos.push('PERMISSÕES INDIVIDUAIS');
+    }
+
+    return rotulos.length > 0 ? rotulos.join(' E ') : 'FILTROS APLICADOS';
+}
+
 function obterNomeContato(contato) {
     const candidatos = [contato?.identificacao, contato?.nome, contato?.email];
 
@@ -155,6 +190,11 @@ function MembersScreen({
     const contatosVisiveis = useMemo(
         () => filtrarContatos(estado.contatos, filtros),
         [estado.contatos, filtros]
+    );
+
+    const rotuloFiltros = useMemo(
+        () => criarRotuloFiltros(filtros, estadoCategorias.categorias),
+        [estadoCategorias.categorias, filtros]
     );
 
     const possuiContatosRegistrados = Array.isArray(estado.contatos) && estado.contatos.length > 0;
@@ -330,6 +370,7 @@ function MembersScreen({
                             atualizando={estado.atualizando}
                             erro={estado.erro}
                             filtroAtivo={possuiFiltros}
+                            rotuloFiltro={rotuloFiltros}
                             aoAcao={tratarAcao}
                             aoAbrirResumo={abrirResumo}
                             aoTentarNovamente={estado.atualizarLista}
@@ -457,6 +498,7 @@ function MembersScreen({
 
 export {
     MembersScreen,
+    criarRotuloFiltros,
     contatoAtendeFiltroEstado,
     contatoAtendeFiltroPermissao,
     criarFiltrosVazios,
