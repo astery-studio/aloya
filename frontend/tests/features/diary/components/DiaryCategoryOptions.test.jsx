@@ -4,7 +4,7 @@ const mockDiaryOptionIcon = jest.fn(() => null);
 jest.mock('../../../../src/features/diary/config/diaryOptionPresentation', () => ({
     obterApresentacaoOpcao: (categoriaId, opcao) => ({
         iconeId: `${categoriaId}-${opcao.id}`,
-        iconeProps: {}
+        iconeProps: opcao.id.endsWith('muitos') ? { color: '#123456', weight: 'fill' } : {}
     })
 }));
 jest.mock('../../../../src/features/diary/components/DiaryOptionIcon/DiaryOptionIcon', () => ({
@@ -64,13 +64,39 @@ describe('opções de DiaryCategoryField', () => {
             />
         );
         expect(mockDiaryOptionIcon).toHaveBeenCalledWith(
-            expect.objectContaining({ selecionado: true, color: '#FFFFFF' })
+            expect.objectContaining({
+                iconeId: 'fluxo_menstrual-fluxo_menstrual_coagulos_grandes',
+                color: '#FFFFFF',
+                selecionado: true
+            })
+        );
+        expect(mockDiaryOptionIcon).toHaveBeenCalledWith(
+            expect.objectContaining({
+                iconeId: 'fluxo_menstrual-fluxo_menstrual_coagulos_muitos',
+                color: '#123456',
+                weight: 'fill'
+            })
         );
         await fireEvent.press(screen.getByRole('button', { name: 'Muitos' }));
         expect(aoAlterar).toHaveBeenLastCalledWith([
             'fluxo_menstrual_coagulos_grandes',
             'fluxo_menstrual_coagulos_muitos'
         ]);
+        await resultado.rerender(
+            <DiaryCategoryField
+                categoria={categoria}
+                valor={['fluxo_menstrual_coagulos_grandes', 'fluxo_menstrual_coagulos_muitos']}
+                aoAlterar={aoAlterar}
+            />
+        );
+        expect(mockDiaryOptionIcon).toHaveBeenCalledWith(
+            expect.objectContaining({
+                iconeId: 'fluxo_menstrual-fluxo_menstrual_coagulos_muitos',
+                color: '#FFFFFF',
+                selecionado: true,
+                weight: 'fill'
+            })
+        );
     });
 
     test('desabilita todas as opções e aceita paleta desconhecida', async () => {

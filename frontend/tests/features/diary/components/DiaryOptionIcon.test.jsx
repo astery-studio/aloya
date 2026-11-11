@@ -7,14 +7,11 @@ const mockIcone = jest.fn(() => null);
 jest.mock('../../../../src/shared/components/icons/DiaryIcons', () => ({
     diaryIcons: {
         componente: (props) => mockIcone(props),
-        svg: '<svg />'
+        svg: '<svg fill="#C85A44" />'
     }
 }));
 
-import {
-    colorirSvgSelecionado,
-    DiaryOptionIcon
-} from '../../../../src/features/diary/components/DiaryOptionIcon/DiaryOptionIcon';
+import { DiaryOptionIcon } from '../../../../src/features/diary/components/DiaryOptionIcon/DiaryOptionIcon';
 
 describe('DiaryOptionIcon', () => {
     beforeEach(() => jest.clearAllMocks());
@@ -36,18 +33,19 @@ describe('DiaryOptionIcon', () => {
     test('renderiza XML SVG sem anunciá-lo em duplicidade', async () => {
         await render(<DiaryOptionIcon iconeId="svg" />);
         expect(mockSvgXml.mock.calls[0][0]).toEqual(
-            expect.objectContaining({ accessible: false, xml: '<svg />', width: 18, height: 18 })
+            expect.objectContaining({
+                accessible: false,
+                xml: '<svg fill="#C85A44" />',
+                width: 18,
+                height: 18
+            })
         );
     });
 
-    test('troca a cor do SVG somente no estado selecionado', async () => {
+    test('troca a cor específica do SVG para branco quando selecionado', async () => {
         mockSvgXml.mockClear();
         await render(<DiaryOptionIcon iconeId="svg" color="#FFFFFF" selecionado />);
-        expect(mockSvgXml.mock.calls[0][0].xml).toBe('<svg />');
-        expect(colorirSvgSelecionado('<path fill="#C85A44" stroke="currentColor"/>', '#FFF')).toBe(
-            '<path fill="#FFF" stroke="#FFF"/>'
-        );
-        expect(colorirSvgSelecionado('<svg />')).toBe('<svg />');
+        expect(mockSvgXml.mock.calls[0][0].xml).toBe('<svg fill="#FFFFFF" />');
     });
 
     test('falha explicitamente para identificador desconhecido', async () => {

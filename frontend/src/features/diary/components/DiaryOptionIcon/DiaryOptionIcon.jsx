@@ -2,8 +2,7 @@ import { SvgXml } from 'react-native-svg';
 
 import { diaryIcons } from '../../../../shared/components/icons/DiaryIcons';
 
-function colorirSvgSelecionado(xml, cor) {
-    if (!cor) return xml;
+function colorirSvg(xml, cor) {
     return xml
         .replace(/(fill|stroke)="(?!none|currentColor)[^"]+"/gu, `$1="${cor}"`)
         .replaceAll('currentColor', cor);
@@ -25,7 +24,7 @@ function DiaryOptionIcon({
     }
 
     if (typeof icone === 'string') {
-        const xml = selecionado ? colorirSvgSelecionado(icone, corResolvida) : icone;
+        const xml = selecionado ? colorirSvg(icone, corResolvida) : icone;
         return (
             <SvgXml
                 accessible={false}
@@ -41,4 +40,4 @@ function DiaryOptionIcon({
     return <Icone accessible={false} size={tamanho} color={corResolvida} weight={weight} />;
 }
 
-export { colorirSvgSelecionado, DiaryOptionIcon };
+export { DiaryOptionIcon };
