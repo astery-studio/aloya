@@ -59,7 +59,7 @@ describe('SupportNetworkModeSelector', () => {
         });
 
         expect(seletor.props.contentContainerStyle).toEqual(
-            expect.arrayContaining([expect.objectContaining({ gap: 5 })])
+            expect.arrayContaining([expect.objectContaining({ gap: 2 })])
         );
     });
 });

@@ -16,7 +16,7 @@ function criarEstilos(tema) {
             gap: 10
         },
         conteudoCompacto: {
-            gap: 5
+            gap: 2
         },
         containerOpcao: {
             height: 30,
