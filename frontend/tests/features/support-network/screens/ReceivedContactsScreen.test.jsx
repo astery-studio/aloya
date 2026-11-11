@@ -212,7 +212,11 @@ test('apresenta a tela e a lista recebida', async () => {
 
     expect(
         screen.getByText('Pessoas que contam com você como parte da sua rede de cuidado e apoio.')
-    ).toBeOnTheScreen();
+    ).toHaveStyle({
+        fontSize: 15,
+        fontWeight: '400',
+        lineHeight: 22.5
+    });
 
     expect(mockUseReceivedContacts).toHaveBeenCalledWith({
         service: {},

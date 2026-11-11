@@ -20,10 +20,12 @@ function criarEstilos(tema) {
         },
 
         descricao: {
+            width: '100%',
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
-            fontSize: 16,
-            lineHeight: 24,
+            fontSize: 15,
+            fontWeight: '400',
+            lineHeight: 22.5,
             includeFontPadding: false
         },
 
