@@ -223,6 +223,31 @@ test('consulta categorias e substitui permissões individuais pela categoria esc
     });
 });
 
+test('edita permissões individuais e notifica o contato imediatamente', async () => {
+    await executarComBanco(async ({ baseUrl, prisma }) => {
+        const consulta = await fetch(`${baseUrl}/contacts/21/link`);
+        const configuracao = await consulta.json();
+
+        const atualizacao = await fetch(`${baseUrl}/contacts/21/link`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: 'individual',
+                permissoesIndividuais: ['saude.consultas'],
+                versao: configuracao.versao
+            })
+        });
+        const corpo = await atualizacao.json();
+        const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 21 } });
+        const notificacoes = await prisma.notificacao.findMany({ where: { usuarioId: 3 } });
+
+        assert.equal(atualizacao.status, 200, JSON.stringify(corpo));
+        assert.equal(vinculo.categoriaId, null);
+        assert.deepEqual(vinculo.permissoesIndividuais, ['saude.consultas']);
+        assert.equal(notificacoes.length, 1);
+    });
+});
+
 test('impede consulta e alteração de convite pendente', async () => {
     await executarComBanco(async ({ baseUrl, prisma }) => {
         const antes = await prisma.vinculoRedeApoio.findUnique({ where: { id: 22 } });

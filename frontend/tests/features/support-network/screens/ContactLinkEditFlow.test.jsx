@@ -317,6 +317,44 @@ test('substitui permissões individuais por uma categoria', async () => {
     });
 });
 
+test('altera as permissões individuais sem exigir troca de categoria', async () => {
+    const service = criarService(configuracaoIndividual);
+    const onSalvo = jest.fn();
+
+    await render(
+        <ContactLinkEditFlow
+            contatoId={21}
+            dadosIniciais={dadosIniciais}
+            service={service}
+            onSalvo={onSalvo}
+        />
+    );
+    await screen.findByTestId('formulario-edicao');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir permissões' }));
+
+    expect(propriedadesPermissoes.permissoesSelecionadas).toEqual(['geral.fase_atual']);
+
+    await act(async () => {
+        propriedadesPermissoes.aoSalvar(['saude.consultas']);
+    });
+
+    expect(propriedadesFormulario.alterado).toBe(true);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar edição' }));
+
+    await waitFor(() => {
+        expect(service.atualizar).toHaveBeenCalledWith(21, {
+            tipo: 'individual',
+            permissoesIndividuais: ['saude.consultas'],
+            iconeId: 'coracao',
+            corId: 'coral',
+            versao: configuracaoIndividual.versao
+        });
+    });
+    expect(onSalvo).toHaveBeenCalledTimes(1);
+});
+
 test('salva ícone e cor mantendo o vínculo e o e-mail bloqueado', async () => {
     const service = criarService();
     const onSalvo = jest.fn();

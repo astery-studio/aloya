@@ -50,7 +50,10 @@ function houveAlteracaoReal(configuracao, dados) {
               (dados.categoriaId === null &&
                   assinaturaPermissoes(dados.permissoesIndividuais) !==
                       assinaturaPermissoes(configuracao.vinculoAtual.permissoes))
-            : Number.isSafeInteger(dados.categoriaId) && dados.categoriaId > 0;
+            : (Number.isSafeInteger(dados.categoriaId) && dados.categoriaId > 0) ||
+              (dados.categoriaId === null &&
+                  assinaturaPermissoes(dados.permissoesIndividuais) !==
+                      assinaturaPermissoes(configuracao.vinculoAtual.permissoes));
 
     return aparenciaAlterada || vinculoAlterado;
 }
@@ -67,7 +70,12 @@ function vinculoFoiAlterado(configuracao, dados) {
         );
     }
 
-    return Number.isSafeInteger(dados.categoriaId) && dados.categoriaId > 0;
+    return (
+        (Number.isSafeInteger(dados.categoriaId) && dados.categoriaId > 0) ||
+        (dados.categoriaId === null &&
+            assinaturaPermissoes(dados.permissoesIndividuais) !==
+                assinaturaPermissoes(configuracao.vinculoAtual.permissoes))
+    );
 }
 
 function criarAlteracao(configuracao, dados) {

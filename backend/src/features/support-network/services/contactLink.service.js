@@ -75,7 +75,12 @@ function apresentarConfiguracao(vinculo, categorias) {
 }
 
 function permissoesIguais(primeiras, segundas) {
-    return JSON.stringify(primeiras) === JSON.stringify(segundas);
+    const normalizar = (permissoes) =>
+        [...new Set(copiarPermissoes(permissoes))].sort((primeira, segunda) =>
+            primeira.localeCompare(segunda)
+        );
+
+    return JSON.stringify(normalizar(primeiras)) === JSON.stringify(normalizar(segundas));
 }
 
 function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
@@ -253,16 +258,13 @@ function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
                 }
             } else {
                 if (tipo === TIPO_VINCULO_INDIVIDUAL) {
-                    if (!permissoesIguais(atual.permissoesIndividuais, permissoesIndividuais)) {
-                        throw criarErro(
-                            'Escolha uma categoria para alterar o vínculo.',
-                            422,
-                            'TIPO_VINCULO_DESTINO_INVALIDO'
-                        );
-                    }
+                    vinculoAlterado = !permissoesIguais(
+                        atual.permissoesIndividuais,
+                        permissoesIndividuais
+                    );
                     dadosAtualizacao = {
                         categoriaId: null,
-                        permissoesIndividuais: atual.permissoesIndividuais
+                        permissoesIndividuais
                     };
                 } else if (tipo !== TIPO_VINCULO_CATEGORIA) {
                     throw criarErro(

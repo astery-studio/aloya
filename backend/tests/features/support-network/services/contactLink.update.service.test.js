@@ -120,6 +120,33 @@ test('move individual para categoria substituindo integralmente as permissões',
     assert.deepEqual(resultado.permissoes, ['saude.consultas']);
 });
 
+test('altera permissões individuais mantendo o vínculo individual', async () => {
+    const { estado, service } = criarCenario();
+
+    const resultado = await service.atualizar({
+        titularId: 1,
+        papel: 'principal',
+        contatoId: 9,
+        tipo: 'individual',
+        permissoesIndividuais: ['saude.consultas'],
+        versao
+    });
+
+    assert.deepEqual(estado.atualizacoes[0].data, {
+        categoriaId: null,
+        permissoesIndividuais: ['saude.consultas']
+    });
+    assert.equal(estado.notificacoes.length, 1);
+    assert.deepEqual(resultado, {
+        contatoId: 9,
+        tipo: 'individual',
+        categoria: null,
+        permissoes: ['saude.consultas'],
+        iconeId: 'coracao',
+        corId: 'coral'
+    });
+});
+
 test('atualiza ícone e cor sem trocar vínculo nem notificar acesso', async () => {
     const categoriaAtual = {
         id: 3,
