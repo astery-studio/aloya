@@ -1,5 +1,6 @@
 import {
     ERRO_DATA,
+    contarMacrocategoriasPreenchidas,
     listarMacrocategoriasAtivas,
     validarDataRegistro
 } from '../../../../src/features/diary/utils/diaryForm';
@@ -45,5 +46,19 @@ describe('regras do formulário do Diário', () => {
             expect.objectContaining({ id: 'macro-ativa', categorias: [categoriaAtiva] })
         ]);
         expect(listarMacrocategoriasAtivas()).toEqual([]);
+    });
+
+    test('conta cada macrocategoria preenchida uma única vez', () => {
+        const catalogo = {
+            macrocategorias: [{
+                ativa: true,
+                categorias: [
+                    { id: 'um', tipoValor: 'opcoes', ativaEfetiva: true },
+                    { id: 'dois', tipoValor: 'texto', ativaEfetiva: true }
+                ]
+            }]
+        };
+        expect(contarMacrocategoriasPreenchidas(catalogo, { um: ['x'], dois: 'nota' })).toBe(1);
+        expect(contarMacrocategoriasPreenchidas(catalogo)).toBe(0);
     });
 });

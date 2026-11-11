@@ -1,5 +1,9 @@
 import { decomporData } from './diaryDate';
-import { montarCategoriaPayload, validarValorCategoria } from './diaryFormValue';
+import {
+    categoriaPreenchida,
+    montarCategoriaPayload,
+    validarValorCategoria
+} from './diaryFormValue';
 
 const ERRO_DATA = 'A data do registro não pode ser no futuro.';
 const ERRO_CONTEUDO = 'Preencha ao menos uma categoria para salvar o registro.';
@@ -17,6 +21,14 @@ function listarMacrocategoriasAtivas(catalogo) {
 
 function validarDataRegistro(data, hoje) {
     return decomporData(data) && decomporData(hoje) && data <= hoje ? null : ERRO_DATA;
+}
+
+function contarMacrocategoriasPreenchidas(catalogo, valores = {}) {
+    return listarMacrocategoriasAtivas(catalogo).filter((macro) =>
+        macro.categorias.some((categoria) =>
+            categoriaPreenchida(categoria, valores[categoria.id])
+        )
+    ).length;
 }
 
 function prepararFormularioDiario({ catalogo, valores = {}, data, hoje }) {
@@ -51,6 +63,7 @@ function prepararFormularioDiario({ catalogo, valores = {}, data, hoje }) {
 export {
     ERRO_CONTEUDO,
     ERRO_DATA,
+    contarMacrocategoriasPreenchidas,
     listarMacrocategoriasAtivas,
     prepararFormularioDiario,
     validarDataRegistro
