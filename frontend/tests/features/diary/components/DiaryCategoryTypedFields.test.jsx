@@ -88,6 +88,14 @@ describe('campos tipados do Diário', () => {
             nativeEvent: { contentSize: { height: 100 } }
         });
         expect(entrada).toHaveStyle({ height: 100 });
+        await fireEvent(entrada, 'contentSizeChange', {
+            nativeEvent: { contentSize: { height: 300 } }
+        });
+        expect(entrada).toHaveStyle({ height: 228 });
+        await fireEvent.press(screen.getByRole('button', { name: 'Expandir anotação livre' }));
+        expect(entrada).toHaveStyle({ height: 300 });
+        await fireEvent.press(screen.getByRole('button', { name: 'Recolher anotação livre' }));
+        expect(entrada).toHaveStyle({ height: 228 });
         expect(screen.getByText('3 / 5000')).toBeOnTheScreen();
         expect(screen.getByText('3 / 5000')).toHaveStyle({ color: '#4A5899' });
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar anotação livre' }));

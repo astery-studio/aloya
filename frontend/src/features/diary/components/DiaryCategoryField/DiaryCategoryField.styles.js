@@ -65,8 +65,27 @@ function criarEstilos(tema) {
             textAlign: 'center',
             textAlignVertical: 'top'
         },
-        limparAnotacao: { position: 'absolute', top: 8, right: 8, zIndex: 1 },
+        limparAnotacao: {
+            position: 'absolute',
+            top: -9,
+            right: 10,
+            zIndex: 1,
+            borderRadius: 9,
+            backgroundColor: tema.cores.interface.superficie
+        },
+        rodapeAnotacao: {
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+        },
+        alternarAnotacao: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 10,
+            lineHeight: 19
+        },
         contador: {
+            marginLeft: 'auto',
             alignSelf: 'flex-end',
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
