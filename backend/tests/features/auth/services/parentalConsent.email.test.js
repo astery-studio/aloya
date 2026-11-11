@@ -30,6 +30,10 @@ test('explica integralmente a autorização parental no próprio e-mail', async 
     assert.match(mensagem.html, /CONFIRMAR AUTORIZAÇÃO/u);
     assert.match(mensagem.html, /background:#FFF3EF/u);
     assert.match(mensagem.html, /Equipe Astery/u);
+    assert.match(mensagem.text, /expira em 60 minutos/iu);
+    assert.match(mensagem.html, /vertical-align:middle/u);
+    assert.match(mensagem.html, /este link expira em <strong>60 minutos<\/strong>/iu);
+    assert.match(mensagem.html, /deixa de funcionar após a confirmação/iu);
 });
 
 test('escapa o nome da titular antes de montar o HTML do e-mail', async () => {

@@ -1,6 +1,8 @@
 /**
  * Envia mensagens transacionais de consentimento e recuperação usando o transporte SMTP.
  */
+import { VALIDADE_LINK_CONSENTIMENTO_MINUTOS } from '../constants/parentalConsent.constants.js';
+
 function criarEmailService({ transporter, remetente }) {
     // Escapa caracteres especiais antes de inserir o nome da pessoa titular no HTML do e-mail.
     function escaparHtml(texto) {
@@ -41,7 +43,7 @@ function criarEmailService({ transporter, remetente }) {
                 Para autorizar o acesso à Rede de Apoio, acesse o link abaixo:
                 ${linkConfirmacao}
 
-                Este link possui validade de 60 minutos.
+                Este link expira em ${VALIDADE_LINK_CONSENTIMENTO_MINUTOS} minutos.
 
                 Se você não reconhece esta solicitação ou não deseja autorizar o acesso, ignore esta mensagem.
 
@@ -50,7 +52,10 @@ function criarEmailService({ transporter, remetente }) {
                             `.trim(),
 
             html: `
-                <main style="box-sizing:border-box;max-width:640px;margin:0 auto;padding:28px;font-family:Arial,Helvetica,sans-serif;color:#222222;background:#FFFFFF;font-size:16px;line-height:1.55;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;min-height:100vh;background:#FFFFFF;">
+                    <tr>
+                        <td align="center" valign="middle" style="padding:28px 18px;vertical-align:middle;">
+                <main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:28px;font-family:Arial,Helvetica,sans-serif;color:#222222;background:#FFFFFF;font-size:16px;line-height:1.55;text-align:left;">
                     <p style="margin:0 0 34px;">Olá!</p>
 
                     <p style="margin:0 0 24px;">
@@ -87,7 +92,14 @@ function criarEmailService({ transporter, remetente }) {
                     <p style="margin:0 0 24px;">Agradecemos pela disponibilidade!</p>
 
                     <p style="margin:0;">Atenciosamente,<br /><strong>Equipe Astery</strong></p>
+
+                    <footer style="margin:32px 0 0;padding-top:18px;border-top:1px solid #E6E2D8;color:#5C5C59;font-size:13px;line-height:1.5;text-align:center;">
+                        Por segurança, este link expira em <strong>${VALIDADE_LINK_CONSENTIMENTO_MINUTOS} minutos</strong> e deixa de funcionar após a confirmação.
+                    </footer>
                 </main>
+                        </td>
+                    </tr>
+                </table>
                             `
         });
     }

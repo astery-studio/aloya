@@ -5,7 +5,8 @@ import {
     MENSAGEM_CONSENTIMENTO_CONFIRMADO,
     MENSAGEM_EMAIL_RESPONSAVEL_IGUAL_TITULAR,
     MENSAGEM_ERRO_ENVIO_CONSENTIMENTO,
-    MENSAGEM_SOLICITACAO_CONSENTIMENTO_ENVIADA
+    MENSAGEM_SOLICITACAO_CONSENTIMENTO_ENVIADA,
+    VALIDADE_LINK_CONSENTIMENTO_MINUTOS
 } from '../constants/parentalConsent.constants.js';
 
 function criarParentalConsentService({
@@ -36,9 +37,9 @@ function criarParentalConsentService({
         return `${baseUrl}/${encodeURIComponent(tokenPuro)}`;
     }
 
-    // Cria uma nova data de expiração de 60 minutos para o link.
+    // Cria a validade usando a mesma configuração informada no rodapé do e-mail.
     function criarValidadeLink() {
-        return new Date(now().getTime() + 60 * 60 * 1000);
+        return new Date(now().getTime() + VALIDADE_LINK_CONSENTIMENTO_MINUTOS * 60 * 1000);
     }
 
     // Busca somente os dados necessários da titular para aplicar as regras de consentimento.
