@@ -7,7 +7,10 @@ jest.mock('../../../../src/features/diary/components/DiaryOptionIcon/DiaryOption
     DiaryOptionIcon: () => null
 }));
 
-import { DiaryCategoryField } from '../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField';
+import {
+    calcularAlturaAnotacao,
+    DiaryCategoryField
+} from '../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const temperatura = {
@@ -37,6 +40,12 @@ const nota = {
 };
 
 describe('campos tipados do Diário', () => {
+    test('limita a expansão vertical da anotação', () => {
+        expect(calcularAlturaAnotacao(10)).toBe(36);
+        expect(calcularAlturaAnotacao(100)).toBe(112);
+        expect(calcularAlturaAnotacao(500)).toBe(240);
+    });
+
     test('renderiza temperatura com limites do backend', async () => {
         const aoAlterar = jest.fn();
         const resultado = await render(
@@ -68,16 +77,23 @@ describe('campos tipados do Diário', () => {
         const entrada = screen.getByLabelText('Digite aqui sua nota...');
         expect(entrada).toHaveStyle({
             minHeight: 24,
-            maxHeight: 24,
+            height: 24,
             fontSize: 13,
-            textAlign: 'center',
-            textAlignVertical: 'center',
+            textAlign: 'justify',
+            textAlignVertical: 'top',
             color: '#4A5899'
         });
+        await fireEvent(entrada, 'contentSizeChange', {
+            nativeEvent: { contentSize: { height: 100 } }
+        });
+        expect(entrada).toHaveStyle({ height: 100 });
         expect(screen.getByText('3 / 5000')).toBeOnTheScreen();
         expect(screen.getByText('3 / 5000')).toHaveStyle({ color: '#4A5899' });
         await fireEvent.changeText(entrada, 'Nova nota');
         await resultado.rerender(<DiaryCategoryField categoria={nota} valor={null} />);
+        expect(screen.getByLabelText('Digite aqui sua nota...')).toHaveStyle({
+            textAlign: 'center'
+        });
         expect(screen.getByText('0 / 5000')).toBeOnTheScreen();
     });
 });

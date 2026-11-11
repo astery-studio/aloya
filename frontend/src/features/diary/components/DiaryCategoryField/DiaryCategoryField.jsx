@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
@@ -18,11 +18,19 @@ function IconeOpcao(props) {
     return <DiaryOptionIcon {...props} />;
 }
 
+const ALTURA_MINIMA_ANOTACAO = 36;
+const ALTURA_MAXIMA_ANOTACAO = 240;
+
+function calcularAlturaAnotacao(alturaConteudo) {
+    return Math.min(ALTURA_MAXIMA_ANOTACAO, Math.max(ALTURA_MINIMA_ANOTACAO, alturaConteudo + 12));
+}
+
 function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
     const selecionadas = Array.isArray(valor) ? valor : [];
+    const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
     let controle;
 
     if (categoria.tipoValor === 'decimal_escalado') {
@@ -63,8 +71,22 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     multiline
                     maxLength={limite}
                     desativado={desabilitado}
-                    estilo={[estilos.campoAnotacao, { borderColor: cores.icone }]}
-                    estiloEntrada={[estilos.entradaAnotacao, { color: cores.icone }]}
+                    estilo={[
+                        estilos.campoAnotacao,
+                        { borderColor: cores.icone, height: alturaAnotacao }
+                    ]}
+                    estiloEntrada={[
+                        estilos.entradaAnotacao,
+                        {
+                            color: cores.icone,
+                            height: alturaAnotacao - 12,
+                            textAlign: valor ? 'justify' : 'center'
+                        }
+                    ]}
+                    scrollEnabled={alturaAnotacao === ALTURA_MAXIMA_ANOTACAO}
+                    onContentSizeChange={({ nativeEvent }) =>
+                        setAlturaAnotacao(calcularAlturaAnotacao(nativeEvent.contentSize.height))
+                    }
                 />
                 <Text style={[estilos.contador, { color: cores.icone }]}>
                     {[...(valor ?? '')].length} / {limite}
@@ -136,4 +158,4 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     );
 }
 
-export { DiaryCategoryField };
+export { calcularAlturaAnotacao, DiaryCategoryField };
