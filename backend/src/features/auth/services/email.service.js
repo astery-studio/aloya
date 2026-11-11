@@ -58,7 +58,9 @@ function criarEmailService({ transporter, remetente }) {
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#FFFFFF;">
                     <tr>
                         <td align="center" valign="top" style="padding:28px 18px;vertical-align:top;">
-                <main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:0;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#222222;background:#FFFFFF;font-size:16px;line-height:1.55;text-align:left;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;background:#FFFFFF;">
+                    <tr>
+                        <td align="left" style="padding:0;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#222222;font-size:16px;line-height:1.55;text-align:left;">
                     <p style="margin:0 0 34px;">Olá!</p>
 
                     <p style="margin:0 0 24px;">
@@ -105,7 +107,9 @@ function criarEmailService({ transporter, remetente }) {
                             </tr>
                         </table>
                     </footer>
-                </main>
+                        </td>
+                    </tr>
+                </table>
                         </td>
                     </tr>
                 </table>
