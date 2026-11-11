@@ -41,7 +41,7 @@ describe('opções de DiaryCategoryField', () => {
         expect(agruparOpcoes(categoria.opcoes)).toEqual([['coagulos', categoria.opcoes]]);
     });
 
-    test('apresenta grupos e permite múltiplas escolhas', async () => {
+    test('apresenta grupos e substitui escolhas exclusivas', async () => {
         const aoAlterar = jest.fn();
         const resultado = await render(
             <DiaryCategoryField
@@ -78,10 +78,7 @@ describe('opções de DiaryCategoryField', () => {
             })
         );
         await fireEvent.press(screen.getByRole('button', { name: 'Muitos' }));
-        expect(aoAlterar).toHaveBeenLastCalledWith([
-            'fluxo_menstrual_coagulos_grandes',
-            'fluxo_menstrual_coagulos_muitos'
-        ]);
+        expect(aoAlterar).toHaveBeenLastCalledWith(['fluxo_menstrual_coagulos_muitos']);
         await resultado.rerender(
             <DiaryCategoryField
                 categoria={categoria}

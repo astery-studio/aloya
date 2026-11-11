@@ -8,7 +8,7 @@ import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { diaryGroupPresentation } from '../../config/diaryGroupPresentation';
 import { obterApresentacaoOpcao } from '../../config/diaryOptionPresentation';
-import { alternarOpcao } from '../../utils/diaryFormValue';
+import { alternarOpcaoCategoria } from '../../utils/diaryFormValue';
 import { agruparOpcoes } from '../../utils/diaryOptionGroups';
 import { DiaryOptionIcon } from '../DiaryOptionIcon/DiaryOptionIcon';
 import { criarEstilos } from './DiaryCategoryField.styles';
@@ -91,7 +91,7 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 desabilitado={desabilitado}
                 cor={cores.icone}
                 fundo={cores.fundoOpcao}
-                onPress={() => aoAlterar?.(alternarOpcao(selecionadas, opcao.id))}
+                onPress={() => aoAlterar?.(alternarOpcaoCategoria(categoria, selecionadas, opcao))}
             />
         );
     }
