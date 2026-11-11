@@ -22,6 +22,14 @@ test('explica integralmente a autorização parental no próprio e-mail', async 
 
     assert.equal(mensagem.to, 'responsavel@email.com');
     assert.equal(mensagem.subject, 'Convite para participar da Rede de Apoio');
+    assert.match(
+        mensagem.text,
+        /Você está recebendo este e-mail porque foi indicado\(a\) como Responsável Legal de Ana em nosso aplicativo\./u
+    );
+    assert.match(
+        mensagem.html,
+        /Você está recebendo este e-mail porque foi indicado\(a\) como Responsável Legal de <strong>Ana<\/strong> em nosso aplicativo\./u
+    );
     assert.match(mensagem.text, /autorização é opcional/iu);
     assert.match(mensagem.text, /exclusivamente para liberar o módulo Rede de Apoio/iu);
     assert.match(mensagem.text, /compartilhe somente informações selecionadas/iu);

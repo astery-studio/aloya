@@ -32,7 +32,7 @@ function criarEmailService({ transporter, remetente }) {
             text: `
                 Olá!
 
-                ${nomeTitular} indicou este endereço como e-mail de seu responsável legal.
+                Você está recebendo este e-mail porque foi indicado(a) como Responsável Legal de ${nomeTitular} em nosso aplicativo.
 
                 O titular já pode usar normalmente todas as funcionalidades privadas do aplicativo. Esta autorização é opcional e serve exclusivamente para liberar o módulo Rede de Apoio.
 
@@ -59,7 +59,7 @@ function criarEmailService({ transporter, remetente }) {
                     <p style="margin:0 0 34px;">Olá!</p>
 
                     <p style="margin:0 0 24px;">
-                        Você está recebendo este e-mail porque <strong>${nomeSeguro}</strong> indicou você como Responsável Legal de uma pessoa titular de uma conta em nosso aplicativo.
+                        Você está recebendo este e-mail porque foi indicado(a) como Responsável Legal de <strong>${nomeSeguro}</strong> em nosso aplicativo.
                     </p>
 
                     <p style="margin:0 0 24px;">
