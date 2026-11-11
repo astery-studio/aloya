@@ -1,5 +1,6 @@
 import {
     alternarOpcao,
+    alternarOpcaoCategoria,
     categoriaPreenchida,
     montarCategoriaPayload,
     validarValorCategoria
@@ -16,6 +17,38 @@ describe('valores do formulário do Diário', () => {
         expect(alternarOpcao(null, 'a')).toEqual(['a']);
         expect(alternarOpcao(['a'], 'b')).toEqual(['a', 'b']);
         expect(alternarOpcao(['a', 'b'], 'a')).toEqual(['b']);
+    });
+
+    test('restringe apenas os grupos exclusivos da primeira macro', () => {
+        const categoria = {
+            id: 'fluxo_menstrual',
+            opcoes: [
+                { id: 'leve', grupo: 'intensidade' },
+                { id: 'intenso', grupo: 'intensidade' }
+            ]
+        };
+        expect(alternarOpcaoCategoria(categoria, null, categoria.opcoes[0])).toEqual(['leve']);
+        expect(alternarOpcaoCategoria(categoria, ['leve'], categoria.opcoes[1])).toEqual([
+            'intenso'
+        ]);
+        expect(alternarOpcaoCategoria(categoria, ['intenso'], categoria.opcoes[1])).toEqual([]);
+        expect(
+            alternarOpcaoCategoria(
+                { id: 'sintomas_fisicos', opcoes: categoria.opcoes },
+                ['leve'],
+                categoria.opcoes[1]
+            )
+        ).toEqual(['leve', 'intenso']);
+    });
+
+    test('restringe odores e combina outras características', () => {
+        const categoria = { id: 'secrecao_corrimento', opcoes: [] };
+        expect(
+            alternarOpcaoCategoria(categoria, ['aspecto_espumoso'], {
+                id: 'secrecao_corrimento_caracteristicas_odor_forte',
+                grupo: 'caracteristicas'
+            })
+        ).toEqual(['aspecto_espumoso', 'secrecao_corrimento_caracteristicas_odor_forte']);
     });
 
     test('reconhece valores preenchidos por tipo', () => {

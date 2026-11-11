@@ -3,6 +3,34 @@ function alternarOpcao(valor, opcaoId) {
     return atuais.includes(opcaoId) ? atuais.filter((id) => id !== opcaoId) : [...atuais, opcaoId];
 }
 
+const gruposExclusivosCiclo = new Set([
+    'fluxo_menstrual:intensidade',
+    'fluxo_menstrual:coagulos',
+    'fluxo_menstrual:aspecto',
+    'sangramento_escape:cor',
+    'sangramento_escape:intensidade',
+    'secrecao_corrimento:presenca',
+    'secrecao_corrimento:consistencia',
+    'secrecao_corrimento:cor'
+]);
+const opcoesOdor = new Set([
+    'secrecao_corrimento_caracteristicas_sem_odor',
+    'secrecao_corrimento_caracteristicas_odor_diferente_do_habitual',
+    'secrecao_corrimento_caracteristicas_odor_forte'
+]);
+
+function alternarOpcaoCategoria(categoria, valor, opcao) {
+    const atuais = Array.isArray(valor) ? valor : [];
+    if (atuais.includes(opcao.id)) return atuais.filter((id) => id !== opcao.id);
+    const grupoExclusivo = gruposExclusivosCiclo.has(`${categoria.id}:${opcao.grupo}`);
+    const idsExclusivos = grupoExclusivo
+        ? categoria.opcoes.filter((item) => item.grupo === opcao.grupo).map((item) => item.id)
+        : opcoesOdor.has(opcao.id)
+          ? [...opcoesOdor]
+          : [];
+    return [...atuais.filter((id) => !idsExclusivos.includes(id)), opcao.id];
+}
+
 function categoriaPreenchida(categoria, valor) {
     if (categoria.tipoValor === 'opcoes') return Array.isArray(valor) && valor.length > 0;
     if (categoria.tipoValor === 'texto')
@@ -39,4 +67,10 @@ function montarCategoriaPayload(categoria, valor) {
     };
 }
 
-export { alternarOpcao, categoriaPreenchida, montarCategoriaPayload, validarValorCategoria };
+export {
+    alternarOpcao,
+    alternarOpcaoCategoria,
+    categoriaPreenchida,
+    montarCategoriaPayload,
+    validarValorCategoria
+};
