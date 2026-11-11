@@ -22,3 +22,10 @@ test('isola opção grande e combina as menores dentro do limite', () => {
     expect(organizarOpcoesEmLinhas([grande, ...pequenas])).toEqual([[grande], pequenas]);
     expect(organizarOpcoesEmLinhas([pequenas[0], grande])).toEqual([[pequenas[0]], [grande]]);
 });
+
+test('não comprime intensidades longas contra as bordas', () => {
+    const limpar = opcao('limpar', 'Apenas ao se limpar');
+    const manchas = opcao('manchas', 'Pequenas manchas');
+    const leve = opcao('leve', 'Leve');
+    expect(organizarOpcoesEmLinhas([limpar, manchas, leve])).toEqual([[limpar], [manchas, leve]]);
+});

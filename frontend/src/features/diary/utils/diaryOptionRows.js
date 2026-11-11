@@ -4,7 +4,7 @@ const ESPACO_ENTRE_OPCOES = 5;
 const PREFIXO_COLICAS = 'sintomas_fisicos_sintomas_colicas_';
 
 function estimarLarguraOpcao(opcao) {
-    return 38 + [...opcao.nome].length * 6;
+    return 38 + [...opcao.nome].length * 6.8;
 }
 
 function distribuir(opcoes, linhas) {
