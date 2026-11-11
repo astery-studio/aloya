@@ -30,7 +30,7 @@ const loginRateLimitMaximo = Number(process.env.LOGIN_RATE_LIMIT_MAXIMO || 5);
 
 const emailRateLimitJanelaMs = Number(process.env.EMAIL_RATE_LIMIT_JANELA_MS || 900000);
 
-const emailRateLimitMaximo = Number(process.env.EMAIL_RATE_LIMIT_MAXIMO || 3);
+const emailRateLimitMaximo = Number(process.env.EMAIL_RATE_LIMIT_MAXIMO || 10);
 
 const supportInvitationRateLimitJanelaMs = Number(
     process.env.SUPPORT_INVITATION_RATE_LIMIT_JANELA_MS || 900000
