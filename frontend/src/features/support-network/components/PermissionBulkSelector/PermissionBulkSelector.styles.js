@@ -88,11 +88,12 @@ function criarEstilos(tema) {
         },
 
         indicadorParcial: {
-            backgroundColor: tema.cores.interface.destaqueSuave
+            backgroundColor: 'transparent',
+            borderColor: tema.cores.interface.textoSecundario
         },
 
         tracoParcial: {
-            color: tema.cores.interface.destaque,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             fontWeight: '700',

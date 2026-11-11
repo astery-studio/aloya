@@ -105,7 +105,7 @@ function PermissionBulkSelector({ permissoesSelecionadas = [], aoAlterar, desabi
                 testID={`indicador-permissoes-${identificador}`}
                 style={[
                     estilos.indicador,
-                    (selecionado || parcial) && estilos.indicadorAtivo,
+                    selecionado && estilos.indicadorAtivo,
                     parcial && estilos.indicadorParcial
                 ]}
             >
