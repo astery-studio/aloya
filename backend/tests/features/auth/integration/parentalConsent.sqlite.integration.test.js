@@ -155,7 +155,8 @@ test('solicita, altera e confirma o consentimento parental pelo fluxo HTTP real'
         const confirmacao = await fetch(`${baseUrl}/parental-consent/${tokenNovo}`);
         const pagina = await confirmacao.text();
         assert.equal(confirmacao.status, 200);
-        assert.match(pagina, /Autorização concluída com sucesso\./u);
+        assert.match(pagina, /Autorização concluída/u);
+        assert.match(pagina, /Sua participação como Responsável Legal/u);
 
         const consentimento = await prisma.consentimentoParental.findUnique({
             where: { titularMenorId: 1 }

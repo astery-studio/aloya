@@ -301,6 +301,42 @@ test('libera o acesso e revoga pendências aos 16 anos', async () => {
     assert.equal(resultado.consentimentoNecessario, false);
 });
 
+test('revoga consentimento anterior quando a correção torna a titular menor', async () => {
+    const atualizacoes = [];
+    const { crypto } = criarCrypto();
+    const service = criarParentalConsentService({
+        prisma: {},
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {}
+    });
+    const tx = {
+        consentimentoParental: {
+            async updateMany(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+
+    await service.reativarAposCorrecaoNascimento(tx, 7);
+
+    assert.deepEqual(atualizacoes, [
+        {
+            where: {
+                titularMenorId: 7,
+                statusConsentimento: {
+                    in: ['pendente', 'liberado', 'expirado']
+                }
+            },
+            data: {
+                statusConsentimento: 'revogado',
+                respondidoEm: null
+            }
+        }
+    ]);
+});
+
 test('informa que o consentimento não é mais necessário depois da autorização', async () => {
     const { crypto } = criarCrypto();
     const service = criarParentalConsentService({

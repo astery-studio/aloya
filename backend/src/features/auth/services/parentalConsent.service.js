@@ -112,6 +112,22 @@ function criarParentalConsentService({
         return true;
     }
 
+    // Volta a exigir autorização quando uma correção da data de nascimento torna a titular menor.
+    async function reativarAposCorrecaoNascimento(tx, titularMenorId) {
+        await tx.consentimentoParental.updateMany({
+            where: {
+                titularMenorId,
+                statusConsentimento: {
+                    in: ['pendente', 'liberado', 'expirado']
+                }
+            },
+            data: {
+                statusConsentimento: 'revogado',
+                respondidoEm: null
+            }
+        });
+    }
+
     // Envia o email sem expor detalhes técnicos do provedor SMTP.
     async function enviarEmail(dados) {
         try {
@@ -449,7 +465,8 @@ function criarParentalConsentService({
         solicitar,
         reenviar,
         confirmar,
-        verificarAcessoRedeApoio
+        verificarAcessoRedeApoio,
+        reativarAposCorrecaoNascimento
     };
 }
 

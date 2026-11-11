@@ -21,11 +21,15 @@ test('explica integralmente a autorização parental no próprio e-mail', async 
     });
 
     assert.equal(mensagem.to, 'responsavel@email.com');
+    assert.equal(mensagem.subject, 'Convite para participar da Rede de Apoio');
     assert.match(mensagem.text, /autorização é opcional/iu);
     assert.match(mensagem.text, /exclusivamente para liberar o módulo Rede de Apoio/iu);
     assert.match(mensagem.text, /compartilhe somente informações selecionadas/iu);
     assert.match(mensagem.text, /não concede acesso à conta, ao diário, ao histórico de ciclos/iu);
     assert.match(mensagem.text, /https:\/\/aloya\.test\/consentimento\/token/u);
+    assert.match(mensagem.html, /CONFIRMAR AUTORIZAÇÃO/u);
+    assert.match(mensagem.html, /background:#FFF3EF/u);
+    assert.match(mensagem.html, /Equipe Astery/u);
 });
 
 test('escapa o nome da titular antes de montar o HTML do e-mail', async () => {
@@ -47,4 +51,25 @@ test('escapa o nome da titular antes de montar o HTML do e-mail', async () => {
 
     assert.equal(mensagem.html.includes('<img src=x'), false);
     assert.match(mensagem.html, /&lt;img src=x onerror=alert\(1\)&gt;/u);
+});
+
+test('escapa o link antes de inseri-lo no HTML do e-mail', async () => {
+    let mensagem;
+    const service = criarEmailService({
+        transporter: {
+            async sendMail(dados) {
+                mensagem = dados;
+            }
+        },
+        remetente: 'Aloya <nao-responda@aloya.test>'
+    });
+
+    await service.enviarEmailConsentimentoParental({
+        nomeTitular: 'Ana',
+        emailResponsavelLegal: 'responsavel@email.com',
+        linkConfirmacao: 'https://aloya.test/consentimento?valor="inseguro"'
+    });
+
+    assert.equal(mensagem.html.includes('valor="inseguro"'), false);
+    assert.match(mensagem.html, /valor=&quot;inseguro&quot;/u);
 });

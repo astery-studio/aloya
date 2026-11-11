@@ -6,6 +6,43 @@ import {
     MENSAGEM_ERRO_ENVIO_CONSENTIMENTO
 } from '../constants/parentalConsent.constants.js';
 
+function criarPaginaConfirmacaoConsentimento() {
+    return `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Autorização concluída — Astery</title>
+            </head>
+
+            <body style="box-sizing:border-box;min-height:100vh;margin:0;padding:64px 20px 28px;background:#F7F5F0;font-family:Arial,Helvetica,sans-serif;color:#222222;">
+                <main style="box-sizing:border-box;width:100%;max-width:550px;margin:0 auto;padding:68px 36px 58px;border:1px solid #E6E2D8;border-radius:28px;background:#FFFFFF;text-align:center;">
+                    <h1 style="max-width:420px;margin:0 auto 28px;font-size:38px;line-height:1.25;">
+                        Autorização concluída<br />com sucesso
+                    </h1>
+
+                    <p style="margin:0 auto 34px;color:#5C5C59;font-size:23px;line-height:1.5;">
+                        Sua participação como Responsável Legal<br />foi confirmada.
+                    </p>
+
+                    <p style="margin:0 auto 34px;padding:24px;border-radius:18px;background:#F7F5F0;color:#5C5C59;font-size:20px;line-height:1.5;">
+                        Esta autorização não concede acesso à<br />conta ou às informações privadas do<br />titular.
+                    </p>
+
+                    <p style="margin:0;color:#2C4C3B;font-size:18px;font-weight:700;">
+                        Você já pode fechar esta página.
+                    </p>
+                </main>
+
+                <footer style="max-width:550px;margin:calc(100vh - 710px) auto 0;color:#77736D;font-size:14px;text-align:center;">
+                    © 2026 Astery &nbsp; • &nbsp; Privacidade &nbsp; • &nbsp; Termos de uso
+                </footer>
+            </body>
+        </html>
+    `;
+}
+
 function criarAuthController({
     authService,
     authValidator,
@@ -170,33 +207,7 @@ function criarAuthController({
 
             const resultado = await parentalConsentService.confirmar(validacao.dados.token);
 
-            return res.status(200).type('html').send(`
-                //ISSO DEVE SER TEMPORÁRIO 
-                <!DOCTYPE html>
-                <html lang="pt-BR">
-                    <head>
-                        <meta charset="UTF-8" />
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                        <title>Autorização confirmada — ALOYA</title>
-                    </head>
-
-                    <body style="margin:0;background:#F7F5F0;font-family:Arial,sans-serif;color:#222222;">
-                        <main style="max-width:560px;margin:80px auto;padding:32px;background:#FFFFFF;border-radius:12px;text-align:center;">
-                            <h1 style="margin-top:0;color:#2C4C3B;">
-                                Autorização concluída
-                            </h1>
-
-                            <p style="line-height:1.6;">
-                                ${resultado.mensagem}
-                            </p>
-
-                            <p style="color:#5C5C59;font-size:14px;">
-                                A Rede de Apoio foi liberada conforme a autorização concedida.
-                            </p>
-                        </main>
-                    </body>
-                </html>
-            `);
+            return res.status(200).type('html').send(criarPaginaConfirmacaoConsentimento());
         } catch (erro) {
             if (!erro.status) erro.mensagemUsuario = MENSAGEM_ERRO_CONFIRMACAO_CONSENTIMENTO;
             return next(erro);
@@ -226,4 +237,4 @@ function criarAuthController({
     };
 }
 
-export { criarAuthController };
+export { criarAuthController, criarPaginaConfirmacaoConsentimento };
