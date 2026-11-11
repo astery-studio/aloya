@@ -493,6 +493,10 @@ describe('ContactCard', () => {
                 name: 'Recusar convite de Julia'
             })
         ).toBeNull();
+
+        expect(screen.getByTestId('contact-summary-button-container')).toHaveStyle({
+            paddingTop: 8
+        });
     });
 
     test('mantém o cartão legível no modo escuro', async () => {

@@ -571,9 +571,10 @@ function ContactCard({
             ) : null}
 
             <View
+                testID="contact-summary-button-container"
                 style={[
                     estilos.containerBotaoResumo,
-                    contatoEnviadoAtivo && estilos.containerBotaoResumoAtivo
+                    estado === 'ativo' && estilos.containerBotaoResumoAtivo
                 ]}
             >
                 <ButtonScreen
