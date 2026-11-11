@@ -51,8 +51,8 @@ function criarPaginaConfirmacaoConsentimento() {
 
                     .pagina {
                         display: grid;
-                        width: min(100%, 25.125rem);
-                        min-height: min(54.625rem, 100svh);
+                        width: 100%;
+                        min-height: 100svh;
                         flex-shrink: 0;
                         grid-template-rows: 4rem minmax(0, 1fr) minmax(4rem, auto);
                         grid-template-columns: minmax(0, 1fr);
@@ -104,6 +104,7 @@ function criarPaginaConfirmacaoConsentimento() {
                     .container-frase {
                         display: flex;
                         width: 100%;
+                        max-width: 24.375rem;
                         padding-top: 1rem;
                         flex-direction: column;
                         align-items: center;

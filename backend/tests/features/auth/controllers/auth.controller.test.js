@@ -571,8 +571,7 @@ test('retorna página HTML após confirmar o consentimento', async () => {
     assert.match(res.body, /max-width: 19\.5416875rem/u);
     assert.match(res.body, /min-height: 2\.8125rem/u);
     assert.match(res.body, /font-family: "DM Sans"/u);
-    assert.match(res.body, /width: min\(100%, 25\.125rem\)/u);
-    assert.match(res.body, /min-height: min\(54\.625rem, 100svh\)/u);
+    assert.match(res.body, /\.pagina \{[\s\S]*?width: 100%;[\s\S]*?min-height: 100svh;/u);
     assert.match(res.body, /width: calc\(100% - 2\.5rem\)/u);
     assert.match(res.body, /@media \(max-width: 22rem\)/u);
     assert.match(res.body, /<footer class="rodape">/u);
