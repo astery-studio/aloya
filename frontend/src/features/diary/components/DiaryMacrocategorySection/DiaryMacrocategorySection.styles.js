@@ -40,7 +40,7 @@ function criarEstilos(tema) {
         conteudo: {
             width: '100%',
             gap: 16,
-            paddingHorizontal: 0,
+            paddingHorizontal: 6,
             paddingTop: 12,
             paddingBottom: 16,
             borderTopWidth: 1
