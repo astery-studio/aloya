@@ -36,6 +36,11 @@ function criarDiaryCatalogBootstrap({ prisma } = {}) {
                         update: {}
                     });
 
+                    await tx.opcaoDiario.updateMany({
+                        where: { categoriaId: categoria.id },
+                        data: { ordem: { increment: 100000 } }
+                    });
+
                     for (const opcao of categoria.opcoes) {
                         await tx.opcaoDiario.upsert({
                             where: { id: opcao.id },
@@ -46,7 +51,11 @@ function criarDiaryCatalogBootstrap({ prisma } = {}) {
                                 nome: opcao.nome,
                                 ordem: opcao.ordem
                             },
-                            update: {}
+                            update: {
+                                grupo: opcao.grupo,
+                                nome: opcao.nome,
+                                ordem: opcao.ordem
+                            }
                         });
                     }
                 }

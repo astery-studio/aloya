@@ -11,7 +11,7 @@ const data = (texto) => new Date(`${texto}T00:00:00.000Z`);
 
 test('bootstrap sincroniza catálogo uma vez e permite tentar novamente após falha', async () => {
     assert.throws(() => criarDiaryCatalogBootstrap(), TypeError);
-    const contagem = { transacoes: 0, macros: 0, categorias: 0, opcoes: 0 };
+    const contagem = { transacoes: 0, macros: 0, categorias: 0, opcoes: 0, liberacoes: 0 };
     let falhar = true;
     const prisma = {
         async $transaction(callback) {
@@ -23,7 +23,10 @@ test('bootstrap sincroniza catálogo uma vez e permite tentar novamente após fa
             return callback({
                 macrocategoriaDiario: { upsert: async () => (contagem.macros += 1) },
                 categoriaDiario: { upsert: async () => (contagem.categorias += 1) },
-                opcaoDiario: { upsert: async () => (contagem.opcoes += 1) }
+                opcaoDiario: {
+                    updateMany: async () => (contagem.liberacoes += 1),
+                    upsert: async () => (contagem.opcoes += 1)
+                }
             });
         }
     };
@@ -35,6 +38,7 @@ test('bootstrap sincroniza catálogo uma vez e permite tentar novamente após fa
     await bootstrap.garantir();
     assert.equal(contagem.transacoes, 2);
     assert.ok(contagem.macros > 0 && contagem.categorias > 0 && contagem.opcoes > 0);
+    assert.ok(contagem.liberacoes > 0);
 });
 
 test('where do histórico cobre todos os filtros, cursor e consulta vazia', () => {

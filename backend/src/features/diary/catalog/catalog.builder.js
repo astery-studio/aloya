@@ -8,14 +8,15 @@ function criarIdentificador(texto) {
 }
 
 function normalizarCategoria(categoria, indice) {
-    const opcoes = (categoria.grupos ?? []).flatMap((grupo) =>
-        grupo.opcoes.map((nome, ordem) => ({
-            id: `${categoria.id}_${grupo.id}_${criarIdentificador(nome)}`,
-            grupo: grupo.id,
-            nome,
-            ordem: ordem + 1
-        }))
-    );
+    const opcoes = (categoria.grupos ?? [])
+        .flatMap((grupo) =>
+            grupo.opcoes.map((nome) => ({
+                id: `${categoria.id}_${grupo.id}_${criarIdentificador(nome)}`,
+                grupo: grupo.id,
+                nome
+            }))
+        )
+        .map((opcao, ordem) => ({ ...opcao, ordem: ordem + 1 }));
 
     return {
         tipoValor: 'opcoes',
