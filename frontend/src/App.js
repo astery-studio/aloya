@@ -641,6 +641,7 @@ export default function App() {
         conteudo = (
             <DiaryFlow
                 service={configuracao.servicos.diaryService}
+                calendarService={configuracao.servicos.calendarService}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />

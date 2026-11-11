@@ -9,7 +9,7 @@ function inserirRegistroOrdenado(registros, novoRegistro) {
     );
 }
 
-function DiaryFlow({ service, onSelecionarAba, onSessaoExpirada, onRegistroCriado }) {
+function DiaryFlow({ service, calendarService, onSelecionarAba, onSessaoExpirada, onRegistroCriado }) {
     const [modalVisivel, setModalVisivel] = useState(false);
     const [registrosCriados, setRegistrosCriados] = useState([]);
 
@@ -28,6 +28,7 @@ function DiaryFlow({ service, onSelecionarAba, onSessaoExpirada, onRegistroCriad
             <NewDiaryEntryModal
                 visivel={modalVisivel}
                 service={service}
+                calendarService={calendarService}
                 onFechar={() => setModalVisivel(false)}
                 onCriado={registrarCriacao}
                 onSessaoExpirada={onSessaoExpirada}

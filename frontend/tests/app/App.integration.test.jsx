@@ -506,6 +506,7 @@ describe('App integrado', () => {
         expect(DiaryFlow).toHaveBeenCalledWith(
             expect.objectContaining({
                 service: servicos.diaryService,
+                calendarService: servicos.calendarService,
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),
