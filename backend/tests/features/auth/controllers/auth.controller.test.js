@@ -566,7 +566,16 @@ test('retorna página HTML após confirmar o consentimento', async () => {
     assert.equal(res.contentType, 'html');
     assert.match(res.body, /Autorização concluída/u);
     assert.match(res.body, /Sua participação como Responsável Legal/u);
-    assert.match(res.body, /Você já pode fechar esta página/u);
-    assert.match(res.body, /© 2026 Astery/u);
+    assert.match(res.body, /Esta autorização não concede acesso à conta/u);
+    assert.match(res.body, /font-family: "DM Sans"/u);
+    assert.match(res.body, /width: min\(100%, 25\.125rem\)/u);
+    assert.match(res.body, /min-height: min\(54\.625rem, 100svh\)/u);
+    assert.match(res.body, /width: calc\(100% - 2\.5rem\)/u);
+    assert.match(res.body, /@media \(max-width: 22rem\)/u);
+    assert.match(res.body, /<footer class="rodape">/u);
+    assert.match(res.body, /<span>Astery<\/span>/u);
+    assert.match(res.body, /Privacidade/u);
+    assert.match(res.body, /Termos de uso/u);
+    assert.doesNotMatch(res.body, /\d+(?:\.\d+)?px/u);
     assert.deepEqual(chamadas, [[token]]);
 });
