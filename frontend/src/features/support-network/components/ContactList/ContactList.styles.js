@@ -116,7 +116,7 @@ function criarEstilos(tema) {
             fontSize: 15,
             fontWeight: '400',
             lineHeight: 22.5,
-            textAlign: 'left',
+            textAlign: 'center',
             includeFontPadding: false
         }
     });

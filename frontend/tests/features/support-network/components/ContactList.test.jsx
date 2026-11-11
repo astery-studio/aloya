@@ -409,7 +409,9 @@ describe('ContactList', () => {
 
         expect(
             screen.getByText('Nenhum registro encontrado para os filtros aplicados.')
-        ).toBeOnTheScreen();
+        ).toHaveStyle({
+            textAlign: 'center'
+        });
 
         expect(screen.queryByText('Nenhum contato encontrado')).toBeNull();
     });
