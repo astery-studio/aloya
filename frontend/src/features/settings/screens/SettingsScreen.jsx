@@ -5,6 +5,7 @@ import { ScrollView, Text, View } from 'react-native';
 import {
     ArrowsClockwiseIcon,
     BellIcon,
+    GavelIcon,
     HouseIcon,
     InfoIcon,
     ShieldCheckIcon,
@@ -27,6 +28,8 @@ function SettingsScreen({
     onAbrirNotificacoes,
     onAbrirSobre,
     onAbrirPoliticasPrivacidade,
+    onAbrirResponsavelLegal,
+    menorDe16 = false,
     onSelecionarAba
 }) {
     const tema = useTheme();
@@ -161,6 +164,29 @@ function SettingsScreen({
                             />
 
                             <Separador estilos={estilos} />
+
+                            {menorDe16 ? (
+                                <>
+                                    <NavigationField
+                                        label="Responsável Legal"
+                                        coresIcone={
+                                            tema.escuro
+                                                ? {
+                                                      icone: '#FFAB91',
+                                                      caixa: 'rgba(255, 171, 145, 0.16)'
+                                                  }
+                                                : undefined
+                                        }
+                                        estilo={estilos.campo}
+                                        icone={GavelIcon}
+                                        variante="semBorda"
+                                        paleta="corLaranja"
+                                        onPress={onAbrirResponsavelLegal}
+                                    />
+
+                                    <Separador estilos={estilos} />
+                                </>
+                            ) : null}
 
                             <NavigationField
                                 label="Políticas de Privacidade"

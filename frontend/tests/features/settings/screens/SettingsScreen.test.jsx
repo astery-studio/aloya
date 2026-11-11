@@ -14,6 +14,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
         BellIcon: IconeTeste,
         HouseIcon: IconeTeste,
         InfoIcon: IconeTeste,
+        GavelIcon: IconeTeste,
         MoonIcon: IconeTeste,
         ShieldCheckIcon: IconeTeste,
         UserIcon: IconeTeste,
@@ -197,6 +198,22 @@ describe('SettingsScreen', () => {
         expect(screen.getByText('Políticas de Privacidade')).toBeOnTheScreen();
 
         expect(screen.getByText('Aba ativa: configuracoes')).toBeOnTheScreen();
+    });
+
+    test('mostra responsável legal somente para menor de 16 anos', async () => {
+        const onAbrirResponsavelLegal = jest.fn();
+
+        const resultado = await renderizarTela({ menorDe16: false, onAbrirResponsavelLegal });
+
+        expect(screen.queryByText('Responsável Legal')).toBeNull();
+
+        await resultado.unmount();
+
+        await renderizarTela({ menorDe16: true, onAbrirResponsavelLegal });
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Responsável Legal' }));
+
+        expect(onAbrirResponsavelLegal).toHaveBeenCalledTimes(1);
     });
 
     test('encaminha separadamente cada ação de navegação', async () => {

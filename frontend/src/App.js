@@ -23,9 +23,11 @@ import { ChangePasswordScreen } from './features/settings/screens/ChangePassword
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
-import { MembersScreen } from './features/support-network/screens/MembersScreen';
+import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
 import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
+import { SupportNetworkScreen } from './features/support-network/screens/SupportNetworkScreen';
+import { ehMenorDe16 } from './features/support-network/utils/age';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
@@ -52,6 +54,7 @@ const telasInternas = Object.freeze({
     calendario: 'calendario',
     cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
+    responsavelLegal: 'responsavelLegal',
     inicio: 'inicio'
 });
 
@@ -172,6 +175,10 @@ export default function App() {
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
+
+    const [retornoResponsavelLegal, setRetornoResponsavelLegal] = useState(
+        telasInternas.configuracoes
+    );
 
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
 
@@ -673,10 +680,16 @@ export default function App() {
                     onSessaoExpirada={finalizarSessao}
                 />
             ) : (
-                <MembersScreen
+                <SupportNetworkScreen
+                    parentalConsentService={configuracao.servicos.parentalConsentService}
                     service={configuracao.servicos.supportContactService}
                     categoriasService={configuracao.servicos.supportCategoryService}
+                    onGerenciarResponsavel={() => {
+                        setRetornoResponsavelLegal(telasInternas.membros);
+                        setTelaInterna(telasInternas.responsavelLegal);
+                    }}
                     onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
+                    onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
                     onAdicionarContato={(dadosIniciais = null) => {
                         setRascunhoNovoContato(dadosIniciais);
                         setTelaInterna(telasInternas.novoContato);
@@ -760,6 +773,20 @@ export default function App() {
                         carregarPerfil();
                     }
                 }}
+                menorDe16={ehMenorDe16(perfil?.dataNascimento)}
+                onAbrirResponsavelLegal={() => {
+                    setRetornoResponsavelLegal(telasInternas.configuracoes);
+                    setTelaInterna(telasInternas.responsavelLegal);
+                }}
+            />
+        );
+    } else if (telaInterna === telasInternas.responsavelLegal) {
+        conteudo = (
+            <ParentalConsentScreen
+                service={configuracao.servicos.parentalConsentService}
+                emailUsuario={perfil?.email}
+                onVoltar={() => setTelaInterna(retornoResponsavelLegal)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.parametrosCiclo) {

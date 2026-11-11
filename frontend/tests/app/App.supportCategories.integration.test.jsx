@@ -147,6 +147,15 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
     };
 });
 
+jest.mock('../../src/features/support-network/screens/SupportNetworkScreen', () => {
+    const React = require('react');
+    const { MembersScreen } = require('../../src/features/support-network/screens/MembersScreen');
+
+    return {
+        SupportNetworkScreen: (props) => React.createElement(MembersScreen, props)
+    };
+});
+
 jest.mock('../../src/features/support-network/screens/ContactFormScreen/ContactFormScreen', () => {
     const React = require('react');
 
