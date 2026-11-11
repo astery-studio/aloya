@@ -32,11 +32,16 @@ jest.mock('../../../../src/features/diary/components/DiaryDateNavigator/DiaryDat
 jest.mock('../../../../src/shared/components/feedback/DatePickerSheet/DatePickerSheet', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        DatePickerSheet: ({ visivel, onSelecionar }) =>
+        DatePickerSheet: ({ visivel, onSelecionar, onFechar }) =>
             visivel ? (
-                <Pressable onPress={() => onSelecionar('2026-11-06')}>
-                    <Text>Escolher data</Text>
-                </Pressable>
+                <>
+                    <Pressable onPress={() => onSelecionar('2026-11-06')}>
+                        <Text>Escolher data</Text>
+                    </Pressable>
+                    <Pressable onPress={onFechar}>
+                        <Text>Fechar seletor</Text>
+                    </Pressable>
+                </>
             ) : null
     };
 });
@@ -86,6 +91,8 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     await fireEvent.press(screen.getByText('Abrir seletor'));
     await fireEvent.press(screen.getByText('Escolher data'));
     expect(formulario.setData).toHaveBeenNthCalledWith(3, '2026-11-06');
+    await fireEvent.press(screen.getByText('Fechar seletor'));
+    expect(screen.queryByText('Escolher data')).toBeNull();
     await fireEvent.press(screen.getByText('Macros:1;desabilitado:false'));
     expect(formulario.alterarValor).toHaveBeenCalledWith('dor', ['leve']);
     await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));
