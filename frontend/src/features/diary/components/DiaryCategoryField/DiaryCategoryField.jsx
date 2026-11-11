@@ -84,14 +84,14 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 selected={selecionadas.includes(opcao.id)}
                 desabilitado={desabilitado}
                 cor={cores.icone}
-                fundo={cores.fundoExpandido}
+                fundo={cores.fundoOpcao}
                 onPress={() => aoAlterar?.(alternarOpcao(selecionadas, opcao.id))}
             />
         );
     }
     return (
         <View style={estilos.container}>
-            <View style={[estilos.faixaTitulo, { backgroundColor: cores.fundoExpandido }]}>
+            <View style={[estilos.faixaTitulo, { backgroundColor: cores.fundoCategoria }]}>
                 <Text accessibilityRole="header" style={[estilos.titulo, { color: cores.icone }]}>
                     {categoria.nome}
                 </Text>
