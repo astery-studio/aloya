@@ -28,21 +28,28 @@ function ParentalConsentRestrictedScreen({
                 <View testID="parental-consent-card" style={estilos.cartao}>
                     <View style={estilos.cabecalhoCartao}>
                         <View style={estilos.caixaIcone}>
-                            <ShieldWarningIcon size={28} color="#FFFFFF" weight="regular" />
+                            <ShieldWarningIcon size={25.993} color="#FFFFFF" weight="regular" />
                         </View>
 
                         <Text style={estilos.rotuloRestrito}>ACESSO RESTRITO</Text>
                     </View>
 
                     <View style={estilos.conteudoCartao}>
-                        <Text accessibilityRole="header" style={estilos.tituloCartao}>
-                            Confirmação pendente
-                        </Text>
+                        <View style={estilos.blocoTexto}>
+                            <View style={estilos.containerTitulo}>
+                                <Text accessibilityRole="header" style={estilos.tituloCartao}>
+                                    Confirmação pendente
+                                </Text>
+                            </View>
 
-                        <Text style={estilos.mensagemCartao}>
-                            Aguardando confirmação de um responsável legal para liberar sua Rede de
-                            Apoio. Verifique se o e-mail de autorização foi enviado ao responsável.
-                        </Text>
+                            <View style={estilos.containerMensagem}>
+                                <Text style={estilos.mensagemCartao}>
+                                    Aguardando confirmação de um responsável legal para liberar sua
+                                    Rede de Apoio. Verifique se o e-mail de autorização foi enviado
+                                    ao responsável.
+                                </Text>
+                            </View>
+                        </View>
 
                         <ButtonScreen
                             texto={
@@ -55,6 +62,7 @@ function ParentalConsentRestrictedScreen({
                             desativado={carregando}
                             carregando={carregando}
                             estilo={estilos.botao}
+                            estiloTexto={estilos.textoBotao}
                         />
                     </View>
                 </View>

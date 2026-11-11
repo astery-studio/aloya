@@ -68,7 +68,11 @@ describe('SupportNetworkScreen', () => {
         ).toBeNull();
         expect(screen.getByTestId('parental-consent-restricted')).toBeOnTheScreen();
         expect(screen.getByTestId('parental-consent-card')).toHaveStyle({
-            alignSelf: 'center'
+            width: '100%',
+            maxWidth: 342,
+            alignSelf: 'center',
+            borderRadius: 20,
+            borderWidth: 0.7
         });
 
         await fireEvent.press(screen.getByRole('button', { name: 'Visualizar E-mail' }));
