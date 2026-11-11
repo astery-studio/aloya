@@ -57,6 +57,14 @@ function criarPrismaMock(usuario) {
                     count: 1
                 };
             }
+        },
+
+        vinculoRedeApoio: {
+            async updateMany() {
+                return {
+                    count: 0
+                };
+            }
         }
     };
 
@@ -161,6 +169,41 @@ test('rejeita e-mail utilizado por outra conta', async function () {
             return erro.codigo === 'EMAIL_JA_CADASTRADO';
         }
     );
+});
+
+test('sincroniza o novo e-mail em todos os vínculos recebidos pela conta', async function () {
+    const usuario = criarUsuario();
+    const prisma = criarPrismaMock(usuario);
+    let sincronizacao = null;
+
+    prisma.vinculoRedeApoio.updateMany = async function atualizarVinculos(dados) {
+        sincronizacao = dados;
+
+        return {
+            count: 3
+        };
+    };
+
+    const service = criarAccountService({
+        prisma,
+        passwordService: {},
+        parentalConsentService: {},
+        dateUtils
+    });
+
+    const resultado = await service.atualizarConfiguracoes(1, {
+        email: 'novo@email.com'
+    });
+
+    assert.deepEqual(sincronizacao, {
+        where: {
+            contatoId: 1
+        },
+        data: {
+            emailConvidado: 'novo@email.com'
+        }
+    });
+    assert.equal(resultado.configuracoes.email, 'novo@email.com');
 });
 
 // Teste para verificar se o serviço altera a senha e revoga outras sessões

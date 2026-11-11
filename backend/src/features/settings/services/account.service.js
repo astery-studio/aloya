@@ -184,6 +184,17 @@ function criarAccountService({
                         select: selectConfiguracoes
                     });
 
+                    if (alteracoes.email !== undefined) {
+                        await tx.vinculoRedeApoio.updateMany({
+                            where: {
+                                contatoId: usuarioId
+                            },
+                            data: {
+                                emailConvidado: alteracoes.email
+                            }
+                        });
+                    }
+
                     if (passouASerMenorDe16) {
                         await parentalConsentService.reativarAposCorrecaoNascimento(tx, usuarioId);
                     }
