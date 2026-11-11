@@ -4,12 +4,25 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { deslocarDataDiario, obterHojeDiario } from '../../utils/diaryDate';
-import { listarMacrocategoriasAtivas } from '../../utils/diaryForm';
+import {
+    contarMacrocategoriasPreenchidas,
+    listarMacrocategoriasAtivas,
+    prepararFormularioDiario
+} from '../../utils/diaryForm';
 import { DiaryDateNavigator } from '../DiaryDateNavigator/DiaryDateNavigator';
 import { DiaryMacrocategoryList } from '../DiaryMacrocategoryList/DiaryMacrocategoryList';
+import { DiaryPhaseBadge } from '../DiaryPhaseBadge/DiaryPhaseBadge';
 import { DiaryFormErrors } from './DiaryFormErrors';
 import { criarEstilos } from './NewDiaryEntryModal.styles';
-function NewDiaryEntryContent({ catalogo, carregando, erroCatalogo, recarregar, formulario }) {
+function NewDiaryEntryContent({
+    catalogo,
+    carregando,
+    erroCatalogo,
+    recarregar,
+    formulario,
+    fase,
+    carregandoFase
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
@@ -34,6 +47,13 @@ function NewDiaryEntryContent({ catalogo, carregando, erroCatalogo, recarregar, 
     }
 
     const macrocategorias = listarMacrocategoriasAtivas(catalogo);
+    const totalPreenchidas = contarMacrocategoriasPreenchidas(catalogo, formulario.valores);
+    const preparacao = prepararFormularioDiario({
+        catalogo,
+        valores: formulario.valores,
+        data: formulario.data,
+        hoje: obterHojeDiario()
+    });
     return (
         <>
             <ScrollView
@@ -48,21 +68,37 @@ function NewDiaryEntryContent({ catalogo, carregando, erroCatalogo, recarregar, 
                     proximoDisponivel={formulario.data < obterHojeDiario()}
                     desabilitado={formulario.salvando}
                 />
-                <DiaryMacrocategoryList
-                    macrocategorias={macrocategorias}
-                    valores={formulario.valores}
-                    erros={formulario.erros}
-                    aoAlterar={formulario.alterarValor}
-                    desabilitado={formulario.salvando}
-                />
-                <DiaryFormErrors erros={formulario.erros} estilos={estilos} />
+                <DiaryPhaseBadge fase={fase} carregando={carregandoFase} />
+                <View style={estilos.cartaoRegistro}>
+                    <Text style={estilos.tituloCartao}>Registro no Diário</Text>
+                    <View style={estilos.contador}>
+                        <Text style={estilos.textoContador}>
+                            {totalPreenchidas} / {macrocategorias.length} marcados
+                        </Text>
+                    </View>
+                    <Text style={estilos.instrucao}>
+                        Selecione pelo menos uma opção para salvar no diário.
+                    </Text>
+                    <View style={estilos.listaMacros}>
+                        <DiaryMacrocategoryList
+                            macrocategorias={macrocategorias}
+                            valores={formulario.valores}
+                            erros={formulario.erros}
+                            aoAlterar={formulario.alterarValor}
+                            desabilitado={formulario.salvando}
+                        />
+                    </View>
+                    <DiaryFormErrors erros={formulario.erros} estilos={estilos} />
+                </View>
             </ScrollView>
             <View style={estilos.rodape}>
                 <ButtonScreen
-                    texto="Salvar registro"
+                    texto="Salvar"
                     aoPressionar={formulario.salvar}
                     carregando={formulario.salvando}
-                    desativado={formulario.salvando}
+                    desativado={formulario.salvando || !preparacao.valido}
+                    estilo={estilos.botaoSalvar}
+                    estiloTexto={estilos.textoBotaoSalvar}
                 />
             </View>
         </>

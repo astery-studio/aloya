@@ -58,6 +58,9 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     );
 
     expect(screen.getByText('Macros:1;desabilitado:false')).toBeOnTheScreen();
+    expect(screen.getByText('Registro no Diário')).toBeOnTheScreen();
+    expect(screen.getByText('0 / 1 marcados')).toBeOnTheScreen();
+    expect(screen.getByText('Selecione pelo menos uma opção para salvar no diário.')).toBeOnTheScreen();
     expect(screen.getByText('Data inválida')).toBeOnTheScreen();
     expect(screen.getByText('Preencha')).toBeOnTheScreen();
     expect(screen.getByRole('alert')).toHaveTextContent('Falha');
@@ -67,6 +70,6 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(formulario.setData).toHaveBeenNthCalledWith(2, '2026-11-09');
     await fireEvent.press(screen.getByText('Macros:1;desabilitado:false'));
     expect(formulario.alterarValor).toHaveBeenCalledWith('dor', ['leve']);
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar registro' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
     expect(formulario.salvar).toHaveBeenCalledTimes(1);
 });
