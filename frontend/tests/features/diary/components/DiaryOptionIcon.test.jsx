@@ -45,8 +45,13 @@ describe('DiaryOptionIcon', () => {
 
     test('troca a cor específica do SVG para branco quando selecionado', async () => {
         mockSvgXml.mockClear();
-        await render(<DiaryOptionIcon iconeId="svg" color="#FFFFFF" selecionado />);
+        await render(<DiaryOptionIcon iconeId="svg" color="#CB442A" selecionado />);
         expect(mockSvgXml.mock.calls[0][0].xml).toBe('<svg fill="#FFFFFF" />');
+    });
+
+    test('sobrepõe também a cor específica de componente selecionado', async () => {
+        await render(<DiaryOptionIcon iconeId="componente" color="#CB442A" selecionado />);
+        expect(mockIcone.mock.calls[0][0].color).toBe('#FFFFFF');
     });
 
     test('troca cores internas pela mesma cor do texto', async () => {
