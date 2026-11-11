@@ -4,18 +4,13 @@ import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        rolagem: {
-            flex: 1,
-            backgroundColor: tema.cores.interface.fundo
-        },
         container: {
-            flexGrow: 1,
+            flex: 1,
             width: '100%',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             paddingHorizontal: 24,
-            paddingTop: 115.3,
-            paddingBottom: 24
+            backgroundColor: tema.cores.interface.fundo
         },
         cartao: {
             width: '100%',
@@ -107,7 +102,10 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
         atualizando: {
-            marginTop: 16,
+            position: 'absolute',
+            right: 0,
+            bottom: 16,
+            left: 0,
             alignItems: 'center'
         }
     });

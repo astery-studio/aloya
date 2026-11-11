@@ -50,7 +50,7 @@ describe('SupportNetworkScreen', () => {
         expect(screen.getByText('Lista liberada')).toBeOnTheScreen();
     });
 
-    test('centraliza o card rolável sem a frase superior e abre o e-mail pendente', async () => {
+    test('centraliza o card sem rolagem e abre o e-mail pendente', async () => {
         mockUseParentalConsent.mockReturnValue(
             estado({
                 status: {
@@ -66,7 +66,11 @@ describe('SupportNetworkScreen', () => {
         expect(
             screen.queryByText('Pessoas que fazem parte da sua rede de cuidado e apoio.')
         ).toBeNull();
-        expect(screen.getByTestId('parental-consent-restricted')).toBeOnTheScreen();
+        expect(screen.getByTestId('parental-consent-restricted')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
         expect(screen.getByTestId('parental-consent-card')).toHaveStyle({
             width: '100%',
             maxWidth: 342,
