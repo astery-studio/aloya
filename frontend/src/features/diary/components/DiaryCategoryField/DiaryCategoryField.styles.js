@@ -59,12 +59,14 @@ function criarEstilos(tema) {
         entradaAnotacao: {
             minHeight: 24,
             paddingVertical: 0,
+            paddingRight: 22,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 24,
             textAlign: 'center',
             textAlignVertical: 'top'
         },
+        limparAnotacao: { position: 'absolute', top: 8, right: 8, zIndex: 1 },
         contador: {
             alignSelf: 'flex-end',
             color: tema.cores.interface.textoSecundario,

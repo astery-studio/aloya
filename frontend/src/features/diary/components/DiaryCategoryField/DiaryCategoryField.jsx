@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Keyboard, Pressable, Text, View } from 'react-native';
+import { XCircleIcon } from 'phosphor-react-native';
 
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import DurationInput from '../../../../shared/components/forms/DurationInput/DurationInput';
@@ -32,6 +33,11 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     const selecionadas = Array.isArray(valor) ? valor : [];
     const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
     let controle;
+
+    function limparAnotacao() {
+        Keyboard.dismiss();
+        aoAlterar?.('');
+    }
 
     if (categoria.tipoValor === 'decimal_escalado') {
         controle = (
@@ -86,6 +92,20 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     scrollEnabled={alturaAnotacao === ALTURA_MAXIMA_ANOTACAO}
                     onContentSizeChange={({ nativeEvent }) =>
                         setAlturaAnotacao(calcularAlturaAnotacao(nativeEvent.contentSize.height))
+                    }
+                    acaoDireita={
+                        valor ? (
+                            <Pressable
+                                accessibilityRole="button"
+                                accessibilityLabel="Limpar anotação livre"
+                                disabled={desabilitado}
+                                hitSlop={8}
+                                onPress={limparAnotacao}
+                                style={estilos.limparAnotacao}
+                            >
+                                <XCircleIcon size={18} color={tema.cores.marca.primaria} />
+                            </Pressable>
+                        ) : null
                     }
                 />
                 <Text style={[estilos.contador, { color: cores.icone }]}>
