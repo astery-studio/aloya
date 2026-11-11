@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './SupportNetworkModeSelector.styles';
@@ -10,19 +10,20 @@ const OPCOES = Object.freeze([
 ]);
 
 const LARGURA_SELETOR_COMPLETO = 350;
+const ESPACO_HORIZONTAL_DA_LISTA = 40;
+
+function deveCompactarSeletor(larguraTela) {
+    return (
+        Number.isFinite(larguraTela) &&
+        larguraTela - ESPACO_HORIZONTAL_DA_LISTA < LARGURA_SELETOR_COMPLETO
+    );
+}
 
 function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const [compacto, setCompacto] = useState(false);
-
-    const medirSeletor = useCallback((evento) => {
-        const largura = evento?.nativeEvent?.layout?.width;
-
-        if (Number.isFinite(largura)) {
-            setCompacto(largura < LARGURA_SELETOR_COMPLETO);
-        }
-    }, []);
+    const { width: larguraTela } = useWindowDimensions();
+    const compacto = deveCompactarSeletor(larguraTela);
 
     return (
         <ScrollView
@@ -30,7 +31,6 @@ function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
             accessibilityLabel="Tipo de contato da Rede de Apoio"
             contentContainerStyle={[estilos.conteudo, compacto && estilos.conteudoCompacto]}
             horizontal
-            onLayout={medirSeletor}
             showsHorizontalScrollIndicator={false}
             style={estilos.container}
         >
@@ -80,4 +80,10 @@ function SupportNetworkModeSelector({ selecionado = 'apoio', aoSelecionar }) {
     );
 }
 
-export { LARGURA_SELETOR_COMPLETO, OPCOES, SupportNetworkModeSelector };
+export {
+    ESPACO_HORIZONTAL_DA_LISTA,
+    LARGURA_SELETOR_COMPLETO,
+    OPCOES,
+    SupportNetworkModeSelector,
+    deveCompactarSeletor
+};

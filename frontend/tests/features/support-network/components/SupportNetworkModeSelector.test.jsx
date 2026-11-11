@@ -1,6 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
-import { SupportNetworkModeSelector } from '../../../../src/features/support-network/components/SupportNetworkModeSelector/SupportNetworkModeSelector';
+import {
+    SupportNetworkModeSelector,
+    deveCompactarSeletor
+} from '../../../../src/features/support-network/components/SupportNetworkModeSelector/SupportNetworkModeSelector';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 describe('SupportNetworkModeSelector', () => {
@@ -41,25 +44,10 @@ describe('SupportNetworkModeSelector', () => {
         expect(acompanhados.props.numberOfLines).toBe(1);
     });
 
-    test('reduz o espaço entre as opções somente quando a largura é pequena', async () => {
-        await render(<SupportNetworkModeSelector selecionado="apoio" aoSelecionar={jest.fn()} />);
-
-        const seletor = screen.getByLabelText('Tipo de contato da Rede de Apoio');
-
-        expect(seletor.props.contentContainerStyle).toEqual(
-            expect.arrayContaining([expect.objectContaining({ gap: 10 })])
-        );
-
-        await fireEvent(seletor, 'layout', {
-            nativeEvent: {
-                layout: {
-                    width: 349
-                }
-            }
-        });
-
-        expect(seletor.props.contentContainerStyle).toEqual(
-            expect.arrayContaining([expect.objectContaining({ gap: 2 })])
-        );
+    test('decide o espaço compacto antes da primeira renderização', () => {
+        expect(deveCompactarSeletor(390)).toBe(false);
+        expect(deveCompactarSeletor(389)).toBe(true);
+        expect(deveCompactarSeletor(320)).toBe(true);
+        expect(deveCompactarSeletor(undefined)).toBe(false);
     });
 });
