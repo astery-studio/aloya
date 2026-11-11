@@ -31,7 +31,8 @@ jest.mock('../../../../src/features/diary/components/DiaryCategoryField/DiaryCat
 
 import {
     DiaryMacrocategoryList,
-    criarEstadoExpandido
+    criarEstadoExpandido,
+    sincronizarEstadoExpandido
 } from '../../../../src/features/diary/components/DiaryMacrocategoryList/DiaryMacrocategoryList';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -52,11 +53,23 @@ const macros = [
 
 test('define a discrição inicial de cada macrocategoria', () => {
     expect(criarEstadoExpandido(macros)).toEqual({ corpo: false, vida: false });
+    expect(sincronizarEstadoExpandido({ corpo: true }, ['corpo', 'vida'])).toEqual({
+        corpo: true,
+        vida: false
+    });
+});
+
+test('aceita catálogo temporariamente vazio', async () => {
+    const resultado = await render(
+        <DiaryMacrocategoryList macrocategorias={[]} valores={{}} erros={{}} />
+    );
+
+    expect(resultado.toJSON()).not.toBeNull();
 });
 
 test('expande a seção sensível e encaminha alterações', async () => {
     const aoAlterar = jest.fn();
-    await render(
+    const resultado = await render(
         <DiaryMacrocategoryList
             macrocategorias={macros}
             valores={{}}
@@ -69,4 +82,14 @@ test('expande a seção sensível e encaminha alterações', async () => {
     await fireEvent.press(screen.getByText('Vida íntima:false'));
     await fireEvent.press(screen.getByText('Intimidade'));
     expect(aoAlterar).toHaveBeenCalledWith('intimidade', ['opcao']);
+    await resultado.rerender(
+        <DiaryMacrocategoryList
+            macrocategorias={[...macros]}
+            valores={{ intimidade: ['opcao'] }}
+            erros={{}}
+            aoAlterar={aoAlterar}
+        />
+    );
+    expect(screen.getByText('Vida íntima:true')).toBeOnTheScreen();
+    expect(screen.getByText('Intimidade')).toBeOnTheScreen();
 });

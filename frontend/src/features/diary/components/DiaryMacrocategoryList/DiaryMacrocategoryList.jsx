@@ -9,12 +9,18 @@ function criarEstadoExpandido(macrocategorias) {
     return Object.fromEntries(macrocategorias.map((macro) => [macro.id, false]));
 }
 
+function sincronizarEstadoExpandido(estado, ids) {
+    return Object.fromEntries(ids.map((id) => [id, estado[id] ?? false]));
+}
+
 function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, desabilitado }) {
     const [expandidas, setExpandidas] = useState(() => criarEstadoExpandido(macrocategorias));
+    const chaveMacrocategorias = macrocategorias.map((macro) => macro.id).join('|');
 
     useEffect(() => {
-        setExpandidas(criarEstadoExpandido(macrocategorias));
-    }, [macrocategorias]);
+        const ids = chaveMacrocategorias ? chaveMacrocategorias.split('|') : [];
+        setExpandidas((atuais) => sincronizarEstadoExpandido(atuais, ids));
+    }, [chaveMacrocategorias]);
 
     function alternar(macroId) {
         setExpandidas((atuais) => ({ ...atuais, [macroId]: !atuais[macroId] }));
@@ -53,4 +59,4 @@ function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, de
     );
 }
 
-export { DiaryMacrocategoryList, criarEstadoExpandido };
+export { criarEstadoExpandido, DiaryMacrocategoryList, sincronizarEstadoExpandido };
