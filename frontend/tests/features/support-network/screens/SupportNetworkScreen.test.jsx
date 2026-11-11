@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 const mockUseParentalConsent = jest.fn();
 
@@ -83,5 +83,33 @@ describe('SupportNetworkScreen', () => {
 
         expect(screen.getByText('E-mail enviado')).toBeOnTheScreen();
         expect(screen.getByText(/responsavel@exemplo.com/)).toBeOnTheScreen();
+    });
+
+    test('reenvia a autorização e mostra a confirmação somente com OK', async () => {
+        const reenviar = jest.fn().mockResolvedValue(true);
+
+        mockUseParentalConsent.mockReturnValue(
+            estado({
+                status: {
+                    acessoLiberado: false,
+                    emailResponsavelInformado: true,
+                    emailResponsavelLegal: 'responsavel@exemplo.com'
+                },
+                reenviar
+            })
+        );
+
+        await renderizar();
+        await fireEvent.press(screen.getByRole('button', { name: 'Visualizar E-mail' }));
+
+        await act(async () => {
+            fireEvent.press(screen.getByRole('button', { name: 'Enviar Novamente' }));
+        });
+
+        expect(reenviar).toHaveBeenCalledTimes(1);
+        expect(screen.getByText(/responsavel@exemplo.com/)).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'OK' })).toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Entendi' })).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Enviar Novamente' })).toBeNull();
     });
 });

@@ -25,6 +25,21 @@ function SupportNetworkScreen({
         onSessaoExpirada
     });
     const [emailVisivel, setEmailVisivel] = useState(false);
+    const [reenvioConfirmado, setReenvioConfirmado] = useState(false);
+
+    async function reenviarEmail() {
+        const enviado = await consentimento.reenviar();
+
+        if (!enviado) return;
+
+        setEmailVisivel(false);
+        setReenvioConfirmado(true);
+    }
+
+    function fecharConfirmacaoReenvio() {
+        setReenvioConfirmado(false);
+        consentimento.limparFeedback();
+    }
 
     if (consentimento.carregando && !consentimento.status) {
         return (
@@ -98,9 +113,29 @@ function SupportNetworkScreen({
                 }}
                 acaoSecundaria={{
                     texto: 'Enviar Novamente',
-                    aoPressionar: consentimento.reenviar,
+                    aoPressionar: reenviarEmail,
                     carregando: consentimento.enviando,
                     desativado: consentimento.enviando
+                }}
+            />
+
+            <SimpleModal
+                visivel={reenvioConfirmado}
+                aoFechar={fecharConfirmacaoReenvio}
+                icone={EnvelopeIcon}
+                corIcone="#C85A44"
+                fundoIcone="#F7EDE5"
+                titulo="E-mail enviado"
+                mensagem={
+                    <>
+                        Enviamos um pedido de autorização para o e-mail informado. Assim que o
+                        responsável confirmar, a Rede de Apoio será liberada.{`\n`}
+                        <Text style={estilos.destaque}>Solicitado:</Text> {email}
+                    </>
+                }
+                acaoPrincipal={{
+                    texto: 'OK',
+                    aoPressionar: fecharConfirmacaoReenvio
                 }}
             />
 
@@ -113,7 +148,7 @@ function SupportNetworkScreen({
                 mensagem={consentimento.erroEnvio ?? ''}
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
-                    aoPressionar: consentimento.reenviar,
+                    aoPressionar: reenviarEmail,
                     carregando: consentimento.enviando
                 }}
                 acaoSecundaria={{
