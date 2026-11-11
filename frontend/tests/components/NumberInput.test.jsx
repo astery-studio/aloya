@@ -2,6 +2,7 @@
  * Testes da digitação numérica com unidade fixa.
  */
 import { fireEvent, screen } from '@testing-library/react-native';
+import { Keyboard } from 'react-native';
 import NumberInput from '../../src/shared/components/forms/NumberInput';
 import { renderWithTheme } from '../helpers/renderWithTheme';
 
@@ -64,10 +65,13 @@ test('aceita decimal exato e expõe os limites da temperatura', async () => {
 
 test('destaca a unidade e permite limpar um valor preenchido', async () => {
     const aoAlterar = jest.fn();
+    const fecharTeclado = jest.spyOn(Keyboard, 'dismiss').mockImplementation(jest.fn());
     await renderWithTheme(
         <NumberInput valor="36,5" aoAlterar={aoAlterar} unidade="°C" permitirLimpar />
     );
     expect(screen.getByText('°C')).toHaveStyle({ fontFamily: 'DMSans_600SemiBold' });
     await fireEvent.press(screen.getByRole('button', { name: 'Limpar Duração em dias' }));
     expect(aoAlterar).toHaveBeenCalledWith(null);
+    expect(fecharTeclado).toHaveBeenCalledTimes(1);
+    fecharTeclado.mockRestore();
 });

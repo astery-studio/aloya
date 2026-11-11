@@ -2,7 +2,7 @@
  * Campo numérico controlado que mantém a unidade visível e não editável.
  */
 import { useMemo, useRef } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { XCircleIcon } from 'phosphor-react-native';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './NumberInput.styles';
@@ -33,6 +33,12 @@ export default function NumberInput({
 
     function alterar(novoTexto) {
         aoAlterar?.(converterEntradaNumerica(novoTexto, casasDecimais, maximoDigitosInteiros));
+    }
+
+    function limpar() {
+        entradaRef.current?.blur();
+        Keyboard.dismiss();
+        aoAlterar?.(null);
     }
 
     return (
@@ -67,7 +73,7 @@ export default function NumberInput({
                         accessibilityRole="button"
                         accessibilityLabel={`Limpar ${rotuloAcessibilidade}`}
                         hitSlop={8}
-                        onPress={() => aoAlterar?.(null)}
+                        onPress={limpar}
                         style={estilos.limpar}
                     >
                         <XCircleIcon size={18} color={tema.cores.marca.primaria} />
