@@ -62,9 +62,10 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     multiline
                     maxLength={limite}
                     desativado={desabilitado}
-                    estiloEntrada={{ minHeight: 120, textAlignVertical: 'top' }}
+                    estilo={[estilos.campoAnotacao, { borderColor: cores.icone }]}
+                    estiloEntrada={[estilos.entradaAnotacao, { color: cores.icone }]}
                 />
-                <Text style={estilos.contador}>
+                <Text style={[estilos.contador, { color: cores.icone }]}>
                     {[...(valor ?? '')].length} / {limite}
                 </Text>
             </>

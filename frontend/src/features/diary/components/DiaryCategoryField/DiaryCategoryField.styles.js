@@ -39,6 +39,22 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 5
         },
+        campoAnotacao: {
+            height: 36,
+            paddingHorizontal: 20,
+            borderWidth: 1,
+            borderRadius: 12
+        },
+        entradaAnotacao: {
+            minHeight: 24,
+            maxHeight: 24,
+            paddingVertical: 0,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            lineHeight: 24,
+            textAlign: 'center',
+            textAlignVertical: 'center'
+        },
         contador: {
             alignSelf: 'flex-end',
             color: tema.cores.interface.textoSecundario,

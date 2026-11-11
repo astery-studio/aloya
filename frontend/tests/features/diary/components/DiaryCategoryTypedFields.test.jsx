@@ -66,7 +66,16 @@ describe('campos tipados do Diário', () => {
             <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} desabilitado />
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota...');
+        expect(entrada).toHaveStyle({
+            minHeight: 24,
+            maxHeight: 24,
+            fontSize: 13,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            color: '#4A5899'
+        });
         expect(screen.getByText('3 / 5000')).toBeOnTheScreen();
+        expect(screen.getByText('3 / 5000')).toHaveStyle({ color: '#4A5899' });
         await fireEvent.changeText(entrada, 'Nova nota');
         await resultado.rerender(<DiaryCategoryField categoria={nota} valor={null} />);
         expect(screen.getByText('0 / 5000')).toBeOnTheScreen();
