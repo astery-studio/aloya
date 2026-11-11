@@ -52,9 +52,9 @@ function criarEmailService({ transporter, remetente }) {
                             `.trim(),
 
             html: `
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;min-height:100vh;background:#FFFFFF;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#FFFFFF;">
                     <tr>
-                        <td align="center" valign="middle" style="padding:28px 18px;vertical-align:middle;">
+                        <td align="center" valign="top" style="padding:28px 18px;vertical-align:top;">
                 <main style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:28px;font-family:Arial,Helvetica,sans-serif;color:#222222;background:#FFFFFF;font-size:16px;line-height:1.55;text-align:left;">
                     <p style="margin:0 0 34px;">Olá!</p>
 
@@ -93,8 +93,14 @@ function criarEmailService({ transporter, remetente }) {
 
                     <p style="margin:0;">Atenciosamente,<br /><strong>Equipe Astery</strong></p>
 
-                    <footer style="margin:32px 0 0;padding-top:18px;border-top:1px solid #E6E2D8;color:#5C5C59;font-size:13px;line-height:1.5;text-align:center;">
-                        Por segurança, este link expira em <strong>${VALIDADE_LINK_CONSENTIMENTO_MINUTOS} minutos</strong> e deixa de funcionar após a confirmação.
+                    <footer style="margin:32px 0 0;">
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-top:1px solid #E6E2D8;color:#5C5C59;font-size:13px;line-height:1.5;">
+                            <tr>
+                                <td height="58" align="center" valign="middle" style="height:58px;padding:0 12px;text-align:center;vertical-align:middle;">
+                                    Por segurança, este link expira em <strong>${VALIDADE_LINK_CONSENTIMENTO_MINUTOS} minutos</strong> e deixa de funcionar após a confirmação.
+                                </td>
+                            </tr>
+                        </table>
                     </footer>
                 </main>
                         </td>

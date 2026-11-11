@@ -39,7 +39,14 @@ test('explica integralmente a autorização parental no próprio e-mail', async 
     assert.match(mensagem.html, /background:#FFF3EF/u);
     assert.match(mensagem.html, /Equipe Astery/u);
     assert.match(mensagem.text, /expira em 60 minutos/iu);
-    assert.match(mensagem.html, /vertical-align:middle/u);
+    assert.match(
+        mensagem.html,
+        /<td align="center" valign="top" style="padding:28px 18px;vertical-align:top;">/u
+    );
+    assert.match(
+        mensagem.html,
+        /<td height="58" align="center" valign="middle" style="height:58px;padding:0 12px;text-align:center;vertical-align:middle;">/u
+    );
     assert.match(mensagem.html, /este link expira em <strong>60 minutos<\/strong>/iu);
     assert.match(mensagem.html, /deixa de funcionar após a confirmação/iu);
 });
