@@ -2,11 +2,15 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 const mockUseDiaryCatalog = jest.fn();
 const mockUseDiaryEntryForm = jest.fn();
+const mockUseDiaryPhase = jest.fn();
 jest.mock('../../../../src/features/diary/hooks/useDiaryCatalog', () => ({
     useDiaryCatalog: (...args) => mockUseDiaryCatalog(...args)
 }));
 jest.mock('../../../../src/features/diary/hooks/useDiaryEntryForm', () => ({
     useDiaryEntryForm: (...args) => mockUseDiaryEntryForm(...args)
+}));
+jest.mock('../../../../src/features/diary/hooks/useDiaryPhase', () => ({
+    useDiaryPhase: (...args) => mockUseDiaryPhase(...args)
 }));
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => ({
     BottomSheet: require('./newDiaryEntryModalDoubles').MockBottomSheet
@@ -24,6 +28,7 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 test('liga o painel aos estados do catálogo e formulário', async () => {
     const catalogo = { versao: 2, macrocategorias: [] };
     const service = {};
+    const calendarService = {};
     const onFechar = jest.fn();
     const onCriado = jest.fn();
     const onSessaoExpirada = jest.fn();
@@ -34,11 +39,13 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
         recarregar: jest.fn()
     });
     mockUseDiaryEntryForm.mockReturnValue({ salvando: false });
+    mockUseDiaryPhase.mockReturnValue({ fase: 'menstruacao', carregando: false });
 
     await render(
         <NewDiaryEntryModal
             visivel
             service={service}
+            calendarService={calendarService}
             onFechar={onFechar}
             onCriado={onCriado}
             onSessaoExpirada={onSessaoExpirada}
@@ -46,6 +53,12 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
     );
 
     expect(mockUseDiaryCatalog).toHaveBeenCalledWith({ ativo: true, service, onSessaoExpirada });
+    expect(mockUseDiaryPhase).toHaveBeenCalledWith({
+        ativo: true,
+        data: undefined,
+        service: calendarService,
+        onSessaoExpirada
+    });
     const parametrosFormulario = mockUseDiaryEntryForm.mock.calls[0][0];
     expect(parametrosFormulario).toMatchObject({
         ativo: true,
