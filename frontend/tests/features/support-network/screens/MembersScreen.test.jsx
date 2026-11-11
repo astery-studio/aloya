@@ -373,10 +373,11 @@ describe('MembersScreen', () => {
         expect(reenviarConvite).toHaveBeenCalledWith(1);
     });
 
-    test('abre um novo convite preenchido para contato inativo', async () => {
-        const onAdicionarContato = jest.fn();
+    test('reenvia diretamente o convite preservado para contato inativo', async () => {
+        const reenviarConvite = jest.fn().mockResolvedValue(true);
+        mockUseSupportContacts.mockReturnValue(criarEstado({ reenviarConvite }));
 
-        await render(<MembersScreen onAdicionarContato={onAdicionarContato} />);
+        await render(<MembersScreen />);
 
         const contatoInativo = {
             id: 9,
@@ -399,13 +400,7 @@ describe('MembersScreen', () => {
             await Promise.resolve();
         });
 
-        expect(onAdicionarContato).toHaveBeenCalledWith({
-            email: 'clara@example.com',
-            iconeId: 'lotus',
-            corId: 'roxo',
-            categoriaId: 10,
-            permissoesIndividuais: []
-        });
+        expect(reenviarConvite).toHaveBeenCalledWith(9);
     });
 
     test('abre a edição de vínculo do contato ativo', async () => {

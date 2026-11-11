@@ -462,7 +462,7 @@ function ContactCard({
                 <View style={estilos.containerTituloPendente}>
                     <Text style={estilos.tituloPendente}>CONVITE PENDENTE</Text>
                 </View>
-            ) : contatoEnviadoAtivo ? (
+            ) : estado === 'ativo' ? (
                 <View style={estilos.containerTagAtivo}>
                     <ContactPermissionBadge vinculo={vinculo} />
                 </View>

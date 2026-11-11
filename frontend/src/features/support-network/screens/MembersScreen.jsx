@@ -256,10 +256,7 @@ function MembersScreen({
         }
 
         if (acao === 'convidar_novamente') {
-            if (typeof onAdicionarContato === 'function') {
-                onAdicionarContato(criarRascunhoDeContatoInativo(contato));
-            }
-
+            reenviarConvite(contato);
             return;
         }
 
