@@ -26,7 +26,7 @@ function criarEstilos(tema) {
             borderWidth: 1,
             borderColor: tema.cores.interface.borda,
             borderRadius: 14,
-            backgroundColor: tema.cores.neutras.superficieClara
+            backgroundColor: tema.cores.interface.superficie
         },
         textos: {
             flex: 1,

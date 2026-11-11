@@ -27,7 +27,7 @@ function criarEstilos(tema) {
             borderWidth: 1,
             borderColor: tema.cores.interface.borda,
             borderRadius: 18,
-            backgroundColor: tema.cores.neutras.superficieClara
+            backgroundColor: tema.cores.interface.superficie
         },
         cabecalhoCartao: {
             height: 166,
