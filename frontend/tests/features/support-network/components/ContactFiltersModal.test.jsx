@@ -121,7 +121,7 @@ describe('ContactFiltersModal', () => {
             screen.getByRole('checkbox', {
                 name: 'Ativo, filtro de tipo de contato'
             })
-        ).toBeChecked();
+        ).not.toBeChecked();
 
         expect(
             screen.getByRole('checkbox', {
@@ -177,6 +177,46 @@ describe('ContactFiltersModal', () => {
             estados: ['ativo'],
             categoriaIds: [1],
             permissaoIndividual: true
+        });
+    });
+
+    test('permite selecionar somente um tipo de contato', async () => {
+        const aoAplicar = jest.fn();
+
+        await render(
+            <ContactFiltersModal
+                visivel
+                filtros={{}}
+                categorias={categorias}
+                aoAplicar={aoAplicar}
+                aoFechar={jest.fn()}
+            />
+        );
+
+        const ativo = screen.getByRole('checkbox', {
+            name: 'Ativo, filtro de tipo de contato'
+        });
+        const pendente = screen.getByRole('checkbox', {
+            name: 'Pendente, filtro de tipo de contato'
+        });
+
+        await fireEvent.press(ativo);
+        expect(ativo).toBeChecked();
+
+        await fireEvent.press(pendente);
+        expect(ativo).not.toBeChecked();
+        expect(pendente).toBeChecked();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Aplicar filtros de contatos'
+            })
+        );
+
+        expect(aoAplicar).toHaveBeenCalledWith({
+            estados: ['pendente'],
+            categoriaIds: [],
+            permissaoIndividual: false
         });
     });
 

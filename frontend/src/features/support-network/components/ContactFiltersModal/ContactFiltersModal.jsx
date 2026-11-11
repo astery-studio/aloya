@@ -84,11 +84,9 @@ function normalizarFiltros(filtros, categorias = []) {
         categoriasValidas.map((categoria) => [String(categoria.id), categoria.id])
     );
 
-    const estadosRecebidos = new Set(
-        Array.isArray(filtrosSeguros.estados)
-            ? filtrosSeguros.estados.filter((estado) => ESTADOS_PERMITIDOS.has(estado))
-            : []
-    );
+    const estadoSelecionado = Array.isArray(filtrosSeguros.estados)
+        ? filtrosSeguros.estados.find((estado) => ESTADOS_PERMITIDOS.has(estado))
+        : null;
 
     const categoriaIds = [];
 
@@ -106,9 +104,7 @@ function normalizarFiltros(filtros, categorias = []) {
     }
 
     return {
-        estados: ESTADOS_CONTATO.map(({ id }) => id).filter((estado) =>
-            estadosRecebidos.has(estado)
-        ),
+        estados: estadoSelecionado ? [estadoSelecionado] : [],
 
         categoriaIds,
 
@@ -161,9 +157,7 @@ function ContactFiltersModal({ visivel, filtros, categorias = [], aoAplicar, aoF
 
             return {
                 ...atual,
-                estados: selecionado
-                    ? atual.estados.filter((item) => item !== estado)
-                    : [...atual.estados, estado]
+                estados: selecionado ? [] : [estado]
             };
         });
     }
