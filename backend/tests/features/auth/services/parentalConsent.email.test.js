@@ -21,7 +21,7 @@ test('explica integralmente a autorização parental no próprio e-mail', async 
     });
 
     assert.equal(mensagem.to, 'responsavel@email.com');
-    assert.equal(mensagem.subject, 'Convite para participar da Rede de Apoio');
+    assert.equal(mensagem.subject, 'Autorização da Rede de Apoio — Astery');
     assert.match(
         mensagem.text,
         /Você está recebendo este e-mail porque foi indicado\(a\) como Responsável Legal de Ana em nosso aplicativo\./u
@@ -97,4 +97,27 @@ test('escapa o link antes de inseri-lo no HTML do e-mail', async () => {
 
     assert.equal(mensagem.html.includes('valor="inseguro"'), false);
     assert.match(mensagem.html, /valor=&quot;inseguro&quot;/u);
+});
+
+test('rejeita o envio quando o SMTP não aceita o destinatário', async () => {
+    const service = criarEmailService({
+        transporter: {
+            async sendMail() {
+                return {
+                    accepted: [],
+                    rejected: ['responsavel@email.com']
+                };
+            }
+        },
+        remetente: 'Aloya <nao-responda@aloya.test>'
+    });
+
+    await assert.rejects(
+        service.enviarEmailConsentimentoParental({
+            nomeTitular: 'Ana',
+            emailResponsavelLegal: 'responsavel@email.com',
+            linkConfirmacao: 'https://aloya.test/consentimento/token'
+        }),
+        /não aceitou o destinatário/u
+    );
 });

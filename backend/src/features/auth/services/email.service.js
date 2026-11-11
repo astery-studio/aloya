@@ -24,10 +24,10 @@ function criarEmailService({ transporter, remetente }) {
         const linkSeguro = escaparHtml(linkConfirmacao);
 
         // Dispara o envio do email.
-        await transporter.sendMail({
+        const resultadoEnvio = await transporter.sendMail({
             from: remetente,
             to: emailResponsavelLegal,
-            subject: 'Convite para participar da Rede de Apoio',
+            subject: 'Autorização da Rede de Apoio — Astery',
 
             text: `
                 Olá!
@@ -115,6 +115,17 @@ function criarEmailService({ transporter, remetente }) {
                 </table>
                             `
         });
+
+        const destinatariosAceitos = Array.isArray(resultadoEnvio?.accepted)
+            ? resultadoEnvio.accepted.map((email) => String(email).trim().toLowerCase())
+            : null;
+
+        if (
+            destinatariosAceitos !== null &&
+            !destinatariosAceitos.includes(String(emailResponsavelLegal).trim().toLowerCase())
+        ) {
+            throw new Error('O servidor de e-mail não aceitou o destinatário informado.');
+        }
     }
 
     async function enviarEmailRecuperacaoSenha({ email, linkRedefinicao }) {
