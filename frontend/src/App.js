@@ -682,6 +682,7 @@ export default function App() {
             ) : (
                 <SupportNetworkScreen
                     parentalConsentService={configuracao.servicos.parentalConsentService}
+                    receivedContactsService={configuracao.servicos.receivedContactsService}
                     service={configuracao.servicos.supportContactService}
                     categoriasService={configuracao.servicos.supportCategoryService}
                     onGerenciarResponsavel={() => {

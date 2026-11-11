@@ -9,10 +9,12 @@ import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { useParentalConsent } from '../hooks/useParentalConsent';
 import { MembersScreen } from './MembersScreen';
 import { ParentalConsentRestrictedScreen } from './ParentalConsentRestrictedScreen/ParentalConsentRestrictedScreen';
+import { ReceivedContactsScreen } from './ReceivedContactsScreen/ReceivedContactsScreen';
 import { criarEstilos } from './SupportNetworkScreen.styles';
 
 function SupportNetworkScreen({
     parentalConsentService,
+    receivedContactsService,
     onGerenciarResponsavel,
     onSelecionarAba,
     onSessaoExpirada,
@@ -26,6 +28,7 @@ function SupportNetworkScreen({
     });
     const [emailVisivel, setEmailVisivel] = useState(false);
     const [reenvioConfirmado, setReenvioConfirmado] = useState(false);
+    const [modoRede, setModoRede] = useState('apoio');
 
     async function reenviarEmail() {
         const enviado = await consentimento.reenviar();
@@ -71,9 +74,24 @@ function SupportNetworkScreen({
     }
 
     if (consentimento.status?.acessoLiberado) {
+        if (modoRede === 'acompanhados') {
+            return (
+                <ReceivedContactsScreen
+                    service={receivedContactsService}
+                    exibirSeletor
+                    modoRede={modoRede}
+                    onSelecionarModoRede={setModoRede}
+                    onSelecionarAba={onSelecionarAba}
+                    onSessaoExpirada={onSessaoExpirada}
+                />
+            );
+        }
+
         return (
             <MembersScreen
                 {...membersProps}
+                modoRede={modoRede}
+                onSelecionarModoRede={setModoRede}
                 onSelecionarAba={onSelecionarAba}
                 onSessaoExpirada={onSessaoExpirada}
             />

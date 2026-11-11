@@ -2,13 +2,27 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 
+import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
+import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
-import { BellIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import {
+    BellIcon,
+    FunnelIcon,
+    WarningCircleIcon
+} from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { ContactList } from '../../components/ContactList/ContactList';
+import { ContactFiltersModal } from '../../components/ContactFiltersModal/ContactFiltersModal';
 import { ContactPermissionsSummaryModal } from '../../components/ContactPermissionsSummaryModal/ContactPermissionsSummaryModal';
+import { SupportNetworkModeSelector } from '../../components/SupportNetworkModeSelector/SupportNetworkModeSelector';
 import { useReceivedContacts } from '../../hooks/useReceivedContacts';
+import {
+    criarFiltrosVazios,
+    criarRotuloFiltros,
+    filtrarContatos,
+    filtrosPossuemSelecao
+} from '../MembersScreen';
 import { criarEstilos } from './ReceivedContactsScreen.styles';
 
 function obterNomeContato(contato) {
@@ -21,7 +35,15 @@ function obterNomeContato(contato) {
     return identificacao?.trim() ?? 'Contato';
 }
 
-function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoExpirada }) {
+function ReceivedContactsScreen({
+    service,
+    onVoltar,
+    onSelecionarAba,
+    onSessaoExpirada,
+    exibirSeletor = false,
+    modoRede = 'acompanhados',
+    onSelecionarModoRede
+}) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -31,6 +53,8 @@ function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoEx
     const [conviteParaRecusar, definirConviteParaRecusar] = useState(null);
 
     const [ultimaAcao, definirUltimaAcao] = useState(null);
+    const [filtros, definirFiltros] = useState(criarFiltrosVazios);
+    const [filtrosAbertos, definirFiltrosAbertos] = useState(false);
 
     const estado = useReceivedContacts({
         service,
@@ -120,11 +144,46 @@ function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoEx
 
     const resumoVisivel = contatoResumo !== null;
 
+    const categorias = useMemo(() => {
+        const categoriasPorId = new Map();
+
+        for (const contato of estado.contatos) {
+            const categoria = contato?.vinculo?.categoria;
+
+            if (categoria?.id !== null && categoria?.id !== undefined && categoria?.nome) {
+                categoriasPorId.set(String(categoria.id), categoria);
+            }
+        }
+
+        return [...categoriasPorId.values()];
+    }, [estado.contatos]);
+
+    const contatosVisiveis = useMemo(
+        () => filtrarContatos(estado.contatos, filtros),
+        [estado.contatos, filtros]
+    );
+    const possuiFiltros = filtrosPossuemSelecao(filtros);
+    const rotuloFiltros = useMemo(
+        () => criarRotuloFiltros(filtros, categorias),
+        [categorias, filtros]
+    );
+
+    const acaoFiltro = (
+        <IconButton
+            icone={FunnelIcon}
+            aoPressionar={() => definirFiltrosAbertos(true)}
+            rotuloAcessibilidade="Filtrar contatos acompanhados"
+            variante="redeApoio"
+            corIcone={tema.cores.interface.destaque}
+        />
+    );
+
     return (
         <>
             <MainLayout
-                titulo="Contatos"
-                varianteHeader={onVoltar ? 'comVoltar' : 'padrao'}
+                titulo={exibirSeletor ? 'Rede de Apoio' : 'Contatos'}
+                varianteHeader={exibirSeletor ? 'redeApoio' : onVoltar ? 'comVoltar' : 'padrao'}
+                acoesHeader={exibirSeletor ? acaoFiltro : null}
                 onVoltar={onVoltar}
                 abaAtiva="membros"
                 onSelecionarAba={onSelecionarAba}
@@ -132,11 +191,13 @@ function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoEx
                 <View testID="received-contacts-screen" style={estilos.tela}>
                     <View style={estilos.lista}>
                         <ContactList
-                            contatos={estado.contatos}
+                            contatos={contatosVisiveis}
                             perspectiva="recebido"
                             carregando={estado.carregando}
                             atualizando={estado.atualizando}
                             erro={estado.erro}
+                            filtroAtivo={possuiFiltros}
+                            rotuloFiltro={rotuloFiltros}
                             aoAcao={tratarAcao}
                             aoAbrirResumo={abrirResumo}
                             aoTentarNovamente={estado.tentarNovamente}
@@ -149,12 +210,43 @@ function ReceivedContactsScreen({ service, onVoltar, onSelecionarAba, onSessaoEx
                                         Pessoas que contam com você como parte da sua rede de
                                         cuidado e apoio.
                                     </Text>
+
+                                    {exibirSeletor ? (
+                                        <SupportNetworkModeSelector
+                                            selecionado={modoRede}
+                                            aoSelecionar={onSelecionarModoRede}
+                                        />
+                                    ) : null}
+
+                                    {possuiFiltros ? (
+                                        <ButtonScreen
+                                            texto="Limpar filtros"
+                                            variante="bordaLaranja"
+                                            aoPressionar={() =>
+                                                definirFiltros(criarFiltrosVazios())
+                                            }
+                                            rotuloAcessibilidade="Limpar filtros de contatos acompanhados"
+                                            estilo={estilos.botaoLimpar}
+                                            estiloTexto={estilos.textoBotaoLimpar}
+                                        />
+                                    ) : null}
                                 </View>
                             }
                         />
                     </View>
                 </View>
             </MainLayout>
+
+            <ContactFiltersModal
+                visivel={filtrosAbertos}
+                filtros={filtros}
+                categorias={categorias}
+                aoAplicar={(novosFiltros) => {
+                    definirFiltros(novosFiltros);
+                    definirFiltrosAbertos(false);
+                }}
+                aoFechar={() => definirFiltrosAbertos(false)}
+            />
 
             <ContactPermissionsSummaryModal
                 visivel={resumoVisivel}

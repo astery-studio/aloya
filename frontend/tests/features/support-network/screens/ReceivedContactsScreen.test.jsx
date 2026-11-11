@@ -12,9 +12,10 @@ jest.mock('../../../../src/shared/layouts/MainLayout/MainLayout', () => {
     const { Text, View } = require('react-native');
 
     return {
-        MainLayout: ({ titulo, children }) => (
+        MainLayout: ({ titulo, acoesHeader, children }) => (
             <View testID="main-layout">
                 <Text>{titulo}</Text>
+                {acoesHeader}
                 {children}
             </View>
         )
@@ -152,6 +153,7 @@ jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => 
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     BellIcon: () => null,
+    FunnelIcon: () => null,
     WarningCircleIcon: () => null
 }));
 
@@ -375,6 +377,27 @@ test('encaminha a nova tentativa da listagem', async () => {
     );
 
     expect(estado.tentarNovamente).toHaveBeenCalledTimes(1);
+});
+
+test('integra o seletor e mantém somente o filtro no cabeçalho acompanhado', async () => {
+    const onSelecionarModoRede = jest.fn();
+
+    await render(
+        <ReceivedContactsScreen
+            service={{}}
+            exibirSeletor
+            modoRede="acompanhados"
+            onSelecionarModoRede={onSelecionarModoRede}
+            onSelecionarAba={jest.fn()}
+        />
+    );
+
+    expect(screen.getByText('Rede de Apoio')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Filtrar contatos acompanhados' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Abrir categorias de permissão' })).toBeNull();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos de Apoio' }));
+    expect(onSelecionarModoRede).toHaveBeenCalledWith('apoio');
 });
 
 test.each([

@@ -13,7 +13,10 @@ function criarEstilos(tema) {
 
         apresentacao: {
             width: '100%',
-            paddingBottom: 18
+            maxWidth: 350.011,
+            alignSelf: 'center',
+            alignItems: 'center',
+            gap: 18
         },
 
         descricao: {
@@ -22,6 +25,24 @@ function criarEstilos(tema) {
             fontSize: 16,
             lineHeight: 24,
             includeFontPadding: false
+        },
+
+        botaoLimpar: {
+            width: '100%',
+            maxWidth: 350.011,
+            height: 35.99,
+            borderWidth: 1,
+            borderColor: '#C85A44',
+            borderRadius: 10
+        },
+
+        textoBotaoLimpar: {
+            color: '#C85A44',
+            fontFamily: fontFamilies.semibold,
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 25.5,
+            textAlign: 'center'
         },
 
         lista: {

@@ -8,10 +8,34 @@ jest.mock('../../../../src/features/support-network/hooks/useParentalConsent', (
 
 jest.mock('../../../../src/features/support-network/screens/MembersScreen', () => {
     const React = require('react');
-    const { Text } = require('react-native');
+    const { Pressable, Text } = require('react-native');
 
-    return { MembersScreen: () => React.createElement(Text, null, 'Lista liberada') };
+    return {
+        MembersScreen: ({ onSelecionarModoRede }) => (
+            <>
+                <Text>Lista liberada</Text>
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Abrir acompanhados"
+                    onPress={() => onSelecionarModoRede('acompanhados')}
+                />
+            </>
+        )
+    };
 });
+
+jest.mock(
+    '../../../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen',
+    () => {
+        const { Text } = require('react-native');
+
+        return {
+            ReceivedContactsScreen: ({ service, exibirSeletor }) => (
+                <Text>{`Acompanhados:${service?.nome}:${String(exibirSeletor)}`}</Text>
+            )
+        };
+    }
+);
 
 import { SupportNetworkScreen } from '../../../../src/features/support-network/screens/SupportNetworkScreen';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
@@ -48,6 +72,23 @@ describe('SupportNetworkScreen', () => {
         await renderizar();
 
         expect(screen.getByText('Lista liberada')).toBeOnTheScreen();
+    });
+
+    test('alterna entre apoio e acompanhados usando serviços independentes', async () => {
+        mockUseParentalConsent.mockReturnValue(estado({ status: { acessoLiberado: true } }));
+
+        await render(
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <SupportNetworkScreen
+                    receivedContactsService={{ nome: 'recebidos' }}
+                    onSelecionarAba={jest.fn()}
+                />
+            </ThemeProvider>
+        );
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir acompanhados' }));
+
+        expect(screen.getByText('Acompanhados:recebidos:true')).toBeOnTheScreen();
     });
 
     test('centraliza o card sem rolagem e abre o e-mail pendente', async () => {
