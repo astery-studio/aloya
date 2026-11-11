@@ -2,10 +2,11 @@ import { fireEvent, screen } from '@testing-library/react-native';
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const { Pressable, Text } = require('react-native');
-    return function MockButtonScreen({ texto, aoPressionar }) {
+    return function MockButtonScreen({ texto, aoPressionar, desativado }) {
         return (
-            <Pressable accessibilityRole="button" onPress={aoPressionar}>
+            <Pressable accessibilityRole="button" disabled={desativado} onPress={aoPressionar}>
                 <Text>{texto}</Text>
+                <Text>{`desativado:${desativado}`}</Text>
             </Pressable>
         );
     };
@@ -70,6 +71,7 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(formulario.setData).toHaveBeenNthCalledWith(2, '2026-11-09');
     await fireEvent.press(screen.getByText('Macros:1;desabilitado:false'));
     expect(formulario.alterarValor).toHaveBeenCalledWith('dor', ['leve']);
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
-    expect(formulario.salvar).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));
+    expect(screen.getByText('desativado:true')).toBeOnTheScreen();
+    expect(formulario.salvar).not.toHaveBeenCalled();
 });

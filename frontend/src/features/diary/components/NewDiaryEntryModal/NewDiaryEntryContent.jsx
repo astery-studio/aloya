@@ -54,6 +54,7 @@ function NewDiaryEntryContent({
         data: formulario.data,
         hoje: obterHojeDiario()
     });
+    const salvarDesativado = formulario.salvando || !preparacao.valido;
     return (
         <>
             <ScrollView
@@ -96,9 +97,11 @@ function NewDiaryEntryContent({
                     texto="Salvar"
                     aoPressionar={formulario.salvar}
                     carregando={formulario.salvando}
-                    desativado={formulario.salvando || !preparacao.valido}
-                    estilo={estilos.botaoSalvar}
-                    estiloTexto={estilos.textoBotaoSalvar}
+                    desativado={salvarDesativado}
+                    estilo={[estilos.botaoSalvar, salvarDesativado && estilos.botaoSalvarDesativado]}
+                    estiloTexto={
+                        salvarDesativado ? estilos.textoBotaoDesativado : estilos.textoBotaoSalvar
+                    }
                 />
             </View>
         </>

@@ -4,7 +4,7 @@ import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        painel: { height: '90%' },
+        painel: { height: '92%', backgroundColor: '#FFFFFF' },
         indicador: {
             alignSelf: 'center',
             width: 42,
@@ -34,7 +34,7 @@ function criarEstilos(tema) {
             color: tema.cores.interface.textoSecundario
         },
         rolagem: { flex: 1 },
-        conteudo: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 24, gap: 14 },
+        conteudo: { paddingBottom: 24 },
         carregamento: { minHeight: 240, alignItems: 'center', justifyContent: 'center', gap: 12 },
         mensagem: {
             fontFamily: fontFamilies.regular,
@@ -96,17 +96,24 @@ function criarEstilos(tema) {
             borderRadius: 10,
             backgroundColor: '#C85A44'
         },
+        botaoSalvarDesativado: {
+            backgroundColor: '#E6E2D8'
+        },
         textoBotaoSalvar: {
             fontFamily: fontFamilies.semiBold,
             fontSize: 15,
             color: '#FFFFFF'
         },
+        textoBotaoDesativado: {
+            color: '#8A8985'
+        },
         rodape: {
-            paddingHorizontal: 20,
-            paddingTop: 14,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.separador,
-            backgroundColor: tema.cores.interface.superficieElevada
+            paddingHorizontal: 24,
+            paddingTop: 12,
+            paddingBottom: 12,
+            borderTopWidth: 1,
+            borderColor: '#E6E2D8',
+            backgroundColor: '#FFFFFF'
         }
     });
 }
