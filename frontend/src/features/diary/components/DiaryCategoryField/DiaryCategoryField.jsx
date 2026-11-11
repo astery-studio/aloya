@@ -38,6 +38,7 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                     categoria.valorMaximo === null ? undefined : Number(categoria.valorMaximo)
                 }
                 desativado={desabilitado}
+                permitirLimpar
                 rotuloAcessibilidade={categoria.nome}
             />
         );

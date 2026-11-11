@@ -3,6 +3,7 @@
  */
 import { useMemo, useRef } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
+import { XCircleIcon } from 'phosphor-react-native';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './NumberInput.styles';
 import { converterEntradaNumerica } from './numberInputValue';
@@ -17,7 +18,8 @@ export default function NumberInput({
     maximoDigitosInteiros = 2,
     valorMinimo,
     valorMaximo,
-    estilo
+    estilo,
+    permitirLimpar = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -60,6 +62,17 @@ export default function NumberInput({
                     style={estilos.entrada}
                 />
                 <Text style={estilos.unidade}>{unidade}</Text>
+                {permitirLimpar && texto ? (
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={`Limpar ${rotuloAcessibilidade}`}
+                        hitSlop={8}
+                        onPress={() => aoAlterar?.(null)}
+                        style={estilos.limpar}
+                    >
+                        <XCircleIcon size={18} color={tema.cores.marca.primaria} />
+                    </Pressable>
+                ) : null}
             </View>
         </Pressable>
     );

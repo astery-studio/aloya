@@ -61,3 +61,13 @@ test('aceita decimal exato e expõe os limites da temperatura', async () => {
     await fireEvent.changeText(entrada, '37,2');
     expect(aoAlterar).toHaveBeenCalledWith('37,2');
 });
+
+test('destaca a unidade e permite limpar um valor preenchido', async () => {
+    const aoAlterar = jest.fn();
+    await renderWithTheme(
+        <NumberInput valor="36,5" aoAlterar={aoAlterar} unidade="°C" permitirLimpar />
+    );
+    expect(screen.getByText('°C')).toHaveStyle({ fontFamily: 'DMSans_600SemiBold' });
+    await fireEvent.press(screen.getByRole('button', { name: 'Limpar Duração em dias' }));
+    expect(aoAlterar).toHaveBeenCalledWith(null);
+});
