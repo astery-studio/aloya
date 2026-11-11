@@ -22,8 +22,15 @@ test('apresenta as seis macrocategorias do backend', () => {
         'saude_acompanhamento'
     ]);
     for (const apresentacao of Object.values(apresentacaoMacrocategorias)) {
-        expect(apresentacao).toEqual({ icone: expect.any(Function), paleta: expect.any(String) });
+        expect(apresentacao).toMatchObject({
+            icone: expect.anything(),
+            paleta: expect.any(String)
+        });
     }
+    expect(apresentacaoMacrocategorias.ciclo_sangramento.iconeProps).toEqual({ weight: 'fill' });
+    expect(apresentacaoMacrocategorias.emocional.iconeProps).toEqual({ weight: 'fill' });
+    expect(apresentacaoMacrocategorias.energia_sono.iconeProps).toEqual({ weight: 'fill' });
+    expect(apresentacaoMacrocategorias.corpo_sintomas_fisicos.iconeProps).toBeUndefined();
 });
 
 test('usa a apresentação de ciclo como fallback seguro', () => {

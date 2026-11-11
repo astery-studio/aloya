@@ -29,6 +29,7 @@ function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, de
                         key={macro.id}
                         titulo={macro.nomeCompacto ?? macro.nome}
                         icone={apresentacao.icone}
+                        iconeProps={apresentacao.iconeProps}
                         paleta={apresentacao.paleta}
                         expandido={Boolean(expandidas[macro.id])}
                         aoAlternar={() => alternar(macro.id)}

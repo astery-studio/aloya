@@ -18,6 +18,7 @@ function montarEstiloCabecalho(estilos, expandido, cores, pressionado) {
 function DiaryMacrocategorySection({
     titulo,
     icone: Icone,
+    iconeProps,
     paleta = 'ciclo',
     expandido,
     aoAlternar,
@@ -47,14 +48,11 @@ function DiaryMacrocategorySection({
                 style={({ pressed }) => montarEstiloCabecalho(estilos, expandido, cores, pressed)}
             >
                 <View style={[estilos.caixaIcone, { backgroundColor: cores.fundoIcone }]}>
-                    <Icone size={18} color={cores.icone} />
+                    <Icone size={18} color={cores.icone} {...iconeProps} />
                 </View>
                 <Text style={[estilos.titulo, expandido && { color: cores.icone }]}>{titulo}</Text>
                 {acessorioCabecalho}
-                <IconeExpansao
-                    size={18}
-                    color={expandido ? cores.icone : COR_ICONE_RECOLHIDO}
-                />
+                <IconeExpansao size={18} color={expandido ? cores.icone : COR_ICONE_RECOLHIDO} />
             </Pressable>
             {expandido ? (
                 <View style={[estilos.conteudo, { borderTopColor: cores.bordaExpandida }]}>
