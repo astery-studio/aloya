@@ -17,13 +17,14 @@ describe('DurationInput', () => {
         await render(<DurationInput valorMinutos={100} aoAlterar={aoAlterar} />);
         await fireEvent.changeText(screen.getByLabelText('Horas de sono'), '2h');
         expect(aoAlterar).toHaveBeenCalledWith(160);
+        expect(screen.getByText('hora')).toHaveStyle({ fontFamily: 'DMSans_600SemiBold' });
+        await fireEvent.press(screen.getByRole('button', { name: 'Limpar tempo de sono' }));
+        expect(aoAlterar).toHaveBeenLastCalledWith(null);
     });
 
     test('limita minutos e permite apagar a duração', async () => {
         const aoAlterar = jest.fn();
-        const resultado = await render(
-            <DurationInput valorMinutos={60} aoAlterar={aoAlterar} />
-        );
+        const resultado = await render(<DurationInput valorMinutos={60} aoAlterar={aoAlterar} />);
         await fireEvent.changeText(screen.getByLabelText('Minutos de sono'), '99');
         expect(aoAlterar).toHaveBeenLastCalledWith(119);
         await resultado.rerender(<DurationInput valorMinutos={null} aoAlterar={aoAlterar} />);
@@ -32,13 +33,7 @@ describe('DurationInput', () => {
     });
 
     test('expõe erro e bloqueia os campos', async () => {
-        await render(
-            <DurationInput
-                valorMinutos={null}
-                desabilitado
-                erro="Duração inválida"
-            />
-        );
+        await render(<DurationInput valorMinutos={null} desabilitado erro="Duração inválida" />);
         expect(screen.getByRole('alert')).toHaveTextContent('Duração inválida');
         expect(screen.getByLabelText('Horas de sono')).toHaveProp('editable', false);
         expect(screen.getByLabelText('Minutos de sono')).toHaveProp('editable', false);

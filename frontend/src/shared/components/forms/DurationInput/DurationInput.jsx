@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { XCircleIcon } from 'phosphor-react-native';
 
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './DurationInput.styles';
@@ -56,6 +57,17 @@ function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) 
                     />
                     <Text style={estilos.unidade}>minutos</Text>
                 </View>
+                {valorMinutos ? (
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Limpar tempo de sono"
+                        hitSlop={8}
+                        onPress={() => aoAlterar?.(null)}
+                        style={estilos.limpar}
+                    >
+                        <XCircleIcon size={18} color={tema.cores.marca.primaria} />
+                    </Pressable>
+                ) : null}
             </View>
             {erro ? (
                 <Text accessibilityRole="alert" style={estilos.erro}>

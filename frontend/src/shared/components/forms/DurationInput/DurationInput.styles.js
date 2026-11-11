@@ -5,6 +5,7 @@ import { fontFamilies } from '../../../theme';
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
+            position: 'relative',
             width: '100%',
             minHeight: 44,
             flexDirection: 'row',
@@ -32,10 +33,11 @@ function criarEstilos(tema) {
         },
         unidade: {
             color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.regular,
+            fontFamily: fontFamilies.semibold,
             fontSize: 13,
             lineHeight: 20
         },
+        limpar: { position: 'absolute', right: 18 },
         desabilitado: { opacity: 0.55 },
         erro: {
             color: tema.cores.feedback.erro,
