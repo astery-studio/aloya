@@ -6,7 +6,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         painel: { height: '92%', backgroundColor: '#FFFFFF' },
         rolagem: { flex: 1 },
-        conteudo: { paddingBottom: 24 },
+        conteudo: {},
         carregamento: { minHeight: 240, alignItems: 'center', justifyContent: 'center', gap: 12 },
         mensagem: {
             fontFamily: fontFamilies.regular,

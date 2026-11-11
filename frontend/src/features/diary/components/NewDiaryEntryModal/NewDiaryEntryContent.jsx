@@ -60,20 +60,20 @@ function NewDiaryEntryContent({
     const salvarDesativado = formulario.salvando || !preparacao.valido;
     return (
         <>
+            <DiaryDateNavigator
+                data={formulario.data}
+                aoAnterior={() => formulario.setData(deslocarDataDiario(formulario.data, -1))}
+                aoProximo={() => formulario.setData(deslocarDataDiario(formulario.data, 1))}
+                proximoDisponivel={formulario.data < hoje}
+                desabilitado={formulario.salvando}
+                aoAbrirSeletor={() => setSeletorAberto(true)}
+            />
+            <DiaryPhaseBadge fase={fase} carregando={carregandoFase} />
             <ScrollView
                 style={estilos.rolagem}
                 contentContainerStyle={estilos.conteudo}
                 keyboardShouldPersistTaps="handled"
             >
-                <DiaryDateNavigator
-                    data={formulario.data}
-                    aoAnterior={() => formulario.setData(deslocarDataDiario(formulario.data, -1))}
-                    aoProximo={() => formulario.setData(deslocarDataDiario(formulario.data, 1))}
-                    proximoDisponivel={formulario.data < hoje}
-                    desabilitado={formulario.salvando}
-                    aoAbrirSeletor={() => setSeletorAberto(true)}
-                />
-                <DiaryPhaseBadge fase={fase} carregando={carregandoFase} />
                 <View style={estilos.cartaoRegistro}>
                     <Text style={estilos.tituloCartao}>Registro no Diário</Text>
                     <View style={estilos.contador}>
