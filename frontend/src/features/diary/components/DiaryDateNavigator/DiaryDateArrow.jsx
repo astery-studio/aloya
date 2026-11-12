@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { Pressable } from 'react-native';
-import { CaretLeft, CaretRight } from 'phosphor-react-native';
+import { CaretLeft } from 'phosphor-react-native/src/icons/CaretLeft';
+import { CaretRight } from 'phosphor-react-native/src/icons/CaretRight';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './DiaryDateNavigator.styles';
 
-function DiaryDateArrow({ direcao, aoPressionar, desabilitado }) {
+function DiaryDateArrow({ direcao, aoPressionar, desabilitado, compacto = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const anterior = direcao === 'anterior';
@@ -19,9 +20,13 @@ function DiaryDateArrow({ direcao, aoPressionar, desabilitado }) {
             accessibilityState={{ disabled: desabilitado }}
             disabled={desabilitado}
             onPress={aoPressionar}
-            style={[estilos.botaoSeta, desabilitado && estilos.desabilitado]}
+            style={[
+                estilos.botaoSeta,
+                compacto && estilos.botaoSetaCompacto,
+                desabilitado && estilos.desabilitado
+            ]}
         >
-            <Icone size={20} color={tema.cores.interface.textoSecundario} />
+            <Icone size={compacto ? 16.47 : 20} color={tema.cores.interface.textoSecundario} />
         </Pressable>
     );
 }
