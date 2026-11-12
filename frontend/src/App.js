@@ -176,6 +176,7 @@ export default function App() {
     const [dataInicialDiario, setDataInicialDiario] = useState(null);
     const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
     const [categoriasDiarioVisiveis, setCategoriasDiarioVisiveis] = useState(false);
+    const [revisaoCategoriasDiario, setRevisaoCategoriasDiario] = useState(0);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -666,6 +667,7 @@ export default function App() {
     } else if (telaInterna === telasInternas.diario) {
         conteudo = (
             <DiaryFlow
+                key={`diario-${revisaoCategoriasDiario}`}
                 service={configuracao.servicos.diaryService}
                 calendarService={configuracao.servicos.calendarService}
                 onSelecionarAba={selecionarAba}
@@ -755,6 +757,7 @@ export default function App() {
                 visivel={categoriasDiarioVisiveis}
                 service={configuracao.servicos.diaryService}
                 onFechar={() => setCategoriasDiarioVisiveis(false)}
+                onAlterado={() => setRevisaoCategoriasDiario((revisao) => revisao + 1)}
                 onSessaoExpirada={finalizarSessao}
             />
         </>
