@@ -45,15 +45,17 @@ function apresentarCategoria(categoria) {
     return resultado;
 }
 
-function apresentarDetalheRegistro(registro, ciclo = null) {
-    const categorias = [...registro.categorias].sort((a, b) => {
-        const primeira = CATEGORIAS_POR_ID.get(a.categoriaId);
-        const segunda = CATEGORIAS_POR_ID.get(b.categoriaId);
-        return (
-            (primeira?.macro.ordem ?? 99) - (segunda?.macro.ordem ?? 99) ||
-            (primeira?.ordem ?? 99) - (segunda?.ordem ?? 99)
-        );
-    });
+function apresentarDetalheRegistro(registro, ciclo = null, categoriasVisiveis = null) {
+    const categorias = registro.categorias
+        .filter(({ categoriaId }) => !categoriasVisiveis || categoriasVisiveis.has(categoriaId))
+        .sort((a, b) => {
+            const primeira = CATEGORIAS_POR_ID.get(a.categoriaId);
+            const segunda = CATEGORIAS_POR_ID.get(b.categoriaId);
+            return (
+                (primeira?.macro.ordem ?? 99) - (segunda?.macro.ordem ?? 99) ||
+                (primeira?.ordem ?? 99) - (segunda?.ordem ?? 99)
+            );
+        });
     for (const categoria of categorias) {
         categoria.opcoes?.sort(
             (a, b) =>
