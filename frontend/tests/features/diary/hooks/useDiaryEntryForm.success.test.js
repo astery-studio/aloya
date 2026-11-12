@@ -113,7 +113,7 @@ test('pré-preenche a edição e só salva depois de uma alteração real', asyn
     expect(result.current.alterado).toBe(false);
 });
 
-test('mantém uma categoria desativada ao salvar alterações no registro antigo', async () => {
+test('omite categoria desativada e delega sua preservação ao servidor', async () => {
     const catalogoComInativa = {
         macrocategorias: [
             ...catalogo.macrocategorias,
@@ -152,9 +152,6 @@ test('mantém uma categoria desativada ao salvar alterações no registro antigo
     expect(service.editarRegistro).toHaveBeenCalledWith(9, 1, {
         data: '2026-11-08',
         fusoHorario: expect.any(String),
-        categorias: [
-            { categoriaId: 'sintomas', opcoes: ['fadiga'] },
-            { categoriaId: 'anotacao_livre', texto: 'Dado histórico preservado.' }
-        ]
+        categorias: [{ categoriaId: 'sintomas', opcoes: ['fadiga'] }]
     });
 });
