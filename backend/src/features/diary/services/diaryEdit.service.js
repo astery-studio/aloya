@@ -28,7 +28,7 @@ function criarDiaryEditService({
         }
         await bootstrap.garantir();
         try {
-            const registro = await prisma.$transaction(async (tx) => {
+            const resultado = await prisma.$transaction(async (tx) => {
                 const atual = await tx.registroDiario.findFirst({
                     where: { id: registroId, usuarioId },
                     include: {
@@ -53,17 +53,22 @@ function criarDiaryEditService({
                     tx.preferenciaMacrocategoriaDiario.findMany({ where: { usuarioId } }),
                     tx.preferenciaCategoriaDiario.findMany({ where: { usuarioId } })
                 ]);
-                validarEdicaoCategorias(
+                const categoriasAtivas = validarEdicaoCategorias(
                     dados.categorias,
                     atual.categorias,
                     preferenciasMacro,
                     preferenciasCategoria
                 );
+                const categoriasAtuaisVisiveis = atual.categorias.filter(({ categoriaId }) =>
+                    categoriasAtivas.has(categoriaId)
+                );
                 const mudouData = formatarData(atual.dataRegistro) !== dados.data;
                 const mudouConteudo =
                     assinaturaCategorias(dados.categorias, assinaturaNova) !==
-                    assinaturaCategorias(atual.categorias, assinaturaAtual);
-                if (!mudouData && !mudouConteudo) return atual;
+                    assinaturaCategorias(categoriasAtuaisVisiveis, assinaturaAtual);
+                if (!mudouData && !mudouConteudo) {
+                    return { registro: atual, categoriasAtivas };
+                }
 
                 const fase = mudouData
                     ? await phaseService.resolver(usuarioId, dados.data, tx)
@@ -75,7 +80,7 @@ function criarDiaryEditService({
                         faseCicloAssociada: fase,
                         versao: { increment: 1 },
                         categorias: {
-                            deleteMany: {},
+                            deleteMany: { categoriaId: { in: [...categoriasAtivas] } },
                             create: montarCategorias(dados.categorias)
                         }
                     },
@@ -88,9 +93,9 @@ function criarDiaryEditService({
                     [formatarData(atual.dataRegistro), dados.data],
                     tx
                 );
-                return editado;
+                return { registro: editado, categoriasAtivas };
             });
-            return apresentarDetalheRegistro(registro);
+            return apresentarDetalheRegistro(resultado.registro, null, resultado.categoriasAtivas);
         } catch (erro) {
             throw traduzirErroMutacao(erro);
         }
