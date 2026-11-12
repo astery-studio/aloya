@@ -4,6 +4,7 @@ import { ActivityIndicator, Text, View } from 'react-native';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
+import { DiaryPhaseIcon } from '../DiaryPhaseIcon/DiaryPhaseIcon';
 import { criarEstilos } from './DiaryOverviewCard.styles';
 
 // Recebe somente dados já autorizados e retorna o cartão de resumo ou nada quando inválido.
@@ -47,7 +48,7 @@ function DiaryOverviewCard({
         return null;
     }
 
-    const { Icone, cor } = apresentacao;
+    const { cor } = apresentacao;
     const textoDias = `${diasRegistrados}${contagemParcial ? '+' : ''} ${
         diasRegistrados === 1 && !contagemParcial ? 'dia registrado' : 'dias registrados'
     }`;
@@ -69,7 +70,7 @@ function DiaryOverviewCard({
                     style={estilos.areaIcone}
                     importantForAccessibility="no-hide-descendants"
                 >
-                    <Icone size={48} color={cor} weight="regular" />
+                    <DiaryPhaseIcon fase={fase} size={48} />
                 </View>
                 <View style={estilos.textos}>
                     <Text style={estilos.titulo}>
