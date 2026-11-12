@@ -15,6 +15,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
         HouseIcon: IconeTeste,
         InfoIcon: IconeTeste,
         MoonIcon: IconeTeste,
+        NotebookIcon: IconeTeste,
         ShieldCheckIcon: IconeTeste,
         UserIcon: IconeTeste,
         WarningCircleIcon: IconeTeste
@@ -182,6 +183,8 @@ describe('SettingsScreen', () => {
 
         expect(screen.getByText('Parâmetros do Ciclo')).toBeOnTheScreen();
 
+        expect(screen.getByText('Categorias do Diário')).toBeOnTheScreen();
+
         expect(screen.getByText('Preferências')).toBeOnTheScreen();
 
         expect(screen.getByText('Modo de Cor')).toBeOnTheScreen();
@@ -206,6 +209,8 @@ describe('SettingsScreen', () => {
 
         const onAbrirTelaInicial = jest.fn();
 
+        const onAbrirCategoriasDiario = jest.fn();
+
         const onAbrirNotificacoes = jest.fn();
 
         const onAbrirSobre = jest.fn();
@@ -215,6 +220,7 @@ describe('SettingsScreen', () => {
         await renderizarTela({
             onAbrirPerfil,
             onAbrirParametrosCiclo,
+            onAbrirCategoriasDiario,
             onAbrirTelaInicial,
             onAbrirNotificacoes,
             onAbrirSobre,
@@ -230,6 +236,12 @@ describe('SettingsScreen', () => {
         await fireEvent.press(
             screen.getByRole('button', {
                 name: 'Parâmetros do Ciclo'
+            })
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Categorias do Diário'
             })
         );
 
@@ -260,6 +272,8 @@ describe('SettingsScreen', () => {
         expect(onAbrirPerfil).toHaveBeenCalledTimes(1);
 
         expect(onAbrirParametrosCiclo).toHaveBeenCalledTimes(1);
+
+        expect(onAbrirCategoriasDiario).toHaveBeenCalledTimes(1);
 
         expect(onAbrirTelaInicial).toHaveBeenCalledTimes(1);
 
@@ -368,6 +382,12 @@ describe('SettingsScreen', () => {
         expect(
             screen.getByRole('button', {
                 name: 'Parâmetros do Ciclo'
+            })
+        ).toBeDisabled();
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Categorias do Diário'
             })
         ).toBeDisabled();
 
