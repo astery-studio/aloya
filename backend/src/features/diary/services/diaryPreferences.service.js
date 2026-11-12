@@ -10,6 +10,9 @@ const MACROS = new Set(CATALOGO_DIARIO.map(({ id }) => id));
 const CATEGORIAS = new Set(
     CATALOGO_DIARIO.flatMap(({ categorias }) => categorias.map(({ id }) => id))
 );
+const CATEGORIAS_POR_MACRO = new Map(
+    CATALOGO_DIARIO.map((macro) => [macro.id, macro.categorias.map((categoria) => categoria.id)])
+);
 
 function criarDiaryPreferencesService({ prisma, bootstrap } = {}) {
     if (typeof prisma?.$transaction !== 'function' || typeof bootstrap?.garantir !== 'function') {
@@ -42,6 +45,15 @@ function criarDiaryPreferencesService({ prisma, bootstrap } = {}) {
                         create: { usuarioId, macrocategoriaId: id, ativa },
                         update: { ativa }
                     });
+                    if (ativa) {
+                        for (const categoriaId of CATEGORIAS_POR_MACRO.get(id) ?? []) {
+                            await tx.preferenciaCategoriaDiario.upsert({
+                                where: { usuarioId_categoriaId: { usuarioId, categoriaId } },
+                                create: { usuarioId, categoriaId, ativa: true },
+                                update: { ativa: true }
+                            });
+                        }
+                    }
                 } else {
                     await tx.preferenciaCategoriaDiario.upsert({
                         where: { usuarioId_categoriaId: { usuarioId, categoriaId: id } },
