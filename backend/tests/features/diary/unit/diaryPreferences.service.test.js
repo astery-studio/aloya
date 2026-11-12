@@ -14,7 +14,8 @@ function criarCenario(contagem = 1) {
             upsert: async (dados) => chamadas.push(['macro', dados])
         },
         preferenciaCategoriaDiario: {
-            upsert: async (dados) => chamadas.push(['categoria', dados])
+            upsert: async (dados) => chamadas.push(['categoria', dados]),
+            updateMany: async (dados) => chamadas.push(['categorias', dados])
         }
     };
     const prisma = { $transaction: async (operacao) => operacao(tx) };
@@ -53,14 +54,14 @@ test('reativa todas as categorias ao reativar uma macro', async () => {
         versao: 2
     });
 
-    const categorias = cenario.chamadas
-        .filter(([tipo]) => tipo === 'categoria')
-        .map(([, dados]) => dados.create);
-    assert.deepEqual(categorias, [
-        { usuarioId: 8, categoriaId: 'energia', ativa: true },
-        { usuarioId: 8, categoriaId: 'qualidade_sono', ativa: true },
-        { usuarioId: 8, categoriaId: 'tempo_sono', ativa: true }
-    ]);
+    const categorias = cenario.chamadas.find(([tipo]) => tipo === 'categorias')[1];
+    assert.deepEqual(categorias, {
+        where: {
+            usuarioId: 8,
+            categoriaId: { in: ['energia', 'qualidade_sono', 'tempo_sono'] }
+        },
+        data: { ativa: true }
+    });
 });
 
 test('rejeita versão superada sem gravar preferência', async () => {
