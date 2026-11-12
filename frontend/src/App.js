@@ -673,12 +673,6 @@ export default function App() {
                 calendarService={configuracao.servicos.calendarService}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
-                aoAbrirFiltros={() =>
-                    Alert.alert(
-                        'Filtrar Diário',
-                        'Os filtros do histórico serão disponibilizados em uma próxima etapa.'
-                    )
-                }
                 aoGerenciarCategorias={() => setCategoriasDiarioVisiveis(true)}
             />
         );
