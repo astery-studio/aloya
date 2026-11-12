@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { CATALOGO_DIARIO } from '../../../../src/features/diary/catalog/diary.catalog.js';
 import { criarDiaryCatalogBootstrap } from '../../../../src/features/diary/services/diaryCatalogBootstrap.service.js';
 import { criarDiaryHistoryService } from '../../../../src/features/diary/services/diaryHistory.service.js';
 import { criarWhereHistorico } from '../../../../src/features/diary/services/diaryHistory.query.js';
@@ -39,6 +40,37 @@ test('bootstrap sincroniza catálogo uma vez e permite tentar novamente após fa
     assert.equal(contagem.transacoes, 2);
     assert.ok(contagem.macros > 0 && contagem.categorias > 0 && contagem.opcoes > 0);
     assert.ok(contagem.liberacoes > 0);
+});
+
+test('bootstrap evita regravar um catálogo que já está sincronizado', async () => {
+    let transacoes = 0;
+    const macros = CATALOGO_DIARIO.map(({ id }) => ({ id }));
+    const categorias = CATALOGO_DIARIO.flatMap((macro) =>
+        macro.categorias.map(({ id }) => ({ id }))
+    );
+    const opcoes = CATALOGO_DIARIO.flatMap((macro) =>
+        macro.categorias.flatMap((categoria) =>
+            categoria.opcoes.map((opcao) => ({
+                id: opcao.id,
+                categoriaId: categoria.id,
+                grupo: opcao.grupo,
+                nome: opcao.nome,
+                ordem: opcao.ordem
+            }))
+        )
+    );
+    const prisma = {
+        macrocategoriaDiario: { findMany: async () => macros },
+        categoriaDiario: { findMany: async () => categorias },
+        opcaoDiario: { findMany: async () => opcoes },
+        $transaction: async () => {
+            transacoes += 1;
+        }
+    };
+
+    await criarDiaryCatalogBootstrap({ prisma }).garantir();
+
+    assert.equal(transacoes, 0);
 });
 
 test('where do histórico cobre todos os filtros, cursor e consulta vazia', () => {
@@ -124,9 +156,8 @@ test('histórico valida sessão, filtros, cursores e paginação', async () => {
     assert.equal(pagina.itens.length, 1);
     assert.ok(pagina.proximoCursor);
     assert.ok(
-        consultas[0].where.AND.some(
-            (condicao) =>
-                condicao.categorias?.some?.categoriaId?.in?.includes('sintomas_emocionais')
+        consultas[0].where.AND.some((condicao) =>
+            condicao.categorias?.some?.categoriaId?.in?.includes('sintomas_emocionais')
         )
     );
     const cursor = codificarCursor({ data: '2026-11-03', id: 3 }, filtros);
