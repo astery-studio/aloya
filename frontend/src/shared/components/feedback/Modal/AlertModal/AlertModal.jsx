@@ -83,7 +83,7 @@ export default function AlertModal({
 
     return (
         <AppModal
-            variante={comSenha || confirmacao ? 'acao' : 'alerta'}
+            variante={comSenha || confirmacao || erroInterno ? 'acao' : 'alerta'}
             visivel={visivel}
             aoFechar={fechamentoDoModal}
             icone={Icone}
