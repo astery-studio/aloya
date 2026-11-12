@@ -116,6 +116,34 @@ test('apresenta confirmação com ícone em bloco bege e ações empilhadas', as
     expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveStyle({ height: 52 });
 });
 
+test('apresenta erro interno no formato compacto sem cabeçalho vermelho', async () => {
+    await renderWithTheme(
+        <AlertModal
+            erroInterno
+            visivel
+            aoFechar={jest.fn()}
+            titulo="Algo deu errado"
+            mensagem="Verifique sua conexão e tente novamente."
+            acaoPrincipal={{
+                texto: 'Tentar novamente',
+                variante: 'preto',
+                aoPressionar: jest.fn()
+            }}
+            acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: jest.fn() }}
+        />
+    );
+
+    expect(screen.getByTestId('app-modal-icon')).toHaveStyle({
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: '#EDEDED'
+    });
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({ maxWidth: 342 });
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toHaveStyle({ height: 52 });
+    expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({ height: 52 });
+});
+
 test('bloqueia ação que está carregando', async () => {
     const aoPressionar = jest.fn();
 
