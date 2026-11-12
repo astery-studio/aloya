@@ -1,3 +1,4 @@
+import { isValidDate } from '../../../shared/utils/validation/isValidDate';
 import { decomporData, formatarDataDiario, obterHojeDiario } from './diaryDate';
 
 const FASES_FILTRO = Object.freeze(['menstrual', 'folicular', 'ovulatoria', 'lutea']);
@@ -41,7 +42,9 @@ function criarChaveFiltrosDiario(filtros) {
 
 function converterDataFiltroParaIso(valor) {
     if (typeof valor !== 'string') return null;
-    const correspondencia = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(valor.trim());
+    const dataNormalizada = valor.trim();
+    if (!isValidDate(dataNormalizada)) return null;
+    const correspondencia = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(dataNormalizada);
     if (!correspondencia) return null;
     const iso = `${correspondencia[3]}-${correspondencia[2]}-${correspondencia[1]}`;
     return decomporData(iso) ? iso : null;
