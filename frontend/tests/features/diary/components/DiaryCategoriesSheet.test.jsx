@@ -48,7 +48,13 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
     await waitFor(() => expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen());
     fireEvent.press(screen.getByRole('button', { name: 'Expandir Corpo e Sintomas Físicos' }));
     await waitFor(() => expect(screen.getByText('Pele')).toBeOnTheScreen());
-    expect(screen.getByRole('button', { name: 'Salvar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Salvar' })).toHaveStyle({
+        width: 342,
+        maxWidth: '100%',
+        height: 54,
+        paddingTop: 15.375,
+        paddingBottom: 14.625
+    });
 });
 
 test('fecha pelo X ou por Salvar sem exigir nova persistência', async () => {
