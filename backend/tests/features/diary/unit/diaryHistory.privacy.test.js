@@ -22,18 +22,20 @@ function categoriaComOpcoes(categoriaId, quantidade) {
 
 test('resumo não revela saúde sexual nem altera +N por sua existência', () => {
     const sexual = categoriaComOpcoes('atividade_sexual', 1);
-    const fisica = categoriaComOpcoes('sintomas_fisicos', 4);
+    const fisicas = ['sintomas_fisicos', 'pele', 'cabelo', 'digestao'].map((id) =>
+        categoriaComOpcoes(id, 1)
+    );
     const registro = {
         id: 5,
         dataRegistro: new Date('2026-11-08T00:00:00Z'),
         faseCicloAssociada: 'menstrual',
         versao: 0,
         atualizadoEm: new Date('2026-11-08T12:00:00Z'),
-        categorias: [sexual, fisica]
+        categorias: [sexual, ...fisicas]
     };
     const resultado = apresentarResumoRegistro(
         registro,
-        new Set(['atividade_sexual', 'sintomas_fisicos'])
+        new Set(['atividade_sexual', 'sintomas_fisicos', 'pele', 'cabelo', 'digestao'])
     );
     const serializado = JSON.stringify(resultado);
 
@@ -67,4 +69,5 @@ test('trecho da anotação contém no máximo 100 pontos de código', () => {
     );
 
     assert.equal([...resultado.trechoAnotacao].length, 100);
+    assert.equal(resultado.trechoAnotacao.endsWith('…'), true);
 });
