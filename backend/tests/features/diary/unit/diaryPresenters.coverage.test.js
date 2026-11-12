@@ -6,7 +6,10 @@ import {
     apresentarDecimal,
     apresentarDetalheRegistro
 } from '../../../../src/features/diary/presenters/diaryEntry.presenter.js';
-import { apresentarResumoRegistro } from '../../../../src/features/diary/presenters/diaryHistory.presenter.js';
+import {
+    apresentarResumoRegistro,
+    obterNomeMicrocategoria
+} from '../../../../src/features/diary/presenters/diaryHistory.presenter.js';
 
 const instante = new Date('2026-11-08T12:00:00.000Z');
 
@@ -66,7 +69,8 @@ test('apresenta todos os formatos, ordenações e metadados térmicos', () => {
         ]
     };
 
-    const detalhe = apresentarDetalheRegistro(registro);
+    const detalhe = apresentarDetalheRegistro(registro, { dia: 21, numero: 3 });
+    assert.deepEqual(detalhe.ciclo, { dia: 21, numero: 3 });
     assert.equal(detalhe.categorias.find((item) => item.id === 'temperatura_basal').valor, '36.7');
     assert.equal(
         detalhe.categorias.find((item) => item.id === 'temperatura_basal').motivoPerturbacao,
@@ -184,5 +188,28 @@ test('resumo cobre decimal, duração, ausência de valor e desempates', () => {
         },
         new Set(['sintomas_fisicos', 'peso'])
     );
-    assert.equal(somenteOpcoes.principais.length, 3);
+    assert.equal(somenteOpcoes.principais.length, 1);
+});
+
+test('resumo nomeia a microcategoria específica de banheiro', () => {
+    const intestinal = [...OPCOES_POR_ID.values()].find(
+        (item) => item.categoriaId === 'banheiro' && item.grupo === 'intestino'
+    );
+    const urinaria = [...OPCOES_POR_ID.values()].find(
+        (item) => item.categoriaId === 'banheiro' && item.grupo === 'urina'
+    );
+    const banheiro = (opcoes) => ({
+        categoriaId: 'banheiro',
+        categoriaNome: 'Banheiro',
+        opcoes
+    });
+    assert.equal(obterNomeMicrocategoria({ categoriaId: 'pele', categoriaNome: 'Pele' }), 'Pele');
+    assert.equal(obterNomeMicrocategoria(banheiro([])), 'Banheiro');
+    assert.equal(obterNomeMicrocategoria(banheiro([{ opcaoId: intestinal.id }])), 'Intestino');
+    assert.equal(obterNomeMicrocategoria(banheiro([{ opcaoId: urinaria.id }])), 'Urina');
+    assert.equal(
+        obterNomeMicrocategoria(banheiro([{ opcaoId: intestinal.id }, { opcaoId: urinaria.id }])),
+        'Banheiro'
+    );
+    assert.equal(obterNomeMicrocategoria(banheiro([{ opcaoId: 'inexistente' }])), 'Banheiro');
 });
