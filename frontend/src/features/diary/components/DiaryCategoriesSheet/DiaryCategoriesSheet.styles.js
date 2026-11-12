@@ -170,7 +170,8 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
         rodape: {
-            width: '100%',
+            alignSelf: 'stretch',
+            marginHorizontal: -tema.espacamentosLayout.margemHorizontalTela,
             minHeight: 87,
             flexShrink: 0,
             alignItems: 'center',
@@ -178,7 +179,7 @@ function criarEstilos(tema) {
             paddingHorizontal: 24,
             paddingBottom: 20,
             backgroundColor: superficie,
-            borderTopWidth: 0.7,
+            borderTopWidth: 1,
             borderTopColor: tema.cores.interface.borda
         },
         botaoSalvar: {
