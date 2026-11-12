@@ -1,7 +1,7 @@
 // Apresenta os estados visualmente fiéis do histórico dentro do layout principal do app.
 import { useMemo } from 'react';
 import { ActivityIndicator, Text, useWindowDimensions, View } from 'react-native';
-import { FunnelSimpleIcon } from 'phosphor-react-native/src/icons/FunnelSimple';
+import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 import { GearSixIcon } from 'phosphor-react-native/src/icons/GearSix';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
@@ -10,7 +10,9 @@ import { EmptyState } from '../../../shared/components/feedback/EmptyState/Empty
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { DiaryOverviewCard } from '../components/DiaryOverviewCard/DiaryOverviewCard';
+import { DiaryActiveFilters } from '../components/DiaryActiveFilters/DiaryActiveFilters';
 import { DiaryTimeline } from '../components/DiaryTimeline/DiaryTimeline';
+import { possuiFiltrosDiario } from '../utils/diaryFilters';
 import { criarEstilos } from './DiaryScreen.styles';
 
 // Mantém o conjunto trilho + card com a largura de 350 px do protótipo em celulares estreitos.
@@ -53,7 +55,11 @@ function DiaryScreen({
     aoEditarRegistro,
     aoExcluirRegistro,
     registroEmExclusaoId,
+    filtros,
+    rotulosCategoriasFiltro,
     aoAbrirFiltros,
+    aoRemoverFiltro,
+    aoLimparFiltros,
     aoGerenciarCategorias,
     onSelecionarAba
 }) {
@@ -63,6 +69,7 @@ function DiaryScreen({
     const margemHorizontalTimeline = calcularMargemHorizontalTimeline(larguraTela);
     const itens = Array.isArray(registros) ? registros : [];
     const possuiErro = typeof erro === 'string' && erro.trim();
+    const filtrosAtivos = possuiFiltrosDiario(filtros);
     const vazio = !carregando && !possuiErro && itens.length === 0;
     const possuiAcoesHeader =
         typeof aoAbrirFiltros === 'function' || typeof aoGerenciarCategorias === 'function';
@@ -71,7 +78,7 @@ function DiaryScreen({
         <>
             {typeof aoAbrirFiltros === 'function' ? (
                 <IconButton
-                    icone={FunnelSimpleIcon}
+                    icone={FunnelIcon}
                     aoPressionar={aoAbrirFiltros}
                     rotuloAcessibilidade="Filtrar histórico do Diário"
                     variante="selecionado"
@@ -104,6 +111,16 @@ function DiaryScreen({
             ) : null}
         </View>
     );
+
+    const filtrosAplicados = filtrosAtivos ? (
+        <DiaryActiveFilters
+            filtros={filtros}
+            rotulosCategorias={rotulosCategoriasFiltro}
+            quantidadeResultados={itens.length}
+            aoRemover={aoRemoverFiltro}
+            aoLimpar={aoLimparFiltros}
+        />
+    ) : null;
 
     let conteudo;
     if (carregando) {
@@ -141,7 +158,17 @@ function DiaryScreen({
             </View>
         );
     } else if (vazio) {
-        conteudo = (
+        conteudo = filtrosAtivos ? (
+            <View style={estilos.conteudoEstatico}>
+                {introducao}
+                {filtrosAplicados}
+                <View accessibilityLiveRegion="polite" style={estilos.estadoFiltroVazio}>
+                    <Text style={estilos.mensagemFiltroVazio}>
+                        Nenhum registro encontrado para os filtros aplicados.
+                    </Text>
+                </View>
+            </View>
+        ) : (
             <View style={estilos.conteudoEstatico}>
                 {introducao}
                 <View style={estilos.estadoCentralizado}>
@@ -165,8 +192,12 @@ function DiaryScreen({
         const cabecalhoLista = (
             <View style={estilos.cabecalhoLista}>
                 {introducao}
-                {resumo ? <DiaryOverviewCard {...resumo} /> : null}
-                <DivisorTimeline estilos={estilos} />
+                {filtrosAtivos ? (
+                    filtrosAplicados
+                ) : resumo ? (
+                    <DiaryOverviewCard {...resumo} />
+                ) : null}
+                {!filtrosAtivos ? <DivisorTimeline estilos={estilos} /> : null}
             </View>
         );
         conteudo = (
@@ -200,7 +231,7 @@ function DiaryScreen({
         >
             <View testID="diary-main-container" style={estilos.tela}>
                 {conteudo}
-                {!carregando && !possuiErro && !vazio ? (
+                {!carregando && !possuiErro && (!vazio || filtrosAtivos) ? (
                     <View style={estilos.acaoFixa}>
                         <ButtonScreen texto="Adicionar novo registro" aoPressionar={aoCriar} />
                     </View>
