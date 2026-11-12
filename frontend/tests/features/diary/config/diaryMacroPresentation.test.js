@@ -9,7 +9,8 @@ jest.mock('phosphor-react-native', () => ({
 
 import {
     apresentacaoMacrocategorias,
-    obterApresentacaoMacrocategoria
+    obterApresentacaoMacrocategoria,
+    obterCorMacrocategoria
 } from '../../../../src/features/diary/config/diaryMacroPresentation';
 
 test('apresenta as seis macrocategorias do backend', () => {
@@ -40,4 +41,28 @@ test('usa a apresentação de ciclo como fallback seguro', () => {
     expect(obterApresentacaoMacrocategoria('emocional')).toBe(
         apresentacaoMacrocategorias.emocional
     );
+});
+
+test('obtém a cor própria da paleta de cada macrocategoria', () => {
+    const tema = {
+        cores: {
+            redeApoio: {
+                ciclo: { icone: '#C85A44' },
+                corpo: { icone: '#2C4C3B' },
+                emocional: { icone: '#7B5EA7' },
+                energia: { icone: '#B07D2A' },
+                vidaIntima: { icone: '#B04A70' },
+                saude: { icone: '#4A5899' }
+            }
+        }
+    };
+
+    expect(obterCorMacrocategoria(tema, 'ciclo_sangramento')).toBe('#C85A44');
+    expect(obterCorMacrocategoria(tema, 'corpo_sintomas_fisicos')).toBe('#2C4C3B');
+    expect(obterCorMacrocategoria(tema, 'emocional')).toBe('#7B5EA7');
+    expect(obterCorMacrocategoria(tema, 'energia_sono')).toBe('#B07D2A');
+    expect(obterCorMacrocategoria(tema, 'vida_intima_social')).toBe('#B04A70');
+    expect(obterCorMacrocategoria(tema, 'saude_acompanhamento')).toBe('#4A5899');
+    expect(obterCorMacrocategoria(tema, 'desconhecida')).toBe('#C85A44');
+    expect(obterCorMacrocategoria(null, 'emocional')).toBe('#C85A44');
 });
