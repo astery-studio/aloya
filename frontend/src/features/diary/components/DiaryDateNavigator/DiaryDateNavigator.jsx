@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { CaretDown } from 'phosphor-react-native';
+import { CaretDown } from 'phosphor-react-native/src/icons/CaretDown';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { formatarDataDiario } from '../../utils/diaryDate';
@@ -14,18 +14,20 @@ function DiaryDateNavigator({
     aoAbrirSeletor,
     anteriorDisponivel = true,
     proximoDisponivel = true,
-    desabilitado = false
+    desabilitado = false,
+    compacto = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const dataFormatada = formatarDataDiario(data);
 
     return (
-        <View style={estilos.container}>
+        <View style={[estilos.container, compacto && estilos.containerCompacto]}>
             <DiaryDateArrow
                 direcao="anterior"
                 aoPressionar={aoAnterior}
                 desabilitado={desabilitado || !anteriorDisponivel}
+                compacto={compacto}
             />
             <Pressable
                 accessibilityRole="button"
@@ -33,15 +35,18 @@ function DiaryDateNavigator({
                 accessibilityState={{ disabled: desabilitado || !aoAbrirSeletor }}
                 disabled={desabilitado || !aoAbrirSeletor}
                 onPress={aoAbrirSeletor}
-                style={estilos.data}
+                style={[estilos.data, compacto && estilos.dataCompacta]}
             >
-                <Text style={estilos.texto}>{dataFormatada}</Text>
+                <Text style={[estilos.texto, compacto && estilos.textoCompacto]}>
+                    {dataFormatada}
+                </Text>
                 {aoAbrirSeletor ? <CaretDown size={15} color="#000000" /> : null}
             </Pressable>
             <DiaryDateArrow
                 direcao="proximo"
                 aoPressionar={aoProximo}
                 desabilitado={desabilitado || !proximoDisponivel}
+                compacto={compacto}
             />
         </View>
     );
