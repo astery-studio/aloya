@@ -81,6 +81,21 @@ function useDiaryRecordDetails({ service, onSessaoExpirada } = {}) {
         setCarregando(false);
     }, []);
 
+    const abrirDetalhe = useCallback((detalhe) => {
+        if (!detalhe || !Number.isSafeInteger(detalhe.id) || !Array.isArray(detalhe.categorias)) {
+            return false;
+        }
+        revisao.current += 1;
+        controleRef.current?.abort();
+        controleRef.current = null;
+        selecionadoRef.current = detalhe;
+        setResumoSelecionado(detalhe);
+        setRegistro(detalhe);
+        setErro(null);
+        setCarregando(false);
+        return true;
+    }, []);
+
     const tentarNovamente = useCallback(() => {
         return selecionadoRef.current ? buscar(selecionadoRef.current) : Promise.resolve(false);
     }, [buscar]);
@@ -92,6 +107,7 @@ function useDiaryRecordDetails({ service, onSessaoExpirada } = {}) {
         carregando,
         erro,
         abrir: buscar,
+        abrirDetalhe,
         fechar,
         tentarNovamente
     };
