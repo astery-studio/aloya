@@ -8,6 +8,11 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(false);
     const controlador = useRef(null);
+    const onSessaoExpiradaRef = useRef(onSessaoExpirada);
+
+    useEffect(() => {
+        onSessaoExpiradaRef.current = onSessaoExpirada;
+    }, [onSessaoExpirada]);
 
     const carregar = useCallback(async () => {
         controlador.current?.abort();
@@ -21,12 +26,12 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             setDataSelecionada(resultado.dataReferencia || null);
         } catch (falha) {
             if (falha?.name === 'AbortError') return;
-            if (falha?.status === 401) onSessaoExpirada?.();
+            if (falha?.status === 401) onSessaoExpiradaRef.current?.();
             else setErro(true);
         } finally {
             if (controlador.current === atual) setCarregando(false);
         }
-    }, [onSessaoExpirada, service]);
+    }, [service]);
 
     useEffect(() => {
         const atual = new AbortController();
@@ -40,7 +45,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             })
             .catch((falha) => {
                 if (falha?.name === 'AbortError') return;
-                if (falha?.status === 401) onSessaoExpirada?.();
+                if (falha?.status === 401) onSessaoExpiradaRef.current?.();
                 else setErro(true);
             })
             .finally(() => {
@@ -48,7 +53,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             });
 
         return () => atual.abort();
-    }, [onSessaoExpirada, service]);
+    }, [service]);
 
     return (
         <CycleTodayScreen
