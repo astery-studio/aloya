@@ -45,3 +45,24 @@ test('encaminha ao Diário a data selecionada na Home', async () => {
 
     expect(abrir).toHaveBeenCalledWith('2026-10-24');
 });
+
+test('preserva o dia selecionado quando a Home renderiza novamente', async () => {
+    const service = {
+        buscar: jest.fn().mockResolvedValue({
+            status: 'DISPONIVEL',
+            dataReferencia: '2026-10-30'
+        })
+    };
+    const resultado = await render(
+        <CycleTodayContainer service={service} onSessaoExpirada={jest.fn()} />
+    );
+    await waitFor(() => expect(mockProps.carregando).toBe(false));
+    await act(() => mockProps.aoSelecionarData('2026-10-20'));
+
+    await resultado.rerender(
+        <CycleTodayContainer service={service} onSessaoExpirada={jest.fn()} />
+    );
+
+    expect(mockProps.dataSelecionada).toBe('2026-10-20');
+    expect(service.buscar).toHaveBeenCalledTimes(1);
+});
