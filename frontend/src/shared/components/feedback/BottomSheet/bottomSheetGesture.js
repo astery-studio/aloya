@@ -1,6 +1,6 @@
-const DISTANCIA_MINIMA_ARRASTE = 8;
-const DISTANCIA_FECHAMENTO = 80;
-const VELOCIDADE_FECHAMENTO = 0.8;
+const DISTANCIA_MINIMA_ARRASTE = 5;
+const DISTANCIA_FECHAMENTO = 64;
+const VELOCIDADE_FECHAMENTO = 0.5;
 
 function deveIniciarArraste({ dx = 0, dy = 0 } = {}, bloqueado = false) {
     return !bloqueado && dy > DISTANCIA_MINIMA_ARRASTE && Math.abs(dy) > Math.abs(dx);
