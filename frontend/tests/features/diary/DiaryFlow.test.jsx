@@ -3,10 +3,16 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 jest.mock('../../../src/features/diary/screens/DiaryScreen', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        DiaryScreen: ({ aoCriar, aoAbrirRegistro, aoExcluirRegistro }) => (
+        DiaryScreen: ({ aoCriar, aoAbrirRegistro, aoEditarRegistro, aoExcluirRegistro }) => (
             <>
                 <Pressable accessibilityRole="button" onPress={aoCriar}>
                     <Text>Abrir Diário</Text>
+                </Pressable>
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => aoEditarRegistro({ id: 8, data: '2026-11-08', versao: 3 })}
+                >
+                    <Text>Editar pelo fluxo</Text>
                 </Pressable>
                 <Pressable
                     accessibilityRole="button"
@@ -24,10 +30,10 @@ jest.mock('../../../src/features/diary/screens/DiaryScreen', () => {
         )
     };
 });
-jest.mock('../../../src/features/diary/components/NewDiaryEntryModal/NewDiaryEntryModal', () => {
+jest.mock('../../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        NewDiaryEntryModal: ({ visivel, onFechar, onCriado }) =>
+        NewDiaryEntrySheet: ({ visivel, onFechar, onCriado }) =>
             visivel ? (
                 <>
                     <Pressable accessibilityRole="button" onPress={onFechar}>
@@ -40,6 +46,23 @@ jest.mock('../../../src/features/diary/components/NewDiaryEntryModal/NewDiaryEnt
                         <Text>Salvar modal</Text>
                     </Pressable>
                 </>
+            ) : null
+    };
+});
+jest.mock('../../../src/features/diary/components/EditDiaryEntrySheet/EditDiaryEntrySheet', () => {
+    const { Pressable, Text } = require('react-native');
+    return {
+        EditDiaryEntrySheet: ({ visivel, registro, onFechar, onSalvo }) =>
+            visivel ? (
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={async () => {
+                        await onSalvo({ ...registro, versao: 4 });
+                        onFechar();
+                    }}
+                >
+                    <Text>Salvar edição</Text>
+                </Pressable>
             ) : null
     };
 });
@@ -145,6 +168,29 @@ test('abre, fecha e recebe o registro criado', async () => {
     await fireEvent.press(screen.getByText('Salvar modal'));
     expect(onRegistroCriado).toHaveBeenCalledWith({ id: 1, data: '2026-11-09' });
     expect(screen.getByText('Abrir Diário')).toBeOnTheScreen();
+});
+
+test('abre a edição pré-preenchida e recarrega a timeline ao salvar', async () => {
+    const detalhe = {
+        id: 8,
+        data: '2026-11-08',
+        fase: 'folicular',
+        versao: 3,
+        categorias: [{ id: 'pele', macrocategoria: 'Corpo', nome: 'Pele', opcoes: [] }]
+    };
+    const service = {
+        listarHistorico: jest.fn().mockResolvedValue({ itens: [], proximoCursor: null }),
+        buscarDetalhe: jest.fn().mockResolvedValue(detalhe)
+    };
+    await render(<DiaryFlow service={service} />);
+
+    await fireEvent.press(screen.getByText('Editar pelo fluxo'));
+    await waitFor(() => expect(service.buscarDetalhe).toHaveBeenCalledWith(8, expect.any(Object)));
+    await waitFor(() => expect(screen.getByText('Salvar edição')).toBeOnTheScreen());
+    await fireEvent.press(screen.getByText('Salvar edição'));
+
+    await waitFor(() => expect(service.listarHistorico).toHaveBeenCalledTimes(2));
+    expect(screen.queryByText('Salvar edição')).not.toBeOnTheScreen();
 });
 
 test('encaminha exclusão confirmada e remove o item localmente', async () => {
