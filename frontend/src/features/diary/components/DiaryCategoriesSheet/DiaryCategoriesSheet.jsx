@@ -227,7 +227,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
                     ) : null}
                 </View>
 
-                <View style={estilos.rodape}>
+                <View testID="rodape-categorias-diario" style={estilos.rodape}>
                     <ButtonScreen
                         texto="Salvar"
                         aoPressionar={fechar}
