@@ -112,3 +112,49 @@ test('pré-preenche a edição e só salva depois de uma alteração real', asyn
     await act(() => result.current.alterarValor('sintomas', ['colica']));
     expect(result.current.alterado).toBe(false);
 });
+
+test('mantém uma categoria desativada ao salvar alterações no registro antigo', async () => {
+    const catalogoComInativa = {
+        macrocategorias: [
+            ...catalogo.macrocategorias,
+            {
+                id: 'emocional',
+                ativa: false,
+                categorias: [{ id: 'anotacao_livre', tipoValor: 'texto', ativaEfetiva: false }]
+            }
+        ]
+    };
+    const registroInicial = {
+        id: 9,
+        data: '2026-11-08',
+        versao: 1,
+        categorias: [
+            { id: 'sintomas', opcoes: [{ id: 'colica' }] },
+            { id: 'anotacao_livre', texto: 'Dado histórico preservado.' }
+        ]
+    };
+    const service = {
+        editarRegistro: jest.fn().mockResolvedValue({ ...registroInicial, versao: 2 })
+    };
+    const { result } = await renderHook(() =>
+        useDiaryEntryForm({
+            ativo: true,
+            modo: 'editar',
+            registroInicial,
+            catalogo: catalogoComInativa,
+            service
+        })
+    );
+
+    await act(() => result.current.alterarValor('sintomas', ['fadiga']));
+    await act(async () => expect(await result.current.salvar()).toBe(true));
+
+    expect(service.editarRegistro).toHaveBeenCalledWith(9, 1, {
+        data: '2026-11-08',
+        fusoHorario: expect.any(String),
+        categorias: [
+            { categoriaId: 'sintomas', opcoes: ['fadiga'] },
+            { categoriaId: 'anotacao_livre', texto: 'Dado histórico preservado.' }
+        ]
+    });
+});
