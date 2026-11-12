@@ -2,7 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { obterHojeDiario } from '../utils/diaryDate';
 import { prepararFormularioDiario } from '../utils/diaryForm';
-import { criarAssinaturaFormulario, criarValoresIniciaisEdicao } from '../utils/diaryEditForm';
+import {
+    criarAssinaturaFormulario,
+    criarCategoriasInativasPreservadas,
+    criarValoresIniciaisEdicao
+} from '../utils/diaryEditForm';
 
 const MENSAGEM_SALVAMENTO =
     'Ocorreu um erro ao salvar registro. Verifique sua conexão e tente novamente.';
@@ -97,6 +101,13 @@ function useDiaryEntryForm({
             data,
             hoje: obterHojeDiario()
         });
+        if (editando) {
+            formulario.dados.categorias.push(
+                ...criarCategoriasInativasPreservadas(catalogo, registroInicial)
+            );
+            if (formulario.dados.categorias.length > 0) delete formulario.erros.conteudo;
+            formulario.valido = Object.keys(formulario.erros).length === 0;
+        }
         setErros(formulario.erros);
         if (!formulario.valido) return false;
 
