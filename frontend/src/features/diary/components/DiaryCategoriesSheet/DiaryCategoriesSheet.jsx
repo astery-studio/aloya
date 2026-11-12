@@ -119,36 +119,48 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
     });
     const [expandidas, setExpandidas] = useState({});
     const posicaoRolagem = useRef(0);
+    const houveAlteracao = useRef(false);
     const macros = preferencias.catalogo?.macrocategorias ?? [];
     const totalAtivas = macros.filter((macro) => macro.ativa).length;
     const bloqueado = Boolean(preferencias.salvando);
 
     useEffect(() => {
-        if (visivel) setExpandidas({});
+        if (visivel) {
+            setExpandidas({});
+            houveAlteracao.current = false;
+        }
     }, [visivel]);
+
+    const fechar = useCallback(() => {
+        if (houveAlteracao.current) {
+            houveAlteracao.current = false;
+            onAlterado?.();
+        }
+        onFechar?.();
+    }, [onAlterado, onFechar]);
 
     function alternarExpansao(id) {
         setExpandidas((estado) => ({ ...estado, [id]: !estado[id] }));
     }
 
     async function alterarMacrocategoria(id, ativa) {
-        if (await preferencias.alterarMacrocategoria(id, ativa)) onAlterado?.();
+        if (await preferencias.alterarMacrocategoria(id, ativa)) houveAlteracao.current = true;
     }
 
     async function alterarCategoria(id, ativa) {
-        if (await preferencias.alterarCategoria(id, ativa)) onAlterado?.();
+        if (await preferencias.alterarCategoria(id, ativa)) houveAlteracao.current = true;
     }
 
     const atualizarPosicaoRolagem = useCallback((evento) => {
         posicaoRolagem.current = Math.max(0, evento.nativeEvent.contentOffset.y);
     }, []);
     const podeIniciarDeslize = useCallback(() => posicaoRolagem.current <= 8, []);
-    const fecharErro = preferencias.erroCarregamento ? onFechar : preferencias.fecharErro;
+    const fecharErro = preferencias.erroCarregamento ? fechar : preferencias.fecharErro;
 
     return (
         <BottomSheet
             visivel={visivel}
-            onFechar={onFechar}
+            onFechar={fechar}
             bloquearFechamento={bloqueado}
             permitirDeslizarParaFechar
             podeIniciarDeslize={podeIniciarDeslize}
@@ -156,7 +168,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
         >
             <BottomSheetLayout
                 titulo="Gerências Categorias"
-                onFechar={onFechar}
+                onFechar={fechar}
                 bloquearFechamento={bloqueado}
                 compacto
             >
@@ -218,7 +230,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
                 <View style={estilos.rodape}>
                     <ButtonScreen
                         texto="Salvar"
-                        aoPressionar={onFechar}
+                        aoPressionar={fechar}
                         desativado={bloqueado || !preferencias.catalogo}
                         carregando={bloqueado}
                         estilo={estilos.botaoSalvar}
