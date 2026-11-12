@@ -1,7 +1,13 @@
 import { adicionarDias, paraDataCalendario } from '../../cycles/utils/calendar.js';
 
-function criarWhereHistorico(usuarioId, filtros, cursor) {
+function criarWhereHistorico(usuarioId, filtros, cursor, categoriasAtivas = null) {
     const where = { usuarioId, AND: [] };
+
+    if (categoriasAtivas) {
+        where.AND.push({
+            categorias: { some: { categoriaId: { in: [...categoriasAtivas] } } }
+        });
+    }
 
     if (filtros.dataInicio || filtros.dataFim) {
         const dataRegistro = {};
