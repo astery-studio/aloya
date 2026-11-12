@@ -46,13 +46,13 @@ function criarDiaryPreferencesService({ prisma, bootstrap } = {}) {
                         update: { ativa }
                     });
                     if (ativa) {
-                        for (const categoriaId of CATEGORIAS_POR_MACRO.get(id) ?? []) {
-                            await tx.preferenciaCategoriaDiario.upsert({
-                                where: { usuarioId_categoriaId: { usuarioId, categoriaId } },
-                                create: { usuarioId, categoriaId, ativa: true },
-                                update: { ativa: true }
-                            });
-                        }
+                        await tx.preferenciaCategoriaDiario.updateMany({
+                            where: {
+                                usuarioId,
+                                categoriaId: { in: CATEGORIAS_POR_MACRO.get(id) ?? [] }
+                            },
+                            data: { ativa: true }
+                        });
                     }
                 } else {
                     await tx.preferenciaCategoriaDiario.upsert({
