@@ -49,7 +49,6 @@ function DiaryFiltersSheet({
     const [expandidas, setExpandidas] = useState({});
     const [erroPeriodo, setErroPeriodo] = useState(null);
     const posicaoRolagem = useRef(0);
-    const expansaoInicialAplicada = useRef(false);
 
     useEffect(() => {
         if (!visivel) return;
@@ -57,7 +56,6 @@ function DiaryFiltersSheet({
         setExpandidas({});
         setErroPeriodo(null);
         posicaoRolagem.current = 0;
-        expansaoInicialAplicada.current = false;
         // A chave evita apagar a edição quando o pai recria um objeto equivalente.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chaveFiltros, visivel]);
@@ -70,12 +68,6 @@ function DiaryFiltersSheet({
             ),
         [catalogo.catalogo]
     );
-
-    useEffect(() => {
-        if (!visivel || expansaoInicialAplicada.current || macrosAtivas.length === 0) return;
-        expansaoInicialAplicada.current = true;
-        setExpandidas({ [macrosAtivas[0].id]: true });
-    }, [macrosAtivas, visivel]);
 
     const atualizarPosicaoRolagem = useCallback((evento) => {
         posicaoRolagem.current = Math.max(0, evento.nativeEvent.contentOffset.y);
