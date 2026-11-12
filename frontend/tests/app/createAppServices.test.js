@@ -225,7 +225,11 @@ describe('createAppServices', () => {
             cycleParametersService,
             diaryService: {
                 buscarCatalogo: expect.any(Function),
-                criarRegistro: expect.any(Function)
+                criarRegistro: expect.any(Function),
+                buscarResumo: expect.any(Function),
+                listarHistorico: expect.any(Function),
+                buscarDetalhe: expect.any(Function),
+                excluirRegistro: expect.any(Function)
             },
             cycleRegistrationService: { registrar: expect.any(Function) },
             menstruationSyncQueue: {
