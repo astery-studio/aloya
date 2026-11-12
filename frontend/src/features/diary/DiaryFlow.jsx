@@ -10,6 +10,7 @@ import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal/Simp
 import { useTheme } from '../../shared/hooks/useTheme';
 import { obterHojeLocal } from '../calendar/utils/cycleCalendar.utils';
 import { EditDiaryEntrySheet } from './components/EditDiaryEntrySheet/EditDiaryEntrySheet';
+import { DiaryFiltersSheet } from './components/DiaryFiltersSheet/DiaryFiltersSheet';
 import { NewDiaryEntrySheet } from './components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { DiaryRecordDetails } from './components/DiaryRecordDetails/DiaryRecordDetails';
 import { criarDescricaoResumo } from './config/diaryOverviewText';
@@ -20,6 +21,7 @@ import { useDiaryPhase } from './hooks/useDiaryPhase';
 import { useDiaryRecordDetails } from './hooks/useDiaryRecordDetails';
 import { DiaryScreen } from './screens/DiaryScreen';
 import { obterApresentacaoFase } from './utils/diaryPhasePresentation';
+import { FILTROS_DIARIO_VAZIOS, normalizarFiltrosDiario } from './utils/diaryFilters';
 import { obterRegistrosAdjacentes } from './utils/diaryRecordNavigation';
 
 // Usa o tamanho atual do protótipo como teto e respeita telas menores.
@@ -67,14 +69,16 @@ function DiaryFlow({
     onSelecionarAba,
     onSessaoExpirada,
     onRegistroCriado,
-    aoAbrirFiltros,
     aoGerenciarCategorias
 }) {
     const tema = useTheme();
     const { height: alturaTela } = useWindowDimensions();
     const alturaMaximaDetalhes = calcularAlturaMaximaDetalhes(alturaTela);
     const [criacaoVisivel, setCriacaoVisivel] = useState(false);
-    const historico = useDiaryHistory({ service, onSessaoExpirada });
+    const [filtrosVisiveis, setFiltrosVisiveis] = useState(false);
+    const [filtros, setFiltros] = useState(FILTROS_DIARIO_VAZIOS);
+    const [rotulosCategoriasFiltro, setRotulosCategoriasFiltro] = useState({});
+    const historico = useDiaryHistory({ service, filtros, onSessaoExpirada });
     const hoje = useMemo(() => obterHojeLocal(), []);
     const faseAtual = useDiaryPhase({
         ativo: !historico.carregando && historico.registros.length > 0,
@@ -148,6 +152,43 @@ function DiaryFlow({
         exclusao.solicitar(registro);
     }
 
+    function aplicarFiltros(proximosFiltros, catalogo) {
+        const rotulos = {};
+        for (const macro of catalogo?.macrocategorias ?? []) {
+            for (const categoria of macro.categorias ?? []) rotulos[categoria.id] = categoria.nome;
+        }
+        setRotulosCategoriasFiltro(rotulos);
+        setFiltros(normalizarFiltrosDiario(proximosFiltros));
+        setFiltrosVisiveis(false);
+    }
+
+    function limparFiltros() {
+        setFiltros(FILTROS_DIARIO_VAZIOS);
+        setRotulosCategoriasFiltro({});
+    }
+
+    function removerFiltro(id) {
+        setFiltros((atuais) => {
+            if (id === 'dataInicio' || id === 'dataFim') {
+                return normalizarFiltrosDiario({ ...atuais, [id]: null });
+            }
+            const [tipo, valor] = id.split(':');
+            if (tipo === 'fase') {
+                return normalizarFiltrosDiario({
+                    ...atuais,
+                    fases: atuais.fases.filter((fase) => fase !== valor)
+                });
+            }
+            if (tipo === 'categoria') {
+                return normalizarFiltrosDiario({
+                    ...atuais,
+                    categorias: atuais.categorias.filter((categoria) => categoria !== valor)
+                });
+            }
+            return atuais;
+        });
+    }
+
     async function abrirRegistroAnterior() {
         let alvo = registrosAdjacentes.anterior;
         if (!alvo && historico.temMais) {
@@ -185,7 +226,11 @@ function DiaryFlow({
                 aoEditarRegistro={iniciarEdicao}
                 aoExcluirRegistro={solicitarExclusao}
                 registroEmExclusaoId={exclusao.registro?.id}
-                aoAbrirFiltros={aoAbrirFiltros}
+                filtros={filtros}
+                rotulosCategoriasFiltro={rotulosCategoriasFiltro}
+                aoAbrirFiltros={() => setFiltrosVisiveis(true)}
+                aoRemoverFiltro={removerFiltro}
+                aoLimparFiltros={limparFiltros}
                 aoGerenciarCategorias={aoGerenciarCategorias}
                 onSelecionarAba={onSelecionarAba}
             />
@@ -196,6 +241,16 @@ function DiaryFlow({
                 calendarService={calendarService}
                 onFechar={() => setCriacaoVisivel(false)}
                 onCriado={registrarCriacao}
+                onSessaoExpirada={onSessaoExpirada}
+            />
+
+            <DiaryFiltersSheet
+                visivel={filtrosVisiveis}
+                filtros={filtros}
+                service={service}
+                aplicando={historico.atualizando}
+                onAplicar={aplicarFiltros}
+                onFechar={() => setFiltrosVisiveis(false)}
                 onSessaoExpirada={onSessaoExpirada}
             />
 
@@ -245,6 +300,26 @@ function DiaryFlow({
                     />
                 ) : null}
             </AppModal>
+
+            <AlertModal
+                erroInterno
+                visivel={Boolean(historico.erroFiltro)}
+                aoFechar={historico.fecharErroFiltro}
+                icone={WarningCircleIcon}
+                titulo="Algo deu errado"
+                mensagem={historico.erroFiltro || ''}
+                acaoPrincipal={{
+                    texto: 'Tentar novamente',
+                    variante: 'preto',
+                    aoPressionar: historico.tentarAplicarFiltros,
+                    carregando: historico.atualizando || historico.carregando
+                }}
+                acaoSecundaria={{
+                    texto: 'Voltar',
+                    variante: 'branco',
+                    aoPressionar: historico.fecharErroFiltro
+                }}
+            />
 
             <AlertModal
                 variante="confirmacao"
