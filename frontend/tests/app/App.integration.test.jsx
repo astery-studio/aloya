@@ -96,12 +96,13 @@ jest.mock('../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntryS
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
-        NewDiaryEntrySheet: jest.fn(({ visivel, onFechar }) =>
+        NewDiaryEntrySheet: jest.fn(({ visivel, dataInicial, onFechar }) =>
             visivel
                 ? React.createElement(
                       View,
                       null,
                       React.createElement(Text, null, 'Cadastro do Diário aberto'),
+                      React.createElement(Text, null, `Data do Diário: ${dataInicial}`),
                       React.createElement(
                           Pressable,
                           {
@@ -177,7 +178,7 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                     React.createElement(Pressable, {
                         accessibilityRole: 'button',
                         accessibilityLabel: 'Cadastrar no Diário',
-                        onPress: aoCadastrarDiario
+                        onPress: () => aoCadastrarDiario('2026-11-05')
                     })
                 )
         )
@@ -693,6 +694,7 @@ describe('App integrado', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
 
         expect(await screen.findByText('Cadastro do Diário aberto')).toBeOnTheScreen();
+        expect(screen.getByText('Data do Diário: 2026-11-05')).toBeOnTheScreen();
         expect(screen.getByText('Ciclo hoje')).toBeOnTheScreen();
 
         await fireEvent.press(screen.getByRole('button', { name: 'Fechar cadastro do Diário' }));
