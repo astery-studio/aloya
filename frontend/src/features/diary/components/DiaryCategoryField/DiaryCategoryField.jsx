@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Keyboard, Pressable, Text, View } from 'react-native';
-import { XCircleIcon } from 'phosphor-react-native';
+import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import DurationInput from '../../../../shared/components/forms/DurationInput/DurationInput';
