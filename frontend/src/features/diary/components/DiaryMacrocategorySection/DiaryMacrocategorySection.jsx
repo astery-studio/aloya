@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { CaretDown, CaretUp } from 'phosphor-react-native';
+import { CaretDown } from 'phosphor-react-native/src/icons/CaretDown';
+import { CaretUp } from 'phosphor-react-native/src/icons/CaretUp';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { criarEstilos } from './DiaryMacrocategorySection.styles';
