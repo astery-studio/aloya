@@ -14,6 +14,8 @@ test('detalhe pesquisa registro pelo id e pela identidade da sessão', async () 
                     return null;
                 }
             },
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: { findMany: async () => [] },
             registroCiclo: { findFirst: async () => null, count: async () => 0 }
         }
     });
@@ -22,7 +24,53 @@ test('detalhe pesquisa registro pelo id e pela identidade da sessão', async () 
         status: 404,
         codigo: 'REGISTRO_DIARIO_NAO_ENCONTRADO'
     });
-    assert.deepEqual(consulta, { id: 11, usuarioId: 7 });
+    assert.equal(consulta.id, 11);
+    assert.equal(consulta.usuarioId, 7);
+    assert.ok(consulta.categorias.some.categoriaId.in.includes('sintomas_emocionais'));
+});
+
+test('detalhe omite categorias desativadas sem apagar o registro persistido', async () => {
+    const base = {
+        id: 11,
+        dataRegistro: new Date('2026-11-08T00:00:00Z'),
+        faseCicloAssociada: 'folicular',
+        versao: 0,
+        criadoEm: new Date('2026-11-08T12:00:00Z'),
+        atualizadoEm: new Date('2026-11-08T12:00:00Z')
+    };
+    const categoria = (categoriaId, categoriaNome) => ({
+        categoriaId,
+        macrocategoriaNome: 'Macro',
+        categoriaNome,
+        valorEscalado: null,
+        casasDecimais: null,
+        valorDuracaoMinutos: null,
+        valorTexto: null,
+        opcoes: [],
+        medicaoTemperatura: null
+    });
+    const service = criarDiaryDetailService({
+        prisma: {
+            registroDiario: {
+                findFirst: async () => ({
+                    ...base,
+                    categorias: [
+                        categoria('sintomas_emocionais', 'Sintomas emocionais'),
+                        categoria('anotacao_livre', 'Anotação livre')
+                    ]
+                })
+            },
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: {
+                findMany: async () => [{ categoriaId: 'sintomas_emocionais', ativa: false }]
+            },
+            registroCiclo: { findFirst: async () => null, count: async () => 0 }
+        }
+    });
+
+    const detalhe = await service.buscar(7, 11);
+
+    assert.deepEqual(detalhe.categorias.map(({ id }) => id), ['anotacao_livre']);
 });
 
 test('exclusão usa proprietário e versão na leitura e na remoção', async () => {
