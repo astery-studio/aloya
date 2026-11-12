@@ -109,7 +109,7 @@ function MacrocategoryPreference({
     );
 }
 
-function DiaryCategoriesSheet({ visivel, service, onFechar, onSessaoExpirada }) {
+function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessaoExpirada }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const preferencias = useDiaryCategoryPreferences({
@@ -129,6 +129,14 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onSessaoExpirada }) 
 
     function alternarExpansao(id) {
         setExpandidas((estado) => ({ ...estado, [id]: !estado[id] }));
+    }
+
+    async function alterarMacrocategoria(id, ativa) {
+        if (await preferencias.alterarMacrocategoria(id, ativa)) onAlterado?.();
+    }
+
+    async function alterarCategoria(id, ativa) {
+        if (await preferencias.alterarCategoria(id, ativa)) onAlterado?.();
     }
 
     const atualizarPosicaoRolagem = useCallback((evento) => {
@@ -197,8 +205,8 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onSessaoExpirada }) 
                                             estilos={estilos}
                                             tema={tema}
                                             aoExpandir={() => alternarExpansao(macro.id)}
-                                            aoMacro={preferencias.alterarMacrocategoria}
-                                            aoCategoria={preferencias.alterarCategoria}
+                                            aoMacro={alterarMacrocategoria}
+                                            aoCategoria={alterarCategoria}
                                         />
                                     ))}
                                 </View>
