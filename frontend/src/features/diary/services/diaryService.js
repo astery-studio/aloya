@@ -1,5 +1,6 @@
 import { endpoints } from '../../../shared/services/api/endpoints';
 import { decomporData } from '../utils/diaryDate';
+import { normalizarFiltrosDiario } from '../utils/diaryFilters';
 
 const MENSAGEM_CARREGAMENTO = 'Não foi possível carregar o Diário. Tente novamente.';
 const MENSAGEM_SALVAMENTO = 'Não foi possível salvar o registro. Tente novamente.';
@@ -327,13 +328,29 @@ function criarDiaryService({ requisicaoAutenticada } = {}) {
         return validarRegistro(resposta);
     }
 
-    async function listarHistorico({ limite = LIMITE_PADRAO, cursor = null, signal } = {}) {
+    async function listarHistorico({
+        limite = LIMITE_PADRAO,
+        cursor = null,
+        filtros,
+        signal
+    } = {}) {
         if (!Number.isSafeInteger(limite) || limite < 1 || limite > 50) {
             throw new TypeError('O limite do histórico deve estar entre 1 e 50.');
         }
         validarCursor(cursor);
         const consulta = new URLSearchParams({ limite: String(limite) });
         if (cursor) consulta.set('cursor', cursor);
+        const filtrosNormalizados = normalizarFiltrosDiario(filtros);
+        if (filtrosNormalizados.dataInicio) {
+            consulta.set('dataInicio', filtrosNormalizados.dataInicio);
+        }
+        if (filtrosNormalizados.dataFim) consulta.set('dataFim', filtrosNormalizados.dataFim);
+        if (filtrosNormalizados.categorias.length) {
+            consulta.set('categorias', filtrosNormalizados.categorias.join(','));
+        }
+        if (filtrosNormalizados.fases.length) {
+            consulta.set('fases', filtrosNormalizados.fases.join(','));
+        }
         const resposta = await requisicaoAutenticada({
             metodo: 'GET',
             caminho: `${endpoints.registrosDiario}?${consulta.toString()}`,
