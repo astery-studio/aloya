@@ -283,7 +283,7 @@ function ConteudoFase({ conteudo, fase }) {
     );
 }
 
-function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
+function EstadoSemCiclo({ aoCadastrarMenstruacao, aoCadastrarDiario, aoAbrirAnticoncepcional }) {
     const visual = useCycleForecastVisual();
     const { estilos } = visual;
     const recursosSemCiclo = criarRecursosSemCiclo(visual);
@@ -306,7 +306,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticonc
                             <BotaoAcao
                                 texto="Cadastrar no Diário"
                                 Icone={NotepadIcon}
-                                aoPressionar={aoAbrirDiario}
+                                aoPressionar={aoCadastrarDiario}
                             />
                             <BotaoAcao
                                 texto="Anticoncepcional"
@@ -342,7 +342,7 @@ function CycleForecastPanel({
     previsao,
     conteudoDaFase,
     aoCadastrarMenstruacao,
-    aoAbrirDiario,
+    aoCadastrarDiario,
     aoAbrirAnticoncepcional
 }) {
     const tema = useTheme();
@@ -355,7 +355,7 @@ function CycleForecastPanel({
             <CycleForecastVisualContext.Provider value={visual}>
                 <EstadoSemCiclo
                     aoCadastrarMenstruacao={aoCadastrarMenstruacao}
-                    aoAbrirDiario={aoAbrirDiario}
+                    aoCadastrarDiario={aoCadastrarDiario}
                     aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
                 />
             </CycleForecastVisualContext.Provider>
@@ -421,7 +421,7 @@ function CycleForecastPanel({
                     <BotaoAcao
                         texto="Cadastrar no Diário"
                         Icone={NotepadIcon}
-                        aoPressionar={aoAbrirDiario}
+                        aoPressionar={aoCadastrarDiario}
                     />
                     <BotaoAcao
                         texto="Anticoncepcional"
