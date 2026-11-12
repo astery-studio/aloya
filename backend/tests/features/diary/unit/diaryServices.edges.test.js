@@ -78,6 +78,8 @@ test('detalhe cobre configuração, ausência e apresentação', async () => {
     const service = criarDiaryDetailService({
         prisma: {
             registroDiario: { findFirst: async () => valor },
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: { findMany: async () => [] },
             registroCiclo: {
                 findFirst: async () => ({ dataInicio: data('2026-10-19') }),
                 count: async () => 3
@@ -93,7 +95,10 @@ function dependenciasEntrada() {
     const tx = {
         preferenciaMacrocategoriaDiario: { findMany: async () => [] },
         preferenciaCategoriaDiario: { findMany: async () => [] },
-        registroDiario: { create: async () => registro() }
+        registroDiario: {
+            findFirst: async () => null,
+            create: async () => registro()
+        }
     };
     return {
         prisma: { $transaction: async (callback) => callback(tx) },
