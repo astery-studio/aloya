@@ -39,7 +39,7 @@ function criarDiaryHistoryService({ prisma } = {}) {
         validarCategoriasDoFiltro(filtros, categoriasAtivas);
         const cursorValidado = await validarCursor(usuarioId, cursor, filtros);
         const registros = await prisma.registroDiario.findMany({
-            where: criarWhereHistorico(usuarioId, filtros, cursorValidado),
+            where: criarWhereHistorico(usuarioId, filtros, cursorValidado, categoriasAtivas),
             orderBy: [{ dataRegistro: 'desc' }, { id: 'desc' }],
             take: limite + 1,
             select: SELECAO_RESUMO
