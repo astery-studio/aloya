@@ -7,7 +7,8 @@ function criarDiaryRoutes({
     overviewController,
     mutationController,
     validarPreferencia,
-    rateLimit
+    rateLimit,
+    preferencesRateLimit = rateLimit
 } = {}) {
     if (typeof Router !== 'function' || typeof autenticar !== 'function') {
         throw new TypeError('Não foi possível configurar as rotas do Diário.');
@@ -29,15 +30,19 @@ function criarDiaryRoutes({
     router.get('/registros', historyController.listar);
     router.get('/registros/:id', historyController.buscar);
     router.post('/registros', rateLimit, entryController.criar);
-    router.patch('/preferencias', rateLimit, catalogController.atualizarLote);
+    router.patch('/preferencias', preferencesRateLimit, catalogController.atualizarLote);
     router.put('/registros/:id', rateLimit, mutationController.editar);
     router.delete('/registros/:id', rateLimit, mutationController.excluir);
     router.patch(
         '/preferencias/macrocategorias/:id',
-        rateLimit,
+        preferencesRateLimit,
         catalogController.atualizarMacrocategoria
     );
-    router.patch('/preferencias/categorias/:id', rateLimit, catalogController.atualizarCategoria);
+    router.patch(
+        '/preferencias/categorias/:id',
+        preferencesRateLimit,
+        catalogController.atualizarCategoria
+    );
 
     return router;
 }
