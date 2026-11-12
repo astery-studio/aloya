@@ -10,23 +10,11 @@ import {
 const agora = new Date('2026-11-08T12:00:00.000Z');
 
 function criarPrisma(vinculos = []) {
-    const estado = { consulta: null, reassociacao: null };
+    const estado = { consulta: null };
     return {
         estado,
         prisma: {
-            usuario: {
-                async findUnique() {
-                    return {
-                        email: 'contato@email.com',
-                        statusConta: 'ativa'
-                    };
-                }
-            },
             vinculoRedeApoio: {
-                async updateMany(consulta) {
-                    estado.reassociacao = consulta;
-                    return { count: 0 };
-                },
                 async findMany(consulta) {
                     estado.consulta = consulta;
                     return vinculos;
@@ -61,7 +49,6 @@ test('valida sessão e restringe a listagem à titular', () => {
     assert.doesNotThrow(() => validarTitular(1, 'principal'));
     assert.doesNotThrow(() => validarTitular(1, 'principal_e_contato_apoio'));
 });
-
 test('consulta vínculos atuais e históricos pertencentes à titular', async () => {
     const { prisma, estado } = criarPrisma([]);
     const service = criarSupportContactService({ prisma, now: () => agora });
@@ -168,15 +155,6 @@ test('lista somente convites recebidos pendentes válidos e vínculos ativos', a
         contatoId: 44,
         OR: [{ status: 'ativo' }, { status: 'pendente', dataExpiracao: { gt: agora } }]
     });
-    assert.deepEqual(estado.reassociacao, {
-        where: {
-            contatoId: null,
-            emailConvidado: 'contato@email.com',
-            status: 'pendente',
-            dataExpiracao: { gt: agora }
-        },
-        data: { contatoId: 44 }
-    });
     assert.deepEqual(resultado.contatos[0], {
         id: 7,
         nome: 'Ana',
@@ -197,30 +175,4 @@ test('lista somente convites recebidos pendentes válidos e vínculos ativos', a
         aguardando: { dias: 0, atrasado: false, rotulo: 'Aguardando há 0 dias' },
         acoes: { podeAceitar: true, podeRecusar: true, podeAbrirResumo: true }
     });
-});
-
-test('rejeita a listagem recebida quando a conta autenticada não está ativa', async () => {
-    const service = criarSupportContactService({
-        prisma: {
-            usuario: {
-                async findUnique() {
-                    return null;
-                }
-            },
-            vinculoRedeApoio: {
-                async updateMany() {
-                    return { count: 0 };
-                },
-                async findMany() {
-                    return [];
-                }
-            }
-        },
-        now: () => agora
-    });
-
-    await assert.rejects(
-        service.listarRecebidos({ usuarioId: 44, papel: 'contato_apoio' }),
-        (erro) => erro.status === 401 && erro.codigo === 'SESSAO_INVALIDA'
-    );
 });

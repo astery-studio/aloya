@@ -21,10 +21,16 @@ function criarSupportContactRoutes({
     }
 
     const router = Router();
-    router.get('/received-contacts', authMiddleware.autenticar, controller.listarRecebidos);
+    router.get(
+        '/received-contacts',
+        authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
+        controller.listarRecebidos
+    );
     router.post(
         '/received-contacts/:conviteId/respond',
         authMiddleware.autenticar,
+        parentalConsentMiddleware.exigirAcessoRedeApoio,
         responseRateLimit,
         controller.responderRecebido
     );

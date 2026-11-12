@@ -268,7 +268,7 @@ test('contato autenticado lista e aceita convite recebido sem token do e-mail', 
     }
 });
 
-test('reassocia convite pendente legado pelo e-mail da conta autenticada', async () => {
+test('não altera convite legado durante a consulta de contatos recebidos', async () => {
     const { diretorio, caminho } = criarBanco();
     const prisma = new PrismaClient({
         adapter: new PrismaBetterSqlite3({ url: `file:${caminho.replaceAll('\\', '/')}` })
@@ -284,9 +284,9 @@ test('reassocia convite pendente legado pelo e-mail da conta autenticada', async
         const vinculo = await prisma.vinculoRedeApoio.findUnique({ where: { id: 25 } });
 
         assert.equal(resposta.status, 200);
-        assert.deepEqual(corpo.resumo, { total: 1, pendentes: 1, ativos: 0 });
-        assert.equal(corpo.contatos[0].id, 25);
-        assert.equal(vinculo.contatoId, 5);
+        assert.deepEqual(corpo.resumo, { total: 0, pendentes: 0, ativos: 0 });
+        assert.deepEqual(corpo.contatos, []);
+        assert.equal(vinculo.contatoId, null);
     } finally {
         servidor.close();
         await once(servidor, 'close');

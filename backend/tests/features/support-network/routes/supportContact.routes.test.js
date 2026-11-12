@@ -41,11 +41,12 @@ test('protege a listagem antes de executar o controller', () => {
 
     assert.equal(resultado, router);
     assert.deepEqual(chamadas, [
-        ['get', '/received-contacts', autenticar, listarRecebidos],
+        ['get', '/received-contacts', autenticar, exigirAcessoRedeApoio, listarRecebidos],
         [
             'post',
             '/received-contacts/:conviteId/respond',
             autenticar,
+            exigirAcessoRedeApoio,
             responseRateLimit,
             responderRecebido
         ],
