@@ -2,23 +2,30 @@ import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
 
-const estilos = StyleSheet.create({
-    chip: {
-        alignSelf: 'center',
-        width: 294,
-        height: 36,
-        marginTop: 8,
-        borderRadius: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6
-    },
-    texto: {
-        fontFamily: fontFamilies.semiBold,
-        fontSize: 13,
-        lineHeight: 18
-    }
-});
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        chip: {
+            alignSelf: 'stretch',
+            minHeight: 36,
+            marginTop: 8,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6
+        },
+        carregando: { backgroundColor: tema.cores.interface.separador },
+        texto: {
+            flexShrink: 1,
+            fontFamily: fontFamilies.semiBold,
+            fontSize: 13,
+            lineHeight: 18,
+            textAlign: 'center'
+        },
+        textoCarregando: { color: tema.cores.interface.textoSecundario }
+    });
+}
 
-export { estilos };
+export { criarEstilos };
