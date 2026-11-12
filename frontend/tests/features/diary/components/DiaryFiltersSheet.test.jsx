@@ -44,34 +44,47 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
     );
     expect(onAplicar).not.toHaveBeenCalled();
     expect(fecharTeclado).toHaveBeenCalledTimes(1);
+    fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '11/11/1111');
+    await waitFor(() =>
+        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '11/11/1111')
+    );
+    fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
+    await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Informe uma data inicial válida.')
+    );
+    expect(onAplicar).not.toHaveBeenCalled();
+    expect(fecharTeclado).toHaveBeenCalledTimes(2);
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '');
+    await waitFor(() =>
+        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '')
+    );
 
     expect(screen.queryByText('Emocional')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Fluxo menstrual')).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' })).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' }));
     await waitFor(() => expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen());
     expect(screen.getByRole('button', { name: 'Recolher Ciclo e Sangramento' })).toBeOnTheScreen();
     expect(screen.queryByText('Secreção')).not.toBeOnTheScreen();
-    fireEvent.press(
-        screen.getByRole('switch', {
-            name: 'Marcar todas as categorias de Ciclo e Sangramento'
-        })
-    );
-    await waitFor(() =>
-        expect(screen.getByRole('switch', { name: 'Filtrar por Fluxo menstrual' })).toBeChecked()
-    );
-    fireEvent.press(
-        screen.getByRole('switch', {
-            name: 'Desmarcar todas as categorias de Ciclo e Sangramento'
-        })
-    );
 
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '01/11/2026');
+    await waitFor(() =>
+        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp(
+            'value',
+            '01/11/2026'
+        )
+    );
     fireEvent.changeText(screen.getByLabelText('Data final do filtro'), '12/11/2026');
+    await waitFor(() =>
+        expect(screen.getByLabelText('Data final do filtro')).toHaveProp('value', '12/11/2026')
+    );
     fireEvent.press(screen.getByRole('switch', { name: 'Filtrar por Fase Folicular' }));
+    await waitFor(() =>
+        expect(screen.getByRole('switch', { name: 'Filtrar por Fase Folicular' })).toBeChecked()
+    );
     fireEvent.press(screen.getByRole('switch', { name: 'Filtrar por Fluxo menstrual' }));
     await waitFor(() => {
-        expect(screen.getByRole('switch', { name: 'Filtrar por Fase Folicular' })).toBeChecked();
         expect(screen.getByRole('switch', { name: 'Filtrar por Fluxo menstrual' })).toBeChecked();
-        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '01/11/2026');
     });
     fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
 
@@ -84,6 +97,6 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
         },
         catalogo
     );
-    expect(fecharTeclado).toHaveBeenCalledTimes(2);
+    expect(fecharTeclado).toHaveBeenCalledTimes(3);
     fecharTeclado.mockRestore();
 });
