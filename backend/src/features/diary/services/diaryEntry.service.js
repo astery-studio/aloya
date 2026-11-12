@@ -1,6 +1,7 @@
 import { AppError } from '../../../shared/errors/AppError.js';
 import { paraDataCalendario } from '../../cycles/utils/calendar.js';
 import { apresentarDetalheRegistro } from '../presenters/diaryEntry.presenter.js';
+import { obterCategoriasAtivas } from './diaryActiveCategories.js';
 import { montarCategorias, validarCategoriasAtivas } from './diaryEntry.data.js';
 
 function dataHojeNoFuso(instante, fusoHorario) {
@@ -53,23 +54,57 @@ function criarDiaryEntryService({
                     tx.preferenciaCategoriaDiario.findMany({ where: { usuarioId } })
                 ]);
                 validarCategoriasAtivas(dados.categorias, preferenciasMacro, preferenciasCategoria);
-                const fase = await phaseService.resolver(usuarioId, dados.data, tx);
-
-                const criado = await tx.registroDiario.create({
-                    data: {
-                        usuarioId,
-                        dataRegistro: paraDataCalendario(dados.data),
-                        faseCicloAssociada: fase,
-                        categorias: { create: montarCategorias(dados.categorias) }
-                    },
+                const categoriasAtivas = obterCategoriasAtivas(
+                    preferenciasMacro,
+                    preferenciasCategoria
+                );
+                const dataRegistro = paraDataCalendario(dados.data);
+                const existente = await tx.registroDiario.findFirst({
+                    where: { usuarioId, dataRegistro },
                     include: {
                         categorias: { include: { opcoes: true, medicaoTemperatura: true } }
                     }
                 });
+                if (
+                    existente?.categorias.some(({ categoriaId }) =>
+                        categoriasAtivas.has(categoriaId)
+                    )
+                ) {
+                    throw new AppError(
+                        'Já existe um registro para esta data.',
+                        409,
+                        'REGISTRO_DIARIO_DUPLICADO'
+                    );
+                }
+                const fase = await phaseService.resolver(usuarioId, dados.data, tx);
+
+                const criado = existente
+                    ? await tx.registroDiario.update({
+                          where: { id: existente.id, usuarioId, versao: existente.versao },
+                          data: {
+                              faseCicloAssociada: fase,
+                              versao: { increment: 1 },
+                              categorias: { create: montarCategorias(dados.categorias) }
+                          },
+                          include: {
+                              categorias: { include: { opcoes: true, medicaoTemperatura: true } }
+                          }
+                      })
+                    : await tx.registroDiario.create({
+                          data: {
+                              usuarioId,
+                              dataRegistro,
+                              faseCicloAssociada: fase,
+                              categorias: { create: montarCategorias(dados.categorias) }
+                          },
+                          include: {
+                              categorias: { include: { opcoes: true, medicaoTemperatura: true } }
+                          }
+                      });
                 await thermalRecalculation.recalcularPorDatas(usuarioId, [dados.data], tx);
-                return criado;
+                return { registro: criado, categoriasAtivas };
             });
-            return apresentarDetalheRegistro(registro);
+            return apresentarDetalheRegistro(registro.registro, null, registro.categoriasAtivas);
         } catch (erro) {
             if (erro?.code === 'P2002') {
                 throw new AppError(
