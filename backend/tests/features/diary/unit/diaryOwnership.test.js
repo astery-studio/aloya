@@ -13,7 +13,8 @@ test('detalhe pesquisa registro pelo id e pela identidade da sessão', async () 
                     consulta = argumentos.where;
                     return null;
                 }
-            }
+            },
+            registroCiclo: { findFirst: async () => null, count: async () => 0 }
         }
     });
 
