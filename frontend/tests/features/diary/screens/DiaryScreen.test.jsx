@@ -126,4 +126,30 @@ describe('histórico do Diário', () => {
             screen.queryByRole('button', { name: 'Filtrar histórico do Diário' })
         ).not.toBeOnTheScreen();
     });
+
+    test('mantém filtros visíveis e informa quando a combinação não encontra registros', async () => {
+        const limpar = jest.fn();
+        const remover = jest.fn();
+        await render(
+            <DiaryScreen
+                registros={[]}
+                filtros={{ fases: ['menstrual'], categorias: [], dataInicio: null, dataFim: null }}
+                aoLimparFiltros={limpar}
+                aoRemoverFiltro={remover}
+                aoCriar={jest.fn()}
+            />
+        );
+
+        expect(
+            screen.getByText('Nenhum registro encontrado para os filtros aplicados.')
+        ).toBeOnTheScreen();
+        expect(screen.getByText('FILTRO APLICADO (0)')).toBeOnTheScreen();
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Remover filtro Fase Menstrual' })
+        );
+        await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
+        expect(remover).toHaveBeenCalledWith('fase:menstrual');
+        expect(limpar).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole('button', { name: 'Adicionar novo registro' })).toBeOnTheScreen();
+    });
 });
