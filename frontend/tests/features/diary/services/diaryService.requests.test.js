@@ -41,4 +41,19 @@ describe('requisições do serviço do Diário', () => {
             corpo: dados
         });
     });
+
+    test('edita o registro com PUT e a versão no If-Match', async () => {
+        const dados = { data: '2026-11-08', fusoHorario: 'America/Sao_Paulo', categorias: [] };
+        const registro = { id: 4, data: dados.data, categorias: [] };
+        const requisicaoAutenticada = jest.fn().mockResolvedValue(registro);
+        const service = criarDiaryService({ requisicaoAutenticada });
+
+        await expect(service.editarRegistro(4, 2, dados)).resolves.toBe(registro);
+        expect(requisicaoAutenticada).toHaveBeenCalledWith({
+            metodo: 'PUT',
+            caminho: '/api/diario/registros/4',
+            corpo: dados,
+            ifMatch: '"2"'
+        });
+    });
 });
