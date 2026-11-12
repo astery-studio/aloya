@@ -1,4 +1,4 @@
-// Integra histórico, resumo, detalhe, criação e exclusão na entrada da aba Diário.
+// Integra histórico, resumo, detalhe, criação, edição e exclusão na entrada da aba Diário.
 import { useMemo, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey';
@@ -9,7 +9,8 @@ import AppModal from '../../shared/components/feedback/Modal/AppModal';
 import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal/SimpleModal';
 import { useTheme } from '../../shared/hooks/useTheme';
 import { obterHojeLocal } from '../calendar/utils/cycleCalendar.utils';
-import { NewDiaryEntryModal } from './components/NewDiaryEntryModal/NewDiaryEntryModal';
+import { EditDiaryEntrySheet } from './components/EditDiaryEntrySheet/EditDiaryEntrySheet';
+import { NewDiaryEntrySheet } from './components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { DiaryRecordDetails } from './components/DiaryRecordDetails/DiaryRecordDetails';
 import { criarDescricaoResumo } from './config/diaryOverviewText';
 import { useDeleteDiaryEntry } from './hooks/useDeleteDiaryEntry';
@@ -110,6 +111,7 @@ function DiaryFlow({
         ]
     );
     const detalhes = useDiaryRecordDetails({ service, onSessaoExpirada });
+    const edicao = useDiaryRecordDetails({ service, onSessaoExpirada });
     const registrosAdjacentes = useMemo(
         () => obterRegistrosAdjacentes(historico.registros, detalhes.resumoSelecionado?.id),
         [detalhes.resumoSelecionado?.id, historico.registros]
@@ -126,6 +128,20 @@ function DiaryFlow({
     async function registrarCriacao(registro) {
         onRegistroCriado?.(registro);
         await historico.recarregar();
+    }
+
+    async function registrarEdicao() {
+        await historico.recarregar();
+    }
+
+    async function iniciarEdicao(registro) {
+        if (!registro) return;
+        detalhes.fechar();
+        if (Array.isArray(registro.categorias)) {
+            edicao.abrirDetalhe(registro);
+            return;
+        }
+        await edicao.abrir(registro);
     }
 
     function solicitarExclusao(registro) {
@@ -166,6 +182,7 @@ function DiaryFlow({
                 aoTentarCarregarMais={historico.tentarCarregarMais}
                 aoCriar={() => setCriacaoVisivel(true)}
                 aoAbrirRegistro={detalhes.abrir}
+                aoEditarRegistro={iniciarEdicao}
                 aoExcluirRegistro={solicitarExclusao}
                 registroEmExclusaoId={exclusao.registro?.id}
                 aoAbrirFiltros={aoAbrirFiltros}
@@ -173,12 +190,25 @@ function DiaryFlow({
                 onSelecionarAba={onSelecionarAba}
             />
 
-            <NewDiaryEntryModal
+            <NewDiaryEntrySheet
                 visivel={criacaoVisivel}
                 service={service}
                 calendarService={calendarService}
                 onFechar={() => setCriacaoVisivel(false)}
                 onCriado={registrarCriacao}
+                onSessaoExpirada={onSessaoExpirada}
+            />
+
+            <EditDiaryEntrySheet
+                visivel={edicao.visivel}
+                registro={edicao.registro}
+                carregandoRegistro={edicao.carregando}
+                erroRegistro={edicao.erro}
+                aoRecarregarRegistro={edicao.tentarNovamente}
+                service={service}
+                calendarService={calendarService}
+                onFechar={edicao.fechar}
+                onSalvo={registrarEdicao}
                 onSessaoExpirada={onSessaoExpirada}
             />
 
@@ -208,6 +238,7 @@ function DiaryFlow({
                                 : undefined
                         }
                         aoProximo={registrosAdjacentes.proximo ? abrirRegistroProximo : undefined}
+                        aoEditar={detalhes.registro ? iniciarEdicao : undefined}
                         aoExcluir={detalhes.registro ? solicitarExclusao : undefined}
                         aoFechar={detalhes.fechar}
                         acaoEmAndamento={exclusao.excluindo ? 'excluir' : null}
