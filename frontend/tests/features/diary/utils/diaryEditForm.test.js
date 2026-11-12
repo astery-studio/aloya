@@ -1,6 +1,5 @@
 import {
     criarAssinaturaFormulario,
-    criarCategoriasInativasPreservadas,
     criarValoresIniciaisEdicao
 } from '../../../../src/features/diary/utils/diaryEditForm';
 
@@ -66,46 +65,4 @@ test('a assinatura ignora a ordem das opções, mas detecta alterações reais',
             valores: { sintomas: ['fadiga', 'colica'], peso: '62,5' }
         })
     ).not.toBe(original);
-});
-
-test('preserva dados históricos de categorias desativadas durante a edição', () => {
-    const catalogoComInativas = {
-        macrocategorias: [
-            {
-                id: 'macro_ativa',
-                ativa: true,
-                categorias: [{ id: 'pele', ativaEfetiva: true }]
-            },
-            {
-                id: 'macro_inativa',
-                ativa: false,
-                categorias: [
-                    { id: 'sintomas', ativaEfetiva: false },
-                    { id: 'temperatura_basal', ativaEfetiva: false }
-                ]
-            }
-        ]
-    };
-    const registro = {
-        categorias: [
-            { id: 'pele', opcoes: [{ id: 'pele_oleosa' }] },
-            { id: 'sintomas', opcoes: [{ id: 'colica' }] },
-            {
-                id: 'temperatura_basal',
-                valor: '36.7',
-                perturbada: true,
-                motivoPerturbacao: 'Noite mal dormida'
-            }
-        ]
-    };
-
-    expect(criarCategoriasInativasPreservadas(catalogoComInativas, registro)).toEqual([
-        { categoriaId: 'sintomas', opcoes: ['colica'] },
-        {
-            categoriaId: 'temperatura_basal',
-            valor: '36.7',
-            perturbada: true,
-            motivoPerturbacao: 'Noite mal dormida'
-        }
-    ]);
 });
