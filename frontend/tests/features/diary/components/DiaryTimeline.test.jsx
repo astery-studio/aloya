@@ -51,6 +51,9 @@ describe('DiaryTimeline', () => {
 
         expect(screen.getByTestId('diary-timeline')).toBeOnTheScreen();
         expect(screen.getAllByTestId('diary-entry-card')).toHaveLength(2);
+        expect(
+            screen.getByTestId('diary-phase-icon-menstrual', { includeHiddenElements: true })
+        ).toBeOnTheScreen();
         await fireEvent(screen.getByTestId('diary-timeline'), 'endReached');
         expect(aoCarregarMais).not.toHaveBeenCalled();
         await fireEvent(screen.getByTestId('diary-timeline'), 'scrollBeginDrag');
