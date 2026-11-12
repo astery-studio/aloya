@@ -126,45 +126,57 @@ function BottomSheet({
     }
 
     const solicitarFechamento = useCallback(() => {
-        if (!bloquearFechamento) {
-            onFechar?.();
-        }
+        if (bloquearFechamento) return false;
+        return onFechar?.();
     }, [bloquearFechamento, onFechar]);
 
-    const responderArraste = useMemo(() => {
-        const deveResponder = (_, gesto) =>
-            permitirDeslizarParaFechar &&
-            podeIniciarDeslize() &&
-            deveIniciarArraste(gesto, bloquearFechamento);
+    const restaurarPosicao = useCallback(() => {
+        Animated.spring(deslocamentoArraste, {
+            toValue: 0,
+            useNativeDriver: true
+        }).start();
+    }, [deslocamentoArraste]);
 
-        return PanResponder.create({
-            onMoveShouldSetPanResponder: deveResponder,
-            onMoveShouldSetPanResponderCapture: deveResponder,
-            onPanResponderMove: (_, gesto) => deslocamentoArraste.setValue(Math.max(0, gesto.dy)),
-            onPanResponderTerminationRequest: () => false,
-            onPanResponderRelease: (_, gesto) => {
-                if (deveFecharPorArraste(gesto)) {
-                    solicitarFechamento();
-                    return;
-                }
-                Animated.spring(deslocamentoArraste, {
-                    toValue: 0,
-                    useNativeDriver: true
-                }).start();
-            },
-            onPanResponderTerminate: () =>
-                Animated.spring(deslocamentoArraste, {
-                    toValue: 0,
-                    useNativeDriver: true
-                }).start()
-        });
-    }, [
-        bloquearFechamento,
-        deslocamentoArraste,
-        permitirDeslizarParaFechar,
-        podeIniciarDeslize,
-        solicitarFechamento
-    ]);
+    const criarResponderArraste = useCallback(
+        (ignorarLimiteConteudo = false) => {
+            const deveResponder = (_, gesto) =>
+                permitirDeslizarParaFechar &&
+                (ignorarLimiteConteudo || podeIniciarDeslize()) &&
+                deveIniciarArraste(gesto, bloquearFechamento);
+
+            return PanResponder.create({
+                onStartShouldSetPanResponder: () =>
+                    ignorarLimiteConteudo && permitirDeslizarParaFechar && !bloquearFechamento,
+                onStartShouldSetPanResponderCapture: () =>
+                    ignorarLimiteConteudo && permitirDeslizarParaFechar && !bloquearFechamento,
+                onMoveShouldSetPanResponder: deveResponder,
+                onMoveShouldSetPanResponderCapture: deveResponder,
+                onPanResponderMove: (_, gesto) =>
+                    deslocamentoArraste.setValue(Math.max(0, gesto.dy)),
+                onPanResponderTerminationRequest: () => false,
+                onPanResponderRelease: (_, gesto) => {
+                    if (deveFecharPorArraste(gesto)) {
+                        const fechamentoAceito = solicitarFechamento();
+                        if (fechamentoAceito === false) restaurarPosicao();
+                        return;
+                    }
+                    restaurarPosicao();
+                },
+                onPanResponderTerminate: restaurarPosicao
+            });
+        },
+        [
+            bloquearFechamento,
+            deslocamentoArraste,
+            permitirDeslizarParaFechar,
+            podeIniciarDeslize,
+            restaurarPosicao,
+            solicitarFechamento
+        ]
+    );
+
+    const responderPainel = useMemo(() => criarResponderArraste(false), [criarResponderArraste]);
+    const responderAlca = useMemo(() => criarResponderArraste(true), [criarResponderArraste]);
 
     return (
         <Modal
@@ -193,7 +205,7 @@ function BottomSheet({
                 <Animated.View
                     testID="bottom-sheet-painel"
                     onAccessibilityEscape={solicitarFechamento}
-                    {...(permitirDeslizarParaFechar ? responderArraste.panHandlers : {})}
+                    {...(permitirDeslizarParaFechar ? responderPainel.panHandlers : {})}
                     style={[
                         estilos.painel,
                         {
@@ -215,6 +227,7 @@ function BottomSheet({
                             testID="bottom-sheet-area-arraste"
                             accessibilityRole="adjustable"
                             accessibilityLabel="Deslize para baixo para fechar"
+                            {...responderAlca.panHandlers}
                             style={estilos.areaArraste}
                         >
                             <View style={estilos.alcaArraste} />
