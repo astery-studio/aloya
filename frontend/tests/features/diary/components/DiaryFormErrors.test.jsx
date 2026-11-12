@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react-native';
 
-import { DiaryFormErrors } from '../../../../src/features/diary/components/NewDiaryEntryModal/DiaryFormErrors';
+import { DiaryFormErrors } from '../../../../src/features/diary/components/DiaryEntryForm/DiaryFormErrors';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const estilos = { erro: {} };
