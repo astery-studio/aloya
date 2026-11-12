@@ -44,6 +44,14 @@ function criarEstilos(tema) {
             ...tema.shadows.popup
         },
 
+        caixaDetalhes: {
+            maxHeight: '96%',
+            flexShrink: 1,
+            paddingTop: 28,
+            paddingBottom: 24,
+            ...tema.shadows.popup
+        },
+
         conteudo: {
             alignItems: 'center'
         },
