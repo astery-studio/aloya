@@ -172,6 +172,7 @@ export default function App() {
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
+    const [dataInicialDiario, setDataInicialDiario] = useState(null);
     const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
@@ -382,6 +383,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.configuracoes);
         setCadastroDiarioVisivel(false);
+        setDataInicialDiario(null);
 
         setEstadoSessao('autenticada');
 
@@ -568,16 +570,23 @@ export default function App() {
                     service={configuracao.servicos.cyclePredictionService}
                     aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                     aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
-                    aoCadastrarDiario={() => setCadastroDiarioVisivel(true)}
+                    aoCadastrarDiario={(data) => {
+                        setDataInicialDiario(data);
+                        setCadastroDiarioVisivel(true);
+                    }}
                     aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                     aoSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />
                 <NewDiaryEntrySheet
                     visivel={cadastroDiarioVisivel}
+                    dataInicial={dataInicialDiario}
                     service={configuracao.servicos.diaryService}
                     calendarService={configuracao.servicos.calendarService}
-                    onFechar={() => setCadastroDiarioVisivel(false)}
+                    onFechar={() => {
+                        setCadastroDiarioVisivel(false);
+                        setDataInicialDiario(null);
+                    }}
                     onSessaoExpirada={finalizarSessao}
                 />
             </>
