@@ -284,6 +284,17 @@ function criarDiaryService({ requisicaoAutenticada } = {}) {
         return validarRegistro(resposta);
     }
 
+    async function editarRegistro(id, versao, dados, { signal } = {}) {
+        const resposta = await requisicaoAutenticada({
+            metodo: 'PUT',
+            caminho: criarCaminhoRegistro(id),
+            corpo: dados,
+            ifMatch: `"${validarVersao(versao)}"`,
+            ...(signal ? { signal } : {})
+        });
+        return validarRegistro(resposta);
+    }
+
     async function listarHistorico({ limite = LIMITE_PADRAO, cursor = null, signal } = {}) {
         if (!Number.isSafeInteger(limite) || limite < 1 || limite > 50) {
             throw new TypeError('O limite do histórico deve estar entre 1 e 50.');
@@ -345,6 +356,7 @@ function criarDiaryService({ requisicaoAutenticada } = {}) {
     return Object.freeze({
         buscarCatalogo,
         criarRegistro,
+        editarRegistro,
         buscarResumo,
         listarHistorico,
         buscarDetalhe,
