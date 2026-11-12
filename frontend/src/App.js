@@ -29,6 +29,7 @@ import { SupportCategoriesScreen } from './features/support-network/screens/Supp
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from './features/diary/DiaryFlow';
+import { DiaryCategoriesSheet } from './features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet';
 import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
@@ -174,6 +175,7 @@ export default function App() {
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
     const [dataInicialDiario, setDataInicialDiario] = useState(null);
     const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
+    const [categoriasDiarioVisiveis, setCategoriasDiarioVisiveis] = useState(false);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -383,6 +385,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.configuracoes);
         setCadastroDiarioVisivel(false);
+        setCategoriasDiarioVisiveis(false);
         setDataInicialDiario(null);
 
         setEstadoSessao('autenticada');
@@ -407,6 +410,7 @@ export default function App() {
         setCarregandoPerfil(false);
 
         setTelaInterna(telasInternas.configuracoes);
+        setCategoriasDiarioVisiveis(false);
 
         setOrigemNovaCategoria(telasInternas.membros);
 
@@ -672,12 +676,7 @@ export default function App() {
                         'Os filtros do histórico serão disponibilizados em uma próxima etapa.'
                     )
                 }
-                aoGerenciarCategorias={() =>
-                    Alert.alert(
-                        'Categorias do Diário',
-                        'O gerenciamento de categorias será disponibilizado em uma próxima etapa.'
-                    )
-                }
+                aoGerenciarCategorias={() => setCategoriasDiarioVisiveis(true)}
             />
         );
     } else if (telaInterna === telasInternas.configuracoes) {
@@ -685,6 +684,7 @@ export default function App() {
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
+                onAbrirCategoriasDiario={() => setCategoriasDiarioVisiveis(true)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
 
@@ -748,5 +748,15 @@ export default function App() {
         );
     }
 
-    return renderizarComTema(conteudo);
+    return renderizarComTema(
+        <>
+            {conteudo}
+            <DiaryCategoriesSheet
+                visivel={categoriasDiarioVisiveis}
+                service={configuracao.servicos.diaryService}
+                onFechar={() => setCategoriasDiarioVisiveis(false)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        </>
+    );
 }
