@@ -6,14 +6,14 @@ import {
 } from '../../../../src/features/diary/utils/diaryPhasePresentation';
 
 test.each([
-    ['menstruacao', 'Fase Menstrual', '#C85A44'],
-    ['folicular', 'Fase Folicular', '#3B7150'],
-    ['ovulacao', 'Fase Ovulatória', '#4A758E'],
-    ['lutea', 'Fase Lútea', '#B06D2A']
-])('apresenta a fase %s com identidade própria', (fase, rotulo, cor) => {
+    ['menstruacao', 'Fase Menstrual', '#C85A44', 'fill'],
+    ['folicular', 'Fase Folicular', '#3B7150', 'regular'],
+    ['ovulacao', 'Fase Ovulatória', '#4A758E', 'regular'],
+    ['lutea', 'Fase Lútea', '#B06D2A', 'regular']
+])('apresenta a fase %s com identidade própria', (fase, rotulo, cor, pesoIcone) => {
     const apresentacao = obterApresentacaoFase(fase);
 
-    expect(apresentacao).toMatchObject({ rotulo, cor });
+    expect(apresentacao).toMatchObject({ rotulo, cor, pesoIcone });
     expect(apresentacao.fundo).toContain('rgba');
     expect(apresentacao.fundoIcone).toContain('0.10');
     expect(apresentacao.Icone).toBeDefined();
