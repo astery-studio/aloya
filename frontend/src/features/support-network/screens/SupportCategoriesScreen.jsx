@@ -30,7 +30,8 @@ function SupportCategoriesScreen({
     onVoltar,
     onCriar,
     onEditar,
-    onExcluir
+    onExcluir,
+    diaryService
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -120,6 +121,7 @@ function SupportCategoriesScreen({
                 onCategoriaAtualizada={receberCategoriaAtualizada}
                 onConcluido={fecharEdicao}
                 onSessaoExpirada={onSessaoExpirada}
+                diaryService={diaryService}
             />
         );
     }
