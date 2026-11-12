@@ -176,7 +176,8 @@ function EditSupportCategoryScreen({
     onVoltar,
     onCategoriaAtualizada,
     onConcluido,
-    onSessaoExpirada
+    onSessaoExpirada,
+    diaryService
 }) {
     const tema = useTheme();
     const categoriaInicialValida = categoriaEhEditavel(categoria);
@@ -501,6 +502,8 @@ function EditSupportCategoryScreen({
                             carregando={salvando}
                             bloqueado={!servicoDisponivel || categoriaBase === null}
                             exibirAcao={false}
+                            diaryService={diaryService}
+                            onSessaoExpirada={onSessaoExpirada}
                         />
                     )}
                 </View>
