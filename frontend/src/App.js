@@ -652,6 +652,7 @@ export default function App() {
                 onCriar={() => abrirNovaCategoria(telasInternas.categoriasPermissao)}
                 onEditar={(categoria) => Alert.alert('Editar categoria', categoria.nome)}
                 onExcluir={(categoria) => Alert.alert('Excluir categoria', categoria.nome)}
+                diaryService={configuracao.servicos.diaryService}
             />
         );
     } else if (telaInterna === telasInternas.ciclos) {
@@ -710,6 +711,7 @@ export default function App() {
                 onVoltar={retornarDaNovaCategoria}
                 onConcluido={retornarDaNovaCategoria}
                 onSessaoExpirada={finalizarSessao}
+                diaryService={configuracao.servicos.diaryService}
             />
         );
     } else if (telaInterna === telasInternas.anticoncepcionais) {
