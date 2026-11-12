@@ -64,6 +64,11 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
                     ? () => acoes.aoCadastrarMenstruacao(dataSelecionada || obterHojeLocal())
                     : undefined
             }
+            aoCadastrarDiario={
+                typeof acoes.aoCadastrarDiario === 'function'
+                    ? () => acoes.aoCadastrarDiario(dataSelecionada || obterHojeLocal())
+                    : undefined
+            }
         />
     );
 }
