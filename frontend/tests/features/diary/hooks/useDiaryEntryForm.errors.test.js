@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import {
+    MENSAGEM_REGISTRO_DUPLICADO,
     MENSAGEM_SALVAMENTO,
     useDiaryEntryForm
 } from '../../../../src/features/diary/hooks/useDiaryEntryForm';
@@ -36,6 +37,18 @@ test.each([{ mensagemUsuario: 'Falha conhecida.' }, new Error('interno')])(
         expect(result.current.erroSalvamento).toBeNull();
     }
 );
+
+test('explica quando já existe um registro na data escolhida', async () => {
+    const service = {
+        criarRegistro: jest.fn().mockRejectedValue({
+            status: 409,
+            codigo: 'REGISTRO_DIARIO_DUPLICADO'
+        })
+    };
+    const { result } = await formularioPreenchido(service);
+    await act(async () => expect(await result.current.salvar()).toBe(false));
+    expect(result.current.erroSalvamento).toBe(MENSAGEM_REGISTRO_DUPLICADO);
+});
 
 test('encerra a sessão ao receber erro 401', async () => {
     const onSessaoExpirada = jest.fn();
