@@ -67,7 +67,7 @@ function apresentarResumoRegistro(registro, categoriasAtivas) {
         .slice(0, 3)
         .map(({ prioridade, macroOrdem, categoriaOrdem, ...item }) => item);
     const anotacao = registro.categorias.find(
-        ({ categoriaId }) => categoriaId === 'anotacao_livre'
+        ({ categoriaId }) => categoriaId === 'anotacao_livre' && categoriasAtivas.has(categoriaId)
     );
 
     return {
