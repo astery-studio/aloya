@@ -48,7 +48,7 @@ function apresentarConfiguracao(vinculo, categorias) {
         contato: Object.freeze({
             id: vinculo.id,
             nome: vinculo.contato.nome,
-            email: vinculo.emailConvidado,
+            email: vinculo.contato.email ?? vinculo.emailConvidado,
             iconeId: iconeContatoEhValido(vinculo.iconeId) ? vinculo.iconeId : 'pessoa',
             corId: corContatoEhValida(vinculo.corId) ? vinculo.corId : 'branco'
         }),
@@ -104,7 +104,7 @@ function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
                 corId: true,
                 permissoesIndividuais: true,
                 atualizadoEm: true,
-                contato: { select: { nome: true } },
+                contato: { select: { nome: true, email: true } },
                 categoria: {
                     select: {
                         id: true,
@@ -167,7 +167,7 @@ function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
                     corId: true,
                     permissoesIndividuais: true,
                     atualizadoEm: true,
-                    contato: { select: { nome: true } },
+                    contato: { select: { nome: true, email: true } },
                     categoria: {
                         select: {
                             id: true,

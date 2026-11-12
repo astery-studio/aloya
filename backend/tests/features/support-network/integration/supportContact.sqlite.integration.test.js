@@ -65,7 +65,7 @@ function criarBanco() {
         INSERT INTO vinculos_rede_apoio
             (id, titular_id, contato_id, email_convidado, categoria_id, permissoes_individuais, status, token_convite_hash, data_envio, data_expiracao, data_resposta, criado_em, atualizado_em)
         VALUES
-            (20, 1, 2, 'zelia@example.com', NULL, '["geral.historico_ciclo"]', 'ativo', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+            (20, 1, 2, 'email-antigo@example.com', NULL, '["geral.historico_ciclo"]', 'ativo', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (21, 1, 3, 'rafael@example.com', 10, '[]', 'pendente', 'hash-antigo', '2026-10-30T12:00:00.000Z', '2026-11-15T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (22, 1, NULL, 'ana@email.com', NULL, '["geral.fase_atual"]', 'pendente', 'hash-ana', '2026-11-07T12:00:00.000Z', '2026-11-14T12:00:00.000Z', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
             (23, 1, NULL, 'recusado@email.com', NULL, '[]', 'recusado', NULL, '2026-10-01T12:00:00.000Z', NULL, '2026-10-02T12:00:00.000Z', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -169,6 +169,7 @@ test('lista contatos reais com isolamento, ordem, vínculo e espera calculada', 
             'saude.consultas'
         ]);
         assert.equal(corpo.contatos[1].aguardando.atrasado, true);
+        assert.equal(corpo.contatos[2].email, 'zelia@example.com');
         assert.equal(corpo.contatos[2].acoes.podeReenviarConvite, false);
         assert.equal(corpo.contatos[3].status, 'recusado');
         assert.equal(corpo.contatos[3].aguardando.rotulo, 'Recusado há 37 dias');

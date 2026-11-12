@@ -102,7 +102,11 @@ function formatarContato(vinculo, agora = new Date()) {
         typeof vinculo?.contato?.nome === 'string' && vinculo.contato.nome.trim().length > 0
             ? vinculo.contato.nome.trim()
             : null;
-    const email = vinculo.emailConvidado;
+    const emailAtual =
+        typeof vinculo?.contato?.email === 'string' && vinculo.contato.email.trim().length > 0
+            ? vinculo.contato.email.trim()
+            : null;
+    const email = emailAtual ?? vinculo.emailConvidado;
     const status = normalizarStatusContato(vinculo.status);
     const pendente = status === STATUS_CONTATO_PENDENTE;
     const ativo = status === STATUS_CONTATO_ATIVO;

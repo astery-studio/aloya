@@ -80,7 +80,8 @@ function criarSupportContactService({ prisma, now = () => new Date() } = {}) {
                 dataResposta: true,
                 contato: {
                     select: {
-                        nome: true
+                        nome: true,
+                        email: true
                     }
                 },
                 categoria: {

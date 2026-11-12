@@ -72,6 +72,25 @@ test('formata contato ativo com nome, ativação e ações permitidas', () => {
     });
 });
 
+test('usa o e-mail atual da conta vinculada mesmo quando o convite possui e-mail antigo', () => {
+    const contato = formatarContato(
+        {
+            id: 23,
+            contato: { nome: 'Ana', email: 'novo@email.com' },
+            emailConvidado: 'antigo@email.com',
+            status: 'ativo',
+            categoria: null,
+            permissoesIndividuais: [],
+            dataEnvio: new Date('2026-11-01T10:00:00.000Z'),
+            dataResposta: new Date('2026-11-02T10:00:00.000Z')
+        },
+        agora
+    );
+
+    assert.equal(contato.email, 'novo@email.com');
+    assert.equal(contato.identificacao, 'Ana');
+});
+
 test('usa e-mail quando ainda não existe nome e habilita somente o reenvio pendente', () => {
     const contato = formatarContato(
         {

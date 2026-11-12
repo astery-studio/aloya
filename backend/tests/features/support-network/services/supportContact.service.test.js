@@ -72,7 +72,7 @@ test('consulta vínculos atuais e históricos pertencentes à titular', async ()
         titularId: 27,
         status: { in: ['pendente', 'ativo', 'revogado', 'recusado'] }
     });
-    assert.deepEqual(estado.consulta.select.contato.select, { nome: true });
+    assert.deepEqual(estado.consulta.select.contato.select, { nome: true, email: true });
     assert.equal(estado.consulta.select.iconeId, true);
     assert.equal(estado.consulta.select.corId, true);
     assert.deepEqual(estado.consulta.select.categoria.select, {
