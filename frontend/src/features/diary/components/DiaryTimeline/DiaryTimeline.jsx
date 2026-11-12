@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { obterApresentacaoFaseRegistro } from '../../utils/diaryPhasePresentation';
 import { DiaryEntryCard } from '../DiaryEntryCard/DiaryEntryCard';
+import { DiaryPhaseIcon } from '../DiaryPhaseIcon/DiaryPhaseIcon';
 import { criarEstilos } from './DiaryTimeline.styles';
 
 // Recebe resumos paginados e retorna uma FlatList otimizada e acessível.
@@ -45,7 +46,6 @@ function DiaryTimeline({
     const renderizar = useCallback(
         ({ item, index }) => {
             const apresentacao = obterApresentacaoFaseRegistro(item.fase);
-            const Icone = apresentacao?.Icone;
             return (
                 <View style={estilos.item}>
                     <View
@@ -55,12 +55,8 @@ function DiaryTimeline({
                     >
                         {index > 0 ? <View style={estilos.linhaSuperior} /> : null}
                         <View style={estilos.marcador}>
-                            {Icone ? (
-                                <Icone
-                                    size={24}
-                                    color={apresentacao.cor}
-                                    weight={item.fase === 'menstrual' ? 'fill' : 'regular'}
-                                />
+                            {apresentacao ? (
+                                <DiaryPhaseIcon fase={item.fase} size={24} aceitarFaseIndefinida />
                             ) : null}
                         </View>
                         <View style={estilos.linhaHorizontal} />
