@@ -51,6 +51,7 @@ test('rotas cobrem falhas de configuração e executam os middlewares próprios'
         catalogController: {},
         entryController: {},
         historyController: {},
+        overviewController: {},
         mutationController: {},
         validarPreferencia,
         rateLimit: () => {}
