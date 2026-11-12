@@ -173,6 +173,7 @@ function criarEstilos(tema) {
             width: '100%',
             minHeight: 87,
             flexShrink: 0,
+            alignItems: 'center',
             paddingTop: 12,
             paddingHorizontal: 24,
             paddingBottom: 20,
@@ -181,7 +182,13 @@ function criarEstilos(tema) {
             borderTopColor: tema.cores.interface.borda
         },
         botaoSalvar: {
+            width: 342,
+            maxWidth: '100%',
             height: 54,
+            paddingTop: 15.375,
+            paddingBottom: 14.625,
+            justifyContent: 'center',
+            alignItems: 'center',
             borderRadius: 14
         }
     });
