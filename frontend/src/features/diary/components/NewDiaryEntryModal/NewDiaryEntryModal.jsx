@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
@@ -21,6 +21,7 @@ function NewDiaryEntryModal({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [registroSalvo, setRegistroSalvo] = useState(null);
+    const posicaoRolagem = useRef(0);
     const catalogo = useDiaryCatalog({ ativo: visivel, service, onSessaoExpirada });
     const formulario = useDiaryEntryForm({
         ativo: visivel,
@@ -42,12 +43,19 @@ function NewDiaryEntryModal({
         onFechar?.();
     }
 
+    const atualizarPosicaoRolagem = useCallback((posicao) => {
+        posicaoRolagem.current = Math.max(0, posicao);
+    }, []);
+
+    const podeIniciarDeslize = useCallback(() => posicaoRolagem.current <= 0, []);
+
     return (
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
             bloquearFechamento={formulario.salvando}
             permitirDeslizarParaFechar
+            podeIniciarDeslize={podeIniciarDeslize}
             estiloPainel={estilos.painel}
         >
             <NewDiaryEntryContent
@@ -58,6 +66,7 @@ function NewDiaryEntryModal({
                 formulario={formulario}
                 fase={fase.fase}
                 carregandoFase={fase.carregando}
+                onPosicaoRolagem={atualizarPosicaoRolagem}
             />
             <SimpleModal
                 visivel={Boolean(registroSalvo)}
