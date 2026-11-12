@@ -7,6 +7,7 @@ import {
     BellIcon,
     HouseIcon,
     InfoIcon,
+    NotebookIcon,
     ShieldCheckIcon,
     UserIcon,
     WarningCircleIcon
@@ -23,6 +24,7 @@ import { criarEstilos } from './SettingsScreen.style';
 function SettingsScreen({
     onAbrirPerfil,
     onAbrirParametrosCiclo,
+    onAbrirCategoriasDiario,
     onAbrirTelaInicial,
     onAbrirNotificacoes,
     onAbrirSobre,
@@ -95,6 +97,19 @@ function SettingsScreen({
                             icone={ArrowsClockwiseIcon}
                             paleta="corLaranja"
                             onPress={onAbrirParametrosCiclo}
+                        />
+
+                        <NavigationField
+                            label="Categorias do Diário"
+                            coresIcone={
+                                tema.escuro
+                                    ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
+                                    : undefined
+                            }
+                            estilo={estilos.campoComBorda}
+                            icone={NotebookIcon}
+                            paleta="corVerde"
+                            onPress={onAbrirCategoriasDiario}
                         />
                     </View>
 
