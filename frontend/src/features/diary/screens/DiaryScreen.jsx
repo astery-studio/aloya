@@ -146,9 +146,9 @@ function DiaryScreen({
                 {introducao}
                 <View style={estilos.estadoCentralizado}>
                     <EmptyState
-                        titulo="Nenhum Registro"
+                        titulo="Nenhum registro visível"
                         mensagem={
-                            'Você ainda não fez nenhum registro no seu Diário.\nToque em "Adicionar novo registro" para começar.'
+                            'Você ainda pode não ter registros ou as categorias usadas neles podem estar desativadas.\nAtive-as em "Gerenciar categorias" ou toque em "Adicionar novo registro" para começar.'
                         }
                         acao={
                             <ButtonScreen
