@@ -39,6 +39,7 @@ test('protege todas as rotas e impede cache de dados sensíveis', () => {
         },
         entryController: { criar: handler },
         historyController: { listar: handler, buscar: handler },
+        overviewController: { buscar: handler },
         mutationController: { editar: handler, excluir: handler },
         validarPreferencia: handler,
         rateLimit: handler
@@ -56,6 +57,6 @@ test('protege todas as rotas e impede cache de dados sensíveis', () => {
         handler
     );
     assert.equal(headers['Cache-Control'], 'private, no-store');
-    assert.equal(rotas.length, 9);
+    assert.equal(rotas.length, 10);
     assert.ok(rotas.every(([, caminho]) => !caminho.includes('termic')));
 });
