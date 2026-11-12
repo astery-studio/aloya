@@ -65,31 +65,35 @@ function criarDiaryOverviewService({ prisma } = {}) {
         if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
             throw new AppError('Sessão inválida.', 401, 'SESSAO_INVALIDA');
         }
-        const [diasRegistrados, preferenciasMacro, preferenciasCategoria, registros] =
-            await Promise.all([
-                prisma.registroDiario.count({ where: { usuarioId } }),
-                prisma.preferenciaMacrocategoriaDiario.findMany({ where: { usuarioId } }),
-                prisma.preferenciaCategoriaDiario.findMany({ where: { usuarioId } }),
-                prisma.registroDiario.findMany({
-                    where: { usuarioId, faseCicloAssociada: fase },
-                    orderBy: [{ dataRegistro: 'desc' }, { id: 'desc' }],
-                    take: LIMITE_REGISTROS_ANALISADOS,
-                    select: {
-                        categorias: {
-                            where: {
-                                categoriaId: { not: 'anotacao_livre' },
-                                categoria: { sensivel: false }
-                            },
-                            select: {
-                                categoriaId: true,
-                                categoriaNome: true,
-                                opcoes: { select: { opcaoId: true, opcaoNome: true } }
-                            }
+        const [preferenciasMacro, preferenciasCategoria] = await Promise.all([
+            prisma.preferenciaMacrocategoriaDiario.findMany({ where: { usuarioId } }),
+            prisma.preferenciaCategoriaDiario.findMany({ where: { usuarioId } })
+        ]);
+        const categoriasAtivas = obterCategoriasAtivas(preferenciasMacro, preferenciasCategoria);
+        const possuiCategoriaAtiva = {
+            categorias: { some: { categoriaId: { in: [...categoriasAtivas] } } }
+        };
+        const [diasRegistrados, registros] = await Promise.all([
+            prisma.registroDiario.count({ where: { usuarioId, ...possuiCategoriaAtiva } }),
+            prisma.registroDiario.findMany({
+                where: { usuarioId, faseCicloAssociada: fase, ...possuiCategoriaAtiva },
+                orderBy: [{ dataRegistro: 'desc' }, { id: 'desc' }],
+                take: LIMITE_REGISTROS_ANALISADOS,
+                select: {
+                    categorias: {
+                        where: {
+                            categoriaId: { not: 'anotacao_livre' },
+                            categoria: { sensivel: false }
+                        },
+                        select: {
+                            categoriaId: true,
+                            categoriaNome: true,
+                            opcoes: { select: { opcaoId: true, opcaoNome: true } }
                         }
                     }
-                })
-            ]);
-        const categoriasAtivas = obterCategoriasAtivas(preferenciasMacro, preferenciasCategoria);
+                }
+            })
+        ]);
         const destaques = contarMarcadores(registros, categoriasAtivas)
             .filter(({ ocorrencias }) => ocorrencias >= MINIMO_OCORRENCIAS)
             .sort(compararDestaques)
