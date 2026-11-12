@@ -27,6 +27,7 @@ test('protege todas as rotas e impede cache de dados sensíveis', () => {
     };
     const autenticar = () => {};
     const handler = () => {};
+    const preferencesRateLimit = () => {};
 
     criarDiaryRoutes({
         Router: () => router,
@@ -42,7 +43,8 @@ test('protege todas as rotas e impede cache de dados sensíveis', () => {
         overviewController: { buscar: handler },
         mutationController: { editar: handler, excluir: handler },
         validarPreferencia: handler,
-        rateLimit: handler
+        rateLimit: handler,
+        preferencesRateLimit
     });
 
     assert.equal(usos[0], autenticar);
@@ -59,4 +61,7 @@ test('protege todas as rotas e impede cache de dados sensíveis', () => {
     assert.equal(headers['Cache-Control'], 'private, no-store');
     assert.equal(rotas.length, 10);
     assert.ok(rotas.every(([, caminho]) => !caminho.includes('termic')));
+    const rotasPreferencias = rotas.filter(([, caminho]) => caminho.includes('/preferencias'));
+    assert.equal(rotasPreferencias.length, 3);
+    assert.ok(rotasPreferencias.every(([, , middleware]) => middleware === preferencesRateLimit));
 });
