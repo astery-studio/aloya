@@ -39,13 +39,15 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
     expect(screen.getByRole('header', { name: 'Gerências Categorias' })).toBeOnTheScreen();
     await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
     for (const [, nome] of macros) expect(screen.getByText(nome)).toBeOnTheScreen();
-    expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen();
-    expect(screen.queryByText('Pele')).toBeNull();
+    await waitFor(() => {
+        expect(screen.queryByText('Fluxo menstrual')).toBeNull();
+        expect(screen.queryByText('Pele')).toBeNull();
+    });
 
-    await fireEvent.press(
-        screen.getByRole('button', { name: 'Expandir Corpo e Sintomas Físicos' })
-    );
-    expect(screen.getByText('Pele')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' }));
+    await waitFor(() => expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen());
+    fireEvent.press(screen.getByRole('button', { name: 'Expandir Corpo e Sintomas Físicos' }));
+    await waitFor(() => expect(screen.getByText('Pele')).toBeOnTheScreen());
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeOnTheScreen();
 });
 
@@ -79,6 +81,8 @@ test('desativa filhos visualmente sem apagar seu estado individual', async () =>
     await render(<DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />);
     await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
 
+    await fireEvent.press(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' }));
+
     await fireEvent.press(screen.getByRole('switch', { name: 'Desativar Ciclo e Sangramento' }));
 
     await waitFor(() => expect(screen.getByText('5 / 6 ativos')).toBeOnTheScreen());
@@ -92,7 +96,8 @@ test('reverte uma categoria e oferece nova tentativa após erro', async () => {
         atualizarCategoria: jest.fn().mockRejectedValue(new Error('rede indisponível'))
     };
     await render(<DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />);
-    await waitFor(() => expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen());
+    await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
+    await fireEvent.press(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' }));
 
     await fireEvent.press(screen.getByRole('switch', { name: 'Desativar Fluxo menstrual' }));
 
@@ -100,4 +105,26 @@ test('reverte uma categoria e oferece nova tentativa após erro', async () => {
     expect(screen.getByText(/Ocorreu um erro ao gerenciar categorias/)).toBeOnTheScreen();
     expect(screen.getByRole('switch', { name: 'Desativar Fluxo menstrual' })).toBeChecked();
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeOnTheScreen();
+});
+
+test('fecha todas as macrocategorias sempre que o sheet reabre', async () => {
+    const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
+    const resultado = await render(
+        <DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />
+    );
+    await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
+    await fireEvent.press(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' }));
+    expect(screen.getByText('Fluxo menstrual')).toBeOnTheScreen();
+
+    await resultado.rerender(
+        <DiaryCategoriesSheet visivel={false} service={service} onFechar={jest.fn()} />
+    );
+    await resultado.rerender(
+        <DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />
+    );
+
+    await waitFor(() => expect(screen.queryByText('Fluxo menstrual')).toBeNull());
+    for (const [, nome] of macros) {
+        expect(screen.getByRole('button', { name: `Expandir ${nome}` })).toBeOnTheScreen();
+    }
 });
