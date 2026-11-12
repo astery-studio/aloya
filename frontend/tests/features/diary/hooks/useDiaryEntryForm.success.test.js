@@ -56,6 +56,18 @@ test('reinicia os valores sempre que o modal abre', async () => {
     });
 });
 
+test('inicia a criação com a data recebida da tela de origem', async () => {
+    const { result } = await renderHook(() =>
+        useDiaryEntryForm({
+            ativo: true,
+            dataInicial: '2026-11-05',
+            catalogo
+        })
+    );
+
+    expect(result.current.data).toBe('2026-11-05');
+});
+
 test('não salva sem serviço configurado', async () => {
     const { result } = await renderHook(() => useDiaryEntryForm({ ativo: true, catalogo }));
     await expect(result.current.salvar()).resolves.toBe(false);
