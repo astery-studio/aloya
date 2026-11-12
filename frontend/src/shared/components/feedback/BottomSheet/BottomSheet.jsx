@@ -7,13 +7,16 @@ import {
     KeyboardAvoidingView,
     Modal,
     PanResponder,
-    Platform
+    Platform,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '../../../hooks/useTheme';
 import { deveFecharPorArraste, deveIniciarArraste } from './bottomSheetGesture';
 import { criarEstilos } from './BottomSheet.style';
+
+const permitirInicioDeslize = () => true;
 
 function BottomSheet({
     visivel,
@@ -23,7 +26,8 @@ function BottomSheet({
     bloquearFechamento = false,
     corPainel,
     estiloPainel,
-    permitirDeslizarParaFechar = false
+    permitirDeslizarParaFechar = false,
+    podeIniciarDeslize = permitirInicioDeslize
 }) {
     const tema = useTheme();
     const insets = useSafeAreaInsets();
@@ -127,32 +131,40 @@ function BottomSheet({
         }
     }, [bloquearFechamento, onFechar]);
 
-    const responderArraste = useMemo(
-        () =>
-            PanResponder.create({
-                onMoveShouldSetPanResponder: (_, gesto) =>
-                    permitirDeslizarParaFechar &&
-                    deveIniciarArraste(gesto, bloquearFechamento),
-                onPanResponderMove: (_, gesto) =>
-                    deslocamentoArraste.setValue(Math.max(0, gesto.dy)),
-                onPanResponderRelease: (_, gesto) => {
-                    if (deveFecharPorArraste(gesto)) {
-                        solicitarFechamento();
-                        return;
-                    }
-                    Animated.spring(deslocamentoArraste, {
-                        toValue: 0,
-                        useNativeDriver: true
-                    }).start();
-                },
-                onPanResponderTerminate: () =>
-                    Animated.spring(deslocamentoArraste, {
-                        toValue: 0,
-                        useNativeDriver: true
-                    }).start()
-            }),
-        [bloquearFechamento, deslocamentoArraste, permitirDeslizarParaFechar, solicitarFechamento]
-    );
+    const responderArraste = useMemo(() => {
+        const deveResponder = (_, gesto) =>
+            permitirDeslizarParaFechar &&
+            podeIniciarDeslize() &&
+            deveIniciarArraste(gesto, bloquearFechamento);
+
+        return PanResponder.create({
+            onMoveShouldSetPanResponder: deveResponder,
+            onMoveShouldSetPanResponderCapture: deveResponder,
+            onPanResponderMove: (_, gesto) => deslocamentoArraste.setValue(Math.max(0, gesto.dy)),
+            onPanResponderTerminationRequest: () => false,
+            onPanResponderRelease: (_, gesto) => {
+                if (deveFecharPorArraste(gesto)) {
+                    solicitarFechamento();
+                    return;
+                }
+                Animated.spring(deslocamentoArraste, {
+                    toValue: 0,
+                    useNativeDriver: true
+                }).start();
+            },
+            onPanResponderTerminate: () =>
+                Animated.spring(deslocamentoArraste, {
+                    toValue: 0,
+                    useNativeDriver: true
+                }).start()
+        });
+    }, [
+        bloquearFechamento,
+        deslocamentoArraste,
+        permitirDeslizarParaFechar,
+        podeIniciarDeslize,
+        solicitarFechamento
+    ]);
 
     return (
         <Modal
@@ -181,7 +193,7 @@ function BottomSheet({
                 <Animated.View
                     testID="bottom-sheet-painel"
                     onAccessibilityEscape={solicitarFechamento}
-                    {...responderArraste.panHandlers}
+                    {...(permitirDeslizarParaFechar ? responderArraste.panHandlers : {})}
                     style={[
                         estilos.painel,
                         {
@@ -198,6 +210,16 @@ function BottomSheet({
                         }
                     ]}
                 >
+                    {permitirDeslizarParaFechar ? (
+                        <View
+                            testID="bottom-sheet-area-arraste"
+                            accessibilityRole="adjustable"
+                            accessibilityLabel="Deslize para baixo para fechar"
+                            style={estilos.areaArraste}
+                        >
+                            <View style={estilos.alcaArraste} />
+                        </View>
+                    ) : null}
                     {children}
                 </Animated.View>
             </KeyboardAvoidingView>
