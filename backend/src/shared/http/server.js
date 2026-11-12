@@ -180,7 +180,8 @@ app.use(
         overviewController: container.diaryOverviewController,
         mutationController: container.diaryMutationController,
         validarPreferencia: container.validarAtualizacaoPreferencia,
-        rateLimit: container.configuracoesContaRateLimit
+        rateLimit: container.configuracoesContaRateLimit,
+        preferencesRateLimit: container.diaryPreferencesRateLimit
     })
 );
 
