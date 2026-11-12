@@ -31,31 +31,19 @@ function assinaturaCategorias(itens, assinatura) {
     return itens.map(assinatura).toSorted().join('|');
 }
 
-function validarEdicaoCategorias(novas, atuais, preferenciasMacro, preferenciasCategoria) {
+function validarEdicaoCategorias(novas, _atuais, preferenciasMacro, preferenciasCategoria) {
     const ativas = obterCategoriasAtivas(preferenciasMacro, preferenciasCategoria);
-    const novasPorId = new Map(novas.map((item) => [item.categoriaId, item]));
-    const atuaisPorId = new Map(atuais.map((item) => [item.categoriaId, item]));
 
     for (const categoria of novas) {
         if (ativas.has(categoria.categoriaId)) continue;
-        const atual = atuaisPorId.get(categoria.categoriaId);
-        if (!atual || assinaturaNova(categoria) !== assinaturaAtual(atual)) {
-            throw new AppError(
-                'Uma categoria desativada não pode ser alterada.',
-                422,
-                'CATEGORIA_DIARIO_INATIVA'
-            );
-        }
+        throw new AppError(
+            'Uma categoria desativada não pode ser alterada.',
+            422,
+            'CATEGORIA_DIARIO_INATIVA'
+        );
     }
-    for (const categoria of atuais) {
-        if (!ativas.has(categoria.categoriaId) && !novasPorId.has(categoria.categoriaId)) {
-            throw new AppError(
-                'Preserve os dados de categorias desativadas.',
-                422,
-                'CATEGORIA_INATIVA_OMITIDA'
-            );
-        }
-    }
+
+    return ativas;
 }
 
 export { assinaturaNova, assinaturaAtual, assinaturaCategorias, validarEdicaoCategorias };
