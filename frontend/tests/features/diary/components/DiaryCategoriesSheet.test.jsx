@@ -96,6 +96,29 @@ test('desativa filhos visualmente sem apagar seu estado individual', async () =>
     expect(screen.getByRole('switch', { name: 'Desativar Fluxo menstrual' })).toBeDisabled();
 });
 
+test('notifica a timeline somente depois de persistir a preferência', async () => {
+    const atualizado = criarCatalogo(1);
+    atualizado.macrocategorias[0].ativa = false;
+    const onAlterado = jest.fn();
+    const service = {
+        buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()),
+        atualizarMacrocategoria: jest.fn().mockResolvedValue(atualizado)
+    };
+    await render(
+        <DiaryCategoriesSheet
+            visivel
+            service={service}
+            onFechar={jest.fn()}
+            onAlterado={onAlterado}
+        />
+    );
+    await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
+
+    await fireEvent.press(screen.getByRole('switch', { name: 'Desativar Ciclo e Sangramento' }));
+
+    await waitFor(() => expect(onAlterado).toHaveBeenCalledTimes(1));
+});
+
 test('reverte uma categoria e oferece nova tentativa após erro', async () => {
     const service = {
         buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()),
