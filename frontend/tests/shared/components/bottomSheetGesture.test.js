@@ -13,9 +13,9 @@ describe('gestos do BottomSheet', () => {
     });
 
     test('fecha por distância ou velocidade suficiente', () => {
-        expect(deveFecharPorArraste({ dy: 64 })).toBe(true);
-        expect(deveFecharPorArraste({ dy: 1, vy: 0.5 })).toBe(true);
-        expect(deveFecharPorArraste({ dy: 63, vy: 0.49 })).toBe(false);
+        expect(deveFecharPorArraste({ dy: 48 })).toBe(true);
+        expect(deveFecharPorArraste({ dy: 1, vy: 0.35 })).toBe(true);
+        expect(deveFecharPorArraste({ dy: 47, vy: 0.34 })).toBe(false);
         expect(deveFecharPorArraste()).toBe(false);
     });
 });
