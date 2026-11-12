@@ -20,4 +20,13 @@ function obterApresentacaoMacrocategoria(id) {
     return apresentacaoMacrocategorias[id] ?? apresentacaoMacrocategorias.ciclo_sangramento;
 }
 
-export { apresentacaoMacrocategorias, obterApresentacaoMacrocategoria };
+function obterCorMacrocategoria(tema, id) {
+    const apresentacao = obterApresentacaoMacrocategoria(id);
+    return (
+        tema?.cores?.redeApoio?.[apresentacao.paleta]?.icone ??
+        tema?.cores?.redeApoio?.ciclo?.icone ??
+        '#C85A44'
+    );
+}
+
+export { apresentacaoMacrocategorias, obterApresentacaoMacrocategoria, obterCorMacrocategoria };
