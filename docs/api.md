@@ -1076,6 +1076,7 @@ Todas as rotas abaixo exigem autenticação e retornam
 | `PATCH` | `/api/diario/preferencias/macrocategorias/:id` | Ativa ou desativa uma macrocategoria |
 | `PATCH` | `/api/diario/preferencias/categorias/:id` | Ativa ou desativa uma categoria |
 | `POST` | `/api/diario/registros` | Cria um registro diário |
+| `GET` | `/api/diario/resumo?fase={fase}` | Resumo agregado e personalizado da fase |
 | `GET` | `/api/diario/registros` | Histórico filtrado e paginado por cursor |
 | `GET` | `/api/diario/registros/:id` | Detalhes de um registro |
 | `PUT` | `/api/diario/registros/:id` | Substitui um registro |
@@ -1098,7 +1099,20 @@ exclusão exigem o mesmo valor no cabeçalho `If-Match`; uma versão antiga
 retorna conflito, impedindo sobrescrita acidental. O histórico aceita `inicio`,
 `fim`, `categorias`, `fases`, `limite` e `cursor`.
 
+O detalhe inclui `ciclo` com `dia` e `numero` sequencial quando existe um ciclo
+iniciado até a data do registro. Quando não há contexto menstrual registrado,
+`ciclo` é `null` e o cliente não deve inferir esses valores.
+
 Os nomes efetivos dos filtros de período são `dataInicio` e `dataFim`.
+
+O resumo aceita `menstrual`, `folicular`, `ovulatoria` ou `lutea`. Ele analisa
+no máximo os 12 registros mais recentes da pessoa autenticada na fase pedida.
+`informacoesSuficientes` só é verdadeiro quando existem ao menos três registros
+da fase e algum marcador não sensível aparece em pelo menos dois dias distintos.
+Até três destaques são retornados. Anotações livres, categorias sensíveis e
+categorias desativadas nas preferências não participam da agregação. Quando a
+amostra é insuficiente, `destaques` pode ser vazio e o cliente deve apresentar o
+texto geral da fase.
 
 # 16. Recursos ainda não expostos pela API
 
