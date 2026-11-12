@@ -92,6 +92,31 @@ jest.mock('../../src/features/diary/DiaryFlow', () => {
     return { DiaryFlow: jest.fn(() => React.createElement(Text, null, 'Diário integrado')) };
 });
 
+jest.mock('../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        NewDiaryEntrySheet: jest.fn(({ visivel, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, 'Cadastro do Diário aberto'),
+                      React.createElement(
+                          Pressable,
+                          {
+                              accessibilityRole: 'button',
+                              accessibilityLabel: 'Fechar cadastro do Diário',
+                              onPress: onFechar
+                          },
+                          React.createElement(Text, null, 'Fechar')
+                      )
+                  )
+                : null
+        )
+    };
+});
+
 jest.mock('../../src/features/cycles/CycleEditFlow', () => {
     const React = require('react');
     const { Text } = require('react-native');
@@ -130,25 +155,31 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return {
-        CycleTodayContainer: jest.fn(({ aoAbrirAnticoncepcional, aoAbrirCalendario }) =>
-            React.createElement(
-                React.Fragment,
-                null,
+        CycleTodayContainer: jest.fn(
+            ({ aoAbrirAnticoncepcional, aoAbrirCalendario, aoCadastrarDiario }) =>
                 React.createElement(
-                    Pressable,
-                    {
+                    React.Fragment,
+                    null,
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Anticoncepcional',
+                            onPress: aoAbrirAnticoncepcional
+                        },
+                        React.createElement(Text, null, 'Ciclo hoje')
+                    ),
+                    React.createElement(Pressable, {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Anticoncepcional',
-                        onPress: aoAbrirAnticoncepcional
-                    },
-                    React.createElement(Text, null, 'Ciclo hoje')
-                ),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Calendário',
-                    onPress: aoAbrirCalendario
-                })
-            )
+                        accessibilityLabel: 'Calendário',
+                        onPress: aoAbrirCalendario
+                    }),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Cadastrar no Diário',
+                        onPress: aoCadastrarDiario
+                    })
+                )
         )
     };
 });
@@ -652,6 +683,20 @@ describe('App integrado', () => {
 
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao ciclo' }));
         expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+    });
+
+    test('abre diretamente o cadastro do Diário pela tela inicial', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+
+        expect(await screen.findByText('Cadastro do Diário aberto')).toBeOnTheScreen();
+        expect(screen.getByText('Ciclo hoje')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar cadastro do Diário' }));
+        expect(screen.queryByText('Cadastro do Diário aberto')).not.toBeOnTheScreen();
     });
 
     test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {
