@@ -1,5 +1,11 @@
 function criarAparenciaErroInterno(tema) {
-    if (!tema.escuro) return {};
+    if (!tema.escuro) {
+        return {
+            icone: { borderRadius: 14 },
+            fundoIcone: '#EDEDED',
+            corIcone: tema.cores.feedback.erro
+        };
+    }
     return {
         icone: { borderRadius: 14 },
         fundoIcone: 'rgba(239, 154, 154, 0.12)',
