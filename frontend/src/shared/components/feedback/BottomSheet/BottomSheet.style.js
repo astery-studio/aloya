@@ -20,6 +20,21 @@ function criarEstilos(tema) {
             borderTopLeftRadius: tema.radius.bottomSheet,
             borderTopRightRadius: tema.radius.bottomSheet,
             ...tema.shadows.sheet
+        },
+
+        areaArraste: {
+            width: '100%',
+            height: 28,
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+
+        alcaArraste: {
+            width: 44,
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: tema.cores.interface.borda
         }
     });
 }
