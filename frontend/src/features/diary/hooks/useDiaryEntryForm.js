@@ -5,6 +5,8 @@ import { prepararFormularioDiario } from '../utils/diaryForm';
 
 const MENSAGEM_SALVAMENTO =
     'Ocorreu um erro ao salvar registro. Verifique sua conexão e tente novamente.';
+const MENSAGEM_REGISTRO_DUPLICADO =
+    'Já existe um registro no Diário para esta data. Escolha outra data ou edite o registro existente.';
 
 function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirada }) {
     const [data, setData] = useState(() => obterHojeDiario());
@@ -54,7 +56,11 @@ function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirad
             return true;
         } catch (erro) {
             if (erro?.status === 401) onSessaoExpirada?.();
-            setErroSalvamento(MENSAGEM_SALVAMENTO);
+            const registroDuplicado =
+                erro?.status === 409 && erro?.codigo === 'REGISTRO_DIARIO_DUPLICADO';
+            setErroSalvamento(
+                registroDuplicado ? MENSAGEM_REGISTRO_DUPLICADO : MENSAGEM_SALVAMENTO
+            );
             return false;
         } finally {
             setSalvando(false);
@@ -74,4 +80,4 @@ function useDiaryEntryForm({ ativo, catalogo, service, onCriado, onSessaoExpirad
     };
 }
 
-export { MENSAGEM_SALVAMENTO, useDiaryEntryForm };
+export { MENSAGEM_REGISTRO_DUPLICADO, MENSAGEM_SALVAMENTO, useDiaryEntryForm };
