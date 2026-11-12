@@ -123,6 +123,12 @@ test('histórico valida sessão, filtros, cursores e paginação', async () => {
     const pagina = await service.listar(1, { limite: 1, cursor: null, filtros });
     assert.equal(pagina.itens.length, 1);
     assert.ok(pagina.proximoCursor);
+    assert.ok(
+        consultas[0].where.AND.some(
+            (condicao) =>
+                condicao.categorias?.some?.categoriaId?.in?.includes('sintomas_emocionais')
+        )
+    );
     const cursor = codificarCursor({ data: '2026-11-03', id: 3 }, filtros);
     const comCursor = await service.listar(1, { limite: 2, cursor, filtros });
     assert.equal(comCursor.proximoCursor, null);
