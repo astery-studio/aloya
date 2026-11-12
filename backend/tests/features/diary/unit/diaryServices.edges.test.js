@@ -76,11 +76,17 @@ test('detalhe cobre configuração, ausência e apresentação', async () => {
     assert.throws(() => criarDiaryDetailService(), TypeError);
     let valor = null;
     const service = criarDiaryDetailService({
-        prisma: { registroDiario: { findFirst: async () => valor } }
+        prisma: {
+            registroDiario: { findFirst: async () => valor },
+            registroCiclo: {
+                findFirst: async () => ({ dataInicio: data('2026-10-19') }),
+                count: async () => 3
+            }
+        }
     });
     await assert.rejects(() => service.buscar(1, 1), { codigo: 'REGISTRO_DIARIO_NAO_ENCONTRADO' });
     valor = registro();
-    assert.equal((await service.buscar(1, 1)).id, 1);
+    assert.deepEqual((await service.buscar(1, 1)).ciclo, { dia: 21, numero: 3 });
 });
 
 function dependenciasEntrada() {
