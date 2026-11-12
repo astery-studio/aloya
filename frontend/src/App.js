@@ -39,6 +39,7 @@ import { useMenstruationSync } from './features/cycles/hooks/useMenstruationSync
 import { useTheme } from './shared/hooks/useTheme';
 import { obterToken } from './shared/storage/tokenStorage';
 import { fontFamilies } from './shared/theme';
+import { analisarLinkExterno } from './shared/utils/externalLinks';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
@@ -74,15 +75,8 @@ function obterBaseUrl() {
 
     return 'http://10.0.2.2:3000';
 }
-
 function permitirHttpParaTeste() {
     return process.env.EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING === 'true';
-}
-
-function obterTokenRecuperacao(url) {
-    const token = url?.match(/[?&]token=([^&]+)/)?.[1];
-
-    return token ? decodeURIComponent(token) : null;
 }
 
 // Verifica se o armazenamento seguro retornou uma sessão com token válido.
@@ -337,13 +331,19 @@ export default function App() {
 
     useEffect(() => {
         function abrirLink({ url }) {
-            const token = obterTokenRecuperacao(url);
+            const destino = analisarLinkExterno(url);
 
-            if (token) {
-                setTokenRecuperacao(token);
+            if (destino?.tipo === 'recuperacao_senha') {
+                setTokenRecuperacao(destino.token);
 
                 setTelaPublica('redefinirSenha');
 
+                setEstadoSessao('anonima');
+            }
+
+            if (destino?.tipo === 'convite_rede_apoio') {
+                setTokenRecuperacao(null);
+                setTelaPublica('cadastro');
                 setEstadoSessao('anonima');
             }
         }
