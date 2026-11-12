@@ -36,7 +36,11 @@ describe('histórico do Diário', () => {
         await render(<DiaryScreen aoCriar={aoCriar} onSelecionarAba={jest.fn()} />);
 
         expect(screen.getByRole('header', { name: 'Diário' })).toBeOnTheScreen();
-        expect(screen.getByRole('header', { name: 'Nenhum Registro' })).toBeOnTheScreen();
+        expect(screen.getByRole('header', { name: 'Nenhum registro visível' })).toBeOnTheScreen();
+        expect(
+            screen.getByText(/as categorias usadas neles podem estar desativadas/)
+        ).toBeOnTheScreen();
+        expect(screen.getByText(/Ative-as em "Gerenciar categorias"/)).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Adicionar novo registro' }));
         expect(aoCriar).toHaveBeenCalledTimes(1);
     });
@@ -108,7 +112,7 @@ describe('histórico do Diário', () => {
         const resultado = await render(
             <DiaryScreen registros="inválido" aoAbrirFiltros={filtrar} />
         );
-        expect(screen.getByRole('header', { name: 'Nenhum Registro' })).toBeOnTheScreen();
+        expect(screen.getByRole('header', { name: 'Nenhum registro visível' })).toBeOnTheScreen();
         expect(
             screen.queryByRole('button', { name: 'Gerenciar categorias do Diário' })
         ).not.toBeOnTheScreen();
