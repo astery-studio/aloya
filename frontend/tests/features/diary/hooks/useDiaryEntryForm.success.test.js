@@ -60,3 +60,43 @@ test('não salva sem serviço configurado', async () => {
     const { result } = await renderHook(() => useDiaryEntryForm({ ativo: true, catalogo }));
     await expect(result.current.salvar()).resolves.toBe(false);
 });
+
+test('pré-preenche a edição e só salva depois de uma alteração real', async () => {
+    const registroInicial = {
+        id: 7,
+        data: '2026-11-08',
+        versao: 3,
+        categorias: [{ id: 'sintomas', opcoes: [{ id: 'colica' }] }]
+    };
+    const atualizado = { ...registroInicial, versao: 4, categorias: [] };
+    const service = { editarRegistro: jest.fn().mockResolvedValue(atualizado) };
+    const onSalvo = jest.fn();
+    const { result } = await renderHook(() =>
+        useDiaryEntryForm({
+            ativo: true,
+            modo: 'editar',
+            registroInicial,
+            catalogo,
+            service,
+            onSalvo
+        })
+    );
+
+    expect(result.current.valores).toEqual({ sintomas: ['colica'] });
+    expect(result.current.alterado).toBe(false);
+    await expect(result.current.salvar()).resolves.toBe(false);
+    expect(service.editarRegistro).not.toHaveBeenCalled();
+
+    await act(() => result.current.alterarValor('sintomas', ['fadiga']));
+    expect(result.current.alterado).toBe(true);
+    await act(async () => expect(await result.current.salvar()).toBe(true));
+    expect(service.editarRegistro).toHaveBeenCalledWith(7, 3, {
+        data: '2026-11-08',
+        fusoHorario: expect.any(String),
+        categorias: [{ categoriaId: 'sintomas', opcoes: ['fadiga'] }]
+    });
+    expect(onSalvo).toHaveBeenCalledWith(atualizado);
+
+    await act(() => result.current.alterarValor('sintomas', ['colica']));
+    expect(result.current.alterado).toBe(false);
+});
