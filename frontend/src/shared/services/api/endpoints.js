@@ -22,6 +22,7 @@ const endpoints = Object.freeze({
     ciclos: '/api/cycles',
     catalogoDiario: '/api/diario/catalogo',
     registrosDiario: '/api/diario/registros',
+    resumoDiario: '/api/diario/resumo',
     categoriasPermissao: '/support-network/permission-categories',
     previsaoCiclo: '/cycles/prediction'
 });
