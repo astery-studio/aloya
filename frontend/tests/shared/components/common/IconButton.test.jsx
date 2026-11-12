@@ -100,6 +100,7 @@ describe('IconButton', () => {
             disabled: false,
             selected: true
         });
+        expect(IconeTeste).toHaveBeenCalledWith(expect.objectContaining({ size: 28 }), undefined);
     });
 
     test('usa a variante de calendário do protótipo', async () => {
@@ -223,6 +224,21 @@ describe('IconButton', () => {
         });
 
         expect(botao).toHaveProp('hitSlop', 4);
+    });
+
+    test('oferece apresentação compacta com área efetiva de toque preservada', async () => {
+        await render(
+            <IconButton
+                icone={IconeTeste}
+                compacto
+                aoPressionar={jest.fn()}
+                rotuloAcessibilidade="Editar registro"
+            />
+        );
+        const botao = screen.getByRole('button', { name: 'Editar registro' });
+        expect(botao).toHaveStyle({ width: 32, height: 32 });
+        expect(botao).toHaveProp('hitSlop', 6);
+        expect(IconeTeste).toHaveBeenCalledWith(expect.objectContaining({ size: 16 }), undefined);
     });
 
     test('usa superfície, borda e ícone do modo escuro', async () => {
