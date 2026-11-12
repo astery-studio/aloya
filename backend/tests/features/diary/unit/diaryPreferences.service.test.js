@@ -41,6 +41,28 @@ test('atualiza macro e incrementa a versão atomicamente', async () => {
     assert.equal(cenario.chamadas.at(-1)[0], 'macro');
 });
 
+test('reativa todas as categorias ao reativar uma macro', async () => {
+    const cenario = criarCenario();
+    const service = criarDiaryPreferencesService(cenario);
+
+    await service.atualizar({
+        usuarioId: 8,
+        tipo: 'macrocategoria',
+        id: 'energia_sono',
+        ativa: true,
+        versao: 2
+    });
+
+    const categorias = cenario.chamadas
+        .filter(([tipo]) => tipo === 'categoria')
+        .map(([, dados]) => dados.create);
+    assert.deepEqual(categorias, [
+        { usuarioId: 8, categoriaId: 'energia', ativa: true },
+        { usuarioId: 8, categoriaId: 'qualidade_sono', ativa: true },
+        { usuarioId: 8, categoriaId: 'tempo_sono', ativa: true }
+    ]);
+});
+
 test('rejeita versão superada sem gravar preferência', async () => {
     const cenario = criarCenario(0);
     const service = criarDiaryPreferencesService(cenario);
