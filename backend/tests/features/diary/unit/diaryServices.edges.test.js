@@ -228,7 +228,7 @@ function dependenciasPreferencias() {
     const tx = {
         configuracaoDiario: { upsert: async () => {}, updateMany: async () => ({ count: 1 }) },
         preferenciaMacrocategoriaDiario: { upsert: async () => {} },
-        preferenciaCategoriaDiario: { upsert: async () => {} }
+        preferenciaCategoriaDiario: { upsert: async () => {}, updateMany: async () => {} }
     };
     return {
         tx,
