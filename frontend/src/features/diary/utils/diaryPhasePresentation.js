@@ -10,28 +10,32 @@ const FASES_DIARIO = Object.freeze({
         cor: '#C85A44',
         fundoIcone: 'rgba(200, 90, 68, 0.10)',
         fundo: 'rgba(200, 90, 68, 0.20)',
-        Icone: DropIcon
+        Icone: DropIcon,
+        pesoIcone: 'fill'
     },
     folicular: {
         rotulo: 'Fase Folicular',
         cor: '#3B7150',
         fundoIcone: 'rgba(59, 113, 80, 0.10)',
         fundo: 'rgba(59, 113, 80, 0.16)',
-        Icone: PlantIcon
+        Icone: PlantIcon,
+        pesoIcone: 'regular'
     },
     ovulacao: {
         rotulo: 'Fase Ovulatória',
         cor: '#4A758E',
         fundoIcone: 'rgba(74, 117, 142, 0.10)',
         fundo: 'rgba(74, 117, 142, 0.16)',
-        Icone: SunIcon
+        Icone: SunIcon,
+        pesoIcone: 'regular'
     },
     lutea: {
         rotulo: 'Fase Lútea',
         cor: '#B06D2A',
         fundoIcone: 'rgba(176, 109, 42, 0.10)',
         fundo: 'rgba(176, 109, 42, 0.16)',
-        Icone: WavesIcon
+        Icone: WavesIcon,
+        pesoIcone: 'regular'
     }
 });
 
@@ -45,7 +49,8 @@ const FASE_INDEFINIDA_DIARIO = Object.freeze({
     cor: '#6B6B66',
     fundoIcone: 'rgba(107, 107, 102, 0.10)',
     fundo: 'rgba(107, 107, 102, 0.14)',
-    Icone: QuestionIcon
+    Icone: QuestionIcon,
+    pesoIcone: 'regular'
 });
 
 function obterApresentacaoFase(fase) {
