@@ -54,6 +54,11 @@ describe('DiaryOverviewCard', () => {
             />
         );
         expect(screen.getByText('1 dia registrado')).toBeOnTheScreen();
+        expect(
+            screen.getByTestId('diary-phase-icon-menstrual', {
+                includeHiddenElements: true
+            })
+        ).toBeOnTheScreen();
 
         await resultado.rerender(
             <DiaryOverviewCard
