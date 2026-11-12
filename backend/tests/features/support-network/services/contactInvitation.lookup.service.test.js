@@ -37,10 +37,23 @@ test('informa somente se o e-mail pertence a uma conta de contato ativa', async 
     });
 });
 
-test('não expõe conta inexistente, principal, suspensa ou da própria titular', async () => {
+test('reconhece uma conta principal ativa como contato cadastrado', async () => {
+    const service = criarContactInvitationService({
+        prisma: criarPrisma({ id: 8, papel: 'principal', statusConta: 'ativa' })
+    });
+
+    const resultado = await service.consultarEmail({
+        titularId: 2,
+        papel: 'principal',
+        email: 'pessoa@example.com'
+    });
+
+    assert.equal(resultado.contaContatoCadastrada, true);
+});
+
+test('não expõe conta inexistente, suspensa ou da própria titular', async () => {
     const cenarios = [
         null,
-        { id: 8, papel: 'principal', statusConta: 'ativa' },
         { id: 8, papel: 'contato_apoio', statusConta: 'suspensa' },
         { id: 2, papel: 'contato_apoio', statusConta: 'ativa' }
     ];

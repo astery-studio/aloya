@@ -16,7 +16,7 @@ test('reconhece somente os papéis que podem convidar contatos', () => {
     assert.equal(papelEhTitular('contato_apoio'), false);
 });
 
-test('reconhece somente contas ativas com papel de contato', () => {
+test('reconhece qualquer conta ativa que possa acompanhar uma titular', () => {
     assert.equal(
         usuarioEhContatoCadastrado({ papel: 'contato_apoio', statusConta: 'ativa' }),
         true
@@ -25,7 +25,7 @@ test('reconhece somente contas ativas com papel de contato', () => {
         usuarioEhContatoCadastrado({ papel: 'principal_e_contato_apoio', statusConta: 'ativa' }),
         true
     );
-    assert.equal(usuarioEhContatoCadastrado({ papel: 'principal', statusConta: 'ativa' }), false);
+    assert.equal(usuarioEhContatoCadastrado({ papel: 'principal', statusConta: 'ativa' }), true);
     assert.equal(
         usuarioEhContatoCadastrado({ papel: 'contato_apoio', statusConta: 'suspensa' }),
         false

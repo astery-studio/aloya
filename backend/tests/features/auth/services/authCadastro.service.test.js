@@ -28,7 +28,11 @@ function criarDadosValidos(alteracoes = {}) {
     };
 }
 
-function criarDependencias({ usuarioExistente = null, falharEnvioEmail = false } = {}) {
+function criarDependencias({
+    usuarioExistente = null,
+    falharEnvioEmail = false,
+    convitesAssociados = 0
+} = {}) {
     const chamadas = {
         buscarUsuario: [],
         gerarHash: [],
@@ -60,7 +64,7 @@ function criarDependencias({ usuarioExistente = null, falharEnvioEmail = false }
         vinculoRedeApoio: {
             async updateMany(argumentos) {
                 chamadas.associarConvites.push(argumentos);
-                return { count: 1 };
+                return { count: convitesAssociados };
             }
         },
 
@@ -242,7 +246,7 @@ test('cria conta ativa e sessão persistida', async () => {
 });
 
 test('cria conta de contato sem ciclo e associa convites pendentes pelo e-mail', async () => {
-    const { authService, chamadas } = criarDependencias();
+    const { authService, chamadas } = criarDependencias({ convitesAssociados: 1 });
 
     const resultado = await authService.cadastrar(
         criarDadosValidos({
@@ -270,6 +274,17 @@ test('cria conta de contato sem ciclo e associa convites pendentes pelo e-mail',
     assert.equal(resultado.usuario.papel, 'contato_apoio');
     assert.equal(resultado.cicloInicial, null);
     assert.equal(resultado.consentimentoParental.exigidoParaRedeApoio, false);
+});
+
+test('associa convite à nova conta principal sem promovê-la antes do aceite', async () => {
+    const { authService, chamadas } = criarDependencias({ convitesAssociados: 1 });
+
+    const resultado = await authService.cadastrar(criarDadosValidos());
+
+    assert.equal(resultado.usuario.papel, 'principal');
+    assert.equal(chamadas.gerarTokenSessao[0].papel, 'principal');
+    assert.equal(chamadas.criarRegistroCiclo.length, 1);
+    assert.equal(chamadas.associarConvites.length, 1);
 });
 
 test('aplica 14 dias como duração lútea padrão', async () => {

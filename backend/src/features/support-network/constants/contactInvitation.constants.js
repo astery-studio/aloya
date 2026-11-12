@@ -20,7 +20,10 @@ function papelEhTitular(papel) {
 }
 
 function usuarioEhContatoCadastrado(usuario) {
-    return usuario?.statusConta === STATUS_CONTA_ATIVA && PAPEIS_CONTATO.includes(usuario?.papel);
+    return (
+        usuario?.statusConta === STATUS_CONTA_ATIVA &&
+        [...PAPEIS_TITULAR, ...PAPEIS_CONTATO].includes(usuario?.papel)
+    );
 }
 
 export {
