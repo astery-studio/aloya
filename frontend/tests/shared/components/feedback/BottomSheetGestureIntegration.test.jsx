@@ -5,11 +5,12 @@ import { BottomSheet } from '../../../../src/shared/components/feedback/BottomSh
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 describe('gesto integrado do BottomSheet', () => {
-    let configuracao;
+    let configuracoes;
 
     beforeEach(() => {
+        configuracoes = [];
         jest.spyOn(PanResponder, 'create').mockImplementation((recebida) => {
-            configuracao = recebida;
+            configuracoes.push(recebida);
             return { panHandlers: {} };
         });
     });
@@ -24,11 +25,16 @@ describe('gesto integrado do BottomSheet', () => {
             </BottomSheet>
         );
 
-        expect(configuracao.onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(true);
-        expect(configuracao.onMoveShouldSetPanResponderCapture(null, { dx: 1, dy: 10 })).toBe(true);
-        expect(configuracao.onPanResponderTerminationRequest()).toBe(false);
+        const painel = configuracoes[0];
+        const alca = configuracoes[1];
+        expect(painel.onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(true);
+        expect(painel.onMoveShouldSetPanResponderCapture(null, { dx: 1, dy: 10 })).toBe(true);
+        expect(alca.onStartShouldSetPanResponder()).toBe(true);
+        expect(alca.onStartShouldSetPanResponderCapture()).toBe(true);
+        expect(alca.onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(true);
+        expect(painel.onPanResponderTerminationRequest()).toBe(false);
         expect(screen.getByTestId('bottom-sheet-area-arraste')).toBeOnTheScreen();
-        await act(async () => configuracao.onPanResponderMove(null, { dy: -5 }));
+        await act(async () => painel.onPanResponderMove(null, { dy: -5 }));
         expect(setValue).toHaveBeenLastCalledWith(0);
 
         await resultado.rerender(
@@ -36,7 +42,13 @@ describe('gesto integrado do BottomSheet', () => {
                 <Text>Conteúdo</Text>
             </BottomSheet>
         );
-        expect(configuracao.onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(false);
+        expect(configuracoes.at(-2).onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(
+            false
+        );
+        expect(configuracoes.at(-1).onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(
+            false
+        );
+        expect(configuracoes.at(-1).onStartShouldSetPanResponder()).toBe(false);
     });
 
     test('fecha por gesto suficiente e permite escape acessível', async () => {
@@ -46,7 +58,7 @@ describe('gesto integrado do BottomSheet', () => {
                 <Text>Conteúdo</Text>
             </BottomSheet>
         );
-        await act(async () => configuracao.onPanResponderRelease(null, { dy: 64, vy: 0 }));
+        await act(async () => configuracoes[0].onPanResponderRelease(null, { dy: 48, vy: 0 }));
         await act(async () =>
             screen.getByTestId('bottom-sheet-painel').props.onAccessibilityEscape()
         );
@@ -61,8 +73,11 @@ describe('gesto integrado do BottomSheet', () => {
             </BottomSheet>
         );
 
-        expect(configuracao.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 20 })).toBe(
+        expect(configuracoes[0].onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 20 })).toBe(
             false
+        );
+        expect(configuracoes[1].onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 20 })).toBe(
+            true
         );
         expect(podeIniciarDeslize).toHaveBeenCalled();
     });
@@ -75,9 +90,25 @@ describe('gesto integrado do BottomSheet', () => {
                 <Text>Conteúdo</Text>
             </BottomSheet>
         );
-        await act(async () => configuracao.onPanResponderRelease(null, { dy: 20, vy: 0 }));
-        await act(async () => configuracao.onPanResponderTerminate());
+        await act(async () => configuracoes[0].onPanResponderRelease(null, { dy: 20, vy: 0 }));
+        await act(async () => configuracoes[0].onPanResponderTerminate());
         expect(spring).toHaveBeenCalledTimes(2);
         expect(iniciar).toHaveBeenCalledTimes(2);
+    });
+
+    test('só restaura um gesto completo quando o fechamento é interceptado', async () => {
+        const iniciar = jest.fn();
+        const spring = jest.spyOn(Animated, 'spring').mockReturnValue({ start: iniciar });
+        const onFechar = jest.fn().mockReturnValue(false);
+        await render(
+            <BottomSheet visivel permitirDeslizarParaFechar onFechar={onFechar}>
+                <Text>Conteúdo</Text>
+            </BottomSheet>
+        );
+
+        await act(async () => configuracoes[0].onPanResponderRelease(null, { dy: 48, vy: 0 }));
+        expect(onFechar).toHaveBeenCalledTimes(1);
+        expect(spring).toHaveBeenCalledTimes(1);
+        expect(iniciar).toHaveBeenCalledTimes(1);
     });
 });
