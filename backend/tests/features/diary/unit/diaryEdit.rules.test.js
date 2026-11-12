@@ -15,11 +15,13 @@ const atual = {
 };
 const macroInativa = [{ macrocategoriaId: 'saude_acompanhamento', ativa: false }];
 
-test('preserva categoria inativa quando permanece idêntica', () => {
-    assert.doesNotThrow(() => validarEdicaoCategorias([nova], [atual], macroInativa, []));
+test('rejeita o envio de categoria inativa mesmo quando permanece idêntica', () => {
+    assert.throws(() => validarEdicaoCategorias([nova], [atual], macroInativa, []), {
+        codigo: 'CATEGORIA_DIARIO_INATIVA'
+    });
 });
 
-test('rejeita alteração de categoria inativa', () => {
+test('rejeita alteração explícita de categoria inativa', () => {
     const alterada = validarCategoriaPreenchida({
         categoriaId: 'anotacao_livre',
         texto: 'Alterada'
@@ -29,8 +31,6 @@ test('rejeita alteração de categoria inativa', () => {
     });
 });
 
-test('rejeita omissão de categoria inativa', () => {
-    assert.throws(() => validarEdicaoCategorias([], [atual], macroInativa, []), {
-        codigo: 'CATEGORIA_INATIVA_OMITIDA'
-    });
+test('permite omitir categoria inativa para preservá-la no servidor', () => {
+    assert.doesNotThrow(() => validarEdicaoCategorias([], [atual], macroInativa, []));
 });
