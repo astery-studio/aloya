@@ -1,42 +1,77 @@
+// Define a composição responsiva da tela do Diário e de sua ação fixa.
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../shared/theme';
 
+// Converte os tokens do tema em estilos da screen e de seus estados.
 function criarEstilos(tema) {
     return StyleSheet.create({
-        conteudo: {
+        tela: {
             flex: 1,
-            paddingHorizontal: 24,
-            paddingTop: 28,
-            backgroundColor: tema.cores.interface.fundo
+            minHeight: 0,
+            alignSelf: 'stretch'
         },
-        apresentacao: {
-            padding: 20,
+        conteudoEstatico: { flex: 1, paddingHorizontal: 20 },
+        introducao: {
+            width: 350.011,
+            maxWidth: '100%',
+            alignSelf: 'center',
+            alignItems: 'center',
             gap: 8,
-            borderRadius: 18,
-            backgroundColor: tema.cores.interface.superficieElevada,
-            ...tema.shadows.card
-        },
-        titulo: {
-            fontFamily: fontFamilies.bold,
-            fontSize: 22,
-            lineHeight: 30,
-            color: tema.cores.interface.textoPrincipal
+            paddingTop: 8,
+            paddingBottom: 20
         },
         descricao: {
+            width: '100%',
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 15,
+            lineHeight: 22
+        },
+        atualizando: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+        textoAtualizando: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 12,
+            lineHeight: 17
+        },
+        estadoCentralizado: { flex: 1, justifyContent: 'center', paddingBottom: 56 },
+        mensagemEstado: {
+            marginTop: 10,
+            color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
-            color: tema.cores.interface.textoSecundario
+            textAlign: 'center'
         },
-        acao: { marginTop: 20 },
-        confirmacao: {
-            marginTop: 14,
-            fontFamily: fontFamilies.medium,
-            fontSize: 13,
-            lineHeight: 19,
-            textAlign: 'center',
-            color: tema.cores.interface.destaque
+        cabecalhoLista: { gap: 0, paddingTop: 0 },
+        divisor: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            paddingTop: 20,
+            paddingBottom: 24
+        },
+        linhaDivisor: { flex: 1, height: 1, backgroundColor: tema.cores.interface.borda },
+        textoDivisor: {
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.bold,
+            fontSize: 12,
+            lineHeight: 18,
+            letterSpacing: 0.72
+        },
+        lista: { paddingBottom: 96 },
+        acaoFixa: {
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            left: 0,
+            paddingHorizontal: 20,
+            paddingTop: 16,
+            paddingBottom: 16,
+            borderTopWidth: 1,
+            borderTopColor: tema.cores.interface.borda,
+            backgroundColor: tema.cores.interface.fundo
         }
     });
 }
