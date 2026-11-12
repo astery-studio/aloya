@@ -1,8 +1,11 @@
 // Controla carregamento, cursor, deduplicação e atualização local do histórico do Diário.
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { criarChaveFiltrosDiario, possuiFiltrosDiario } from '../utils/diaryFilters';
+
 const MENSAGEM_ERRO = 'Não foi possível carregar seu histórico do Diário. Tente novamente.';
 const MENSAGEM_ERRO_PAGINACAO = 'Não foi possível carregar mais registros.';
+const MENSAGEM_ERRO_FILTRO = 'Não foi possível aplicar os filtros no momento. Tente novamente.';
 
 // Identifica falhas que exigem encerrar a sessão sem revelar detalhes técnicos.
 function sessaoInvalida(erro) {
@@ -19,13 +22,16 @@ function mesclarRegistros(atuais, novos) {
 }
 
 // Recebe o serviço autenticado e retorna o estado e as ações paginadas do histórico.
-function useDiaryHistory({ service, onSessaoExpirada } = {}) {
+function useDiaryHistory({ service, filtros, onSessaoExpirada } = {}) {
+    const chaveFiltros = criarChaveFiltrosDiario(filtros);
+    const filtrosAtivos = possuiFiltrosDiario(filtros);
     const [registros, setRegistros] = useState([]);
     const [proximoCursor, setProximoCursor] = useState(null);
     const [carregando, setCarregando] = useState(true);
     const [atualizando, setAtualizando] = useState(false);
     const [carregandoMais, setCarregandoMais] = useState(false);
     const [erro, setErro] = useState(null);
+    const [erroFiltro, setErroFiltro] = useState(null);
     const [erroCarregarMais, setErroCarregarMais] = useState(null);
     const montado = useRef(false);
     const registrosRef = useRef([]);
@@ -63,13 +69,17 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
         const versao = ++revisao.current;
         controleInicial.current = controle;
         setErro(null);
+        setErroFiltro(null);
         setErroCarregarMais(null);
         if (registrosRef.current.length) setAtualizando(true);
         else setCarregando(true);
 
         const requisicao = (async () => {
             try {
-                const pagina = await service.listarHistorico({ signal: controle.signal });
+                const pagina = await service.listarHistorico({
+                    ...(filtrosAtivos ? { filtros: JSON.parse(chaveFiltros) } : {}),
+                    signal: controle.signal
+                });
                 if (!montado.current || controle.signal.aborted || versao !== revisao.current) {
                     return false;
                 }
@@ -84,7 +94,8 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
                     onSessaoExpirada?.({ mensagem: 'Sua sessão expirou. Entre novamente.' });
                     return false;
                 }
-                setErro(MENSAGEM_ERRO);
+                if (filtrosAtivos) setErroFiltro(MENSAGEM_ERRO_FILTRO);
+                else setErro(MENSAGEM_ERRO);
                 return false;
             } finally {
                 if (requisicaoInicial.current === requisicao) requisicaoInicial.current = null;
@@ -97,7 +108,14 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
         })();
         requisicaoInicial.current = requisicao;
         return requisicao;
-    }, [atualizarCursor, atualizarRegistros, onSessaoExpirada, service]);
+    }, [
+        atualizarCursor,
+        atualizarRegistros,
+        chaveFiltros,
+        filtrosAtivos,
+        onSessaoExpirada,
+        service
+    ]);
 
     const carregarMais = useCallback(() => {
         const cursor = cursorRef.current;
@@ -117,7 +135,11 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
 
         const requisicao = (async () => {
             try {
-                const pagina = await service.listarHistorico({ cursor, signal: controle.signal });
+                const pagina = await service.listarHistorico({
+                    cursor,
+                    ...(filtrosAtivos ? { filtros: JSON.parse(chaveFiltros) } : {}),
+                    signal: controle.signal
+                });
                 if (!montado.current || controle.signal.aborted || versao !== revisao.current) {
                     return false;
                 }
@@ -142,7 +164,14 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
         })();
         requisicaoPagina.current = requisicao;
         return requisicao;
-    }, [atualizarCursor, atualizarRegistros, onSessaoExpirada, service]);
+    }, [
+        atualizarCursor,
+        atualizarRegistros,
+        chaveFiltros,
+        filtrosAtivos,
+        onSessaoExpirada,
+        service
+    ]);
 
     useEffect(() => {
         montado.current = true;
@@ -167,6 +196,7 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
     );
 
     const obterRegistrosAtuais = useCallback(() => registrosRef.current, []);
+    const fecharErroFiltro = useCallback(() => setErroFiltro(null), []);
 
     return {
         registros,
@@ -174,11 +204,14 @@ function useDiaryHistory({ service, onSessaoExpirada } = {}) {
         atualizando,
         carregandoMais,
         erro,
+        erroFiltro,
         erroCarregarMais,
         temMais: proximoCursor !== null,
         recarregar: carregar,
         carregarMais,
         tentarCarregarMais: carregarMais,
+        tentarAplicarFiltros: carregar,
+        fecharErroFiltro,
         obterRegistrosAtuais,
         removerLocalmente
     };
