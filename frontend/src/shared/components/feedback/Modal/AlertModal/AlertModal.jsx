@@ -29,6 +29,7 @@ export default function AlertModal({
     erroInterno = false
 }) {
     const comSenha = variante === 'comSenha';
+    const confirmacao = variante === 'confirmacao';
     const senhaAtual = typeof senha === 'string' ? senha : '';
     const Icone = icone === undefined ? (comSenha ? LockKeyIcon : WarningCircleIcon) : icone;
     const acaoPadrao =
@@ -48,7 +49,7 @@ export default function AlertModal({
     );
     const fechamentoDoModal = carregando ? ignorarFechamento : aoFechar;
 
-    if (!['padrao', 'comSenha'].includes(variante)) {
+    if (!['padrao', 'comSenha', 'confirmacao'].includes(variante)) {
         throw new Error(`Variante de AlertModal inválida: ${variante}`);
     }
 
@@ -65,14 +66,24 @@ export default function AlertModal({
     }
 
     const tema = useTheme();
+    const aparenciaConfirmacao = confirmacao
+        ? {
+              fundoIcone: tema.escuro ? tema.cores.interface.separador : '#F5EDE3',
+              corIcone: tema.cores.marca.primaria,
+              icone: { borderRadius: 12 }
+          }
+        : {};
+    const aparenciaErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
     const aparencia = {
+        ...aparenciaConfirmacao,
         ...aparenciaInformada,
-        ...(erroInterno ? criarAparenciaErroInterno(tema) : {})
+        ...aparenciaErro,
+        icone: [aparenciaConfirmacao.icone, aparenciaInformada.icone, aparenciaErro.icone]
     };
 
     return (
         <AppModal
-            variante={comSenha ? 'acao' : 'alerta'}
+            variante={comSenha || confirmacao ? 'acao' : 'alerta'}
             visivel={visivel}
             aoFechar={fechamentoDoModal}
             icone={Icone}
