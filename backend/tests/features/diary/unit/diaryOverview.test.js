@@ -61,6 +61,35 @@ test('mantém fallback quando a amostra ou repetição é insuficiente', async (
     assert.equal((await service.buscar(3, 'lutea')).informacoesSuficientes, false);
 });
 
+test('conta e analisa somente registros com categorias atualmente ativas', async () => {
+    let whereContagem;
+    let whereRegistros;
+    const prisma = prismaCom([]);
+    prisma.preferenciaCategoriaDiario.findMany = async () => [
+        { categoriaId: 'sintomas_emocionais', ativa: false }
+    ];
+    prisma.registroDiario.count = async ({ where }) => {
+        whereContagem = where;
+        return 2;
+    };
+    prisma.registroDiario.findMany = async ({ where }) => {
+        whereRegistros = where;
+        return [];
+    };
+
+    const resumo = await criarDiaryOverviewService({ prisma }).buscar(3, 'folicular');
+
+    assert.equal(resumo.diasRegistrados, 2);
+    assert.equal(
+        whereContagem.categorias.some.categoriaId.in.includes('sintomas_emocionais'),
+        false
+    );
+    assert.equal(
+        whereRegistros.categorias.some.categoriaId.in.includes('sintomas_emocionais'),
+        false
+    );
+});
+
 test('deduplica marcadores no mesmo dia e ignora categorias não ativas', () => {
     const registros = [
         {
