@@ -31,6 +31,51 @@ function normalizarCategoria(categoria) {
     return normalizada;
 }
 
+function converterCategoriaDoDetalhe(categoria) {
+    if (!categoria || typeof categoria.id !== 'string' || !categoria.id) return null;
+    if (Array.isArray(categoria.opcoes) && categoria.opcoes.length > 0) {
+        return {
+            categoriaId: categoria.id,
+            opcoes: categoria.opcoes.map(({ id }) => id).filter(Boolean)
+        };
+    }
+    if (typeof categoria.texto === 'string' && categoria.texto.length > 0) {
+        return { categoriaId: categoria.id, texto: categoria.texto };
+    }
+    if (Number.isSafeInteger(categoria.duracaoMinutos)) {
+        return { categoriaId: categoria.id, duracaoMinutos: categoria.duracaoMinutos };
+    }
+    if (typeof categoria.valor !== 'string' || !categoria.valor) return null;
+    return {
+        categoriaId: categoria.id,
+        valor: categoria.valor,
+        ...(categoria.id === 'temperatura_basal'
+            ? {
+                  perturbada: categoria.perturbada === true,
+                  ...(categoria.perturbada && categoria.motivoPerturbacao
+                      ? { motivoPerturbacao: categoria.motivoPerturbacao }
+                      : {})
+              }
+            : {})
+    };
+}
+
+function criarCategoriasInativasPreservadas(catalogo, registro) {
+    const categoriasAtivas = new Set(
+        (catalogo?.macrocategorias ?? []).flatMap((macro) =>
+            macro.ativa
+                ? macro.categorias
+                      .filter((categoria) => categoria.ativaEfetiva)
+                      .map((categoria) => categoria.id)
+                : []
+        )
+    );
+    return (registro?.categorias ?? [])
+        .filter((categoria) => !categoriasAtivas.has(categoria?.id))
+        .map(converterCategoriaDoDetalhe)
+        .filter(Boolean);
+}
+
 // Compara o que efetivamente seria persistido, ignorando ordem visual e fuso horário.
 function criarAssinaturaFormulario({ catalogo, valores, data, hoje }) {
     const formulario = prepararFormularioDiario({ catalogo, valores, data, hoje });
@@ -41,4 +86,9 @@ function criarAssinaturaFormulario({ catalogo, valores, data, hoje }) {
     return JSON.stringify({ data, categorias });
 }
 
-export { criarAssinaturaFormulario, criarValoresIniciaisEdicao };
+export {
+    converterCategoriaDoDetalhe,
+    criarAssinaturaFormulario,
+    criarCategoriasInativasPreservadas,
+    criarValoresIniciaisEdicao
+};
