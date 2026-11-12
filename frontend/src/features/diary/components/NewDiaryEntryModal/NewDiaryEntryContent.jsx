@@ -22,7 +22,8 @@ function NewDiaryEntryContent({
     recarregar,
     formulario,
     fase,
-    carregandoFase
+    carregandoFase,
+    onPosicaoRolagem
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -79,6 +80,8 @@ function NewDiaryEntryContent({
                 contentContainerStyle={estilos.conteudo}
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="never"
+                onScroll={(evento) => onPosicaoRolagem?.(evento.nativeEvent.contentOffset.y)}
+                scrollEventThrottle={16}
             >
                 <View style={estilos.cartaoRegistro}>
                     <Text style={estilos.tituloCartao}>Registro no Diário</Text>
