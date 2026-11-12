@@ -130,7 +130,7 @@ function SupportCategoriesScreen({
         <>
             <SafeAreaView
                 testID="support-categories-screen"
-                edges={['bottom']}
+                edges={['left', 'right', 'bottom']}
                 style={estilos.tela}
             >
                 <Header titulo="Categorias de Permissão" variante="comVoltar" onVoltar={onVoltar} />

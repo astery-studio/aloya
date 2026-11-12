@@ -26,8 +26,9 @@ function MainLayout({
     const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
 
     return (
-        <View
+        <SafeAreaView
             testID="main-layout"
+            edges={['left', 'right']}
             style={[
                 estilos.container,
                 corFundo
@@ -70,7 +71,7 @@ function MainLayout({
             ) : (
                 navegacaoInferior
             )}
-        </View>
+        </SafeAreaView>
     );
 }
 

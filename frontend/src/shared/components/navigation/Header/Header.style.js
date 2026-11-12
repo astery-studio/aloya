@@ -16,15 +16,15 @@ function criarEstilos(tema) {
             : {},
 
         espacamentoSuperior: {
-            height: 56
+            height: 12
         },
 
         espacamentoSuperiorComVoltar: {
-            height: 48
+            height: 4
         },
 
         espacamentoSuperiorRedeApoio: {
-            height: 55.99
+            height: 12
         },
 
         areaTitulo: {

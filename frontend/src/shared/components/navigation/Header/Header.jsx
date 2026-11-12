@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ArrowLeftIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
@@ -19,8 +20,9 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
     return (
-        <View
+        <SafeAreaView
             testID="header-container"
+            edges={['top']}
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
@@ -97,7 +99,7 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
                     </View>
                 ) : null}
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 

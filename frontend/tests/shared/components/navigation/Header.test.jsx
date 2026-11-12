@@ -33,6 +33,11 @@ describe('Header', () => {
             flex: 1,
             flexShrink: 1
         });
+
+        expect(screen.getByTestId('header-container').props.edges).toMatchObject({
+            top: 'additive',
+            bottom: 'off'
+        });
     });
 
     test('não mostra botão de voltar na variante padrão', async () => {
