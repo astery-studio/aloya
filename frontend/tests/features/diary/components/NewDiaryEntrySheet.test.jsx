@@ -53,6 +53,7 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
     await render(
         <NewDiaryEntrySheet
             visivel
+            dataInicial="2026-11-05"
             service={service}
             calendarService={calendarService}
             onFechar={onFechar}
@@ -73,6 +74,7 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
         ativo: true,
         catalogo,
         service,
+        dataInicial: '2026-11-05',
         onSessaoExpirada
     });
     await act(async () => parametrosFormulario.onCriado({ id: 1 }));
