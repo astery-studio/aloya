@@ -231,3 +231,32 @@ test('não limpa uma requisição inicial mais nova ao trocar de serviço', asyn
     await waitFor(() => expect(hook.result.current.registros).toEqual([recente]));
     await hook.unmount();
 });
+
+test('aplica filtros, preserva a última lista válida no erro e permite tentar novamente', async () => {
+    const service = {
+        listarHistorico: jest
+            .fn()
+            .mockResolvedValueOnce({ itens: [recente], proximoCursor: null })
+            .mockRejectedValueOnce(new Error('falha privada'))
+            .mockResolvedValueOnce({ itens: [antigo], proximoCursor: null })
+    };
+    const hook = await renderHook(({ filtros }) => useDiaryHistory({ service, filtros }), {
+        initialProps: { filtros: {} }
+    });
+    await waitFor(() => expect(hook.result.current.registros).toEqual([recente]));
+
+    await hook.rerender({ filtros: { fases: ['lutea'] } });
+    await waitFor(() => expect(hook.result.current.erroFiltro).not.toBeNull());
+    expect(hook.result.current.erroFiltro).toBe(
+        'Não foi possível aplicar os filtros no momento. Tente novamente.'
+    );
+    expect(hook.result.current.registros).toEqual([recente]);
+    expect(service.listarHistorico).toHaveBeenNthCalledWith(2, {
+        filtros: { dataInicio: null, dataFim: null, categorias: [], fases: ['lutea'] },
+        signal: expect.any(AbortSignal)
+    });
+
+    await act(async () => hook.result.current.tentarAplicarFiltros());
+    expect(hook.result.current.registros).toEqual([antigo]);
+    expect(hook.result.current.erroFiltro).toBeNull();
+});
