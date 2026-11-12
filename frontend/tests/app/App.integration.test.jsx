@@ -405,6 +405,7 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
+import { NewSupportCategoryScreen } from '../../src/features/support-network/screens/NewSupportCategoryScreen';
 import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from '../../src/features/diary/DiaryFlow';
@@ -627,6 +628,10 @@ describe('App integrado', () => {
         );
 
         expect(await screen.findByText('Nova categoria')).toBeOnTheScreen();
+        expect(NewSupportCategoryScreen).toHaveBeenCalledWith(
+            expect.objectContaining({ diaryService: servicos.diaryService }),
+            undefined
+        );
     });
 
     test('volta da criação de categoria para membros', async () => {
