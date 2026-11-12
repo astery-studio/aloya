@@ -70,6 +70,29 @@ describe('histórico no diaryService', () => {
         expect(Object.isFrozen(pagina)).toBe(true);
     });
 
+    test('serializa filtros combinados e ordenados no histórico', async () => {
+        const requisicaoAutenticada = jest.fn().mockResolvedValue({
+            itens: [],
+            proximoCursor: null
+        });
+        const service = criarDiaryService({ requisicaoAutenticada });
+
+        await service.listarHistorico({
+            filtros: {
+                dataInicio: '2026-11-01',
+                dataFim: '2026-11-12',
+                categorias: ['pele', 'fluxo_menstrual'],
+                fases: ['lutea', 'menstrual']
+            }
+        });
+
+        expect(requisicaoAutenticada).toHaveBeenCalledWith({
+            metodo: 'GET',
+            caminho:
+                '/api/diario/registros?limite=20&dataInicio=2026-11-01&dataFim=2026-11-12&categorias=fluxo_menstrual%2Cpele&fases=lutea%2Cmenstrual'
+        });
+    });
+
     test('preserva registros antigos sem fase sem rejeitar a página inteira', () => {
         const legado = { ...resumo, id: 5, fase: null };
 
