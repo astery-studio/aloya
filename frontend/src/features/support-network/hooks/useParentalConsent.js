@@ -6,8 +6,6 @@ import { MENSAGEM_ERRO_ENVIO } from '../services/parentalConsentService';
 const MENSAGEM_ERRO_STATUS =
     'Não foi possível verificar a autorização da Rede de Apoio. Tente novamente.';
 
-const INTERVALO_ATUALIZACAO_CONSENTIMENTO_MS = 2000;
-
 const CODIGOS_SESSAO_INVALIDA = new Set([
     'NAO_AUTENTICADO',
     'TOKEN_INVALIDO',
@@ -117,49 +115,14 @@ function useParentalConsent({ service, onSessaoExpirada } = {}) {
         montadoRef.current = true;
         carregar();
 
-        let intervalo = null;
-
-        const pararAtualizacaoAutomatica = () => {
-            if (intervalo !== null) {
-                clearInterval(intervalo);
-                intervalo = null;
-            }
-        };
-
-        const atualizarEnquantoPendente = () => {
-            if (statusRef.current?.acessoLiberado) {
-                pararAtualizacaoAutomatica();
-                return;
-            }
-
-            carregar({ silencioso: true });
-        };
-
-        const iniciarAtualizacaoAutomatica = () => {
-            if (intervalo === null && !statusRef.current?.acessoLiberado) {
-                intervalo = setInterval(
-                    atualizarEnquantoPendente,
-                    INTERVALO_ATUALIZACAO_CONSENTIMENTO_MS
-                );
-            }
-        };
-
-        if (!['background', 'inactive'].includes(AppState.currentState)) {
-            iniciarAtualizacaoAutomatica();
-        }
-
         const assinatura = AppState.addEventListener('change', (proximoEstado) => {
-            if (proximoEstado === 'active') {
-                atualizarEnquantoPendente();
-                iniciarAtualizacaoAutomatica();
-            } else {
-                pararAtualizacaoAutomatica();
+            if (proximoEstado === 'active' && !statusRef.current?.acessoLiberado) {
+                carregar({ silencioso: true });
             }
         });
 
         return () => {
             montadoRef.current = false;
-            pararAtualizacaoAutomatica();
             controladorRef.current?.abort();
             assinatura?.remove?.();
             requisicaoRef.current = null;
@@ -237,10 +200,4 @@ function useParentalConsent({ service, onSessaoExpirada } = {}) {
     };
 }
 
-export {
-    INTERVALO_ATUALIZACAO_CONSENTIMENTO_MS,
-    MENSAGEM_ERRO_STATUS,
-    criarStatusPendente,
-    erroEhSessaoInvalida,
-    useParentalConsent
-};
+export { MENSAGEM_ERRO_STATUS, criarStatusPendente, erroEhSessaoInvalida, useParentalConsent };
