@@ -249,7 +249,7 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
 
     return {
         SettingsScreen: jest.fn(
-            ({ onAbrirPerfil, onAbrirParametrosCiclo, onAbrirCategoriasDiario, onSelecionarAba }) =>
+            ({ onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba }) =>
                 React.createElement(
                     View,
                     null,
@@ -262,15 +262,6 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                             onPress: onAbrirParametrosCiclo
                         },
                         React.createElement(Text, null, 'Parâmetros')
-                    ),
-                    React.createElement(
-                        Pressable,
-                        {
-                            accessibilityRole: 'button',
-                            accessibilityLabel: 'Abrir categorias do Diário',
-                            onPress: onAbrirCategoriasDiario
-                        },
-                        React.createElement(Text, null, 'Categorias do Diário')
                     ),
                     React.createElement(
                         Pressable,
@@ -589,19 +580,6 @@ describe('App integrado', () => {
 
         await fireEvent.press(screen.getByRole('button', { name: 'Fechar categorias do Diário' }));
         expect(await screen.findByText('Diário integrado')).toBeOnTheScreen();
-    });
-
-    test('abre categorias pelas configurações e retorna à origem', async () => {
-        obterToken.mockResolvedValue({ token: 'token-valido' });
-        await render(<App />);
-
-        await fireEvent.press(
-            await screen.findByRole('button', { name: 'Abrir categorias do Diário' })
-        );
-        expect(await screen.findByText('Categorias do Diário integradas')).toBeOnTheScreen();
-
-        await fireEvent.press(screen.getByRole('button', { name: 'Fechar categorias do Diário' }));
-        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
     });
 
     test('abre a edição de menstruação ao tocar no ciclo do calendário', async () => {
