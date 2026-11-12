@@ -177,6 +177,7 @@ app.use(
         catalogController: container.diaryCatalogController,
         entryController: container.diaryEntryController,
         historyController: container.diaryHistoryController,
+        overviewController: container.diaryOverviewController,
         mutationController: container.diaryMutationController,
         validarPreferencia: container.validarAtualizacaoPreferencia,
         rateLimit: container.configuracoesContaRateLimit
