@@ -16,12 +16,13 @@ function useDiaryEntryForm({
     catalogo,
     service,
     modo = 'criar',
+    dataInicial,
     registroInicial,
     onCriado,
     onSalvo,
     onSessaoExpirada
 }) {
-    const [data, setData] = useState(() => obterHojeDiario());
+    const [data, setData] = useState(() => dataInicial || obterHojeDiario());
     const [valores, setValores] = useState({});
     const [erros, setErros] = useState({});
     const [erroSalvamento, setErroSalvamento] = useState(null);
@@ -35,7 +36,11 @@ function useDiaryEntryForm({
 
     useEffect(() => {
         if (!ativo) return;
-        setData(editando && registroInicial?.data ? registroInicial.data : obterHojeDiario());
+        setData(
+            editando && registroInicial?.data
+                ? registroInicial.data
+                : dataInicial || obterHojeDiario()
+        );
         setValores(valoresIniciais);
         setErros({});
         setErroSalvamento(null);
@@ -43,6 +48,7 @@ function useDiaryEntryForm({
         setSalvando(false);
     }, [
         ativo,
+        dataInicial,
         editando,
         registroInicial?.data,
         registroInicial?.id,
