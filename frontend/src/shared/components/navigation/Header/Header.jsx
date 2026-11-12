@@ -5,12 +5,13 @@ import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './Header.style';
 
-function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
+function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoesDireita }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
+    const ehDiario = variante === 'diario';
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
@@ -20,17 +21,25 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
+                ehDiario && estilos.containerDiario,
                 corFundo ? { backgroundColor: corFundo } : null
             ]}
         >
             <View
                 style={[
                     estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar
+                    temVoltar && estilos.espacamentoSuperiorComVoltar,
+                    ehDiario && estilos.espacamentoSuperiorDiario
                 ]}
             />
 
-            <View style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}>
+            <View
+                style={[
+                    estilos.areaTitulo,
+                    temVoltar && estilos.areaTituloComVoltar,
+                    ehDiario && estilos.areaTituloDiario
+                ]}
+            >
                 {temVoltar ? (
                     <Pressable
                         onPress={onVoltar}
@@ -54,11 +63,21 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
                 ) : null}
 
                 <Text
-                    style={[estilos.titulo, temVoltar && estilos.tituloComVoltar]}
+                    style={[
+                        estilos.titulo,
+                        temVoltar && estilos.tituloComVoltar,
+                        ehDiario && estilos.tituloDiario
+                    ]}
                     accessibilityRole="header"
                 >
                     {titulo}
                 </Text>
+
+                {!temVoltar && acoesDireita ? (
+                    <View style={[estilos.acoesDireita, ehDiario && estilos.acoesDireitaDiario]}>
+                        {acoesDireita}
+                    </View>
+                ) : null}
             </View>
         </View>
     );
