@@ -686,7 +686,6 @@ export default function App() {
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
-                onAbrirCategoriasDiario={() => setCategoriasDiarioVisiveis(true)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
 
