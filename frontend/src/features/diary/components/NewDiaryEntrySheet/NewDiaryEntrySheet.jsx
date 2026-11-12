@@ -14,6 +14,7 @@ function NewDiaryEntrySheet({
     visivel,
     service,
     calendarService,
+    dataInicial,
     onFechar,
     onCriado,
     onSessaoExpirada
@@ -27,6 +28,7 @@ function NewDiaryEntrySheet({
         ativo: visivel,
         catalogo: catalogo.catalogo,
         service,
+        dataInicial,
         onSessaoExpirada,
         onCriado: setRegistroSalvo
     });
