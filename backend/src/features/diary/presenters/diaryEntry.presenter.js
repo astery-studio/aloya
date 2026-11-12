@@ -45,7 +45,7 @@ function apresentarCategoria(categoria) {
     return resultado;
 }
 
-function apresentarDetalheRegistro(registro) {
+function apresentarDetalheRegistro(registro, ciclo = null) {
     const categorias = [...registro.categorias].sort((a, b) => {
         const primeira = CATEGORIAS_POR_ID.get(a.categoriaId);
         const segunda = CATEGORIAS_POR_ID.get(b.categoriaId);
@@ -66,6 +66,7 @@ function apresentarDetalheRegistro(registro) {
         id: registro.id,
         data: formatarData(registro.dataRegistro),
         fase: registro.faseCicloAssociada,
+        ciclo,
         versao: registro.versao,
         categorias: categorias.map(apresentarCategoria),
         criadoEm: registro.criadoEm.toISOString(),
