@@ -24,7 +24,7 @@ function criarEstilos(tema) {
 
         areaArraste: {
             width: '100%',
-            height: 28,
+            height: 36,
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center'
