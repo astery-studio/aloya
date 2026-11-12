@@ -4,13 +4,14 @@ import test from 'node:test';
 import { criarDiaryEntryService } from '../../../../src/features/diary/services/diaryEntry.service.js';
 import { validarCriacaoRegistro } from '../../../../src/features/diary/validators/diaryEntry.validator.js';
 
-function criarCenario() {
+function criarCenario(existente = null) {
     const chamadas = [];
     const chamadasTermicas = [];
     const tx = {
         preferenciaMacrocategoriaDiario: { findMany: async () => [] },
         preferenciaCategoriaDiario: { findMany: async () => [] },
         registroDiario: {
+            findFirst: async () => existente,
             create: async ({ data }) => {
                 chamadas.push(data);
                 return {
@@ -31,6 +32,28 @@ function criarCenario() {
                         }
                     ],
                     criadoEm: new Date('2026-11-08T12:00:00Z'),
+                    atualizadoEm: new Date('2026-11-08T12:00:00Z')
+                };
+            },
+            update: async ({ data }) => {
+                chamadas.push(data);
+                return {
+                    ...existente,
+                    faseCicloAssociada: data.faseCicloAssociada,
+                    versao: existente.versao + 1,
+                    categorias: [
+                        ...existente.categorias,
+                        {
+                            categoriaId: 'anotacao_livre',
+                            macrocategoriaNome: 'Saúde e Acompanhamento',
+                            categoriaNome: 'Anotação livre',
+                            valorEscalado: null,
+                            casasDecimais: null,
+                            valorDuracaoMinutos: null,
+                            valorTexto: 'Hoje.',
+                            opcoes: []
+                        }
+                    ],
                     atualizadoEm: new Date('2026-11-08T12:00:00Z')
                 };
             }
@@ -82,6 +105,36 @@ test('compara data futura no fuso informado', async () => {
         codigo: 'DATA_REGISTRO_FUTURA'
     });
     assert.deepEqual(cenario.chamadas, []);
+});
+
+test('atualiza transparentemente registro composto apenas por categoria inativa', async () => {
+    const existente = {
+        id: 10,
+        dataRegistro: new Date('2026-11-08T00:00:00Z'),
+        faseCicloAssociada: 'folicular',
+        versao: 2,
+        categorias: [{ categoriaId: 'humor', opcoes: [] }],
+        criadoEm: new Date('2026-11-08T10:00:00Z'),
+        atualizadoEm: new Date('2026-11-08T10:00:00Z')
+    };
+    const cenario = criarCenario(existente);
+    cenario.tx.preferenciaCategoriaDiario.findMany = async () => [
+        { categoriaId: 'humor', ativa: false }
+    ];
+    const service = criarDiaryEntryService({
+        ...cenario,
+        agora: () => new Date('2026-11-08T12:00:00Z')
+    });
+
+    const resultado = await service.criar(7, dados('2026-11-08'));
+
+    assert.equal(resultado.id, 10);
+    assert.equal(resultado.versao, 3);
+    assert.deepEqual(
+        resultado.categorias.map(({ id }) => id),
+        ['anotacao_livre']
+    );
+    assert.equal(cenario.chamadas[0].categorias.create.length, 1);
 });
 
 test('falha térmica impede a conclusão da transação de criação', async () => {
