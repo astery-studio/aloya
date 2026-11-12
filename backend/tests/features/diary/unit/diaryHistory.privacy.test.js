@@ -71,3 +71,29 @@ test('trecho da anotação contém no máximo 100 pontos de código', () => {
     assert.equal([...resultado.trechoAnotacao].length, 100);
     assert.equal(resultado.trechoAnotacao.endsWith('…'), true);
 });
+
+test('oculta o trecho da anotação quando sua categoria está desativada', () => {
+    const resultado = apresentarResumoRegistro(
+        {
+            id: 7,
+            dataRegistro: new Date('2026-11-08T00:00:00Z'),
+            faseCicloAssociada: null,
+            versao: 0,
+            atualizadoEm: new Date('2026-11-08T12:00:00Z'),
+            categorias: [
+                {
+                    categoriaId: 'anotacao_livre',
+                    categoriaNome: 'Anotação livre',
+                    valorEscalado: null,
+                    casasDecimais: null,
+                    valorDuracaoMinutos: null,
+                    valorTexto: 'Conteúdo oculto',
+                    opcoes: []
+                }
+            ]
+        },
+        new Set()
+    );
+
+    assert.equal(resultado.trechoAnotacao, null);
+});
