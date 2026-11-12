@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
@@ -117,11 +117,15 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onSessaoExpirada }) 
         service,
         onSessaoExpirada
     });
-    const [expandidas, setExpandidas] = useState({ ciclo_sangramento: true });
+    const [expandidas, setExpandidas] = useState({});
     const posicaoRolagem = useRef(0);
     const macros = preferencias.catalogo?.macrocategorias ?? [];
     const totalAtivas = macros.filter((macro) => macro.ativa).length;
     const bloqueado = Boolean(preferencias.salvando);
+
+    useEffect(() => {
+        if (visivel) setExpandidas({});
+    }, [visivel]);
 
     function alternarExpansao(id) {
         setExpandidas((estado) => ({ ...estado, [id]: !estado[id] }));
