@@ -1,7 +1,7 @@
 /**
  * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler } from 'react-native';
 import {
     CalendarBlankIcon as CalendarBlank,
@@ -101,6 +101,7 @@ export default function OnboardingScreen({
     const [erro, setErro] = useState(null);
     const [errosCampos, setErrosCampos] = useState({});
     const [destinoSaida, setDestinoSaida] = useState(null);
+    const cadastroEmAndamentoRef = useRef(false);
     const alterar = useCallback((mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []);
     const alterarCampo = useCallback((campo, valor) => {
         setDados((atuais) => ({ ...atuais, [campo]: valor }));
@@ -226,10 +227,11 @@ export default function OnboardingScreen({
     }
 
     async function finalizar(sobrescritas = {}) {
-        if (carregando) return;
+        if (cadastroEmAndamentoRef.current) return;
         const dadosCadastro = { ...dados, ...sobrescritas };
         const contaContato = dadosCadastro.tipoUsuario === 'contato_apoio';
         if (!contaContato && !validarDuracoes(dadosCadastro, 5)) return;
+        cadastroEmAndamentoRef.current = true;
         const duracaoLutea = dadosCadastro.duracaoLutea;
         setCarregando(true);
         setErro(null);
@@ -264,6 +266,7 @@ export default function OnboardingScreen({
         } catch (falha) {
             tratarFalhaCadastro(falha);
         } finally {
+            cadastroEmAndamentoRef.current = false;
             setCarregando(false);
         }
     }
