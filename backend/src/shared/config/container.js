@@ -128,6 +128,7 @@ import { criarDiaryEditService } from '../../features/diary/services/diaryEdit.s
 import { criarDiaryDeletionService } from '../../features/diary/services/diaryDeletion.service.js';
 import { criarDiaryMutationController } from '../../features/diary/controllers/diaryMutation.controller.js';
 import { criarThermalRecalculationService } from '../../features/diary/thermal/thermalRecalculation.service.js';
+import { criarDiaryPreferencesRateLimit } from '../../features/diary/middleware/diaryPreferencesRateLimit.middleware.js';
 
 import { criarAuthMiddleware } from '../middleware/auth.middleware.js';
 
@@ -354,6 +355,12 @@ function criarContainer() {
         limite: env.configuracoesContaRateLimitMaximo
     });
 
+    const diaryPreferencesRateLimit = criarDiaryPreferencesRateLimit({
+        rateLimit,
+        janelaMs: env.diarioPreferenciasRateLimitJanelaMs,
+        limite: env.diarioPreferenciasRateLimitMaximo
+    });
+
     const permissionCategoryRateLimit = criarPermissionCategoryRateLimit({
         rateLimit,
         janelaMs: env.configuracoesContaRateLimitJanelaMs,
@@ -473,6 +480,7 @@ function criarContainer() {
         loginRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
+        diaryPreferencesRateLimit,
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,
         permissionCategoryDeletionRateLimit,
