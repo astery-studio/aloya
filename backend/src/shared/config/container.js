@@ -119,6 +119,9 @@ import { validarCriacaoRegistro } from '../../features/diary/validators/diaryEnt
 import { criarDiaryHistoryService } from '../../features/diary/services/diaryHistory.service.js';
 import { criarDiaryDetailService } from '../../features/diary/services/diaryDetail.service.js';
 import { criarDiaryHistoryController } from '../../features/diary/controllers/diaryHistory.controller.js';
+import { criarDiaryOverviewService } from '../../features/diary/services/diaryOverview.service.js';
+import { criarDiaryOverviewController } from '../../features/diary/controllers/diaryOverview.controller.js';
+import { validarResumoDiario } from '../../features/diary/validators/diaryOverview.validator.js';
 import { validarHistorico } from '../../features/diary/validators/diaryHistory.validator.js';
 import { validarLotePreferencias } from '../../features/diary/validators/diaryPreferencesBatch.validator.js';
 import { criarDiaryEditService } from '../../features/diary/services/diaryEdit.service.js';
@@ -249,6 +252,11 @@ function criarContainer() {
         historyService: diaryHistoryService,
         detailService: diaryDetailService,
         validarHistorico
+    });
+    const diaryOverviewService = criarDiaryOverviewService({ prisma });
+    const diaryOverviewController = criarDiaryOverviewController({
+        service: diaryOverviewService,
+        validarResumo: validarResumoDiario
     });
     const diaryEditService = criarDiaryEditService({
         prisma,
@@ -476,6 +484,7 @@ function criarContainer() {
         diaryCatalogController,
         diaryEntryController,
         diaryHistoryController,
+        diaryOverviewController,
         diaryMutationController,
         validarAtualizacaoPreferencia
     };
