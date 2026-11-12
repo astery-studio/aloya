@@ -96,7 +96,7 @@ test('desativa filhos visualmente sem apagar seu estado individual', async () =>
     expect(screen.getByRole('switch', { name: 'Desativar Fluxo menstrual' })).toBeDisabled();
 });
 
-test('notifica a timeline somente depois de persistir a preferência', async () => {
+test('atualiza a timeline uma vez somente ao fechar após persistir mudanças', async () => {
     const atualizado = criarCatalogo(1);
     atualizado.macrocategorias[0].ativa = false;
     const onAlterado = jest.fn();
@@ -116,7 +116,12 @@ test('notifica a timeline somente depois de persistir a preferência', async () 
 
     await fireEvent.press(screen.getByRole('switch', { name: 'Desativar Ciclo e Sangramento' }));
 
-    await waitFor(() => expect(onAlterado).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByText('5 / 6 ativos')).toBeOnTheScreen());
+    expect(onAlterado).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
+
+    expect(onAlterado).toHaveBeenCalledTimes(1);
 });
 
 test('reverte uma categoria e oferece nova tentativa após erro', async () => {
