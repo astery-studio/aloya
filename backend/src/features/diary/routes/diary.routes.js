@@ -4,6 +4,7 @@ function criarDiaryRoutes({
     catalogController,
     entryController,
     historyController,
+    overviewController,
     mutationController,
     validarPreferencia,
     rateLimit
@@ -24,6 +25,7 @@ function criarDiaryRoutes({
     });
 
     router.get('/catalogo', catalogController.buscar);
+    router.get('/resumo', overviewController.buscar);
     router.get('/registros', historyController.listar);
     router.get('/registros/:id', historyController.buscar);
     router.post('/registros', rateLimit, entryController.criar);
