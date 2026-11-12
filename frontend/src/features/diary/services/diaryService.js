@@ -73,6 +73,16 @@ function validarVersao(versao) {
     return versao;
 }
 
+function validarPreferencia(id, ativa, versao) {
+    if (typeof id !== 'string' || !id.trim()) {
+        throw new TypeError('O identificador da preferência é inválido.');
+    }
+    if (typeof ativa !== 'boolean') {
+        throw new TypeError('O estado da preferência é inválido.');
+    }
+    return { id: id.trim(), ativa, versao: validarVersao(versao) };
+}
+
 // Restringe cursores ao formato e ao tamanho aceitos pelo contrato paginado.
 function validarCursor(cursor) {
     if (
@@ -275,6 +285,28 @@ function criarDiaryService({ requisicaoAutenticada } = {}) {
         return validarCatalogo(resposta);
     }
 
+    async function atualizarPreferencia(tipo, id, ativa, versao, { signal } = {}) {
+        if (!['macrocategorias', 'categorias'].includes(tipo)) {
+            throw new TypeError('O tipo da preferência é inválido.');
+        }
+        const preferencia = validarPreferencia(id, ativa, versao);
+        const resposta = await requisicaoAutenticada({
+            metodo: 'PATCH',
+            caminho: `${endpoints.preferenciasDiario}/${tipo}/${encodeURIComponent(preferencia.id)}`,
+            corpo: { ativa: preferencia.ativa, versao: preferencia.versao },
+            ...(signal ? { signal } : {})
+        });
+        return validarCatalogo(resposta);
+    }
+
+    function atualizarMacrocategoria(id, ativa, versao, opcoes) {
+        return atualizarPreferencia('macrocategorias', id, ativa, versao, opcoes);
+    }
+
+    function atualizarCategoria(id, ativa, versao, opcoes) {
+        return atualizarPreferencia('categorias', id, ativa, versao, opcoes);
+    }
+
     async function criarRegistro(dados) {
         const resposta = await requisicaoAutenticada({
             metodo: 'POST',
@@ -355,6 +387,8 @@ function criarDiaryService({ requisicaoAutenticada } = {}) {
 
     return Object.freeze({
         buscarCatalogo,
+        atualizarMacrocategoria,
+        atualizarCategoria,
         criarRegistro,
         editarRegistro,
         buscarResumo,
