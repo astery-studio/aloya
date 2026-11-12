@@ -29,6 +29,7 @@ import { SupportCategoriesScreen } from './features/support-network/screens/Supp
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from './features/diary/DiaryFlow';
+import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
@@ -171,6 +172,7 @@ export default function App() {
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
+    const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -379,6 +381,7 @@ export default function App() {
         setErroPerfil(false);
 
         setTelaInterna(telasInternas.configuracoes);
+        setCadastroDiarioVisivel(false);
 
         setEstadoSessao('autenticada');
 
@@ -554,20 +557,30 @@ export default function App() {
         }
     } else if (telaInterna === telasInternas.inicio) {
         conteudo = (
-            <CycleTodayContainer
-                key={sincronizacaoMenstrual.revisao}
-                aoCadastrarMenstruacao={(data) => {
-                    setDataInicialCadastro(data);
-                    setRetornoCadastro(telasInternas.inicio);
-                    setTelaInterna(telasInternas.cadastrarMenstruacao);
-                }}
-                service={configuracao.servicos.cyclePredictionService}
-                aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-                aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
-                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                aoSelecionarAba={selecionarAba}
-                onSessaoExpirada={finalizarSessao}
-            />
+            <>
+                <CycleTodayContainer
+                    key={sincronizacaoMenstrual.revisao}
+                    aoCadastrarMenstruacao={(data) => {
+                        setDataInicialCadastro(data);
+                        setRetornoCadastro(telasInternas.inicio);
+                        setTelaInterna(telasInternas.cadastrarMenstruacao);
+                    }}
+                    service={configuracao.servicos.cyclePredictionService}
+                    aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                    aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
+                    aoCadastrarDiario={() => setCadastroDiarioVisivel(true)}
+                    aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                    aoSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+                <NewDiaryEntrySheet
+                    visivel={cadastroDiarioVisivel}
+                    service={configuracao.servicos.diaryService}
+                    calendarService={configuracao.servicos.calendarService}
+                    onFechar={() => setCadastroDiarioVisivel(false)}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            </>
         );
     } else if (telaInterna === telasInternas.cadastrarMenstruacao) {
         conteudo = (
