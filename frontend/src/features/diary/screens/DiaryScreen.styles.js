@@ -44,6 +44,21 @@ function criarEstilos(tema) {
             lineHeight: 21,
             textAlign: 'center'
         },
+        estadoFiltroVazio: {
+            flex: 1,
+            alignItems: 'center',
+            paddingTop: 22,
+            paddingHorizontal: 20,
+            paddingBottom: 96
+        },
+        mensagemFiltroVazio: {
+            maxWidth: 310,
+            color: tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 16,
+            lineHeight: 24,
+            textAlign: 'center'
+        },
         cabecalhoLista: { gap: 0, paddingTop: 0 },
         divisor: {
             flexDirection: 'row',
