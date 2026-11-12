@@ -25,6 +25,9 @@ describe('gesto integrado do BottomSheet', () => {
         );
 
         expect(configuracao.onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(true);
+        expect(configuracao.onMoveShouldSetPanResponderCapture(null, { dx: 1, dy: 10 })).toBe(true);
+        expect(configuracao.onPanResponderTerminationRequest()).toBe(false);
+        expect(screen.getByTestId('bottom-sheet-area-arraste')).toBeOnTheScreen();
         await act(async () => configuracao.onPanResponderMove(null, { dy: -5 }));
         expect(setValue).toHaveBeenLastCalledWith(0);
 
@@ -43,11 +46,25 @@ describe('gesto integrado do BottomSheet', () => {
                 <Text>Conteúdo</Text>
             </BottomSheet>
         );
-        await act(async () => configuracao.onPanResponderRelease(null, { dy: 80, vy: 0 }));
+        await act(async () => configuracao.onPanResponderRelease(null, { dy: 64, vy: 0 }));
         await act(async () =>
             screen.getByTestId('bottom-sheet-painel').props.onAccessibilityEscape()
         );
         expect(onFechar).toHaveBeenCalledTimes(2);
+    });
+
+    test('não captura a rolagem interna enquanto o conteúdo estiver fora do topo', async () => {
+        const podeIniciarDeslize = jest.fn(() => false);
+        await render(
+            <BottomSheet visivel permitirDeslizarParaFechar podeIniciarDeslize={podeIniciarDeslize}>
+                <Text>Conteúdo</Text>
+            </BottomSheet>
+        );
+
+        expect(configuracao.onMoveShouldSetPanResponderCapture(null, { dx: 0, dy: 20 })).toBe(
+            false
+        );
+        expect(podeIniciarDeslize).toHaveBeenCalled();
     });
 
     test('restaura a posição em gesto curto ou interrompido', async () => {
