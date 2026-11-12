@@ -25,7 +25,7 @@ function SettingsLayout({
     return (
         <SafeAreaView
             testID={testeId}
-            edges={['left', 'right', 'bottom']}
+            edges={['bottom']}
             style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
         >
             <Header

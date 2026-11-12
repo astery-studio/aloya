@@ -30,20 +30,6 @@ function renderizarLayout(propriedades = {}, preferencia = 'claro') {
 }
 
 describe('MainLayout', () => {
-    test('protege as laterais e a navegação inferior com áreas seguras', async () => {
-        await renderizarLayout();
-
-        expect(screen.getByTestId('main-layout').props.edges).toMatchObject({
-            left: 'additive',
-            right: 'additive',
-            top: 'off',
-            bottom: 'off'
-        });
-        expect(screen.getByTestId('navegacao-segura-main-layout').props.edges).toMatchObject({
-            bottom: 'additive'
-        });
-    });
-
     beforeEach(() => {
         jest.clearAllMocks();
     });
