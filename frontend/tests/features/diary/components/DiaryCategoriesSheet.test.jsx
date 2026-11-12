@@ -55,6 +55,13 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
         paddingTop: 15.375,
         paddingBottom: 14.625
     });
+    expect(screen.getByTestId('rodape-categorias-diario')).toHaveStyle({
+        alignSelf: 'stretch',
+        marginHorizontal: -24,
+        paddingHorizontal: 24,
+        borderTopWidth: 1,
+        borderTopColor: '#E6E2D8'
+    });
 });
 
 test('fecha pelo X ou por Salvar sem exigir nova persistência', async () => {
