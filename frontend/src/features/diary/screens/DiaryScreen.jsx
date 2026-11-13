@@ -1,16 +1,18 @@
 // Apresenta os estados visualmente fiéis do histórico dentro do layout principal do app.
 import { useMemo } from 'react';
-import { ActivityIndicator, Text, useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 import { GearSixIcon } from 'phosphor-react-native/src/icons/GearSix';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
-import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
-import { DiaryOverviewCard } from '../components/DiaryOverviewCard/DiaryOverviewCard';
-import { DiaryActiveFilters } from '../components/DiaryActiveFilters/DiaryActiveFilters';
+import {
+    DiaryHistoryHeader,
+    DiaryTimelineDivider as DivisorTimeline
+} from '../components/DiaryHistoryHeader/DiaryHistoryHeader';
+import { DiaryHistoryStateView } from '../components/DiaryHistoryStateView/DiaryHistoryStateView';
 import { DiaryTimeline } from '../components/DiaryTimeline/DiaryTimeline';
 import { possuiFiltrosDiario } from '../utils/diaryFilters';
 import { criarEstilos } from './DiaryScreen.styles';
@@ -19,22 +21,6 @@ import { criarEstilos } from './DiaryScreen.styles';
 function calcularMargemHorizontalTimeline(larguraTela) {
     if (!Number.isFinite(larguraTela) || larguraTela <= 0) return 20;
     return Math.max(5, Math.min(20, (larguraTela - 350) / 2));
-}
-
-// Renderiza o separador acessível que introduz a linha do tempo.
-function DivisorTimeline({ estilos }) {
-    return (
-        <View
-            accessible
-            accessibilityRole="header"
-            accessibilityLabel="Linha do tempo"
-            style={estilos.divisor}
-        >
-            <View style={estilos.linhaDivisor} />
-            <Text style={estilos.textoDivisor}>LINHA DO TEMPO</Text>
-            <View style={estilos.linhaDivisor} />
-        </View>
-    );
 }
 
 // Recebe estado e callbacks do fluxo e retorna loading, erro, vazio ou histórico preenchido.
@@ -97,109 +83,56 @@ function DiaryScreen({
         </>
     ) : null;
 
-    const introducao = (
-        <View style={estilos.introducao}>
-            <Text style={estilos.descricao}>
-                Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao longo do seu
-                ciclo.
-            </Text>
-            {atualizando ? (
-                <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
-                    <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
-                    <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
-                </View>
-            ) : null}
-        </View>
-    );
-
-    const filtrosAplicados = filtrosAtivos ? (
-        <DiaryActiveFilters
-            filtros={filtros}
-            rotulosCategorias={rotulosCategoriasFiltro}
-            quantidadeResultados={itens.length}
-            aoRemover={aoRemoverFiltro}
-            aoLimpar={aoLimparFiltros}
-        />
-    ) : null;
+    function criarCabecalho(mostrarConteudo = true, mostrarDivisor = true) {
+        return (
+            <DiaryHistoryHeader
+                atualizando={atualizando}
+                resumo={resumo}
+                filtrosAtivos={filtrosAtivos}
+                filtros={filtros}
+                rotulosCategorias={rotulosCategoriasFiltro}
+                quantidadeResultados={itens.length}
+                aoRemoverFiltro={aoRemoverFiltro}
+                aoLimparFiltros={aoLimparFiltros}
+                mostrarConteudo={mostrarConteudo}
+                mostrarDivisor={mostrarDivisor}
+                estilos={estilos}
+                tema={tema}
+            />
+        );
+    }
 
     let conteudo;
     if (carregando) {
         conteudo = (
-            <View style={estilos.conteudoEstatico}>
-                {introducao}
-                <View
-                    testID="diary-loading"
-                    accessibilityLiveRegion="polite"
-                    style={estilos.estadoCentralizado}
-                >
-                    <ActivityIndicator color={tema.cores.interface.destaque} />
-                    <Text style={estilos.mensagemEstado}>Carregando histórico do Diário...</Text>
-                </View>
-            </View>
+            <DiaryHistoryStateView
+                tipo="carregando"
+                cabecalho={criarCabecalho(false)}
+                estilos={estilos}
+                tema={tema}
+            />
         );
     } else if (possuiErro) {
         conteudo = (
-            <View style={estilos.conteudoEstatico}>
-                {introducao}
-                <View style={estilos.estadoCentralizado}>
-                    <EmptyState
-                        variante="erro"
-                        titulo="Ocorreu um erro"
-                        mensagem="Não foi possível carregar seu histórico do Diário. Tente novamente."
-                        acao={
-                            <ButtonScreen
-                                texto="Tentar Novamente"
-                                variante="preto"
-                                aoPressionar={aoTentarNovamente}
-                            />
-                        }
-                    />
-                </View>
-            </View>
+            <DiaryHistoryStateView
+                tipo="erro"
+                cabecalho={criarCabecalho(false)}
+                aoTentarNovamente={aoTentarNovamente}
+                estilos={estilos}
+                tema={tema}
+            />
         );
     } else if (vazio) {
-        conteudo = filtrosAtivos ? (
-            <View style={estilos.conteudoEstatico}>
-                {introducao}
-                {filtrosAplicados}
-                <View accessibilityLiveRegion="polite" style={estilos.estadoFiltroVazio}>
-                    <Text style={estilos.mensagemFiltroVazio}>
-                        Nenhum registro encontrado para os filtros aplicados.
-                    </Text>
-                </View>
-            </View>
-        ) : (
-            <View style={estilos.conteudoEstatico}>
-                {introducao}
-                <View style={estilos.estadoCentralizado}>
-                    <EmptyState
-                        titulo="Nenhum registro visível"
-                        mensagem={
-                            'Você ainda pode não ter registros ou as categorias usadas neles podem estar desativadas.\nAtive-as em "Gerenciar categorias" ou toque em "Adicionar novo registro" para começar.'
-                        }
-                        acao={
-                            <ButtonScreen
-                                texto="Adicionar novo registro"
-                                variante="laranja"
-                                aoPressionar={aoCriar}
-                            />
-                        }
-                    />
-                </View>
-            </View>
+        conteudo = (
+            <DiaryHistoryStateView
+                tipo={filtrosAtivos ? 'filtro-vazio' : 'vazio'}
+                cabecalho={criarCabecalho(filtrosAtivos, false)}
+                aoCriar={aoCriar}
+                estilos={estilos}
+                tema={tema}
+            />
         );
     } else {
-        const cabecalhoLista = (
-            <View style={estilos.cabecalhoLista}>
-                {introducao}
-                {filtrosAtivos ? (
-                    filtrosAplicados
-                ) : resumo ? (
-                    <DiaryOverviewCard {...resumo} />
-                ) : null}
-                {!filtrosAtivos ? <DivisorTimeline estilos={estilos} /> : null}
-            </View>
-        );
         conteudo = (
             <DiaryTimeline
                 registros={itens}
@@ -212,7 +145,7 @@ function DiaryScreen({
                 temMais={temMais}
                 aoCarregarMais={aoCarregarMais}
                 aoTentarCarregarMais={aoTentarCarregarMais}
-                ListHeaderComponent={cabecalhoLista}
+                ListHeaderComponent={criarCabecalho(true, true)}
                 contentContainerStyle={[
                     estilos.lista,
                     { paddingHorizontal: margemHorizontalTimeline }
