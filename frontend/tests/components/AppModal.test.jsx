@@ -145,6 +145,22 @@ describe('AppModal', () => {
         });
 
         expect(screen.getByTestId('app-modal-scroll')).toHaveProp('scrollEnabled', false);
+        expect(screen.getByTestId('app-modal-fundo-interativo')).toHaveProp(
+            'pointerEvents',
+            'box-none'
+        );
+    });
+
+    test('mantém a camada externa interativa quando fecha ao tocar fora', async () => {
+        await renderizarModal({
+            fecharAoTocarFora: true,
+            aoFechar: jest.fn()
+        });
+
+        expect(screen.getByTestId('app-modal-fundo-interativo')).toHaveProp(
+            'pointerEvents',
+            'auto'
+        );
     });
 
     test('expõe o término do fechamento nativo para transições entre modais', async () => {

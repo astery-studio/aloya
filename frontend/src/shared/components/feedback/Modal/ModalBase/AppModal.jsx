@@ -84,6 +84,7 @@ export default function AppModal({
                     testID="app-modal-fundo-interativo"
                     accessibilityRole={fecharAoTocarFora ? 'button' : undefined}
                     accessibilityLabel={fecharAoTocarFora ? 'Fechar modal' : undefined}
+                    pointerEvents={fecharAoTocarFora ? 'auto' : 'box-none'}
                     onPress={fecharAoTocarFora ? aoFechar : undefined}
                     style={estilos.fundoInterativo}
                 >
