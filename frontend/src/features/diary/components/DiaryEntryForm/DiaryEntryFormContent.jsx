@@ -4,6 +4,7 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { DatePickerSheet } from '../../../../shared/components/feedback/DatePickerSheet/DatePickerSheet';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { deslocarDataDiario, obterHojeDiario } from '../../utils/diaryDate';
 import {
     contarMacrocategoriasPreenchidas,
@@ -30,6 +31,7 @@ function DiaryEntryFormContent({
     onDeslizarParaFechar
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [seletorAberto, setSeletorAberto] = useState(false);
     const posicaoRolagem = useRef(0);
@@ -64,7 +66,7 @@ function DiaryEntryFormContent({
     if (carregando) {
         return (
             <View accessibilityRole="progressbar" style={estilos.carregamento}>
-                <ActivityIndicator size="large" color={tema.cores.marca.primaria} />
+                <ActivityIndicator size="large" color={coresDiario.primaria} />
                 <Text style={estilos.mensagem}>Carregando suas categorias...</Text>
             </View>
         );
