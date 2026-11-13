@@ -155,3 +155,21 @@ test('omite categoria desativada e delega sua preservação ao servidor', async 
         categorias: [{ categoriaId: 'sintomas', opcoes: ['fadiga'] }]
     });
 });
+
+test('mantém o erro de conteúdo ao editar um registro sem categorias', async () => {
+    const registroInicial = { id: 10, data: '2026-11-08', versao: 1, categorias: [] };
+    const service = { editarRegistro: jest.fn() };
+    const hook = await renderHook(() =>
+        useDiaryEntryForm({
+            ativo: true,
+            modo: 'editar',
+            registroInicial,
+            catalogo,
+            service
+        })
+    );
+    await act(() => hook.result.current.setData('2026-11-07'));
+    await act(async () => expect(await hook.result.current.salvar()).toBe(false));
+    expect(hook.result.current.erros.conteudo).toBeDefined();
+    expect(service.editarRegistro).not.toHaveBeenCalled();
+});
