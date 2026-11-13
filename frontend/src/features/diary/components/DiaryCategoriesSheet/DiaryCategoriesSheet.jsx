@@ -8,6 +8,7 @@ import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchF
 import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { obterApresentacaoMacrocategoria } from '../../config/diaryMacroPresentation';
 import { useDiaryCategoryPreferences } from '../../hooks/useDiaryCategoryPreferences';
 import { DiaryMacrocategoryAccordion } from '../DiaryMacrocategoryAccordion/DiaryMacrocategoryAccordion';
@@ -22,8 +23,16 @@ function MacrocategoryPreference({
     aoMacro,
     aoCategoria
 }) {
+    const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const apresentacao = obterApresentacaoMacrocategoria(macro.id);
     const bloqueado = Boolean(salvando);
+    const coresSwitch = {
+        trilhaAtiva: coresDiario.interface.destaque,
+        trilhaInativa: coresDiario.interface.switchInativo,
+        indicadorAtivo: coresDiario.interface.textoPrincipal,
+        indicadorInativo: coresDiario.interface.textoPrincipal
+    };
 
     return (
         <DiaryMacrocategoryAccordion
@@ -37,6 +46,7 @@ function MacrocategoryPreference({
             desabilitado={bloqueado}
             acessorio={
                 <SwitchField
+                    cores={coresSwitch}
                     somenteControle
                     ativo={macro.ativa}
                     desabilitado={bloqueado}
@@ -58,6 +68,7 @@ function MacrocategoryPreference({
                             {categoria.nome}
                         </Text>
                         <SwitchField
+                            cores={coresSwitch}
                             somenteControle
                             ativo={macro.ativa && categoria.ativaIndividual}
                             desabilitado={categoriaBloqueada}
@@ -73,6 +84,7 @@ function MacrocategoryPreference({
 
 function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessaoExpirada }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const preferencias = useDiaryCategoryPreferences({
         ativo: visivel,
@@ -127,17 +139,21 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
             permitirDeslizarParaFechar
             podeIniciarDeslize={podeIniciarDeslize}
             estiloPainel={estilos.painel}
+            corAlca={coresDiario.interface.borda}
         >
             <BottomSheetLayout
                 titulo="Gerências Categorias"
                 onFechar={fechar}
                 bloquearFechamento={bloqueado}
                 compacto
+                corFundo={coresDiario.interface.superficie}
+                corIconeFechar={coresDiario.interface.textoSecundario}
+                estiloTitulo={{ color: coresDiario.interface.textoPrincipal }}
             >
                 <View style={estilos.areaConteudo}>
                     {preferencias.carregando && !preferencias.catalogo ? (
                         <View accessibilityLiveRegion="polite" style={estilos.estadoCentral}>
-                            <ActivityIndicator color={tema.cores.interface.destaque} />
+                            <ActivityIndicator color={coresDiario.interface.destaque} />
                             <Text style={estilos.textoEstado}>
                                 Carregando categorias do Diário...
                             </Text>
@@ -158,7 +174,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
                                         <ActivityIndicator
                                             testID="salvando-preferencia-diario"
                                             size="small"
-                                            color={tema.cores.interface.destaque}
+                                            color={coresDiario.interface.destaque}
                                         />
                                     ) : null}
                                     <Text style={estilos.textoContador}>
