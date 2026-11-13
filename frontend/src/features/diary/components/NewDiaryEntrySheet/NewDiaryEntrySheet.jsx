@@ -4,6 +4,7 @@ import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
 import { LockKeyIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { useDiaryCatalog } from '../../hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../hooks/useDiaryEntryForm';
 import { useDiaryPhase } from '../../hooks/useDiaryPhase';
@@ -21,6 +22,7 @@ function NewDiaryEntrySheet({
     onSessaoExpirada
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [registroSalvo, setRegistroSalvo] = useState(null);
     const posicaoRolagem = useRef(0);
@@ -60,6 +62,7 @@ function NewDiaryEntrySheet({
             permitirDeslizarParaFechar
             podeIniciarDeslize={podeIniciarDeslize}
             estiloPainel={estilos.painel}
+            corAlca={coresDiario.interface.borda}
         >
             <DiaryEntryFormContent
                 catalogo={catalogo.catalogo}
