@@ -1,18 +1,18 @@
 // Integra histórico, resumo, detalhe, criação, edição e exclusão na entrada da aba Diário.
 import { useMemo, useState } from 'react';
-import { useWindowDimensions } from 'react-native';
-import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 
 import AlertModal from '../../shared/components/feedback/Modal/AlertModal/AlertModal';
-import AppModal from '../../shared/components/feedback/Modal/AppModal';
-import SimpleModal from '../../shared/components/feedback/Modal/SimpleModal/SimpleModal';
 import { useTheme } from '../../shared/hooks/useTheme';
 import { obterHojeLocal } from '../calendar/utils/cycleCalendar.utils';
 import { EditDiaryEntrySheet } from './components/EditDiaryEntrySheet/EditDiaryEntrySheet';
+import { DiaryDeleteDialogs } from './components/DiaryDeleteDialogs/DiaryDeleteDialogs';
 import { DiaryFiltersSheet } from './components/DiaryFiltersSheet/DiaryFiltersSheet';
 import { NewDiaryEntrySheet } from './components/NewDiaryEntrySheet/NewDiaryEntrySheet';
-import { DiaryRecordDetails } from './components/DiaryRecordDetails/DiaryRecordDetails';
+import {
+    calcularAlturaMaximaDetalhes,
+    DiaryRecordDetailsModal
+} from './components/DiaryRecordDetailsModal/DiaryRecordDetailsModal';
 import { criarDescricaoResumo } from './config/diaryOverviewText';
 import { useDeleteDiaryEntry } from './hooks/useDeleteDiaryEntry';
 import { useDiaryHistory } from './hooks/useDiaryHistory';
@@ -23,12 +23,6 @@ import { DiaryScreen } from './screens/DiaryScreen';
 import { obterApresentacaoFase } from './utils/diaryPhasePresentation';
 import { FILTROS_DIARIO_VAZIOS, normalizarFiltrosDiario } from './utils/diaryFilters';
 import { obterRegistrosAdjacentes } from './utils/diaryRecordNavigation';
-
-// Usa o tamanho atual do protótipo como teto e respeita telas menores.
-function calcularAlturaMaximaDetalhes(alturaTela) {
-    if (!Number.isFinite(alturaTela) || alturaTela <= 0) return 756.67;
-    return Math.min(756.67, alturaTela * 0.92);
-}
 
 // Insere um registro sem alterar a coleção original e devolve a ordem mais recente primeiro.
 function inserirRegistroOrdenado(registros, novoRegistro) {
@@ -72,8 +66,6 @@ function DiaryFlow({
     aoGerenciarCategorias
 }) {
     const tema = useTheme();
-    const { height: alturaTela } = useWindowDimensions();
-    const alturaMaximaDetalhes = calcularAlturaMaximaDetalhes(alturaTela);
     const [criacaoVisivel, setCriacaoVisivel] = useState(false);
     const [filtrosVisiveis, setFiltrosVisiveis] = useState(false);
     const [filtros, setFiltros] = useState(FILTROS_DIARIO_VAZIOS);
@@ -267,39 +259,23 @@ function DiaryFlow({
                 onSessaoExpirada={onSessaoExpirada}
             />
 
-            <AppModal
-                variante="detalhes"
+            <DiaryRecordDetailsModal
                 visivel={detalhes.visivel}
-                aoFechar={exclusao.excluindo ? undefined : detalhes.fechar}
-                estilo={{
-                    width: 342,
-                    maxWidth: '100%',
-                    maxHeight: alturaMaximaDetalhes,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                    borderRadius: 20,
-                    ...(tema.escuro ? {} : { backgroundColor: '#FFFFFF' })
-                }}
-            >
-                {detalhes.visivel ? (
-                    <DiaryRecordDetails
-                        registro={detalhes.registro}
-                        carregando={detalhes.carregando}
-                        erro={detalhes.erro}
-                        aoTentarNovamente={detalhes.tentarNovamente}
-                        aoAnterior={
-                            registrosAdjacentes.anterior || historico.temMais
-                                ? abrirRegistroAnterior
-                                : undefined
-                        }
-                        aoProximo={registrosAdjacentes.proximo ? abrirRegistroProximo : undefined}
-                        aoEditar={detalhes.registro ? iniciarEdicao : undefined}
-                        aoExcluir={detalhes.registro ? solicitarExclusao : undefined}
-                        aoFechar={detalhes.fechar}
-                        acaoEmAndamento={exclusao.excluindo ? 'excluir' : null}
-                    />
-                ) : null}
-            </AppModal>
+                registro={detalhes.registro}
+                carregando={detalhes.carregando}
+                erro={detalhes.erro}
+                aoTentarNovamente={detalhes.tentarNovamente}
+                aoAnterior={
+                    registrosAdjacentes.anterior || historico.temMais
+                        ? abrirRegistroAnterior
+                        : undefined
+                }
+                aoProximo={registrosAdjacentes.proximo ? abrirRegistroProximo : undefined}
+                aoEditar={detalhes.registro ? iniciarEdicao : undefined}
+                aoExcluir={detalhes.registro ? solicitarExclusao : undefined}
+                aoFechar={detalhes.fechar}
+                excluindo={exclusao.excluindo}
+            />
 
             <AlertModal
                 erroInterno
@@ -321,60 +297,7 @@ function DiaryFlow({
                 }}
             />
 
-            <AlertModal
-                variante="confirmacao"
-                visivel={exclusao.confirmacaoVisivel}
-                aoFechar={exclusao.cancelar}
-                icone={WarningCircleIcon}
-                titulo="Excluir Registro"
-                mensagem="Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita."
-                acaoPrincipal={{
-                    texto: 'Excluir',
-                    variante: 'verde',
-                    aoPressionar: exclusao.confirmar,
-                    carregando: exclusao.excluindo
-                }}
-                acaoSecundaria={{
-                    texto: 'Cancelar',
-                    variante: 'branco',
-                    aoPressionar: exclusao.cancelar,
-                    desativado: exclusao.excluindo
-                }}
-            />
-
-            <AlertModal
-                visivel={exclusao.erro}
-                aoFechar={exclusao.fecharErro}
-                titulo="Algo deu errado"
-                mensagem={exclusao.mensagemErro}
-                erroInterno
-                acaoPrincipal={{
-                    texto: 'Tentar novamente',
-                    variante: 'preto',
-                    aoPressionar: exclusao.tentarNovamente,
-                    carregando: exclusao.excluindo
-                }}
-                acaoSecundaria={{
-                    texto: 'Voltar',
-                    variante: 'branco',
-                    aoPressionar: exclusao.fecharErro,
-                    desativado: exclusao.excluindo
-                }}
-            />
-
-            <SimpleModal
-                visivel={exclusao.sucesso}
-                aoFechar={exclusao.concluirSucesso}
-                icone={LockKeyIcon}
-                corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.escuro ? tema.cores.interface.separador : '#F5EDE3'}
-                titulo="Registro excluído com sucesso."
-                acaoPrincipal={{
-                    texto: 'OK',
-                    variante: 'verde',
-                    aoPressionar: exclusao.concluirSucesso
-                }}
-            />
+            <DiaryDeleteDialogs exclusao={exclusao} tema={tema} />
         </>
     );
 }
