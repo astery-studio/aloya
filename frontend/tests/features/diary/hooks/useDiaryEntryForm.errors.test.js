@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 
 import {
+    MENSAGEM_CONFLITO_EDICAO,
     MENSAGEM_REGISTRO_DUPLICADO,
     MENSAGEM_SALVAMENTO,
     useDiaryEntryForm
@@ -78,4 +79,35 @@ test('impede dois salvamentos simultâneos', async () => {
     await act(() => resolver({ id: 1, data: '2026-11-09' }));
     await act(() => primeiro);
     expect(service.criarRegistro).toHaveBeenCalledTimes(1);
+});
+
+test.each([
+    [{ status: 409 }, MENSAGEM_CONFLITO_EDICAO, true],
+    [{ status: 500 }, MENSAGEM_SALVAMENTO, false],
+    [
+        { status: 409, codigo: 'REGISTRO_DIARIO_DUPLICADO' },
+        MENSAGEM_REGISTRO_DUPLICADO,
+        false
+    ]
+])('classifica falhas da edição %#', async (falha, mensagem, conflitoVersao) => {
+    const registroInicial = {
+        id: 7,
+        data: '2026-11-08',
+        versao: 2,
+        categorias: [{ id: 'sintomas', opcoes: [{ id: 'colica' }] }]
+    };
+    const service = { editarRegistro: jest.fn().mockRejectedValue(falha) };
+    const hook = await renderHook(() =>
+        useDiaryEntryForm({
+            ativo: true,
+            modo: 'editar',
+            registroInicial,
+            catalogo,
+            service
+        })
+    );
+    await act(() => hook.result.current.alterarValor('sintomas', ['fadiga']));
+    await act(() => hook.result.current.salvar());
+    expect(hook.result.current.erroSalvamento).toBe(mensagem);
+    expect(hook.result.current.conflitoVersao).toBe(conflitoVersao);
 });
