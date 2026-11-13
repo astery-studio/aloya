@@ -2,6 +2,7 @@ import { useWindowDimensions } from 'react-native';
 
 import AppModal from '../../../../shared/components/feedback/Modal/AppModal';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { DiaryRecordDetails } from '../DiaryRecordDetails/DiaryRecordDetails';
 
 function calcularAlturaMaximaDetalhes(alturaTela) {
@@ -23,6 +24,7 @@ function DiaryRecordDetailsModal({
     excluindo = false
 }) {
     const tema = useTheme();
+    const cores = obterCoresDiario(tema).interface;
     const { height } = useWindowDimensions();
 
     return (
@@ -37,7 +39,7 @@ function DiaryRecordDetailsModal({
                 paddingTop: 0,
                 paddingBottom: 0,
                 borderRadius: 20,
-                ...(tema.escuro ? {} : { backgroundColor: '#FFFFFF' })
+                backgroundColor: cores.superficie
             }}
         >
             {visivel ? (
