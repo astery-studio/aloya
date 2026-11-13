@@ -1,5 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
+import { obterCoresDiario } from '../../config/diaryColors';
+
 function DiaryTimelinePaginationFooter({
     carregando,
     erro,
@@ -8,6 +10,7 @@ function DiaryTimelinePaginationFooter({
     tema,
     children
 }) {
+    const cores = obterCoresDiario(tema).interface;
     return (
         <>
             {carregando ? (
@@ -16,7 +19,7 @@ function DiaryTimelinePaginationFooter({
                     accessibilityLiveRegion="polite"
                     style={estilos.rodapeCarregando}
                 >
-                    <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
+                    <ActivityIndicator size="small" color={cores.destaque} />
                     <Text style={estilos.textoCarregando}>Carregando mais registros...</Text>
                 </View>
             ) : null}
