@@ -1,9 +1,11 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
-    const superficie = tema.cores.interface.superficieElevada;
+    const cores = obterCoresDiario(tema).interface;
+    const superficie = cores.superficie;
     return StyleSheet.create({
         painel: {
             width: 390,
@@ -34,11 +36,11 @@ function criarEstilos(tema) {
             alignItems: 'center',
             backgroundColor: superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: 16
         },
         tituloPainel: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             lineHeight: 21,
@@ -54,11 +56,11 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             flexDirection: 'row',
             gap: 6,
-            backgroundColor: tema.escuro ? tema.cores.interface.destaqueSuave : '#EEF4F0',
+            backgroundColor: cores.destaqueSuave,
             borderRadius: 999
         },
         textoContador: {
-            color: tema.escuro ? tema.cores.interface.destaque : '#2C4C3B',
+            color: cores.destaque,
             fontFamily: fontFamilies.semibold,
             fontSize: 12,
             lineHeight: 18,
@@ -67,7 +69,7 @@ function criarEstilos(tema) {
         descricao: {
             width: '100%',
             marginTop: 4,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 19,
@@ -90,19 +92,19 @@ function criarEstilos(tema) {
             paddingLeft: 58,
             gap: 12,
             borderTopWidth: 0.7,
-            borderTopColor: tema.cores.interface.separador
+            borderTopColor: cores.separador
         },
         nomeCategoria: {
             minWidth: 0,
             flex: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 22,
             includeFontPadding: false
         },
         nomeCategoriaDesativada: {
-            color: tema.cores.interface.textoDesabilitado
+            color: cores.textoDesabilitado
         },
         estadoCentral: {
             minHeight: 280,
@@ -112,7 +114,7 @@ function criarEstilos(tema) {
             paddingHorizontal: 24
         },
         textoEstado: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
@@ -129,7 +131,7 @@ function criarEstilos(tema) {
             paddingBottom: 20,
             backgroundColor: superficie,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda
+            borderTopColor: cores.borda
         },
         botaoSalvar: {
             width: 342,
