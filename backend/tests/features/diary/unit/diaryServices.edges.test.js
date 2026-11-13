@@ -91,6 +91,31 @@ test('detalhe cobre configuração, ausência e apresentação', async () => {
     assert.deepEqual((await service.buscar(1, 1)).ciclo, { dia: 21, numero: 3 });
 });
 
+test('contexto do ciclo descarta ciclo ausente, contagem inválida e dia inválido', async () => {
+    let ciclo = null;
+    let numero = 0;
+    const service = criarDiaryDetailService({
+        prisma: {
+            registroDiario: { findFirst: async () => registro() },
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: { findMany: async () => [] },
+            registroCiclo: {
+                findFirst: async () => ciclo,
+                count: async () => numero
+            }
+        }
+    });
+
+    assert.equal(await service.buscarContextoCiclo(1, data('2026-11-08')), null);
+    ciclo = { dataInicio: data('2026-10-19') };
+    assert.equal(await service.buscarContextoCiclo(1, data('2026-11-08')), null);
+    numero = 1.5;
+    assert.equal(await service.buscarContextoCiclo(1, data('2026-11-08')), null);
+    numero = 1;
+    ciclo = { dataInicio: data('2026-11-09') };
+    assert.equal(await service.buscarContextoCiclo(1, data('2026-11-08')), null);
+});
+
 function dependenciasEntrada() {
     const tx = {
         preferenciaMacrocategoriaDiario: { findMany: async () => [] },
@@ -146,6 +171,27 @@ test('criação cobre validações e todos os erros concorrentes', async () => {
         throw new Error('outro');
     };
     await assert.rejects(() => criarDiaryEntryService(deps).criar(1, dados), /outro/);
+});
+
+test('criação rejeita registro existente com categoria ainda ativa', async () => {
+    const deps = dependenciasEntrada();
+    deps.prisma.$transaction = async (callback) =>
+        callback({
+            ...deps.prisma,
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: { findMany: async () => [] },
+            registroDiario: {
+                findFirst: async () => ({
+                    ...registro(),
+                    categorias: [{ categoriaId: 'anotacao_livre' }]
+                })
+            }
+        });
+    const dados = { data: '2026-11-08', fusoHorario: 'UTC', categorias: [categoriaNova()] };
+
+    await assert.rejects(() => criarDiaryEntryService(deps).criar(1, dados), {
+        codigo: 'REGISTRO_DIARIO_DUPLICADO'
+    });
 });
 
 function dependenciasEdicao() {
