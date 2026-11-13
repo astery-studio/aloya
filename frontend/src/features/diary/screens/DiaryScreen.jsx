@@ -83,7 +83,7 @@ function DiaryScreen({
         </>
     ) : null;
 
-    function criarCabecalho(mostrarConteudo = true, mostrarDivisor = true) {
+    function criarCabecalho(mostrarConteudo, mostrarDivisor) {
         return (
             <DiaryHistoryHeader
                 atualizando={atualizando}
