@@ -1,14 +1,17 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
+    const diario = obterCoresDiario(tema);
+    const cores = diario.interface;
     return StyleSheet.create({
         painel: {
             height: '92%',
             maxHeight: '92%',
             paddingBottom: 0,
-            backgroundColor: '#FFFFFF'
+            backgroundColor: cores.superficie
         },
         rolagem: { flex: 1 },
         conteudo: { alignItems: 'center', paddingHorizontal: 16 },
@@ -18,7 +21,7 @@ function criarEstilos(tema) {
             fontSize: 14,
             lineHeight: 20,
             textAlign: 'center',
-            color: tema.cores.interface.textoSecundario
+            color: cores.textoSecundario
         },
         leitorTela: {
             position: 'absolute',
@@ -31,7 +34,7 @@ function criarEstilos(tema) {
             fontFamily: fontFamilies.medium,
             fontSize: 13,
             lineHeight: 19,
-            color: tema.cores.interface.erro
+            color: tema.cores.feedback.erro
         },
         cartaoRegistro: {
             width: '100%',
@@ -41,16 +44,16 @@ function criarEstilos(tema) {
             marginBottom: 24,
             padding: 16,
             borderWidth: 1.41,
-            borderColor: '#E6E2D8',
+            borderColor: cores.borda,
             borderRadius: 16,
-            backgroundColor: '#FFFFFF'
+            backgroundColor: cores.superficieElevada
         },
         tituloCartao: {
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             lineHeight: 20,
             textAlign: 'center',
-            color: '#222222'
+            color: cores.textoPrincipal
         },
         contador: {
             alignSelf: 'center',
@@ -58,13 +61,13 @@ function criarEstilos(tema) {
             paddingHorizontal: 10,
             paddingVertical: 4,
             borderRadius: 999,
-            backgroundColor: '#EEF4F0'
+            backgroundColor: cores.destaqueSuave
         },
         textoContador: {
             fontFamily: fontFamilies.semiBold,
             fontSize: 12,
             lineHeight: 16,
-            color: '#2C4C3B'
+            color: cores.destaque
         },
         instrucao: {
             marginTop: 10,
@@ -72,7 +75,7 @@ function criarEstilos(tema) {
             fontSize: 13,
             lineHeight: 19,
             textAlign: 'center',
-            color: '#5C5C59'
+            color: cores.textoSecundario
         },
         listaMacros: {
             width: '100%',
@@ -86,22 +89,22 @@ function criarEstilos(tema) {
             height: 54,
             alignSelf: 'center',
             borderRadius: 10,
-            backgroundColor: '#C85A44'
+            backgroundColor: diario.primaria
         },
-        botaoSalvarDesativado: { backgroundColor: '#E6E2D8' },
+        botaoSalvarDesativado: { backgroundColor: cores.borda },
         textoBotaoSalvar: {
             fontFamily: fontFamilies.semiBold,
             fontSize: 15,
-            color: '#FFFFFF'
+            color: diario.textoSobrePrimaria
         },
-        textoBotaoDesativado: { color: '#8A8985' },
+        textoBotaoDesativado: { color: cores.textoDesabilitado },
         rodape: {
             paddingHorizontal: 24,
             paddingTop: 12,
             paddingBottom: 20,
             borderTopWidth: 1,
-            borderColor: '#E6E2D8',
-            backgroundColor: '#FFFFFF'
+            borderColor: cores.borda,
+            backgroundColor: cores.superficie
         }
     });
 }
