@@ -49,7 +49,7 @@ function criarDiaryPreferencesService({ prisma, bootstrap } = {}) {
                         await tx.preferenciaCategoriaDiario.updateMany({
                             where: {
                                 usuarioId,
-                                categoriaId: { in: CATEGORIAS_POR_MACRO.get(id) ?? [] }
+                                categoriaId: { in: CATEGORIAS_POR_MACRO.get(id) }
                             },
                             data: { ativa: true }
                         });
