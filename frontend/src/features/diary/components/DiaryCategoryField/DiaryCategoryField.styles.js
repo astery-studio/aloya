@@ -1,14 +1,16 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
         container: { width: '100%', gap: 8 },
         divisorCategoria: {
             width: '100%',
             height: 0.7,
-            backgroundColor: tema.cores.interface.borda
+            backgroundColor: cores.borda
         },
         faixaTitulo: {
             width: '100%',
@@ -36,9 +38,9 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 10
         },
-        linha: { flex: 1, height: 1, backgroundColor: tema.cores.interface.borda },
+        linha: { flex: 1, height: 1, backgroundColor: cores.borda },
         tituloGrupo: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.semibold,
             fontSize: 11,
             lineHeight: 16,
@@ -79,7 +81,7 @@ function criarEstilos(tema) {
         },
         contador: {
             alignSelf: 'flex-end',
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.medium,
             fontSize: 10,
             lineHeight: 19
