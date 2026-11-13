@@ -142,7 +142,7 @@ test('mantém opções ocultas quando macro ou categorias estão desativadas', a
 });
 
 test('usa paleta de fallback para macros sem paleta conhecida', async () => {
-    const resultado = await render(
+    await render(
         <DiaryMacrocategoryAccordion
             titulo="Macro sem paleta"
             icone={IconeTeste}
