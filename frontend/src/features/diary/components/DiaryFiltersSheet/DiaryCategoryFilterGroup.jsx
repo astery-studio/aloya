@@ -21,8 +21,8 @@ function DiaryCategoryFilterGroup({
     const coresSwitch = {
         trilhaAtiva: coresDiario.interface.destaque,
         trilhaInativa: coresDiario.interface.switchInativo,
-        indicadorAtivo: coresDiario.interface.textoPrincipal,
-        indicadorInativo: coresDiario.interface.textoPrincipal
+        indicadorAtivo: coresDiario.interface.textoSobreDestaque,
+        indicadorInativo: coresDiario.interface.textoSobreDestaque
     };
     const categorias = macro.categorias.filter((categoria) => categoria.ativaEfetiva);
     const quantidadeSelecionada = categorias.filter((categoria) =>
