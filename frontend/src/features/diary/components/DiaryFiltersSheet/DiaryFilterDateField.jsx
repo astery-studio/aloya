@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
 import DateInput from '../../../../shared/components/forms/DateInput/DateInput';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function DiaryFilterDateField({
     rotulo,
@@ -13,6 +14,7 @@ function DiaryFilterDateField({
     estilos,
     tema
 }) {
+    const coresDiario = obterCoresDiario(tema);
     return (
         <View style={estilos.grupoCampo}>
             <Text style={estilos.rotuloCampo}>{rotulo}</Text>
@@ -33,7 +35,7 @@ function DiaryFilterDateField({
                         onPress={aoLimpar}
                         style={estilos.limparData}
                     >
-                        <XCircleIcon size={20} color={tema.cores.marca.primaria} />
+                        <XCircleIcon size={20} color={coresDiario.primaria} />
                     </Pressable>
                 ) : null}
             </View>
