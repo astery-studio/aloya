@@ -30,8 +30,8 @@ function MacrocategoryPreference({
     const coresSwitch = {
         trilhaAtiva: coresDiario.interface.destaque,
         trilhaInativa: coresDiario.interface.switchInativo,
-        indicadorAtivo: coresDiario.interface.textoPrincipal,
-        indicadorInativo: coresDiario.interface.textoPrincipal
+        indicadorAtivo: coresDiario.interface.textoSobreDestaque,
+        indicadorInativo: coresDiario.interface.textoSobreDestaque
     };
 
     return (
