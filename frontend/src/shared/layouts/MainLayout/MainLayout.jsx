@@ -17,6 +17,8 @@ function MainLayout({
     usarAreaSeguraInferior = true,
     children,
     corFundo,
+    corTextoHeader,
+    corFundoNavegacao,
     acoesHeader
 }) {
     const tema = useTheme();
@@ -29,6 +31,7 @@ function MainLayout({
             variante={varianteHeader}
             onVoltar={onVoltar}
             corFundo={corFundo}
+            corTexto={corTextoHeader}
             acoesDireita={acoesHeader}
         />
     );
@@ -64,7 +67,10 @@ function MainLayout({
                 <SafeAreaView
                     testID="navegacao-segura-main-layout"
                     edges={['bottom']}
-                    style={estilos.navegacaoSegura}
+                    style={[
+                        estilos.navegacaoSegura,
+                        corFundoNavegacao ? { backgroundColor: corFundoNavegacao } : null
+                    ]}
                 >
                     {navegacaoInferior}
                 </SafeAreaView>
