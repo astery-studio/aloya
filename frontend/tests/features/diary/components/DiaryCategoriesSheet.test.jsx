@@ -148,6 +148,51 @@ test('reverte uma categoria e oferece nova tentativa após erro', async () => {
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeOnTheScreen();
 });
 
+test('persiste categoria individual e acompanha a posição da rolagem', async () => {
+    const atualizado = criarCatalogo(1);
+    atualizado.macrocategorias[0].categorias[0] = {
+        ...atualizado.macrocategorias[0].categorias[0],
+        ativaIndividual: false,
+        ativaEfetiva: false
+    };
+    const service = {
+        buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()),
+        atualizarCategoria: jest.fn().mockResolvedValue(atualizado)
+    };
+    const onAlterado = jest.fn();
+    await render(
+        <DiaryCategoriesSheet
+            visivel
+            service={service}
+            onAlterado={onAlterado}
+            onFechar={jest.fn()}
+        />
+    );
+    await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
+    await fireEvent.scroll(screen.getByTestId('rolagem-categorias-diario'), {
+        nativeEvent: { contentOffset: { y: -4 } }
+    });
+    await fireEvent.press(screen.getByRole('button', { name: 'Expandir Ciclo e Sangramento' }));
+    await fireEvent.press(screen.getByRole('switch', { name: 'Desativar Fluxo menstrual' }));
+
+    await waitFor(() =>
+        expect(service.atualizarCategoria).toHaveBeenCalledWith('fluxo_menstrual', false, 0)
+    );
+    expect(screen.getByRole('switch', { name: 'Ativar Fluxo menstrual' })).not.toBeChecked();
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
+    expect(onAlterado).toHaveBeenCalledTimes(1);
+});
+
+test('fecha o sheet ao dispensar um erro de carregamento', async () => {
+    const onFechar = jest.fn();
+    const service = { buscarCatalogo: jest.fn().mockRejectedValue(new Error('offline')) };
+    await render(<DiaryCategoriesSheet visivel service={service} onFechar={onFechar} />);
+
+    await waitFor(() => expect(screen.getByText('Algo deu errado')).toBeOnTheScreen());
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    expect(onFechar).toHaveBeenCalledTimes(1);
+});
+
 test('fecha todas as macrocategorias sempre que o sheet reabre', async () => {
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
     const resultado = await render(
