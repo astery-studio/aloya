@@ -3,6 +3,7 @@ import { Keyboard, Pressable, Text } from 'react-native';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
 import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 const ALTURA_MINIMA_ANOTACAO = 36;
 
@@ -19,6 +20,7 @@ function DiaryFreeTextCategoryField({
     cores,
     tema
 }) {
+    const coresDiario = obterCoresDiario(tema);
     const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
 
     function limpar() {
@@ -66,7 +68,7 @@ function DiaryFreeTextCategoryField({
                             onPress={limpar}
                             style={estilos.limparAnotacao}
                         >
-                            <XCircleIcon size={18} color={tema.cores.marca.primaria} />
+                            <XCircleIcon size={18} color={coresDiario.primaria} />
                         </Pressable>
                     ) : null
                 }
