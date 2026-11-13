@@ -27,4 +27,5 @@ test('desabilita somente a direção sem registro disponível', () => {
 test('trata seleção ausente ou coleção inválida com segurança', () => {
     expect(obterRegistrosAdjacentes(registros, 99)).toEqual({ anterior: null, proximo: null });
     expect(obterRegistrosAdjacentes(null, 2)).toEqual({ anterior: null, proximo: null });
+    expect(obterRegistrosAdjacentes()).toEqual({ anterior: null, proximo: null });
 });
