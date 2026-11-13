@@ -1,6 +1,8 @@
 import { Pressable, Text, View } from 'react-native';
 
 import { PencilSimpleIcon, TrashIcon } from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstiloBotaoAcao(estilos, bloqueado, pressionado) {
     return [
@@ -11,7 +13,9 @@ function criarEstiloBotaoAcao(estilos, bloqueado, pressionado) {
 }
 
 function DiaryRecordActions({ registro, dataFormatada, aoEditar, aoExcluir, bloqueado, estilos }) {
+    const tema = useTheme();
     if (typeof aoEditar !== 'function' && typeof aoExcluir !== 'function') return null;
+    const corConteudo = obterCoresDiario(tema).textoSobrePrimaria;
 
     return (
         <View style={estilos.alteracao}>
@@ -34,7 +38,7 @@ function DiaryRecordActions({ registro, dataFormatada, aoEditar, aoExcluir, bloq
                         )
                     }
                 >
-                    <PencilSimpleIcon size={13} color="#FFFFFF" />
+                    <PencilSimpleIcon size={13} color={corConteudo} />
                     <Text style={estilos.textoBotaoAcao}>Editar</Text>
                 </Pressable>
                 {typeof aoExcluir === 'function' ? (
@@ -46,7 +50,7 @@ function DiaryRecordActions({ registro, dataFormatada, aoEditar, aoExcluir, bloq
                         onPress={() => aoExcluir(registro)}
                         style={({ pressed }) => criarEstiloBotaoAcao(estilos, bloqueado, pressed)}
                     >
-                        <TrashIcon size={13} color="#FFFFFF" />
+                        <TrashIcon size={13} color={corConteudo} />
                         <Text style={estilos.textoBotaoAcao}>Excluir</Text>
                     </Pressable>
                 ) : null}
