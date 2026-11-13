@@ -1,5 +1,7 @@
 import { Text, View } from 'react-native';
 
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { DiaryRecordValueChip } from '../DiaryRecordValueChip/DiaryRecordValueChip';
 
 function formatarDuracao(minutos) {
@@ -19,11 +21,21 @@ function valorEscalado(categoria) {
     return unidade ? `${categoria.valor.trim()} ${unidade}` : categoria.valor.trim();
 }
 
-function obterCoresCategoria(categoriaId, corPadrao, macrocategoria = '') {
+function obterCoresCategoria(categoriaId, corPadrao, macrocategoria = '', tema) {
     const macroNormalizada = macrocategoria
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
+    if (tema?.escuro) {
+        let paleta = 'corpo';
+        if (macroNormalizada.includes('ciclo')) paleta = 'ciclo';
+        else if (macroNormalizada.includes('emocional')) paleta = 'emocional';
+        else if (macroNormalizada.includes('energia')) paleta = 'energia';
+        else if (macroNormalizada.includes('intima')) paleta = 'vidaIntima';
+        else if (macroNormalizada.includes('saude')) paleta = 'saude';
+        const cores = obterCoresDiario(tema).macrocategorias[paleta];
+        return { fundo: cores.fundoOpcao, texto: cores.icone };
+    }
     if (macroNormalizada.includes('ciclo'))
         return { fundo: 'rgba(200, 90, 68, 0.1)', texto: '#C85A44' };
     if (macroNormalizada.includes('corpo'))
@@ -43,13 +55,14 @@ function obterCoresCategoria(categoriaId, corPadrao, macrocategoria = '') {
 }
 
 function DiaryRecordCategorySection({ categoria, estilos, cor }) {
+    const tema = useTheme();
     const anotacao = categoria.id === 'anotacao_livre' ? categoria.texto : null;
     const duracao = formatarDuracao(categoria.duracaoMinutos);
     const valor = valorEscalado(categoria);
     const opcoes = Array.isArray(categoria.opcoes)
         ? categoria.opcoes.filter((opcao) => opcao && typeof opcao.nome === 'string')
         : [];
-    const cores = obterCoresCategoria(categoria.id, cor, categoria.macrocategoria);
+    const cores = obterCoresCategoria(categoria.id, cor, categoria.macrocategoria, tema);
 
     if (!anotacao && !duracao && !valor && opcoes.length === 0) return null;
 
