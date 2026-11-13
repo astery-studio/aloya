@@ -3,7 +3,15 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 jest.mock('../../../src/features/diary/screens/DiaryScreen', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        DiaryScreen: ({ aoCriar, aoAbrirRegistro, aoEditarRegistro, aoExcluirRegistro }) => (
+        DiaryScreen: ({
+            aoCriar,
+            aoAbrirRegistro,
+            aoEditarRegistro,
+            aoExcluirRegistro,
+            aoAbrirFiltros,
+            aoRemoverFiltro,
+            aoLimparFiltros
+        }) => (
             <>
                 <Pressable accessibilityRole="button" onPress={aoCriar}>
                     <Text>Abrir Diário</Text>
@@ -26,8 +34,74 @@ jest.mock('../../../src/features/diary/screens/DiaryScreen', () => {
                 >
                     <Text>Excluir pelo fluxo</Text>
                 </Pressable>
+                <Pressable onPress={() => aoEditarRegistro(null)}>
+                    <Text>Editar ausente</Text>
+                </Pressable>
+                <Pressable
+                    onPress={() =>
+                        aoEditarRegistro({
+                            id: 10,
+                            data: '2026-11-10',
+                            versao: 1,
+                            categorias: []
+                        })
+                    }
+                >
+                    <Text>Editar detalhe carregado</Text>
+                </Pressable>
+                <Pressable onPress={aoAbrirFiltros}>
+                    <Text>Abrir filtros</Text>
+                </Pressable>
+                {['dataInicio', 'dataFim', 'fase:lutea', 'categoria:pele', 'desconhecido'].map(
+                    (id) => (
+                        <Pressable key={id} onPress={() => aoRemoverFiltro(id)}>
+                            <Text>{`Remover ${id}`}</Text>
+                        </Pressable>
+                    )
+                )}
+                <Pressable onPress={aoLimparFiltros}>
+                    <Text>Limpar filtros do fluxo</Text>
+                </Pressable>
             </>
         )
+    };
+});
+jest.mock('../../../src/features/diary/components/DiaryFiltersSheet/DiaryFiltersSheet', () => {
+    const { Pressable, Text } = require('react-native');
+    return {
+        DiaryFiltersSheet: ({ visivel, onAplicar, onFechar }) =>
+            visivel ? (
+                <>
+                    <Pressable
+                        onPress={() =>
+                            onAplicar(
+                                {
+                                    dataInicio: '2026-11-01',
+                                    dataFim: '2026-11-12',
+                                    fases: ['lutea'],
+                                    categorias: ['pele']
+                                },
+                                {
+                                    macrocategorias: [
+                                        {
+                                            categorias: [{ id: 'pele', nome: 'Pele' }]
+                                        },
+                                        {}
+                                    ]
+                                }
+                            )
+                        }
+                    >
+                        <Text>Aplicar filtros simulados</Text>
+                    </Pressable>
+                    <Pressable onPress={() => onAplicar({}, undefined)}>
+                        <Text>Aplicar filtros sem catálogo</Text>
+                    </Pressable>
+                    <Pressable onPress={onFechar}>
+                        <Text>Fechar filtros simulados</Text>
+                    </Pressable>
+                </>
+            ) : null
     };
 });
 jest.mock('../../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet', () => {
@@ -168,6 +242,28 @@ test('abre, fecha e recebe o registro criado', async () => {
     await fireEvent.press(screen.getByText('Salvar modal'));
     expect(onRegistroCriado).toHaveBeenCalledWith({ id: 1, data: '2026-11-09' });
     expect(screen.getByText('Abrir Diário')).toBeOnTheScreen();
+});
+
+test('aplica, remove e limpa todos os tipos de filtro', async () => {
+    await render(<DiaryFlow service={{}} />);
+    await fireEvent.press(screen.getByText('Abrir filtros'));
+    await fireEvent.press(screen.getByText('Aplicar filtros simulados'));
+    for (const id of ['dataInicio', 'dataFim', 'fase:lutea', 'categoria:pele', 'desconhecido']) {
+        await fireEvent.press(screen.getByText(`Remover ${id}`));
+    }
+    await fireEvent.press(screen.getByText('Limpar filtros do fluxo'));
+
+    await fireEvent.press(screen.getByText('Abrir filtros'));
+    await fireEvent.press(screen.getByText('Aplicar filtros sem catálogo'));
+    await fireEvent.press(screen.getByText('Abrir filtros'));
+    await fireEvent.press(screen.getByText('Fechar filtros simulados'));
+});
+
+test('ignora edição ausente e abre diretamente detalhe já carregado', async () => {
+    await render(<DiaryFlow service={{}} />);
+    await fireEvent.press(screen.getByText('Editar ausente'));
+    await fireEvent.press(screen.getByText('Editar detalhe carregado'));
+    expect(screen.getByText('Salvar edição')).toBeOnTheScreen();
 });
 
 test('abre a edição pré-preenchida e recarrega a timeline ao salvar', async () => {
@@ -320,4 +416,29 @@ test('carrega outra página ao navegar além do registro mais antigo carregado',
     await waitFor(() =>
         expect(service.buscarDetalhe).toHaveBeenLastCalledWith(7, expect.any(Object))
     );
+});
+
+test('mantém o detalhe atual quando a próxima página falha', async () => {
+    const service = {
+        listarHistorico: jest
+            .fn()
+            .mockResolvedValueOnce({
+                itens: [{ id: 8, data: '2026-11-08', versao: 1 }],
+                proximoCursor: 'pagina-2'
+            })
+            .mockRejectedValueOnce(new Error('rede')),
+        buscarDetalhe: jest.fn().mockResolvedValue({
+            id: 8,
+            data: '2026-11-08',
+            fase: 'folicular',
+            versao: 1,
+            categorias: []
+        })
+    };
+    await render(<DiaryFlow service={service} />);
+    await waitFor(() => expect(service.listarHistorico).toHaveBeenCalledTimes(1));
+    await fireEvent.press(screen.getByText('Abrir detalhe pelo fluxo'));
+    await fireEvent.press(screen.getByRole('button', { name: 'Detalhe anterior' }));
+    await waitFor(() => expect(service.listarHistorico).toHaveBeenCalledTimes(2));
+    expect(service.buscarDetalhe).toHaveBeenCalledTimes(1);
 });
