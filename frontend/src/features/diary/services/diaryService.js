@@ -287,9 +287,6 @@ function criarDiaryService({ requisicaoAutenticada } = {}) {
     }
 
     async function atualizarPreferencia(tipo, id, ativa, versao, { signal } = {}) {
-        if (!['macrocategorias', 'categorias'].includes(tipo)) {
-            throw new TypeError('O tipo da preferência é inválido.');
-        }
         const preferencia = validarPreferencia(id, ativa, versao);
         const resposta = await requisicaoAutenticada({
             metodo: 'PATCH',
