@@ -292,5 +292,30 @@ describe('histórico no diaryService', () => {
                 'ovulatoria'
             )
         ).toThrow('histórico do Diário');
+        expect(
+            validarResumoDiario(
+                {
+                    ...resposta,
+                    destaques: [
+                        {
+                            categoriaId: 'sintomas_fisicos',
+                            grupo: 'sintomas',
+                            valor: ' Fadiga ',
+                            ocorrencias: 2
+                        },
+                        {
+                            categoriaId: 'energia',
+                            grupo: null,
+                            valor: ' Cansaço ',
+                            ocorrencias: 2
+                        }
+                    ]
+                },
+                'ovulatoria'
+            ).destaques
+        ).toEqual([
+            expect.objectContaining({ grupo: 'sintomas' }),
+            expect.objectContaining({ grupo: null })
+        ]);
     });
 });
