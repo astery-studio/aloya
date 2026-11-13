@@ -4,6 +4,7 @@ import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonPopup from '../../../../shared/components/common/Button/ButtonPopup/ButtonPopup';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { formatarDataDiario } from '../../utils/diaryDate';
 import { DiaryDateNavigator } from '../DiaryDateNavigator/DiaryDateNavigator';
 import { DiaryPhaseBadge } from '../DiaryPhaseBadge/DiaryPhaseBadge';
@@ -69,6 +70,7 @@ function DiaryRecordDetails({
     acaoEmAndamento = null
 }) {
     const tema = useTheme();
+    const cores = obterCoresDiario(tema).interface;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [limiteConteudo, setLimiteConteudo] = useState(0);
     const [alturaVisivel, setAlturaVisivel] = useState(0);
@@ -83,7 +85,7 @@ function DiaryRecordDetails({
                 accessibilityLiveRegion="polite"
                 style={estilos.estado}
             >
-                <ActivityIndicator color={tema.cores.interface.destaque} />
+                <ActivityIndicator color={cores.destaque} />
                 <Text style={estilos.mensagemEstado}>Carregando registro...</Text>
             </View>
         );
@@ -140,7 +142,7 @@ function DiaryRecordDetails({
                         key={categoria.id}
                         categoria={categoria}
                         estilos={estilos}
-                        cor={tema.cores.interface.destaque}
+                        cor={cores.destaque}
                     />
                 ))}
             </View>
