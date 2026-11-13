@@ -1,8 +1,10 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
         container: {
             width: '100%',
@@ -35,14 +37,14 @@ function criarEstilos(tema) {
         },
         dataCompacta: { minHeight: 26, paddingHorizontal: 0 },
         texto: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 17,
             lineHeight: 26,
             textAlign: 'center'
         },
         textoCompacto: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.semiBold,
             fontSize: 14,
             lineHeight: 26
