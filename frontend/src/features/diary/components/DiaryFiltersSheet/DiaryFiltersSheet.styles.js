@@ -1,9 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
-    const superficie = tema.cores.interface.superficieElevada;
+    const diario = obterCoresDiario(tema);
+    const cores = diario.interface;
+    const superficie = cores.superficie;
     return StyleSheet.create({
         painel: {
             width: 390,
@@ -33,12 +36,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             padding: 16,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: 16,
             backgroundColor: superficie
         },
         tituloSecao: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             lineHeight: 21,
@@ -47,7 +50,7 @@ function criarEstilos(tema) {
         descricaoSecao: {
             width: '100%',
             marginTop: 4,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 19,
@@ -57,7 +60,7 @@ function criarEstilos(tema) {
         camposData: { width: '100%', marginTop: 8, gap: 14 },
         grupoCampo: { width: '100%', alignItems: 'center', gap: 4 },
         rotuloCampo: {
-            color: tema.cores.marca.secundaria,
+            color: cores.destaque,
             fontFamily: fontFamilies.medium,
             fontSize: 12,
             lineHeight: 18,
@@ -93,7 +96,7 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'space-between',
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: 12,
             backgroundColor: superficie
         },
@@ -106,7 +109,7 @@ function criarEstilos(tema) {
             borderRadius: 9
         },
         nomeFase: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             lineHeight: 21
@@ -121,12 +124,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             gap: 12,
             borderTopWidth: 0.7,
-            borderTopColor: tema.cores.interface.separador
+            borderTopColor: cores.separador
         },
         nomeCategoria: {
             minWidth: 0,
             flex: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 22
@@ -134,7 +137,7 @@ function criarEstilos(tema) {
         pressionado: { opacity: 0.72 },
         estadoCentral: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
         textoEstado: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21
@@ -150,7 +153,7 @@ function criarEstilos(tema) {
             paddingHorizontal: 24,
             paddingBottom: 20,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda,
+            borderTopColor: cores.borda,
             backgroundColor: superficie
         },
         botaoLimpar: {
@@ -158,10 +161,11 @@ function criarEstilos(tema) {
             maxWidth: '100%',
             height: 54,
             borderWidth: 1.41,
-            borderColor: tema.cores.marca.primaria,
-            borderRadius: 14
+            borderColor: diario.primaria,
+            borderRadius: 14,
+            backgroundColor: superficie
         },
-        textoLimpar: { color: tema.cores.marca.primaria },
+        textoLimpar: { color: diario.primaria },
         botaoAplicar: { width: 342, maxWidth: '100%', height: 54, borderRadius: 14 }
     });
 }
