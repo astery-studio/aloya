@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import AlertModal from '../../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchField';
-import {
-    CaretDownIcon,
-    CaretUpIcon,
-    WarningCircleIcon
-} from '../../../../shared/components/icons/AppIcons';
+import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
 import { obterApresentacaoMacrocategoria } from '../../config/diaryMacroPresentation';
 import { useDiaryCategoryPreferences } from '../../hooks/useDiaryCategoryPreferences';
+import { DiaryMacrocategoryAccordion } from '../DiaryMacrocategoryAccordion/DiaryMacrocategoryAccordion';
 import { criarEstilos } from './DiaryCategoriesSheet.styles';
 
 function MacrocategoryPreference({
@@ -21,55 +18,24 @@ function MacrocategoryPreference({
     expandida,
     salvando,
     estilos,
-    tema,
     aoExpandir,
     aoMacro,
     aoCategoria
 }) {
     const apresentacao = obterApresentacaoMacrocategoria(macro.id);
-    const paleta = tema.cores.redeApoio[apresentacao.paleta];
-    const Icone = apresentacao.icone;
-    const IconeExpansao = expandida ? CaretUpIcon : CaretDownIcon;
     const bloqueado = Boolean(salvando);
 
     return (
-        <View
+        <DiaryMacrocategoryAccordion
             testID={`preferencia-macro-${macro.id}`}
-            style={[
-                estilos.macro,
-                expandida && estilos.macroExpandida,
-                expandida && { borderColor: paleta.bordaExpandida }
-            ]}
-        >
-            <View
-                style={[
-                    estilos.macroCabecalho,
-                    expandida && { backgroundColor: paleta.fundoDiarioExpandido }
-                ]}
-            >
-                <Pressable
-                    onPress={aoExpandir}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${expandida ? 'Recolher' : 'Expandir'} ${macro.nome}`}
-                    accessibilityState={{ expanded: expandida }}
-                    style={({ pressed }) => [estilos.expansao, pressed && estilos.pressionado]}
-                >
-                    <View style={[estilos.caixaIcone, { backgroundColor: paleta.fundoIcone }]}>
-                        <Icone
-                            size={18}
-                            color={paleta.icone}
-                            weight={apresentacao.iconeProps?.weight ?? 'regular'}
-                        />
-                    </View>
-                    <Text
-                        style={[estilos.nomeMacro, expandida && { color: paleta.icone }]}
-                        numberOfLines={2}
-                    >
-                        {macro.nome}
-                    </Text>
-                    <IconeExpansao size={18} color={expandida ? paleta.icone : '#A8A49C'} />
-                </Pressable>
-
+            titulo={macro.nome}
+            icone={apresentacao.icone}
+            iconeProps={apresentacao.iconeProps}
+            paleta={apresentacao.paleta}
+            expandido={expandida}
+            aoAlternar={aoExpandir}
+            desabilitado={bloqueado}
+            acessorio={
                 <SwitchField
                     somenteControle
                     ativo={macro.ativa}
@@ -77,35 +43,31 @@ function MacrocategoryPreference({
                     aoAlterar={(ativa) => aoMacro(macro.id, ativa)}
                     rotuloAcessibilidade={`${macro.ativa ? 'Desativar' : 'Ativar'} ${macro.nome}`}
                 />
-            </View>
-
-            {expandida ? (
-                <View style={estilos.categorias}>
-                    {macro.categorias.map((categoria) => {
-                        const categoriaBloqueada = bloqueado || !macro.ativa;
-                        return (
-                            <View key={categoria.id} style={estilos.categoria}>
-                                <Text
-                                    style={[
-                                        estilos.nomeCategoria,
-                                        categoriaBloqueada && estilos.nomeCategoriaDesativada
-                                    ]}
-                                >
-                                    {categoria.nome}
-                                </Text>
-                                <SwitchField
-                                    somenteControle
-                                    ativo={macro.ativa && categoria.ativaIndividual}
-                                    desabilitado={categoriaBloqueada}
-                                    aoAlterar={(ativa) => aoCategoria(categoria.id, ativa)}
-                                    rotuloAcessibilidade={`${categoria.ativaIndividual ? 'Desativar' : 'Ativar'} ${categoria.nome}`}
-                                />
-                            </View>
-                        );
-                    })}
-                </View>
-            ) : null}
-        </View>
+            }
+        >
+            {macro.categorias.map((categoria) => {
+                const categoriaBloqueada = bloqueado || !macro.ativa;
+                return (
+                    <View key={categoria.id} style={estilos.categoria}>
+                        <Text
+                            style={[
+                                estilos.nomeCategoria,
+                                categoriaBloqueada && estilos.nomeCategoriaDesativada
+                            ]}
+                        >
+                            {categoria.nome}
+                        </Text>
+                        <SwitchField
+                            somenteControle
+                            ativo={macro.ativa && categoria.ativaIndividual}
+                            desabilitado={categoriaBloqueada}
+                            aoAlterar={(ativa) => aoCategoria(categoria.id, ativa)}
+                            rotuloAcessibilidade={`${categoria.ativaIndividual ? 'Desativar' : 'Ativar'} ${categoria.nome}`}
+                        />
+                    </View>
+                );
+            })}
+        </DiaryMacrocategoryAccordion>
     );
 }
 
@@ -215,7 +177,6 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
                                             expandida={Boolean(expandidas[macro.id])}
                                             salvando={preferencias.salvando}
                                             estilos={estilos}
-                                            tema={tema}
                                             aoExpandir={() => alternarExpansao(macro.id)}
                                             aoMacro={alterarMacrocategoria}
                                             aoCategoria={alterarCategoria}
