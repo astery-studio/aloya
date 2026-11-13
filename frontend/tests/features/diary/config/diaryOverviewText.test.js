@@ -75,3 +75,43 @@ test('mantém fallback legível para futuras categorias do catálogo', () => {
         formatarDestaque({ categoriaId: 'nova_categoria', grupo: 'grupo', valor: 'Opção X' })
     ).toBe('opção x na categoria nova categoria');
 });
+
+test.each([
+    [undefined, '', '', ''],
+    ['fluxo_menstrual', 'coagulos', 'Nenhum', 'ausência de coágulos no fluxo menstrual'],
+    ['fluxo_menstrual', 'coagulos', 'Muitos', 'muitos coágulos no fluxo menstrual'],
+    ['secrecao_corrimento', 'presenca', 'Nenhuma', 'ausência de secreção/corrimento'],
+    ['secrecao_corrimento', 'presenca', 'Moderada', 'quantidade moderada de secreção/corrimento'],
+    ['secrecao_corrimento', 'presenca', 'Abundante', 'secreção/corrimento abundante'],
+    ['pele', null, 'Oleosa', 'pele oleosa'],
+    ['cabelo', null, 'Oleoso', 'cabelo oleoso'],
+    ['digestao', null, 'Sem alterações', 'digestão sem alterações'],
+    ['banheiro', 'intestino', 'Dor', 'dor intestinal'],
+    ['banheiro', 'intestino', 'Frequente', 'frequente no funcionamento intestinal'],
+    ['banheiro', 'urina', 'Normal', 'micção sem alterações'],
+    ['banheiro', 'urina', 'Alteração na cor', 'alteração na cor da urina'],
+    ['banheiro', 'urina', 'Frequente', 'frequente ao urinar'],
+    ['regiao_genital', null, 'Sem alterações', 'região genital sem alterações'],
+    ['torax_peito', null, 'Sem alterações', 'tórax/peito sem alterações'],
+    ['energia', null, 'Inquieta', 'energia descrita como inquieta'],
+    ['futuro', null, 'Futuro', 'futuro']
+])('cobre a linguagem alternativa de %s/%s', (categoriaId, grupo, valor, esperado) => {
+    expect(formatarDestaque({ categoriaId, grupo, valor })).toBe(esperado);
+});
+
+test('cobre rótulos inválidos, listas longas e resumo sem destaques', () => {
+    expect(rotuloCategoriaResumo()).toBe('');
+    expect(rotuloCategoriaResumo('   ')).toBe('');
+    expect(rotuloCategoriaResumo('fluxo_menstrual')).toBe('Fluxo menstrual');
+    expect(formatarDestaque()).toBe('');
+    expect(formatarDestaque({ categoriaId: 'pele', valor: 2 })).toBe('');
+    expect(formatarDestaque({ categoriaId: 'banheiro', grupo: 'outro', valor: 'Urgência' })).toBe(
+        'urgência na categoria banheiro'
+    );
+    expect(listarDestaques([{ valor: 'A' }, { valor: 'B' }, { valor: 'C' }])).toBe(
+        'a, b e c'
+    );
+    expect(criarDescricaoResumo({ fase: 'lutea', resumo: { informacoesSuficientes: true } })).toBe(
+        'Nesta fase, são comuns mudanças de energia, sensibilidade e alterações de humor.'
+    );
+});
