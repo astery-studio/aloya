@@ -13,7 +13,8 @@ function IconButton({
     tamanhoCompacto = 32,
     tamanhoIconeCompacto = 16,
     desativado = false,
-    corIcone
+    corIcone,
+    estilo
 }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
@@ -57,6 +58,7 @@ function IconButton({
                       }
                     : null,
                 varianteVisual.container,
+                estilo,
                 pressed && !estaDesativado && estilos.pressionado
             ]}
         >
