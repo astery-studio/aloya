@@ -20,7 +20,7 @@ function criarEstilos(tema) {
 
         label: {
             marginTop: 4,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             lineHeight: 18,
