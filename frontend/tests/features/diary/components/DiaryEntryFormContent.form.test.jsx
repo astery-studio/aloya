@@ -196,4 +196,6 @@ test('fecha pelo gesto complementar somente quando a rolagem está no topo', asy
     await fireEvent(rolagem, 'touchMove', { nativeEvent: { pageY: 180 } });
     await fireEvent(rolagem, 'touchEnd', { nativeEvent: { pageY: 180 } });
     expect(onDeslizarParaFechar).toHaveBeenCalledTimes(1);
+
+    await fireEvent(rolagem, 'touchCancel', { nativeEvent: {} });
 });
