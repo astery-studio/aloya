@@ -5,6 +5,7 @@ import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/
 import AlertModal from '../../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { useDiaryCatalog } from '../../hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../hooks/useDiaryEntryForm';
 import { useDiaryPhase } from '../../hooks/useDiaryPhase';
@@ -26,6 +27,7 @@ function EditDiaryEntrySheet({
     onSessaoExpirada
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [confirmacaoDescarteVisivel, setConfirmacaoDescarteVisivel] = useState(false);
     const [dadosExternosAnunciados, setDadosExternosAnunciados] = useState(false);
@@ -111,6 +113,7 @@ function EditDiaryEntrySheet({
                 permitirDeslizarParaFechar
                 podeIniciarDeslize={podeIniciarDeslize}
                 estiloPainel={estilos.painel}
+                corAlca={coresDiario.interface.borda}
             >
                 <Text accessibilityLiveRegion="polite" style={estilos.leitorTela}>
                     {dadosExternosAnunciados
