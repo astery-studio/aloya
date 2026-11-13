@@ -111,46 +111,6 @@ function criarEstilos(tema) {
             fontSize: 15,
             lineHeight: 21
         },
-        grupoCategoria: {
-            width: '100%',
-            overflow: 'hidden',
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
-            borderRadius: 12,
-            backgroundColor: superficie
-        },
-        grupoCategoriaExpandido: { borderWidth: 1.41, borderRadius: 14 },
-        cabecalhoCategoria: {
-            width: '100%',
-            minHeight: 60,
-            paddingHorizontal: 12,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10
-        },
-        expansaoCategoria: {
-            minWidth: 0,
-            minHeight: 44,
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10
-        },
-        iconeCategoria: {
-            width: 34,
-            height: 34,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 9
-        },
-        nomeMacro: {
-            minWidth: 0,
-            flex: 1,
-            color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.semibold,
-            fontSize: 15,
-            lineHeight: 21
-        },
         opcaoCategoria: {
             width: '100%',
             minHeight: 52,
