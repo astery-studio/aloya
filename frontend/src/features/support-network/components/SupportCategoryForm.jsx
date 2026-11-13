@@ -74,7 +74,9 @@ function SupportCategoryForm({
     aoErroValidacao,
     carregando = false,
     bloqueado = false,
-    exibirAcao = true
+    exibirAcao = true,
+    diaryService,
+    onSessaoExpirada
 }) {
     const tema = useTheme();
     const estilos = useMemo(
@@ -214,6 +216,8 @@ function SupportCategoryForm({
                     permissoesSelecionadas={dadosVisiveis}
                     aoAlterar={alterarPermissoesAcesso}
                     desabilitado={camposDesabilitados || typeof aoAlterar !== 'function'}
+                    diaryService={diaryService}
+                    onSessaoExpirada={onSessaoExpirada}
                 />
             </View>
 

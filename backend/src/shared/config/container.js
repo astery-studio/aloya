@@ -107,6 +107,28 @@ import { criarAccountController } from '../../features/settings/controllers/acco
 import { criarAccountDeletionController } from '../../features/settings/controllers/accountDeletion.controller.js';
 
 import { criarLogoutController } from '../../features/auth/controllers/logout.controller.js';
+import { criarDiaryCatalogBootstrap } from '../../features/diary/services/diaryCatalogBootstrap.service.js';
+import { criarDiaryCatalogService } from '../../features/diary/services/diaryCatalog.service.js';
+import { criarDiaryPreferencesService } from '../../features/diary/services/diaryPreferences.service.js';
+import { criarDiaryCatalogController } from '../../features/diary/controllers/diaryCatalog.controller.js';
+import { validarAtualizacaoPreferencia } from '../../features/diary/validators/diaryPreferences.validator.js';
+import { criarDiaryPhaseService } from '../../features/diary/services/diaryPhase.service.js';
+import { criarDiaryEntryService } from '../../features/diary/services/diaryEntry.service.js';
+import { criarDiaryEntryController } from '../../features/diary/controllers/diaryEntry.controller.js';
+import { validarCriacaoRegistro } from '../../features/diary/validators/diaryEntry.validator.js';
+import { criarDiaryHistoryService } from '../../features/diary/services/diaryHistory.service.js';
+import { criarDiaryDetailService } from '../../features/diary/services/diaryDetail.service.js';
+import { criarDiaryHistoryController } from '../../features/diary/controllers/diaryHistory.controller.js';
+import { criarDiaryOverviewService } from '../../features/diary/services/diaryOverview.service.js';
+import { criarDiaryOverviewController } from '../../features/diary/controllers/diaryOverview.controller.js';
+import { validarResumoDiario } from '../../features/diary/validators/diaryOverview.validator.js';
+import { validarHistorico } from '../../features/diary/validators/diaryHistory.validator.js';
+import { validarLotePreferencias } from '../../features/diary/validators/diaryPreferencesBatch.validator.js';
+import { criarDiaryEditService } from '../../features/diary/services/diaryEdit.service.js';
+import { criarDiaryDeletionService } from '../../features/diary/services/diaryDeletion.service.js';
+import { criarDiaryMutationController } from '../../features/diary/controllers/diaryMutation.controller.js';
+import { criarThermalRecalculationService } from '../../features/diary/thermal/thermalRecalculation.service.js';
+import { criarDiaryPreferencesRateLimit } from '../../features/diary/middleware/diaryPreferencesRateLimit.middleware.js';
 
 import { criarAuthMiddleware } from '../middleware/auth.middleware.js';
 
@@ -202,6 +224,54 @@ function criarContainer() {
         prisma
     });
 
+    const diaryCatalogBootstrap = criarDiaryCatalogBootstrap({ prisma });
+    const diaryCatalogService = criarDiaryCatalogService({ prisma });
+    const diaryPreferencesService = criarDiaryPreferencesService({
+        prisma,
+        bootstrap: diaryCatalogBootstrap
+    });
+    const diaryCatalogController = criarDiaryCatalogController({
+        catalogService: diaryCatalogService,
+        preferencesService: diaryPreferencesService,
+        validarLote: validarLotePreferencias
+    });
+    const diaryPhaseService = criarDiaryPhaseService({ prisma });
+    const thermalRecalculation = criarThermalRecalculationService();
+    const diaryEntryService = criarDiaryEntryService({
+        prisma,
+        bootstrap: diaryCatalogBootstrap,
+        phaseService: diaryPhaseService,
+        thermalRecalculation
+    });
+    const diaryEntryController = criarDiaryEntryController({
+        service: diaryEntryService,
+        validarCriacao: validarCriacaoRegistro
+    });
+    const diaryHistoryService = criarDiaryHistoryService({ prisma });
+    const diaryDetailService = criarDiaryDetailService({ prisma });
+    const diaryHistoryController = criarDiaryHistoryController({
+        historyService: diaryHistoryService,
+        detailService: diaryDetailService,
+        validarHistorico
+    });
+    const diaryOverviewService = criarDiaryOverviewService({ prisma });
+    const diaryOverviewController = criarDiaryOverviewController({
+        service: diaryOverviewService,
+        validarResumo: validarResumoDiario
+    });
+    const diaryEditService = criarDiaryEditService({
+        prisma,
+        bootstrap: diaryCatalogBootstrap,
+        phaseService: diaryPhaseService,
+        thermalRecalculation
+    });
+    const diaryDeletionService = criarDiaryDeletionService({ prisma, thermalRecalculation });
+    const diaryMutationController = criarDiaryMutationController({
+        editService: diaryEditService,
+        deletionService: diaryDeletionService,
+        validarEdicao: validarCriacaoRegistro
+    });
+
     const cycleHistoryRepository = criarCycleHistoryRepository({
         prisma
     });
@@ -210,9 +280,9 @@ function criarContainer() {
         repository: cycleHistoryRepository
     });
 
-    const cycleRemovalModule = criarCycleRemovalModule({ prisma });
+    const cycleRemovalModule = criarCycleRemovalModule({ prisma, thermalRecalculation });
     const cycleEditValidator = criarCycleEditValidator();
-    const cycleEditService = criarCycleEditService({ prisma });
+    const cycleEditService = criarCycleEditService({ prisma, thermalRecalculation });
 
     const predictionService = criarPredictionService({ prisma });
 
@@ -283,6 +353,12 @@ function criarContainer() {
         rateLimit,
         janelaMs: env.configuracoesContaRateLimitJanelaMs,
         limite: env.configuracoesContaRateLimitMaximo
+    });
+
+    const diaryPreferencesRateLimit = criarDiaryPreferencesRateLimit({
+        rateLimit,
+        janelaMs: env.diarioPreferenciasRateLimitJanelaMs,
+        limite: env.diarioPreferenciasRateLimitMaximo
     });
 
     const permissionCategoryRateLimit = criarPermissionCategoryRateLimit({
@@ -379,7 +455,10 @@ function criarContainer() {
 
     return {
         authController,
-        cycleRegistrationController: criarCycleRegistrationModule({ prisma }).controller,
+        cycleRegistrationController: criarCycleRegistrationModule({
+            prisma,
+            thermalRecalculation
+        }).controller,
         accountController,
         cycleParametersController,
         accountDeletionController,
@@ -401,6 +480,7 @@ function criarContainer() {
         loginRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
+        diaryPreferencesRateLimit,
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,
         permissionCategoryDeletionRateLimit,
@@ -408,7 +488,13 @@ function criarContainer() {
         exclusaoContaRateLimit,
         passwordRecoveryController,
         edicaoAnticoncepcionalRateLimit,
-        remocaoAnticoncepcionalRateLimit
+        remocaoAnticoncepcionalRateLimit,
+        diaryCatalogController,
+        diaryEntryController,
+        diaryHistoryController,
+        diaryOverviewController,
+        diaryMutationController,
+        validarAtualizacaoPreferencia
     };
 }
 

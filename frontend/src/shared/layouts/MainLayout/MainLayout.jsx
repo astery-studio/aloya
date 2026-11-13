@@ -16,24 +16,45 @@ function MainLayout({
     onSelecionarAba,
     usarAreaSeguraInferior = true,
     children,
-    corFundo
+    corFundo,
+    corTextoHeader,
+    corFundoNavegacao,
+    acoesHeader
 }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
+    const cabecalho = (
+        <Header
+            titulo={titulo}
+            variante={varianteHeader}
+            onVoltar={onVoltar}
+            corFundo={corFundo}
+            corTexto={corTextoHeader}
+            acoesDireita={acoesHeader}
+        />
+    );
 
     return (
         <View
             testID="main-layout"
             style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
         >
-            <Header
-                titulo={titulo}
-                variante={varianteHeader}
-                onVoltar={onVoltar}
-                corFundo={corFundo}
-            />
+            {varianteHeader === 'diario' ? (
+                <SafeAreaView
+                    testID="cabecalho-seguro-main-layout"
+                    edges={['top']}
+                    style={[
+                        estilos.cabecalhoSeguro,
+                        corFundo ? { backgroundColor: corFundo } : null
+                    ]}
+                >
+                    {cabecalho}
+                </SafeAreaView>
+            ) : (
+                cabecalho
+            )}
 
             <View
                 testID="conteudo-main-layout"
@@ -46,7 +67,10 @@ function MainLayout({
                 <SafeAreaView
                     testID="navegacao-segura-main-layout"
                     edges={['bottom']}
-                    style={estilos.navegacaoSegura}
+                    style={[
+                        estilos.navegacaoSegura,
+                        corFundoNavegacao ? { backgroundColor: corFundoNavegacao } : null
+                    ]}
                 >
                     {navegacaoInferior}
                 </SafeAreaView>

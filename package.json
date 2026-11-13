@@ -16,7 +16,11 @@
     "preview:hu013": "cd frontend && npm run preview:hu013",
     "quality": "npm run format:check && npm run lint && npm test",
     "test:backend": "cd backend && npm test",
+    "test:coverage": "npm --prefix backend run test:coverage && npm --prefix frontend run test:coverage",
+    "test:coverage:diary": "npm --prefix backend run test:coverage:diary && npm --prefix frontend run test:coverage:diary",
     "test:frontend": "cd frontend && npm test",
+    "test:watch:backend": "npm --prefix backend run test:watch",
+    "test:watch:frontend": "npm --prefix frontend run test:watch",
     "test": "npm --prefix backend test && npm --prefix frontend test",
     "tunnel": "cd \"$env:USERPROFILE\\Downloads\" && .\\cloudflared.exe tunnel --url http://localhost:3000"
   },

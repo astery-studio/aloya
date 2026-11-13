@@ -174,6 +174,20 @@ describe('ButtonSelection', () => {
         );
     });
 
+    test('combina estilos da descrição na intensidade selecionada', async () => {
+        await renderizarBotao({
+            variante: 'intensidade',
+            selected: true,
+            descricao: 'Descrição selecionada',
+            estiloDescricao: { letterSpacing: 2 },
+            estiloTextoSelecionado: { textTransform: 'uppercase' }
+        });
+        expect(screen.getByText('Descrição selecionada')).toHaveStyle({
+            letterSpacing: 2,
+            textTransform: 'uppercase'
+        });
+    });
+
     test('usa superfície escura na variante intensidade', async () => {
         await renderizarBotao(
             {
@@ -225,5 +239,38 @@ describe('ButtonSelection', () => {
         });
 
         expect(screen.queryByTestId('radio-selecao-vazio')).toBeNull();
+    });
+
+    test('renderiza chip compacto com paleta e ícone menor', async () => {
+        await renderizarBotao({
+            variante: 'compacto',
+            cor: '#C85A44',
+            fundo: 'rgba(200, 90, 68, 0.1)',
+            icone: IconeTeste,
+            iconeProps: { weight: 'fill' }
+        });
+        expect(screen.getByRole('button')).toHaveStyle({
+            minHeight: 28,
+            backgroundColor: 'rgba(200, 90, 68, 0.1)'
+        });
+        expect(screen.getByText('Opção mensal')).toHaveStyle({ color: '#C85A44' });
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
+            expect.objectContaining({ size: 18, color: '#C85A44', weight: 'fill' })
+        );
+    });
+
+    test('inverte as cores do chip compacto selecionado', async () => {
+        await renderizarBotao({
+            variante: 'compacto',
+            selected: true,
+            cor: '#C85A44',
+            fundo: 'rgba(200, 90, 68, 0.1)',
+            icone: IconeTeste
+        });
+        expect(screen.getByRole('button')).toHaveStyle({ backgroundColor: '#C85A44' });
+        expect(screen.getByText('Opção mensal')).toHaveStyle({ color: '#FFFFFF' });
+        expect(IconeTeste.mock.calls[0][0]).toEqual(
+            expect.objectContaining({ size: 18, color: '#FFFFFF' })
+        );
     });
 });

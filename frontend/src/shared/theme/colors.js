@@ -72,42 +72,60 @@ const cores = Object.freeze({
         ciclo: Object.freeze({
             fundoIcone: '#FDF0EC',
             icone: '#C85A44',
+            fundoCategoria: 'rgba(200, 90, 68, 0.2)',
+            fundoOpcao: 'rgba(200, 90, 68, 0.1)',
             fundoExpandido: 'rgba(253, 240, 236, 0.267)',
+            fundoDiarioExpandido: 'rgba(253, 240, 236, 0.533)',
             bordaExpandida: 'rgba(200, 90, 68, 0.333)'
         }),
 
         corpo: Object.freeze({
             fundoIcone: '#EEF4F0',
             icone: '#2C4C3B',
+            fundoCategoria: 'rgba(44, 76, 59, 0.2)',
+            fundoOpcao: 'rgba(44, 76, 59, 0.1)',
             fundoExpandido: 'rgba(238, 244, 240, 0.267)',
+            fundoDiarioExpandido: 'rgba(238, 244, 240, 0.533)',
             bordaExpandida: 'rgba(44, 76, 59, 0.333)'
         }),
 
         emocional: Object.freeze({
             fundoIcone: '#EDE6F8',
             icone: '#7B5EA7',
+            fundoCategoria: 'rgba(123, 94, 167, 0.2)',
+            fundoOpcao: 'rgba(123, 94, 167, 0.1)',
             fundoExpandido: 'rgba(237, 230, 248, 0.267)',
+            fundoDiarioExpandido: 'rgba(237, 230, 248, 0.533)',
             bordaExpandida: 'rgba(123, 94, 167, 0.333)'
         }),
 
         energia: Object.freeze({
             fundoIcone: '#FBF3E0',
             icone: '#B07D2A',
+            fundoCategoria: 'rgba(176, 125, 42, 0.2)',
+            fundoOpcao: 'rgba(176, 125, 42, 0.1)',
             fundoExpandido: 'rgba(251, 243, 224, 0.267)',
+            fundoDiarioExpandido: 'rgba(251, 243, 224, 0.533)',
             bordaExpandida: 'rgba(176, 125, 42, 0.333)'
         }),
 
         vidaIntima: Object.freeze({
             fundoIcone: '#FAECF2',
             icone: '#B04A70',
+            fundoCategoria: 'rgba(176, 74, 112, 0.2)',
+            fundoOpcao: 'rgba(176, 74, 112, 0.1)',
             fundoExpandido: 'rgba(250, 236, 242, 0.267)',
+            fundoDiarioExpandido: 'rgba(250, 236, 242, 0.533)',
             bordaExpandida: 'rgba(176, 74, 112, 0.333)'
         }),
 
         saude: Object.freeze({
             fundoIcone: '#EEF0F8',
             icone: '#4A5899',
+            fundoCategoria: 'rgba(74, 88, 153, 0.2)',
+            fundoOpcao: 'rgba(74, 88, 153, 0.1)',
             fundoExpandido: 'rgba(238, 240, 248, 0.267)',
+            fundoDiarioExpandido: 'rgba(238, 240, 248, 0.533)',
             bordaExpandida: 'rgba(74, 88, 153, 0.333)'
         })
     })

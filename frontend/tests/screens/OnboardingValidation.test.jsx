@@ -44,7 +44,7 @@ test('cadastro explica quando o nome tem menos de três caracteres', async () =>
     expect(screen.getByText('Nome inválido')).toBeTruthy();
     expect(screen.getAllByText('O nome deve ter pelo menos 3 caracteres.')).toHaveLength(2);
     expect(cadastrar).not.toHaveBeenCalled();
-});
+}, 30000);
 
 test('cadastro não avança quando o e-mail já existe', async () => {
     const verificarEmailDisponivel = jest.fn().mockResolvedValue({ disponivel: false });

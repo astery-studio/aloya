@@ -15,6 +15,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
         HouseIcon: IconeTeste,
         InfoIcon: IconeTeste,
         MoonIcon: IconeTeste,
+        NotebookIcon: IconeTeste,
         ShieldCheckIcon: IconeTeste,
         UserIcon: IconeTeste,
         WarningCircleIcon: IconeTeste
@@ -181,6 +182,8 @@ describe('SettingsScreen', () => {
         expect(screen.getByText('Meu Ciclo')).toBeOnTheScreen();
 
         expect(screen.getByText('Parâmetros do Ciclo')).toBeOnTheScreen();
+
+        expect(screen.queryByText('Categorias do Diário')).toBeNull();
 
         expect(screen.getByText('Preferências')).toBeOnTheScreen();
 

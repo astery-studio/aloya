@@ -11,12 +11,30 @@ function criarEstilos(tema) {
 
         containerComVoltar: tema.escuro ? { backgroundColor: '#121212' } : {},
 
+        containerDiario: {
+            width: 390,
+            maxWidth: '100%',
+            flexShrink: 0,
+            flexDirection: 'row',
+            alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: 56,
+            paddingHorizontal: 16,
+            paddingBottom: 12
+        },
+
         espacamentoSuperior: {
             height: 56
         },
 
         espacamentoSuperiorComVoltar: {
             height: 48
+        },
+
+        espacamentoSuperiorDiario: {
+            display: 'none',
+            height: 0
         },
 
         areaTitulo: {
@@ -35,6 +53,15 @@ function criarEstilos(tema) {
             paddingBottom: 24
         },
 
+        areaTituloDiario: {
+            width: '100%',
+            minHeight: 44,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 0,
+            paddingBottom: 0
+        },
+
         titulo: {
             flex: 1,
             flexShrink: 1,
@@ -48,6 +75,25 @@ function criarEstilos(tema) {
             fontWeight: '700',
             lineHeight: 27,
             textAlign: 'center'
+        },
+
+        tituloDiario: {
+            fontSize: 28,
+            lineHeight: 34
+        },
+
+        acoesDireita: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            marginTop: -8,
+            marginLeft: 12
+        },
+
+        acoesDireitaDiario: {
+            gap: 16,
+            marginTop: 0,
+            marginLeft: 16
         },
 
         containerVoltar: {

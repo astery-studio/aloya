@@ -174,7 +174,7 @@ test('encaminha todas as interações da tela carregada', async () => {
         aoSelecionarData: jest.fn(),
         aoSelecionarAba: jest.fn(),
         aoCadastrarMenstruacao: jest.fn(),
-        aoAbrirDiario: jest.fn(),
+        aoCadastrarDiario: jest.fn(),
         aoAbrirAnticoncepcional: jest.fn()
     };
     await renderizar({ previsao, ...acoes });
@@ -192,7 +192,7 @@ test('encaminha todas as interações da tela carregada', async () => {
     expect(acoes.aoSelecionarData).toHaveBeenCalledWith('2026-10-14');
     expect(acoes.aoSelecionarAba).toHaveBeenCalledWith('ciclos');
     expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
-    expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
 });
 

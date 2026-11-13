@@ -1,0 +1,126 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { criarDiaryDeletionService } from '../../../../src/features/diary/services/diaryDeletion.service.js';
+import { criarDiaryDetailService } from '../../../../src/features/diary/services/diaryDetail.service.js';
+
+test('detalhe pesquisa registro pelo id e pela identidade da sessão', async () => {
+    let consulta;
+    const service = criarDiaryDetailService({
+        prisma: {
+            registroDiario: {
+                async findFirst(argumentos) {
+                    consulta = argumentos.where;
+                    return null;
+                }
+            },
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: { findMany: async () => [] },
+            registroCiclo: { findFirst: async () => null, count: async () => 0 }
+        }
+    });
+
+    await assert.rejects(() => service.buscar(7, 11), {
+        status: 404,
+        codigo: 'REGISTRO_DIARIO_NAO_ENCONTRADO'
+    });
+    assert.equal(consulta.id, 11);
+    assert.equal(consulta.usuarioId, 7);
+    assert.ok(consulta.categorias.some.categoriaId.in.includes('sintomas_emocionais'));
+});
+
+test('detalhe omite categorias desativadas sem apagar o registro persistido', async () => {
+    const base = {
+        id: 11,
+        dataRegistro: new Date('2026-11-08T00:00:00Z'),
+        faseCicloAssociada: 'folicular',
+        versao: 0,
+        criadoEm: new Date('2026-11-08T12:00:00Z'),
+        atualizadoEm: new Date('2026-11-08T12:00:00Z')
+    };
+    const categoria = (categoriaId, categoriaNome) => ({
+        categoriaId,
+        macrocategoriaNome: 'Macro',
+        categoriaNome,
+        valorEscalado: null,
+        casasDecimais: null,
+        valorDuracaoMinutos: null,
+        valorTexto: null,
+        opcoes: [],
+        medicaoTemperatura: null
+    });
+    const service = criarDiaryDetailService({
+        prisma: {
+            registroDiario: {
+                findFirst: async () => ({
+                    ...base,
+                    categorias: [
+                        categoria('sintomas_emocionais', 'Sintomas emocionais'),
+                        categoria('anotacao_livre', 'Anotação livre')
+                    ]
+                })
+            },
+            preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+            preferenciaCategoriaDiario: {
+                findMany: async () => [{ categoriaId: 'sintomas_emocionais', ativa: false }]
+            },
+            registroCiclo: { findFirst: async () => null, count: async () => 0 }
+        }
+    });
+
+    const detalhe = await service.buscar(7, 11);
+
+    assert.deepEqual(detalhe.categorias.map(({ id }) => id), ['anotacao_livre']);
+});
+
+test('exclusão usa proprietário e versão na leitura e na remoção', async () => {
+    const consultas = [];
+    const recalculos = [];
+    const tx = {
+        registroDiario: {
+            async findFirst(argumentos) {
+                consultas.push(argumentos.where);
+                return {
+                    id: 11,
+                    versao: 3,
+                    dataRegistro: new Date('2026-11-08T00:00:00.000Z')
+                };
+            },
+            async delete(argumentos) {
+                consultas.push(argumentos.where);
+            }
+        }
+    };
+    const service = criarDiaryDeletionService({
+        prisma: { $transaction: async (operacao) => operacao(tx) },
+        thermalRecalculation: {
+            recalcularPorDatas: async (...argumentos) => recalculos.push(argumentos)
+        }
+    });
+
+    await service.excluir(7, 11, 3);
+    assert.deepEqual(consultas, [
+        { id: 11, usuarioId: 7 },
+        { id: 11, usuarioId: 7, versao: 3 }
+    ]);
+    assert.deepEqual(recalculos[0].slice(0, 2), [7, ['2026-11-08']]);
+});
+
+test('exclusão rejeita versão superada sem remover', async () => {
+    let removeu = false;
+    const tx = {
+        registroDiario: {
+            findFirst: async () => ({ id: 11, versao: 4 }),
+            delete: async () => {
+                removeu = true;
+            }
+        }
+    };
+    const service = criarDiaryDeletionService({
+        prisma: { $transaction: async (operacao) => operacao(tx) },
+        thermalRecalculation: { recalcularPorDatas: async () => undefined }
+    });
+
+    await assert.rejects(() => service.excluir(7, 11, 3), { codigo: 'CONFLITO_DIARIO' });
+    assert.equal(removeu, false);
+});

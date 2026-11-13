@@ -80,7 +80,7 @@ test.each([
 test('executa as três ações do painel com previsão', async () => {
     const acoes = {
         aoCadastrarMenstruacao: jest.fn(),
-        aoAbrirDiario: jest.fn(),
+        aoCadastrarDiario: jest.fn(),
         aoAbrirAnticoncepcional: jest.fn()
     };
     await render(<CycleForecastPanel previsao={previsao} {...acoes} />);
@@ -90,7 +90,7 @@ test('executa as três ações do painel com previsão', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
 
     expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
-    expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
 });
 
@@ -146,7 +146,7 @@ test('orienta novos registros quando a confiança é baixa', async () => {
 test('oferece ações e recursos completos quando ainda não há ciclo', async () => {
     const acoes = {
         aoCadastrarMenstruacao: jest.fn(),
-        aoAbrirDiario: jest.fn(),
+        aoCadastrarDiario: jest.fn(),
         aoAbrirAnticoncepcional: jest.fn()
     };
     await render(<CycleForecastPanel {...acoes} />);
@@ -156,7 +156,7 @@ test('oferece ações e recursos completos quando ainda não há ciclo', async (
     await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
 
     expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
-    expect(acoes.aoAbrirDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Fases do ciclo')).toBeOnTheScreen();
     expect(screen.getByText(/orientações para cada momento/)).toBeOnTheScreen();

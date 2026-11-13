@@ -162,7 +162,8 @@ function NewSupportCategoryScreen({
     onVoltar,
     onCategoriaCriada,
     onConcluido,
-    onSessaoExpirada
+    onSessaoExpirada,
+    diaryService
 }) {
     const tema = useTheme();
     const corDestaque = tema.escuro ? '#F08A75' : tema.cores.marca.primaria;
@@ -358,6 +359,8 @@ function NewSupportCategoryScreen({
                         carregando={carregando}
                         bloqueado={!servicoDisponivel}
                         exibirAcao={false}
+                        diaryService={diaryService}
+                        onSessaoExpirada={onSessaoExpirada}
                     />
                 </View>
             </SettingsLayout>

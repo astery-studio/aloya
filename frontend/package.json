@@ -32,8 +32,10 @@
     "lint": "expo lint src tests --max-warnings=0",
     "web": "expo start --web",
     "test": "jest --runInBand",
+    "test:integration:diary": "jest --runInBand tests/features/diary/DiaryFlow.test.jsx tests/features/diary/components/NewDiaryEntrySheet.integration.test.jsx tests/features/diary/components/EditDiaryEntrySheet.test.jsx",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --runInBand",
+    "test:coverage:diary": "jest --coverage --runInBand tests/features/diary tests/components/NumberInput.test.jsx tests/shared/components/numberInputValue.test.js tests/shared/components/forms/DurationInput.test.jsx tests/shared/components/common/ButtonSelection.test.jsx --collectCoverageFrom=src/features/diary/**/*.{js,jsx} --collectCoverageFrom=!src/features/diary/**/*.styles.js --collectCoverageFrom=src/shared/components/forms/NumberInput/NumberInput.jsx --collectCoverageFrom=src/shared/components/forms/NumberInput/numberInputValue.js --collectCoverageFrom=src/shared/components/forms/DurationInput/DurationInput.jsx --collectCoverageFrom=src/shared/components/common/Button/ButtonSelection/ButtonSelection.jsx",
     "lint:support-network": "expo lint src/features/support-network src/shared/components/forms/SwitchField tests/features/support-network"
   },
   "jest": {

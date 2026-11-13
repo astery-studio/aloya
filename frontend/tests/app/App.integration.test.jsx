@@ -86,6 +86,59 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     };
 });
 
+jest.mock('../../src/features/diary/DiaryFlow', () => {
+    const React = require('react');
+    const { Text } = require('react-native');
+    return { DiaryFlow: jest.fn(() => React.createElement(Text, null, 'Diário integrado')) };
+});
+
+jest.mock('../../src/features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        DiaryCategoriesSheet: jest.fn(({ visivel, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, 'Categorias do Diário integradas'),
+                      React.createElement(Pressable, {
+                          accessibilityRole: 'button',
+                          accessibilityLabel: 'Fechar categorias do Diário',
+                          onPress: onFechar
+                      })
+                  )
+                : null
+        )
+    };
+});
+
+jest.mock('../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        NewDiaryEntrySheet: jest.fn(({ visivel, dataInicial, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, 'Cadastro do Diário aberto'),
+                      React.createElement(Text, null, `Data do Diário: ${dataInicial}`),
+                      React.createElement(
+                          Pressable,
+                          {
+                              accessibilityRole: 'button',
+                              accessibilityLabel: 'Fechar cadastro do Diário',
+                              onPress: onFechar
+                          },
+                          React.createElement(Text, null, 'Fechar')
+                      )
+                  )
+                : null
+        )
+    };
+});
+
 jest.mock('../../src/features/cycles/CycleEditFlow', () => {
     const React = require('react');
     const { Text } = require('react-native');
@@ -124,25 +177,31 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return {
-        CycleTodayContainer: jest.fn(({ aoAbrirAnticoncepcional, aoAbrirCalendario }) =>
-            React.createElement(
-                React.Fragment,
-                null,
+        CycleTodayContainer: jest.fn(
+            ({ aoAbrirAnticoncepcional, aoAbrirCalendario, aoCadastrarDiario }) =>
                 React.createElement(
-                    Pressable,
-                    {
+                    React.Fragment,
+                    null,
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Anticoncepcional',
+                            onPress: aoAbrirAnticoncepcional
+                        },
+                        React.createElement(Text, null, 'Ciclo hoje')
+                    ),
+                    React.createElement(Pressable, {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Anticoncepcional',
-                        onPress: aoAbrirAnticoncepcional
-                    },
-                    React.createElement(Text, null, 'Ciclo hoje')
-                ),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Calendário',
-                    onPress: aoAbrirCalendario
-                })
-            )
+                        accessibilityLabel: 'Calendário',
+                        onPress: aoAbrirCalendario
+                    }),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Cadastrar no Diário',
+                        onPress: () => aoCadastrarDiario('2026-11-05')
+                    })
+                )
         )
     };
 });
@@ -189,57 +248,67 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        SettingsScreen: jest.fn(({ onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba }) =>
-            React.createElement(
-                View,
-                null,
-                React.createElement(Text, null, 'Configurações'),
+        SettingsScreen: jest.fn(
+            ({ onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba }) =>
                 React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir parâmetros',
-                        onPress: onAbrirParametrosCiclo
-                    },
-                    React.createElement(Text, null, 'Parâmetros')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir perfil',
-                        onPress: onAbrirPerfil
-                    },
-                    React.createElement(Text, null, 'Perfil')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir membros',
-                        onPress: () => onSelecionarAba?.('membros')
-                    },
-                    React.createElement(Text, null, 'Membros')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir ciclos',
-                        onPress: () => onSelecionarAba?.('ciclos')
-                    },
-                    React.createElement(Text, null, 'Ciclos')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir início',
-                        onPress: () => onSelecionarAba?.('inicio')
-                    },
-                    React.createElement(Text, null, 'Início')
+                    View,
+                    null,
+                    React.createElement(Text, null, 'Configurações'),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir parâmetros',
+                            onPress: onAbrirParametrosCiclo
+                        },
+                        React.createElement(Text, null, 'Parâmetros')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir perfil',
+                            onPress: onAbrirPerfil
+                        },
+                        React.createElement(Text, null, 'Perfil')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir membros',
+                            onPress: () => onSelecionarAba?.('membros')
+                        },
+                        React.createElement(Text, null, 'Membros')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir ciclos',
+                            onPress: () => onSelecionarAba?.('ciclos')
+                        },
+                        React.createElement(Text, null, 'Ciclos')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir início',
+                            onPress: () => onSelecionarAba?.('inicio')
+                        },
+                        React.createElement(Text, null, 'Início')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir Diário',
+                            onPress: () => onSelecionarAba?.('diario')
+                        },
+                        React.createElement(Text, null, 'Diário')
+                    )
                 )
-            )
         )
     };
 });
@@ -336,8 +405,10 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
+import { NewSupportCategoryScreen } from '../../src/features/support-network/screens/NewSupportCategoryScreen';
 import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
+import { DiaryFlow } from '../../src/features/diary/DiaryFlow';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
 
 //Cria os serviços usados pelo App durante os testes de integração.
@@ -389,7 +460,8 @@ function criarServicos() {
         },
         supportCategoryService: {
             criarCategoria: jest.fn()
-        }
+        },
+        diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() }
     };
 }
 
@@ -480,6 +552,36 @@ describe('App integrado', () => {
         );
     });
 
+    test('abre o Diário integrado pelo menu', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir Diário' }));
+
+        expect(await screen.findByText('Diário integrado')).toBeOnTheScreen();
+        expect(DiaryFlow).toHaveBeenCalledWith(
+            expect.objectContaining({
+                service: servicos.diaryService,
+                calendarService: servicos.calendarService,
+                onSelecionarAba: expect.any(Function),
+                onSessaoExpirada: expect.any(Function),
+                aoGerenciarCategorias: expect.any(Function)
+            }),
+            undefined
+        );
+    });
+
+    test('abre categorias pelo Diário e retorna à origem', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir Diário' }));
+
+        await act(() => DiaryFlow.mock.calls.at(-1)[0].aoGerenciarCategorias());
+        expect(await screen.findByText('Categorias do Diário integradas')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar categorias do Diário' }));
+        expect(await screen.findByText('Diário integrado')).toBeOnTheScreen();
+    });
+
     test('abre a edição de menstruação ao tocar no ciclo do calendário', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
@@ -525,6 +627,10 @@ describe('App integrado', () => {
         );
 
         expect(await screen.findByText('Nova categoria')).toBeOnTheScreen();
+        expect(NewSupportCategoryScreen).toHaveBeenCalledWith(
+            expect.objectContaining({ diaryService: servicos.diaryService }),
+            undefined
+        );
     });
 
     test('volta da criação de categoria para membros', async () => {
@@ -616,6 +722,21 @@ describe('App integrado', () => {
 
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao ciclo' }));
         expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+    });
+
+    test('abre diretamente o cadastro do Diário pela tela inicial', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+
+        expect(await screen.findByText('Cadastro do Diário aberto')).toBeOnTheScreen();
+        expect(screen.getByText('Data do Diário: 2026-11-05')).toBeOnTheScreen();
+        expect(screen.getByText('Ciclo hoje')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar cadastro do Diário' }));
+        expect(screen.queryByText('Cadastro do Diário aberto')).not.toBeOnTheScreen();
     });
 
     test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {

@@ -1,11 +1,12 @@
 //Reúne os grupos de permissões de acesso e controla a lista selecionada.
 import { useCallback, useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import PermissionGroup from './PermissionGroup';
 import PermissionCounter from './PermissionCounter';
+import { useVisibleDiaryPermissionGroups } from '../hooks/useVisibleDiaryPermissionGroups';
 import { criarEstilos } from './PermissionGroups.styles';
 
 const idsPermitidos = new Set([
@@ -35,10 +36,14 @@ function PermissionGroups({
     permissoesSelecionadas = [],
     aoAlterar,
     desabilitado = false,
-    estilo
+    estilo,
+    diaryService,
+    onSessaoExpirada
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const visibilidade = useVisibleDiaryPermissionGroups({ diaryService, onSessaoExpirada });
+    const gruposVisiveis = visibilidade.grupos;
     //Memoização evita repetir a limpeza da lista quando ela não foi alterada.
     const permissoesNormalizadas = useMemo(
         () => normalizarPermissoes(permissoesSelecionadas),
@@ -52,7 +57,7 @@ function PermissionGroups({
 
     const estaDesabilitado = desabilitado || typeof aoAlterar !== 'function';
 
-    const quantidadeGruposAtivos = gruposPermissoes.reduce((total, grupo) => {
+    const quantidadeGruposAtivos = gruposVisiveis.reduce((total, grupo) => {
         const grupoPossuiSelecao = grupo.permissoes.some((permissao) =>
             permissoesAtivas.has(permissao.id)
         );
@@ -115,12 +120,36 @@ function PermissionGroups({
 
                 <PermissionCounter
                     quantidadeAtiva={quantidadeGruposAtivos}
-                    total={gruposPermissoes.length}
+                    total={gruposVisiveis.length}
                 />
             </View>
 
             <View style={estilos.lista}>
-                {gruposPermissoes.map((grupo) => (
+                {visibilidade.carregando ? (
+                    <View accessibilityLiveRegion="polite" style={estilos.estadoCatalogo}>
+                        <ActivityIndicator color={tema.cores.interface.destaque} />
+                        <Text style={estilos.textoEstado}>Carregando categorias do Diário...</Text>
+                    </View>
+                ) : null}
+                {visibilidade.erro ? (
+                    <View accessibilityLiveRegion="polite" style={estilos.estadoCatalogo}>
+                        <Text style={estilos.textoEstado}>
+                            Não foi possível carregar as categorias do Diário.
+                        </Text>
+                        <Pressable
+                            accessibilityRole="button"
+                            accessibilityLabel="Tentar carregar categorias do Diário novamente"
+                            onPress={visibilidade.tentarNovamente}
+                            style={estilos.tentarNovamente}
+                        >
+                            <Text style={estilos.textoTentarNovamente}>Tentar novamente</Text>
+                        </Pressable>
+                    </View>
+                ) : null}
+                {!visibilidade.carregando && !visibilidade.erro && gruposVisiveis.length === 0 ? (
+                    <Text style={estilos.textoEstado}>Nenhuma categoria do Diário está ativa.</Text>
+                ) : null}
+                {gruposVisiveis.map((grupo) => (
                     <PermissionGroup
                         aparenciaNovaCategoria={aparenciaNovaCategoria}
                         coresInterruptor={coresInterruptor}

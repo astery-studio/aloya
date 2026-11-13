@@ -11,13 +11,11 @@ test.each(['envio', 'leitura'])(
             const fetchImpl =
                 etapa === 'envio'
                     ? jest.fn(() => new Promise(() => {}))
-                    : jest
-                          .fn()
-                          .mockResolvedValue({
-                              ok: true,
-                              status: 200,
-                              json: () => new Promise(() => {})
-                          });
+                    : jest.fn().mockResolvedValue({
+                          ok: true,
+                          status: 200,
+                          json: () => new Promise(() => {})
+                      });
             const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl, timeoutMs: 1000 });
             const resultado = expect(
                 cliente.requisicao({ caminho: '/categoria', metodo: 'POST' })
@@ -46,6 +44,22 @@ test('envia chave de idempotência preservada nas retentativas', async () => {
         'https://api/registrations',
         expect.objectContaining({
             headers: expect.objectContaining({ 'Idempotency-Key': 'menstrual-123' })
+        })
+    );
+});
+
+test('envia If-Match sem permitir que o corpo controle os cabeçalhos', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({ ok: true, status: 204 });
+    const cliente = criarApiClient({ baseUrl: 'https://api', fetchImpl });
+    await cliente.requisicao({
+        caminho: '/api/diario/registros/4',
+        metodo: 'DELETE',
+        ifMatch: '"2"'
+    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+        'https://api/api/diario/registros/4',
+        expect.objectContaining({
+            headers: expect.objectContaining({ 'If-Match': '"2"' })
         })
     );
 });

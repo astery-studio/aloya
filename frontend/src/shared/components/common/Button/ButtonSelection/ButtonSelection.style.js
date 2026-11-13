@@ -78,6 +78,24 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.destaque
         },
 
+        compacto: {
+            minHeight: 28,
+            alignSelf: 'flex-start',
+            marginBottom: 0,
+            paddingVertical: 3,
+            paddingHorizontal: 8,
+            gap: 3,
+            borderRadius: 99
+        },
+
+        textosCompactos: { flex: 0 },
+
+        labelCompacto: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 11,
+            lineHeight: 16
+        },
+
         labelModoCor: {
             fontSize: 16,
             lineHeight: 24

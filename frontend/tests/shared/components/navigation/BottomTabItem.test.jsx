@@ -173,13 +173,13 @@ describe('BottomTabItem', () => {
         expect(IconeTeste.mock.calls[0][0]).toEqual(
             expect.objectContaining({
                 size: 26,
-                color: '#C4C8C5',
+                color: '#999999',
                 weight: 'regular'
             })
         );
 
         expect(screen.getByText('Ciclos')).toHaveStyle({
-            color: '#C4C8C5'
+            color: '#999999'
         });
     });
 

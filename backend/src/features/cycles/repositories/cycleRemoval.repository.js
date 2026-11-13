@@ -81,7 +81,7 @@ async function limparPrevisoes(tx, usuarioId) {
     return quantidadeCiclos;
 }
 
-function criarCycleRemovalRepository({ prisma } = {}) {
+function criarCycleRemovalRepository({ prisma, thermalRecalculation } = {}) {
     validarPrisma(prisma);
 
     async function buscarCiclo(tx, usuarioId, cicloId) {
@@ -144,6 +144,7 @@ function criarCycleRemovalRepository({ prisma } = {}) {
 
             await recalcularCiclos(tx, usuarioId);
             const quantidadeCiclos = await limparPrevisoes(tx, usuarioId);
+            await thermalRecalculation?.recalcularTodos(usuarioId, tx);
 
             return { cicloRemovido, quantidadeCiclos };
         });
@@ -170,6 +171,7 @@ function criarCycleRemovalRepository({ prisma } = {}) {
 
             await recalcularCiclos(tx, usuarioId);
             const quantidadeCiclos = await limparPrevisoes(tx, usuarioId);
+            await thermalRecalculation?.recalcularTodos(usuarioId, tx);
 
             return { cicloRemovido: true, quantidadeCiclos };
         });
