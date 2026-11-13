@@ -8,6 +8,7 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
+import { obterCoresDiario } from '../config/diaryColors';
 import {
     DiaryHistoryHeader,
     DiaryTimelineDivider as DivisorTimeline
@@ -50,6 +51,7 @@ function DiaryScreen({
     onSelecionarAba
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const { width: larguraTela } = useWindowDimensions();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const margemHorizontalTimeline = calcularMargemHorizontalTimeline(larguraTela);
@@ -68,7 +70,11 @@ function DiaryScreen({
                     aoPressionar={aoAbrirFiltros}
                     rotuloAcessibilidade="Filtrar histórico do Diário"
                     variante="selecionado"
-                    corIcone={tema.cores.marca.secundaria}
+                    corIcone={coresDiario.interface.destaque}
+                    estilo={{
+                        backgroundColor: coresDiario.interface.superficie,
+                        borderColor: coresDiario.interface.borda
+                    }}
                 />
             ) : null}
             {typeof aoGerenciarCategorias === 'function' ? (
@@ -77,7 +83,11 @@ function DiaryScreen({
                     aoPressionar={aoGerenciarCategorias}
                     rotuloAcessibilidade="Gerenciar categorias do Diário"
                     variante="selecionado"
-                    corIcone={tema.cores.marca.primaria}
+                    corIcone={tema.escuro ? '#EF9A9A' : coresDiario.primaria}
+                    estilo={{
+                        backgroundColor: coresDiario.interface.superficie,
+                        borderColor: coresDiario.interface.borda
+                    }}
                 />
             ) : null}
         </>
@@ -161,6 +171,9 @@ function DiaryScreen({
             abaAtiva="diario"
             onSelecionarAba={onSelecionarAba}
             acoesHeader={acoesHeader}
+            corFundo={coresDiario.interface.fundo}
+            corTextoHeader={coresDiario.interface.textoPrincipal}
+            corFundoNavegacao={coresDiario.interface.superficie}
         >
             <View testID="diary-main-container" style={estilos.tela}>
                 {conteudo}
