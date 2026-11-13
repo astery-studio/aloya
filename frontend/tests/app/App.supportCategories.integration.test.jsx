@@ -7,6 +7,7 @@ import {
     Alert,
     Linking
 } from 'react-native'
+import {SafeAreaProvider} from 'react-native-safe-area-context'
 
 import App from '../../src/App'
 import {
@@ -15,6 +16,18 @@ import {
 import {
     obterToken
 } from '../../src/shared/storage/tokenStorage'
+
+const metricasSafeArea = {
+    frame: {x: 0, y: 0, width: 390, height: 844},
+    insets: {top: 0, right: 0, bottom: 0, left: 0}
+}
+
+const renderApp = (componente) =>
+    render(
+        <SafeAreaProvider initialMetrics={metricasSafeArea}>
+            {componente}
+        </SafeAreaProvider>
+    )
 
 jest.mock('expo-font', () => ({
     useFonts: () => [true, null]
@@ -445,7 +458,7 @@ describe(
         })
 
         test('abre a listagem e conecta o serviço', async () => {
-            await render(<App />)
+            await renderApp(<App />)
 
             await abrirCategorias()
 
@@ -457,7 +470,7 @@ describe(
         })
 
         test('volta da listagem para membros', async () => {
-            await render(<App />)
+            await renderApp(<App />)
 
             await abrirCategorias()
 
@@ -479,7 +492,7 @@ describe(
         })
 
         test('abre a criação e retorna para a listagem ao cancelar', async () => {
-            await render(<App />)
+            await renderApp(<App />)
 
             await abrirCategorias()
 
@@ -517,7 +530,7 @@ describe(
         })
 
         test('retorna para a listagem depois de concluir a criação', async () => {
-            await render(<App />)
+            await renderApp(<App />)
 
             await abrirCategorias()
 
@@ -549,7 +562,7 @@ describe(
         })
 
         test('encaminha edição e exclusão para os fluxos provisórios', async () => {
-            await render(<App />)
+            await renderApp(<App />)
 
             await abrirCategorias()
 
