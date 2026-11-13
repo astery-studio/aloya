@@ -1,20 +1,6 @@
-import { memo, useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { CaretDown } from 'phosphor-react-native/src/icons/CaretDown';
-import { CaretUp } from 'phosphor-react-native/src/icons/CaretUp';
+import { memo } from 'react';
 
-import { useTheme } from '../../../../shared/hooks/useTheme';
-import { criarEstilos } from './DiaryMacrocategorySection.styles';
-
-const COR_ICONE_RECOLHIDO = '#A8A49C';
-
-function montarEstiloCabecalho(estilos, expandido, cores, pressionado) {
-    return [
-        estilos.cabecalho,
-        expandido && { backgroundColor: cores.fundoDiarioExpandido },
-        pressionado && estilos.pressionado
-    ];
-}
+import { DiaryMacrocategoryAccordion } from '../DiaryMacrocategoryAccordion/DiaryMacrocategoryAccordion';
 
 function DiaryMacrocategorySection({
     titulo,
@@ -27,42 +13,22 @@ function DiaryMacrocategorySection({
     desabilitado = false,
     children
 }) {
-    const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
-    const IconeExpansao = expandido ? CaretUp : CaretDown;
-
     return (
-        <View
-            style={[
-                estilos.container,
-                expandido && { borderColor: cores.bordaExpandida },
-                desabilitado && estilos.desabilitado
-            ]}
+        <DiaryMacrocategoryAccordion
+            titulo={titulo}
+            icone={Icone}
+            iconeProps={iconeProps}
+            paleta={paleta}
+            expandido={expandido}
+            aoAlternar={aoAlternar}
+            acessorio={acessorioCabecalho}
+            rotuloAcao={titulo}
+            desabilitado={desabilitado}
+            variante="formulario"
         >
-            <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={titulo}
-                accessibilityState={{ expanded: expandido, disabled: desabilitado }}
-                disabled={desabilitado}
-                onPress={aoAlternar}
-                style={({ pressed }) => montarEstiloCabecalho(estilos, expandido, cores, pressed)}
-            >
-                <View style={[estilos.caixaIcone, { backgroundColor: cores.fundoIcone }]}>
-                    <Icone size={18} color={cores.icone} {...iconeProps} />
-                </View>
-                <Text style={[estilos.titulo, expandido && { color: cores.icone }]}>{titulo}</Text>
-                {acessorioCabecalho}
-                <IconeExpansao size={18} color={expandido ? cores.icone : COR_ICONE_RECOLHIDO} />
-            </Pressable>
-            {expandido ? (
-                <View style={[estilos.conteudo, { borderTopColor: cores.bordaExpandida }]}>
-                    {children}
-                </View>
-            ) : null}
-        </View>
+            {children}
+        </DiaryMacrocategoryAccordion>
     );
 }
 
 export default memo(DiaryMacrocategorySection);
-export { COR_ICONE_RECOLHIDO, montarEstiloCabecalho };
