@@ -3,6 +3,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import {
     criarEstiloBotaoAcao,
     DiaryRecordDetails,
+    criarIntroducaoRegistro,
     formatarDuracao,
     normalizarDetalhe,
     obterCoresCategoria,
@@ -144,6 +145,7 @@ describe('DiaryRecordDetails', () => {
         expect(tentar).toHaveBeenCalledTimes(1);
         expect(fechar).toHaveBeenCalledTimes(1);
         expect(normalizarDetalhe({ id: 0 })).toBeNull();
+        expect(criarIntroducaoRegistro({})).toBe('Neste dia você registrou:');
         expect(formatarDuracao(0)).toBeNull();
         expect(formatarDuracao(60)).toBe('1 hora');
         expect(formatarDuracao(120)).toBe('2 horas');
@@ -222,6 +224,22 @@ describe('DiaryRecordDetails', () => {
         expect(obterCoresCategoria('tempo_sono', '#123', 'Energia e Sono')).toEqual({
             fundo: 'rgba(176, 125, 42, 0.1)',
             texto: '#B07D2A'
+        });
+        expect(obterCoresCategoria('fluxo_menstrual', '#123', 'Ciclo e Sangramento')).toEqual({
+            fundo: 'rgba(200, 90, 68, 0.1)',
+            texto: '#C85A44'
+        });
+        expect(obterCoresCategoria('humor', '#123', 'Emocional')).toEqual({
+            fundo: 'rgba(123, 94, 167, 0.1)',
+            texto: '#7B5EA7'
+        });
+        expect(obterCoresCategoria('vida_social', '#123', 'Vida Íntima e Social')).toEqual({
+            fundo: 'rgba(176, 74, 112, 0.1)',
+            texto: '#B04A70'
+        });
+        expect(obterCoresCategoria('consultas', '#123', 'Saúde e Acompanhamento')).toEqual({
+            fundo: 'rgba(74, 88, 153, 0.1)',
+            texto: '#4A5899'
         });
         const estilos = { botaoAcao: {}, botaoAcaoDesativado: {}, pressionado: {} };
         expect(criarEstiloBotaoAcao(estilos, false, false)).toEqual([{}, null, null]);
