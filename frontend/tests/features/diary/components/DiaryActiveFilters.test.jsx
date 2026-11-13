@@ -44,3 +44,16 @@ test('não renderiza sem critérios e usa fallback seguro para categoria', async
     await render(<DiaryActiveFilters filtros={{}} />);
     expect(screen.queryByTestId('filtros-ativos-diario')).not.toBeOnTheScreen();
 });
+
+test('ignora fase desconhecida e usa zero quando a contagem não é inteira', async () => {
+    expect(criarDescritoresFiltros({ fases: ['desconhecida'] })).toEqual([]);
+    await render(
+        <DiaryActiveFilters
+            filtros={{ categorias: ['pele'] }}
+            rotulosCategorias={{ pele: 'Pele' }}
+            quantidadeResultados="3"
+        />
+    );
+    expect(screen.getByText('FILTRO APLICADO (0)')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Remover filtro Pele' }));
+});
