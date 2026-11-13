@@ -3,13 +3,13 @@ import { AccessibilityInfo, findNodeHandle, Text } from 'react-native';
 
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import AlertModal from '../../../../shared/components/feedback/Modal/AlertModal/AlertModal';
-import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
 import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useDiaryCatalog } from '../../hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../hooks/useDiaryEntryForm';
 import { useDiaryPhase } from '../../hooks/useDiaryPhase';
 import { DiaryEntryFormContent } from '../DiaryEntryForm/DiaryEntryFormContent';
+import { DiaryEntrySaveErrorModal } from '../DiaryEntrySaveErrorModal/DiaryEntrySaveErrorModal';
 import { criarEstilos } from '../DiaryEntryForm/DiaryEntrySheet.styles';
 
 // Orquestra exclusivamente os estados e as regras da edição de um registro existente.
@@ -128,28 +128,13 @@ function EditDiaryEntrySheet({
                     onDeslizarParaFechar={formulario.salvando ? undefined : solicitarFechamento}
                     onPosicaoRolagem={atualizarPosicaoRolagem}
                 />
-                <SimpleModal
-                    erroInterno
-                    visivel={Boolean(formulario.erroSalvamento)}
+                <DiaryEntrySaveErrorModal
+                    erro={formulario.erroSalvamento}
+                    salvando={formulario.salvando}
+                    conflitoVersao={formulario.conflitoVersao}
                     aoFechar={formulario.limparErroSalvamento}
-                    icone={WarningCircleIcon}
-                    corIcone="#5C5C59"
-                    fundoIcone="#EDEDED"
-                    titulo={formulario.conflitoVersao ? 'Registro atualizado' : 'Algo deu errado'}
-                    mensagem={formulario.erroSalvamento}
-                    acaoPrincipal={{
-                        texto: formulario.conflitoVersao ? 'Recarregar dados' : 'Tentar novamente',
-                        variante: 'preto',
-                        aoPressionar: formulario.conflitoVersao
-                            ? recarregarAposConflito
-                            : formulario.salvar,
-                        carregando: formulario.salvando
-                    }}
-                    acaoSecundaria={{
-                        texto: 'Voltar',
-                        aoPressionar: formulario.limparErroSalvamento,
-                        desativado: formulario.salvando
-                    }}
+                    aoTentarNovamente={formulario.salvar}
+                    aoRecarregarDados={recarregarAposConflito}
                 />
             </BottomSheet>
             <AlertModal
