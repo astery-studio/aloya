@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { CaretDown } from 'phosphor-react-native/src/icons/CaretDown';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { formatarDataDiario } from '../../utils/diaryDate';
 import { DiaryDateArrow } from './DiaryDateArrow';
 import { criarEstilos } from './DiaryDateNavigator.styles';
@@ -18,6 +19,7 @@ function DiaryDateNavigator({
     compacto = false
 }) {
     const tema = useTheme();
+    const cores = obterCoresDiario(tema).interface;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const dataFormatada = formatarDataDiario(data);
 
@@ -40,7 +42,7 @@ function DiaryDateNavigator({
                 <Text style={[estilos.texto, compacto && estilos.textoCompacto]}>
                     {dataFormatada}
                 </Text>
-                {aoAbrirSeletor ? <CaretDown size={15} color="#000000" /> : null}
+                {aoAbrirSeletor ? <CaretDown size={15} color={cores.textoPrincipal} /> : null}
             </Pressable>
             <DiaryDateArrow
                 direcao="proximo"
