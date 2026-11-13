@@ -1,6 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert, Linking } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const ReactInterno = require('react');
@@ -150,6 +151,14 @@ import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
 
+const metricasSafeArea = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, right: 0, bottom: 0, left: 0 }
+};
+
+const renderApp = (componente) =>
+    render(<SafeAreaProvider initialMetrics={metricasSafeArea}>{componente}</SafeAreaProvider>);
+
 describe('App — calendário', () => {
     let servicos;
 
@@ -184,7 +193,7 @@ describe('App — calendário', () => {
     });
 
     test('encaminha o dia da Home e limpa a pré-seleção ao entrar pelo Calendário', async () => {
-        await render(<App />);
+        await renderApp(<App />);
 
         expect(await screen.findByText('Configurações')).toBeOnTheScreen();
 
