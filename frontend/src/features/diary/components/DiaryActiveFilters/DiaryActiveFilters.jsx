@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { FilterChip } from '../../../../shared/components/common/FilterChip/FilterChip';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { formatarDataFiltro } from '../../utils/diaryFilters';
 import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { criarEstilos } from './DiaryActiveFilters.styles';
@@ -40,6 +41,7 @@ function DiaryActiveFilters({
     aoLimpar
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const descritores = criarDescritoresFiltros(filtros, rotulosCategorias);
     if (descritores.length === 0) return null;
@@ -63,6 +65,8 @@ function DiaryActiveFilters({
                         key={filtro.id}
                         rotulo={filtro.rotulo}
                         aoRemover={() => aoRemover?.(filtro.id)}
+                        cor={coresDiario.primaria}
+                        fundo={coresDiario.interface.fundo}
                     />
                 ))}
             </ScrollView>
