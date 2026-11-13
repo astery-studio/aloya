@@ -6,6 +6,7 @@ import {
     PersonArmsSpreadIcon,
     UsersIcon
 } from '../../../shared/components/icons/AppIcons';
+import { obterCoresDiario } from './diaryColors';
 
 const apresentacaoMacrocategorias = Object.freeze({
     ciclo_sangramento: { icone: DropIcon, paleta: 'ciclo', iconeProps: { weight: 'fill' } },
@@ -23,6 +24,7 @@ function obterApresentacaoMacrocategoria(id) {
 function obterCorMacrocategoria(tema, id) {
     const apresentacao = obterApresentacaoMacrocategoria(id);
     return (
+        (tema ? obterCoresDiario(tema).macrocategorias[apresentacao.paleta]?.icone : null) ??
         tema?.cores?.redeApoio?.[apresentacao.paleta]?.icone ??
         tema?.cores?.redeApoio?.ciclo?.icone ??
         '#C85A44'
