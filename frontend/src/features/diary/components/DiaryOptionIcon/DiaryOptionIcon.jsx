@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { SvgXml } from 'react-native-svg';
 
 import { diaryIcons } from '../../../../shared/components/icons/DiaryIcons';
-
-const COR_ICONE_SELECIONADO = '#FFFFFF';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function colorirSvg(xml, cor) {
     if (!cor) return xml;
@@ -20,8 +20,10 @@ function DiaryOptionIcon({
     weight = 'regular',
     selecionado = false
 }) {
+    const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const icone = diaryIcons[iconeId];
-    const corResolvida = selecionado ? COR_ICONE_SELECIONADO : (color ?? cor);
+    const corResolvida = selecionado ? coresDiario.textoSobrePrimaria : (color ?? cor);
 
     if (!icone) {
         throw new Error(`Ícone do Diário não encontrado: ${iconeId}`);
