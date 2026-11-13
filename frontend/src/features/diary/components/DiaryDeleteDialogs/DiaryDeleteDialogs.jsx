@@ -1,8 +1,10 @@
 import AlertModal from '../../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal/SimpleModal';
 import { LockKeyIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function DiaryDeleteDialogs({ exclusao, tema }) {
+    const coresDiario = obterCoresDiario(tema);
     return (
         <>
             <AlertModal
@@ -48,8 +50,8 @@ function DiaryDeleteDialogs({ exclusao, tema }) {
                 visivel={exclusao.sucesso}
                 aoFechar={exclusao.concluirSucesso}
                 icone={LockKeyIcon}
-                corIcone={tema.cores.marca.primaria}
-                fundoIcone={tema.escuro ? tema.cores.interface.separador : '#F5EDE3'}
+                corIcone={coresDiario.primaria}
+                fundoIcone={tema.escuro ? coresDiario.interface.separador : '#F5EDE3'}
                 titulo="Registro excluído com sucesso."
                 acaoPrincipal={{
                     texto: 'OK',
