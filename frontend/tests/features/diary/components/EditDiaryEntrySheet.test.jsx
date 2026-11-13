@@ -17,10 +17,18 @@ jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', 
     BottomSheet: require('./diaryEntrySheetDoubles').MockBottomSheet
 }));
 jest.mock('../../../../src/features/diary/components/DiaryEntryForm/DiaryEntryFormContent', () => {
-    const { Text } = require('react-native');
+    const { Pressable, Text, View } = require('react-native');
     return {
-        DiaryEntryFormContent: ({ bloquearSalvarSemAlteracoes }) => (
-            <Text>{`salvar-bloqueado:${bloquearSalvarSemAlteracoes}`}</Text>
+        DiaryEntryFormContent: ({ bloquearSalvarSemAlteracoes, onPosicaoRolagem }) => (
+            <View>
+                <Text>{`salvar-bloqueado:${bloquearSalvarSemAlteracoes}`}</Text>
+                <Pressable testID="rolagem-edicao-negativa" onPress={() => onPosicaoRolagem(-3)}>
+                    <Text>Rolagem negativa</Text>
+                </Pressable>
+                <Pressable testID="rolagem-edicao-positiva" onPress={() => onPosicaoRolagem(20)}>
+                    <Text>Rolagem positiva</Text>
+                </Pressable>
+            </View>
         )
     };
 });
@@ -64,6 +72,11 @@ function configurarFormulario(sobrescritas = {}) {
 }
 
 test('mantém a edição em um sheet próprio e bloqueia salvar sem mudanças', async () => {
+    const reactNative = require('react-native');
+    const foco = jest.spyOn(reactNative, 'findNodeHandle').mockReturnValue(1);
+    const anunciarFoco = jest
+        .spyOn(reactNative.AccessibilityInfo, 'setAccessibilityFocus')
+        .mockImplementation(() => {});
     configurarFormulario();
     const onFechar = jest.fn();
     await render(<EditDiaryEntrySheet visivel registro={registro} onFechar={onFechar} />);
@@ -79,8 +92,15 @@ test('mantém a edição em um sheet próprio e bloqueia salvar sem mudanças', 
     expect(
         screen.getByText('Formulário de edição carregado com os valores existentes.')
     ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId('rolagem-edicao-negativa'));
+    await fireEvent.press(screen.getByTestId('verificar-deslize-sheet'));
+    await fireEvent.press(screen.getByTestId('rolagem-edicao-positiva'));
+    await fireEvent.press(screen.getByTestId('verificar-deslize-sheet'));
     await fireEvent.press(screen.getByText('Fechar painel'));
     expect(onFechar).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(anunciarFoco).toHaveBeenCalledWith(1));
+    foco.mockRestore();
+    anunciarFoco.mockRestore();
 });
 
 test('confirma o descarte quando a edição possui mudanças', async () => {
@@ -134,4 +154,44 @@ test('salva pelo callback da edição e fecha somente depois da atualização ex
     await act(async () => parametros.onSalvo({ ...registro, versao: 4 }));
     expect(onSalvo).toHaveBeenCalledWith({ ...registro, versao: 4 });
     expect(onFechar).toHaveBeenCalledTimes(1);
+});
+
+test('limpa estados ao ocultar e mantém aviso quando o conflito não recarrega', async () => {
+    const formulario = configurarFormulario({
+        alterado: true,
+        conflitoVersao: true,
+        erroSalvamento: 'Conflito.'
+    });
+    const aoRecarregarRegistro = jest.fn().mockResolvedValue(false);
+    const resultado = await render(
+        <EditDiaryEntrySheet
+            visivel
+            registro={registro}
+            aoRecarregarRegistro={aoRecarregarRegistro}
+        />
+    );
+    await fireEvent.press(screen.getByText('Recarregar dados'));
+    expect(formulario.limparErroSalvamento).toHaveBeenCalledTimes(1);
+    expect(
+        screen.queryByText('Dados externos carregados. O rascunho anterior foi substituído.')
+    ).not.toBeOnTheScreen();
+
+    await resultado.rerender(
+        <EditDiaryEntrySheet visivel={false} registro={registro} aoRecarregarRegistro={jest.fn()} />
+    );
+});
+
+test('combina carregamento, erro do registro e bloqueio durante salvamento', async () => {
+    configurarFormulario({ salvando: true });
+    const recarregar = jest.fn();
+    await render(
+        <EditDiaryEntrySheet
+            visivel
+            carregandoRegistro
+            erroRegistro="Falha ao carregar."
+            aoRecarregarRegistro={recarregar}
+        />
+    );
+    expect(screen.getByText('bloqueado:true;deslize:true')).toBeOnTheScreen();
+    expect(screen.getByText('salvar-bloqueado:true')).toBeOnTheScreen();
 });
