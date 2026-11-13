@@ -42,7 +42,6 @@ function pontuarDistribuicaoChips(linhas) {
 function organizarChipsEmLinhas(itens) {
     if (!Array.isArray(itens) || !itens.length) return [];
     if (larguraLinhaChips(itens) <= LARGURA_UTIL_CHIPS) return [itens];
-    if (itens.length === 1) return [itens];
     if (itens.length === 2) {
         return itens.map((item) => [item]);
     }
