@@ -6,6 +6,7 @@ import {
     waitFor
 } from '@testing-library/react-native'
 import {Linking} from 'react-native'
+import {SafeAreaProvider} from 'react-native-safe-area-context'
 
 jest.mock('expo-font', () => ({
     useFonts: jest.fn(() => [true, null])
@@ -180,6 +181,18 @@ import {
     obterToken
 } from '../../src/shared/storage/tokenStorage'
 
+const metricasSafeArea = {
+    frame: {x: 0, y: 0, width: 390, height: 844},
+    insets: {top: 0, right: 0, bottom: 0, left: 0}
+}
+
+const renderApp = (componente) =>
+    render(
+        <SafeAreaProvider initialMetrics={metricasSafeArea}>
+            {componente}
+        </SafeAreaProvider>
+    )
+
 const perfil = {
     id: 1,
     nome: 'Julia',
@@ -288,7 +301,7 @@ describe(
                     criarServicos(buscarPerfil)
                 )
 
-                await render(<App />)
+                await renderApp(<App />)
 
                 await waitFor(() => {
                     expect(
@@ -373,7 +386,7 @@ describe(
                 )
 
                 const resultado =
-                    await render(<App />)
+                    await renderApp(<App />)
 
                 await waitFor(() => {
                     expect(
