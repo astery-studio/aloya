@@ -259,4 +259,24 @@ test('aplica filtros, preserva a última lista válida no erro e permite tentar 
     await act(async () => hook.result.current.tentarAplicarFiltros());
     expect(hook.result.current.registros).toEqual([antigo]);
     expect(hook.result.current.erroFiltro).toBeNull();
+    await act(() => hook.result.current.fecharErroFiltro());
+});
+
+test('encaminha filtros ativos também durante a paginação', async () => {
+    const service = {
+        listarHistorico: jest
+            .fn()
+            .mockResolvedValueOnce({ itens: [recente], proximoCursor: 'cursor_1' })
+            .mockResolvedValueOnce({ itens: [antigo], proximoCursor: null })
+    };
+    const filtros = { fases: ['lutea'] };
+    const hook = await renderHook(() => useDiaryHistory({ service, filtros }));
+    await waitFor(() => expect(hook.result.current.temMais).toBe(true));
+    await act(() => hook.result.current.carregarMais());
+    expect(service.listarHistorico).toHaveBeenNthCalledWith(2, {
+        cursor: 'cursor_1',
+        filtros: { dataInicio: null, dataFim: null, categorias: [], fases: ['lutea'] },
+        signal: expect.any(AbortSignal)
+    });
+    await hook.unmount();
 });
