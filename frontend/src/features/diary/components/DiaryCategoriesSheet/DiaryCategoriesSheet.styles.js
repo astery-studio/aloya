@@ -79,57 +79,6 @@ function criarEstilos(tema) {
             marginTop: 14,
             gap: 8
         },
-        macro: {
-            width: '100%',
-            overflow: 'hidden',
-            backgroundColor: superficie,
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
-            borderRadius: 12
-        },
-        macroExpandida: {
-            borderWidth: 1.41,
-            borderRadius: 14
-        },
-        macroCabecalho: {
-            width: '100%',
-            minHeight: 60,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 12,
-            gap: 10
-        },
-        expansao: {
-            minWidth: 0,
-            flex: 1,
-            minHeight: 44,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 10
-        },
-        pressionado: {
-            opacity: 0.72
-        },
-        caixaIcone: {
-            width: 34,
-            height: 34,
-            flexShrink: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 9
-        },
-        nomeMacro: {
-            minWidth: 0,
-            flex: 1,
-            color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.semibold,
-            fontSize: 15,
-            lineHeight: 21,
-            includeFontPadding: false
-        },
-        categorias: {
-            width: '100%'
-        },
         categoria: {
             width: '100%',
             minHeight: 52,
