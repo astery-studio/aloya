@@ -8,7 +8,7 @@ import { criarEstilos } from './DiaryPhaseBadge.styles';
 function DiaryPhaseBadge({ fase, carregando, estilo, estiloTexto, tamanhoIcone = 14 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const apresentacao = obterApresentacaoFase(fase);
+    const apresentacao = obterApresentacaoFase(fase, tema);
 
     if (!apresentacao) {
         if (!carregando) return null;
