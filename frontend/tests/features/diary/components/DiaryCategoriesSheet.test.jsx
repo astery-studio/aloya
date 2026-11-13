@@ -64,6 +64,25 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
     });
 });
 
+test.each([
+    ['claro', '#FFFFFF', '#2C4C3B'],
+    ['escuro', '#121212', '#A5D6A7']
+])('mantém contraste correto nos toggles do tema %s', async (preferencia, indicador, trilha) => {
+    const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
+    await render(
+        <DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />,
+        { preferencia }
+    );
+    await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
+
+    expect(screen.getAllByTestId('switch-field-thumb')[0]).toHaveStyle({
+        backgroundColor: indicador
+    });
+    expect(screen.getAllByTestId('switch-field-track')[0]).toHaveStyle({
+        backgroundColor: trilha
+    });
+});
+
 test('fecha pelo X ou por Salvar sem exigir nova persistência', async () => {
     const onFechar = jest.fn();
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
