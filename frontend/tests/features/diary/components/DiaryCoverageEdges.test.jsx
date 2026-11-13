@@ -84,6 +84,79 @@ test('usa padrões do cabeçalho e do acordeão sem configuração opcional', as
     expect(screen.getByText('Conteúdo')).toBeOnTheScreen();
 });
 
+test('mantém opções ocultas quando macro ou categorias estão desativadas', async () => {
+    const estilos = { opcaoCategoria: {}, pressionado: {} };
+    const macros = [
+        {
+            id: 'ciclo_sangramento',
+            nome: 'Ciclo e Sangramento',
+            ativa: false,
+            categorias: [{ id: 'fluxo', nome: 'Fluxo', ativaEfetiva: true }]
+        },
+        {
+            id: 'emocional',
+            nome: 'Emocional',
+            ativa: true,
+            categorias: [{ id: 'humor', nome: 'Humor', ativaEfetiva: false }]
+        }
+    ];
+    const aoAlternar = jest.fn();
+    const aoExpandir = jest.fn();
+    const resultado = await render(
+        <DiaryCategoryFilterGroup
+            macro={macros[0]}
+            selecionadas={[]}
+            estilos={estilos}
+            aoAlternar={aoAlternar}
+        />
+    );
+    expect(screen.queryByText('Ciclo e Sangramento')).toBeNull();
+
+    await resultado.rerender(
+        <DiaryCategoryFilterGroup
+            macro={macros[1]}
+            selecionadas={[]}
+            estilos={estilos}
+            aoExpandir={aoExpandir}
+        />
+    );
+    expect(screen.queryByText('Emocional')).toBeNull();
+
+    const macroAtiva = {
+        id: 'ciclo_sangramento',
+        nome: 'Ciclo e Sangramento',
+        ativa: true,
+        categorias: [{ id: 'fluxo', nome: 'Fluxo menstrual', ativaEfetiva: true }]
+    };
+    await resultado.rerender(
+        <DiaryCategoryFilterGroup
+            macro={macroAtiva}
+            selecionadas={[]}
+            expandida
+            estilos={estilos}
+            aoAlternar={aoAlternar}
+        />
+    );
+    await fireEvent.press(screen.getByText('Fluxo menstrual'));
+    expect(aoAlternar).toHaveBeenCalledWith('fluxo');
+});
+
+test('usa paleta de fallback para macros sem paleta conhecida', async () => {
+    const resultado = await render(
+        <DiaryMacrocategoryAccordion
+            titulo="Macro sem paleta"
+            icone={IconeTeste}
+            paleta="nao-mapeada"
+            expandido
+            aoAlternar={jest.fn()}
+        >
+            <Text>Conteúdo expandido</Text>
+        </DiaryMacrocategoryAccordion>
+    );
+    expect(screen.getByText('Conteúdo expandido')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Recolher Macro sem paleta' })).toBeOnTheScreen();
+});
+
 test('modal de detalhes assume que a exclusão está inativa', async () => {
     await render(
         <DiaryRecordDetailsModal
