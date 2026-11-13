@@ -1,11 +1,10 @@
 // Virtualiza o histórico do Diário com marcadores, paginação e retentativa.
 import { memo, useCallback, useMemo, useRef } from 'react';
-import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList } from 'react-native';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { obterApresentacaoFaseRegistro } from '../../utils/diaryPhasePresentation';
-import { DiaryEntryCard } from '../DiaryEntryCard/DiaryEntryCard';
-import { DiaryPhaseIcon } from '../DiaryPhaseIcon/DiaryPhaseIcon';
+import { DiaryTimelineItem } from '../DiaryTimelineItem/DiaryTimelineItem';
+import { DiaryTimelinePaginationFooter } from '../DiaryTimelinePaginationFooter/DiaryTimelinePaginationFooter';
 import { criarEstilos } from './DiaryTimeline.styles';
 
 // Recebe resumos paginados e retorna uma FlatList otimizada e acessível.
@@ -45,72 +44,33 @@ function DiaryTimeline({
 
     const renderizar = useCallback(
         ({ item, index }) => {
-            const apresentacao = obterApresentacaoFaseRegistro(item.fase);
             return (
-                <View style={estilos.item}>
-                    <View
-                        accessible={false}
-                        importantForAccessibility="no-hide-descendants"
-                        style={estilos.trilho}
-                    >
-                        {index > 0 ? <View style={estilos.linhaSuperior} /> : null}
-                        <View style={estilos.marcador}>
-                            {apresentacao ? (
-                                <DiaryPhaseIcon fase={item.fase} size={24} aceitarFaseIndefinida />
-                            ) : null}
-                        </View>
-                        <View style={estilos.linhaHorizontal} />
-                        {index < itens.length - 1 || temMais ? (
-                            <View style={estilos.linhaInferior} />
-                        ) : null}
-                    </View>
-                    <View style={estilos.cartao}>
-                        <DiaryEntryCard
-                            registro={item}
-                            aoAbrir={aoAbrir}
-                            aoEditar={aoEditar}
-                            aoExcluir={aoExcluir}
-                            acaoEmAndamento={
-                                String(acaoEmAndamentoId) === String(item.id) ? 'excluir' : null
-                            }
-                        />
-                    </View>
-                </View>
+                <DiaryTimelineItem
+                    item={item}
+                    indice={index}
+                    quantidade={itens.length}
+                    temMais={temMais}
+                    acaoEmAndamentoId={acaoEmAndamentoId}
+                    aoAbrir={aoAbrir}
+                    aoEditar={aoEditar}
+                    aoExcluir={aoExcluir}
+                    estilos={estilos}
+                />
             );
         },
         [acaoEmAndamentoId, aoAbrir, aoEditar, aoExcluir, estilos, itens.length, temMais]
     );
 
     const rodape = (
-        <>
-            {carregandoMais ? (
-                <View
-                    testID="diary-timeline-loading-more"
-                    accessibilityLiveRegion="polite"
-                    style={estilos.rodapeCarregando}
-                >
-                    <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
-                    <Text style={estilos.textoCarregando}>Carregando mais registros...</Text>
-                </View>
-            ) : null}
-            {erroCarregarMais ? (
-                <View accessibilityRole="alert" style={estilos.rodape}>
-                    <Text style={estilos.textoRodape}>
-                        Não foi possível carregar mais registros.
-                    </Text>
-                    <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel="Tentar carregar mais registros novamente"
-                        disabled={typeof aoTentarCarregarMais !== 'function'}
-                        onPress={aoTentarCarregarMais}
-                        style={estilos.tentarNovamente}
-                    >
-                        <Text style={estilos.textoTentarNovamente}>Tentar novamente</Text>
-                    </Pressable>
-                </View>
-            ) : null}
+        <DiaryTimelinePaginationFooter
+            carregando={carregandoMais}
+            erro={erroCarregarMais}
+            aoTentarNovamente={aoTentarCarregarMais}
+            estilos={estilos}
+            tema={tema}
+        >
             {ListFooterComponent}
-        </>
+        </DiaryTimelinePaginationFooter>
     );
 
     return (
