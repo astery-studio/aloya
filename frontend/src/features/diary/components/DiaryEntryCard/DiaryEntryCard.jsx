@@ -1,7 +1,6 @@
 // Apresenta um resumo minimizado e seguro de cada registro na linha do tempo.
 import { memo, useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { PlusCircleIcon } from 'phosphor-react-native/src/icons/PlusCircle';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
@@ -11,12 +10,10 @@ import {
     TrashIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import {
-    obterApresentacaoMacrocategoria,
-    obterCorMacrocategoria
-} from '../../config/diaryMacroPresentation';
 import { formatarDataDiario } from '../../utils/diaryDate';
 import { obterApresentacaoFaseRegistro } from '../../utils/diaryPhasePresentation';
+import { DiaryAdditionalCategoriesChip } from '../DiaryAdditionalCategoriesChip/DiaryAdditionalCategoriesChip';
+import { DiaryEntrySummaryChip } from '../DiaryEntrySummaryChip/DiaryEntrySummaryChip';
 import { criarEstilos } from './DiaryEntryCard.styles';
 
 const LARGURA_UTIL_CHIPS = 247;
@@ -217,23 +214,14 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                                     >
                                         {linha.map((chip) =>
                                             chip.contador ? (
-                                                <View
+                                                <DiaryAdditionalCategoriesChip
                                                     key={chip.chave}
-                                                    accessible
-                                                    accessibilityLabel={`${item.maisQuantidade} outras categorias marcadas`}
-                                                    style={estilos.chip}
-                                                >
-                                                    <PlusCircleIcon
-                                                        accessible={false}
-                                                        size={10.89}
-                                                        color={tema.cores.interface.textoPrincipal}
-                                                    />
-                                                    <Text style={estilos.textoChip}>
-                                                        {chip.texto}
-                                                    </Text>
-                                                </View>
+                                                    quantidade={item.maisQuantidade}
+                                                    estilos={estilos}
+                                                    tema={tema}
+                                                />
                                             ) : (
-                                                <ChipPrincipal
+                                                <DiaryEntrySummaryChip
                                                     key={chip.chave}
                                                     principal={chip.principal}
                                                     estilos={estilos}
@@ -270,27 +258,9 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
     );
 }
 
-function ChipPrincipal({ principal, estilos, tema }) {
-    const macro = obterApresentacaoMacrocategoria(principal.macrocategoriaId);
-    const cor = obterCorMacrocategoria(tema, principal.macrocategoriaId);
-    const IconeMacro = macro.icone;
-    return (
-        <View style={estilos.chip}>
-            <IconeMacro
-                accessible={false}
-                size={10.89}
-                color={cor}
-                weight={macro.iconeProps?.weight ?? 'regular'}
-            />
-            <Text style={estilos.textoChip}>{principal.valor.trim()}</Text>
-        </View>
-    );
-}
-
 const MemoizedDiaryEntryCard = memo(DiaryEntryCard);
 
 export {
-    ChipPrincipal,
     MemoizedDiaryEntryCard as DiaryEntryCard,
     limitarTrechoAnotacao,
     normalizarRegistro,
