@@ -232,7 +232,6 @@ function DiaryFiltersSheet({
                                                 })
                                             }
                                             estilos={estilos}
-                                            tema={tema}
                                         />
                                     ))}
                                 </View>
