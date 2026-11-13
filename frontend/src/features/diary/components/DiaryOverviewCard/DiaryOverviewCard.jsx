@@ -3,6 +3,7 @@ import { memo, useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { DiaryPhaseIcon } from '../DiaryPhaseIcon/DiaryPhaseIcon';
 import { criarEstilos } from './DiaryOverviewCard.styles';
@@ -17,8 +18,9 @@ function DiaryOverviewCard({
     carregando = false
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const apresentacao = obterApresentacaoFase(fase);
+    const apresentacao = obterApresentacaoFase(fase, tema);
 
     if (carregando) {
         return (
@@ -29,7 +31,7 @@ function DiaryOverviewCard({
             >
                 <Text style={estilos.cabecalho}>RESUMO DO DIÁRIO</Text>
                 <View style={estilos.carregando}>
-                    <ActivityIndicator color={tema.cores.interface.destaque} />
+                    <ActivityIndicator color={coresDiario.interface.destaque} />
                     <Text style={estilos.textoCarregando}>Carregando resumo do Diário...</Text>
                 </View>
             </View>
