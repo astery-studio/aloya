@@ -2,8 +2,10 @@ import { ActivityIndicator, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, aoCriar, estilos, tema }) {
+    const cores = obterCoresDiario(tema).interface;
     let estado;
 
     if (tipo === 'carregando') {
@@ -13,7 +15,7 @@ function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, aoCriar, es
                 accessibilityLiveRegion="polite"
                 style={estilos.estadoCentralizado}
             >
-                <ActivityIndicator color={tema.cores.interface.destaque} />
+                <ActivityIndicator color={cores.destaque} />
                 <Text style={estilos.mensagemEstado}>Carregando histórico do Diário...</Text>
             </View>
         );
