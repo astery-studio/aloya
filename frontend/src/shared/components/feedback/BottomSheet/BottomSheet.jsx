@@ -25,6 +25,7 @@ function BottomSheet({
     children,
     bloquearFechamento = false,
     corPainel,
+    corAlca,
     estiloPainel,
     permitirDeslizarParaFechar = false,
     podeIniciarDeslize = permitirInicioDeslize
@@ -230,7 +231,12 @@ function BottomSheet({
                             {...responderAlca.panHandlers}
                             style={estilos.areaArraste}
                         >
-                            <View style={estilos.alcaArraste} />
+                            <View
+                                style={[
+                                    estilos.alcaArraste,
+                                    corAlca ? { backgroundColor: corAlca } : null
+                                ]}
+                            />
                         </View>
                     ) : null}
                     {children}
