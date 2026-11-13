@@ -5,7 +5,7 @@ import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './Header.style';
 
-function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoesDireita }) {
+function Header({ titulo, variante = 'padrao', onVoltar, corFundo, corTexto, acoesDireita }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -66,7 +66,8 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoesDireita 
                     style={[
                         estilos.titulo,
                         temVoltar && estilos.tituloComVoltar,
-                        ehDiario && estilos.tituloDiario
+                        ehDiario && estilos.tituloDiario,
+                        corTexto ? { color: corTexto } : null
                     ]}
                     accessibilityRole="header"
                 >
