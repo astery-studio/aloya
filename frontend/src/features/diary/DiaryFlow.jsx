@@ -196,7 +196,7 @@ function DiaryFlow({
     }
 
     async function abrirRegistroProximo() {
-        if (registrosAdjacentes.proximo) await detalhes.abrir(registrosAdjacentes.proximo);
+        await detalhes.abrir(registrosAdjacentes.proximo);
     }
 
     return (
