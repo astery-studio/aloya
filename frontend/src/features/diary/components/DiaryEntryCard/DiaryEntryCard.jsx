@@ -79,10 +79,10 @@ function limitarTrechoAnotacao(valor, limite = 100) {
 }
 
 // Valida e prepara um resumo recebido da API sem acrescentar dados sensíveis.
-function normalizarRegistro(registro) {
+function normalizarRegistro(registro, tema) {
     if (!registro || typeof registro !== 'object' || Array.isArray(registro)) return null;
     const dataFormatada = formatarDataDiario(registro.data);
-    const fase = obterApresentacaoFaseRegistro(registro.fase);
+    const fase = obterApresentacaoFaseRegistro(registro.fase, tema);
     if (!Number.isSafeInteger(registro.id) || registro.id <= 0 || !dataFormatada || !fase)
         return null;
 
@@ -116,7 +116,7 @@ function normalizarRegistro(registro) {
 function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndamento = null }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const item = normalizarRegistro(registro);
+    const item = normalizarRegistro(registro, tema);
 
     if (!item) return null;
 
