@@ -2,24 +2,26 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 // Converte os tokens do tema em estilos nativos do cartão.
 function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
         cartao: {
             overflow: 'hidden',
             borderWidth: 1,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: tema.radius.grande,
-            backgroundColor: tema.cores.interface.superficieElevada
+            backgroundColor: cores.superficie
         },
         cabecalho: {
             paddingTop: 16,
             paddingHorizontal: 20,
             paddingBottom: 14,
             borderBottomWidth: 1,
-            borderBottomColor: tema.cores.interface.borda,
-            color: tema.cores.interface.textoSecundario,
+            borderBottomColor: cores.borda,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 13,
             lineHeight: 18,
@@ -39,7 +41,7 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             padding: 10,
             borderRightWidth: 1,
-            borderRightColor: tema.cores.interface.borda
+            borderRightColor: cores.borda
         },
         textos: {
             flex: 1,
@@ -49,14 +51,14 @@ function criarEstilos(tema) {
             padding: 10
         },
         titulo: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 20
         },
         fase: { fontFamily: fontFamilies.bold },
         descricao: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 11,
             lineHeight: 17
@@ -66,7 +68,7 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             padding: 10,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda
+            borderTopColor: cores.borda
         },
         quantidade: {
             width: 266,
@@ -75,8 +77,8 @@ function criarEstilos(tema) {
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: tema.radius.circular,
-            color: tema.cores.interface.destaque,
-            backgroundColor: tema.cores.interface.destaqueSuave,
+            color: cores.destaque,
+            backgroundColor: cores.destaqueSuave,
             fontFamily: fontFamilies.semiBold,
             fontSize: 12,
             lineHeight: 16,
@@ -84,7 +86,7 @@ function criarEstilos(tema) {
         },
         carregando: { minHeight: 132, alignItems: 'center', justifyContent: 'center', gap: 10 },
         textoCarregando: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 20
