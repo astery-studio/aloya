@@ -16,8 +16,7 @@ import {
     criarConfiguracoesContaRateLimit,
     criarAlteracaoSenhaRateLimit,
     criarExclusaoContaRateLimit,
-    criarEmailRateLimit,
-    criarLoginRateLimit
+    criarEmailRateLimit
 } from '../middleware/rateLimit.middleware.js';
 
 import { criarPasswordService } from '../../features/auth/services/password.service.js';
@@ -312,12 +311,6 @@ function criarContainer() {
         limite: env.cadastroRateLimitMaximo
     });
 
-    const loginRateLimit = criarLoginRateLimit({
-        rateLimit,
-        janelaMs: env.loginRateLimitJanelaMs,
-        limite: env.loginRateLimitMaximo
-    });
-
     const contaLoginRateLimit = criarContaLoginRateLimit({
         rateLimit,
         janelaMs: env.loginRateLimitJanelaMs,
@@ -507,7 +500,6 @@ function criarContainer() {
         parentalConsentMiddleware,
         cadastroRateLimit,
         emailRateLimit,
-        loginRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
         permissionCategoryRateLimit,

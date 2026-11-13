@@ -125,6 +125,8 @@ const env = {
     port: Number(process.env.PORT || 3000), //define a porta onde a api vai rodar
     cadastroRateLimitJanelaMs,
     cadastroRateLimitMaximo,
+    loginRateLimitJanelaMs,
+    loginRateLimitMaximo,
     emailRateLimitJanelaMs,
     emailRateLimitMaximo,
     supportInvitationRateLimitJanelaMs,

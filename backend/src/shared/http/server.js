@@ -65,7 +65,8 @@ app.use(
         authMiddleware: container.authMiddleware,
         cadastroRateLimit: container.cadastroRateLimit,
         emailRateLimit: container.emailRateLimit,
-        loginRateLimit: container.loginRateLimit,
+        loginRateLimitJanelaMs: env.loginRateLimitJanelaMs,
+        loginRateLimitMaximo: env.loginRateLimitMaximo,
         contaLoginRateLimit: container.contaLoginRateLimit
     })
 );

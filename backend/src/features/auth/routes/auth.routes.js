@@ -2,6 +2,8 @@
  * Define endpoints de autenticação, conta, consentimento e recuperação de senha.
  */
 import express from 'express';
+import rateLimit from 'express-rate-limit';
+import { criarConfiguracaoLoginRateLimit } from '../../../shared/middleware/rateLimit.middleware.js';
 const { Router } = express;
 
 function criarAuthRoutes({
@@ -10,51 +12,33 @@ function criarAuthRoutes({
     authMiddleware,
     cadastroRateLimit,
     emailRateLimit,
-    loginRateLimit,
+    loginRateLimitJanelaMs,
+    loginRateLimitMaximo,
     contaLoginRateLimit
 }) {
     const router = Router();
-
-    router.post(
-        '/register',
-        cadastroRateLimit,
-        authController.cadastrar
+    // A construção direta torna a proteção visível para o CodeQL e mantém
+    // a mesma resposta segura configurada para tentativas de força bruta.
+    const loginRateLimit = rateLimit(
+        criarConfiguracaoLoginRateLimit({
+            janelaMs: loginRateLimitJanelaMs,
+            limite: loginRateLimitMaximo
+        })
     );
 
-    router.post(
-        '/login',
-        loginRateLimit,
-        contaLoginRateLimit,
-        authController.realizarLogin
-    );
+    router.post('/register', cadastroRateLimit, authController.cadastrar);
 
-    router.post(
-        '/email-availability',
-        cadastroRateLimit,
-        authController.verificarEmail
-    );
+    router.post('/login', loginRateLimit, contaLoginRateLimit, authController.realizarLogin);
 
-    router.post(
-        '/password-recovery/request',
-        emailRateLimit,
-        passwordRecoveryController.solicitar
-    );
+    router.post('/email-availability', cadastroRateLimit, authController.verificarEmail);
 
-    router.get(
-        '/password-recovery/open',
-        passwordRecoveryController.abrirNoAplicativo
-    );
+    router.post('/password-recovery/request', emailRateLimit, passwordRecoveryController.solicitar);
 
-    router.get(
-        '/password-recovery/:token',
-        passwordRecoveryController.validarToken
-    );
+    router.get('/password-recovery/open', passwordRecoveryController.abrirNoAplicativo);
 
-    router.post(
-        '/password-recovery/reset',
-        emailRateLimit,
-        passwordRecoveryController.redefinir
-    );
+    router.get('/password-recovery/:token', passwordRecoveryController.validarToken);
+
+    router.post('/password-recovery/reset', emailRateLimit, passwordRecoveryController.redefinir);
 
     // Retorna o estado atual da liberação da Rede de Apoio.
     router.get(
@@ -80,14 +64,9 @@ function criarAuthRoutes({
     );
 
     // Esta rota é pública porque será aberta pelo responsável legal pelo e-mail.
-    router.get(
-        '/parental-consent/:token',
-        authController.confirmarConsentimento
-    );
+    router.get('/parental-consent/:token', authController.confirmarConsentimento);
 
     return router;
 }
 
-export {
-    criarAuthRoutes
-};
+export { criarAuthRoutes };

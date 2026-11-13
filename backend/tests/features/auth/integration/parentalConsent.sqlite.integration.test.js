@@ -88,7 +88,8 @@ function criarApp(prisma, emails) {
             },
             cadastroRateLimit: passar,
             emailRateLimit: passar,
-            loginRateLimit: passar,
+            loginRateLimitJanelaMs: 900000,
+            loginRateLimitMaximo: 5,
             contaLoginRateLimit: passar
         })
     );
