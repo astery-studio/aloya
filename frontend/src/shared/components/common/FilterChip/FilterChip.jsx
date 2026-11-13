@@ -5,7 +5,7 @@ import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './FilterChip.styles';
 
-function FilterChip({ rotulo, aoRemover, rotuloAcessibilidade, testID }) {
+function FilterChip({ rotulo, aoRemover, rotuloAcessibilidade, testID, cor, fundo }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
@@ -15,10 +15,15 @@ function FilterChip({ rotulo, aoRemover, rotuloAcessibilidade, testID }) {
             accessibilityRole="button"
             accessibilityLabel={rotuloAcessibilidade ?? `Remover filtro ${rotulo}`}
             onPress={aoRemover}
-            style={({ pressed }) => [estilos.chip, pressed && estilos.pressionado]}
+            style={({ pressed }) => [
+                estilos.chip,
+                cor ? { borderColor: cor } : null,
+                fundo ? { backgroundColor: fundo } : null,
+                pressed && estilos.pressionado
+            ]}
         >
-            <Text style={estilos.texto}>{rotulo}</Text>
-            <XCircleIcon size={18} color={tema.cores.marca.primaria} />
+            <Text style={[estilos.texto, cor ? { color: cor } : null]}>{rotulo}</Text>
+            <XCircleIcon size={18} color={cor ?? tema.cores.marca.primaria} />
         </Pressable>
     );
 }
