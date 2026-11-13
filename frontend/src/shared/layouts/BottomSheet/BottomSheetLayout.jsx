@@ -12,6 +12,7 @@ function BottomSheetLayout({
     bloquearFechamento = false,
     compacto = false,
     corFundo,
+    corIconeFechar,
     children,
     estiloTitulo
 }) {
@@ -61,7 +62,7 @@ function BottomSheetLayout({
                 >
                     <XIcon
                         size={24}
-                        color={tema.cores.interface.textoSecundario}
+                        color={corIconeFechar ?? tema.cores.interface.textoSecundario}
                         weight="regular"
                     />
                 </Pressable>
