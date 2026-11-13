@@ -1,22 +1,24 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
         container: {
             width: '100%',
             overflow: 'hidden',
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: 12,
-            backgroundColor: tema.cores.interface.superficieElevada
+            backgroundColor: cores.superficieElevada
         },
         containerFormulario: {
             maxWidth: 308,
             alignSelf: 'center',
             borderRadius: 14,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: cores.superficieElevada
         },
         expandido: { borderWidth: 1.41, borderRadius: 14 },
         cabecalho: {
@@ -47,7 +49,7 @@ function criarEstilos(tema) {
         titulo: {
             minWidth: 0,
             flex: 1,
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             lineHeight: 21
