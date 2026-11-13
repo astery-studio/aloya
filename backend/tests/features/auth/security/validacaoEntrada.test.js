@@ -14,7 +14,7 @@ test('corpos nulos são rejeitados sem provocar erro interno', () => {
     assert.equal(recuperacao.validarSolicitacao(null).valido, false);
     assert.equal(recuperacao.validarRedefinicao(null).valido, false);
     assert.equal(consentimento.validarSolicitacao(null).valido, false);
-    assert.equal(consentimento.validarReenvio(null).valido, true);
+    assert.equal(consentimento.validarReenvio(null).valido, false);
 });
 
 test('senhas curtas são rejeitadas em todos os fluxos', () => {

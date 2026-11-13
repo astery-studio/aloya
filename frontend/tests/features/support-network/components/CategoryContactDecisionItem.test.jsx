@@ -3,9 +3,9 @@ import React from 'react';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
-import { CategoryContactDecisionItem } from '../../../../src/features/support-network/components/CategoryContactDecisionItem';
+import { CategoryContactDecisionItem } from '../../../../src/features/support-network/components/CategoryContactDecisionItem/CategoryContactDecisionItem';
 import { ACOES_EXCLUSAO_CATEGORIA } from '../../../../src/features/support-network/constants/categoryDeletionOptions';
-import { COR_PERIGO } from '../../../../src/features/support-network/components/CategoryDecisionOption.styles';
+import { COR_PERIGO } from '../../../../src/features/support-network/components/CategoryDecisionOption/CategoryDecisionOption.styles';
 import { cores } from '../../../../src/shared/theme';
 
 const contato = Object.freeze({

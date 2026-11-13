@@ -53,60 +53,70 @@ jest.mock('../../../../src/shared/components/navigation/Header/Header', () => {
     };
 });
 
-jest.mock('../../../../src/features/support-network/components/SupportCategoryList', () => {
-    const React = require('react');
-    const { Pressable, Text, View } = require('react-native');
+jest.mock(
+    '../../../../src/features/support-network/components/SupportCategoryList/SupportCategoryList',
+    () => {
+        const React = require('react');
+        const { Pressable, Text, View } = require('react-native');
 
-    return {
-        SupportCategoryList: (propriedades) => {
-            return React.createElement(
-                View,
-                {
-                    testID: 'lista-categorias'
-                },
-                React.createElement(Text, null, propriedades.categorias[0]?.nome || 'Lista vazia'),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Excluir categoria de teste',
-                    onPress: () => propriedades.onExcluir(mockCategoria)
-                })
-            );
-        }
-    };
-});
-
-jest.mock('../../../../src/features/support-network/components/DeleteSupportCategoryModal', () => {
-    const React = require('react');
-    const { Pressable, Text, View } = require('react-native');
-
-    return {
-        DeleteSupportCategoryModal: (propriedades) => {
-            mockModalExclusaoProps = propriedades;
-
-            if (!propriedades.visivel) {
-                return null;
+        return {
+            SupportCategoryList: (propriedades) => {
+                return React.createElement(
+                    View,
+                    {
+                        testID: 'lista-categorias'
+                    },
+                    React.createElement(
+                        Text,
+                        null,
+                        propriedades.categorias[0]?.nome || 'Lista vazia'
+                    ),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Excluir categoria de teste',
+                        onPress: () => propriedades.onExcluir(mockCategoria)
+                    })
+                );
             }
+        };
+    }
+);
 
-            return React.createElement(
-                View,
-                {
-                    testID: 'modal-exclusao'
-                },
-                React.createElement(Text, null, `Excluindo ${propriedades.categoria?.nome}`),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Confirmar exclusão simulada',
-                    onPress: () => propriedades.onConfirmar([])
-                }),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Cancelar exclusão simulada',
-                    onPress: propriedades.onCancelar
-                })
-            );
-        }
-    };
-});
+jest.mock(
+    '../../../../src/features/support-network/components/DeleteSupportCategoryModal/DeleteSupportCategoryModal',
+    () => {
+        const React = require('react');
+        const { Pressable, Text, View } = require('react-native');
+
+        return {
+            DeleteSupportCategoryModal: (propriedades) => {
+                mockModalExclusaoProps = propriedades;
+
+                if (!propriedades.visivel) {
+                    return null;
+                }
+
+                return React.createElement(
+                    View,
+                    {
+                        testID: 'modal-exclusao'
+                    },
+                    React.createElement(Text, null, `Excluindo ${propriedades.categoria?.nome}`),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Confirmar exclusão simulada',
+                        onPress: () => propriedades.onConfirmar([])
+                    }),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Cancelar exclusão simulada',
+                        onPress: propriedades.onCancelar
+                    })
+                );
+            }
+        };
+    }
+);
 
 jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => {
     const React = require('react');

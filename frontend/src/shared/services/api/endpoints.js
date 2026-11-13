@@ -1,6 +1,8 @@
 //Guarda os caminhos das operações disponíveis na API.
 
-const caminhoConta = '/users/me'
+const caminhoConta = '/users/me';
+const caminhoConvitesContato = '/support-network/contact-invitations';
+const caminhoContatosRedeApoio = '/support-network/contacts';
 
 const endpoints = Object.freeze({
     cadastro: '/auth/register',
@@ -9,6 +11,9 @@ const endpoints = Object.freeze({
     solicitarRecuperacao: '/auth/password-recovery/request',
     validarRecuperacao: '/auth/password-recovery',
     redefinirSenha: '/auth/password-recovery/reset',
+    statusConsentimentoParental: '/auth/parental-consent/status',
+    solicitarConsentimentoParental: '/auth/parental-consent/request',
+    reenviarConsentimentoParental: '/auth/parental-consent/resend',
     configuracoesConta: caminhoConta,
     alteracaoSenha: `${caminhoConta}/password`,
     exclusaoConta: caminhoConta,
@@ -21,7 +26,18 @@ const endpoints = Object.freeze({
     historicoCiclos: '/api/cycles/history',
     ciclos: '/api/cycles',
     categoriasPermissao: '/support-network/permission-categories',
+    convitesContato: caminhoConvitesContato,
+    consultaEmailContato: `${caminhoConvitesContato}/lookup`,
+    contatosRedeApoio: caminhoContatosRedeApoio,
+    reenviarConviteContato: (contatoId) =>
+        `${caminhoContatosRedeApoio}/${contatoId}/resend-invitation`,
+    removerContatoRedeApoio: (contatoId) => `${caminhoContatosRedeApoio}/${contatoId}`,
+    desativarContatoRedeApoio: (contatoId) => `${caminhoContatosRedeApoio}/${contatoId}/deactivate`,
+    vinculoContatoRedeApoio: (contatoId) => `${caminhoContatosRedeApoio}/${contatoId}/link`,
+    contatosRecebidos: '/support-network/received-contacts',
+    responderContatoRecebido: (conviteId) =>
+        `/support-network/received-contacts/${conviteId}/respond`,
     previsaoCiclo: '/cycles/prediction'
-})
+});
 
-export {endpoints}
+export { endpoints };

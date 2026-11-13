@@ -9,7 +9,12 @@ import { criarCyclePredictionService } from '../../src/features/cycles/services/
 import { criarCycleRemovalService } from '../../src/features/cycles/services/cycleRemovalService';
 import { criarAccountService } from '../../src/features/settings/services/accountService';
 import { criarThemePreferenceService } from '../../src/features/settings/services/themePreferenceService';
+import { criarContactInvitationService } from '../../src/features/support-network/services/contactInvitationService';
+import { criarContactLinkService } from '../../src/features/support-network/services/contactLinkService';
+import { criarReceivedContactsService } from '../../src/features/support-network/services/receivedContactsService';
+import { criarParentalConsentService } from '../../src/features/support-network/services/parentalConsentService';
 import { criarSupportCategoryService } from '../../src/features/support-network/services/supportCategoryService';
+import { criarSupportContactService } from '../../src/features/support-network/services/supportContactService';
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
 import { obterToken, removerToken } from '../../src/shared/storage/tokenStorage';
@@ -42,9 +47,30 @@ jest.mock('../../src/features/support-network/services/supportCategoryService', 
     criarSupportCategoryService: jest.fn()
 }));
 
+jest.mock('../../src/features/support-network/services/contactInvitationService', () => ({
+    criarContactInvitationService: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/services/contactLinkService', () => ({
+    criarContactLinkService: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/services/receivedContactsService', () => ({
+    criarReceivedContactsService: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/services/parentalConsentService', () => ({
+    criarParentalConsentService: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/services/supportContactService', () => ({
+    criarSupportContactService: jest.fn()
+}));
+
 jest.mock('../../src/features/cycles/services/cyclePredictionService', () => ({
     criarCyclePredictionService: jest.fn()
 }));
+
 jest.mock('../../src/features/cycles/services/cycleRemovalService', () => ({
     criarCycleRemovalService: jest.fn()
 }));
@@ -76,6 +102,11 @@ describe('createAppServices', () => {
     let contraceptiveService;
     let cycleHistoryService;
     let supportCategoryService;
+    let contactInvitationService;
+    let contactLinkService;
+    let supportContactService;
+    let receivedContactsService;
+    let parentalConsentService;
     let cyclePredictionService;
     let cycleParametersService;
     let cycleRemovalService;
@@ -101,6 +132,7 @@ describe('createAppServices', () => {
         calendarService = Object.freeze({
             nome: 'calendarService'
         });
+
         contraceptiveService = Object.freeze({
             nome: 'contraceptiveService'
         });
@@ -112,6 +144,27 @@ describe('createAppServices', () => {
         supportCategoryService = Object.freeze({
             nome: 'supportCategoryService'
         });
+
+        contactInvitationService = Object.freeze({
+            nome: 'contactInvitationService'
+        });
+
+        contactLinkService = Object.freeze({
+            nome: 'contactLinkService'
+        });
+
+        supportContactService = Object.freeze({
+            nome: 'supportContactService'
+        });
+
+        receivedContactsService = Object.freeze({
+            nome: 'receivedContactsService'
+        });
+
+        parentalConsentService = Object.freeze({
+            nome: 'parentalConsentService'
+        });
+
         cyclePredictionService = Object.freeze({
             nome: 'cyclePredictionService'
         });
@@ -130,6 +183,7 @@ describe('createAppServices', () => {
         });
 
         criarCalendarService.mockReturnValue(calendarService);
+
         criarRequisicaoAutenticada.mockReturnValue(requisicaoAutenticada);
 
         criarAuthService.mockReturnValue(authService);
@@ -137,14 +191,27 @@ describe('createAppServices', () => {
         criarAccountService.mockReturnValue(accountService);
 
         criarThemePreferenceService.mockReturnValue(themePreferenceService);
+
         criarContraceptiveService.mockReturnValue(contraceptiveService);
 
         criarCycleHistoryService.mockReturnValue(cycleHistoryService);
 
         criarSupportCategoryService.mockReturnValue(supportCategoryService);
 
+        criarContactInvitationService.mockReturnValue(contactInvitationService);
+
+        criarContactLinkService.mockReturnValue(contactLinkService);
+
+        criarSupportContactService.mockReturnValue(supportContactService);
+
+        criarReceivedContactsService.mockReturnValue(receivedContactsService);
+
+        criarParentalConsentService.mockReturnValue(parentalConsentService);
+
         criarCyclePredictionService.mockReturnValue(cyclePredictionService);
+
         criarCycleRemovalService.mockReturnValue(cycleRemovalService);
+
         criarCycleParametersService.mockReturnValue(cycleParametersService);
     });
 
@@ -178,6 +245,7 @@ describe('createAppServices', () => {
             requisicaoAutenticada,
             removerCredencialLocal: removerToken
         });
+
         expect(criarThemePreferenceService).toHaveBeenCalledWith({
             requisicaoAutenticada
         });
@@ -198,13 +266,37 @@ describe('createAppServices', () => {
             requisicaoAutenticada
         });
 
+        expect(criarContactInvitationService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
+        expect(criarContactLinkService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
+        expect(criarSupportContactService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
+        expect(criarReceivedContactsService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
+        expect(criarParentalConsentService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
+
         expect(criarCyclePredictionService).toHaveBeenCalledWith({
             requisicaoAutenticada
         });
 
-        expect(criarCycleRemovalService).toHaveBeenCalledWith({ requisicaoAutenticada });
+        expect(criarCycleRemovalService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
 
-        expect(criarCycleParametersService).toHaveBeenCalledWith({ requisicaoAutenticada });
+        expect(criarCycleParametersService).toHaveBeenCalledWith({
+            requisicaoAutenticada
+        });
 
         expect(servicos).toEqual({
             authService,
@@ -221,9 +313,16 @@ describe('createAppServices', () => {
                 ...cycleRemovalService
             }),
             supportCategoryService,
+            contactInvitationService,
+            contactLinkService,
+            supportContactService,
+            receivedContactsService,
+            parentalConsentService,
             cyclePredictionService,
             cycleParametersService,
-            cycleRegistrationService: { registrar: expect.any(Function) },
+            cycleRegistrationService: {
+                registrar: expect.any(Function)
+            },
             menstruationSyncQueue: {
                 adicionar: expect.any(Function),
                 listar: expect.any(Function),
@@ -236,6 +335,7 @@ describe('createAppServices', () => {
 
     test('usa a URL configurada no ambiente', () => {
         const apiUrlAnterior = process.env.EXPO_PUBLIC_API_URL;
+
         process.env.EXPO_PUBLIC_API_URL = 'https://api.aloya.com/';
 
         try {

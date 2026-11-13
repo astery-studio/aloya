@@ -19,13 +19,21 @@ function criarEstilos(tema) {
         },
 
         conteudo: {
+            width: '100%',
             alignItems: 'center',
             flexDirection: 'row',
             gap: 8,
             justifyContent: 'center'
         },
 
+        caixaIcone: {
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+
         texto: {
+            flexShrink: 1,
             textAlign: 'center'
         },
 

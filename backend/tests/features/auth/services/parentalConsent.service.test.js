@@ -4,9 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {
-    criarParentalConsentService
-} from '../../../../src/features/auth/services/parentalConsent.service.js';
+import { criarParentalConsentService } from '../../../../src/features/auth/services/parentalConsent.service.js';
 
 function criarCrypto() {
     const tokenPuro = 't'.repeat(43);
@@ -36,6 +34,7 @@ function criarTitular() {
         id: 1,
         nome: 'Carla Cristina',
         email: 'carla@email.com',
+        papel: 'principal',
         dataNascimento: new Date('2015-05-13T00:00:00.000Z')
     };
 }
@@ -69,14 +68,8 @@ test('cria solicitação armazenando somente o hash do token', async () => {
 
     assert.equal(registros[0].data.tokenConfirmacaoHash, 'hash-do-token');
     assert.equal(JSON.stringify(registros).includes(tokenPuro), false);
-    assert.equal(
-        registros[0].data.validadeLink.toISOString(),
-        '2026-09-14T13:00:00.000Z'
-    );
-    assert.equal(
-        resultado.linkConfirmacao,
-        `https://aloya.test/consentimento/${tokenPuro}`
-    );
+    assert.equal(registros[0].data.validadeLink.toISOString(), '2026-09-14T13:00:00.000Z');
+    assert.equal(resultado.linkConfirmacao, `https://aloya.test/consentimento/${tokenPuro}`);
 });
 
 test('solicita consentimento e envia o link ao responsável', async () => {
@@ -112,10 +105,7 @@ test('solicita consentimento e envia o link ao responsável', async () => {
         now: () => new Date('2026-09-14T12:00:00.000Z')
     });
 
-    const resultado = await service.solicitar(
-        1,
-        'responsavel@email.com'
-    );
+    const resultado = await service.solicitar(1, 'responsavel@email.com');
 
     assert.equal(atualizacoes.length, 1);
     assert.equal(emails.length, 1);
@@ -157,22 +147,20 @@ test('substitui e-mail e token ao reenviar o consentimento', async () => {
 
     await service.reenviar(1, 'novo@email.com');
 
-    assert.equal(
-        atualizacoes[0].data.emailResponsavelLegal,
-        'novo@email.com'
-    );
-    assert.equal(
-        atualizacoes[0].data.tokenConfirmacaoHash,
-        'hash-do-token'
-    );
+    assert.equal(atualizacoes[0].data.emailResponsavelLegal, 'novo@email.com');
+    assert.equal(atualizacoes[0].data.tokenConfirmacaoHash, 'hash-do-token');
     assert.equal(atualizacoes[0].data.respondidoEm, null);
 });
 
 test('libera a Rede de Apoio ao confirmar token válido', async () => {
     const atualizacoes = [];
+    const notificacoes = [];
     const { crypto, tokenPuro } = criarCrypto();
     const agora = new Date('2026-09-14T12:00:00.000Z');
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -187,8 +175,14 @@ test('libera a Rede de Apoio ao confirmar token válido', async () => {
                     validadeLink: new Date('2026-09-14T13:00:00.000Z')
                 };
             },
-            async update(argumentos) {
+            async updateMany(argumentos) {
                 atualizacoes.push(argumentos);
+                return { count: 1 };
+            }
+        },
+        notificacao: {
+            async create(argumentos) {
+                notificacoes.push(argumentos);
             }
         }
     };
@@ -208,16 +202,23 @@ test('libera a Rede de Apoio ao confirmar token válido', async () => {
         respondidoEm: agora
     });
     assert.equal(resultado.acessoRedeApoioLiberado, true);
-    assert.equal(
-        resultado.mensagem,
-        'Autorização concluída com sucesso.'
-    );
+    assert.equal(resultado.mensagem, 'Autorização concluída com sucesso.');
+    assert.deepEqual(notificacoes[0].data, {
+        usuarioId: 1,
+        tipoOrigem: 'rede_apoio',
+        origemId: 10,
+        dataHoraProgramada: agora,
+        statusEnvio: 'agendada'
+    });
 });
 
 test('marca o link como expirado e rejeita a confirmação', async () => {
     const atualizacoes = [];
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -232,8 +233,9 @@ test('marca o link como expirado e rejeita a confirmação', async () => {
                     validadeLink: new Date('2026-09-14T11:00:00.000Z')
                 };
             },
-            async update(argumentos) {
+            async updateMany(argumentos) {
                 atualizacoes.push(argumentos);
+                return { count: 1 };
             }
         }
     };
@@ -264,8 +266,7 @@ test('libera o acesso e revoga pendências aos 16 anos', async () => {
             async findUnique() {
                 return {
                     ...criarTitular(),
-                    dataNascimento:
-                        new Date('2010-05-13T00:00:00.000Z')
+                    dataNascimento: new Date('2010-05-13T00:00:00.000Z')
                 };
             }
         },
@@ -284,8 +285,7 @@ test('libera o acesso e revoga pendências aos 16 anos', async () => {
         now: () => new Date('2026-09-14T12:00:00.000Z')
     });
 
-    const resultado =
-        await service.verificarAcessoRedeApoio(1);
+    const resultado = await service.verificarAcessoRedeApoio(1);
 
     assert.deepEqual(revogacoes[0], {
         where: {
@@ -299,6 +299,73 @@ test('libera o acesso e revoga pendências aos 16 anos', async () => {
     assert.equal(resultado.acessoLiberado, true);
     assert.equal(resultado.motivo, 'MAIOR_DE_16_ANOS');
     assert.equal(resultado.consentimentoNecessario, false);
+});
+
+test('revoga consentimento anterior quando a correção torna a titular menor', async () => {
+    const atualizacoes = [];
+    const { crypto } = criarCrypto();
+    const service = criarParentalConsentService({
+        prisma: {},
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: {},
+        emailService: {}
+    });
+    const tx = {
+        consentimentoParental: {
+            async updateMany(argumentos) {
+                atualizacoes.push(argumentos);
+            }
+        }
+    };
+
+    await service.reativarAposCorrecaoNascimento(tx, 7);
+
+    assert.deepEqual(atualizacoes, [
+        {
+            where: {
+                titularMenorId: 7,
+                statusConsentimento: {
+                    in: ['pendente', 'liberado', 'expirado']
+                }
+            },
+            data: {
+                statusConsentimento: 'revogado',
+                respondidoEm: null
+            }
+        }
+    ]);
+});
+
+test('informa que o consentimento não é mais necessário depois da autorização', async () => {
+    const { crypto } = criarCrypto();
+    const service = criarParentalConsentService({
+        prisma: {
+            usuario: {
+                async findUnique() {
+                    return criarTitular();
+                }
+            },
+            consentimentoParental: {
+                async findUnique() {
+                    return {
+                        emailResponsavelLegal: 'responsavel@email.com',
+                        statusConsentimento: 'liberado'
+                    };
+                }
+            }
+        },
+        crypto,
+        baseUrl: 'https://aloya.test',
+        dateUtils: { calcularIdade: () => 11 },
+        emailService: {}
+    });
+
+    const resultado = await service.verificarAcessoRedeApoio(1);
+
+    assert.equal(resultado.acessoLiberado, true);
+    assert.equal(resultado.consentimentoNecessario, false);
+    assert.equal(resultado.statusConsentimento, 'liberado');
 });
 
 test('rejeita solicitação para usuário inexistente', async () => {
@@ -318,13 +385,10 @@ test('rejeita solicitação para usuário inexistente', async () => {
         emailService: {}
     });
 
-    await assert.rejects(
-        service.solicitar(99, 'responsavel@email.com'),
-        {
-            status: 404,
-            codigo: 'USUARIO_NAO_ENCONTRADO'
-        }
-    );
+    await assert.rejects(service.solicitar(99, 'responsavel@email.com'), {
+        status: 404,
+        codigo: 'USUARIO_NAO_ENCONTRADO'
+    });
 });
 
 test('rejeita o próprio e-mail como responsável legal', async () => {
@@ -348,13 +412,10 @@ test('rejeita o próprio e-mail como responsável legal', async () => {
         emailService: {}
     });
 
-    await assert.rejects(
-        service.solicitar(1, 'carla@email.com'),
-        {
-            status: 422,
-            codigo: 'EMAIL_RESPONSAVEL_IGUAL_TITULAR'
-        }
-    );
+    await assert.rejects(service.solicitar(1, 'carla@email.com'), {
+        status: 422,
+        codigo: 'EMAIL_RESPONSAVEL_IGUAL_TITULAR'
+    });
 });
 
 test('rejeita reenvio sem solicitação anterior', async () => {
@@ -379,13 +440,10 @@ test('rejeita reenvio sem solicitação anterior', async () => {
         emailService: {}
     });
 
-    await assert.rejects(
-        service.reenviar(1),
-        {
-            status: 422,
-            codigo: 'EMAIL_RESPONSAVEL_NECESSARIO'
-        }
-    );
+    await assert.rejects(service.reenviar(1), {
+        status: 422,
+        codigo: 'EMAIL_RESPONSAVEL_NECESSARIO'
+    });
 });
 
 test('rejeita reenvio quando consentimento não está pendente', async () => {
@@ -413,18 +471,18 @@ test('rejeita reenvio quando consentimento não está pendente', async () => {
         emailService: {}
     });
 
-    await assert.rejects(
-        service.reenviar(1),
-        {
-            status: 409,
-            codigo: 'CONSENTIMENTO_NAO_PENDENTE'
-        }
-    );
+    await assert.rejects(service.reenviar(1), {
+        status: 409,
+        codigo: 'CONSENTIMENTO_NAO_PENDENTE'
+    });
 });
 
 test('rejeita token de consentimento inexistente', async () => {
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         consentimentoParental: {
             async findFirst() {
                 return null;
@@ -439,18 +497,18 @@ test('rejeita token de consentimento inexistente', async () => {
         emailService: {}
     });
 
-    await assert.rejects(
-        service.confirmar(tokenPuro),
-        {
-            status: 400,
-            codigo: 'LINK_CONSENTIMENTO_INVALIDO'
-        }
-    );
+    await assert.rejects(service.confirmar(tokenPuro), {
+        status: 400,
+        codigo: 'LINK_CONSENTIMENTO_INVALIDO'
+    });
 });
 
 test('rejeita token de consentimento revogado', async () => {
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -475,18 +533,18 @@ test('rejeita token de consentimento revogado', async () => {
         emailService: {}
     });
 
-    await assert.rejects(
-        service.confirmar(tokenPuro),
-        {
-            status: 410,
-            codigo: 'LINK_CONSENTIMENTO_INDISPONIVEL'
-        }
-    );
+    await assert.rejects(service.confirmar(tokenPuro), {
+        status: 410,
+        codigo: 'LINK_CONSENTIMENTO_INDISPONIVEL'
+    });
 });
 
 test('trata confirmação repetida de forma idempotente', async () => {
     const { crypto, tokenPuro } = criarCrypto();
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: {
             async findUnique() {
                 return criarTitular();
@@ -511,17 +569,10 @@ test('trata confirmação repetida de forma idempotente', async () => {
         emailService: {}
     });
 
-    const resultado =
-        await service.confirmar(tokenPuro);
+    const resultado = await service.confirmar(tokenPuro);
 
-    assert.equal(
-        resultado.acessoRedeApoioLiberado,
-        true
-    );
-    assert.equal(
-        resultado.mensagem,
-        'A autorização já havia sido confirmada.'
-    );
+    assert.equal(resultado.acessoRedeApoioLiberado, true);
+    assert.equal(resultado.mensagem, 'A autorização já havia sido confirmada.');
 });
 
 test('converte falha de SMTP em erro público seguro', async () => {
@@ -533,9 +584,7 @@ test('converte falha de SMTP em erro público seguro', async () => {
         dateUtils: {},
         emailService: {
             async enviarEmailConsentimentoParental() {
-                throw new Error(
-                    'Detalhes internos do SMTP.'
-                );
+                throw new Error('Detalhes internos do SMTP.');
             }
         }
     });
@@ -547,8 +596,7 @@ test('converte falha de SMTP em erro público seguro', async () => {
             linkConfirmacao: 'https://aloya.test/token'
         }),
         {
-            message:
-                'Não foi possível enviar o pedido de autorização no momento. Tente novamente.',
+            message: 'Não foi possível enviar o pedido de autorização no momento. Tente novamente.',
             status: 502,
             codigo: 'FALHA_ENVIO_EMAIL'
         }

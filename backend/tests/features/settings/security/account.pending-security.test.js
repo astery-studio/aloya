@@ -68,6 +68,14 @@ function criarPrismaMock() {
                     count: 0
                 }
             }
+        },
+
+        vinculoRedeApoio: {
+            async updateMany() {
+                return {
+                    count: 0
+                }
+            }
         }
     }
 

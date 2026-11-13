@@ -10,26 +10,39 @@ function criarParentalConsentValidator() {
         return { campo, mensagem };
     }
 
+    function ehObjetoPlano(valor) {
+        if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return false;
+        const prototipo = Object.getPrototypeOf(valor);
+        return prototipo === Object.prototype || prototipo === null;
+    }
+
+    function possuiCamposDesconhecidos(body) {
+        return Object.keys(body).some((campo) => campo !== 'emailResponsavelLegal');
+    }
+
     // Valida o e-mail informado posteriormente para solicitar o consentimento.
     function validarSolicitacao(body) {
-        body = body && typeof body === 'object' ? body : {};
         const erros = [];
+
+        if (!ehObjetoPlano(body)) {
+            return {
+                valido: false,
+                erros: [erro('body', 'Solicitação inválida.')],
+                dados: { emailResponsavelLegal: '' }
+            };
+        }
+
+        if (possuiCamposDesconhecidos(body)) {
+            erros.push(erro('body', 'A solicitação contém campos não permitidos.'));
+        }
 
         const emailResponsavelLegal =
             typeof body.emailResponsavelLegal === 'string'
                 ? body.emailResponsavelLegal.trim().toLowerCase()
                 : '';
 
-        if (
-            !regexEmail.test(emailResponsavelLegal) ||
-            emailResponsavelLegal.length > 254
-        ) {
-            erros.push(
-                erro(
-                    'emailResponsavelLegal',
-                    'Informe um e-mail válido.'
-                )
-            );
+        if (!regexEmail.test(emailResponsavelLegal) || emailResponsavelLegal.length > 254) {
+            erros.push(erro('emailResponsavelLegal', 'Informe um e-mail válido.'));
         }
 
         return {
@@ -44,8 +57,20 @@ function criarParentalConsentValidator() {
 
     // Valida o e-mail opcionalmente informado durante o reenvio.
     function validarReenvio(body) {
-        body = body && typeof body === 'object' ? body : {};
+        body = body === undefined ? {} : body;
         const erros = [];
+
+        if (!ehObjetoPlano(body)) {
+            return {
+                valido: false,
+                erros: [erro('body', 'Reenvio inválido.')],
+                dados: { emailResponsavelLegal: null }
+            };
+        }
+
+        if (possuiCamposDesconhecidos(body)) {
+            erros.push(erro('body', 'O reenvio contém campos não permitidos.'));
+        }
 
         const emailResponsavelLegal =
             typeof body.emailResponsavelLegal === 'string'
@@ -55,17 +80,9 @@ function criarParentalConsentValidator() {
         // Se nenhum e-mail for enviado, o sistema reutilizará o último e-mail cadastrado.
         if (
             emailResponsavelLegal &&
-            (
-                !regexEmail.test(emailResponsavelLegal) ||
-                emailResponsavelLegal.length > 254
-            )
+            (!regexEmail.test(emailResponsavelLegal) || emailResponsavelLegal.length > 254)
         ) {
-            erros.push(
-                erro(
-                    'emailResponsavelLegal',
-                    'Informe um e-mail válido.'
-                )
-            );
+            erros.push(erro('emailResponsavelLegal', 'Informe um e-mail válido.'));
         }
 
         return {
@@ -82,16 +99,8 @@ function criarParentalConsentValidator() {
     function validarToken(token) {
         const erros = [];
 
-        if (
-            typeof token !== 'string' ||
-            !/^[A-Za-z0-9_-]{43}$/.test(token)
-        ) {
-            erros.push(
-                erro(
-                    'token',
-                    'Link de consentimento inválido.'
-                )
-            );
+        if (typeof token !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
+            erros.push(erro('token', 'Link de consentimento inválido.'));
         }
 
         return {
@@ -111,6 +120,4 @@ function criarParentalConsentValidator() {
     };
 }
 
-export {
-    criarParentalConsentValidator
-};
+export { criarParentalConsentValidator };
