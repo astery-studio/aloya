@@ -1,43 +1,23 @@
-import { useMemo, useState } from 'react';
-import { Keyboard, Pressable, Text, View } from 'react-native';
-import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
+import { useMemo } from 'react';
+import { Text, View } from 'react-native';
 
-import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import DurationInput from '../../../../shared/components/forms/DurationInput/DurationInput';
 import NumberInput from '../../../../shared/components/forms/NumberInput/NumberInput';
-import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { diaryGroupPresentation } from '../../config/diaryGroupPresentation';
-import { obterApresentacaoOpcao } from '../../config/diaryOptionPresentation';
-import { alternarOpcaoCategoria } from '../../utils/diaryFormValue';
 import { agruparOpcoes } from '../../utils/diaryOptionGroups';
-import { organizarOpcoesEmLinhas } from '../../utils/diaryOptionRows';
-import { DiaryOptionIcon } from '../DiaryOptionIcon/DiaryOptionIcon';
+import { DiaryCategoryOptionGroup } from '../DiaryCategoryOptionGroup/DiaryCategoryOptionGroup';
+import {
+    calcularAlturaAnotacao,
+    DiaryFreeTextCategoryField
+} from '../DiaryFreeTextCategoryField/DiaryFreeTextCategoryField';
 import { criarEstilos } from './DiaryCategoryField.styles';
-
-function IconeOpcao(props) {
-    return <DiaryOptionIcon {...props} />;
-}
-
-const ALTURA_MINIMA_ANOTACAO = 36;
-
-function calcularAlturaAnotacao(alturaConteudo) {
-    return Math.max(ALTURA_MINIMA_ANOTACAO, alturaConteudo + 12);
-}
 
 function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
     const selecionadas = Array.isArray(valor) ? valor : [];
-    const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
     let controle;
-
-    function limparAnotacao() {
-        setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
-        Keyboard.dismiss();
-        aoAlterar?.('');
-    }
 
     if (categoria.tipoValor === 'decimal_escalado') {
         controle = (
@@ -67,79 +47,15 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
             />
         );
     } else if (categoria.tipoValor === 'texto') {
-        const limite = categoria.limiteCaracteres;
         controle = (
-            <>
-                <TextInput
-                    value={valor ?? ''}
-                    onChangeText={aoAlterar}
-                    placeholder="Digite aqui sua nota..."
-                    multiline
-                    maxLength={limite}
-                    desativado={desabilitado}
-                    estilo={[
-                        estilos.campoAnotacao,
-                        {
-                            borderColor: cores.icone,
-                            height: alturaAnotacao + (valor ? 18 : 0),
-                            paddingTop: valor ? 18 : 0
-                        }
-                    ]}
-                    estiloEntrada={[
-                        estilos.entradaAnotacao,
-                        {
-                            color: cores.icone,
-                            height: alturaAnotacao - 12,
-                            textAlign: valor ? 'justify' : 'center'
-                        }
-                    ]}
-                    scrollEnabled={false}
-                    onContentSizeChange={({ nativeEvent }) =>
-                        setAlturaAnotacao(calcularAlturaAnotacao(nativeEvent.contentSize.height))
-                    }
-                    acaoDireita={
-                        valor ? (
-                            <Pressable
-                                accessibilityRole="button"
-                                accessibilityLabel="Limpar anotação livre"
-                                disabled={desabilitado}
-                                hitSlop={8}
-                                onPress={limparAnotacao}
-                                style={estilos.limparAnotacao}
-                            >
-                                <XCircleIcon size={18} color={tema.cores.marca.primaria} />
-                            </Pressable>
-                        ) : null
-                    }
-                />
-                <Text style={[estilos.contador, { color: cores.icone }]}>
-                    {[...(valor ?? '')].length} / {limite}
-                </Text>
-            </>
-        );
-    }
-
-    function renderizarOpcao(opcao) {
-        const apresentacao = obterApresentacaoOpcao(categoria.id, opcao);
-        const selecionada = selecionadas.includes(opcao.id);
-        const { color: corEspecifica, ...propriedadesIcone } = apresentacao.iconeProps;
-        return (
-            <ButtonSelection
-                key={opcao.id}
-                variante="compacto"
-                label={opcao.nome}
-                icone={IconeOpcao}
-                iconeProps={{
-                    ...propriedadesIcone,
-                    iconeId: apresentacao.iconeId,
-                    selecionado: selecionada,
-                    ...(corEspecifica && !selecionada ? { color: corEspecifica } : {})
-                }}
-                selected={selecionada}
+            <DiaryFreeTextCategoryField
+                valor={valor}
+                limite={categoria.limiteCaracteres}
+                aoAlterar={aoAlterar}
                 desabilitado={desabilitado}
-                cor={cores.icone}
-                fundo={cores.fundoOpcao}
-                onPress={() => aoAlterar?.(alternarOpcaoCategoria(categoria, selecionadas, opcao))}
+                estilos={estilos}
+                cores={cores}
+                tema={tema}
             />
         );
     }
@@ -154,24 +70,18 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 </Text>
             </View>
             {agruparOpcoes(categoria.opcoes).map(([grupoId, opcoes]) => {
-                const titulo = diaryGroupPresentation[`${categoria.id}:${grupoId}`]?.[0];
                 return (
-                    <View key={grupoId} style={estilos.grupo}>
-                        {titulo ? (
-                            <View style={estilos.tituloGrupoLinha}>
-                                <View style={estilos.linha} />
-                                <Text style={estilos.tituloGrupo}>{titulo}</Text>
-                                <View style={estilos.linha} />
-                            </View>
-                        ) : null}
-                        <View accessibilityRole="list" style={estilos.opcoes}>
-                            {organizarOpcoesEmLinhas(opcoes).map((linhaOpcoes) => (
-                                <View key={linhaOpcoes[0].id} style={estilos.linhaOpcoes}>
-                                    {linhaOpcoes.map(renderizarOpcao)}
-                                </View>
-                            ))}
-                        </View>
-                    </View>
+                    <DiaryCategoryOptionGroup
+                        key={grupoId}
+                        categoria={categoria}
+                        grupoId={grupoId}
+                        opcoes={opcoes}
+                        selecionadas={selecionadas}
+                        aoAlterar={aoAlterar}
+                        desabilitado={desabilitado}
+                        cores={cores}
+                        estilos={estilos}
+                    />
                 );
             })}
             {controle}
