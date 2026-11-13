@@ -42,6 +42,20 @@ test('converte todas as formas de valor do detalhe para o formulário', () => {
     });
 });
 
+test('ignora registros e categorias sem contrato reconhecido', () => {
+    expect(criarValoresIniciaisEdicao()).toEqual({});
+    expect(
+        criarValoresIniciaisEdicao({
+            categorias: [
+                {},
+                { id: '' },
+                { id: 'opcoes', opcoes: [{}, { id: '' }, { id: 'valida' }] },
+                { id: 'desconhecida', valor: 10 }
+            ]
+        })
+    ).toEqual({ opcoes: ['valida'] });
+});
+
 test('a assinatura ignora a ordem das opções, mas detecta alterações reais', () => {
     const base = {
         catalogo,
