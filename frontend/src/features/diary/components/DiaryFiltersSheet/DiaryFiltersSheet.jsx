@@ -7,6 +7,7 @@ import AlertModal from '../../../../shared/components/feedback/Modal/AlertModal/
 import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { useDiaryCatalog } from '../../hooks/useDiaryCatalog';
 import {
     alternarValorFiltro,
@@ -42,6 +43,7 @@ function DiaryFiltersSheet({
     onSessaoExpirada
 }) {
     const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const catalogo = useDiaryCatalog({ ativo: visivel, service, onSessaoExpirada });
     const chaveFiltros = criarChaveFiltrosDiario(filtros);
@@ -95,17 +97,21 @@ function DiaryFiltersSheet({
             permitirDeslizarParaFechar
             podeIniciarDeslize={podeIniciarDeslize}
             estiloPainel={estilos.painel}
+            corAlca={coresDiario.interface.borda}
         >
             <BottomSheetLayout
                 titulo="Filtrar Diário"
                 onFechar={onFechar}
                 bloquearFechamento={aplicando}
                 compacto
+                corFundo={coresDiario.interface.superficie}
+                corIconeFechar={coresDiario.interface.textoSecundario}
+                estiloTitulo={{ color: coresDiario.interface.textoPrincipal }}
             >
                 <View style={estilos.areaConteudo}>
                     {catalogo.carregando && !catalogo.catalogo ? (
                         <View accessibilityLiveRegion="polite" style={estilos.estadoCentral}>
-                            <ActivityIndicator color={tema.cores.interface.destaque} />
+                            <ActivityIndicator color={coresDiario.interface.destaque} />
                             <Text style={estilos.textoEstado}>Carregando filtros do Diário...</Text>
                         </View>
                     ) : catalogo.catalogo ? (
