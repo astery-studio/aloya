@@ -60,7 +60,11 @@ test('encerra sessão e cancela resposta tardia', async () => {
             }
         })
     );
-    const requisicao = segundo.result.current.abrir(resumo);
+    let requisicao;
+    await act(async () => {
+        requisicao = segundo.result.current.abrir(resumo);
+        await Promise.resolve();
+    });
     await waitFor(() => expect(sinal).toBeDefined());
     await act(async () => segundo.result.current.fechar());
     await expect(requisicao).resolves.toBe(false);
@@ -93,5 +97,18 @@ test('cobre configuração ausente, retry vazio e resposta obsoleta', async () =
         await expect(primeira).resolves.toBe(false);
     });
     expect(hook.result.current.registro.id).toBe(4);
+    await hook.unmount();
+});
+
+test('abre diretamente um detalhe já carregado e rejeita contratos incompletos', async () => {
+    const hook = await renderHook(() => useDiaryRecordDetails());
+    for (const invalido of [null, {}, { id: 1 }, { id: '1', categorias: [] }]) {
+        expect(hook.result.current.abrirDetalhe(invalido)).toBe(false);
+    }
+
+    await act(() => expect(hook.result.current.abrirDetalhe(detalhe)).toBe(true));
+    expect(hook.result.current.registro).toBe(detalhe);
+    expect(hook.result.current.resumoSelecionado).toBe(detalhe);
+    expect(hook.result.current.visivel).toBe(true);
     await hook.unmount();
 });
