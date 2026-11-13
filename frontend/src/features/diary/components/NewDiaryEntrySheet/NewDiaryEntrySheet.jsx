@@ -2,12 +2,13 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
-import { LockKeyIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import { LockKeyIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useDiaryCatalog } from '../../hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../hooks/useDiaryEntryForm';
 import { useDiaryPhase } from '../../hooks/useDiaryPhase';
 import { DiaryEntryFormContent } from '../DiaryEntryForm/DiaryEntryFormContent';
+import { DiaryEntrySaveErrorModal } from '../DiaryEntrySaveErrorModal/DiaryEntrySaveErrorModal';
 import { criarEstilos } from '../DiaryEntryForm/DiaryEntrySheet.styles';
 
 function NewDiaryEntrySheet({
@@ -79,26 +80,11 @@ function NewDiaryEntrySheet({
                 titulo="Registro salvo com sucesso."
                 acaoPrincipal={{ texto: 'OK', aoPressionar: concluirSalvamento }}
             />
-            <SimpleModal
-                erroInterno
-                visivel={Boolean(formulario.erroSalvamento)}
+            <DiaryEntrySaveErrorModal
+                erro={formulario.erroSalvamento}
+                salvando={formulario.salvando}
                 aoFechar={formulario.limparErroSalvamento}
-                icone={WarningCircleIcon}
-                corIcone="#5C5C59"
-                fundoIcone="#EDEDED"
-                titulo="Algo deu errado"
-                mensagem={formulario.erroSalvamento}
-                acaoPrincipal={{
-                    texto: 'Tentar novamente',
-                    variante: 'preto',
-                    aoPressionar: formulario.salvar,
-                    carregando: formulario.salvando
-                }}
-                acaoSecundaria={{
-                    texto: 'Voltar',
-                    aoPressionar: formulario.limparErroSalvamento,
-                    desativado: formulario.salvando
-                }}
+                aoTentarNovamente={formulario.salvar}
             />
         </BottomSheet>
     );
