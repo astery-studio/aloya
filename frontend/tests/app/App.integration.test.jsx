@@ -564,7 +564,6 @@ describe('App integrado', () => {
                 calendarService: servicos.calendarService,
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function),
-                aoAbrirFiltros: expect.any(Function),
                 aoGerenciarCategorias: expect.any(Function)
             }),
             undefined
