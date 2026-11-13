@@ -84,6 +84,10 @@ function EditDiaryEntrySheet({
         onFechar?.();
     }, [onFechar]);
 
+    const continuarEdicao = useCallback(() => {
+        setConfirmacaoDescarteVisivel(false);
+    }, []);
+
     const recarregarAposConflito = useCallback(async () => {
         formulario.limparErroSalvamento();
         const recarregou = await aoRecarregarRegistro?.();
@@ -140,7 +144,7 @@ function EditDiaryEntrySheet({
             <AlertModal
                 variante="confirmacao"
                 visivel={confirmacaoDescarteVisivel}
-                aoFechar={() => setConfirmacaoDescarteVisivel(false)}
+                aoFechar={continuarEdicao}
                 icone={WarningCircleIcon}
                 titulo="Dados não salvos"
                 mensagem="Você tem atualizações não salvas. Deseja mesmo sair?"
@@ -152,7 +156,7 @@ function EditDiaryEntrySheet({
                 acaoSecundaria={{
                     texto: 'Continuar a editar',
                     variante: 'verde',
-                    aoPressionar: () => setConfirmacaoDescarteVisivel(false)
+                    aoPressionar: continuarEdicao
                 }}
             />
         </>
