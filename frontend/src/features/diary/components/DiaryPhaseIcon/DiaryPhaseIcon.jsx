@@ -1,14 +1,17 @@
 import { memo } from 'react';
 
+import { useTheme } from '../../../../shared/hooks/useTheme';
+
 import {
     obterApresentacaoFase,
     obterApresentacaoFaseRegistro
 } from '../../utils/diaryPhasePresentation';
 
 function DiaryPhaseIcon({ fase, size, aceitarFaseIndefinida = false }) {
+    const tema = useTheme();
     const apresentacao = aceitarFaseIndefinida
-        ? obterApresentacaoFaseRegistro(fase)
-        : obterApresentacaoFase(fase);
+        ? obterApresentacaoFaseRegistro(fase, tema)
+        : obterApresentacaoFase(fase, tema);
     if (!apresentacao) return null;
 
     const Icone = apresentacao.Icone;
