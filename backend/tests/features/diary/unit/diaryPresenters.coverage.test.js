@@ -8,6 +8,7 @@ import {
 } from '../../../../src/features/diary/presenters/diaryEntry.presenter.js';
 import {
     apresentarResumoRegistro,
+    criarTrechoAnotacao,
     obterNomeMicrocategoria
 } from '../../../../src/features/diary/presenters/diaryHistory.presenter.js';
 
@@ -212,4 +213,17 @@ test('resumo nomeia a microcategoria específica de banheiro', () => {
         'Banheiro'
     );
     assert.equal(obterNomeMicrocategoria(banheiro([{ opcaoId: 'inexistente' }])), 'Banheiro');
+});
+
+test('trecho da anotação cobre entradas inválidas, curtas e truncadas', () => {
+    for (const [valor, limite] of [
+        [null, 100],
+        ['', 100],
+        ['texto', 1],
+        ['texto', 1.5]
+    ]) {
+        assert.equal(criarTrechoAnotacao(valor, limite), null);
+    }
+    assert.equal(criarTrechoAnotacao('texto', 5), 'texto');
+    assert.equal(criarTrechoAnotacao('texto maior', 6), 'texto…');
 });
