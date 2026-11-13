@@ -1,11 +1,21 @@
 import { Pressable, Text, View } from 'react-native';
 
 import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchField';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { DiaryPhaseIcon } from '../DiaryPhaseIcon/DiaryPhaseIcon';
 
 function DiaryPhaseFilterOption({ fase, ativo, aoAlterar, estilos }) {
-    const apresentacao = obterApresentacaoFase(fase);
+    const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
+    const apresentacao = obterApresentacaoFase(fase, tema);
+    const coresSwitch = {
+        trilhaAtiva: coresDiario.interface.destaque,
+        trilhaInativa: coresDiario.interface.switchInativo,
+        indicadorAtivo: coresDiario.interface.textoPrincipal,
+        indicadorInativo: coresDiario.interface.textoPrincipal
+    };
 
     return (
         <Pressable
@@ -20,6 +30,7 @@ function DiaryPhaseFilterOption({ fase, ativo, aoAlterar, estilos }) {
                 <Text style={estilos.nomeFase}>{apresentacao.rotulo}</Text>
             </View>
             <SwitchField
+                cores={coresSwitch}
                 somenteControle
                 ativo={ativo}
                 aoAlterar={aoAlterar}
