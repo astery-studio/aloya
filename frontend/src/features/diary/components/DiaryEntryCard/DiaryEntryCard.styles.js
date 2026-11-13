@@ -2,9 +2,11 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 // Converte os tokens do tema em estilos nativos do cartão de registro.
 function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
         cartao: {
             width: '100%',
@@ -14,9 +16,9 @@ function criarEstilos(tema) {
             paddingVertical: 10,
             paddingHorizontal: 16,
             borderWidth: 0.70489,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: 16,
-            backgroundColor: tema.cores.interface.superficieElevada,
+            backgroundColor: cores.superficie,
             ...tema.shadows.card
         },
         cabecalho: {
@@ -36,7 +38,7 @@ function criarEstilos(tema) {
         },
         areaData: { flex: 1, minHeight: 26, alignItems: 'center', justifyContent: 'center' },
         data: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             lineHeight: 24
@@ -47,10 +49,10 @@ function criarEstilos(tema) {
             marginTop: 6,
             paddingTop: 10,
             borderTopWidth: 0.70489,
-            borderTopColor: tema.cores.interface.separador
+            borderTopColor: cores.separador
         },
         rotuloSecao: {
-            color: tema.cores.interface.destaque,
+            color: cores.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 8,
             lineHeight: 15,
@@ -62,7 +64,7 @@ function criarEstilos(tema) {
             marginTop: 4,
             paddingVertical: 6,
             borderBottomWidth: 0.70489,
-            borderBottomColor: tema.cores.interface.separador
+            borderBottomColor: cores.separador
         },
         linhaChips: {
             minHeight: 28,
@@ -82,12 +84,12 @@ function criarEstilos(tema) {
             paddingHorizontal: 8,
             paddingVertical: 3,
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: tema.radius.circular,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: cores.superficie
         },
         textoChip: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
             lineHeight: 16
@@ -96,15 +98,15 @@ function criarEstilos(tema) {
             gap: 8,
             paddingTop: 12,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.separador
+            borderTopColor: cores.separador
         },
         textoAnotacao: {
             padding: 10,
             borderWidth: 1,
-            borderColor: tema.cores.interface.borda,
+            borderColor: cores.borda,
             borderRadius: 8,
-            color: tema.cores.interface.textoSecundario,
-            backgroundColor: tema.cores.interface.fundo,
+            color: cores.textoSecundario,
+            backgroundColor: tema.escuro ? cores.superficieElevada : cores.fundo,
             fontFamily: fontFamilies.regular,
             fontSize: 11,
             lineHeight: 16
