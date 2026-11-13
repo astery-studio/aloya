@@ -2,9 +2,11 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../shared/theme';
+import { obterCoresDiario } from '../config/diaryColors';
 
 // Converte os tokens do tema em estilos da screen e de seus estados.
 function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
         tela: {
             flex: 1,
@@ -23,14 +25,14 @@ function criarEstilos(tema) {
         },
         descricao: {
             width: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             lineHeight: 22
         },
         atualizando: { flexDirection: 'row', alignItems: 'center', gap: 8 },
         textoAtualizando: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             lineHeight: 17
@@ -38,7 +40,7 @@ function criarEstilos(tema) {
         estadoCentralizado: { flex: 1, justifyContent: 'center', paddingBottom: 56 },
         mensagemEstado: {
             marginTop: 10,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
@@ -53,7 +55,7 @@ function criarEstilos(tema) {
         },
         mensagemFiltroVazio: {
             maxWidth: 310,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 16,
             lineHeight: 24,
@@ -67,9 +69,9 @@ function criarEstilos(tema) {
             paddingTop: 20,
             paddingBottom: 24
         },
-        linhaDivisor: { flex: 1, height: 1, backgroundColor: tema.cores.interface.borda },
+        linhaDivisor: { flex: 1, height: 1, backgroundColor: cores.borda },
         textoDivisor: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             lineHeight: 18,
@@ -85,8 +87,8 @@ function criarEstilos(tema) {
             paddingTop: 16,
             paddingBottom: 16,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.fundo
+            borderTopColor: cores.borda,
+            backgroundColor: cores.fundo
         }
     });
 }
