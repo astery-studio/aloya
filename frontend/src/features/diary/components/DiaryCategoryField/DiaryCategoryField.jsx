@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import DurationInput from '../../../../shared/components/forms/DurationInput/DurationInput';
 import NumberInput from '../../../../shared/components/forms/NumberInput/NumberInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { agruparOpcoes } from '../../utils/diaryOptionGroups';
 import { DiaryCategoryOptionGroup } from '../DiaryCategoryOptionGroup/DiaryCategoryOptionGroup';
 import {
@@ -15,7 +16,8 @@ import { criarEstilos } from './DiaryCategoryField.styles';
 function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
+    const paletas = obterCoresDiario(tema).macrocategorias;
+    const cores = paletas[paleta] ?? paletas.ciclo;
     const selecionadas = Array.isArray(valor) ? valor : [];
     let controle;
 
