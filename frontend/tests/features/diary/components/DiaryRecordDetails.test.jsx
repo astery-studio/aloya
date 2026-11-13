@@ -10,6 +10,7 @@ import {
     precisaAtivarRolagem,
     valorEscalado
 } from '../../../../src/features/diary/components/DiaryRecordDetails/DiaryRecordDetails';
+import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const registro = {
@@ -241,6 +242,12 @@ describe('DiaryRecordDetails', () => {
             fundo: 'rgba(74, 88, 153, 0.1)',
             texto: '#4A5899'
         });
+        expect(obterCoresCategoria('fluxo', '#123', 'Ciclo', temaEscuro).texto).toBe('#EF9A9A');
+        expect(obterCoresCategoria('pele', '#123', 'Corpo', temaEscuro).texto).toBe('#A5D6A7');
+        expect(obterCoresCategoria('humor', '#123', 'Emocional', temaEscuro).texto).toBe('#B59DDB');
+        expect(obterCoresCategoria('sono', '#123', 'Energia', temaEscuro).texto).toBe('#FFE082');
+        expect(obterCoresCategoria('social', '#123', 'Íntima', temaEscuro).texto).toBe('#EF9A9A');
+        expect(obterCoresCategoria('consulta', '#123', 'Saúde', temaEscuro).texto).toBe('#90CAF9');
         const estilos = { botaoAcao: {}, botaoAcaoDesativado: {}, pressionado: {} };
         expect(criarEstiloBotaoAcao(estilos, false, false)).toEqual([{}, null, null]);
         expect(criarEstiloBotaoAcao(estilos, true, true)).toEqual([{}, {}, {}]);
