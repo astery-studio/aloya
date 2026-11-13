@@ -1,6 +1,8 @@
 import { Pressable, Text } from 'react-native';
 
 import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchField';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { obterApresentacaoMacrocategoria } from '../../config/diaryMacroPresentation';
 import { DiaryMacrocategoryAccordion } from '../DiaryMacrocategoryAccordion/DiaryMacrocategoryAccordion';
 
@@ -13,7 +15,15 @@ function DiaryCategoryFilterGroup({
     aoAlternarTodas,
     estilos
 }) {
+    const tema = useTheme();
+    const coresDiario = obterCoresDiario(tema);
     const apresentacao = obterApresentacaoMacrocategoria(macro.id);
+    const coresSwitch = {
+        trilhaAtiva: coresDiario.interface.destaque,
+        trilhaInativa: coresDiario.interface.switchInativo,
+        indicadorAtivo: coresDiario.interface.textoPrincipal,
+        indicadorInativo: coresDiario.interface.textoPrincipal
+    };
     const categorias = macro.categorias.filter((categoria) => categoria.ativaEfetiva);
     const quantidadeSelecionada = categorias.filter((categoria) =>
         selecionadas.includes(categoria.id)
@@ -32,6 +42,7 @@ function DiaryCategoryFilterGroup({
             aoAlternar={aoExpandir}
             acessorio={
                 <SwitchField
+                    cores={coresSwitch}
                     somenteControle
                     ativo={todasSelecionadas}
                     aoAlterar={(ativa) => aoAlternarTodas(categorias, ativa)}
@@ -53,6 +64,7 @@ function DiaryCategoryFilterGroup({
                     >
                         <Text style={estilos.nomeCategoria}>{categoria.nome}</Text>
                         <SwitchField
+                            cores={coresSwitch}
                             somenteControle
                             ativo={ativa}
                             aoAlterar={() => aoAlternar(categoria.id)}
