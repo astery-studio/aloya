@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { CaretDownIcon, CaretUpIcon } from '../../../../shared/components/icons/AppIcons';
 
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { criarEstilos } from './DiaryMacrocategoryAccordion.styles';
 
 function DiaryMacrocategoryAccordion({
@@ -21,7 +22,9 @@ function DiaryMacrocategoryAccordion({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const cores = tema.cores.redeApoio[paleta] ?? tema.cores.redeApoio.ciclo;
+    const coresDiario = obterCoresDiario(tema);
+    const paletas = coresDiario.macrocategorias;
+    const cores = paletas[paleta] ?? paletas.ciclo;
     const IconeExpansao = expandido ? CaretUpIcon : CaretDownIcon;
     const formulario = variante === 'formulario';
 
@@ -65,7 +68,10 @@ function DiaryMacrocategoryAccordion({
                     >
                         {titulo}
                     </Text>
-                    <IconeExpansao size={18} color={expandido ? cores.icone : '#A8A49C'} />
+                    <IconeExpansao
+                        size={18}
+                        color={expandido ? cores.icone : coresDiario.interface.textoSecundario}
+                    />
                 </Pressable>
                 {acessorio}
             </View>
