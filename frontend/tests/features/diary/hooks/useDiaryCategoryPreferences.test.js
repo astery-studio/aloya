@@ -3,6 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import {
     MENSAGEM_ERRO,
     aplicarPreferencia,
+    obterEstadoPreferencia,
     useDiaryCategoryPreferences
 } from '../../../../src/features/diary/hooks/useDiaryCategoryPreferences';
 
@@ -178,4 +179,94 @@ test('informa sessão expirada durante o carregamento', async () => {
     await waitFor(() => expect(result.current.erro).toBe(MENSAGEM_ERRO));
     expect(result.current.erroCarregamento).toBe(true);
     expect(onSessaoExpirada).toHaveBeenCalledTimes(1);
+});
+
+test('consulta estados e preserva catálogos ausentes', () => {
+    const catalogo = criarCatalogo();
+    expect(obterEstadoPreferencia(catalogo, { tipo: 'macrocategoria', id: 'energia_sono' })).toBe(
+        true
+    );
+    expect(obterEstadoPreferencia(catalogo, { tipo: 'categoria', id: 'energia' })).toBe(false);
+    expect(obterEstadoPreferencia(catalogo, { tipo: 'categoria', id: 'inexistente' })).toBeUndefined();
+    expect(obterEstadoPreferencia(null, { tipo: 'categoria', id: 'energia' })).toBeUndefined();
+    expect(aplicarPreferencia(null, { tipo: 'categoria', id: 'energia', ativa: true })).toBeNull();
+});
+
+test('fica inativo sem serviço e permite fechar o erro', async () => {
+    const inativo = await renderHook(() =>
+        useDiaryCategoryPreferences({ ativo: false, service: {} })
+    );
+    expect(inativo.result.current.catalogo).toBeNull();
+    expect(inativo.result.current.carregando).toBe(false);
+    await expect(inativo.result.current.alterarCategoria('energia', true)).resolves.toBe(false);
+    await expect(inativo.result.current.tentarNovamente()).resolves.toBe(false);
+    await act(() => inativo.result.current.fecharErro());
+    await inativo.unmount();
+});
+
+test('ignora cancelamento do catálogo ao desmontar', async () => {
+    let sinal;
+    const service = {
+        buscarCatalogo: jest.fn(({ signal }) => {
+            sinal = signal;
+            return new Promise((_resolve, reject) => {
+                signal.addEventListener('abort', () =>
+                    reject(Object.assign(new Error('cancelado'), { name: 'AbortError' }))
+                );
+            });
+        })
+    };
+    const hook = await renderHook(() => useDiaryCategoryPreferences({ service }));
+    await waitFor(() => expect(sinal).toBeDefined());
+    await hook.unmount();
+    expect(sinal.aborted).toBe(true);
+});
+
+test('aceita conflito já aplicado pelo servidor e tenta novamente após erro', async () => {
+    const inicial = criarCatalogo();
+    const sincronizado = aplicarPreferencia(criarCatalogo(2), {
+        tipo: 'categoria',
+        id: 'qualidade_sono',
+        ativa: false
+    });
+    const service = {
+        buscarCatalogo: jest
+            .fn()
+            .mockResolvedValueOnce(inicial)
+            .mockResolvedValueOnce(sincronizado),
+        atualizarCategoria: jest
+            .fn()
+            .mockRejectedValueOnce({ status: 409 })
+            .mockRejectedValueOnce(new Error('rede'))
+            .mockResolvedValueOnce(sincronizado)
+    };
+    const hook = await renderHook(() => useDiaryCategoryPreferences({ service }));
+    await waitFor(() => expect(hook.result.current.catalogo).toBe(inicial));
+
+    await act(() => hook.result.current.alterarCategoria('qualidade_sono', false));
+    expect(service.atualizarCategoria).toHaveBeenCalledTimes(1);
+    expect(hook.result.current.catalogo).toBe(sincronizado);
+
+    await act(() => hook.result.current.alterarCategoria('qualidade_sono', true));
+    expect(hook.result.current.erro).toBe(MENSAGEM_ERRO);
+    await act(() => hook.result.current.tentarNovamente());
+    expect(hook.result.current.erro).toBeNull();
+    await hook.unmount();
+});
+
+test('informa sessão expirada durante a persistência', async () => {
+    const onSessaoExpirada = jest.fn();
+    const service = {
+        buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()),
+        atualizarCategoria: jest.fn().mockRejectedValue({ status: 401 })
+    };
+    const hook = await renderHook(() =>
+        useDiaryCategoryPreferences({ service, onSessaoExpirada })
+    );
+    await waitFor(() => expect(hook.result.current.catalogo).not.toBeNull());
+    await act(() => hook.result.current.alterarCategoria('energia', true));
+    expect(onSessaoExpirada).toHaveBeenCalledTimes(1);
+    await act(() => hook.result.current.fecharErro());
+    expect(hook.result.current.erro).toBeNull();
+    await hook.unmount();
 });
