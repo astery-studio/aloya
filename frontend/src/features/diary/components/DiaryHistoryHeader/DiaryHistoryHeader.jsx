@@ -1,5 +1,6 @@
 import { ActivityIndicator, Text, View } from 'react-native';
 
+import { obterCoresDiario } from '../../config/diaryColors';
 import { DiaryActiveFilters } from '../DiaryActiveFilters/DiaryActiveFilters';
 import { DiaryOverviewCard } from '../DiaryOverviewCard/DiaryOverviewCard';
 
@@ -32,6 +33,7 @@ function DiaryHistoryHeader({
     estilos,
     tema
 }) {
+    const cores = obterCoresDiario(tema).interface;
     return (
         <View style={estilos.cabecalhoLista}>
             <View style={estilos.introducao}>
@@ -41,7 +43,7 @@ function DiaryHistoryHeader({
                 </Text>
                 {atualizando ? (
                     <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
-                        <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
+                        <ActivityIndicator size="small" color={cores.destaque} />
                         <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
                     </View>
                 ) : null}
