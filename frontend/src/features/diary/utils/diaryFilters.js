@@ -45,9 +45,8 @@ function converterDataFiltroParaIso(valor) {
     const dataNormalizada = valor.trim();
     if (!isValidDate(dataNormalizada)) return null;
     const correspondencia = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(dataNormalizada);
-    if (!correspondencia) return null;
     const iso = `${correspondencia[3]}-${correspondencia[2]}-${correspondencia[1]}`;
-    return decomporData(iso) ? iso : null;
+    return iso;
 }
 
 function formatarDataFiltro(data) {
@@ -74,7 +73,7 @@ function alternarValorFiltro(valores, valor) {
         : ordenarUnicos([...atuais, valor]);
 }
 
-function criarFiltrosDaEdicao({ dataInicio = '', dataFim = '', categorias = [], fases = [] }) {
+function criarFiltrosDaEdicao({ dataInicio = '', dataFim = '', categorias = [], fases = [] } = {}) {
     return normalizarFiltrosDiario({
         dataInicio: dataInicio ? converterDataFiltroParaIso(dataInicio) : null,
         dataFim: dataFim ? converterDataFiltroParaIso(dataFim) : null,
