@@ -2,9 +2,12 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 // Converte os tokens do tema em estilos do detalhe e de seus grupos.
 function criarEstilos(tema) {
+    const diario = obterCoresDiario(tema);
+    const cores = diario.interface;
     return StyleSheet.create({
         rolagem: { width: '100%', flexShrink: 1 },
         container: {
@@ -15,7 +18,7 @@ function criarEstilos(tema) {
         },
         titulo: {
             width: '100%',
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 17,
             lineHeight: 22,
@@ -23,17 +26,17 @@ function criarEstilos(tema) {
         },
         resumoDia: {
             width: '100%',
-            color: tema.cores.marca.primaria,
+            color: diario.primaria,
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             lineHeight: 15,
             letterSpacing: 0.6,
             textAlign: 'center'
         },
-        tituloAlteracao: { color: '#2C4C3B' },
+        tituloAlteracao: { color: cores.destaque },
         introducao: {
             width: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
@@ -47,10 +50,10 @@ function criarEstilos(tema) {
             alignItems: 'center',
             gap: 10
         },
-        separador: { flex: 1, height: 1, backgroundColor: tema.cores.interface.borda },
+        separador: { flex: 1, height: 1, backgroundColor: cores.borda },
         tituloCategoria: {
             flexShrink: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             lineHeight: 15,
@@ -73,11 +76,11 @@ function criarEstilos(tema) {
             paddingHorizontal: 8,
             paddingVertical: 3,
             borderRadius: tema.radius.circular,
-            backgroundColor: tema.cores.interface.destaqueSuave
+            backgroundColor: cores.destaqueSuave
         },
         textoChip: {
             flexShrink: 1,
-            color: tema.cores.interface.destaque,
+            color: cores.destaque,
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
             lineHeight: 16
@@ -87,10 +90,10 @@ function criarEstilos(tema) {
             alignSelf: 'stretch',
             padding: 6,
             borderWidth: 0.7,
-            borderColor: '#E6E2D8',
+            borderColor: cores.borda,
             borderRadius: 6,
-            color: '#5C5C59',
-            backgroundColor: 'rgba(247, 245, 240, 0.5)',
+            color: cores.textoSecundario,
+            backgroundColor: tema.escuro ? cores.superficieElevada : 'rgba(247, 245, 240, 0.5)',
             fontFamily: fontFamilies.regular,
             fontSize: 8,
             fontWeight: '300',
@@ -98,7 +101,7 @@ function criarEstilos(tema) {
         },
         alteracao: { width: '100%', alignItems: 'center', gap: 12 },
         textoAlteracao: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
@@ -114,11 +117,11 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 6,
             borderRadius: 20,
-            backgroundColor: tema.cores.marca.primaria
+            backgroundColor: diario.primaria
         },
         botaoAcaoDesativado: { opacity: 0.5 },
         textoBotaoAcao: {
-            color: '#FFFFFF',
+            color: diario.textoSobrePrimaria,
             fontFamily: fontFamilies.semiBold,
             fontSize: 13,
             lineHeight: 20
@@ -132,8 +135,14 @@ function criarEstilos(tema) {
         },
         textoFaseRegistro: { fontSize: 13, lineHeight: 20 },
         areaBotaoOk: { width: '100%' },
-        botaoOk: { width: '100%', height: 52, borderRadius: 12 },
+        botaoOk: {
+            width: '100%',
+            height: 52,
+            borderRadius: 12,
+            backgroundColor: cores.destaque
+        },
         textoBotaoOk: {
+            color: cores.textoSobreDestaque,
             fontFamily: fontFamilies.medium,
             fontSize: 16,
             lineHeight: 24
@@ -141,14 +150,14 @@ function criarEstilos(tema) {
         pressionado: { opacity: 0.72 },
         estado: { minHeight: 260, alignItems: 'center', justifyContent: 'center', gap: 16 },
         tituloErro: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             lineHeight: 27,
             textAlign: 'center'
         },
         mensagemEstado: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,
