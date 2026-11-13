@@ -1,5 +1,7 @@
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
 import { WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { obterCoresDiario } from '../../config/diaryColors';
 
 function DiaryEntrySaveErrorModal({
     erro,
@@ -9,14 +11,16 @@ function DiaryEntrySaveErrorModal({
     aoTentarNovamente,
     aoRecarregarDados
 }) {
+    const tema = useTheme();
+    const cores = obterCoresDiario(tema).interface;
     return (
         <SimpleModal
             erroInterno
             visivel={Boolean(erro)}
             aoFechar={aoFechar}
             icone={WarningCircleIcon}
-            corIcone="#5C5C59"
-            fundoIcone="#EDEDED"
+            corIcone={cores.textoSecundario}
+            fundoIcone={cores.separador}
             titulo={conflitoVersao ? 'Registro atualizado' : 'Algo deu errado'}
             mensagem={erro}
             acaoPrincipal={{
