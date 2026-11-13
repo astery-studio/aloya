@@ -60,6 +60,17 @@ describe('DiaryEntryCard', () => {
 
         const tres = [{ texto: 'Sintomas físicos' }, { texto: 'Pele' }, { texto: 'Peso' }];
         expect(organizarChipsEmLinhas(tres)).toEqual([tres]);
+
+        const umLongo = [{ texto: 'X'.repeat(100) }];
+        expect(organizarChipsEmLinhas(umLongo)).toEqual([umLongo]);
+        const doisLongos = [{ texto: 'X'.repeat(40) }, { texto: 'Y'.repeat(40) }];
+        expect(organizarChipsEmLinhas(doisLongos)).toEqual([[doisLongos[0]], [doisLongos[1]]]);
+        const tresLongos = [
+            { texto: 'X'.repeat(30) },
+            { texto: 'Y'.repeat(30) },
+            { texto: 'Z'.repeat(30) }
+        ];
+        expect(organizarChipsEmLinhas(tresLongos)).toHaveLength(2);
     });
 
     test('limita a prévia da anotação a 100 caracteres com reticência', () => {
@@ -218,5 +229,24 @@ describe('DiaryEntryCard', () => {
         expect(screen.queryByTestId('diary-entry-content')).not.toBeOnTheScreen();
         expect(screen.queryByText('CATEGORIAS MARCADAS')).not.toBeOnTheScreen();
         expect(screen.getByText('Fase Lútea')).toBeOnTheScreen();
+    });
+
+    test('mostra somente a anotação quando não há categorias públicas', async () => {
+        await render(
+            <DiaryEntryCard
+                registro={{
+                    id: 11,
+                    data: '2026-11-01',
+                    fase: 'lutea',
+                    principais: [],
+                    maisQuantidade: 0,
+                    trechoAnotacao: 'Somente anotação'
+                }}
+                aoAbrir={jest.fn()}
+            />
+        );
+
+        expect(screen.getByText('Somente anotação')).toBeOnTheScreen();
+        expect(screen.queryByText('CATEGORIAS MARCADAS')).not.toBeOnTheScreen();
     });
 });
