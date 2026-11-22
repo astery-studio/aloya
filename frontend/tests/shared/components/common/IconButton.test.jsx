@@ -127,6 +127,31 @@ describe('IconButton', () => {
         );
     });
 
+    test('usa a variante da Rede de Apoio com ícone de 32 pixels', async () => {
+        await render(
+            <IconButton
+                icone={IconeTeste}
+                aoPressionar={jest.fn()}
+                rotuloAcessibilidade="Filtrar contatos"
+                variante="redeApoio"
+            />
+        );
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Filtrar contatos'
+            })
+        ).toHaveStyle(variantes.redeApoio.container);
+
+        expect(IconeTeste).toHaveBeenCalledWith(
+            expect.objectContaining({
+                size: 32,
+                weight: 'regular'
+            }),
+            undefined
+        );
+    });
+
     test('fica desativado quando recebe a propriedade desativado', async () => {
         const aoPressionar = jest.fn();
 

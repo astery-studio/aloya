@@ -28,11 +28,11 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     };
 });
 
-import { GeneralPermissions } from '../../../../src/features/support-network/components/GeneralPermissions';
-import PermissionCounter from '../../../../src/features/support-network/components/PermissionCounter';
-import PermissionGroup from '../../../../src/features/support-network/components/PermissionGroup';
-import { PermissionGroups } from '../../../../src/features/support-network/components/PermissionGroups';
-import PermissionItem from '../../../../src/features/support-network/components/PermissionItem';
+import { GeneralPermissions } from '../../../../src/features/support-network/components/GeneralPermissions/GeneralPermissions';
+import PermissionCounter from '../../../../src/features/support-network/components/PermissionCounter/PermissionCounter';
+import PermissionGroup from '../../../../src/features/support-network/components/PermissionGroup/PermissionGroup';
+import { PermissionGroups } from '../../../../src/features/support-network/components/PermissionGroups/PermissionGroups';
+import PermissionItem from '../../../../src/features/support-network/components/PermissionItem/PermissionItem';
 import SwitchField from '../../../../src/shared/components/forms/SwitchField/SwitchField';
 
 const permissoes = [

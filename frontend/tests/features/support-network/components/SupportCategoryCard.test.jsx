@@ -26,7 +26,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
 import {
     criarRotuloContatos,
     SupportCategoryCard
-} from '../../../../src/features/support-network/components/SupportCategoryCard';
+} from '../../../../src/features/support-network/components/SupportCategoryCard/SupportCategoryCard';
 import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 
 const categoria = Object.freeze({

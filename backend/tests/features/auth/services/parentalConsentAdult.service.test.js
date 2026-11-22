@@ -7,9 +7,13 @@ function criarService() {
         id: 1,
         nome: 'Carla',
         email: 'carla@email.com',
+        papel: 'principal',
         dataNascimento: new Date('2000-01-01')
     };
     const prisma = {
+        async $transaction(callback) {
+            return callback(prisma);
+        },
         usuario: { findUnique: async () => titular },
         consentimentoParental: {
             updateMany: async () => ({ count: 1 }),
@@ -26,7 +30,9 @@ function criarService() {
         emailService: {},
         crypto: {
             createHash: () => ({
-                update() { return this; },
+                update() {
+                    return this;
+                },
                 digest: () => 'hash'
             })
         },
@@ -44,15 +50,12 @@ test('encerra fluxos parentais quando a titular completa 16 anos', async () => {
         mensagem: 'O acesso à Rede de Apoio já está liberado.'
     });
 
-    await assert.rejects(
-        service.reenviar(1),
-        { codigo: 'CONSENTIMENTO_NAO_NECESSARIO', status: 409 }
-    );
+    await assert.rejects(service.reenviar(1), {
+        codigo: 'CONSENTIMENTO_NAO_NECESSARIO',
+        status: 409
+    });
 
     const confirmacao = await service.confirmar('token');
     assert.equal(confirmacao.acessoRedeApoioLiberado, true);
-    assert.equal(
-        confirmacao.mensagem,
-        'A Rede de Apoio já está liberada para esta titular.'
-    );
+    assert.equal(confirmacao.mensagem, 'A Rede de Apoio já está liberada para esta titular.');
 });

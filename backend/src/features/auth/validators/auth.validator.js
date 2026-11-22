@@ -20,9 +20,7 @@ function criarAuthValidator({ dateUtils }) {
         }
 
         if (!Number.isInteger(valor) || valor <= 0) {
-            erros.push(
-                erro(campo, 'Informe um número inteiro positivo.')
-            );
+            erros.push(erro(campo, 'Informe um número inteiro positivo.'));
 
             return null;
         }
@@ -32,89 +30,52 @@ function criarAuthValidator({ dateUtils }) {
 
     // Função principal responsável por validar todos os campos enviados no corpo da requisição de cadastro
     function validarCadastro(body) {
-        body = body && typeof body === 'object'
-            ? body
-            : {};
+        body = body && typeof body === 'object' ? body : {};
         const erros = [];
         const hoje = new Date();
 
+        const tipoUsuario = body.tipoUsuario === undefined ? 'principal' : body.tipoUsuario;
+
+        if (!['principal', 'contato_apoio'].includes(tipoUsuario)) {
+            erros.push(erro('tipoUsuario', 'Selecione um tipo de usuário válido.'));
+        }
+
         // Limpa e normaliza o nome enviado, removendo espaços excedentes.
-        const nome = typeof body.nome === 'string'
-            ? body.nome.trim().replace(/\s+/g, ' ')
-            : '';
+        const nome = typeof body.nome === 'string' ? body.nome.trim().replace(/\s+/g, ' ') : '';
 
         // Valida as restrições de comprimento e caracteres permitidos para o nome.
         if (nome.length < 3) {
-            erros.push(
-                erro('nome', 'O nome deve ter pelo menos 3 caracteres.')
-            );
+            erros.push(erro('nome', 'O nome deve ter pelo menos 3 caracteres.'));
         } else if (nome.length > 120 || !regexNome.test(nome)) {
-            erros.push(
-                erro(
-                    'nome',
-                    'O nome deve conter apenas letras, espaços ou hífens.'
-                )
-            );
+            erros.push(erro('nome', 'O nome deve conter apenas letras, espaços ou hífens.'));
         }
 
         // Valida e formata a data de nascimento utilizando o utilitário de datas.
-        const dataNascimento =
-            dateUtils.criarDataValida(body.dataNascimento);
+        const dataNascimento = dateUtils.criarDataValida(body.dataNascimento);
 
         // Calcula a idade do usuário com base na data de nascimento informada.
-        const idade = dateUtils.calcularIdade(
-            body.dataNascimento
-        );
+        const idade = dateUtils.calcularIdade(body.dataNascimento);
 
         // Valida se a data de nascimento é real, não está no futuro e não resulta em idade negativa.
-        if (
-            !dataNascimento ||
-            dataNascimento > hoje ||
-            idade === null ||
-            idade < 0
-        ) {
-            erros.push(
-                erro(
-                    'dataNascimento',
-                    'Informe uma data de nascimento válida.'
-                )
-            );
+        if (!dataNascimento || dataNascimento > hoje || idade === null || idade < 0) {
+            erros.push(erro('dataNascimento', 'Informe uma data de nascimento válida.'));
         }
 
         // Normaliza o e-mail removendo espaços e convertendo para minúsculas
-        const email = typeof body.email === 'string'
-            ? body.email.trim().toLowerCase()
-            : '';
+        const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
 
         // Valida o formato e o tamanho máximo permitido para o e-mail.
         if (!regexEmail.test(email) || email.length > 254) {
-            erros.push(
-                erro('email', 'Informe um e-mail válido.')
-            );
+            erros.push(erro('email', 'Informe um e-mail válido.'));
         }
 
         // Aplica a mesma regra mínima usada na redefinição de senha.
-        if (
-            typeof body.senha !== 'string' ||
-            body.senha.length === 0
-        ) {
-            erros.push(
-                erro('senha', 'Informe uma senha.')
-            );
+        if (typeof body.senha !== 'string' || body.senha.length === 0) {
+            erros.push(erro('senha', 'Informe uma senha.'));
         } else if (body.senha.length < 8) {
-            erros.push(
-                erro(
-                    'senha',
-                    'A senha deve possuir pelo menos 8 caracteres.'
-                )
-            );
+            erros.push(erro('senha', 'A senha deve possuir pelo menos 8 caracteres.'));
         } else if (Buffer.byteLength(body.senha, 'utf8') > 72) {
-            erros.push(
-                erro(
-                    'senha',
-                    'A senha ultrapassa o tamanho máximo permitido.'
-                )
-            );
+            erros.push(erro('senha', 'A senha ultrapassa o tamanho máximo permitido.'));
         }
 
         // Valida opcionalmente a data de início da última menstruação.
@@ -123,20 +84,14 @@ function criarAuthValidator({ dateUtils }) {
             body.dataInicioUltimaMenstruacao !== null &&
             body.dataInicioUltimaMenstruacao !== '';
 
-        const dataInicioUltimaMenstruacao =
-            informouDataInicioUltimaMenstruacao
-                ? dateUtils.criarDataValida(
-                    body.dataInicioUltimaMenstruacao
-                )
-                : null;
+        const dataInicioUltimaMenstruacao = informouDataInicioUltimaMenstruacao
+            ? dateUtils.criarDataValida(body.dataInicioUltimaMenstruacao)
+            : null;
 
         // Quando informada, impede data inválida ou situada no futuro.
         if (
             informouDataInicioUltimaMenstruacao &&
-            (
-                !dataInicioUltimaMenstruacao ||
-                dataInicioUltimaMenstruacao > hoje
-            )
+            (!dataInicioUltimaMenstruacao || dataInicioUltimaMenstruacao > hoje)
         ) {
             erros.push(
                 erro(
@@ -152,29 +107,19 @@ function criarAuthValidator({ dateUtils }) {
             body.dataFimUltimaMenstruacao !== null &&
             body.dataFimUltimaMenstruacao !== '';
 
-        const dataFimUltimaMenstruacao =
-            informouDataFimUltimaMenstruacao
-                ? dateUtils.criarDataValida(
-                    body.dataFimUltimaMenstruacao
-                )
-                : null;
+        const dataFimUltimaMenstruacao = informouDataFimUltimaMenstruacao
+            ? dateUtils.criarDataValida(body.dataFimUltimaMenstruacao)
+            : null;
 
         // Garante que a data de término seja coerente.
         if (
             informouDataFimUltimaMenstruacao &&
-            (
-                !dataInicioUltimaMenstruacao ||
+            (!dataInicioUltimaMenstruacao ||
                 !dataFimUltimaMenstruacao ||
                 dataFimUltimaMenstruacao < dataInicioUltimaMenstruacao ||
-                dataFimUltimaMenstruacao > hoje
-            )
+                dataFimUltimaMenstruacao > hoje)
         ) {
-            erros.push(
-                erro(
-                    'dataFimUltimaMenstruacao',
-                    'Informe uma data de término válida.'
-                )
-            );
+            erros.push(erro('dataFimUltimaMenstruacao', 'Informe uma data de término válida.'));
         }
 
         // Valida a duração informada do ciclo utilizando a função auxiliar de inteiros positivos.
@@ -215,8 +160,7 @@ function criarAuthValidator({ dateUtils }) {
         // Valida se a fase lútea informada respeita o limite biológico calculado.
         if (duracaoLuteaInformada !== null) {
             const ciclo = duracaoCicloInformada || 28;
-            const menstruacao =
-                duracaoMenstruacaoInformada || 5;
+            const menstruacao = duracaoMenstruacaoInformada || 5;
 
             if (duracaoLuteaInformada > ciclo - menstruacao - 2) {
                 erros.push(
@@ -229,9 +173,7 @@ function criarAuthValidator({ dateUtils }) {
         }
 
         // Determina se o usuário é menor de 16 anos
-        const menorDe16 =
-            idade !== null &&
-            idade < 16;
+        const menorDe16 = idade !== null && idade < 16;
 
         // Normaliza o e-mail do responsável legal informado.
         const emailResponsavelLegal =
@@ -242,24 +184,13 @@ function criarAuthValidator({ dateUtils }) {
         // O e-mail do responsável legal é opcional.
         if (
             emailResponsavelLegal &&
-            (
-                !regexEmail.test(emailResponsavelLegal) ||
-                emailResponsavelLegal.length > 254
-            )
+            (!regexEmail.test(emailResponsavelLegal) || emailResponsavelLegal.length > 254)
         ) {
-            erros.push(
-                erro(
-                    'emailResponsavelLegal',
-                    'Informe um e-mail válido.'
-                )
-            );
+            erros.push(erro('emailResponsavelLegal', 'Informe um e-mail válido.'));
         }
 
         // Impede que a titular informe o próprio e-mail como e-mail de responsável legal.
-        if (
-            emailResponsavelLegal &&
-            emailResponsavelLegal === email
-        ) {
+        if (emailResponsavelLegal && emailResponsavelLegal === email) {
             erros.push(
                 erro(
                     'emailResponsavelLegal',
@@ -278,6 +209,8 @@ function criarAuthValidator({ dateUtils }) {
                 email,
                 senha: body.senha,
 
+                tipoUsuario,
+
                 dataInicioUltimaMenstruacao,
                 dataFimUltimaMenstruacao,
 
@@ -287,8 +220,7 @@ function criarAuthValidator({ dateUtils }) {
 
                 menorDe16,
 
-                emailResponsavelLegal:
-                    emailResponsavelLegal || null
+                emailResponsavelLegal: emailResponsavelLegal || null
             }
         };
     }
@@ -298,39 +230,22 @@ function criarAuthValidator({ dateUtils }) {
         body = body && typeof body === 'object' ? body : {};
         const erros = [];
 
-        const email = typeof body.email === 'string'
-            ? body.email.trim().toLowerCase()
-            : '';
+        const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
 
         if (!email) {
-            erros.push(
-                erro('email', 'Informe seu e-mail.')
-            );
-        } else if (
-            !regexEmail.test(email) ||
-            email.length > 254
-        ) {
-            erros.push(
-                erro('email', 'Informe um e-mail válido.')
-            );
+            erros.push(erro('email', 'Informe seu e-mail.'));
+        } else if (!regexEmail.test(email) || email.length > 254) {
+            erros.push(erro('email', 'Informe um e-mail válido.'));
         }
 
-        const senha = typeof body.senha === 'string'
-            ? body.senha
-            : '';
+        const senha = typeof body.senha === 'string' ? body.senha : '';
 
         if (!senha) {
-            erros.push(
-                erro('senha', 'Informe sua senha.')
-            );
+            erros.push(erro('senha', 'Informe sua senha.'));
         } else if (senha.length < 8) {
-            erros.push(
-                erro('senha', 'A senha deve possuir pelo menos 8 caracteres.')
-            );
+            erros.push(erro('senha', 'A senha deve possuir pelo menos 8 caracteres.'));
         } else if (Buffer.byteLength(senha, 'utf8') > 72) {
-            erros.push(
-                erro('senha', 'A senha ultrapassa o tamanho máximo permitido.')
-            );
+            erros.push(erro('senha', 'A senha ultrapassa o tamanho máximo permitido.'));
         }
 
         return {
@@ -345,16 +260,12 @@ function criarAuthValidator({ dateUtils }) {
     }
 
     function validarEmail(body) {
-        const email = typeof body.email === 'string'
-            ? body.email.trim().toLowerCase()
-            : '';
+        const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
 
         const erros = [];
 
         if (!regexEmail.test(email) || email.length > 254) {
-            erros.push(
-                erro('email', 'Informe um e-mail válido.')
-            );
+            erros.push(erro('email', 'Informe um e-mail válido.'));
         }
 
         return {
@@ -371,6 +282,4 @@ function criarAuthValidator({ dateUtils }) {
     };
 }
 
-export {
-    criarAuthValidator
-};
+export { criarAuthValidator };

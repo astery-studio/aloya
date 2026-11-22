@@ -138,6 +138,15 @@ describe('AppModal', () => {
         });
     });
 
+    test('permite desativar somente a rolagem externa', async () => {
+        await renderizarModal({
+            rolagemExternaHabilitada: false,
+            children: <Text>Conteúdo com rolagem própria</Text>
+        });
+
+        expect(screen.getByTestId('app-modal-scroll')).toHaveProp('scrollEnabled', false);
+    });
+
     test('expõe o término do fechamento nativo para transições entre modais', async () => {
         const aoOcultar = jest.fn();
         const resultado = await renderizarModal({ aoOcultar });

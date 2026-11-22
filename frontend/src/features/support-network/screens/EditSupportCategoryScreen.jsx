@@ -7,11 +7,11 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { BellIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
-import { CategoryImpactConfirmationModal } from '../components/CategoryImpactConfirmationModal';
+import { CategoryImpactConfirmationModal } from '../components/CategoryImpactConfirmationModal/CategoryImpactConfirmationModal';
 import {
     prepararCategoriaParaSalvar,
     SupportCategoryForm
-} from '../components/SupportCategoryForm';
+} from '../components/SupportCategoryForm/SupportCategoryForm';
 import { estilos } from './EditSupportCategoryScreen.styles';
 
 const ALERTA_NOME = Object.freeze({

@@ -10,17 +10,26 @@ function criarPermissionCategoryRoutes({
     permissionCategoryDeletionController
 }) {
     const router = Router();
+    const autenticar = authMiddleware.autenticar;
+    const exigirAcesso = parentalConsentMiddleware.exigirAcessoRedeApoio;
 
-    router.use(authMiddleware.autenticar);
-    router.use(parentalConsentMiddleware.exigirAcessoRedeApoio);
-    router.get('/permission-categories', permissionCategoryController.listarCategorias);
+    router.get(
+        '/permission-categories',
+        autenticar,
+        exigirAcesso,
+        permissionCategoryController.listarCategorias
+    );
     router.post(
         '/permission-categories',
+        autenticar,
+        exigirAcesso,
         permissionCategoryRateLimit,
         permissionCategoryController.criarCategoria
     );
     router.put(
         '/permission-categories/:id',
+        autenticar,
+        exigirAcesso,
         permissionCategoryUpdateRateLimit,
         permissionCategoryController.editarCategoria
     );
@@ -28,10 +37,14 @@ function criarPermissionCategoryRoutes({
     if (permissionCategoryDeletionController) {
         router.get(
             '/permission-categories/:id/deletion-impact',
+            autenticar,
+            exigirAcesso,
             permissionCategoryDeletionController.consultarImpacto
         );
         router.delete(
             '/permission-categories/:id',
+            autenticar,
+            exigirAcesso,
             permissionCategoryDeletionRateLimit,
             permissionCategoryDeletionController.excluirCategoria
         );

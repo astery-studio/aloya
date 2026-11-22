@@ -85,6 +85,17 @@ describe('ProfileField', () => {
         expect(obterValorVisivel(0)).toBe('0');
     });
 
+    test('aceita placeholder mantendo a cor de valor ausente', async () => {
+        await renderizarCampo({
+            valor: '',
+            placeholder: 'Digite aqui o e-mail'
+        });
+
+        expect(screen.getByText('Digite aqui o e-mail')).toHaveStyle({
+            color: '#5C5C59'
+        });
+    });
+
     test('desabilita sem ação', async () => {
         await renderizarCampo({
             onPress: undefined
