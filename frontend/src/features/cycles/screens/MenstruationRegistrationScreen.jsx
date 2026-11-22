@@ -36,19 +36,29 @@ function MenstruationRegistrationScreen({
     onSalvar,
     onVoltar,
     onTentarNovamente,
+    onSincronizarPendentes,
     onFecharFeedback,
     onCarregarAnteriores,
     hoje = obterHojeLocal()
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const [conflitoLocal, setConflitoLocal] = useState(false);
+    const [conflitoLocal, setConflitoLocal] = useState(null);
     const conflito =
-        conflitoLocal ||
+        conflitoLocal === 'conflito' ||
         ['CONFLITO_REGISTRO_MENSTRUAL', 'SOBREPOSICAO_CICLO'].includes(erro?.codigo);
-    const feedback = conflito ? 'conflito' : erro ? 'erro' : sucesso ? 'sucesso' : null;
+    const pendente = conflitoLocal === 'pendente' || erro?.codigo === 'REGISTRO_MENSTRUAL_PENDENTE';
+    const feedback = pendente
+        ? 'pendente'
+        : conflito
+          ? 'conflito'
+          : erro
+            ? 'erro'
+            : sucesso
+              ? 'sucesso'
+              : null;
     const fecharFeedback = () => {
-        setConflitoLocal(false);
+        setConflitoLocal(null);
         onFecharFeedback?.();
     };
     const selecionadas = Array.isArray(datasSelecionadas) ? datasSelecionadas : [];
@@ -100,7 +110,7 @@ function MenstruationRegistrationScreen({
                 bloqueado={salvando}
                 onAlternarData={onAlternarData}
                 onIniciarFaixa={onIniciarFaixa}
-                onConflito={() => setConflitoLocal(true)}
+                onConflito={(dia) => setConflitoLocal(dia.local ? 'pendente' : 'conflito')}
                 onCarregarAnteriores={onCarregarAnteriores}
             />
             {mesesValidos.length === 0 && <Text style={estilos.vazio}>Nenhum mês disponível.</Text>}
@@ -147,26 +157,43 @@ function MenstruationRegistrationScreen({
                 }
                 corIcone={feedback === 'erro' ? estilos.corIconeErro : estilos.corIconeFeedback}
                 titulo={
-                    feedback === 'conflito'
-                        ? 'Ciclo existente'
-                        : feedback === 'erro'
-                          ? 'Algo deu errado'
-                          : 'Menstruação cadastrada'
+                    feedback === 'pendente'
+                        ? 'Registro aguardando sincronização'
+                        : feedback === 'conflito'
+                          ? 'Ciclo existente'
+                          : feedback === 'erro'
+                            ? 'Algo deu errado'
+                            : 'Menstruação cadastrada'
                 }
                 mensagem={
-                    feedback === 'conflito'
-                        ? 'Este dia já pertence a outro ciclo registrado. Para corrigi-lo, edite o ciclo existente em vez de criar um novo registro.'
-                        : feedback === 'erro'
-                          ? 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
-                          : undefined
+                    feedback === 'pendente'
+                        ? 'Este registro foi salvo neste aparelho. Ele aparecerá no Histórico de Ciclos após a sincronização.'
+                        : feedback === 'conflito'
+                          ? 'Este dia já pertence a outro ciclo registrado. Para corrigi-lo, edite o ciclo existente em vez de criar um novo registro.'
+                          : feedback === 'erro'
+                            ? 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
+                            : undefined
                 }
                 acaoPrincipal={{
-                    texto: feedback === 'erro' ? 'Tentar novamente' : 'OK',
+                    texto:
+                        feedback === 'pendente'
+                            ? 'Sincronizar'
+                            : feedback === 'erro'
+                              ? 'Tentar novamente'
+                              : 'OK',
                     variante: feedback === 'erro' ? 'preto' : 'verde',
-                    aoPressionar: feedback === 'erro' ? onTentarNovamente : fecharFeedback
+                    aoPressionar:
+                        feedback === 'pendente'
+                            ? () => {
+                                  fecharFeedback();
+                                  onSincronizarPendentes?.();
+                              }
+                            : feedback === 'erro'
+                              ? onTentarNovamente
+                              : fecharFeedback
                 }}
                 acaoSecundaria={
-                    feedback === 'erro'
+                    ['erro', 'pendente'].includes(feedback)
                         ? { texto: 'Voltar', variante: 'branco', aoPressionar: fecharFeedback }
                         : undefined
                 }

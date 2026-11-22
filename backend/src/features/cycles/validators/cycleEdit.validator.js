@@ -1,7 +1,7 @@
 import { AppError } from '../../../shared/errors/AppError.js';
 import { formatarData, paraDataCalendario } from '../utils/calendar.js';
 
-const CAMPOS_PERMITIDOS = Object.freeze(['dataInicio', 'dataFim']);
+const CAMPOS_PERMITIDOS = Object.freeze(['dataInicio', 'dataFim', 'dias', 'confirmarOutrosCiclos']);
 
 function erro(mensagem, codigo, status = 422) {
     return new AppError(mensagem, status, codigo);
@@ -65,6 +65,32 @@ function criarCycleEditValidator({ agora = () => new Date() } = {}) {
         }
 
         const hoje = paraDataCalendario(formatarData(agora()));
+        if (Object.hasOwn(body, 'dias')) {
+            if (
+                campos.some((campo) => !['dias', 'confirmarOutrosCiclos'].includes(campo)) ||
+                (Object.hasOwn(body, 'confirmarOutrosCiclos') &&
+                    typeof body.confirmarOutrosCiclos !== 'boolean') ||
+                !Array.isArray(body.dias) ||
+                body.dias.length > 366
+            ) {
+                throw erro(
+                    'Informe somente a lista de dias da menstruação.',
+                    'DIAS_CICLO_INVALIDOS'
+                );
+            }
+            const dias = body.dias.map((data) => validarData(data, 'dias', hoje));
+            if (new Set(dias.map((data) => data.getTime())).size !== dias.length)
+                throw erro('Informe dias sem repetição.', 'DIAS_CICLO_INVALIDOS');
+            dias.sort((a, b) => a - b);
+            return {
+                dias,
+                ...(Object.hasOwn(body, 'confirmarOutrosCiclos')
+                    ? { confirmarOutrosCiclos: body.confirmarOutrosCiclos }
+                    : {})
+            };
+        }
+        if (Object.hasOwn(body, 'confirmarOutrosCiclos'))
+            throw erro('A confirmação deve acompanhar a lista de dias.', 'DIAS_CICLO_INVALIDOS');
         const dados = {};
 
         for (const campo of campos) {

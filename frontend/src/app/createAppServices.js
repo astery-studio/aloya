@@ -5,7 +5,7 @@ import { criarContraceptiveService } from '../features/contraceptives/services/c
 import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService';
 import { obterIdentidadeMenstrual } from '../features/cycles/services/menstruationIdentity';
 import { criarMenstruationSyncQueue } from '../features/cycles/services/menstruationSyncQueue';
-import { comRegistrosPendentes } from '../features/cycles/services/pendingCalendarService';
+import { comRegistrosPendentes, registroJaConfirmado } from '../features/cycles/services/pendingCalendarService';
 import { criarCycleParametersService } from '../features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService';
 import { criarCycleRegistrationService } from '../features/cycles/services/cycleRegistrationService';
@@ -90,6 +90,13 @@ function criarServicosApp({
         ler: lerSeguro,
         salvar: salvarSeguro,
         registrar: cycleRegistrationService.registrar,
+        jaConfirmado: ({ inicio, fim, identidade }) =>
+            registroJaConfirmado({
+                service: calendarServiceBase,
+                inicio,
+                fim,
+                validarCredencial: (sessao) => obterIdentidadeMenstrual(sessao) === identidade
+            }),
         identificar: async () => obterIdentidadeMenstrual(await obterToken()),
         criarChave: () => `menstrual-${Date.now()}-${Math.random().toString(36).slice(2, 14)}`
     });

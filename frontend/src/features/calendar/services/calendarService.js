@@ -52,12 +52,13 @@ function criarCalendarService({requisicaoAutenticada} = {}) {
         throw new Error('Não foi possível configurar o serviço do calendário.')
     }
 
-    async function buscarMes({mes, signal} = {}) {
+    async function buscarMes({mes, signal, validarCredencial} = {}) {
         validarMes(mes)
 
         const resposta = await requisicaoAutenticada({
             caminho: `${endpoints.calendario}?mes=${encodeURIComponent(mes)}`,
-            signal
+            signal,
+            ...(validarCredencial ? {validarCredencial} : {})
         })
 
         if (!respostaMensalEhValida(resposta?.calendario, mes)) {

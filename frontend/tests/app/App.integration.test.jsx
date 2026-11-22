@@ -471,7 +471,6 @@ describe('App integrado', () => {
         expect(CycleHistoryFlow).toHaveBeenCalledWith(
             expect.objectContaining({
                 service: servicos.cycleHistoryService,
-                calendarService: servicos.calendarService,
                 aoAbrirCalendario: expect.any(Function),
                 onSelecionarAba: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
