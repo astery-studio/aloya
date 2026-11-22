@@ -1,0 +1,8 @@
+updates=$(cat)
+
+if [ -z "$updates" ]; then
+    echo "Nenhuma atualização para enviar; testes ignorados."
+    exit 0
+fi
+
+printf '%s\n' "$updates" | npm run prepush
