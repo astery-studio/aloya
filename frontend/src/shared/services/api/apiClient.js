@@ -9,6 +9,7 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
         corpo,
         token,
         chaveIdempotencia,
+        ifMatch,
         signal: sinalExterno
     }) {
         const controle = new AbortController();
@@ -47,6 +48,7 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                         ...(chaveIdempotencia ? { 'Idempotency-Key': chaveIdempotencia } : {}),
+                        ...(ifMatch ? { 'If-Match': ifMatch } : {}),
                         ...(token ? { Authorization: `Bearer ${token}` } : {})
                     },
                     signal: controle.signal,

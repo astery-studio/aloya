@@ -13,6 +13,14 @@ function criarEstilos(tema) {
             borderRadius: tema.radius.buttonAndInput
         },
 
+        containerCompacto: {
+            width: 32,
+            minWidth: 32,
+            height: 32,
+            minHeight: 32,
+            borderRadius: 8
+        },
+
         pressionado: {
             opacity: 0.65,
             transform: [
@@ -46,7 +54,8 @@ function criarEstilos(tema) {
                 borderWidth: 1,
                 borderColor: tema.cores.interface.borda
             }),
-            icone: tema.cores.interface.textoSecundario
+            icone: tema.cores.interface.textoSecundario,
+            tamanhoIcone: 28
         }),
 
         calendario: Object.freeze({

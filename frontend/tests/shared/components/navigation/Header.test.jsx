@@ -111,6 +111,23 @@ describe('Header', () => {
         });
     });
 
+    test('usa a composição específica do cabeçalho do Diário', async () => {
+        await renderizarHeader({ variante: 'diario', acoesDireita: <></> });
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({
+            width: 390,
+            maxWidth: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: 56,
+            paddingHorizontal: 16,
+            paddingBottom: 12,
+            flexShrink: 0
+        });
+        expect(screen.getByRole('header')).toHaveStyle({ fontSize: 28, lineHeight: 34 });
+    });
+
     test('renderiza o ícone de voltar no tema claro', async () => {
         await renderizarHeader({
             titulo: 'Perfil',
@@ -156,6 +173,11 @@ describe('Header', () => {
         expect(screen.getByRole('header')).toHaveStyle({
             color: '#222222'
         });
+    });
+
+    test('aceita fundo específico da screen', async () => {
+        await renderizarHeader({ corFundo: '#ABCDEF' });
+        expect(screen.getByTestId('header-container')).toHaveStyle({ backgroundColor: '#ABCDEF' });
     });
 
     test('usa fundo e texto do tema escuro', async () => {

@@ -40,7 +40,7 @@ function CycleTodayScreen({
     aoTentarNovamente,
     aoVoltar,
     aoCadastrarMenstruacao,
-    aoAbrirDiario,
+    aoCadastrarDiario,
     aoAbrirAnticoncepcional,
     aoAbrirCalendario,
     aoSelecionarAba
@@ -132,7 +132,7 @@ function CycleTodayScreen({
                         previsao={semDados ? null : previsao}
                         conteudoDaFase={conteudoDaFase ?? conteudoPorFase[fase]}
                         aoCadastrarMenstruacao={aoCadastrarMenstruacao}
-                        aoAbrirDiario={aoAbrirDiario}
+                        aoCadastrarDiario={aoCadastrarDiario}
                         aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
                     />
                 </ScrollView>

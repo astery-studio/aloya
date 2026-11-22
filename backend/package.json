@@ -17,6 +17,7 @@
     "test": "node --test",
     "test:watch": "node --test --watch",
     "test:coverage": "node --test --experimental-test-coverage",
+    "test:coverage:diary": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 --test-coverage-include=src/features/diary/**/*.js tests/features/diary/unit/*.test.js",
     "postinstall": "prisma generate"
   },
   "keywords": [],

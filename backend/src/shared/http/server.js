@@ -28,6 +28,7 @@ import { criarSupportContactRemovalRoutes } from '../../features/support-network
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
+import { criarDiaryRoutes } from '../../features/diary/routes/diary.routes.js';
 
 import { criarLogoutRoutes } from '../../features/auth/routes/logout.routes.js';
 
@@ -218,6 +219,22 @@ app.use(
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         controller: container.cycleRegistrationController
+    })
+);
+
+app.use(
+    '/api/diario',
+    criarDiaryRoutes({
+        Router: express.Router,
+        autenticar: container.authMiddleware.autenticar,
+        catalogController: container.diaryCatalogController,
+        entryController: container.diaryEntryController,
+        historyController: container.diaryHistoryController,
+        overviewController: container.diaryOverviewController,
+        mutationController: container.diaryMutationController,
+        validarPreferencia: container.validarAtualizacaoPreferencia,
+        rateLimit: container.configuracoesContaRateLimit,
+        preferencesRateLimit: container.diaryPreferencesRateLimit
     })
 );
 
