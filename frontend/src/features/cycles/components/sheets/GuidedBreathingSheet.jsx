@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
-import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { estilos } from './GuidedBreathingSheet.styles';
 
 function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido = false }) {
     const escala = useRef(new Animated.Value(1)).current;
@@ -32,23 +32,32 @@ function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido = false }) 
 
     const texto = movimentoReduzido ? 'Inspire e expire devagar, no seu ritmo.' : instrucao;
     return (
-        <BottomSheet visivel={visivel} onFechar={aoFechar}>
-            <BottomSheetLayout titulo="Um respiro para você" onFechar={aoFechar}>
-                <View style={{ alignItems: 'center', gap: 24 }}>
-                    <Text accessibilityLiveRegion="polite">{texto}</Text>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={aoFechar}
+            permitirDeslizarParaFechar
+            estiloPainel={estilos.painel}
+            corPainel="#FFFFFF"
+        >
+            <View style={estilos.conteudo}>
+                <Text style={estilos.rotulo}>Pausa guiada</Text>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Acompanhe o movimento
+                </Text>
+                <Text style={estilos.descricao}>
+                    Inspire quando o círculo crescer e expire quando ele se recolher. Faça no seu
+                    ritmo, sem obrigação.
+                </Text>
+                <View style={estilos.areaRespiracao}>
                     <Animated.View
-                        accessibilityElementsHidden
-                        style={{
-                            width: 128,
-                            height: 128,
-                            borderRadius: 64,
-                            backgroundColor: '#EAC3B1',
-                            transform: [{ scale: escala }]
-                        }}
-                    />
-                    <Text>Respire confortavelmente. Você pode fechar quando quiser.</Text>
+                        accessibilityLiveRegion="polite"
+                        accessibilityLabel={texto}
+                        style={[estilos.circulo, { transform: [{ scale: escala }] }]}
+                    >
+                        <Text style={estilos.instrucao}>{movimentoReduzido ? texto : 'Respire'}</Text>
+                    </Animated.View>
                 </View>
-            </BottomSheetLayout>
+            </View>
         </BottomSheet>
     );
 }
