@@ -70,7 +70,7 @@ function criarEstilos(tema) {
             width: '100%',
             maxWidth: 342,
             alignSelf: 'center',
-            marginTop: 20,
+            marginTop: 0,
             marginBottom: 24,
             padding: 16,
             borderWidth: 1.41,

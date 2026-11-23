@@ -90,6 +90,7 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
         'on-drag'
     );
     expect(screen.getByText('Registro no Diário')).toBeOnTheScreen();
+    expect(screen.getByTestId('cartao-registro-diario')).toHaveStyle({ marginTop: 0 });
     expect(screen.getByText('0 / 1 marcados')).toBeOnTheScreen();
     expect(
         screen.getByText('Selecione pelo menos uma opção para salvar no diário.')

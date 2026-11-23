@@ -153,7 +153,7 @@ function DiaryEntryFormContent({
                 onTouchCancel={cancelarToque}
                 scrollEventThrottle={16}
             >
-                <View style={estilos.cartaoRegistro}>
+                <View testID="cartao-registro-diario" style={estilos.cartaoRegistro}>
                     <Text ref={tituloRef} accessibilityRole="header" style={estilos.tituloCartao}>
                         Registro no Diário
                     </Text>
