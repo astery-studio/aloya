@@ -9,5 +9,5 @@ test('alterna o conteúdo educativo das quatro fases', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Ovulatória' }));
 
     expect(screen.getByText(/fertilidade estimada/)).toBeOnTheScreen();
-    expect(screen.getByText(/não substituem orientação médica/)).toBeOnTheScreen();
+    expect(screen.getByText(/não possuem duração fixa/)).toBeOnTheScreen();
 });

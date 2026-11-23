@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { CONTEUDOS_EDUCATIVOS } from '../constants/cycleEducationContent';
+import { CycleEducationalDisclaimer } from './home/CycleEducationalDisclaimer';
+import { estilos } from './CycleEducationSection.styles';
+import { textos } from './CycleEducationSection.textStyles';
 
 const PHASES = Object.freeze(
     Object.entries(CONTEUDOS_EDUCATIVOS).map(([id, conteudo]) => ({
@@ -24,13 +27,20 @@ function CycleEducationSection({
         aoSelecionarFase?.(id);
     };
     return (
-        <View style={{ paddingHorizontal: 16, paddingVertical: 24, gap: 14 }}>
-            <Text accessibilityRole="header" style={{ fontFamily: 'DMSans_700Bold', fontSize: 20 }}>
+        <View style={estilos.secao}>
+            <Text style={textos.etiqueta}>Conteúdo educativo</Text>
+            <Text accessibilityRole="header" style={textos.titulo}>
                 Conheça as fases do ciclo
             </Text>
-            <View
+            <Text style={textos.introducao}>
+                Uma apresentação geral — nenhuma fase está sendo atribuída a você.
+            </Text>
+            <ScrollView
+                horizontal
                 accessibilityRole="list"
-                style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
+                style={estilos.rolagem}
+                contentContainerStyle={estilos.seletor}
+                showsHorizontalScrollIndicator={false}
             >
                 {fases.map((phase) => (
                     <Pressable
@@ -38,17 +48,27 @@ function CycleEducationSection({
                         accessibilityRole="button"
                         accessibilityState={{ selected: phase.id === idSelecionado }}
                         onPress={() => selecionar(phase.id)}
-                        style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 }}
+                        style={[
+                            estilos.fase,
+                            phase.id === idSelecionado && { borderColor: phase.cor }
+                        ]}
                     >
-                        <Text>{phase.label}</Text>
+                        <View style={[estilos.icone, { backgroundColor: phase.fundo }]}>
+                            <phase.Icone size={24} color={phase.cor} weight="fill" />
+                        </View>
+                        <Text style={[textos.nomeFase, { color: phase.cor }]}>{phase.label}</Text>
                     </Pressable>
                 ))}
+            </ScrollView>
+            <View style={estilos.artigo}>
+                <Text style={[textos.visao, { color: selected.cor }]}>Visão educativa</Text>
+                <Text style={textos.tituloArtigo}>{selected.titulo}</Text>
+                <Text style={textos.descricao}>{selected.texto}</Text>
             </View>
-            <Text>{selected.texto}</Text>
-            <Text>
-                Cada corpo é único. Estas informações são educativas e não substituem orientação
-                médica.
-            </Text>
+            <CycleEducationalDisclaimer
+                texto="As fases podem se sobrepor biologicamente e não possuem duração fixa para todas as pessoas."
+                style={estilos.aviso}
+            />
         </View>
     );
 }
