@@ -57,7 +57,7 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
     expect(screen.getByText('quinta-feira, 8 de outubro')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'qui, dia 8' })).toBeOnTheScreen();
     expect(screen.getByText('Conteúdo recebido pela tela.')).toBeOnTheScreen();
-    expect(screen.getByText('8 de outubro até 12 de outubro')).toBeOnTheScreen();
+    expect(screen.getByText('8–12 de outubro')).toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'Início' }).props.accessibilityState.selected).toBe(
         true
     );
@@ -158,7 +158,7 @@ test.each([
     expect(
         screen.getByRole('button', { name: 'qui, dia 8' }).props.accessibilityState.selected
     ).toBe(true);
-    expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+    expect(screen.getByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
 });
 
 test('apresenta a faixa horizontal com hoje selecionado quando ciclo e previsão não existem', async () => {
@@ -171,7 +171,7 @@ test('apresenta a faixa horizontal com hoje selecionado quando ciclo e previsão
         expect(faixa.props.data).toHaveLength(16);
         expect(faixa.props.data.every((dia) => dia.fase === 'desconhecida')).toBe(true);
         expect(screen.getByRole('button', { name: 'sex, dia 30' })).toBeSelected();
-        expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+        expect(screen.getByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
     } finally {
         jest.useRealTimers();
     }
@@ -194,7 +194,7 @@ test('encaminha todas as interações da tela carregada', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
     await fireEvent.press(screen.getByRole('tab', { name: 'Ciclos' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Diário' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
 
     expect(acoes.aoAbrirCalendario).toHaveBeenCalledTimes(1);
