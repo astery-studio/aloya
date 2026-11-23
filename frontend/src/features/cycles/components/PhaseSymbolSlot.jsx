@@ -10,7 +10,7 @@ function PhaseSymbolSlot({ children, compact = false, style }) {
             style={[
                 {
                     width: compact ? 128 : 260,
-                    height: compact ? 144 : 304,
+                    height: compact ? 144 : 284,
                     alignSelf: 'center'
                 },
                 style

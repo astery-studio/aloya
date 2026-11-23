@@ -7,7 +7,7 @@ test('reserva o espaço sem expor símbolo ou fallback', async () => {
 
     expect(screen.getByTestId('phase-symbol-slot', { includeHiddenElements: true })).toHaveStyle({
         width: 260,
-        height: 304,
+        height: 284,
         alignSelf: 'center'
     });
     expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
