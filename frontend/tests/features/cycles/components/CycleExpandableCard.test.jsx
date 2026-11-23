@@ -17,3 +17,16 @@ test('expande e recolhe o conteúdo de forma independente', async () => {
     expect(screen.getByText('Conteúdo educativo')).toBeOnTheScreen();
     expect(trigger.props.accessibilityState.expanded).toBe(true);
 });
+
+test('respeita estado controlado e delega a alternância', async () => {
+    const aoAlternar = jest.fn();
+    await render(
+        <CycleExpandableCard titulo="Ritmo do ciclo" expandido={false} aoAlternar={aoAlternar}>
+            <Text>Conteúdo controlado</Text>
+        </CycleExpandableCard>
+    );
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Ritmo do ciclo' }));
+    expect(aoAlternar).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Conteúdo controlado')).not.toBeOnTheScreen();
+});
