@@ -9,11 +9,20 @@ function criarEstilos(tema) {
     const diario = obterCoresDiario(tema);
     const cores = diario.interface;
     return StyleSheet.create({
-        rolagem: { width: '100%', flexShrink: 1 },
-        container: {
+        detalhes: { width: '100%', flexShrink: 1 },
+        cabecalhoFixo: {
             width: '100%',
             alignItems: 'center',
-            padding: 24,
+            paddingTop: 24,
+            paddingHorizontal: 24,
+            gap: 12
+        },
+        rolagem: { width: '100%', flexShrink: 1 },
+        conteudoRolavel: {
+            width: '100%',
+            alignItems: 'center',
+            paddingTop: 12,
+            paddingHorizontal: 24,
             gap: 12
         },
         titulo: {
@@ -134,7 +143,14 @@ function criarEstilos(tema) {
             paddingVertical: 0
         },
         textoFaseRegistro: { fontSize: 13, lineHeight: 20 },
-        areaBotaoOk: { width: '100%' },
+        areaBotaoOk: {
+            width: '100%',
+            flexShrink: 0,
+            paddingTop: 12,
+            paddingHorizontal: 24,
+            paddingBottom: 24,
+            backgroundColor: cores.superficie
+        },
         botaoOk: {
             width: '100%',
             height: 52,

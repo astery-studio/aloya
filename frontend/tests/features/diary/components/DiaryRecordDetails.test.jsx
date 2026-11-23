@@ -7,7 +7,6 @@ import {
     formatarDuracao,
     normalizarDetalhe,
     obterCoresCategoria,
-    precisaAtivarRolagem,
     valorEscalado
 } from '../../../../src/features/diary/components/DiaryRecordDetails/DiaryRecordDetails';
 import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
@@ -42,13 +41,6 @@ const registro = {
 };
 
 describe('DiaryRecordDetails', () => {
-    test('habilita rolagem somente quando o conteúdo ultrapassa a área visível', () => {
-        expect(precisaAtivarRolagem(400, 500)).toBe(false);
-        expect(precisaAtivarRolagem(501, 500)).toBe(false);
-        expect(precisaAtivarRolagem(503, 500)).toBe(true);
-        expect(precisaAtivarRolagem(600, 0)).toBe(false);
-    });
-
     test('apresenta detalhe autorizado e ações contextualizadas', async () => {
         const aoEditar = jest.fn();
         const aoExcluir = jest.fn();
@@ -62,17 +54,10 @@ describe('DiaryRecordDetails', () => {
             />
         );
 
-        const detalhes = screen.getByTestId('diary-record-details');
-        expect(detalhes).toHaveProp('scrollEnabled', false);
-        await fireEvent(detalhes, 'layout', { nativeEvent: { layout: { height: 500 } } });
-        await fireEvent(screen.getByTestId('diary-details-end'), 'layout', {
-            nativeEvent: { layout: { y: 430, height: 52 } }
-        });
-        expect(screen.getByTestId('diary-record-details')).toHaveProp('scrollEnabled', false);
-        await fireEvent(screen.getByTestId('diary-details-end'), 'layout', {
-            nativeEvent: { layout: { y: 451, height: 52 } }
-        });
-        expect(screen.getByTestId('diary-record-details')).toHaveProp('scrollEnabled', true);
+        expect(screen.getByTestId('diary-details-header')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-details-footer')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-details-scroll')).toHaveProp('scrollEnabled', true);
+        expect(screen.getByTestId('diary-details-scroll')).toHaveProp('nestedScrollEnabled', true);
 
         expect(screen.getByText('Espinhas')).toBeOnTheScreen();
         expect(screen.getByText('8 horas e 20 minutos')).toBeOnTheScreen();
