@@ -16,9 +16,10 @@ function criarEstilos(tema) {
         containerFase: {
             width: 294,
             maxWidth: '100%',
-            height: 43.993,
+            height: 63.993,
             alignSelf: 'center',
             paddingTop: 8,
+            paddingBottom: 20,
             flexDirection: 'column',
             alignItems: 'center'
         },

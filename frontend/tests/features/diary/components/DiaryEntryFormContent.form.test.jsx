@@ -140,8 +140,9 @@ test('habilita o salvamento e atualiza o contador quando há conteúdo válido',
     expect(screen.getByTestId('container-fase-formulario')).toHaveStyle({
         width: 294,
         maxWidth: '100%',
-        height: 43.993,
+        height: 63.993,
         paddingTop: 8,
+        paddingBottom: 20,
         alignItems: 'center'
     });
     expect(screen.getByLabelText('Fase Menstrual')).toHaveStyle({
