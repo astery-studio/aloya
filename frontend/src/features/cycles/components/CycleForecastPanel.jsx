@@ -425,6 +425,7 @@ function CycleForecastPanel({
                     <DiaryCheckIn
                         date={dataSelecionada}
                         service={diaryService}
+                        onOpenDiary={aoCadastrarDiario}
                         onSessionExpired={onSessaoExpirada}
                     />
                 ) : null}

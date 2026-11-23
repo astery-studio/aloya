@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { DiaryMacrocategoryList } from '../../diary/components/DiaryMacrocategoryList/DiaryMacrocategoryList';
@@ -6,7 +7,8 @@ import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { obterHojeDiario } from '../../diary/utils/diaryDate';
 import { listarMacrocategoriasAtivas, prepararFormularioDiario } from '../../diary/utils/diaryForm';
 
-function CycleDiaryCheckIn({ date, service, onSessionExpired }) {
+function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
+    const [saved, setSaved] = useState(false);
     const catalog = useDiaryCatalog({
         ativo: Boolean(service),
         service,
@@ -17,8 +19,10 @@ function CycleDiaryCheckIn({ date, service, onSessionExpired }) {
         catalogo: catalog.catalogo,
         service,
         dataInicial: date,
+        onCriado: () => setSaved(true),
         onSessaoExpirada: onSessionExpired
     });
+    useEffect(() => setSaved(false), [date]);
     if (!service) return null;
     const valid = catalog.catalogo
         ? prepararFormularioDiario({
@@ -41,7 +45,13 @@ function CycleDiaryCheckIn({ date, service, onSessionExpired }) {
                     <ButtonScreen texto="Tentar novamente" aoPressionar={catalog.recarregar} />
                 </>
             ) : null}
-            {catalog.catalogo ? (
+            {saved ? (
+                <>
+                    <Text>Check-in registrado no Diário.</Text>
+                    <ButtonScreen texto="Adicionar detalhes" aoPressionar={onOpenDiary} />
+                </>
+            ) : null}
+            {catalog.catalogo && !saved ? (
                 <>
                     <DiaryMacrocategoryList
                         macrocategorias={listarMacrocategoriasAtivas(catalog.catalogo)}
