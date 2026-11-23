@@ -9,8 +9,12 @@ function IconButton({
     aoPressionar,
     rotuloAcessibilidade,
     variante = 'neutro',
+    compacto = false,
+    tamanhoCompacto = 32,
+    tamanhoIconeCompacto = 16,
     desativado = false,
-    corIcone
+    corIcone,
+    estilo
 }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
@@ -41,14 +45,28 @@ function IconButton({
                 disabled: estaDesativado,
                 selected: variante === 'selecionado'
             }}
-            hitSlop={4}
+            hitSlop={compacto ? 6 : 4}
             style={({ pressed }) => [
                 estilos.container,
+                compacto && estilos.containerCompacto,
+                compacto && tamanhoCompacto !== 32
+                    ? {
+                          width: tamanhoCompacto,
+                          minWidth: tamanhoCompacto,
+                          height: tamanhoCompacto,
+                          minHeight: tamanhoCompacto
+                      }
+                    : null,
                 varianteVisual.container,
+                estilo,
                 pressed && !estaDesativado && estilos.pressionado
             ]}
         >
-            <Icone size={tamanhoIcone} color={corIcone ?? varianteVisual.icone} weight="regular" />
+            <Icone
+                size={compacto ? tamanhoIconeCompacto : tamanhoIcone}
+                color={corIcone ?? varianteVisual.icone}
+                weight="regular"
+            />
         </Pressable>
     );
 }

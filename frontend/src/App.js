@@ -32,6 +32,9 @@ import { NewSupportCategoryScreen } from './features/support-network/screens/New
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
+import { DiaryFlow } from './features/diary/DiaryFlow';
+import { DiaryCategoriesSheet } from './features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet';
+import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
@@ -56,6 +59,7 @@ const telasInternas = Object.freeze({
     cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
     responsavelLegal: 'responsavelLegal',
+    diario: 'diario',
     inicio: 'inicio'
 });
 
@@ -177,6 +181,10 @@ export default function App() {
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
 
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
+    const [dataInicialDiario, setDataInicialDiario] = useState(null);
+    const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
+    const [categoriasDiarioVisiveis, setCategoriasDiarioVisiveis] = useState(false);
+    const [revisaoCategoriasDiario, setRevisaoCategoriasDiario] = useState(0);
 
     const [rascunhoNovoContato, setRascunhoNovoContato] = useState(null);
 
@@ -407,6 +415,9 @@ export default function App() {
         setErroPerfil(false);
 
         setTelaInterna(telasInternas.configuracoes);
+        setCadastroDiarioVisivel(false);
+        setCategoriasDiarioVisiveis(false);
+        setDataInicialDiario(null);
 
         setEstadoSessao('autenticada');
 
@@ -435,6 +446,7 @@ export default function App() {
         setCarregandoPerfil(false);
 
         setTelaInterna(telasInternas.configuracoes);
+        setCategoriasDiarioVisiveis(false);
 
         setOrigemNovaCategoria(telasInternas.membros);
         setRascunhoNovoContato(null);
@@ -466,6 +478,12 @@ export default function App() {
 
         if (aba === 'ciclos') {
             setTelaInterna(telasInternas.ciclos);
+
+            return;
+        }
+
+        if (aba === 'diario') {
+            setTelaInterna(telasInternas.diario);
 
             return;
         }
@@ -616,20 +634,37 @@ export default function App() {
         }
     } else if (telaInterna === telasInternas.inicio) {
         conteudo = (
-            <CycleTodayContainer
-                key={sincronizacaoMenstrual.revisao}
-                aoCadastrarMenstruacao={(data) => {
-                    setDataInicialCadastro(data);
-                    setRetornoCadastro(telasInternas.inicio);
-                    setTelaInterna(telasInternas.cadastrarMenstruacao);
-                }}
-                service={configuracao.servicos.cyclePredictionService}
-                aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-                aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
-                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                aoSelecionarAba={selecionarAba}
-                onSessaoExpirada={finalizarSessao}
-            />
+            <>
+                <CycleTodayContainer
+                    key={sincronizacaoMenstrual.revisao}
+                    aoCadastrarMenstruacao={(data) => {
+                        setDataInicialCadastro(data);
+                        setRetornoCadastro(telasInternas.inicio);
+                        setTelaInterna(telasInternas.cadastrarMenstruacao);
+                    }}
+                    service={configuracao.servicos.cyclePredictionService}
+                    aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                    aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
+                    aoCadastrarDiario={(data) => {
+                        setDataInicialDiario(data);
+                        setCadastroDiarioVisivel(true);
+                    }}
+                    aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                    aoSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+                <NewDiaryEntrySheet
+                    visivel={cadastroDiarioVisivel}
+                    dataInicial={dataInicialDiario}
+                    service={configuracao.servicos.diaryService}
+                    calendarService={configuracao.servicos.calendarService}
+                    onFechar={() => {
+                        setCadastroDiarioVisivel(false);
+                        setDataInicialDiario(null);
+                    }}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            </>
         );
     } else if (telaInterna === telasInternas.cadastrarMenstruacao) {
         conteudo = (
@@ -647,6 +682,7 @@ export default function App() {
                 <CalendarScreenContainer
                     key={`${revisaoCalendario}-${sincronizacaoMenstrual.revisao}`}
                     statusSincronizacao={sincronizacaoMenstrual.status}
+                    erroSincronizacao={sincronizacaoMenstrual.erro}
                     aoTentarSincronizar={sincronizacaoMenstrual.sincronizar}
                     service={configuracao.servicos.calendarService}
                     onSessaoExpirada={finalizarSessao}
@@ -750,16 +786,27 @@ export default function App() {
                 onCriar={() => abrirNovaCategoria(telasInternas.categoriasPermissao)}
                 onEditar={(categoria) => Alert.alert('Editar categoria', categoria.nome)}
                 onExcluir={(categoria) => Alert.alert('Excluir categoria', categoria.nome)}
+                diaryService={configuracao.servicos.diaryService}
             />
         );
     } else if (telaInterna === telasInternas.ciclos) {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
-                calendarService={configuracao.servicos.calendarService}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.diario) {
+        conteudo = (
+            <DiaryFlow
+                key={`diario-${revisaoCategoriasDiario}`}
+                service={configuracao.servicos.diaryService}
+                calendarService={configuracao.servicos.calendarService}
+                onSelecionarAba={selecionarAba}
+                onSessaoExpirada={finalizarSessao}
+                aoGerenciarCategorias={() => setCategoriasDiarioVisiveis(true)}
             />
         );
     } else if (telaInterna === telasInternas.configuracoes) {
@@ -806,6 +853,7 @@ export default function App() {
                 onCategoriaCriada={selecionarCategoriaCriadaNoContato}
                 onConcluido={retornarDaNovaCategoria}
                 onSessaoExpirada={finalizarSessao}
+                diaryService={configuracao.servicos.diaryService}
             />
         );
     } else if (telaInterna === telasInternas.anticoncepcionais) {
@@ -845,5 +893,16 @@ export default function App() {
         );
     }
 
-    return renderizarComTema(conteudo);
+    return renderizarComTema(
+        <>
+            {conteudo}
+            <DiaryCategoriesSheet
+                visivel={categoriasDiarioVisiveis}
+                service={configuracao.servicos.diaryService}
+                onFechar={() => setCategoriasDiarioVisiveis(false)}
+                onAlterado={() => setRevisaoCategoriasDiario((revisao) => revisao + 1)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        </>
+    );
 }

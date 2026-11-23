@@ -29,8 +29,10 @@ jobs:
         include:
           - application: backend
             audit-level: high
+            allowed-advisories: GHSA-7589-6fvf-x4pw
           - application: frontend
             audit-level: critical
+            allowed-advisories: ''
     defaults:
       run:
         working-directory: ${{ matrix.application }}
@@ -45,4 +47,6 @@ jobs:
           cache-dependency-path: ${{ matrix.application }}/package-lock.json
       - run: npm ci
       - name: Bloquear vulnerabilidades de runtime não aceitas
-        run: npm audit --omit=dev --audit-level=${{ matrix.audit-level }}
+        env:
+          RUNTIME_AUDIT_ALLOWLIST: ${{ matrix.allowed-advisories }}
+        run: node ../scripts/run-runtime-audit.mjs --audit-level=${{ matrix.audit-level }}

@@ -6,6 +6,11 @@ import {
 } from '../../../../src/features/cycles/components/CycleRemovalFeedbackModal';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
+jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
+    DropIcon: (props) =>
+        require('react').createElement('DropIcon', { ...props, testID: 'gota-modal' })
+}));
+
 test('confirma exclusão com textos e ações idênticos ao protótipo', async () => {
     const onConfirmar = jest.fn();
     const onCancelar = jest.fn();
@@ -104,7 +109,7 @@ test('usa área quadrada de 48 por 48 e diferencia as cores do alerta', async ()
         width: 48,
         height: 48,
         borderRadius: 14,
-        backgroundColor: '#4A3737'
+        backgroundColor: '#333333'
     });
 
     await render(<IconeAlerta erro />, { preferencia: 'escuro' });
@@ -120,3 +125,37 @@ test('não renderiza tipo desconhecido', async () => {
     await render(<CycleRemovalFeedbackModal tipo="desconhecido" />);
     expect(screen.queryByRole('header')).toBeNull();
 });
+
+test('confirmacao noturna usa acao verde e cancelamento escuro sem inverter cores', async () => {
+    await render(
+        <CycleRemovalFeedbackModal tipo="confirmacao" periodo="07/08/2026 a 11/08/2026" />,
+        { preferencia: 'escuro' }
+    );
+    expect(screen.getByRole('button', { name: 'Apagar' })).toHaveStyle({
+        backgroundColor: '#A5D6A7'
+    });
+    expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveStyle({
+        backgroundColor: '#242424',
+        borderWidth: 1
+    });
+    expect(screen.getByText('Apagar')).toHaveStyle({ color: '#121212' });
+    expect(screen.getByText('Cancelar')).toHaveStyle({ color: '#E3E3E3' });
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({ backgroundColor: '#1E1E1E' });
+});
+test.each(['sucesso-excluir', 'sucesso-atualizar'])(
+    'sucesso noturno %s mantem botao verde e icone de contorno',
+    async (tipo) => {
+        await render(<CycleRemovalFeedbackModal tipo={tipo} />, {
+            preferencia: 'escuro'
+        });
+        expect(screen.getByRole('button', { name: 'OK' })).toHaveStyle({
+            backgroundColor: '#A5D6A7'
+        });
+        expect(screen.getByTestId('icone-sucesso-ciclo')).toHaveStyle({
+            backgroundColor: '#444444'
+        });
+        const icone = screen.getByTestId('gota-modal');
+        expect(icone.props.weight).toBe('regular');
+        expect(icone.props.color).toBe('#E3E3E3');
+    }
+);

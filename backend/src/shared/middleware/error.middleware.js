@@ -34,7 +34,7 @@ function rotaNaoEncontrada(_req, res) {
         codigo: 'ERRO_INTERNO',
         mensagem:
             erro.mensagemUsuario ||
-            'Ocorreu um erro ao criar sua conta. Tente novamente.'
+            'Ocorreu um erro interno. Tente novamente.'
         }
     });
 }

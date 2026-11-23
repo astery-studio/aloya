@@ -5,16 +5,26 @@ import { ArrowLeftIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './Header.style';
 
-function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null }) {
+function Header({
+    titulo,
+    variante = 'padrao',
+    onVoltar,
+    corFundo,
+    corTexto,
+    acoes = null,
+    acoesDireita = null
+}) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
+    const ehDiario = variante === 'diario';
 
     const ehRedeApoio = variante === 'redeApoio';
 
-    const temAcoes = !temVoltar && Boolean(acoes);
+    const acoesExibidas = acoesDireita ?? acoes;
+    const temAcoes = !temVoltar && Boolean(acoesExibidas);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
@@ -24,18 +34,16 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
-                corFundo
-                    ? {
-                          backgroundColor: corFundo
-                      }
-                    : null
+                ehDiario && estilos.containerDiario,
+                corFundo ? { backgroundColor: corFundo } : null
             ]}
         >
             <View
                 style={[
                     estilos.espacamentoSuperior,
                     temVoltar && estilos.espacamentoSuperiorComVoltar,
-                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio
+                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio,
+                    ehDiario && estilos.espacamentoSuperiorDiario
                 ]}
             />
 
@@ -43,7 +51,8 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
                 style={[
                     estilos.areaTitulo,
                     temVoltar && estilos.areaTituloComVoltar,
-                    ehRedeApoio && estilos.areaTituloRedeApoio
+                    ehRedeApoio && estilos.areaTituloRedeApoio,
+                    ehDiario && estilos.areaTituloDiario
                 ]}
             >
                 {temVoltar ? (
@@ -71,7 +80,11 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
                 {ehRedeApoio ? (
                     <View testID="header-title-container" style={estilos.containerTituloRedeApoio}>
                         <Text
-                            style={[estilos.titulo, estilos.tituloRedeApoio]}
+                            style={[
+                                estilos.titulo,
+                                estilos.tituloRedeApoio,
+                                corTexto ? { color: corTexto } : null
+                            ]}
                             accessibilityRole="header"
                         >
                             {titulo}
@@ -79,7 +92,12 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
                     </View>
                 ) : (
                     <Text
-                        style={[estilos.titulo, temVoltar && estilos.tituloComVoltar]}
+                        style={[
+                            estilos.titulo,
+                            temVoltar && estilos.tituloComVoltar,
+                            ehDiario && estilos.tituloDiario,
+                            corTexto ? { color: corTexto } : null
+                        ]}
                         accessibilityRole="header"
                     >
                         {titulo}
@@ -91,9 +109,9 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null 
                         testID="header-actions"
                         accessibilityRole="toolbar"
                         accessibilityLabel="Ações da tela"
-                        style={estilos.acoes}
+                        style={[estilos.acoes, ehDiario && estilos.acoesDireitaDiario]}
                     >
-                        {acoes}
+                        {acoesExibidas}
                     </View>
                 ) : null}
             </View>

@@ -12,7 +12,7 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
 
     const corAtiva = tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque;
 
-    const corInativa = tema.cores.interface.textoSecundario;
+    const corInativa = tema.escuro ? '#999999' : tema.cores.interface.textoSecundario;
 
     const corDoItem = ativo ? corAtiva : corInativa;
 

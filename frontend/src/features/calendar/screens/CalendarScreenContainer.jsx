@@ -10,6 +10,7 @@ function CalendarScreenContainer({
     aoCadastrarMenstruacao,
     aoEditarCiclo,
     statusSincronizacao,
+    erroSincronizacao,
     aoTentarSincronizar
 }) {
     const estado = useCalendar({ service, onSessaoExpirada });
@@ -20,6 +21,7 @@ function CalendarScreenContainer({
     return (
         <CalendarScreen
             statusSincronizacao={statusSincronizacao}
+            erroSincronizacao={erroSincronizacao}
             aoTentarSincronizar={aoTentarSincronizar}
             meses={estado.meses}
             confianca={confianca}

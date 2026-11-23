@@ -55,7 +55,7 @@ function buscarCalendarioBackend(parametros) {
     return JSON.parse(saida)
 }
 
-function criarIntegracao({inicio, fim, duracaoMenstruacao}) {
+function criarIntegracao({inicio, fim, duracaoMenstruacao, hoje = HOJE}) {
     const consultas = []
     const requisicaoAutenticada = jest.fn(async ({caminho}) => {
         const mes = decodeURIComponent(caminho.split('?mes=')[1])
@@ -67,7 +67,7 @@ function criarIntegracao({inicio, fim, duracaoMenstruacao}) {
 
     async function buscarMesNormalizado(mes) {
         const calendario = await frontend.buscarMes({mes})
-        return normalizarMes(calendario, HOJE)
+        return normalizarMes(calendario, hoje)
     }
 
     return {buscarMesNormalizado, consultas, requisicaoAutenticada}
@@ -82,7 +82,8 @@ describe('previsão do backend até a grade do calendário', () => {
         const integracao = criarIntegracao({
             inicio: '2026-09-01',
             fim: '2026-09-07',
-            duracaoMenstruacao: 7
+            duracaoMenstruacao: 7,
+            hoje: '2026-10-01'
         })
         const outubro = await integracao.buscarMesNormalizado('2026-10')
 
@@ -127,7 +128,8 @@ describe('previsão do backend até a grade do calendário', () => {
         const integracao = criarIntegracao({
             inicio: '2026-09-01',
             fim: '2026-09-07',
-            duracaoMenstruacao: 7
+            duracaoMenstruacao: 7,
+            hoje: '2026-10-01'
         })
         const novembro = await integracao.buscarMesNormalizado('2026-11')
         const dezembro = await integracao.buscarMesNormalizado('2026-12')
@@ -148,7 +150,8 @@ describe('previsão do backend até a grade do calendário', () => {
         const integracao = criarIntegracao({
             inicio: '2026-09-04',
             fim: '2026-09-08',
-            duracaoMenstruacao: 5
+            duracaoMenstruacao: 5,
+            hoje: '2026-10-01'
         })
         const outubro = await integracao.buscarMesNormalizado('2026-10')
 

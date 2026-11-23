@@ -39,10 +39,26 @@ function criarCycleEditController({ service, validator } = {}) {
             res.set('Cache-Control', 'no-store');
 
             return res.status(200).json({
-                mensagem: 'Registro de menstruação atualizado com sucesso.',
+                mensagem:
+                    ciclo === null
+                        ? 'Registro de menstruação excluído com sucesso.'
+                        : 'Registro de menstruação atualizado com sucesso.',
+                ...(ciclo === null ? { cicloRemovido: true } : {}),
                 ciclo
             });
         } catch (erro) {
+            if (
+                (erro.codigo === 'SOBREPOSICAO_CICLO' && erro.conflito) ||
+                (erro.codigo === 'CONFIRMAR_ALTERACAO_OUTROS_CICLOS' && erro.outrosCiclos)
+            ) {
+                return res.status(409).json({
+                    erro: {
+                        codigo: erro.codigo,
+                        mensagem: erro.message,
+                        detalhes: erro.outrosCiclos ?? erro.conflito
+                    }
+                });
+            }
             if (!erro.status) {
                 erro.mensagemUsuario =
                     'Ocorreu um erro ao atualizar este registro. Tente novamente.';

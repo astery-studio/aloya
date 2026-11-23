@@ -3,8 +3,8 @@ import { criarCycleRegistrationService } from './services/cycleRegistration.serv
 import { criarCycleRegistrationController } from './controllers/cycleRegistration.controller.js';
 import { criarCycleSharingService } from './services/cycleSharing.service.js';
 
-function criarCycleRegistrationModule({ prisma, agora } = {}) {
-    const repository = criarCycleRegistrationRepository({ prisma });
+function criarCycleRegistrationModule({ prisma, agora, thermalRecalculation } = {}) {
+    const repository = criarCycleRegistrationRepository({ prisma, thermalRecalculation });
     const service = criarCycleRegistrationService({ repository, agora });
     const sharingService = criarCycleSharingService({ prisma });
     const controller = criarCycleRegistrationController({ service, sharingService });

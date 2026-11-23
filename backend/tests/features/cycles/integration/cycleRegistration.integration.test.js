@@ -159,11 +159,10 @@ test('marcações retroativas preservam a cronologia e não unem ciclos separado
     assert.equal(prependido.ciclo.dataInicio, '2026-10-09');
     assert.equal(await prisma.registroCiclo.count(), 1);
     await registrar({ data: '2026-10-16' });
-    await assert.rejects(() => registrar({ dataInicio: '2026-10-13', dataFim: '2026-10-15' }), {
-        status: 409
-    });
+    await registrar({ dataInicio: '2026-10-13', dataFim: '2026-10-15' });
     await assert.rejects(() => registrar({ data: '2026-11-01' }), { status: 422 });
-    assert.equal(await prisma.registroCiclo.count(), 2);
+    assert.equal(await prisma.registroCiclo.count(), 1);
+    assert.equal(await prisma.diaMenstruacao.count(), 8);
 });
 
 test('rotas autenticadas entregam o resultado síncrono e permitem repetir uma sincronização HTTP', async (t) => {
@@ -350,4 +349,45 @@ test('controller compartilha dados autorizados sem cache e respeita a sessão do
     assert.equal(corpo.ciclos.length, 1);
     assert.equal(corpo.ciclos[0].dataInicio, '2026-10-01');
     assert.equal(Object.hasOwn(corpo.ciclos[0], 'usuarioId'), false);
+});
+
+for (const pausa of [0, 1, 2, 3])
+    test(`cadastro considera pausa de ${pausa} dias entre sangramentos`, async (t) => {
+        const { prisma, registrar } = await cenario(t);
+        const primeiro = await registrar({ data: '2026-10-25' });
+        const segundo = await registrar({
+            dataInicio: `2026-10-${26 + pausa}`,
+            dataFim: '2026-10-30'
+        });
+        assert.equal(
+            await prisma.registroCiclo.count({ where: { usuarioId: 1 } }),
+            pausa <= 2 ? 1 : 2
+        );
+        assert.equal(segundo.ciclo.id === primeiro.ciclo.id, pausa <= 2);
+        assert.equal(await prisma.diaMenstruacao.count(), 1 + 5 - pausa);
+    });
+
+test('cadastro retroativo une dois ciclos próximos sem preencher a pausa e reverte falhas', async (t) => {
+    const { prisma, registrar } = await cenario(t);
+    const primeiro = await registrar({ data: '2026-10-25' });
+    await registrar({ data: '2026-10-29' });
+    const estado = () =>
+        prisma.registroCiclo.findMany({
+            orderBy: { id: 'asc' },
+            include: { diasMenstruacao: { orderBy: { data: 'asc' } } }
+        });
+    const antes = await estado();
+    await prisma.$executeRawUnsafe(
+        `CREATE TRIGGER falhar_uniao_recibo BEFORE INSERT ON sincronizacoes_menstruais BEGIN SELECT RAISE(ABORT,'falha simulada'); END`
+    );
+    await assert.rejects(() => registrar({ data: '2026-10-27' }, 'uniao-ponte-001'));
+    assert.deepEqual(await estado(), antes);
+    await prisma.$executeRawUnsafe('DROP TRIGGER falhar_uniao_recibo');
+    const resultado = await registrar({ data: '2026-10-27' }, 'uniao-ponte-001');
+    assert.equal(await prisma.registroCiclo.count({ where: { usuarioId: 1 } }), 1);
+    assert.equal(resultado.ciclo.id, primeiro.ciclo.id);
+    assert.deepEqual(resultado.ciclo.dias, ['2026-10-25', '2026-10-27', '2026-10-29']);
+    const repetido = await registrar({ data: '2026-10-27' }, 'uniao-ponte-001');
+    assert.equal(repetido.repetida, true);
+    assert.equal(await prisma.diaMenstruacao.count(), 3);
 });
