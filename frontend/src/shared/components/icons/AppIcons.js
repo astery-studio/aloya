@@ -29,6 +29,7 @@ import { FlowerLotusIcon } from 'phosphor-react-native/src/icons/FlowerLotus';
 import { FlowerTulipIcon } from 'phosphor-react-native/src/icons/FlowerTulip';
 import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 import { GavelIcon } from 'phosphor-react-native/src/icons/Gavel';
+import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
 import { HandshakeIcon } from 'phosphor-react-native/src/icons/Handshake';
 import { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
 import { HeartbeatIcon } from 'phosphor-react-native/src/icons/Heartbeat';
@@ -94,6 +95,7 @@ export {
     FlowerTulipIcon,
     FunnelIcon,
     GavelIcon,
+    GearIcon,
     HandshakeIcon,
     HeartIcon,
     HeartbeatIcon,
