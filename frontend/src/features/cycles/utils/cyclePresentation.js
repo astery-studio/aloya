@@ -4,9 +4,11 @@ function paraDataUtc(texto) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(texto || '')) return null;
     const [ano, mes, dia] = texto.split('-').map(Number);
     const data = new Date(Date.UTC(ano, mes - 1, dia));
-    return data.getUTCFullYear() === ano
-        && data.getUTCMonth() === mes - 1
-        && data.getUTCDate() === dia ? data : null;
+    return data.getUTCFullYear() === ano &&
+        data.getUTCMonth() === mes - 1 &&
+        data.getUTCDate() === dia
+        ? data
+        : null;
 }
 
 function formatarIso(data) {
@@ -24,13 +26,27 @@ function formatarDataLonga(texto) {
     const data = paraDataUtc(texto);
     if (!data) return '—';
     return new Intl.DateTimeFormat('pt-BR', {
-        day: 'numeric', month: 'long', timeZone: 'UTC'
+        day: 'numeric',
+        month: 'long',
+        timeZone: 'UTC'
+    }).format(data);
+}
+
+function formatarDataCabecalho(texto) {
+    const data = paraDataUtc(texto);
+    if (!data) return '—';
+    return new Intl.DateTimeFormat('pt-BR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        timeZone: 'UTC'
     }).format(data);
 }
 
 function dataNoIntervalo(data, intervalo) {
-    return Boolean(intervalo?.inicio && intervalo?.fim
-        && data >= intervalo.inicio && data <= intervalo.fim);
+    return Boolean(
+        intervalo?.inicio && intervalo?.fim && data >= intervalo.inicio && data <= intervalo.fim
+    );
 }
 
 function obterFaseDireta(data, fases) {
@@ -64,7 +80,13 @@ function obterFase(data, fases, duracaoCiclo) {
     return obterFaseDireta(adicionarDias(inicioCiclo, diaProjetado), fases);
 }
 
-function criarDiasDaFaixa(dataCentral, fases, deslocamentoInicial = -3, quantidade = 16, duracaoCiclo) {
+function criarDiasDaFaixa(
+    dataCentral,
+    fases,
+    deslocamentoInicial = -3,
+    quantidade = 16,
+    duracaoCiclo
+) {
     return Array.from({ length: quantidade }, (_, indice) => {
         const data = adicionarDias(dataCentral, deslocamentoInicial + indice);
         const objeto = paraDataUtc(data);
@@ -72,8 +94,11 @@ function criarDiasDaFaixa(dataCentral, fases, deslocamentoInicial = -3, quantida
             data,
             dia: objeto?.getUTCDate(),
             semana: new Intl.DateTimeFormat('pt-BR', {
-                weekday: 'short', timeZone: 'UTC'
-            }).format(objeto).replace('.', ''),
+                weekday: 'short',
+                timeZone: 'UTC'
+            })
+                .format(objeto)
+                .replace('.', ''),
             fase: obterFase(data, fases, duracaoCiclo),
             hoje: data === dataCentral
         };
@@ -85,4 +110,11 @@ function obterDiaCiclo(data, fases) {
     return diferenca === null || diferenca < 0 ? null : diferenca + 1;
 }
 
-export { criarDiasDaFaixa, formatarDataLonga, obterDiaCiclo, obterFase, paraDataUtc };
+export {
+    criarDiasDaFaixa,
+    formatarDataCabecalho,
+    formatarDataLonga,
+    obterDiaCiclo,
+    obterFase,
+    paraDataUtc
+};
