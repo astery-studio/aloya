@@ -94,8 +94,9 @@ function criarEstilos(tema) {
             backgroundColor: cores.destaqueSuave
         },
         textoContador: {
-            fontFamily: fontFamilies.semiBold,
+            fontFamily: fontFamilies.bold,
             fontSize: 12,
+            fontWeight: '700',
             lineHeight: 16,
             color: cores.destaque
         },

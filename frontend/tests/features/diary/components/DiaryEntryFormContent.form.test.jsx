@@ -92,6 +92,7 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(screen.getByText('Registro no Diário')).toBeOnTheScreen();
     expect(screen.getByTestId('cartao-registro-diario')).toHaveStyle({ marginTop: 0 });
     expect(screen.getByText('0 / 1 marcados')).toBeOnTheScreen();
+    expect(screen.getByText('0 / 1 marcados')).toHaveStyle({ fontWeight: '700' });
     expect(
         screen.getByText('Selecione pelo menos uma opção para salvar no diário.')
     ).toBeOnTheScreen();
@@ -138,6 +139,7 @@ test('habilita o salvamento e atualiza o contador quando há conteúdo válido',
     );
 
     expect(screen.getByText('1 / 1 marcados')).toBeOnTheScreen();
+    expect(screen.getByText('1 / 1 marcados')).toHaveStyle({ fontWeight: '700' });
     expect(screen.getByTestId('container-fase-formulario')).toHaveStyle({
         width: 294,
         maxWidth: '100%',
