@@ -177,6 +177,7 @@ test('oferece ações e recursos completos quando ainda não há ciclo', async (
     expect(screen.getByText('Janela fértil')).toBeOnTheScreen();
     expect(screen.getByText('Próxima menstruação')).toBeOnTheScreen();
     expect(screen.getByText('Sintomas e bem-estar')).toBeOnTheScreen();
+    expect(screen.getByText('Conheça as fases do ciclo')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Fases do ciclo' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Janela fértil' }));
     expect(screen.getByText(/orientações para cada momento/)).toBeOnTheScreen();

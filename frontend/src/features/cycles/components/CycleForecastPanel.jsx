@@ -20,6 +20,7 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import { formatarDataLonga } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleForecastPanel.styles';
 import { CycleExpandableCard } from './CycleExpandableCard';
+import { CycleEducationSection } from './CycleEducationSection';
 import { PhaseSymbolSlot } from './PhaseSymbolSlot';
 
 const CycleForecastVisualContext = createContext(null);
@@ -309,6 +310,7 @@ function EstadoSemCiclo({
                     }
                 />
             </View>
+            <CycleEducationSection />
             <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
             <View style={estilos.recursos}>
                 {recursosSemCiclo.map(({ titulo, descricao, Icone, cor, peso = 'regular' }) => (
