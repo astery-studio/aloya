@@ -1,12 +1,14 @@
 // Reúne os cinco itens da navegação inferior.
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { ArrowsClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
-import { CalendarBlankIcon } from 'phosphor-react-native/src/icons/CalendarBlank';
-import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
-import { HouseIcon } from 'phosphor-react-native/src/icons/House';
-import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 
+import {
+    CalendarCheckIcon,
+    GearIcon,
+    HouseIcon,
+    NotebookIcon,
+    UsersIcon
+} from '../../../icons/AppIcons';
 import { useTheme } from '../../../../hooks/useTheme';
 import { BottomTabItem } from '../BottomTabItem/BottomTabItem';
 import { criarEstilos } from './BottomTabBar.style';
@@ -14,14 +16,14 @@ import { criarEstilos } from './BottomTabBar.style';
 const abas = Object.freeze([
     Object.freeze({
         id: 'membros',
-        label: 'Membros',
+        label: 'Contatos',
         icone: UsersIcon
     }),
 
     Object.freeze({
         id: 'ciclos',
-        label: 'Ciclos',
-        icone: ArrowsClockwiseIcon
+        label: 'Calendário',
+        icone: CalendarCheckIcon
     }),
 
     Object.freeze({
@@ -33,7 +35,7 @@ const abas = Object.freeze([
     Object.freeze({
         id: 'diario',
         label: 'Diário',
-        icone: CalendarBlankIcon
+        icone: NotebookIcon
     }),
 
     Object.freeze({
