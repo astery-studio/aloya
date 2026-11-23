@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-import { CycleForecastPanel } from '../../../../src/features/cycles/components/CycleForecastPanel';
-import { estilos } from '../../../../src/features/cycles/components/CycleForecastPanel.styles';
+import { CycleHomeContent } from '../../../../src/features/cycles/components/CycleHomeContent';
+import { estilos } from '../../../../src/features/cycles/components/CycleHomeContent.styles';
 import { conteudoPorFase } from '../../../../src/features/cycles/constants/phaseContent';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -13,7 +13,7 @@ const previsao = {
 };
 
 test('exibe previsão, confiança e aviso médico', async () => {
-    await render(<CycleForecastPanel fase="folicular" diaCiclo={8} previsao={previsao} />);
+    await render(<CycleHomeContent fase="folicular" diaCiclo={8} previsao={previsao} />);
 
     expect(screen.getByText('Fase Folicular')).toBeOnTheScreen();
     expect(screen.getByText('29 de outubro')).toBeOnTheScreen();
@@ -23,7 +23,7 @@ test('exibe previsão, confiança e aviso médico', async () => {
 });
 
 test('mantém o estado sem dados dentro da HU-013', async () => {
-    await render(<CycleForecastPanel aoCadastrarMenstruacao={jest.fn()} />);
+    await render(<CycleHomeContent aoCadastrarMenstruacao={jest.fn()} />);
     expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeEnabled();
 });
@@ -59,7 +59,7 @@ test.each([
     ]
 ])('exibe conteúdo completo da fase %s', async (fase, titulo, subtitulo, descricao, sintoma) => {
     await render(
-        <CycleForecastPanel
+        <CycleHomeContent
             fase={fase}
             diaCiclo={8}
             previsao={{ ...previsao, confiabilidadeMenstrual: { nivel: 'ALTA' } }}
@@ -91,7 +91,7 @@ test('executa as três ações do painel com previsão', async () => {
         aoCadastrarDiario: jest.fn(),
         aoAbrirAnticoncepcional: jest.fn()
     };
-    await render(<CycleForecastPanel previsao={previsao} {...acoes} />);
+    await render(<CycleHomeContent previsao={previsao} {...acoes} />);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
@@ -105,7 +105,7 @@ test('executa as três ações do painel com previsão', async () => {
 test('prioriza a janela fértil recebida por prop e aceita confiança média', async () => {
     const janelaFertil = { inicio: '2026-09-08', fim: '2026-09-14' };
     await render(
-        <CycleForecastPanel
+        <CycleHomeContent
             previsao={{ ...previsao, confiabilidadeMenstrual: { nivel: 'MEDIA' } }}
             janelaFertil={janelaFertil}
         />
@@ -119,7 +119,7 @@ test('prioriza a janela fértil recebida por prop e aceita confiança média', a
 
 test('explica previsão parcial sem confiança nem janela fértil', async () => {
     await render(
-        <CycleForecastPanel
+        <CycleHomeContent
             previsao={{
                 ...previsao,
                 status: 'PARCIALMENTE_DISPONIVEL',
@@ -136,14 +136,12 @@ test('explica previsão parcial sem confiança nem janela fértil', async () => 
 });
 
 test('sinaliza como incerta uma previsão ultrapassada', async () => {
-    await render(
-        <CycleForecastPanel previsao={{ ...previsao, status: 'PREVISAO_ULTRAPASSADA' }} />
-    );
+    await render(<CycleHomeContent previsao={{ ...previsao, status: 'PREVISAO_ULTRAPASSADA' }} />);
     expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
 });
 
 test('trata fase inválida como ciclo desconhecido', async () => {
-    await render(<CycleForecastPanel fase="inexistente" previsao={previsao} />);
+    await render(<CycleHomeContent fase="inexistente" previsao={previsao} />);
 
     expect(screen.getByText('Seu ciclo')).toBeOnTheScreen();
     expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
@@ -152,7 +150,7 @@ test('trata fase inválida como ciclo desconhecido', async () => {
 });
 
 test('orienta novos registros quando a confiança é baixa', async () => {
-    await render(<CycleForecastPanel previsao={previsao} />);
+    await render(<CycleHomeContent previsao={previsao} />);
 
     expect(screen.getByText(/Continue registrando seus ciclos/)).toBeOnTheScreen();
     expect(screen.getByText('9 de outubro até 14 de outubro')).toBeOnTheScreen();
@@ -160,7 +158,7 @@ test('orienta novos registros quando a confiança é baixa', async () => {
 
 test('não confunde fase folicular com janela fértil ativa', async () => {
     await render(
-        <CycleForecastPanel fase="folicular" janelaFertilAtiva={false} previsao={previsao} />
+        <CycleHomeContent fase="folicular" janelaFertilAtiva={false} previsao={previsao} />
     );
     expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
 });
@@ -171,7 +169,7 @@ test('oferece ações e recursos completos quando ainda não há ciclo', async (
         aoCadastrarDiario: jest.fn(),
         aoAbrirAnticoncepcional: jest.fn()
     };
-    await render(<CycleForecastPanel {...acoes} />);
+    await render(<CycleHomeContent {...acoes} />);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
@@ -271,7 +269,7 @@ test.each([
     'aplica as cores da confiabilidade %s no modo noturno',
     async (nivel, acessibilidade, rotulo, cor, fundo, borda) => {
         await render(
-            <CycleForecastPanel previsao={{ ...previsao, confiabilidadeMenstrual: { nivel } }} />,
+            <CycleHomeContent previsao={{ ...previsao, confiabilidadeMenstrual: { nivel } }} />,
             { preferencia: 'escuro' }
         );
         expect(screen.getByLabelText('Confiabilidade ' + acessibilidade)).toHaveStyle({

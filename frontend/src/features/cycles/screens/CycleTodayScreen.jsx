@@ -7,7 +7,7 @@ import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
-import { CycleForecastPanel } from '../components/CycleForecastPanel';
+import { CycleHomeContent } from '../components/CycleHomeContent';
 import { ReturnToTodayButton } from '../components/ReturnToTodayButton';
 import { conteudoPorFase } from '../constants/phaseContent';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
@@ -142,7 +142,7 @@ function CycleTodayScreen({
                     {referencia !== dataBaseDaFaixa ? (
                         <ReturnToTodayButton onPress={() => aoSelecionarData?.(dataBaseDaFaixa)} />
                     ) : null}
-                    <CycleForecastPanel
+                    <CycleHomeContent
                         fase={fase}
                         estado={home.estado}
                         dataSelecionada={referencia}

@@ -18,7 +18,7 @@ import {
 import { cores } from '../../../shared/theme';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { formatarDataLonga } from '../utils/cyclePresentation';
-import { criarEstilos } from './CycleForecastPanel.styles';
+import { criarEstilos } from './CycleHomeContent.styles';
 import { CycleExpandableCard } from './CycleExpandableCard';
 import { CycleEducationSection } from './CycleEducationSection';
 import { PhaseSymbolSlot } from './PhaseSymbolSlot';
@@ -328,7 +328,7 @@ function EstadoSemCiclo({
     );
 }
 
-function CycleForecastPanel({
+function CycleHomeContent({
     estado,
     dataSelecionada,
     janelaFertilAtiva,
@@ -441,4 +441,4 @@ function CycleForecastPanel({
     );
 }
 
-export { AVISO_MEDICO, CycleForecastPanel };
+export { AVISO_MEDICO, CycleHomeContent };
