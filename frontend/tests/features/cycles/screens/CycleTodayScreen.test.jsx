@@ -77,6 +77,15 @@ test('mantém a faixa de datas no estado sem dados', async () => {
     expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
 });
 
+test('retorna da data selecionada para a data de referência', async () => {
+    const aoSelecionarData = jest.fn();
+    await renderizar({ previsao, dataSelecionada: '2026-10-10', aoSelecionarData });
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar para hoje' }));
+
+    expect(aoSelecionarData).toHaveBeenCalledWith('2026-10-08');
+});
+
 test('acrescenta páginas de dias passados e futuros ao alcançar as bordas', async () => {
     await renderizar({ previsao });
     const evento = (x) => ({

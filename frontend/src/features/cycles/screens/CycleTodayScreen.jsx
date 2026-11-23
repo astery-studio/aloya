@@ -8,6 +8,7 @@ import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/Bo
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleForecastPanel } from '../components/CycleForecastPanel';
+import { ReturnToTodayButton } from '../components/ReturnToTodayButton';
 import { conteudoPorFase } from '../constants/phaseContent';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import {
@@ -129,6 +130,9 @@ function CycleTodayScreen({
                             aoCarregarAnteriores={() => carregarDias('anteriores')}
                             aoCarregarPosteriores={() => carregarDias('posteriores')}
                         />
+                    ) : null}
+                    {referencia !== dataBaseDaFaixa ? (
+                        <ReturnToTodayButton onPress={() => aoSelecionarData?.(dataBaseDaFaixa)} />
                     ) : null}
                     <CycleForecastPanel
                         fase={fase}
