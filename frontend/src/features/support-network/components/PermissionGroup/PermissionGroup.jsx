@@ -1,0 +1,285 @@
+//Mostra um grupo expansível de permissões com ícone, contador e controle geral.
+import { memo, useCallback, useMemo, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+
+import SwitchField from '../../../../shared/components/forms/SwitchField/SwitchField';
+import {
+    CaretDownIcon,
+    CaretUpIcon,
+    DropIcon,
+    FirstAidKitIcon,
+    HeartIcon,
+    LightningIcon,
+    PersonArmsSpreadIcon,
+    UsersIcon
+} from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import PermissionItem from '../PermissionItem/PermissionItem';
+import { criarEstilos } from './PermissionGroup.styles';
+
+//Recebe o nome da paleta e devolve somente uma paleta conhecida pelo aplicativo.
+function obterPaleta(paleta, tema, aparenciaNovaCategoria) {
+    const paletasDosGrupos = tema.cores.redeApoio;
+    const paletaBase = paletasDosGrupos[paleta] ?? paletasDosGrupos.ciclo;
+
+    if (!tema.escuro) return paletaBase;
+
+    const coresEscuras = {
+        ciclo: '#F08A75',
+        corpo: '#9FD6B6',
+        emocional: '#C7A7E8',
+        energia: '#F2B45F',
+        vidaIntima: '#E59ABB',
+        saude: '#AEBBEF'
+    };
+    const cor = coresEscuras[paleta] ?? coresEscuras.ciclo;
+    const coresCadastro = {
+        ciclo: { icone: '#EF9A9A', fundoIcone: 'rgba(239, 154, 154, 0.16)' },
+        corpo: { icone: '#A5D6A7', fundoIcone: 'rgba(165, 214, 167, 0.16)' },
+        emocional: { icone: '#B39DDB', fundoIcone: 'rgba(179, 157, 219, 0.16)' },
+        energia: { icone: '#FFE082', fundoIcone: 'rgba(255, 224, 130, 0.16)' },
+        vidaIntima: { icone: '#EF9A9A', fundoIcone: 'rgba(239, 154, 154, 0.16)' },
+        saude: { icone: '#90CAF9', fundoIcone: 'rgba(144, 202, 249, 0.20)' }
+    };
+
+    const coresCadastroAtivas = coresCadastro[paleta] ?? coresCadastro.ciclo;
+    return {
+        ...paletaBase,
+        icone: cor,
+        fundoIcone: tema.cores.interface.superficieElevada,
+        fundoExpandido: tema.cores.interface.destaqueSuave,
+        bordaExpandida: cor,
+        ...(aparenciaNovaCategoria
+            ? { ...coresCadastroAtivas, fundoExpandido: coresCadastroAtivas.fundoIcone }
+            : {})
+    };
+}
+
+//Renderiza somente componentes de ícone conhecidos e declarados fora do componente.
+function renderizarIconeDoGrupo(icone, propriedades) {
+    switch (icone) {
+        case 'pessoa':
+            return <PersonArmsSpreadIcon {...propriedades} />;
+        case 'coracao':
+            return <HeartIcon {...propriedades} />;
+        case 'raio':
+            return <LightningIcon {...propriedades} />;
+        case 'pessoas':
+            return <UsersIcon {...propriedades} />;
+        case 'primeirosSocorros':
+            return <FirstAidKitIcon {...propriedades} />;
+        case 'gota':
+        default:
+            return <DropIcon {...propriedades} />;
+    }
+}
+
+//Recebe uma quantidade e devolve o texto correto no singular ou no plural.
+function obterTextoDaContagem(quantidade) {
+    return quantidade === 1 ? '1 permissão ativa' : `${quantidade} permissões ativas`;
+}
+
+//Recebe as permissões e ações do grupo e controla sua abertura e seus interruptores.
+function PermissionGroup({
+    aparenciaNovaCategoria = false,
+    coresInterruptor,
+    titulo,
+    icone = 'gota',
+    paleta = 'ciclo',
+    permissoes = [],
+    permissoesSelecionadas = [],
+    aoAlterarPermissao,
+    aoAlterarGrupo,
+    desabilitado = false,
+    inicialmenteExpandido = false
+}) {
+    const tema = useTheme();
+    const estilos = useMemo(
+        () => criarEstilos(tema, aparenciaNovaCategoria),
+        [tema, aparenciaNovaCategoria]
+    );
+    const [expandido, definirExpandido] = useState(inicialmenteExpandido === true);
+    const coresDoGrupo = obterPaleta(paleta, tema, aparenciaNovaCategoria);
+    const IconeDaExpansao = expandido ? CaretUpIcon : CaretDownIcon;
+
+    //Memoização reaproveita os dados calculados enquanto as propriedades recebidas não mudarem.
+    const permissoesValidas = useMemo(() => {
+        if (!Array.isArray(permissoes)) {
+            return [];
+        }
+
+        return permissoes.filter(
+            (permissao) =>
+                permissao &&
+                typeof permissao.id === 'string' &&
+                typeof permissao.titulo === 'string'
+        );
+    }, [permissoes]);
+
+    const idsDasPermissoes = useMemo(
+        () => permissoesValidas.map((permissao) => permissao.id),
+        [permissoesValidas]
+    );
+
+    const permissoesAtivas = useMemo(() => {
+        const selecionadasRecebidas = Array.isArray(permissoesSelecionadas)
+            ? permissoesSelecionadas
+            : [];
+
+        return new Set(selecionadasRecebidas);
+    }, [permissoesSelecionadas]);
+
+    const quantidadeAtiva = idsDasPermissoes.reduce(
+        (total, permissaoId) => total + (permissoesAtivas.has(permissaoId) ? 1 : 0),
+        0
+    );
+
+    const todasAtivas = idsDasPermissoes.length > 0 && quantidadeAtiva === idsDasPermissoes.length;
+
+    const grupoDesabilitado =
+        desabilitado || idsDasPermissoes.length === 0 || typeof aoAlterarGrupo !== 'function';
+
+    //Abre ou fecha somente a lista deste grupo.
+    const alternarExpansao = useCallback(() => {
+        definirExpandido((valorAtual) => !valorAtual);
+    }, []);
+
+    //Envia todos os identificadores do grupo e o novo estado ao componente pai.
+    const alterarGrupo = useCallback(
+        (ativo) => {
+            if (!grupoDesabilitado) {
+                aoAlterarGrupo(idsDasPermissoes, ativo);
+            }
+        },
+        [aoAlterarGrupo, grupoDesabilitado, idsDasPermissoes]
+    );
+
+    const iconeDoGrupo = renderizarIconeDoGrupo(icone, {
+        testID: `icone-grupo-${icone}`,
+        size: 18,
+        color: coresDoGrupo.icone,
+        weight: 'regular'
+    });
+
+    return (
+        <View
+            style={[
+                estilos.container,
+                expandido && {
+                    borderColor: coresDoGrupo.bordaExpandida
+                }
+            ]}
+        >
+            <View
+                style={[
+                    estilos.cabecalho,
+                    expandido && {
+                        backgroundColor: coresDoGrupo.fundoExpandido
+                    }
+                ]}
+            >
+                <Pressable
+                    onPress={alternarExpansao}
+                    accessibilityRole="button"
+                    accessibilityLabel={titulo}
+                    accessibilityHint={
+                        expandido
+                            ? 'Recolhe as permissões deste grupo'
+                            : 'Mostra as permissões deste grupo'
+                    }
+                    accessibilityState={{
+                        expanded: expandido
+                    }}
+                    style={({ pressed }) => [estilos.areaExpansao, pressed && estilos.pressionado]}
+                >
+                    <View
+                        style={[
+                            estilos.caixaIcone,
+                            {
+                                backgroundColor: coresDoGrupo.fundoIcone
+                            }
+                        ]}
+                    >
+                        {iconeDoGrupo}
+                    </View>
+
+                    <View style={estilos.textos}>
+                        <Text
+                            style={[
+                                estilos.titulo,
+                                expandido && {
+                                    color: coresDoGrupo.icone
+                                }
+                            ]}
+                            numberOfLines={2}
+                        >
+                            {titulo}
+                        </Text>
+
+                        {quantidadeAtiva > 0 ? (
+                            <Text
+                                style={[
+                                    estilos.contagem,
+                                    tema.escuro &&
+                                        aparenciaNovaCategoria &&
+                                        expandido && { color: coresDoGrupo.icone }
+                                ]}
+                            >
+                                {obterTextoDaContagem(quantidadeAtiva)}
+                            </Text>
+                        ) : null}
+                    </View>
+
+                    <IconeDaExpansao
+                        size={18}
+                        color={
+                            expandido ? coresDoGrupo.icone : tema.cores.interface.textoSecundario
+                        }
+                        weight="regular"
+                    />
+                </Pressable>
+
+                <SwitchField
+                    cores={coresInterruptor}
+                    ativo={todasAtivas}
+                    aoAlterar={alterarGrupo}
+                    desabilitado={grupoDesabilitado}
+                    somenteControle
+                    rotuloAcessibilidade={`Ativar todas as permissões de ${titulo}`}
+                />
+            </View>
+
+            {expandido ? (
+                <View
+                    style={[
+                        estilos.lista,
+                        {
+                            borderTopColor: coresDoGrupo.bordaExpandida
+                        }
+                    ]}
+                >
+                    {permissoesValidas.map((permissao, indice) => (
+                        <View
+                            key={permissao.id}
+                            style={[estilos.item, indice > 0 && estilos.itemComSeparador]}
+                        >
+                            <PermissionItem
+                                aparenciaNovaCategoria={aparenciaNovaCategoria}
+                                coresInterruptor={coresInterruptor}
+                                titulo={permissao.titulo}
+                                ativo={permissoesAtivas.has(permissao.id)}
+                                aoAlterar={(ativo) => aoAlterarPermissao?.(permissao.id, ativo)}
+                                desabilitado={
+                                    desabilitado || typeof aoAlterarPermissao !== 'function'
+                                }
+                                paleta={paleta}
+                            />
+                        </View>
+                    ))}
+                </View>
+            ) : null}
+        </View>
+    );
+}
+
+export default memo(PermissionGroup);

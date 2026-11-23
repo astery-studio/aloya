@@ -21,6 +21,10 @@ import { criarCycleEditRoutes } from '../../features/cycles/routes/cycleEdit.rou
 import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
+import { criarContactInvitationRoutes } from '../../features/support-network/routes/contactInvitation.routes.js';
+import { criarSupportContactRoutes } from '../../features/support-network/routes/supportContact.routes.js';
+import { criarContactLinkRoutes } from '../../features/support-network/routes/contactLink.routes.js';
+import { criarSupportContactRemovalRoutes } from '../../features/support-network/routes/supportContactRemoval.routes.js';
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
@@ -61,7 +65,8 @@ app.use(
         authMiddleware: container.authMiddleware,
         cadastroRateLimit: container.cadastroRateLimit,
         emailRateLimit: container.emailRateLimit,
-        loginRateLimit: container.loginRateLimit,
+        loginRateLimitJanelaMs: env.loginRateLimitJanelaMs,
+        loginRateLimitMaximo: env.loginRateLimitMaximo,
         contaLoginRateLimit: container.contaLoginRateLimit
     })
 );
@@ -156,6 +161,54 @@ app.use(
         permissionCategoryDeletionRateLimit: container.permissionCategoryDeletionRateLimit,
         permissionCategoryController: container.permissionCategoryController,
         permissionCategoryDeletionController: container.permissionCategoryDeletionController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarContactInvitationRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        lookupRateLimit: container.contactInvitationLookupRateLimit,
+        rateLimit: container.contactInvitationRateLimit,
+        responseRateLimit: container.contactInvitationResponseRateLimit,
+        controller: container.contactInvitationController,
+        responseController: container.contactInvitationResponseController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSupportContactRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactInvitationRateLimit,
+        responseRateLimit: container.contactInvitationResponseRateLimit,
+        controller: container.supportContactController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarContactLinkRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactLinkRateLimit,
+        controller: container.contactLinkController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSupportContactRemovalRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.supportContactRemovalRateLimit,
+        controller: container.supportContactRemovalController
     })
 );
 

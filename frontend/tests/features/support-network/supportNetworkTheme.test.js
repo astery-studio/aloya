@@ -1,11 +1,11 @@
-import { criarEstilos as criarEstilosGerais } from '../../../src/features/support-network/components/GeneralPermissions.styles';
-import { criarEstilos as criarEstilosGrupo } from '../../../src/features/support-network/components/PermissionGroup.styles';
+import { criarEstilos as criarEstilosGerais } from '../../../src/features/support-network/components/GeneralPermissions/GeneralPermissions.styles';
+import { criarEstilos as criarEstilosGrupo } from '../../../src/features/support-network/components/PermissionGroup/PermissionGroup.styles';
 import {
     criarEstilos as criarEstilosItem,
     criarFundosAtivos
-} from '../../../src/features/support-network/components/PermissionItem.styles';
-import { criarEstilos as criarEstilosGrupos } from '../../../src/features/support-network/components/PermissionGroups.styles';
-import { criarEstilos as criarEstilosContador } from '../../../src/features/support-network/components/PermissionCounter.styles';
+} from '../../../src/features/support-network/components/PermissionItem/PermissionItem.styles';
+import { criarEstilos as criarEstilosGrupos } from '../../../src/features/support-network/components/PermissionGroups/PermissionGroups.styles';
+import { criarEstilos as criarEstilosContador } from '../../../src/features/support-network/components/PermissionCounter/PermissionCounter.styles';
 import { criarEstilos as criarEstilosMembros } from '../../../src/features/support-network/screens/MembersScreen.styles';
 import { temaEscuro } from '../../../src/shared/theme/themePalettes';
 

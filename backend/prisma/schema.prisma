@@ -478,6 +478,11 @@ model VinculoRedeApoio {
   // O validator deve garantir um array de identificadores permitidos.
   permissoesIndividuais Json @default("[]") @map("permissoes_individuais")
 
+  // Identificação visual escolhida pela titular para o contato.
+  // Os valores são validados pelo backend antes da persistência.
+  iconeId String @default("pessoa") @map("icone_id")
+  corId   String @default("branco") @map("cor_id")
+
   status StatusVinculoRedeApoio @default(pendente)
 
   tokenConviteHash String?   @unique @map("token_convite_hash")

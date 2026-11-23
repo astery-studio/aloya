@@ -1,7 +1,5 @@
 //Testa a validação dos dados de perfil recebidos da API.
-import {
-    criarUserProfile
-} from '../../../../src/features/settings/models/userProfile'
+import { criarUserProfile } from '../../../../src/features/settings/models/userProfile';
 
 function criarResposta(alteracoes = {}) {
     return {
@@ -9,148 +7,122 @@ function criarResposta(alteracoes = {}) {
             id: 15,
             nome: 'Kaylanne Sátiro',
             email: 'kaylanne@example.com',
+            papel: 'principal',
             identidadeGenero: 'MULHER_CIS',
             dataNascimento: '2000-02-29',
-            atualizadoEm:
-                '2026-09-22T20:00:00.000Z',
+            atualizadoEm: '2026-09-22T20:00:00.000Z',
             ...alteracoes
         }
-    }
+    };
 }
 
 describe('criarUserProfile', () => {
     test('retorna somente os campos permitidos do perfil', () => {
-        const resposta =
-            criarResposta({
-                senhaHash:
-                    'valor que não pode chegar à tela',
-                papel: 'ADMIN',
-                token: 'token sensível'
-            })
+        const resposta = criarResposta({
+            senhaHash: 'valor que não pode chegar à tela',
+            escopoAdministrativo: 'ADMIN',
+            token: 'token sensível'
+        });
 
-        const perfil =
-            criarUserProfile(resposta)
+        const perfil = criarUserProfile(resposta);
 
         expect(perfil).toEqual({
             id: 15,
             nome: 'Kaylanne Sátiro',
             email: 'kaylanne@example.com',
+            papel: 'principal',
             identidadeGenero: 'MULHER_CIS',
             dataNascimento: '2000-02-29',
-            atualizadoEm:
-                '2026-09-22T20:00:00.000Z',
+            atualizadoEm: '2026-09-22T20:00:00.000Z',
             consentimentoParentalNecessario: false
-        })
+        });
 
-        expect(perfil).not.toHaveProperty(
-            'senhaHash'
-        )
+        expect(perfil).not.toHaveProperty('senhaHash');
 
-        expect(perfil).not.toHaveProperty(
-            'papel'
-        )
-
-        expect(perfil).not.toHaveProperty(
-            'token'
-        )
-    })
+        expect(perfil).not.toHaveProperty('token');
+    });
 
     test('retorna um perfil que não pode ser alterado', () => {
-        const perfil =
-            criarUserProfile(
-                criarResposta()
-            )
+        const perfil = criarUserProfile(criarResposta());
 
-        expect(
-            Object.isFrozen(perfil)
-        ).toBe(true)
-    })
+        expect(Object.isFrozen(perfil)).toBe(true);
+    });
+
+    test.each(['principal', 'contato_apoio', 'principal_e_contato_apoio'])(
+        'aceita o papel de conta %s',
+        (papel) => {
+            expect(criarUserProfile(criarResposta({ papel })).papel).toBe(papel);
+        }
+    );
+
+    test.each([undefined, null, 'administrador', '', 1])(
+        'rejeita o papel de conta inválido %p',
+        (papel) => {
+            expect(() => criarUserProfile(criarResposta({ papel }))).toThrow(
+                'Não foi possível carregar os dados do perfil.'
+            );
+        }
+    );
 
     test('preserva a exigência de consentimento parental', () => {
         const resposta = {
             ...criarResposta(),
             consentimentoParentalNecessario: true
-        }
+        };
 
-        const perfil =
-            criarUserProfile(resposta)
+        const perfil = criarUserProfile(resposta);
 
-        expect(
-            perfil.consentimentoParentalNecessario
-        ).toBe(true)
-    })
+        expect(perfil.consentimentoParentalNecessario).toBe(true);
+    });
 
     test('preserva a ausência da exigência de consentimento parental', () => {
         const resposta = {
             ...criarResposta(),
             consentimentoParentalNecessario: false
-        }
+        };
 
-        const perfil =
-            criarUserProfile(resposta)
+        const perfil = criarUserProfile(resposta);
 
-        expect(
-            perfil.consentimentoParentalNecessario
-        ).toBe(false)
-    })
+        expect(perfil.consentimentoParentalNecessario).toBe(false);
+    });
 
     test('considera que o consentimento não é necessário quando o campo não é enviado', () => {
-        const perfil =
-            criarUserProfile(
-                criarResposta()
-            )
+        const perfil = criarUserProfile(criarResposta());
 
-        expect(
-            perfil.consentimentoParentalNecessario
-        ).toBe(false)
-    })
+        expect(perfil.consentimentoParentalNecessario).toBe(false);
+    });
 
-    test.each([
-        null,
-        'true',
-        1,
-        {},
-        []
-    ])(
+    test.each([null, 'true', 1, {}, []])(
         'rejeita indicador de consentimento inválido %p',
         (consentimentoParentalNecessario) => {
-            expect(
-                () => criarUserProfile({
+            expect(() =>
+                criarUserProfile({
                     ...criarResposta(),
                     consentimentoParentalNecessario
                 })
-            ).toThrow(
-                'Não foi possível carregar os dados do perfil.'
-            )
+            ).toThrow('Não foi possível carregar os dados do perfil.');
         }
-    )
+    );
 
     test('aceita identidade de gênero nula', () => {
-        const perfil =
-            criarUserProfile(
-                criarResposta({
-                    identidadeGenero: null
-                })
-            )
+        const perfil = criarUserProfile(
+            criarResposta({
+                identidadeGenero: null
+            })
+        );
 
-        expect(
-            perfil.identidadeGenero
-        ).toBeNull()
-    })
+        expect(perfil.identidadeGenero).toBeNull();
+    });
 
     test('aceita o dia 29 em um ano bissexto', () => {
-        const perfil =
-            criarUserProfile(
-                criarResposta({
-                    dataNascimento:
-                        '2024-02-29'
-                })
-            )
+        const perfil = criarUserProfile(
+            criarResposta({
+                dataNascimento: '2024-02-29'
+            })
+        );
 
-        expect(
-            perfil.dataNascimento
-        ).toBe('2024-02-29')
-    })
+        expect(perfil.dataNascimento).toBe('2024-02-29');
+    });
 
     test.each([
         '2025-02-29',
@@ -166,45 +138,35 @@ describe('criarUserProfile', () => {
         '31/01/2026',
         '2026-1-01',
         'data inválida'
-    ])(
-        'rejeita a data de nascimento inválida %s',
-        (dataNascimento) => {
-            expect(
-                () => criarUserProfile(
-                    criarResposta({
-                        dataNascimento
-                    })
-                )
-            ).toThrow(
-                'Não foi possível carregar os dados do perfil.'
-            )
-        }
-    )
-
-    test('rejeita data de nascimento futura', () => {
-        expect(
-            () => criarUserProfile(
+    ])('rejeita a data de nascimento inválida %s', (dataNascimento) => {
+        expect(() =>
+            criarUserProfile(
                 criarResposta({
-                    dataNascimento:
-                        '2999-01-01'
+                    dataNascimento
                 })
             )
-        ).toThrow(
-            'Não foi possível carregar os dados do perfil.'
-        )
-    })
+        ).toThrow('Não foi possível carregar os dados do perfil.');
+    });
+
+    test('rejeita data de nascimento futura', () => {
+        expect(() =>
+            criarUserProfile(
+                criarResposta({
+                    dataNascimento: '2999-01-01'
+                })
+            )
+        ).toThrow('Não foi possível carregar os dados do perfil.');
+    });
 
     test('rejeita data de nascimento que não seja texto', () => {
-        expect(
-            () => criarUserProfile(
+        expect(() =>
+            criarUserProfile(
                 criarResposta({
                     dataNascimento: null
                 })
             )
-        ).toThrow(
-            'Não foi possível carregar os dados do perfil.'
-        )
-    })
+        ).toThrow('Não foi possível carregar os dados do perfil.');
+    });
 
     test.each([
         {
@@ -225,46 +187,29 @@ describe('criarUserProfile', () => {
         {
             atualizadoEm: null
         }
-    ])(
-        'rejeita campos de perfil com tipos inválidos',
-        (alteracoes) => {
-            expect(
-                () => criarUserProfile(
-                    criarResposta(
-                        alteracoes
-                    )
-                )
-            ).toThrow(
-                'Não foi possível carregar os dados do perfil.'
-            )
-        }
-    )
+    ])('rejeita campos de perfil com tipos inválidos', (alteracoes) => {
+        expect(() => criarUserProfile(criarResposta(alteracoes))).toThrow(
+            'Não foi possível carregar os dados do perfil.'
+        );
+    });
 
     test('rejeita configurações ausentes', () => {
-        expect(
-            () => criarUserProfile({})
-        ).toThrow(
-            'Não foi possível carregar os dados do perfil.'
-        )
-    })
+        expect(() => criarUserProfile({})).toThrow('Não foi possível carregar os dados do perfil.');
+    });
 
     test('rejeita configurações nulas', () => {
-        expect(
-            () => criarUserProfile({
+        expect(() =>
+            criarUserProfile({
                 configuracoes: null
             })
-        ).toThrow(
-            'Não foi possível carregar os dados do perfil.'
-        )
-    })
+        ).toThrow('Não foi possível carregar os dados do perfil.');
+    });
 
     test('rejeita configurações em formato de lista', () => {
-        expect(
-            () => criarUserProfile({
+        expect(() =>
+            criarUserProfile({
                 configuracoes: []
             })
-        ).toThrow(
-            'Não foi possível carregar os dados do perfil.'
-        )
-    })
-})
+        ).toThrow('Não foi possível carregar os dados do perfil.');
+    });
+});

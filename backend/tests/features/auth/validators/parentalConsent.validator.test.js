@@ -4,229 +4,191 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {
-    criarParentalConsentValidator
-} from '../../../../src/features/auth/validators/parentalConsent.validator.js';
+import { criarParentalConsentValidator } from '../../../../src/features/auth/validators/parentalConsent.validator.js';
 
 function criarValidator() {
     return criarParentalConsentValidator();
 }
 
-test(
-    'aceita e normaliza o e-mail na solicitação',
-    () => {
-        const validator = criarValidator();
+test('aceita e normaliza o e-mail na solicitação', () => {
+    const validator = criarValidator();
 
-        const resultado =
-            validator.validarSolicitacao({
-                emailResponsavelLegal:
-                    '  RESPONSAVEL@EMAIL.COM  '
-            });
+    const resultado = validator.validarSolicitacao({
+        emailResponsavelLegal: '  RESPONSAVEL@EMAIL.COM  '
+    });
 
-        assert.equal(resultado.valido, true);
-        assert.deepEqual(resultado.erros, []);
+    assert.equal(resultado.valido, true);
+    assert.deepEqual(resultado.erros, []);
 
-        assert.deepEqual(resultado.dados, {
-            emailResponsavelLegal:
-                'responsavel@email.com'
-        });
+    assert.deepEqual(resultado.dados, {
+        emailResponsavelLegal: 'responsavel@email.com'
+    });
+});
+
+test('rejeita solicitação sem e-mail do responsável', () => {
+    const validator = criarValidator();
+
+    const resultado = validator.validarSolicitacao({});
+
+    assert.equal(resultado.valido, false);
+
+    assert.deepEqual(resultado.erros, [
+        {
+            campo: 'emailResponsavelLegal',
+
+            mensagem: 'Informe um e-mail válido.'
+        }
+    ]);
+});
+
+test('rejeita e-mail inválido na solicitação', () => {
+    const validator = criarValidator();
+
+    const resultado = validator.validarSolicitacao({
+        emailResponsavelLegal: 'email-invalido'
+    });
+
+    assert.equal(resultado.valido, false);
+
+    assert.deepEqual(resultado.erros, [
+        {
+            campo: 'emailResponsavelLegal',
+
+            mensagem: 'Informe um e-mail válido.'
+        }
+    ]);
+});
+
+test('permite reenvio sem novo e-mail', () => {
+    const validator = criarValidator();
+
+    const resultado = validator.validarReenvio({});
+
+    assert.equal(resultado.valido, true);
+    assert.deepEqual(resultado.erros, []);
+
+    assert.deepEqual(resultado.dados, {
+        emailResponsavelLegal: null
+    });
+});
+
+test('normaliza o novo e-mail informado no reenvio', () => {
+    const validator = criarValidator();
+
+    const resultado = validator.validarReenvio({
+        emailResponsavelLegal: '  NOVO@EMAIL.COM  '
+    });
+
+    assert.equal(resultado.valido, true);
+
+    assert.deepEqual(resultado.dados, {
+        emailResponsavelLegal: 'novo@email.com'
+    });
+});
+
+test('rejeita novo e-mail inválido no reenvio', () => {
+    const validator = criarValidator();
+
+    const resultado = validator.validarReenvio({
+        emailResponsavelLegal: 'email-invalido'
+    });
+
+    assert.equal(resultado.valido, false);
+
+    assert.deepEqual(resultado.erros, [
+        {
+            campo: 'emailResponsavelLegal',
+
+            mensagem: 'Informe um e-mail válido.'
+        }
+    ]);
+});
+
+test('aceita token de consentimento no formato esperado', () => {
+    const validator = criarValidator();
+
+    const tokenValido = 'a'.repeat(43);
+
+    const resultado = validator.validarToken(tokenValido);
+
+    assert.equal(resultado.valido, true);
+    assert.deepEqual(resultado.erros, []);
+
+    assert.deepEqual(resultado.dados, {
+        token: tokenValido
+    });
+});
+
+test('rejeita corpos malformados e campos protegidos na solicitação', () => {
+    const validator = criarParentalConsentValidator();
+
+    for (const body of [null, [], 'email@exemplo.com', Object.create({ admin: true })]) {
+        assert.equal(validator.validarSolicitacao(body).valido, false);
     }
-);
 
-test(
-    'rejeita solicitação sem e-mail do responsável',
-    () => {
-        const validator = criarValidator();
+    const resultado = validator.validarSolicitacao({
+        emailResponsavelLegal: 'responsavel@email.com',
+        titularMenorId: 999
+    });
+    assert.equal(resultado.valido, false);
+    assert.match(resultado.erros[0].mensagem, /campos não permitidos/u);
+});
 
-        const resultado =
-            validator.validarSolicitacao({});
+test('aceita reenvio vazio, mas rejeita corpo malformado ou campo interno', () => {
+    const validator = criarParentalConsentValidator();
 
-        assert.equal(resultado.valido, false);
+    assert.equal(validator.validarReenvio({}).valido, true);
+    assert.equal(validator.validarReenvio(undefined).valido, true);
+    assert.equal(validator.validarReenvio(null).valido, false);
+    assert.equal(
+        validator.validarReenvio({ emailResponsavelLegal: null, statusConsentimento: 'liberado' })
+            .valido,
+        false
+    );
+});
 
-        assert.deepEqual(resultado.erros, [
-            {
-                campo:
-                    'emailResponsavelLegal',
+test('aceita caracteres seguros para URL no token', () => {
+    const validator = criarValidator();
 
-                mensagem:
-                    'Informe um e-mail válido.'
-            }
-        ]);
-    }
-);
+    const tokenValido = `${'a'.repeat(41)}-_`;
 
-test(
-    'rejeita e-mail inválido na solicitação',
-    () => {
-        const validator = criarValidator();
+    const resultado = validator.validarToken(tokenValido);
 
-        const resultado =
-            validator.validarSolicitacao({
-                emailResponsavelLegal:
-                    'email-invalido'
-            });
+    assert.equal(tokenValido.length, 43);
+    assert.equal(resultado.valido, true);
+});
 
-        assert.equal(resultado.valido, false);
+test('rejeita token com tamanho incorreto', () => {
+    const validator = criarValidator();
 
-        assert.deepEqual(resultado.erros, [
-            {
-                campo:
-                    'emailResponsavelLegal',
+    const resultado = validator.validarToken('token-curto');
 
-                mensagem:
-                    'Informe um e-mail válido.'
-            }
-        ]);
-    }
-);
+    assert.equal(resultado.valido, false);
 
-test(
-    'permite reenvio sem novo e-mail',
-    () => {
-        const validator = criarValidator();
+    assert.deepEqual(resultado.erros, [
+        {
+            campo: 'token',
 
-        const resultado =
-            validator.validarReenvio({});
+            mensagem: 'Link de consentimento inválido.'
+        }
+    ]);
+});
 
-        assert.equal(resultado.valido, true);
-        assert.deepEqual(resultado.erros, []);
+test('rejeita token com caracteres não permitidos', () => {
+    const validator = criarValidator();
 
-        assert.deepEqual(resultado.dados, {
-            emailResponsavelLegal: null
-        });
-    }
-);
+    const tokenInvalido = `${'a'.repeat(42)}!`;
 
-test(
-    'normaliza o novo e-mail informado no reenvio',
-    () => {
-        const validator = criarValidator();
+    const resultado = validator.validarToken(tokenInvalido);
 
-        const resultado =
-            validator.validarReenvio({
-                emailResponsavelLegal:
-                    '  NOVO@EMAIL.COM  '
-            });
+    assert.equal(tokenInvalido.length, 43);
+    assert.equal(resultado.valido, false);
 
-        assert.equal(resultado.valido, true);
+    assert.deepEqual(resultado.erros, [
+        {
+            campo: 'token',
 
-        assert.deepEqual(resultado.dados, {
-            emailResponsavelLegal:
-                'novo@email.com'
-        });
-    }
-);
-
-test(
-    'rejeita novo e-mail inválido no reenvio',
-    () => {
-        const validator = criarValidator();
-
-        const resultado =
-            validator.validarReenvio({
-                emailResponsavelLegal:
-                    'email-invalido'
-            });
-
-        assert.equal(resultado.valido, false);
-
-        assert.deepEqual(resultado.erros, [
-            {
-                campo:
-                    'emailResponsavelLegal',
-
-                mensagem:
-                    'Informe um e-mail válido.'
-            }
-        ]);
-    }
-);
-
-test(
-    'aceita token de consentimento no formato esperado',
-    () => {
-        const validator = criarValidator();
-
-        const tokenValido = 'a'.repeat(43);
-
-        const resultado =
-            validator.validarToken(
-                tokenValido
-            );
-
-        assert.equal(resultado.valido, true);
-        assert.deepEqual(resultado.erros, []);
-
-        assert.deepEqual(resultado.dados, {
-            token: tokenValido
-        });
-    }
-);
-
-test(
-    'aceita caracteres seguros para URL no token',
-    () => {
-        const validator = criarValidator();
-
-        const tokenValido =
-            `${'a'.repeat(41)}-_`;
-
-        const resultado =
-            validator.validarToken(
-                tokenValido
-            );
-
-        assert.equal(tokenValido.length, 43);
-        assert.equal(resultado.valido, true);
-    }
-);
-
-test(
-    'rejeita token com tamanho incorreto',
-    () => {
-        const validator = criarValidator();
-
-        const resultado =
-            validator.validarToken(
-                'token-curto'
-            );
-
-        assert.equal(resultado.valido, false);
-
-        assert.deepEqual(resultado.erros, [
-            {
-                campo: 'token',
-
-                mensagem:
-                    'Link de consentimento inválido.'
-            }
-        ]);
-    }
-);
-
-test(
-    'rejeita token com caracteres não permitidos',
-    () => {
-        const validator = criarValidator();
-
-        const tokenInvalido =
-            `${'a'.repeat(42)}!`;
-
-        const resultado =
-            validator.validarToken(
-                tokenInvalido
-            );
-
-        assert.equal(tokenInvalido.length, 43);
-        assert.equal(resultado.valido, false);
-
-        assert.deepEqual(resultado.erros, [
-            {
-                campo: 'token',
-
-                mensagem:
-                    'Link de consentimento inválido.'
-            }
-        ]);
-    }
-);
+            mensagem: 'Link de consentimento inválido.'
+        }
+    ]);
+});

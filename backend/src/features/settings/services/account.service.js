@@ -9,6 +9,7 @@ function criarAccountService({
         id: true,
         nome: true,
         email: true,
+        papel: true,
         genero: true,
         dataNascimento: true,
         temaVisual: true,
@@ -36,6 +37,8 @@ function criarAccountService({
             id: usuario.id,
             nome: usuario.nome,
             email: usuario.email,
+
+            papel: usuario.papel,
 
             identidadeGenero: usuario.genero,
 
@@ -180,6 +183,17 @@ function criarAccountService({
 
                         select: selectConfiguracoes
                     });
+
+                    if (alteracoes.email !== undefined) {
+                        await tx.vinculoRedeApoio.updateMany({
+                            where: {
+                                contatoId: usuarioId
+                            },
+                            data: {
+                                emailConvidado: alteracoes.email
+                            }
+                        });
+                    }
 
                     if (passouASerMenorDe16) {
                         await parentalConsentService.reativarAposCorrecaoNascimento(tx, usuarioId);

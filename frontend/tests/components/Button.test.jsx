@@ -31,6 +31,22 @@ describe('Button', () => {
         expect(aoPressionar).toHaveBeenCalledTimes(1);
     });
 
+    test('mantém textos longos em uma linha e reduz a fonte quando necessário', async () => {
+        await renderizarBotao(
+            <Button
+                texto="Cadastrar Permissões Individuais"
+                icone={() => null}
+                aoPressionar={jest.fn()}
+            />
+        );
+
+        const texto = screen.getByText('Cadastrar Permissões Individuais');
+
+        expect(texto).toHaveProp('numberOfLines', 1);
+        expect(texto).toHaveProp('adjustsFontSizeToFit', true);
+        expect(texto).toHaveProp('minimumFontScale', 0.72);
+    });
+
     test.each([
         [
             'desativado',

@@ -1,12 +1,7 @@
 /**
  * Configura limitadores de requisição e respostas seguras para excesso de tentativas.
  */
-function criarCadastroRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
+function criarCadastroRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
     // Limita tentativas de criação de conta por endereço IP.
     return rateLimit({
         windowMs: janelaMs,
@@ -25,19 +20,15 @@ function criarCadastroRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_TENTATIVAS',
-                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
     });
 }
 
-function criarEmailRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
+function criarEmailRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
     // Limita solicitações e reenvios de e-mail por endereço IP.
     return rateLimit({
         windowMs: janelaMs,
@@ -56,21 +47,16 @@ function criarEmailRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_ENVIOS_EMAIL',
-                    mensagem: 'Muitas solicitações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas solicitações em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
     });
 }
 
-function criarLoginRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
-    // Limita tentativas de login por endereço IP contra tentativas de força bruta.
-    return rateLimit({
+function criarConfiguracaoLoginRateLimit({ janelaMs, limite, logger = console }) {
+    return {
         windowMs: janelaMs,
         limit: limite,
         standardHeaders: true,
@@ -88,19 +74,20 @@ function criarLoginRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_TENTATIVAS_LOGIN',
-                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
-    });
+    };
 }
 
-function criarContaLoginRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
+function criarLoginRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
+    // Mantém a fábrica disponível para os demais consumidores e testes isolados.
+    return rateLimit(criarConfiguracaoLoginRateLimit({ janelaMs, limite, logger }));
+}
+
+function criarContaLoginRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
     return rateLimit({
         windowMs: janelaMs,
         limit: limite,
@@ -108,9 +95,8 @@ function criarContaLoginRateLimit({
         legacyHeaders: false,
         skipSuccessfulRequests: true,
         keyGenerator: (req) => {
-            const email = typeof req.body?.email === 'string'
-                ? req.body.email.trim().toLowerCase()
-                : '';
+            const email =
+                typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
             return email || 'credencial-ausente';
         },
         handler: (req, res) => {
@@ -122,7 +108,8 @@ function criarContaLoginRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_TENTATIVAS_LOGIN',
-                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
@@ -130,12 +117,7 @@ function criarContaLoginRateLimit({
 }
 
 // Limita alterações dos dados da conta por usuário autenticado.
-function criarConfiguracoesContaRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
+function criarConfiguracoesContaRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
     return rateLimit({
         windowMs: janelaMs,
         limit: limite,
@@ -152,7 +134,8 @@ function criarConfiguracoesContaRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_ALTERACOES_CONTA',
-                    mensagem: 'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
@@ -160,12 +143,7 @@ function criarConfiguracoesContaRateLimit({
 }
 
 // Limita tentativas malsucedidas de alteração de senha por usuário autenticado.
-function criarAlteracaoSenhaRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
+function criarAlteracaoSenhaRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
     return rateLimit({
         windowMs: janelaMs,
         limit: limite,
@@ -183,7 +161,8 @@ function criarAlteracaoSenhaRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_ALTERACAO_SENHA',
-                    mensagem: 'Muitas tentativas de alteração de senha. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas tentativas de alteração de senha. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
@@ -191,12 +170,7 @@ function criarAlteracaoSenhaRateLimit({
 }
 
 // Limita tentativas malsucedidas de confirmação da senha para exclusão.
-function criarExclusaoContaRateLimit({
-    rateLimit,
-    janelaMs,
-    limite,
-    logger = console
-}) {
+function criarExclusaoContaRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
     return rateLimit({
         windowMs: janelaMs,
         limit: limite,
@@ -214,7 +188,8 @@ function criarExclusaoContaRateLimit({
             return res.status(429).json({
                 erro: {
                     codigo: 'LIMITE_EXCLUSAO_CONTA',
-                    mensagem: 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem:
+                        'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
             });
         }
@@ -224,6 +199,7 @@ function criarExclusaoContaRateLimit({
 export {
     criarCadastroRateLimit,
     criarEmailRateLimit,
+    criarConfiguracaoLoginRateLimit,
     criarLoginRateLimit,
     criarContaLoginRateLimit,
     criarConfiguracoesContaRateLimit,

@@ -27,7 +27,7 @@ import {
     criarResumoPermissoes,
     ordenarCategorias,
     SupportCategoryList
-} from '../../../../src/features/support-network/components/SupportCategoryList';
+} from '../../../../src/features/support-network/components/SupportCategoryList/SupportCategoryList';
 import {
     gruposPermissoes,
     permissoesGerais

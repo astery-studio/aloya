@@ -46,6 +46,8 @@ function criarAuthService({
         });
     }
     async function cadastrar(dados, dispositivo) {
+        const papelCadastro = dados.tipoUsuario === 'contato_apoio' ? 'contato_apoio' : 'principal';
+        const contaPrincipal = papelCadastro === 'principal';
         const usuarioExistente = await prisma.usuario.findUnique({
             where: {
                 email: dados.email
@@ -82,7 +84,7 @@ function criarAuthService({
 
                         senhaHash,
 
-                        papel: 'principal',
+                        papel: papelCadastro,
                         statusConta: 'ativa',
 
                         duracaoCicloInformada: dados.duracaoCicloInformada,
@@ -103,13 +105,22 @@ function criarAuthService({
                     }
                 });
 
-                // Gera o token JWT de sessão e seus dados seguros para persistência.
-                const sessao = tokenService.gerarTokenSessao(usuario);
-                const cicloInicial = dados.dataInicioUltimaMenstruacao
-                    ? await criarRegistroInicial(tx, usuario.id, dados)
-                    : null;
+                const cicloInicial =
+                    contaPrincipal && dados.dataInicioUltimaMenstruacao
+                        ? await criarRegistroInicial(tx, usuario.id, dados)
+                        : null;
 
-                if (dados.menorDe16 && dados.emailResponsavelLegal) {
+                await tx.vinculoRedeApoio.updateMany({
+                    where: {
+                        emailConvidado: usuario.email,
+                        contatoId: null,
+                        status: 'pendente',
+                        dataExpiracao: { gt: new Date() }
+                    },
+                    data: { contatoId: usuario.id }
+                });
+
+                if (contaPrincipal && dados.menorDe16 && dados.emailResponsavelLegal) {
                     emailConsentimentoPendente = await parentalConsentService.criarPendente(tx, {
                         titularMenorId: usuario.id,
                         nomeTitular: usuario.nome,
@@ -118,6 +129,8 @@ function criarAuthService({
                         emailResponsavelLegal: dados.emailResponsavelLegal
                     });
                 }
+
+                const sessao = tokenService.gerarTokenSessao(usuario);
 
                 // Cria o registro de sessão sem armazenar o token JWT puro.
                 await tx.sessao.create({
@@ -171,25 +184,26 @@ function criarAuthService({
                       }
                     : null,
 
-                consentimentoParental: dados.menorDe16
-                    ? {
-                          exigidoParaRedeApoio: true,
-                          solicitado: solicitouConsentimento,
-                          redeApoioBloqueada: true,
-                          emailEnviado,
+                consentimentoParental:
+                    contaPrincipal && dados.menorDe16
+                        ? {
+                              exigidoParaRedeApoio: true,
+                              solicitado: solicitouConsentimento,
+                              redeApoioBloqueada: true,
+                              emailEnviado,
 
-                          mensagemEnvio:
-                              emailConsentimentoPendente && !emailEnviado
-                                  ? 'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
-                                  : null
-                      }
-                    : {
-                          exigidoParaRedeApoio: false,
-                          solicitado: false,
-                          redeApoioBloqueada: false,
-                          emailEnviado: false,
-                          mensagemEnvio: null
-                      },
+                              mensagemEnvio:
+                                  emailConsentimentoPendente && !emailEnviado
+                                      ? 'Não foi possível enviar o pedido de autorização no momento. Tente novamente.'
+                                      : null
+                          }
+                        : {
+                              exigidoParaRedeApoio: false,
+                              solicitado: false,
+                              redeApoioBloqueada: false,
+                              emailEnviado: false,
+                              mensagemEnvio: null
+                          },
 
                 mensagem: `Boas-vindas ao ALOYA, ${resultado.usuario.nome}.`
             };
