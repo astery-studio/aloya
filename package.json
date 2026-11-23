@@ -10,17 +10,44 @@
     "backend:start": "cd backend && npm run start:prepared",
     "frontend": "npm --prefix frontend start -- --clear",
     "frontend:dev-client": "npm --prefix frontend run start:dev-client -- --clear",
-    "format": "npm --prefix backend run format && npm --prefix frontend run format",
-    "format:check": "npm --prefix backend run format:check:ci && npm --prefix frontend run format:check:ci",
-    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "format": "npm --prefix backend run format && npm --prefix frontend run format && npm --prefix backend exec -- prettier --write \"scripts/**/*.mjs\"",
+    "format:check": "npm --prefix backend run format:check:ci && npm --prefix frontend run format:check:ci && npm --prefix backend exec -- prettier --check \"scripts/**/*.mjs\"",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint && npm --prefix backend exec -- eslint --config backend/eslint.config.js scripts --max-warnings=0",
+    "precommit": "lint-staged",
+    "prepush": "node scripts/run-affected-tests.mjs",
     "preview:hu013": "cd frontend && npm run preview:hu013",
     "quality": "npm run format:check && npm run lint && npm test",
     "test:backend": "cd backend && npm test",
     "test:frontend": "cd frontend && npm test",
     "test": "npm --prefix backend test && npm --prefix frontend test",
-    "tunnel": "cd \"$env:USERPROFILE\\Downloads\" && .\\cloudflared.exe tunnel --url http://localhost:3000"
+    "tunnel": "cd \"$env:USERPROFILE\\Downloads\" && .\\cloudflared.exe tunnel --url http://localhost:3000",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "backend/**/*.{js,mjs,cjs}": [
+      "npm --prefix backend exec -- eslint --fix --max-warnings=0",
+      "npm --prefix backend exec -- prettier --write"
+    ],
+    "frontend/src/**/*.{js,jsx}": [
+      "npm --prefix frontend exec -- eslint --fix --max-warnings=0",
+      "npm --prefix frontend exec -- prettier --write"
+    ],
+    "frontend/tests/**/*.{js,jsx}": [
+      "npm --prefix frontend exec -- eslint --fix --max-warnings=0",
+      "npm --prefix frontend exec -- prettier --write"
+    ],
+    "scripts/**/*.{js,mjs,cjs}": [
+      "npm --prefix backend exec -- eslint --config backend/eslint.config.js --max-warnings=0",
+      "npm --prefix backend exec -- prettier --write"
+    ],
+    "**/*.{json,md}": "npm --prefix backend exec -- prettier --write",
+    ".prettierrc.json": "npm --prefix backend exec -- prettier --write",
+    "frontend/{app.config.js,app.config.test.cjs,eslint.config.js}": "npm --prefix backend exec -- prettier --write",
+    ".github/**/*.{yml,yaml}": "npm --prefix backend exec -- prettier --write"
   },
   "devDependencies": {
-    "concurrently": "^10.0.6"
+    "concurrently": "^10.0.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0"
   }
 }
