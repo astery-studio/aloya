@@ -2,6 +2,7 @@ import { Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { DropIcon, NotepadIcon, PillIcon } from '../../../../shared/components/icons/AppIcons';
 import { NoCycleHero } from './NoCycleHero';
+import { estilos } from './NoCycleStartSection.styles';
 
 function NoCycleStartSection({
     motivoSemPrevisao,
@@ -12,51 +13,44 @@ function NoCycleStartSection({
     return (
         <>
             <NoCycleHero motivoSemPrevisao={motivoSemPrevisao} />
-            <View
-                style={{
-                    margin: 16,
-                    padding: 18,
-                    gap: 12,
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: 24
-                }}
-            >
-                <Text>PRIMEIRO PASSO</Text>
-                <Text style={{ fontSize: 21 }}>Vamos começar?</Text>
-                <Text>
+            <View style={estilos.cartao}>
+                <Text style={estilos.rotulo}>Primeiro passo</Text>
+                <Text style={estilos.titulo}>Vamos começar?</Text>
+                <Text style={estilos.descricao}>
                     Registre as datas da sua menstruação para começar a construir seu histórico.
+                    Com o tempo, esses registros ajudam a acompanhar a duração e as variações dos
+                    seus ciclos.
                 </Text>
                 <ButtonScreen
                     texto="Cadastrar Menstruação"
                     icone={DropIcon}
                     aoPressionar={aoCadastrarMenstruacao}
                 />
+                <Text style={estilos.observacao}>
+                    Você também pode registrar menstruações anteriores, caso se lembre das datas.
+                </Text>
             </View>
-            <View
-                style={{
-                    margin: 16,
-                    padding: 18,
-                    gap: 12,
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: 24
-                }}
-            >
-                <Text>SEU ESPAÇO</Text>
-                <Text style={{ fontSize: 21 }}>Comece por você!</Text>
-                <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={estilos.cartao}>
+                <Text style={estilos.rotulo}>Seu espaço</Text>
+                <Text style={estilos.titulo}>Comece por você!</Text>
+                <Text style={estilos.descricao}>
+                    Você não precisa ter um ciclo registrado para começar. Anote como está se
+                    sentindo ou organize o acompanhamento do seu anticoncepcional.
+                </Text>
+                <View style={estilos.acoes}>
                     <ButtonScreen
                         texto="Diário"
                         icone={NotepadIcon}
                         aoPressionar={aoAbrirDiario}
                         variante="verde"
-                        estilo={{ flex: 1 }}
+                        estilo={estilos.acao}
                     />
                     <ButtonScreen
                         texto="Anticoncepcional"
                         icone={PillIcon}
                         aoPressionar={aoAbrirAnticoncepcional}
                         variante="verde"
-                        estilo={{ flex: 1 }}
+                        estilo={estilos.acao}
                     />
                 </View>
             </View>
