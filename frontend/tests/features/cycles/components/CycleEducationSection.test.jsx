@@ -4,7 +4,7 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('alterna o conteúdo educativo das quatro fases', async () => {
     await render(<CycleEducationSection />);
-    expect(screen.getByText(/ciclo recomeça/)).toBeOnTheScreen();
+    expect(screen.getByText(/revestimento interno/)).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ovulatória' }));
 

@@ -1,20 +1,14 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { CONTEUDOS_EDUCATIVOS } from '../constants/cycleEducationContent';
 
-const PHASES = Object.freeze([
-    { id: 'menstrual', label: 'Menstrual', text: 'O ciclo recomeça com o período menstrual.' },
-    {
-        id: 'folicular',
-        label: 'Folicular',
-        text: 'O corpo se prepara gradualmente para a ovulação.'
-    },
-    {
-        id: 'ovulatoria',
-        label: 'Ovulatória',
-        text: 'A fertilidade estimada costuma ser mais alta.'
-    },
-    { id: 'lutea', label: 'Lútea', text: 'O corpo se prepara para o próximo ciclo.' }
-]);
+const PHASES = Object.freeze(
+    Object.entries(CONTEUDOS_EDUCATIVOS).map(([id, conteudo]) => ({
+        id,
+        ...conteudo,
+        text: conteudo.texto
+    }))
+);
 
 function CycleEducationSection() {
     const [selected, setSelected] = useState(PHASES[0]);
