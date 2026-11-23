@@ -19,6 +19,7 @@ import { cores } from '../../../shared/theme';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { formatarDataLonga } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleForecastPanel.styles';
+import { CycleExpandableCard } from './CycleExpandableCard';
 import { PhaseSymbolSlot } from './PhaseSymbolSlot';
 
 const CycleForecastVisualContext = createContext(null);
@@ -218,37 +219,40 @@ function ConteudoFase({ conteudo, fase }) {
     const cor = coresConteudo[fase];
     return (
         <View>
-            <View style={estilos.secaoTexto}>
-                <Text style={estilos.tituloSecao}>{conteudo.tituloExplicacao}</Text>
-                <View style={estilos.textoComMarcador}>
-                    <View style={[estilos.marcador, { backgroundColor: cor }]} />
-                    <Text style={estilos.descricaoFase}>{conteudo.descricao}</Text>
+            <CycleExpandableCard title={conteudo.tituloExplicacao} initiallyExpanded>
+                <View style={estilos.secaoTexto}>
+                    <View style={estilos.textoComMarcador}>
+                        <View style={[estilos.marcador, { backgroundColor: cor }]} />
+                        <Text style={estilos.descricaoFase}>{conteudo.descricao}</Text>
+                    </View>
                 </View>
-            </View>
-            <View style={estilos.secaoSintomas}>
-                <Text style={estilos.tituloSecao}>Sintomas comuns</Text>
-                <View style={estilos.listaSintomas}>
-                    {conteudo.sintomas.map((sintoma) => (
-                        <View key={sintoma} style={estilos.sintoma}>
-                            <View style={[estilos.marcadorSintoma, { backgroundColor: cor }]} />
-                            <Text style={estilos.textoSintoma}>{sintoma}</Text>
+            </CycleExpandableCard>
+            <CycleExpandableCard title="Sintomas comuns" initiallyExpanded>
+                <View style={estilos.secaoSintomas}>
+                    <View style={estilos.listaSintomas}>
+                        {conteudo.sintomas.map((sintoma) => (
+                            <View key={sintoma} style={estilos.sintoma}>
+                                <View style={[estilos.marcadorSintoma, { backgroundColor: cor }]} />
+                                <Text style={estilos.textoSintoma}>{sintoma}</Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            </CycleExpandableCard>
+            <CycleExpandableCard title="Dicas para hoje" initiallyExpanded>
+                <View style={estilos.secaoDicas}>
+                    {conteudo.dicas.map((dica, indice) => (
+                        <View key={dica} style={estilos.dica}>
+                            <View style={estilos.numeroDica}>
+                                <Text style={[estilos.textoNumeroDica, { color: cor }]}>
+                                    {indice + 1}
+                                </Text>
+                            </View>
+                            <Text style={estilos.textoDica}>{dica}</Text>
                         </View>
                     ))}
                 </View>
-            </View>
-            <View style={estilos.secaoDicas}>
-                <Text style={estilos.tituloSecao}>Dicas para hoje</Text>
-                {conteudo.dicas.map((dica, indice) => (
-                    <View key={dica} style={estilos.dica}>
-                        <View style={estilos.numeroDica}>
-                            <Text style={[estilos.textoNumeroDica, { color: cor }]}>
-                                {indice + 1}
-                            </Text>
-                        </View>
-                        <Text style={estilos.textoDica}>{dica}</Text>
-                    </View>
-                ))}
-            </View>
+            </CycleExpandableCard>
         </View>
     );
 }

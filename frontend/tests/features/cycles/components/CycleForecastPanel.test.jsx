@@ -71,6 +71,9 @@ test.each([
     expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
     expect(screen.getByText(descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
+    expect(
+        screen.getByRole('button', { name: 'Sintomas comuns' }).props.accessibilityState
+    ).toEqual({ expanded: true });
     expect(screen.getByText('Observe como seu corpo está se sentindo hoje.')).toBeOnTheScreen();
     expect(
         screen.getByText('Continue registrando suas percepções ao longo do ciclo.')
