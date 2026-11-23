@@ -93,6 +93,7 @@ function criarEstilos(tema) {
         labelCompacto: {
             fontFamily: fontFamilies.semibold,
             fontSize: 11,
+            fontWeight: '600',
             lineHeight: 16
         },
 

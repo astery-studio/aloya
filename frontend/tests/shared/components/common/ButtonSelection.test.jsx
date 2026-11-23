@@ -72,6 +72,17 @@ describe('ButtonSelection', () => {
         expect(screen.getByRole('button')).not.toBeSelected();
     });
 
+    test.each([false, true])(
+        'mantém peso semibold na variante compacta selecionada=%s',
+        async (selected) => {
+            await renderizarBotao({ variante: 'compacto', selected });
+
+            expect(screen.getByText('Opção mensal')).toHaveStyle({
+                fontWeight: '600'
+            });
+        }
+    );
+
     test('não executa ação desabilitada', async () => {
         const onPress = jest.fn();
 
