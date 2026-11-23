@@ -48,6 +48,9 @@ test('habilita a reflexão preenchida e delega o salvamento', async () => {
         />
     );
 
+    expect(
+        screen.getByRole('header', { name: 'O que seu corpo está pedindo hoje?' })
+    ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
     expect(aoSalvar).toHaveBeenCalledTimes(1);
 });
@@ -55,5 +58,6 @@ test('habilita a reflexão preenchida e delega o salvamento', async () => {
 test('mantém instrução textual quando o movimento é reduzido', async () => {
     await render(<GuidedBreathingSheet visivel movimentoReduzido aoFechar={jest.fn()} />);
 
+    expect(screen.getByRole('header', { name: 'Acompanhe o movimento' })).toBeOnTheScreen();
     expect(screen.getByText('Inspire e expire devagar, no seu ritmo.')).toBeOnTheScreen();
 });
