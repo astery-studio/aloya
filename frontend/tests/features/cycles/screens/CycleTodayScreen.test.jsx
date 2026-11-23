@@ -64,7 +64,7 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
 });
 
 test('mantém o cabeçalho dentro da área rolável', async () => {
-    const { getByTestId, getByText } = await renderizar({ previsao });
+    const { getByTestId } = await renderizar({ previsao });
     const rolagem = getByTestId('conteudo-rolavel');
 
     expect(within(rolagem).getByText('quinta-feira, 8 de outubro')).toBeOnTheScreen();
