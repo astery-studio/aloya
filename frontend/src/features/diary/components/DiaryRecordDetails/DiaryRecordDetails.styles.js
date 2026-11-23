@@ -17,6 +17,20 @@ function criarEstilos(tema) {
             paddingHorizontal: 24,
             gap: 12
         },
+        navegadorData: {
+            width: 294,
+            maxWidth: '100%',
+            padding: 2,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 5
+        },
+        textoData: {
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.semiBold,
+            fontSize: 14,
+            lineHeight: 25.5
+        },
         rolagem: { width: '100%', flexShrink: 1 },
         conteudoRolavel: {
             width: '100%',

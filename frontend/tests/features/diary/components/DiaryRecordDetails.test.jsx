@@ -77,7 +77,19 @@ describe('DiaryRecordDetails', () => {
             fontSize: 17,
             lineHeight: 22
         });
-        expect(screen.getByText('28/10/2026')).toHaveStyle({ fontSize: 14, lineHeight: 26 });
+        expect(screen.getByTestId('diary-date-navigator')).toHaveStyle({
+            width: 294,
+            maxWidth: '100%',
+            padding: 2,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 5
+        });
+        expect(screen.getByText('28/10/2026')).toHaveStyle({
+            color: '#5C5C59',
+            fontSize: 14,
+            lineHeight: 25.5
+        });
         expect(screen.getByText('No dia 21 do seu ciclo 03 você registrou:')).toBeOnTheScreen();
         expect(screen.getByRole('header', { name: 'PELE' })).toHaveStyle({
             fontSize: 10,

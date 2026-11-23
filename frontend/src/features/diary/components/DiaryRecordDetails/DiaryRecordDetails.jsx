@@ -111,6 +111,8 @@ function DiaryRecordDetails({
                     proximoDisponivel={typeof aoProximo === 'function'}
                     desabilitado={bloqueado}
                     compacto
+                    estiloContainer={estilos.navegadorData}
+                    estiloTexto={estilos.textoData}
                 />
             </View>
 
