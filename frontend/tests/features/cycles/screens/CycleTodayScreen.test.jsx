@@ -74,7 +74,8 @@ test('mantém a faixa de datas no estado sem dados', async () => {
     await renderizar({ previsao: { ...previsao, status: 'DADOS_INSUFICIENTES' } });
 
     expect(screen.getByLabelText('Datas do ciclo')).toBeOnTheScreen();
-    expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+    expect(screen.getByText('Continue registrando seu ciclo')).toBeOnTheScreen();
+    expect(screen.queryByText('Conheça seu ciclo')).not.toBeOnTheScreen();
 });
 
 test('retorna da data selecionada para a data de referência', async () => {

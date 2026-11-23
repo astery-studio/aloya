@@ -11,6 +11,7 @@ import { CycleForecastPanel } from '../components/CycleForecastPanel';
 import { ReturnToTodayButton } from '../components/ReturnToTodayButton';
 import { conteudoPorFase } from '../constants/phaseContent';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
+import { criarCycleHomeViewModel } from '../utils/cycleHomeViewModel';
 import {
     criarDiasDaFaixa,
     formatarDataCabecalho,
@@ -91,7 +92,12 @@ function CycleTodayScreen({
                 quantidade: base.quantidade + DIAS_POR_PAGINA
             };
         });
-    const semDados = !previsao || previsao.status === 'DADOS_INSUFICIENTES';
+    const home = criarCycleHomeViewModel({
+        previsao,
+        fase,
+        dataSelecionada: referencia,
+        janelaFertil
+    });
     const tipoErro = erroSincronizacao ? 'sincronizacao' : erroPrevisao || erro ? 'previsao' : null;
     const configuracaoErro = CONFIGURACOES_ERRO[tipoErro] || CONFIGURACOES_ERRO.previsao;
 
@@ -136,9 +142,10 @@ function CycleTodayScreen({
                     ) : null}
                     <CycleForecastPanel
                         fase={fase}
+                        estado={home.estado}
                         diaCiclo={obterDiaCiclo(referencia, fases)}
                         janelaFertil={janelaFertil}
-                        previsao={semDados ? null : previsao}
+                        previsao={previsao}
                         conteudoDaFase={conteudoDaFase ?? conteudoPorFase[fase]}
                         aoCadastrarMenstruacao={aoCadastrarMenstruacao}
                         aoCadastrarDiario={aoCadastrarDiario}

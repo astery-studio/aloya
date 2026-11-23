@@ -253,7 +253,12 @@ function ConteudoFase({ conteudo, fase }) {
     );
 }
 
-function EstadoSemCiclo({ aoCadastrarMenstruacao, aoCadastrarDiario, aoAbrirAnticoncepcional }) {
+function EstadoSemCiclo({
+    dadosInsuficientes,
+    aoCadastrarMenstruacao,
+    aoCadastrarDiario,
+    aoAbrirAnticoncepcional
+}) {
     const visual = useCycleForecastVisual();
     const { estilos } = visual;
     const recursosSemCiclo = criarRecursosSemCiclo(visual);
@@ -263,8 +268,14 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoCadastrarDiario, aoAbrirAnti
                 <PhaseSymbolSlot compact />
                 <EmptyState
                     variante="apresentacao"
-                    titulo="Conheça seu ciclo"
-                    mensagem="Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo."
+                    titulo={
+                        dadosInsuficientes ? 'Continue registrando seu ciclo' : 'Conheça seu ciclo'
+                    }
+                    mensagem={
+                        dadosInsuficientes
+                            ? 'Ainda precisamos de mais registros para criar previsões personalizadas.'
+                            : 'Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo.'
+                    }
                     acao={
                         <View style={estilos.acoesSemCiclo}>
                             <BotaoAcao
@@ -306,6 +317,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoCadastrarDiario, aoAbrirAnti
 }
 
 function CycleForecastPanel({
+    estado,
     fase = 'desconhecida',
     diaCiclo,
     janelaFertil,
@@ -320,10 +332,12 @@ function CycleForecastPanel({
     const coresDaPrevisao = useMemo(() => criarCoresDaPrevisao(tema), [tema]);
     const visual = useMemo(() => ({ estilos, ...coresDaPrevisao }), [coresDaPrevisao, estilos]);
 
-    if (!previsao)
+    const estadoAtual = estado ?? (previsao ? 'comCiclo' : 'semCiclo');
+    if (estadoAtual !== 'comCiclo')
         return (
             <CycleForecastVisualContext.Provider value={visual}>
                 <EstadoSemCiclo
+                    dadosInsuficientes={estadoAtual === 'dadosInsuficientes'}
                     aoCadastrarMenstruacao={aoCadastrarMenstruacao}
                     aoCadastrarDiario={aoCadastrarDiario}
                     aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
