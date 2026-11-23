@@ -28,7 +28,8 @@ function ConfidenceBadge({
     estilo,
     onPress,
     desabilitado = false,
-    rotuloAcessibilidade
+    rotuloAcessibilidade,
+    exibirPrefixo = true
 }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
@@ -118,7 +119,7 @@ function ConfidenceBadge({
                             }
                         ]}
                     >
-                        {rotulo}
+                        {exibirPrefixo ? `Confiança ${rotulo}` : rotulo}
                     </Text>
                     <InfoIcon size={16} color={visual.cor} weight="fill" />
                 </>

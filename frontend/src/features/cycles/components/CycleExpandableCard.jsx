@@ -27,8 +27,8 @@ function CycleExpandableCard({
         <View style={[estilos.card, desabilitado && estilos.desabilitado]}>
             <Pressable
                 accessibilityRole="button"
-                accessibilityState={{ expanded, disabled: desabilitado }}
-                disabled={desabilitado}
+                accessibilityState={{ expanded, ...(desabilitado ? { disabled: true } : {}) }}
+                disabled={desabilitado || undefined}
                 onPress={alternar}
                 style={estilos.trigger}
             >

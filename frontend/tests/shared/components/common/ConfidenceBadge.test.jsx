@@ -38,7 +38,7 @@ describe('ConfidenceBadge', () => {
         expect(componente).toHaveStyle({
             backgroundColor: visual.fundo
         });
-        expect(screen.getByText(rotulo)).toBeOnTheScreen();
+        expect(screen.getByText(`Confiança ${rotulo}`)).toBeOnTheScreen();
         expect(screen.queryByText('CONFIABILIDADE')).not.toBeOnTheScreen();
     });
 

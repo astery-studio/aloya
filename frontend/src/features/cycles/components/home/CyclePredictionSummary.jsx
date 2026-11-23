@@ -43,7 +43,11 @@ function CyclePredictionSummary({
                             Próximo ciclo
                         </Text>
                     </View>
-                    <ConfidenceBadge nivel={confiabilidade} onPress={aoAbrirConfiabilidade} />
+                    <ConfidenceBadge
+                        nivel={confiabilidade}
+                        onPress={aoAbrirConfiabilidade}
+                        exibirPrefixo={false}
+                    />
                 </View>
                 <View style={estilos.metricas}>
                     <View style={estilos.data}>
