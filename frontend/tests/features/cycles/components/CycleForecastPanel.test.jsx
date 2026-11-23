@@ -68,7 +68,7 @@ test.each([
         fontFamily: 'DMSans_700Bold',
         fontWeight: '700'
     });
-    expect(screen.getByLabelText(`Símbolo provisório: ${titulo}`)).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
     expect(screen.getByText(descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
     expect(screen.getByText('Observe como seu corpo está se sentindo hoje.')).toBeOnTheScreen();
@@ -131,7 +131,7 @@ test('trata fase inválida como ciclo desconhecido', async () => {
     await render(<CycleForecastPanel fase="inexistente" previsao={previsao} />);
 
     expect(screen.getByText('Seu ciclo')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Símbolo provisório: Seu ciclo')).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
     expect(screen.queryByText(/Dia \d+ do ciclo/)).not.toBeOnTheScreen();
     expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
 });

@@ -19,6 +19,7 @@ import { cores } from '../../../shared/theme';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { formatarDataLonga } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleForecastPanel.styles';
+import { PhaseSymbolSlot } from './PhaseSymbolSlot';
 
 const CycleForecastVisualContext = createContext(null);
 
@@ -132,37 +133,6 @@ function GotaPreenchidaIcon(props) {
     const { estilos } = useCycleForecastVisual();
     const corTexto = StyleSheet.flatten(estilos.textoCadastrarMenstruacao)?.color;
     return <DropIcon {...props} color={corTexto ?? props.color} weight="fill" />;
-}
-
-function FormaProvisoria({ fase = 'desconhecida', compacta = false }) {
-    const { estilos, coresForma } = useCycleForecastVisual();
-    const comContorno = fase === 'folicular' || fase === 'ovulatoria';
-    const cor = coresForma[fase];
-    return (
-        <View
-            accessibilityLabel={`Símbolo provisório: ${ROTULOS[fase]}`}
-            style={[estilos.formaProvisoria, compacta && estilos.formaProvisoriaCompacta]}
-        >
-            {comContorno ? <View style={[estilos.formaInterna, { borderColor: cor }]} /> : null}
-            {fase === 'ovulatoria' ? (
-                <View
-                    style={[estilos.orbitaForma, estilos.orbitaFormaEsquerda, { borderColor: cor }]}
-                />
-            ) : null}
-            {fase === 'ovulatoria' ? (
-                <View
-                    style={[estilos.orbitaForma, estilos.orbitaFormaDireita, { borderColor: cor }]}
-                />
-            ) : null}
-            <View
-                style={[
-                    estilos.sombraForma,
-                    compacta && estilos.sombraFormaCompacta,
-                    { backgroundColor: cor }
-                ]}
-            />
-        </View>
-    );
 }
 
 function PainelPrevisao({ previsao, janelaFertil }) {
@@ -290,7 +260,7 @@ function EstadoSemCiclo({ aoCadastrarMenstruacao, aoCadastrarDiario, aoAbrirAnti
     return (
         <View style={estilos.estadoSemCiclo}>
             <View style={estilos.cartaoIntroducao}>
-                <FormaProvisoria compacta />
+                <PhaseSymbolSlot compact />
                 <EmptyState
                     variante="apresentacao"
                     titulo="Conheça seu ciclo"
@@ -371,7 +341,7 @@ function CycleForecastPanel({
                             estilos.heroiFaseFertil
                     ]}
                 >
-                    <FormaProvisoria fase={faseAtual} />
+                    <PhaseSymbolSlot />
                     <Text accessibilityRole="header" style={estilos.tituloFase}>
                         {ROTULOS[faseAtual]}
                     </Text>
