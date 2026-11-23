@@ -6,11 +6,23 @@ const mockHouseIcon = jest.fn(() => null);
 const mockNotebookIcon = jest.fn(() => null);
 const mockGearIcon = jest.fn(() => null);
 
-jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
-    UsersIcon: (propriedades) => mockUsersIcon(propriedades),
-    CalendarCheckIcon: (propriedades) => mockCalendarCheckIcon(propriedades),
-    HouseIcon: (propriedades) => mockHouseIcon(propriedades),
-    NotebookIcon: (propriedades) => mockNotebookIcon(propriedades),
+jest.mock('phosphor-react-native/src/icons/Users', () => ({
+    UsersIcon: (propriedades) => mockUsersIcon(propriedades)
+}));
+
+jest.mock('phosphor-react-native/src/icons/CalendarCheck', () => ({
+    CalendarCheckIcon: (propriedades) => mockCalendarCheckIcon(propriedades)
+}));
+
+jest.mock('phosphor-react-native/src/icons/House', () => ({
+    HouseIcon: (propriedades) => mockHouseIcon(propriedades)
+}));
+
+jest.mock('phosphor-react-native/src/icons/Notebook', () => ({
+    NotebookIcon: (propriedades) => mockNotebookIcon(propriedades)
+}));
+
+jest.mock('phosphor-react-native/src/icons/Gear', () => ({
     GearIcon: (propriedades) => mockGearIcon(propriedades)
 }));
 
