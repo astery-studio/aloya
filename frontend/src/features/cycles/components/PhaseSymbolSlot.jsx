@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-function PhaseSymbolSlot({ compact = false, style }) {
+function PhaseSymbolSlot({ children, compact = false, style }) {
     return (
         <View
             accessibilityElementsHidden
@@ -15,7 +15,9 @@ function PhaseSymbolSlot({ compact = false, style }) {
                 },
                 style
             ]}
-        />
+        >
+            {children}
+        </View>
     );
 }
 
