@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
-import { DiaryMacrocategoryList } from '../../diary/components/DiaryMacrocategoryList/DiaryMacrocategoryList';
 import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { obterHojeDiario } from '../../diary/utils/diaryDate';
-import { listarMacrocategoriasAtivas, prepararFormularioDiario } from '../../diary/utils/diaryForm';
+import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
+import { CompactDiaryOptions } from './home/CompactDiaryOptions';
 
 function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
     const [saved, setSaved] = useState(false);
@@ -53,10 +53,9 @@ function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
             ) : null}
             {catalog.catalogo && !saved ? (
                 <>
-                    <DiaryMacrocategoryList
-                        macrocategorias={listarMacrocategoriasAtivas(catalog.catalogo)}
+                    <CompactDiaryOptions
+                        catalogo={catalog.catalogo}
                         valores={form.valores}
-                        erros={form.erros}
                         aoAlterar={form.alterarValor}
                         desabilitado={form.salvando}
                     />
