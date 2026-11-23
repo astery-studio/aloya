@@ -50,7 +50,9 @@ function CycleTodayScreen({
     aoCadastrarDiario,
     aoAbrirAnticoncepcional,
     aoAbrirCalendario,
-    aoSelecionarAba
+    aoSelecionarAba,
+    diaryService,
+    onSessaoExpirada
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -143,6 +145,7 @@ function CycleTodayScreen({
                     <CycleForecastPanel
                         fase={fase}
                         estado={home.estado}
+                        dataSelecionada={referencia}
                         diaCiclo={obterDiaCiclo(referencia, fases)}
                         janelaFertil={janelaFertil}
                         previsao={previsao}
@@ -150,6 +153,8 @@ function CycleTodayScreen({
                         aoCadastrarMenstruacao={aoCadastrarMenstruacao}
                         aoCadastrarDiario={aoCadastrarDiario}
                         aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
+                        diaryService={diaryService}
+                        onSessaoExpirada={onSessaoExpirada}
                     />
                 </ScrollView>
             )}

@@ -643,6 +643,7 @@ export default function App() {
                         setTelaInterna(telasInternas.cadastrarMenstruacao);
                     }}
                     service={configuracao.servicos.cyclePredictionService}
+                    diaryService={configuracao.servicos.diaryService}
                     aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                     aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
                     aoCadastrarDiario={(data) => {

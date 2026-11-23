@@ -321,6 +321,7 @@ function EstadoSemCiclo({
 
 function CycleForecastPanel({
     estado,
+    dataSelecionada,
     fase = 'desconhecida',
     diaCiclo,
     janelaFertil,
@@ -328,12 +329,15 @@ function CycleForecastPanel({
     conteudoDaFase,
     aoCadastrarMenstruacao,
     aoCadastrarDiario,
-    aoAbrirAnticoncepcional
+    aoAbrirAnticoncepcional,
+    diaryService,
+    onSessaoExpirada
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const coresDaPrevisao = useMemo(() => criarCoresDaPrevisao(tema), [tema]);
     const visual = useMemo(() => ({ estilos, ...coresDaPrevisao }), [coresDaPrevisao, estilos]);
+    const DiaryCheckIn = diaryService ? require('./CycleDiaryCheckIn').CycleDiaryCheckIn : null;
 
     const estadoAtual = estado ?? (previsao ? 'comCiclo' : 'semCiclo');
     if (estadoAtual !== 'comCiclo')
@@ -417,6 +421,13 @@ function CycleForecastPanel({
                     />
                 </View>
                 <PainelPrevisao previsao={previsao} janelaFertil={janelaFertil} />
+                {diaryService ? (
+                    <DiaryCheckIn
+                        date={dataSelecionada}
+                        service={diaryService}
+                        onSessionExpired={onSessaoExpirada}
+                    />
+                ) : null}
                 <ConteudoFase conteudo={conteudoDaFase} fase={faseAtual} />
             </View>
         </CycleForecastVisualContext.Provider>
