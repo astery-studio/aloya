@@ -81,10 +81,7 @@ function MenstruationRegistrationContainer({
     async function salvar(datas) {
         if (!datas.length) return;
         const registradas = new Set(
-            meses.flatMap((mes) => [
-                ...(mes.diasMenstruacao || []).map((dia) => dia.data),
-                ...(mes.datasLocais || [])
-            ])
+            meses.flatMap((mes) => (mes.diasMenstruacao || []).map((dia) => dia.data))
         );
         if (datas.some((data) => registradas.has(data))) {
             setErro(
@@ -92,6 +89,11 @@ function MenstruationRegistrationContainer({
                     codigo: 'CONFLITO_REGISTRO_MENSTRUAL'
                 })
             );
+            return;
+        }
+        const pendentes = new Set(meses.flatMap((mes) => mes.datasLocais || []));
+        if (datas.some((data) => pendentes.has(data))) {
+            setErro({ codigo: 'REGISTRO_MENSTRUAL_PENDENTE' });
             return;
         }
         setSalvando(true);
@@ -110,7 +112,7 @@ function MenstruationRegistrationContainer({
         <MenstruationRegistrationScreen
             meses={meses}
             datasSelecionadas={selecao}
-            salvando={salvando}
+            salvando={salvando || status === 'sincronizando'}
             erro={erro}
             sucesso={sucesso}
             statusSincronizacao={status}
@@ -118,7 +120,8 @@ function MenstruationRegistrationContainer({
             onIniciarFaixa={(data) => setSelecao([data])}
             onSalvar={salvar}
             onVoltar={onVoltar}
-            onTentarNovamente={() => salvar(selecao)}
+            onTentarNovamente={() => (status === 'falha' ? sincronizar() : salvar(selecao))}
+            onSincronizarPendentes={sincronizar}
             onFecharFeedback={() => {
                 setErro(undefined);
                 if (sucesso) onVoltar();

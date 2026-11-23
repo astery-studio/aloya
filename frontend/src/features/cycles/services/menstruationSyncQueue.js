@@ -1,5 +1,12 @@
 // Uma única gravação conserva a fila inteira; falhas de rede nunca removem a marcação local.
-function criarMenstruationSyncQueue({ ler, salvar, registrar, identificar, criarChave }) {
+function criarMenstruationSyncQueue({
+    ler,
+    salvar,
+    registrar,
+    identificar,
+    criarChave,
+    jaConfirmado
+}) {
     let executando = Promise.resolve();
     const serializar = (acao) => {
         const proxima = executando.then(acao);
@@ -41,10 +48,19 @@ function criarMenstruationSyncQueue({ ler, salvar, registrar, identificar, criar
                     try {
                         await registrar({ ...item, identidade: ctx.identidade });
                     } catch (erro) {
-                        item.status = 'falha';
-                        item.codigo = erro.codigo;
-                        await salvar(ctx.chave, JSON.stringify(ctx.fila));
-                        throw erro;
+                        const confirmado =
+                            erro.codigo === 'CONFLITO_REGISTRO_MENSTRUAL' &&
+                            jaConfirmado &&
+                            (await jaConfirmado({ ...item, identidade: ctx.identidade }).catch(
+                                () => false
+                            ));
+                        if (!confirmado) {
+                            await conferirIdentidade(ctx.identidade);
+                            item.status = 'falha';
+                            item.codigo = erro.codigo;
+                            await salvar(ctx.chave, JSON.stringify(ctx.fila));
+                            throw erro;
+                        }
                     }
                     // Se o servidor confirmou e a gravação local falhar, a mesma chave permite repetir sem duplicar.
                     await conferirIdentidade(ctx.identidade);

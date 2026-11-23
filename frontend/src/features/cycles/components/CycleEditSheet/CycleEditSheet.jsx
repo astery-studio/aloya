@@ -1,87 +1,109 @@
-import { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
-
-import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { InfoIcon } from 'phosphor-react-native/src/icons/Info';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
-import DateInput from '../../../../shared/components/forms/DateInput/DateInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { MenstrualDaysCalendar } from '../MenstrualDaysCalendar';
 import { criarEstilos } from './CycleEditSheet.styles';
 
 function CycleEditSheet({
     visivel,
-    dataInicio,
-    dataFim,
+    meses = [],
+    mesInicial,
     alterado,
     salvando,
-    onAlterarInicio,
-    onAlterarFim,
+    carregando,
+    onAlternarDia,
     onFechar,
     onOcultar,
     onSalvar
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-
+    const [larguraMes, setLarguraMes] = useState(312);
     return (
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
             onOcultar={onOcultar}
             bloquearFechamento={salvando}
+            corPainel={tema.escuro ? '#1E1E1E' : '#FFFFFF'}
         >
-            <BottomSheetLayout
-                titulo="Editar ciclo"
-                onFechar={onFechar}
-                bloquearFechamento={salvando}
-            >
-                <View style={estilos.formulario}>
-                    <View style={estilos.campo}>
-                        <Text style={estilos.label}>Data de Início</Text>
-                        <DateInput
-                            valor={dataInicio}
-                            onChangeText={onAlterarInicio}
-                            desativado={salvando}
-                            rotuloAcessibilidade="Data de início do ciclo"
-                            testeId="data-inicio-edicao-ciclo"
-                        />
+            <View style={estilos.painel}>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Editar Menstruação
+                </Text>
+                <ScrollView
+                    style={estilos.rolagem}
+                    contentContainerStyle={estilos.conteudo}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View
+                        style={estilos.calendario}
+                        onLayout={({ nativeEvent }) => {
+                            const largura = nativeEvent.layout.width - 30.82;
+                            if (largura > 0) setLarguraMes(largura);
+                        }}
+                    >
+                        {carregando ? (
+                            <ActivityIndicator
+                                accessibilityLabel="Carregando dias da menstruação"
+                                color={tema.cores.interface.destaque}
+                            />
+                        ) : (
+                            <MenstrualDaysCalendar
+                                meses={meses}
+                                editavel
+                                mesInicial={mesInicial}
+                                desativado={salvando}
+                                aoPressionarDia={onAlternarDia}
+                                larguraMes={larguraMes}
+                            />
+                        )}
                     </View>
-
-                    <View style={estilos.campo}>
-                        <Text style={estilos.label}>Data de Término</Text>
-                        <DateInput
-                            valor={dataFim}
-                            onChangeText={onAlterarFim}
-                            desativado={salvando}
-                            rotuloAcessibilidade="Data de término do ciclo"
-                            testeId="data-fim-edicao-ciclo"
+                    <View style={estilos.aviso}>
+                        <InfoIcon
+                            size={15}
+                            color={tema.escuro ? '#999999' : tema.cores.interface.textoSecundario}
                         />
-                        <Text style={estilos.ajuda}>
-                            Deixe em branco se o ciclo ainda estiver em andamento.
+                        <Text style={estilos.instrucao}>
+                            Clique em um dia para alterar seu estado.
                         </Text>
-                        {dataFim ? (
-                            <Pressable
-                                accessibilityRole="button"
-                                accessibilityLabel="Limpar data de término"
-                                disabled={salvando}
-                                onPress={() => onAlterarFim?.('')}
-                                style={estilos.limpar}
-                            >
-                                <Text style={estilos.textoLimpar}>Limpar data de término</Text>
-                            </Pressable>
-                        ) : null}
                     </View>
-
-                    <ButtonScreen
-                        texto="Salvar alterações"
-                        aoPressionar={onSalvar}
-                        desativado={!alterado || salvando}
-                        carregando={salvando}
-                    />
+                </ScrollView>
+                <View style={estilos.rodape}>
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Concluir"
+                        disabled={!alterado || salvando || carregando}
+                        accessibilityState={{ disabled: !alterado || salvando || carregando }}
+                        onPress={onSalvar}
+                        style={[
+                            estilos.concluir,
+                            (!alterado || salvando || carregando) && estilos.desativado
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                estilos.textoConcluir,
+                                (!alterado || salvando || carregando) && estilos.textoDesativado
+                            ]}
+                        >
+                            Concluir
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Descartar Alterações"
+                        disabled={salvando}
+                        onPress={onFechar}
+                        style={estilos.descartar}
+                    >
+                        <Text style={estilos.textoDescartar}>Descartar Alterações</Text>
+                    </Pressable>
                 </View>
-            </BottomSheetLayout>
+            </View>
         </BottomSheet>
     );
 }
-
 export { CycleEditSheet };

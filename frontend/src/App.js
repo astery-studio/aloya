@@ -647,6 +647,7 @@ export default function App() {
                 <CalendarScreenContainer
                     key={`${revisaoCalendario}-${sincronizacaoMenstrual.revisao}`}
                     statusSincronizacao={sincronizacaoMenstrual.status}
+                    erroSincronizacao={sincronizacaoMenstrual.erro}
                     aoTentarSincronizar={sincronizacaoMenstrual.sincronizar}
                     service={configuracao.servicos.calendarService}
                     onSessaoExpirada={finalizarSessao}
@@ -756,7 +757,6 @@ export default function App() {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
-                calendarService={configuracao.servicos.calendarService}
                 aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
