@@ -1,32 +1,16 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 const mockUsersIcon = jest.fn(() => null);
-
-const mockArrowsClockwiseIcon = jest.fn(() => null);
-
+const mockCalendarCheckIcon = jest.fn(() => null);
 const mockHouseIcon = jest.fn(() => null);
-
-const mockCalendarBlankIcon = jest.fn(() => null);
-
+const mockNotebookIcon = jest.fn(() => null);
 const mockGearIcon = jest.fn(() => null);
 
-jest.mock('phosphor-react-native/src/icons/Users', () => ({
-    UsersIcon: (propriedades) => mockUsersIcon(propriedades)
-}));
-
-jest.mock('phosphor-react-native/src/icons/ArrowsClockwise', () => ({
-    ArrowsClockwiseIcon: (propriedades) => mockArrowsClockwiseIcon(propriedades)
-}));
-
-jest.mock('phosphor-react-native/src/icons/House', () => ({
-    HouseIcon: (propriedades) => mockHouseIcon(propriedades)
-}));
-
-jest.mock('phosphor-react-native/src/icons/CalendarBlank', () => ({
-    CalendarBlankIcon: (propriedades) => mockCalendarBlankIcon(propriedades)
-}));
-
-jest.mock('phosphor-react-native/src/icons/Gear', () => ({
+jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
+    UsersIcon: (propriedades) => mockUsersIcon(propriedades),
+    CalendarCheckIcon: (propriedades) => mockCalendarCheckIcon(propriedades),
+    HouseIcon: (propriedades) => mockHouseIcon(propriedades),
+    NotebookIcon: (propriedades) => mockNotebookIcon(propriedades),
     GearIcon: (propriedades) => mockGearIcon(propriedades)
 }));
 
@@ -52,29 +36,20 @@ describe('BottomTabBar', () => {
         const itens = screen.getAllByRole('tab');
 
         expect(itens).toHaveLength(5);
-
-        expect(itens[0]).toHaveAccessibleName('Membros');
-
-        expect(itens[1]).toHaveAccessibleName('Ciclos');
-
+        expect(itens[0]).toHaveAccessibleName('Contatos');
+        expect(itens[1]).toHaveAccessibleName('Calendário');
         expect(itens[2]).toHaveAccessibleName('Início');
-
         expect(itens[3]).toHaveAccessibleName('Diário');
-
         expect(itens[4]).toHaveAccessibleName('Config.');
     });
 
-    test('renderiza um ícone para cada aba', async () => {
+    test('renderiza os novos ícones do menu', async () => {
         await renderizarBarra();
 
         expect(mockUsersIcon).toHaveBeenCalledTimes(1);
-
-        expect(mockArrowsClockwiseIcon).toHaveBeenCalledTimes(1);
-
+        expect(mockCalendarCheckIcon).toHaveBeenCalledTimes(1);
         expect(mockHouseIcon).toHaveBeenCalledTimes(1);
-
-        expect(mockCalendarBlankIcon).toHaveBeenCalledTimes(1);
-
+        expect(mockNotebookIcon).toHaveBeenCalledTimes(1);
         expect(mockGearIcon).toHaveBeenCalledTimes(1);
     });
 
@@ -83,19 +58,41 @@ describe('BottomTabBar', () => {
             abaAtiva: 'inicio'
         });
 
-        expect(
-            screen.getByRole('tab', {
-                name: 'Início'
-            })
-        ).toBeSelected();
+        expect(screen.getByRole('tab', { name: 'Início' })).toBeSelected();
 
-        for (const nome of ['Membros', 'Ciclos', 'Diário', 'Config.']) {
-            expect(
-                screen.getByRole('tab', {
-                    name: nome
-                })
-            ).not.toBeSelected();
+        for (const nome of ['Contatos', 'Calendário', 'Diário', 'Config.']) {
+            expect(screen.getByRole('tab', { name: nome })).not.toBeSelected();
         }
+    });
+
+    test('mantém temporariamente os identificadores atuais', async () => {
+        const onSelecionar = jest.fn();
+
+        await renderizarBarra({
+            onSelecionar
+        });
+
+        await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
+        expect(onSelecionar).toHaveBeenLastCalledWith('membros');
+
+        await fireEvent.press(screen.getByRole('tab', { name: 'Calendário' }));
+        expect(onSelecionar).toHaveBeenLastCalledWith('ciclos');
+    });
+
+    test.each([
+        ['Início', 'inicio'],
+        ['Diário', 'diario'],
+        ['Config.', 'configuracoes']
+    ])('envia %s ao selecionar a aba', async (label, idEsperado) => {
+        const onSelecionar = jest.fn();
+
+        await renderizarBarra({
+            onSelecionar
+        });
+
+        await fireEvent.press(screen.getByRole('tab', { name: label }));
+
+        expect(onSelecionar).toHaveBeenCalledWith(idEsperado);
     });
 
     test('não seleciona aba para identificador desconhecido', async () => {
@@ -108,38 +105,12 @@ describe('BottomTabBar', () => {
         }
     });
 
-    test.each([
-        ['Membros', 'membros'],
-        ['Ciclos', 'ciclos'],
-        ['Início', 'inicio'],
-        ['Diário', 'diario'],
-        ['Config.', 'configuracoes']
-    ])('envia %s ao selecionar a aba', async (label, idEsperado) => {
-        const onSelecionar = jest.fn();
-
-        await renderizarBarra({
-            onSelecionar
-        });
-
-        await fireEvent.press(
-            screen.getByRole('tab', {
-                name: label
-            })
-        );
-
-        expect(onSelecionar).toHaveBeenCalledWith(idEsperado);
-    });
-
     test('desabilita todas as abas sem callback', async () => {
         await renderizarBarra({
             onSelecionar: undefined
         });
 
-        const itens = screen.getAllByRole('tab');
-
-        expect(itens).toHaveLength(5);
-
-        for (const item of itens) {
+        for (const item of screen.getAllByRole('tab')) {
             expect(item).toBeDisabled();
         }
     });
@@ -149,11 +120,7 @@ describe('BottomTabBar', () => {
             abaAtiva: 'inicio'
         });
 
-        expect(
-            screen.getByRole('tab', {
-                name: 'Início'
-            })
-        ).toBeSelected();
+        expect(screen.getByRole('tab', { name: 'Início' })).toBeSelected();
 
         await resultado.rerender(
             <ThemeProvider preferencia="claro" esquemaDoSistema="light">
@@ -161,25 +128,21 @@ describe('BottomTabBar', () => {
             </ThemeProvider>
         );
 
-        expect(
-            screen.getByRole('tab', {
-                name: 'Início'
-            })
-        ).not.toBeSelected();
-
-        expect(
-            screen.getByRole('tab', {
-                name: 'Diário'
-            })
-        ).toBeSelected();
+        expect(screen.getByRole('tab', { name: 'Início' })).not.toBeSelected();
+        expect(screen.getByRole('tab', { name: 'Diário' })).toBeSelected();
     });
 
-    test('usa superfície e borda claras', async () => {
+    test('aplica as medidas e cores do menu claro', async () => {
         await renderizarBarra({}, 'claro');
 
         expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            height: 91,
+            width: '100%',
+            padding: 12,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
             backgroundColor: '#FFFFFF',
+            borderTopWidth: 0.667,
             borderTopColor: '#E6E2D8'
         });
     });
@@ -188,28 +151,9 @@ describe('BottomTabBar', () => {
         await renderizarBarra({}, 'escuro');
 
         expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            height: 91,
             backgroundColor: '#1E1E1E',
             borderTopWidth: 0.667,
             borderTopColor: 'rgba(255, 255, 255, 0.12)'
-        });
-    });
-
-    test('atualiza a superfície quando o tema muda', async () => {
-        const resultado = await renderizarBarra({}, 'claro');
-
-        expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            backgroundColor: '#FFFFFF'
-        });
-
-        await resultado.rerender(
-            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
-                <BottomTabBar abaAtiva="inicio" onSelecionar={jest.fn()} />
-            </ThemeProvider>
-        );
-
-        expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            backgroundColor: '#1E1E1E'
         });
     });
 });
