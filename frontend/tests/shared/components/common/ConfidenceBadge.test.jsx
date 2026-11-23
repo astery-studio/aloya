@@ -4,7 +4,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
-    ChartLineUpIcon: jest.fn(() => null)
+    ChartLineUpIcon: jest.fn(() => null),
+    InfoIcon: jest.fn(() => null)
 }));
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceStatusBar', () => ({
@@ -37,7 +38,7 @@ describe('ConfidenceBadge', () => {
         expect(componente).toHaveStyle({
             backgroundColor: visual.fundo
         });
-        expect(screen.getByText(`Confiança ${rotulo}`)).toBeOnTheScreen();
+        expect(screen.getByText(rotulo)).toBeOnTheScreen();
         expect(screen.queryByText('CONFIABILIDADE')).not.toBeOnTheScreen();
     });
 
@@ -79,11 +80,14 @@ describe('ConfidenceBadge', () => {
         );
     });
 
-    test('não carrega os componentes compostos na variante simples', async () => {
+    test('usa a escala visual também na variante simples', async () => {
         await render(<ConfidenceBadge nivel="alta" />);
 
         expect(ChartLineUpIcon).not.toHaveBeenCalled();
-        expect(ConfidenceStatusBar).not.toHaveBeenCalled();
+        expect(ConfidenceStatusBar).toHaveBeenCalledWith(
+            expect.objectContaining({ nivel: 'alta', cor: variantes.alta.cor }),
+            undefined
+        );
     });
 
     test('vira botão sem quebrar o uso informativo existente', async () => {
@@ -111,17 +115,11 @@ describe('ConfidenceBadge', () => {
         await render(<ConfidenceBadge nivel="alta" />);
 
         expect(screen.getByLabelText('Confiança alta')).toHaveStyle({
-            height: 24,
-            gap: 5,
-            paddingVertical: 3,
+            height: 34,
+            gap: 8,
             paddingHorizontal: 10,
-            borderRadius: 999
-        });
-
-        expect(estilos.ponto).toMatchObject({
-            width: 5.99,
-            height: 5.99,
-            borderRadius: 2.99578
+            borderWidth: 0.666667,
+            borderRadius: 16
         });
     });
 

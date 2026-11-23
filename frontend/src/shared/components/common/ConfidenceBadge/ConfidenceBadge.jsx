@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { useTheme } from '../../../hooks/useTheme';
-import { ChartLineUpIcon } from '../../icons/AppIcons';
+import { ChartLineUpIcon, InfoIcon } from '../../icons/AppIcons';
 import { ConfidenceStatusBar } from './ConfidenceStatusBar';
 import { criarEstilos } from './ConfidenceBadge.styles';
 
@@ -107,14 +107,7 @@ function ConfidenceBadge({
                 </>
             ) : (
                 <>
-                    <View
-                        style={[
-                            estilos.ponto,
-                            {
-                                backgroundColor: visual.cor
-                            }
-                        ]}
-                    />
+                    <ConfidenceStatusBar nivel={nivel} cor={visual.cor} />
 
                     <Text
                         numberOfLines={1}
@@ -125,8 +118,9 @@ function ConfidenceBadge({
                             }
                         ]}
                     >
-                        Confiança {rotulo}
+                        {rotulo}
                     </Text>
+                    <InfoIcon size={16} color={visual.cor} weight="fill" />
                 </>
             )}
         </Container>
