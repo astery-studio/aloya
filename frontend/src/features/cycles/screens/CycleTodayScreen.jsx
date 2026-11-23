@@ -10,7 +10,12 @@ import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleForecastPanel } from '../components/CycleForecastPanel';
 import { conteudoPorFase } from '../constants/phaseContent';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
-import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
+import {
+    criarDiasDaFaixa,
+    formatarDataCabecalho,
+    obterDiaCiclo,
+    obterFase
+} from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleTodayScreen.styles';
 
 const CONFIGURACOES_ERRO = Object.freeze({
@@ -91,19 +96,6 @@ function CycleTodayScreen({
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
-            {!carregando ? (
-                <View style={estilos.cabecalho}>
-                    <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                    <View style={estilos.acoesCabecalho}>
-                        <IconButton
-                            icone={CalendarBlankIcon}
-                            aoPressionar={aoAbrirCalendario}
-                            rotuloAcessibilidade="Abrir calendário"
-                            variante="calendario"
-                        />
-                    </View>
-                </View>
-            ) : null}
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}>
                     <ActivityIndicator size="large" color={corCarregamento} />
@@ -116,6 +108,19 @@ function CycleTodayScreen({
                     contentContainerStyle={estilos.rolagem}
                     showsVerticalScrollIndicator={false}
                 >
+                    <View style={estilos.cabecalho}>
+                        <Text accessibilityRole="header" style={estilos.titulo}>
+                            {formatarDataCabecalho(referencia)}
+                        </Text>
+                        <View style={estilos.acoesCabecalho}>
+                            <IconButton
+                                icone={CalendarBlankIcon}
+                                aoPressionar={aoAbrirCalendario}
+                                rotuloAcessibilidade="Abrir calendário"
+                                variante="calendario"
+                            />
+                        </View>
+                    </View>
                     {dias.length ? (
                         <CycleDateStrip
                             dias={dias}

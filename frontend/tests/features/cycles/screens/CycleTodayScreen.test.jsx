@@ -36,7 +36,7 @@ test('apresenta o estado de carregamento sem exibir erro simultâneo', async () 
     await renderizar({ carregando: true, erro: true });
 
     expect(screen.getByText('Carregando sua previsão...')).toBeOnTheScreen();
-    expect(screen.queryByText('Aloya - Seu Ciclo Hoje')).not.toBeOnTheScreen();
+    expect(screen.queryByText(/feira, \d+ de/)).not.toBeOnTheScreen();
     expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'Início' })).toBeOnTheScreen();
 });
@@ -54,7 +54,7 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
         janelaFertil: { inicio: '2026-10-08', fim: '2026-10-12' }
     });
 
-    expect(screen.getByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+    expect(screen.getByText('quinta-feira, 8 de outubro')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'qui, dia 8' })).toBeOnTheScreen();
     expect(screen.getByText('Conteúdo recebido pela tela.')).toBeOnTheScreen();
     expect(screen.getByText('8 de outubro até 12 de outubro')).toBeOnTheScreen();
@@ -63,12 +63,11 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
     );
 });
 
-test('mantém o cabeçalho fora da área rolável', async () => {
+test('mantém o cabeçalho dentro da área rolável', async () => {
     const { getByTestId, getByText } = await renderizar({ previsao });
     const rolagem = getByTestId('conteudo-rolavel');
 
-    expect(getByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
-    expect(within(rolagem).queryByText('Aloya - Seu Ciclo Hoje')).toBeNull();
+    expect(within(rolagem).getByText('quinta-feira, 8 de outubro')).toBeOnTheScreen();
 });
 
 test('mantém a faixa de datas no estado sem dados', async () => {
