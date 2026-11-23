@@ -1,12 +1,16 @@
 import { Pressable, Text, View } from 'react-native';
-import { BookOpenIcon, HeartIcon, WindIcon } from '../../../../shared/components/icons/AppIcons';
+import {
+    FlowerLotusIcon,
+    HeartIcon,
+    NotebookIcon
+} from '../../../../shared/components/icons/AppIcons';
 
 const CUIDADOS = Object.freeze([
     {
         id: 'respiracao',
         titulo: 'Um respiro para você',
         descricao: 'Faça uma pausa com uma respiração guiada.',
-        Icone: WindIcon
+        Icone: FlowerLotusIcon
     },
     {
         id: 'reflexao',
@@ -18,7 +22,7 @@ const CUIDADOS = Object.freeze([
         id: 'educacao',
         titulo: 'O que acontece agora?',
         descricao: 'Entenda as mudanças comuns desta fase.',
-        Icone: BookOpenIcon
+        Icone: NotebookIcon
     }
 ]);
 
