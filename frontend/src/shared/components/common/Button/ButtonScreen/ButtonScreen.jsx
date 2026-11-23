@@ -13,7 +13,8 @@ export default function ButtonScreen({
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
     estilo,
-    estiloTexto
+    estiloTexto,
+    ajustarFonteAoEspaco = true
 }) {
     const semAcao = typeof aoPressionar !== 'function';
     const estaDesativado = desativado || semAcao;
@@ -34,6 +35,7 @@ export default function ButtonScreen({
             rotuloAcessibilidade={rotuloAcessibilidade}
             estilo={estilo}
             estiloTexto={estiloTexto}
+            ajustarFonteAoEspaco={ajustarFonteAoEspaco}
         />
     );
 }

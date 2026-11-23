@@ -211,6 +211,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
                         desativado={bloqueado || !preferencias.catalogo}
                         carregando={bloqueado}
                         estilo={estilos.botaoSalvar}
+                        ajustarFonteAoEspaco={false}
                     />
                 </View>
             </BottomSheetLayout>

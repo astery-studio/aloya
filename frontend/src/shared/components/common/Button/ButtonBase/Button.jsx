@@ -22,7 +22,8 @@ function Button({
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
     estilo,
-    estiloTexto
+    estiloTexto,
+    ajustarFonteAoEspaco = true
 }) {
     const tema = useTheme();
 
@@ -67,7 +68,7 @@ function Button({
 
                 <Text
                     numberOfLines={1}
-                    adjustsFontSizeToFit
+                    adjustsFontSizeToFit={ajustarFonteAoEspaco}
                     minimumFontScale={0.72}
                     style={[
                         estilos.texto,

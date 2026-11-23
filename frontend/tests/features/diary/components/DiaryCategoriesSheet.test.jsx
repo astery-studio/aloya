@@ -52,9 +52,10 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
         width: 342,
         maxWidth: '100%',
         height: 54,
-        paddingTop: 15.375,
-        paddingBottom: 14.625
+        justifyContent: 'center',
+        alignItems: 'center'
     });
+    expect(screen.getByText('Salvar')).toHaveProp('adjustsFontSizeToFit', false);
     expect(screen.getByTestId('rodape-categorias-diario')).toHaveStyle({
         alignSelf: 'stretch',
         marginHorizontal: -24,
@@ -69,10 +70,9 @@ test.each([
     ['escuro', '#121212', '#A5D6A7']
 ])('mantém contraste correto nos toggles do tema %s', async (preferencia, indicador, trilha) => {
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
-    await render(
-        <DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />,
-        { preferencia }
-    );
+    await render(<DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />, {
+        preferencia
+    });
     await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
 
     expect(screen.getAllByTestId('switch-field-thumb')[0]).toHaveStyle({
