@@ -6,7 +6,6 @@ import {
     ArrowsClockwiseIcon,
     BellIcon,
     GavelIcon,
-    HouseIcon,
     InfoIcon,
     ShieldCheckIcon,
     UserIcon,
@@ -24,7 +23,6 @@ import { criarEstilos } from './SettingsScreen.style';
 function SettingsScreen({
     onAbrirPerfil,
     onAbrirParametrosCiclo,
-    onAbrirTelaInicial,
     onAbrirNotificacoes,
     onAbrirSobre,
     onAbrirPoliticasPrivacidade,
@@ -74,7 +72,10 @@ function SettingsScreen({
                             label="Configurações de Perfil"
                             coresIcone={
                                 tema.escuro
-                                    ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
+                                    ? {
+                                          icone: '#A5D6A7',
+                                          caixa: 'rgba(165, 214, 167, 0.16)'
+                                      }
                                     : undefined
                             }
                             estilo={estilos.campoComBorda}
@@ -91,7 +92,10 @@ function SettingsScreen({
                             label="Parâmetros do Ciclo"
                             coresIcone={
                                 tema.escuro
-                                    ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' }
+                                    ? {
+                                          icone: '#C85A44',
+                                          caixa: 'rgba(255, 171, 145, 0.16)'
+                                      }
                                     : undefined
                             }
                             estilo={estilos.campoComBorda}
@@ -114,26 +118,13 @@ function SettingsScreen({
                             <Separador estilos={estilos} />
 
                             <NavigationField
-                                label="Tela inicial"
-                                coresIcone={
-                                    tema.escuro
-                                        ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
-                                        : undefined
-                                }
-                                estilo={estilos.campo}
-                                icone={HouseIcon}
-                                variante="semBorda"
-                                paleta="corVerde"
-                                onPress={onAbrirTelaInicial}
-                            />
-
-                            <Separador estilos={estilos} />
-
-                            <NavigationField
                                 label="Notificações"
                                 coresIcone={
                                     tema.escuro
-                                        ? { icone: '#C85A44', caixa: 'rgba(255, 171, 145, 0.16)' }
+                                        ? {
+                                              icone: '#C85A44',
+                                              caixa: 'rgba(255, 171, 145, 0.16)'
+                                          }
                                         : undefined
                                 }
                                 estilo={estilos.campo}
@@ -153,7 +144,10 @@ function SettingsScreen({
                                 label="Sobre a aplicação"
                                 coresIcone={
                                     tema.escuro
-                                        ? { icone: '#B39DDB', caixa: 'rgba(179, 157, 219, 0.16)' }
+                                        ? {
+                                              icone: '#B39DDB',
+                                              caixa: 'rgba(179, 157, 219, 0.16)'
+                                          }
                                         : undefined
                                 }
                                 estilo={estilos.campo}
@@ -192,7 +186,10 @@ function SettingsScreen({
                                 label="Políticas de Privacidade"
                                 coresIcone={
                                     tema.escuro
-                                        ? { icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }
+                                        ? {
+                                              icone: '#A5D6A7',
+                                              caixa: 'rgba(165, 214, 167, 0.16)'
+                                          }
                                         : undefined
                                 }
                                 estilo={estilos.campo}
