@@ -187,9 +187,10 @@ function DiaryEntryFormContent({
                         estilos.botaoSalvar,
                         salvarDesativado && estilos.botaoSalvarDesativado
                     ]}
-                    estiloTexto={
-                        salvarDesativado ? estilos.textoBotaoDesativado : estilos.textoBotaoSalvar
-                    }
+                    estiloTexto={[
+                        estilos.textoBotaoSalvar,
+                        salvarDesativado && estilos.textoBotaoDesativado
+                    ]}
                 />
             </View>
             <DatePickerSheet

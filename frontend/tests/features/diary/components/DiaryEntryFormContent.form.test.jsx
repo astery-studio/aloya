@@ -1,8 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
+const mockButtonScreen = jest.fn();
+
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const { Pressable, Text } = require('react-native');
-    return function MockButtonScreen({ texto, aoPressionar, desativado }) {
+    return function MockButtonScreen(props) {
+        mockButtonScreen(props);
+        const { texto, aoPressionar, desativado } = props;
         return (
             <Pressable accessibilityRole="button" disabled={desativado} onPress={aoPressionar}>
                 <Text>{texto}</Text>
@@ -67,6 +71,7 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 import { catalogoFormulario as catalogo } from './diaryContentFixtures';
 
 test('renderiza o formulário, navega nas datas e salva', async () => {
+    mockButtonScreen.mockClear();
     const formulario = {
         data: '2026-11-08',
         setData: jest.fn(),
@@ -115,10 +120,18 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     expect(formulario.alterarValor).toHaveBeenCalledWith('dor', ['leve']);
     await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));
     expect(screen.getByText('desativado:true')).toBeOnTheScreen();
+    const salvarDesativado = mockButtonScreen.mock.calls
+        .map(([props]) => props)
+        .find((props) => props.texto === 'Salvar');
+    expect(salvarDesativado.estiloTexto).toEqual([
+        expect.objectContaining({ fontSize: 15 }),
+        expect.objectContaining({ color: '#777772' })
+    ]);
     expect(formulario.salvar).not.toHaveBeenCalled();
 });
 
 test('habilita o salvamento e atualiza o contador quando há conteúdo válido', async () => {
+    mockButtonScreen.mockClear();
     const formulario = {
         data: '2026-11-08',
         setData: jest.fn(),
@@ -163,6 +176,10 @@ test('habilita o salvamento e atualiza o contador quando há conteúdo válido',
     expect(screen.getByTestId('phosphor-react-native-drop-fill')).toHaveProp('width', 13);
     expect(screen.getByTestId('phosphor-react-native-drop-fill')).toHaveProp('height', 14);
     expect(screen.getByText('desativado:false')).toBeOnTheScreen();
+    const salvarAtivo = mockButtonScreen.mock.calls
+        .map(([props]) => props)
+        .find((props) => props.texto === 'Salvar');
+    expect(salvarAtivo.estiloTexto).toEqual([expect.objectContaining({ fontSize: 15 }), false]);
     await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));
     expect(formulario.salvar).toHaveBeenCalledTimes(1);
 });
