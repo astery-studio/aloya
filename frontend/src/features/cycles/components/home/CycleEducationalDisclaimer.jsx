@@ -1,29 +1,23 @@
 import { Text, View } from 'react-native';
 import { InfoIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../../shared/hooks/useTheme';
+import { estilos } from './CycleEducationalDisclaimer.styles';
 
-function CycleEducationalDisclaimer({ texto, variante = 'educativa' }) {
-    const tema = useTheme();
+function CycleEducationalDisclaimer({ texto, variante = 'educativa', icone, style }) {
     const contraceptiva = variante === 'contraceptiva';
     const Icone = contraceptiva ? WarningCircleIcon : InfoIcon;
-    const cor = contraceptiva ? tema.cores.feedback.aviso : tema.cores.feedback.informacao;
 
     return (
         <View
             accessibilityLabel={texto}
-            style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                gap: 10,
-                padding: 14,
-                borderRadius: 14,
-                borderWidth: 1,
-                borderColor: cor,
-                backgroundColor: tema.cores.interface.superficie
-            }}
+            style={[estilos.base, contraceptiva ? estilos.contraceptiva : estilos.educativa, style]}
         >
-            <Icone size={18} color={cor} weight="fill" />
-            <Text style={{ flex: 1, color: tema.cores.interface.textoSecundario, lineHeight: 20 }}>
+            {icone ?? <Icone size={contraceptiva ? 16 : 17} color="#5C5C59" weight="fill" />}
+            <Text
+                style={[
+                    estilos.texto,
+                    contraceptiva ? estilos.textoContraceptivo : estilos.textoEducativo
+                ]}
+            >
                 {texto}
             </Text>
         </View>
