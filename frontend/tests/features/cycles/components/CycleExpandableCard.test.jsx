@@ -30,3 +30,20 @@ test('respeita estado controlado e delega a alternância', async () => {
     expect(aoAlternar).toHaveBeenCalledTimes(1);
     expect(screen.queryByText('Conteúdo controlado')).not.toBeOnTheScreen();
 });
+
+test('impede a alternância quando está desabilitado', async () => {
+    const aoAlternar = jest.fn();
+    await render(
+        <CycleExpandableCard
+            titulo="Indisponível"
+            expandido={false}
+            aoAlternar={aoAlternar}
+            desabilitado
+        />
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Indisponível' });
+    expect(trigger).toBeDisabled();
+    await fireEvent.press(trigger);
+    expect(aoAlternar).not.toHaveBeenCalled();
+});
