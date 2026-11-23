@@ -18,6 +18,7 @@ export default function DateInput({
     corIcone,
     corPlaceholder,
     corDestaque,
+    mostrarIcone = true,
     rotuloAcessibilidade = 'Data',
     onFocus,
     onBlur,
@@ -35,9 +36,21 @@ export default function DateInput({
             onPress={() => entradaRef.current?.focus()}
             style={[estilos.botao, desativado && estilos.desativado, estilo]}
         >
-            <View style={[estilos.campo, focado && estilos.focado,
-                estiloCampo, focado && corDestaque && { borderColor: corDestaque }]} testID={testeId}>
-                <CalendarBlank size={20} color={corIcone ?? tema.cores.interface.textoSecundario} />
+            <View
+                style={[
+                    estilos.campo,
+                    focado && estilos.focado,
+                    estiloCampo,
+                    focado && corDestaque && { borderColor: corDestaque }
+                ]}
+                testID={testeId}
+            >
+                {mostrarIcone ? (
+                    <CalendarBlank
+                        size={20}
+                        color={corIcone ?? tema.cores.interface.textoSecundario}
+                    />
+                ) : null}
                 <TextInput
                     ref={entradaRef}
                     accessibilityLabel={rotuloAcessibilidade}

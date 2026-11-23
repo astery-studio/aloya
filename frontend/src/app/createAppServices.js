@@ -5,11 +5,15 @@ import { criarContraceptiveService } from '../features/contraceptives/services/c
 import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService';
 import { obterIdentidadeMenstrual } from '../features/cycles/services/menstruationIdentity';
 import { criarMenstruationSyncQueue } from '../features/cycles/services/menstruationSyncQueue';
-import { comRegistrosPendentes, registroJaConfirmado } from '../features/cycles/services/pendingCalendarService';
+import {
+    comRegistrosPendentes,
+    registroJaConfirmado
+} from '../features/cycles/services/pendingCalendarService';
 import { criarCycleParametersService } from '../features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService';
 import { criarCycleRegistrationService } from '../features/cycles/services/cycleRegistrationService';
 import { criarCycleRemovalService } from '../features/cycles/services/cycleRemovalService';
+import { criarDiaryService } from '../features/diary/services/diaryService';
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
 import { criarContactInvitationService } from '../features/support-network/services/contactInvitationService';
@@ -73,7 +77,6 @@ function criarServicosApp({
         requisicaoAutenticada,
         removerCredencialLocal: removerToken
     });
-
     const themePreferenceService = criarThemePreferenceService({
         requisicaoAutenticada
     });
@@ -93,6 +96,7 @@ function criarServicosApp({
     const cycleRemovalService = criarCycleRemovalService({
         requisicaoAutenticada
     });
+    const diaryService = criarDiaryService({ requisicaoAutenticada });
 
     const calendarServiceComRemocao = Object.freeze({
         ...calendarServiceBase,
@@ -169,6 +173,7 @@ function criarServicosApp({
         calendarService,
         contraceptiveService,
         cycleHistoryService,
+        diaryService,
         supportCategoryService,
         contactInvitationService,
         contactLinkService,

@@ -92,6 +92,58 @@ test('executa as ações principal e secundária separadamente', async () => {
     expect(secundaria).toHaveBeenCalledTimes(1);
 });
 
+test('apresenta confirmação com ícone em bloco bege e ações empilhadas', async () => {
+    await renderWithTheme(
+        <AlertModal
+            variante="confirmacao"
+            visivel
+            aoFechar={jest.fn()}
+            titulo="Excluir Registro"
+            mensagem="Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita."
+            acaoPrincipal={{ texto: 'Excluir', variante: 'verde', aoPressionar: jest.fn() }}
+            acaoSecundaria={{ texto: 'Cancelar', variante: 'branco', aoPressionar: jest.fn() }}
+        />
+    );
+
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({ width: '100%', maxWidth: 342 });
+    expect(screen.getByTestId('app-modal-icon')).toHaveStyle({
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#F5EDE3'
+    });
+    expect(screen.getByRole('button', { name: 'Excluir' })).toHaveStyle({ height: 52 });
+    expect(screen.getByRole('button', { name: 'Cancelar' })).toHaveStyle({ height: 52 });
+});
+
+test('apresenta erro interno no formato compacto sem cabeçalho vermelho', async () => {
+    await renderWithTheme(
+        <AlertModal
+            erroInterno
+            visivel
+            aoFechar={jest.fn()}
+            titulo="Algo deu errado"
+            mensagem="Verifique sua conexão e tente novamente."
+            acaoPrincipal={{
+                texto: 'Tentar novamente',
+                variante: 'preto',
+                aoPressionar: jest.fn()
+            }}
+            acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: jest.fn() }}
+        />
+    );
+
+    expect(screen.getByTestId('app-modal-icon')).toHaveStyle({
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        backgroundColor: '#EDEDED'
+    });
+    expect(screen.getByTestId('app-modal-caixa')).toHaveStyle({ maxWidth: 342 });
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toHaveStyle({ height: 52 });
+    expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({ height: 52 });
+});
+
 test('bloqueia ação que está carregando', async () => {
     const aoPressionar = jest.fn();
 

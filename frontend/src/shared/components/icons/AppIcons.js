@@ -35,6 +35,7 @@ import { InfoIcon } from 'phosphor-react-native/src/icons/Info';
 import { LightningIcon } from 'phosphor-react-native/src/icons/Lightning';
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey';
 import { MoonIcon } from 'phosphor-react-native/src/icons/Moon';
+import { NotebookIcon } from 'phosphor-react-native/src/icons/Notebook';
 import { NotepadIcon } from 'phosphor-react-native/src/icons/Notepad';
 import { NotePencilIcon } from 'phosphor-react-native/src/icons/NotePencil';
 import { PaperPlaneTiltIcon } from 'phosphor-react-native/src/icons/PaperPlaneTilt';
@@ -98,6 +99,7 @@ export {
     LightningIcon,
     LockKeyIcon,
     MoonIcon,
+    NotebookIcon,
     NotepadIcon,
     NotePencilIcon,
     PaperPlaneTiltIcon,

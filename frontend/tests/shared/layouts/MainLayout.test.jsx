@@ -58,6 +58,16 @@ describe('MainLayout', () => {
         expect(propriedadesHeader.onVoltar).toBe(onVoltar);
     });
 
+    test('respeita a área segura superior antes do espaçamento do cabeçalho do Diário', async () => {
+        await renderizarLayout({ varianteHeader: 'diario' });
+
+        expect(screen.getByTestId('cabecalho-seguro-main-layout')).toHaveStyle({
+            width: '100%',
+            flexShrink: 0
+        });
+        expect(Header.mock.calls[0][0].variante).toBe('diario');
+    });
+
     test('envia os dados corretos para a navegação inferior', async () => {
         const onSelecionarAba = jest.fn();
 

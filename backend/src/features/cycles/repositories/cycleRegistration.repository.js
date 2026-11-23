@@ -10,7 +10,7 @@ import {
 import { calcularPrevisao } from '../utils/prediction.js';
 import { permiteHistorico, selecionarPeriodo } from '../utils/cycleRegistration.js';
 
-function criarCycleRegistrationRepository({ prisma }) {
+function criarCycleRegistrationRepository({ prisma, thermalRecalculation } = {}) {
     if (typeof prisma?.$transaction !== 'function')
         throw new TypeError('Repositório de registro menstrual inválido.');
 
@@ -174,6 +174,7 @@ function criarCycleRegistrationRepository({ prisma }) {
                 await tx.sincronizacaoMenstrual.create({
                     data: { usuarioId, chave, solicitacao, resultado }
                 });
+                await thermalRecalculation?.recalcularTodos(usuarioId, tx);
                 return resultado;
             });
         } catch (erro) {

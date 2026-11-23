@@ -21,7 +21,6 @@ if (!Number.isInteger(bcryptRounds) || bcryptRounds < 10 || bcryptRounds > 15) {
 }
 
 const cadastroRateLimitJanelaMs = Number(process.env.CADASTRO_RATE_LIMIT_JANELA_MS || 900000);
-
 const cadastroRateLimitMaximo = Number(process.env.CADASTRO_RATE_LIMIT_MAXIMO || 20);
 
 const loginRateLimitJanelaMs = Number(process.env.LOGIN_RATE_LIMIT_JANELA_MS || 900000);
@@ -46,6 +45,14 @@ const configuracoesContaRateLimitJanelaMs = Number(
 
 const configuracoesContaRateLimitMaximo = Number(
     process.env.CONFIGURACOES_CONTA_RATE_LIMIT_MAXIMO || 20
+);
+
+const diarioPreferenciasRateLimitJanelaMs = Number(
+    process.env.DIARIO_PREFERENCIAS_RATE_LIMIT_JANELA_MS || 900000
+);
+
+const diarioPreferenciasRateLimitMaximo = Number(
+    process.env.DIARIO_PREFERENCIAS_RATE_LIMIT_MAXIMO || 120
 );
 
 const alteracaoSenhaRateLimitJanelaMs = Number(
@@ -105,6 +112,8 @@ const limitesAdicionais = [
     ['CONFIGURACOES_CONTA_RATE_LIMIT_MAXIMO', configuracoesContaRateLimitMaximo],
     ['SUPPORT_INVITATION_RATE_LIMIT_JANELA_MS', supportInvitationRateLimitJanelaMs],
     ['SUPPORT_INVITATION_RATE_LIMIT_MAXIMO', supportInvitationRateLimitMaximo],
+    ['DIARIO_PREFERENCIAS_RATE_LIMIT_JANELA_MS', diarioPreferenciasRateLimitJanelaMs],
+    ['DIARIO_PREFERENCIAS_RATE_LIMIT_MAXIMO', diarioPreferenciasRateLimitMaximo],
     ['ALTERACAO_SENHA_RATE_LIMIT_JANELA_MS', alteracaoSenhaRateLimitJanelaMs],
     ['ALTERACAO_SENHA_RATE_LIMIT_MAXIMO', alteracaoSenhaRateLimitMaximo],
     ['EXCLUSAO_CONTA_RATE_LIMIT_JANELA_MS', exclusaoContaRateLimitJanelaMs],
@@ -133,6 +142,8 @@ const env = {
     supportInvitationRateLimitMaximo,
     configuracoesContaRateLimitJanelaMs,
     configuracoesContaRateLimitMaximo,
+    diarioPreferenciasRateLimitJanelaMs,
+    diarioPreferenciasRateLimitMaximo,
     alteracaoSenhaRateLimitJanelaMs,
     alteracaoSenhaRateLimitMaximo,
     exclusaoContaRateLimitJanelaMs,
@@ -151,7 +162,6 @@ const env = {
     ),
 
     passwordResetBaseUrl: process.env.PASSWORD_RESET_BASE_URL || 'aloya://reset-password',
-
     supportInvitationBaseUrl:
         process.env.SUPPORT_INVITATION_BASE_URL || 'aloya://support-network/invitation',
 

@@ -29,6 +29,7 @@ function criarEstilos(tema) {
             backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
         conteudo: {
+            width: '100%',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -41,7 +42,8 @@ function criarEstilos(tema) {
             textAlign: 'center',
             textAlignVertical: 'center'
         },
-        unidade: { ...texto },
+        unidade: { ...texto, fontFamily: fontFamilies.semibold },
+        limpar: { position: 'absolute', right: 18 },
         desativado: { opacity: 0.55 }
     });
 }
