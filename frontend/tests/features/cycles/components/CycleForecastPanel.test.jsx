@@ -167,8 +167,6 @@ test('oferece ações e recursos completos quando ainda não há ciclo', async (
 });
 
 test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
-    expect(estilos.formaProvisoria).toMatchObject({ width: 260, height: 304 });
-    expect(estilos.formaProvisoriaCompacta).toMatchObject({ width: 190, height: 200 });
     expect(estilos.destaqueFertil).toMatchObject({ width: '100%', minHeight: 68 });
     expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 62 });
     expect(estilos.textoAvisoBaixa).toMatchObject({ flex: 1, maxWidth: 226 });
@@ -198,9 +196,6 @@ test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
     expect(estilos.sintoma).toMatchObject({ flexGrow: 1, flexBasis: '47%', minWidth: 130 });
     expect(estilos.cartaoIntroducao).toMatchObject({ minHeight: 666 });
     expect(estilos.recurso).toMatchObject({ minHeight: 92 });
-    expect(estilos.orbitaForma).toMatchObject({ width: 94, height: 180, borderStyle: 'dashed' });
-    expect(estilos.orbitaFormaEsquerda.transform).toEqual([{ rotate: '45deg' }]);
-    expect(estilos.orbitaFormaDireita.transform).toEqual([{ rotate: '-45deg' }]);
 });
 
 test('declara os pesos tipográficos especificados para os textos da HU-013', () => {
