@@ -1,16 +1,20 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 
+import { ArrowLeftIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './Header.style';
 
-function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
+function Header({ titulo, variante = 'padrao', onVoltar, corFundo, acoes = null }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
+
+    const ehRedeApoio = variante === 'redeApoio';
+
+    const temAcoes = !temVoltar && Boolean(acoes);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
@@ -20,17 +24,28 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
-                corFundo ? { backgroundColor: corFundo } : null
+                corFundo
+                    ? {
+                          backgroundColor: corFundo
+                      }
+                    : null
             ]}
         >
             <View
                 style={[
                     estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar
+                    temVoltar && estilos.espacamentoSuperiorComVoltar,
+                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio
                 ]}
             />
 
-            <View style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}>
+            <View
+                style={[
+                    estilos.areaTitulo,
+                    temVoltar && estilos.areaTituloComVoltar,
+                    ehRedeApoio && estilos.areaTituloRedeApoio
+                ]}
+            >
                 {temVoltar ? (
                     <Pressable
                         onPress={onVoltar}
@@ -53,12 +68,34 @@ function Header({ titulo, variante = 'padrao', onVoltar, corFundo }) {
                     </Pressable>
                 ) : null}
 
-                <Text
-                    style={[estilos.titulo, temVoltar && estilos.tituloComVoltar]}
-                    accessibilityRole="header"
-                >
-                    {titulo}
-                </Text>
+                {ehRedeApoio ? (
+                    <View testID="header-title-container" style={estilos.containerTituloRedeApoio}>
+                        <Text
+                            style={[estilos.titulo, estilos.tituloRedeApoio]}
+                            accessibilityRole="header"
+                        >
+                            {titulo}
+                        </Text>
+                    </View>
+                ) : (
+                    <Text
+                        style={[estilos.titulo, temVoltar && estilos.tituloComVoltar]}
+                        accessibilityRole="header"
+                    >
+                        {titulo}
+                    </Text>
+                )}
+
+                {temAcoes ? (
+                    <View
+                        testID="header-actions"
+                        accessibilityRole="toolbar"
+                        accessibilityLabel="Ações da tela"
+                        style={estilos.acoes}
+                    >
+                        {acoes}
+                    </View>
+                ) : null}
             </View>
         </View>
     );

@@ -1,10 +1,12 @@
 /**
  * Orquestra etapas, validações, cadastro e persistência da sessão inicial.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler } from 'react-native';
-import { CalendarBlankIcon as CalendarBlank,
-    WarningCircleIcon as WarningCircle } from '../../../shared/components/icons/AppIcons';
+import {
+    CalendarBlankIcon as CalendarBlank,
+    WarningCircleIcon as WarningCircle
+} from '../../../shared/components/icons/AppIcons';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import AccountStep from '../components/AccountStep/AccountStep';
 import BirthDateStep from '../components/BirthDateStep/BirthDateStep';
@@ -13,15 +15,26 @@ import LastMenstruationStep from '../components/LastMenstruationStep/LastMenstru
 import LutealPhaseLengthStep from '../components/LutealPhaseLengthStep/LutealPhaseLengthStep';
 import MenstruationLengthStep from '../components/MenstruationLengthStep/MenstruationLengthStep';
 import OnboardingComplete from '../components/OnboardingComplete/OnboardingComplete';
+import SupportContactOnboardingComplete from '../components/SupportContactOnboardingComplete/SupportContactOnboardingComplete';
+import UserTypeStep from '../components/UserTypeStep/UserTypeStep';
 import { salvarToken } from '../../../shared/storage/tokenStorage';
 import { isValidDate } from '../../../shared/utils/validation/isValidDate';
 import { isValidEmail } from '../../../shared/utils/validation/isValidEmail';
 import { contarBytesUtf8 } from '../../../shared/utils/validation/contarBytesUtf8';
 
 const iniciais = {
-    nome: '', email: '', senha: '', confirmacao: '', aceitouTermos: false,
-    dataNascimento: '', emailResponsavelLegal: '', ultimaMenstruacao: null,
-    duracaoCiclo: 28, duracaoMenstruacao: 5, duracaoLutea: 14
+    nome: '',
+    email: '',
+    senha: '',
+    confirmacao: '',
+    aceitouTermos: false,
+    tipoUsuario: null,
+    dataNascimento: '',
+    emailResponsavelLegal: '',
+    ultimaMenstruacao: null,
+    duracaoCiclo: 28,
+    duracaoMenstruacao: 5,
+    duracaoLutea: 14
 };
 
 function possuiDadosPreenchidos(dados) {
@@ -29,10 +42,15 @@ function possuiDadosPreenchidos(dados) {
 }
 
 const etapaPorCampo = {
-    nome: 0, email: 0, senha: 0,
-    dataNascimento: 1, emailResponsavelLegal: 1,
-    dataInicioUltimaMenstruacao: 2, dataFimUltimaMenstruacao: 2,
-    duracaoCicloInformada: 3, duracaoMenstruacaoInformada: 4,
+    nome: 0,
+    email: 0,
+    senha: 0,
+    dataNascimento: 1,
+    emailResponsavelLegal: 1,
+    dataInicioUltimaMenstruacao: 2,
+    dataFimUltimaMenstruacao: 2,
+    duracaoCicloInformada: 3,
+    duracaoMenstruacaoInformada: 4,
     duracaoLuteaInformada: 5
 };
 
@@ -64,14 +82,18 @@ function ehMenorDe16(dataTexto, hoje = new Date()) {
     if (nascimento > hoje) return false;
     let idade = hoje.getFullYear() - ano;
     const aniversarioAindaNaoChegou =
-        hoje.getMonth() + 1 < mes ||
-        (hoje.getMonth() + 1 === mes && hoje.getDate() < dia);
+        hoje.getMonth() + 1 < mes || (hoje.getMonth() + 1 === mes && hoje.getDate() < dia);
     if (aniversarioAindaNaoChegou) idade -= 1;
     return idade < 16;
 }
 
 export default function OnboardingScreen({
-    cadastrar, verificarEmailDisponivel, aoVoltar, aoEntrar, aoConcluir, logo
+    cadastrar,
+    verificarEmailDisponivel,
+    aoVoltar,
+    aoEntrar,
+    aoConcluir,
+    logo
 }) {
     const [etapa, setEtapa] = useState(0);
     const [dados, setDados] = useState(iniciais);
@@ -79,9 +101,8 @@ export default function OnboardingScreen({
     const [erro, setErro] = useState(null);
     const [errosCampos, setErrosCampos] = useState({});
     const [destinoSaida, setDestinoSaida] = useState(null);
-    const alterar = useCallback(
-        (mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []
-    );
+    const cadastroEmAndamentoRef = useRef(false);
+    const alterar = useCallback((mudanca) => setDados((atuais) => ({ ...atuais, ...mudanca })), []);
     const alterarCampo = useCallback((campo, valor) => {
         setDados((atuais) => ({ ...atuais, [campo]: valor }));
         setErrosCampos((atuais) => {
@@ -91,30 +112,32 @@ export default function OnboardingScreen({
             return proximos;
         });
     }, []);
-    const solicitarSaida = useCallback((destino = aoVoltar) => {
-        if (carregando || etapa === 6) return;
-        if (!possuiDadosPreenchidos(dados)) {
-            destino?.();
-            return;
-        }
-        setDestinoSaida(() => destino || (() => {}));
-    }, [aoVoltar, carregando, dados, etapa]);
+    const solicitarSaida = useCallback(
+        (destino = aoVoltar) => {
+            if (carregando || etapa === 6) return;
+            if (!possuiDadosPreenchidos(dados)) {
+                destino?.();
+                return;
+            }
+            setDestinoSaida(() => destino || (() => {}));
+        },
+        [aoVoltar, carregando, dados, etapa]
+    );
     const voltar = () => {
         if (carregando || etapa === 6) return;
         if (etapa === 0) solicitarSaida();
+        else if (etapa === 'tipoUsuario') setEtapa(1);
+        else if (etapa === 2) setEtapa('tipoUsuario');
         else setEtapa(etapa - 1);
     };
     const avancar = () => setEtapa(etapa + 1);
 
     useEffect(() => {
-        const inscricao = BackHandler.addEventListener(
-            'hardwareBackPress',
-            () => {
-                if (carregando || etapa === 6) return true;
-                solicitarSaida();
-                return true;
-            }
-        );
+        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (carregando || etapa === 6) return true;
+            solicitarSaida();
+            return true;
+        });
         return () => inscricao.remove();
     }, [carregando, etapa, solicitarSaida]);
 
@@ -136,9 +159,10 @@ export default function OnboardingScreen({
             setErro({ titulo: 'Este e-mail já está em uso', mensagem, emailEmUso: true });
             return;
         }
-        const detalhe = falha.codigo === 'ERRO_VALIDACAO'
-            ? falha.detalhes?.find(({ campo }) => etapaPorCampo[campo] !== undefined)
-            : null;
+        const detalhe =
+            falha.codigo === 'ERRO_VALIDACAO'
+                ? falha.detalhes?.find(({ campo }) => etapaPorCampo[campo] !== undefined)
+                : null;
         if (detalhe) {
             const campo = campoNaTela[detalhe.campo] || detalhe.campo;
             setEtapa(etapaPorCampo[detalhe.campo]);
@@ -146,8 +170,11 @@ export default function OnboardingScreen({
             setErro({ titulo: 'Revise este dado', mensagem: detalhe.mensagem });
             return;
         }
-        setErro({ interno: true, titulo: 'Algo deu errado', mensagem:
-            'Ocorreu um erro ao criar sua conta. Verifique sua conexão e tente novamente.' });
+        setErro({
+            interno: true,
+            titulo: 'Algo deu errado',
+            mensagem: 'Ocorreu um erro ao criar sua conta. Verifique sua conexão e tente novamente.'
+        });
     }
 
     function invalidarDuracao(campo, etapaDestino, mensagem) {
@@ -158,45 +185,77 @@ export default function OnboardingScreen({
     }
 
     function validarDuracoes(valores, ateEtapa) {
-        const campos = [['duracaoCiclo', 3], ['duracaoMenstruacao', 4], ['duracaoLutea', 5]];
+        const campos = [
+            ['duracaoCiclo', 3],
+            ['duracaoMenstruacao', 4],
+            ['duracaoLutea', 5]
+        ];
         for (const [campo, etapaCampo] of campos) {
-            if (etapaCampo <= ateEtapa && valores[campo] !== null
-                && (!Number.isInteger(valores[campo]) || valores[campo] <= 0)) {
+            if (
+                etapaCampo <= ateEtapa &&
+                valores[campo] !== null &&
+                (!Number.isInteger(valores[campo]) || valores[campo] <= 0)
+            ) {
                 return invalidarDuracao(campo, etapaCampo, 'Informe um número inteiro positivo.');
             }
         }
         const { duracaoCiclo, duracaoMenstruacao, duracaoLutea } = valores;
-        if (ateEtapa >= 4 && duracaoCiclo !== null && duracaoMenstruacao !== null
-            && duracaoMenstruacao >= duracaoCiclo) {
-            return invalidarDuracao('duracaoMenstruacao', 4,
-                'A duração da menstruação deve ser menor que a duração do ciclo.');
+        if (
+            ateEtapa >= 4 &&
+            duracaoCiclo !== null &&
+            duracaoMenstruacao !== null &&
+            duracaoMenstruacao >= duracaoCiclo
+        ) {
+            return invalidarDuracao(
+                'duracaoMenstruacao',
+                4,
+                'A duração da menstruação deve ser menor que a duração do ciclo.'
+            );
         }
-        if (ateEtapa >= 5 && duracaoLutea !== null
-            && duracaoLutea > (duracaoCiclo ?? 28) - (duracaoMenstruacao ?? 5) - 2) {
-            return invalidarDuracao('duracaoLutea', 5,
-                'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.');
+        if (
+            ateEtapa >= 5 &&
+            duracaoLutea !== null &&
+            duracaoLutea > (duracaoCiclo ?? 28) - (duracaoMenstruacao ?? 5) - 2
+        ) {
+            return invalidarDuracao(
+                'duracaoLutea',
+                5,
+                'A duração da fase lútea informada não é compatível com o ciclo. Ajuste os valores.'
+            );
         }
         return true;
     }
 
     async function finalizar(sobrescritas = {}) {
-        if (carregando) return;
+        if (cadastroEmAndamentoRef.current) return;
         const dadosCadastro = { ...dados, ...sobrescritas };
-        if (!validarDuracoes(dadosCadastro, 5)) return;
+        const contaContato = dadosCadastro.tipoUsuario === 'contato_apoio';
+        if (!contaContato && !validarDuracoes(dadosCadastro, 5)) return;
+        cadastroEmAndamentoRef.current = true;
         const duracaoLutea = dadosCadastro.duracaoLutea;
         setCarregando(true);
         setErro(null);
         try {
             const resultado = await cadastrar({
-                nome: dadosCadastro.nome, email: dadosCadastro.email, senha: dadosCadastro.senha,
+                nome: dadosCadastro.nome,
+                email: dadosCadastro.email,
+                senha: dadosCadastro.senha,
                 dataNascimento: paraIso(dadosCadastro.dataNascimento),
-                dataInicioUltimaMenstruacao: paraIso(dadosCadastro.ultimaMenstruacao?.inicio),
-                dataFimUltimaMenstruacao: paraIso(dadosCadastro.ultimaMenstruacao?.fim),
-                duracaoCicloInformada: dadosCadastro.duracaoCiclo,
-                duracaoMenstruacaoInformada: dadosCadastro.duracaoMenstruacao,
-                duracaoLuteaInformada: duracaoLutea,
-                ...(ehMenorDe16(dadosCadastro.dataNascimento)
-                    && dadosCadastro.emailResponsavelLegal.trim()
+                tipoUsuario: dadosCadastro.tipoUsuario,
+                ...(!contaContato
+                    ? {
+                          dataInicioUltimaMenstruacao: paraIso(
+                              dadosCadastro.ultimaMenstruacao?.inicio
+                          ),
+                          dataFimUltimaMenstruacao: paraIso(dadosCadastro.ultimaMenstruacao?.fim),
+                          duracaoCicloInformada: dadosCadastro.duracaoCiclo,
+                          duracaoMenstruacaoInformada: dadosCadastro.duracaoMenstruacao,
+                          duracaoLuteaInformada: duracaoLutea
+                      }
+                    : {}),
+                ...(!contaContato &&
+                ehMenorDe16(dadosCadastro.dataNascimento) &&
+                dadosCadastro.emailResponsavelLegal.trim()
                     ? { emailResponsavelLegal: dadosCadastro.emailResponsavelLegal.trim() }
                     : {})
             });
@@ -207,6 +266,7 @@ export default function OnboardingScreen({
         } catch (falha) {
             tratarFalhaCadastro(falha);
         } finally {
+            cadastroEmAndamentoRef.current = false;
             setCarregando(false);
         }
     }
@@ -220,11 +280,17 @@ export default function OnboardingScreen({
             return;
         }
         if (!inicio || !isValidDate(inicio.split('-').reverse().join('/')) || inicio > hoje) {
-            setErro({ titulo: 'Data inválida', mensagem:
-                'Informe a data de início da sua última menstruação. Ela não pode ser uma data no futuro.' });
+            setErro({
+                titulo: 'Data inválida',
+                mensagem:
+                    'Informe a data de início da sua última menstruação. Ela não pode ser uma data no futuro.'
+            });
             return;
         }
-        if (fim && (!isValidDate(fim.split('-').reverse().join('/')) || fim < inicio || fim > hoje)) {
+        if (
+            fim &&
+            (!isValidDate(fim.split('-').reverse().join('/')) || fim < inicio || fim > hoje)
+        ) {
             const mensagem = 'Informe uma data de término válida.';
             setErrosCampos({ ultimaMenstruacao: mensagem });
             setErro({ titulo: 'Data inválida', mensagem });
@@ -242,7 +308,10 @@ export default function OnboardingScreen({
         setErrosCampos({});
         if (dados.nome.trim().length < 3) {
             setErrosCampos({ nome: 'O nome deve ter pelo menos 3 caracteres.' });
-            setErro({ titulo: 'Nome inválido', mensagem: 'O nome deve ter pelo menos 3 caracteres.' });
+            setErro({
+                titulo: 'Nome inválido',
+                mensagem: 'O nome deve ter pelo menos 3 caracteres.'
+            });
         } else if (dados.nome.trim().length > 120) {
             const mensagem = 'O nome deve ter no máximo 120 caracteres.';
             setErrosCampos({ nome: mensagem });
@@ -255,8 +324,10 @@ export default function OnboardingScreen({
             setErro({ titulo: 'E-mail inválido', mensagem: 'Informe um e-mail válido.' });
         } else if (dados.senha.length < 8) {
             setErrosCampos({ senha: 'A senha deve possuir pelo menos 8 caracteres.' });
-            setErro({ titulo: 'Senha inválida', mensagem:
-                'A senha deve possuir pelo menos 8 caracteres.' });
+            setErro({
+                titulo: 'Senha inválida',
+                mensagem: 'A senha deve possuir pelo menos 8 caracteres.'
+            });
         } else if (contarBytesUtf8(dados.senha) > 72) {
             const mensagem = 'A senha ultrapassa o tamanho máximo permitido.';
             setErrosCampos({ senha: mensagem });
@@ -276,8 +347,11 @@ export default function OnboardingScreen({
                 }
                 avancar();
             } catch (falha) {
-                setErro({ aparencia: 'erroInterno', titulo: 'Algo deu errado', mensagem:
-                    falha.mensagemUsuario || 'Não foi possível verificar o e-mail.' });
+                setErro({
+                    aparencia: 'erroInterno',
+                    titulo: 'Algo deu errado',
+                    mensagem: falha.mensagemUsuario || 'Não foi possível verificar o e-mail.'
+                });
             } finally {
                 setCarregando(false);
             }
@@ -288,7 +362,10 @@ export default function OnboardingScreen({
         const [dia, mes, ano] = dados.dataNascimento.split('/').map(Number);
         const data = new Date(ano, mes - 1, dia);
         if (!isValidDate(dados.dataNascimento) || data > new Date()) {
-            setErro({ titulo: 'Data inválida', mensagem: 'Informe uma data de nascimento válida.' });
+            setErro({
+                titulo: 'Data inválida',
+                mensagem: 'Informe uma data de nascimento válida.'
+            });
             return;
         }
         if (ehMenorDe16(dados.dataNascimento)) {
@@ -301,7 +378,19 @@ export default function OnboardingScreen({
             alterar({ emailResponsavelLegal: '' });
         }
         setErrosCampos({});
-        avancar();
+
+        setEtapa('tipoUsuario');
+    }
+
+    function selecionarTipoUsuario(tipoUsuario) {
+        alterar({ tipoUsuario });
+
+        if (tipoUsuario === 'contato_apoio') {
+            void finalizar({ tipoUsuario });
+            return;
+        }
+
+        setEtapa(2);
     }
 
     function validarEmailResponsavel(valor) {
@@ -322,41 +411,114 @@ export default function OnboardingScreen({
 
     const comum = { aoVoltar: voltar, carregando };
     let conteudo;
-    if (etapa === 0) conteudo = <AccountStep dados={dados} aoAlterar={alterar}
-        aoAvancar={avancarConta} aoVoltar={voltar}
-        aoEntrar={() => solicitarSaida(aoEntrar)}
-        carregando={carregando} erros={errosCampos} />;
-    if (etapa === 1) conteudo = <BirthDateStep {...comum} valor={dados.dataNascimento}
-        aoAlterar={(dataNascimento) => alterarCampo('dataNascimento', dataNascimento)}
-        menorDe16={ehMenorDe16(dados.dataNascimento)}
-        emailResponsavelLegal={dados.emailResponsavelLegal}
-        aoAlterarEmailResponsavel={alterarEmailResponsavel}
-        aoValidarEmailResponsavel={() => validarEmailResponsavel(dados.emailResponsavelLegal)}
-        erroEmailResponsavel={errosCampos.emailResponsavelLegal}
-        aoAvancar={avancarNascimento} />;
-    if (etapa === 2) conteudo = <LastMenstruationStep {...comum}
-        valor={dados.ultimaMenstruacao}
-        aoAlterar={(ultimaMenstruacao) => alterarCampo('ultimaMenstruacao', ultimaMenstruacao)}
-        erro={errosCampos.ultimaMenstruacao} aoAvancar={avancarMenstruacao}
-        aoNaoSei={avancarSemMenstruacao} />;
-    if (etapa === 3) conteudo = <CycleLengthStep {...comum} valor={dados.duracaoCiclo}
-        aoAlterar={(duracaoCiclo) => alterarCampo('duracaoCiclo', duracaoCiclo)}
-        erro={errosCampos.duracaoCiclo}
-        aoAvancar={() => { if (validarDuracoes(dados, 3)) avancar(); }}
-        aoPular={() => { alterarCampo('duracaoCiclo', null); avancar(); }} />;
-    if (etapa === 4) conteudo = <MenstruationLengthStep {...comum} valor={dados.duracaoMenstruacao}
-        aoAlterar={(duracaoMenstruacao) => alterarCampo('duracaoMenstruacao', duracaoMenstruacao)}
-        erro={errosCampos.duracaoMenstruacao}
-        aoAvancar={() => { if (validarDuracoes(dados, 4)) avancar(); }}
-        aoPular={() => { alterarCampo('duracaoMenstruacao', null); avancar(); }} />;
-    if (etapa === 5) conteudo = <LutealPhaseLengthStep {...comum} valor={dados.duracaoLutea}
-        aoAlterar={(duracaoLutea) => alterarCampo('duracaoLutea', duracaoLutea)}
-        erro={errosCampos.duracaoLutea} aoAvancar={() => finalizar()}
-        aoPular={() => {
-            alterarCampo('duracaoLutea', null);
-            finalizar({ duracaoLutea: null });
-        }} />;
-    if (etapa === 6) conteudo = <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />;
+    if (etapa === 0)
+        conteudo = (
+            <AccountStep
+                dados={dados}
+                aoAlterar={alterar}
+                aoAvancar={avancarConta}
+                aoVoltar={voltar}
+                aoEntrar={() => solicitarSaida(aoEntrar)}
+                carregando={carregando}
+                erros={errosCampos}
+            />
+        );
+    if (etapa === 1)
+        conteudo = (
+            <BirthDateStep
+                {...comum}
+                valor={dados.dataNascimento}
+                aoAlterar={(dataNascimento) => alterarCampo('dataNascimento', dataNascimento)}
+                menorDe16={ehMenorDe16(dados.dataNascimento)}
+                emailResponsavelLegal={dados.emailResponsavelLegal}
+                aoAlterarEmailResponsavel={alterarEmailResponsavel}
+                aoValidarEmailResponsavel={() =>
+                    validarEmailResponsavel(dados.emailResponsavelLegal)
+                }
+                erroEmailResponsavel={errosCampos.emailResponsavelLegal}
+                aoAvancar={avancarNascimento}
+            />
+        );
+    if (etapa === 'tipoUsuario')
+        conteudo = (
+            <UserTypeStep
+                tipoUsuario={dados.tipoUsuario}
+                aoSelecionar={selecionarTipoUsuario}
+                aoVoltar={voltar}
+                carregando={carregando}
+            />
+        );
+    if (etapa === 2)
+        conteudo = (
+            <LastMenstruationStep
+                {...comum}
+                valor={dados.ultimaMenstruacao}
+                aoAlterar={(ultimaMenstruacao) =>
+                    alterarCampo('ultimaMenstruacao', ultimaMenstruacao)
+                }
+                erro={errosCampos.ultimaMenstruacao}
+                aoAvancar={avancarMenstruacao}
+                aoNaoSei={avancarSemMenstruacao}
+            />
+        );
+    if (etapa === 3)
+        conteudo = (
+            <CycleLengthStep
+                {...comum}
+                valor={dados.duracaoCiclo}
+                aoAlterar={(duracaoCiclo) => alterarCampo('duracaoCiclo', duracaoCiclo)}
+                erro={errosCampos.duracaoCiclo}
+                aoAvancar={() => {
+                    if (validarDuracoes(dados, 3)) avancar();
+                }}
+                aoPular={() => {
+                    alterarCampo('duracaoCiclo', null);
+                    avancar();
+                }}
+            />
+        );
+    if (etapa === 4)
+        conteudo = (
+            <MenstruationLengthStep
+                {...comum}
+                valor={dados.duracaoMenstruacao}
+                aoAlterar={(duracaoMenstruacao) =>
+                    alterarCampo('duracaoMenstruacao', duracaoMenstruacao)
+                }
+                erro={errosCampos.duracaoMenstruacao}
+                aoAvancar={() => {
+                    if (validarDuracoes(dados, 4)) avancar();
+                }}
+                aoPular={() => {
+                    alterarCampo('duracaoMenstruacao', null);
+                    avancar();
+                }}
+            />
+        );
+    if (etapa === 5)
+        conteudo = (
+            <LutealPhaseLengthStep
+                {...comum}
+                valor={dados.duracaoLutea}
+                aoAlterar={(duracaoLutea) => alterarCampo('duracaoLutea', duracaoLutea)}
+                erro={errosCampos.duracaoLutea}
+                aoAvancar={() => finalizar()}
+                aoPular={() => {
+                    alterarCampo('duracaoLutea', null);
+                    finalizar({ duracaoLutea: null });
+                }}
+            />
+        );
+    if (etapa === 6)
+        conteudo =
+            dados.tipoUsuario === 'contato_apoio' ? (
+                <SupportContactOnboardingComplete
+                    logo={logo}
+                    aoIniciar={() => aoConcluir?.(dados)}
+                />
+            ) : (
+                <OnboardingComplete logo={logo} aoIniciar={() => aoConcluir?.(dados)} />
+            );
 
     const irParaLogin = () => {
         setDados({ ...iniciais });
@@ -370,21 +532,48 @@ export default function OnboardingScreen({
         if (erroInterno) finalizar();
     };
 
-    return <>{conteudo}<SimpleModal erroInterno={Boolean(erroInterno) || erro?.aparencia === 'erroInterno'} visivel={Boolean(erro)}
-        icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
-        titulo={erro?.titulo} mensagem={erro?.mensagem}
-        acaoPrincipal={erro?.emailEmUso
-            ? { texto: 'Fazer login', aoPressionar: irParaLogin }
-            : erroInterno
-                ? { texto: 'Tentar novamente', variante: 'preto', aoPressionar: tentarNovamente }
-                : { texto: 'Entendi', aoPressionar: () => setErro(null) }}
-        acaoSecundaria={erro?.emailEmUso || erroInterno
-            ? { texto: 'Voltar', aoPressionar: () => setErro(null) } : undefined} />
-        <SimpleModal visivel={Boolean(destinoSaida)} aoFechar={() => setDestinoSaida(null)}
-            icone={WarningCircle} titulo="Sair do cadastro?"
-            mensagem="Se você sair agora, os dados preenchidos serão perdidos."
-            acaoPrincipal={{ texto: 'Continuar cadastro',
-                aoPressionar: () => setDestinoSaida(null) }}
-            acaoSecundaria={{ texto: 'Sair e descartar', varianteVisual: 'sairSemSalvar', aoPressionar: confirmarSaida }} />
-    </>;
+    return (
+        <>
+            {conteudo}
+            <SimpleModal
+                erroInterno={Boolean(erroInterno) || erro?.aparencia === 'erroInterno'}
+                visivel={Boolean(erro)}
+                icone={erro?.titulo?.includes('Data') ? CalendarBlank : WarningCircle}
+                titulo={erro?.titulo}
+                mensagem={erro?.mensagem}
+                acaoPrincipal={
+                    erro?.emailEmUso
+                        ? { texto: 'Fazer login', aoPressionar: irParaLogin }
+                        : erroInterno
+                          ? {
+                                texto: 'Tentar novamente',
+                                variante: 'preto',
+                                aoPressionar: tentarNovamente
+                            }
+                          : { texto: 'Entendi', aoPressionar: () => setErro(null) }
+                }
+                acaoSecundaria={
+                    erro?.emailEmUso || erroInterno
+                        ? { texto: 'Voltar', aoPressionar: () => setErro(null) }
+                        : undefined
+                }
+            />
+            <SimpleModal
+                visivel={Boolean(destinoSaida)}
+                aoFechar={() => setDestinoSaida(null)}
+                icone={WarningCircle}
+                titulo="Sair do cadastro?"
+                mensagem="Se você sair agora, os dados preenchidos serão perdidos."
+                acaoPrincipal={{
+                    texto: 'Continuar cadastro',
+                    aoPressionar: () => setDestinoSaida(null)
+                }}
+                acaoSecundaria={{
+                    texto: 'Sair e descartar',
+                    varianteVisual: 'sairSemSalvar',
+                    aoPressionar: confirmarSaida
+                }}
+            />
+        </>
+    );
 }

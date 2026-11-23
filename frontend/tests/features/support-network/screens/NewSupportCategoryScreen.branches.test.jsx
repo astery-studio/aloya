@@ -36,21 +36,24 @@ jest.mock('../../../../src/features/settings/layouts/SettingsLayout/SettingsLayo
     };
 });
 
-jest.mock('../../../../src/features/support-network/components/SupportCategoryForm', () => {
-    const React = require('react');
-    const { View } = require('react-native');
-    const moduloReal = jest.requireActual(
-        '../../../../src/features/support-network/components/SupportCategoryForm'
-    );
+jest.mock(
+    '../../../../src/features/support-network/components/SupportCategoryForm/SupportCategoryForm',
+    () => {
+        const React = require('react');
+        const { View } = require('react-native');
+        const moduloReal = jest.requireActual(
+            '../../../../src/features/support-network/components/SupportCategoryForm/SupportCategoryForm'
+        );
 
-    return {
-        prepararCategoriaParaSalvar: moduloReal.prepararCategoriaParaSalvar,
-        SupportCategoryForm: (props) => {
-            mockFormularioProps = props;
-            return React.createElement(View, { testID: 'formulario-falso' });
-        }
-    };
-});
+        return {
+            prepararCategoriaParaSalvar: moduloReal.prepararCategoriaParaSalvar,
+            SupportCategoryForm: (props) => {
+                mockFormularioProps = props;
+                return React.createElement(View, { testID: 'formulario-falso' });
+            }
+        };
+    }
+);
 
 jest.mock('../../../../src/shared/components/feedback/Modal/SimpleModal', () => {
     const React = require('react');

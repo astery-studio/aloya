@@ -2,14 +2,7 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    BackHandler,
-    Linking,
-    NativeModules,
-    Text
-} from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
@@ -30,7 +23,11 @@ import { ChangePasswordScreen } from './features/settings/screens/ChangePassword
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
-import { MembersScreen } from './features/support-network/screens/MembersScreen';
+import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
+import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
+import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
+import { SupportNetworkScreen } from './features/support-network/screens/SupportNetworkScreen';
+import { ehMenorDe16 } from './features/support-network/utils/age';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
@@ -42,10 +39,13 @@ import { useMenstruationSync } from './features/cycles/hooks/useMenstruationSync
 import { useTheme } from './shared/hooks/useTheme';
 import { obterToken } from './shared/storage/tokenStorage';
 import { fontFamilies } from './shared/theme';
+import { analisarLinkExterno } from './shared/utils/externalLinks';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     membros: 'membros',
+    novoContato: 'novoContato',
+    editarContato: 'editarContato',
     categoriasPermissao: 'categoriasPermissao',
     ciclos: 'ciclos',
     perfil: 'perfil',
@@ -55,6 +55,7 @@ const telasInternas = Object.freeze({
     calendario: 'calendario',
     cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
+    responsavelLegal: 'responsavelLegal',
     inicio: 'inicio'
 });
 
@@ -63,6 +64,7 @@ function obterBaseUrl() {
     if (process.env.EXPO_PUBLIC_API_URL) {
         return process.env.EXPO_PUBLIC_API_URL;
     }
+
     const script = NativeModules.SourceCode?.scriptURL || '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
@@ -73,15 +75,8 @@ function obterBaseUrl() {
 
     return 'http://10.0.2.2:3000';
 }
-
 function permitirHttpParaTeste() {
     return process.env.EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING === 'true';
-}
-
-function obterTokenRecuperacao(url) {
-    const token = url?.match(/[?&]token=([^&]+)/)?.[1];
-
-    return token ? decodeURIComponent(token) : null;
 }
 
 // Verifica se o armazenamento seguro retornou uma sessão com token válido.
@@ -174,8 +169,18 @@ export default function App() {
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
+
+    const [retornoResponsavelLegal, setRetornoResponsavelLegal] = useState(
+        telasInternas.configuracoes
+    );
+
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
+
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
+
+    const [rascunhoNovoContato, setRascunhoNovoContato] = useState(null);
+
+    const [contatoEdicao, setContatoEdicao] = useState(null);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -252,6 +257,10 @@ export default function App() {
 
             if (requisicaoAtual.current === identificador) {
                 setPerfil(perfilRecebido);
+
+                if (perfilRecebido.papel === 'contato_apoio') {
+                    setTelaInterna(telasInternas.membros);
+                }
             }
         } catch (erro) {
             if (erro?.name === 'AbortError') {
@@ -322,13 +331,19 @@ export default function App() {
 
     useEffect(() => {
         function abrirLink({ url }) {
-            const token = obterTokenRecuperacao(url);
+            const destino = analisarLinkExterno(url);
 
-            if (token) {
-                setTokenRecuperacao(token);
+            if (destino?.tipo === 'recuperacao_senha') {
+                setTokenRecuperacao(destino.token);
 
                 setTelaPublica('redefinirSenha');
 
+                setEstadoSessao('anonima');
+            }
+
+            if (destino?.tipo === 'convite_rede_apoio') {
+                setTokenRecuperacao(null);
+                setTelaPublica('cadastro');
                 setEstadoSessao('anonima');
             }
         }
@@ -348,10 +363,18 @@ export default function App() {
 
     useEffect(() => {
         const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (estadoSessao !== 'anonima') return false;
+            if (estadoSessao !== 'anonima') {
+                return false;
+            }
+
             const destino = obterDestinoDeRetorno(telaPublica);
-            if (!destino) return false;
+
+            if (!destino) {
+                return false;
+            }
+
             setTelaPublica(destino);
+
             return true;
         });
 
@@ -390,9 +413,14 @@ export default function App() {
         carregarPerfil();
     }
 
-    function concluirCadastro() {
+    function concluirCadastro(dadosCadastro = {}) {
         concluirAutenticacao();
-        setTelaInterna(telasInternas.inicio);
+
+        setTelaInterna(
+            dadosCadastro.tipoUsuario === 'contato_apoio'
+                ? telasInternas.membros
+                : telasInternas.inicio
+        );
     }
 
     function finalizarSessao(resultado = {}) {
@@ -409,6 +437,8 @@ export default function App() {
         setTelaInterna(telasInternas.configuracoes);
 
         setOrigemNovaCategoria(telasInternas.membros);
+        setRascunhoNovoContato(null);
+        setContatoEdicao(null);
 
         setTelaPublica('login');
 
@@ -418,6 +448,10 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
+        if (perfil?.papel === 'contato_apoio' && !['membros', 'configuracoes'].includes(aba)) {
+            return;
+        }
+
         if (aba === 'inicio') {
             setTelaInterna(telasInternas.inicio);
 
@@ -451,6 +485,7 @@ export default function App() {
                 finalizarSessao({
                     mensagem: 'Sua sessão expirou. Entre novamente.'
                 });
+
                 return;
             }
 
@@ -464,6 +499,7 @@ export default function App() {
 
     function abrirNovaCategoria(origem) {
         setOrigemNovaCategoria(origem);
+
         setTelaInterna(telasInternas.novaCategoria);
     }
 
@@ -471,8 +507,35 @@ export default function App() {
         setTelaInterna(origemNovaCategoria);
     }
 
+    function selecionarCategoriaCriadaNoContato(categoria) {
+        const identificadorValido =
+            Number.isSafeInteger(categoria?.id) ||
+            (typeof categoria?.id === 'string' && categoria.id.trim().length > 0);
+
+        if (!identificadorValido) {
+            return;
+        }
+
+        if (origemNovaCategoria === telasInternas.editarContato) {
+            setContatoEdicao((contatoAtual) => ({
+                ...(contatoAtual && typeof contatoAtual === 'object' ? contatoAtual : {}),
+                categoriaId: categoria.id
+            }));
+            return;
+        }
+
+        if (origemNovaCategoria !== telasInternas.novoContato) return;
+
+        setRascunhoNovoContato((rascunhoAtual) => ({
+            ...(rascunhoAtual && typeof rascunhoAtual === 'object' ? rascunhoAtual : {}),
+            categoriaId: categoria.id,
+            permissoesIndividuais: []
+        }));
+    }
+
     function abrirParametrosCiclo(origem) {
         setRetornoParametros(origem);
+
         setTelaInterna(telasInternas.parametrosCiclo);
     }
 
@@ -595,6 +658,7 @@ export default function App() {
                     }}
                     aoEditarCiclo={abrirEdicaoPeloCalendario}
                 />
+
                 {cicloCalendarioEditado ? (
                     <CycleEditFlow
                         key={cicloCalendarioEditado.id}
@@ -608,11 +672,73 @@ export default function App() {
             </>
         );
     } else if (telaInterna === telasInternas.membros) {
+        conteudo =
+            perfil?.papel === 'contato_apoio' ? (
+                <ReceivedContactsScreen
+                    service={configuracao.servicos.receivedContactsService}
+                    onSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            ) : (
+                <SupportNetworkScreen
+                    parentalConsentService={configuracao.servicos.parentalConsentService}
+                    receivedContactsService={configuracao.servicos.receivedContactsService}
+                    service={configuracao.servicos.supportContactService}
+                    categoriasService={configuracao.servicos.supportCategoryService}
+                    onGerenciarResponsavel={() => {
+                        setRetornoResponsavelLegal(telasInternas.membros);
+                        setTelaInterna(telasInternas.responsavelLegal);
+                    }}
+                    onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
+                    onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
+                    onAdicionarContato={(dadosIniciais = null) => {
+                        setRascunhoNovoContato(dadosIniciais);
+                        setTelaInterna(telasInternas.novoContato);
+                    }}
+                    onAlterarVinculo={(contato) => {
+                        setContatoEdicao(contato);
+                        setTelaInterna(telasInternas.editarContato);
+                    }}
+                    onSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            );
+    } else if (telaInterna === telasInternas.novoContato) {
         conteudo = (
-            <MembersScreen
-                onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
-                onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
-                onSelecionarAba={selecionarAba}
+            <ContactFormScreen
+                dadosIniciais={rascunhoNovoContato}
+                emailUsuario={perfil?.email}
+                service={configuracao.servicos.contactInvitationService}
+                categoriasService={configuracao.servicos.supportCategoryService}
+                onRascunhoAlterado={setRascunhoNovoContato}
+                onVoltar={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onSalvo={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.novoContato)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.editarContato) {
+        conteudo = (
+            <ContactFormScreen
+                contatoId={contatoEdicao?.id}
+                dadosIniciais={contatoEdicao}
+                service={configuracao.servicos.contactLinkService}
+                onVoltar={() => {
+                    setContatoEdicao(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onSalvo={() => {
+                    setContatoEdicao(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.editarContato)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.categoriasPermissao) {
@@ -648,6 +774,20 @@ export default function App() {
                         carregarPerfil();
                     }
                 }}
+                menorDe16={ehMenorDe16(perfil?.dataNascimento)}
+                onAbrirResponsavelLegal={() => {
+                    setRetornoResponsavelLegal(telasInternas.configuracoes);
+                    setTelaInterna(telasInternas.responsavelLegal);
+                }}
+            />
+        );
+    } else if (telaInterna === telasInternas.responsavelLegal) {
+        conteudo = (
+            <ParentalConsentScreen
+                service={configuracao.servicos.parentalConsentService}
+                emailUsuario={perfil?.email}
+                onVoltar={() => setTelaInterna(retornoResponsavelLegal)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.parametrosCiclo) {
@@ -663,6 +803,7 @@ export default function App() {
             <NewSupportCategoryScreen
                 criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
                 onVoltar={retornarDaNovaCategoria}
+                onCategoriaCriada={selecionarCategoriaCriadaNoContato}
                 onConcluido={retornarDaNovaCategoria}
                 onSessaoExpirada={finalizarSessao}
             />

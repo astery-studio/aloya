@@ -16,9 +16,9 @@ function valorFoiInformado(valor) {
     return Boolean(String(valor).trim());
 }
 
-function obterValorVisivel(valor) {
+function obterValorVisivel(valor, placeholder = VALOR_NAO_INFORMADO) {
     if (!valorFoiInformado(valor)) {
-        return VALOR_NAO_INFORMADO;
+        return placeholder;
     }
 
     return String(valor).trim();
@@ -34,7 +34,13 @@ function obterEstiloCampo({ estilos, pressionado, desabilitado }) {
     ];
 }
 
-function ProfileField({ label, valor, onPress, desabilitado = false }) {
+function ProfileField({
+    label,
+    valor,
+    placeholder = VALOR_NAO_INFORMADO,
+    onPress,
+    desabilitado = false
+}) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -43,7 +49,7 @@ function ProfileField({ label, valor, onPress, desabilitado = false }) {
 
     const valorInformado = valorFoiInformado(valor);
 
-    const valorVisivel = obterValorVisivel(valor);
+    const valorVisivel = obterValorVisivel(valor, placeholder);
 
     return (
         <Pressable

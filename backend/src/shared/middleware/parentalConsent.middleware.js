@@ -1,15 +1,17 @@
 /**
  * Middleware que restringe operações conforme o estado do consentimento parental.
  */
-function criarParentalConsentMiddleware({
-    parentalConsentService
-}) {
+function criarParentalConsentMiddleware({ parentalConsentService }) {
     // Impede o acesso à Rede de Apoio enquanto o titular menor de 16 anos não possuir consentimento válido.
     async function exigirAcessoRedeApoio(req, _res, next) {
         try {
-            const resultado =
-                await parentalConsentService
-                    .verificarAcessoRedeApoio(req.usuario.id);
+            // Contas exclusivamente de apoio não administram uma Rede de Apoio própria
+            // e, por isso, não estão sujeitas ao consentimento parental da titular.
+            if (req.usuario?.papel === 'contato_apoio') {
+                return next();
+            }
+
+            const resultado = await parentalConsentService.verificarAcessoRedeApoio(req.usuario.id);
 
             if (!resultado.acessoLiberado) {
                 const erro = new Error(
@@ -34,6 +36,4 @@ function criarParentalConsentMiddleware({
     };
 }
 
-export {
-    criarParentalConsentMiddleware
-};
+export { criarParentalConsentMiddleware };

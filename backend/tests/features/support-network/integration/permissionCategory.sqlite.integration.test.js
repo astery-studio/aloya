@@ -36,6 +36,13 @@ const CAMINHO_MIGRATION_NORMALIZACAO = fileURLToPath(
     )
 );
 
+const CAMINHO_MIGRATION_APARENCIA_CONTATO = fileURLToPath(
+    new URL(
+        '../../../../prisma/migrations/20261108020000_adicionar_aparencia_contato/migration.sql',
+        import.meta.url
+    )
+);
+
 function criarBancoTemporario() {
     const diretorio = mkdtempSync(join(tmpdir(), 'aloya-categorias-'));
     const caminhoBanco = join(diretorio, 'teste.db');
@@ -46,6 +53,7 @@ function criarBancoTemporario() {
     const migrationInicial = readFileSync(CAMINHO_MIGRATION_INICIAL, 'utf8');
 
     banco.exec(migrationInicial);
+    banco.exec(readFileSync(CAMINHO_MIGRATION_APARENCIA_CONTATO, 'utf8'));
 
     banco
         .prepare(
