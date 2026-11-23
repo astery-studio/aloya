@@ -96,6 +96,7 @@ function DiaryFiltersSheet({
             bloquearFechamento={aplicando}
             permitirDeslizarParaFechar
             podeIniciarDeslize={podeIniciarDeslize}
+            ajustarAoTeclado={false}
             estiloPainel={estilos.painel}
             corAlca={coresDiario.interface.borda}
         >
@@ -121,6 +122,8 @@ function DiaryFiltersSheet({
                             contentContainerStyle={estilos.conteudo}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
+                            keyboardDismissMode="on-drag"
+                            onScrollBeginDrag={Keyboard.dismiss}
                             onScroll={atualizarPosicaoRolagem}
                             scrollEventThrottle={16}
                         >

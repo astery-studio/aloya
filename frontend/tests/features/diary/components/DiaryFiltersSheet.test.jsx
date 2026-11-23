@@ -81,10 +81,7 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
 
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '01/11/2026');
     await waitFor(() =>
-        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp(
-            'value',
-            '01/11/2026'
-        )
+        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '01/11/2026')
     );
     fireEvent.changeText(screen.getByLabelText('Data final do filtro'), '12/11/2026');
     await waitFor(() =>
@@ -117,6 +114,21 @@ test('permanece desmontado quando não está visível', async () => {
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(catalogo) };
     await render(<DiaryFiltersSheet visivel={false} filtros={{}} service={service} />);
     expect(screen.queryByText('Filtrar Diário')).not.toBeOnTheScreen();
+});
+
+test('não desloca o painel e fecha o teclado ao iniciar a rolagem', async () => {
+    const fecharTeclado = jest.spyOn(Keyboard, 'dismiss').mockImplementation(jest.fn());
+    const service = { buscarCatalogo: jest.fn().mockResolvedValue(catalogo) };
+
+    await render(<DiaryFiltersSheet visivel filtros={{}} service={service} />);
+    await waitFor(() => expect(screen.getByText('Filtro por Período')).toBeOnTheScreen());
+
+    const rolagem = screen.getByTestId('rolagem-filtros-diario');
+    expect(rolagem).toHaveProp('keyboardDismissMode', 'on-drag');
+
+    fireEvent(rolagem, 'scrollBeginDrag');
+    expect(fecharTeclado).toHaveBeenCalledTimes(1);
+    fecharTeclado.mockRestore();
 });
 
 test('limpa datas, fases e todas as categorias pelos controles do painel', async () => {
@@ -177,9 +189,7 @@ test('mostra loading e erro de catálogo com ações de recuperação', async ()
             .mockImplementationOnce(() => new Promise((_resolve, reject) => (rejeitar = reject)))
             .mockResolvedValueOnce(catalogo)
     };
-    await render(
-        <DiaryFiltersSheet visivel filtros={{}} service={service} onFechar={onFechar} />
-    );
+    await render(<DiaryFiltersSheet visivel filtros={{}} service={service} onFechar={onFechar} />);
     expect(screen.getByText('Carregando filtros do Diário...')).toBeOnTheScreen();
     await waitFor(() => expect(rejeitar).toBeDefined());
     rejeitar(new Error('rede'));
