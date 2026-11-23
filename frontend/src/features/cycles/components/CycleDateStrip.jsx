@@ -16,10 +16,18 @@ function CycleDateStrip({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const carregamentos = useRef({ anteriores: false, posteriores: false });
+    const lista = useRef(null);
 
     useEffect(() => {
         carregamentos.current = { anteriores: false, posteriores: false };
     }, [dias]);
+
+    useEffect(() => {
+        const indice = dias.findIndex(({ data }) => data === dataSelecionada);
+        if (indice >= 0) {
+            lista.current?.scrollToIndex({ index: indice, animated: true, viewPosition: 0.5 });
+        }
+    }, [dataSelecionada, dias]);
 
     function carregarBordas({ nativeEvent }) {
         const { x } = nativeEvent.contentOffset;
@@ -41,6 +49,7 @@ function CycleDateStrip({
 
     return (
         <FlatList
+            ref={lista}
             horizontal
             data={dias}
             keyExtractor={(item) => item.data}
