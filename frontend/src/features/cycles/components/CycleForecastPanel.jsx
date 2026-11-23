@@ -39,6 +39,13 @@ const ROTULOS = {
     lutea: 'Fase Lútea',
     desconhecida: 'Seu ciclo'
 };
+const SUBTITULOS = {
+    menstrual: 'O início de um novo ciclo',
+    folicular: 'Preparação para a ovulação',
+    ovulatoria: 'A liberação do óvulo',
+    lutea: 'Preparação para uma possível gravidez',
+    desconhecida: 'Acompanhe seu corpo ao longo do ciclo'
+};
 function criarCoresDaPrevisao(tema) {
     const coresForma = {
         menstrual: tema.escuro ? '#A8524A' : cores.marca.primaria,
@@ -362,6 +369,7 @@ function CycleForecastPanel({
                     <Text accessibilityRole="header" style={estilos.tituloFase}>
                         {ROTULOS[faseAtual]}
                     </Text>
+                    <Text style={estilos.diaCiclo}>{SUBTITULOS[faseAtual]}</Text>
                     {diaCiclo ? (
                         <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text>
                     ) : null}
