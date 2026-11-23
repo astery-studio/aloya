@@ -1,24 +1,36 @@
 import { Text, View } from 'react-native';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
-import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
-import { conteudoPorFase } from '../../constants/phaseContent';
 import { CycleEducationalDisclaimer } from '../home/CycleEducationalDisclaimer';
-import { NOMES_DAS_FASES } from '../home/CyclePhaseHero';
-
-const AVISO_EDUCATIVO =
-    'Cada corpo vive o ciclo de um jeito. Este conteúdo é educativo e não substitui orientação profissional.';
+import { AVISO_EDUCATIVO, CONTEUDO_POR_FASE } from './CyclePhaseEducationSheet.content';
+import { estilos } from './CyclePhaseEducationSheet.styles';
 
 function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
-    const conteudo = conteudoPorFase[fase] ?? conteudoPorFase.menstrual;
-    const nome = NOMES_DAS_FASES[fase] ?? NOMES_DAS_FASES.desconhecida;
+    const conteudo = CONTEUDO_POR_FASE[fase] ?? CONTEUDO_POR_FASE.menstrual;
+    const { Icone } = conteudo;
     return (
-        <BottomSheet visivel={visivel} onFechar={aoFechar}>
-            <BottomSheetLayout titulo={nome} onFechar={aoFechar}>
-                <View style={{ gap: 16 }}>
-                    <Text>{conteudo.descricao}</Text>
-                    <CycleEducationalDisclaimer texto={AVISO_EDUCATIVO} />
+        <BottomSheet
+            visivel={visivel}
+            onFechar={aoFechar}
+            permitirDeslizarParaFechar
+            estiloPainel={estilos.painel}
+            corPainel="#FFFFFF"
+        >
+            <View style={estilos.conteudo}>
+                <View style={estilos.cabecalho}>
+                    <View style={[estilos.icone, { backgroundColor: conteudo.fundo }]}>
+                        <Icone size={28} color={conteudo.cor} weight="fill" />
+                    </View>
+                    <Text style={estilos.rotulo}>Conheça seu ciclo</Text>
                 </View>
-            </BottomSheetLayout>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    {conteudo.titulo}
+                </Text>
+                <Text style={estilos.descricao}>{conteudo.descricao}</Text>
+                <CycleEducationalDisclaimer
+                    texto={AVISO_EDUCATIVO}
+                    style={estilos.aviso}
+                />
+            </View>
         </BottomSheet>
     );
 }

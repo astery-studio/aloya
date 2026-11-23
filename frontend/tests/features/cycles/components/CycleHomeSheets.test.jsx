@@ -32,8 +32,8 @@ test('explica o nível atual de confiabilidade', async () => {
 test('apresenta a educação da fase em sheet próprio', async () => {
     await render(<CyclePhaseEducationSheet visivel fase="folicular" aoFechar={jest.fn()} />);
 
-    expect(screen.getByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
-    expect(screen.getByText(/níveis hormonais começam a subir/)).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Por que “folicular”?' })).toBeOnTheScreen();
+    expect(screen.getByText(/pequenas estruturas nos ovários/)).toBeOnTheScreen();
 });
 
 test('habilita a reflexão preenchida e delega o salvamento', async () => {
