@@ -10,8 +10,19 @@ const PHASES = Object.freeze(
     }))
 );
 
-function CycleEducationSection() {
-    const [selected, setSelected] = useState(PHASES[0]);
+function CycleEducationSection({
+    faseSelecionada,
+    aoSelecionarFase,
+    conteudos = CONTEUDOS_EDUCATIVOS
+}) {
+    const [faseLocal, setFaseLocal] = useState('menstrual');
+    const idSelecionado = faseSelecionada ?? faseLocal;
+    const selected = conteudos[idSelecionado] ?? conteudos.menstrual;
+    const fases = Object.entries(conteudos).map(([id, conteudo]) => ({ id, ...conteudo }));
+    const selecionar = (id) => {
+        setFaseLocal(id);
+        aoSelecionarFase?.(id);
+    };
     return (
         <View style={{ paddingHorizontal: 16, paddingVertical: 24, gap: 14 }}>
             <Text accessibilityRole="header" style={{ fontFamily: 'DMSans_700Bold', fontSize: 20 }}>
@@ -21,19 +32,19 @@ function CycleEducationSection() {
                 accessibilityRole="list"
                 style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
             >
-                {PHASES.map((phase) => (
+                {fases.map((phase) => (
                     <Pressable
                         key={phase.id}
                         accessibilityRole="button"
-                        accessibilityState={{ selected: phase.id === selected.id }}
-                        onPress={() => setSelected(phase)}
+                        accessibilityState={{ selected: phase.id === idSelecionado }}
+                        onPress={() => selecionar(phase.id)}
                         style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 }}
                     >
                         <Text>{phase.label}</Text>
                     </Pressable>
                 ))}
             </View>
-            <Text>{selected.text}</Text>
+            <Text>{selected.texto}</Text>
             <Text>
                 Cada corpo é único. Estas informações são educativas e não substituem orientação
                 médica.
