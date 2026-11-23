@@ -54,7 +54,9 @@ function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido = false }) 
                         accessibilityLabel={texto}
                         style={[estilos.circulo, { transform: [{ scale: escala }] }]}
                     >
-                        <Text style={estilos.instrucao}>{movimentoReduzido ? texto : 'Respire'}</Text>
+                        <Text style={estilos.instrucao}>
+                            {movimentoReduzido ? texto : 'Respire'}
+                        </Text>
                     </Animated.View>
                 </View>
             </View>

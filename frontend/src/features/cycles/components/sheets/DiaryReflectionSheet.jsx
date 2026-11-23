@@ -35,23 +35,23 @@ function DiaryReflectionSheet({
                 <Text accessibilityRole="header" style={estilos.pergunta}>
                     {PERGUNTA}
                 </Text>
-                    <TextInput
-                        label={PERGUNTA}
-                        placeholder="Escreva livremente..."
-                        value={valor}
-                        onChangeText={aoAlterar}
-                        multiline
-                        desativado={salvando}
-                        erro={erro}
-                        estilo={estilos.entrada}
-                        estiloEntrada={estilos.textoEntrada}
-                    />
-                    <ButtonScreen
-                        texto="Salvar no Diário"
-                        aoPressionar={aoSalvar}
-                        desativado={!valor.trim()}
-                        carregando={salvando}
-                    />
+                <TextInput
+                    label={PERGUNTA}
+                    placeholder="Escreva livremente..."
+                    value={valor}
+                    onChangeText={aoAlterar}
+                    multiline
+                    desativado={salvando}
+                    erro={erro}
+                    estilo={estilos.entrada}
+                    estiloEntrada={estilos.textoEntrada}
+                />
+                <ButtonScreen
+                    texto="Salvar no Diário"
+                    aoPressionar={aoSalvar}
+                    desativado={!valor.trim()}
+                    carregando={salvando}
+                />
             </View>
         </BottomSheet>
     );

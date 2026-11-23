@@ -17,9 +17,9 @@ function NoCycleStartSection({
                 <Text style={estilos.rotulo}>Primeiro passo</Text>
                 <Text style={estilos.titulo}>Vamos começar?</Text>
                 <Text style={estilos.descricao}>
-                    Registre as datas da sua menstruação para começar a construir seu histórico.
-                    Com o tempo, esses registros ajudam a acompanhar a duração e as variações dos
-                    seus ciclos.
+                    Registre as datas da sua menstruação para começar a construir seu histórico. Com
+                    o tempo, esses registros ajudam a acompanhar a duração e as variações dos seus
+                    ciclos.
                 </Text>
                 <ButtonScreen
                     texto="Cadastrar Menstruação"
