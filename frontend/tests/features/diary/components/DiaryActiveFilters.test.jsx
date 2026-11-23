@@ -31,6 +31,21 @@ test('exibe todos os critérios e permite remover somente um', async () => {
     expect(screen.getByText('Até 12/11/2026')).toBeOnTheScreen();
     expect(screen.getByText('Fase Folicular')).toBeOnTheScreen();
     expect(screen.getByText('Pele')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Limpar filtros' })).toHaveStyle({
+        width: '100%',
+        maxWidth: 350.011,
+        height: 35.99,
+        borderWidth: 1,
+        borderColor: '#C85A44',
+        borderRadius: 10
+    });
+    expect(screen.getByText('Limpar filtros')).toHaveStyle({
+        color: '#C85A44',
+        fontSize: 13,
+        fontWeight: '600',
+        lineHeight: 25.5,
+        textAlign: 'center'
+    });
     await fireEvent.press(screen.getByRole('button', { name: 'Remover filtro Pele' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
     expect(aoRemover).toHaveBeenCalledWith('categoria:pele');
