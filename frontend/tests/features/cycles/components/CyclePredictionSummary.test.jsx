@@ -16,7 +16,7 @@ test('apresenta previsão e abre a explicação de confiabilidade', async () => 
     );
 
     expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
-    expect(screen.getByText(/10 de novembro.*15 de novembro/)).toBeOnTheScreen();
+    expect(screen.getByText('10–15 de novembro')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
     expect(aoAbrir).toHaveBeenCalledTimes(1);
 });
