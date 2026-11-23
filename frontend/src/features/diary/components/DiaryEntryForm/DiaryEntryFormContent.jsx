@@ -17,6 +17,20 @@ import { DiaryPhaseBadge } from '../DiaryPhaseBadge/DiaryPhaseBadge';
 import { DiaryFormErrors } from './DiaryFormErrors';
 import { criarEstilos } from './DiaryEntrySheet.styles';
 
+const APARENCIAS_FASE_FORMULARIO = Object.freeze({
+    menstruacao: { cor: '#C85A44', fundo: 'rgba(200, 90, 68, 0.20)' },
+    folicular: { cor: '#2C4C3B', fundo: 'rgba(86, 112, 98, 0.20)' },
+    lutea: { cor: '#D68C3A', fundo: 'rgba(214, 140, 58, 0.20)' },
+    ovulacao: { cor: '#4A758E', fundo: 'rgba(74, 117, 142, 0.20)' }
+});
+
+function obterAparenciaFaseFormulario(fase, tema) {
+    if (tema?.escuro) return null;
+    const faseNormalizada =
+        fase === 'menstrual' ? 'menstruacao' : fase === 'ovulatoria' ? 'ovulacao' : fase;
+    return APARENCIAS_FASE_FORMULARIO[faseNormalizada] ?? null;
+}
+
 function DiaryEntryFormContent({
     catalogo,
     carregando,
@@ -33,6 +47,7 @@ function DiaryEntryFormContent({
     const tema = useTheme();
     const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const aparenciaFase = obterAparenciaFaseFormulario(fase, tema);
     const [seletorAberto, setSeletorAberto] = useState(false);
     const posicaoRolagem = useRef(0);
     const toqueInicialY = useRef(null);
@@ -108,7 +123,19 @@ function DiaryEntryFormContent({
                 desabilitado={formulario.salvando}
                 aoAbrirSeletor={() => setSeletorAberto(true)}
             />
-            <DiaryPhaseBadge fase={fase} carregando={carregandoFase} />
+            <View testID="container-fase-formulario" style={estilos.containerFase}>
+                <DiaryPhaseBadge
+                    fase={fase}
+                    carregando={carregandoFase}
+                    estilo={estilos.tagFase}
+                    estiloTexto={estilos.textoFase}
+                    tamanhoIcone={13}
+                    larguraIcone={13}
+                    alturaIcone={14}
+                    cor={aparenciaFase?.cor}
+                    fundo={aparenciaFase?.fundo}
+                />
+            </View>
             <ScrollView
                 testID="rolagem-registro-diario"
                 style={estilos.rolagem}
@@ -180,4 +207,4 @@ function DiaryEntryFormContent({
     );
 }
 
-export { DiaryEntryFormContent };
+export { APARENCIAS_FASE_FORMULARIO, DiaryEntryFormContent, obterAparenciaFaseFormulario };

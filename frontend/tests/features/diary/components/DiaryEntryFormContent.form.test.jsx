@@ -59,7 +59,10 @@ jest.mock(
     }
 );
 
-import { DiaryEntryFormContent } from '../../../../src/features/diary/components/DiaryEntryForm/DiaryEntryFormContent';
+import {
+    DiaryEntryFormContent,
+    obterAparenciaFaseFormulario
+} from '../../../../src/features/diary/components/DiaryEntryForm/DiaryEntryFormContent';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 import { catalogoFormulario as catalogo } from './diaryContentFixtures';
 
@@ -134,9 +137,50 @@ test('habilita o salvamento e atualiza o contador quando há conteúdo válido',
     );
 
     expect(screen.getByText('1 / 1 marcados')).toBeOnTheScreen();
+    expect(screen.getByTestId('container-fase-formulario')).toHaveStyle({
+        width: 294,
+        maxWidth: '100%',
+        height: 43.993,
+        paddingTop: 8,
+        alignItems: 'center'
+    });
+    expect(screen.getByLabelText('Fase Menstrual')).toHaveStyle({
+        height: 35.993,
+        paddingHorizontal: 14,
+        borderRadius: 10,
+        backgroundColor: 'rgba(200, 90, 68, 0.20)'
+    });
+    expect(screen.getByText('Fase Menstrual')).toHaveStyle({
+        color: '#C85A44',
+        fontSize: 13,
+        fontWeight: '600',
+        lineHeight: 19.5
+    });
+    expect(screen.getByTestId('phosphor-react-native-drop-fill')).toHaveProp('width', 13);
+    expect(screen.getByTestId('phosphor-react-native-drop-fill')).toHaveProp('height', 14);
     expect(screen.getByText('desativado:false')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: /Salvar/u }));
     expect(formulario.salvar).toHaveBeenCalledTimes(1);
+});
+
+test('define as quatro cores da tag do formulário sem sobrescrever o tema escuro', () => {
+    expect(obterAparenciaFaseFormulario('menstrual')).toEqual({
+        cor: '#C85A44',
+        fundo: 'rgba(200, 90, 68, 0.20)'
+    });
+    expect(obterAparenciaFaseFormulario('folicular')).toEqual({
+        cor: '#2C4C3B',
+        fundo: 'rgba(86, 112, 98, 0.20)'
+    });
+    expect(obterAparenciaFaseFormulario('lutea')).toEqual({
+        cor: '#D68C3A',
+        fundo: 'rgba(214, 140, 58, 0.20)'
+    });
+    expect(obterAparenciaFaseFormulario('ovulatoria')).toEqual({
+        cor: '#4A758E',
+        fundo: 'rgba(74, 117, 142, 0.20)'
+    });
+    expect(obterAparenciaFaseFormulario('folicular', { escuro: true })).toBeNull();
 });
 
 test('mantém Salvar desativado na edição sem mudanças', async () => {

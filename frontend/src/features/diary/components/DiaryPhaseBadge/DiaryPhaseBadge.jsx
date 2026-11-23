@@ -5,7 +5,17 @@ import { useTheme } from '../../../../shared/hooks/useTheme';
 import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { criarEstilos } from './DiaryPhaseBadge.styles';
 
-function DiaryPhaseBadge({ fase, carregando, estilo, estiloTexto, tamanhoIcone = 14 }) {
+function DiaryPhaseBadge({
+    fase,
+    carregando,
+    estilo,
+    estiloTexto,
+    tamanhoIcone = 14,
+    larguraIcone,
+    alturaIcone,
+    cor: corPersonalizada,
+    fundo: fundoPersonalizado
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const apresentacao = obterApresentacaoFase(fase, tema);
@@ -21,7 +31,9 @@ function DiaryPhaseBadge({ fase, carregando, estilo, estiloTexto, tamanhoIcone =
         );
     }
 
-    const { Icone, cor, fundo, rotulo } = apresentacao;
+    const { Icone, cor: corPadrao, fundo: fundoPadrao, rotulo } = apresentacao;
+    const cor = corPersonalizada ?? corPadrao;
+    const fundo = fundoPersonalizado ?? fundoPadrao;
     return (
         <View
             accessibilityLabel={rotulo}
@@ -29,6 +41,8 @@ function DiaryPhaseBadge({ fase, carregando, estilo, estiloTexto, tamanhoIcone =
         >
             <Icone
                 size={tamanhoIcone}
+                width={larguraIcone ?? tamanhoIcone}
+                height={alturaIcone ?? tamanhoIcone}
                 color={cor}
                 weight={fase === 'menstruacao' || fase === 'menstrual' ? 'fill' : 'regular'}
             />

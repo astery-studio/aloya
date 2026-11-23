@@ -13,6 +13,35 @@ function criarEstilos(tema) {
             paddingBottom: 0,
             backgroundColor: cores.superficie
         },
+        containerFase: {
+            width: 294,
+            maxWidth: '100%',
+            height: 43.993,
+            alignSelf: 'center',
+            paddingTop: 8,
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+        tagFase: {
+            height: 35.993,
+            minHeight: 0,
+            marginTop: 0,
+            alignSelf: 'stretch',
+            flexShrink: 0,
+            paddingVertical: 0,
+            paddingHorizontal: 14,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
+            borderRadius: 10
+        },
+        textoFase: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
+        },
         rolagem: { flex: 1 },
         conteudo: { alignItems: 'center', paddingHorizontal: 16 },
         carregamento: { minHeight: 240, alignItems: 'center', justifyContent: 'center', gap: 12 },
