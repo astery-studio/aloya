@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import { PhaseSymbolSlot } from '../PhaseSymbolSlot';
+import { estilos } from './NoCycleHero.styles';
 
 const MENSAGENS = Object.freeze({
     primeiroUso: [
@@ -15,12 +16,12 @@ const MENSAGENS = Object.freeze({
 function NoCycleHero({ motivoSemPrevisao }) {
     const mensagem = MENSAGENS[motivoSemPrevisao] ?? MENSAGENS.primeiroUso;
     return (
-        <View style={{ alignItems: 'center', paddingHorizontal: 16 }}>
-            <PhaseSymbolSlot />
-            <Text accessibilityRole="header" style={{ fontSize: 28, textAlign: 'center' }}>
+        <View style={estilos.container}>
+            <PhaseSymbolSlot style={estilos.simbolo} />
+            <Text accessibilityRole="header" style={estilos.titulo}>
                 {mensagem[0]}
             </Text>
-            <Text style={{ marginTop: 14, textAlign: 'center' }}>{mensagem[1]}</Text>
+            <Text style={estilos.descricao}>{mensagem[1]}</Text>
         </View>
     );
 }
