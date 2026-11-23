@@ -17,7 +17,8 @@ function criarEstilos(tema) {
             gap: 8,
             borderWidth: 1,
             borderColor: '#C85A44',
-            borderRadius: 10
+            borderRadius: 10,
+            backgroundColor: 'transparent'
         },
         textoLimpar: {
             color: '#C85A44',

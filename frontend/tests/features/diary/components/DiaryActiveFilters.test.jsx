@@ -37,7 +37,8 @@ test('exibe todos os critérios e permite remover somente um', async () => {
         height: 35.99,
         borderWidth: 1,
         borderColor: '#C85A44',
-        borderRadius: 10
+        borderRadius: 10,
+        backgroundColor: 'transparent'
     });
     expect(screen.getByText('Limpar filtros')).toHaveStyle({
         color: '#C85A44',
