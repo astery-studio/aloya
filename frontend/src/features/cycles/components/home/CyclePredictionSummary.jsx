@@ -34,33 +34,40 @@ function CyclePredictionSummary({
     const intervalo = formatarJanelaFertil(janelaFertil);
 
     return (
-        <View style={{ padding: 16, gap: 16 }}>
-            <Text accessibilityRole="header" style={{ fontFamily: 'DMSans_700Bold', fontSize: 20 }}>
-                Sua previsão
-            </Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-                <Metrica
-                    Icone={SunIcon}
-                    rotulo="Próximo ciclo"
-                    valor={`${proximo.dia} de ${proximo.mes}`}
-                    cor="#C85A44"
-                />
-                <ConfidenceBadge nivel={confiabilidade} onPress={aoAbrirConfiabilidade} />
-                <Metrica
-                    Icone={SunIcon}
-                    rotulo="Ovulação prevista"
-                    valor={`${ovulacao.dia} de ${ovulacao.mes}`}
-                    cor="#4A758E"
-                />
-                <Metrica
-                    Icone={SparkleIcon}
-                    rotulo="Janela fértil"
-                    valor={intervalo}
-                    cor="#222222"
-                />
+        <View style={estilos.margem}>
+            <View style={estilos.card}>
+                <View style={estilos.cabecalho}>
+                    <View>
+                        <Text style={textos.previsao}>Previsão</Text>
+                        <Text accessibilityRole="header" style={textos.titulo}>
+                            Próximo ciclo
+                        </Text>
+                    </View>
+                    <ConfidenceBadge nivel={confiabilidade} onPress={aoAbrirConfiabilidade} />
+                </View>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+                    <Metrica
+                        Icone={SunIcon}
+                        rotulo="Próximo ciclo"
+                        valor={`${proximo.dia} de ${proximo.mes}`}
+                        cor="#C85A44"
+                    />
+                    <Metrica
+                        Icone={SunIcon}
+                        rotulo="Ovulação prevista"
+                        valor={`${ovulacao.dia} de ${ovulacao.mes}`}
+                        cor="#4A758E"
+                    />
+                    <Metrica
+                        Icone={SparkleIcon}
+                        rotulo="Janela fértil"
+                        valor={intervalo}
+                        cor="#222222"
+                    />
+                </View>
+                {estimativaIncerta ? <Text>Estimativa incerta</Text> : null}
+                <CycleEducationalDisclaimer texto={AVISO_PREVISAO} variante="contraceptiva" />
             </View>
-            {estimativaIncerta ? <Text>Estimativa incerta</Text> : null}
-            <CycleEducationalDisclaimer texto={AVISO_PREVISAO} variante="contraceptiva" />
         </View>
     );
 }
