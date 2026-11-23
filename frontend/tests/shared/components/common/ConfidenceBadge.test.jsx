@@ -1,5 +1,5 @@
 //Testa os níveis, as variantes e a acessibilidade da tag de confiabilidade.
-import { screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -84,6 +84,27 @@ describe('ConfidenceBadge', () => {
 
         expect(ChartLineUpIcon).not.toHaveBeenCalled();
         expect(ConfidenceStatusBar).not.toHaveBeenCalled();
+    });
+
+    test('vira botão sem quebrar o uso informativo existente', async () => {
+        const onPress = jest.fn();
+        await render(<ConfidenceBadge nivel="media" onPress={onPress} />);
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
+
+        expect(onPress).toHaveBeenCalledTimes(1);
+    });
+
+    test('respeita estado desabilitado e rótulo personalizado', async () => {
+        await render(
+            <ConfidenceBadge
+                nivel="baixa"
+                onPress={jest.fn()}
+                desabilitado
+                rotuloAcessibilidade="Entenda a confiabilidade"
+            />
+        );
+        expect(screen.getByRole('button', { name: 'Entenda a confiabilidade' })).toBeDisabled();
     });
 
     test('mantém as medidas da variante simples', async () => {
