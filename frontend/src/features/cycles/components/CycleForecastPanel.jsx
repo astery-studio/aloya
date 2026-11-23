@@ -149,7 +149,7 @@ function PainelPrevisao({ previsao, janelaFertil }) {
         useCycleForecastVisual();
     const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
     const janela = janelaFertil ?? previsao.janelaFertilEstimada;
-    const incerta = previsao.status === 'PARCIALMENTE_DISPONIVEL';
+    const incerta = ['PARCIALMENTE_DISPONIVEL', 'PREVISAO_ULTRAPASSADA'].includes(previsao.status);
 
     return (
         <View style={estilos.secaoPrevisao}>

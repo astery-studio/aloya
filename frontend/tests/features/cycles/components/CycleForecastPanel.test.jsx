@@ -135,6 +135,13 @@ test('explica previsão parcial sem confiança nem janela fértil', async () => 
     expect(screen.getByText('Baixa')).toBeOnTheScreen();
 });
 
+test('sinaliza como incerta uma previsão ultrapassada', async () => {
+    await render(
+        <CycleForecastPanel previsao={{ ...previsao, status: 'PREVISAO_ULTRAPASSADA' }} />
+    );
+    expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
+});
+
 test('trata fase inválida como ciclo desconhecido', async () => {
     await render(<CycleForecastPanel fase="inexistente" previsao={previsao} />);
 
