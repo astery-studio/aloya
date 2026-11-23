@@ -45,28 +45,39 @@ function CyclePredictionSummary({
                     </View>
                     <ConfidenceBadge nivel={confiabilidade} onPress={aoAbrirConfiabilidade} />
                 </View>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-                    <Metrica
-                        Icone={SunIcon}
-                        rotulo="Próximo ciclo"
-                        valor={`${proximo.dia} de ${proximo.mes}`}
-                        cor="#C85A44"
-                    />
-                    <Metrica
-                        Icone={SunIcon}
-                        rotulo="Ovulação prevista"
-                        valor={`${ovulacao.dia} de ${ovulacao.mes}`}
-                        cor="#4A758E"
-                    />
-                    <Metrica
-                        Icone={SparkleIcon}
-                        rotulo="Janela fértil"
-                        valor={intervalo}
-                        cor="#222222"
-                    />
+                <View style={estilos.metricas}>
+                    <View style={estilos.data}>
+                        <Text style={textos.dia}>{proximo.dia}</Text>
+                        <View>
+                            <Text style={textos.mes}>{proximo.mes}</Text>
+                            <Text style={textos.estimativa}>estimativa</Text>
+                        </View>
+                    </View>
+                    <View style={estilos.secundarias}>
+                        <Metrica
+                            Icone={SunIcon}
+                            rotulo="Ovulação prevista"
+                            valor={`${ovulacao.dia} de ${ovulacao.mes}`}
+                            cor="#4A758E"
+                        />
+                        <Metrica
+                            Icone={SparkleIcon}
+                            rotulo="Janela fértil estimada"
+                            valor={intervalo}
+                            cor="#222222"
+                        />
+                    </View>
                 </View>
-                {estimativaIncerta ? <Text>Estimativa incerta</Text> : null}
-                <CycleEducationalDisclaimer texto={AVISO_PREVISAO} variante="contraceptiva" />
+                <CycleEducationalDisclaimer
+                    texto={AVISO_PREVISAO}
+                    variante="contraceptiva"
+                    style={estilos.aviso}
+                />
+                {estimativaIncerta ? (
+                    <View style={estilos.incerta}>
+                        <Text style={textos.incerta}>Estimativa incerta</Text>
+                    </View>
+                ) : null}
             </View>
         </View>
     );
