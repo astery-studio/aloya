@@ -61,13 +61,22 @@ function DiaryActiveFilters({
                 contentContainerStyle={estilos.lista}
             >
                 {descritores.map((filtro) => (
-                    <FilterChip
+                    <View
                         key={filtro.id}
-                        rotulo={filtro.rotulo}
-                        aoRemover={() => aoRemover?.(filtro.id)}
-                        cor={coresDiario.primaria}
-                        fundo={coresDiario.interface.fundo}
-                    />
+                        testID={`container-filtro-ativo-${filtro.id}`}
+                        style={estilos.containerTag}
+                    >
+                        <FilterChip
+                            testID={`filtro-ativo-${filtro.id}`}
+                            rotulo={filtro.rotulo}
+                            aoRemover={() => aoRemover?.(filtro.id)}
+                            cor={coresDiario.primaria}
+                            fundo="transparent"
+                            estilo={estilos.tag}
+                            estiloTexto={estilos.textoTag}
+                            tamanhoIcone={18}
+                        />
+                    </View>
                 ))}
             </ScrollView>
             <View style={estilos.divisor}>

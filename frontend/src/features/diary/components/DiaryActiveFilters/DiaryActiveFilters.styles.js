@@ -28,7 +28,33 @@ function criarEstilos(tema) {
             lineHeight: 25.5,
             textAlign: 'center'
         },
-        lista: { gap: 8, paddingHorizontal: 8 },
+        lista: { paddingHorizontal: 3 },
+        containerTag: {
+            height: 30,
+            paddingHorizontal: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10
+        },
+        tag: {
+            minHeight: 0,
+            alignSelf: 'stretch',
+            justifyContent: 'center',
+            paddingVertical: 3,
+            paddingHorizontal: 8,
+            gap: 3,
+            borderWidth: 0.7,
+            borderColor: '#C85A44',
+            borderRadius: 99,
+            backgroundColor: 'transparent'
+        },
+        textoTag: {
+            color: '#C85A44',
+            fontFamily: fontFamilies.semibold,
+            fontSize: 11,
+            fontWeight: '600',
+            lineHeight: 16.5
+        },
         divisor: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
         linha: { flex: 1, height: 1, backgroundColor: cores.borda },
         textoDivisor: {
