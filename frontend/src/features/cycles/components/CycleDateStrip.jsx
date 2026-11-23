@@ -47,6 +47,13 @@ function CycleDateStrip({
         }
     }
 
+    function recuperarRolagem({ index, averageItemLength }) {
+        lista.current?.scrollToOffset({
+            offset: Math.max(0, index * (averageItemLength || LARGURA_ITEM)),
+            animated: true
+        });
+    }
+
     return (
         <FlatList
             ref={lista}
@@ -62,6 +69,7 @@ function CycleDateStrip({
             maxToRenderPerBatch={10}
             windowSize={5}
             maintainVisibleContentPosition={{ minIndexForVisible: 1 }}
+            onScrollToIndexFailed={recuperarRolagem}
             onScrollEndDrag={carregarBordas}
             onMomentumScrollEnd={carregarBordas}
             scrollEventThrottle={16}

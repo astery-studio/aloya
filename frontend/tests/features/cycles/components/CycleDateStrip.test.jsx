@@ -19,6 +19,7 @@ test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
     expect(faixa.props.showsHorizontalScrollIndicator).toBe(false);
     expect(faixa.props.windowSize).toBe(5);
     expect(faixa.props.maintainVisibleContentPosition).toEqual({ minIndexForVisible: 1 });
+    expect(faixa.props.onScrollToIndexFailed).toEqual(expect.any(Function));
     expect(screen.getAllByRole('button')).toHaveLength(2);
 });
 
