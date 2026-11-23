@@ -75,7 +75,7 @@ test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não
     try {
         await renderizarTela({ service, aoCadastrarMenstruacao });
 
-        expect(await screen.findByText('Conheça seu ciclo')).toBeOnTheScreen();
+        expect(await screen.findByText('Continue registrando seu ciclo')).toBeOnTheScreen();
         expect(screen.getByLabelText('Datas do ciclo')).toHaveProp('horizontal', true);
         const inicioDaFaixa = screen.getByLabelText('Datas do ciclo').props.data[0].data;
         await fireEvent.press(screen.getByRole('button', { name: 'qui, dia 29' }));
