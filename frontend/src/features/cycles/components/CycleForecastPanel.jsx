@@ -305,15 +305,14 @@ function EstadoSemCiclo({
             <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
             <View style={estilos.recursos}>
                 {recursosSemCiclo.map(({ titulo, descricao, Icone, cor, peso = 'regular' }) => (
-                    <View key={titulo} style={estilos.recurso}>
-                        <View style={estilos.iconeRecurso}>
-                            <Icone size={20} color={cor} weight={peso} />
-                        </View>
-                        <View style={estilos.textoRecurso}>
-                            <Text style={estilos.tituloRecurso}>{titulo}</Text>
+                    <CycleExpandableCard key={titulo} title={titulo}>
+                        <View style={estilos.recurso}>
+                            <View style={estilos.iconeRecurso}>
+                                <Icone size={20} color={cor} weight={peso} />
+                            </View>
                             <Text style={estilos.descricaoRecurso}>{descricao}</Text>
                         </View>
-                    </View>
+                    </CycleExpandableCard>
                 ))}
             </View>
         </View>

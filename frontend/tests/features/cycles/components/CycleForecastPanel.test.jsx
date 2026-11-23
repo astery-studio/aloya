@@ -162,11 +162,13 @@ test('oferece ações e recursos completos quando ainda não há ciclo', async (
     expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
     expect(screen.getByText('Fases do ciclo')).toBeOnTheScreen();
-    expect(screen.getByText(/orientações para cada momento/)).toBeOnTheScreen();
     expect(screen.getByText('Janela fértil')).toBeOnTheScreen();
-    expect(screen.getByText(/previsões baseadas no seu histórico/)).toBeOnTheScreen();
     expect(screen.getByText('Próxima menstruação')).toBeOnTheScreen();
     expect(screen.getByText('Sintomas e bem-estar')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Fases do ciclo' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Janela fértil' }));
+    expect(screen.getByText(/orientações para cada momento/)).toBeOnTheScreen();
+    expect(screen.getByText(/previsões baseadas no seu histórico/)).toBeOnTheScreen();
 });
 
 test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
