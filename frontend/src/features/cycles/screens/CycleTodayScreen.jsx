@@ -146,6 +146,7 @@ function CycleTodayScreen({
                         fase={fase}
                         estado={home.estado}
                         dataSelecionada={referencia}
+                        janelaFertilAtiva={home.janelaFertilAtiva}
                         diaCiclo={obterDiaCiclo(referencia, fases)}
                         janelaFertil={janelaFertil}
                         previsao={previsao}

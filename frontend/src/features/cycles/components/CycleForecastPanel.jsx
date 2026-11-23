@@ -322,6 +322,7 @@ function EstadoSemCiclo({
 function CycleForecastPanel({
     estado,
     dataSelecionada,
+    janelaFertilAtiva,
     fase = 'desconhecida',
     diaCiclo,
     janelaFertil,
@@ -352,16 +353,11 @@ function CycleForecastPanel({
             </CycleForecastVisualContext.Provider>
         );
     const faseAtual = Object.hasOwn(ROTULOS, fase) ? fase : 'desconhecida';
+    const emJanelaFertil = janelaFertilAtiva ?? ['folicular', 'ovulatoria'].includes(faseAtual);
     return (
         <CycleForecastVisualContext.Provider value={visual}>
             <View style={estilos.conteudo}>
-                <View
-                    style={[
-                        estilos.heroiFase,
-                        (faseAtual === 'folicular' || faseAtual === 'ovulatoria') &&
-                            estilos.heroiFaseFertil
-                    ]}
-                >
+                <View style={[estilos.heroiFase, emJanelaFertil && estilos.heroiFaseFertil]}>
                     <PhaseSymbolSlot />
                     <Text accessibilityRole="header" style={estilos.tituloFase}>
                         {ROTULOS[faseAtual]}
@@ -369,7 +365,7 @@ function CycleForecastPanel({
                     {diaCiclo ? (
                         <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text>
                     ) : null}
-                    {faseAtual === 'folicular' || faseAtual === 'ovulatoria' ? (
+                    {emJanelaFertil ? (
                         <View
                             style={[
                                 estilos.destaqueFertil,

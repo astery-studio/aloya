@@ -146,6 +146,13 @@ test('orienta novos registros quando a confiança é baixa', async () => {
     expect(screen.getByText('9 de outubro até 14 de outubro')).toBeOnTheScreen();
 });
 
+test('não confunde fase folicular com janela fértil ativa', async () => {
+    await render(
+        <CycleForecastPanel fase="folicular" janelaFertilAtiva={false} previsao={previsao} />
+    );
+    expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
+});
+
 test('oferece ações e recursos completos quando ainda não há ciclo', async () => {
     const acoes = {
         aoCadastrarMenstruacao: jest.fn(),
