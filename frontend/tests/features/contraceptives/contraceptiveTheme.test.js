@@ -4,6 +4,7 @@ import { criarEstilosUso } from '../../../src/features/contraceptives/components
 import { criarEstilos as criarEstilosFormulario } from '../../../src/features/contraceptives/forms/contraceptiveForms.styles';
 import { criarEstilos as criarEstilosTelas } from '../../../src/features/contraceptives/screens/contraceptiveScreens.styles';
 import { criarEstilosAcompanhamento } from '../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen.styles';
+import { criarEstilos as criarEstilosInicio } from '../../../src/features/contraceptives/screens/ContraceptiveHomeScreen';
 
 describe('tema escuro de anticoncepcionais', () => {
     test('aplica superfícies e textos escuros aos cartões e ao histórico', () => {
@@ -22,6 +23,7 @@ describe('tema escuro de anticoncepcionais', () => {
         const formulario = criarEstilosFormulario(temaEscuro);
         const telas = criarEstilosTelas(temaEscuro);
         const acompanhamento = criarEstilosAcompanhamento(temaEscuro);
+        const inicio = criarEstilosInicio(temaEscuro);
 
         expect(formulario.telaFluxo.backgroundColor).toBe('#121212');
         expect(formulario.conteudoFluxo.paddingTop).toBe(24);
@@ -29,5 +31,6 @@ describe('tema escuro de anticoncepcionais', () => {
         expect(telas.conteudoFormulario.paddingTop).toBe(24);
         expect(acompanhamento.tela.backgroundColor).toBe('#121212');
         expect(acompanhamento.titulo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
+        expect(inicio.conteudo.paddingTop).toBe(24);
     });
 });

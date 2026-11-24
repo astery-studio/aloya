@@ -135,7 +135,13 @@ function criarEstilos(tema) {
     const interfaceTema = tema.cores.interface;
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: interfaceTema.fundo },
-        conteudo: { padding: 21.66, gap: 12, alignItems: 'center' },
+        conteudo: {
+            paddingHorizontal: 21.66,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: 21.66,
+            gap: 12,
+            alignItems: 'center'
+        },
         titulo: {
             width: '100%',
             maxWidth: 350.01,
@@ -154,4 +160,4 @@ function criarEstilos(tema) {
     });
 }
 
-export { ContraceptiveHomeScreen };
+export { ContraceptiveHomeScreen, criarEstilos };
