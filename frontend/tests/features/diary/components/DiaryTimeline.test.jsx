@@ -2,6 +2,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import { DiaryTimeline } from '../../../../src/features/diary/components/DiaryTimeline/DiaryTimeline';
+import { criarEstilos } from '../../../../src/features/diary/components/DiaryTimeline/DiaryTimeline.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const registros = [
@@ -38,6 +40,14 @@ const registros = [
 ];
 
 describe('DiaryTimeline', () => {
+    test('alinha a bolinha ao início da margem lateral da tela', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.trilho.alignItems).toBe('flex-start');
+        expect(estilos.linhaSuperior.left).toBe(24.5);
+        expect(estilos.linhaInferior.left).toBe(24.5);
+    });
+
     test('virtualiza registros e solicita a próxima página quando permitido', async () => {
         const aoCarregarMais = jest.fn();
         await render(

@@ -10,7 +10,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         lista: { paddingBottom: 24 },
         item: { flexDirection: 'row' },
-        trilho: { width: 69, alignItems: 'center' },
+        trilho: { width: 69, alignItems: 'flex-start' },
         marcador: {
             position: 'absolute',
             zIndex: 1,
@@ -26,12 +26,14 @@ function criarEstilos(tema) {
         linhaSuperior: {
             position: 'absolute',
             top: 0,
+            left: 24.5,
             width: 1,
             backgroundColor: cores.borda
         },
         linhaInferior: {
             position: 'absolute',
             bottom: 0,
+            left: 24.5,
             width: 1,
             backgroundColor: cores.borda
         },
