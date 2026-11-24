@@ -121,7 +121,7 @@ function ConfidenceBadge({
                     >
                         {exibirPrefixo ? `Confiança ${rotulo}` : rotulo}
                     </Text>
-                    <InfoIcon size={16} color={visual.cor} weight="fill" />
+                    <InfoIcon size={16} color={visual.cor} weight="regular" />
                 </>
             )}
         </Container>

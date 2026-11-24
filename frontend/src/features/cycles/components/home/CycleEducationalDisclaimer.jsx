@@ -11,7 +11,7 @@ function CycleEducationalDisclaimer({ texto, variante = 'educativa', icone, styl
             accessibilityLabel={texto}
             style={[estilos.base, contraceptiva ? estilos.contraceptiva : estilos.educativa, style]}
         >
-            {icone ?? <Icone size={contraceptiva ? 16 : 17} color="#5C5C59" weight="fill" />}
+            {icone ?? <Icone size={contraceptiva ? 16 : 17} color="#5C5C59" weight="regular" />}
             <Text
                 style={[
                     estilos.texto,
