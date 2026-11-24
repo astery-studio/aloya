@@ -12,7 +12,7 @@ function DiaryAdditionalCategoriesChip({ quantidade, estilos, tema }) {
             style={estilos.chip}
         >
             <PlusCircleIcon accessible={false} size={10.89} color={cores.textoPrincipal} />
-            <Text style={estilos.textoChip}>+ {quantidade}</Text>
+            <Text style={estilos.textoChip}>{quantidade}</Text>
         </View>
     );
 }

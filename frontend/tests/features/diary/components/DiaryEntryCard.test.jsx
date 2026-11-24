@@ -45,7 +45,7 @@ describe('DiaryEntryCard', () => {
             { texto: 'Sintomas emocionais' },
             { texto: 'Sintomas pré-menstruais' },
             { texto: 'Fluxo menstrual' },
-            { texto: '+ 2' }
+            { texto: '2' }
         ];
         expect(organizarChipsEmLinhas(itens)).toEqual([
             [itens[0], itens[2]],
@@ -56,7 +56,7 @@ describe('DiaryEntryCard', () => {
             { texto: 'Intestino' },
             { texto: 'Sangramento de Escape' },
             { texto: 'Tempo de Sono' },
-            { texto: '+ 2' }
+            { texto: '2' }
         ];
         expect(organizarChipsEmLinhas(curtos)).toEqual([curtos.slice(0, 2), curtos.slice(2)]);
 
@@ -153,7 +153,8 @@ describe('DiaryEntryCard', () => {
             lineHeight: 16
         });
         expect(screen.getByText('Sangramento de Escape')).toBeOnTheScreen();
-        expect(screen.getByText('+ 2')).toBeOnTheScreen();
+        expect(screen.getByText('2')).toBeOnTheScreen();
+        expect(screen.queryByText('+ 2')).not.toBeOnTheScreen();
         expect(screen.getAllByTestId('diary-entry-chip-row')).toHaveLength(2);
         expect(screen.getByText('Hoje me senti melhor.')).toBeOnTheScreen();
         expect(screen.getByTestId('diary-entry-categories-note-divider')).toHaveStyle({
@@ -231,7 +232,8 @@ describe('DiaryEntryCard', () => {
 
         await render(<DiaryEntryCard registro={minimo} aoAbrir={jest.fn()} />);
         expect(screen.getByText('Primeiro')).toBeOnTheScreen();
-        expect(screen.getByText('+ 1')).toBeOnTheScreen();
+        expect(screen.getByText('1')).toBeOnTheScreen();
+        expect(screen.queryByText('+ 1')).not.toBeOnTheScreen();
         expect(screen.queryByText('Ignorado')).not.toBeOnTheScreen();
     });
 

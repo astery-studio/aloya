@@ -137,7 +137,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
             principal
         })),
         ...(item.maisQuantidade
-            ? [{ chave: 'mais-categorias', texto: `+ ${item.maisQuantidade}`, contador: true }]
+            ? [{ chave: 'mais-categorias', texto: String(item.maisQuantidade), contador: true }]
             : [])
     ];
     const linhasChips = organizarChipsEmLinhas(chipsResumo);
