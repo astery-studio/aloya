@@ -122,6 +122,7 @@ function DiaryEntryFormContent({
                 proximoDisponivel={formulario.data < hoje}
                 desabilitado={formulario.salvando}
                 aoAbrirSeletor={() => setSeletorAberto(true)}
+                estiloContainer={estilos.navegadorData}
             />
             <View testID="container-fase-formulario" style={estilos.containerFase}>
                 <DiaryPhaseBadge

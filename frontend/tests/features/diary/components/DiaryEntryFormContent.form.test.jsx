@@ -18,8 +18,8 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonSc
 jest.mock('../../../../src/features/diary/components/DiaryDateNavigator/DiaryDateNavigator', () => {
     const { Pressable, Text, View } = require('react-native');
     return {
-        DiaryDateNavigator: ({ aoAnterior, aoProximo, aoAbrirSeletor }) => (
-            <View>
+        DiaryDateNavigator: ({ aoAnterior, aoProximo, aoAbrirSeletor, estiloContainer }) => (
+            <View testID="navegador-data-formulario" style={estiloContainer}>
                 <Pressable onPress={aoAnterior}>
                     <Text>Anterior</Text>
                 </Pressable>
@@ -86,6 +86,7 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     );
 
     expect(screen.getByText('Macros:1;desabilitado:false')).toBeOnTheScreen();
+    expect(screen.getByTestId('navegador-data-formulario')).toHaveStyle({ paddingTop: 10 });
     expect(screen.getByTestId('rolagem-registro-diario')).toHaveProp(
         'keyboardShouldPersistTaps',
         'never'
