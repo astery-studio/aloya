@@ -14,7 +14,7 @@ function NoCycleHomeContent(props) {
             return proximos;
         });
     return (
-        <View style={{ paddingBottom: 40 }}>
+        <View style={{ paddingTop: 24, paddingBottom: 40 }}>
             <NoCycleStartSection {...props} />
             <CycleEducationSection />
             <NoCycleTrackingSection
