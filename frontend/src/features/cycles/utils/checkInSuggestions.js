@@ -1,7 +1,7 @@
-import { listarMacrocategoriasAtivas } from '../../diary/utils/diaryForm';
 import { sugestoesPadraoPorFase } from '../constants/checkInDefaults';
 
 const LIMITE_SUGESTOES = 8;
+const LIMITE_POR_CATEGORIA = 2;
 const CATEGORIAS_CHECK_IN = new Set([
     'fluxo_menstrual',
     'sintomas_fisicos',
@@ -24,7 +24,7 @@ function localizarOpcao(categorias, categoriaId, nome) {
 
 function criarSugestoesCheckIn({ catalogo, fase, destaques = [] }) {
     const categorias = new Map(
-        listarMacrocategoriasAtivas(catalogo)
+        (catalogo?.macrocategorias ?? [])
             .flatMap((macro) => macro.categorias)
             .filter(({ id }) => CATEGORIAS_CHECK_IN.has(id))
             .map((categoria) => [categoria.id, categoria])
@@ -32,25 +32,33 @@ function criarSugestoesCheckIn({ catalogo, fase, destaques = [] }) {
     const personalizadas = destaques
         .filter(({ categoriaId }) => CATEGORIAS_CHECK_IN.has(categoriaId))
         .map(({ categoriaId, valor }) => [categoriaId, valor]);
-    const reservasAtivas = [...categorias.values()].flatMap((categoria) =>
-        categoria.opcoes.map(({ nome }) => [categoria.id, nome])
-    );
+    const reservasAtivas = [...categorias.values()]
+        .filter(({ id }) => fase === 'menstrual' || id !== 'fluxo_menstrual')
+        .flatMap((categoria) => categoria.opcoes.map(({ nome }) => [categoria.id, nome]));
     const candidatas = [
         ...personalizadas,
         ...(sugestoesPadraoPorFase[fase] ?? []),
         ...reservasAtivas
     ];
     const idsIncluidos = new Set();
+    const quantidadePorCategoria = new Map();
     const sugestoes = [];
 
     for (const [categoriaId, nome] of candidatas) {
         const encontrada = localizarOpcao(categorias, categoriaId, nome);
-        if (!encontrada || idsIncluidos.has(encontrada.opcao.id)) continue;
+        const quantidade = quantidadePorCategoria.get(categoriaId) ?? 0;
+        if (
+            !encontrada ||
+            idsIncluidos.has(encontrada.opcao.id) ||
+            quantidade >= LIMITE_POR_CATEGORIA
+        )
+            continue;
         idsIncluidos.add(encontrada.opcao.id);
+        quantidadePorCategoria.set(categoriaId, quantidade + 1);
         sugestoes.push(encontrada);
         if (sugestoes.length === LIMITE_SUGESTOES) break;
     }
     return sugestoes;
 }
 
-export { criarSugestoesCheckIn, LIMITE_SUGESTOES };
+export { criarSugestoesCheckIn, LIMITE_POR_CATEGORIA, LIMITE_SUGESTOES };
