@@ -89,7 +89,10 @@ function CycleDateStrip({
                         style={[
                             estilos.dia,
                             estilos[`dia_${item.fase}`],
-                            selecionado && estilos.diaSelecionado
+                            selecionado && estilos.diaSelecionado,
+                            selecionado &&
+                                item.fase === 'desconhecida' &&
+                                estilos.diaSelecionadoDesconhecida
                         ]}
                     >
                         <View
