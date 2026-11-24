@@ -120,7 +120,7 @@ function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
                     <Text numberOfLines={1} style={estilos.tituloEstimativa}>
                         {texto}
                     </Text>
-                    <Text numberOfLines={1} style={estilos.descricaoEstimativa}>
+                    <Text style={estilos.descricaoEstimativa}>
                         {configuracao.descricao}
                     </Text>
                 </View>
