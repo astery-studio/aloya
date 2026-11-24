@@ -13,7 +13,15 @@ import {
 } from '../DiaryFreeTextCategoryField/DiaryFreeTextCategoryField';
 import { criarEstilos } from './DiaryCategoryField.styles';
 
-function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
+function DiaryCategoryField({
+    categoria,
+    valor,
+    aoAlterar,
+    paleta = 'ciclo',
+    desabilitado,
+    erro,
+    exibirDivisor = false
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const paletas = obterCoresDiario(tema).macrocategorias;
@@ -78,8 +86,11 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     }
     return (
         <View style={estilos.container}>
-            {categoria.id === 'anotacao_livre' ? (
-                <View testID="divisor-anotacao-livre" style={estilos.divisorCategoria} />
+            {exibirDivisor ? (
+                <View
+                    testID={`divisor-categoria-${categoria.id}`}
+                    style={estilos.divisorCategoria}
+                />
             ) : null}
             <View style={[estilos.faixaTitulo, { backgroundColor: cores.fundoCategoria }]}>
                 <Text accessibilityRole="header" style={[estilos.titulo, { color: cores.icone }]}>

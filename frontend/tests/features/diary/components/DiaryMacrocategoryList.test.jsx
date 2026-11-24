@@ -21,9 +21,10 @@ jest.mock(
 jest.mock('../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        DiaryCategoryField: ({ categoria, aoAlterar }) => (
+        DiaryCategoryField: ({ categoria, aoAlterar, exibirDivisor }) => (
             <Pressable accessibilityRole="button" onPress={() => aoAlterar(['opcao'])}>
                 <Text>{categoria.nome}</Text>
+                <Text testID={`divisor-${categoria.id}`}>{String(exibirDivisor)}</Text>
             </Pressable>
         )
     };
@@ -109,4 +110,28 @@ test('expande a seção sensível e encaminha alterações', async () => {
     );
     expect(screen.getByText('Vida íntima:true')).toBeOnTheScreen();
     expect(screen.getByText('Intimidade')).toBeOnTheScreen();
+});
+
+test('exibe divisor somente a partir da segunda categoria da macrocategoria', async () => {
+    const macro = {
+        id: 'saude',
+        nome: 'Saúde e Acompanhamento',
+        categorias: [
+            { id: 'testes', nome: 'Testes' },
+            { id: 'consultas', nome: 'Consultas' }
+        ]
+    };
+
+    await render(
+        <DiaryMacrocategoryList
+            macrocategorias={[macro]}
+            valores={{}}
+            erros={{}}
+            aoAlterar={jest.fn()}
+        />
+    );
+    await fireEvent.press(screen.getByText('Saúde e Acompanhamento:false'));
+
+    expect(screen.getByTestId('divisor-testes')).toHaveTextContent('false');
+    expect(screen.getByTestId('divisor-consultas')).toHaveTextContent('true');
 });

@@ -10,7 +10,7 @@ function criarEstilos(tema) {
         divisorCategoria: {
             width: '100%',
             height: 0.7,
-            backgroundColor: cores.borda
+            backgroundColor: '#E6E2D8'
         },
         faixaTitulo: {
             width: '100%',

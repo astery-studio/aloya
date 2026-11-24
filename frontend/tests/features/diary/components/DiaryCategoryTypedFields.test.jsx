@@ -144,10 +144,19 @@ describe('campos tipados do Diário', () => {
     test('renderiza anotação longa com contador em tempo real', async () => {
         const aoAlterar = jest.fn();
         const resultado = await render(
-            <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} paleta="saude" />
+            <DiaryCategoryField
+                categoria={nota}
+                valor="Olá"
+                aoAlterar={aoAlterar}
+                paleta="saude"
+                exibirDivisor
+            />
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota…');
-        expect(screen.getByTestId('divisor-anotacao-livre')).toBeOnTheScreen();
+        expect(screen.getByTestId('divisor-categoria-anotacao_livre')).toHaveStyle({
+            height: 0.7,
+            backgroundColor: '#E6E2D8'
+        });
         expect(entrada).toHaveProp('scrollEnabled', false);
         expect(entrada).toHaveStyle({
             minHeight: 24,
