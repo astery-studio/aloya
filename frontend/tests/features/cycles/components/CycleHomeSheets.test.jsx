@@ -30,6 +30,17 @@ test('explica o nível atual de confiabilidade', async () => {
     expect(screen.getByText(/dados suficientes e consistentes/)).toBeOnTheScreen();
 });
 
+test('permite consultar a explicação de outro nível de confiabilidade', async () => {
+    await render(<CycleConfidenceSheet visivel nivel="baixa" aoFechar={jest.fn()} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Média' }));
+
+    expect(screen.getByText('Confiabilidade média')).toBeOnTheScreen();
+    expect(screen.getByText(/variações recentes podem alterar/)).toBeOnTheScreen();
+    expect(screen.getByLabelText('Nível atual: média')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Média' })).toBeSelected();
+});
+
 test('apresenta a educação da fase em sheet próprio', async () => {
     await render(<CyclePhaseEducationSheet visivel fase="folicular" aoFechar={jest.fn()} />);
 
