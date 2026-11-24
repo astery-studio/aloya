@@ -3,6 +3,7 @@ import { fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     conteudo: {
+        paddingTop: 16,
         paddingBottom: 40
     },
     explore: {
