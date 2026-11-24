@@ -1,6 +1,8 @@
 import { act, screen } from '@testing-library/react-native';
 
 let mockOnCreated;
+let mockFormOptions;
+let mockExistingRecord;
 
 jest.mock('../../../../src/features/diary/hooks/useDiaryCatalog', () => ({
     useDiaryCatalog: () => ({
@@ -12,6 +14,7 @@ jest.mock('../../../../src/features/diary/hooks/useDiaryCatalog', () => ({
 }));
 jest.mock('../../../../src/features/diary/hooks/useDiaryEntryForm', () => ({
     useDiaryEntryForm: (options) => {
+        mockFormOptions = options;
         mockOnCreated = options.onCriado;
         return {
             data: '2026-10-08',
@@ -24,6 +27,9 @@ jest.mock('../../../../src/features/diary/hooks/useDiaryEntryForm', () => ({
         };
     }
 }));
+jest.mock('../../../../src/features/cycles/hooks/useDiaryRecordForDate', () => ({
+    useDiaryRecordForDate: () => ({ record: mockExistingRecord, loading: false })
+}));
 jest.mock(
     '../../../../src/features/diary/components/DiaryMacrocategoryList/DiaryMacrocategoryList',
     () => ({
@@ -35,6 +41,10 @@ import { CycleDiaryCheckIn } from '../../../../src/features/cycles/components/Cy
 import { estilos } from '../../../../src/features/cycles/components/CycleDiaryCheckIn.styles';
 import { estilos as estilosOpcoes } from '../../../../src/features/cycles/components/home/CompactDiaryOptions.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
+
+beforeEach(() => {
+    mockExistingRecord = null;
+});
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
     await render(
@@ -83,4 +93,15 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
     await act(async () => mockOnCreated());
     expect(screen.getByText('Check-in registrado no Diário.')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Adicionar detalhes' })).toBeEnabled();
+});
+
+test('edita silenciosamente o registro já existente para a data', async () => {
+    mockExistingRecord = { id: 9, data: '2026-10-08', versao: 2, categorias: [] };
+    await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} />);
+
+    expect(mockFormOptions).toMatchObject({
+        modo: 'editar',
+        registroInicial: mockExistingRecord
+    });
+    expect(screen.queryByText(/Já existe um registro/)).not.toBeOnTheScreen();
 });

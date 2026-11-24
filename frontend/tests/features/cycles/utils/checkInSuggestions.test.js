@@ -20,7 +20,8 @@ const opcoesPorCategoria = {
         'Choro fácil'
     ],
     sintomas_emocionais: ['Feliz', 'Animado', 'Tranquilo', 'Motivado', 'Otimista', 'Reflexivo'],
-    energia: ['Sem energia', 'Com energia', 'Exausto', 'Cansado', 'Disposto', 'Agitado']
+    energia: ['Sem energia', 'Com energia', 'Exausto', 'Cansado', 'Disposto', 'Agitado'],
+    digestao: ['Sem alterações', 'Gases', 'Inchaço', 'Azia']
 };
 
 const catalogo = {
@@ -75,6 +76,18 @@ test('usa um único registro sem expandir toda a categoria menstrual', () => {
     expect(sugestoes[0].opcao.nome).toBe('Leve');
     expect(sugestoes).toHaveLength(LIMITE_SUGESTOES);
     expect(sugestoes.filter(({ categoria }) => categoria.id === 'fluxo_menstrual')).toHaveLength(1);
+});
+
+test('não repete no check-in uma opção já registrada naquele dia', () => {
+    const sugestoes = criarSugestoesCheckIn({
+        catalogo,
+        fase: 'lutea',
+        destaques: [{ categoriaId: 'digestao', valor: 'Gases', ocorrencias: 2 }],
+        idsExcluidos: ['digestao_1']
+    });
+
+    expect(sugestoes).toHaveLength(LIMITE_SUGESTOES);
+    expect(sugestoes.map(({ opcao }) => opcao.nome)).not.toContain('Gases');
 });
 
 test('mantém oito opções variadas mesmo com preferências do Diário recolhidas', () => {
