@@ -46,8 +46,9 @@ const estilosBase = {
     },
     texto: { flexShrink: 0 },
     conteudoEstimativa: {
-        width: 226.68,
-        height: 33,
+        flex: 1,
+        minWidth: 0,
+        minHeight: 33,
         alignItems: 'flex-start',
         justifyContent: 'center'
     },
@@ -61,12 +62,15 @@ const estilosBase = {
         color: cores.aviso
     },
     descricaoEstimativa: {
-        width: 228,
-        height: 15,
+        width: '100%',
+        height: 'auto',
+        minHeight: 15,
+        flexShrink: 1,
         fontFamily: fontFamilies.regular,
         fontWeight: '300',
         fontSize: 10,
         lineHeight: 14,
+        includeFontPadding: false,
         color: cores.aviso
     }
 };
@@ -258,7 +262,9 @@ const variantes = Object.freeze({
     estimativaIncerta: {
         container: {
             width: 316.62,
-            height: 42.41,
+            maxWidth: '100%',
+            height: 'auto',
+            minHeight: 42.41,
             justifyContent: 'flex-start',
             gap: 15,
             paddingVertical: 4,
