@@ -63,7 +63,7 @@ test('habilita a reflexão preenchida e delega o salvamento', async () => {
     expect(
         screen.getByRole('header', { name: 'O que seu corpo está pedindo agora?' })
     ).toBeOnTheScreen();
-    expect(screen.queryByText('17 / 5000')).not.toBeOnTheScreen();
+    expect(screen.getByText('17 / 5000')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
     expect(aoSalvar).toHaveBeenCalledTimes(1);
 });
