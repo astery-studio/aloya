@@ -37,18 +37,26 @@ function DiaryReflectionSheet({
                     {PERGUNTA}
                 </Text>
                 <View style={estilos.formulario}>
-                    <TextInput
-                        accessibilityLabel={PERGUNTA}
-                        placeholder="Escreva livremente..."
-                        value={valor}
-                        onChangeText={aoAlterar}
-                        multiline
-                        maxLength={LIMITE_REFLEXAO}
-                        desativado={salvando}
-                        erro={erro}
-                        estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
-                        estiloEntrada={estilos.textoEntrada}
-                    />
+                    <View style={estilos.campo}>
+                        <TextInput
+                            accessibilityLabel={PERGUNTA}
+                            placeholder="Escreva livremente..."
+                            value={valor}
+                            onChangeText={aoAlterar}
+                            multiline
+                            maxLength={LIMITE_REFLEXAO}
+                            desativado={salvando}
+                            erro={erro}
+                            estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
+                            estiloEntrada={estilos.textoEntrada}
+                        />
+                        <Text
+                            accessibilityLiveRegion="polite"
+                            style={[estilos.contador, valor && estilos.contadorPreenchido]}
+                        >
+                            {[...valor].length} / {LIMITE_REFLEXAO}
+                        </Text>
+                    </View>
                     <ButtonScreen
                         texto="Salvar no Diário"
                         aoPressionar={aoSalvar}
