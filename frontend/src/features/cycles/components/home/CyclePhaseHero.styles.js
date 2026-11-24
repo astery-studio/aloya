@@ -26,44 +26,6 @@ const estilos = StyleSheet.create({
         fontSize: 16,
         lineHeight: 24,
         textAlign: 'center'
-    },
-    margemFertil: {
-        width: '100%',
-        maxWidth: 358,
-        marginTop: 20
-    },
-    fertil: {
-        minHeight: 67.67,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderWidth: 1.33333,
-        borderStyle: 'dashed',
-        borderRadius: 16
-    },
-    icone: {
-        width: 40,
-        height: 40,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-        borderWidth: 0.666667,
-        borderColor: '#E6E2D8',
-        borderRadius: 12
-    },
-    tituloFertil: {
-        color: '#222222',
-        fontFamily: fontFamilies.bold,
-        fontSize: 14,
-        lineHeight: 21
-    },
-    textoFertil: {
-        color: '#5C5C59',
-        fontFamily: fontFamilies.regular,
-        fontSize: 13,
-        lineHeight: 20
     }
 });
 
