@@ -6,6 +6,7 @@ import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { estilos } from './DiaryReflectionSheet.styles';
 
 const PERGUNTA = 'O que seu corpo está pedindo agora?';
+const LIMITE_REFLEXAO = 5000;
 
 function DiaryReflectionSheet({
     visivel,
@@ -28,7 +29,7 @@ function DiaryReflectionSheet({
             <View style={estilos.conteudo}>
                 <View style={estilos.cabecalho}>
                     <View style={estilos.icone}>
-                        <QuestionIcon color="#4D7891" size={28} weight="bold" />
+                        <QuestionIcon color="#4A758E" size={28} weight="regular" />
                     </View>
                     <Text style={estilos.rotulo}>Uma pergunta para hoje</Text>
                 </View>
@@ -37,16 +38,23 @@ function DiaryReflectionSheet({
                 </Text>
                 <View style={estilos.formulario}>
                     <TextInput
-                        label={PERGUNTA}
+                        accessibilityLabel={PERGUNTA}
                         placeholder="Escreva livremente..."
                         value={valor}
                         onChangeText={aoAlterar}
                         multiline
+                        maxLength={LIMITE_REFLEXAO}
                         desativado={salvando}
                         erro={erro}
-                        estilo={estilos.entrada}
+                        estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
                         estiloEntrada={estilos.textoEntrada}
                     />
+                    <Text
+                        accessibilityLiveRegion="polite"
+                        style={[estilos.contador, valor && estilos.contadorPreenchido]}
+                    >
+                        {[...valor].length} / {LIMITE_REFLEXAO}
+                    </Text>
                     <ButtonScreen
                         texto="Salvar no Diário"
                         aoPressionar={aoSalvar}
@@ -59,4 +67,4 @@ function DiaryReflectionSheet({
     );
 }
 
-export { DiaryReflectionSheet, PERGUNTA };
+export { DiaryReflectionSheet, LIMITE_REFLEXAO, PERGUNTA };

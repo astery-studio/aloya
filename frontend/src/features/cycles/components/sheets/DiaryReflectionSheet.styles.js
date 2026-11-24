@@ -52,13 +52,23 @@ const estilos = StyleSheet.create({
         height: 123,
         padding: 13
     },
+    entradaPreenchida: { borderColor: '#C85A44' },
     textoEntrada: {
         fontSize: 16,
         fontFamily: fontFamilies.regular,
         lineHeight: 24,
         minHeight: 95.6,
         textAlignVertical: 'top'
-    }
+    },
+    contador: {
+        alignSelf: 'flex-end',
+        marginTop: -13,
+        color: '#A8A49C',
+        fontFamily: fontFamilies.medium,
+        fontSize: 10,
+        lineHeight: 19
+    },
+    contadorPreenchido: { color: '#C85A44' }
 });
 
 export { estilos };
