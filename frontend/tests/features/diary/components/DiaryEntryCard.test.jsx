@@ -109,6 +109,18 @@ describe('DiaryEntryCard', () => {
             fontSize: 12,
             lineHeight: 24
         });
+        for (const titulo of ['CATEGORIAS MARCADAS', 'ANOTAÇÃO DO DIA']) {
+            expect(screen.getByText(titulo)).toHaveStyle({
+                color: '#2C4C3B',
+                textAlign: 'center',
+                fontSize: 8,
+                fontStyle: 'normal',
+                fontWeight: '700',
+                lineHeight: 15,
+                letterSpacing: 0.6,
+                textTransform: 'uppercase'
+            });
+        }
         expect(screen.getByTestId('diary-entry-header-leading')).toHaveStyle({
             width: 56,
             alignItems: 'flex-start'

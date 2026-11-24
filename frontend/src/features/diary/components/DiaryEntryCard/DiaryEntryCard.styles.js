@@ -68,9 +68,12 @@ function criarEstilos(tema) {
             color: cores.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 8,
+            fontStyle: 'normal',
+            fontWeight: '700',
             lineHeight: 15,
             letterSpacing: 0.6,
-            textAlign: 'center'
+            textAlign: 'center',
+            textTransform: 'uppercase'
         },
         chips: {
             alignItems: 'center',
