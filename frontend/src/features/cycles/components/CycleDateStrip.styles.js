@@ -20,39 +20,25 @@ function criarEstilos(tema) {
             width: 46,
             height: 74.33,
             alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingVertical: 10,
+            paddingTop: 2,
             borderRadius: radius.onboardingCalendar,
-            backgroundColor: tema.cores.interface.superficie,
-            borderWidth: 0.666667,
-            borderColor: tema.cores.interface.borda
+            borderWidth: 0.666667
         },
-        diaNaoSelecionado: tema.escuro
-            ? {
-                  borderRadius: 16,
-                  borderWidth: 0.667,
-                  borderColor: 'rgba(255, 255, 255, 0.08)',
-                  backgroundColor: '#1E1E1E'
-              }
-            : {},
+        dia_menstrual: { backgroundColor: '#C85A44', borderColor: '#C85A44' },
+        dia_folicular: { backgroundColor: '#2C4C3B', borderColor: '#2C4C3B' },
+        dia_ovulatoria: { backgroundColor: '#4A758E', borderColor: '#4A758E' },
+        dia_lutea: { backgroundColor: '#D68C3A', borderColor: '#D68C3A' },
+        dia_desconhecida: { backgroundColor: '#847F76', borderColor: '#847F76' },
         diaSelecionado: shadows.cardSuave,
-        diaSelecionado_menstrual: {
-            backgroundColor: tema.escuro ? '#A8524A' : tema.cores.marca.primaria,
-            borderColor: tema.escuro ? '#A8524A' : tema.cores.marca.primaria
+        interior: {
+            width: 42,
+            height: 62,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 14,
+            backgroundColor: '#FFFFFF'
         },
-        diaSelecionado_folicular: {
-            backgroundColor: tema.escuro ? '#52665E' : tema.cores.marca.secundaria,
-            borderColor: tema.escuro ? '#52665E' : tema.cores.marca.secundaria
-        },
-        diaSelecionado_ovulatoria: {
-            backgroundColor: tema.escuro ? '#5A7382' : tema.cores.feedback.informacao,
-            borderColor: tema.escuro ? '#5A7382' : tema.cores.feedback.informacao
-        },
-        diaSelecionado_lutea: {
-            backgroundColor: tema.escuro ? '#B87550' : tema.cores.feedback.aviso,
-            borderColor: tema.escuro ? '#B87550' : tema.cores.feedback.aviso
-        },
-        diaSelecionado_desconhecida: { backgroundColor: tema.cores.interface.textoSecundario },
+        interiorSelecionado: { backgroundColor: 'transparent' },
         semana: {
             ...typography.labelCompact,
             color: tema.escuro ? '#E1E1E1' : tema.cores.interface.textoSecundario,
@@ -69,19 +55,20 @@ function criarEstilos(tema) {
             ...typography.numberCompactStrong,
             color: tema.escuro ? '#E3E3E3' : corSelecionada
         },
-        textoSelecionadoDesconhecido: {
-            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.superficie
-        },
         indicador: {
             width: 5,
             height: 5,
             marginTop: espacamentos.minimo,
             borderRadius: 3,
-            backgroundColor: 'transparent'
+            backgroundColor: '#847F76'
         },
+        indicador_menstrual: { backgroundColor: '#C85A44' },
+        indicador_folicular: { backgroundColor: '#2C4C3B' },
+        indicador_ovulatoria: { backgroundColor: '#4A758E' },
+        indicador_lutea: { backgroundColor: '#D68C3A' },
+        indicador_desconhecida: { backgroundColor: '#847F76' },
         indicadorHoje: { backgroundColor: tema.cores.interface.textoPrincipal },
-        indicadorSelecionado: { backgroundColor: corSelecionada },
-        indicadorSelecionadoDesconhecido: { backgroundColor: tema.cores.interface.superficie }
+        indicadorSelecionado: { backgroundColor: corSelecionada }
     });
 }
 
