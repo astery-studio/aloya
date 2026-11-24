@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { InfoIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { estilos } from './CycleEducationalDisclaimer.styles';
 
-function CycleEducationalDisclaimer({ texto, variante = 'educativa', icone, style }) {
+function CycleEducationalDisclaimer({ texto, variante = 'educativa', icone, style, textStyle }) {
     const contraceptiva = variante === 'contraceptiva';
     const Icone = contraceptiva ? WarningCircleIcon : InfoIcon;
 
@@ -15,7 +15,8 @@ function CycleEducationalDisclaimer({ texto, variante = 'educativa', icone, styl
             <Text
                 style={[
                     estilos.texto,
-                    contraceptiva ? estilos.textoContraceptivo : estilos.textoEducativo
+                    contraceptiva ? estilos.textoContraceptivo : estilos.textoEducativo,
+                    textStyle
                 ]}
             >
                 {texto}

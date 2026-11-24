@@ -29,6 +29,7 @@ function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
                 <CycleEducationalDisclaimer
                     texto={AVISO_EDUCATIVO}
                     style={estilos.aviso}
+                    textStyle={estilos.textoAviso}
                 />
             </View>
         </BottomSheet>

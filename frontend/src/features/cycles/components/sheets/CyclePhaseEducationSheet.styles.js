@@ -49,6 +49,10 @@ const estilos = StyleSheet.create({
         marginTop: 18,
         minHeight: 54,
         padding: 11
+    },
+    textoAviso: {
+        fontSize: 10,
+        lineHeight: 16
     }
 });
 
