@@ -29,7 +29,7 @@ function ConfidenceBadge({
     onPress,
     desabilitado = false,
     rotuloAcessibilidade,
-    exibirPrefixo = true
+    exibirPrefixo = false
 }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
