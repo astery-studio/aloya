@@ -65,6 +65,18 @@ test('usa somente sintomas comuns da fase quando não há histórico suficiente'
     expect(sugestoes.some(({ categoria }) => categoria.id === 'fluxo_menstrual')).toBe(false);
 });
 
+test('usa um único registro sem expandir toda a categoria menstrual', () => {
+    const sugestoes = criarSugestoesCheckIn({
+        catalogo,
+        fase: 'lutea',
+        destaques: [{ categoriaId: 'fluxo_menstrual', valor: 'Leve', ocorrencias: 1 }]
+    });
+
+    expect(sugestoes[0].opcao.nome).toBe('Leve');
+    expect(sugestoes).toHaveLength(LIMITE_SUGESTOES);
+    expect(sugestoes.filter(({ categoria }) => categoria.id === 'fluxo_menstrual')).toHaveLength(1);
+});
+
 test('mantém oito opções variadas mesmo com preferências do Diário recolhidas', () => {
     const catalogoRecolhido = {
         macrocategorias: catalogo.macrocategorias.map((macro) => ({
