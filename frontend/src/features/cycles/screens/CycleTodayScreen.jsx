@@ -93,7 +93,9 @@ function CycleTodayScreen({
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
             {!carregando ? (
                 <View style={estilos.cabecalho}>
-                    <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
+                    <Text accessibilityRole="header" style={estilos.titulo}>
+                        Aloya - Seu Ciclo Hoje
+                    </Text>
                     <View style={estilos.acoesCabecalho}>
                         <IconButton
                             icone={CalendarBlankIcon}

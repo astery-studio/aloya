@@ -9,34 +9,32 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo },
         cabecalho: {
-            minHeight: 67,
-            paddingHorizontal: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            paddingLeft: 12,
+            paddingRight: 24,
             paddingTop: 12,
-            paddingBottom: 16,
-            justifyContent: 'center',
+            paddingBottom: 0,
             borderBottomWidth: StyleSheet.hairlineWidth,
             borderColor: tema.cores.interface.separador
         },
         titulo: {
-            textAlign: 'center',
-            marginLeft: 24,
-            fontFamily: fontFamilies.bold,
-            fontSize: 18,
-            lineHeight: 39,
+            ...tema.headerTypography.compacto,
+            flex: 1,
+            flexShrink: 1,
             color: tema.cores.interface.textoPrincipal
         },
         voltar: {
-            position: 'absolute',
-            left: 10,
-            top: 13,
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             alignItems: 'center',
             justifyContent: 'center'
         },
         corIconeCabecalho: tema.cores.interface.textoPrincipal,
         legenda: {
             minHeight: 40,
+            marginTop: tema.espacamentosLayout.headerParaConteudo,
             paddingHorizontal: 24,
             paddingVertical: 8,
             flexDirection: 'row',

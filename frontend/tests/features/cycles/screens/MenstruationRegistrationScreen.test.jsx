@@ -1,5 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { MenstruationRegistrationScreen } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen';
+import { criarEstilos } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const meses = [
@@ -21,6 +23,24 @@ function montar(props = {}, opcoes = {}) {
         opcoes
     );
 }
+
+test('usa o padrão compacto sem altura rígida e separa o conteúdo', async () => {
+    await montar();
+
+    expect(screen.getByRole('header')).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 20,
+        fontWeight: '700',
+        lineHeight: 28,
+        textAlign: 'left'
+    });
+
+    const estilos = criarEstilos(temaClaro);
+
+    expect(estilos.cabecalho.minHeight).toBeUndefined();
+    expect(estilos.voltar).toMatchObject({ width: 48, height: 48 });
+    expect(estilos.legenda.marginTop).toBe(24);
+});
 
 test('abre no mês atual após carregar os meses, mesmo com um dia anterior pré-selecionado', async () => {
     const propriedades = { hoje: '2026-10-30', datasSelecionadas: ['2026-09-21'] };

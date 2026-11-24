@@ -73,9 +73,6 @@ function MenstruationRegistrationScreen({
             style={estilos.tela}
         >
             <View style={estilos.cabecalho}>
-                <Text accessibilityRole="header" style={estilos.titulo}>
-                    Cadastrar menstruação
-                </Text>
                 <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Voltar"
@@ -85,6 +82,9 @@ function MenstruationRegistrationScreen({
                 >
                     <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
                 </Pressable>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Cadastrar menstruação
+                </Text>
             </View>
             <View style={estilos.legenda}>
                 <View style={estilos.itemLegenda}>
