@@ -112,9 +112,9 @@ function CycleDateStrip({
                                 testID={`indicador-${item.data}`}
                                 style={[
                                     estilos.indicador,
-                                    estilos[`indicador_${item.fase}`],
                                     item.hoje && estilos.indicadorHoje,
-                                    selecionado && estilos.indicadorSelecionado
+                                    selecionado && estilos.indicadorSelecionado,
+                                    item.hoje && selecionado && estilos.indicadorHojeSelecionado
                                 ]}
                             />
                         </View>

@@ -104,7 +104,9 @@ test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, bor
     });
     expect(screen.getByText('qua')).toHaveStyle({ color: conteudo, opacity: 0.85 });
     expect(screen.getByText('7')).toHaveStyle({ color: conteudo });
-    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: conteudo });
+    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({
+        backgroundColor: 'transparent'
+    });
 });
 
 test('mantém a borda da fase no dia não selecionado', async () => {
@@ -128,6 +130,17 @@ test('diferencia o indicador de hoje dos demais dias', async () => {
 
     expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: '#222222' });
     expect(screen.getByTestId('indicador-2026-10-08')).toHaveStyle({
-        backgroundColor: '#2C4C3B'
+        backgroundColor: 'transparent'
+    });
+});
+
+test('exibe a bolinha clara quando hoje também está selecionado', async () => {
+    await montar({
+        dias: [{ data: '2026-10-07', dia: 7, semana: 'qua', fase: 'folicular', hoje: true }],
+        dataSelecionada: '2026-10-07'
+    });
+
+    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({
+        backgroundColor: '#F7F5F0'
     });
 });

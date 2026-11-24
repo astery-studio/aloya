@@ -60,15 +60,11 @@ function criarEstilos(tema) {
             height: 5,
             marginTop: espacamentos.minimo,
             borderRadius: 3,
-            backgroundColor: '#847F76'
+            backgroundColor: 'transparent'
         },
-        indicador_menstrual: { backgroundColor: '#C85A44' },
-        indicador_folicular: { backgroundColor: '#2C4C3B' },
-        indicador_ovulatoria: { backgroundColor: '#4A758E' },
-        indicador_lutea: { backgroundColor: '#D68C3A' },
-        indicador_desconhecida: { backgroundColor: '#847F76' },
         indicadorHoje: { backgroundColor: tema.cores.interface.textoPrincipal },
-        indicadorSelecionado: { backgroundColor: corSelecionada }
+        indicadorSelecionado: { backgroundColor: 'transparent' },
+        indicadorHojeSelecionado: { backgroundColor: corSelecionada }
     });
 }
 

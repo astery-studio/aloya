@@ -3,12 +3,16 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { DropIcon, NotepadIcon, PillIcon } from '../../../../shared/components/icons/AppIcons';
 import { estilos } from './CycleQuickActions.styles';
 
+function MenstruationIcon(props) {
+    return <DropIcon {...props} weight="fill" />;
+}
+
 function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
     return (
         <View style={estilos.secao}>
             <ButtonScreen
                 texto="Cadastrar Menstruação"
-                icone={DropIcon}
+                icone={MenstruationIcon}
                 aoPressionar={aoCadastrarMenstruacao}
                 estilo={estilos.principal}
             />
