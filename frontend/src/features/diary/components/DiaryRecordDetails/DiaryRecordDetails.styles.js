@@ -15,10 +15,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             paddingTop: 24,
             paddingHorizontal: 24,
-            gap: 12
+            gap: 0
         },
         navegadorData: {
-            width: '100%',
+            width: 294,
+            maxWidth: '100%',
+            marginTop: 12,
             padding: 2,
             justifyContent: 'space-between',
             alignItems: 'center',

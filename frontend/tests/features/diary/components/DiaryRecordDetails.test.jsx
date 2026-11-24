@@ -54,7 +54,7 @@ describe('DiaryRecordDetails', () => {
             />
         );
 
-        expect(screen.getByTestId('diary-details-header')).toHaveStyle({ gap: 12 });
+        expect(screen.getByTestId('diary-details-header')).toHaveStyle({ gap: 0 });
         expect(screen.getByTestId('diary-details-footer')).toBeOnTheScreen();
         expect(screen.getByTestId('diary-details-scroll')).toHaveProp('scrollEnabled', true);
         expect(screen.getByTestId('diary-details-scroll')).toHaveProp('nestedScrollEnabled', true);
@@ -81,7 +81,9 @@ describe('DiaryRecordDetails', () => {
             lineHeight: 22
         });
         expect(screen.getByTestId('diary-date-navigator')).toHaveStyle({
-            width: '100%',
+            width: 294,
+            maxWidth: '100%',
+            marginTop: 12,
             padding: 2,
             justifyContent: 'space-between',
             alignItems: 'center',
