@@ -137,28 +137,30 @@ describe('CalendarScreen', () => {
         expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen();
         expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen();
         expect(estilos.centralizadorCabecalho).toMatchObject({
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            alignItems: 'center'
+            flex: 1,
+            minWidth: 0,
+            alignItems: 'flex-start'
         });
         expect(estilos.caixaCalendario).toMatchObject({
-            width: 288
+            maxWidth: '100%'
         });
         expect(estilos.tituloEConfianca).toMatchObject({
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'flex-start'
         });
         expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
-            alignSelf: 'center',
-            alignItems: 'center',
+            alignSelf: 'flex-start',
+            alignItems: 'flex-start',
             justifyContent: 'center'
         });
-        //O grupo inteiro precisa caber antes do cabeçalho dos dias da semana.
-        const fimDoGrupo = estilos.centralizadorCabecalho.top + estilos.caixaCalendario.height;
-        expect(fimDoGrupo + estilos.cabecalho.paddingBottom).toBeLessThanOrEqual(
-            estilos.cabecalho.height
-        );
+        expect(estilos.cabecalho.height).toBeUndefined();
+        expect(estilos.titulo).toMatchObject({
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 20,
+            lineHeight: 28,
+            textAlign: 'left'
+        });
+        expect(estilos.conteudo).toMatchObject({ paddingTop: 24 });
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
         expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();

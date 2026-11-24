@@ -25,14 +25,14 @@ function criarEstilos(tema) {
         },
         cabecalho: {
             display: 'flex',
-            height: 139,
             paddingTop: 56,
             paddingRight: 20,
-            paddingBottom: 8,
+            paddingBottom: 0,
             paddingLeft: 20,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: 8,
             flexShrink: 0,
             alignSelf: 'stretch'
         },
@@ -48,47 +48,40 @@ function criarEstilos(tema) {
             justifyContent: 'center'
         },
         centralizadorCabecalho: {
-            position: 'absolute',
-            top: 56,
-            left: 0,
-            right: 0,
-            height: 75,
-            alignItems: 'center',
+            flex: 1,
+            minWidth: 0,
+            alignItems: 'flex-start',
             justifyContent: 'center'
         },
         caixaCalendario: {
             display: 'flex',
-            width: 288,
-            maxWidth: '82%',
-            height: 75,
+            maxWidth: '100%',
             flexDirection: 'column',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center'
         },
         tituloEConfianca: {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             gap: 2
         },
         centralizadorConfianca: {
-            alignSelf: 'center',
-            alignItems: 'center',
+            alignSelf: 'flex-start',
+            alignItems: 'flex-start',
             justifyContent: 'center'
         },
         titulo: {
+            ...tema.headerTypography.compacto,
             color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.bold,
-            fontSize: 28,
-            fontWeight: '700',
-            lineHeight: 34,
-            textAlign: 'center'
+            flexShrink: 1
         },
         corIconeCabecalho: tema.cores.interface.textoSecundario,
         conteudo: {
             flex: 1,
             minHeight: 0,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         areaCalendario: {
