@@ -63,6 +63,7 @@ function DiaryFiltersSheet({
     const posicaoRolagem = useRef(0);
     const possuiFiltrosAplicados = possuiFiltrosDiario(filtros);
     const possuiPreenchimento = edicaoPossuiPreenchimento(edicao);
+    const aplicarDesativado = aplicando || !catalogo.catalogo || !possuiPreenchimento;
 
     useEffect(() => {
         if (!visivel) return;
@@ -91,7 +92,9 @@ function DiaryFiltersSheet({
     function limpar() {
         setEdicao(criarEdicao());
         setErroPeriodo(null);
-        onAplicar?.(FILTROS_DIARIO_VAZIOS, catalogo.catalogo);
+        if (possuiFiltrosAplicados) {
+            onAplicar?.(FILTROS_DIARIO_VAZIOS, catalogo.catalogo);
+        }
     }
 
     function aplicar() {
@@ -263,8 +266,8 @@ function DiaryFiltersSheet({
                     ) : null}
                 </View>
 
-                <View style={[estilos.rodape, !possuiFiltrosAplicados && estilos.rodapeSemLimpar]}>
-                    {possuiFiltrosAplicados ? (
+                <View style={[estilos.rodape, !possuiPreenchimento && estilos.rodapeSemLimpar]}>
+                    {possuiPreenchimento ? (
                         <ButtonScreen
                             texto="Limpar"
                             variante="branco"
@@ -277,9 +280,13 @@ function DiaryFiltersSheet({
                     <ButtonScreen
                         texto="Aplicar Filtro"
                         aoPressionar={aplicar}
-                        desativado={aplicando || !catalogo.catalogo || !possuiPreenchimento}
+                        desativado={aplicarDesativado}
                         carregando={aplicando}
                         estilo={estilos.botaoAplicar}
+                        estiloTexto={[
+                            estilos.textoAplicar,
+                            aplicarDesativado && estilos.textoAplicarDesativado
+                        ]}
                     />
                 </View>
             </BottomSheetLayout>

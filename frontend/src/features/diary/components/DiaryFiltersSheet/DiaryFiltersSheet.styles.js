@@ -167,7 +167,27 @@ function criarEstilos(tema) {
             backgroundColor: superficie
         },
         textoLimpar: { color: diario.primaria },
-        botaoAplicar: { width: 342, maxWidth: '100%', height: 54, borderRadius: 14 }
+        botaoAplicar: {
+            width: 342,
+            maxWidth: '100%',
+            height: 54,
+            paddingTop: 15.375,
+            paddingRight: 0,
+            paddingBottom: 14.625,
+            paddingLeft: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 14
+        },
+        textoAplicar: {
+            color: '#FFF',
+            fontFamily: fontFamilies.semibold,
+            fontSize: 16,
+            fontWeight: '600',
+            lineHeight: 24,
+            textAlign: 'center'
+        },
+        textoAplicarDesativado: { color: cores.textoDesabilitado }
     });
 }
 

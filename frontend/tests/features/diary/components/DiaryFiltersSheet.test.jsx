@@ -57,6 +57,26 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
     await waitFor(() =>
         expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '01/01/7777')
     );
+    expect(screen.getByRole('button', { name: 'Limpar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toHaveStyle({
+        width: 342,
+        height: 54,
+        paddingTop: 15.375,
+        paddingRight: 0,
+        paddingBottom: 14.625,
+        paddingLeft: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 14
+    });
+    expect(screen.getByText('Aplicar Filtro')).toHaveStyle({
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: '600',
+        lineHeight: 24,
+        textAlign: 'center'
+    });
     fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
     await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent('A data inicial não pode ser futura.')
@@ -183,6 +203,11 @@ test('limpa datas, fases e todas as categorias pelos controles do painel', async
         screen.getByRole('switch', { name: 'Desmarcar todas as categorias de Ciclo e Sangramento' })
     );
 
+    expect(screen.queryByRole('button', { name: 'Limpar' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('switch', { name: 'Filtrar por Fluxo menstrual' }));
+    expect(screen.getByRole('button', { name: 'Limpar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeEnabled();
     await fireEvent.press(screen.getByRole('button', { name: 'Limpar' }));
     expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '');
     expect(screen.getByLabelText('Data final do filtro')).toHaveProp('value', '');
