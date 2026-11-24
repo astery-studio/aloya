@@ -63,7 +63,7 @@ test('habilita a reflexão preenchida e delega o salvamento', async () => {
     expect(
         screen.getByRole('header', { name: 'O que seu corpo está pedindo agora?' })
     ).toBeOnTheScreen();
-    expect(screen.getByText('17 / 5000')).toBeOnTheScreen();
+    expect(screen.queryByText('17 / 5000')).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
     expect(aoSalvar).toHaveBeenCalledTimes(1);
 });
@@ -73,8 +73,8 @@ test('mantém instrução textual quando o movimento é reduzido', async () => {
 
     expect(screen.getByRole('header', { name: 'Acompanhe o movimento' })).toBeOnTheScreen();
     expect(screen.getByText('Respire')).toBeOnTheScreen();
-    expect(estilosRespiracao.painel).toMatchObject({ paddingBottom: 24 });
-    expect(estilosRespiracao.areaRespiracao).toMatchObject({ height: 210, marginTop: 10 });
+    expect(estilosRespiracao.painel).toMatchObject({ paddingTop: 8, paddingBottom: 48 });
+    expect(estilosRespiracao.areaRespiracao).toMatchObject({ height: 153, paddingTop: 23 });
     expect(estilosRespiracao.circuloInterno).toMatchObject({
         width: 121.11,
         height: 121.11,
