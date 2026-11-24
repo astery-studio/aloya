@@ -227,7 +227,7 @@ function ConteudoFase({ conteudo, fase }) {
     const cor = coresConteudo[fase];
     return (
         <View>
-            <CycleExpandableCard title={conteudo.tituloExplicacao} initiallyExpanded>
+            <CycleExpandableCard title={conteudo.tituloExplicacao}>
                 <View style={estilos.secaoTexto}>
                     <View style={estilos.textoComMarcador}>
                         <View style={[estilos.marcador, { backgroundColor: cor }]} />
@@ -235,7 +235,7 @@ function ConteudoFase({ conteudo, fase }) {
                     </View>
                 </View>
             </CycleExpandableCard>
-            <CycleExpandableCard title="Sintomas comuns" initiallyExpanded>
+            <CycleExpandableCard title="Sintomas comuns">
                 <View style={estilos.secaoSintomas}>
                     <View style={estilos.listaSintomas}>
                         {conteudo.sintomas.map((sintoma) => (
@@ -247,7 +247,7 @@ function ConteudoFase({ conteudo, fase }) {
                     </View>
                 </View>
             </CycleExpandableCard>
-            <CycleExpandableCard title="Dicas para hoje" initiallyExpanded>
+            <CycleExpandableCard title="Dicas para hoje">
                 <View style={estilos.secaoDicas}>
                     {conteudo.dicas.map((dica, indice) => (
                         <View key={dica} style={estilos.dica}>

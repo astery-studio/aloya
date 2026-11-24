@@ -50,11 +50,20 @@ test.each([
     });
     expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
     expect(screen.getAllByText(subtitulo)).not.toHaveLength(0);
+    const sobreFase = screen.getByRole('button', { name: subtitulo });
+    const sintomasComuns = screen.getByRole('button', { name: 'Sintomas comuns' });
+    const dicasHoje = screen.getByRole('button', { name: 'Dicas para hoje' });
+    expect(sobreFase.props.accessibilityState.expanded).toBe(false);
+    expect(sintomasComuns.props.accessibilityState.expanded).toBe(false);
+    expect(dicasHoje.props.accessibilityState.expanded).toBe(false);
+    expect(screen.queryByText(conteudoPorFase[fase].descricao)).not.toBeOnTheScreen();
+    expect(screen.queryByText(sintoma)).not.toBeOnTheScreen();
+    await fireEvent.press(sobreFase);
+    await fireEvent.press(sintomasComuns);
+    await fireEvent.press(dicasHoje);
     expect(screen.getByText(conteudoPorFase[fase].descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
-    expect(
-        screen.getByRole('button', { name: 'Sintomas comuns' }).props.accessibilityState
-    ).toEqual({ expanded: true });
+    expect(sintomasComuns.props.accessibilityState.expanded).toBe(true);
     expect(screen.getByText('Observe como seu corpo está se sentindo hoje.')).toBeOnTheScreen();
     expect(
         screen.getByText('Continue registrando suas percepções ao longo do ciclo.')

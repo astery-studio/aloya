@@ -56,6 +56,10 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
 
     expect(screen.getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'qui, dia 8' })).toBeOnTheScreen();
+    const sobreFase = screen.getByRole('button', { name: /Sobre a fase personalizada/ });
+    expect(sobreFase.props.accessibilityState.expanded).toBe(false);
+    expect(screen.queryByText('Conteúdo recebido pela tela.')).not.toBeOnTheScreen();
+    await fireEvent.press(sobreFase);
     expect(screen.getByText('Conteúdo recebido pela tela.')).toBeOnTheScreen();
     expect(screen.getByText('8–12 de outubro')).toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'Início' }).props.accessibilityState.selected).toBe(

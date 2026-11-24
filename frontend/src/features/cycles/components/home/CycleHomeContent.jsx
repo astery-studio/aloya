@@ -52,7 +52,6 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
                     rotulo="Sobre esta fase"
                     corRotulo={corDaFase}
                     titulo={conteudoDaFase?.tituloExplicacao}
-                    initiallyExpanded
                 >
                     <Text style={estilos.descricaoFase}>{conteudoDaFase?.descricao}</Text>
                     <CycleEducationalDisclaimer
