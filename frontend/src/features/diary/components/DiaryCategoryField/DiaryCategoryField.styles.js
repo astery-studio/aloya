@@ -92,6 +92,7 @@ function criarEstilos(tema) {
         entradaAnotacao: {
             minHeight: 24,
             paddingVertical: 0,
+            paddingHorizontal: 32,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 24,
@@ -120,7 +121,7 @@ function criarEstilos(tema) {
         medidorAnotacao: {
             position: 'absolute',
             width: '100%',
-            paddingHorizontal: 20,
+            paddingHorizontal: 52,
             opacity: 0,
             fontFamily: fontFamilies.regular,
             fontSize: 13,

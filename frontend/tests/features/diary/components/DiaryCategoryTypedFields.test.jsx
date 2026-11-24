@@ -153,6 +153,7 @@ describe('campos tipados do Diário', () => {
             minHeight: 24,
             height: 24,
             fontSize: 13,
+            paddingHorizontal: 32,
             textAlign: 'center',
             textAlignVertical: 'top',
             color: '#4A5899'
