@@ -34,9 +34,10 @@ const estilos = StyleSheet.create({
         lineHeight: 21
     },
     areaRespiracao: {
+        height: 216,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 23
+        marginTop: 18
     },
     circulo: {
         alignItems: 'center',

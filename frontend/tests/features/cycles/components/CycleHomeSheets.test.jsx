@@ -3,6 +3,7 @@ import { CycleConfidenceSheet } from '../../../../src/features/cycles/components
 import { CyclePhaseEducationSheet } from '../../../../src/features/cycles/components/sheets/CyclePhaseEducationSheet';
 import { DiaryReflectionSheet } from '../../../../src/features/cycles/components/sheets/DiaryReflectionSheet';
 import { GuidedBreathingSheet } from '../../../../src/features/cycles/components/sheets/GuidedBreathingSheet';
+import { estilos as estilosRespiracao } from '../../../../src/features/cycles/components/sheets/GuidedBreathingSheet.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => ({
@@ -61,4 +62,5 @@ test('mantém instrução textual quando o movimento é reduzido', async () => {
 
     expect(screen.getByRole('header', { name: 'Acompanhe o movimento' })).toBeOnTheScreen();
     expect(screen.getByText('Respire')).toBeOnTheScreen();
+    expect(estilosRespiracao.areaRespiracao).toMatchObject({ height: 216, marginTop: 18 });
 });
