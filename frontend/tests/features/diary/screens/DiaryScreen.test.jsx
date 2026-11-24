@@ -93,7 +93,7 @@ describe('histórico do Diário', () => {
             screen.getByRole('button', { name: 'Gerenciar categorias do Diário' })
         );
         await fireEvent.press(
-            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+            screen.getAllByRole('button', { name: 'Adicionar novo registro' })[0]
         );
         await fireEvent.press(screen.getByLabelText('Ver detalhes do registro de 09/11/2026'));
         await fireEvent.press(
@@ -150,12 +150,6 @@ describe('histórico do Diário', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
         expect(remover).toHaveBeenCalledWith('fase:menstrual');
         expect(limpar).toHaveBeenCalledTimes(1);
-        expect(
-            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
-        ).toHaveStyle({
-            width: '100%',
-            height: 56,
-            borderRadius: 12
-        });
+        expect(screen.getByRole('button', { name: 'Adicionar novo registro' })).toBeOnTheScreen();
     });
 });

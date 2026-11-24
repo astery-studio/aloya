@@ -85,21 +85,10 @@ function criarEstilos(tema) {
             left: 0,
             paddingHorizontal: 20,
             paddingTop: 16,
-            paddingBottom: 18,
+            paddingBottom: 16,
             borderTopWidth: 1,
             borderTopColor: cores.borda,
             backgroundColor: cores.fundo
-        },
-        botaoAdicionar: {
-            width: '100%',
-            height: 56,
-            borderRadius: 12
-        },
-        textoBotaoAdicionar: {
-            fontFamily: fontFamilies.semibold,
-            fontSize: 17,
-            fontWeight: '600',
-            lineHeight: 24
         }
     });
 }
