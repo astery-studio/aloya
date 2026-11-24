@@ -1,41 +1,52 @@
 import { StyleSheet } from 'react-native';
+import { fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     cartao: {
         backgroundColor: '#FFFFFF',
         borderColor: '#E7E1D7',
-        borderRadius: 20,
-        borderWidth: 1,
-        gap: 10,
+        borderRadius: 28,
+        borderWidth: 0.7,
         marginHorizontal: 16,
-        marginTop: 16,
-        padding: 18,
+        marginTop: 34,
+        paddingHorizontal: 20,
+        paddingVertical: 24,
         shadowColor: '#193D2E',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12
+        shadowOffset: { width: 0, height: 18 },
+        shadowOpacity: 0.16,
+        shadowRadius: 36
     },
     rotulo: {
         color: '#5F5B54',
-        fontSize: 10,
+        fontFamily: fontFamilies.bold,
+        fontSize: 9,
         fontWeight: '700',
-        letterSpacing: 1.2,
+        letterSpacing: 0.9,
+        lineHeight: 14,
         textTransform: 'uppercase'
     },
     titulo: {
         color: '#222222',
-        fontSize: 20,
-        lineHeight: 26
+        fontFamily: fontFamilies.regular,
+        fontSize: 24,
+        letterSpacing: -0.84,
+        lineHeight: 36,
+        paddingTop: 7
     },
     descricao: {
         color: '#66635E',
-        fontSize: 13,
-        lineHeight: 19
+        fontFamily: fontFamilies.regular,
+        fontSize: 12,
+        lineHeight: 19,
+        paddingBottom: 19,
+        paddingTop: 9
     },
     observacao: {
         color: '#77736C',
-        fontSize: 10,
-        lineHeight: 14,
+        fontFamily: fontFamilies.regular,
+        fontSize: 9,
+        lineHeight: 13,
+        paddingTop: 11,
         textAlign: 'center'
     },
     acoes: {
@@ -44,7 +55,7 @@ const estilos = StyleSheet.create({
     },
     acao: {
         flex: 1,
-        minHeight: 48
+        height: 45
     }
 });
 
