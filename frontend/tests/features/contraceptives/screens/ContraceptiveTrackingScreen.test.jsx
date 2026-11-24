@@ -17,7 +17,7 @@ function renderizar(componente) {
 }
 
 test('protege a listagem e o botão fixo nas quatro bordas nativas', async () => {
-    await renderizar(<ContraceptiveTrackingScreen />);
+    await renderizar(<ContraceptiveTrackingScreen aoCadastrarNovo={jest.fn()} />);
     const area = screen.getByTestId('anticoncepcionais-area-segura');
     expect(area).toHaveProp('edges', {
         top: 'additive',

@@ -19,7 +19,8 @@ function criarEstilos(tema) {
 
         lista: {
             flexGrow: 1,
-            padding: espacamentos.grande
+            padding: espacamentos.grande,
+            paddingBottom: 104
         },
 
         separador: {
@@ -45,10 +46,6 @@ function criarEstilos(tema) {
             ...typography.bodyDefault,
             textAlign: 'center',
             color: interfaceTema.textoSecundario
-        },
-
-        acao: {
-            marginTop: espacamentos.grande
         },
 
         acaoExcluir: {
