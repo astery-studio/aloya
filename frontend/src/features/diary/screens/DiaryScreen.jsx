@@ -69,8 +69,12 @@ function DiaryScreen({
                     icone={FunnelIcon}
                     aoPressionar={aoAbrirFiltros}
                     rotuloAcessibilidade="Filtrar histórico do Diário"
-                    variante="redeApoio"
+                    variante="selecionado"
                     corIcone={coresDiario.interface.destaque}
+                    estilo={{
+                        backgroundColor: coresDiario.interface.superficie,
+                        borderColor: coresDiario.interface.borda
+                    }}
                 />
             ) : null}
             {typeof aoGerenciarCategorias === 'function' ? (
@@ -78,8 +82,12 @@ function DiaryScreen({
                     icone={GearSixIcon}
                     aoPressionar={aoGerenciarCategorias}
                     rotuloAcessibilidade="Gerenciar categorias do Diário"
-                    variante="redeApoio"
+                    variante="selecionado"
                     corIcone={tema.escuro ? '#EF9A9A' : coresDiario.primaria}
+                    estilo={{
+                        backgroundColor: coresDiario.interface.superficie,
+                        borderColor: coresDiario.interface.borda
+                    }}
                 />
             ) : null}
         </>
@@ -159,7 +167,7 @@ function DiaryScreen({
     return (
         <MainLayout
             titulo="Diário"
-            varianteHeader="redeApoio"
+            varianteHeader="diario"
             abaAtiva="diario"
             onSelecionarAba={onSelecionarAba}
             acoesHeader={acoesHeader}
