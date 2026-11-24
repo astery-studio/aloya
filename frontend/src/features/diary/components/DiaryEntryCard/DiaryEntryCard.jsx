@@ -155,7 +155,12 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                         }
                     ]}
                 >
-                    <NotebookIcon size={13} color={cor} weight="regular" />
+                    <NotebookIcon
+                        testID="diary-entry-notebook-icon"
+                        size={13}
+                        color={cor}
+                        weight="regular"
+                    />
                 </View>
                 <Pressable
                     accessibilityRole="button"
@@ -250,7 +255,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                 accessibilityLabel={rotulo}
                 style={[estilos.fase, { backgroundColor: item.apresentacaoFase.fundo }]}
             >
-                <ArrowsClockwiseIcon size={13} color={cor} />
+                <ArrowsClockwiseIcon testID="diary-entry-phase-tag-icon" size={13} color={cor} />
                 <Text style={[estilos.textoFase, { color: cor }]}>{rotulo}</Text>
             </View>
         </View>

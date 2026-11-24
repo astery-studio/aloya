@@ -229,6 +229,16 @@ describe('DiaryEntryCard', () => {
         expect(screen.queryByTestId('diary-entry-content')).not.toBeOnTheScreen();
         expect(screen.queryByText('CATEGORIAS MARCADAS')).not.toBeOnTheScreen();
         expect(screen.getByText('Fase Lútea')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-entry-icon')).toHaveStyle({
+            borderColor: '#D68C3A',
+            backgroundColor: 'rgba(214, 140, 58, 0.10)'
+        });
+        expect(screen.getByTestId('diary-entry-notebook-icon')).toHaveProp('color', '#D68C3A');
+        expect(screen.getByLabelText('Fase Lútea')).toHaveStyle({
+            backgroundColor: 'rgba(214, 140, 58, 0.20)'
+        });
+        expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('color', '#D68C3A');
+        expect(screen.getByText('Fase Lútea')).toHaveStyle({ color: '#D68C3A' });
     });
 
     test('mostra somente a anotação quando não há categorias públicas', async () => {
