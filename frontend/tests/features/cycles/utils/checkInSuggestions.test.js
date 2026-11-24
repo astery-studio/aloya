@@ -1,9 +1,11 @@
 import {
     criarSugestoesCheckIn,
+    LIMITE_POR_CATEGORIA,
     LIMITE_SUGESTOES
 } from '../../../../src/features/cycles/utils/checkInSuggestions';
 
 const opcoesPorCategoria = {
+    fluxo_menstrual: ['Ausente', 'Muito leve', 'Leve', 'Moderado', 'Intenso', 'Muito intenso'],
     sintomas_fisicos: [
         'Fadiga',
         'Retenção de líquidos',
@@ -16,7 +18,9 @@ const opcoesPorCategoria = {
         'Oscilações de humor',
         'Diminuição da motivação',
         'Choro fácil'
-    ]
+    ],
+    sintomas_emocionais: ['Feliz', 'Animado', 'Tranquilo', 'Motivado', 'Otimista', 'Reflexivo'],
+    energia: ['Sem energia', 'Com energia', 'Exausto', 'Cansado', 'Disposto', 'Agitado']
 };
 
 const catalogo = {
@@ -46,6 +50,10 @@ test('prioriza padrões pessoais da fase e completa oito sugestões típicas', (
     expect(sugestoes[0].opcao.nome).toBe('Fadiga');
     expect(sugestoes.map(({ opcao }) => opcao.nome)).not.toContain('Acne');
     expect(new Set(sugestoes.map(({ opcao }) => opcao.id)).size).toBe(LIMITE_SUGESTOES);
+    const quantidades = Object.groupBy(sugestoes, ({ categoria }) => categoria.id);
+    expect(Object.values(quantidades).every((itens) => itens.length <= LIMITE_POR_CATEGORIA)).toBe(
+        true
+    );
 });
 
 test('usa somente sintomas comuns da fase quando não há histórico suficiente', () => {
@@ -53,34 +61,22 @@ test('usa somente sintomas comuns da fase quando não há histórico suficiente'
 
     expect(sugestoes).toHaveLength(LIMITE_SUGESTOES);
     expect(sugestoes[0].opcao.nome).toBe('Retenção de líquidos');
-    expect(sugestoes.at(-1).opcao.nome).toBe('Choro fácil');
+    expect(new Set(sugestoes.map(({ categoria }) => categoria.id)).size).toBeGreaterThanOrEqual(4);
+    expect(sugestoes.some(({ categoria }) => categoria.id === 'fluxo_menstrual')).toBe(false);
 });
 
-test('mantém entre seis e oito opções mesmo sem as categorias principais', () => {
-    const nomes = [
-        'Sem energia',
-        'Com energia',
-        'Exausto',
-        'Cansado',
-        'Disposto',
-        'Agitado',
-        'Energia oscilante'
-    ];
-    const catalogoAlternativo = {
-        macrocategorias: [
-            {
-                ativa: true,
-                categorias: [
-                    {
-                        id: 'energia',
-                        ativaEfetiva: true,
-                        opcoes: nomes.map((nome, indice) => ({ id: `energia_${indice}`, nome }))
-                    }
-                ]
-            }
-        ]
+test('mantém oito opções variadas mesmo com preferências do Diário recolhidas', () => {
+    const catalogoRecolhido = {
+        macrocategorias: catalogo.macrocategorias.map((macro) => ({
+            ...macro,
+            ativa: false,
+            categorias: macro.categorias.map((categoria) => ({
+                ...categoria,
+                ativaEfetiva: false
+            }))
+        }))
     };
-
-    const sugestoes = criarSugestoesCheckIn({ catalogo: catalogoAlternativo, fase: 'lutea' });
-    expect(sugestoes).toHaveLength(7);
+    const sugestoes = criarSugestoesCheckIn({ catalogo: catalogoRecolhido, fase: 'lutea' });
+    expect(sugestoes).toHaveLength(LIMITE_SUGESTOES);
+    expect(new Set(sugestoes.map(({ categoria }) => categoria.id)).size).toBeGreaterThanOrEqual(4);
 });

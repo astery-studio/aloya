@@ -9,6 +9,9 @@ const preMenstruais = [
     'Diminuição da motivação',
     'Choro fácil'
 ];
+const fluxos = ['Ausente', 'Muito leve', 'Leve', 'Moderado', 'Intenso', 'Muito intenso'];
+const energias = ['Sem energia', 'Com energia', 'Exausto', 'Cansado', 'Disposto', 'Agitado'];
+const emocionais = ['Feliz', 'Animado', 'Tranquilo', 'Motivado', 'Otimista', 'Reflexivo'];
 const categoria = (id, nomes) => ({
     id,
     ativaEfetiva: true,
@@ -22,8 +25,11 @@ const catalogo = {
         {
             ativa: true,
             categorias: [
+                categoria('fluxo_menstrual', fluxos),
                 categoria('sintomas_fisicos', fisicos),
-                categoria('sintomas_pre_menstruais', preMenstruais)
+                categoria('sintomas_pre_menstruais', preMenstruais),
+                categoria('sintomas_emocionais', emocionais),
+                categoria('energia', energias)
             ]
         }
     ]
@@ -44,7 +50,10 @@ test('mostra oito sugestões da fase priorizando o histórico pessoal', async ()
     expect(screen.getAllByRole('button')).toHaveLength(8);
     expect(screen.getByText('Fadiga')).toBeOnTheScreen();
     expect(screen.getByText('Retenção de líquidos')).toBeOnTheScreen();
-    expect(screen.getByText('Diminuição da motivação')).toBeOnTheScreen();
+    expect(screen.getByText('Oscilações de humor')).toBeOnTheScreen();
+    expect(screen.getByText('Energia')).toBeOnTheScreen();
+    expect(screen.getByText('Sintomas emocionais')).toBeOnTheScreen();
+    expect(screen.queryByText('Intensidade fluxo menstrual')).not.toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Fadiga' }));
     expect(aoAlterar).toHaveBeenCalledWith('sintomas_fisicos', ['sintomas_fisicos_fadiga']);
