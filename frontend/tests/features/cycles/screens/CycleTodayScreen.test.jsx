@@ -1,7 +1,8 @@
 import { fireEvent, screen, within } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayScreen } from '../../../../src/features/cycles/screens/CycleTodayScreen';
-import { estilos } from '../../../../src/features/cycles/screens/CycleTodayScreen.styles';
+import { criarEstilos } from '../../../../src/features/cycles/screens/CycleTodayScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const previsao = {
@@ -210,11 +211,15 @@ test('encaminha todas as interações da tela carregada', async () => {
 });
 
 test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
+    const estilos = criarEstilos(temaClaro, metricas.insets.top);
     expect(estilos.areaRolagem).toMatchObject({ flex: 1 });
-    expect(estilos.cabecalho).toMatchObject({ width: '100%', minHeight: 78, paddingTop: 32 });
+    expect(estilos.cabecalho).toMatchObject({ width: '100%', paddingBottom: 12 });
+    expect(estilos.cabecalho.height).toBeCloseTo(87.99);
+    expect(estilos.cabecalho.paddingTop).toBeCloseTo(31.99);
     expect(estilos.titulo).toMatchObject({
         flexShrink: 1,
         fontFamily: 'DMSans_700Bold',
+        fontSize: 24,
         fontWeight: '700'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
