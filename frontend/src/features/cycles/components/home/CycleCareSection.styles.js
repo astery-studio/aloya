@@ -4,7 +4,7 @@ import { fontFamilies } from '../../../../shared/theme';
 const estilos = StyleSheet.create({
     secao: { width: '100%', paddingTop: 34, paddingHorizontal: 16 },
     etiqueta: {
-        color: '#C85A44',
+        color: '#D68C3A',
         fontFamily: fontFamilies.bold,
         fontSize: 11,
         lineHeight: 16,
