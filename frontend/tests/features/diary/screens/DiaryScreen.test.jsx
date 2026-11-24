@@ -81,6 +81,7 @@ describe('histórico do Diário', () => {
         );
 
         expect(screen.getByText('RESUMO DO DIÁRIO')).toBeOnTheScreen();
+        expect(screen.getByTestId('header-title-container')).toBeOnTheScreen();
         expect(screen.getByTestId('diary-main-container')).toHaveStyle({
             flex: 1,
             minHeight: 0,
@@ -88,6 +89,11 @@ describe('histórico do Diário', () => {
         });
         expect(screen.getByText('LINHA DO TEMPO')).toBeOnTheScreen();
         expect(screen.getByText('Atualizando Diário...')).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Filtrar histórico do Diário' })).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderRadius: 16
+        });
         await fireEvent.press(screen.getByRole('button', { name: 'Filtrar histórico do Diário' }));
         await fireEvent.press(
             screen.getByRole('button', { name: 'Gerenciar categorias do Diário' })
