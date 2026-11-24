@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { fontFamilies } from '../../../../shared/theme';
 
 const sombra = {
     shadowColor: '#222222',
@@ -18,7 +19,8 @@ const estilos = StyleSheet.create({
         ...sombra,
         backgroundColor: '#C85A44',
         borderRadius: 12,
-        height: 55
+        height: 55,
+        paddingHorizontal: 0
     },
     linha: {
         flexDirection: 'row',
@@ -30,7 +32,20 @@ const estilos = StyleSheet.create({
         backgroundColor: '#2C4C3B',
         borderRadius: 12,
         flex: 1,
-        height: 55
+        height: 55,
+        paddingHorizontal: 0
+    },
+    anticoncepcional: {
+        borderWidth: 0.666667,
+        borderColor: '#E6E2D8',
+        paddingHorizontal: 20
+    },
+    texto: {
+        fontFamily: fontFamilies.semibold,
+        fontSize: 15,
+        fontWeight: '600',
+        letterSpacing: 0,
+        lineHeight: 22
     }
 });
 
