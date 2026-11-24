@@ -7,6 +7,7 @@ function DiaryAdditionalCategoriesChip({ quantidade, estilos, tema }) {
     const cores = obterCoresDiario(tema).interface;
     return (
         <View
+            testID="diary-entry-additional-chip"
             accessible
             accessibilityLabel={`${quantidade} outras categorias marcadas`}
             style={estilos.chip}

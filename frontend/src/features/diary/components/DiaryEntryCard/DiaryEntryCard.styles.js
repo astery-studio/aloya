@@ -86,8 +86,8 @@ function criarEstilos(tema) {
         },
         chip: {
             maxWidth: '100%',
-            minHeight: 21.78,
-            height: 21.78,
+            minHeight: 24,
+            height: 24,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -106,6 +106,7 @@ function criarEstilos(tema) {
             justifyContent: 'center'
         },
         textoChip: {
+            height: 16.5,
             color: tema.escuro ? cores.textoSecundario : '#5C5C59',
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
