@@ -18,8 +18,7 @@ function criarEstilos(tema) {
             gap: 12
         },
         navegadorData: {
-            width: 294,
-            maxWidth: '100%',
+            width: '100%',
             padding: 2,
             justifyContent: 'space-between',
             alignItems: 'center',
