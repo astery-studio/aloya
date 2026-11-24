@@ -1,5 +1,19 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
+import { criarEstilos } from '../../../../src/features/settings/screens/SettingsScreen.style';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
+
+test('mantém o espaçamento no conteúdo sem alterar os títulos de seção', () => {
+    const estilos = criarEstilos(temaClaro);
+
+    expect(estilos.conteudo.paddingTop).toBe(24);
+    expect(estilos.tituloSecao).toMatchObject({
+        fontFamily: 'DMSans_500Medium',
+        fontSize: 16,
+        lineHeight: 24
+    });
+});
+
 const mockAlterarPreferencia = jest.fn();
 
 const mockLimparErro = jest.fn();
