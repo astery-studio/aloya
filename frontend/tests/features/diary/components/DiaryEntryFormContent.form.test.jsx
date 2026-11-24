@@ -174,8 +174,8 @@ test('habilita o salvamento e atualiza o contador quando há conteúdo válido',
         fontWeight: '600',
         lineHeight: 19.5
     });
-    expect(screen.getByTestId('phosphor-react-native-drop-fill')).toHaveProp('width', 13);
-    expect(screen.getByTestId('phosphor-react-native-drop-fill')).toHaveProp('height', 14);
+    expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('width', 13);
+    expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('height', 14);
     expect(screen.getByText('desativado:false')).toBeOnTheScreen();
     const salvarAtivo = mockButtonScreen.mock.calls
         .map(([props]) => props)
