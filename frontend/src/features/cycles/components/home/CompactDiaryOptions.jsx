@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import { DiaryOptionIcon } from '../../../diary/components/DiaryOptionIcon/DiaryOptionIcon';
 import { obterApresentacaoOpcao } from '../../../diary/config/diaryOptionPresentation';
-import { alternarOpcao } from '../../../diary/utils/diaryFormValue';
+import { alternarOpcaoCategoria } from '../../../diary/utils/diaryFormValue';
 import { criarSugestoesCheckIn } from '../../utils/checkInSuggestions';
 import { estilos } from './CompactDiaryOptions.styles';
 
@@ -57,8 +57,16 @@ const GRUPOS_HOME = Object.freeze([
     }
 ]);
 
-function CompactDiaryOptions({ catalogo, fase, destaques, valores, aoAlterar, desabilitado }) {
-    const sugestoes = criarSugestoesCheckIn({ catalogo, fase, destaques });
+function CompactDiaryOptions({
+    catalogo,
+    fase,
+    destaques,
+    idsExcluidos,
+    valores,
+    aoAlterar,
+    desabilitado
+}) {
+    const sugestoes = criarSugestoesCheckIn({ catalogo, fase, destaques, idsExcluidos });
     const grupos = GRUPOS_HOME.map((configuracao) => {
         const encontradas = sugestoes.filter(
             ({ categoria }) => categoria.id === configuracao.categoriaId
@@ -106,7 +114,11 @@ function CompactDiaryOptions({ catalogo, fase, destaques, valores, aoAlterar, de
                                     onPress={() =>
                                         aoAlterar(
                                             categoria.id,
-                                            alternarOpcao(valores[categoria.id], opcao.id)
+                                            alternarOpcaoCategoria(
+                                                categoria,
+                                                valores[categoria.id],
+                                                opcao
+                                            )
                                         )
                                     }
                                 />

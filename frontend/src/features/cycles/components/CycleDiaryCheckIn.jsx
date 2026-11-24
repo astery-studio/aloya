@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { useDiaryOverview } from '../../diary/hooks/useDiaryOverview';
 import { obterHojeDiario } from '../../diary/utils/diaryDate';
+import { criarValoresIniciaisEdicao } from '../../diary/utils/diaryEditForm';
 import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
+import { useDiaryRecordForDate } from '../hooks/useDiaryRecordForDate';
 import { CompactDiaryOptions } from './home/CompactDiaryOptions';
 import { estilos } from './CycleDiaryCheckIn.styles';
 
@@ -24,14 +26,25 @@ function CycleDiaryCheckIn({
         onSessaoExpirada: onSessionExpired
     });
     const overview = useDiaryOverview({ fase, service, onSessaoExpirada: onSessionExpired });
+    const existing = useDiaryRecordForDate({ date, service, onSessionExpired });
     const form = useDiaryEntryForm({
         ativo: Boolean(catalog.catalogo),
         catalogo: catalog.catalogo,
         service,
+        modo: existing.record ? 'editar' : 'criar',
         dataInicial: date,
+        registroInicial: existing.record,
         onCriado: () => setSaved(true),
+        onSalvo: () => setSaved(true),
         onSessaoExpirada: onSessionExpired
     });
+    const registeredIds = useMemo(
+        () =>
+            Object.values(criarValoresIniciaisEdicao(existing.record)).flatMap((value) =>
+                Array.isArray(value) ? value : []
+            ),
+        [existing.record]
+    );
     useEffect(() => setSaved(false), [date]);
     if (!service) return null;
     const valid = catalog.catalogo
@@ -54,7 +67,9 @@ function CycleDiaryCheckIn({
                     Escolha quantos itens fizerem sentido para você.
                 </Text>
                 <View style={estilos.conteudo}>
-                    {catalog.carregando ? <Text>Carregando seu check-in...</Text> : null}
+                    {catalog.carregando || existing.loading ? (
+                        <Text>Carregando seu check-in...</Text>
+                    ) : null}
                     {catalog.erro ? (
                         <>
                             <Text accessibilityRole="alert">{catalog.erro}</Text>
@@ -70,12 +85,13 @@ function CycleDiaryCheckIn({
                             <ButtonScreen texto="Adicionar detalhes" aoPressionar={onOpenDiary} />
                         </>
                     ) : null}
-                    {catalog.catalogo && !saved ? (
+                    {catalog.catalogo && !existing.loading && !saved ? (
                         <>
                             <CompactDiaryOptions
                                 catalogo={catalog.catalogo}
                                 fase={fase}
                                 destaques={overview.resumo?.sugestoesCheckIn ?? []}
+                                idsExcluidos={registeredIds}
                                 valores={form.valores}
                                 aoAlterar={form.alterarValor}
                                 desabilitado={form.salvando}
@@ -87,7 +103,7 @@ function CycleDiaryCheckIn({
                                 texto="Salvar no Diário"
                                 aoPressionar={form.salvar}
                                 carregando={form.salvando}
-                                desativado={!valid}
+                                desativado={!valid || (existing.record && !form.alterado)}
                                 estilo={estilos.botao}
                                 estiloTexto={estilos.textoBotao}
                             />

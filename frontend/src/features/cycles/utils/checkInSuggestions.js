@@ -22,7 +22,7 @@ function localizarOpcao(categorias, categoriaId, nome) {
     return opcao ? { categoria, opcao } : null;
 }
 
-function criarSugestoesCheckIn({ catalogo, fase, destaques = [] }) {
+function criarSugestoesCheckIn({ catalogo, fase, destaques = [], idsExcluidos = [] }) {
     const categorias = new Map(
         (catalogo?.macrocategorias ?? [])
             .flatMap((macro) => macro.categorias)
@@ -40,7 +40,7 @@ function criarSugestoesCheckIn({ catalogo, fase, destaques = [] }) {
         ...(sugestoesPadraoPorFase[fase] ?? []),
         ...reservasAtivas
     ];
-    const idsIncluidos = new Set();
+    const idsIncluidos = new Set(idsExcluidos);
     const quantidadePorCategoria = new Map();
     const sugestoes = [];
 
