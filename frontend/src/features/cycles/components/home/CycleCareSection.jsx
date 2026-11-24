@@ -1,9 +1,9 @@
 import { Pressable, Text, View } from 'react-native';
 import {
     CaretRightIcon,
-    FlowerLotusIcon,
-    HeartIcon,
-    NotebookIcon
+    NotebookIcon,
+    QuestionIcon,
+    WindIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { CONTEUDO_POR_FASE } from '../sheets/CyclePhaseEducationSheet.content';
 import { estilos } from './CycleCareSection.styles';
@@ -14,7 +14,8 @@ const CUIDADOS = Object.freeze([
         categoria: '2 minutos',
         titulo: 'Um respiro para você',
         descricao: 'Exercício guiado',
-        Icone: FlowerLotusIcon,
+        Icone: WindIcon,
+        weight: 'regular',
         cor: '#7B5EA7',
         fundo: 'rgba(123, 94, 167, 0.1)'
     },
@@ -23,7 +24,8 @@ const CUIDADOS = Object.freeze([
         categoria: 'Reflexão',
         titulo: 'Uma pergunta para hoje',
         descricao: 'Registre no Diário',
-        Icone: HeartIcon,
+        Icone: QuestionIcon,
+        weight: 'regular',
         cor: '#B04A70',
         fundo: 'rgba(176, 74, 112, 0.1)'
     },
