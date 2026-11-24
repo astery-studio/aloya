@@ -81,7 +81,7 @@ function FloatingActionButton({
                         testID="floating-action-button-icon"
                         accessible={false}
                         size={24}
-                        weight="regular"
+                        weight="bold"
                         color={estilos.corIcone}
                     />
                 )}

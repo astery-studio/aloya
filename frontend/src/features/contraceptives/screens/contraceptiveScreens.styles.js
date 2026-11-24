@@ -19,8 +19,7 @@ function criarEstilos(tema) {
 
         lista: {
             flexGrow: 1,
-            padding: espacamentos.grande,
-            paddingBottom: 104
+            padding: espacamentos.grande
         },
 
         separador: {

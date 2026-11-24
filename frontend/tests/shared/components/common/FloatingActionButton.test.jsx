@@ -64,7 +64,11 @@ describe('FloatingActionButton', () => {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: '#C85A44'
+            backgroundColor: '#C85A44',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.22,
+            shadowRadius: 10,
+            elevation: 8
         });
         expect(screen.getByTestId('floating-action-button-icon')).toHaveProp('width', 24);
         expect(screen.getByTestId('floating-action-button-icon')).toHaveProp('height', 24);

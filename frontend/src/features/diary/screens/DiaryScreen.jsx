@@ -156,10 +156,7 @@ function DiaryScreen({
                 aoCarregarMais={aoCarregarMais}
                 aoTentarCarregarMais={aoTentarCarregarMais}
                 ListHeaderComponent={criarCabecalho(true, true)}
-                contentContainerStyle={[
-                    estilos.lista,
-                    { paddingHorizontal: margemHorizontalTimeline }
-                ]}
+                contentContainerStyle={{ paddingHorizontal: margemHorizontalTimeline }}
             />
         );
     }

@@ -37,7 +37,7 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 17
         },
-        estadoCentralizado: { flex: 1, justifyContent: 'center', paddingBottom: 96 },
+        estadoCentralizado: { flex: 1, justifyContent: 'center' },
         mensagemEstado: {
             marginTop: 10,
             color: cores.textoSecundario,
@@ -76,8 +76,7 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 18,
             letterSpacing: 0.72
-        },
-        lista: { paddingBottom: 96 }
+        }
     });
 }
 

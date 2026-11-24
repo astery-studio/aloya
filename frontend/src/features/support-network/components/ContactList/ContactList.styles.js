@@ -7,7 +7,7 @@ function criarEstilos(tema) {
         conteudoLista: {
             paddingHorizontal: 20,
             paddingTop: 18,
-            paddingBottom: 104
+            paddingBottom: 28
         },
 
         separador: {
@@ -26,8 +26,7 @@ function criarEstilos(tema) {
             width: '100%',
             flex: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            paddingBottom: 104
+            justifyContent: 'center'
         },
 
         botaoEstado: {

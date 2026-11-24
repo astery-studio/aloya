@@ -20,7 +20,11 @@ function criarEstilos(tema) {
                 borderWidth: 2,
                 borderColor: 'transparent',
                 backgroundColor: COR_FAB,
-                ...tema.shadows.cardSuave
+                ...tema.shadows.cardSuave,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.22,
+                shadowRadius: 10,
+                elevation: 8
             },
             pressionado: {
                 transform: [{ scale: 0.95 }]
