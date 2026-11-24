@@ -1,14 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Text, View } from 'react-native';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { estilos } from './GuidedBreathingSheet.styles';
 
-function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido = false }) {
+function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido }) {
     const escala = useRef(new Animated.Value(1)).current;
     const [instrucao, setInstrucao] = useState('Prepare-se');
+    const [reduzirMovimentoDoSistema, setReduzirMovimentoDoSistema] = useState(false);
+    const reduzirMovimento = movimentoReduzido ?? reduzirMovimentoDoSistema;
 
     useEffect(() => {
-        if (!visivel || movimentoReduzido) return undefined;
+        AccessibilityInfo.isReduceMotionEnabled().then(setReduzirMovimentoDoSistema);
+        const assinatura = AccessibilityInfo.addEventListener(
+            'reduceMotionChanged',
+            setReduzirMovimentoDoSistema
+        );
+        return () => assinatura.remove();
+    }, []);
+
+    useEffect(() => {
+        if (!visivel || reduzirMovimento) return undefined;
         setInstrucao('Inspire devagar');
         const animacao = Animated.loop(
             Animated.sequence([
@@ -28,9 +39,9 @@ function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido = false }) 
             clearInterval(intervalo);
             animacao.stop();
         };
-    }, [escala, movimentoReduzido, visivel]);
+    }, [escala, reduzirMovimento, visivel]);
 
-    const texto = movimentoReduzido ? 'Inspire e expire devagar, no seu ritmo.' : instrucao;
+    const texto = reduzirMovimento ? 'Inspire e expire devagar, no seu ritmo.' : instrucao;
     return (
         <BottomSheet
             visivel={visivel}
@@ -55,7 +66,7 @@ function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido = false }) 
                         style={[estilos.circulo, { transform: [{ scale: escala }] }]}
                     >
                         <Text style={estilos.instrucao}>
-                            {movimentoReduzido ? texto : 'Respire'}
+                            {reduzirMovimento ? texto : 'Respire'}
                         </Text>
                     </Animated.View>
                 </View>
