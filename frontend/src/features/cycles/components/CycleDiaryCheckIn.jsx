@@ -75,11 +75,7 @@ function CycleDiaryCheckIn({
                             <CompactDiaryOptions
                                 catalogo={catalog.catalogo}
                                 fase={fase}
-                                destaques={
-                                    overview.resumo?.informacoesSuficientes
-                                        ? overview.resumo.destaques
-                                        : []
-                                }
+                                destaques={overview.resumo?.sugestoesCheckIn ?? []}
                                 valores={form.valores}
                                 aoAlterar={form.alterarValor}
                                 desabilitado={form.salvando}
