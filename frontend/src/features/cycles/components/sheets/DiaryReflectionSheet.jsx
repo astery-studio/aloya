@@ -5,7 +5,7 @@ import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/
 import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { estilos } from './DiaryReflectionSheet.styles';
 
-const PERGUNTA = 'O que seu corpo está pedindo hoje?';
+const PERGUNTA = 'O que seu corpo está pedindo agora?';
 
 function DiaryReflectionSheet({
     visivel,
@@ -35,6 +35,7 @@ function DiaryReflectionSheet({
                 <Text accessibilityRole="header" style={estilos.pergunta}>
                     {PERGUNTA}
                 </Text>
+                <View style={estilos.formulario}>
                 <TextInput
                     label={PERGUNTA}
                     placeholder="Escreva livremente..."
@@ -52,6 +53,7 @@ function DiaryReflectionSheet({
                     desativado={!valor.trim()}
                     carregando={salvando}
                 />
+                </View>
             </View>
         </BottomSheet>
     );
