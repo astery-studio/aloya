@@ -15,7 +15,7 @@ const estilos = StyleSheet.create({
         paddingVertical: 24
     },
     rotulo: {
-        color: '#C85A44',
+        color: '#D68C3A',
         fontFamily: fontFamilies.bold,
         fontSize: 11,
         letterSpacing: 0.88,
@@ -40,6 +40,17 @@ const estilos = StyleSheet.create({
     conteudo: {
         gap: 12,
         paddingTop: 17
+    },
+    botao: {
+        height: 36,
+        paddingHorizontal: 14,
+        borderRadius: 10
+    },
+    textoBotao: {
+        fontFamily: fontFamilies.semibold,
+        fontSize: 13,
+        fontWeight: '600',
+        lineHeight: 20
     }
 });
 

@@ -1,5 +1,7 @@
 import { Text, View } from 'react-native';
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
+import { DiaryOptionIcon } from '../../../diary/components/DiaryOptionIcon/DiaryOptionIcon';
+import { obterApresentacaoOpcao } from '../../../diary/config/diaryOptionPresentation';
 import { listarMacrocategoriasAtivas } from '../../../diary/utils/diaryForm';
 import { alternarOpcao } from '../../../diary/utils/diaryFormValue';
 import { estilos } from './CompactDiaryOptions.styles';
@@ -50,6 +52,8 @@ function CompactDiaryOptions({ catalogo, valores, aoAlterar, desabilitado }) {
                     <View style={estilos.opcoes}>
                         {opcoes.map((opcao) => {
                             const selecionada = (valores[categoria.id] ?? []).includes(opcao.id);
+                            const apresentacao = obterApresentacaoOpcao(categoria.id, opcao);
+                            const { color, ...iconeProps } = apresentacao?.iconeProps ?? {};
                             return (
                                 <ButtonSelection
                                     key={opcao.id}
@@ -57,6 +61,17 @@ function CompactDiaryOptions({ catalogo, valores, aoAlterar, desabilitado }) {
                                     selected={selecionada}
                                     desabilitado={desabilitado}
                                     variante="compacto"
+                                    icone={apresentacao ? DiaryOptionIcon : undefined}
+                                    iconeProps={
+                                        apresentacao
+                                            ? {
+                                                  ...iconeProps,
+                                                  iconeId: apresentacao.iconeId,
+                                                  selecionado: selecionada,
+                                                  ...(!selecionada && color ? { color } : {})
+                                              }
+                                            : undefined
+                                    }
                                     cor={cor}
                                     fundo={fundo}
                                     onPress={() =>

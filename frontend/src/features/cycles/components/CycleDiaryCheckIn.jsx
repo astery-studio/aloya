@@ -77,6 +77,8 @@ function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
                                 aoPressionar={form.salvar}
                                 carregando={form.salvando}
                                 desativado={!valid}
+                                estilo={estilos.botao}
+                                estiloTexto={estilos.textoBotao}
                             />
                         </>
                     ) : null}

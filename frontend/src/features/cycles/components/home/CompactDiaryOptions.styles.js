@@ -6,6 +6,9 @@ const estilos = StyleSheet.create({
         gap: 12
     },
     grupo: {
+        width: 294,
+        maxWidth: '100%',
+        alignSelf: 'center',
         gap: 6
     },
     cabecalho: {
@@ -21,9 +24,10 @@ const estilos = StyleSheet.create({
     },
     titulo: {
         color: '#5C5C59',
-        fontFamily: fontFamilies.regular,
-        fontSize: 9,
-        lineHeight: 14,
+        fontFamily: fontFamilies.semibold,
+        fontSize: 10,
+        fontWeight: '600',
+        lineHeight: 15,
         textAlign: 'center',
         textTransform: 'uppercase'
     },
