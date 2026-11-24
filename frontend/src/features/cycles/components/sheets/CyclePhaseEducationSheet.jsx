@@ -18,7 +18,7 @@ function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
             <View style={estilos.conteudo}>
                 <View style={estilos.cabecalho}>
                     <View style={[estilos.icone, { backgroundColor: conteudo.fundo }]}>
-                        <Icone size={28} color={conteudo.cor} weight="fill" />
+                        <Icone size={28} color={conteudo.cor} weight={conteudo.weight} />
                     </View>
                     <Text style={estilos.rotulo}>Conheça seu ciclo</Text>
                 </View>
