@@ -9,7 +9,7 @@ function criarEstilos(tema) {
         container: { width: '100%', gap: 8 },
         divisorCategoria: {
             width: '100%',
-            height: 0.7,
+            height: StyleSheet.hairlineWidth,
             backgroundColor: '#E6E2D8'
         },
         faixaTitulo: {

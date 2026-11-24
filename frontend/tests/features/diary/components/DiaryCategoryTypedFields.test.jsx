@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 jest.mock('../../../../src/features/diary/config/diaryOptionPresentation', () => ({
     obterApresentacaoOpcao: jest.fn()
@@ -154,7 +155,7 @@ describe('campos tipados do Diário', () => {
         );
         const entrada = screen.getByLabelText('Digite aqui sua nota…');
         expect(screen.getByTestId('divisor-categoria-anotacao_livre')).toHaveStyle({
-            height: 0.7,
+            height: StyleSheet.hairlineWidth,
             backgroundColor: '#E6E2D8'
         });
         expect(entrada).toHaveProp('scrollEnabled', false);
