@@ -82,7 +82,7 @@ test('retorna da data selecionada para a data de referência', async () => {
     const aoSelecionarData = jest.fn();
     await renderizar({ previsao, dataSelecionada: '2026-10-10', aoSelecionarData });
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Voltar para hoje' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar pra hoje' }));
 
     expect(aoSelecionarData).toHaveBeenCalledWith('2026-10-08');
 });

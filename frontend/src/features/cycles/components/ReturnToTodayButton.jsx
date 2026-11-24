@@ -11,18 +11,20 @@ function ReturnToTodayButton({ onPress }) {
                 alignSelf: 'center',
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 8,
-                minHeight: 40,
-                marginVertical: 8,
-                paddingHorizontal: 16,
-                borderRadius: 20,
+                gap: 5,
+                height: 34,
+                marginBottom: 8,
+                paddingHorizontal: 13,
+                paddingVertical: 6,
+                borderRadius: 999,
                 borderWidth: 1,
-                borderColor: tema.cores.interface.borda
+                borderColor: '#AAAAA5',
+                borderStyle: 'dashed'
             },
             texto: {
                 color: tema.cores.interface.textoPrincipal,
-                fontFamily: 'DMSans_600SemiBold',
-                fontSize: 14,
+                fontFamily: 'DMSans_400Regular',
+                fontSize: 13,
                 lineHeight: 20
             }
         }),
@@ -31,8 +33,8 @@ function ReturnToTodayButton({ onPress }) {
 
     return (
         <Pressable accessibilityRole="button" onPress={onPress} style={estilos.botao}>
-            <ArrowsClockwiseIcon size={18} color={tema.cores.interface.textoPrincipal} />
-            <Text style={estilos.texto}>Voltar para hoje</Text>
+            <ArrowsClockwiseIcon size={13} color="#5C5C59" />
+            <Text style={estilos.texto}>Voltar pra hoje</Text>
         </Pressable>
     );
 }

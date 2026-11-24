@@ -6,7 +6,7 @@ test('retorna para a data de referência pela ação acessível', async () => {
     const onPress = jest.fn();
     await render(<ReturnToTodayButton onPress={onPress} />);
 
-    const botao = screen.getByRole('button', { name: 'Voltar para hoje' });
+    const botao = screen.getByRole('button', { name: 'Voltar pra hoje' });
     await fireEvent.press(botao);
 
     expect(onPress).toHaveBeenCalledTimes(1);
