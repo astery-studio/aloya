@@ -49,7 +49,7 @@ describe('histórico do Diário', () => {
         await render(<DiaryScreen aoCriar={aoCriar} onSelecionarAba={jest.fn()} />);
 
         expect(screen.getByRole('header', { name: 'Diário' })).toBeOnTheScreen();
-        expect(screen.getByTestId('header-top-spacing')).toHaveStyle({ height: 56 });
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
         expect(screen.getByRole('header', { name: 'Nenhum registro visível' })).toBeOnTheScreen();
         expect(
             screen.getByText(/as categorias usadas neles podem estar desativadas/)

@@ -1,7 +1,7 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
@@ -142,7 +142,8 @@ function CalendarScreen({
     aoTentarSincronizar
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const insets = useSafeAreaInsets();
+    const estilos = useMemo(() => criarEstilos(tema, insets.top), [insets.top, tema]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
 
     const mesesValidos = Array.isArray(meses) ? meses : [];
@@ -233,11 +234,7 @@ function CalendarScreen({
                 </View>
             ) : null}
 
-            <SafeAreaView
-                testID="rodape-calendario"
-                edges={['bottom']}
-                style={estilos.rodape}
-            >
+            <SafeAreaView testID="rodape-calendario" edges={['bottom']} style={estilos.rodape}>
                 <SyncStatusIndicator
                     status={statusSincronizacao}
                     mensagem={

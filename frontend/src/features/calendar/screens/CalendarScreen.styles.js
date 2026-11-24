@@ -17,7 +17,7 @@ const coresConfiabilidadeEscuras = Object.freeze({
     alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
 });
 
-function criarEstilos(tema) {
+function criarEstilos(tema, insetSuperior = 0) {
     return StyleSheet.create({
         tela: {
             flex: 1,
@@ -25,7 +25,7 @@ function criarEstilos(tema) {
         },
         cabecalho: {
             display: 'flex',
-            paddingTop: 56,
+            paddingTop: insetSuperior + tema.espacamentosLayout.espacamentoSuperiorHeader,
             paddingRight: 20,
             paddingBottom: 0,
             paddingLeft: 20,

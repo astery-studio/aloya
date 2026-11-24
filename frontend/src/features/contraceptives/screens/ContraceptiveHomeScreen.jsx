@@ -57,7 +57,12 @@ function ContraceptiveHomeScreen({
             edges={['top', 'left', 'right', 'bottom']}
             testID="usos-home-area-segura"
         >
-            <MainLayout titulo="Início" abaAtiva="inicio" onSelecionarAba={onSelecionarAba}>
+            <MainLayout
+                titulo="Início"
+                abaAtiva="inicio"
+                onSelecionarAba={onSelecionarAba}
+                aplicarSafeAreaSuperiorHeader={false}
+            >
                 <ScrollView
                     contentContainerStyle={estilos.conteudo}
                     showsVerticalScrollIndicator={false}

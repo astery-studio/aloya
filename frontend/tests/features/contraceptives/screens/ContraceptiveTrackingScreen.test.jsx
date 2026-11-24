@@ -61,6 +61,8 @@ test('usa o padrão compacto sem reduzir o título pela largura', async () => {
     const estilos = criarEstilosAcompanhamento(temaClaro);
 
     expect(estilos.cabecalho.minHeight).toBeUndefined();
+    expect(estilos.cabecalho.paddingTop).toBe(16);
+    expect(estilos.cabecalho.paddingBottom).toBe(8.5);
     expect(estilos.corpo.paddingTop).toBe(24);
 });
 

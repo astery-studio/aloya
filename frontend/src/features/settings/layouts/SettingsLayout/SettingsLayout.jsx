@@ -28,13 +28,7 @@ function SettingsLayout({
             edges={['bottom']}
             style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
         >
-            <Header
-                titulo={titulo}
-                corFundo={corFundo}
-                variante="comVoltar"
-                onVoltar={onVoltar}
-                usarEspacamentoSuperior
-            />
+            <Header titulo={titulo} corFundo={corFundo} variante="comVoltar" onVoltar={onVoltar} />
 
             <KeyboardAvoidingView
                 testID="teclado-settings-layout"

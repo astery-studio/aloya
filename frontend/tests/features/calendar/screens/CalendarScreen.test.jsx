@@ -1,7 +1,11 @@
 import React from 'react';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';
 import { CalendarScreen } from '../../../../src/features/calendar/screens/CalendarScreen';
-import { estilos } from '../../../../src/features/calendar/screens/CalendarScreen.styles';
+import {
+    criarEstilos,
+    estilos
+} from '../../../../src/features/calendar/screens/CalendarScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
@@ -154,6 +158,7 @@ describe('CalendarScreen', () => {
             justifyContent: 'center'
         });
         expect(estilos.cabecalho.height).toBeUndefined();
+        expect(criarEstilos(temaClaro, 59).cabecalho.paddingTop).toBe(75);
         expect(estilos.titulo).toMatchObject({
             fontFamily: 'DMSans_700Bold',
             fontSize: 20,

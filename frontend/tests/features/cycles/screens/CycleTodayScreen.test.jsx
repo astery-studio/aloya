@@ -198,7 +198,7 @@ test('encaminha todas as interações da tela carregada', async () => {
 
 test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
     expect(estilos.areaRolagem).toMatchObject({ flex: 1 });
-    expect(estilos.cabecalho).toMatchObject({ width: '100%', paddingTop: 32 });
+    expect(estilos.cabecalho).toMatchObject({ width: '100%', paddingTop: 16 });
     expect(estilos.cabecalho.minHeight).toBeUndefined();
     expect(estilos.titulo).toMatchObject({
         flex: 1,

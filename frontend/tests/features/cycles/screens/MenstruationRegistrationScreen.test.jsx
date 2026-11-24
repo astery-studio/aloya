@@ -38,6 +38,7 @@ test('usa o padrão compacto sem altura rígida e separa o conteúdo', async () 
     const estilos = criarEstilos(temaClaro);
 
     expect(estilos.cabecalho.minHeight).toBeUndefined();
+    expect(estilos.cabecalho.paddingTop).toBe(16);
     expect(estilos.voltar).toMatchObject({ width: 48, height: 48 });
     expect(estilos.legenda.marginTop).toBe(24);
 });
