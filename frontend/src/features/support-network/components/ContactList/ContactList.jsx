@@ -12,7 +12,7 @@ import { criarEstilos } from './ContactList.styles';
 const MENSAGEM_ERRO = 'Não foi possível carregar sua Rede de Apoio no momento. Tente novamente.';
 
 const MENSAGEM_VAZIA_ENVIADA =
-    "Você ainda não adicionou nenhum contato à sua Rede de Apoio. Toque em 'Adicionar novo contato' para convidar alguém de confiança.";
+    'Você ainda não adicionou nenhum contato à sua Rede de Apoio. Use o botão de adicionar para convidar alguém de confiança.';
 
 const MENSAGEM_VAZIA_RECEBIDA =
     'Você ainda não recebeu nenhum convite para participar de uma Rede de Apoio.';
@@ -159,8 +159,7 @@ function ContactList({
     acaoEmAndamento = null,
     desabilitado = false,
     cabecalho = null,
-    rotuloFiltro = 'FILTROS APLICADOS',
-    aoAdicionarContato
+    rotuloFiltro = 'FILTROS APLICADOS'
 }) {
     const tema = useTheme();
 
@@ -335,33 +334,8 @@ function ContactList({
                 <View style={estilos.estadoCentral}>
                     <EmptyState
                         titulo={recebido ? 'Nenhum convite recebido' : 'Nenhum contato'}
-                        mensagem={
-                            recebido ? (
-                                MENSAGEM_VAZIA_RECEBIDA
-                            ) : (
-                                <>
-                                    Você ainda não adicionou nenhum contato à sua Rede de Apoio.
-                                    Toque em{' '}
-                                    <Text style={estilos.textoDestaque}>
-                                        {"'Adicionar novo contato'"}
-                                    </Text>{' '}
-                                    para convidar alguém de confiança.
-                                </>
-                            )
-                        }
+                        mensagem={recebido ? MENSAGEM_VAZIA_RECEBIDA : MENSAGEM_VAZIA_ENVIADA}
                         variante="vazio"
-                        acao={
-                            !recebido && typeof aoAdicionarContato === 'function' ? (
-                                <ButtonScreen
-                                    texto="Adicionar novo contato"
-                                    variante="laranja"
-                                    aoPressionar={aoAdicionarContato}
-                                    rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
-                                    estilo={estilos.botaoEstado}
-                                    estiloTexto={estilos.textoBotaoEstado}
-                                />
-                            ) : null
-                        }
                     />
                 </View>
             </View>

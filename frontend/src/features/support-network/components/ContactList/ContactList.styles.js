@@ -7,7 +7,7 @@ function criarEstilos(tema) {
         conteudoLista: {
             paddingHorizontal: 20,
             paddingTop: 18,
-            paddingBottom: 28
+            paddingBottom: 104
         },
 
         separador: {
@@ -27,25 +27,13 @@ function criarEstilos(tema) {
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
-            paddingBottom: 76
+            paddingBottom: 104
         },
 
         botaoEstado: {
             width: '100%',
             height: 56,
             borderRadius: 12
-        },
-
-        textoBotaoEstado: {
-            fontFamily: fontFamilies.semibold,
-            fontSize: 17,
-            fontWeight: '600',
-            lineHeight: 24
-        },
-
-        textoDestaque: {
-            fontFamily: fontFamilies.bold,
-            fontWeight: '700'
         },
 
         textoCarregamento: {

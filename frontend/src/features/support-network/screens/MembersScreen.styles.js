@@ -55,30 +55,6 @@ function criarEstilos(tema) {
         areaLista: {
             flex: 1,
             minHeight: 0
-        },
-
-        acaoPrincipal: {
-            width: '100%',
-            flexShrink: 0,
-            paddingHorizontal: 20,
-            paddingTop: 16,
-            paddingBottom: 18,
-            borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.separador,
-            backgroundColor: tema.cores.interface.fundo
-        },
-
-        botaoAdicionar: {
-            width: '100%',
-            height: 56,
-            borderRadius: 12
-        },
-
-        textoBotaoAdicionar: {
-            fontFamily: fontFamilies.semibold,
-            fontSize: 17,
-            fontWeight: '600',
-            lineHeight: 24
         }
     });
 }
