@@ -99,6 +99,25 @@ describe('DiaryTimeline', () => {
         expect(tentar).toHaveBeenCalledTimes(1);
     });
 
+    test('centraliza a bolinha e o conector pela altura real de cada card', async () => {
+        await render(<DiaryTimeline registros={registros} />);
+
+        const cartoes = screen.getAllByTestId('diary-timeline-card-layout');
+        const marcadores = screen.getAllByTestId('diary-timeline-marker', {
+            includeHiddenElements: true
+        });
+        const conectores = screen.getAllByTestId('diary-timeline-horizontal-connector', {
+            includeHiddenElements: true
+        });
+
+        await fireEvent(cartoes[0], 'layout', {
+            nativeEvent: { layout: { width: 281, height: 200 } }
+        });
+
+        expect(marcadores[0]).toHaveStyle({ top: 75 });
+        expect(conectores[0]).toHaveStyle({ top: 99.5 });
+    });
+
     test('aceita lista vazia, dados inválidos e componentes auxiliares', async () => {
         const resultado = await render(<DiaryTimeline />);
         expect(screen.getByTestId('diary-timeline')).toBeOnTheScreen();

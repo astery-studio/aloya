@@ -12,12 +12,12 @@ function criarEstilos(tema) {
         item: { flexDirection: 'row' },
         trilho: { width: 69, alignItems: 'center' },
         marcador: {
+            position: 'absolute',
             zIndex: 1,
             width: 50,
             height: 50,
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: 36,
             borderWidth: 1,
             borderColor: cores.borda,
             borderRadius: 25,
@@ -26,20 +26,17 @@ function criarEstilos(tema) {
         linhaSuperior: {
             position: 'absolute',
             top: 0,
-            height: 61,
             width: 1,
             backgroundColor: cores.borda
         },
         linhaInferior: {
             position: 'absolute',
-            top: 86,
             bottom: 0,
             width: 1,
             backgroundColor: cores.borda
         },
         linhaHorizontal: {
             position: 'absolute',
-            top: 61,
             right: 0,
             width: 20,
             height: 1,
