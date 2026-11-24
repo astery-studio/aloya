@@ -63,7 +63,19 @@ describe('DiaryMacrocategorySection', () => {
             alignItems: 'center',
             gap: 10
         });
-        expect(cabecalho).toHaveStyle({ minHeight: 0, height: 40, gap: 10 });
+        expect(cabecalho).toHaveStyle({
+            minHeight: 0,
+            width: 'auto',
+            height: 40,
+            flex: 0,
+            flexShrink: 1,
+            justifyContent: 'center',
+            gap: 10
+        });
+        expect(screen.getByText('Vida Íntima e Social')).toHaveStyle({
+            flex: 0,
+            flexShrink: 1
+        });
         expect(cabecalho).toBeDisabled();
         expect(cabecalho).toHaveProp('accessibilityState', { expanded: false, disabled: true });
         expect(screen.queryByText('Conteúdo íntimo')).toBeNull();

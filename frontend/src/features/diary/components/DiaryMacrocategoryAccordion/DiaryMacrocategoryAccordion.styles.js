@@ -48,7 +48,15 @@ function criarEstilos(tema) {
             alignItems: 'center',
             gap: 10
         },
-        expansaoFormulario: { minHeight: 0, height: 40 },
+        expansaoFormulario: {
+            minHeight: 0,
+            width: 'auto',
+            height: 40,
+            flex: 0,
+            flexShrink: 1,
+            justifyContent: 'center',
+            gap: 10
+        },
         caixaIcone: {
             width: 34,
             height: 34,
@@ -65,6 +73,7 @@ function criarEstilos(tema) {
             fontSize: 15,
             lineHeight: 21
         },
+        tituloFormulario: { flex: 0, flexShrink: 1 },
         conteudoFormulario: {
             width: '100%',
             gap: 16,

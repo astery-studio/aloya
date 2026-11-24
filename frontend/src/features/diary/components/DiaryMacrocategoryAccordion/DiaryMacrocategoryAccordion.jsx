@@ -65,7 +65,11 @@ function DiaryMacrocategoryAccordion({
                         <Icone size={18} color={cores.icone} {...iconeProps} />
                     </View>
                     <Text
-                        style={[estilos.titulo, expandido && { color: cores.icone }]}
+                        style={[
+                            estilos.titulo,
+                            formulario && estilos.tituloFormulario,
+                            expandido && { color: cores.icone }
+                        ]}
                         numberOfLines={2}
                     >
                         {titulo}
