@@ -7,11 +7,16 @@ test('retorna para a data de referência pela ação acessível', async () => {
     await render(<ReturnToTodayButton onPress={onPress} />);
 
     const botao = screen.getByRole('button', { name: 'Voltar pra hoje' });
+    expect(screen.getByTestId('faixa-voltar-hoje')).toHaveStyle({
+        width: '100%',
+        height: 38,
+        paddingVertical: 2,
+        paddingHorizontal: 16
+    });
     expect(botao).toHaveStyle({
         width: 135,
         height: 34,
         alignSelf: 'flex-start',
-        marginLeft: 18,
         borderColor: '#AAAAA5',
         borderStyle: 'dashed',
         borderRadius: 999
