@@ -143,7 +143,7 @@ jest.mock('../../../src/features/diary/components/EditDiaryEntrySheet/EditDiaryE
 jest.mock('../../../src/features/diary/components/DiaryRecordDetails/DiaryRecordDetails', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        DiaryRecordDetails: ({ aoAnterior, aoProximo }) => (
+        DiaryRecordDetails: ({ registro, aoAnterior, aoProximo, aoExcluir }) => (
             <>
                 <Pressable
                     accessibilityRole="button"
@@ -161,6 +161,11 @@ jest.mock('../../../src/features/diary/components/DiaryRecordDetails/DiaryRecord
                 >
                     <Text>Próximo detalhe</Text>
                 </Pressable>
+                {typeof aoExcluir === 'function' ? (
+                    <Pressable accessibilityRole="button" onPress={() => aoExcluir(registro)}>
+                        <Text>Excluir pelo detalhe</Text>
+                    </Pressable>
+                ) : null}
             </>
         )
     };
@@ -303,7 +308,6 @@ test('encaminha exclusão confirmada e remove o item localmente', async () => {
         excluirRegistro: jest.fn(() => new Promise((resolve) => (resolverExclusao = resolve)))
     };
     await render(<DiaryFlow service={service} />);
-    await fireEvent.press(screen.getByText('Abrir detalhe pelo fluxo'));
     await fireEvent.press(screen.getByText('Excluir pelo fluxo'));
     let confirmacao;
     await act(async () => {
@@ -318,6 +322,29 @@ test('encaminha exclusão confirmada e remove o item localmente', async () => {
         resolverExclusao(true);
         await confirmacao;
     });
+});
+
+test('fecha o detalhe antes de preparar a confirmação de exclusão', async () => {
+    const detalhe = {
+        id: 8,
+        data: '2026-11-08',
+        fase: 'folicular',
+        versao: 3,
+        categorias: []
+    };
+    const service = {
+        listarHistorico: jest.fn().mockResolvedValue({ itens: [], proximoCursor: null }),
+        buscarDetalhe: jest.fn().mockResolvedValue(detalhe),
+        excluirRegistro: jest.fn().mockResolvedValue(true)
+    };
+    await render(<DiaryFlow service={service} />);
+
+    await fireEvent.press(screen.getByText('Abrir detalhe pelo fluxo'));
+    await waitFor(() => expect(screen.getByText('Excluir pelo detalhe')).toBeOnTheScreen());
+    await fireEvent.press(screen.getByText('Excluir pelo detalhe'));
+
+    await waitFor(() => expect(screen.queryByText('Excluir pelo detalhe')).not.toBeOnTheScreen());
+    expect(service.excluirRegistro).not.toHaveBeenCalled();
 });
 
 test('abre detalhe sob demanda nos temas claro e escuro', async () => {
