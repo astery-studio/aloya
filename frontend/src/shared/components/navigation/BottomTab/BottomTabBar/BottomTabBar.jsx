@@ -21,7 +21,7 @@ const abas = Object.freeze([
     }),
 
     Object.freeze({
-        id: 'ciclos',
+        id: 'calendario',
         label: 'Calendário',
         icone: CalendarCheckIcon
     }),
