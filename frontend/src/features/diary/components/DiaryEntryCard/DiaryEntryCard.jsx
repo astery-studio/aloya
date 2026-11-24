@@ -217,7 +217,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                     {possuiCategoriasPublicas ? (
                         <>
                             <Text style={estilos.rotuloSecao}>CATEGORIAS MARCADAS</Text>
-                            <View style={estilos.chips}>
+                            <View testID="diary-entry-chips" style={estilos.chips}>
                                 {linhasChips.map((linha, indiceLinha) => (
                                     <View
                                         key={`linha-${indiceLinha}`}

@@ -75,7 +75,8 @@ function criarEstilos(tema) {
         chips: {
             alignItems: 'center',
             marginTop: 4,
-            paddingVertical: 6
+            paddingTop: 6,
+            paddingBottom: 10
         },
         linhaChips: {
             minHeight: 28,

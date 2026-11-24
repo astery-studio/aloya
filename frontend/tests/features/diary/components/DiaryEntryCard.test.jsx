@@ -161,6 +161,10 @@ describe('DiaryEntryCard', () => {
         expect(screen.getByText('2')).toBeOnTheScreen();
         expect(screen.queryByText('+ 2')).not.toBeOnTheScreen();
         expect(screen.getAllByTestId('diary-entry-chip-row')).toHaveLength(2);
+        expect(screen.getByTestId('diary-entry-chips')).toHaveStyle({
+            paddingTop: 6,
+            paddingBottom: 10
+        });
         expect(screen.getAllByTestId('diary-entry-summary-chip')[0]).toHaveStyle({
             height: 24,
             alignItems: 'center',
