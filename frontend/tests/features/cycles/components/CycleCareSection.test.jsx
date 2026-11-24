@@ -20,3 +20,14 @@ test('oferece três cuidados com destinos independentes', async () => {
     for (const card of cards) await fireEvent.press(card);
     callbacks.forEach((callback) => expect(callback).toHaveBeenCalledTimes(1));
 });
+
+test.each([
+    ['menstrual', 'phosphor-react-native-drop-fill'],
+    ['folicular', 'phosphor-react-native-plant-regular'],
+    ['ovulatoria', 'phosphor-react-native-sun-regular'],
+    ['lutea', 'phosphor-react-native-waves-regular']
+])('usa o ícone da fase %s no card educativo', async (fase, testID) => {
+    await render(<CycleCareSection fase={fase} />);
+
+    expect(screen.getByTestId(testID)).toBeOnTheScreen();
+});

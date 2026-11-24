@@ -5,6 +5,7 @@ import {
     HeartIcon,
     NotebookIcon
 } from '../../../../shared/components/icons/AppIcons';
+import { CONTEUDO_POR_FASE } from '../sheets/CyclePhaseEducationSheet.content';
 import { estilos } from './CycleCareSection.styles';
 
 const CUIDADOS = Object.freeze([
@@ -44,6 +45,12 @@ function CycleCareSection({
     aoAbrirReflexao,
     aoAbrirEducacao
 }) {
+    const visualEducativo = CONTEUDO_POR_FASE[fase] ?? {
+        Icone: NotebookIcon,
+        cor: '#C85A44',
+        fundo: 'rgba(200, 90, 68, 0.1)',
+        weight: 'regular'
+    };
     const callbacks = {
         respiracao: aoAbrirRespiracao,
         reflexao: aoAbrirReflexao,
@@ -56,25 +63,30 @@ function CycleCareSection({
                 Cuidados para hoje
             </Text>
             <View style={estilos.lista}>
-                {CUIDADOS.map(({ id, categoria, titulo, descricao, Icone, cor, fundo }) => (
-                    <Pressable
-                        key={id}
-                        accessibilityLabel={`${categoria}. ${titulo}. ${descricao}. Abrir para a fase ${fase}.`}
-                        accessibilityRole="button"
-                        onPress={callbacks[id]}
-                        style={estilos.card}
-                    >
-                        <View style={[estilos.caixaIcone, { backgroundColor: fundo }]}>
-                            <Icone size={24} color={cor} />
-                        </View>
-                        <View style={estilos.textos}>
-                            <Text style={estilos.categoria}>{categoria}</Text>
-                            <Text style={estilos.titulo}>{titulo}</Text>
-                            <Text style={estilos.descricao}>{descricao}</Text>
-                        </View>
-                        <CaretRightIcon size={20} color="#222222" />
-                    </Pressable>
-                ))}
+                {CUIDADOS.map((cuidado) => {
+                    const visual = cuidado.id === 'educacao' ? visualEducativo : cuidado;
+                    const { id, categoria, titulo, descricao } = cuidado;
+                    const { Icone } = visual;
+                    return (
+                        <Pressable
+                            key={id}
+                            accessibilityLabel={`${categoria}. ${titulo}. ${descricao}. Abrir para a fase ${fase}.`}
+                            accessibilityRole="button"
+                            onPress={callbacks[id]}
+                            style={estilos.card}
+                        >
+                            <View style={[estilos.caixaIcone, { backgroundColor: visual.fundo }]}>
+                                <Icone size={24} color={visual.cor} weight={visual.weight} />
+                            </View>
+                            <View style={estilos.textos}>
+                                <Text style={estilos.categoria}>{categoria}</Text>
+                                <Text style={estilos.titulo}>{titulo}</Text>
+                                <Text style={estilos.descricao}>{descricao}</Text>
+                            </View>
+                            <CaretRightIcon size={20} color="#222222" />
+                        </Pressable>
+                    );
+                })}
             </View>
         </View>
     );
