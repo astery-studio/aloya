@@ -25,6 +25,7 @@ function NoCycleStartSection({
                     texto="Cadastrar Menstruação"
                     icone={DropIcon}
                     aoPressionar={aoCadastrarMenstruacao}
+                    estilo={estilos.acaoPrincipal}
                 />
                 <Text style={estilos.observacao}>
                     Você também pode registrar menstruações anteriores, caso se lembre das datas.

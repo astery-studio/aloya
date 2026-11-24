@@ -53,6 +53,9 @@ const estilos = StyleSheet.create({
         flexDirection: 'row',
         gap: 8
     },
+    acaoPrincipal: {
+        height: 45
+    },
     acao: {
         flex: 1,
         height: 45
