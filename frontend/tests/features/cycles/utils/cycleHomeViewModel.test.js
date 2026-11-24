@@ -26,3 +26,13 @@ test('deriva fase, confiança, incerteza e janela fértil da data selecionada', 
         janelaFertilAtiva: true
     });
 });
+
+test('mantém a janela fértil visível na fase ovulatória sem intervalo da API', () => {
+    expect(
+        criarCycleHomeViewModel({
+            previsao: { status: 'DISPONIVEL' },
+            fase: 'ovulatoria',
+            dataSelecionada: '2026-10-14'
+        }).janelaFertilAtiva
+    ).toBe(true);
+});

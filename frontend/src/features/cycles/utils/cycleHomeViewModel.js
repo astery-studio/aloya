@@ -25,7 +25,8 @@ function criarCycleHomeViewModel({ previsao, fase, dataSelecionada, janelaFertil
         faseConhecida,
         nivelConfiabilidade,
         previsaoIncerta: previsaoParcial || previsaoUltrapassada,
-        janelaFertilAtiva: dataEstaNoIntervalo(dataSelecionada, intervaloFertil)
+        janelaFertilAtiva:
+            fase === 'ovulatoria' || dataEstaNoIntervalo(dataSelecionada, intervaloFertil)
     };
 }
 
