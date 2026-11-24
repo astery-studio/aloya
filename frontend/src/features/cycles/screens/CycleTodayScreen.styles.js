@@ -1,25 +1,30 @@
 import { StyleSheet } from 'react-native';
-import { espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { espacamentos, fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
-function criarEstilos(tema) {
+function criarEstilos(tema, insetSuperior = 0) {
+    const alturaCabecalho = 111.99 - insetSuperior;
+    const paddingSuperiorCabecalho = Math.max(0, 55.99 - insetSuperior);
+
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo },
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',
-            minHeight: 78,
+            height: alturaCabecalho,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingHorizontal: espacamentos.medio,
-            paddingTop: espacamentos.extraGrande
+            paddingTop: paddingSuperiorCabecalho,
+            paddingBottom: 12
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
-            ...typography.h2,
             flexShrink: 1,
             color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 24,
             fontWeight: '700',
             lineHeight: 28
         },
