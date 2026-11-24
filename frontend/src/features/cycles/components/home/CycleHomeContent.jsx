@@ -34,6 +34,7 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
             {diaryService ? (
                 <CycleDiaryCheckIn
                     date={dataSelecionada}
+                    fase={fase}
                     service={diaryService}
                     onOpenDiary={callbacks.aoAbrirDiario}
                     onSessionExpired={onSessaoExpirada}
