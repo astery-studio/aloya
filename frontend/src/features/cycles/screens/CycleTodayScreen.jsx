@@ -63,7 +63,6 @@ function CycleTodayScreen({
         : tema.cores.marca.secundaria;
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const [sheetAberto, setSheetAberto] = useState(null);
-    const [reflexao, setReflexao] = useState('');
     const dataBaseDaFaixa = previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
     const referencia = dataSelecionada || dataBaseDaFaixa;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
@@ -206,12 +205,9 @@ function CycleTodayScreen({
                 aberto={sheetAberto}
                 nivel={home.nivelConfiabilidade ?? 'baixa'}
                 fase={fase}
-                reflexao={reflexao}
-                aoAlterarReflexao={setReflexao}
-                aoSalvarReflexao={() => {
-                    fecharSheet();
-                    aoCadastrarDiario?.();
-                }}
+                data={referencia}
+                diaryService={diaryService}
+                onSessaoExpirada={onSessaoExpirada}
                 aoFechar={fecharSheet}
             />
         </SafeAreaView>
