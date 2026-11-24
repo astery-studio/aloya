@@ -56,7 +56,7 @@ function criarEstilos(tema) {
             fontSize: 14,
             lineHeight: 20
         },
-        fase: { fontFamily: fontFamilies.bold },
+        fase: { fontFamily: fontFamilies.bold, fontWeight: '700' },
         descricao: {
             color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
@@ -70,18 +70,22 @@ function criarEstilos(tema) {
             borderTopWidth: 1,
             borderTopColor: cores.borda
         },
-        quantidade: {
-            width: 266,
+        contadorDias: {
+            width: 266.59,
             maxWidth: '100%',
-            overflow: 'hidden',
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: tema.radius.circular,
-            color: cores.destaque,
-            backgroundColor: cores.destaqueSuave,
-            fontFamily: fontFamilies.semiBold,
-            fontSize: 12,
-            lineHeight: 16,
+            height: 26,
+            paddingHorizontal: 14,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
+            borderRadius: 100
+        },
+        quantidade: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 10,
+            fontWeight: '600',
+            lineHeight: 19.5,
             textAlign: 'center'
         },
         carregando: { minHeight: 132, alignItems: 'center', justifyContent: 'center', gap: 10 },
