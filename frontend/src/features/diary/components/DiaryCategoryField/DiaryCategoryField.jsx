@@ -41,6 +41,8 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 corPlaceholder={cores.icone}
                 estiloEntrada={[estilos.entradaValor, { color: cores.icone }]}
                 estiloUnidade={[estilos.unidadeValor, { color: cores.icone }]}
+                placeholderComoTexto
+                estiloPlaceholder={[estilos.placeholderValor, { color: cores.icone }]}
             />
         );
     } else if (categoria.tipoValor === 'duracao_minutos') {
@@ -57,6 +59,8 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 rotuloMinutos="minutos"
                 estiloEntrada={[estilos.entradaValor, { color: cores.icone }]}
                 estiloUnidade={[estilos.unidadeValor, { color: cores.icone }]}
+                placeholderComoTexto
+                estiloPlaceholder={[estilos.placeholderValor, { color: cores.icone }]}
             />
         );
     } else if (categoria.tipoValor === 'texto') {

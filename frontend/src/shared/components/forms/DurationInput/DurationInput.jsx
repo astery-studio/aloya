@@ -28,7 +28,9 @@ function DurationInput({
     rotuloHoras = 'hora',
     rotuloMinutos = 'minutos',
     estiloEntrada,
-    estiloUnidade
+    estiloUnidade,
+    placeholderComoTexto = false,
+    estiloPlaceholder
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -46,33 +48,63 @@ function DurationInput({
         <View>
             <View style={[estilos.container, desabilitado && estilos.desabilitado]}>
                 <View style={estilos.grupo}>
-                    <TextInput
-                        accessibilityLabel="Horas de sono"
-                        editable={!desabilitado}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        selectTextOnFocus
-                        placeholder={placeholderHoras}
-                        placeholderTextColor={corPlaceholder}
-                        value={duracao.horas}
-                        onChangeText={(texto) => alterar('horas', texto)}
-                        style={[estilos.entrada, estiloEntrada]}
-                    />
+                    <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                        <TextInput
+                            accessibilityLabel="Horas de sono"
+                            editable={!desabilitado}
+                            keyboardType="number-pad"
+                            maxLength={2}
+                            selectTextOnFocus
+                            placeholder={placeholderComoTexto ? undefined : placeholderHoras}
+                            placeholderTextColor={corPlaceholder}
+                            value={duracao.horas}
+                            onChangeText={(texto) => alterar('horas', texto)}
+                            style={[
+                                estilos.entrada,
+                                placeholderComoTexto && estilos.entradaSobreposta,
+                                estiloEntrada
+                            ]}
+                        />
+                        {placeholderComoTexto && !duracao.horas ? (
+                            <Text
+                                testID="placeholder-horas-sono"
+                                pointerEvents="none"
+                                style={[estilos.placeholderSobreposto, estiloPlaceholder]}
+                            >
+                                {placeholderHoras}
+                            </Text>
+                        ) : null}
+                    </View>
                     <Text style={[estilos.unidade, estiloUnidade]}>{rotuloHoras}</Text>
                 </View>
                 <View style={estilos.grupo}>
-                    <TextInput
-                        accessibilityLabel="Minutos de sono"
-                        editable={!desabilitado}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        selectTextOnFocus
-                        placeholder={placeholderMinutos}
-                        placeholderTextColor={corPlaceholder}
-                        value={duracao.minutos}
-                        onChangeText={(texto) => alterar('minutos', texto)}
-                        style={[estilos.entrada, estiloEntrada]}
-                    />
+                    <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                        <TextInput
+                            accessibilityLabel="Minutos de sono"
+                            editable={!desabilitado}
+                            keyboardType="number-pad"
+                            maxLength={2}
+                            selectTextOnFocus
+                            placeholder={placeholderComoTexto ? undefined : placeholderMinutos}
+                            placeholderTextColor={corPlaceholder}
+                            value={duracao.minutos}
+                            onChangeText={(texto) => alterar('minutos', texto)}
+                            style={[
+                                estilos.entrada,
+                                placeholderComoTexto && estilos.entradaSobreposta,
+                                estiloEntrada
+                            ]}
+                        />
+                        {placeholderComoTexto && !duracao.minutos ? (
+                            <Text
+                                testID="placeholder-minutos-sono"
+                                pointerEvents="none"
+                                style={[estilos.placeholderSobreposto, estiloPlaceholder]}
+                            >
+                                {placeholderMinutos}
+                            </Text>
+                        ) : null}
+                    </View>
                     <Text style={[estilos.unidade, estiloUnidade]}>{rotuloMinutos}</Text>
                 </View>
                 {valorMinutos ? (

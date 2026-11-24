@@ -42,6 +42,20 @@ function criarEstilos(tema) {
             textAlign: 'center',
             textAlignVertical: 'center'
         },
+        areaEntradaSobreposta: {
+            position: 'relative',
+            width: 32,
+            height: 24,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        entradaSobreposta: { width: '100%', height: '100%' },
+        placeholderSobreposto: {
+            position: 'absolute',
+            width: '100%',
+            height: 24,
+            textAlign: 'center'
+        },
         unidade: { ...texto, fontFamily: fontFamilies.semibold },
         limpar: { position: 'absolute', right: 18 },
         desativado: { opacity: 0.55 }

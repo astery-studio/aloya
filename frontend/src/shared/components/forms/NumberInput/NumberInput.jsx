@@ -23,7 +23,9 @@ export default function NumberInput({
     placeholder,
     corPlaceholder,
     estiloEntrada,
-    estiloUnidade
+    estiloUnidade,
+    placeholderComoTexto = false,
+    estiloPlaceholder
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -54,25 +56,40 @@ export default function NumberInput({
             style={[estilos.campo, desativado && estilos.desativado, estilo]}
         >
             <View style={estilos.conteudo}>
-                <TextInput
-                    ref={entradaRef}
-                    accessibilityLabel={rotuloAcessibilidade}
-                    accessibilityValue={{
-                        ...(Number.isFinite(valorMinimo) ? { min: valorMinimo } : {}),
-                        ...(Number.isFinite(valorMaximo) ? { max: valorMaximo } : {}),
-                        ...(Number.isFinite(numeroAtual) ? { now: numeroAtual } : {})
-                    }}
-                    editable={!desativado}
-                    keyboardType={casasDecimais > 0 ? 'decimal-pad' : 'number-pad'}
-                    maxLength={comprimentoMaximo}
-                    selectionColor={tema.cores.interface.destaque}
-                    selectTextOnFocus
-                    placeholder={placeholder}
-                    placeholderTextColor={corPlaceholder}
-                    value={texto}
-                    onChangeText={alterar}
-                    style={[estilos.entrada, estiloEntrada]}
-                />
+                <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                    <TextInput
+                        ref={entradaRef}
+                        accessibilityLabel={rotuloAcessibilidade}
+                        accessibilityValue={{
+                            ...(Number.isFinite(valorMinimo) ? { min: valorMinimo } : {}),
+                            ...(Number.isFinite(valorMaximo) ? { max: valorMaximo } : {}),
+                            ...(Number.isFinite(numeroAtual) ? { now: numeroAtual } : {})
+                        }}
+                        editable={!desativado}
+                        keyboardType={casasDecimais > 0 ? 'decimal-pad' : 'number-pad'}
+                        maxLength={comprimentoMaximo}
+                        selectionColor={tema.cores.interface.destaque}
+                        selectTextOnFocus
+                        placeholder={placeholderComoTexto ? undefined : placeholder}
+                        placeholderTextColor={corPlaceholder}
+                        value={texto}
+                        onChangeText={alterar}
+                        style={[
+                            estilos.entrada,
+                            placeholderComoTexto && estilos.entradaSobreposta,
+                            estiloEntrada
+                        ]}
+                    />
+                    {placeholderComoTexto && !texto ? (
+                        <Text
+                            testID="placeholder-campo-numero"
+                            pointerEvents="none"
+                            style={[estilos.placeholderSobreposto, estiloPlaceholder]}
+                        >
+                            {placeholder}
+                        </Text>
+                    ) : null}
+                </View>
                 <Text style={[estilos.unidade, estiloUnidade]}>{unidade}</Text>
                 {permitirLimpar && texto ? (
                     <Pressable

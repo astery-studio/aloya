@@ -42,8 +42,8 @@ function DiaryFreeTextCategoryField({
                     estilos.campoAnotacao,
                     {
                         borderColor: cores.icone,
-                        height: alturaAnotacao + (valor ? 18 : 0),
-                        paddingTop: valor ? 18 : 0
+                        height: alturaAnotacao,
+                        paddingTop: 0
                     }
                 ]}
                 estiloEntrada={[
@@ -51,7 +51,7 @@ function DiaryFreeTextCategoryField({
                     {
                         color: cores.icone,
                         height: alturaAnotacao - 12,
-                        textAlign: valor ? 'justify' : 'center'
+                        textAlign: 'center'
                     }
                 ]}
                 scrollEnabled={false}

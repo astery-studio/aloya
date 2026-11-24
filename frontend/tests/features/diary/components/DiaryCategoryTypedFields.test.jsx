@@ -59,8 +59,7 @@ describe('campos tipados do Diário', () => {
         );
         const entrada = screen.getByLabelText('Temperatura basal');
         expect(entrada).toHaveProp('accessibilityValue', { min: 32, max: 42, now: 36.5 });
-        expect(entrada).toHaveProp('placeholder', '0');
-        expect(entrada).toHaveProp('placeholderTextColor', '#2C4C3B');
+        expect(entrada).not.toHaveProp('placeholder');
         expect(entrada).toHaveStyle({
             color: '#2C4C3B',
             height: 24,
@@ -81,8 +80,16 @@ describe('campos tipados do Diário', () => {
             <DiaryCategoryField categoria={peso} valor={null} paleta="corpo" />
         );
         expect(screen.getByLabelText('Peso')).toHaveProp('accessibilityValue', {});
-        expect(screen.getByLabelText('Peso')).toHaveProp('placeholder', '0');
-        expect(screen.getByLabelText('Peso')).toHaveProp('placeholderTextColor', '#2C4C3B');
+        expect(screen.getByLabelText('Peso')).not.toHaveProp('placeholder');
+        expect(screen.getByTestId('placeholder-campo-numero')).toHaveTextContent('0');
+        expect(screen.getByTestId('placeholder-campo-numero')).toHaveStyle({
+            color: '#2C4C3B',
+            height: 24,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
         expect(screen.getByText('kg')).toHaveStyle({
             color: '#2C4C3B',
             fontWeight: '700'
@@ -90,7 +97,7 @@ describe('campos tipados do Diário', () => {
     });
 
     test('renderiza duração e encaminha seu erro', async () => {
-        await render(
+        const resultado = await render(
             <DiaryCategoryField
                 categoria={sono}
                 valor={80}
@@ -98,12 +105,6 @@ describe('campos tipados do Diário', () => {
                 paleta="energia"
             />
         );
-        expect(screen.getByLabelText('Horas de sono')).toHaveProp('placeholder', '00');
-        expect(screen.getByLabelText('Horas de sono')).toHaveProp(
-            'placeholderTextColor',
-            '#B07D2A'
-        );
-        expect(screen.getByLabelText('Minutos de sono')).toHaveProp('placeholder', '00');
         expect(screen.getByLabelText('Minutos de sono')).toHaveStyle({
             color: '#B07D2A',
             fontSize: 13,
@@ -122,6 +123,21 @@ describe('campos tipados do Diário', () => {
             fontWeight: '700'
         });
         expect(screen.getByRole('alert')).toHaveTextContent('Duração inválida');
+
+        await resultado.rerender(
+            <DiaryCategoryField categoria={sono} valor={null} paleta="energia" />
+        );
+        expect(screen.getByLabelText('Horas de sono')).not.toHaveProp('placeholder');
+        expect(screen.getByTestId('placeholder-horas-sono')).toHaveTextContent('00');
+        expect(screen.getByTestId('placeholder-minutos-sono')).toHaveTextContent('00');
+        expect(screen.getByTestId('placeholder-horas-sono')).toHaveStyle({
+            color: '#B07D2A',
+            height: 24,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
     });
 
     test('renderiza anotação longa com contador em tempo real', async () => {
@@ -136,14 +152,19 @@ describe('campos tipados do Diário', () => {
             minHeight: 24,
             height: 24,
             fontSize: 13,
-            textAlign: 'justify',
+            textAlign: 'center',
             textAlignVertical: 'top',
             color: '#4A5899'
+        });
+        expect(screen.getByTestId('container-campo-texto')).toHaveStyle({
+            height: 36,
+            paddingTop: 0
         });
         await fireEvent(entrada, 'contentSizeChange', {
             nativeEvent: { contentSize: { height: 100 } }
         });
         expect(entrada).toHaveStyle({ height: 100 });
+        expect(screen.getByTestId('container-campo-texto')).toHaveStyle({ height: 112 });
         await fireEvent(entrada, 'contentSizeChange', {
             nativeEvent: { contentSize: { height: 300 } }
         });

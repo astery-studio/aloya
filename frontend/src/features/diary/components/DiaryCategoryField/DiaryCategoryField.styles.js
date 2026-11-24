@@ -69,6 +69,14 @@ function criarEstilos(tema) {
             textAlignVertical: 'center',
             includeFontPadding: false
         },
+        placeholderValor: {
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            includeFontPadding: false
+        },
         unidadeValor: {
             fontFamily: fontFamilies.bold,
             fontSize: 13,
