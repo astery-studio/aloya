@@ -73,5 +73,6 @@ test('mantém instrução textual quando o movimento é reduzido', async () => {
 
     expect(screen.getByRole('header', { name: 'Acompanhe o movimento' })).toBeOnTheScreen();
     expect(screen.getByText('Respire')).toBeOnTheScreen();
-    expect(estilosRespiracao.areaRespiracao).toMatchObject({ height: 216, marginTop: 18 });
+    expect(estilosRespiracao.painel).toMatchObject({ paddingBottom: 24 });
+    expect(estilosRespiracao.areaRespiracao).toMatchObject({ height: 210, marginTop: 10 });
 });

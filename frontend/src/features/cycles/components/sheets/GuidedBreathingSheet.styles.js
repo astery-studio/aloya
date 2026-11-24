@@ -5,7 +5,7 @@ const estilos = StyleSheet.create({
     painel: {
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
-        paddingBottom: 48,
+        paddingBottom: 24,
         paddingHorizontal: 24,
         paddingTop: 0
     },
@@ -34,10 +34,10 @@ const estilos = StyleSheet.create({
         lineHeight: 21
     },
     areaRespiracao: {
-        height: 216,
+        height: 210,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 18
+        marginTop: 10
     },
     circulo: {
         alignItems: 'center',
