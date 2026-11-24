@@ -49,17 +49,13 @@ function DiaryReflectionSheet({
                         estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
                         estiloEntrada={estilos.textoEntrada}
                     />
-                    <Text
-                        accessibilityLiveRegion="polite"
-                        style={[estilos.contador, valor && estilos.contadorPreenchido]}
-                    >
-                        {[...valor].length} / {LIMITE_REFLEXAO}
-                    </Text>
                     <ButtonScreen
                         texto="Salvar no Diário"
                         aoPressionar={aoSalvar}
                         desativado={!valor.trim()}
                         carregando={salvando}
+                        estilo={[estilos.botao, valor.trim() && estilos.botaoAtivo]}
+                        estiloTexto={estilos.textoBotao}
                     />
                 </View>
             </View>
