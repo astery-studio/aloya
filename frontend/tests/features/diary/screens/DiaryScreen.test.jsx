@@ -40,7 +40,9 @@ describe('histórico do Diário', () => {
         expect(
             screen.getByText(/as categorias usadas neles podem estar desativadas/)
         ).toBeOnTheScreen();
-        expect(screen.getByText(/Ative-as em "Gerenciar categorias"/)).toBeOnTheScreen();
+        expect(screen.getByText('"Gerenciar categorias"')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.getByText('"Adicionar novo registro"')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.queryByText(/desativadas\.\nAtive-as/)).not.toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Adicionar novo registro' }));
         expect(aoCriar).toHaveBeenCalledTimes(1);
     });

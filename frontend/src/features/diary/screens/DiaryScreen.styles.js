@@ -46,6 +46,10 @@ function criarEstilos(tema) {
             lineHeight: 21,
             textAlign: 'center'
         },
+        opcaoEstadoVazio: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
         estadoFiltroVazio: {
             flex: 1,
             alignItems: 'center',
