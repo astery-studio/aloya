@@ -76,6 +76,8 @@ describe('themePalettes', () => {
 
             expect(tema.espacamentosLayout).toBeDefined();
 
+            expect(tema.headerTypography).toBeDefined();
+
             expect(tema.typography).toBeDefined();
 
             expect(tema.radius).toBeDefined();
@@ -88,6 +90,32 @@ describe('themePalettes', () => {
 
             expect(tema.cores.interface).toBeDefined();
         }
+    });
+
+    test('mantém os tokens semânticos exclusivos dos headers', () => {
+        expect(temaClaro.headerTypography.principal).toEqual({
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 28,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 36,
+            letterSpacing: 0,
+            textAlign: 'left'
+        });
+
+        expect(temaClaro.headerTypography.compacto).toEqual({
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 20,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 28,
+            letterSpacing: 0,
+            textAlign: 'left'
+        });
+
+        expect(temaClaro.espacamentosLayout.headerParaConteudo).toBe(24);
+        expect(temaClaro.espacamentosLayout.descricaoParaConteudo).toBe(24);
+        expect(temaClaro.typography.h1.lineHeight).toBe(33.6);
     });
 
     test.each([

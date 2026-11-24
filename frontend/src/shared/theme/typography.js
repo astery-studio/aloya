@@ -77,4 +77,26 @@ const typography = {
     }
 };
 
-export { fontFamilies, typography };
+const headerTypography = Object.freeze({
+    principal: Object.freeze({
+        fontFamily: fontFamilies.bold,
+        fontSize: 28,
+        fontStyle: 'normal',
+        fontWeight: '700',
+        lineHeight: 36,
+        letterSpacing: 0,
+        textAlign: 'left'
+    }),
+
+    compacto: Object.freeze({
+        fontFamily: fontFamilies.bold,
+        fontSize: 20,
+        fontStyle: 'normal',
+        fontWeight: '700',
+        lineHeight: 28,
+        letterSpacing: 0,
+        textAlign: 'left'
+    })
+});
+
+export { fontFamilies, headerTypography, typography };

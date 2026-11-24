@@ -9,7 +9,9 @@ const espacamentos = Object.freeze({
 
 const espacamentosLayout = Object.freeze({
     margemHorizontalTela: espacamentos.grande,
-    espacamentoEntreColunas: espacamentos.medio
+    espacamentoEntreColunas: espacamentos.medio,
+    headerParaConteudo: espacamentos.grande,
+    descricaoParaConteudo: espacamentos.grande
 });
 
 export { espacamentos, espacamentosLayout };
