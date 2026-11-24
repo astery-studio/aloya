@@ -17,6 +17,8 @@ test('oferece três cuidados com destinos independentes', async () => {
     const cards = screen.getAllByRole('button');
     expect(screen.getByText('Para o seu momento')).toHaveStyle({ color: '#D68C3A' });
     expect(cards).toHaveLength(3);
+    expect(screen.getByTestId('phosphor-react-native-wind-regular')).toBeOnTheScreen();
+    expect(screen.getByTestId('phosphor-react-native-question-regular')).toBeOnTheScreen();
     for (const card of cards) await fireEvent.press(card);
     callbacks.forEach((callback) => expect(callback).toHaveBeenCalledTimes(1));
 });
