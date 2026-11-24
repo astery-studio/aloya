@@ -88,44 +88,36 @@ function CycleDateStrip({
                         onPress={() => aoSelecionarData?.(item.data)}
                         style={[
                             estilos.dia,
-                            !selecionado && estilos.diaNaoSelecionado,
-                            selecionado && estilos.diaSelecionado,
-                            selecionado && estilos[`diaSelecionado_${item.fase}`]
+                            estilos[`dia_${item.fase}`],
+                            selecionado && estilos.diaSelecionado
                         ]}
                     >
-                        <Text
-                            style={[
-                                estilos.semana,
-                                selecionado && estilos.semanaSelecionada,
-                                selecionado &&
-                                    item.fase === 'desconhecida' &&
-                                    estilos.textoSelecionadoDesconhecido
-                            ]}
-                        >
-                            {item.semana}
-                        </Text>
-                        <Text
-                            style={[
-                                estilos.textoNumero,
-                                selecionado && estilos.numeroSelecionado,
-                                selecionado &&
-                                    item.fase === 'desconhecida' &&
-                                    estilos.textoSelecionadoDesconhecido
-                            ]}
-                        >
-                            {item.dia ?? '?'}
-                        </Text>
                         <View
-                            testID={`indicador-${item.data}`}
-                            style={[
-                                estilos.indicador,
-                                item.hoje && estilos.indicadorHoje,
-                                selecionado && estilos.indicadorSelecionado,
-                                selecionado &&
-                                    item.fase === 'desconhecida' &&
-                                    estilos.indicadorSelecionadoDesconhecido
-                            ]}
-                        />
+                            style={[estilos.interior, selecionado && estilos.interiorSelecionado]}
+                        >
+                            <Text
+                                style={[estilos.semana, selecionado && estilos.semanaSelecionada]}
+                            >
+                                {item.semana}
+                            </Text>
+                            <Text
+                                style={[
+                                    estilos.textoNumero,
+                                    selecionado && estilos.numeroSelecionado
+                                ]}
+                            >
+                                {item.dia ?? '?'}
+                            </Text>
+                            <View
+                                testID={`indicador-${item.data}`}
+                                style={[
+                                    estilos.indicador,
+                                    estilos[`indicador_${item.fase}`],
+                                    item.hoje && estilos.indicadorHoje,
+                                    selecionado && estilos.indicadorSelecionado
+                                ]}
+                            />
+                        </View>
                     </Pressable>
                 );
             }}
