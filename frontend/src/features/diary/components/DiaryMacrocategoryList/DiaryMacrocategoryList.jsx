@@ -33,7 +33,7 @@ function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, de
                 return (
                     <DiaryMacrocategorySection
                         key={macro.id}
-                        titulo={macro.nomeCompacto ?? macro.nome}
+                        titulo={macro.nome}
                         icone={apresentacao.icone}
                         iconeProps={apresentacao.iconeProps}
                         paleta={apresentacao.paleta}

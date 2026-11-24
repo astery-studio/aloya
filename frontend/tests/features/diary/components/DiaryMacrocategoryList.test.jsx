@@ -51,6 +51,14 @@ const macros = [
     }
 ];
 
+const macroEnergia = {
+    id: 'energia_sono',
+    nome: 'Energia e Sono',
+    nomeCompacto: 'Energia',
+    recolhidaPorPadrao: true,
+    categorias: [{ id: 'energia', nome: 'Energia' }]
+};
+
 test('define a discrição inicial de cada macrocategoria', () => {
     expect(criarEstadoExpandido(macros)).toEqual({ corpo: false, vida: false });
     expect(sincronizarEstadoExpandido({ corpo: true }, ['corpo', 'vida'])).toEqual({
@@ -65,6 +73,15 @@ test('aceita catálogo temporariamente vazio', async () => {
     );
 
     expect(resultado.toJSON()).not.toBeNull();
+});
+
+test('usa o nome completo da macrocategoria no formulário', async () => {
+    await render(
+        <DiaryMacrocategoryList macrocategorias={[macroEnergia]} valores={{}} erros={{}} />
+    );
+
+    expect(screen.getByText('Energia e Sono:false')).toBeOnTheScreen();
+    expect(screen.queryByText('Energia:false')).not.toBeOnTheScreen();
 });
 
 test('expande a seção sensível e encaminha alterações', async () => {
