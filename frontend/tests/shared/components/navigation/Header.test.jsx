@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 const mockArrowLeftIcon = jest.fn(() => null);
 
@@ -31,8 +32,31 @@ describe('Header', () => {
 
         expect(titulo).toHaveStyle({
             flex: 1,
-            flexShrink: 1
+            flexShrink: 1,
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 28,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 36,
+            letterSpacing: 0,
+            textAlign: 'left'
         });
+    });
+
+    test('permite título longo e fonte ampliada sem altura rígida', async () => {
+        const tituloLongo =
+            'Configurações de acompanhamento e compartilhamento de informações do ciclo';
+
+        await renderizarHeader({ titulo: tituloLongo });
+
+        const titulo = screen.getByRole('header');
+        const estiloConteudo = StyleSheet.flatten(screen.getByTestId('header-content').props.style);
+
+        expect(titulo).toHaveTextContent(tituloLongo);
+        expect(titulo.props.numberOfLines).toBeUndefined();
+        expect(titulo.props.allowFontScaling).not.toBe(false);
+        expect(estiloConteudo.height).toBeUndefined();
+        expect(estiloConteudo.minHeight).toBeUndefined();
     });
 
     test('não mostra botão de voltar na variante padrão', async () => {
@@ -96,7 +120,7 @@ describe('Header', () => {
         });
     });
 
-    test('usa estilo centralizado na variante comVoltar', async () => {
+    test('usa o título compacto alinhado à esquerda na variante comVoltar', async () => {
         await renderizarHeader({
             titulo: 'Editar perfil',
             variante: 'comVoltar',
@@ -104,10 +128,11 @@ describe('Header', () => {
         });
 
         expect(screen.getByRole('header')).toHaveStyle({
-            fontSize: 18,
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 20,
             fontWeight: '700',
-            lineHeight: 27,
-            textAlign: 'center'
+            lineHeight: 28,
+            textAlign: 'left'
         });
     });
 
@@ -115,17 +140,11 @@ describe('Header', () => {
         await renderizarHeader({ variante: 'diario', acoesDireita: <></> });
 
         expect(screen.getByTestId('header-container')).toHaveStyle({
-            width: 390,
-            maxWidth: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            width: '100%',
             paddingTop: 56,
-            paddingHorizontal: 16,
-            paddingBottom: 12,
             flexShrink: 0
         });
-        expect(screen.getByRole('header')).toHaveStyle({ fontSize: 28, lineHeight: 34 });
+        expect(screen.getByRole('header')).toHaveStyle({ fontSize: 28, lineHeight: 36 });
     });
 
     test('renderiza o ícone de voltar no tema claro', async () => {

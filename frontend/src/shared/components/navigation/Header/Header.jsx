@@ -20,7 +20,6 @@ function Header({
 
     const temVoltar = variante === 'comVoltar';
     const ehDiario = variante === 'diario';
-
     const ehRedeApoio = variante === 'redeApoio';
 
     const acoesExibidas = acoesDireita ?? acoes;
@@ -48,12 +47,8 @@ function Header({
             />
 
             <View
-                style={[
-                    estilos.areaTitulo,
-                    temVoltar && estilos.areaTituloComVoltar,
-                    ehRedeApoio && estilos.areaTituloRedeApoio,
-                    ehDiario && estilos.areaTituloDiario
-                ]}
+                testID="header-content"
+                style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}
             >
                 {temVoltar ? (
                     <Pressable
@@ -77,39 +72,23 @@ function Header({
                     </Pressable>
                 ) : null}
 
-                {ehRedeApoio ? (
-                    <View testID="header-title-container" style={estilos.containerTituloRedeApoio}>
-                        <Text
-                            style={[
-                                estilos.titulo,
-                                estilos.tituloRedeApoio,
-                                corTexto ? { color: corTexto } : null
-                            ]}
-                            accessibilityRole="header"
-                        >
-                            {titulo}
-                        </Text>
-                    </View>
-                ) : (
-                    <Text
-                        style={[
-                            estilos.titulo,
-                            temVoltar && estilos.tituloComVoltar,
-                            ehDiario && estilos.tituloDiario,
-                            corTexto ? { color: corTexto } : null
-                        ]}
-                        accessibilityRole="header"
-                    >
-                        {titulo}
-                    </Text>
-                )}
+                <Text
+                    style={[
+                        estilos.titulo,
+                        temVoltar && estilos.tituloComVoltar,
+                        corTexto ? { color: corTexto } : null
+                    ]}
+                    accessibilityRole="header"
+                >
+                    {titulo}
+                </Text>
 
                 {temAcoes ? (
                     <View
                         testID="header-actions"
                         accessibilityRole="toolbar"
                         accessibilityLabel="Ações da tela"
-                        style={[estilos.acoes, ehDiario && estilos.acoesDireitaDiario]}
+                        style={estilos.acoes}
                     >
                         {acoesExibidas}
                     </View>

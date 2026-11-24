@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Pressable, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { Header } from '../../../../src/shared/components/navigation/Header/Header';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
@@ -13,6 +13,14 @@ function renderizarHeader(propriedades = {}) {
 }
 
 describe('Header com ações', () => {
+    function criarAcao(rotulo) {
+        return (
+            <Pressable accessibilityRole="button" accessibilityLabel={rotulo}>
+                <Text>{rotulo}</Text>
+            </Pressable>
+        );
+    }
+
     test('apresenta as ações ao lado do título', async () => {
         const aoFiltrar = jest.fn();
 
@@ -57,26 +65,35 @@ describe('Header com ações', () => {
         expect(screen.queryByText('Ação incompatível')).toBeNull();
     });
 
-    test('aplica o cabeçalho específico da Rede de Apoio', async () => {
-        await renderizarHeader({
-            variante: 'redeApoio',
-            acoes: (
-                <Pressable accessibilityRole="button" accessibilityLabel="Ação da Rede de Apoio">
-                    <Text>Ação</Text>
-                </Pressable>
-            )
-        });
+    test.each([
+        ['sem ações', 'padrao', null, 0],
+        ['com uma ação', 'redeApoio', criarAcao('Filtrar'), 1],
+        [
+            'com duas ações',
+            'diario',
+            <>
+                {criarAcao('Filtrar')}
+                {criarAcao('Gerenciar')}
+            </>,
+            2
+        ]
+    ])('mantém o mesmo título principal %s', async (_, variante, acoes, quantidade) => {
+        await renderizarHeader({ variante, acoes });
 
-        expect(screen.getByTestId('header-title-container')).toHaveStyle({
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            alignSelf: 'stretch'
-        });
+        const estilo = StyleSheet.flatten(screen.getByRole('header').props.style);
 
-        expect(screen.getByRole('header')).toHaveStyle({
+        expect(estilo).toMatchObject({
+            fontFamily: 'DMSans_700Bold',
             fontSize: 28,
             fontWeight: '700',
-            lineHeight: 27.5
+            lineHeight: 36,
+            textAlign: 'left'
         });
+
+        if (quantidade === 0) {
+            expect(screen.queryByTestId('header-actions')).toBeNull();
+        } else {
+            expect(screen.getByTestId('header-actions').children).toHaveLength(quantidade);
+        }
     });
 });
