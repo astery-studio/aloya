@@ -6,6 +6,7 @@ import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { obterHojeDiario } from '../../diary/utils/diaryDate';
 import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
 import { CompactDiaryOptions } from './home/CompactDiaryOptions';
+import { estilos } from './CycleDiaryCheckIn.styles';
 
 function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
     const [saved, setSaved] = useState(false);
@@ -34,42 +35,53 @@ function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
         : false;
 
     return (
-        <View style={{ paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
-            <Text accessibilityRole="header" style={{ fontFamily: 'DMSans_700Bold', fontSize: 20 }}>
-                Como você está hoje?
-            </Text>
-            {catalog.carregando ? <Text>Carregando seu check-in...</Text> : null}
-            {catalog.erro ? (
-                <>
-                    <Text accessibilityRole="alert">{catalog.erro}</Text>
-                    <ButtonScreen texto="Tentar novamente" aoPressionar={catalog.recarregar} />
-                </>
-            ) : null}
-            {saved ? (
-                <>
-                    <Text>Check-in registrado no Diário.</Text>
-                    <ButtonScreen texto="Adicionar detalhes" aoPressionar={onOpenDiary} />
-                </>
-            ) : null}
-            {catalog.catalogo && !saved ? (
-                <>
-                    <CompactDiaryOptions
-                        catalogo={catalog.catalogo}
-                        valores={form.valores}
-                        aoAlterar={form.alterarValor}
-                        desabilitado={form.salvando}
-                    />
-                    {form.erroSalvamento ? (
-                        <Text accessibilityRole="alert">{form.erroSalvamento}</Text>
+        <View style={estilos.margem}>
+            <View style={estilos.cartao}>
+                <Text style={estilos.rotulo}>Check-in gentil</Text>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Como você está se sentindo hoje?
+                </Text>
+                <Text style={estilos.descricao}>
+                    Escolha quantos itens fizerem sentido para você.
+                </Text>
+                <View style={estilos.conteudo}>
+                    {catalog.carregando ? <Text>Carregando seu check-in...</Text> : null}
+                    {catalog.erro ? (
+                        <>
+                            <Text accessibilityRole="alert">{catalog.erro}</Text>
+                            <ButtonScreen
+                                texto="Tentar novamente"
+                                aoPressionar={catalog.recarregar}
+                            />
+                        </>
                     ) : null}
-                    <ButtonScreen
-                        texto="Salvar check-in"
-                        aoPressionar={form.salvar}
-                        carregando={form.salvando}
-                        desativado={!valid}
-                    />
-                </>
-            ) : null}
+                    {saved ? (
+                        <>
+                            <Text>Check-in registrado no Diário.</Text>
+                            <ButtonScreen texto="Adicionar detalhes" aoPressionar={onOpenDiary} />
+                        </>
+                    ) : null}
+                    {catalog.catalogo && !saved ? (
+                        <>
+                            <CompactDiaryOptions
+                                catalogo={catalog.catalogo}
+                                valores={form.valores}
+                                aoAlterar={form.alterarValor}
+                                desabilitado={form.salvando}
+                            />
+                            {form.erroSalvamento ? (
+                                <Text accessibilityRole="alert">{form.erroSalvamento}</Text>
+                            ) : null}
+                            <ButtonScreen
+                                texto="Salvar no Diário"
+                                aoPressionar={form.salvar}
+                                carregando={form.salvando}
+                                desativado={!valid}
+                            />
+                        </>
+                    ) : null}
+                </View>
+            </View>
         </View>
     );
 }

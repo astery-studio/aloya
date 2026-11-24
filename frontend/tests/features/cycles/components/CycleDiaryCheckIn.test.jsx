@@ -37,8 +37,8 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
     await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} onOpenDiary={jest.fn()} />);
 
-    expect(screen.getByText('Como você está hoje?')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Salvar check-in' })).toBeDisabled();
+    expect(screen.getByText('Como você está se sentindo hoje?')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toBeDisabled();
 
     await act(async () => mockOnCreated());
     expect(screen.getByText('Check-in registrado no Diário.')).toBeOnTheScreen();
