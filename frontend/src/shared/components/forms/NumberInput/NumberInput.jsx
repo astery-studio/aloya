@@ -19,7 +19,11 @@ export default function NumberInput({
     valorMinimo,
     valorMaximo,
     estilo,
-    permitirLimpar = false
+    permitirLimpar = false,
+    placeholder,
+    corPlaceholder,
+    estiloEntrada,
+    estiloUnidade
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -63,11 +67,13 @@ export default function NumberInput({
                     maxLength={comprimentoMaximo}
                     selectionColor={tema.cores.interface.destaque}
                     selectTextOnFocus
+                    placeholder={placeholder}
+                    placeholderTextColor={corPlaceholder}
                     value={texto}
                     onChangeText={alterar}
-                    style={estilos.entrada}
+                    style={[estilos.entrada, estiloEntrada]}
                 />
-                <Text style={estilos.unidade}>{unidade}</Text>
+                <Text style={[estilos.unidade, estiloUnidade]}>{unidade}</Text>
                 {permitirLimpar && texto ? (
                     <Pressable
                         accessibilityRole="button"

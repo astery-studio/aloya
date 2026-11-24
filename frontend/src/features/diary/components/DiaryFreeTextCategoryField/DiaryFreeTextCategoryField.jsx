@@ -34,7 +34,7 @@ function DiaryFreeTextCategoryField({
             <TextInput
                 value={valor ?? ''}
                 onChangeText={aoAlterar}
-                placeholder="Digite aqui sua nota..."
+                accessibilityLabel="Digite aqui sua nota…"
                 multiline
                 maxLength={limite}
                 desativado={desabilitado}
@@ -70,7 +70,15 @@ function DiaryFreeTextCategoryField({
                         >
                             <XCircleIcon size={18} color={coresDiario.primaria} />
                         </Pressable>
-                    ) : null
+                    ) : (
+                        <Text
+                            testID="placeholder-anotacao-livre"
+                            pointerEvents="none"
+                            style={[estilos.placeholderAnotacao, { color: cores.icone }]}
+                        >
+                            Digite aqui sua nota…
+                        </Text>
+                    )
                 }
             />
             <Text style={[estilos.contador, { color: cores.icone }]}>

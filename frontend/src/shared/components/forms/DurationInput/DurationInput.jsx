@@ -17,7 +17,19 @@ function decomporDuracao(valorMinutos) {
     };
 }
 
-function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) {
+function DurationInput({
+    valorMinutos,
+    aoAlterar,
+    desabilitado = false,
+    erro,
+    placeholderHoras,
+    placeholderMinutos,
+    corPlaceholder,
+    rotuloHoras = 'hora',
+    rotuloMinutos = 'minutos',
+    estiloEntrada,
+    estiloUnidade
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const duracao = decomporDuracao(valorMinutos);
@@ -40,11 +52,13 @@ function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) 
                         keyboardType="number-pad"
                         maxLength={2}
                         selectTextOnFocus
+                        placeholder={placeholderHoras}
+                        placeholderTextColor={corPlaceholder}
                         value={duracao.horas}
                         onChangeText={(texto) => alterar('horas', texto)}
-                        style={estilos.entrada}
+                        style={[estilos.entrada, estiloEntrada]}
                     />
-                    <Text style={estilos.unidade}>hora</Text>
+                    <Text style={[estilos.unidade, estiloUnidade]}>{rotuloHoras}</Text>
                 </View>
                 <View style={estilos.grupo}>
                     <TextInput
@@ -53,11 +67,13 @@ function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) 
                         keyboardType="number-pad"
                         maxLength={2}
                         selectTextOnFocus
+                        placeholder={placeholderMinutos}
+                        placeholderTextColor={corPlaceholder}
                         value={duracao.minutos}
                         onChangeText={(texto) => alterar('minutos', texto)}
-                        style={estilos.entrada}
+                        style={[estilos.entrada, estiloEntrada]}
                     />
-                    <Text style={estilos.unidade}>minutos</Text>
+                    <Text style={[estilos.unidade, estiloUnidade]}>{rotuloMinutos}</Text>
                 </View>
                 {valorMinutos ? (
                     <Pressable

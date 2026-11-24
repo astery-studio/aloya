@@ -37,6 +37,10 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 desativado={desabilitado}
                 permitirLimpar
                 rotuloAcessibilidade={categoria.nome}
+                placeholder="0"
+                corPlaceholder={cores.icone}
+                estiloEntrada={[estilos.entradaValor, { color: cores.icone }]}
+                estiloUnidade={[estilos.unidadeValor, { color: cores.icone }]}
             />
         );
     } else if (categoria.tipoValor === 'duracao_minutos') {
@@ -46,6 +50,13 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 aoAlterar={aoAlterar}
                 desabilitado={desabilitado}
                 erro={erro}
+                placeholderHoras="00"
+                placeholderMinutos="00"
+                corPlaceholder={cores.icone}
+                rotuloHoras="horas"
+                rotuloMinutos="minutos"
+                estiloEntrada={[estilos.entradaValor, { color: cores.icone }]}
+                estiloUnidade={[estilos.unidadeValor, { color: cores.icone }]}
             />
         );
     } else if (categoria.tipoValor === 'texto') {

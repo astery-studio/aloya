@@ -58,6 +58,24 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 5
         },
+        entradaValor: {
+            height: 24,
+            padding: 0,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            includeFontPadding: false
+        },
+        unidadeValor: {
+            fontFamily: fontFamilies.bold,
+            fontSize: 13,
+            fontWeight: '700',
+            lineHeight: 24,
+            includeFontPadding: false
+        },
         campoAnotacao: {
             paddingHorizontal: 20,
             borderWidth: 1,
@@ -78,6 +96,18 @@ function criarEstilos(tema) {
             right: 8,
             zIndex: 1,
             borderRadius: 9
+        },
+        placeholderAnotacao: {
+            position: 'absolute',
+            right: 83,
+            top: 5.995,
+            color: '#4A5899',
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            includeFontPadding: false
         },
         contador: {
             alignSelf: 'flex-end',

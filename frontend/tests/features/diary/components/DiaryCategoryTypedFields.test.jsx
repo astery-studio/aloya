@@ -54,18 +54,73 @@ describe('campos tipados do Diário', () => {
                 valor="36,5"
                 aoAlterar={aoAlterar}
                 erro="Erro"
+                paleta="corpo"
             />
         );
         const entrada = screen.getByLabelText('Temperatura basal');
         expect(entrada).toHaveProp('accessibilityValue', { min: 32, max: 42, now: 36.5 });
+        expect(entrada).toHaveProp('placeholder', '0');
+        expect(entrada).toHaveProp('placeholderTextColor', '#2C4C3B');
+        expect(entrada).toHaveStyle({
+            color: '#2C4C3B',
+            height: 24,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
+        expect(screen.getByText('°C')).toHaveStyle({
+            color: '#2C4C3B',
+            fontSize: 13,
+            fontWeight: '700',
+            lineHeight: 24
+        });
         await fireEvent.changeText(entrada, '37,1');
         expect(aoAlterar).toHaveBeenCalledWith('37,1');
-        await resultado.rerender(<DiaryCategoryField categoria={peso} valor={null} />);
+        await resultado.rerender(
+            <DiaryCategoryField categoria={peso} valor={null} paleta="corpo" />
+        );
         expect(screen.getByLabelText('Peso')).toHaveProp('accessibilityValue', {});
+        expect(screen.getByLabelText('Peso')).toHaveProp('placeholder', '0');
+        expect(screen.getByLabelText('Peso')).toHaveProp('placeholderTextColor', '#2C4C3B');
+        expect(screen.getByText('kg')).toHaveStyle({
+            color: '#2C4C3B',
+            fontWeight: '700'
+        });
     });
 
     test('renderiza duração e encaminha seu erro', async () => {
-        await render(<DiaryCategoryField categoria={sono} valor={80} erro="Duração inválida" />);
+        await render(
+            <DiaryCategoryField
+                categoria={sono}
+                valor={80}
+                erro="Duração inválida"
+                paleta="energia"
+            />
+        );
+        expect(screen.getByLabelText('Horas de sono')).toHaveProp('placeholder', '00');
+        expect(screen.getByLabelText('Horas de sono')).toHaveProp(
+            'placeholderTextColor',
+            '#B07D2A'
+        );
+        expect(screen.getByLabelText('Minutos de sono')).toHaveProp('placeholder', '00');
+        expect(screen.getByLabelText('Minutos de sono')).toHaveStyle({
+            color: '#B07D2A',
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
+        expect(screen.getByText('horas')).toHaveStyle({
+            color: '#B07D2A',
+            fontSize: 13,
+            fontWeight: '700',
+            lineHeight: 24
+        });
+        expect(screen.getByText('minutos')).toHaveStyle({
+            color: '#B07D2A',
+            fontWeight: '700'
+        });
         expect(screen.getByRole('alert')).toHaveTextContent('Duração inválida');
     });
 
@@ -74,7 +129,7 @@ describe('campos tipados do Diário', () => {
         const resultado = await render(
             <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} paleta="saude" />
         );
-        const entrada = screen.getByLabelText('Digite aqui sua nota...');
+        const entrada = screen.getByLabelText('Digite aqui sua nota…');
         expect(screen.getByTestId('divisor-anotacao-livre')).toBeOnTheScreen();
         expect(entrada).toHaveProp('scrollEnabled', false);
         expect(entrada).toHaveStyle({
@@ -99,8 +154,23 @@ describe('campos tipados do Diário', () => {
         expect(aoAlterar).toHaveBeenLastCalledWith('');
         expect(entrada).toHaveStyle({ height: 24 });
         await fireEvent.changeText(entrada, 'Nova nota');
-        await resultado.rerender(<DiaryCategoryField categoria={nota} valor={null} />);
-        expect(screen.getByLabelText('Digite aqui sua nota...')).toHaveStyle({
+        await resultado.rerender(
+            <DiaryCategoryField categoria={nota} valor={null} paleta="saude" />
+        );
+        expect(screen.getByLabelText('Digite aqui sua nota…')).toHaveStyle({
+            textAlign: 'center'
+        });
+        expect(screen.getByTestId('placeholder-anotacao-livre')).toHaveTextContent(
+            'Digite aqui sua nota…'
+        );
+        expect(screen.getByTestId('placeholder-anotacao-livre')).toHaveStyle({
+            position: 'absolute',
+            right: 83,
+            top: 5.995,
+            color: '#4A5899',
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
             textAlign: 'center'
         });
         expect(screen.getByText('0 / 5000')).toBeOnTheScreen();
