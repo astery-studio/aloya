@@ -165,7 +165,8 @@ describe('CalendarScreen', () => {
             lineHeight: 28,
             textAlign: 'left'
         });
-        expect(estilos.conteudo).toMatchObject({ paddingTop: 24 });
+        expect(estilos.cabecalho.paddingBottom).toBe(16);
+        expect(estilos.conteudo).toMatchObject({ paddingTop: 8 });
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
         expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();

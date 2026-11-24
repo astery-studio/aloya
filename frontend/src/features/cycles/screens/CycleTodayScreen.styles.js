@@ -13,7 +13,8 @@ function criarEstilos(tema) {
             justifyContent: 'space-between',
             gap: espacamentos.medio,
             paddingHorizontal: espacamentos.medio,
-            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader
+            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {

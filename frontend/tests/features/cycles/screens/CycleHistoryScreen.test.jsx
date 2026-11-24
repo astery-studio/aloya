@@ -41,8 +41,8 @@ describe('CycleHistoryScreen', () => {
     test('mantém o espaçamento inicial nos estados e na lista', () => {
         const estilos = criarEstilos(temaClaro);
 
-        expect(estilos.conteudoEstatico.paddingTop).toBe(24);
-        expect(estilos.conteudoDaLista.paddingTop).toBe(24);
+        expect(estilos.conteudoEstatico.paddingTop).toBe(8);
+        expect(estilos.conteudoDaLista.paddingTop).toBe(8);
     });
 
     test('mostra o resumo e os ciclos carregados', async () => {

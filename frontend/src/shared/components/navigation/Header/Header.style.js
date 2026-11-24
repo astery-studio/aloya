@@ -18,7 +18,7 @@ function criarEstilos(tema) {
             alignItems: 'center',
             gap: 12,
             paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-            paddingBottom: 0
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
 
         areaTituloComVoltar: {

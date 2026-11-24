@@ -29,7 +29,7 @@ describe('histórico do Diário', () => {
     test('mantém a descrição rolável separada do conteúdo', () => {
         const estilos = criarEstilos(temaClaro);
 
-        expect(estilos.introducao).toMatchObject({ paddingTop: 24, paddingBottom: 24 });
+        expect(estilos.introducao).toMatchObject({ paddingTop: 8, paddingBottom: 24 });
         expect(estilos.descricao).toMatchObject({
             fontFamily: 'DMSans_400Regular',
             fontSize: 15,

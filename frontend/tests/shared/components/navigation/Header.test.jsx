@@ -51,6 +51,7 @@ describe('Header', () => {
             letterSpacing: 0,
             textAlign: 'left'
         });
+        expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
     });
 
     test.each([
@@ -166,7 +167,8 @@ describe('Header', () => {
 
         expect(screen.getByTestId('header-content')).toHaveStyle({
             paddingHorizontal: 12,
-            gap: 12
+            gap: 12,
+            paddingBottom: 16
         });
         expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
             width: 48,

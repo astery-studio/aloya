@@ -18,7 +18,7 @@ test('apresenta a vitrine de ciclos com contraste do tema escuro', async () => {
 test('mantém o espaçamento no início da lista sem alterar a descrição', () => {
     const estilos = criarEstilos(temaClaro);
 
-    expect(estilos.conteudo.paddingTop).toBe(24);
+    expect(estilos.conteudo.paddingTop).toBe(8);
     expect(estilos.descricao).toMatchObject({
         fontFamily: 'DMSans_400Regular',
         fontSize: 16,

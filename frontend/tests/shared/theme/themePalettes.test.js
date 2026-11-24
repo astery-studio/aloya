@@ -113,7 +113,8 @@ describe('themePalettes', () => {
             textAlign: 'left'
         });
 
-        expect(temaClaro.espacamentosLayout.headerParaConteudo).toBe(24);
+        expect(temaClaro.espacamentosLayout.espacamentoInferiorHeader).toBe(16);
+        expect(temaClaro.espacamentosLayout.headerParaConteudo).toBe(8);
         expect(temaClaro.espacamentosLayout.descricaoParaConteudo).toBe(24);
         expect(temaClaro.espacamentosLayout.espacamentoSuperiorHeader).toBe(16);
         expect(temaClaro.typography.h1.lineHeight).toBe(33.6);

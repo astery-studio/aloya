@@ -15,7 +15,7 @@ function criarEstilos(tema) {
             paddingLeft: 12,
             paddingRight: 24,
             paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingBottom: 0,
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
             borderBottomWidth: StyleSheet.hairlineWidth,
             borderColor: tema.cores.interface.separador
         },

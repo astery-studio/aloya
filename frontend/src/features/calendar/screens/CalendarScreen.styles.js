@@ -27,7 +27,7 @@ function criarEstilos(tema, insetSuperior = 0) {
             display: 'flex',
             paddingTop: insetSuperior + tema.espacamentosLayout.espacamentoSuperiorHeader,
             paddingRight: 20,
-            paddingBottom: 0,
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
             paddingLeft: 20,
             flexDirection: 'row',
             alignItems: 'center',

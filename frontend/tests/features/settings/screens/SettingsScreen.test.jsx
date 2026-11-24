@@ -6,7 +6,7 @@ import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 test('mantém o espaçamento no conteúdo sem alterar os títulos de seção', () => {
     const estilos = criarEstilos(temaClaro);
 
-    expect(estilos.conteudo.paddingTop).toBe(24);
+    expect(estilos.conteudo.paddingTop).toBe(8);
     expect(estilos.tituloSecao).toMatchObject({
         fontFamily: 'DMSans_500Medium',
         fontSize: 16,

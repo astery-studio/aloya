@@ -18,8 +18,8 @@ import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 test('mantém o espaçamento inicial dentro da lista e dos estados', () => {
     const estilos = criarEstilos(temaClaro);
 
-    expect(estilos.conteudoLista.paddingTop).toBe(24);
-    expect(estilos.estadoComCabecalho.paddingTop).toBe(24);
+    expect(estilos.conteudoLista.paddingTop).toBe(8);
+    expect(estilos.estadoComCabecalho.paddingTop).toBe(8);
 });
 
 const contatos = [

@@ -63,7 +63,7 @@ const categorias = [
 
 describe('SupportCategoryList', () => {
     test('inicia a lista após o espaçamento padrão do cabeçalho', () => {
-        expect(criarEstilos(temaClaro).conteudoLista.paddingTop).toBe(24);
+        expect(criarEstilos(temaClaro).conteudoLista.paddingTop).toBe(8);
     });
 
     test('adapta todos os títulos à maior largura medida sem mudar as posições', async () => {

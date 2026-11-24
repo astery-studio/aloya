@@ -68,7 +68,7 @@ describe('SettingsLayout com rodapé', () => {
 
         expect(screen.getByTestId('rolagem-settings-layout').props.contentContainerStyle).toEqual(
             expect.objectContaining({
-                paddingTop: 24
+                paddingTop: 8
             })
         );
     });

@@ -210,6 +210,7 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
         textAlign: 'left'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
-    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingTop: 24, paddingBottom: 16 });
+    expect(estilos.cabecalho.paddingBottom).toBe(16);
+    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingTop: 8, paddingBottom: 16 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });

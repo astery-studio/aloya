@@ -16,7 +16,7 @@ function criarEstilosAcompanhamento(tema) {
             paddingLeft: 12,
             paddingRight: 24,
             paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingBottom: 8.5
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
         botaoVoltar: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
         titulo: {

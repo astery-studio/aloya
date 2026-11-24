@@ -40,7 +40,8 @@ test('usa o padrão compacto sem altura rígida e separa o conteúdo', async () 
     expect(estilos.cabecalho.minHeight).toBeUndefined();
     expect(estilos.cabecalho.paddingTop).toBe(16);
     expect(estilos.voltar).toMatchObject({ width: 48, height: 48 });
-    expect(estilos.legenda.marginTop).toBe(24);
+    expect(estilos.cabecalho.paddingBottom).toBe(16);
+    expect(estilos.legenda.marginTop).toBe(8);
 });
 
 test('abre no mês atual após carregar os meses, mesmo com um dia anterior pré-selecionado', async () => {
