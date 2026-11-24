@@ -430,9 +430,11 @@ function CycleHomeContent({
                 {diaryService ? (
                     <DiaryCheckIn
                         date={dataSelecionada}
+                        fase={faseAtual}
                         service={diaryService}
                         onOpenDiary={aoCadastrarDiario}
                         onSessionExpired={onSessaoExpirada}
+                        corDestaque={visual.coresConteudo[faseAtual]}
                     />
                 ) : null}
                 <ConteudoFase conteudo={conteudoDaFase} fase={faseAtual} />

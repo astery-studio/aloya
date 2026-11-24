@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
+import { useDiaryOverview } from '../../diary/hooks/useDiaryOverview';
 import { obterHojeDiario } from '../../diary/utils/diaryDate';
 import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
 import { CompactDiaryOptions } from './home/CompactDiaryOptions';
@@ -10,6 +11,7 @@ import { estilos } from './CycleDiaryCheckIn.styles';
 
 function CycleDiaryCheckIn({
     date,
+    fase,
     service,
     onOpenDiary,
     onSessionExpired,
@@ -21,6 +23,7 @@ function CycleDiaryCheckIn({
         service,
         onSessaoExpirada: onSessionExpired
     });
+    const overview = useDiaryOverview({ fase, service, onSessaoExpirada: onSessionExpired });
     const form = useDiaryEntryForm({
         ativo: Boolean(catalog.catalogo),
         catalogo: catalog.catalogo,
@@ -71,6 +74,12 @@ function CycleDiaryCheckIn({
                         <>
                             <CompactDiaryOptions
                                 catalogo={catalog.catalogo}
+                                fase={fase}
+                                destaques={
+                                    overview.resumo?.informacoesSuficientes
+                                        ? overview.resumo.destaques
+                                        : []
+                                }
                                 valores={form.valores}
                                 aoAlterar={form.alterarValor}
                                 desabilitado={form.salvando}
