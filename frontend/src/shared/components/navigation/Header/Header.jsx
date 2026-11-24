@@ -78,6 +78,14 @@ function Header({
                     {titulo}
                 </Text>
 
+                {temVoltar ? (
+                    <View
+                        testID="header-back-balance"
+                        pointerEvents="none"
+                        style={estilos.espacadorVoltar}
+                    />
+                ) : null}
+
                 {temAcoes ? (
                     <View
                         testID="header-actions"

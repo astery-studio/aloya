@@ -22,8 +22,7 @@ function criarEstilos(tema) {
         },
 
         areaTituloComVoltar: {
-            paddingLeft: 12,
-            paddingRight: tema.espacamentosLayout.margemHorizontalTela
+            paddingHorizontal: 12
         },
 
         titulo: {
@@ -34,7 +33,8 @@ function criarEstilos(tema) {
         },
 
         tituloComVoltar: {
-            ...tema.headerTypography.compacto
+            ...tema.headerTypography.compacto,
+            textAlign: 'center'
         },
 
         acoes: {
@@ -50,6 +50,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 24
+        },
+
+        espacadorVoltar: {
+            width: 48,
+            height: 48,
+            flexShrink: 0
         },
 
         desabilitado: {

@@ -149,7 +149,7 @@ describe('Header', () => {
         });
     });
 
-    test('usa o título compacto alinhado à esquerda na variante comVoltar', async () => {
+    test('centraliza o título compacto no eixo da tela na variante comVoltar', async () => {
         await renderizarHeader({
             titulo: 'Editar perfil',
             variante: 'comVoltar',
@@ -161,8 +161,27 @@ describe('Header', () => {
             fontSize: 20,
             fontWeight: '700',
             lineHeight: 28,
-            textAlign: 'left'
+            textAlign: 'center'
         });
+
+        expect(screen.getByTestId('header-content')).toHaveStyle({
+            paddingHorizontal: 12,
+            gap: 12
+        });
+        expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
+            width: 48,
+            height: 48
+        });
+        expect(screen.getByTestId('header-back-balance')).toHaveStyle({
+            width: 48,
+            height: 48
+        });
+    });
+
+    test('não reserva o balanceamento do botão nos headers sem voltar', async () => {
+        await renderizarHeader();
+
+        expect(screen.queryByTestId('header-back-balance')).toBeNull();
     });
 
     test('renderiza o ícone de voltar no tema claro', async () => {
