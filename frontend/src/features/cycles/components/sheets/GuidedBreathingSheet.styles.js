@@ -41,14 +41,20 @@ const estilos = StyleSheet.create({
     },
     circulo: {
         alignItems: 'center',
-        borderRadius: 65,
         height: 130,
         justifyContent: 'center',
-        shadowColor: '#4D7891',
-        shadowOffset: { width: 0, height: 16 },
-        shadowOpacity: 0.24,
-        shadowRadius: 37,
         width: 130
+    },
+    circuloInterno: {
+        alignItems: 'center',
+        borderBottomLeftRadius: 61.19,
+        borderBottomRightRadius: 59.92,
+        borderTopLeftRadius: 60.01,
+        borderTopRightRadius: 61.1,
+        boxShadow: '0px 16.7686px 37.2636px rgba(74, 117, 142, 0.24)',
+        height: 121.11,
+        justifyContent: 'center',
+        width: 121.11
     },
     gradiente: { position: 'absolute' },
     instrucao: {

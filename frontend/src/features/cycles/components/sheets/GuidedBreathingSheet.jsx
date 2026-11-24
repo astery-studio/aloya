@@ -55,24 +55,31 @@ function GuidedBreathingSheet({
                         accessibilityLabel={texto}
                         style={[estilos.circulo, { transform: [{ scale: escala }] }]}
                     >
-                        <Svg width={121.11} height={121.11} style={estilos.gradiente}>
-                            <Defs>
-                                <RadialGradient
-                                    id="respiracao"
-                                    cx="35%"
-                                    cy="30%"
-                                    rx="95.52%"
-                                    ry="95.52%"
-                                >
-                                    <Stop offset="0%" stopColor="#B8D3DC" />
-                                    <Stop offset="100%" stopColor="#4A758E" />
-                                </RadialGradient>
-                            </Defs>
-                            <Circle cx={60.555} cy={60.555} r={60.555} fill="url(#respiracao)" />
-                        </Svg>
-                        <Animated.Text style={[estilos.instrucao, { opacity: opacidadeTexto }]}>
-                            {reduzirMovimento ? 'Respire' : instrucao}
-                        </Animated.Text>
+                        <View style={estilos.circuloInterno}>
+                            <Svg width={121.11} height={121.11} style={estilos.gradiente}>
+                                <Defs>
+                                    <RadialGradient
+                                        id="respiracao"
+                                        cx="35%"
+                                        cy="30%"
+                                        rx="95.52%"
+                                        ry="95.52%"
+                                    >
+                                        <Stop offset="0%" stopColor="#B8D3DC" />
+                                        <Stop offset="100%" stopColor="#4A758E" />
+                                    </RadialGradient>
+                                </Defs>
+                                <Circle
+                                    cx={60.555}
+                                    cy={60.555}
+                                    r={60.555}
+                                    fill="url(#respiracao)"
+                                />
+                            </Svg>
+                            <Animated.Text style={[estilos.instrucao, { opacity: opacidadeTexto }]}>
+                                {reduzirMovimento ? 'Respire' : instrucao}
+                            </Animated.Text>
+                        </View>
                     </Animated.View>
                 </View>
             </View>

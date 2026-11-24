@@ -75,4 +75,9 @@ test('mantém instrução textual quando o movimento é reduzido', async () => {
     expect(screen.getByText('Respire')).toBeOnTheScreen();
     expect(estilosRespiracao.painel).toMatchObject({ paddingBottom: 24 });
     expect(estilosRespiracao.areaRespiracao).toMatchObject({ height: 210, marginTop: 10 });
+    expect(estilosRespiracao.circuloInterno).toMatchObject({
+        width: 121.11,
+        height: 121.11,
+        boxShadow: '0px 16.7686px 37.2636px rgba(74, 117, 142, 0.24)'
+    });
 });
