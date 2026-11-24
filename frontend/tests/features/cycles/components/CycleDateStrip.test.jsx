@@ -85,7 +85,7 @@ const variantes = [
     ['folicular', '#2C4C3B', '#2C4C3B', '#F7F5F0'],
     ['ovulatoria', '#4A758E', '#4A758E', '#F7F5F0'],
     ['lutea', '#D68C3A', '#D68C3A', '#F7F5F0'],
-    ['desconhecida', '#847F76', '#847F76', '#F7F5F0']
+    ['desconhecida', '#5C5C59', '#E6E2D8', '#F7F5F0']
 ];
 
 test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, borda, conteudo) => {
