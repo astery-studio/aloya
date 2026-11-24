@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import {
@@ -60,7 +60,8 @@ function CycleTodayScreen({
     onSessaoExpirada
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const insets = useSafeAreaInsets();
+    const estilos = useMemo(() => criarEstilos(tema, insets.top), [insets.top, tema]);
     const corCarregamento = tema.escuro
         ? tema.cores.interface.destaque
         : tema.cores.marca.secundaria;
