@@ -46,6 +46,16 @@ describe('SettingsLayout com rodapé', () => {
         expect(screen.queryByTestId('rodape-fixo-settings-layout')).toBeNull();
     });
 
+    test('mantém o espaçamento inicial dentro da rolagem', async () => {
+        await renderizarLayout();
+
+        expect(screen.getByTestId('rolagem-settings-layout').props.contentContainerStyle).toEqual(
+            expect.objectContaining({
+                paddingTop: 24
+            })
+        );
+    });
+
     test('não renderiza rodapé quando ausente', async () => {
         await renderizarLayout();
 
