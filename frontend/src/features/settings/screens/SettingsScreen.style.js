@@ -21,8 +21,10 @@ function criarEstilos(tema) {
         tituloSecao: {
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
-            fontSize: 16,
-            lineHeight: 24,
+            fontSize: 14,
+            fontStyle: 'normal',
+            fontWeight: '500',
+            lineHeight: 19.6,
             includeFontPadding: false
         },
 

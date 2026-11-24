@@ -190,6 +190,21 @@ describe('SettingsScreen', () => {
         expect(screen.queryByText('Categorias do Diário')).toBeNull();
     });
 
+    test('usa a tipografia padrão nos títulos das seções', async () => {
+        await renderizarTela();
+
+        for (const titulo of ['Minha Conta', 'Meu Ciclo', 'Preferências', 'Privacidade e Sobre']) {
+            expect(screen.getByText(titulo)).toHaveStyle({
+                color: '#5C5C59',
+                fontFamily: 'DMSans_500Medium',
+                fontSize: 14,
+                fontStyle: 'normal',
+                fontWeight: '500',
+                lineHeight: 19.6
+            });
+        }
+    });
+
     test('mostra responsável legal somente para menor de 16 anos', async () => {
         const onAbrirResponsavelLegal = jest.fn();
 
