@@ -1,13 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AccessibilityInfo, Animated, Text, View } from 'react-native';
+import { Circle, Defs, RadialGradient, Stop, Svg } from 'react-native-svg';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
+import { useBreathingAnimation } from '../../hooks/useBreathingAnimation';
 import { estilos } from './GuidedBreathingSheet.styles';
 
-function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido }) {
-    const escala = useRef(new Animated.Value(1)).current;
-    const [instrucao, setInstrucao] = useState('Prepare-se');
+function GuidedBreathingSheet({
+    visivel,
+    aoFechar,
+    movimentoReduzido,
+    duracaoInspiracao = 5000,
+    duracaoExpiracao = 5000,
+    escalaMaxima = 1.6
+}) {
     const [reduzirMovimentoDoSistema, setReduzirMovimentoDoSistema] = useState(false);
     const reduzirMovimento = movimentoReduzido ?? reduzirMovimentoDoSistema;
+    const { escala, instrucao, opacidadeTexto } = useBreathingAnimation({
+        ativo: visivel && !reduzirMovimento,
+        duracaoInspiracao,
+        duracaoExpiracao,
+        escalaMaxima
+    });
 
     useEffect(() => {
         AccessibilityInfo.isReduceMotionEnabled().then(setReduzirMovimentoDoSistema);
@@ -17,29 +30,6 @@ function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido }) {
         );
         return () => assinatura.remove();
     }, []);
-
-    useEffect(() => {
-        if (!visivel || reduzirMovimento) return undefined;
-        setInstrucao('Inspire devagar');
-        const animacao = Animated.loop(
-            Animated.sequence([
-                Animated.timing(escala, { toValue: 1.35, duration: 4000, useNativeDriver: true }),
-                Animated.timing(escala, { toValue: 1, duration: 4000, useNativeDriver: true })
-            ])
-        );
-        animacao.start();
-        const intervalo = setInterval(
-            () =>
-                setInstrucao((atual) =>
-                    atual.startsWith('Inspire') ? 'Expire devagar' : 'Inspire devagar'
-                ),
-            4000
-        );
-        return () => {
-            clearInterval(intervalo);
-            animacao.stop();
-        };
-    }, [escala, reduzirMovimento, visivel]);
 
     const texto = reduzirMovimento ? 'Inspire e expire devagar, no seu ritmo.' : instrucao;
     return (
@@ -65,9 +55,24 @@ function GuidedBreathingSheet({ visivel, aoFechar, movimentoReduzido }) {
                         accessibilityLabel={texto}
                         style={[estilos.circulo, { transform: [{ scale: escala }] }]}
                     >
-                        <Text style={estilos.instrucao}>
-                            {reduzirMovimento ? texto : 'Respire'}
-                        </Text>
+                        <Svg width={121.11} height={121.11} style={estilos.gradiente}>
+                            <Defs>
+                                <RadialGradient
+                                    id="respiracao"
+                                    cx="35%"
+                                    cy="30%"
+                                    rx="95.52%"
+                                    ry="95.52%"
+                                >
+                                    <Stop offset="0%" stopColor="#B8D3DC" />
+                                    <Stop offset="100%" stopColor="#4A758E" />
+                                </RadialGradient>
+                            </Defs>
+                            <Circle cx={60.555} cy={60.555} r={60.555} fill="url(#respiracao)" />
+                        </Svg>
+                        <Animated.Text style={[estilos.instrucao, { opacity: opacidadeTexto }]}>
+                            {reduzirMovimento ? 'Respire' : instrucao}
+                        </Animated.Text>
                     </Animated.View>
                 </View>
             </View>

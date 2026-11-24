@@ -40,7 +40,6 @@ const estilos = StyleSheet.create({
     },
     circulo: {
         alignItems: 'center',
-        backgroundColor: '#7CA4B7',
         borderRadius: 65,
         height: 130,
         justifyContent: 'center',
@@ -50,6 +49,7 @@ const estilos = StyleSheet.create({
         shadowRadius: 37,
         width: 130
     },
+    gradiente: { position: 'absolute' },
     instrucao: {
         color: '#FFFFFF',
         fontFamily: fontFamilies.bold,
