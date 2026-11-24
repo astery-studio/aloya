@@ -102,10 +102,33 @@ describe('histórico do Diário', () => {
         });
         expect(screen.getByText('LINHA DO TEMPO')).toBeOnTheScreen();
         expect(screen.getByText('Atualizando Diário...')).toBeOnTheScreen();
-        await fireEvent.press(screen.getByRole('button', { name: 'Filtrar histórico do Diário' }));
-        await fireEvent.press(
-            screen.getByRole('button', { name: 'Gerenciar categorias do Diário' })
-        );
+        const botaoFiltrar = screen.getByRole('button', {
+            name: 'Filtrar histórico do Diário'
+        });
+        const botaoCategorias = screen.getByRole('button', {
+            name: 'Gerenciar categorias do Diário'
+        });
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({
+            backgroundColor: '#F7F5F0'
+        });
+        expect(botaoFiltrar).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderWidth: 0.667,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF'
+        });
+        expect(botaoCategorias).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderWidth: 0.667,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF'
+        });
+
+        await fireEvent.press(botaoFiltrar);
+        await fireEvent.press(botaoCategorias);
         await fireEvent.press(
             screen.getAllByRole('button', { name: 'Adicionar novo registro' })[0]
         );
