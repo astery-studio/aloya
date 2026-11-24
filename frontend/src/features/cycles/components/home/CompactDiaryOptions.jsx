@@ -2,6 +2,7 @@ import { Text, View } from 'react-native';
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import { listarMacrocategoriasAtivas } from '../../../diary/utils/diaryForm';
 import { alternarOpcao } from '../../../diary/utils/diaryFormValue';
+import { estilos } from './CompactDiaryOptions.styles';
 
 const GRUPOS_HOME = Object.freeze([
     {
@@ -38,20 +39,15 @@ function CompactDiaryOptions({ catalogo, valores, aoAlterar, desabilitado }) {
     }).filter(Boolean);
 
     return (
-        <View style={{ gap: 12 }}>
+        <View style={estilos.lista}>
             {grupos.map(({ categoria, titulo, opcoes, cor, fundo }) => (
-                <View key={categoria.id} style={{ gap: 6 }}>
-                    <Text style={{ textAlign: 'center', fontSize: 9, textTransform: 'uppercase' }}>
-                        {titulo}
-                    </Text>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            flexWrap: 'wrap',
-                            justifyContent: 'center',
-                            gap: 6
-                        }}
-                    >
+                <View key={categoria.id} style={estilos.grupo}>
+                    <View style={estilos.cabecalho}>
+                        <View style={estilos.divisor} />
+                        <Text style={estilos.titulo}>{titulo}</Text>
+                        <View style={estilos.divisor} />
+                    </View>
+                    <View style={estilos.opcoes}>
                         {opcoes.map((opcao) => {
                             const selecionada = (valores[categoria.id] ?? []).includes(opcao.id);
                             return (
