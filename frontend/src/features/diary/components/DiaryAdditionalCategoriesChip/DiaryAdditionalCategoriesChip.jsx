@@ -11,7 +11,9 @@ function DiaryAdditionalCategoriesChip({ quantidade, estilos, tema }) {
             accessibilityLabel={`${quantidade} outras categorias marcadas`}
             style={estilos.chip}
         >
-            <PlusCircleIcon accessible={false} size={10.89} color={cores.textoPrincipal} />
+            <View testID="diary-entry-chip-icon" style={estilos.iconeChip}>
+                <PlusCircleIcon accessible={false} size={10.89} color={cores.textoPrincipal} />
+            </View>
             <Text style={estilos.textoChip}>{quantidade}</Text>
         </View>
     );

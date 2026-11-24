@@ -149,13 +149,23 @@ describe('DiaryEntryCard', () => {
         expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('height', 13);
         expect(screen.getByText('Intestino')).toBeOnTheScreen();
         expect(screen.getByText('Intestino')).toHaveStyle({
+            color: '#5C5C59',
             fontSize: 8.56,
-            lineHeight: 16
+            fontWeight: '600',
+            lineHeight: 16.5,
+            textAlignVertical: 'center',
+            includeFontPadding: false
         });
         expect(screen.getByText('Sangramento de Escape')).toBeOnTheScreen();
         expect(screen.getByText('2')).toBeOnTheScreen();
         expect(screen.queryByText('+ 2')).not.toBeOnTheScreen();
         expect(screen.getAllByTestId('diary-entry-chip-row')).toHaveLength(2);
+        expect(screen.getAllByTestId('diary-entry-chip-icon')[0]).toHaveStyle({
+            width: 10.89,
+            height: 16.5,
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
         expect(screen.getByText('Hoje me senti melhor.')).toBeOnTheScreen();
         expect(screen.getByTestId('diary-entry-categories-note-divider')).toHaveStyle({
             height: StyleSheet.hairlineWidth

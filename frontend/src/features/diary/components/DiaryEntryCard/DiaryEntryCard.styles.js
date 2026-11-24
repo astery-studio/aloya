@@ -99,11 +99,20 @@ function criarEstilos(tema) {
             borderRadius: tema.radius.circular,
             backgroundColor: cores.superficie
         },
+        iconeChip: {
+            width: 10.89,
+            height: 16.5,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
         textoChip: {
-            color: cores.textoSecundario,
+            color: tema.escuro ? cores.textoSecundario : '#5C5C59',
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
-            lineHeight: 16
+            fontWeight: '600',
+            lineHeight: 16.5,
+            textAlignVertical: 'center',
+            includeFontPadding: false
         },
         anotacao: {
             gap: 8,
