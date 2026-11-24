@@ -4,6 +4,10 @@ import { DropIcon, NotepadIcon, PillIcon } from '../../../../shared/components/i
 import { NoCycleHero } from './NoCycleHero';
 import { estilos } from './NoCycleStartSection.styles';
 
+function MenstruationIcon(props) {
+    return <DropIcon {...props} weight="fill" />;
+}
+
 function NoCycleStartSection({
     motivoSemPrevisao,
     aoCadastrarMenstruacao,
@@ -23,9 +27,11 @@ function NoCycleStartSection({
                 </Text>
                 <ButtonScreen
                     texto="Cadastrar Menstruação"
-                    icone={DropIcon}
+                    icone={MenstruationIcon}
+                    tamanhoIcone={20}
                     aoPressionar={aoCadastrarMenstruacao}
                     estilo={estilos.acaoPrincipal}
+                    estiloTexto={[estilos.textoAcao, estilos.textoAcaoPrincipal]}
                 />
                 <Text style={estilos.observacao}>
                     Você também pode registrar menstruações anteriores, caso se lembre das datas.
@@ -42,16 +48,20 @@ function NoCycleStartSection({
                     <ButtonScreen
                         texto="Diário"
                         icone={NotepadIcon}
+                        tamanhoIcone={20}
                         aoPressionar={aoAbrirDiario}
                         variante="verde"
                         estilo={estilos.acao}
+                        estiloTexto={estilos.textoAcao}
                     />
                     <ButtonScreen
                         texto="Anticoncepcional"
                         icone={PillIcon}
+                        tamanhoIcone={20}
                         aoPressionar={aoAbrirAnticoncepcional}
                         variante="verde"
-                        estilo={estilos.acao}
+                        estilo={[estilos.acao, estilos.acaoAnticoncepcional]}
+                        estiloTexto={estilos.textoAcao}
                     />
                 </View>
             </View>
