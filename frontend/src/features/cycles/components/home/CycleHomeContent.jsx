@@ -6,11 +6,12 @@ import { CycleEducationalDisclaimer } from './CycleEducationalDisclaimer';
 import { CyclePhaseHero } from './CyclePhaseHero';
 import { CyclePredictionSummary } from './CyclePredictionSummary';
 import { CycleQuickActions } from './CycleQuickActions';
+import { estilos } from './CycleHomeContent.styles';
 
 function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada }) {
     const { fase, diaCiclo, janelaFertilAtiva, previsao, conteudoDaFase, dataSelecionada } = modelo;
     return (
-        <View style={{ paddingBottom: 40 }}>
+        <View style={estilos.conteudo}>
             <CyclePhaseHero fase={fase} diaCiclo={diaCiclo} janelaFertilAtiva={janelaFertilAtiva} />
             <CycleQuickActions {...callbacks} />
             <CyclePredictionSummary
@@ -21,9 +22,9 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
                 estimativaIncerta={modelo.previsaoIncerta}
                 aoAbrirConfiabilidade={callbacks.aoAbrirConfiabilidade}
             />
-            <View style={{ paddingTop: 34, paddingHorizontal: 16 }}>
-                <Text>EXPLORE</Text>
-                <Text accessibilityRole="header" style={{ fontSize: 21 }}>
+            <View style={estilos.explore}>
+                <Text style={estilos.rotuloExplore}>Explore</Text>
+                <Text accessibilityRole="header" style={estilos.tituloExplore}>
                     Conheça mais sobre seu ciclo
                 </Text>
             </View>
@@ -41,13 +42,13 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
                 aoAbrirReflexao={callbacks.aoAbrirReflexao}
                 aoAbrirEducacao={callbacks.aoAbrirEducacao}
             />
-            <View style={{ padding: 16 }}>
+            <View style={estilos.sobreFase}>
                 <CycleExpandableCard
                     titulo="Sobre esta fase"
                     subtitulo={conteudoDaFase?.tituloExplicacao}
                     initiallyExpanded
                 >
-                    <Text>{conteudoDaFase?.descricao}</Text>
+                    <Text style={estilos.descricaoFase}>{conteudoDaFase?.descricao}</Text>
                     <CycleEducationalDisclaimer texto="Este conteúdo é educativo e não substitui orientação profissional." />
                 </CycleExpandableCard>
             </View>
