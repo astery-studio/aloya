@@ -4,6 +4,8 @@ import {
     calcularMargemHorizontalTimeline,
     DiaryScreen
 } from '../../../../src/features/diary/screens/DiaryScreen';
+import { criarEstilos } from '../../../../src/features/diary/screens/DiaryScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const registro = {
@@ -24,6 +26,17 @@ const registro = {
 };
 
 describe('histórico do Diário', () => {
+    test('mantém a descrição rolável separada do conteúdo', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.introducao).toMatchObject({ paddingTop: 24, paddingBottom: 24 });
+        expect(estilos.descricao).toMatchObject({
+            fontFamily: 'DMSans_400Regular',
+            fontSize: 15,
+            lineHeight: 22
+        });
+    });
+
     test('preserva a largura do card do protótipo em celulares estreitos', () => {
         expect(calcularMargemHorizontalTimeline(360)).toBe(5);
         expect(calcularMargemHorizontalTimeline(390)).toBe(20);
