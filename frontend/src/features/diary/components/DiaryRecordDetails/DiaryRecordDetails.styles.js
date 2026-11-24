@@ -183,7 +183,8 @@ function criarEstilos(tema) {
             backgroundColor: cores.superficie
         },
         botaoOk: {
-            width: '100%',
+            width: 294,
+            maxWidth: '100%',
             height: 52,
             borderRadius: 12,
             backgroundColor: cores.destaque

@@ -138,6 +138,8 @@ describe('DiaryRecordDetails', () => {
         expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('width', 13);
         expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('height', 13);
         expect(screen.getByRole('button', { name: 'OK' })).toHaveStyle({
+            width: 294,
+            maxWidth: '100%',
             height: 52,
             borderRadius: 12
         });
