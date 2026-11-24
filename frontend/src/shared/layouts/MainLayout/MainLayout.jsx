@@ -19,7 +19,8 @@ function MainLayout({
     children,
     corFundo,
     corTextoHeader,
-    corFundoNavegacao
+    corFundoNavegacao,
+    aplicarSafeAreaSuperiorHeader = true
 }) {
     const tema = useTheme();
 
@@ -34,6 +35,7 @@ function MainLayout({
             corFundo={corFundo}
             corTexto={corTextoHeader}
             acoes={acoesHeader}
+            aplicarSafeAreaSuperior={aplicarSafeAreaSuperiorHeader}
         />
     );
 

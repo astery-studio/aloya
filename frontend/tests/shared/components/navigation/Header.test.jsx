@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mockArrowLeftIcon = jest.fn(() => null);
 
@@ -10,11 +11,20 @@ jest.mock('phosphor-react-native/src/icons/ArrowLeft', () => ({
 import { Header } from '../../../../src/shared/components/navigation/Header/Header';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
-function renderizarHeader(propriedades = {}, preferencia = 'claro') {
+function criarMetricas(insetSuperior) {
+    return {
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: insetSuperior, right: 0, bottom: 0, left: 0 }
+    };
+}
+
+function renderizarHeader(propriedades = {}, preferencia = 'claro', insetSuperior = 0) {
     return render(
-        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
-            <Header titulo="Configurações" {...propriedades} />
-        </ThemeProvider>
+        <SafeAreaProvider initialMetrics={criarMetricas(insetSuperior)}>
+            <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+                <Header titulo="Configurações" {...propriedades} />
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 }
 
@@ -43,13 +53,23 @@ describe('Header', () => {
         });
     });
 
-    test('aplica o espaçamento superior padrão uma única vez', async () => {
-        await renderizarHeader();
+    test.each([
+        [0, 16],
+        [24, 40],
+        [44, 60],
+        [59, 75]
+    ])('soma 16 dp ao inset superior %i', async (insetSuperior, paddingEsperado) => {
+        await renderizarHeader({}, 'claro', insetSuperior);
 
-        expect(screen.getByTestId('header-top-spacing')).toHaveStyle({ height: 56 });
-        expect(
-            StyleSheet.flatten(screen.getByTestId('header-container').props.style).paddingTop
-        ).toBeUndefined();
+        expect(screen.getByTestId('header-container')).toHaveStyle({
+            paddingTop: paddingEsperado
+        });
+    });
+
+    test('não duplica o inset quando a Safe Area já foi aplicada pelo pai', async () => {
+        await renderizarHeader({ aplicarSafeAreaSuperior: false }, 'claro', 59);
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
     });
 
     test('permite título longo e fonte ampliada sem altura rígida', async () => {
@@ -217,9 +237,11 @@ describe('Header', () => {
         });
 
         await resultado.rerender(
-            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
-                <Header titulo="Configurações" />
-            </ThemeProvider>
+            <SafeAreaProvider initialMetrics={criarMetricas(0)}>
+                <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
+                    <Header titulo="Configurações" />
+                </ThemeProvider>
+            </SafeAreaProvider>
         );
 
         expect(screen.getByRole('header')).toHaveStyle({

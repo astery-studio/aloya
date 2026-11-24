@@ -13,18 +13,6 @@ function criarEstilos(tema) {
               }
             : {},
 
-        espacamentoSuperior: {
-            height: 56
-        },
-
-        espacamentoSuperiorComVoltar: {
-            height: 48
-        },
-
-        espacamentoSuperiorRedeApoio: {
-            height: 55.99
-        },
-
         areaTitulo: {
             flexDirection: 'row',
             alignItems: 'center',

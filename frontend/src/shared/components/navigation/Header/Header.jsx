@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ArrowLeftIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
@@ -12,19 +13,23 @@ function Header({
     corFundo,
     corTexto,
     acoes = null,
-    acoesDireita = null
+    acoesDireita = null,
+    aplicarSafeAreaSuperior = true
 }) {
     const tema = useTheme();
+    const insets = useSafeAreaInsets();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
-    const ehRedeApoio = variante === 'redeApoio';
 
     const acoesExibidas = acoesDireita ?? acoes;
     const temAcoes = !temVoltar && Boolean(acoesExibidas);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
+    const paddingTop =
+        (aplicarSafeAreaSuperior ? insets.top : 0) +
+        tema.espacamentosLayout.espacamentoSuperiorHeader;
 
     return (
         <View
@@ -32,18 +37,10 @@ function Header({
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
+                { paddingTop },
                 corFundo ? { backgroundColor: corFundo } : null
             ]}
         >
-            <View
-                testID="header-top-spacing"
-                style={[
-                    estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar,
-                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio
-                ]}
-            />
-
             <View
                 testID="header-content"
                 style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}

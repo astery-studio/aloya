@@ -58,6 +58,12 @@ describe('MainLayout', () => {
         expect(propriedadesHeader.onVoltar).toBe(onVoltar);
     });
 
+    test('informa ao Header quando o pai já aplicou a Safe Area superior', async () => {
+        await renderizarLayout({ aplicarSafeAreaSuperiorHeader: false });
+
+        expect(Header.mock.calls[0][0].aplicarSafeAreaSuperior).toBe(false);
+    });
+
     test('envia os dados corretos para a navegação inferior', async () => {
         const onSelecionarAba = jest.fn();
 
