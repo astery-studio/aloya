@@ -78,6 +78,7 @@ function CompactDiaryOptions({ catalogo, fase, destaques, valores, aoAlterar, de
                                     }
                                     cor={cor}
                                     fundo={fundo}
+                                    estiloTexto={estilos.textoOpcao}
                                     onPress={() =>
                                         aoAlterar(
                                             categoria.id,

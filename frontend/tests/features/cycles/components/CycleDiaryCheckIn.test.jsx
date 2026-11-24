@@ -33,6 +33,7 @@ jest.mock(
 
 import { CycleDiaryCheckIn } from '../../../../src/features/cycles/components/CycleDiaryCheckIn';
 import { estilos } from '../../../../src/features/cycles/components/CycleDiaryCheckIn.styles';
+import { estilos as estilosOpcoes } from '../../../../src/features/cycles/components/home/CompactDiaryOptions.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
@@ -59,6 +60,23 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
     expect(estilos.textoBotao).toMatchObject({
         fontSize: 13,
         lineHeight: 20,
+        includeFontPadding: false
+    });
+    expect(estilos.rotulo).toMatchObject({ fontWeight: '700', includeFontPadding: false });
+    expect(estilos.titulo).toMatchObject({ fontWeight: '400', includeFontPadding: false });
+    expect(estilos.descricao).toMatchObject({ fontWeight: '400', includeFontPadding: false });
+    expect(estilosOpcoes.titulo).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontWeight: '700',
+        fontSize: 10,
+        lineHeight: 15,
+        letterSpacing: 0.55,
+        includeFontPadding: false
+    });
+    expect(estilosOpcoes.textoOpcao).toMatchObject({
+        fontWeight: '600',
+        fontSize: 11,
+        lineHeight: 16,
         includeFontPadding: false
     });
 

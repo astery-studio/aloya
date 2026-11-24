@@ -9,7 +9,7 @@ const estilos = StyleSheet.create({
         width: 294,
         maxWidth: '100%',
         alignSelf: 'center',
-        gap: 6
+        gap: 10
     },
     cabecalho: {
         alignItems: 'center',
@@ -24,9 +24,11 @@ const estilos = StyleSheet.create({
     },
     titulo: {
         color: '#5C5C59',
-        fontFamily: fontFamilies.semibold,
+        fontFamily: fontFamilies.bold,
         fontSize: 10,
-        fontWeight: '600',
+        fontWeight: '700',
+        includeFontPadding: false,
+        letterSpacing: 0.55,
         lineHeight: 15,
         textAlign: 'center',
         textTransform: 'uppercase'
@@ -36,6 +38,13 @@ const estilos = StyleSheet.create({
         flexWrap: 'wrap',
         gap: 6,
         justifyContent: 'center'
+    },
+    textoOpcao: {
+        fontFamily: fontFamilies.semibold,
+        fontSize: 11,
+        fontWeight: '600',
+        includeFontPadding: false,
+        lineHeight: 16
     }
 });
 
