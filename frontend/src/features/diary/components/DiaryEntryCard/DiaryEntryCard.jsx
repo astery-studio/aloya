@@ -150,24 +150,27 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
     return (
         <View testID="diary-entry-card" style={estilos.cartao}>
             <View style={estilos.cabecalho}>
-                <View
-                    testID="diary-entry-icon"
-                    style={[
-                        estilos.iconeRegistro,
-                        {
-                            borderColor: cor,
-                            backgroundColor: item.apresentacaoFase.fundoIcone
-                        }
-                    ]}
-                >
-                    <NotebookIcon
-                        testID="diary-entry-notebook-icon"
-                        size={13}
-                        color={cor}
-                        weight="regular"
-                    />
+                <View testID="diary-entry-header-leading" style={estilos.lateralCabecalho}>
+                    <View
+                        testID="diary-entry-icon"
+                        style={[
+                            estilos.iconeRegistro,
+                            {
+                                borderColor: cor,
+                                backgroundColor: item.apresentacaoFase.fundoIcone
+                            }
+                        ]}
+                    >
+                        <NotebookIcon
+                            testID="diary-entry-notebook-icon"
+                            size={13}
+                            color={cor}
+                            weight="regular"
+                        />
+                    </View>
                 </View>
                 <Pressable
+                    testID="diary-entry-date-area"
                     accessibilityRole="button"
                     accessibilityLabel={`Abrir registro de ${item.dataFormatada}${resumoAcessivel ? `. ${resumoAcessivel}` : ''}`}
                     accessibilityState={{ disabled: !podeAbrir }}
@@ -177,7 +180,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                 >
                     <Text style={estilos.data}>{item.dataFormatada}</Text>
                 </Pressable>
-                <View style={estilos.acoes}>
+                <View testID="diary-entry-header-actions" style={estilos.acoes}>
                     <IconButton
                         icone={PencilSimpleIcon}
                         compacto

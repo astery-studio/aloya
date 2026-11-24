@@ -108,6 +108,20 @@ describe('DiaryEntryCard', () => {
             fontSize: 12,
             lineHeight: 24
         });
+        expect(screen.getByTestId('diary-entry-header-leading')).toHaveStyle({
+            width: 56,
+            alignItems: 'flex-start'
+        });
+        expect(screen.getByTestId('diary-entry-date-area')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
+        expect(screen.getByTestId('diary-entry-header-actions')).toHaveStyle({
+            width: 56,
+            alignItems: 'center',
+            justifyContent: 'flex-end'
+        });
         expect(screen.getByTestId('diary-entry-icon')).toHaveStyle({
             width: 26,
             height: 26,

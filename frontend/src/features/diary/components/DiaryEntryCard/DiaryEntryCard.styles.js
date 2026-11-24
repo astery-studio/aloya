@@ -28,6 +28,12 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center'
         },
+        lateralCabecalho: {
+            width: 56,
+            height: 26,
+            alignItems: 'flex-start',
+            justifyContent: 'center'
+        },
         iconeRegistro: {
             width: 26,
             height: 26,
@@ -43,7 +49,14 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 24
         },
-        acoes: { height: 26, flexDirection: 'row', alignItems: 'center', gap: 4 },
+        acoes: {
+            width: 56,
+            height: 26,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 4
+        },
         conteudo: {
             alignSelf: 'stretch',
             marginTop: 6,
