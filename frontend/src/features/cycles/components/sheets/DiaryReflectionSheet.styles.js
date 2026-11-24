@@ -7,7 +7,7 @@ const estilos = StyleSheet.create({
         borderTopRightRadius: 24,
         paddingBottom: 48,
         paddingHorizontal: 24,
-        paddingTop: 0
+        paddingTop: 8
     },
     conteudo: {},
     cabecalho: {
@@ -60,15 +60,18 @@ const estilos = StyleSheet.create({
         minHeight: 95.6,
         textAlignVertical: 'top'
     },
-    contador: {
-        alignSelf: 'flex-end',
-        marginTop: -13,
-        color: '#A8A49C',
-        fontFamily: fontFamilies.medium,
-        fontSize: 10,
-        lineHeight: 19
+    botao: {
+        height: 54,
+        borderRadius: 14
     },
-    contadorPreenchido: { color: '#C85A44' }
+    botaoAtivo: { backgroundColor: '#C85A44' },
+    textoBotao: {
+        fontFamily: fontFamilies.semibold,
+        fontSize: 16,
+        fontWeight: '600',
+        letterSpacing: 0,
+        lineHeight: 24
+    }
 });
 
 export { estilos };
