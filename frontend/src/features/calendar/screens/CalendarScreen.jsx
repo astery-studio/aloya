@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { ArrowLeftIcon, InfoIcon } from '../../../shared/components/icons/AppIcons';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
@@ -152,6 +152,10 @@ function CalendarScreen({
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
+    const mostrarStatusSincronizacao = ['sincronizando', 'pendente', 'falha'].includes(
+        statusSincronizacao
+    );
+    const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
     return (
         <View style={estilos.tela}>
@@ -227,33 +231,38 @@ function CalendarScreen({
                 <View accessibilityRole="alert" style={estilos.avisoVazio}>
                     <InfoIcon size={18} color={tema.cores.interface.destaque} />
                     <Text style={estilos.textoVazio}>
-                        Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar
-                        Menstruação’ pra começar.
+                        Você ainda não possui nenhum ciclo registrado. Use o botão de adicionar para
+                        começar.
                     </Text>
                 </View>
             ) : null}
 
-            <SafeAreaView
-                testID="rodape-calendario"
-                edges={['bottom']}
-                style={estilos.rodape}
-            >
-                <SyncStatusIndicator
-                    status={statusSincronizacao}
-                    mensagem={
-                        statusSincronizacao === 'falha' && erroSincronizacao?.status
-                            ? erroSincronizacao.mensagemUsuario
-                            : undefined
-                    }
-                    onTentarNovamente={aoTentarSincronizar}
-                />
-                <ButtonScreen
-                    texto="Cadastrar Menstruação"
+            {mostrarStatusSincronizacao ? (
+                <SafeAreaView
+                    testID="status-sincronizacao-calendario"
+                    edges={['bottom']}
+                    style={estilos.areaSincronizacao}
+                >
+                    <SyncStatusIndicator
+                        status={statusSincronizacao}
+                        mensagem={
+                            statusSincronizacao === 'falha' && erroSincronizacao?.status
+                                ? erroSincronizacao.mensagemUsuario
+                                : undefined
+                        }
+                        onTentarNovamente={aoTentarSincronizar}
+                    />
+                </SafeAreaView>
+            ) : null}
+
+            {mostrarFab ? (
+                <FloatingActionButton
                     aoPressionar={aoCadastrarMenstruacao}
-                    estilo={estilos.botaoCadastrarMenstruacao}
-                    estiloTexto={estilos.textoCadastrarMenstruacao}
+                    rotuloAcessibilidade="Cadastrar menstruação"
+                    deslocamentoInferior={mostrarStatusSincronizacao ? 50 : 0}
+                    testID="calendar-add-fab"
                 />
-            </SafeAreaView>
+            ) : null}
 
             <CycleLegendSheet
                 visivel={legendaVisivel}

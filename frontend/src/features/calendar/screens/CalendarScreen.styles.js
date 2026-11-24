@@ -115,14 +115,8 @@ function criarEstilos(tema) {
             fontSize: 13,
             lineHeight: 19
         },
-        botaoCadastrarMenstruacao: tema.escuro ? { backgroundColor: '#C26E5F' } : {},
-        textoCadastrarMenstruacao: tema.escuro ? { color: '#121212' } : {},
-        rodape: {
+        areaSincronizacao: {
             flexShrink: 0,
-            paddingTop: 20,
-            paddingRight: 24,
-            paddingBottom: 24,
-            paddingLeft: 24,
             borderTopWidth: 1,
             borderTopColor: tema.escuro
                 ? 'rgba(255, 255, 255, 0.08)'
