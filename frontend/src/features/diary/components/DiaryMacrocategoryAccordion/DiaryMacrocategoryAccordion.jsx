@@ -40,6 +40,7 @@ function DiaryMacrocategoryAccordion({
             ]}
         >
             <View
+                testID={testID ? `${testID}-cabecalho` : undefined}
                 style={[
                     estilos.cabecalho,
                     formulario && estilos.cabecalhoFormulario,
@@ -56,6 +57,7 @@ function DiaryMacrocategoryAccordion({
                     onPress={aoAlternar}
                     style={({ pressed }) => [
                         estilos.expansao,
+                        formulario && estilos.expansaoFormulario,
                         pressed && !desabilitado && estilos.pressionado
                     ]}
                 >

@@ -110,7 +110,7 @@ function criarEstilos(tema) {
         },
         listaMacros: {
             width: '100%',
-            maxWidth: 308,
+            maxWidth: 311,
             alignSelf: 'center',
             paddingTop: 14
         },
