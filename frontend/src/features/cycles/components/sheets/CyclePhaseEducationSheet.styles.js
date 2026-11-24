@@ -3,6 +3,7 @@ import { fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     painel: {
+        paddingTop: 8,
         paddingBottom: 48
     },
     conteudo: {
@@ -46,6 +47,8 @@ const estilos = StyleSheet.create({
     },
     aviso: {
         backgroundColor: '#F7F5F0',
+        borderRadius: 13,
+        gap: 8,
         marginTop: 18,
         minHeight: 54,
         padding: 11
