@@ -47,6 +47,20 @@ test('personaliza somente após padrão repetido em três registros da fase', as
                 valor: 'Cólicas leves',
                 ocorrencias: 2
             }
+        ],
+        sugestoesCheckIn: [
+            {
+                categoriaId: 'sintomas_fisicos',
+                grupo: null,
+                valor: 'Cólicas leves',
+                ocorrencias: 2
+            },
+            {
+                categoriaId: 'sintomas_fisicos',
+                grupo: null,
+                valor: 'Fadiga',
+                ocorrencias: 1
+            }
         ]
     });
 });
@@ -58,7 +72,15 @@ test('mantém fallback quando a amostra ou repetição é insuficiente', async (
             { categorias: [categoria('fadiga', 'Fadiga')] }
         ])
     });
-    assert.equal((await service.buscar(3, 'lutea')).informacoesSuficientes, false);
+    const resumo = await service.buscar(3, 'lutea');
+    assert.equal(resumo.informacoesSuficientes, false);
+    assert.deepEqual(
+        resumo.sugestoesCheckIn.map(({ valor, ocorrencias }) => ({ valor, ocorrencias })),
+        [
+            { valor: 'Cólicas leves', ocorrencias: 1 },
+            { valor: 'Fadiga', ocorrencias: 1 }
+        ]
+    );
 });
 
 test('conta e analisa somente registros com categorias atualmente ativas', async () => {
