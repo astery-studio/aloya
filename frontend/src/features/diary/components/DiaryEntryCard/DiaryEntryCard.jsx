@@ -4,9 +4,9 @@ import { Pressable, Text, View } from 'react-native';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
-    ArrowsClockwiseIcon,
     NotebookIcon,
     PencilSimpleIcon,
+    RepeatIcon,
     TrashIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -105,6 +105,10 @@ function normalizarRegistro(registro, tema) {
         ...registro,
         dataFormatada,
         apresentacaoFase: fase,
+        diaCiclo:
+            Number.isSafeInteger(registro.diaCiclo) && registro.diaCiclo > 0
+                ? registro.diaCiclo
+                : null,
         principais,
         maisQuantidade:
             quantidadeAdicionalRecebida + Math.max(0, principaisValidos.length - principais.length),
@@ -123,6 +127,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
     const bloqueado = acaoEmAndamento !== null;
     const podeAbrir = typeof aoAbrir === 'function' && !bloqueado;
     const { cor, rotulo } = item.apresentacaoFase;
+    const rotuloFase = item.diaCiclo ? `${rotulo} - Dia ${item.diaCiclo} do Ciclo` : rotulo;
     const possuiCategoriasPublicas = item.principais.length > 0 || item.maisQuantidade > 0;
     const possuiResumoPublico = possuiCategoriasPublicas || Boolean(item.trechoAnotacao);
     const chipsResumo = [
@@ -252,11 +257,17 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
 
             <View
                 accessible
-                accessibilityLabel={rotulo}
+                accessibilityLabel={rotuloFase}
                 style={[estilos.fase, { backgroundColor: item.apresentacaoFase.fundo }]}
             >
-                <ArrowsClockwiseIcon testID="diary-entry-phase-tag-icon" size={13} color={cor} />
-                <Text style={[estilos.textoFase, { color: cor }]}>{rotulo}</Text>
+                <RepeatIcon
+                    testID="diary-entry-phase-tag-icon"
+                    size={13}
+                    width={13}
+                    height={13}
+                    color={cor}
+                />
+                <Text style={[estilos.textoFase, { color: cor }]}>{rotuloFase}</Text>
             </View>
         </View>
     );

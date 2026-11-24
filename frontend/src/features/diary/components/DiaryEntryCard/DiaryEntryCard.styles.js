@@ -128,6 +128,7 @@ function criarEstilos(tema) {
             flexShrink: 1,
             fontFamily: fontFamilies.semiBold,
             fontSize: 10,
+            fontWeight: '600',
             lineHeight: 19.5,
             textAlign: 'center'
         },

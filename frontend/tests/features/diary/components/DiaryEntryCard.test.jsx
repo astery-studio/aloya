@@ -12,6 +12,7 @@ const registro = {
     id: 8,
     data: '2026-11-04',
     fase: 'menstrual',
+    diaCiclo: 4,
     principais: [
         {
             categoriaId: 'banheiro',
@@ -115,7 +116,7 @@ describe('DiaryEntryCard', () => {
             borderColor: '#C85A44',
             backgroundColor: 'rgba(200, 90, 68, 0.10)'
         });
-        expect(screen.getByLabelText('Fase Menstrual')).toHaveStyle({
+        expect(screen.getByLabelText('Fase Menstrual - Dia 4 do Ciclo')).toHaveStyle({
             alignSelf: 'stretch',
             height: 26,
             paddingHorizontal: 14,
@@ -124,10 +125,13 @@ describe('DiaryEntryCard', () => {
             borderRadius: 100,
             backgroundColor: 'rgba(200, 90, 68, 0.20)'
         });
-        expect(screen.getByText('Fase Menstrual')).toHaveStyle({
+        expect(screen.getByText('Fase Menstrual - Dia 4 do Ciclo')).toHaveStyle({
             fontSize: 10,
+            fontWeight: '600',
             lineHeight: 19.5
         });
+        expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('width', 13);
+        expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('height', 13);
         expect(screen.getByText('Intestino')).toBeOnTheScreen();
         expect(screen.getByText('Intestino')).toHaveStyle({
             fontSize: 8.56,
@@ -208,7 +212,7 @@ describe('DiaryEntryCard', () => {
         await render(<DiaryEntryCard registro={{ ...registro, fase: null }} />);
 
         expect(screen.getByTestId('diary-entry-card')).toBeOnTheScreen();
-        expect(screen.getByText('Fase não identificada')).toBeOnTheScreen();
+        expect(screen.getByText('Fase não identificada - Dia 4 do Ciclo')).toBeOnTheScreen();
     });
 
     test('compacta o card quando somente dados sigilosos foram registrados', async () => {
@@ -218,6 +222,7 @@ describe('DiaryEntryCard', () => {
                     id: 10,
                     data: '2026-11-02',
                     fase: 'lutea',
+                    diaCiclo: 18,
                     principais: [],
                     maisQuantidade: 0,
                     trechoAnotacao: null
@@ -228,17 +233,19 @@ describe('DiaryEntryCard', () => {
 
         expect(screen.queryByTestId('diary-entry-content')).not.toBeOnTheScreen();
         expect(screen.queryByText('CATEGORIAS MARCADAS')).not.toBeOnTheScreen();
-        expect(screen.getByText('Fase Lútea')).toBeOnTheScreen();
+        expect(screen.getByText('Fase Lútea - Dia 18 do Ciclo')).toBeOnTheScreen();
         expect(screen.getByTestId('diary-entry-icon')).toHaveStyle({
             borderColor: '#D68C3A',
             backgroundColor: 'rgba(214, 140, 58, 0.10)'
         });
         expect(screen.getByTestId('diary-entry-notebook-icon')).toHaveProp('color', '#D68C3A');
-        expect(screen.getByLabelText('Fase Lútea')).toHaveStyle({
+        expect(screen.getByLabelText('Fase Lútea - Dia 18 do Ciclo')).toHaveStyle({
             backgroundColor: 'rgba(214, 140, 58, 0.20)'
         });
         expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('color', '#D68C3A');
-        expect(screen.getByText('Fase Lútea')).toHaveStyle({ color: '#D68C3A' });
+        expect(screen.getByText('Fase Lútea - Dia 18 do Ciclo')).toHaveStyle({
+            color: '#D68C3A'
+        });
     });
 
     test('mostra somente a anotação quando não há categorias públicas', async () => {

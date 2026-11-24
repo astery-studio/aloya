@@ -116,12 +116,14 @@ function validarPrincipal(item) {
 
 // Normaliza e congela um resumo retornado pelo presenter seguro do backend.
 function normalizarResumoRegistro(item) {
+    const diaCiclo = item?.diaCiclo ?? null;
     const valido =
         ehObjetoSimples(item) &&
         Number.isSafeInteger(item.id) &&
         item.id > 0 &&
         Boolean(decomporData(item.data)) &&
         (item.fase === null || FASES.has(item.fase)) &&
+        (diaCiclo === null || (Number.isSafeInteger(diaCiclo) && diaCiclo > 0)) &&
         Array.isArray(item.principais) &&
         item.principais.length <= 3 &&
         item.principais.every(validarPrincipal) &&
@@ -137,6 +139,7 @@ function normalizarResumoRegistro(item) {
         id: item.id,
         data: item.data,
         fase: item.fase,
+        diaCiclo,
         principais: Object.freeze(
             item.principais.map((principal) =>
                 Object.freeze({

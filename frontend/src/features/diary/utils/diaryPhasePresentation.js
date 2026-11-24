@@ -15,9 +15,9 @@ const FASES_DIARIO = Object.freeze({
     },
     folicular: {
         rotulo: 'Fase Folicular',
-        cor: '#2C4C3B',
-        fundoIcone: 'rgba(44, 76, 59, 0.10)',
-        fundo: 'rgba(44, 76, 59, 0.20)',
+        cor: '#567062',
+        fundoIcone: 'rgba(86, 112, 98, 0.10)',
+        fundo: 'rgba(86, 112, 98, 0.20)',
         Icone: PlantIcon,
         pesoIcone: 'regular'
     },

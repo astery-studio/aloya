@@ -43,6 +43,7 @@ import { PencilSimpleIcon } from 'phosphor-react-native/src/icons/PencilSimple';
 import { PersonArmsSpreadIcon } from 'phosphor-react-native/src/icons/PersonArmsSpread';
 import { PillIcon } from 'phosphor-react-native/src/icons/Pill';
 import { RainbowCloudIcon } from 'phosphor-react-native/src/icons/RainbowCloud';
+import { RepeatIcon } from 'phosphor-react-native/src/icons/Repeat';
 import { ShieldCheckIcon } from 'phosphor-react-native/src/icons/ShieldCheck';
 import { SmileyWinkIcon } from 'phosphor-react-native/src/icons/SmileyWink';
 import { SparkleIcon } from 'phosphor-react-native/src/icons/Sparkle';
@@ -107,6 +108,7 @@ export {
     PersonArmsSpreadIcon,
     PillIcon,
     RainbowCloudIcon,
+    RepeatIcon,
     ShieldCheckIcon,
     SmileyWinkIcon,
     SparkleIcon,

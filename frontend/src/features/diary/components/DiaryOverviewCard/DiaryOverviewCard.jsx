@@ -22,7 +22,7 @@ const APRESENTACAO_RESUMO_FASE = Object.freeze({
         corFundoContador: 'rgba(214, 140, 58, 0.20)'
     },
     folicular: {
-        corIcone: '#2C4C3B',
+        corIcone: '#567062',
         corTexto: '#2C4C3B',
         corTextoContador: 'rgba(44, 76, 59, 0.80)',
         corFundoContador: 'rgba(44, 76, 59, 0.20)'

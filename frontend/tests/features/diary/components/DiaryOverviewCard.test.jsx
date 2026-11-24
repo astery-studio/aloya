@@ -39,7 +39,7 @@ describe('DiaryOverviewCard', () => {
         });
         expect(
             screen.getByTestId('diary-phase-icon-folicular', { includeHiddenElements: true })
-        ).toHaveProp('color', '#2C4C3B');
+        ).toHaveProp('color', '#567062');
         expect(screen.getByTestId('diary-overview-title')).toHaveStyle({ color: '#2C4C3B' });
         expect(screen.getByTestId('diary-overview-phase')).toHaveStyle({
             color: '#2C4C3B',
