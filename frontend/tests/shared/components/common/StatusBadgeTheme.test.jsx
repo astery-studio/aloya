@@ -108,12 +108,22 @@ test('mantém o aviso de estimativa legível no tema escuro', async () => {
 test.each([
     ['pendenteDeUso', 152.6, 23],
     ['confirmadoHistoricoUso', 81, 23],
-    ['diasMenstruacao', 143.41, 30.88],
-    ['estimativaIncerta', 316.62, 42.41]
+    ['diasMenstruacao', 143.41, 30.88]
 ])('preserva as dimensões de %s ao trocar o tema', (estado, width, height) => {
     const varianteClara = criarVariantes(temaClaro)[estado];
     const varianteEscura = criarVariantes(temaEscuro)[estado];
 
     expect(varianteClara.container).toMatchObject({ width, height });
     expect(varianteEscura.container).toMatchObject({ width, height });
+});
+
+test('mantém a estimativa responsiva ao trocar o tema', () => {
+    for (const tema of [temaClaro, temaEscuro]) {
+        expect(criarVariantes(tema).estimativaIncerta.container).toMatchObject({
+            width: 316.62,
+            maxWidth: '100%',
+            height: 'auto',
+            minHeight: 42.41
+        });
+    }
 });
