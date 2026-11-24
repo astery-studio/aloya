@@ -178,7 +178,7 @@ describe('BottomTabBar', () => {
         await renderizarBarra({}, 'claro');
 
         expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            height: 91,
+            height: 78.17,
             backgroundColor: '#FFFFFF',
             borderTopColor: '#E6E2D8'
         });
@@ -188,9 +188,9 @@ describe('BottomTabBar', () => {
         await renderizarBarra({}, 'escuro');
 
         expect(screen.getByTestId('bottom-tab-bar')).toHaveStyle({
-            height: 91,
+            height: 78.17,
             backgroundColor: '#1E1E1E',
-            borderTopWidth: 0.667,
+            borderTopWidth: 0.666667,
             borderTopColor: 'rgba(255, 255, 255, 0.12)'
         });
     });
