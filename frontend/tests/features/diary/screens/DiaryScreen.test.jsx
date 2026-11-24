@@ -41,7 +41,9 @@ describe('histórico do Diário', () => {
             screen.getByText(/as categorias usadas neles podem estar desativadas/)
         ).toBeOnTheScreen();
         expect(screen.getByText(/Ative-as em "Gerenciar categorias"/)).toBeOnTheScreen();
-        await fireEvent.press(screen.getByRole('button', { name: 'Adicionar novo registro' }));
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+        );
         expect(aoCriar).toHaveBeenCalledTimes(1);
     });
 
@@ -49,8 +51,10 @@ describe('histórico do Diário', () => {
         const tentar = jest.fn();
         const resultado = await render(<DiaryScreen carregando />);
         expect(screen.getByTestId('diary-loading')).toBeOnTheScreen();
+        expect(screen.queryByTestId('diary-add-fab')).toBeNull();
 
         await resultado.rerender(<DiaryScreen erro="erro seguro" aoTentarNovamente={tentar} />);
+        expect(screen.queryByTestId('diary-add-fab')).toBeNull();
         expect(screen.getByRole('header', { name: 'Ocorreu um erro' })).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
         expect(tentar).toHaveBeenCalledTimes(1);
@@ -93,7 +97,7 @@ describe('histórico do Diário', () => {
             screen.getByRole('button', { name: 'Gerenciar categorias do Diário' })
         );
         await fireEvent.press(
-            screen.getAllByRole('button', { name: 'Adicionar novo registro' })[0]
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
         );
         await fireEvent.press(screen.getByLabelText('Ver detalhes do registro de 09/11/2026'));
         await fireEvent.press(
@@ -150,6 +154,8 @@ describe('histórico do Diário', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
         expect(remover).toHaveBeenCalledWith('fase:menstrual');
         expect(limpar).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('button', { name: 'Adicionar novo registro' })).toBeOnTheScreen();
+        expect(
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+        ).toBeOnTheScreen();
     });
 });

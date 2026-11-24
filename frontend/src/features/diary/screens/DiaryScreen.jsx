@@ -4,7 +4,7 @@ import { useWindowDimensions, View } from 'react-native';
 import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 import { GearSixIcon } from 'phosphor-react-native/src/icons/GearSix';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
@@ -59,6 +59,7 @@ function DiaryScreen({
     const possuiErro = typeof erro === 'string' && erro.trim();
     const filtrosAtivos = possuiFiltrosDiario(filtros);
     const vazio = !carregando && !possuiErro && itens.length === 0;
+    const mostrarFab = !carregando && !possuiErro && typeof aoCriar === 'function';
     const possuiAcoesHeader =
         typeof aoAbrirFiltros === 'function' || typeof aoGerenciarCategorias === 'function';
 
@@ -137,7 +138,6 @@ function DiaryScreen({
             <DiaryHistoryStateView
                 tipo={filtrosAtivos ? 'filtro-vazio' : 'vazio'}
                 cabecalho={criarCabecalho(filtrosAtivos, false)}
-                aoCriar={aoCriar}
                 estilos={estilos}
                 tema={tema}
             />
@@ -177,10 +177,13 @@ function DiaryScreen({
         >
             <View testID="diary-main-container" style={estilos.tela}>
                 {conteudo}
-                {!carregando && !possuiErro && (!vazio || filtrosAtivos) ? (
-                    <View style={estilos.acaoFixa}>
-                        <ButtonScreen texto="Adicionar novo registro" aoPressionar={aoCriar} />
-                    </View>
+                {mostrarFab ? (
+                    <FloatingActionButton
+                        aoPressionar={aoCriar}
+                        rotuloAcessibilidade="Adicionar novo registro ao Diário"
+                        considerarAreaSeguraInferior={false}
+                        testID="diary-add-fab"
+                    />
                 ) : null}
             </View>
         </MainLayout>
