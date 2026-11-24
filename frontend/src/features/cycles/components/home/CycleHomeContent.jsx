@@ -4,6 +4,7 @@ import { CycleExpandableCard } from '../CycleExpandableCard';
 import { CycleCareSection } from './CycleCareSection';
 import { CycleEducationalDisclaimer } from './CycleEducationalDisclaimer';
 import { CyclePhaseHero } from './CyclePhaseHero';
+import { CORES_FASE } from './CyclePhaseHero.styles';
 import { CyclePredictionSummary } from './CyclePredictionSummary';
 import { CycleQuickActions } from './CycleQuickActions';
 import { estilos } from './CycleHomeContent.styles';
@@ -44,12 +45,16 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
             />
             <View style={estilos.sobreFase}>
                 <CycleExpandableCard
-                    titulo="Sobre esta fase"
-                    subtitulo={conteudoDaFase?.tituloExplicacao}
+                    rotulo="Sobre esta fase"
+                    corRotulo={CORES_FASE[fase]}
+                    titulo={conteudoDaFase?.tituloExplicacao}
                     initiallyExpanded
                 >
                     <Text style={estilos.descricaoFase}>{conteudoDaFase?.descricao}</Text>
-                    <CycleEducationalDisclaimer texto="Este conteúdo é educativo e não substitui orientação profissional." />
+                    <CycleEducationalDisclaimer
+                        texto="Este conteúdo é educativo e não substitui orientação profissional."
+                        style={estilos.avisoFase}
+                    />
                 </CycleExpandableCard>
             </View>
         </View>

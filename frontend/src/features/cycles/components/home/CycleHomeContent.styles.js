@@ -33,7 +33,15 @@ const estilos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 12,
-        lineHeight: 19
+        lineHeight: 19,
+        textAlign: 'justify'
+    },
+    avisoFase: {
+        minHeight: 37,
+        marginTop: 12,
+        padding: 10,
+        backgroundColor: '#F7F5F0',
+        borderRadius: 12
     }
 });
 
