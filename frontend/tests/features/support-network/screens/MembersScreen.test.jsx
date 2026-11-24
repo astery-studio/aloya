@@ -1,6 +1,19 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
+import { criarEstilos } from '../../../../src/features/support-network/screens/MembersScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
+
+test('separa a descrição do conteúdo sem alterar sua tipografia', () => {
+    const estilos = criarEstilos(temaClaro);
+
+    expect(estilos.apresentacao).toMatchObject({ gap: 24, marginBottom: 24 });
+    expect(estilos.descricao).toMatchObject({
+        fontFamily: 'DMSans_400Regular',
+        fontSize: 15,
+        lineHeight: 22.5
+    });
+});
 
 const mockUseSupportContacts = jest.fn();
 const mockUseSupportCategories = jest.fn();
