@@ -35,9 +35,17 @@ import { CycleDiaryCheckIn } from '../../../../src/features/cycles/components/Cy
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
-    await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} onOpenDiary={jest.fn()} />);
+    await render(
+        <CycleDiaryCheckIn
+            date="2026-10-08"
+            service={{}}
+            onOpenDiary={jest.fn()}
+            corDestaque="#4A758E"
+        />
+    );
 
     expect(screen.getByText('Como você está se sentindo hoje?')).toBeOnTheScreen();
+    expect(screen.getByText('Check-in gentil')).toHaveStyle({ color: '#4A758E' });
     expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toBeDisabled();
 
     await act(async () => mockOnCreated());

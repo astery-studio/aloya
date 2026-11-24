@@ -7,6 +7,7 @@ test('oferece três cuidados com destinos independentes', async () => {
     await render(
         <CycleCareSection
             fase="lutea"
+            corDestaque="#D68C3A"
             aoAbrirRespiracao={callbacks[0]}
             aoAbrirReflexao={callbacks[1]}
             aoAbrirEducacao={callbacks[2]}
@@ -14,6 +15,7 @@ test('oferece três cuidados com destinos independentes', async () => {
     );
 
     const cards = screen.getAllByRole('button');
+    expect(screen.getByText('Para o seu momento')).toHaveStyle({ color: '#D68C3A' });
     expect(cards).toHaveLength(3);
     for (const card of cards) await fireEvent.press(card);
     callbacks.forEach((callback) => expect(callback).toHaveBeenCalledTimes(1));

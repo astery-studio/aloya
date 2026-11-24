@@ -28,7 +28,8 @@ function CyclePredictionSummary({
     janelaFertil,
     confiabilidade,
     estimativaIncerta = false,
-    aoAbrirConfiabilidade
+    aoAbrirConfiabilidade,
+    corDestaque = '#C85A44'
 }) {
     const proximo = separarData(proximoInicio);
     const ovulacao = separarData(ovulacaoEstimada);
@@ -39,7 +40,7 @@ function CyclePredictionSummary({
             <View style={estilos.card}>
                 <View style={estilos.cabecalho}>
                     <View>
-                        <Text style={textos.previsao}>Previsão</Text>
+                        <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
                             Próximo ciclo
                         </Text>

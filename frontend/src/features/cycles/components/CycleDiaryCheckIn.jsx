@@ -8,7 +8,13 @@ import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
 import { CompactDiaryOptions } from './home/CompactDiaryOptions';
 import { estilos } from './CycleDiaryCheckIn.styles';
 
-function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
+function CycleDiaryCheckIn({
+    date,
+    service,
+    onOpenDiary,
+    onSessionExpired,
+    corDestaque = '#C85A44'
+}) {
     const [saved, setSaved] = useState(false);
     const catalog = useDiaryCatalog({
         ativo: Boolean(service),
@@ -37,7 +43,7 @@ function CycleDiaryCheckIn({ date, service, onOpenDiary, onSessionExpired }) {
     return (
         <View style={estilos.margem}>
             <View style={estilos.cartao}>
-                <Text style={estilos.rotulo}>Check-in gentil</Text>
+                <Text style={[estilos.rotulo, { color: corDestaque }]}>Check-in gentil</Text>
                 <Text accessibilityRole="header" style={estilos.titulo}>
                     Como você está se sentindo hoje?
                 </Text>

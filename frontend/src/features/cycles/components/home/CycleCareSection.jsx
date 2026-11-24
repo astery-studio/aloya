@@ -37,7 +37,13 @@ const CUIDADOS = Object.freeze([
     }
 ]);
 
-function CycleCareSection({ fase, aoAbrirRespiracao, aoAbrirReflexao, aoAbrirEducacao }) {
+function CycleCareSection({
+    fase,
+    corDestaque = '#C85A44',
+    aoAbrirRespiracao,
+    aoAbrirReflexao,
+    aoAbrirEducacao
+}) {
     const callbacks = {
         respiracao: aoAbrirRespiracao,
         reflexao: aoAbrirReflexao,
@@ -45,7 +51,7 @@ function CycleCareSection({ fase, aoAbrirRespiracao, aoAbrirReflexao, aoAbrirEdu
     };
     return (
         <View style={estilos.secao}>
-            <Text style={estilos.etiqueta}>Para o seu momento</Text>
+            <Text style={[estilos.etiqueta, { color: corDestaque }]}>Para o seu momento</Text>
             <Text accessibilityRole="header" style={estilos.tituloSecao}>
                 Cuidados para hoje
             </Text>

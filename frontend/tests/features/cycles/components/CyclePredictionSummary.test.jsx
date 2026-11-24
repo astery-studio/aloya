@@ -12,10 +12,12 @@ test('apresenta previsão e abre a explicação de confiabilidade', async () => 
             confiabilidade="media"
             estimativaIncerta
             aoAbrirConfiabilidade={aoAbrir}
+            corDestaque="#2C4C3B"
         />
     );
 
     expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
+    expect(screen.getByText('Previsão')).toHaveStyle({ color: '#2C4C3B' });
     expect(screen.getByText('10–15 de novembro')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
     expect(aoAbrir).toHaveBeenCalledTimes(1);

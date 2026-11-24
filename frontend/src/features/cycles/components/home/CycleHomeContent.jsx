@@ -11,6 +11,7 @@ import { estilos } from './CycleHomeContent.styles';
 
 function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada }) {
     const { fase, diaCiclo, janelaFertilAtiva, previsao, conteudoDaFase, dataSelecionada } = modelo;
+    const corDaFase = CORES_FASE[fase] ?? CORES_FASE.desconhecida;
     return (
         <View style={estilos.conteudo}>
             <CyclePhaseHero fase={fase} diaCiclo={diaCiclo} janelaFertilAtiva={janelaFertilAtiva} />
@@ -22,6 +23,7 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
                 confiabilidade={modelo.nivelConfiabilidade ?? 'baixa'}
                 estimativaIncerta={modelo.previsaoIncerta}
                 aoAbrirConfiabilidade={callbacks.aoAbrirConfiabilidade}
+                corDestaque={corDaFase}
             />
             <View style={estilos.explore}>
                 <Text style={estilos.rotuloExplore}>Explore</Text>
@@ -35,10 +37,12 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
                     service={diaryService}
                     onOpenDiary={callbacks.aoAbrirDiario}
                     onSessionExpired={onSessaoExpirada}
+                    corDestaque={corDaFase}
                 />
             ) : null}
             <CycleCareSection
                 fase={fase}
+                corDestaque={corDaFase}
                 aoAbrirRespiracao={callbacks.aoAbrirRespiracao}
                 aoAbrirReflexao={callbacks.aoAbrirReflexao}
                 aoAbrirEducacao={callbacks.aoAbrirEducacao}
@@ -46,7 +50,7 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
             <View style={estilos.sobreFase}>
                 <CycleExpandableCard
                     rotulo="Sobre esta fase"
-                    corRotulo={CORES_FASE[fase]}
+                    corRotulo={corDaFase}
                     titulo={conteudoDaFase?.tituloExplicacao}
                     initiallyExpanded
                 >
