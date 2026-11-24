@@ -28,8 +28,12 @@ function criarEstilos(tema) {
         dia_folicular: { backgroundColor: '#2C4C3B', borderColor: '#2C4C3B' },
         dia_ovulatoria: { backgroundColor: '#4A758E', borderColor: '#4A758E' },
         dia_lutea: { backgroundColor: '#D68C3A', borderColor: '#D68C3A' },
-        dia_desconhecida: { backgroundColor: '#847F76', borderColor: '#847F76' },
-        diaSelecionado: shadows.cardSuave,
+        dia_desconhecida: { backgroundColor: '#FFFFFF', borderColor: '#E6E2D8' },
+        diaSelecionado: { ...shadows.cardSuave, paddingTop: 10 },
+        diaSelecionadoDesconhecida: {
+            backgroundColor: '#5C5C59',
+            borderColor: '#E6E2D8'
+        },
         interior: {
             width: 42,
             height: 62,
@@ -38,7 +42,11 @@ function criarEstilos(tema) {
             borderRadius: 14,
             backgroundColor: '#FFFFFF'
         },
-        interiorSelecionado: { backgroundColor: 'transparent' },
+        interiorSelecionado: {
+            height: 54,
+            justifyContent: 'flex-start',
+            backgroundColor: 'transparent'
+        },
         semana: {
             ...typography.labelCompact,
             color: tema.escuro ? '#E1E1E1' : tema.cores.interface.textoSecundario,
