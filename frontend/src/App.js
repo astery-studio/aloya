@@ -650,7 +650,7 @@ export default function App() {
                         setDataInicialDiario(data);
                         setCadastroDiarioVisivel(true);
                     }}
-                    aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                    aoAbrirHistorico={() => setTelaInterna(telasInternas.ciclos)}
                     aoSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />

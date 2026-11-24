@@ -33,14 +33,12 @@ function formatarDataLonga(texto) {
 }
 
 function formatarDataCabecalho(texto) {
-    const data = paraDataUtc(texto);
-    if (!data) return '—';
-    return new Intl.DateTimeFormat('pt-BR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        timeZone: 'UTC'
-    }).format(data);
+    const dataLonga = formatarDataLonga(texto);
+    if (dataLonga === '—') return dataLonga;
+    return `Aloya - ${dataLonga.replace(
+        / de ([a-zá-ú])/u,
+        (_, inicial) => ` de ${inicial.toLocaleUpperCase('pt-BR')}`
+    )}`;
 }
 
 function dataNoIntervalo(data, intervalo) {
