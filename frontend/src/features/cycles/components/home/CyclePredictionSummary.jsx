@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import { ConfidenceBadge } from '../../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { StatusBadge } from '../../../../shared/components/common/StatusBadge/StatusBadge';
 import { SparkleIcon, SunIcon } from '../../../../shared/components/icons/AppIcons';
 import { formatarJanelaFertil, separarData } from '../../utils/cyclePredictionFormat';
 import { CycleEducationalDisclaimer } from './CycleEducationalDisclaimer';
@@ -78,9 +79,7 @@ function CyclePredictionSummary({
                     style={estilos.aviso}
                 />
                 {estimativaIncerta ? (
-                    <View style={estilos.incerta}>
-                        <Text style={textos.incerta}>Estimativa incerta</Text>
-                    </View>
+                    <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
                 ) : null}
             </View>
         </View>

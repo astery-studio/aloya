@@ -38,12 +38,7 @@ const estilos = StyleSheet.create({
     metrica: { minHeight: 32, flexDirection: 'row', alignItems: 'center', gap: 8 },
     textosMetrica: { flex: 1 },
     aviso: { marginTop: 18 },
-    incerta: {
-        marginTop: 10,
-        padding: 10,
-        borderRadius: 10,
-        backgroundColor: 'rgba(214, 140, 58, 0.12)'
-    }
+    incerta: { width: '100%', marginTop: 10 }
 });
 
 export { estilos };

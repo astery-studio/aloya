@@ -41,8 +41,7 @@ const textos = StyleSheet.create({
         fontFamily: fontFamilies.bold,
         fontSize: 11,
         lineHeight: 16
-    },
-    incerta: { color: '#A8671E', fontFamily: fontFamilies.medium, fontSize: 10, lineHeight: 14 }
+    }
 });
 
 export { textos };
