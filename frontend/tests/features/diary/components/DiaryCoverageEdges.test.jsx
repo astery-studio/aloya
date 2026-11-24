@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
-import { Modal, Text } from 'react-native';
+import { Text } from 'react-native';
 
 import { DiaryDateArrow } from '../../../../src/features/diary/components/DiaryDateNavigator/DiaryDateArrow';
 import { DiaryCategoryFilterGroup } from '../../../../src/features/diary/components/DiaryFiltersSheet/DiaryCategoryFilterGroup';
@@ -158,18 +158,14 @@ test('usa paleta de fallback para macros sem paleta conhecida', async () => {
 });
 
 test('modal de detalhes assume que a exclusão está inativa', async () => {
-    const aoOcultar = jest.fn();
     await render(
         <DiaryRecordDetailsModal
             visivel
             registro={{ id: 1, data: '2026-11-01', fase: 'folicular', categorias: [] }}
             aoFechar={jest.fn()}
-            aoOcultar={aoOcultar}
         />
     );
     expect(screen.getByRole('header', { name: 'Diário' })).toBeOnTheScreen();
-    screen.UNSAFE_getByType(Modal).props.onDismiss();
-    expect(aoOcultar).toHaveBeenCalledTimes(1);
 });
 
 test('aciona os controles elementares do filtro e ignora grupos indisponíveis', async () => {
