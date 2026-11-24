@@ -54,9 +54,13 @@ const estilos = StyleSheet.create({
         gap: 8
     },
     acaoPrincipal: {
+        backgroundColor: '#C85A44',
+        borderRadius: 12,
         height: 45
     },
     acao: {
+        backgroundColor: '#2C4C3B',
+        borderRadius: 12,
         flex: 1,
         height: 45
     }
