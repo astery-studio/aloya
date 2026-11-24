@@ -6,6 +6,8 @@ import {
     MENSAGEM_VAZIO,
     criarSecoes
 } from '../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen';
+import { criarEstilosAcompanhamento } from '../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 const metricas = {
     frame: { x: 0, y: 0, width: 393, height: 852 },
@@ -39,6 +41,27 @@ test('reproduz o estado vazio e a ação principal do protótipo', async () => {
     expect(screen.getByText(MENSAGEM_VAZIO)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar novo anticoncepcional' }));
     expect(aoCadastrarNovo).toHaveBeenCalledTimes(1);
+});
+
+test('usa o padrão compacto sem reduzir o título pela largura', async () => {
+    await renderizar(<ContraceptiveTrackingScreen />);
+
+    const titulo = screen.getByRole('header', { name: 'Anticoncepcionais' });
+
+    expect(titulo).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 20,
+        fontWeight: '700',
+        lineHeight: 28,
+        textAlign: 'left'
+    });
+    expect(titulo.props.numberOfLines).toBeUndefined();
+    expect(titulo.props.adjustsFontSizeToFit).toBeUndefined();
+
+    const estilos = criarEstilosAcompanhamento(temaClaro);
+
+    expect(estilos.cabecalho.minHeight).toBeUndefined();
+    expect(estilos.corpo.paddingTop).toBe(24);
 });
 
 test('não duplica o cartão que possui doses com estados diferentes', () => {

@@ -10,23 +10,26 @@ function criarEstilosAcompanhamento(tema) {
             width: '100%',
             maxWidth: 393.33,
             alignSelf: 'center',
-            minHeight: 61,
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: 21.66,
+            gap: 8,
+            paddingLeft: 12,
+            paddingRight: 24,
             paddingVertical: 8.5
         },
-        botaoVoltar: { width: 44, height: 44, alignItems: 'flex-start', justifyContent: 'center' },
+        botaoVoltar: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
         titulo: {
+            ...tema.headerTypography.compacto,
             flex: 1,
+            flexShrink: 1,
             color: interfaceTema.textoPrincipal,
-            fontFamily: fontFamilies.bold,
-            fontSize: 26,
-            lineHeight: 39,
-            textAlign: 'center'
+            minWidth: 0
         },
-        espacoCabecalho: { width: 44 },
-        corpo: { flex: 1, minHeight: 0 },
+        corpo: {
+            flex: 1,
+            minHeight: 0,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
+        },
         areaBanner: {
             width: '100%',
             maxWidth: 393.33,
@@ -65,7 +68,13 @@ function criarEstilosAcompanhamento(tema) {
             letterSpacing: 0.72
         },
         espacoCartao: { height: 12 },
-        estadoCentral: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+        estadoCentral: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
+        },
         mensagemEstado: {
             color: interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
@@ -76,6 +85,7 @@ function criarEstilosAcompanhamento(tema) {
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingHorizontal: 22
         },
         tituloVazio: {

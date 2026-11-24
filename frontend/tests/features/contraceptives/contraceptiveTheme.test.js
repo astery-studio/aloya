@@ -24,7 +24,9 @@ describe('tema escuro de anticoncepcionais', () => {
         const acompanhamento = criarEstilosAcompanhamento(temaEscuro);
 
         expect(formulario.telaFluxo.backgroundColor).toBe('#121212');
+        expect(formulario.conteudoFluxo.paddingTop).toBe(24);
         expect(telas.tela.backgroundColor).toBe(temaEscuro.cores.interface.fundo);
+        expect(telas.conteudoFormulario.paddingTop).toBe(24);
         expect(acompanhamento.tela.backgroundColor).toBe('#121212');
         expect(acompanhamento.titulo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
     });

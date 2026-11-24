@@ -130,8 +130,6 @@ function ContraceptiveTrackingScreen({
     const tema = useTheme();
     const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
     const [usosAtualizados, setUsosAtualizados] = useState({});
-    const [larguraCabecalho, setLarguraCabecalho] = useState(393.33);
-    const tamanhoTitulo = Math.min(26, Math.max(18, ((larguraCabecalho - 131.32) * 26) / 244));
     const itens = anticoncepcionais.map((item) => {
         const atualizacao = usosAtualizados[item.id];
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
@@ -159,12 +157,7 @@ function ContraceptiveTrackingScreen({
             style={estilosAcompanhamento.tela}
             testID="anticoncepcionais-area-segura"
         >
-            <View
-                style={estilosAcompanhamento.cabecalho}
-                onLayout={({ nativeEvent }) => {
-                    if (nativeEvent.layout.width > 0) setLarguraCabecalho(nativeEvent.layout.width);
-                }}
-            >
+            <View style={estilosAcompanhamento.cabecalho}>
                 <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Voltar"
@@ -174,16 +167,9 @@ function ContraceptiveTrackingScreen({
                 >
                     <ArrowLeftIcon size={24} color={tema.cores.interface.textoSecundario} />
                 </Pressable>
-                <Text
-                    accessibilityRole="header"
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.8}
-                    style={[estilosAcompanhamento.titulo, { fontSize: tamanhoTitulo }]}
-                >
+                <Text accessibilityRole="header" style={estilosAcompanhamento.titulo}>
                     Anticoncepcionais
                 </Text>
-                <View style={estilosAcompanhamento.espacoCabecalho} />
             </View>
 
             {carregando ? (
