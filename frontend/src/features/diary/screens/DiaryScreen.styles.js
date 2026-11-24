@@ -1,7 +1,7 @@
 // Define a composição responsiva da tela do Diário e de sua ação fixa.
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies } from '../../../shared/theme';
+import { espacamentosLayout, fontFamilies } from '../../../shared/theme';
 import { obterCoresDiario } from '../config/diaryColors';
 
 // Converte os tokens do tema em estilos da screen e de seus estados.
@@ -13,7 +13,10 @@ function criarEstilos(tema) {
             minHeight: 0,
             alignSelf: 'stretch'
         },
-        conteudoEstatico: { flex: 1, paddingHorizontal: 20 },
+        conteudoEstatico: {
+            flex: 1,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela
+        },
         introducao: {
             width: 350.011,
             maxWidth: '100%',
@@ -54,7 +57,7 @@ function criarEstilos(tema) {
             flex: 1,
             alignItems: 'center',
             paddingTop: 22,
-            paddingHorizontal: 20,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
             paddingBottom: 96
         },
         mensagemFiltroVazio: {
@@ -81,13 +84,16 @@ function criarEstilos(tema) {
             lineHeight: 18,
             letterSpacing: 0.72
         },
-        lista: { paddingBottom: 96 },
+        lista: {
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
+            paddingBottom: 96
+        },
         acaoFixa: {
             position: 'absolute',
             right: 0,
             bottom: 0,
             left: 0,
-            paddingHorizontal: 20,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
             paddingTop: 16,
             paddingBottom: 16,
             borderTopWidth: 1,
