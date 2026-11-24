@@ -77,7 +77,7 @@ describe('BottomTabBar', () => {
         }
     });
 
-    test('mantém temporariamente os identificadores atuais', async () => {
+    test('envia os identificadores das rotas de contatos e calendário', async () => {
         const onSelecionar = jest.fn();
 
         await renderizarBarra({
@@ -88,7 +88,7 @@ describe('BottomTabBar', () => {
         expect(onSelecionar).toHaveBeenLastCalledWith('membros');
 
         await fireEvent.press(screen.getByRole('tab', { name: 'Calendário' }));
-        expect(onSelecionar).toHaveBeenLastCalledWith('ciclos');
+        expect(onSelecionar).toHaveBeenLastCalledWith('calendario');
     });
 
     test.each([
