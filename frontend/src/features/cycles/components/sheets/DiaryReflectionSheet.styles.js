@@ -44,6 +44,10 @@ const estilos = StyleSheet.create({
     formulario: {
         gap: 13
     },
+    campo: {
+        height: 123,
+        position: 'relative'
+    },
     entrada: {
         backgroundColor: '#F7F5F0',
         borderColor: '#A8A49C',
@@ -60,6 +64,16 @@ const estilos = StyleSheet.create({
         minHeight: 95.6,
         textAlignVertical: 'top'
     },
+    contador: {
+        position: 'absolute',
+        right: 13,
+        bottom: 8,
+        color: '#A8A49C',
+        fontFamily: fontFamilies.medium,
+        fontSize: 10,
+        lineHeight: 15
+    },
+    contadorPreenchido: { color: '#C85A44' },
     botao: {
         height: 54,
         borderRadius: 14
