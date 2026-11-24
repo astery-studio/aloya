@@ -8,7 +8,7 @@ const CORES = Object.freeze({
 });
 
 const estilos = StyleSheet.create({
-    painel: { paddingBottom: 48 },
+    painel: { paddingTop: 8, paddingBottom: 48 },
     conteudo: { paddingHorizontal: 24 },
     cabecalho: { height: 54, flexDirection: 'row', alignItems: 'center', gap: 5 },
     icone: {
