@@ -1,39 +1,36 @@
-import { useMemo } from 'react';
 import { Pressable, Text } from 'react-native';
-import { ArrowsClockwiseIcon } from '../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../shared/hooks/useTheme';
+import { RewindIcon } from 'phosphor-react-native/src/icons/Rewind';
 
 function ReturnToTodayButton({ onPress }) {
-    const tema = useTheme();
-    const estilos = useMemo(
-        () => ({
-            botao: {
-                alignSelf: 'center',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5,
-                height: 34,
-                marginBottom: 8,
-                paddingHorizontal: 13,
-                paddingVertical: 6,
-                borderRadius: 999,
-                borderWidth: 1,
-                borderColor: '#AAAAA5',
-                borderStyle: 'dashed'
-            },
-            texto: {
-                color: tema.cores.interface.textoPrincipal,
-                fontFamily: 'DMSans_400Regular',
-                fontSize: 13,
-                lineHeight: 20
-            }
-        }),
-        [tema]
-    );
+    const estilos = {
+        botao: {
+            width: 135,
+            height: 34,
+            alignSelf: 'flex-start',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            marginLeft: 18,
+            marginBottom: 8,
+            paddingHorizontal: 13,
+            paddingVertical: 6,
+            borderWidth: 1,
+            borderColor: '#AAAAA5',
+            borderStyle: 'dashed',
+            borderRadius: 999
+        },
+        texto: {
+            color: '#5C5C59',
+            fontFamily: 'DMSans_400Regular',
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 20
+        }
+    };
 
     return (
         <Pressable accessibilityRole="button" onPress={onPress} style={estilos.botao}>
-            <ArrowsClockwiseIcon size={13} color="#5C5C59" />
+            <RewindIcon size={13} color="#5C5C59" weight="regular" />
             <Text style={estilos.texto}>Voltar pra hoje</Text>
         </Pressable>
     );
