@@ -179,7 +179,14 @@ function DiaryScreen({
                 {conteudo}
                 {!carregando && !possuiErro && (!vazio || filtrosAtivos) ? (
                     <View style={estilos.acaoFixa}>
-                        <ButtonScreen texto="Adicionar novo registro" aoPressionar={aoCriar} />
+                        <ButtonScreen
+                            texto="Adicionar novo registro"
+                            variante="laranja"
+                            aoPressionar={aoCriar}
+                            rotuloAcessibilidade="Adicionar novo registro ao Diário"
+                            estilo={estilos.botaoAdicionar}
+                            estiloTexto={estilos.textoBotaoAdicionar}
+                        />
                     </View>
                 ) : null}
             </View>
