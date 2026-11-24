@@ -43,6 +43,15 @@ describe('Header', () => {
         });
     });
 
+    test('aplica o espaçamento superior padrão uma única vez', async () => {
+        await renderizarHeader();
+
+        expect(screen.getByTestId('header-top-spacing')).toHaveStyle({ height: 56 });
+        expect(
+            StyleSheet.flatten(screen.getByTestId('header-container').props.style).paddingTop
+        ).toBeUndefined();
+    });
+
     test('permite título longo e fonte ampliada sem altura rígida', async () => {
         const tituloLongo =
             'Configurações de acompanhamento e compartilhamento de informações do ciclo';
@@ -134,17 +143,6 @@ describe('Header', () => {
             lineHeight: 28,
             textAlign: 'left'
         });
-    });
-
-    test('usa a composição específica do cabeçalho do Diário', async () => {
-        await renderizarHeader({ variante: 'diario', acoesDireita: <></> });
-
-        expect(screen.getByTestId('header-container')).toHaveStyle({
-            width: '100%',
-            paddingTop: 56,
-            flexShrink: 0
-        });
-        expect(screen.getByRole('header')).toHaveStyle({ fontSize: 28, lineHeight: 36 });
     });
 
     test('renderiza o ícone de voltar no tema claro', async () => {

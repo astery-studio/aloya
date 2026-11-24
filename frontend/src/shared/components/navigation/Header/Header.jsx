@@ -19,7 +19,6 @@ function Header({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
-    const ehDiario = variante === 'diario';
     const ehRedeApoio = variante === 'redeApoio';
 
     const acoesExibidas = acoesDireita ?? acoes;
@@ -33,16 +32,15 @@ function Header({
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
-                ehDiario && estilos.containerDiario,
                 corFundo ? { backgroundColor: corFundo } : null
             ]}
         >
             <View
+                testID="header-top-spacing"
                 style={[
                     estilos.espacamentoSuperior,
                     temVoltar && estilos.espacamentoSuperiorComVoltar,
-                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio,
-                    ehDiario && estilos.espacamentoSuperiorDiario
+                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio
                 ]}
             />
 

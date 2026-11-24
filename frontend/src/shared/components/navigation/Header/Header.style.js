@@ -13,12 +13,6 @@ function criarEstilos(tema) {
               }
             : {},
 
-        containerDiario: {
-            width: '100%',
-            flexShrink: 0,
-            paddingTop: 56
-        },
-
         espacamentoSuperior: {
             height: 56
         },
@@ -29,11 +23,6 @@ function criarEstilos(tema) {
 
         espacamentoSuperiorRedeApoio: {
             height: 55.99
-        },
-
-        espacamentoSuperiorDiario: {
-            display: 'none',
-            height: 0
         },
 
         areaTitulo: {

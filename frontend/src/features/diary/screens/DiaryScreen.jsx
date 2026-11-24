@@ -167,7 +167,6 @@ function DiaryScreen({
     return (
         <MainLayout
             titulo="Diário"
-            varianteHeader="diario"
             abaAtiva="diario"
             onSelecionarAba={onSelecionarAba}
             acoesHeader={acoesHeader}

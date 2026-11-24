@@ -49,20 +49,7 @@ function MainLayout({
                     : null
             ]}
         >
-            {varianteHeader === 'diario' ? (
-                <SafeAreaView
-                    testID="cabecalho-seguro-main-layout"
-                    edges={['top']}
-                    style={[
-                        estilos.cabecalhoSeguro,
-                        corFundo ? { backgroundColor: corFundo } : null
-                    ]}
-                >
-                    {cabecalho}
-                </SafeAreaView>
-            ) : (
-                cabecalho
-            )}
+            {cabecalho}
 
             <View
                 testID="conteudo-main-layout"
