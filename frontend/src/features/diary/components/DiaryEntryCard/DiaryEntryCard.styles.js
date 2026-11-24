@@ -75,9 +75,7 @@ function criarEstilos(tema) {
         chips: {
             alignItems: 'center',
             marginTop: 4,
-            paddingVertical: 6,
-            borderBottomWidth: 0.70489,
-            borderBottomColor: cores.separador
+            paddingVertical: 6
         },
         linhaChips: {
             minHeight: 28,
@@ -110,8 +108,12 @@ function criarEstilos(tema) {
         anotacao: {
             gap: 8,
             paddingTop: 12,
-            borderTopWidth: 1,
-            borderTopColor: cores.separador
+            paddingBottom: 12
+        },
+        divisorConteudo: {
+            alignSelf: 'stretch',
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: cores.separador
         },
         textoAnotacao: {
             padding: 10,
@@ -124,6 +126,12 @@ function criarEstilos(tema) {
             fontSize: 11,
             lineHeight: 16
         },
+        containerFase: {
+            alignSelf: 'stretch',
+            paddingTop: 6,
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderTopColor: cores.separador
+        },
         fase: {
             alignSelf: 'stretch',
             minHeight: 26,
@@ -134,7 +142,6 @@ function criarEstilos(tema) {
             gap: 6,
             paddingHorizontal: 14,
             paddingVertical: 0,
-            marginTop: 6,
             borderRadius: 100
         },
         textoFase: {

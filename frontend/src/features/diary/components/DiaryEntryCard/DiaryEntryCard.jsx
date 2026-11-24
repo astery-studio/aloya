@@ -247,8 +247,15 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                         </>
                     ) : null}
 
+                    {possuiCategoriasPublicas && item.trechoAnotacao ? (
+                        <View
+                            testID="diary-entry-categories-note-divider"
+                            style={estilos.divisorConteudo}
+                        />
+                    ) : null}
+
                     {item.trechoAnotacao ? (
-                        <View style={estilos.anotacao}>
+                        <View testID="diary-entry-note" style={estilos.anotacao}>
                             <Text style={estilos.rotuloSecao}>ANOTAÇÃO DO DIA</Text>
                             <Text numberOfLines={3} style={estilos.textoAnotacao}>
                                 {item.trechoAnotacao}
@@ -258,19 +265,21 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                 </Pressable>
             ) : null}
 
-            <View
-                accessible
-                accessibilityLabel={rotuloFase}
-                style={[estilos.fase, { backgroundColor: item.apresentacaoFase.fundo }]}
-            >
-                <RepeatIcon
-                    testID="diary-entry-phase-tag-icon"
-                    size={13}
-                    width={13}
-                    height={13}
-                    color={cor}
-                />
-                <Text style={[estilos.textoFase, { color: cor }]}>{rotuloFase}</Text>
+            <View testID="diary-entry-phase-section" style={estilos.containerFase}>
+                <View
+                    accessible
+                    accessibilityLabel={rotuloFase}
+                    style={[estilos.fase, { backgroundColor: item.apresentacaoFase.fundo }]}
+                >
+                    <RepeatIcon
+                        testID="diary-entry-phase-tag-icon"
+                        size={13}
+                        width={13}
+                        height={13}
+                        color={cor}
+                    />
+                    <Text style={[estilos.textoFase, { color: cor }]}>{rotuloFase}</Text>
+                </View>
             </View>
         </View>
     );

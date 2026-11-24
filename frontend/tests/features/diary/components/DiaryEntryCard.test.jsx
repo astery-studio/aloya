@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 import {
     DiaryEntryCard,
@@ -155,6 +156,18 @@ describe('DiaryEntryCard', () => {
         expect(screen.getByText('+ 2')).toBeOnTheScreen();
         expect(screen.getAllByTestId('diary-entry-chip-row')).toHaveLength(2);
         expect(screen.getByText('Hoje me senti melhor.')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-entry-categories-note-divider')).toHaveStyle({
+            height: StyleSheet.hairlineWidth
+        });
+        expect(screen.getByTestId('diary-entry-note')).toHaveStyle({
+            paddingTop: 12,
+            paddingBottom: 12
+        });
+        expect(screen.getByTestId('diary-entry-phase-section')).toHaveStyle({
+            alignSelf: 'stretch',
+            paddingTop: 6,
+            borderTopWidth: StyleSheet.hairlineWidth
+        });
 
         await fireEvent.press(screen.getByLabelText('Ver detalhes do registro de 04/11/2026'));
         await fireEvent.press(
