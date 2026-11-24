@@ -13,6 +13,7 @@ function DiaryPhaseBadge({
     tamanhoIcone = 14,
     larguraIcone,
     alturaIcone,
+    icone: IconePersonalizado,
     cor: corPersonalizada,
     fundo: fundoPersonalizado
 }) {
@@ -31,7 +32,8 @@ function DiaryPhaseBadge({
         );
     }
 
-    const { Icone, cor: corPadrao, fundo: fundoPadrao, rotulo } = apresentacao;
+    const { Icone: IconeFase, cor: corPadrao, fundo: fundoPadrao, rotulo } = apresentacao;
+    const Icone = IconePersonalizado ?? IconeFase;
     const cor = corPersonalizada ?? corPadrao;
     const fundo = fundoPersonalizado ?? fundoPadrao;
     return (
@@ -40,11 +42,18 @@ function DiaryPhaseBadge({
             style={[estilos.chip, { backgroundColor: fundo }, estilo]}
         >
             <Icone
+                testID="diary-phase-badge-icon"
                 size={tamanhoIcone}
                 width={larguraIcone ?? tamanhoIcone}
                 height={alturaIcone ?? tamanhoIcone}
                 color={cor}
-                weight={fase === 'menstruacao' || fase === 'menstrual' ? 'fill' : 'regular'}
+                weight={
+                    IconePersonalizado
+                        ? 'regular'
+                        : fase === 'menstruacao' || fase === 'menstrual'
+                          ? 'fill'
+                          : 'regular'
+                }
             />
             <Text style={[estilos.texto, { color: cor }, estiloTexto]}>{rotulo}</Text>
         </View>

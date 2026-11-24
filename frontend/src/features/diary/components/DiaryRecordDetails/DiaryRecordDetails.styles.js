@@ -29,6 +29,7 @@ function criarEstilos(tema) {
             color: cores.textoSecundario,
             fontFamily: fontFamilies.semiBold,
             fontSize: 14,
+            fontWeight: '600',
             lineHeight: 25.5
         },
         rolagem: { width: '100%', flexShrink: 1 },
@@ -106,7 +107,8 @@ function criarEstilos(tema) {
             color: cores.destaque,
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
-            lineHeight: 16
+            fontWeight: '600',
+            lineHeight: 16.5
         },
         anotacao: {
             width: '100%',
@@ -144,19 +146,33 @@ function criarEstilos(tema) {
         },
         botaoAcaoDesativado: { opacity: 0.5 },
         textoBotaoAcao: {
-            color: diario.textoSobrePrimaria,
+            color: '#FFF',
             fontFamily: fontFamilies.semiBold,
             fontSize: 13,
-            lineHeight: 20
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
         },
         faseRegistro: {
             width: '100%',
-            minHeight: 35.99,
-            height: 35.99,
+            minHeight: 35.993,
+            height: 35.993,
             marginTop: 0,
-            paddingVertical: 0
+            alignSelf: 'stretch',
+            paddingVertical: 0,
+            paddingHorizontal: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            borderRadius: 10
         },
-        textoFaseRegistro: { fontSize: 13, lineHeight: 20 },
+        textoFaseRegistro: {
+            fontFamily: fontFamilies.semiBold,
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
+        },
         areaBotaoOk: {
             width: '100%',
             flexShrink: 0,

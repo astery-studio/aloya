@@ -3,9 +3,11 @@ import { memo, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonPopup from '../../../../shared/components/common/Button/ButtonPopup/ButtonPopup';
+import { RepeatIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { obterCoresDiario } from '../../config/diaryColors';
 import { formatarDataDiario } from '../../utils/diaryDate';
+import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { DiaryDateNavigator } from '../DiaryDateNavigator/DiaryDateNavigator';
 import { DiaryPhaseBadge } from '../DiaryPhaseBadge/DiaryPhaseBadge';
 import { DiaryRecordActions, criarEstiloBotaoAcao } from '../DiaryRecordActions/DiaryRecordActions';
@@ -64,6 +66,11 @@ function DiaryRecordDetails({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const detalhe = normalizarDetalhe(registro);
     const bloqueado = acaoEmAndamento !== null;
+    const apresentacaoFase = obterApresentacaoFase(detalhe?.fase, tema);
+    const fundoFase =
+        !tema.escuro && ['ovulacao', 'ovulatoria'].includes(detalhe?.fase)
+            ? 'rgba(74, 117, 142, 0.20)'
+            : apresentacaoFase?.fundo;
 
     if (carregando) {
         return (
@@ -153,6 +160,11 @@ function DiaryRecordDetails({
                     estilo={estilos.faseRegistro}
                     estiloTexto={estilos.textoFaseRegistro}
                     tamanhoIcone={13}
+                    larguraIcone={13}
+                    alturaIcone={13}
+                    icone={RepeatIcon}
+                    cor={apresentacaoFase?.cor}
+                    fundo={fundoFase}
                 />
             </ScrollView>
 

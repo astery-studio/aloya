@@ -88,19 +88,51 @@ describe('DiaryRecordDetails', () => {
         expect(screen.getByText('28/10/2026')).toHaveStyle({
             color: '#5C5C59',
             fontSize: 14,
+            fontWeight: '600',
             lineHeight: 25.5
         });
+        expect(screen.getByTestId('diary-date-arrow-icon-anterior')).toHaveProp('width', 16.47);
+        expect(screen.getByTestId('diary-date-arrow-icon-anterior')).toHaveProp('height', 16.47);
         expect(screen.getByText('No dia 21 do seu ciclo 03 você registrou:')).toBeOnTheScreen();
         expect(screen.getByRole('header', { name: 'PELE' })).toHaveStyle({
             fontSize: 10,
             lineHeight: 15
         });
         expect(screen.getByText('ALTERAÇÃO DO REGISTRO')).toHaveStyle({ color: '#2C4C3B' });
-        expect(screen.getByText('Espinhas')).toHaveStyle({ fontSize: 8.56, lineHeight: 16 });
+        expect(screen.getByText('Espinhas')).toHaveStyle({
+            fontSize: 8.56,
+            fontWeight: '600',
+            lineHeight: 16.5
+        });
         expect(screen.getByRole('button', { name: 'Editar registro de 28/10/2026' })).toHaveStyle({
             height: 35.99,
             borderRadius: 20
         });
+        expect(screen.getByText('Editar')).toHaveStyle({
+            color: '#FFF',
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
+        });
+        expect(screen.getByLabelText('Fase Lútea')).toHaveStyle({
+            alignSelf: 'stretch',
+            height: 35.993,
+            paddingHorizontal: 14,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
+            borderRadius: 10,
+            backgroundColor: 'rgba(214, 140, 58, 0.20)'
+        });
+        expect(screen.getByText('Fase Lútea')).toHaveStyle({
+            color: '#D68C3A',
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5
+        });
+        expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('width', 13);
+        expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('height', 13);
         expect(screen.getByRole('button', { name: 'OK' })).toHaveStyle({
             height: 52,
             borderRadius: 12
