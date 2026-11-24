@@ -30,6 +30,30 @@ const GRUPOS_HOME = Object.freeze([
         titulo: 'Sintomas pré-menstruais',
         cor: '#8761A8',
         fundo: '#F1EAF8'
+    },
+    {
+        categoriaId: 'energia',
+        titulo: 'Energia',
+        cor: '#D68C3A',
+        fundo: 'rgba(214, 140, 58, 0.1)'
+    },
+    {
+        categoriaId: 'qualidade_sono',
+        titulo: 'Sono',
+        cor: '#4A758E',
+        fundo: 'rgba(74, 117, 142, 0.1)'
+    },
+    {
+        categoriaId: 'digestao',
+        titulo: 'Digestão',
+        cor: '#2C4C3B',
+        fundo: 'rgba(44, 76, 59, 0.1)'
+    },
+    {
+        categoriaId: 'pele',
+        titulo: 'Pele',
+        cor: '#2C4C3B',
+        fundo: 'rgba(44, 76, 59, 0.1)'
     }
 ]);
 

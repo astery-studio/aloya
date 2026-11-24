@@ -6,7 +6,11 @@ const CATEGORIAS_CHECK_IN = new Set([
     'fluxo_menstrual',
     'sintomas_fisicos',
     'sintomas_emocionais',
-    'sintomas_pre_menstruais'
+    'sintomas_pre_menstruais',
+    'energia',
+    'qualidade_sono',
+    'digestao',
+    'pele'
 ]);
 
 function localizarOpcao(categorias, categoriaId, nome) {
@@ -28,7 +32,14 @@ function criarSugestoesCheckIn({ catalogo, fase, destaques = [] }) {
     const personalizadas = destaques
         .filter(({ categoriaId }) => CATEGORIAS_CHECK_IN.has(categoriaId))
         .map(({ categoriaId, valor }) => [categoriaId, valor]);
-    const candidatas = [...personalizadas, ...(sugestoesPadraoPorFase[fase] ?? [])];
+    const reservasAtivas = [...categorias.values()].flatMap((categoria) =>
+        categoria.opcoes.map(({ nome }) => [categoria.id, nome])
+    );
+    const candidatas = [
+        ...personalizadas,
+        ...(sugestoesPadraoPorFase[fase] ?? []),
+        ...reservasAtivas
+    ];
     const idsIncluidos = new Set();
     const sugestoes = [];
 

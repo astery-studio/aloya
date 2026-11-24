@@ -55,3 +55,32 @@ test('usa somente sintomas comuns da fase quando não há histórico suficiente'
     expect(sugestoes[0].opcao.nome).toBe('Retenção de líquidos');
     expect(sugestoes.at(-1).opcao.nome).toBe('Choro fácil');
 });
+
+test('mantém entre seis e oito opções mesmo sem as categorias principais', () => {
+    const nomes = [
+        'Sem energia',
+        'Com energia',
+        'Exausto',
+        'Cansado',
+        'Disposto',
+        'Agitado',
+        'Energia oscilante'
+    ];
+    const catalogoAlternativo = {
+        macrocategorias: [
+            {
+                ativa: true,
+                categorias: [
+                    {
+                        id: 'energia',
+                        ativaEfetiva: true,
+                        opcoes: nomes.map((nome, indice) => ({ id: `energia_${indice}`, nome }))
+                    }
+                ]
+            }
+        ]
+    };
+
+    const sugestoes = criarSugestoesCheckIn({ catalogo: catalogoAlternativo, fase: 'lutea' });
+    expect(sugestoes).toHaveLength(7);
+});
