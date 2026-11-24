@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mockUseParentalConsent = jest.fn();
 
@@ -40,6 +41,21 @@ jest.mock(
 import { SupportNetworkScreen } from '../../../../src/features/support-network/screens/SupportNetworkScreen';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
+const metricas = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, right: 0, bottom: 0, left: 0 }
+};
+
+function envolverComProviders(conteudo) {
+    return (
+        <SafeAreaProvider initialMetrics={metricas}>
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                {conteudo}
+            </ThemeProvider>
+        </SafeAreaProvider>
+    );
+}
+
 function estado(overrides = {}) {
     return {
         status: null,
@@ -59,9 +75,9 @@ function estado(overrides = {}) {
 
 function renderizar() {
     return render(
-        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+        envolverComProviders(
             <SupportNetworkScreen onSelecionarAba={jest.fn()} onGerenciarResponsavel={jest.fn()} />
-        </ThemeProvider>
+        )
     );
 }
 
@@ -78,12 +94,12 @@ describe('SupportNetworkScreen', () => {
         mockUseParentalConsent.mockReturnValue(estado({ status: { acessoLiberado: true } }));
 
         await render(
-            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+            envolverComProviders(
                 <SupportNetworkScreen
                     receivedContactsService={{ nome: 'recebidos' }}
                     onSelecionarAba={jest.fn()}
                 />
-            </ThemeProvider>
+            )
         );
 
         await fireEvent.press(screen.getByRole('button', { name: 'Abrir acompanhados' }));

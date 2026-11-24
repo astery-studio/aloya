@@ -1,17 +1,34 @@
 // Confirma a posição do rodapé e as cores do layout.
 import { render, screen, within } from '@testing-library/react-native';
 import { Text } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SettingsLayout } from '../../../../src/features/settings/layouts/SettingsLayout/SettingsLayout';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
+const metricas = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, right: 0, bottom: 0, left: 0 }
+};
+
+function envolverComProviders(conteudo, preferencia) {
+    return (
+        <SafeAreaProvider initialMetrics={metricas}>
+            <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+                {conteudo}
+            </ThemeProvider>
+        </SafeAreaProvider>
+    );
+}
+
 function renderizarLayout(propriedades = {}, preferencia = 'claro') {
     return render(
-        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+        envolverComProviders(
             <SettingsLayout titulo="Configurações" {...propriedades}>
                 <Text>Campos da tela</Text>
-            </SettingsLayout>
-        </ThemeProvider>
+            </SettingsLayout>,
+            preferencia
+        )
     );
 }
 
@@ -105,11 +122,12 @@ describe('SettingsLayout com rodapé', () => {
         });
 
         await resultado.rerender(
-            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
+            envolverComProviders(
                 <SettingsLayout titulo="Configurações">
                     <Text>Campos da tela</Text>
-                </SettingsLayout>
-            </ThemeProvider>
+                </SettingsLayout>,
+                'escuro'
+            )
         );
 
         expect(screen.getByTestId('settings-layout')).toHaveStyle({

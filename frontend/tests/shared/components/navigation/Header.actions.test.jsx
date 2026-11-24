@@ -1,14 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Header } from '../../../../src/shared/components/navigation/Header/Header';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
 function renderizarHeader(propriedades = {}) {
     return render(
-        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
-            <Header titulo="Rede de Apoio" {...propriedades} />
-        </ThemeProvider>
+        <SafeAreaProvider
+            initialMetrics={{
+                frame: { x: 0, y: 0, width: 390, height: 844 },
+                insets: { top: 0, right: 0, bottom: 0, left: 0 }
+            }}
+        >
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <Header titulo="Rede de Apoio" {...propriedades} />
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 }
 
