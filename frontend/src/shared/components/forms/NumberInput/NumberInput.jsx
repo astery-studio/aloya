@@ -35,6 +35,7 @@ export default function NumberInput({
             ? ''
             : String(valor).replace('.', casasDecimais > 0 ? ',' : '.');
     const numeroAtual = texto ? Number(texto.replace(',', '.')) : Number.NaN;
+    const exibirPlaceholderComoTexto = placeholderComoTexto && !texto;
     const comprimentoMaximo = maximoDigitosInteiros + (casasDecimais > 0 ? casasDecimais + 1 : 0);
 
     function alterar(novoTexto) {
@@ -77,20 +78,24 @@ export default function NumberInput({
                         style={[
                             estilos.entrada,
                             placeholderComoTexto && estilos.entradaSobreposta,
+                            exibirPlaceholderComoTexto && estilos.entradaOculta,
                             estiloEntrada
                         ]}
                     />
-                    {placeholderComoTexto && !texto ? (
-                        <Text
-                            testID="placeholder-campo-numero"
-                            pointerEvents="none"
-                            style={[estilos.placeholderSobreposto, estiloPlaceholder]}
-                        >
-                            {placeholder}
-                        </Text>
-                    ) : null}
                 </View>
-                <Text style={[estilos.unidade, estiloUnidade]}>{unidade}</Text>
+                {exibirPlaceholderComoTexto ? null : (
+                    <Text style={[estilos.unidade, estiloUnidade]}>{unidade}</Text>
+                )}
+                {exibirPlaceholderComoTexto ? (
+                    <Text
+                        testID="placeholder-campo-numero"
+                        pointerEvents="none"
+                        style={[estilos.placeholderComUnidade, estiloPlaceholder]}
+                    >
+                        {placeholder}
+                        <Text style={estiloUnidade}> {unidade}</Text>
+                    </Text>
+                ) : null}
                 {permitirLimpar && texto ? (
                     <Pressable
                         accessibilityRole="button"

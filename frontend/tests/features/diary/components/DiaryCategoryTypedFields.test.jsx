@@ -81,7 +81,7 @@ describe('campos tipados do Diário', () => {
         );
         expect(screen.getByLabelText('Peso')).toHaveProp('accessibilityValue', {});
         expect(screen.getByLabelText('Peso')).not.toHaveProp('placeholder');
-        expect(screen.getByTestId('placeholder-campo-numero')).toHaveTextContent('0');
+        expect(screen.getByTestId('placeholder-campo-numero')).toHaveTextContent('0 kg');
         expect(screen.getByTestId('placeholder-campo-numero')).toHaveStyle({
             color: '#2C4C3B',
             height: 24,
@@ -128,9 +128,10 @@ describe('campos tipados do Diário', () => {
             <DiaryCategoryField categoria={sono} valor={null} paleta="energia" />
         );
         expect(screen.getByLabelText('Horas de sono')).not.toHaveProp('placeholder');
-        expect(screen.getByTestId('placeholder-horas-sono')).toHaveTextContent('00');
-        expect(screen.getByTestId('placeholder-minutos-sono')).toHaveTextContent('00');
-        expect(screen.getByTestId('placeholder-horas-sono')).toHaveStyle({
+        expect(screen.getByTestId('placeholder-tempo-sono')).toHaveTextContent(
+            '00 horas 00 minutos'
+        );
+        expect(screen.getByTestId('placeholder-tempo-sono')).toHaveStyle({
             color: '#B07D2A',
             height: 24,
             fontSize: 13,
@@ -160,15 +161,15 @@ describe('campos tipados do Diário', () => {
             height: 36,
             paddingTop: 0
         });
-        await fireEvent(entrada, 'contentSizeChange', {
-            nativeEvent: { contentSize: { height: 100 } }
+        await fireEvent(screen.getByTestId('medidor-anotacao-livre'), 'textLayout', {
+            nativeEvent: { lines: [{}, {}, {}, {}] }
         });
-        expect(entrada).toHaveStyle({ height: 100 });
-        expect(screen.getByTestId('container-campo-texto')).toHaveStyle({ height: 112 });
-        await fireEvent(entrada, 'contentSizeChange', {
-            nativeEvent: { contentSize: { height: 300 } }
+        expect(entrada).toHaveStyle({ height: 96 });
+        expect(screen.getByTestId('container-campo-texto')).toHaveStyle({ height: 108 });
+        await fireEvent(screen.getByTestId('medidor-anotacao-livre'), 'textLayout', {
+            nativeEvent: { lines: Array.from({ length: 12 }, () => ({})) }
         });
-        expect(entrada).toHaveStyle({ height: 300 });
+        expect(entrada).toHaveStyle({ height: 288 });
         expect(screen.getByText('3 / 5000')).toBeOnTheScreen();
         expect(screen.getByText('3 / 5000')).toHaveStyle({ color: '#4A5899' });
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar anotação livre' }));

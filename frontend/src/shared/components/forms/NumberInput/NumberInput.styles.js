@@ -50,11 +50,13 @@ function criarEstilos(tema) {
             justifyContent: 'center'
         },
         entradaSobreposta: { width: '100%', height: '100%' },
-        placeholderSobreposto: {
+        entradaOculta: { opacity: 0 },
+        placeholderComUnidade: {
             position: 'absolute',
             width: '100%',
             height: 24,
-            textAlign: 'center'
+            textAlign: 'center',
+            textAlignVertical: 'center'
         },
         unidade: { ...texto, fontFamily: fontFamilies.semibold },
         limpar: { position: 'absolute', right: 18 },

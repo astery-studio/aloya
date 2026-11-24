@@ -35,6 +35,7 @@ function DurationInput({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const duracao = decomporDuracao(valorMinutos);
+    const exibirPlaceholderComoTexto = placeholderComoTexto && !duracao.horas && !duracao.minutos;
 
     function alterar(parte, texto) {
         const recebido = limitarDoisDigitos(texto);
@@ -62,20 +63,14 @@ function DurationInput({
                             style={[
                                 estilos.entrada,
                                 placeholderComoTexto && estilos.entradaSobreposta,
+                                exibirPlaceholderComoTexto && estilos.entradaOculta,
                                 estiloEntrada
                             ]}
                         />
-                        {placeholderComoTexto && !duracao.horas ? (
-                            <Text
-                                testID="placeholder-horas-sono"
-                                pointerEvents="none"
-                                style={[estilos.placeholderSobreposto, estiloPlaceholder]}
-                            >
-                                {placeholderHoras}
-                            </Text>
-                        ) : null}
                     </View>
-                    <Text style={[estilos.unidade, estiloUnidade]}>{rotuloHoras}</Text>
+                    {exibirPlaceholderComoTexto ? null : (
+                        <Text style={[estilos.unidade, estiloUnidade]}>{rotuloHoras}</Text>
+                    )}
                 </View>
                 <View style={estilos.grupo}>
                     <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
@@ -92,21 +87,27 @@ function DurationInput({
                             style={[
                                 estilos.entrada,
                                 placeholderComoTexto && estilos.entradaSobreposta,
+                                exibirPlaceholderComoTexto && estilos.entradaOculta,
                                 estiloEntrada
                             ]}
                         />
-                        {placeholderComoTexto && !duracao.minutos ? (
-                            <Text
-                                testID="placeholder-minutos-sono"
-                                pointerEvents="none"
-                                style={[estilos.placeholderSobreposto, estiloPlaceholder]}
-                            >
-                                {placeholderMinutos}
-                            </Text>
-                        ) : null}
                     </View>
-                    <Text style={[estilos.unidade, estiloUnidade]}>{rotuloMinutos}</Text>
+                    {exibirPlaceholderComoTexto ? null : (
+                        <Text style={[estilos.unidade, estiloUnidade]}>{rotuloMinutos}</Text>
+                    )}
                 </View>
+                {exibirPlaceholderComoTexto ? (
+                    <Text
+                        testID="placeholder-tempo-sono"
+                        pointerEvents="none"
+                        style={[estilos.placeholderComUnidade, estiloPlaceholder]}
+                    >
+                        {placeholderHoras}
+                        <Text style={estiloUnidade}> {rotuloHoras} </Text>
+                        {placeholderMinutos}
+                        <Text style={estiloUnidade}> {rotuloMinutos}</Text>
+                    </Text>
+                ) : null}
                 {valorMinutos ? (
                     <Pressable
                         accessibilityRole="button"

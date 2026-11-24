@@ -117,6 +117,18 @@ function criarEstilos(tema) {
             textAlign: 'center',
             includeFontPadding: false
         },
+        medidorAnotacao: {
+            position: 'absolute',
+            width: '100%',
+            paddingHorizontal: 20,
+            opacity: 0,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            includeFontPadding: false
+        },
         contador: {
             alignSelf: 'flex-end',
             color: cores.textoSecundario,

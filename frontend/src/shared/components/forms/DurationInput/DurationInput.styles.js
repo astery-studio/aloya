@@ -39,11 +39,13 @@ function criarEstilos(tema) {
             justifyContent: 'center'
         },
         entradaSobreposta: { width: '100%', height: '100%' },
-        placeholderSobreposto: {
+        entradaOculta: { opacity: 0 },
+        placeholderComUnidade: {
             position: 'absolute',
             width: '100%',
             height: 24,
-            textAlign: 'center'
+            textAlign: 'center',
+            textAlignVertical: 'center'
         },
         unidade: {
             color: tema.cores.interface.textoPrincipal,

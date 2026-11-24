@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Keyboard, Pressable, Text } from 'react-native';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
@@ -22,6 +22,17 @@ function DiaryFreeTextCategoryField({
 }) {
     const coresDiario = obterCoresDiario(tema);
     const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
+
+    useEffect(() => {
+        if (!valor) setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
+    }, [valor]);
+
+    function medirLinhas(linhas) {
+        const quantidadeLinhas = Array.isArray(linhas) ? linhas.length : 0;
+        if (quantidadeLinhas === 0) return;
+        const proximaAltura = calcularAlturaAnotacao(quantidadeLinhas * 24);
+        setAlturaAnotacao((atual) => (atual === proximaAltura ? atual : proximaAltura));
+    }
 
     function limpar() {
         setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
@@ -55,9 +66,6 @@ function DiaryFreeTextCategoryField({
                     }
                 ]}
                 scrollEnabled={false}
-                onContentSizeChange={({ nativeEvent }) =>
-                    setAlturaAnotacao(calcularAlturaAnotacao(nativeEvent.contentSize.height))
-                }
                 acaoDireita={
                     valor ? (
                         <Pressable
@@ -81,6 +89,16 @@ function DiaryFreeTextCategoryField({
                     )
                 }
             />
+            {valor ? (
+                <Text
+                    testID="medidor-anotacao-livre"
+                    accessible={false}
+                    onTextLayout={({ nativeEvent }) => medirLinhas(nativeEvent.lines)}
+                    style={[estilos.medidorAnotacao, { color: cores.icone }]}
+                >
+                    {valor}
+                </Text>
+            ) : null}
             <Text style={[estilos.contador, { color: cores.icone }]}>
                 {[...(valor ?? '')].length} / {limite}
             </Text>
