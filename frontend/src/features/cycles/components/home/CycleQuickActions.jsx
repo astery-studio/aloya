@@ -13,23 +13,29 @@ function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAntic
             <ButtonScreen
                 texto="Cadastrar Menstruação"
                 icone={MenstruationIcon}
+                tamanhoIcone={20}
                 aoPressionar={aoCadastrarMenstruacao}
                 estilo={estilos.principal}
+                estiloTexto={estilos.texto}
             />
             <View style={estilos.linha}>
                 <ButtonScreen
                     texto="Diário"
                     icone={NotepadIcon}
+                    tamanhoIcone={20}
                     aoPressionar={aoAbrirDiario}
                     variante="verde"
                     estilo={estilos.secundaria}
+                    estiloTexto={estilos.texto}
                 />
                 <ButtonScreen
                     texto="Anticoncepcional"
                     icone={PillIcon}
+                    tamanhoIcone={20}
                     aoPressionar={aoAbrirAnticoncepcional}
                     variante="verde"
-                    estilo={estilos.secundaria}
+                    estilo={[estilos.secundaria, estilos.anticoncepcional]}
+                    estiloTexto={estilos.texto}
                 />
             </View>
         </View>
