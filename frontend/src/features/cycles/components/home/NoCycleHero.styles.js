@@ -4,11 +4,12 @@ import { fontFamilies } from '../../../../shared/theme';
 const estilos = StyleSheet.create({
     container: {
         alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         width: '100%'
     },
     simbolo: {
         height: 260,
+        marginVertical: 32,
         width: 260
     },
     titulo: {
@@ -18,7 +19,7 @@ const estilos = StyleSheet.create({
         fontWeight: '400',
         letterSpacing: -1.085,
         lineHeight: 33,
-        marginTop: 16,
+        marginTop: 0,
         maxWidth: 310,
         textAlign: 'center'
     },
