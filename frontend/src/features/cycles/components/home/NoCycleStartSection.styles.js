@@ -56,13 +56,31 @@ const estilos = StyleSheet.create({
     acaoPrincipal: {
         backgroundColor: '#C85A44',
         borderRadius: 12,
-        height: 45
+        height: 45,
+        paddingHorizontal: 0
     },
     acao: {
         backgroundColor: '#2C4C3B',
         borderRadius: 12,
         flex: 1,
-        height: 45
+        height: 45,
+        paddingHorizontal: 0
+    },
+    acaoAnticoncepcional: {
+        borderWidth: 0.666667,
+        borderColor: '#E6E2D8',
+        paddingHorizontal: 20
+    },
+    textoAcao: {
+        fontFamily: fontFamilies.semibold,
+        fontSize: 15,
+        fontWeight: '600',
+        letterSpacing: 0,
+        lineHeight: 22
+    },
+    textoAcaoPrincipal: {
+        fontFamily: fontFamilies.bold,
+        fontWeight: '700'
     }
 });
 
