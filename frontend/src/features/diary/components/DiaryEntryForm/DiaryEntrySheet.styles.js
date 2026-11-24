@@ -13,7 +13,7 @@ function criarEstilos(tema) {
             paddingBottom: 0,
             backgroundColor: cores.superficie
         },
-        navegadorData: { paddingTop: 10 },
+        navegadorData: { paddingTop: 0 },
         containerFase: {
             width: 294,
             maxWidth: '100%',

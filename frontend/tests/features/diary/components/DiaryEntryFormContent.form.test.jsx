@@ -86,7 +86,7 @@ test('renderiza o formulário, navega nas datas e salva', async () => {
     );
 
     expect(screen.getByText('Macros:1;desabilitado:false')).toBeOnTheScreen();
-    expect(screen.getByTestId('navegador-data-formulario')).toHaveStyle({ paddingTop: 10 });
+    expect(screen.getByTestId('navegador-data-formulario')).toHaveStyle({ paddingTop: 0 });
     expect(screen.getByTestId('rolagem-registro-diario')).toHaveProp(
         'keyboardShouldPersistTaps',
         'never'
