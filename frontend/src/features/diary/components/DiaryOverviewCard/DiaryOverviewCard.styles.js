@@ -58,10 +58,11 @@ function criarEstilos(tema) {
         },
         fase: { fontFamily: fontFamilies.bold, fontWeight: '700' },
         descricao: {
-            color: cores.textoSecundario,
+            color: tema.escuro ? cores.textoSecundario : '#5C5C59',
             fontFamily: fontFamilies.regular,
-            fontSize: 11,
-            lineHeight: 17
+            fontSize: 10,
+            fontWeight: '400',
+            lineHeight: 22.5
         },
         rodape: {
             alignItems: 'center',

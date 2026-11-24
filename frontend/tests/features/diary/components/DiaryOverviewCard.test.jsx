@@ -45,6 +45,12 @@ describe('DiaryOverviewCard', () => {
             color: '#2C4C3B',
             fontWeight: '700'
         });
+        expect(screen.getByText('Energia e disposição podem aumentar.')).toHaveStyle({
+            color: '#5C5C59',
+            fontSize: 10,
+            fontWeight: '400',
+            lineHeight: 22.5
+        });
         expect(screen.getByTestId('diary-overview-day-counter')).toHaveStyle({
             width: 266.59,
             height: 26,
