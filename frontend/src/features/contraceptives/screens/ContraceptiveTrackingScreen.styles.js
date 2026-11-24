@@ -6,26 +6,6 @@ function criarEstilosAcompanhamento(tema) {
     const interfaceTema = tema.cores.interface;
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo },
-        cabecalho: {
-            width: '100%',
-            maxWidth: 393.33,
-            alignSelf: 'center',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            paddingLeft: 12,
-            paddingRight: 24,
-            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
-        },
-        botaoVoltar: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
-        titulo: {
-            ...tema.headerTypography.compacto,
-            flex: 1,
-            flexShrink: 1,
-            color: interfaceTema.textoPrincipal,
-            minWidth: 0
-        },
         corpo: {
             flex: 1,
             minHeight: 0,

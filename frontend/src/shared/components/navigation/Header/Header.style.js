@@ -32,6 +32,21 @@ function criarEstilos(tema) {
             color: tema.cores.interface.textoPrincipal
         },
 
+        blocoTitulo: {
+            flex: 1,
+            flexShrink: 1,
+            alignItems: 'flex-start'
+        },
+
+        blocoTituloComVoltar: {
+            alignItems: 'center'
+        },
+
+        tituloNoBloco: {
+            ...tema.headerTypography.principal,
+            color: tema.cores.interface.textoPrincipal
+        },
+
         tituloComVoltar: {
             ...tema.headerTypography.compacto,
             textAlign: 'center'
@@ -42,6 +57,12 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 12
+        },
+
+        acoesComVoltar: {
+            width: 48,
+            height: 48,
+            justifyContent: 'center'
         },
 
         containerVoltar: {

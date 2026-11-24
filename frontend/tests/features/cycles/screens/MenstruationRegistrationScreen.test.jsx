@@ -24,7 +24,7 @@ function montar(props = {}, opcoes = {}) {
     );
 }
 
-test('usa o padrão compacto sem altura rígida e separa o conteúdo', async () => {
+test('usa o padrão compartilhado dos headers com voltar e separa o conteúdo', async () => {
     await montar();
 
     expect(screen.getByRole('header')).toHaveStyle({
@@ -32,15 +32,17 @@ test('usa o padrão compacto sem altura rígida e separa o conteúdo', async () 
         fontSize: 20,
         fontWeight: '700',
         lineHeight: 28,
-        textAlign: 'left'
+        textAlign: 'center'
     });
 
     const estilos = criarEstilos(temaClaro);
 
-    expect(estilos.cabecalho.minHeight).toBeUndefined();
-    expect(estilos.cabecalho.paddingTop).toBe(16);
-    expect(estilos.voltar).toMatchObject({ width: 48, height: 48 });
-    expect(estilos.cabecalho.paddingBottom).toBe(16);
+    expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
+    expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+    expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
+        width: 48,
+        height: 48
+    });
     expect(estilos.legenda.marginTop).toBe(8);
 });
 

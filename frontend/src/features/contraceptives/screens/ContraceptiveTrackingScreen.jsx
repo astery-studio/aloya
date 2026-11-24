@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, SectionList, Text, View } from 'react-native';
-import { ArrowLeftIcon } from '../../../shared/components/icons/AppIcons';
+import { ActivityIndicator, SectionList, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import {
     ContraceptiveUsageCard,
@@ -153,24 +153,11 @@ function ContraceptiveTrackingScreen({
 
     return (
         <SafeAreaView
-            edges={['top', 'left', 'right', 'bottom']}
+            edges={['left', 'right', 'bottom']}
             style={estilosAcompanhamento.tela}
             testID="anticoncepcionais-area-segura"
         >
-            <View style={estilosAcompanhamento.cabecalho}>
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Voltar"
-                    onPress={aoVoltar}
-                    hitSlop={10}
-                    style={estilosAcompanhamento.botaoVoltar}
-                >
-                    <ArrowLeftIcon size={24} color={tema.cores.interface.textoSecundario} />
-                </Pressable>
-                <Text accessibilityRole="header" style={estilosAcompanhamento.titulo}>
-                    Anticoncepcionais
-                </Text>
-            </View>
+            <Header titulo="Anticoncepcionais" variante="comVoltar" onVoltar={aoVoltar} />
 
             {carregando ? (
                 <View style={estilosAcompanhamento.estadoCentral}>

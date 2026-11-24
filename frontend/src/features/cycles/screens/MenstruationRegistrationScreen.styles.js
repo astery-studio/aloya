@@ -8,30 +8,6 @@ function criarEstilos(tema) {
 
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo },
-        cabecalho: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            paddingLeft: 12,
-            paddingRight: 24,
-            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.separador
-        },
-        titulo: {
-            ...tema.headerTypography.compacto,
-            flex: 1,
-            flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal
-        },
-        voltar: {
-            width: 48,
-            height: 48,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        corIconeCabecalho: tema.cores.interface.textoPrincipal,
         legenda: {
             minHeight: 40,
             marginTop: tema.espacamentosLayout.headerParaConteudo,

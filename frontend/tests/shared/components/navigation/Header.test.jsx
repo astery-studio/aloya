@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mockArrowLeftIcon = jest.fn(() => null);
@@ -178,6 +178,40 @@ describe('Header', () => {
             width: 48,
             height: 48
         });
+    });
+
+    test('mantém o título centralizado quando o header com voltar possui ação direita', async () => {
+        await renderizarHeader({
+            titulo: 'Calendário',
+            variante: 'comVoltar',
+            onVoltar: jest.fn(),
+            acoesDireita: (
+                <Pressable accessibilityRole="button" accessibilityLabel="Abrir legenda">
+                    <Text>Legenda</Text>
+                </Pressable>
+            )
+        });
+
+        expect(screen.getByRole('header')).toHaveStyle({ textAlign: 'center' });
+        expect(screen.queryByTestId('header-back-balance')).toBeNull();
+        expect(screen.getByTestId('header-actions')).toHaveStyle({
+            width: 48,
+            height: 48,
+            justifyContent: 'center'
+        });
+        expect(screen.getByRole('button', { name: 'Abrir legenda' })).toBeOnTheScreen();
+    });
+
+    test('mantém complemento abaixo do título centralizado sem criar outra variante', async () => {
+        await renderizarHeader({
+            titulo: 'Calendário',
+            variante: 'comVoltar',
+            onVoltar: jest.fn(),
+            complementoTitulo: <Text>Confiança alta</Text>
+        });
+
+        expect(screen.getByRole('header')).toHaveStyle({ textAlign: 'center' });
+        expect(screen.getByText('Confiança alta')).toBeOnTheScreen();
     });
 
     test('não reserva o balanceamento do botão nos headers sem voltar', async () => {

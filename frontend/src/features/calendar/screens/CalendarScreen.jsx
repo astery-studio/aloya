@@ -1,12 +1,13 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
-import { ArrowLeftIcon, InfoIcon } from '../../../shared/components/icons/AppIcons';
+import { InfoIcon } from '../../../shared/components/icons/AppIcons';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import { Header } from '../../../shared/components/navigation/Header/Header';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
 import { useTheme } from '../../../shared/hooks/useTheme';
@@ -142,8 +143,7 @@ function CalendarScreen({
     aoTentarSincronizar
 }) {
     const tema = useTheme();
-    const insets = useSafeAreaInsets();
-    const estilos = useMemo(() => criarEstilos(tema, insets.top), [insets.top, tema]);
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
 
     const mesesValidos = Array.isArray(meses) ? meses : [];
@@ -156,59 +156,41 @@ function CalendarScreen({
 
     return (
         <View style={estilos.tela}>
-            <View testID="cabecalho-calendario" style={estilos.cabecalho}>
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Voltar"
-                    accessibilityState={{ disabled: typeof aoVoltar !== 'function' }}
-                    disabled={typeof aoVoltar !== 'function'}
-                    onPress={aoVoltar}
-                    style={estilos.acaoCabecalho}
-                >
-                    <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
-                </Pressable>
-
-                <View
-                    testID="centralizador-cabecalho"
-                    pointerEvents="box-none"
-                    style={estilos.centralizadorCabecalho}
-                >
-                    <View style={estilos.caixaCalendario}>
-                        <View testID="titulo-e-confianca" style={estilos.tituloEConfianca}>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
-                                Calendário
-                            </Text>
-                            {!estadoVazio && confiancaValida ? (
-                                <View
-                                    testID="centralizador-confianca"
-                                    style={estilos.centralizadorConfianca}
-                                >
-                                    <ConfidenceBadge
-                                        nivel={confiancaValida}
-                                        variante="simples"
-                                        coresPersonalizadas={
-                                            tema.escuro
-                                                ? coresConfiabilidadeEscuras[confiancaValida]
-                                                : undefined
-                                        }
-                                    />
-                                </View>
-                            ) : null}
+            <Header
+                titulo="Calendário"
+                variante="comVoltar"
+                onVoltar={aoVoltar}
+                complementoTitulo={
+                    !estadoVazio && confiancaValida ? (
+                        <View
+                            testID="centralizador-confianca"
+                            style={estilos.centralizadorConfianca}
+                        >
+                            <ConfidenceBadge
+                                nivel={confiancaValida}
+                                variante="simples"
+                                coresPersonalizadas={
+                                    tema.escuro
+                                        ? coresConfiabilidadeEscuras[confiancaValida]
+                                        : undefined
+                                }
+                            />
                         </View>
-                    </View>
-                </View>
-
-                <Pressable
-                    testID="acao-legenda-calendario"
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir legenda do calendário"
-                    onPress={() => setLegendaVisivel(true)}
-                    hitSlop={8}
-                    style={estilos.acaoLegenda}
-                >
-                    <InfoIcon size={21.995} color={estilos.corIconeCabecalho} />
-                </Pressable>
-            </View>
+                    ) : null
+                }
+                acoesDireita={
+                    <Pressable
+                        testID="acao-legenda-calendario"
+                        accessibilityRole="button"
+                        accessibilityLabel="Abrir legenda do calendário"
+                        onPress={() => setLegendaVisivel(true)}
+                        hitSlop={8}
+                        style={estilos.acaoLegenda}
+                    >
+                        <InfoIcon size={21.995} color={estilos.corIconeCabecalho} />
+                    </Pressable>
+                }
+            />
 
             <View style={estilos.conteudo}>
                 <View style={estilos.areaCalendario}>

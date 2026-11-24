@@ -1,11 +1,7 @@
 import React from 'react';
-import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { CalendarScreen } from '../../../../src/features/calendar/screens/CalendarScreen';
-import {
-    criarEstilos,
-    estilos
-} from '../../../../src/features/calendar/screens/CalendarScreen.styles';
-import { temaClaro } from '../../../../src/shared/theme/themePalettes';
+import { estilos } from '../../../../src/features/calendar/screens/CalendarScreen.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
@@ -137,35 +133,19 @@ describe('CalendarScreen', () => {
         expect(screen.getByText('Calendário')).toBeOnTheScreen();
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('alta');
-        const tituloEConfianca = within(screen.getByTestId('titulo-e-confianca'));
-        expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen();
-        expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen();
-        expect(estilos.centralizadorCabecalho).toMatchObject({
-            flex: 1,
-            minWidth: 0,
-            alignItems: 'flex-start'
-        });
-        expect(estilos.caixaCalendario).toMatchObject({
-            maxWidth: '100%'
-        });
-        expect(estilos.tituloEConfianca).toMatchObject({
-            flexDirection: 'column',
-            alignItems: 'flex-start'
-        });
-        expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
-            alignSelf: 'flex-start',
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        });
-        expect(estilos.cabecalho.height).toBeUndefined();
-        expect(criarEstilos(temaClaro, 59).cabecalho.paddingTop).toBe(75);
-        expect(estilos.titulo).toMatchObject({
+        expect(screen.getByRole('header', { name: 'Calendário' })).toHaveStyle({
             fontFamily: 'DMSans_700Bold',
             fontSize: 20,
             lineHeight: 28,
-            textAlign: 'left'
+            textAlign: 'center'
         });
-        expect(estilos.cabecalho.paddingBottom).toBe(16);
+        expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
+            alignSelf: 'center',
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
+        expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
         expect(estilos.conteudo).toMatchObject({ paddingTop: 8 });
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
         expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
@@ -185,7 +165,8 @@ describe('CalendarScreen', () => {
             registroCicloId: 9
         });
         expect(screen.getByTestId('acao-legenda-calendario')).toHaveStyle({
-            padding: 8,
+            width: 48,
+            height: 48,
             alignItems: 'center'
         });
         expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 21.995);

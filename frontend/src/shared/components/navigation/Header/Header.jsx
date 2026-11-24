@@ -14,6 +14,7 @@ function Header({
     corTexto,
     acoes = null,
     acoesDireita = null,
+    complementoTitulo = null,
     aplicarSafeAreaSuperior = true
 }) {
     const tema = useTheme();
@@ -24,7 +25,7 @@ function Header({
     const temVoltar = variante === 'comVoltar';
 
     const acoesExibidas = acoesDireita ?? acoes;
-    const temAcoes = !temVoltar && Boolean(acoesExibidas);
+    const temAcoes = temVoltar ? Boolean(acoesDireita) : Boolean(acoesExibidas);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
     const paddingTop =
@@ -67,18 +68,34 @@ function Header({
                     </Pressable>
                 ) : null}
 
-                <Text
-                    style={[
-                        estilos.titulo,
-                        temVoltar && estilos.tituloComVoltar,
-                        corTexto ? { color: corTexto } : null
-                    ]}
-                    accessibilityRole="header"
-                >
-                    {titulo}
-                </Text>
+                {complementoTitulo ? (
+                    <View style={[estilos.blocoTitulo, temVoltar && estilos.blocoTituloComVoltar]}>
+                        <Text
+                            style={[
+                                estilos.tituloNoBloco,
+                                temVoltar && estilos.tituloComVoltar,
+                                corTexto ? { color: corTexto } : null
+                            ]}
+                            accessibilityRole="header"
+                        >
+                            {titulo}
+                        </Text>
+                        {complementoTitulo}
+                    </View>
+                ) : (
+                    <Text
+                        style={[
+                            estilos.titulo,
+                            temVoltar && estilos.tituloComVoltar,
+                            corTexto ? { color: corTexto } : null
+                        ]}
+                        accessibilityRole="header"
+                    >
+                        {titulo}
+                    </Text>
+                )}
 
-                {temVoltar ? (
+                {temVoltar && !temAcoes ? (
                     <View
                         testID="header-back-balance"
                         pointerEvents="none"
@@ -91,7 +108,7 @@ function Header({
                         testID="header-actions"
                         accessibilityRole="toolbar"
                         accessibilityLabel="Ações da tela"
-                        style={estilos.acoes}
+                        style={[estilos.acoes, temVoltar && estilos.acoesComVoltar]}
                     >
                         {acoesExibidas}
                     </View>

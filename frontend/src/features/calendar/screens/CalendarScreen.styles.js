@@ -17,65 +17,22 @@ const coresConfiabilidadeEscuras = Object.freeze({
     alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
 });
 
-function criarEstilos(tema, insetSuperior = 0) {
+function criarEstilos(tema) {
     return StyleSheet.create({
         tela: {
             flex: 1,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
-        cabecalho: {
-            display: 'flex',
-            paddingTop: insetSuperior + tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingRight: 20,
-            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
-            paddingLeft: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 8,
-            flexShrink: 0,
-            alignSelf: 'stretch'
-        },
-        acaoCabecalho: {
-            width: 32,
-            height: 40,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
         acaoLegenda: {
-            padding: 8,
+            width: 48,
+            height: 48,
             alignItems: 'center',
             justifyContent: 'center'
-        },
-        centralizadorCabecalho: {
-            flex: 1,
-            minWidth: 0,
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        },
-        caixaCalendario: {
-            display: 'flex',
-            maxWidth: '100%',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        },
-        tituloEConfianca: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: 2
         },
         centralizadorConfianca: {
-            alignSelf: 'flex-start',
-            alignItems: 'flex-start',
+            alignSelf: 'center',
+            alignItems: 'center',
             justifyContent: 'center'
-        },
-        titulo: {
-            ...tema.headerTypography.compacto,
-            color: tema.cores.interface.textoPrincipal,
-            flexShrink: 1
         },
         corIconeCabecalho: tema.cores.interface.textoSecundario,
         conteudo: {

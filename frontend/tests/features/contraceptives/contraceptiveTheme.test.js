@@ -31,7 +31,7 @@ describe('tema escuro de anticoncepcionais', () => {
         expect(telas.conteudoFormulario.paddingTop).toBe(8);
         expect(telas.lista.paddingTop).toBe(8);
         expect(acompanhamento.tela.backgroundColor).toBe('#121212');
-        expect(acompanhamento.titulo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
+        expect(acompanhamento.corpo.paddingTop).toBe(8);
         expect(inicio.conteudo.paddingTop).toBe(8);
     });
 });

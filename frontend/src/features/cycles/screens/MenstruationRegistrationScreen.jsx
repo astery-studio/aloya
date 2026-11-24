@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { InfoIcon } from 'phosphor-react-native/src/icons/Info';
 import { DropIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal/SimpleModal';
+import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { MenstruationRegistrationCalendar } from '../components/MenstruationRegistrationCalendar';
@@ -67,25 +67,12 @@ function MenstruationRegistrationScreen({
         selecionadas.length > 0 &&
         selecionadas.every((data) => /^\d{4}-\d{2}-\d{2}$/.test(data) && data <= hoje);
     return (
-        <SafeAreaView
-            testID="tela-cadastro-menstruacao"
-            edges={['top', 'bottom']}
-            style={estilos.tela}
-        >
-            <View style={estilos.cabecalho}>
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Voltar"
-                    disabled={salvando || typeof onVoltar !== 'function'}
-                    onPress={onVoltar}
-                    style={estilos.voltar}
-                >
-                    <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
-                </Pressable>
-                <Text accessibilityRole="header" style={estilos.titulo}>
-                    Cadastrar menstruação
-                </Text>
-            </View>
+        <SafeAreaView testID="tela-cadastro-menstruacao" edges={['bottom']} style={estilos.tela}>
+            <Header
+                titulo="Cadastrar menstruação"
+                variante="comVoltar"
+                onVoltar={salvando ? undefined : onVoltar}
+            />
             <View style={estilos.legenda}>
                 <View style={estilos.itemLegenda}>
                     <View style={estilos.simboloAnterior} />
