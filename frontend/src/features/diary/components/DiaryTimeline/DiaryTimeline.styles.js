@@ -1,17 +1,14 @@
 // Define a geometria responsiva da linha do tempo e de seus estados de paginação.
 import { StyleSheet } from 'react-native';
 
-import { espacamentosLayout, fontFamilies } from '../../../../shared/theme';
+import { fontFamilies } from '../../../../shared/theme';
 import { obterCoresDiario } from '../../config/diaryColors';
 
 // Converte os tokens do tema em estilos da lista, trilho e rodapé.
 function criarEstilos(tema) {
     const cores = obterCoresDiario(tema).interface;
     return StyleSheet.create({
-        lista: {
-            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
-            paddingBottom: 24
-        },
+        lista: { paddingBottom: 24 },
         item: { flexDirection: 'row' },
         trilho: { width: 69, alignItems: 'center' },
         marcador: {
