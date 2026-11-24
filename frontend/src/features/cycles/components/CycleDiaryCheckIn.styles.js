@@ -42,15 +42,22 @@ const estilos = StyleSheet.create({
         paddingTop: 17
     },
     botao: {
+        width: '100%',
         height: 36,
+        minHeight: 36,
+        maxHeight: 36,
+        flexGrow: 0,
+        alignSelf: 'stretch',
         paddingHorizontal: 14,
+        paddingVertical: 0,
         borderRadius: 10
     },
     textoBotao: {
         fontFamily: fontFamilies.semibold,
         fontSize: 13,
         fontWeight: '600',
-        lineHeight: 20
+        lineHeight: 20,
+        includeFontPadding: false
     }
 });
 

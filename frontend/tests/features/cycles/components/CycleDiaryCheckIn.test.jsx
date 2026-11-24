@@ -32,6 +32,7 @@ jest.mock(
 );
 
 import { CycleDiaryCheckIn } from '../../../../src/features/cycles/components/CycleDiaryCheckIn';
+import { estilos } from '../../../../src/features/cycles/components/CycleDiaryCheckIn.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
@@ -47,6 +48,19 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
     expect(screen.getByText('Como você está se sentindo hoje?')).toBeOnTheScreen();
     expect(screen.getByText('Check-in gentil')).toHaveStyle({ color: '#4A758E' });
     expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toHaveStyle({
+        width: '100%',
+        height: 36,
+        minHeight: 36,
+        maxHeight: 36,
+        borderRadius: 10,
+        paddingVertical: 0
+    });
+    expect(estilos.textoBotao).toMatchObject({
+        fontSize: 13,
+        lineHeight: 20,
+        includeFontPadding: false
+    });
 
     await act(async () => mockOnCreated());
     expect(screen.getByText('Check-in registrado no Diário.')).toBeOnTheScreen();
