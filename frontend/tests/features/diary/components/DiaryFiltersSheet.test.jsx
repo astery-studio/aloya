@@ -4,9 +4,13 @@ import { Keyboard } from 'react-native';
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => {
     const { Pressable } = require('react-native');
     return {
-        BottomSheet: ({ visivel, children, podeIniciarDeslize }) =>
+        BottomSheet: ({ visivel, children, podeIniciarDeslize, exibirAlcaArraste }) =>
             visivel ? (
-                <Pressable testID="sonda-deslize-filtros" onPress={podeIniciarDeslize}>
+                <Pressable
+                    testID="sonda-deslize-filtros"
+                    accessibilityLabel={`Exibir alça: ${String(exibirAlcaArraste)}`}
+                    onPress={podeIniciarDeslize}
+                >
                     {children}
                 </Pressable>
             ) : null
@@ -45,6 +49,9 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
         <DiaryFiltersSheet visivel filtros={{}} service={service} onAplicar={onAplicar} />
     );
     await waitFor(() => expect(screen.getByText('Filtro por Período')).toBeOnTheScreen());
+    expect(screen.getByLabelText('Exibir alça: false')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Limpar' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeDisabled();
 
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '01/01/7777');
     await waitFor(() =>
@@ -132,6 +139,7 @@ test('não desloca o painel e fecha o teclado ao iniciar a rolagem', async () =>
 });
 
 test('limpa datas, fases e todas as categorias pelos controles do painel', async () => {
+    const onAplicar = jest.fn();
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(catalogo) };
     await render(
         <DiaryFiltersSheet
@@ -143,7 +151,7 @@ test('limpa datas, fases e todas as categorias pelos controles do painel', async
                 categorias: ['fluxo_menstrual']
             }}
             service={service}
-            onAplicar={jest.fn()}
+            onAplicar={onAplicar}
         />
     );
     await waitFor(() => expect(screen.getByText('Filtro por Período')).toBeOnTheScreen());
@@ -178,6 +186,15 @@ test('limpa datas, fases e todas as categorias pelos controles do painel', async
     await fireEvent.press(screen.getByRole('button', { name: 'Limpar' }));
     expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '');
     expect(screen.getByLabelText('Data final do filtro')).toHaveProp('value', '');
+    expect(onAplicar).toHaveBeenCalledWith(
+        {
+            dataInicio: null,
+            dataFim: null,
+            categorias: [],
+            fases: []
+        },
+        catalogo
+    );
 });
 
 test('mostra loading e erro de catálogo com ações de recuperação', async () => {

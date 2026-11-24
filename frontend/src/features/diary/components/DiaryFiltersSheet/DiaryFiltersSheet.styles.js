@@ -156,6 +156,7 @@ function criarEstilos(tema) {
             borderTopColor: cores.borda,
             backgroundColor: superficie
         },
+        rodapeSemLimpar: { minHeight: 86 },
         botaoLimpar: {
             width: 342,
             maxWidth: '100%',

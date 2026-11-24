@@ -16,6 +16,7 @@ import {
     FASES_FILTRO,
     FILTROS_DIARIO_VAZIOS,
     formatarDataFiltro,
+    possuiFiltrosDiario,
     validarPeriodoDiario
 } from '../../utils/diaryFilters';
 import { DiaryCategoryFilterGroup } from './DiaryCategoryFilterGroup';
@@ -31,6 +32,15 @@ function criarEdicao(filtros = FILTROS_DIARIO_VAZIOS) {
         categorias: [...(filtros.categorias ?? [])],
         fases: [...(filtros.fases ?? [])]
     };
+}
+
+function edicaoPossuiPreenchimento(edicao) {
+    return Boolean(
+        edicao?.dataInicio?.trim() ||
+        edicao?.dataFim?.trim() ||
+        edicao?.categorias?.length ||
+        edicao?.fases?.length
+    );
 }
 
 function DiaryFiltersSheet({
@@ -51,6 +61,8 @@ function DiaryFiltersSheet({
     const [expandidas, setExpandidas] = useState({});
     const [erroPeriodo, setErroPeriodo] = useState(null);
     const posicaoRolagem = useRef(0);
+    const possuiFiltrosAplicados = possuiFiltrosDiario(filtros);
+    const possuiPreenchimento = edicaoPossuiPreenchimento(edicao);
 
     useEffect(() => {
         if (!visivel) return;
@@ -79,6 +91,7 @@ function DiaryFiltersSheet({
     function limpar() {
         setEdicao(criarEdicao());
         setErroPeriodo(null);
+        onAplicar?.(FILTROS_DIARIO_VAZIOS, catalogo.catalogo);
     }
 
     function aplicar() {
@@ -95,6 +108,7 @@ function DiaryFiltersSheet({
             onFechar={onFechar}
             bloquearFechamento={aplicando}
             permitirDeslizarParaFechar
+            exibirAlcaArraste={false}
             podeIniciarDeslize={podeIniciarDeslize}
             ajustarAoTeclado={false}
             estiloPainel={estilos.painel}
@@ -249,19 +263,21 @@ function DiaryFiltersSheet({
                     ) : null}
                 </View>
 
-                <View style={estilos.rodape}>
-                    <ButtonScreen
-                        texto="Limpar"
-                        variante="branco"
-                        aoPressionar={limpar}
-                        desativado={aplicando || !catalogo.catalogo}
-                        estilo={estilos.botaoLimpar}
-                        estiloTexto={estilos.textoLimpar}
-                    />
+                <View style={[estilos.rodape, !possuiFiltrosAplicados && estilos.rodapeSemLimpar]}>
+                    {possuiFiltrosAplicados ? (
+                        <ButtonScreen
+                            texto="Limpar"
+                            variante="branco"
+                            aoPressionar={limpar}
+                            desativado={aplicando || !catalogo.catalogo}
+                            estilo={estilos.botaoLimpar}
+                            estiloTexto={estilos.textoLimpar}
+                        />
+                    ) : null}
                     <ButtonScreen
                         texto="Aplicar Filtro"
                         aoPressionar={aplicar}
-                        desativado={aplicando || !catalogo.catalogo}
+                        desativado={aplicando || !catalogo.catalogo || !possuiPreenchimento}
                         carregando={aplicando}
                         estilo={estilos.botaoAplicar}
                     />
@@ -287,4 +303,4 @@ function DiaryFiltersSheet({
     );
 }
 
-export { criarEdicao, DiaryFiltersSheet };
+export { criarEdicao, DiaryFiltersSheet, edicaoPossuiPreenchimento };

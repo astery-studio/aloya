@@ -28,6 +28,7 @@ function BottomSheet({
     corAlca,
     estiloPainel,
     permitirDeslizarParaFechar = false,
+    exibirAlcaArraste = true,
     podeIniciarDeslize = permitirInicioDeslize,
     ajustarAoTeclado = true
 }) {
@@ -225,7 +226,7 @@ function BottomSheet({
                         }
                     ]}
                 >
-                    {permitirDeslizarParaFechar ? (
+                    {permitirDeslizarParaFechar && exibirAlcaArraste ? (
                         <View
                             testID="bottom-sheet-area-arraste"
                             accessibilityRole="adjustable"
