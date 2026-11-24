@@ -66,7 +66,7 @@ test('reproduz as medidas exatas definidas para HU-019 e HU-023', () => {
 test('reproduz as medidas exatas definidas para HU-011', () => {
     expect(variantes.diasMenstruacao.container).toMatchObject({ width: 143.41, height: 30.88 });
     expect(variantes.diasCiclo.container).toMatchObject({ width: 146, height: 30.88 });
-    expect(variantes.estimativaIncerta.container).toMatchObject({ width: 316.62, height: 52.41 });
+    expect(variantes.estimativaIncerta.container).toMatchObject({ width: 316.62, height: 42.41 });
 });
 
 test('usa o glifo de nove pixels especificado para os estados com marcador', async () => {

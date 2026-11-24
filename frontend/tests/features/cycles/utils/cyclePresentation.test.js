@@ -28,7 +28,7 @@ test('gera a faixa inicial com três dias anteriores à data de referência', ()
     expect(dias[15].data).toBe('2026-10-17');
     expect(dias[3].hoje).toBe(true);
     expect(formatarDataLonga('2026-10-14')).toBe('14 de outubro');
-    expect(formatarDataCabecalho('2026-10-14')).toBe('quarta-feira, 14 de outubro');
+    expect(formatarDataCabecalho('2026-10-14')).toBe('Aloya - 14 de Outubro');
 });
 
 test('gera páginas adicionais em qualquer direção mantendo a referência identificada', () => {

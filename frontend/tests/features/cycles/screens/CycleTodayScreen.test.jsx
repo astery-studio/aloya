@@ -54,7 +54,7 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
         janelaFertil: { inicio: '2026-10-08', fim: '2026-10-12' }
     });
 
-    expect(screen.getByText('quinta-feira, 8 de outubro')).toBeOnTheScreen();
+    expect(screen.getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'qui, dia 8' })).toBeOnTheScreen();
     expect(screen.getByText('Conteúdo recebido pela tela.')).toBeOnTheScreen();
     expect(screen.getByText('8–12 de outubro')).toBeOnTheScreen();
@@ -67,7 +67,7 @@ test('mantém o cabeçalho dentro da área rolável', async () => {
     const { getByTestId } = await renderizar({ previsao });
     const rolagem = getByTestId('conteudo-rolavel');
 
-    expect(within(rolagem).getByText('quinta-feira, 8 de outubro')).toBeOnTheScreen();
+    expect(within(rolagem).getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
 });
 
 test('mantém a faixa de datas no estado sem dados', async () => {
@@ -179,7 +179,7 @@ test('apresenta a faixa horizontal com hoje selecionado quando ciclo e previsão
 
 test('encaminha todas as interações da tela carregada', async () => {
     const acoes = {
-        aoAbrirCalendario: jest.fn(),
+        aoAbrirHistorico: jest.fn(),
         aoSelecionarData: jest.fn(),
         aoSelecionarAba: jest.fn(),
         aoCadastrarMenstruacao: jest.fn(),
@@ -189,7 +189,7 @@ test('encaminha todas as interações da tela carregada', async () => {
     await renderizar({ previsao, ...acoes });
 
     expect(screen.queryByRole('button', { name: 'Abrir parâmetros do ciclo' })).toBeNull();
-    await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
     expect(screen.queryByRole('button', { name: 'Abrir parâmetros do ciclo' })).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
     await fireEvent.press(screen.getByRole('tab', { name: 'Ciclos' }));
@@ -197,7 +197,7 @@ test('encaminha todas as interações da tela carregada', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Diário' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
 
-    expect(acoes.aoAbrirCalendario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirHistorico).toHaveBeenCalledTimes(1);
     expect(acoes.aoSelecionarData).toHaveBeenCalledWith('2026-10-14');
     expect(acoes.aoSelecionarAba).toHaveBeenCalledWith('ciclos');
     expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);

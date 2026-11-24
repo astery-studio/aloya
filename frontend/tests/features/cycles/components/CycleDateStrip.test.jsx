@@ -85,7 +85,7 @@ const variantes = [
     ['folicular', '#2C4C3B', '#2C4C3B', '#F7F5F0'],
     ['ovulatoria', '#4A758E', '#4A758E', '#F7F5F0'],
     ['lutea', '#D68C3A', '#D68C3A', '#F7F5F0'],
-    ['desconhecida', '#5C5C59', '#E6E2D8', '#FFFFFF']
+    ['desconhecida', '#847F76', '#847F76', '#F7F5F0']
 ];
 
 test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, borda, conteudo) => {
@@ -107,11 +107,11 @@ test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, bor
     expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: conteudo });
 });
 
-test('mantém o estilo neutro no dia não selecionado', async () => {
+test('mantém a borda da fase no dia não selecionado', async () => {
     await montar({ dataSelecionada: 'outra-data' });
 
     const botao = screen.getByRole('button', { name: 'dom, dia 4' });
-    expect(botao).toHaveStyle({ backgroundColor: '#FFFFFF', borderColor: '#E6E2D8' });
+    expect(botao).toHaveStyle({ backgroundColor: '#C85A44', borderColor: '#C85A44' });
     expect(botao).not.toHaveStyle({ shadowOpacity: 0.04 });
     expect(screen.getByText('dom')).toHaveStyle({ color: '#5C5C59', opacity: 0.7 });
     expect(screen.getByText('4')).toHaveStyle({ color: '#5C5C59' });
@@ -128,6 +128,6 @@ test('diferencia o indicador de hoje dos demais dias', async () => {
 
     expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: '#222222' });
     expect(screen.getByTestId('indicador-2026-10-08')).toHaveStyle({
-        backgroundColor: 'transparent'
+        backgroundColor: '#2C4C3B'
     });
 });

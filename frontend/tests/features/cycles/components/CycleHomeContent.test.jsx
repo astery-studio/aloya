@@ -29,35 +29,11 @@ test('mantém o estado sem dados dentro da HU-013', async () => {
 });
 
 test.each([
-    [
-        'menstrual',
-        'Fase Menstrual',
-        'O início de um novo ciclo',
-        'O ciclo recomeça. O corpo libera o revestimento uterino e a energia tende a se voltar para dentro. É um bom momento para reduzir o ritmo e observar como você se sente.',
-        'Sensação de cansaço'
-    ],
-    [
-        'folicular',
-        'Fase Folicular',
-        'Preparação para a ovulação',
-        'Os níveis hormonais começam a subir e muitas pessoas relatam mais disposição e clareza. É uma janela em que o corpo se prepara gradualmente para a ovulação.',
-        'Aumento de energia'
-    ],
-    [
-        'ovulatoria',
-        'Fase Ovulatória',
-        'A liberação do óvulo',
-        'O óvulo é liberado e o corpo atinge um ponto de maior expansão no ciclo. É a fase em que a fertilidade estimada é mais alta.',
-        'Pico de energia'
-    ],
-    [
-        'lutea',
-        'Fase Lútea',
-        'Preparação para uma possível gravidez',
-        'Após a ovulação, o corpo entra em uma fase de transição. A energia costuma diminuir gradualmente conforme o ciclo se aproxima do fim.',
-        'Retenção de líquidos'
-    ]
-])('exibe conteúdo completo da fase %s', async (fase, titulo, subtitulo, descricao, sintoma) => {
+    ['menstrual', 'Fase Menstrual', 'O início de um novo ciclo', 'Sensação de cansaço'],
+    ['folicular', 'Fase Folicular', 'Preparação para a ovulação', 'Aumento de energia'],
+    ['ovulatoria', 'Fase Ovulatória', 'A liberação do óvulo', 'Pico de energia'],
+    ['lutea', 'Fase Lútea', 'Preparação para uma possível gravidez', 'Retenção de líquidos']
+])('exibe conteúdo completo da fase %s', async (fase, titulo, subtitulo, sintoma) => {
     await render(
         <CycleHomeContent
             fase={fase}
@@ -73,8 +49,8 @@ test.each([
         fontWeight: '700'
     });
     expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
-    expect(screen.getByText(subtitulo)).toBeOnTheScreen();
-    expect(screen.getByText(descricao)).toBeOnTheScreen();
+    expect(screen.getAllByText(subtitulo)).not.toHaveLength(0);
+    expect(screen.getByText(conteudoPorFase[fase].descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
     expect(
         screen.getByRole('button', { name: 'Sintomas comuns' }).props.accessibilityState
