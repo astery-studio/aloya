@@ -26,9 +26,10 @@ function criarEstilos(tema, insetSuperior = 0) {
             fontFamily: fontFamilies.bold,
             fontSize: 24,
             fontWeight: '700',
+            includeFontPadding: false,
             lineHeight: 28
         },
-        rolagem: { flexGrow: 1, paddingBottom: espacamentos.medio },
+        rolagem: { flexGrow: 1 },
         carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
         textoCarregando: {
             color: tema.cores.interface.textoSecundario,
