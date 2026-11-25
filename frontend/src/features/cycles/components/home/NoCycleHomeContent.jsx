@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { CycleEducationSection } from '../CycleEducationSection';
 import { NoCycleDiarySection } from './NoCycleDiarySection';
 import { NoCycleStartSection } from './NoCycleStartSection';
 import { NoCycleTrackingSection } from './NoCycleTrackingSection';
+
+const estilos = StyleSheet.create({
+    conteudo: { flexShrink: 0, paddingTop: 24, paddingBottom: 16 }
+});
 
 function NoCycleHomeContent(props) {
     const [idsExpandidos, setIdsExpandidos] = useState(new Set());
@@ -15,7 +19,7 @@ function NoCycleHomeContent(props) {
             return proximos;
         });
     return (
-        <View style={{ paddingTop: 24 }}>
+        <View style={estilos.conteudo}>
             <NoCycleStartSection {...props} />
             <CycleEducationSection />
             <NoCycleTrackingSection
