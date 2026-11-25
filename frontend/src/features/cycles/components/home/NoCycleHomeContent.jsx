@@ -6,7 +6,7 @@ import { NoCycleStartSection } from './NoCycleStartSection';
 import { NoCycleTrackingSection } from './NoCycleTrackingSection';
 
 const estilos = StyleSheet.create({
-    conteudo: { flexShrink: 0, paddingTop: 24, paddingBottom: 16 }
+    conteudo: { flexShrink: 0, paddingTop: 24, paddingBottom: 16, gap: 38 }
 });
 
 function NoCycleHomeContent(props) {
@@ -19,8 +19,10 @@ function NoCycleHomeContent(props) {
             return proximos;
         });
     return (
-        <View style={estilos.conteudo}>
-            <NoCycleStartSection {...props} />
+        <View testID="home-sem-ciclo" style={estilos.conteudo}>
+            <View>
+                <NoCycleStartSection {...props} />
+            </View>
             <CycleEducationSection />
             <NoCycleTrackingSection
                 idsExpandidos={idsExpandidos}
