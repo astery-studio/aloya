@@ -24,7 +24,8 @@ const estilos = StyleSheet.create({
     texto: {
         flex: 1,
         color: '#5C5C59',
-        fontFamily: fontFamilies.regular
+        fontFamily: fontFamilies.regular,
+        includeFontPadding: false
     },
     textoEducativo: { fontSize: 9, lineHeight: 13 },
     textoContraceptivo: { fontSize: 10, lineHeight: 14 }
