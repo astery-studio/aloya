@@ -3,13 +3,10 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FileTextIcon } from 'phosphor-react-native/src/icons/FileText';
 
-import {
-    CaretDownIcon,
-    CaretUpIcon,
-    ShieldCheckIcon
-} from '../../../shared/components/icons/AppIcons';
+import { ShieldCheckIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { LegalSupport } from '../../legal/components/LegalSupport/LegalSupport';
+import { LegalSection } from '../../legal/components/LegalSection/LegalSection';
 import { CONSULTA_LEGAL_DISPONIVEL } from '../../legal/data/legalConfig';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { criarEstilos } from './PrivacyTermsScreen.styles';
@@ -33,16 +30,7 @@ const abas = [
     { id: 'terms', titulo: 'Termos de uso', icone: FileTextIcon }
 ];
 
-function LegalDocument({
-    documento,
-    abertas,
-    onAlterarAbertas,
-    posicao,
-    onRolar,
-    Icone,
-    estilos,
-    corDestaque
-}) {
+function LegalDocument({ documento, abertas, onAlterarAbertas, posicao, onRolar, Icone, estilos }) {
     const { secoes, estadoEditorial } = documento;
     const rolagem = useRef(null);
     const [posicaoInicial] = useState(() => ({ x: 0, y: posicao }));
@@ -123,44 +111,15 @@ function LegalDocument({
                         </Text>
                     </Pressable>
                 </View>
-                {secoes.map((secao, indice) => {
-                    const aberta = abertas.has(secao.id);
-                    const Chevron = aberta ? CaretUpIcon : CaretDownIcon;
-                    return (
-                        <View key={secao.id} style={[estilos.secao, aberta && estilos.secaoAberta]}>
-                            <Pressable
-                                accessibilityRole="button"
-                                accessibilityLabel={secao.titulo}
-                                accessibilityState={{ expanded: aberta }}
-                                onPress={() => alternarSecao(secao.id)}
-                                style={({ pressed }) => [
-                                    estilos.linha,
-                                    estilos.cabecalhoSecao,
-                                    pressed && estilos.pressionado
-                                ]}
-                            >
-                                <Text style={estilos.numero}>{indice + 1}.</Text>
-                                <Text style={[estilos.tituloSecao, estilos.flexivel]}>
-                                    {secao.titulo}
-                                </Text>
-                                <Chevron size={18} color={corDestaque} accessible={false} />
-                            </Pressable>
-                            {aberta && (
-                                <View style={estilos.corpoSecao}>
-                                    {secao.contatoSuporte && <LegalSupport somenteEndereco />}
-                                    {secao.blocos.map(({ enfase, texto }) => (
-                                        <Text key={texto} selectable style={estilos.corpo}>
-                                            {enfase ? (
-                                                <Text style={estilos.enfase}>{enfase} </Text>
-                                            ) : null}
-                                            {texto}
-                                        </Text>
-                                    ))}
-                                </View>
-                            )}
-                        </View>
-                    );
-                })}
+                {secoes.map((secao, indice) => (
+                    <LegalSection
+                        key={secao.id}
+                        secao={secao}
+                        indice={indice}
+                        aberta={abertas.has(secao.id)}
+                        onAlternar={() => alternarSecao(secao.id)}
+                    />
+                ))}
             </View>
             <LegalSupport />
         </ScrollView>
@@ -182,7 +141,6 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
 
     if (!CONSULTA_LEGAL_DISPONIVEL) return null;
 
-    const corDestaque = tema.cores.interface.destaque;
     const abaSelecionada = abas.find(({ id }) => id === selecionado);
     return (
         <Modal
@@ -251,7 +209,6 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
                     }}
                     Icone={abaSelecionada.icone}
                     estilos={estilos}
-                    corDestaque={corDestaque}
                 />
             </View>
         </Modal>

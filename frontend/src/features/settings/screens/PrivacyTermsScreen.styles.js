@@ -72,7 +72,6 @@ export function criarEstilos(tema) {
             color: tema.cores.marca.secundaria
         },
         textoResumo: { ...textoLeitura, color: tema.cores.neutras.textoPrincipalClaro },
-        enfase: semibold,
         chamada: { ...typography.bodyDefault, ...semibold, color: cor.textoPrincipal },
         resumo: {
             padding: e.medio,
@@ -96,22 +95,6 @@ export function criarEstilos(tema) {
             ...semibold,
             color: cor.destaque,
             textDecorationLine: 'underline'
-        },
-        secao: {
-            borderRadius: radius.grande,
-            backgroundColor: cor.superficie,
-            borderWidth: 1,
-            borderColor: cor.borda
-        },
-        secaoAberta: { borderColor: cor.destaque },
-        cabecalhoSecao: { minHeight: 48, paddingHorizontal: e.medio, paddingVertical: e.pequeno },
-        numero: { ...typography.caption, color: cor.textoSecundario },
-        tituloSecao: { ...typography.bodyDefault, ...semibold, color: cor.textoPrincipal },
-        corpoSecao: {
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderTopColor: cor.borda,
-            padding: e.medio,
-            gap: e.medio
         }
     });
 }
