@@ -189,11 +189,7 @@ function CycleTodayScreen({
                 </ScrollView>
             )}
             <SafeAreaView edges={['bottom']} style={estilos.navegacaoSegura}>
-                <BottomTabBar
-                    abaAtiva="inicio"
-                    onSelecionar={aoSelecionarAba}
-                    semCiclo={semPrevisao}
-                />
+                <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
             </SafeAreaView>
             <SimpleModal
                 erroInterno
