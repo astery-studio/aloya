@@ -3,7 +3,8 @@ import { Pressable, Text, View } from 'react-native';
 import { useUsageHistoryEdit } from '../hooks/useUsageHistoryEdit';
 import { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 import { StatusBadge } from '../../../shared/components/common/StatusBadge/StatusBadge';
-import { CaretDownIcon, CaretUpIcon } from '../../../shared/components/icons/AppIcons';
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { CaretDownIcon, CaretUpIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { estadoRegistroUso, formatarDataUso, partesDaDataUso } from '../utils/usageHistory';
 import { UsageCalendar } from './UsageCalendar';
@@ -116,15 +117,15 @@ const rotulosHistorico = {
 };
 
 function UsageHistoryPanel({
-    expandido = false, registros = [], modo = 'lista', aoAlternar, aoSalvarEdicaoHistorico
+    expandido = false, registros = [], horarios = [], modo = 'lista', aoAlternar, aoSalvarEdicaoHistorico
 }) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
     const [mes, setMes] = useState(() => mesInicial(registros));
     const {
         sessao, setSessao, salvando, editaveis, alvo, opcoes, alterado, podeSalvar, ocorrenciasDoDia,
-        sairDoAlvo, selecionar, selecionarData, salvar
-    } = useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico);
+        sairDoAlvo, selecionar, selecionarData, salvar, popup, fecharPopup
+    } = useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico, horarios);
     const registrosDoMes = registros.filter(
         (registro) => !registro.data || partesDaDataUso(registro.data)?.chaveMes === mes
     );
@@ -139,6 +140,35 @@ function UsageHistoryPanel({
     const calendario = modo === 'calendario';
     const instrucao = sessao ? (
         <Text style={estilosUso.instrucaoEdicao}>
+    function confirmarPopup() {
+        fecharPopup();
+        popup?.aoConfirmar?.();
+    }
+
+    const configuracaoPopup = {
+        diaIndisponivel: {
+            titulo: 'Dia indisponível',
+            mensagem: 'Escolha um dia anterior. Para hoje, use os controles de próximos horários.'
+        },
+        descarte: {
+            titulo: 'Descartar alteração?',
+            mensagem: 'A edição do histórico ainda não foi salva.',
+            acaoPrincipal: {
+                texto: 'Descartar', varianteVisual: 'sairSemSalvar', variante: 'branco', aoPressionar: confirmarPopup
+            },
+            acaoSecundaria: { texto: 'Continuar editando', variante: 'verde', aoPressionar: fecharPopup }
+        },
+        exclusao: {
+            titulo: 'Apagar este registro?',
+            mensagem: 'O horário voltará a ficar sem registro. A programação do anticoncepcional será preservada.',
+            acaoPrincipal: { texto: 'Apagar', variante: 'vermelho', aoPressionar: confirmarPopup },
+            acaoSecundaria: { texto: 'Cancelar', variante: 'branco', aoPressionar: fecharPopup }
+        },
+        erroExclusao: {
+            titulo: 'Não foi possível apagar',
+            mensagem: 'Tente novamente.'
+        }
+    }[popup?.tipo];
             {calendario ? 'Para editar clique na célula do dia correspondente:' : 'Para editar, selecione o registro correspondente:'}
         </Text>
     ) : null;
@@ -209,3 +239,12 @@ function UsageHistoryPanel({
 }
 
 export { UsageHistoryPanel };
+            <SimpleModal
+                visivel={Boolean(popup)}
+                aoFechar={fecharPopup}
+                icone={WarningCircleIcon}
+                corIcone={tema.cores.marca.primaria}
+                fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
+                acaoPrincipal={{ texto: 'OK', aoPressionar: fecharPopup }}
+                {...configuracaoPopup}
+            />
