@@ -7,6 +7,7 @@ const estilos = StyleSheet.create({
         color: '#D68C3A',
         fontFamily: fontFamilies.bold,
         fontSize: 11,
+        includeFontPadding: false,
         lineHeight: 16,
         letterSpacing: 0.88,
         textTransform: 'uppercase'
@@ -16,6 +17,7 @@ const estilos = StyleSheet.create({
         color: '#222222',
         fontFamily: fontFamilies.regular,
         fontSize: 21,
+        includeFontPadding: false,
         lineHeight: 24,
         letterSpacing: -0.525
     },
@@ -44,6 +46,7 @@ const estilos = StyleSheet.create({
         color: '#847F76',
         fontFamily: fontFamilies.bold,
         fontSize: 8,
+        includeFontPadding: false,
         lineHeight: 12,
         letterSpacing: 0.64,
         textTransform: 'uppercase'
@@ -53,6 +56,7 @@ const estilos = StyleSheet.create({
         color: '#222222',
         fontFamily: fontFamilies.bold,
         fontSize: 13,
+        includeFontPadding: false,
         lineHeight: 20
     },
     descricao: {
@@ -60,6 +64,7 @@ const estilos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 10,
+        includeFontPadding: false,
         lineHeight: 15
     }
 });
