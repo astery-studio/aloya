@@ -115,7 +115,7 @@ test('mantém a borda da fase no dia não selecionado', async () => {
     const botao = screen.getByRole('button', { name: 'dom, dia 4' });
     expect(botao).toHaveStyle({ backgroundColor: '#C85A44', borderColor: '#C85A44' });
     expect(botao).not.toHaveStyle({ shadowOpacity: 0.04 });
-    expect(screen.getByText('dom')).toHaveStyle({ color: '#5C5C59', opacity: 0.7 });
+    expect(screen.getByText('dom')).toHaveStyle({ color: '#5C5C59', includeFontPadding: false });
     expect(screen.getByText('4')).toHaveStyle({ color: '#5C5C59' });
 });
 
