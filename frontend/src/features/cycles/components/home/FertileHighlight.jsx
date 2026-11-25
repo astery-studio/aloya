@@ -2,12 +2,15 @@ import { Text, View } from 'react-native';
 import { SparkleIcon } from '../../../../shared/components/icons/AppIcons';
 import { estilos } from './FertileHighlight.styles';
 
-function FertileHighlight() {
+function FertileHighlight({ cor = '#4A758E' } = {}) {
     return (
         <View style={estilos.margem}>
-            <View accessibilityLabel="Janela fértil ativa" style={estilos.container}>
+            <View
+                accessibilityLabel="Janela fértil ativa"
+                style={[estilos.container, { borderColor: cor }]}
+            >
                 <View style={estilos.icone}>
-                    <SparkleIcon size={22} color="#4A758E" weight="fill" />
+                    <SparkleIcon size={22} color={cor} weight="fill" />
                 </View>
                 <View style={estilos.textos}>
                     <Text style={estilos.titulo}>Janela fértil</Text>
