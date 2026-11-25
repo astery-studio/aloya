@@ -6,11 +6,6 @@ export function criarEstilos(tema) {
     const { espacamentos: e, radius, typography } = tema;
     const { margemHorizontalTela } = tema.espacamentosLayout;
     const cor = tema.cores.interface;
-    const textoLeitura = {
-        ...typography.caption,
-        fontFamily: fontFamilies.regular,
-        fontWeight: '400'
-    };
     const escalaAbas = 0.8;
     const semibold = { fontFamily: fontFamilies.semibold, fontWeight: '600' };
 
@@ -52,49 +47,6 @@ export function criarEstilos(tema) {
             color: cor.textoSecundario
         },
         textoAbaAtiva: { ...semibold, color: cor.textoSobreDestaque },
-        pressionado: { opacity: 0.72 },
-        conteudo: {
-            paddingHorizontal: margemHorizontalTela,
-            paddingTop: e.pequeno,
-            paddingBottom: e.pequeno,
-            gap: e.medio,
-            width: '100%',
-            maxWidth: 680,
-            alignSelf: 'center'
-        },
-        identificacao: { gap: e.minimo },
-        titulo: { ...typography.h2, color: cor.textoPrincipal },
-        meta: { ...typography.caption, color: cor.textoSecundario },
-        corpo: { ...textoLeitura, color: cor.textoPrincipal },
-        tituloResumo: {
-            ...typography.bodyDefault,
-            ...semibold,
-            color: tema.cores.marca.secundaria
-        },
-        textoResumo: { ...textoLeitura, color: tema.cores.neutras.textoPrincipalClaro },
-        chamada: { ...typography.bodyDefault, ...semibold, color: cor.textoPrincipal },
-        resumo: {
-            padding: e.medio,
-            gap: e.pequeno,
-            borderRadius: radius.grande,
-            backgroundColor: tema.cores.neutras.superficieClara
-        },
-        linha: { flexDirection: 'row', alignItems: 'center', gap: e.pequeno },
-        flexivel: { flex: 1, minWidth: 0 },
-        secoes: { gap: e.pequeno },
-        barraSecoes: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            columnGap: e.medio
-        },
-        acao: { minHeight: 48, justifyContent: 'center' },
-        textoAcao: {
-            ...typography.caption,
-            ...semibold,
-            color: cor.destaque,
-            textDecorationLine: 'underline'
-        }
+        pressionado: { opacity: 0.72 }
     });
 }
