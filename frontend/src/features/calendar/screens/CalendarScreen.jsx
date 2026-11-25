@@ -7,6 +7,7 @@ import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBad
 import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { InfoIcon } from '../../../shared/components/icons/AppIcons';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
@@ -189,28 +190,36 @@ function CalendarScreen({
             />
 
             <View style={estilos.conteudo}>
-                <View style={estilos.areaCalendario}>
-                    <CycleCalendar
-                        meses={mesesValidos}
-                        carregando={carregando}
-                        carregandoAnteriores={carregandoAnteriores}
-                        carregandoPosteriores={carregandoPosteriores}
-                        aoCarregarAnteriores={aoCarregarAnteriores}
-                        aoCarregarPosteriores={aoCarregarPosteriores}
-                        aoPressionarDia={aoEditarCiclo}
-                    />
-                </View>
+                {estadoVazio ? (
+                    <View testID="calendar-empty-state" style={estilos.estadoVazio}>
+                        <EmptyState
+                            titulo="Nenhum ciclo registrado"
+                            mensagem={
+                                <>
+                                    Você ainda não possui nenhum ciclo registrado. Toque em{' '}
+                                    <Text style={estilos.textoDestaque}>
+                                        {"'Cadastrar Menstruação'"}
+                                    </Text>{' '}
+                                    para começar.
+                                </>
+                            }
+                            variante="vazio"
+                        />
+                    </View>
+                ) : (
+                    <View style={estilos.areaCalendario}>
+                        <CycleCalendar
+                            meses={mesesValidos}
+                            carregando={carregando}
+                            carregandoAnteriores={carregandoAnteriores}
+                            carregandoPosteriores={carregandoPosteriores}
+                            aoCarregarAnteriores={aoCarregarAnteriores}
+                            aoCarregarPosteriores={aoCarregarPosteriores}
+                            aoPressionarDia={aoEditarCiclo}
+                        />
+                    </View>
+                )}
             </View>
-
-            {estadoVazio ? (
-                <View accessibilityRole="alert" style={estilos.avisoVazio}>
-                    <InfoIcon size={18} color={tema.cores.interface.destaque} />
-                    <Text style={estilos.textoVazio}>
-                        Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar
-                        Menstruação’ pra começar.
-                    </Text>
-                </View>
-            ) : null}
 
             <SafeAreaView testID="rodape-calendario" edges={['bottom']} style={estilos.rodape}>
                 <SyncStatusIndicator

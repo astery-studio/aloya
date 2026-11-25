@@ -32,25 +32,17 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0
         },
-        avisoVazio: {
-            flexShrink: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 9,
-            marginHorizontal: 20,
-            paddingHorizontal: 12,
-            paddingVertical: 11,
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.destaque,
-            borderRadius: 12,
-            backgroundColor: tema.escuro ? 'transparent' : 'rgba(44, 76, 59, 0.05)'
-        },
-        textoVazio: {
+        estadoVazio: {
+            width: '100%',
             flex: 1,
-            color: tema.cores.interface.destaque,
-            fontFamily: fontFamilies.medium,
-            fontSize: 13,
-            lineHeight: 19
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        },
+        textoDestaque: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
         },
         rodape: {
             flexShrink: 0,

@@ -246,11 +246,18 @@ describe('CalendarScreen', () => {
             />
         );
 
+        expect(screen.getByText('Nenhum ciclo registrado')).toBeOnTheScreen();
         expect(
-            screen.getByText(
-                'Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar Menstruação’ pra começar.'
-            )
+            screen.getByText(/Você ainda não possui nenhum ciclo registrado/u)
         ).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-empty-state')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        });
+        expect(screen.queryByTestId('cycle-calendar')).toBeNull();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');
         expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 
