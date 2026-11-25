@@ -175,3 +175,17 @@ test('mantém a mensagem de erro quando a nova tentativa falha', async () => {
     expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
     expect(buscar).toHaveBeenCalledTimes(2);
 });
+
+test('encerra a nova tentativa sem erro se a consulta for cancelada', async () => {
+    const buscar = jest
+        .fn()
+        .mockRejectedValueOnce(new Error('Sem rede'))
+        .mockRejectedValueOnce({ name: 'AbortError' });
+    await renderizarTela({ service: { buscar } });
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tentar novamente' }));
+
+    expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
+    expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
+    expect(buscar).toHaveBeenCalledTimes(2);
+});
