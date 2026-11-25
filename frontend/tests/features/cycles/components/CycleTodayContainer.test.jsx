@@ -56,6 +56,7 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
     await renderizarTela({ service });
 
     const primeiroDia = await screen.findByRole('button', { name: 'sex, dia 2' });
+    const faixaAntes = screen.getByLabelText('Datas do ciclo').props.data;
     fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
 
     expect(primeiroDia).toBeOnTheScreen();
@@ -65,6 +66,7 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
             screen.getByRole('button', { name: 'qua, dia 14' }).props.accessibilityState
         ).toEqual(expect.objectContaining({ selected: true }));
     });
+    expect(screen.getByLabelText('Datas do ciclo').props.data).toBe(faixaAntes);
 }, 30_000);
 
 test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não encontra registros', async () => {
