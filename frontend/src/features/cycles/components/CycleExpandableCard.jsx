@@ -61,9 +61,13 @@ function CycleExpandableCard({
                         {subtitulo ? <Text style={estilos.subtitle}>{subtitulo}</Text> : null}
                     </View>
                 </View>
-                <Icon size={22} color="#222222" />
+                <Icon size={comResumo ? 20 : 22} color="#222222" />
             </Pressable>
-            {expanded ? <View style={estilos.content}>{children}</View> : null}
+            {expanded ? (
+                <View style={[estilos.content, comResumo && estilos.contentComResumo]}>
+                    {children}
+                </View>
+            ) : null}
         </View>
     );
 }
