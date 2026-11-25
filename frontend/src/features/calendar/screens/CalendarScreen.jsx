@@ -206,7 +206,6 @@ function CalendarScreen({
                                     accessibilityRole="alert"
                                     style={estilos.avisoVazio}
                                 >
-                                    <InfoIcon size={18} color={tema.cores.interface.destaque} />
                                     <Text style={estilos.textoVazio}>
                                         Você ainda não possui nenhum ciclo registrado. Toque em{' '}
                                         <Text style={estilos.textoDestaque}>{"'+'"}</Text> pra

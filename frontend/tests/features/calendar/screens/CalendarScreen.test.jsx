@@ -320,6 +320,14 @@ describe('CalendarScreen', () => {
         expect(estilos.avisoVazio.borderWidth).toBeUndefined();
         expect(estilos.avisoVazio.borderColor).toBeUndefined();
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
+        expect(
+            within(screen.getByTestId('calendar-empty-state')).queryByTestId('icone-legenda')
+        ).toBeNull();
+        expect(
+            within(screen.getByTestId('calendar-empty-state')).getByText(
+                /Você ainda não possui nenhum ciclo registrado/u
+            )
+        ).toHaveStyle({ width: '100%', textAlign: 'center' });
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');
         expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 

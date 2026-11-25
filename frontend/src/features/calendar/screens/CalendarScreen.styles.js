@@ -58,12 +58,13 @@ function criarEstilos(tema) {
             elevation: 2
         },
         textoVazio: {
-            flex: 1,
+            width: '100%',
             color: tema.cores.interface.destaque,
             fontFamily: fontFamilies.medium,
             fontSize: 15,
             fontWeight: '500',
-            lineHeight: 24
+            lineHeight: 24,
+            textAlign: 'center'
         },
         estadoCentral: {
             width: '100%',
