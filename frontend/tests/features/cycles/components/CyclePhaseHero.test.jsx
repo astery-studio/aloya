@@ -29,3 +29,11 @@ test('usa o verde da fase folicular e conserva o espaço vazio do símbolo', asy
         height: 284
     });
 });
+
+test('mostra o título genérico quando a fase ainda não é conhecida', async () => {
+    await render(<CyclePhaseHero fase="fase-nova" />);
+
+    expect(screen.getByRole('header', { name: 'Seu ciclo' })).toBeOnTheScreen();
+    expect(screen.queryByLabelText('Janela fértil ativa')).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Dia .* do ciclo/)).not.toBeOnTheScreen();
+});
