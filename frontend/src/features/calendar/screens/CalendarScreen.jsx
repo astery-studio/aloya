@@ -188,22 +188,6 @@ function CalendarScreen({
                                 }
                             />
                         </View>
-                    ) : estadoVazio ? (
-                        <View testID="calendar-empty-state" style={estilos.estadoVazio}>
-                            <EmptyState
-                                titulo="Nenhum ciclo registrado"
-                                mensagem={
-                                    <>
-                                        Você ainda não possui nenhum ciclo registrado. Toque em{' '}
-                                        <Text style={estilos.textoDestaque}>
-                                            {"'Cadastrar Menstruação'"}
-                                        </Text>{' '}
-                                        para começar.
-                                    </>
-                                }
-                                variante="vazio"
-                            />
-                        </View>
                     ) : (
                         <View style={estilos.areaCalendario}>
                             <CycleCalendar
@@ -215,6 +199,23 @@ function CalendarScreen({
                                 aoCarregarPosteriores={aoCarregarPosteriores}
                                 aoPressionarDia={aoEditarCiclo}
                             />
+
+                            {estadoVazio ? (
+                                <View
+                                    testID="calendar-empty-state"
+                                    accessibilityRole="alert"
+                                    style={estilos.avisoVazio}
+                                >
+                                    <InfoIcon size={18} color={tema.cores.interface.destaque} />
+                                    <Text style={estilos.textoVazio}>
+                                        Você ainda não possui nenhum ciclo registrado. Toque em{' '}
+                                        <Text style={estilos.textoDestaque}>
+                                            {"'Cadastrar Menstruação'"}
+                                        </Text>{' '}
+                                        pra começar.
+                                    </Text>
+                                </View>
+                            ) : null}
                         </View>
                     )}
                 </View>

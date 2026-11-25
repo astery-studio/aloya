@@ -299,18 +299,18 @@ describe('CalendarScreen', () => {
             />
         );
 
-        expect(screen.getByText('Nenhum ciclo registrado')).toBeOnTheScreen();
         expect(
             screen.getByText(/Você ainda não possui nenhum ciclo registrado/u)
         ).toBeOnTheScreen();
         expect(screen.getByTestId('calendar-empty-state')).toHaveStyle({
-            flex: 1,
+            position: 'absolute',
+            top: 54,
+            right: 20,
+            left: 20,
             alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 20,
-            paddingBottom: 76
+            borderRadius: 14
         });
-        expect(screen.queryByTestId('cycle-calendar')).toBeNull();
+        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');
         expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 

@@ -34,15 +34,33 @@ function criarEstilos(tema) {
         },
         areaCalendario: {
             flex: 1,
-            minHeight: 0
+            minHeight: 0,
+            position: 'relative'
         },
-        estadoVazio: {
-            width: '100%',
-            flex: 1,
+        avisoVazio: {
+            position: 'absolute',
+            top: 54,
+            right: 20,
+            left: 20,
+            zIndex: 5,
+            minHeight: 80,
+            flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 20,
-            paddingBottom: 76
+            gap: 12,
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            borderWidth: 1,
+            borderColor: tema.cores.interface.destaque,
+            borderRadius: 14,
+            backgroundColor: tema.escuro ? '#232926' : '#EEF1ED'
+        },
+        textoVazio: {
+            flex: 1,
+            color: tema.cores.interface.destaque,
+            fontFamily: fontFamilies.medium,
+            fontSize: 15,
+            fontWeight: '500',
+            lineHeight: 24
         },
         estadoCentral: {
             width: '100%',
