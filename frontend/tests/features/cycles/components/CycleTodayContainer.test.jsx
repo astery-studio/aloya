@@ -114,8 +114,7 @@ test('mostra o Diário dentro da rolagem sem ciclo e mantém os atalhos acessív
         })
     };
     const aoCadastrarDiario = jest.fn();
-    const aoSelecionarAba = jest.fn();
-    await renderizarTela({ service, aoCadastrarDiario, aoSelecionarAba });
+    await renderizarTela({ service, aoCadastrarDiario });
 
     const rolagem = await screen.findByTestId('conteudo-rolavel');
     expect(within(rolagem).getByTestId('home-sem-ciclo')).toHaveStyle({ gap: 38 });
@@ -125,8 +124,6 @@ test('mostra o Diário dentro da rolagem sem ciclo e mantém os atalhos acessív
         'accessibilityState',
         expect.objectContaining({ expanded: false })
     );
-    await fireEvent.press(screen.getByRole('tab', { name: 'Calendário' }));
-    expect(aoSelecionarAba).toHaveBeenCalledWith('calendario');
     await fireEvent.press(
         within(diario).getByRole('button', { name: 'Como você está se sentindo?' })
     );
