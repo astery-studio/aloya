@@ -39,7 +39,7 @@ function CyclePredictionSummary({
         <View style={estilos.margem}>
             <View style={estilos.card}>
                 <View style={estilos.cabecalho}>
-                    <View>
+                    <View style={estilos.textosCabecalho}>
                         <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
                             Próximo ciclo
@@ -54,7 +54,7 @@ function CyclePredictionSummary({
                 <View style={estilos.metricas}>
                     <View style={estilos.data}>
                         <Text style={textos.dia}>{proximo.dia}</Text>
-                        <View>
+                        <View style={estilos.textosMetrica}>
                             <Text style={textos.mes}>{proximo.mes}</Text>
                             <Text style={textos.estimativa}>estimativa</Text>
                         </View>
