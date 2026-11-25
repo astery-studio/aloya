@@ -107,6 +107,7 @@ function CycleTodayScreen({
         dataSelecionada: referencia,
         janelaFertil
     });
+    const semPrevisao = home.estado !== 'comCiclo';
     const tipoErro = erroSincronizacao ? 'sincronizacao' : erroPrevisao || erro ? 'previsao' : null;
     const configuracaoErro = CONFIGURACOES_ERRO[tipoErro] || CONFIGURACOES_ERRO.previsao;
     const fecharSheet = () => setSheetAberto(null);
@@ -162,12 +163,13 @@ function CycleTodayScreen({
                             aoSelecionarData={aoSelecionarData}
                             aoCarregarAnteriores={() => carregarDias('anteriores')}
                             aoCarregarPosteriores={() => carregarDias('posteriores')}
+                            semCiclo={semPrevisao}
                         />
                     ) : null}
                     {referencia !== dataBaseDaFaixa ? (
                         <ReturnToTodayButton onPress={() => aoSelecionarData?.(dataBaseDaFaixa)} />
                     ) : null}
-                    {home.estado === 'comCiclo' ? (
+                    {!semPrevisao ? (
                         <CycleHomeContent
                             modelo={modeloHome}
                             callbacks={callbacksHome}
@@ -187,7 +189,11 @@ function CycleTodayScreen({
                 </ScrollView>
             )}
             <SafeAreaView edges={['bottom']} style={estilos.navegacaoSegura}>
-                <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
+                <BottomTabBar
+                    abaAtiva="inicio"
+                    onSelecionar={aoSelecionarAba}
+                    semCiclo={semPrevisao}
+                />
             </SafeAreaView>
             <SimpleModal
                 erroInterno
