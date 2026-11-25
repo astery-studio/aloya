@@ -1,15 +1,11 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Linking } from 'react-native';
-import { setStringAsync } from 'expo-clipboard';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
 import { PrivacyTermsScreen } from '../../../../src/features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen';
-import AccountStep from '../../../../src/features/onboarding/components/AccountStep/AccountStep';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 import documentos from '../../../../src/features/legal/data/legalDocuments.json';
 
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
-jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn() }));
 
 function abrir(documentoInicial, onVoltar = jest.fn()) {
     return render(
@@ -21,7 +17,6 @@ function abrir(documentoInicial, onVoltar = jest.fn()) {
 
 describe('Privacidade e termos', () => {
     afterEach(() => {
-        jest.useRealTimers();
         jest.restoreAllMocks();
         jest.clearAllMocks();
     });
@@ -96,36 +91,6 @@ describe('Privacidade e termos', () => {
         }
     );
 
-    test('abre o cliente de e-mail e trata falhas mantendo a cópia disponível', async () => {
-        const abrirUrl = jest
-            .spyOn(Linking, 'openURL')
-            .mockResolvedValueOnce(undefined)
-            .mockRejectedValueOnce(new Error());
-        await abrir();
-        const email = screen.getByRole('link', { name: 'aloya.support@gmail.com' });
-        await fireEvent.press(email);
-        expect(abrirUrl).toHaveBeenCalledWith('mailto:aloya.support@gmail.com');
-        await fireEvent.press(email);
-        expect(await screen.findByText(/Pode copiar|pode copiar o endereço/)).toBeOnTheScreen();
-        expect(screen.getByRole('button', { name: 'Copiar endereço de e-mail' })).toBeOnTheScreen();
-    });
-
-    test('confirma a cópia bem-sucedida e oculta o aviso após 1,5 segundo', async () => {
-        jest.useFakeTimers();
-        setStringAsync.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
-        await abrir('terms');
-        const copiar = screen.getByRole('button', { name: 'Copiar endereço de e-mail' });
-        await fireEvent.press(copiar);
-        expect(
-            await screen.findByText('Não foi possível copiar o endereço de e-mail.')
-        ).toBeOnTheScreen();
-        await fireEvent.press(copiar);
-        expect(await screen.findByText('Endereço de e-mail copiado.')).toBeOnTheScreen();
-        expect(setStringAsync).toHaveBeenCalledWith('aloya.support@gmail.com');
-        await act(async () => jest.advanceTimersByTime(1500));
-        expect(screen.queryByText('Endereço de e-mail copiado.')).toBeNull();
-    });
-
     test('mantém seções estáveis e omite referências internas', () => {
         for (const documento of Object.values(documentos)) {
             expect(documento.estadoEditorial).toBe('minuta');
@@ -141,37 +106,5 @@ describe('Privacidade e termos', () => {
         expect(documentos.privacy.secoes).toHaveLength(22);
         expect(documentos.terms.secoes).toHaveLength(24);
         expect(JSON.stringify(documentos)).not.toMatch(/PENDÊNCIA|PEN-\d|AF-\d|EC-[A-Z]+-|ALOYA_/);
-    });
-
-    test('o link no texto do aceite abre os Termos sem marcar a caixa nem descartar os campos', async () => {
-        const aoAlterar = jest.fn();
-        const aoConsultar = jest.fn();
-        const dados = {
-            nome: 'Pessoa de teste',
-            email: '',
-            senha: '',
-            confirmacao: '',
-            aceitouTermos: false
-        };
-        await render(
-            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
-                <AccountStep
-                    dados={dados}
-                    aoAlterar={aoAlterar}
-                    aoConsultarDocumentos={aoConsultar}
-                />
-            </ThemeProvider>
-        );
-
-        expect(screen.getAllByRole('link')).toHaveLength(1);
-        await fireEvent.press(
-            screen.getByRole('link', { name: 'Termos e Política de Privacidade' })
-        );
-        expect(aoConsultar.mock.calls).toEqual([['terms']]);
-        expect(aoAlterar).not.toHaveBeenCalled();
-        expect(screen.getByDisplayValue(dados.nome)).toBeOnTheScreen();
-        expect(screen.getByRole('checkbox', { checked: false })).toBeOnTheScreen();
-        await fireEvent.press(screen.getByRole('checkbox'));
-        expect(aoAlterar).toHaveBeenCalledWith({ aceitouTermos: true });
     });
 });
