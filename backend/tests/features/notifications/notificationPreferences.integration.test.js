@@ -55,12 +55,16 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
     assert.equal(leituraInicial.headers.get('cache-control'), 'no-store');
     assert.equal((await leituraInicial.json()).preferencias.horarioLembreteDiario, '20:00');
     assert.equal(await prisma.preferenciaNotificacao.count(), 1);
-    const respostas = await Promise.all([salvar('ciclo.diario', false), salvar('ciclo.diario.resumoSemanal', true), salvar('antecedenciaProximoCiclo', 0)]);
-    assert.deepEqual(respostas.map((resposta) => resposta.status), [200, 200, 200]);
+    const respostas = await Promise.all([
+        salvar('ciclo.diario', false), salvar('ciclo.diario.resumoSemanal', true),
+        salvar('antecedenciaProximoCiclo', 0), salvar('horarioLembreteDiario', '21:30')
+    ]);
+    assert.deepEqual(respostas.map((resposta) => resposta.status), [200, 200, 200, 200]);
     const { preferencias } = await (await chamar(1)).json();
     assert.equal(preferencias['ciclo.diario'], false);
     assert.equal(preferencias['ciclo.diario.resumoSemanal'], true);
     assert.equal(preferencias.antecedenciaProximoCiclo, 0);
+    assert.equal(preferencias.horarioLembreteDiario, '21:30');
     assert.equal((await salvar('ciclo.diario', true)).status, 200);
     assert.equal((await (await chamar(1)).json()).preferencias['ciclo.diario.resumoSemanal'], true);
     assert.equal((await (await chamar(2)).json()).preferencias.horarioLembreteDiario, '18:00');
