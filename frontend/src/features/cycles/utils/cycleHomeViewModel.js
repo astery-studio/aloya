@@ -11,8 +11,12 @@ function dataEstaNoIntervalo(data, intervalo) {
 
 function criarCycleHomeViewModel({ previsao, fase, dataSelecionada, janelaFertil }) {
     const status = previsao?.status;
-    const semCiclo = !previsao;
     const dadosInsuficientes = status === 'DADOS_INSUFICIENTES';
+    const semCiclo =
+        !previsao ||
+        (dadosInsuficientes &&
+            Array.isArray(previsao.motivos) &&
+            previsao.motivos.includes('INICIO_ELEGIVEL_AUSENTE'));
     const previsaoParcial = status === 'PARCIALMENTE_DISPONIVEL';
     const previsaoUltrapassada = status === 'PREVISAO_ULTRAPASSADA';
     const faseConhecida = FASES_CONHECIDAS.has(fase);
