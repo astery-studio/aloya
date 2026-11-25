@@ -226,3 +226,17 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
     expect(estilos.rolagem).toEqual({ flexGrow: 1 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });
+
+test('abre a explicação de confiabilidade pela previsão', async () => {
+    await renderizar({ previsao });
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
+    expect(await screen.findByText('O que isso significa?')).toBeOnTheScreen();
+});
+
+test('abre a leitura da fase pela seção de cuidados', async () => {
+    await renderizar({ previsao });
+
+    await fireEvent.press(screen.getByRole('button', { name: /O que acontece agora/ }));
+    expect(await screen.findByText('Por que “folicular”?')).toBeOnTheScreen();
+});
