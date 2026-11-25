@@ -30,7 +30,7 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
             }}
             style={[estilos.item, desabilitado && estilos.desabilitado]}
         >
-            <Icone size={24} color={corDoItem} weight={ativo ? 'fill' : 'regular'} />
+            <Icone size={26} color={corDoItem} weight={ativo ? 'fill' : 'regular'} />
 
             <Text numberOfLines={1} style={[estilos.label, ativo && estilos.labelAtiva]}>
                 {label}
