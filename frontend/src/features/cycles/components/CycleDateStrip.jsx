@@ -11,7 +11,8 @@ function CycleDateStrip({
     dataSelecionada,
     aoSelecionarData,
     aoCarregarAnteriores,
-    aoCarregarPosteriores
+    aoCarregarPosteriores,
+    semCiclo = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -25,9 +26,13 @@ function CycleDateStrip({
     useEffect(() => {
         const indice = dias.findIndex(({ data }) => data === dataSelecionada);
         if (indice >= 0) {
-            lista.current?.scrollToIndex({ index: indice, animated: true, viewPosition: 0.5 });
+            lista.current?.scrollToIndex({
+                index: indice,
+                animated: true,
+                viewPosition: semCiclo ? 0 : 0.5
+            });
         }
-    }, [dataSelecionada, dias]);
+    }, [dataSelecionada, dias, semCiclo]);
 
     function carregarBordas({ nativeEvent }) {
         const { x } = nativeEvent.contentOffset;
@@ -74,7 +79,7 @@ function CycleDateStrip({
             onMomentumScrollEnd={carregarBordas}
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
-            style={estilos.container}
+            style={[estilos.container, semCiclo && estilos.containerSemCiclo]}
             contentContainerStyle={estilos.faixa}
             accessibilityLabel="Datas do ciclo"
             renderItem={({ item }) => {
@@ -88,15 +93,19 @@ function CycleDateStrip({
                         onPress={() => aoSelecionarData?.(item.data)}
                         style={[
                             estilos.dia,
-                            estilos[`dia_${item.fase}`],
+                            semCiclo ? estilos.dia_desconhecida : estilos[`dia_${item.fase}`],
+                            semCiclo && estilos.diaSemCiclo,
                             selecionado && estilos.diaSelecionado,
                             selecionado &&
-                                item.fase === 'desconhecida' &&
+                                (semCiclo || item.fase === 'desconhecida') &&
                                 estilos.diaSelecionadoDesconhecida
                         ]}
                     >
                         <View
-                            style={[estilos.interior, selecionado && estilos.interiorSelecionado]}
+                            style={[
+                                estilos.interior,
+                                (semCiclo || selecionado) && estilos.interiorSelecionado
+                            ]}
                         >
                             <Text
                                 style={[estilos.semana, selecionado && estilos.semanaSelecionada]}
