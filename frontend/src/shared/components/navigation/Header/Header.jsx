@@ -11,6 +11,7 @@ function Header({
     onVoltar,
     corFundo,
     corTexto,
+    alturaEspacamentoSuperior,
     acoes = null,
     acoesDireita = null
 }) {
@@ -43,7 +44,8 @@ function Header({
                     estilos.espacamentoSuperior,
                     temVoltar && estilos.espacamentoSuperiorComVoltar,
                     ehRedeApoio && estilos.espacamentoSuperiorRedeApoio,
-                    ehDiario && estilos.espacamentoSuperiorDiario
+                    ehDiario && estilos.espacamentoSuperiorDiario,
+                    alturaEspacamentoSuperior === undefined ? null : { height: alturaEspacamentoSuperior }
                 ]}
             />
 
