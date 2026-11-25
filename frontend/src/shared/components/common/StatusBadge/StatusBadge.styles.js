@@ -3,6 +3,7 @@ import { fontFamilies } from '../../../theme';
 
 const cores = Object.freeze({
     aviso: '#B07D2A',
+    estimativaIncerta: '#D68C3A',
     informacao: '#4A758E',
     sucesso: '#2C4C3B'
 });
@@ -54,24 +55,26 @@ const estilosBase = {
     },
     tituloEstimativa: {
         alignSelf: 'stretch',
-        height: 17,
+        minHeight: 17,
         fontFamily: fontFamilies.medium,
         fontWeight: '500',
         fontSize: 12,
         lineHeight: 17,
-        color: cores.aviso
+        includeFontPadding: false,
+        color: cores.estimativaIncerta
     },
     descricaoEstimativa: {
         width: '100%',
         height: 'auto',
         minHeight: 15,
         flexShrink: 1,
-        fontFamily: fontFamilies.regular,
+        fontFamily: fontFamilies.light,
         fontWeight: '300',
         fontSize: 10,
         lineHeight: 14,
         includeFontPadding: false,
-        color: cores.aviso
+        paddingTop: 1,
+        color: cores.estimativaIncerta
     }
 };
 
@@ -269,12 +272,12 @@ const variantes = Object.freeze({
             gap: 15,
             paddingVertical: 4,
             paddingHorizontal: 12,
-            backgroundColor: '#FBF3E0',
+            backgroundColor: 'rgba(214, 140, 58, 0.1)',
             borderWidth: 0.70489,
             borderColor: 'rgba(214, 140, 58, 0.3)',
             borderRadius: 15
         },
-        texto: { color: cores.aviso }
+        texto: { color: cores.estimativaIncerta }
     }
 });
 
@@ -296,11 +299,11 @@ function criarEstilos(tema) {
         ...estilosBase,
         tituloEstimativa: {
             ...estilosBase.tituloEstimativa,
-            color: coresAtivas.aviso
+            color: coresAtivas.estimativaIncerta ?? coresAtivas.aviso
         },
         descricaoEstimativa: {
             ...estilosBase.descricaoEstimativa,
-            color: coresAtivas.aviso
+            color: coresAtivas.estimativaIncerta ?? coresAtivas.aviso
         }
     });
 }
