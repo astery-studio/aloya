@@ -44,7 +44,7 @@ const estilos = StyleSheet.create({
         paddingTop: 7
     },
     conteudo: {
-        gap: 12,
+        gap: 14,
         paddingTop: 17
     },
     botao: {
@@ -58,13 +58,16 @@ const estilos = StyleSheet.create({
         paddingVertical: 0,
         borderRadius: 10
     },
+    botaoDesativado: { backgroundColor: '#E6E2D8' },
     textoBotao: {
         fontFamily: fontFamilies.semibold,
         fontSize: 13,
         fontWeight: '600',
+        letterSpacing: 0,
         lineHeight: 20,
         includeFontPadding: false
-    }
+    },
+    textoBotaoDesativado: { color: '#A8A49C' }
 });
 
 export { estilos };
