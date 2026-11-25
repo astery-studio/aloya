@@ -53,8 +53,12 @@ function CycleEducationSection({
                             phase.id === idSelecionado && { borderColor: phase.cor }
                         ]}
                     >
-                        <View style={[estilos.icone, { backgroundColor: phase.fundo }]}>
-                            <phase.Icone size={24} color={phase.cor} weight="fill" />
+                        <View style={estilos.icone}>
+                            <phase.Icone
+                                size={24}
+                                color={phase.cor}
+                                weight={phase.weight ?? 'fill'}
+                            />
                         </View>
                         <Text style={[textos.nomeFase, { color: phase.cor }]}>{phase.label}</Text>
                     </Pressable>
