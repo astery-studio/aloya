@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react-native';
+import { act, renderHook, waitFor } from '@testing-library/react-native';
 import { useDiaryRecordForDate } from '../../../../src/features/cycles/hooks/useDiaryRecordForDate';
 
 const date = '2026-11-24';
@@ -47,5 +47,68 @@ test('mantém criação normal quando não existe registro e trata sessão expir
 
     await hook.rerender({ currentDate: '2026-11-23' });
     await waitFor(() => expect(onSessionExpired).toHaveBeenCalledTimes(1));
+    expect(hook.result.current.record).toBeNull();
+});
+
+test('ignora a resposta da data anterior quando a busca já foi cancelada', async () => {
+    let resolverDetalhe;
+    const dataNova = '2026-11-25';
+    const service = {
+        listarHistorico: jest
+            .fn()
+            .mockResolvedValueOnce({ itens: [{ id: 7, data: date }] })
+            .mockResolvedValueOnce({ itens: [] }),
+        buscarDetalhe: jest.fn(
+            () =>
+                new Promise((resolve) => {
+                    resolverDetalhe = resolve;
+                })
+        )
+    };
+    const hook = await renderHook(
+        ({ currentDate }) => useDiaryRecordForDate({ date: currentDate, service }),
+        { initialProps: { currentDate: date } }
+    );
+
+    await waitFor(() => expect(service.buscarDetalhe).toHaveBeenCalledTimes(1));
+    const [, { signal }] = service.buscarDetalhe.mock.calls[0];
+    await hook.rerender({ currentDate: dataNova });
+    await waitFor(() => expect(hook.result.current.loading).toBe(false));
+    expect(signal.aborted).toBe(true);
+
+    await act(() => resolverDetalhe(record));
+
+    expect(hook.result.current).toEqual({ record: null, loading: false });
+});
+
+test.each([{ name: 'AbortError' }, { status: 500 }, undefined])(
+    'encerra uma busca com erro sem sinalizar expiração (%#)',
+    async (erro) => {
+        const onSessionExpired = jest.fn();
+        const service = { listarHistorico: jest.fn().mockRejectedValue(erro) };
+        const hook = await renderHook(() =>
+            useDiaryRecordForDate({ date, service, onSessionExpired })
+        );
+
+        await waitFor(() => expect(hook.result.current.loading).toBe(false));
+        expect(hook.result.current.record).toBeNull();
+        expect(onSessionExpired).not.toHaveBeenCalled();
+    }
+);
+
+test('não consulta outra data nem busca detalhes sem serviço ou método disponível', async () => {
+    const listarHistorico = jest.fn().mockResolvedValue({ itens: [{ id: 7, data: date }] });
+    const hook = await renderHook(
+        ({ data, service }) => useDiaryRecordForDate({ date: data, service }),
+        { initialProps: { data: null, service: { listarHistorico } } }
+    );
+
+    expect(listarHistorico).not.toHaveBeenCalled();
+    await hook.rerender({ data: date });
+    expect(listarHistorico).not.toHaveBeenCalled();
+    await hook.rerender({ data: date, service: { listarHistorico } });
+
+    await waitFor(() => expect(listarHistorico).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(hook.result.current.loading).toBe(false));
     expect(hook.result.current.record).toBeNull();
 });
