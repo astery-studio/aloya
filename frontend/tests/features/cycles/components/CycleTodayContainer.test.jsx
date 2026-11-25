@@ -118,6 +118,7 @@ test('mostra o Diário dentro da rolagem sem ciclo e mantém os atalhos acessív
     await renderizarTela({ service, aoCadastrarDiario, aoSelecionarAba });
 
     const rolagem = await screen.findByTestId('conteudo-rolavel');
+    expect(within(rolagem).getByTestId('home-sem-ciclo')).toHaveStyle({ gap: 38 });
     const diario = within(rolagem).getByTestId('diario-home-sem-ciclo');
     expect(within(diario).getByText('Seu Diário já está disponível')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: /Entenda o ritmo/ })).toHaveProp(
