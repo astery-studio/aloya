@@ -12,7 +12,8 @@ function Header({
     corFundo,
     corTexto,
     acoes = null,
-    acoesDireita = null
+    acoesDireita = null,
+    layoutRefatorado = false
 }) {
     const tema = useTheme();
 
@@ -22,6 +23,7 @@ function Header({
     const ehDiario = variante === 'diario';
 
     const ehRedeApoio = variante === 'redeApoio';
+    const voltarRefatorado = temVoltar && layoutRefatorado;
 
     const acoesExibidas = acoesDireita ?? acoes;
     const temAcoes = !temVoltar && Boolean(acoesExibidas);
@@ -35,24 +37,28 @@ function Header({
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
                 ehDiario && estilos.containerDiario,
+                voltarRefatorado && estilos.containerRefatorado,
                 corFundo ? { backgroundColor: corFundo } : null
             ]}
         >
-            <View
-                style={[
-                    estilos.espacamentoSuperior,
-                    temVoltar && estilos.espacamentoSuperiorComVoltar,
-                    ehRedeApoio && estilos.espacamentoSuperiorRedeApoio,
-                    ehDiario && estilos.espacamentoSuperiorDiario
-                ]}
-            />
+            {!voltarRefatorado && (
+                <View
+                    style={[
+                        estilos.espacamentoSuperior,
+                        temVoltar && estilos.espacamentoSuperiorComVoltar,
+                        ehRedeApoio && estilos.espacamentoSuperiorRedeApoio,
+                        ehDiario && estilos.espacamentoSuperiorDiario
+                    ]}
+                />
+            )}
 
             <View
                 style={[
                     estilos.areaTitulo,
                     temVoltar && estilos.areaTituloComVoltar,
                     ehRedeApoio && estilos.areaTituloRedeApoio,
-                    ehDiario && estilos.areaTituloDiario
+                    ehDiario && estilos.areaTituloDiario,
+                    voltarRefatorado && estilos.areaTituloRefatorada
                 ]}
             >
                 {temVoltar ? (
@@ -95,6 +101,7 @@ function Header({
                         style={[
                             estilos.titulo,
                             temVoltar && estilos.tituloComVoltar,
+                            voltarRefatorado && estilos.tituloRefatorado,
                             ehDiario && estilos.tituloDiario,
                             corTexto ? { color: corTexto } : null
                         ]}
@@ -102,6 +109,14 @@ function Header({
                     >
                         {titulo}
                     </Text>
+                )}
+
+                {voltarRefatorado && (
+                    <View
+                        testID="header-back-balance"
+                        pointerEvents="none"
+                        style={estilos.espacadorVoltar}
+                    />
                 )}
 
                 {temAcoes ? (
