@@ -1,15 +1,17 @@
-import { act, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 
 let mockOnCreated;
 let mockFormOptions;
 let mockExistingRecord;
+let mockCatalogState;
 
 jest.mock('../../../../src/features/diary/hooks/useDiaryCatalog', () => ({
     useDiaryCatalog: () => ({
         catalogo: { macrocategorias: [] },
         carregando: false,
         erro: null,
-        recarregar: jest.fn()
+        recarregar: jest.fn(),
+        ...mockCatalogState
     })
 }));
 jest.mock('../../../../src/features/diary/hooks/useDiaryEntryForm', () => ({
@@ -44,6 +46,7 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 beforeEach(() => {
     mockExistingRecord = null;
+    mockCatalogState = {};
 });
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
@@ -104,4 +107,26 @@ test('edita silenciosamente o registro já existente para a data', async () => {
         registroInicial: mockExistingRecord
     });
     expect(screen.queryByText(/Já existe um registro/)).not.toBeOnTheScreen();
+});
+
+test('não exibe o check-in quando o Diário está indisponível', async () => {
+    await render(<CycleDiaryCheckIn date="2026-10-08" />);
+    expect(screen.queryByText('Check-in gentil')).not.toBeOnTheScreen();
+});
+
+test('exibe carregamento e permite tentar de novo após erro do catálogo', async () => {
+    const service = {};
+    mockCatalogState = { catalogo: null, carregando: true };
+    const { rerender } = await render(<CycleDiaryCheckIn date="2026-10-08" service={service} />);
+
+    expect(screen.getByText('Carregando seu check-in...')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Salvar no Diário' })).not.toBeOnTheScreen();
+
+    const recarregar = jest.fn();
+    mockCatalogState = { catalogo: null, erro: 'Falha ao carregar o Diário', recarregar };
+    await rerender(<CycleDiaryCheckIn date="2026-10-08" service={service} />);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Falha ao carregar o Diário');
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(recarregar).toHaveBeenCalledTimes(1);
 });
