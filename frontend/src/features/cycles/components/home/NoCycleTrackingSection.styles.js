@@ -49,8 +49,8 @@ const estilos = StyleSheet.create({
         borderRadius: 10
     },
     textoAcao: {
-        fontFamily: fontFamilies.semibold,
-        fontWeight: '600',
+        fontFamily: fontFamilies.regular,
+        fontWeight: '400',
         fontSize: 13,
         letterSpacing: 0,
         lineHeight: 20,
