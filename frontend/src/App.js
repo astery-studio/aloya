@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { DMSans_300Light } from '@expo-google-fonts/dm-sans/300Light';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
 import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
@@ -168,6 +169,7 @@ function EstadoCarregamentoApp() {
 // Inicializa fontes, sessão, serviços e navegação provisória entre as telas.
 export default function App() {
     const [fontes, erroFontes] = useFonts({
+        DMSans_300Light,
         DMSans_400Regular,
         DMSans_500Medium,
         DMSans_600SemiBold,
