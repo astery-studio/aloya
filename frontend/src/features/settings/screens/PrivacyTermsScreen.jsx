@@ -1,11 +1,12 @@
 import { useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Modal, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FileTextIcon } from 'phosphor-react-native/src/icons/FileText';
 
 import { ShieldCheckIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { LegalDocument } from '../../legal/components/LegalDocument/LegalDocument';
+import { LegalTabs } from '../../legal/components/LegalTabs/LegalTabs';
 import { CONSULTA_LEGAL_DISPONIVEL } from '../../legal/data/legalConfig';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { criarEstilos } from './PrivacyTermsScreen.styles';
@@ -24,10 +25,7 @@ const documentos = __DEV__
       )
     : null;
 
-const abas = [
-    { id: 'privacy', titulo: 'Privacidade', icone: ShieldCheckIcon },
-    { id: 'terms', titulo: 'Termos de uso', icone: FileTextIcon }
-];
+const iconesDocumento = { privacy: ShieldCheckIcon, terms: FileTextIcon };
 
 function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
     const tema = useTheme();
@@ -44,7 +42,7 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
 
     if (!CONSULTA_LEGAL_DISPONIVEL) return null;
 
-    const abaSelecionada = abas.find(({ id }) => id === selecionado);
+    const IconeDocumento = iconesDocumento[selecionado];
     return (
         <Modal
             testID="consulta-legal"
@@ -71,31 +69,7 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
                     corFundo={tema.cores.interface.fundo}
                     layoutRefatorado
                 />
-                <View accessibilityRole="tablist" style={estilos.abas}>
-                    {abas.map(({ id, titulo }) => {
-                        const ativo = selecionado === id;
-                        return (
-                            <Pressable
-                                key={id}
-                                accessibilityRole="tab"
-                                accessibilityState={{ selected: ativo }}
-                                onPress={() => setSelecionado(id)}
-                                style={({ pressed }) => [
-                                    estilos.aba,
-                                    pressed && estilos.pressionado
-                                ]}
-                            >
-                                <View style={[estilos.rotuloAba, ativo && estilos.abaAtiva]}>
-                                    <Text
-                                        style={[estilos.textoAba, ativo && estilos.textoAbaAtiva]}
-                                    >
-                                        {titulo}
-                                    </Text>
-                                </View>
-                            </Pressable>
-                        );
-                    })}
-                </View>
+                <LegalTabs selecionado={selecionado} onSelecionar={setSelecionado} />
                 <LegalDocument
                     key={selecionado}
                     documento={documentos[selecionado]}
@@ -110,7 +84,7 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
                     onRolar={(y) => {
                         posicoes.current[selecionado] = y;
                     }}
-                    Icone={abaSelecionada.icone}
+                    Icone={IconeDocumento}
                 />
             </View>
         </Modal>
