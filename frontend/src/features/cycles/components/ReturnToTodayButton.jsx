@@ -30,6 +30,7 @@ function ReturnToTodayButton({ onPress }) {
             fontFamily: 'DMSans_400Regular',
             fontSize: 13,
             fontWeight: '400',
+            includeFontPadding: false,
             lineHeight: 20
         }
     };
