@@ -4,6 +4,7 @@ let mockOnCreated;
 let mockFormOptions;
 let mockExistingRecord;
 let mockCatalogState;
+let mockFormState;
 
 jest.mock('../../../../src/features/diary/hooks/useDiaryCatalog', () => ({
     useDiaryCatalog: () => ({
@@ -25,7 +26,8 @@ jest.mock('../../../../src/features/diary/hooks/useDiaryEntryForm', () => ({
             salvando: false,
             alterarValor: jest.fn(),
             salvar: jest.fn(),
-            erroSalvamento: null
+            erroSalvamento: null,
+            ...mockFormState
         };
     }
 }));
@@ -47,6 +49,7 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 beforeEach(() => {
     mockExistingRecord = null;
     mockCatalogState = {};
+    mockFormState = {};
 });
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
@@ -129,4 +132,48 @@ test('exibe carregamento e permite tentar de novo após erro do catálogo', asyn
     expect(screen.getByRole('alert')).toHaveTextContent('Falha ao carregar o Diário');
     await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
     expect(recarregar).toHaveBeenCalledTimes(1);
+});
+
+test('habilita a edição após alterar o dia e não repete itens registrados', async () => {
+    const service = {};
+    const salvar = jest.fn();
+    const digestao = {
+        id: 'digestao',
+        tipoValor: 'opcoes',
+        ativaEfetiva: true,
+        opcoes: [
+            { id: 'gases', nome: 'Gases' },
+            { id: 'azia', nome: 'Azia' }
+        ]
+    };
+    mockCatalogState = {
+        catalogo: { macrocategorias: [{ ativa: true, categorias: [digestao] }] }
+    };
+    mockExistingRecord = {
+        categorias: [
+            { id: 'digestao', opcoes: [{ id: 'gases' }] },
+            { id: 'anotacao_livre', texto: 'Uma anotação' }
+        ]
+    };
+    mockFormState = { valores: { digestao: ['gases'] }, alterado: false, salvar };
+    const checkIn = <CycleDiaryCheckIn date="2026-10-08" fase="lutea" service={service} />;
+    const { rerender } = await render(checkIn, { preferencia: 'escuro' });
+
+    expect(screen.queryByRole('button', { name: 'Gases' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Azia' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toBeDisabled();
+
+    mockFormState = {
+        valores: { digestao: ['gases', 'azia'] },
+        alterado: true,
+        salvar,
+        erroSalvamento: 'Falha ao salvar'
+    };
+    await rerender(<CycleDiaryCheckIn date="2026-10-08" fase="lutea" service={service} />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Falha ao salvar');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
+    expect(salvar).toHaveBeenCalledTimes(1);
+
+    await act(() => mockFormOptions.onSalvo());
+    expect(screen.getByText('Check-in registrado no Diário.')).toBeOnTheScreen();
 });
