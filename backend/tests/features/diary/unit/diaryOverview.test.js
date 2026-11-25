@@ -273,3 +273,29 @@ test('valida fase, sessão, configuração e controller', async () => {
     );
     assert.equal(erros.length, 1);
 });
+
+test('limita o check-in e preserva o valor observado uma única vez', async () => {
+    const opcoes = Array.from({ length: 10 }, (_, indice) =>
+        categoria(`opcao-${indice}`, `Sintoma ${indice}`)
+    );
+    const prisma = prismaCom([
+        { categorias: [opcoes[9]] },
+        { categorias: opcoes }
+    ]);
+    const buscarRegistros = prisma.registroDiario.findMany;
+    prisma.registroDiario.findMany = async (consulta) => {
+        assert.equal(consulta.where.usuarioId, 3);
+        assert.equal(consulta.where.faseCicloAssociada, 'lutea');
+        assert.equal(consulta.take, 12);
+        return buscarRegistros();
+    };
+
+    const service = criarDiaryOverviewService({ prisma });
+    const resumo = await service.buscar(3, 'lutea');
+
+    assert.equal(resumo.informacoesSuficientes, false);
+    assert.deepEqual(
+        resumo.sugestoesCheckIn.map(({ valor, ocorrencias }) => [valor, ocorrencias]),
+        [['Sintoma 9', 2], ...opcoes.slice(0, 7).map(({ opcoes }) => [opcoes[0].opcaoNome, 1])]
+    );
+});
