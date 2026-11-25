@@ -29,6 +29,7 @@ import { criarSupportContactRemovalRoutes } from '../../features/support-network
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
 import { criarDiaryRoutes } from '../../features/diary/routes/diary.routes.js';
+import { criarNotificationPreferencesRoutes } from '../../features/notifications/notificationPreferences.routes.js';
 
 import { criarLogoutRoutes } from '../../features/auth/routes/logout.routes.js';
 
@@ -105,6 +106,13 @@ app.use(
         remocaoRateLimit: container.remocaoAnticoncepcionalRateLimit
     })
 );
+
+app.use('/api/preferencias-notificacao', criarNotificationPreferencesRoutes({
+    Router: express.Router,
+    autenticar: container.authMiddleware.autenticar,
+    rateLimit: container.configuracoesContaRateLimit,
+    service: container.notificationPreferencesService
+}));
 
 app.use(
     '/api/cycles',

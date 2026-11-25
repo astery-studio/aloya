@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 
 import { env } from './env.js';
 import { prisma } from './prisma.js';
+import { criarNotificationPreferencesService } from '../../features/notifications/notificationPreferences.service.js';
 import { criarCycleRegistrationModule } from '../../features/cycles/cycleRegistration.module.js';
 
 import * as dateUtils from '../utils/date.utils.js';
@@ -235,6 +236,7 @@ function criarContainer() {
     });
 
     const contraceptiveService = criarContraceptiveService(prisma);
+    const notificationPreferencesService = criarNotificationPreferencesService(prisma);
     const contraceptiveUsageService = criarContraceptiveUsageService(prisma, {
         avaliarJanelaEficacia: criarAvaliadorJanelaEficacia(lerJanelasDeUso())
     });
@@ -561,6 +563,7 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        notificationPreferencesService,
         contraceptiveUsageController,
         calendarController: calendarModule.calendarController,
         cycleHistoryController,
