@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 const estilos = StyleSheet.create({
-    secao: { width: '100%', paddingTop: 38, paddingHorizontal: 16 },
+    secao: { width: '100%', paddingHorizontal: 16 },
     rolagem: { marginTop: 17 },
     seletor: { flexDirection: 'row', gap: 9, paddingTop: 2, paddingBottom: 8, paddingRight: 16 },
     fase: {
@@ -22,8 +22,7 @@ const estilos = StyleSheet.create({
         width: 48,
         height: 48,
         alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 17
+        justifyContent: 'center'
     },
     artigo: {
         minHeight: 106.33,
