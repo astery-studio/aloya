@@ -135,3 +135,33 @@ test('mostra o Diário dentro da rolagem sem ciclo e mantém os atalhos acessív
     );
     expect(await screen.findByText('O que seu corpo está pedindo agora?')).toBeOnTheScreen();
 }, 30_000);
+
+test.each(['ao entrar', 'ao tentar novamente'])(
+    'avisa que a sessão expirou %s',
+    async (momento) => {
+        const falha = Object.assign(new Error('Sessão expirada'), { status: 401 });
+        const buscar = jest.fn().mockRejectedValue(falha);
+        const onSessaoExpirada = jest.fn();
+        if (momento === 'ao tentar novamente') buscar.mockRejectedValueOnce(new Error('Sem rede'));
+
+        await renderizarTela({ service: { buscar }, onSessaoExpirada });
+
+        if (momento === 'ao tentar novamente') {
+            const retry = await screen.findByRole('button', { name: 'Tentar novamente' });
+            await fireEvent.press(retry);
+        }
+
+        await waitFor(() => expect(onSessaoExpirada).toHaveBeenCalledTimes(1));
+        expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
+    }
+);
+
+test('mantém a Home disponível quando uma consulta cancelada devolve AbortError', async () => {
+    const buscar = jest.fn().mockRejectedValue({ name: 'AbortError' });
+    const onSessaoExpirada = jest.fn();
+    await renderizarTela({ service: { buscar }, onSessaoExpirada });
+
+    expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
+    expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
+    expect(onSessaoExpirada).not.toHaveBeenCalled();
+});
