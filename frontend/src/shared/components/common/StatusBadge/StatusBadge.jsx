@@ -115,14 +115,10 @@ function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
                 accessibilityLabel={acessibilidade}
                 style={[estilos.container, visual.container, estilo]}
             >
-                <WarningCircleIcon size={18} color={visual.texto.color} weight="regular" />
+                <WarningCircleIcon size={18} color={visual.texto.color} weight="fill" />
                 <View style={estilos.conteudoEstimativa}>
-                    <Text numberOfLines={1} style={estilos.tituloEstimativa}>
-                        {texto}
-                    </Text>
-                    <Text style={estilos.descricaoEstimativa}>
-                        {configuracao.descricao}
-                    </Text>
+                    <Text style={estilos.tituloEstimativa}>{texto}</Text>
+                    <Text style={estilos.descricaoEstimativa}>{configuracao.descricao}</Text>
                 </View>
             </View>
         );
