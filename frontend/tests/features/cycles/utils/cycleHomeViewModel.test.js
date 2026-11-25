@@ -37,3 +37,39 @@ test('mantém a janela fértil visível na fase ovulatória sem intervalo da API
         }).janelaFertilAtiva
     ).toBe(true);
 });
+
+test.each([
+    ['2026-10-08', false],
+    ['2026-10-09', true],
+    ['2026-10-14', true],
+    ['2026-10-15', false]
+])('inclui as duas datas limite da janela fértil da API (%s)', (dataSelecionada, visivel) => {
+    const modelo = criarCycleHomeViewModel({
+        previsao: {
+            status: 'PREVISAO_ULTRAPASSADA',
+            janelaFertilEstimada: { inicio: '2026-10-09', fim: '2026-10-14' }
+        },
+        dataSelecionada,
+        fase: 'folicular'
+    });
+
+    expect(modelo).toMatchObject({ previsaoIncerta: true, janelaFertilAtiva: visivel });
+});
+
+test.each([
+    [undefined, { inicio: '2026-10-09', fim: '2026-10-14' }],
+    ['2026-10-10', { fim: '2026-10-14' }],
+    ['2026-10-10', { inicio: '2026-10-09' }]
+])('ignora datas e intervalos incompletos (%#)', (dataSelecionada, janelaFertil) => {
+    expect(criarCycleHomeViewModel({ dataSelecionada, janelaFertil }).janelaFertilAtiva).toBe(
+        false
+    );
+});
+
+test('dados insuficientes com outro motivo não indicam primeiro uso', () => {
+    expect(
+        criarCycleHomeViewModel({
+            previsao: { status: 'DADOS_INSUFICIENTES', motivos: ['OUTRO_MOTIVO'] }
+        }).estado
+    ).toBe('dadosInsuficientes');
+});
