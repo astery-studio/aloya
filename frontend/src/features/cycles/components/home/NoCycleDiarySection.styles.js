@@ -5,7 +5,6 @@ const estilos = StyleSheet.create({
     cartao: {
         minHeight: 262.33,
         marginHorizontal: 16,
-        marginTop: 38,
         paddingVertical: 23,
         paddingHorizontal: 18,
         backgroundColor: '#FFFFFF',
