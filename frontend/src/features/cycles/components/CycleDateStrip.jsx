@@ -18,14 +18,24 @@ function CycleDateStrip({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const carregamentos = useRef({ anteriores: false, posteriores: false });
     const lista = useRef(null);
+    const dataTocada = useRef(null);
+    const selecaoPosicionada = useRef(null);
 
     useEffect(() => {
         carregamentos.current = { anteriores: false, posteriores: false };
     }, [dias]);
 
     useEffect(() => {
+        const anterior = selecaoPosicionada.current;
+        if (anterior && anterior.data === dataSelecionada && anterior.semCiclo === semCiclo) return;
+
         const indice = dias.findIndex(({ data }) => data === dataSelecionada);
-        if (indice >= 0) {
+        if (indice < 0) return;
+
+        selecaoPosicionada.current = { data: dataSelecionada, semCiclo };
+        const tocouNoDia = dataTocada.current === dataSelecionada;
+        dataTocada.current = null;
+        if (!tocouNoDia) {
             lista.current?.scrollToIndex({
                 index: indice,
                 animated: true,
@@ -91,7 +101,11 @@ function CycleDateStrip({
                         accessibilityRole="button"
                         accessibilityLabel={`${item.semana}, dia ${item.dia ?? '?'}`}
                         accessibilityState={{ selected: selecionado }}
-                        onPress={() => aoSelecionarData?.(item.data)}
+                        onPress={() => {
+                            if (!aoSelecionarData || selecionado) return;
+                            dataTocada.current = item.data;
+                            aoSelecionarData(item.data);
+                        }}
                         style={[
                             estilos.dia,
                             semCiclo ? estilos.dia_desconhecida : estilos[`dia_${item.fase}`],
