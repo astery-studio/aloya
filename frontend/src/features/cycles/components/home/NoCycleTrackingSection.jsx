@@ -26,7 +26,7 @@ function NoCycleTrackingSection({
                         subtitulo={subtitulo}
                         icone={
                             <View style={[estilos.icone, { backgroundColor: fundo }]}>
-                                <Icone size={24} color={cor} />
+                                <Icone size={24} color={cor} weight="regular" />
                             </View>
                         }
                         expandido={abertos.has(id)}
