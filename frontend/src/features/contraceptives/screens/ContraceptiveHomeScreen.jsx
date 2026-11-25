@@ -10,7 +10,7 @@ import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import {
     ContraceptiveUsageCard,
     criarUsos,
-    usoConfirmado
+    usoPendente
 } from '../components/ContraceptiveUsageCard';
 import { PendingUsesBanner } from '../components/PendingUsesBanner';
 import { MENSAGEM_ERRO_CARREGAR } from './ContraceptiveTrackingScreen';
@@ -43,7 +43,7 @@ function ContraceptiveHomeScreen({
         (item) => criarUsos(item).length || item.tipo === 'diu_hormonal'
     );
     const pendentes = itensHoje.reduce(
-        (total, item) => total + criarUsos(item).filter((uso) => !usoConfirmado(uso)).length,
+        (total, item) => total + criarUsos(item).filter(usoPendente).length,
         0
     );
     function atualizarUsos(item, usos) {

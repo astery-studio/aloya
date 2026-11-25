@@ -25,6 +25,8 @@ function formatarDataUso(valor) {
 }
 
 function estadoCalendarioUso(estado) {
+    if (estado === 'naoUsei' || estado === 'nao_usou') return 'naoUsei';
+    if (estado === 'naoSei' || estado === 'nao_sabe') return 'naoConfirmado';
     if (['foraDoPrazo', 'confirmadoForaDoPrazo', 'confirmadoForaPrazoHistoricoUso'].includes(estado)) {
         return 'foraDoPrazo';
     }

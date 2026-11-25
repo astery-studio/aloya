@@ -9,7 +9,8 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import {
     ContraceptiveUsageCard,
     criarUsos,
-    usoConfirmado
+    usoConfirmado,
+    usoPendente
 } from '../components/ContraceptiveUsageCard';
 import { PendingUsesBanner } from '../components/PendingUsesBanner';
 import { criarEstilosAcompanhamento } from './ContraceptiveTrackingScreen.styles';
@@ -143,7 +144,7 @@ function ContraceptiveTrackingScreen({
             total +
             (item.removido || item.ativo === false
                 ? 0
-                : criarUsos(item).filter((uso) => !usoConfirmado(uso)).length),
+                : criarUsos(item).filter(usoPendente).length),
         0
     );
 
