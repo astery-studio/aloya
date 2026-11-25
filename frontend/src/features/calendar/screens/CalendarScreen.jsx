@@ -10,6 +10,7 @@ import { IconButton } from '../../../shared/components/common/IconButton/IconBut
 import { InfoIcon } from '../../../shared/components/icons/AppIcons';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import { Header } from '../../../shared/components/navigation/Header/Header';
+import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
 import { CycleConfidenceSheet } from '../../cycles/components/sheets/CycleConfidenceSheet';
@@ -119,7 +120,8 @@ function CalendarScreen({
     aoEditarCiclo,
     statusSincronizacao,
     erroSincronizacao,
-    aoTentarSincronizar
+    aoTentarSincronizar,
+    onSelecionarAba
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -133,9 +135,8 @@ function CalendarScreen({
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
-    const mostrarStatusSincronizacao = ['sincronizando', 'pendente', 'falha'].includes(
-        statusSincronizacao
-    );
+    const mostrarStatusSincronizacao =
+        !existeErro && ['sincronizando', 'pendente', 'falha'].includes(statusSincronizacao);
     const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
     return (
@@ -169,80 +170,90 @@ function CalendarScreen({
                 }
             />
 
-            <View style={estilos.conteudo}>
-                {existeErro ? (
-                    <View testID="calendar-error-state" style={estilos.estadoCentral}>
-                        <EmptyState
-                            titulo="Ocorreu um erro"
-                            mensagem={MENSAGEM_ERRO_CALENDARIO}
-                            variante="erro"
-                            acao={
-                                <ButtonScreen
-                                    texto="Tentar Novamente"
-                                    aoPressionar={aoTentarNovamente}
-                                    variante="preto"
-                                    estilo={estilos.botaoEstado}
-                                />
-                            }
-                        />
-                    </View>
-                ) : estadoVazio ? (
-                    <View testID="calendar-empty-state" style={estilos.estadoVazio}>
-                        <EmptyState
-                            titulo="Nenhum ciclo registrado"
+            <View testID="calendar-body" style={estilos.corpo}>
+                <View style={estilos.conteudo}>
+                    {existeErro ? (
+                        <View testID="calendar-error-state" style={estilos.estadoCentral}>
+                            <EmptyState
+                                titulo="Ocorreu um erro"
+                                mensagem={MENSAGEM_ERRO_CALENDARIO}
+                                variante="erro"
+                                acao={
+                                    <ButtonScreen
+                                        texto="Tentar Novamente"
+                                        aoPressionar={aoTentarNovamente}
+                                        variante="preto"
+                                        estilo={estilos.botaoEstado}
+                                    />
+                                }
+                            />
+                        </View>
+                    ) : estadoVazio ? (
+                        <View testID="calendar-empty-state" style={estilos.estadoVazio}>
+                            <EmptyState
+                                titulo="Nenhum ciclo registrado"
+                                mensagem={
+                                    <>
+                                        Você ainda não possui nenhum ciclo registrado. Toque em{' '}
+                                        <Text style={estilos.textoDestaque}>
+                                            {"'Cadastrar Menstruação'"}
+                                        </Text>{' '}
+                                        para começar.
+                                    </>
+                                }
+                                variante="vazio"
+                            />
+                        </View>
+                    ) : (
+                        <View style={estilos.areaCalendario}>
+                            <CycleCalendar
+                                meses={mesesValidos}
+                                carregando={carregando}
+                                carregandoAnteriores={carregandoAnteriores}
+                                carregandoPosteriores={carregandoPosteriores}
+                                aoCarregarAnteriores={aoCarregarAnteriores}
+                                aoCarregarPosteriores={aoCarregarPosteriores}
+                                aoPressionarDia={aoEditarCiclo}
+                            />
+                        </View>
+                    )}
+                </View>
+
+                {mostrarStatusSincronizacao ? (
+                    <View
+                        testID="status-sincronizacao-calendario"
+                        style={estilos.areaSincronizacao}
+                    >
+                        <SyncStatusIndicator
+                            status={statusSincronizacao}
                             mensagem={
-                                <>
-                                    Você ainda não possui nenhum ciclo registrado. Toque em{' '}
-                                    <Text style={estilos.textoDestaque}>
-                                        {"'Cadastrar Menstruação'"}
-                                    </Text>{' '}
-                                    para começar.
-                                </>
+                                statusSincronizacao === 'falha' && erroSincronizacao?.status
+                                    ? erroSincronizacao.mensagemUsuario
+                                    : undefined
                             }
-                            variante="vazio"
+                            onTentarNovamente={aoTentarSincronizar}
                         />
                     </View>
-                ) : (
-                    <View style={estilos.areaCalendario}>
-                        <CycleCalendar
-                            meses={mesesValidos}
-                            carregando={carregando}
-                            carregandoAnteriores={carregandoAnteriores}
-                            carregandoPosteriores={carregandoPosteriores}
-                            aoCarregarAnteriores={aoCarregarAnteriores}
-                            aoCarregarPosteriores={aoCarregarPosteriores}
-                            aoPressionarDia={aoEditarCiclo}
-                        />
-                    </View>
-                )}
+                ) : null}
+
+                {mostrarFab ? (
+                    <FloatingActionButton
+                        rotuloAcessibilidade="Cadastrar menstruação"
+                        aoPressionar={aoCadastrarMenstruacao}
+                        considerarAreaSeguraInferior={false}
+                        deslocamentoInferior={mostrarStatusSincronizacao ? 50 : 0}
+                        testID="calendar-add-fab"
+                    />
+                ) : null}
             </View>
 
-            {mostrarStatusSincronizacao ? (
-                <SafeAreaView
-                    testID="status-sincronizacao-calendario"
-                    edges={['bottom']}
-                    style={estilos.areaSincronizacao}
-                >
-                    <SyncStatusIndicator
-                        status={statusSincronizacao}
-                        mensagem={
-                            statusSincronizacao === 'falha' && erroSincronizacao?.status
-                                ? erroSincronizacao.mensagemUsuario
-                                : undefined
-                        }
-                        onTentarNovamente={aoTentarSincronizar}
-                    />
-                </SafeAreaView>
-            ) : null}
-
-            {mostrarFab ? (
-                <FloatingActionButton
-                    rotuloAcessibilidade="Cadastrar menstruação"
-                    aoPressionar={aoCadastrarMenstruacao}
-                    deslocamentoInferior={mostrarStatusSincronizacao ? 50 : 0}
-                    testID="calendar-add-fab"
-                />
-            ) : null}
+            <SafeAreaView
+                testID="calendar-bottom-navigation"
+                edges={['bottom']}
+                style={estilos.navegacaoSegura}
+            >
+                <BottomTabBar abaAtiva="calendario" onSelecionar={onSelecionarAba} />
+            </SafeAreaView>
 
             <CycleLegendSheet
                 visivel={legendaVisivel}

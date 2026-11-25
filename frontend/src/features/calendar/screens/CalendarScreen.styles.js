@@ -23,6 +23,10 @@ function criarEstilos(tema) {
             flex: 1,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
+        corpo: {
+            flex: 1,
+            minHeight: 0
+        },
         conteudo: {
             flex: 1,
             minHeight: 0,
@@ -64,6 +68,10 @@ function criarEstilos(tema) {
                 ? 'rgba(255, 255, 255, 0.08)'
                 : tema.cores.interface.separador,
             backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
+        },
+        navegacaoSegura: {
+            flexShrink: 0,
+            backgroundColor: tema.escuro ? '#1E1E1E' : '#FFFFFF'
         }
     });
 }

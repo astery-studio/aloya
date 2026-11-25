@@ -57,6 +57,32 @@ jest.mock('../../../../src/shared/components/common/FloatingActionButton', () =>
     };
 });
 
+jest.mock(
+    '../../../../src/shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar',
+    () => {
+        const ReactInterno = require('react');
+        const { Pressable, Text, View } = require('react-native');
+
+        return {
+            BottomTabBar: ({ abaAtiva, onSelecionar }) =>
+                ReactInterno.createElement(
+                    View,
+                    { testID: 'bottom-tab-bar' },
+                    ReactInterno.createElement(Text, null, `Aba ativa: ${abaAtiva}`),
+                    ReactInterno.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir configurações pelo menu',
+                            onPress: () => onSelecionar?.('configuracoes')
+                        },
+                        ReactInterno.createElement(Text, null, 'Configurações')
+                    )
+                )
+        };
+    }
+);
+
 jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalendar', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
@@ -159,7 +185,8 @@ describe('CalendarScreen', () => {
         });
         expect(screen.queryByTestId('status-sincronizacao-calendario')).toBeNull();
         expect(screen.getByRole('button', { name: 'Cadastrar menstruação' })).toBeOnTheScreen();
-        expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
+        expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen();
+        expect(screen.getByText('Aba ativa: calendario')).toBeOnTheScreen();
         expect(estilos.areaSincronizacao).toMatchObject({
             flexShrink: 0,
             borderTopWidth: 1
@@ -194,6 +221,24 @@ describe('CalendarScreen', () => {
         await waitFor(() => {
             expect(screen.queryByTestId('cycle-legend-sheet')).toBeNull();
         });
+    });
+
+    test('encaminha a navegação selecionada no menu inferior', async () => {
+        const onSelecionarAba = jest.fn();
+
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
+                confianca="alta"
+                onSelecionarAba={onSelecionarAba}
+            />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Abrir configurações pelo menu' })
+        );
+
+        expect(onSelecionarAba).toHaveBeenCalledWith('configuracoes');
     });
 
     test('abre e fecha a explicação pela tag de confiabilidade', async () => {
