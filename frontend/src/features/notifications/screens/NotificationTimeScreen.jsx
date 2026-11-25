@@ -18,7 +18,7 @@ export function NotificationTimeScreen({ horarioInicial, ocupado, onConfirmar, o
             estiloRodapeFixo={estilos.rodape}
             rodape={
                 <ButtonScreen texto="Confirmar horários" desativado={!valido || ocupado}
-                    carregando={ocupado} aoPressionar={() => onConfirmar(horario)} />
+                    carregando={ocupado} aoPressionar={() => { void onConfirmar(horario); }} />
             }
         >
             <Text style={[typography.bodyDefault, estilos.descricao, { color: cores.interface.textoSecundario }]}>
