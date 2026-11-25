@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../theme';
+import { headerTypography } from '../../../theme/typography';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -14,6 +15,29 @@ function criarEstilos(tema) {
                   backgroundColor: '#121212'
               }
             : {},
+
+        containerRefatorado: {
+            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader
+        },
+
+        areaTituloRefatorada: {
+            minHeight: 0,
+            gap: 12,
+            paddingLeft: 12,
+            paddingRight: 12,
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
+        },
+
+        tituloRefatorado: {
+            ...headerTypography.compacto,
+            textAlign: 'center'
+        },
+
+        espacadorVoltar: {
+            width: 48,
+            height: 48,
+            flexShrink: 0
+        },
 
         containerDiario: {
             width: 390,
