@@ -40,6 +40,19 @@ function criarEstilos(tema) {
             paddingHorizontal: 20,
             paddingBottom: 76
         },
+        estadoCentral: {
+            width: '100%',
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        },
+        botaoEstado: {
+            width: '100%',
+            height: 56,
+            borderRadius: 12
+        },
         textoDestaque: {
             fontFamily: fontFamilies.bold,
             fontWeight: '700'

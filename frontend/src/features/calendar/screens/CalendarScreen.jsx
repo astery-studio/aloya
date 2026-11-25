@@ -3,12 +3,12 @@ import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { InfoIcon } from '../../../shared/components/icons/AppIcons';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
@@ -90,6 +90,9 @@ const ITENS_LEGENDA = Object.freeze([
     }
 ]);
 
+const MENSAGEM_ERRO_CALENDARIO =
+    'Não foi possível carregar os dados do calendário. Tente novamente.';
+
 function normalizarConfianca(valor) {
     if (typeof valor !== 'string') return null;
 
@@ -100,32 +103,6 @@ function normalizarConfianca(valor) {
     }
 
     return null;
-}
-
-function ErroCalendario({ erro, aoTentarNovamente }) {
-    const [fechado, setFechado] = useState(false);
-
-    function tentarNovamente() {
-        if (typeof aoTentarNovamente === 'function') {
-            aoTentarNovamente();
-        } else {
-            setFechado(true);
-        }
-    }
-
-    return (
-        <AlertModal
-            erroInterno
-            visivel={!fechado}
-            titulo="Não foi possível carregar o calendário"
-            mensagem={erro}
-            acaoPrincipal={{
-                texto: typeof aoTentarNovamente === 'function' ? 'Tentar novamente' : 'Fechar',
-                aoPressionar: tentarNovamente
-            }}
-            aoFechar={() => setFechado(true)}
-        />
-    );
 }
 
 function CalendarScreen({
@@ -167,7 +144,7 @@ function CalendarScreen({
                 titulo="Calendário"
                 variante="redeApoio"
                 complementoTitulo={
-                    confiancaValida ? (
+                    confiancaValida && !existeErro ? (
                         <ConfidenceBadge
                             nivel={confiancaValida}
                             variante="simples"
@@ -193,7 +170,23 @@ function CalendarScreen({
             />
 
             <View style={estilos.conteudo}>
-                {estadoVazio ? (
+                {existeErro ? (
+                    <View testID="calendar-error-state" style={estilos.estadoCentral}>
+                        <EmptyState
+                            titulo="Ocorreu um erro"
+                            mensagem={MENSAGEM_ERRO_CALENDARIO}
+                            variante="erro"
+                            acao={
+                                <ButtonScreen
+                                    texto="Tentar Novamente"
+                                    aoPressionar={aoTentarNovamente}
+                                    variante="preto"
+                                    estilo={estilos.botaoEstado}
+                                />
+                            }
+                        />
+                    </View>
+                ) : estadoVazio ? (
                     <View testID="calendar-empty-state" style={estilos.estadoVazio}>
                         <EmptyState
                             titulo="Nenhum ciclo registrado"
@@ -262,13 +255,9 @@ function CalendarScreen({
                 nivel={confiancaValida}
                 aoFechar={() => setConfiancaVisivel(false)}
             />
-
-            {existeErro ? (
-                <ErroCalendario key={erro} erro={erro} aoTentarNovamente={aoTentarNovamente} />
-            ) : null}
         </View>
     );
 }
 
-export { CalendarScreen, ITENS_LEGENDA, normalizarConfianca };
+export { CalendarScreen, ITENS_LEGENDA, MENSAGEM_ERRO_CALENDARIO, normalizarConfianca };
 export default CalendarScreen;

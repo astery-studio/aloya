@@ -57,31 +57,6 @@ jest.mock('../../../../src/shared/components/common/FloatingActionButton', () =>
     };
 });
 
-jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModal', () => {
-    const ReactInterno = require('react');
-    const { Pressable, Text, View } = require('react-native');
-
-    return function AlertModalMock({ visivel, titulo, mensagem, acaoPrincipal }) {
-        if (!visivel) return null;
-
-        return ReactInterno.createElement(
-            View,
-            { testID: 'alert-modal' },
-            ReactInterno.createElement(Text, null, titulo),
-            ReactInterno.createElement(Text, null, mensagem),
-            ReactInterno.createElement(
-                Pressable,
-                {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: acaoPrincipal?.texto,
-                    onPress: acaoPrincipal?.aoPressionar
-                },
-                ReactInterno.createElement(Text, null, acaoPrincipal?.texto)
-            )
-        );
-    };
-});
-
 jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalendar', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
@@ -312,30 +287,41 @@ describe('CalendarScreen', () => {
             />
         );
 
-        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-error-state')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        });
+        expect(screen.getByText('Ocorreu um erro')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Não foi possível carregar os dados do calendário. Tente novamente.')
+        ).toBeOnTheScreen();
+        expect(screen.queryByTestId('cycle-calendar')).toBeNull();
+        expect(screen.queryByTestId('confidence-badge')).toBeNull();
+        expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
 
         expect(aoTentarNovamente).toHaveBeenCalledTimes(1);
     });
 
-    test('reabre o mesmo erro após uma nova falha, sem reabrir o erro já dispensado', async () => {
+    test('mantém o estado de erro enquanto a falha continuar presente', async () => {
         const props = {
             meses: [{ mes: '2026-10', possuiCiclos: true }],
             confianca: 'alta',
-            aoVoltar: jest.fn()
+            aoTentarNovamente: jest.fn()
         };
         const mensagem = 'Não foi possível carregar os dados do calendário. Tente novamente.';
         const { rerender } = await render(<CalendarScreen {...props} erro={mensagem} />);
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Fechar' }));
-        expect(screen.queryByTestId('alert-modal')).toBeNull();
+        expect(screen.getByTestId('calendar-error-state')).toBeOnTheScreen();
         await rerender(<CalendarScreen {...props} erro={mensagem} />);
-        expect(screen.queryByTestId('alert-modal')).toBeNull();
+        expect(screen.getByTestId('calendar-error-state')).toBeOnTheScreen();
 
         await rerender(<CalendarScreen {...props} />);
-        await rerender(<CalendarScreen {...props} erro={mensagem} />);
-        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-error-state')).toBeNull();
     });
 
     test('ignora confiança desconhecida', async () => {
