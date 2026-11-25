@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { PhaseSymbolSlot } from '../PhaseSymbolSlot';
-import { estilos } from './CyclePhaseHero.styles';
+import { CORES_FASE, estilos } from './CyclePhaseHero.styles';
 import { FertileHighlight } from './FertileHighlight';
 
 const NOMES_DAS_FASES = Object.freeze({
@@ -21,7 +21,7 @@ function CyclePhaseHero({ fase, diaCiclo, janelaFertilAtiva = false, symbol }) {
                 {NOMES_DAS_FASES[faseAtual]}
             </Text>
             {diaCiclo ? <Text style={estilos.dia}>Dia {diaCiclo} do ciclo</Text> : null}
-            {janelaFertilAtiva ? <FertileHighlight /> : null}
+            {janelaFertilAtiva ? <FertileHighlight cor={CORES_FASE[faseAtual]} /> : null}
         </View>
     );
 }
