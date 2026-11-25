@@ -7,7 +7,7 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
-        CycleTodayContainer: ({ aoAbrirCalendario, aoCadastrarMenstruacao }) =>
+        CycleTodayContainer: ({ aoAbrirHistorico, aoCadastrarMenstruacao }) =>
             ReactInterno.createElement(
                 View,
                 null,
@@ -16,10 +16,10 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                     Pressable,
                     {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir calendário',
-                        onPress: aoAbrirCalendario
+                        accessibilityLabel: 'Abrir histórico do ciclo',
+                        onPress: aoAbrirHistorico
                     },
-                    ReactInterno.createElement(Text, null, 'Calendário')
+                    ReactInterno.createElement(Text, null, 'Histórico')
                 ),
                 ReactInterno.createElement(
                     Pressable,
@@ -106,6 +106,20 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                     ReactInterno.createElement(Text, null, 'Início')
                 )
             )
+    };
+});
+
+jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
+    const ReactInterno = require('react');
+    const { Pressable } = require('react-native');
+
+    return {
+        CycleHistoryFlow: ({ aoAbrirCalendario }) =>
+            ReactInterno.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Ir para o Calendário',
+                onPress: aoAbrirCalendario
+            })
     };
 });
 
@@ -226,7 +240,8 @@ describe('App — calendário', () => {
         expect(await screen.findByText('Data inicial: 2026-10-27')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para o Calendário' }));
 
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
