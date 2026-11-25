@@ -11,11 +11,21 @@ test('comunica fase, dia e janela fértil por texto', async () => {
     expect(screen.getByLabelText('Janela fértil ativa')).toBeOnTheScreen();
     expect(screen.getByLabelText('Janela fértil ativa')).toHaveStyle({
         width: '100%',
-        height: 67.67,
+        minHeight: 67.67,
         borderWidth: 1.33333,
         borderColor: '#4A758E',
         borderStyle: 'dashed',
         borderRadius: 16
     });
-    expect(estilosFerteis.margem).toMatchObject({ width: 358, height: 87.67, paddingTop: 20 });
+    expect(estilosFerteis.margem).toMatchObject({ width: 358, minHeight: 87.67, paddingTop: 20 });
+});
+
+test('usa o verde da fase folicular e conserva o espaço vazio do símbolo', async () => {
+    await render(<CyclePhaseHero fase="folicular" diaCiclo={8} janelaFertilAtiva />);
+
+    expect(screen.getByLabelText('Janela fértil ativa')).toHaveStyle({ borderColor: '#2C4C3B' });
+    expect(screen.getByTestId('phase-symbol-slot', { includeHiddenElements: true })).toHaveStyle({
+        width: 260,
+        height: 284
+    });
 });
