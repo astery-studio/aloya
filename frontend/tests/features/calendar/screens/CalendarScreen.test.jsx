@@ -6,11 +6,20 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
     const ReactInterno = require('react');
-    const { Text } = require('react-native');
+    const { Pressable, Text } = require('react-native');
 
     return {
-        ConfidenceBadge: ({ nivel }) =>
-            ReactInterno.createElement(Text, { testID: 'confidence-badge' }, nivel)
+        ConfidenceBadge: ({ nivel, onPress, rotuloAcessibilidade }) =>
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    testID: 'confidence-badge',
+                    accessibilityRole: 'button',
+                    accessibilityLabel: rotuloAcessibilidade,
+                    onPress
+                },
+                ReactInterno.createElement(Text, null, nivel)
+            )
     };
 });
 
@@ -116,6 +125,31 @@ jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLe
     };
 });
 
+jest.mock('../../../../src/features/cycles/components/sheets/CycleConfidenceSheet', () => {
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
+
+    return {
+        CycleConfidenceSheet: ({ visivel, nivel, aoFechar }) =>
+            visivel
+                ? ReactInterno.createElement(
+                      View,
+                      { testID: 'cycle-confidence-sheet' },
+                      ReactInterno.createElement(Text, null, `Confiança: ${nivel}`),
+                      ReactInterno.createElement(
+                          Pressable,
+                          {
+                              accessibilityRole: 'button',
+                              accessibilityLabel: 'Fechar explicação',
+                              onPress: aoFechar
+                          },
+                          ReactInterno.createElement(Text, null, 'Fechar')
+                      )
+                  )
+                : null
+    };
+});
+
 describe('CalendarScreen', () => {
     test('mostra calendário, título e confiança', async () => {
         const aoCadastrarMenstruacao = jest.fn();
@@ -134,32 +168,13 @@ describe('CalendarScreen', () => {
         expect(screen.getByText('Calendário')).toBeOnTheScreen();
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('alta');
-        const tituloEConfianca = within(screen.getByTestId('titulo-e-confianca'));
-        expect(tituloEConfianca.getByText('Calendário')).toBeOnTheScreen();
-        expect(tituloEConfianca.getByTestId('confidence-badge')).toBeOnTheScreen();
-        expect(estilos.centralizadorCabecalho).toMatchObject({
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            alignItems: 'center'
+        const cabecalho = within(screen.getByTestId('header-content'));
+        expect(cabecalho.getByText('Calendário')).toBeOnTheScreen();
+        expect(cabecalho.getByTestId('confidence-badge')).toBeOnTheScreen();
+        expect(screen.getByTestId('header-content')).toHaveStyle({
+            flexDirection: 'row',
+            justifyContent: 'space-between'
         });
-        expect(estilos.caixaCalendario).toMatchObject({
-            width: 288
-        });
-        expect(estilos.tituloEConfianca).toMatchObject({
-            flexDirection: 'column',
-            alignItems: 'center'
-        });
-        expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center'
-        });
-        //O grupo inteiro precisa caber antes do cabeçalho dos dias da semana.
-        const fimDoGrupo = estilos.centralizadorCabecalho.top + estilos.caixaCalendario.height;
-        expect(fimDoGrupo + estilos.cabecalho.paddingBottom).toBeLessThanOrEqual(
-            estilos.cabecalho.height
-        );
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
         expect(screen.getByRole('button', { name: 'Cadastrar menstruação' })).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
@@ -177,11 +192,8 @@ describe('CalendarScreen', () => {
             data: '2026-10-04',
             registroCicloId: 9
         });
-        expect(screen.getByTestId('acao-legenda-calendario')).toHaveStyle({
-            padding: 8,
-            alignItems: 'center'
-        });
-        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 21.995);
+        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 32);
+        expect(screen.getByTestId('icone-legenda')).toHaveProp('color', '#2C4C3B');
     });
 
     test('abre e fecha a legenda pelo botão de informação', async () => {
@@ -204,6 +216,24 @@ describe('CalendarScreen', () => {
         });
     });
 
+    test('abre e fecha a explicação pela tag de confiabilidade', async () => {
+        await render(
+            <CalendarScreen meses={[{ mes: '2026-10', possuiCiclos: true }]} confianca="alta" />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Explicar confiabilidade do calendário' })
+        );
+
+        expect(screen.getByText('Confiança: alta')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar explicação' }));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('cycle-confidence-sheet')).toBeNull();
+        });
+    });
+
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {
         const aoCadastrarMenstruacao = jest.fn();
 
@@ -221,7 +251,7 @@ describe('CalendarScreen', () => {
                 'Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar Menstruação’ pra começar.'
             )
         ).toBeOnTheScreen();
-        expect(screen.queryByTestId('confidence-badge')).toBeNull();
+        expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');
         expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));

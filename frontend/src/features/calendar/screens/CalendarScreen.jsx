@@ -1,14 +1,17 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
-import { ArrowLeftIcon, InfoIcon } from '../../../shared/components/icons/AppIcons';
+import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
+import { InfoIcon } from '../../../shared/components/icons/AppIcons';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import { Header } from '../../../shared/components/navigation/Header/Header';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
+import { CycleConfidenceSheet } from '../../cycles/components/sheets/CycleConfidenceSheet';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { coresConfiabilidadeEscuras, criarEstilos } from './CalendarScreen.styles';
 import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
@@ -134,7 +137,6 @@ function CalendarScreen({
     aoCarregarAnteriores,
     aoCarregarPosteriores,
     aoTentarNovamente,
-    aoVoltar,
     aoCadastrarMenstruacao,
     aoEditarCiclo,
     statusSincronizacao,
@@ -144,6 +146,7 @@ function CalendarScreen({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
+    const [confiancaVisivel, setConfiancaVisivel] = useState(false);
 
     const mesesValidos = Array.isArray(meses) ? meses : [];
     const confiancaValida = normalizarConfianca(confianca);
@@ -156,59 +159,34 @@ function CalendarScreen({
 
     return (
         <View style={estilos.tela}>
-            <View testID="cabecalho-calendario" style={estilos.cabecalho}>
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Voltar"
-                    accessibilityState={{ disabled: typeof aoVoltar !== 'function' }}
-                    disabled={typeof aoVoltar !== 'function'}
-                    onPress={aoVoltar}
-                    style={estilos.acaoCabecalho}
-                >
-                    <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
-                </Pressable>
-
-                <View
-                    testID="centralizador-cabecalho"
-                    pointerEvents="box-none"
-                    style={estilos.centralizadorCabecalho}
-                >
-                    <View style={estilos.caixaCalendario}>
-                        <View testID="titulo-e-confianca" style={estilos.tituloEConfianca}>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
-                                Calendário
-                            </Text>
-                            {!estadoVazio && confiancaValida ? (
-                                <View
-                                    testID="centralizador-confianca"
-                                    style={estilos.centralizadorConfianca}
-                                >
-                                    <ConfidenceBadge
-                                        nivel={confiancaValida}
-                                        variante="simples"
-                                        coresPersonalizadas={
-                                            tema.escuro
-                                                ? coresConfiabilidadeEscuras[confiancaValida]
-                                                : undefined
-                                        }
-                                    />
-                                </View>
-                            ) : null}
-                        </View>
-                    </View>
-                </View>
-
-                <Pressable
-                    testID="acao-legenda-calendario"
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir legenda do calendário"
-                    onPress={() => setLegendaVisivel(true)}
-                    hitSlop={8}
-                    style={estilos.acaoLegenda}
-                >
-                    <InfoIcon size={21.995} color={estilos.corIconeCabecalho} />
-                </Pressable>
-            </View>
+            <Header
+                titulo="Calendário"
+                variante="redeApoio"
+                complementoTitulo={
+                    confiancaValida ? (
+                        <ConfidenceBadge
+                            nivel={confiancaValida}
+                            variante="simples"
+                            onPress={() => setConfiancaVisivel(true)}
+                            rotuloAcessibilidade="Explicar confiabilidade do calendário"
+                            coresPersonalizadas={
+                                tema.escuro
+                                    ? coresConfiabilidadeEscuras[confiancaValida]
+                                    : undefined
+                            }
+                        />
+                    ) : null
+                }
+                acoes={
+                    <IconButton
+                        icone={InfoIcon}
+                        aoPressionar={() => setLegendaVisivel(true)}
+                        rotuloAcessibilidade="Abrir legenda do calendário"
+                        variante="redeApoio"
+                        corIcone={tema.cores.interface.destaque}
+                    />
+                }
+            />
 
             <View style={estilos.conteudo}>
                 <View style={estilos.areaCalendario}>
@@ -257,6 +235,12 @@ function CalendarScreen({
                 visivel={legendaVisivel}
                 itens={ITENS_LEGENDA}
                 aoFechar={() => setLegendaVisivel(false)}
+            />
+
+            <CycleConfidenceSheet
+                visivel={confiancaVisivel}
+                nivel={confiancaValida}
+                aoFechar={() => setConfiancaVisivel(false)}
             />
 
             {existeErro ? (
