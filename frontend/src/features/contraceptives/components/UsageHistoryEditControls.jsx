@@ -52,7 +52,7 @@ function UsageHistoryEditControls({
             {erro ? <Text accessibilityRole="alert" style={{ color: tema.cores.interface.textoPrincipal }}>{erro}</Text> : null}
             <Button texto="Salvar" variante="verde" tamanho="compacto"
                 desativado={!podeSalvar} carregando={salvando} aoPressionar={aoSalvar}
-                estilo={{ minHeight: 36, borderRadius: 10, ...(!podeSalvar && !tema.escuro && { backgroundColor: '#E6E2D8' }) }}
+                estilo={{ height: 'auto', minHeight: 36, borderRadius: 10, ...(!podeSalvar && !tema.escuro && { backgroundColor: '#E6E2D8' }) }}
                 estiloTexto={{ fontSize: 13, lineHeight: 20, ...(!podeSalvar && !tema.escuro && { color: '#A8A49C' }) }}
             />
         </View>

@@ -41,7 +41,7 @@ function criarEstilosAcompanhamento(tema) {
             maxWidth: 393.33,
             alignSelf: 'center',
             paddingHorizontal: 21.66,
-            paddingBottom: 12
+            paddingBottom: 32
         },
         rotuloSecao: {
             width: '100%',
