@@ -79,6 +79,7 @@ test('HU-023 SQLite/API: doses, timestamp, desmarcação, prazo e autorização 
         assert.equal(confirmado.status, 200);
         assert.equal(confirmado.dados.uso.confirmadoEm, agora.toISOString());
         assert.equal(confirmado.dados.uso.status, 'confirmado');
+        assert.equal(confirmado.dados.uso.atrasado, false);
         assert.equal(confirmado.dados.uso.prazoConfigurado, true);
         const usoId = confirmado.dados.uso.id;
         async function corrigir(id, estado, autenticado = true) {
@@ -91,6 +92,8 @@ test('HU-023 SQLite/API: doses, timestamp, desmarcação, prazo e autorização 
         assert.equal((await corrigir(1, 'foraDoPrazo', false)).status, 401);
         assert.equal((await corrigir(2, 'foraDoPrazo')).status, 404);
         assert.equal((await corrigir(1, 'naoConfirmado')).status, 422);
+        // A correção é feita no dia seguinte e preserva a ocorrência e a confirmação originais.
+        agora = new Date('2026-10-10T11:00:00Z');
         const correcao = await corrigir(1, 'foraDoPrazo');
         assert.equal(correcao.status, 200);
         assert.deepEqual((await correcao.json()).uso, {
@@ -100,11 +103,21 @@ test('HU-023 SQLite/API: doses, timestamp, desmarcação, prazo e autorização 
         const relido = await criarContraceptiveService(prisma, () => agora)
             .listar(1, { fusoHorario: 'America/Sao_Paulo' });
         assert.equal(relido.find((registro) => registro.id === 1).historico[0].estado, 'foraDoPrazo');
-        assert.equal((await corrigir(1, 'confirmado')).status, 200);
+        const naoUsou = await corrigir(1, 'naoUsei');
+        assert.equal(naoUsou.status, 200);
+        const { uso: usoNaoRealizado } = await naoUsou.json();
+        assert.equal(usoNaoRealizado.estado, 'naoUsei');
+        assert.equal(usoNaoRealizado.confirmadoEm, null);
+        assert.equal((await corrigir(1, 'naoSei')).status, 422);
+        const restaurado = await corrigir(1, 'confirmado');
+        assert.equal(restaurado.status, 200);
+        assert.equal((await restaurado.json()).uso.confirmadoEm, confirmado.dados.uso.confirmadoEm);
         agora = new Date('2026-10-09T11:05:00Z');
         const repetido = await put(1, true);
         assert.equal(repetido.dados.uso.confirmadoEm, confirmado.dados.uso.confirmadoEm);
-        assert.equal((await put(1, false)).dados.uso.status, 'pendente');
+        const desmarcado = await put(1, false);
+        assert.equal(desmarcado.dados.uso.status, 'pendente');
+        assert.equal(desmarcado.dados.uso.atrasado, true);
         agora = new Date('2026-10-09T12:01:00Z');
         assert.equal((await put(1, true)).dados.uso.status, 'foraDoPrazo');
         assert.equal((await put(1, false)).dados.uso.status, 'pendente');
@@ -119,6 +132,48 @@ test('HU-023 SQLite/API: doses, timestamp, desmarcação, prazo e autorização 
         assert.equal(item.usosHoje[1].status, 'pendente');
         assert.equal(item.historico.length, 1);
         assert.equal(await prisma.usoAnticoncepcional.count(), 2);
+        assert.deepEqual(await prisma.notificacao.findMany({ orderBy: { id: 'asc' } }), alertasAntes);
+        async function registrarPassado(id, data, horario, estado = 'confirmado') {
+            return fetch(`${url}/${id}/usos`, {
+                method: 'PATCH',
+                headers: { 'content-type': 'application/json', authorization: 'Bearer teste' },
+                body: JSON.stringify({ estado, data, horario, fusoHorario: 'America/Sao_Paulo' })
+            });
+        }
+        assert.equal((await registrarPassado(1, '2026-10-09', '20:00')).status, 422);
+        assert.equal((await registrarPassado(1, '2026-10-08', '21:00')).status, 422);
+        assert.equal((await registrarPassado(2, '2026-10-08', '20:00')).status, 404);
+        const criado = await registrarPassado(1, '2026-10-08', '20:00');
+        assert.equal(criado.status, 200);
+        const { uso: usoRetroativo } = await criado.json();
+        assert.equal(usoRetroativo.confirmadoEm, null);
+        assert.equal(usoRetroativo.horarioProgramado, '20:00');
+        assert.equal(usoRetroativo.estado, 'confirmado');
+        const repeticao = await registrarPassado(1, '2026-10-08', '20:00');
+        assert.equal((await repeticao.json()).uso.id, usoRetroativo.id);
+        const recarregado = await criarContraceptiveService(prisma, () => agora).listar(1);
+        assert.deepEqual(recarregado.find((metodo) => metodo.id === 1).historico.find(
+            (uso) => uso.id === usoRetroativo.id
+        ), usoRetroativo);
+        const novoNaoUsou = await registrarPassado(1, '2026-10-07', '20:00', 'naoUsei');
+        assert.equal(novoNaoUsou.status, 200);
+        const { uso: historicoNaoUsei } = await novoNaoUsou.json();
+        assert.equal(historicoNaoUsei.estado, 'naoUsei');
+        assert.equal(historicoNaoUsei.confirmadoEm, null);
+        assert.equal((await criarContraceptiveService(prisma, () => agora).listar(1))
+            .find((metodo) => metodo.id === 1).historico.find((uso) => uso.id === historicoNaoUsei.id).estado, 'naoUsei');
+        const apagar = (id, autenticado = true) => fetch(`${url}/${id}/usos/${historicoNaoUsei.id}`, {
+            method: 'DELETE',
+            headers: autenticado ? { authorization: 'Bearer teste' } : {}
+        });
+        assert.equal((await apagar(1, false)).status, 401);
+        assert.equal((await apagar(2)).status, 404);
+        assert.equal((await apagar(1)).status, 204);
+        const aposExclusao = (await criarContraceptiveService(prisma, () => agora).listar(1))
+            .find((metodo) => metodo.id === 1);
+        assert.deepEqual(aposExclusao.horarios, ['08:00', '20:00']);
+        assert.equal(aposExclusao.historico.some((uso) => uso.id === historicoNaoUsei.id), false);
+        assert.equal(aposExclusao.historico.some((uso) => uso.id === usoRetroativo.id), true);
         assert.deepEqual(await prisma.notificacao.findMany({ orderBy: { id: 'asc' } }), alertasAntes);
     } finally {
         if (servidor) await new Promise((res) => servidor.close(res));
