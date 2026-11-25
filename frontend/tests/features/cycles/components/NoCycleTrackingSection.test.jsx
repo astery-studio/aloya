@@ -35,3 +35,13 @@ test('associa os ícones importados do protótipo aos quatro cartões', () => {
         ['anticoncepcional', PillIcon]
     ]);
 });
+
+test.each([undefined, [], ['ritmo']])(
+    'aceita a seleção de cartões como lista (%#)',
+    async (idsExpandidos) => {
+        await render(<NoCycleTrackingSection idsExpandidos={idsExpandidos} />);
+        const ritmo = screen.getByRole('button', { name: /Entenda o ritmo/ });
+
+        expect(ritmo.props.accessibilityState.expanded).toBe(Boolean(idsExpandidos?.length));
+    }
+);
