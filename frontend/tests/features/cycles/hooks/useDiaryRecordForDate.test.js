@@ -112,3 +112,8 @@ test('não consulta outra data nem busca detalhes sem serviço ou método dispon
     await waitFor(() => expect(hook.result.current.loading).toBe(false));
     expect(hook.result.current.record).toBeNull();
 });
+
+test('começa sem registro quando usado sem parâmetros', async () => {
+    const { result } = await renderHook(() => useDiaryRecordForDate());
+    expect(result.current).toEqual({ record: null, loading: false });
+});
