@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { PillIcon } from '../../../../shared/components/icons/AppIcons';
 import { RECURSOS_SEM_CICLO } from '../../constants/noCycleTrackingContent';
 import { CycleExpandableCard } from '../CycleExpandableCard';
 import { estilos } from './NoCycleTrackingSection.styles';
@@ -37,6 +38,8 @@ function NoCycleTrackingSection({
                                 texto="Abrir Anticoncepcionais"
                                 aoPressionar={aoAbrirAnticoncepcional}
                                 variante="verde"
+                                icone={PillIcon}
+                                tamanhoIcone={13}
                                 estilo={estilos.acao}
                                 estiloTexto={estilos.textoAcao}
                             />
