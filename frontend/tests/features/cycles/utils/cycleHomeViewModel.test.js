@@ -2,6 +2,7 @@ import { criarCycleHomeViewModel } from '../../../../src/features/cycles/utils/c
 
 test.each([
     [undefined, 'semCiclo'],
+    [{ status: 'DADOS_INSUFICIENTES', motivos: ['INICIO_ELEGIVEL_AUSENTE'] }, 'semCiclo'],
     [{ status: 'DADOS_INSUFICIENTES' }, 'dadosInsuficientes'],
     [{ status: 'DISPONIVEL' }, 'comCiclo']
 ])('distingue o estado de domínio %#', (previsao, estado) => {
