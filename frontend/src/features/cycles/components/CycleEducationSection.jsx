@@ -53,7 +53,7 @@ function CycleEducationSection({
                             phase.id === idSelecionado && { borderColor: phase.cor }
                         ]}
                     >
-                        <View style={estilos.icone}>
+                        <View testID={`icone-fase-educativa-${phase.id}`} style={estilos.icone}>
                             <phase.Icone
                                 size={24}
                                 color={phase.cor}
