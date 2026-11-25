@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayContainer } from '../../../../src/features/cycles/screens/CycleTodayContainer';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -69,14 +69,17 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
 
 test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não encontra registros', async () => {
     const service = {
-        buscar: jest.fn().mockResolvedValue({ status: 'DADOS_INSUFICIENTES' })
+        buscar: jest.fn().mockResolvedValue({
+            status: 'DADOS_INSUFICIENTES',
+            motivos: ['INICIO_ELEGIVEL_AUSENTE']
+        })
     };
     const aoCadastrarMenstruacao = jest.fn();
     jest.useFakeTimers().setSystemTime(new Date(2026, 9, 30, 23, 30));
     try {
         await renderizarTela({ service, aoCadastrarMenstruacao });
 
-        expect(await screen.findByText('Continue registrando seu ciclo')).toBeOnTheScreen();
+        expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
         expect(screen.getByLabelText('Datas do ciclo')).toHaveProp('horizontal', true);
         const inicioDaFaixa = screen.getByLabelText('Datas do ciclo').props.data[0].data;
         await fireEvent.press(screen.getByRole('button', { name: 'qui, dia 29' }));
@@ -102,3 +105,33 @@ test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não
         jest.useRealTimers();
     }
 });
+
+test('mostra o Diário dentro da rolagem sem ciclo e mantém os atalhos acessíveis', async () => {
+    const service = {
+        buscar: jest.fn().mockResolvedValue({
+            status: 'DADOS_INSUFICIENTES',
+            motivos: ['INICIO_ELEGIVEL_AUSENTE']
+        })
+    };
+    const aoCadastrarDiario = jest.fn();
+    const aoSelecionarAba = jest.fn();
+    await renderizarTela({ service, aoCadastrarDiario, aoSelecionarAba });
+
+    const rolagem = await screen.findByTestId('conteudo-rolavel');
+    const diario = within(rolagem).getByTestId('diario-home-sem-ciclo');
+    expect(within(diario).getByText('Seu Diário já está disponível')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /Entenda o ritmo/ })).toHaveProp(
+        'accessibilityState',
+        expect.objectContaining({ expanded: false })
+    );
+    await fireEvent.press(screen.getByRole('tab', { name: 'Calendário' }));
+    expect(aoSelecionarAba).toHaveBeenCalledWith('calendario');
+    await fireEvent.press(
+        within(diario).getByRole('button', { name: 'Como você está se sentindo?' })
+    );
+    expect(aoCadastrarDiario).toHaveBeenCalledTimes(1);
+    await fireEvent.press(
+        within(diario).getByRole('button', { name: 'Gostaria de fazer uma anotação?' })
+    );
+    expect(await screen.findByText('O que seu corpo está pedindo agora?')).toBeOnTheScreen();
+}, 30_000);
