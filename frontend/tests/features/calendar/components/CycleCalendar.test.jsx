@@ -1,6 +1,7 @@
 //Testa carregamento, virtualização, paginação e interação do calendário.
 import { fireEvent } from '@testing-library/react-native';
 import { CycleCalendar } from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar';
+import { estilos } from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 function criarMes(chave, alteracoes = {}) {
@@ -14,6 +15,37 @@ function criarMes(chave, alteracoes = {}) {
 }
 
 describe('CycleCalendar', () => {
+    test('mantém o primeiro mês no topo antes de qualquer interação', async () => {
+        const resultado = await render(<CycleCalendar meses={[criarMes('2026-10')]} />);
+
+        expect(resultado.getByTestId('cycle-calendar-list')).toHaveStyle({ flex: 1 });
+        expect(estilos.conteudoLista).toMatchObject({
+            flexGrow: 1,
+            justifyContent: 'flex-start'
+        });
+    });
+
+    test('mantém o mês no topo após remover o último ciclo', async () => {
+        const mesComCiclo = criarMes('2026-10', {
+            diasMenstruacao: [{ data: '2026-10-01', registroCicloId: 18 }]
+        });
+        const resultado = await render(<CycleCalendar meses={[mesComCiclo]} />);
+
+        await resultado.rerender(
+            <CycleCalendar
+                meses={[
+                    criarMes('2026-10', {
+                        possuiCiclos: false,
+                        diasMenstruacao: []
+                    })
+                ]}
+            />
+        );
+
+        expect(resultado.getByTestId('cycle-calendar-list')).toBeOnTheScreen();
+        expect(estilos.conteudoLista.justifyContent).toBe('flex-start');
+    });
+
     test('carrega próximos meses no primeiro gesto mesmo quando o fim foi notificado na montagem', async () => {
         const aoCarregarPosteriores = jest.fn();
         const resultado = await render(
