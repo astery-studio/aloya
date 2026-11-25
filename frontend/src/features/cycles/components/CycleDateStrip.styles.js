@@ -9,6 +9,7 @@ function criarEstilos(tema) {
             width: '100%',
             height: 82.33
         },
+        containerSemCiclo: { height: 94.33, paddingTop: 12, paddingHorizontal: 8 },
         faixa: {
             gap: espacamentos.pequeno,
             paddingHorizontal: espacamentos.pequeno,
@@ -27,6 +28,7 @@ function criarEstilos(tema) {
         dia_ovulatoria: { backgroundColor: '#4A758E', borderColor: '#4A758E' },
         dia_lutea: { backgroundColor: '#D68C3A', borderColor: '#D68C3A' },
         dia_desconhecida: { backgroundColor: '#FFFFFF', borderColor: '#E6E2D8' },
+        diaSemCiclo: { paddingTop: 10 },
         diaSelecionado: { ...shadows.cardSuave, paddingTop: 10 },
         diaSelecionadoDesconhecida: {
             backgroundColor: '#5C5C59',
