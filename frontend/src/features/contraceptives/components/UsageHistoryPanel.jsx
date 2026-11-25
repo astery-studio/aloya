@@ -128,6 +128,14 @@ function UsageHistoryPanel({
     const registrosDoMes = registros.filter(
         (registro) => !registro.data || partesDaDataUso(registro.data)?.chaveMes === mes
     );
+
+    function navegarMes(deslocamento) {
+        sairDoAlvo(() => {
+            if (sessao) setSessao({});
+            setMes(deslocarMes(mes, deslocamento));
+        });
+    }
+
     const calendario = modo === 'calendario';
     const instrucao = sessao ? (
         <Text style={estilosUso.instrucaoEdicao}>
@@ -147,13 +155,6 @@ function UsageHistoryPanel({
             aoSelecionarData={selecionarData}
         />
     ) : null;
-
-    function navegarMes(deslocamento) {
-        sairDoAlvo(() => {
-            if (sessao) setSessao({});
-            setMes(deslocarMes(mes, deslocamento));
-        });
-    }
 
     return (
         <View style={[estilosUso.painel, expandido && estilosUso.painelExpandido]}>
