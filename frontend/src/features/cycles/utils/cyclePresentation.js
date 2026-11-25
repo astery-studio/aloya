@@ -1,4 +1,13 @@
 const DIA_MS = 86_400_000;
+const formatadorDataLonga = new Intl.DateTimeFormat('pt-BR', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC'
+});
+const formatadorSemana = new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'short',
+    timeZone: 'UTC'
+});
 
 function paraDataUtc(texto) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(texto || '')) return null;
@@ -25,11 +34,7 @@ function adicionarDias(texto, quantidade) {
 function formatarDataLonga(texto) {
     const data = paraDataUtc(texto);
     if (!data) return '—';
-    return new Intl.DateTimeFormat('pt-BR', {
-        day: 'numeric',
-        month: 'long',
-        timeZone: 'UTC'
-    }).format(data);
+    return formatadorDataLonga.format(data);
 }
 
 function formatarDataCabecalho(texto) {
@@ -91,12 +96,7 @@ function criarDiasDaFaixa(
         return {
             data,
             dia: objeto?.getUTCDate(),
-            semana: new Intl.DateTimeFormat('pt-BR', {
-                weekday: 'short',
-                timeZone: 'UTC'
-            })
-                .format(objeto)
-                .replace('.', ''),
+            semana: formatadorSemana.format(objeto).replace('.', ''),
             fase: obterFase(data, fases, duracaoCiclo),
             hoje: data === dataCentral
         };
