@@ -2,7 +2,14 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    BackHandler,
+    Linking,
+    Text,
+    TurboModuleRegistry
+} from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
@@ -69,7 +76,8 @@ function obterBaseUrl() {
         return process.env.EXPO_PUBLIC_API_URL;
     }
 
-    const script = NativeModules.SourceCode?.scriptURL || '';
+    const fonte = __DEV__ ? TurboModuleRegistry.get('SourceCode') : null;
+    const script = fonte?.getConstants?.()?.scriptURL ?? fonte?.scriptURL ?? '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
 
