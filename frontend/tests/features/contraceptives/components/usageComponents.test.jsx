@@ -273,11 +273,12 @@ test('preserva a tipografia e espaçamento da legenda sem limitar a medição na
         width: '100%',
         minHeight: 23,
         flexWrap: 'wrap',
-        gap: 10,
+        columnGap: 8,
+        rowGap: 4,
         paddingTop: 8,
         paddingHorizontal: 13
     });
-    expect(estilosUso.itemLegenda).toMatchObject({ minHeight: 15, flexShrink: 0, gap: 4 });
+    expect(estilosUso.itemLegenda).toMatchObject({ minHeight: 15, flexBasis: '46%', flexShrink: 0, gap: 4 });
     expect(estilosUso.itemLegenda.width).toBeUndefined();
     expect(estilosUso.marcadorLegenda).toMatchObject({
         width: 5.99,
@@ -288,6 +289,7 @@ test('preserva a tipografia e espaçamento da legenda sem limitar a medição na
         minHeight: 15,
         fontSize: 10,
         lineHeight: 15,
+        flexShrink: 1,
         includeFontPadding: false
     });
     expect(estilosUso.textoLegenda.width).toBeUndefined();
@@ -363,11 +365,14 @@ test('a legenda se adapta em telas estreitas sem reduzir a grade nem cortar os r
     await render(<UsageCalendar mes="2026-09" />);
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 256.43 });
     expect(screen.getByTestId('usage-calendar').props.onLayout).toBeUndefined();
-    expect(screen.getByTestId('usage-calendar-legend')).toHaveStyle({ flexWrap: 'wrap', gap: 10 });
+    expect(screen.getByTestId('usage-calendar-legend')).toHaveStyle({
+        flexWrap: 'wrap', columnGap: 8, rowGap: 4, justifyContent: 'flex-start'
+    });
     expect(screen.getByText('Confirmado')).toBeOnTheScreen();
     expect(screen.getByText('Fora do prazo')).toBeOnTheScreen();
     expect(screen.getByText('Não confirmado')).toBeOnTheScreen();
-    ['Confirmado', 'Fora do prazo', 'Não confirmado'].forEach((rotulo) => {
+    expect(screen.queryByText('Não sei')).toBeNull();
+    ['Confirmado', 'Fora do prazo', 'Não usei', 'Não confirmado'].forEach((rotulo) => {
         const texto = screen.getByText(rotulo);
         expect(texto).toHaveStyle({ fontSize: 10, lineHeight: 15 });
         expect(texto.props.numberOfLines).toBeUndefined();

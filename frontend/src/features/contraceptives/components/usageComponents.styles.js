@@ -6,13 +6,14 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 const coresHistorico = Object.freeze({
     confirmado: 'rgba(44, 76, 59, 0.8)',
     foraDoPrazo: 'rgba(214, 140, 58, 0.8)',
-    naoConfirmado: 'rgba(200, 90, 68, 0.8)'
+    naoConfirmado: 'rgba(200, 90, 68, 0.8)',
+    naoUsei: '#A65140'
 });
 
 function criarEstilosUso(tema) {
     const interfaceTema = tema.cores.interface;
     const coresCalendario = tema.escuro
-        ? { confirmado: '#A5D6A7CC', foraDoPrazo: '#FFE082CC', naoConfirmado: '#EF9A9ACC' }
+        ? { ...coresHistorico, confirmado: '#A5D6A7CC', foraDoPrazo: '#FFE082CC', naoConfirmado: '#EF9A9ACC' }
         : coresHistorico;
     return StyleSheet.create({
         banner: {
@@ -95,6 +96,7 @@ function criarEstilosUso(tema) {
         },
         registroSelecionado: { borderWidth: 2, borderStyle: 'dashed', borderColor: interfaceTema.destaque },
         celulaSelecionada: { borderWidth: 2, borderStyle: 'dashed', borderColor: '#FFFFFF' },
+        celulaSelecionadaSemRegistro: { borderColor: interfaceTema.destaque },
         listaRegistros: { width: '100%', alignItems: 'flex-start', gap: 6 },
         registro: {
             width: '100%',
@@ -278,22 +280,25 @@ function criarEstilosUso(tema) {
         celula_confirmado: { backgroundColor: coresCalendario.confirmado },
         celula_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
         celula_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
-        // Cada item mede seu texto nativo. Se faltar espaço, a legenda cresce por linhas.
+        celula_naoUsei: { backgroundColor: coresCalendario.naoUsei },
+        // Duas colunas fixam o alinhamento dos marcadores e deixam cada rótulo crescer.
         legenda: {
             width: '100%',
             minHeight: 23,
             flexDirection: 'row',
             flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
+            alignItems: 'flex-start',
+            justifyContent: 'flex-start',
+            columnGap: 8,
+            rowGap: 4,
             paddingTop: 8,
             paddingHorizontal: 13
         },
         itemLegenda: {
             minHeight: 15,
             flexDirection: 'row',
-            alignItems: 'center',
+            alignItems: 'flex-start',
+            flexBasis: '46%',
             flexGrow: 0,
             flexShrink: 0,
             gap: 4
@@ -303,15 +308,17 @@ function criarEstilosUso(tema) {
             height: 5.99,
             flexGrow: 0,
             flexShrink: 0,
+            marginTop: 4.5,
             borderRadius: 2.99578
         },
         marcador_confirmado: { backgroundColor: coresCalendario.confirmado },
         marcador_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
         marcador_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
+        marcador_naoUsei: { backgroundColor: coresCalendario.naoUsei },
         textoLegenda: {
             minHeight: 15,
             flexGrow: 0,
-            flexShrink: 0,
+            flexShrink: 1,
             includeFontPadding: false,
             color: interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,

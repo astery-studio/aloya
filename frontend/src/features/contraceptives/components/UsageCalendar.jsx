@@ -12,8 +12,10 @@ const SEMANAS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ESTADOS = Object.freeze({
     confirmado: 'Confirmado',
     foraDoPrazo: 'Fora do prazo',
-    naoConfirmado: 'Não confirmado'
+    naoConfirmado: 'Não confirmado',
+    naoUsei: 'Não usei'
 });
+const ORDEM_LEGENDA = ['confirmado', 'foraDoPrazo', 'naoUsei', 'naoConfirmado'];
 const MESES = [
     'Janeiro',
     'Fevereiro',
@@ -63,7 +65,7 @@ function ehHoje(ano, numeroMes, dia) {
 
 function UsageCalendar({
     mes, dias = [], aoMesAnterior, aoProximoMes,
-    emEdicao = false, dataSelecionada, datasEditaveis, aoSelecionarData
+    emEdicao = false, dataSelecionada, datasEditaveis, editarAntesDe, aoSelecionarData
 }) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
@@ -71,7 +73,7 @@ function UsageCalendar({
     const semanas = criarSemanas(ano, numeroMes);
     const possuiSeisSemanas = semanas.length === 6;
     const registros = new Map();
-    const prioridades = { confirmado: 1, foraDoPrazo: 2, naoConfirmado: 3 };
+    const prioridades = { confirmado: 1, foraDoPrazo: 2, naoConfirmado: 3, naoUsei: 4 };
     dias.forEach((item) => {
         const partes = partesDaDataUso(item.data);
         if (partes && partes.chaveMes !== mes) return;
@@ -141,16 +143,19 @@ function UsageCalendar({
                                 const hoje = ehHoje(ano, numeroMes, dia);
                                 const dataCivil = dia ? `${mes}-${String(dia).padStart(2, '0')}` : null;
                                 const selecionado = emEdicao && dataCivil === dataSelecionada;
-                                const editavel = emEdicao && dia && datasEditaveis?.has(dataCivil);
-                                const Celula = editavel ? Pressable : View;
+                                const editavel = emEdicao && dia
+                                    && (datasEditaveis?.has(dataCivil) || dataCivil < editarAntesDe);
+                                const interativa = emEdicao && Boolean(dia) && typeof aoSelecionarData === 'function';
+                                const Celula = interativa ? Pressable : View;
 
                                 return (
                                     <Celula
                                         key={`${dia || 'vazio'}-${indiceSemana}-${indiceDia}`}
                                         accessible={Boolean(dia)}
-                                        accessibilityRole={editavel ? 'button' : dia ? 'text' : undefined}
-                                        {...(editavel && {
+                                        accessibilityRole={interativa ? 'button' : dia ? 'text' : undefined}
+                                        {...(interativa && {
                                             accessibilityState: { selected: selecionado },
+                                            accessibilityHint: editavel ? 'Seleciona o dia' : 'Explica por que o dia não pode ser editado',
                                             onPress: () => aoSelecionarData?.(dataCivil)
                                         })}
                                         accessibilityLabel={
@@ -162,7 +167,8 @@ function UsageCalendar({
                                             estilosUso.celulaDia,
                                             hoje && estilosUso.celulaHoje,
                                             rotuloEstado && estilosUso[`celula_${estado}`],
-                                            selecionado && estilosUso.celulaSelecionada
+                                            selecionado && estilosUso.celulaSelecionada,
+                                            selecionado && !rotuloEstado && estilosUso.celulaSelecionadaSemRegistro
                                         ]}
                                     >
                                         {dia ? (
@@ -185,12 +191,12 @@ function UsageCalendar({
             </View>
 
             {!emEdicao ? <View testID="usage-calendar-legend" style={estilosUso.legenda}>
-                {Object.entries(ESTADOS).map(([estado, rotulo]) => (
+                {ORDEM_LEGENDA.map((estado) => (
                     <View key={estado} style={estilosUso.itemLegenda}>
                         <View
                             style={[estilosUso.marcadorLegenda, estilosUso[`marcador_${estado}`]]}
                         />
-                        <Text style={estilosUso.textoLegenda}>{rotulo}</Text>
+                        <Text style={estilosUso.textoLegenda}>{ESTADOS[estado]}</Text>
                     </View>
                 ))}
             </View> : null}
