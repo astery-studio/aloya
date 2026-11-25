@@ -55,3 +55,7 @@ test('infere duração do ciclo pelas fases quando a previsão não informa o va
     expect(obterFase('2026-10-29', fases)).toBe('menstrual');
     expect(obterFase('data inválida', fases, 28)).toBe('desconhecida');
 });
+
+test('rejeita dias de calendário que o Date normalizaria para outro mês', () => {
+    expect(formatarDataCabecalho('2026-02-30')).toBe('—');
+});
