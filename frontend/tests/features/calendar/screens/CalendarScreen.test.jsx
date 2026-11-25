@@ -310,12 +310,15 @@ describe('CalendarScreen', () => {
             right: 20,
             left: 20,
             alignItems: 'center',
-            borderRadius: 14,
+            borderRadius: 12,
+            backgroundColor: '#E3E4DE',
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.08,
             shadowRadius: 4,
             elevation: 2
         });
+        expect(estilos.avisoVazio.borderWidth).toBeUndefined();
+        expect(estilos.avisoVazio.borderColor).toBeUndefined();
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');
         expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
