@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { NavigationField } from '../../../../shared/components/common/NavigationField/NavigationField';
-import { HeartIcon, NotePencilIcon } from '../../../../shared/components/icons/AppIcons';
+import { HeartIcon, PencilSimpleIcon } from '../../../../shared/components/icons/AppIcons';
 import { estilos } from './NoCycleDiarySection.styles';
 
 const CORES_ICONE = Object.freeze({ caixa: 'transparent', icone: '#D68C3A' });
@@ -8,11 +8,11 @@ const CORES_ICONE = Object.freeze({ caixa: 'transparent', icone: '#D68C3A' });
 function NoCycleDiarySection({ aoAbrirDiario, aoAbrirReflexao }) {
     const acoes = [
         ['Como você está se sentindo?', HeartIcon, aoAbrirDiario],
-        ['Gostaria de fazer uma anotação?', NotePencilIcon, aoAbrirReflexao]
+        ['Gostaria de fazer uma anotação?', PencilSimpleIcon, aoAbrirReflexao]
     ];
 
     return (
-        <View style={estilos.cartao}>
+        <View testID="diario-home-sem-ciclo" style={estilos.cartao}>
             <Text style={estilos.rotulo}>Seu Diário já está disponível</Text>
             <Text accessibilityRole="header" style={estilos.titulo}>
                 Você já pode começar por aqui.
