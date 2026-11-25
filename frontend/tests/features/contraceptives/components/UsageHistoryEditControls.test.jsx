@@ -10,10 +10,10 @@ test('anuncia a seleção e bloqueia salvamento sem mudança ou durante o envio'
         aoSalvar, aoSelecionarOpcao
     };
     const { rerender } = await render(<UsageHistoryEditControls {...props} podeSalvar={false} />);
-    expect(screen.getByRole('button', { name: 'Confirmado', selected: true })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Remover', disabled: true })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Usei', selected: true })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Apagar registro' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Salvar', disabled: true })).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Fora do prazo' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usei fora do prazo' }));
     expect(aoSelecionarOpcao).toHaveBeenCalledWith('foraDoPrazo');
 
     await rerender(<UsageHistoryEditControls {...props} podeSalvar erro="Tente novamente." />);

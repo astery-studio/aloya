@@ -5,18 +5,16 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import { fontFamilies } from '../../../shared/theme';
 
 const opcoes = [
-    ['confirmado', 'Confirmado', '#546E5F'],
-    ['foraDoPrazo', 'Fora do prazo', '#DCA15E'],
-    ['naoConfirmado', 'Não confirmado', '#D17966'],
-    ['remover', 'Remover', 'transparent']
+    ['confirmado', 'Usei', '#546E5F'],
+    ['foraDoPrazo', 'Usei fora do prazo', '#DCA15E'],
+    ['naoUsei', 'Não usei', '#A65140']
 ];
 
 function UsageHistoryEditControls({
     opcaoSelecionada, opcoesDisponiveis, podeSalvar, salvando, erro,
-    aoSelecionarOpcao, aoSalvar, modo = 'calendario', children, estiloOpcoes
+    aoSelecionarOpcao, aoSalvar, aoApagarRegistro, modo = 'calendario', children, estiloOpcoes
 }) {
     const tema = useTheme();
-    const corRemover = tema.escuro ? tema.cores.interface.textoSecundario : '#999999';
     return (
         <View style={{ width: '100%', gap: 10 }}>
             <View style={[{ gap: 10 }, estiloOpcoes]}>
@@ -29,8 +27,7 @@ function UsageHistoryEditControls({
                         {linha.map(([id, rotulo, fundo]) => {
                             const selecionada = opcaoSelecionada === id;
                             const desabilitada = salvando || !opcoesDisponiveis.includes(id);
-                            const remover = id === 'remover';
-                            const cor = remover ? corRemover : '#FFFFFF';
+                            const cor = '#FFFFFF';
                             return (
                                 <Pressable key={id} accessibilityRole="button"
                                     accessibilityState={{ selected: selecionada, disabled: Boolean(desabilitada) }}
@@ -39,8 +36,7 @@ function UsageHistoryEditControls({
                                         flexGrow: modo === 'lista' ? 1 : 0, minHeight: 24,
                                         flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
                                         paddingHorizontal: 14, gap: 6, borderRadius: 30, backgroundColor: fundo,
-                                        borderWidth: remover ? 0.67 : 0, borderColor: corRemover,
-                                        opacity: desabilitada && !remover ? 0.65 : 1
+                                        opacity: desabilitada ? 0.65 : 1
                                     }}>
                                     {selecionada ? <CheckIcon size={10} weight="bold" color={cor} /> : null}
                                     <Text style={{ color: cor, fontFamily: fontFamilies.semibold, fontSize: 10, lineHeight: 20 }}>{rotulo}</Text>
@@ -49,6 +45,12 @@ function UsageHistoryEditControls({
                         })}
                     </View>
                 ))}
+                {aoApagarRegistro ? (
+                    <Button texto="Apagar registro" variante="branco" tamanho="compacto"
+                        desativado={salvando} aoPressionar={aoApagarRegistro}
+                        estilo={{ height: 'auto', minHeight: 36, borderRadius: 10 }}
+                    />
+                ) : null}
             </View>
             {erro ? <Text accessibilityRole="alert" style={{ color: tema.cores.interface.textoPrincipal }}>{erro}</Text> : null}
             <Button texto="Salvar" variante="verde" tamanho="compacto"
