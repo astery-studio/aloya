@@ -61,3 +61,15 @@ test('adiciona a reflexão ao registro existente como edição', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
     expect(salvar).toHaveBeenCalledTimes(1);
 });
+
+test('encaminha a digitação da reflexão para o campo de anotação livre', async () => {
+    const alterarValor = jest.fn();
+    mockUseDiaryCatalog.mockReturnValue({ catalogo: { categorias: [] } });
+    mockUseDiaryRecordForDate.mockReturnValue({ record: null, loading: false });
+    mockUseDiaryEntryForm.mockReturnValue({ valores: {}, erros: {}, alterarValor });
+
+    await render(<CycleHomeSheets aberto="reflexao" data="2026-11-24" diaryService={{}} />);
+    await fireEvent.changeText(screen.getByPlaceholderText('Escreva livremente...'), 'Uma nota');
+
+    expect(alterarValor).toHaveBeenCalledWith('anotacao_livre', 'Uma nota');
+});
