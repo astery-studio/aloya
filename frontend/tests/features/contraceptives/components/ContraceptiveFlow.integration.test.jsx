@@ -55,6 +55,34 @@ afterEach(() => {
     jest.useRealTimers();
 });
 
+test('salva a correção do Evra pela API e conserva o histórico do Yaz', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
+    const uso = {
+        id: '11', data: '2026-10-08', horarioProgramado: '08:00',
+        confirmadoEm: '2026-10-08T11:02:00.000Z', estado: 'confirmado'
+    };
+    const evra = { ...registro, id: 2, nome: 'Evra', tipo: 'adesivo', historico: [uso] };
+    const yaz = { ...registro, historico: [{ ...uso, id: '12' }] };
+    const requisicaoAutenticada = jest.fn()
+        .mockResolvedValueOnce({ anticoncepcionais: [evra, yaz] })
+        .mockResolvedValueOnce({ uso: { ...uso, estado: 'foraDoPrazo' } });
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Evra');
+    const paineis = screen.getAllByRole('button', { name: 'Histórico de uso' });
+    await fireEvent.press(paineis[0]);
+    await fireEvent.press(paineis[1]);
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Alterar Histórico' })[0]);
+    await fireEvent.press(screen.getByRole('button', { name: '08/10/2026, 08:00, Confirmado' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Fora do prazo' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
+    expect(requisicaoAutenticada).toHaveBeenNthCalledWith(2, {
+        metodo: 'PATCH', caminho: '/api/anticoncepcionais/2/usos/11',
+        corpo: { estado: 'foraDoPrazo', fusoHorario: expect.any(String) }
+    });
+    expect(await screen.findByText('Confirmado fora do prazo')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Dia 8, Confirmado')).toBeOnTheScreen();
+});
+
 test('API → normalizador → tela: confirma, atualiza histórico/calendário e desmarca sem recarregar', async () => {
     jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
     const confirmadoEm = '2026-10-09T12:34:56.789Z';

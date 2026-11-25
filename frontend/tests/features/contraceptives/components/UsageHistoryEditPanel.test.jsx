@@ -32,7 +32,7 @@ test('lista conserva o registro e a opção após falha e permite nova tentativa
     await pressionar('06/09/2026, 08:00, Confirmado');
     await pressionar('Fora do prazo');
     await pressionar('Salvar');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Tente novamente.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível salvar. Tente novamente.');
     expect(screen.getByRole('button', { name: 'Fora do prazo', selected: true })).toBeOnTheScreen();
     await pressionar('Salvar');
     expect(salvar).toHaveBeenCalledTimes(2);
