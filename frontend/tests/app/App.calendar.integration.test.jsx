@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking, TurboModuleRegistry } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
@@ -190,6 +190,26 @@ describe('App — calendário', () => {
 
     afterEach(() => {
         jest.restoreAllMocks();
+    });
+
+    test('usa o IP do bundle do Expo Go quando a URL da API não está configurada', async () => {
+        jest.replaceProperty(process, 'env', { ...process.env, EXPO_PUBLIC_API_URL: '' });
+        const obterModulo = TurboModuleRegistry.get;
+        jest.spyOn(TurboModuleRegistry, 'get').mockImplementation((nome) => {
+            if (nome === 'SourceCode') {
+                return {
+                    getConstants: () => ({ scriptURL: 'http://192.168.0.2:8081/index.bundle' })
+                };
+            }
+            return obterModulo(nome);
+        });
+
+        await renderApp(<App />);
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+        expect(criarServicosApp).toHaveBeenCalledWith({
+            apiUrl: 'http://192.168.0.2:3000',
+            permitirHttpDesenvolvimento: true
+        });
     });
 
     test('encaminha o dia da Home e limpa a pré-seleção ao entrar pelo Calendário', async () => {
