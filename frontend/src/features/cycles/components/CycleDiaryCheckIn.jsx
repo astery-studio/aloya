@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { useDiaryOverview } from '../../diary/hooks/useDiaryOverview';
@@ -19,6 +20,7 @@ function CycleDiaryCheckIn({
     onSessionExpired,
     corDestaque = '#C85A44'
 }) {
+    const tema = useTheme();
     const [saved, setSaved] = useState(false);
     const catalog = useDiaryCatalog({
         ativo: Boolean(service),
@@ -55,6 +57,9 @@ function CycleDiaryCheckIn({
               hoje: obterHojeDiario()
           }).valido
         : false;
+
+    const salvarDesativado = !valid || Boolean(existing.record && !form.alterado);
+    const aplicarVisualDesativado = salvarDesativado && !tema.escuro;
 
     return (
         <View style={estilos.margem}>
@@ -103,9 +108,15 @@ function CycleDiaryCheckIn({
                                 texto="Salvar no Diário"
                                 aoPressionar={form.salvar}
                                 carregando={form.salvando}
-                                desativado={!valid || (existing.record && !form.alterado)}
-                                estilo={estilos.botao}
-                                estiloTexto={estilos.textoBotao}
+                                desativado={salvarDesativado}
+                                estilo={[
+                                    estilos.botao,
+                                    aplicarVisualDesativado && estilos.botaoDesativado
+                                ]}
+                                estiloTexto={[
+                                    estilos.textoBotao,
+                                    aplicarVisualDesativado && estilos.textoBotaoDesativado
+                                ]}
                             />
                         </>
                     ) : null}
