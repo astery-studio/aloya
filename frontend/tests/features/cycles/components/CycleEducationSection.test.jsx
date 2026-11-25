@@ -28,3 +28,19 @@ test.each([
     const icone = screen.getByTestId(`icone-fase-educativa-${fase}`);
     expect(StyleSheet.flatten(icone.props.style).backgroundColor).toBeUndefined();
 });
+
+test('mostra o conteúdo menstrual quando a fase solicitada não existe', async () => {
+    const menstrual = { ...CONTEUDOS_EDUCATIVOS.menstrual, weight: undefined };
+    const aoSelecionarFase = jest.fn();
+    await render(
+        <CycleEducationSection
+            faseSelecionada="desconhecida"
+            conteudos={{ menstrual }}
+            aoSelecionarFase={aoSelecionarFase}
+        />
+    );
+
+    expect(screen.getByText(menstrual.titulo)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Menstrual' }));
+    expect(aoSelecionarFase).toHaveBeenCalledWith('menstrual');
+});
