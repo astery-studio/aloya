@@ -55,12 +55,22 @@ test('HU-019 apresenta doses independentes hoje e preserva a confirmação real'
     }), agora);
 
     assert.deepEqual(resultado.usosHoje, [
-        { id: '40', data: '2026-10-09', horario: '08:00', status: 'confirmado', confirmadoEm: '2026-10-09T08:01:32.123Z', foraDoPrazo: false },
-        { id: '2026-10-09-20:00', data: '2026-10-09', horario: '20:00', status: 'pendente', confirmadoEm: null, foraDoPrazo: false }
+        { id: '40', data: '2026-10-09', horario: '08:00', status: 'confirmado', confirmadoEm: '2026-10-09T08:01:32.123Z', foraDoPrazo: false, atrasado: false },
+        { id: '2026-10-09-20:00', data: '2026-10-09', horario: '20:00', status: 'pendente', confirmadoEm: null, foraDoPrazo: false, atrasado: false }
     ]);
     assert.equal(resultado.statusUltimoUso, 'pendente');
     assert.equal(resultado.historico.length, 1);
     assert.equal(resultado.historico[0].horarioProgramado, '08:00');
+});
+
+test('marca apenas os horários pendentes que já passaram no fuso do dispositivo', () => {
+    const metodo = registro({ usos: [uso()] });
+    const fuso = 'America/Sao_Paulo';
+    const listar = (instante) => apresentarAnticoncepcionalListagem(metodo, new Date(instante), fuso)
+        .usosHoje.map(({ horario, atrasado }) => [horario, atrasado]);
+    assert.deepEqual(listar('2026-10-09T11:00:00Z'), [['08:00', false], ['20:00', false]]);
+    assert.deepEqual(listar('2026-10-09T11:01:00Z'), [['08:00', true], ['20:00', false]]);
+    assert.deepEqual(listar('2026-10-09T23:01:00Z'), [['08:00', true], ['20:00', true]]);
 });
 
 test('HU-019 histórico real mais recente primeiro distingue tardio, pendente e não confirmado', () => {
@@ -100,6 +110,14 @@ test('HU-019 histórico preserva usos não confirmados do esquema existente', ()
     assert.equal(resultado.historico[0].estado, 'naoConfirmado');
     assert.equal(resultado.usosHoje[0].status, 'naoConfirmado');
     assert.equal(resultado.statusUltimoUso, 'pendente');
+});
+
+test('apresenta o registro legado de dúvida como Não confirmado sem expor horário real', () => {
+    const legado = uso({ statusUso: 'nao_sabe', horarioRealConfirmacao: agora });
+    const historico = apresentarUsoHistorico(legado);
+    assert.equal(historico.estado, 'naoConfirmado');
+    assert.equal(historico.confirmadoEm, null);
+    assert.equal(legado.statusUso, 'nao_sabe');
 });
 
 test('HU-019 validade do DIU é uma contagem civil no fuso, sem marcação ou histórico diário', () => {

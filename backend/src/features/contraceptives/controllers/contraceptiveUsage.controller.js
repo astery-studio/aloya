@@ -25,7 +25,20 @@ function criarContraceptiveUsageController(service) {
             proximo(falha);
         }
     }
-    return { definirConfirmacao, corrigirHistorico };
+    async function apagarRegistroHistorico(requisicao, resposta, proximo) {
+        try {
+            await service.apagarRegistroHistorico(
+                requisicao.usuario.id, requisicao.params.id, requisicao.params.usoId
+            );
+            resposta.status(204).end();
+        } catch (erro) {
+            if (erro instanceof AppError) return proximo(erro);
+            const falha = new AppError('Não foi possível apagar o registro.', 500, 'ERRO_APAGAR_REGISTRO');
+            falha.cause = erro;
+            proximo(falha);
+        }
+    }
+    return { definirConfirmacao, corrigirHistorico, apagarRegistroHistorico };
 }
 
 export { criarContraceptiveUsageController };
