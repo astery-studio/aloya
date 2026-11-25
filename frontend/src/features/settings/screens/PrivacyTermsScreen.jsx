@@ -9,7 +9,7 @@ import {
     ShieldCheckIcon
 } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { LegalSupport } from '../components/LegalSupport';
+import { LegalSupport } from '../../legal/components/LegalSupport/LegalSupport';
 import { CONSULTA_LEGAL_DISPONIVEL } from '../../legal/data/legalConfig';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { criarEstilos } from './PrivacyTermsScreen.styles';
@@ -147,13 +147,7 @@ function LegalDocument({
                             </Pressable>
                             {aberta && (
                                 <View style={estilos.corpoSecao}>
-                                    {secao.contatoSuporte && (
-                                        <LegalSupport
-                                            estilos={estilos}
-                                            corDestaque={corDestaque}
-                                            somenteEndereco
-                                        />
-                                    )}
+                                    {secao.contatoSuporte && <LegalSupport somenteEndereco />}
                                     {secao.blocos.map(({ enfase, texto }) => (
                                         <Text key={texto} selectable style={estilos.corpo}>
                                             {enfase ? (
@@ -168,7 +162,7 @@ function LegalDocument({
                     );
                 })}
             </View>
-            <LegalSupport estilos={estilos} corDestaque={corDestaque} />
+            <LegalSupport />
         </ScrollView>
     );
 }

@@ -112,29 +112,6 @@ export function criarEstilos(tema) {
             borderTopColor: cor.borda,
             padding: e.medio,
             gap: e.medio
-        },
-        suporte: {
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderTopColor: cor.borda,
-            paddingTop: e.medio,
-            gap: e.minimo
-        },
-        copiar: {
-            minWidth: 48,
-            minHeight: 48,
-            alignItems: 'flex-end',
-            justifyContent: 'center'
-        },
-        avisoCopia: {
-            position: 'absolute',
-            bottom: 48 + e.minimo,
-            right: 0,
-            maxWidth: '100%',
-            paddingHorizontal: e.medio,
-            paddingVertical: e.pequeno,
-            borderRadius: radius.medio,
-            backgroundColor: cor.destaque
-        },
-        textoAvisoCopia: { ...typography.caption, color: cor.textoSobreDestaque }
+        }
     });
 }

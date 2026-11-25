@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AccessibilityInfo, Linking, Platform, Pressable, Text, View } from 'react-native';
 import { setStringAsync } from 'expo-clipboard';
 import { CopySimpleIcon } from 'phosphor-react-native/src/icons/CopySimple';
 
-import { EnvelopeSimpleIcon } from '../../../shared/components/icons/AppIcons';
-import { EMAIL_SUPORTE } from '../../legal/data/legalConfig';
+import { EnvelopeSimpleIcon } from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { EMAIL_SUPORTE } from '../../data/legalConfig';
+import { criarEstilos } from './LegalSupport.styles';
 
-function LegalSupport({ estilos, corDestaque, somenteEndereco = false }) {
+function LegalSupport({ somenteEndereco = false }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [mensagem, setMensagem] = useState(null);
 
     useEffect(() => {
@@ -75,7 +79,11 @@ function LegalSupport({ estilos, corDestaque, somenteEndereco = false }) {
     return (
         <View style={estilos.suporte}>
             <View style={estilos.linha}>
-                <EnvelopeSimpleIcon size={20} color={corDestaque} accessible={false} />
+                <EnvelopeSimpleIcon
+                    size={20}
+                    color={tema.cores.interface.destaque}
+                    accessible={false}
+                />
                 <Text accessibilityRole="header" style={estilos.chamada}>
                     Precisa de ajuda?
                 </Text>
@@ -91,7 +99,7 @@ function LegalSupport({ estilos, corDestaque, somenteEndereco = false }) {
                 >
                     <CopySimpleIcon
                         size={20}
-                        color={corDestaque}
+                        color={tema.cores.interface.destaque}
                         weight="bold"
                         accessible={false}
                     />
