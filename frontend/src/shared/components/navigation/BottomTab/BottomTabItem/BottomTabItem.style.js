@@ -11,7 +11,7 @@ function criarEstilos(tema) {
             minWidth: 0,
             height: '100%',
             alignItems: 'center',
-            justifyContent: 'center'
+            paddingTop: 14
         },
 
         desabilitado: {
@@ -21,9 +21,9 @@ function criarEstilos(tema) {
         label: {
             marginTop: 4,
             color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
-            fontFamily: fontFamilies.medium,
-            fontSize: 11,
-            lineHeight: 16,
+            fontFamily: fontFamilies.regular,
+            fontSize: 12,
+            lineHeight: 18,
             textAlign: 'center',
             includeFontPadding: false
         },
