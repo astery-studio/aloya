@@ -51,7 +51,8 @@ const estilos = StyleSheet.create({
         includeFontPadding: false,
         lineHeight: 14
     },
-    content: { paddingHorizontal: 17, paddingBottom: 17 }
+    content: { paddingHorizontal: 17, paddingBottom: 17 },
+    contentComResumo: { paddingHorizontal: 14, paddingBottom: 15 }
 });
 
 export { estilos };
