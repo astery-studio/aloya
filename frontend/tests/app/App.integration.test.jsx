@@ -249,11 +249,16 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
 
     return {
         SettingsScreen: jest.fn(
-            ({ onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba }) =>
+            ({ onAbrirPerfil, onAbrirParametrosCiclo, onAbrirNotificacoes, onSelecionarAba }) =>
                 React.createElement(
                     View,
                     null,
                     React.createElement(Text, null, 'Configurações'),
+                    React.createElement(
+                        Pressable,
+                        { accessibilityRole: 'button', onPress: onAbrirNotificacoes },
+                        React.createElement(Text, null, 'Notificações')
+                    ),
                     React.createElement(
                         Pressable,
                         {
@@ -470,12 +475,22 @@ function criarServicos() {
         supportCategoryService: {
             criarCategoria: jest.fn()
         },
-        diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() }
+        diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() },
+        notificationPreferencesService: { buscar: jest.fn().mockResolvedValue({}) }
     };
 }
 
 describe('App integrado', () => {
     let servicos;
+
+    test('abre Notificações pela ação de Configurações e volta ao menu', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
+        expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+        expect(screen.getByText('Configurações')).toBeOnTheScreen();
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();

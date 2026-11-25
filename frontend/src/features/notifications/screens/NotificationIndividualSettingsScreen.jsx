@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField';
 import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet';
-import { SwitchField } from '../../../shared/components/forms/SwitchField/SwitchField';
+import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import FormLayout from '../../../shared/layouts/FormLayout';

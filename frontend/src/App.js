@@ -22,6 +22,7 @@ import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
+import { NotificationPreferencesFlow } from './features/notifications/NotificationPreferencesFlow';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
@@ -46,6 +47,7 @@ import { analisarLinkExterno } from './shared/utils/externalLinks';
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
+    notificacoes: 'notificacoes',
     membros: 'membros',
     novoContato: 'novoContato',
     editarContato: 'editarContato',
@@ -813,6 +815,7 @@ export default function App() {
         conteudo = (
             <SettingsScreen
                 onSelecionarAba={selecionarAba}
+                onAbrirNotificacoes={() => setTelaInterna(telasInternas.notificacoes)}
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
@@ -826,6 +829,14 @@ export default function App() {
                     setRetornoResponsavelLegal(telasInternas.configuracoes);
                     setTelaInterna(telasInternas.responsavelLegal);
                 }}
+            />
+        );
+    } else if (telaInterna === telasInternas.notificacoes) {
+        conteudo = (
+            <NotificationPreferencesFlow
+                service={configuracao.servicos.notificationPreferencesService}
+                onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.responsavelLegal) {
