@@ -49,6 +49,7 @@ const estados = Object.freeze({
     },
     naoConfirmado: { rotulo: 'Não confirmado', variante: 'naoConfirmadoHistoricoUso' },
     naoConfirmadoHistoricoUso: { rotulo: 'Não confirmado', variante: 'naoConfirmadoHistoricoUso' },
+    naoUsei: { rotulo: 'Não usei', variante: 'naoConfirmadoHistoricoUso' },
     validadeAindaPrazo: { rotulo: '30 meses restantes', variante: 'validadeAindaPrazo' },
     diasMenstruacao: {
         rotulo: '6 dias menstruação',
@@ -102,8 +103,9 @@ function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
     const visual = variantes[configuracao.variante];
     const texto = rotulo || configuracao.rotulo;
     const ajustarTextoDeUso = estado !== 'emAndamento' && variantesDeUso.has(configuracao.variante);
-    const confirmadoNoHistorico =
-        configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado';
+    const textoSemQuebra =
+        configuracao.variante === 'atrasadoProximosHorarios' ||
+        (configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado');
 
     if (configuracao.estimativa) {
         const acessibilidade = `${texto}. ${configuracao.descricao}`;
@@ -141,7 +143,7 @@ function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
                 estilos.container,
                 visual.container,
                 ajustarTextoDeUso && dimensoesFlexiveis(visual.container),
-                confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width },
+                textoSemQuebra && { width: 'auto', minWidth: visual.container.width },
                 estilo
             ]}
         >
@@ -160,12 +162,12 @@ function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
                 </Text>
             ) : null}
             <Text
-                numberOfLines={confirmadoNoHistorico || !ajustarTextoDeUso ? 1 : undefined}
+                numberOfLines={textoSemQuebra || !ajustarTextoDeUso ? 1 : undefined}
                 style={[
                     estilos.texto,
                     visual.texto,
                     ajustarTextoDeUso && textoFlexivel(visual.texto),
-                    confirmadoNoHistorico && { flexShrink: 0 },
+                    textoSemQuebra && { flexShrink: 0 },
                     corConteudo && { color: corConteudo }
                 ]}
             >
