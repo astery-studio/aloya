@@ -76,6 +76,21 @@ function criarEstilosUso(tema) {
             paddingTop: 8,
             paddingHorizontal: 16
         },
+        instrucaoEdicao: {
+            marginBottom: 12, textAlign: 'center', color: interfaceTema.textoSecundario,
+            fontFamily: fontFamilies.regular, fontSize: 10, lineHeight: 15
+        },
+        alterarHistorico: {
+            width: '100%', minHeight: 36, marginTop: 10, padding: 8,
+            alignItems: 'center', justifyContent: 'center', borderRadius: 10,
+            backgroundColor: interfaceTema.destaque
+        },
+        textoAlterarHistorico: {
+            color: interfaceTema.textoSobreDestaque, fontFamily: fontFamilies.semibold,
+            fontSize: 13, lineHeight: 20, textAlign: 'center'
+        },
+        registroSelecionado: { borderWidth: 2, borderStyle: 'dashed', borderColor: interfaceTema.destaque },
+        celulaSelecionada: { borderWidth: 2, borderStyle: 'dashed', borderColor: '#FFFFFF' },
         listaRegistros: { width: '100%', alignItems: 'flex-start', gap: 6 },
         registro: {
             width: '100%',

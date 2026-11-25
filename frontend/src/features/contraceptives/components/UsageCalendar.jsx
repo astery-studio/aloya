@@ -61,7 +61,10 @@ function ehHoje(ano, numeroMes, dia) {
     );
 }
 
-function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
+function UsageCalendar({
+    mes, dias = [], aoMesAnterior, aoProximoMes,
+    emEdicao = false, dataSelecionada, datasEditaveis, aoSelecionarData
+}) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
     const { ano, numeroMes } = obterPartesDoMes(mes);
@@ -136,12 +139,20 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                                 const estado = dia ? registros.get(dia) : null;
                                 const rotuloEstado = ESTADOS[estado];
                                 const hoje = ehHoje(ano, numeroMes, dia);
+                                const dataCivil = dia ? `${mes}-${String(dia).padStart(2, '0')}` : null;
+                                const selecionado = emEdicao && dataCivil === dataSelecionada;
+                                const editavel = emEdicao && dia && datasEditaveis?.has(dataCivil);
+                                const Celula = editavel ? Pressable : View;
 
                                 return (
-                                    <View
+                                    <Celula
                                         key={`${dia || 'vazio'}-${indiceSemana}-${indiceDia}`}
                                         accessible={Boolean(dia)}
-                                        accessibilityRole={dia ? 'text' : undefined}
+                                        accessibilityRole={editavel ? 'button' : dia ? 'text' : undefined}
+                                        {...(editavel && {
+                                            accessibilityState: { selected: selecionado },
+                                            onPress: () => aoSelecionarData?.(dataCivil)
+                                        })}
                                         accessibilityLabel={
                                             dia
                                                 ? `Dia ${dia}, ${rotuloEstado ?? 'sem registro'}`
@@ -150,7 +161,8 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                                         style={[
                                             estilosUso.celulaDia,
                                             hoje && estilosUso.celulaHoje,
-                                            rotuloEstado && estilosUso[`celula_${estado}`]
+                                            rotuloEstado && estilosUso[`celula_${estado}`],
+                                            selecionado && estilosUso.celulaSelecionada
                                         ]}
                                     >
                                         {dia ? (
@@ -164,7 +176,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                                                 {dia}
                                             </Text>
                                         ) : null}
-                                    </View>
+                                    </Celula>
                                 );
                             })}
                         </View>
@@ -172,7 +184,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                 </View>
             </View>
 
-            <View testID="usage-calendar-legend" style={estilosUso.legenda}>
+            {!emEdicao ? <View testID="usage-calendar-legend" style={estilosUso.legenda}>
                 {Object.entries(ESTADOS).map(([estado, rotulo]) => (
                     <View key={estado} style={estilosUso.itemLegenda}>
                         <View
@@ -181,7 +193,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                         <Text style={estilosUso.textoLegenda}>{rotulo}</Text>
                     </View>
                 ))}
-            </View>
+            </View> : null}
         </View>
     );
 }
