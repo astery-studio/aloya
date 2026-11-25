@@ -6,7 +6,7 @@ import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 import { PrivacyTermsScreen } from '../../../../src/features/settings/screens/PrivacyTermsScreen';
 import AccountStep from '../../../../src/features/onboarding/components/AccountStep/AccountStep';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
-import documentos from '../../../../src/features/settings/data/legalDocuments.json';
+import documentos from '../../../../src/features/legal/data/legalDocuments.json';
 
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn() }));

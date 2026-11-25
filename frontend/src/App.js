@@ -18,7 +18,7 @@ import LoginScreen from './features/auth/screens/LoginScreen';
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
 import WelcomeScreen from './features/auth/screens/WelcomeScreen';
 import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
-import { CONSULTA_LEGAL_DISPONIVEL } from './features/settings/data/legalConfig';
+import { CONSULTA_LEGAL_DISPONIVEL } from './features/legal/data/legalConfig';
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';

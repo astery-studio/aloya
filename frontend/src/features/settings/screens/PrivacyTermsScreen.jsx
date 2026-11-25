@@ -10,13 +10,13 @@ import {
 } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { LegalSupport } from '../components/LegalSupport';
-import { CONSULTA_LEGAL_DISPONIVEL } from '../data/legalConfig';
+import { CONSULTA_LEGAL_DISPONIVEL } from '../../legal/data/legalConfig';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { criarEstilos } from './PrivacyTermsScreen.styles';
 
 const documentos = __DEV__
     ? Object.fromEntries(
-          Object.entries(require('../data/legalDocuments.json')).map(([id, documento]) => [
+          Object.entries(require('../../legal/data/legalDocuments.json')).map(([id, documento]) => [
               id,
               {
                   ...documento,

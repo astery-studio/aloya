@@ -4,7 +4,7 @@ import { setStringAsync } from 'expo-clipboard';
 import { CopySimpleIcon } from 'phosphor-react-native/src/icons/CopySimple';
 
 import { EnvelopeSimpleIcon } from '../../../shared/components/icons/AppIcons';
-import { EMAIL_SUPORTE } from '../data/legalConfig';
+import { EMAIL_SUPORTE } from '../../legal/data/legalConfig';
 
 function LegalSupport({ estilos, corDestaque, somenteEndereco = false }) {
     const [mensagem, setMensagem] = useState(null);
