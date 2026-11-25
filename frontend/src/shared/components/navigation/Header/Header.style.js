@@ -78,6 +78,10 @@ function criarEstilos(tema) {
             paddingBottom: 0
         },
 
+        areaTituloComComplemento: {
+            justifyContent: 'space-between'
+        },
+
         titulo: {
             flex: 1,
             flexShrink: 1,
@@ -109,6 +113,17 @@ function criarEstilos(tema) {
             lineHeight: 27.5
         },
 
+        containerTituloComComplemento: {
+            flex: 0,
+            alignSelf: 'center'
+        },
+
+        complementoTitulo: {
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+
         acoes: {
             flexShrink: 0,
             flexDirection: 'row',
@@ -134,6 +149,10 @@ function criarEstilos(tema) {
             gap: 16,
             marginTop: 0,
             marginLeft: 16
+        },
+
+        acoesComComplemento: {
+            marginLeft: 0
         },
 
         containerVoltar: {

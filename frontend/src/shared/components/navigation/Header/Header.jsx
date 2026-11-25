@@ -12,7 +12,8 @@ function Header({
     corFundo,
     corTexto,
     acoes = null,
-    acoesDireita = null
+    acoesDireita = null,
+    complementoTitulo = null
 }) {
     const tema = useTheme();
 
@@ -25,6 +26,7 @@ function Header({
 
     const acoesExibidas = acoesDireita ?? acoes;
     const temAcoes = !temVoltar && Boolean(acoesExibidas);
+    const temComplementoTitulo = !temVoltar && Boolean(complementoTitulo);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
 
@@ -48,11 +50,13 @@ function Header({
             />
 
             <View
+                testID="header-content"
                 style={[
                     estilos.areaTitulo,
                     temVoltar && estilos.areaTituloComVoltar,
                     ehRedeApoio && estilos.areaTituloRedeApoio,
-                    ehDiario && estilos.areaTituloDiario
+                    ehDiario && estilos.areaTituloDiario,
+                    temComplementoTitulo && estilos.areaTituloComComplemento
                 ]}
             >
                 {temVoltar ? (
@@ -78,7 +82,13 @@ function Header({
                 ) : null}
 
                 {ehRedeApoio ? (
-                    <View testID="header-title-container" style={estilos.containerTituloRedeApoio}>
+                    <View
+                        testID="header-title-container"
+                        style={[
+                            estilos.containerTituloRedeApoio,
+                            temComplementoTitulo && estilos.containerTituloComComplemento
+                        ]}
+                    >
                         <Text
                             style={[
                                 estilos.titulo,
@@ -104,12 +114,22 @@ function Header({
                     </Text>
                 )}
 
+                {temComplementoTitulo ? (
+                    <View testID="header-title-complement" style={estilos.complementoTitulo}>
+                        {complementoTitulo}
+                    </View>
+                ) : null}
+
                 {temAcoes ? (
                     <View
                         testID="header-actions"
                         accessibilityRole="toolbar"
                         accessibilityLabel="Ações da tela"
-                        style={[estilos.acoes, ehDiario && estilos.acoesDireitaDiario]}
+                        style={[
+                            estilos.acoes,
+                            ehDiario && estilos.acoesDireitaDiario,
+                            temComplementoTitulo && estilos.acoesComComplemento
+                        ]}
                     >
                         {acoesExibidas}
                     </View>
