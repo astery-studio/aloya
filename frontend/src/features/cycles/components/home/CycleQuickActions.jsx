@@ -16,7 +16,7 @@ function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAntic
                 tamanhoIcone={20}
                 aoPressionar={aoCadastrarMenstruacao}
                 estilo={estilos.principal}
-                estiloTexto={estilos.texto}
+                estiloTexto={[estilos.texto, estilos.textoPrincipal]}
             />
             <View style={estilos.linha}>
                 <ButtonScreen
