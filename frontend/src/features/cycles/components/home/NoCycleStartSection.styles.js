@@ -13,7 +13,7 @@ const estilos = StyleSheet.create({
         paddingVertical: 24,
         boxShadow: '0px 18px 36px rgba(44, 76, 59, 0.16)'
     },
-    primeiroPasso: { minHeight: 292.4 },
+    primeiroPasso: { minHeight: 292.4, marginBottom: 10 },
     seuEspaco: { minHeight: 235.4 },
     rotulo: {
         color: '#5C5C59',
