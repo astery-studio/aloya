@@ -58,3 +58,23 @@ test('mostra oito sugestões da fase priorizando o histórico pessoal', async ()
     await fireEvent.press(screen.getByRole('button', { name: 'Fadiga' }));
     expect(aoAlterar).toHaveBeenCalledWith('sintomas_fisicos', ['sintomas_fisicos_fadiga']);
 });
+
+test('mantém a seleção e permite desmarcar uma sugestão sem ícone do catálogo', async () => {
+    const aoAlterar = jest.fn();
+    const catalogoSemIcone = {
+        macrocategorias: [{ categorias: [categoria('sintomas_fisicos', ['Sensação incomum'])] }]
+    };
+    await render(
+        <CompactDiaryOptions
+            catalogo={catalogoSemIcone}
+            fase="lutea"
+            valores={{ sintomas_fisicos: ['sintomas_fisicos_sensação_incomum'] }}
+            aoAlterar={aoAlterar}
+        />
+    );
+
+    const opcao = screen.getByRole('button', { name: 'Sensação incomum' });
+    expect(opcao).toBeSelected();
+    await fireEvent.press(opcao);
+    expect(aoAlterar).toHaveBeenCalledWith('sintomas_fisicos', []);
+});
