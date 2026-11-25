@@ -1,5 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { BookOpenIcon } from 'phosphor-react-native/src/icons/BookOpen';
 import { NoCycleTrackingSection } from '../../../../src/features/cycles/components/home/NoCycleTrackingSection';
+import { RECURSOS_SEM_CICLO } from '../../../../src/features/cycles/constants/noCycleTrackingContent';
+import {
+    CalendarBlankIcon,
+    PillIcon,
+    SparkleIcon
+} from '../../../../src/shared/components/icons/AppIcons';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 test('mantém expansões independentes e abre anticoncepcionais', async () => {
@@ -18,4 +25,13 @@ test('mantém expansões independentes e abre anticoncepcionais', async () => {
     expect(aoAlternar).toHaveBeenCalledWith('ritmo');
     await fireEvent.press(screen.getByRole('button', { name: 'Abrir Anticoncepcionais' }));
     expect(aoAbrir).toHaveBeenCalledTimes(1);
+});
+
+test('associa os ícones importados do protótipo aos quatro cartões', () => {
+    expect(RECURSOS_SEM_CICLO.map(({ id, Icone }) => [id, Icone])).toEqual([
+        ['ritmo', CalendarBlankIcon],
+        ['fertilidade', SparkleIcon],
+        ['sentimentos', BookOpenIcon],
+        ['anticoncepcional', PillIcon]
+    ]);
 });
