@@ -3,8 +3,7 @@ import { fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     conteudo: {
-        paddingTop: 16,
-        paddingBottom: 40
+        paddingTop: 16
     },
     explore: {
         paddingHorizontal: 16,
@@ -14,6 +13,7 @@ const estilos = StyleSheet.create({
         color: '#847F76',
         fontFamily: fontFamilies.bold,
         fontSize: 11,
+        includeFontPadding: false,
         letterSpacing: 0.88,
         lineHeight: 16,
         textTransform: 'uppercase'
@@ -22,6 +22,7 @@ const estilos = StyleSheet.create({
         color: '#222222',
         fontFamily: fontFamilies.regular,
         fontSize: 21,
+        includeFontPadding: false,
         letterSpacing: -0.525,
         lineHeight: 24,
         paddingTop: 4
@@ -34,6 +35,7 @@ const estilos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 12,
+        includeFontPadding: false,
         lineHeight: 19,
         textAlign: 'justify'
     },
