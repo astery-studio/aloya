@@ -84,6 +84,7 @@ function CycleDateStrip({
             accessibilityLabel="Datas do ciclo"
             renderItem={({ item }) => {
                 const selecionado = item.data === dataSelecionada;
+                const interiorSemFundo = semCiclo || selecionado;
                 return (
                     <Pressable
                         key={item.data}
@@ -104,9 +105,17 @@ function CycleDateStrip({
                         <View
                             style={[
                                 estilos.interior,
-                                (semCiclo || selecionado) && estilos.interiorSelecionado
+                                interiorSemFundo && estilos.interiorSelecionado
                             ]}
                         >
+                            <View
+                                testID={`fundo-dia-${item.data}`}
+                                pointerEvents="none"
+                                style={[
+                                    estilos.fundoInterior,
+                                    interiorSemFundo && estilos.fundoInteriorOculto
+                                ]}
+                            />
                             <Text
                                 style={[estilos.semana, selecionado && estilos.semanaSelecionada]}
                             >
