@@ -44,7 +44,7 @@ function criarEstilos(tema) {
             left: 0,
             zIndex: 5,
             alignItems: 'center',
-            paddingHorizontal: 20
+            paddingHorizontal: 15.33
         },
         avisoVazio: {
             display: 'flex',
@@ -92,8 +92,8 @@ function criarEstilos(tema) {
         },
         areaSincronizacao: {
             position: 'absolute',
+            top: 40,
             right: 0,
-            bottom: 0,
             left: 0,
             zIndex: 5,
             alignItems: 'center',

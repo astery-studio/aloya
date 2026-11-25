@@ -197,7 +197,7 @@ describe('CalendarScreen', () => {
         expect(screen.getByText('Aba ativa: calendario')).toBeOnTheScreen();
         expect(estilos.areaSincronizacao).toMatchObject({
             position: 'absolute',
-            bottom: 0,
+            top: 40,
             zIndex: 5,
             paddingHorizontal: 15.33
         });
@@ -294,12 +294,51 @@ describe('CalendarScreen', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Tentar sincronizar novamente' }));
 
         expect(aoTentarSincronizar).toHaveBeenCalledTimes(1);
-        expect(screen.getByTestId('calendar-add-fab')).toHaveProp('deslocamentoInferior', 76);
+        expect(screen.getByTestId('calendar-add-fab')).toHaveProp('deslocamentoInferior', 0);
         expect(screen.getByTestId('sync-status-calendar')).toHaveStyle({
             maxWidth: 351,
             height: 64,
             backgroundColor: '#FBF3E0'
         });
+    });
+
+    test('prioriza o aviso de sincronização sobre o aviso de ciclo vazio', async () => {
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: false }]}
+                statusSincronizacao="pendente"
+                aoCadastrarMenstruacao={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(screen.getByText(/Sincronização pendente/u)).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-empty-state')).toBeNull();
+        expect(estilos.areaSincronizacao).toMatchObject({
+            top: estilos.posicionadorAvisoVazio.top,
+            right: estilos.posicionadorAvisoVazio.right,
+            left: estilos.posicionadorAvisoVazio.left,
+            paddingHorizontal: estilos.posicionadorAvisoVazio.paddingHorizontal
+        });
+    });
+
+    test('mantém a falha como aviso prioritário entre os estados de sincronização', async () => {
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: false }]}
+                statusSincronizacao={['pendente', 'sincronizando', 'falha']}
+                erroSincronizacao={{
+                    status: 503,
+                    mensagemUsuario: 'Alterações salvas neste aparelho. Falha na sincronização.'
+                }}
+                aoTentarSincronizar={jest.fn()}
+            />
+        );
+
+        expect(screen.getByText('Falha na sincronização.')).toBeOnTheScreen();
+        expect(screen.queryByText(/Sincronização pendente/u)).toBeNull();
+        expect(screen.queryByText(/Sincronizando alterações/u)).toBeNull();
+        expect(screen.queryByTestId('calendar-empty-state')).toBeNull();
     });
 
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {

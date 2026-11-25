@@ -72,6 +72,10 @@ function criarEstilos(tema) {
             textAlign: 'center',
             color: '#B07D2A'
         },
+        textoCalendarioDestaque: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
         botaoCalendario: {
             width: 44,
             height: 44,
@@ -104,6 +108,12 @@ function SyncStatusIndicator({
             : status === 'sincronizado'
               ? CheckCircleIcon
               : ClockIcon;
+    const textoApresentado = mensagem || rotulos[status];
+    const marcadorFalha = 'Falha na sincronização.';
+    const deveDestacarFalha = status === 'falha' && textoApresentado.includes(marcadorFalha);
+    const textoAntesDaFalha = deveDestacarFalha
+        ? textoApresentado.slice(0, textoApresentado.indexOf(marcadorFalha)).trim()
+        : textoApresentado;
 
     if (variante === 'calendario') {
         return (
@@ -113,7 +123,15 @@ function SyncStatusIndicator({
                 accessibilityLiveRegion="polite"
             >
                 <View style={estilos.conteudoCalendario}>
-                    <Text style={estilos.textoCalendario}>{mensagem || rotulos[status]}</Text>
+                    <Text testID="sync-status-calendar-message" style={estilos.textoCalendario}>
+                        {textoAntesDaFalha}
+                        {deveDestacarFalha ? (
+                            <>
+                                {'\n'}
+                                <Text style={estilos.textoCalendarioDestaque}>{marcadorFalha}</Text>
+                            </>
+                        ) : null}
+                    </Text>
                     {status === 'falha' && typeof onTentarNovamente === 'function' ? (
                         <Pressable
                             accessibilityRole="button"

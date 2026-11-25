@@ -48,12 +48,15 @@ test('apresenta a variante flutuante do calendário', async () => {
         borderRadius: 12,
         backgroundColor: '#FBF3E0'
     });
-    expect(screen.getByText(/Falha na sincronização/u)).toHaveStyle({
+    expect(screen.getByTestId('sync-status-calendar-message')).toHaveStyle({
         fontSize: 13,
         fontWeight: '500',
         lineHeight: 19,
         textAlign: 'center',
         color: '#B07D2A'
+    });
+    expect(screen.getByText('Falha na sincronização.')).toHaveStyle({
+        fontWeight: '700'
     });
     expect(screen.getByRole('button', { name: 'Tentar sincronizar novamente' })).toHaveStyle({
         width: 44,

@@ -94,6 +94,7 @@ const ITENS_LEGENDA = Object.freeze([
 const MENSAGEM_ERRO_CALENDARIO =
     'Não foi possível carregar os dados do calendário. Tente novamente.';
 const TEMPO_REAPARECER_AVISO_MS = 5000;
+const PRIORIDADE_STATUS_SINCRONIZACAO = Object.freeze(['falha', 'sincronizando', 'pendente']);
 
 function normalizarConfianca(valor) {
     if (typeof valor !== 'string') return null;
@@ -105,6 +106,12 @@ function normalizarConfianca(valor) {
     }
 
     return null;
+}
+
+function obterStatusSincronizacaoPrioritario(status) {
+    const recebidos = Array.isArray(status) ? status : [status];
+
+    return PRIORIDADE_STATUS_SINCRONIZACAO.find((item) => recebidos.includes(item)) ?? null;
 }
 
 function CalendarScreen({
@@ -140,8 +147,9 @@ function CalendarScreen({
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
-    const mostrarStatusSincronizacao =
-        !existeErro && ['sincronizando', 'pendente', 'falha'].includes(statusSincronizacao);
+    const statusSincronizacaoPrioritario = obterStatusSincronizacaoPrioritario(statusSincronizacao);
+    const mostrarStatusSincronizacao = !existeErro && Boolean(statusSincronizacaoPrioritario);
+    const mostrarAvisoCicloVazio = estadoVazio && !mostrarStatusSincronizacao;
     const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
     const animarEntradaAviso = useCallback(() => {
@@ -187,7 +195,7 @@ function CalendarScreen({
     }, [deslocamentoAviso, opacidadeAviso]);
 
     const registrarInteracao = useCallback(() => {
-        if (!estadoVazio) return;
+        if (!mostrarAvisoCicloVazio) return;
 
         if (temporizadorAviso.current) {
             clearTimeout(temporizadorAviso.current);
@@ -201,10 +209,10 @@ function CalendarScreen({
             animarEntradaAviso();
             temporizadorAviso.current = null;
         }, TEMPO_REAPARECER_AVISO_MS);
-    }, [animarEntradaAviso, animarSaidaAviso, estadoVazio]);
+    }, [animarEntradaAviso, animarSaidaAviso, mostrarAvisoCicloVazio]);
 
     useEffect(() => {
-        if (!estadoVazio) {
+        if (!mostrarAvisoCicloVazio) {
             setAvisoVazioVisivel(false);
             opacidadeAviso.setValue(0);
             deslocamentoAviso.setValue(-10);
@@ -220,7 +228,7 @@ function CalendarScreen({
                 temporizadorAviso.current = null;
             }
         };
-    }, [animarEntradaAviso, deslocamentoAviso, estadoVazio, opacidadeAviso]);
+    }, [animarEntradaAviso, deslocamentoAviso, mostrarAvisoCicloVazio, opacidadeAviso]);
 
     return (
         <View testID="calendar-screen" style={estilos.tela} onTouchStart={registrarInteracao}>
@@ -283,7 +291,24 @@ function CalendarScreen({
                                 aoPressionarDia={aoEditarCiclo}
                             />
 
-                            {estadoVazio ? (
+                            {mostrarStatusSincronizacao ? (
+                                <View
+                                    testID="status-sincronizacao-calendario"
+                                    style={estilos.areaSincronizacao}
+                                >
+                                    <SyncStatusIndicator
+                                        variante="calendario"
+                                        status={statusSincronizacaoPrioritario}
+                                        mensagem={
+                                            statusSincronizacaoPrioritario === 'falha' &&
+                                            erroSincronizacao?.status
+                                                ? erroSincronizacao.mensagemUsuario
+                                                : undefined
+                                        }
+                                        onTentarNovamente={aoTentarSincronizar}
+                                    />
+                                </View>
+                            ) : mostrarAvisoCicloVazio ? (
                                 <Animated.View
                                     pointerEvents="box-none"
                                     style={[
@@ -315,30 +340,12 @@ function CalendarScreen({
                     )}
                 </View>
 
-                {mostrarStatusSincronizacao ? (
-                    <View
-                        testID="status-sincronizacao-calendario"
-                        style={estilos.areaSincronizacao}
-                    >
-                        <SyncStatusIndicator
-                            variante="calendario"
-                            status={statusSincronizacao}
-                            mensagem={
-                                statusSincronizacao === 'falha' && erroSincronizacao?.status
-                                    ? erroSincronizacao.mensagemUsuario
-                                    : undefined
-                            }
-                            onTentarNovamente={aoTentarSincronizar}
-                        />
-                    </View>
-                ) : null}
-
                 {mostrarFab ? (
                     <FloatingActionButton
                         rotuloAcessibilidade="Cadastrar menstruação"
                         aoPressionar={aoCadastrarMenstruacao}
                         considerarAreaSeguraInferior={false}
-                        deslocamentoInferior={mostrarStatusSincronizacao ? 76 : 0}
+                        deslocamentoInferior={0}
                         testID="calendar-add-fab"
                     />
                 ) : null}
@@ -371,7 +378,9 @@ export {
     CalendarScreen,
     ITENS_LEGENDA,
     MENSAGEM_ERRO_CALENDARIO,
+    PRIORIDADE_STATUS_SINCRONIZACAO,
     TEMPO_REAPARECER_AVISO_MS,
-    normalizarConfianca
+    normalizarConfianca,
+    obterStatusSincronizacaoPrioritario
 };
 export default CalendarScreen;
