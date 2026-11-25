@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { ArrowLeftIcon, InfoIcon } from '../../../shared/components/icons/AppIcons';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
@@ -152,6 +152,7 @@ function CalendarScreen({
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
+    const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
     return (
         <View style={estilos.tela}>
@@ -233,11 +234,7 @@ function CalendarScreen({
                 </View>
             ) : null}
 
-            <SafeAreaView
-                testID="rodape-calendario"
-                edges={['bottom']}
-                style={estilos.rodape}
-            >
+            <SafeAreaView testID="rodape-calendario" edges={['bottom']} style={estilos.rodape}>
                 <SyncStatusIndicator
                     status={statusSincronizacao}
                     mensagem={
@@ -247,13 +244,14 @@ function CalendarScreen({
                     }
                     onTentarNovamente={aoTentarSincronizar}
                 />
-                <ButtonScreen
-                    texto="Cadastrar Menstruação"
-                    aoPressionar={aoCadastrarMenstruacao}
-                    estilo={estilos.botaoCadastrarMenstruacao}
-                    estiloTexto={estilos.textoCadastrarMenstruacao}
-                />
             </SafeAreaView>
+
+            {mostrarFab ? (
+                <FloatingActionButton
+                    rotuloAcessibilidade="Cadastrar menstruação"
+                    aoPressionar={aoCadastrarMenstruacao}
+                />
+            ) : null}
 
             <CycleLegendSheet
                 visivel={legendaVisivel}

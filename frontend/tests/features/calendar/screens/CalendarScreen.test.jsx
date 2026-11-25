@@ -23,20 +23,21 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     }
 }));
 
-jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
+jest.mock('../../../../src/shared/components/common/FloatingActionButton', () => {
     const ReactInterno = require('react');
     const { Pressable, Text } = require('react-native');
 
-    return function ButtonScreenMock({ texto, aoPressionar }) {
-        return ReactInterno.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: texto,
-                onPress: aoPressionar
-            },
-            ReactInterno.createElement(Text, null, texto)
-        );
+    return {
+        FloatingActionButton: ({ rotuloAcessibilidade, aoPressionar }) =>
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: rotuloAcessibilidade,
+                    onPress: aoPressionar
+                },
+                ReactInterno.createElement(Text, null, rotuloAcessibilidade)
+            )
     };
 });
 
@@ -160,7 +161,7 @@ describe('CalendarScreen', () => {
             estilos.cabecalho.height
         );
         expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
-        expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Cadastrar menstruação' })).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
         expect(estilos.rodape).toMatchObject({
             flexShrink: 0,
@@ -169,7 +170,7 @@ describe('CalendarScreen', () => {
             paddingRight: 24
         });
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
         await fireEvent.press(screen.getByRole('button', { name: 'Dia menstrual registrado' }));
         expect(aoEditarCiclo).toHaveBeenCalledWith({
@@ -221,9 +222,9 @@ describe('CalendarScreen', () => {
             )
         ).toBeOnTheScreen();
         expect(screen.queryByTestId('confidence-badge')).toBeNull();
-        expect(screen.getAllByRole('button', { name: 'Cadastrar Menstruação' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
 
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
     });
