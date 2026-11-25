@@ -6,6 +6,7 @@ const textos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.bold,
         fontSize: 9,
+        includeFontPadding: false,
         lineHeight: 14,
         letterSpacing: 0.9,
         textTransform: 'uppercase'
@@ -15,6 +16,7 @@ const textos = StyleSheet.create({
         color: '#222222',
         fontFamily: fontFamilies.regular,
         fontSize: 23,
+        includeFontPadding: false,
         lineHeight: 26,
         letterSpacing: -0.805
     },
@@ -23,12 +25,20 @@ const textos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 11,
+        includeFontPadding: false,
         lineHeight: 16
     },
-    nomeFase: { marginTop: 7, fontFamily: fontFamilies.bold, fontSize: 10, lineHeight: 15 },
+    nomeFase: {
+        marginTop: 7,
+        fontFamily: fontFamilies.bold,
+        fontSize: 10,
+        includeFontPadding: false,
+        lineHeight: 15
+    },
     visao: {
         fontFamily: fontFamilies.bold,
         fontSize: 8,
+        includeFontPadding: false,
         lineHeight: 12,
         letterSpacing: 0.64,
         textTransform: 'uppercase'
@@ -38,6 +48,7 @@ const textos = StyleSheet.create({
         color: '#222222',
         fontFamily: fontFamilies.regular,
         fontSize: 15,
+        includeFontPadding: false,
         lineHeight: 22
     },
     descricao: {
@@ -45,6 +56,7 @@ const textos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 10,
+        includeFontPadding: false,
         lineHeight: 15
     }
 });
