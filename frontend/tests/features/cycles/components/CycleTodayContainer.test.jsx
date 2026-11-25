@@ -165,3 +165,13 @@ test('mantém a Home disponível quando uma consulta cancelada devolve AbortErro
     expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
     expect(onSessaoExpirada).not.toHaveBeenCalled();
 });
+
+test('mantém a mensagem de erro quando a nova tentativa falha', async () => {
+    const buscar = jest.fn().mockRejectedValue(new Error('Sem rede'));
+    await renderizarTela({ service: { buscar } });
+
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tentar novamente' }));
+
+    expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
+    expect(buscar).toHaveBeenCalledTimes(2);
+});
