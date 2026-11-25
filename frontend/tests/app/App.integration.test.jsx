@@ -3,7 +3,10 @@
  */
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Linking } from 'react-native';
+import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
+jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn() }));
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
 jest.mock('expo-status-bar', () => ({ StatusBar: jest.fn(() => null) }));
 jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({ DMSans_400Regular: 'regular' }));
@@ -17,15 +20,24 @@ jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
 
-    return jest.fn(({ aoEntrar }) =>
+    return jest.fn(({ aoEntrar, aoCriarConta }) =>
         React.createElement(
-            Pressable,
-            {
+            React.Fragment,
+            null,
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Ir para login',
+                    onPress: aoEntrar
+                },
+                React.createElement(Text, null, 'Boas-vindas')
+            ),
+            React.createElement(Pressable, {
                 accessibilityRole: 'button',
-                accessibilityLabel: 'Ir para login',
-                onPress: aoEntrar
-            },
-            React.createElement(Text, null, 'Boas-vindas')
+                accessibilityLabel: 'Ir para cadastro',
+                onPress: aoCriarConta
+            })
         )
     );
 });
@@ -36,20 +48,34 @@ jest.mock('../../src/features/auth/screens/LoginScreen', () => {
 
     return jest.fn(({ aoEntrar }) =>
         React.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: 'Concluir login',
-                onPress: aoEntrar
-            },
-            React.createElement(Text, null, 'Login')
+            React.Fragment,
+            null,
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Concluir login',
+                    onPress: aoEntrar
+                },
+                React.createElement(Text, null, 'Login')
+            )
         )
     );
 });
 
 jest.mock('../../src/features/auth/screens/ForgotPasswordScreen', () => jest.fn(() => null));
 jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn(() => null));
-jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => {
+    const React = require('react');
+    const { Pressable } = require('react-native');
+    return jest.fn(({ aoConsultarDocumentos }) =>
+        React.createElement(Pressable, {
+            accessibilityRole: 'link',
+            accessibilityLabel: 'Consultar no cadastro',
+            onPress: () => aoConsultarDocumentos?.('terms')
+        })
+    );
+});
 
 jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
@@ -249,11 +275,21 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
 
     return {
         SettingsScreen: jest.fn(
-            ({ onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba }) =>
+            ({
+                onAbrirPerfil,
+                onAbrirParametrosCiclo,
+                onSelecionarAba,
+                onAbrirPoliticasPrivacidade
+            }) =>
                 React.createElement(
                     View,
                     null,
                     React.createElement(Text, null, 'Configurações'),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Consultar em configurações',
+                        onPress: onAbrirPoliticasPrivacidade
+                    }),
                     React.createElement(
                         Pressable,
                         {
@@ -490,6 +526,25 @@ describe('App integrado', () => {
     afterEach(() => {
         jest.restoreAllMocks();
     });
+
+    test.each([
+        [null, 'Ir para cadastro', 'Consultar no cadastro', 'link', 'Termos de uso'],
+        [{ token: 'token-valido' }, null, 'Consultar em configurações', 'button', 'Privacidade']
+    ])(
+        'abre e fecha documentos sem desmontar sua origem (%s, %s)',
+        async (sessao, entrada, nome, role, aba) => {
+            obterToken.mockResolvedValue(sessao);
+            await render(<App />);
+            if (entrada)
+                await fireEvent.press(await screen.findByRole('button', { name: entrada }));
+            const origem = await screen.findByRole(role, { name: nome });
+            await fireEvent.press(origem);
+            expect(screen.getByRole('tab', { name: aba, selected: true })).toBeOnTheScreen();
+            await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+            expect(screen.getByRole(role, { name: nome })).toBe(origem);
+            if (!sessao) expect(servicos.accountService.buscarPerfil).not.toHaveBeenCalled();
+        }
+    );
 
     test('mantém o fluxo público quando não existe sessão', async () => {
         obterToken.mockResolvedValue(null);
