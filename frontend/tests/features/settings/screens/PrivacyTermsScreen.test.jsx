@@ -3,7 +3,7 @@ import { Linking } from 'react-native';
 import { setStringAsync } from 'expo-clipboard';
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
-import { PrivacyTermsScreen } from '../../../../src/features/settings/screens/PrivacyTermsScreen';
+import { PrivacyTermsScreen } from '../../../../src/features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen';
 import AccountStep from '../../../../src/features/onboarding/components/AccountStep/AccountStep';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 import documentos from '../../../../src/features/legal/data/legalDocuments.json';

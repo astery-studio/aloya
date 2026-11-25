@@ -3,13 +3,13 @@ import { Modal, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FileTextIcon } from 'phosphor-react-native/src/icons/FileText';
 
-import { ShieldCheckIcon } from '../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../shared/hooks/useTheme';
-import { LegalDocument } from '../../legal/components/LegalDocument/LegalDocument';
-import { LegalTabs } from '../../legal/components/LegalTabs/LegalTabs';
-import { CONSULTA_LEGAL_DISPONIVEL } from '../../legal/data/legalConfig';
-import { documentosLegais, normalizarDocumentoInicial } from '../../legal/utils/legalDocuments';
-import { Header } from '../../../shared/components/navigation/Header/Header';
+import { ShieldCheckIcon } from '../../../../shared/components/icons/AppIcons';
+import { Header } from '../../../../shared/components/navigation/Header/Header';
+import { useTheme } from '../../../../shared/hooks/useTheme';
+import { LegalDocument } from '../../components/LegalDocument/LegalDocument';
+import { LegalTabs } from '../../components/LegalTabs/LegalTabs';
+import { CONSULTA_LEGAL_DISPONIVEL } from '../../data/legalConfig';
+import { documentosLegais, normalizarDocumentoInicial } from '../../utils/legalDocuments';
 import { criarEstilos } from './PrivacyTermsScreen.styles';
 
 const iconesDocumento = { privacy: ShieldCheckIcon, terms: FileTextIcon };

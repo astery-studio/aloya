@@ -46,7 +46,7 @@ import { fontFamilies } from './shared/theme';
 import { analisarLinkExterno } from './shared/utils/externalLinks';
 
 const PrivacyTermsScreen = __DEV__
-    ? require('./features/settings/screens/PrivacyTermsScreen').PrivacyTermsScreen
+    ? require('./features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen').PrivacyTermsScreen
     : null;
 
 const telasInternas = Object.freeze({
