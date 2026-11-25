@@ -240,3 +240,14 @@ test('abre a leitura da fase pela seção de cuidados', async () => {
     await fireEvent.press(screen.getByRole('button', { name: /O que acontece agora/ }));
     expect(await screen.findByText('Por que “folicular”?')).toBeOnTheScreen();
 });
+
+test('abre a pausa guiada e a reflexão a partir dos cartões da Home', async () => {
+    const { unmount } = await renderizar({ previsao });
+    await fireEvent.press(screen.getByRole('button', { name: /Um respiro para você/ }));
+    expect(await screen.findByText('Acompanhe o movimento')).toBeOnTheScreen();
+    await unmount();
+
+    await renderizar({ previsao });
+    await fireEvent.press(screen.getByRole('button', { name: /Uma pergunta para hoje/ }));
+    expect(await screen.findByText('O que seu corpo está pedindo agora?')).toBeOnTheScreen();
+});
