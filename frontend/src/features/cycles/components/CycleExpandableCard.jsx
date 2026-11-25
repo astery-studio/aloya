@@ -24,15 +24,22 @@ function CycleExpandableCard({
         if (typeof expandido !== 'boolean') setLocalExpanded((current) => !current);
     };
     const Icon = expanded ? CaretUpIcon : CaretDownIcon;
+    const comResumo = Boolean(icone && subtitulo);
 
     return (
-        <View style={[estilos.card, desabilitado && estilos.desabilitado]}>
+        <View
+            style={[
+                estilos.card,
+                comResumo && estilos.cardComResumo,
+                desabilitado && estilos.desabilitado
+            ]}
+        >
             <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ expanded, ...(desabilitado ? { disabled: true } : {}) }}
                 disabled={desabilitado || undefined}
                 onPress={alternar}
-                style={estilos.trigger}
+                style={[estilos.trigger, comResumo && estilos.triggerComResumo]}
             >
                 <View style={estilos.titleArea}>
                     {icone}
@@ -42,13 +49,19 @@ function CycleExpandableCard({
                                 {rotulo}
                             </Text>
                         ) : null}
-                        <Text style={[estilos.title, rotulo && estilos.titleComRotulo]}>
+                        <Text
+                            style={[
+                                estilos.title,
+                                rotulo && estilos.titleComRotulo,
+                                comResumo && estilos.titleComResumo
+                            ]}
+                        >
                             {titulo ?? title}
                         </Text>
                         {subtitulo ? <Text style={estilos.subtitle}>{subtitulo}</Text> : null}
                     </View>
                 </View>
-                <Icon size={20} color="#222222" />
+                <Icon size={22} color="#222222" />
             </Pressable>
             {expanded ? <View style={estilos.content}>{children}</View> : null}
         </View>
