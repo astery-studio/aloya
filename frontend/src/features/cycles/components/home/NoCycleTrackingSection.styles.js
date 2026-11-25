@@ -30,6 +30,7 @@ const estilos = StyleSheet.create({
     icone: {
         width: 45,
         height: 45,
+        flexShrink: 0,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 15
