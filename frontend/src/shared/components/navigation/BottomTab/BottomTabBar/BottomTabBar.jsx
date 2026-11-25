@@ -3,8 +3,10 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { ArrowsClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
 import { CalendarBlankIcon } from 'phosphor-react-native/src/icons/CalendarBlank';
+import { CalendarCheckIcon } from 'phosphor-react-native/src/icons/CalendarCheck';
 import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
 import { HouseIcon } from 'phosphor-react-native/src/icons/House';
+import { NotebookIcon } from 'phosphor-react-native/src/icons/Notebook';
 import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 
 import { useTheme } from '../../../../hooks/useTheme';
@@ -43,7 +45,15 @@ const abas = Object.freeze([
     })
 ]);
 
-function BottomTabBar({ abaAtiva, onSelecionar }) {
+const abasSemCiclo = Object.freeze([
+    { ...abas[0], label: 'Contatos' },
+    { id: 'calendario', label: 'Calendário', icone: CalendarCheckIcon },
+    abas[2],
+    { ...abas[3], icone: NotebookIcon },
+    abas[4]
+]);
+
+function BottomTabBar({ abaAtiva, onSelecionar, semCiclo = false }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -66,7 +76,7 @@ function BottomTabBar({ abaAtiva, onSelecionar }) {
 
     return (
         <View testID="bottom-tab-bar" accessibilityRole="tablist" style={estilos.barra}>
-            {abas.map(renderizarAba)}
+            {(semCiclo ? abasSemCiclo : abas).map(renderizarAba)}
         </View>
     );
 }
