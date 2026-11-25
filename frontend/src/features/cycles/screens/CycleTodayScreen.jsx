@@ -77,15 +77,21 @@ function CycleTodayScreen({
         faixaDias.dataBase === dataBaseDaFaixa
             ? faixaDias
             : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-    const dias = dataBaseDaFaixa
-        ? criarDiasDaFaixa(
-              dataBaseDaFaixa,
-              fases,
-              faixaAtual.deslocamentoInicial,
-              faixaAtual.quantidade,
-              previsao?.duracaoCicloEstimada
-          )
-        : [];
+    const { deslocamentoInicial, quantidade } = faixaAtual;
+    const duracaoCiclo = previsao?.duracaoCicloEstimada;
+    const dias = useMemo(
+        () =>
+            dataBaseDaFaixa
+                ? criarDiasDaFaixa(
+                      dataBaseDaFaixa,
+                      fases,
+                      deslocamentoInicial,
+                      quantidade,
+                      duracaoCiclo
+                  )
+                : [],
+        [dataBaseDaFaixa, fases, deslocamentoInicial, quantidade, duracaoCiclo]
+    );
     const carregarDias = (direcao) =>
         setFaixaDias((atual) => {
             const base =
