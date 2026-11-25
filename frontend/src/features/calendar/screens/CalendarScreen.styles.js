@@ -91,12 +91,13 @@ function criarEstilos(tema) {
             fontWeight: '700'
         },
         areaSincronizacao: {
-            flexShrink: 0,
-            borderTopWidth: 1,
-            borderTopColor: tema.escuro
-                ? 'rgba(255, 255, 255, 0.08)'
-                : tema.cores.interface.separador,
-            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 5,
+            alignItems: 'center',
+            paddingHorizontal: 15.33
         },
         navegacaoSegura: {
             flexShrink: 0,

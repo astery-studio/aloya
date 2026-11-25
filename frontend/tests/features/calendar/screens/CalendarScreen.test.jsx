@@ -28,6 +28,11 @@ jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBa
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     ArrowLeftIcon: () => null,
+    ArrowsClockwiseIcon: (props) => {
+        const ReactInterno = require('react');
+        const { View } = require('react-native');
+        return ReactInterno.createElement(View, { testID: 'icone-sincronizar', ...props });
+    },
     InfoIcon: (props) => {
         const ReactInterno = require('react');
         const { View } = require('react-native');
@@ -191,8 +196,10 @@ describe('CalendarScreen', () => {
         expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen();
         expect(screen.getByText('Aba ativa: calendario')).toBeOnTheScreen();
         expect(estilos.areaSincronizacao).toMatchObject({
-            flexShrink: 0,
-            borderTopWidth: 1
+            position: 'absolute',
+            bottom: 0,
+            zIndex: 5,
+            paddingHorizontal: 15.33
         });
 
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
@@ -287,7 +294,12 @@ describe('CalendarScreen', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Tentar sincronizar novamente' }));
 
         expect(aoTentarSincronizar).toHaveBeenCalledTimes(1);
-        expect(screen.getByTestId('calendar-add-fab')).toHaveProp('deslocamentoInferior', 50);
+        expect(screen.getByTestId('calendar-add-fab')).toHaveProp('deslocamentoInferior', 76);
+        expect(screen.getByTestId('sync-status-calendar')).toHaveStyle({
+            maxWidth: 351,
+            height: 64,
+            backgroundColor: '#FBF3E0'
+        });
     });
 
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {

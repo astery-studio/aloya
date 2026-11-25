@@ -321,6 +321,7 @@ function CalendarScreen({
                         style={estilos.areaSincronizacao}
                     >
                         <SyncStatusIndicator
+                            variante="calendario"
                             status={statusSincronizacao}
                             mensagem={
                                 statusSincronizacao === 'falha' && erroSincronizacao?.status
@@ -337,7 +338,7 @@ function CalendarScreen({
                         rotuloAcessibilidade="Cadastrar menstruação"
                         aoPressionar={aoCadastrarMenstruacao}
                         considerarAreaSeguraInferior={false}
-                        deslocamentoInferior={mostrarStatusSincronizacao ? 50 : 0}
+                        deslocamentoInferior={mostrarStatusSincronizacao ? 76 : 0}
                         testID="calendar-add-fab"
                     />
                 ) : null}
