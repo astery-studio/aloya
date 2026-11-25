@@ -7,9 +7,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
             width: '100%',
-            height: 94.33,
-            paddingTop: 12,
-            paddingHorizontal: espacamentos.pequeno
+            height: 82.33
         },
         faixa: {
             gap: espacamentos.pequeno,
@@ -50,12 +48,13 @@ function criarEstilos(tema) {
         semana: {
             ...typography.labelCompact,
             color: tema.escuro ? '#E1E1E1' : tema.cores.interface.textoSecundario,
-            textTransform: 'capitalize',
-            opacity: 0.7
+            includeFontPadding: false,
+            textTransform: 'capitalize'
         },
         textoNumero: {
             ...typography.numberCompact,
             color: tema.escuro ? '#E1E1E1' : tema.cores.interface.textoSecundario,
+            includeFontPadding: false,
             marginTop: 2
         },
         semanaSelecionada: { color: tema.escuro ? '#E3E3E3' : corSelecionada, opacity: 0.85 },
