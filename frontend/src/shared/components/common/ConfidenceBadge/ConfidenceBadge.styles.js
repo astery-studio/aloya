@@ -11,15 +11,15 @@ function criarEstilos(tema) {
         },
 
         simples: {
-            height: 24,
+            height: 34,
             maxWidth: '100%',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 5,
-            paddingVertical: 3,
+            justifyContent: 'center',
+            gap: 8,
             paddingHorizontal: 10,
-            borderWidth: 0,
-            borderRadius: tema.radius.switch
+            borderWidth: 0.666667,
+            borderRadius: 16
         },
 
         composta: {
@@ -40,20 +40,13 @@ function criarEstilos(tema) {
             gap: 6
         },
 
-        ponto: {
-            width: 5.99,
-            height: 5.99,
-            flexShrink: 0,
-            borderRadius: 2.99578
-        },
-
         textoSimples: {
             flexShrink: 1,
-            fontFamily: fontFamilies.semibold,
-            fontSize: 12,
+            fontFamily: fontFamilies.medium,
+            fontSize: 14,
             fontStyle: 'normal',
-            fontWeight: '600',
-            lineHeight: 18,
+            fontWeight: '500',
+            lineHeight: 21,
             includeFontPadding: false
         },
 
