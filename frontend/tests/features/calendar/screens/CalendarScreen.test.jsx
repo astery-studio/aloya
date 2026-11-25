@@ -37,13 +37,20 @@ jest.mock('../../../../src/shared/components/common/FloatingActionButton', () =>
     const { Pressable, Text } = require('react-native');
 
     return {
-        FloatingActionButton: ({ rotuloAcessibilidade, aoPressionar }) =>
+        FloatingActionButton: ({
+            rotuloAcessibilidade,
+            aoPressionar,
+            deslocamentoInferior,
+            testID
+        }) =>
             ReactInterno.createElement(
                 Pressable,
                 {
+                    testID,
                     accessibilityRole: 'button',
                     accessibilityLabel: rotuloAcessibilidade,
-                    onPress: aoPressionar
+                    onPress: aoPressionar,
+                    deslocamentoInferior
                 },
                 ReactInterno.createElement(Text, null, rotuloAcessibilidade)
             )
@@ -175,14 +182,12 @@ describe('CalendarScreen', () => {
             flexDirection: 'row',
             justifyContent: 'space-between'
         });
-        expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
+        expect(screen.queryByTestId('status-sincronizacao-calendario')).toBeNull();
         expect(screen.getByRole('button', { name: 'Cadastrar menstruação' })).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
-        expect(estilos.rodape).toMatchObject({
+        expect(estilos.areaSincronizacao).toMatchObject({
             flexShrink: 0,
-            borderTopWidth: 1,
-            paddingLeft: 24,
-            paddingRight: 24
+            borderTopWidth: 1
         });
 
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
@@ -232,6 +237,34 @@ describe('CalendarScreen', () => {
         await waitFor(() => {
             expect(screen.queryByTestId('cycle-confidence-sheet')).toBeNull();
         });
+    });
+
+    test('mostra falha de sincronização, permite tentar novamente e desloca o FAB', async () => {
+        const aoTentarSincronizar = jest.fn();
+
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
+                confianca="alta"
+                aoCadastrarMenstruacao={jest.fn()}
+                statusSincronizacao="falha"
+                erroSincronizacao={{
+                    status: 503,
+                    mensagemUsuario: 'Alterações salvas neste aparelho. Falha na sincronização.'
+                }}
+                aoTentarSincronizar={aoTentarSincronizar}
+            />
+        );
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Alterações salvas neste aparelho. Falha na sincronização.')
+        ).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Tentar sincronizar novamente' }));
+
+        expect(aoTentarSincronizar).toHaveBeenCalledTimes(1);
+        expect(screen.getByTestId('calendar-add-fab')).toHaveProp('deslocamentoInferior', 50);
     });
 
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {

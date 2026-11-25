@@ -156,6 +156,9 @@ function CalendarScreen({
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
+    const mostrarStatusSincronizacao = ['sincronizando', 'pendente', 'falha'].includes(
+        statusSincronizacao
+    );
     const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
     return (
@@ -221,22 +224,30 @@ function CalendarScreen({
                 )}
             </View>
 
-            <SafeAreaView testID="rodape-calendario" edges={['bottom']} style={estilos.rodape}>
-                <SyncStatusIndicator
-                    status={statusSincronizacao}
-                    mensagem={
-                        statusSincronizacao === 'falha' && erroSincronizacao?.status
-                            ? erroSincronizacao.mensagemUsuario
-                            : undefined
-                    }
-                    onTentarNovamente={aoTentarSincronizar}
-                />
-            </SafeAreaView>
+            {mostrarStatusSincronizacao ? (
+                <SafeAreaView
+                    testID="status-sincronizacao-calendario"
+                    edges={['bottom']}
+                    style={estilos.areaSincronizacao}
+                >
+                    <SyncStatusIndicator
+                        status={statusSincronizacao}
+                        mensagem={
+                            statusSincronizacao === 'falha' && erroSincronizacao?.status
+                                ? erroSincronizacao.mensagemUsuario
+                                : undefined
+                        }
+                        onTentarNovamente={aoTentarSincronizar}
+                    />
+                </SafeAreaView>
+            ) : null}
 
             {mostrarFab ? (
                 <FloatingActionButton
                     rotuloAcessibilidade="Cadastrar menstruação"
                     aoPressionar={aoCadastrarMenstruacao}
+                    deslocamentoInferior={mostrarStatusSincronizacao ? 50 : 0}
+                    testID="calendar-add-fab"
                 />
             ) : null}
 

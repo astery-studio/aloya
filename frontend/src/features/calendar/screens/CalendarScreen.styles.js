@@ -44,12 +44,8 @@ function criarEstilos(tema) {
             fontFamily: fontFamilies.bold,
             fontWeight: '700'
         },
-        rodape: {
+        areaSincronizacao: {
             flexShrink: 0,
-            paddingTop: 20,
-            paddingRight: 24,
-            paddingBottom: 24,
-            paddingLeft: 24,
             borderTopWidth: 1,
             borderTopColor: tema.escuro
                 ? 'rgba(255, 255, 255, 0.08)'
