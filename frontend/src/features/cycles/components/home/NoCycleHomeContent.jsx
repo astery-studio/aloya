@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { CycleEducationSection } from '../CycleEducationSection';
+import { NoCycleDiarySection } from './NoCycleDiarySection';
 import { NoCycleStartSection } from './NoCycleStartSection';
 import { NoCycleTrackingSection } from './NoCycleTrackingSection';
 
@@ -14,13 +15,17 @@ function NoCycleHomeContent(props) {
             return proximos;
         });
     return (
-        <View style={{ paddingTop: 24, paddingBottom: 40 }}>
+        <View style={{ paddingTop: 24 }}>
             <NoCycleStartSection {...props} />
             <CycleEducationSection />
             <NoCycleTrackingSection
                 idsExpandidos={idsExpandidos}
                 aoAlternar={alternar}
                 aoAbrirAnticoncepcional={props.aoAbrirAnticoncepcional}
+            />
+            <NoCycleDiarySection
+                aoAbrirDiario={props.aoAbrirDiario}
+                aoAbrirReflexao={props.aoAbrirReflexao}
             />
         </View>
     );
