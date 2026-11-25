@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
-import { DropIcon, NotepadIcon, PillIcon } from '../../../../shared/components/icons/AppIcons';
+import { DropIcon, NotebookIcon, PillIcon } from '../../../../shared/components/icons/AppIcons';
 import { NoCycleHero } from './NoCycleHero';
 import { estilos } from './NoCycleStartSection.styles';
 
@@ -17,7 +17,7 @@ function NoCycleStartSection({
     return (
         <>
             <NoCycleHero motivoSemPrevisao={motivoSemPrevisao} />
-            <View style={estilos.cartao}>
+            <View style={[estilos.cartao, estilos.primeiroPasso]}>
                 <Text style={estilos.rotulo}>Primeiro passo</Text>
                 <Text style={estilos.titulo}>Vamos começar?</Text>
                 <Text style={estilos.descricao}>
@@ -37,7 +37,7 @@ function NoCycleStartSection({
                     Você também pode registrar menstruações anteriores, caso se lembre das datas.
                 </Text>
             </View>
-            <View style={estilos.cartao}>
+            <View style={[estilos.cartao, estilos.seuEspaco]}>
                 <Text style={estilos.rotulo}>Seu espaço</Text>
                 <Text style={estilos.titulo}>Comece por você!</Text>
                 <Text style={estilos.descricao}>
@@ -47,7 +47,7 @@ function NoCycleStartSection({
                 <View style={estilos.acoes}>
                     <ButtonScreen
                         texto="Diário"
-                        icone={NotepadIcon}
+                        icone={NotebookIcon}
                         tamanhoIcone={20}
                         aoPressionar={aoAbrirDiario}
                         variante="verde"
