@@ -183,7 +183,7 @@ function SettingsScreen({
                             ) : null}
 
                             <NavigationField
-                                label="Políticas de Privacidade"
+                                label="Privacidade e Termos"
                                 coresIcone={
                                     tema.escuro
                                         ? {
