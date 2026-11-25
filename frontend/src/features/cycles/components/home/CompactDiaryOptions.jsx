@@ -28,8 +28,8 @@ const GRUPOS_HOME = Object.freeze([
     {
         categoriaId: 'sintomas_pre_menstruais',
         titulo: 'Sintomas pré-menstruais',
-        cor: '#8761A8',
-        fundo: '#F1EAF8'
+        cor: '#7B5EA7',
+        fundo: 'rgba(123, 94, 167, 0.1)'
     },
     {
         categoriaId: 'energia',
