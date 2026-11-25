@@ -71,3 +71,51 @@ test('lista conserva o registro e a opção após falha e permite nova tentativa
     expect(salvar).toHaveBeenCalledTimes(2);
     expect(salvar).toHaveBeenLastCalledWith(registros[0], { estado: 'foraDoPrazo' });
 });
+
+test('a lista permite editar um registro passado sem confirmação', async () => {
+    const confirmado = registros[0];
+    const semConfirmacao = { ...registros[1], estado: 'naoConfirmado', confirmadoEm: null };
+    await render(<UsageHistoryPanel expandido registros={[confirmado, semConfirmacao]}
+        aoSalvarEdicaoHistorico={jest.fn()} />);
+    await pressionar('Alterar Histórico');
+    expect(screen.getByText('Não houve confirmação')).toBeOnTheScreen();
+    await pressionar('06/09/2026, 20:00, Não confirmado');
+    await pressionar('Usei fora do prazo');
+    expect(screen.getByRole('button', { name: 'Salvar', disabled: false })).toBeOnTheScreen();
+});
+
+test('abre um dia passado sem registro, escolhe um horário e salva a correção', async () => {
+    const salvar = jest.fn().mockResolvedValue({});
+    await render(<UsageHistoryPanel expandido modo="calendario" registros={[registros[0]]}
+        horarios={['08:00', '20:00']} aoSalvarEdicaoHistorico={salvar} />);
+    await pressionar('Alterar Histórico');
+    await pressionar('Dia 5, sem registro');
+    expect(screen.queryByText('Dia indisponível')).toBeNull();
+    await pressionar('05/09/2026, 20:00, Sem confirmação');
+    expect(screen.queryByRole('button', { name: 'Apagar registro' })).toBeNull();
+    await pressionar('Usei');
+    await pressionar('Salvar');
+    expect(salvar).toHaveBeenCalledWith(
+        expect.objectContaining({ novo: true, data: '2026-09-05', horarioProgramado: '20:00' }),
+        { estado: 'confirmado' }
+    );
+});
+
+test('salva Não usei e apresenta a opção legada de dúvida como Não confirmado', async () => {
+    const anterior = { ...registros[0], data: '2026-09-04', id: '3', estado: 'naoSei', confirmadoEm: null };
+    const salvo = { ...registros[0], estado: 'naoUsei', confirmadoEm: null };
+    const salvar = jest.fn().mockResolvedValue(salvo);
+    const painel = (itens) => <UsageHistoryPanel expandido modo="calendario" registros={itens}
+        aoSalvarEdicaoHistorico={salvar} />;
+    const { rerender } = await render(painel([registros[0], anterior]));
+    await pressionar('Alterar Histórico');
+    await pressionar('Dia 6, Confirmado');
+    expect(screen.queryByRole('button', { name: 'Não confirmado' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Não sei' })).toBeNull();
+    await pressionar('Não usei');
+    await pressionar('Salvar');
+    expect(salvar).toHaveBeenCalledWith(registros[0], { estado: 'naoUsei' });
+    await rerender(painel([salvo, anterior]));
+    expect(screen.getByLabelText('Dia 6, Não usei')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Dia 4, Não confirmado')).toBeOnTheScreen();
+});
