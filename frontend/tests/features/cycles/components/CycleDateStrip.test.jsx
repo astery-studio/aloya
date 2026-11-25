@@ -187,3 +187,15 @@ test('não solicita mais datas se a faixa cabe inteira na área visível', async
     expect(aoCarregarAnteriores).not.toHaveBeenCalled();
     expect(aoCarregarPosteriores).not.toHaveBeenCalled();
 });
+
+test.each([0, 56])(
+    'recupera a posição quando a faixa não mediu os itens (%i)',
+    async (averageItemLength) => {
+        await montar();
+
+        const faixa = screen.getByLabelText('Datas do ciclo');
+        const recuperar = faixa.props.onScrollToIndexFailed;
+        expect(() => recuperar({ index: 1, averageItemLength })).not.toThrow();
+        expect(screen.getByRole('button', { name: 'seg, dia 5' })).toBeSelected();
+    }
+);
