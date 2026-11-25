@@ -3,8 +3,7 @@ import { fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     secao: {
-        paddingHorizontal: 16,
-        paddingTop: 38
+        paddingHorizontal: 16
     },
     rotulo: {
         color: '#5C5C59',
