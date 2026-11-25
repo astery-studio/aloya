@@ -38,14 +38,21 @@ function criarEstilos(tema) {
             width: 42,
             height: 62,
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'center'
+        },
+        fundoInterior: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 62,
             borderRadius: 14,
             backgroundColor: '#FFFFFF'
         },
+        fundoInteriorOculto: { opacity: 0 },
         interiorSelecionado: {
             height: 54,
-            justifyContent: 'flex-start',
-            backgroundColor: 'transparent'
+            justifyContent: 'flex-start'
         },
         semana: {
             ...typography.labelCompact,
