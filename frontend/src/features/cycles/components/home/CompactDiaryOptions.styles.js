@@ -20,7 +20,7 @@ const estilos = StyleSheet.create({
     divisor: {
         backgroundColor: '#E6E2D8',
         flex: 1,
-        height: 0.666667
+        height: 1
     },
     titulo: {
         color: '#5C5C59',
