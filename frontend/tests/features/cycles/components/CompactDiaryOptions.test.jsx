@@ -2,6 +2,13 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { CompactDiaryOptions } from '../../../../src/features/cycles/components/home/CompactDiaryOptions';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
+jest.mock('../../../../src/features/diary/components/DiaryOptionIcon/DiaryOptionIcon', () => {
+    const { Text } = require('react-native');
+    return {
+        DiaryOptionIcon: ({ iconeId, color }) => <Text testID={iconeId} style={{ color }} />
+    };
+});
+
 const fisicos = ['Fadiga', 'Retenção de líquidos', 'Inchaço', 'Sensibilidade', 'Dor de cabeça'];
 const preMenstruais = [
     'Irritabilidade',
@@ -77,4 +84,28 @@ test('mantém a seleção e permite desmarcar uma sugestão sem ícone do catál
     expect(opcao).toBeSelected();
     await fireEvent.press(opcao);
     expect(aoAlterar).toHaveBeenCalledWith('sintomas_fisicos', []);
+});
+
+test.each([true, false])('mantém a cor de seleção do ícone de fluxo (%s)', async (selected) => {
+    const id = 'fluxo_menstrual_aspecto_vermelho_vivo';
+    const categoriaFluxo = {
+        id: 'fluxo_menstrual',
+        opcoes: [{ id, grupo: 'aspecto', nome: 'Vermelho vivo' }]
+    };
+    await render(
+        <CompactDiaryOptions
+            catalogo={{ macrocategorias: [{ categorias: [categoriaFluxo] }] }}
+            fase="menstrual"
+            valores={{ fluxo_menstrual: selected ? [id] : [] }}
+        />
+    );
+
+    const opcao = screen.getByRole('button', { name: 'Vermelho vivo' });
+    expect(opcao.props.accessibilityState.selected).toBe(selected);
+    const icone = screen.getByTestId('ciclo-fluxo-menstrual-aspecto-vermelho-vivo');
+    if (selected) {
+        expect(icone).not.toHaveStyle({ color: '#CB442A' });
+    } else {
+        expect(icone).toHaveStyle({ color: '#CB442A' });
+    }
 });
