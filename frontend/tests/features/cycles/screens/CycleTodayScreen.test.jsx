@@ -223,6 +223,6 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
         fontWeight: '700'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
-    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 16 });
+    expect(estilos.rolagem).toEqual({ flexGrow: 1 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });
