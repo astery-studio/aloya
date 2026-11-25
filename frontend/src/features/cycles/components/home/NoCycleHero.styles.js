@@ -10,6 +10,7 @@ const estilos = StyleSheet.create({
     simbolo: {
         height: 260,
         marginVertical: 32,
+        maxWidth: '100%',
         width: 260
     },
     titulo: {
@@ -20,7 +21,6 @@ const estilos = StyleSheet.create({
         includeFontPadding: false,
         letterSpacing: -1.085,
         lineHeight: 33,
-        marginTop: 0,
         maxWidth: 310,
         textAlign: 'center'
     },
