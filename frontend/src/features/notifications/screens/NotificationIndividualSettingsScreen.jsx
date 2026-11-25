@@ -36,9 +36,14 @@ export function NotificationIndividualSettingsScreen({
                     <View key={grupoId} style={estilos.secao}>
                         <Text accessibilityRole="header"
                             style={[estilos.titulo, { color: cores.interface.textoSecundario }]}>{nome}</Text>
+                        {valores[`${categoriaId}.${grupoId}`] === false && (
+                            <Text style={{ color: cores.interface.textoSecundario }}>
+                                Grupo desligado. Suas escolhas individuais estão preservadas.
+                            </Text>
+                        )}
                         {linhas.map(([id, label, tipo]) => {
                             if (tipo === 'horario' || tipo === 'antecedencia') {
-                                return <NavigationField key={id} label={label} desabilitado={ocupado}
+                                return <NavigationField key={id} label={label} labelSemLimite desabilitado={ocupado}
                                     referencia={tipo === 'antecedencia' ? botaoAntecedencia : undefined}
                                     onPress={tipo === 'horario' ? onAbrirHorario
                                         : () => definirAntecedenciaAberta(true)} />;
@@ -46,6 +51,7 @@ export function NotificationIndividualSettingsScreen({
                             const chave = tipo === 'legado' ? id : `${categoriaId}.${grupoId}.${id}`;
                             return (
                                 <SwitchField key={chave} titulo={label} ativo={valores[chave]}
+                                    tituloSemLimite dicaAcessibilidade="Ativa ou desativa esta notificação"
                                     aoAlterar={(ativo) => onAlterar(chave, ativo)}
                                     desabilitado={ocupado} estilo={estilos.campo}
                                     estiloTitulo={estilos.rotulo} />

@@ -33,6 +33,7 @@ function NavigationField({
     variante = 'comBorda',
     paleta = 'corVerde',
     desabilitado = false,
+    labelSemLimite = false,
     referencia,
     estilo,
     coresIcone
@@ -92,7 +93,7 @@ function NavigationField({
                 </View>
             ) : null}
 
-            <Text style={estilos.label} numberOfLines={2}>
+            <Text style={estilos.label} numberOfLines={labelSemLimite ? undefined : 2}>
                 {label}
             </Text>
 

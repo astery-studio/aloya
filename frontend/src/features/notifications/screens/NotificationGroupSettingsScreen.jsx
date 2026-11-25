@@ -23,6 +23,8 @@ export function NotificationGroupSettingsScreen({
                             <SwitchField
                                 key={chave}
                                 titulo={grupos[grupoId][0]}
+                                tituloSemLimite
+                                dicaAcessibilidade="Ativa ou desativa as notificações deste grupo"
                                 ativo={valores[chave] ?? true}
                                 desabilitado={ocupado}
                                 aoAlterar={(ativo) => onAlterar(chave, ativo)}
@@ -34,7 +36,7 @@ export function NotificationGroupSettingsScreen({
                 </View>
                 <View style={estilos.secao}>
                     <Text accessibilityRole="header" style={estiloTitulo}>Configuração individual</Text>
-                    <NavigationField label="Personalizar notificações" onPress={onAbrirIndividual} />
+                    <NavigationField label="Personalizar notificações" labelSemLimite onPress={onAbrirIndividual} />
                 </View>
             </View>
         </SettingsLayout>

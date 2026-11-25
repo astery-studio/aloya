@@ -26,7 +26,7 @@ export function NotificationsScreen({ onAbrirCategoria, onVoltar }) {
                     Tipo de Notificações
                 </Text>
                 {categorias.map(({ id, ...campo }) => (
-                    <NavigationField key={id} {...campo} onPress={() => onAbrirCategoria(id)} />
+                    <NavigationField key={id} {...campo} labelSemLimite onPress={() => onAbrirCategoria(id)} />
                 ))}
             </View>
         </SettingsLayout>
