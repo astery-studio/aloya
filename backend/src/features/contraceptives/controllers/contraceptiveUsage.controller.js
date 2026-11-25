@@ -12,7 +12,20 @@ function criarContraceptiveUsageController(service) {
             proximo(falha);
         }
     }
-    return { definirConfirmacao };
+    async function corrigirHistorico(requisicao, resposta, proximo) {
+        try {
+            const uso = await service.corrigirHistorico(
+                requisicao.usuario.id, requisicao.params.id, requisicao.params.usoId, requisicao.body
+            );
+            resposta.status(200).json({ uso });
+        } catch (erro) {
+            if (erro instanceof AppError) return proximo(erro);
+            const falha = new AppError('Não foi possível corrigir o histórico.', 500, 'ERRO_CORRIGIR_HISTORICO');
+            falha.cause = erro;
+            proximo(falha);
+        }
+    }
+    return { definirConfirmacao, corrigirHistorico };
 }
 
 export { criarContraceptiveUsageController };

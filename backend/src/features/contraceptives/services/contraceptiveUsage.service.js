@@ -1,4 +1,5 @@
 import { AppError } from '../../../shared/errors/AppError.js';
+import { apresentarUsoHistorico } from '../presenters/contraceptive.listing.presenter.js';
 import { validarIdAnticoncepcional } from '../validators/contraceptive.validator.js';
 import { horarioPertenceAgenda } from '../utils/contraceptive.listing.schedule.js';
 import { validarConfirmacaoUso, dataHoraNoFuso, dataLocalNoFuso, horarioNoFuso, validarFusoHorario } from '../validators/contraceptiveUsage.validator.js';
@@ -121,7 +122,39 @@ function criarContraceptiveUsageService(prisma, { relogio = () => new Date(), av
             }
         }
     }
-    return { definirConfirmacao };
+    async function corrigirHistorico(usuarioId, idRecebido, usoIdRecebido, entrada) {
+        const anticoncepcionalId = validarIdAnticoncepcional(idRecebido);
+        const usoId = validarIdAnticoncepcional(usoIdRecebido);
+        if (!entrada || typeof entrada !== 'object' || Array.isArray(entrada)
+            || Object.keys(entrada).some((campo) => !['estado', 'fusoHorario'].includes(campo))
+            || !['confirmado', 'foraDoPrazo'].includes(entrada.estado)) {
+            throw new AppError('Informe um estado de correção válido.', 422, 'CORRECAO_USO_INVALIDA');
+        }
+        const fusoHorario = validarFusoHorario(entrada.fusoHorario);
+        const where = { id: usoId, anticoncepcionalId, anticoncepcional: { usuarioId, ativo: true } };
+        return prisma.$transaction(async (transacao) => {
+            const uso = await transacao.usoAnticoncepcional.findFirst({ where });
+            if (!uso) throw new AppError('Ocorrência não encontrada.', 404, 'USO_NAO_ENCONTRADO');
+            const data = uso.dataUsoProgramado.toISOString().slice(0, 10);
+            const programadoEm = dataHoraNoFuso(data, uso.horarioProgramado, fusoHorario);
+            if (!programadoEm || programadoEm > relogio()
+                || uso.statusUso !== 'confirmado' || !uso.horarioRealConfirmacao) {
+                throw new AppError('Esta ocorrência não pode ser corrigida.', 422, 'USO_NAO_EDITAVEL');
+            }
+            const confirmacaoForaPrazo = entrada.estado === 'foraDoPrazo';
+            if (uso.confirmacaoForaPrazo === confirmacaoForaPrazo) return apresentarUsoHistorico(uso);
+            const resultado = await transacao.usoAnticoncepcional.updateMany({
+                where: { ...where, atualizadoEm: uso.atualizadoEm },
+                data: { confirmacaoForaPrazo }
+            });
+            if (resultado.count !== 1) {
+                throw new AppError('O uso foi alterado. Atualize os dados e tente novamente.', 409, 'CONFLITO_CORRECAO_USO');
+            }
+            return apresentarUsoHistorico({ ...uso, confirmacaoForaPrazo });
+        });
+    }
+
+    return { definirConfirmacao, corrigirHistorico };
 }
 
 export { apresentarUsoConfirmacao, criarAvaliadorJanelaEficacia, lerJanelasDeUso, criarContraceptiveUsageService };
