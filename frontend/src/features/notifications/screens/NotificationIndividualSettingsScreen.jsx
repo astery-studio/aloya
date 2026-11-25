@@ -3,9 +3,8 @@ import { Text, View } from 'react-native';
 import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField';
 import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet';
 import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
-import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import FormLayout from '../../../shared/layouts/FormLayout';
+import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { catalogoNotificacoes } from '../notificationCatalog';
 import { estilos } from './notificationSettingsStyles';
 
@@ -21,8 +20,7 @@ export function NotificationIndividualSettingsScreen({
     const { titulo, grupos } = catalogoNotificacoes[categoriaId];
     const [antecedenciaAberta, definirAntecedenciaAberta] = useState(false);
     return (
-        <FormLayout corFundo={cores.interface.fundo}
-            cabecalho={<Header titulo={titulo} variante="comVoltar" onVoltar={onVoltar} />}>
+        <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
             <View style={estilos.lista}>
                 {Object.entries(grupos).map(([grupoId, [nome, linhas]]) => (
                     <View key={grupoId} style={estilos.secao}>
@@ -57,6 +55,6 @@ export function NotificationIndividualSettingsScreen({
                     onAlterar('antecedenciaProximoCiclo', id);
                 }}
             />
-        </FormLayout>
+        </SettingsLayout>
     );
 }

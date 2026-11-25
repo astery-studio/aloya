@@ -1,9 +1,8 @@
 import { Text, View } from 'react-native';
 import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField';
 import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
-import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import FormLayout from '../../../shared/layouts/FormLayout';
+import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { catalogoNotificacoes } from '../notificationCatalog';
 import { estilos } from './notificationSettingsStyles';
 
@@ -14,8 +13,7 @@ export function NotificationGroupSettingsScreen({
     const { titulo, grupos, ordemGrupo = Object.keys(grupos) } = catalogoNotificacoes[categoriaId];
     const estiloTitulo = [estilos.titulo, { color: cores.interface.textoSecundario }];
     return (
-        <FormLayout corFundo={cores.interface.fundo}
-            cabecalho={<Header titulo={titulo} variante="comVoltar" onVoltar={onVoltar} />}>
+        <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
             <View style={estilos.lista}>
                 <View style={estilos.secao}>
                     <Text accessibilityRole="header" style={estiloTitulo}>Configuração em grupo</Text>
@@ -39,6 +37,6 @@ export function NotificationGroupSettingsScreen({
                     <NavigationField label="Personalizar notificações" onPress={onAbrirIndividual} />
                 </View>
             </View>
-        </FormLayout>
+        </SettingsLayout>
     );
 }

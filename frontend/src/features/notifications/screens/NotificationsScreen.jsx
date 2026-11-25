@@ -2,9 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { TargetIcon } from 'phosphor-react-native/src/icons/Target';
 import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField';
 import { PillIcon, UsersThreeIcon } from '../../../shared/components/icons/AppIcons';
-import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import FormLayout from '../../../shared/layouts/FormLayout';
+import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 
 const categorias = [
     { id: 'ciclo', label: 'Ciclo e Previsões', icone: TargetIcon, paleta: 'corLaranja' },
@@ -15,10 +14,7 @@ const categorias = [
 export function NotificationsScreen({ onAbrirCategoria, onVoltar }) {
     const { cores, typography } = useTheme();
     return (
-        <FormLayout
-            corFundo={cores.interface.fundo}
-            cabecalho={<Header titulo="Notificações" variante="comVoltar" onVoltar={onVoltar} />}
-        >
+        <SettingsLayout titulo="Notificações" onVoltar={onVoltar} respeitarEntalhe>
             <Text style={[typography.bodyDefault, { color: cores.interface.textoSecundario }]}>
                 {'Fique por dentro do que importa! Personalize suas notificações e escolha quais lembretes, atualizações e avisos deseja receber.'}
             </Text>
@@ -33,7 +29,7 @@ export function NotificationsScreen({ onAbrirCategoria, onVoltar }) {
                     <NavigationField key={id} {...campo} onPress={() => onAbrirCategoria(id)} />
                 ))}
             </View>
-        </FormLayout>
+        </SettingsLayout>
     );
 }
 

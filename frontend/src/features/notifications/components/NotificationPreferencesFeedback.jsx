@@ -2,15 +2,13 @@ import { ActivityIndicator, Text } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
-import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import FormLayout from '../../../shared/layouts/FormLayout';
+import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 
 export function NotificationPreferencesLoading({ titulo, erro, onVoltar, onRecarregar }) {
     const { cores } = useTheme();
     return (
-        <FormLayout corFundo={cores.interface.fundo}
-            cabecalho={<Header titulo={titulo} variante="comVoltar" onVoltar={onVoltar} />}>
+        <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
             {erro ? (
                 <>
                     <Text accessibilityRole="alert" style={{ color: cores.interface.textoPrincipal }}>
@@ -19,7 +17,7 @@ export function NotificationPreferencesLoading({ titulo, erro, onVoltar, onRecar
                     <ButtonScreen texto="Tentar novamente" aoPressionar={onRecarregar} />
                 </>
             ) : <ActivityIndicator accessibilityLabel="Carregando preferências" />}
-        </FormLayout>
+        </SettingsLayout>
     );
 }
 
