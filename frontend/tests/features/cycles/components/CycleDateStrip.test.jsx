@@ -170,3 +170,20 @@ test('exibe a bolinha clara quando hoje também está selecionado', async () => 
         backgroundColor: '#F7F5F0'
     });
 });
+
+test('não solicita mais datas se a faixa cabe inteira na área visível', async () => {
+    const aoCarregarAnteriores = jest.fn();
+    const aoCarregarPosteriores = jest.fn();
+    await montar({ aoCarregarAnteriores, aoCarregarPosteriores });
+
+    await fireEvent(screen.getByLabelText('Datas do ciclo'), 'scrollEndDrag', {
+        nativeEvent: {
+            contentOffset: { x: 0, y: 0 },
+            contentSize: { width: 100, height: 94 },
+            layoutMeasurement: { width: 390, height: 94 }
+        }
+    });
+
+    expect(aoCarregarAnteriores).not.toHaveBeenCalled();
+    expect(aoCarregarPosteriores).not.toHaveBeenCalled();
+});
