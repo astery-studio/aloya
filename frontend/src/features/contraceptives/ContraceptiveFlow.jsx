@@ -7,7 +7,7 @@ import { ContraceptiveTrackingScreen } from './screens/ContraceptiveTrackingScre
 import { ContraceptiveHomeScreen } from './screens/ContraceptiveHomeScreen';
 import { NewContraceptiveScreen } from './screens/NewContraceptiveScreen';
 import { EditContraceptiveScreen } from './screens/EditContraceptiveScreen';
-import { atualizarUsoDoAnticoncepcional, fusoDoDispositivo } from './utils/contraceptiveTrackingAdapter';
+import { atualizarUsoDoAnticoncepcional, fusoDoDispositivo, mesmoUso } from './utils/contraceptiveTrackingAdapter';
 
 const serviceLocal = Object.freeze({
     listar: async () => [],
@@ -145,17 +145,35 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada,
         operacoesUso.current.add(chaveDose);
         versaoBusca.current += 1;
         try {
-            const salvo = await service.corrigirHistorico(anticoncepcional.id, ocorrencia, {
-                ...alteracao, fusoHorario: fusoDoDispositivo()
-            });
+            let salvo;
+            if (alteracao.apagar) {
+                await service.apagarRegistroHistorico(anticoncepcional.id, ocorrencia);
+            } else {
+                salvo = await service.corrigirHistorico(anticoncepcional.id, ocorrencia, {
+                    ...alteracao, fusoHorario: fusoDoDispositivo()
+                });
+            }
+            const agora = new Date();
             if (montado.current) setItens((atuais) => atuais.map((item) => {
                 if (item.id !== anticoncepcional.id) return item;
-                const historico = item.historico.map((registro) => registro.id === salvo.id ? salvo : registro);
-                const usosHoje = item.usosHoje.map((uso) => uso.id === salvo.id
-                    ? { ...uso, status: salvo.estado, foraDoPrazo: salvo.estado === 'foraDoPrazo',
-                        confirmacaoForaPrazo: salvo.estado === 'foraDoPrazo' }
-                    : uso);
-                const statusUltimoUso = item.statusUltimoUso === 'pendente'
+                const historico = item.historico.filter((registro) => !mesmoUso(registro, salvo ?? ocorrencia));
+                if (salvo) {
+                    historico.unshift(salvo);
+                    historico.sort((a, b) => `${b.data} ${b.horarioProgramado}`.localeCompare(`${a.data} ${a.horarioProgramado}`));
+                }
+                const usosHoje = item.usosHoje.map((uso) => {
+                    if (uso.id !== (salvo ?? ocorrencia).id) return uso;
+                    if (!salvo) return {
+                        ...uso, id: `${uso.data}-${uso.horario}`, status: 'pendente',
+                        confirmadoEm: null, horarioConfirmacao: null, foraDoPrazo: false,
+                        confirmacaoForaPrazo: false, atrasado: new Date(`${uso.data}T${uso.horario}:00`) < agora
+                    };
+                    return { ...uso, status: salvo.estado, atrasado: false,
+                        confirmadoEm: salvo.confirmadoEm, horarioConfirmacao: salvo.horarioConfirmacao,
+                        foraDoPrazo: salvo.estado === 'foraDoPrazo',
+                        confirmacaoForaPrazo: salvo.estado === 'foraDoPrazo' };
+                });
+                const statusUltimoUso = usosHoje.some((uso) => ['pendente', 'naoConfirmado'].includes(uso.status))
                     ? 'pendente' : (usosHoje.at(-1)?.status ?? historico[0]?.estado ?? null);
                 return { ...item, historico, usosHoje, statusUltimoUso };
             }));

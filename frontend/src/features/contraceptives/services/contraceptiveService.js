@@ -63,6 +63,10 @@ function validarFusoHorario(fusoHorario) {
     }
 }
 
+function idUsoValido(id) {
+    return /^[1-9]\d*$/.test(id) && Number.isSafeInteger(Number(id));
+}
+
 function criarCorpoUso({ data, horario, confirmar, fusoHorario }) {
     if (typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data) || !partesDaDataUso(data)) {
         throw new Error('A data programada do uso é inválida.');
@@ -143,19 +147,34 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
 
     async function corrigirHistorico(anticoncepcionalId, ocorrencia, { estado, fusoHorario }) {
         const caminho = criarCaminhoAnticoncepcional(anticoncepcionalId);
-        const usoId = String(ocorrencia.id);
-        if (!/^[1-9]\d*$/.test(usoId) || !Number.isSafeInteger(Number(usoId))) {
+        const usoId = ocorrencia.novo ? null : String(ocorrencia.id);
+        if (usoId !== null && !idUsoValido(usoId)) {
             throw new Error('O identificador da ocorrência é inválido.');
         }
         validarFusoHorario(fusoHorario);
+        const corpo = { estado, fusoHorario };
+        if (ocorrencia.novo) {
+            corpo.data = ocorrencia.data;
+            corpo.horario = ocorrencia.horarioProgramado;
+        }
         const { uso } = await requisicaoAutenticada({
-            metodo: 'PATCH', caminho: `${caminho}/usos/${usoId}`, corpo: { estado, fusoHorario }
+            metodo: 'PATCH', caminho: `${caminho}/usos${usoId === null ? '' : `/${usoId}`}`, corpo
         });
-        if (String(uso?.id) !== usoId || uso.data !== ocorrencia.data
+        if (!idUsoValido(String(uso?.id)) || (usoId !== null && String(uso.id) !== usoId)
+            || uso.data !== ocorrencia.data
             || uso.horarioProgramado !== ocorrencia.horarioProgramado || uso.estado !== estado) {
             throw new Error('Resposta de correção inválida.');
         }
         return normalizarRegistroHistorico(uso);
+    }
+
+    async function apagarRegistroHistorico(anticoncepcionalId, ocorrencia) {
+        const caminho = criarCaminhoAnticoncepcional(anticoncepcionalId);
+        const usoId = String(ocorrencia.id);
+        if (ocorrencia.novo || !idUsoValido(usoId)) {
+            throw new Error('O identificador da ocorrência é inválido.');
+        }
+        await requisicaoAutenticada({ metodo: 'DELETE', caminho: `${caminho}/usos/${usoId}` });
     }
 
     return Object.freeze({
@@ -164,7 +183,8 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
         editar,
         remover,
         alternarUso,
-        corrigirHistorico
+        corrigirHistorico,
+        apagarRegistroHistorico
     });
 }
 
