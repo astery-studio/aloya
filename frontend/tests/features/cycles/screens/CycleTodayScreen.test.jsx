@@ -1,4 +1,5 @@
-import { fireEvent, screen, within } from '@testing-library/react-native';
+import { act, fireEvent, screen, within } from '@testing-library/react-native';
+import { Animated } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayScreen } from '../../../../src/features/cycles/screens/CycleTodayScreen';
 import { criarEstilos } from '../../../../src/features/cycles/screens/CycleTodayScreen.styles';
@@ -232,6 +233,16 @@ test('abre a explicação de confiabilidade pela previsão', async () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
     expect(await screen.findByText('O que isso significa?')).toBeOnTheScreen();
+    const painel = screen.getByTestId('bottom-sheet-painel');
+    const animarFechamento = jest.spyOn(Animated, 'timing').mockReturnValue({
+        start: (concluir) => concluir?.({ finished: true })
+    });
+    try {
+        await act(() => painel.props.onAccessibilityEscape());
+        expect(screen.queryByText('O que isso significa?')).not.toBeOnTheScreen();
+    } finally {
+        animarFechamento.mockRestore();
+    }
 });
 
 test('abre a leitura da fase pela seção de cuidados', async () => {
@@ -250,4 +261,34 @@ test('abre a pausa guiada e a reflexão a partir dos cartões da Home', async ()
     await renderizar({ previsao });
     await fireEvent.press(screen.getByRole('button', { name: /Uma pergunta para hoje/ }));
     expect(await screen.findByText('O que seu corpo está pedindo agora?')).toBeOnTheScreen();
+});
+
+test('carrega dias extras nas duas bordas e preserva a data selecionada', async () => {
+    await renderizar({ previsao });
+    const faixa = () => screen.getByLabelText('Datas do ciclo');
+    const aoRolar = (x) =>
+        fireEvent(faixa(), 'scrollEndDrag', {
+            nativeEvent: {
+                contentOffset: { x, y: 0 },
+                contentSize: { width: 1000, height: 94 },
+                layoutMeasurement: { width: 390, height: 94 }
+            }
+        });
+
+    const datasIniciais = faixa().props.data;
+    await aoRolar(0);
+    expect(faixa().props.data).toHaveLength(datasIniciais.length + 14);
+    expect(faixa().props.data[0].data < datasIniciais[0].data).toBe(true);
+
+    await aoRolar(610);
+    expect(faixa().props.data).toHaveLength(datasIniciais.length + 28);
+    expect(screen.getByRole('button', { name: 'qui, dia 8' })).toBeSelected();
+});
+
+test('mostra o check-in quando o serviço do Diário está disponível', async () => {
+    const buscarCatalogo = jest.fn().mockResolvedValue({ macrocategorias: [] });
+    await renderizar({ previsao, diaryService: { buscarCatalogo } });
+
+    expect(await screen.findByText('Check-in gentil')).toBeOnTheScreen();
+    expect(buscarCatalogo).toHaveBeenCalledTimes(1);
 });
