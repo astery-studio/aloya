@@ -4,6 +4,7 @@ import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { partesDaDataUso } from '../utils/usageHistory';
 import {
     normalizarAcompanhamentoAnticoncepcional,
+    normalizarRegistroHistorico,
     normalizarUsoAcompanhamento
 } from '../utils/contraceptiveTrackingAdapter';
 
@@ -140,12 +141,30 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
         return Object.freeze({ uso: normalizarUsoAcompanhamento(resposta.uso) });
     }
 
+    async function corrigirHistorico(anticoncepcionalId, ocorrencia, { estado, fusoHorario }) {
+        const caminho = criarCaminhoAnticoncepcional(anticoncepcionalId);
+        const usoId = String(ocorrencia.id);
+        if (!/^[1-9]\d*$/.test(usoId) || !Number.isSafeInteger(Number(usoId))) {
+            throw new Error('O identificador da ocorrência é inválido.');
+        }
+        validarFusoHorario(fusoHorario);
+        const { uso } = await requisicaoAutenticada({
+            metodo: 'PATCH', caminho: `${caminho}/usos/${usoId}`, corpo: { estado, fusoHorario }
+        });
+        if (String(uso?.id) !== usoId || uso.data !== ocorrencia.data
+            || uso.horarioProgramado !== ocorrencia.horarioProgramado || uso.estado !== estado) {
+            throw new Error('Resposta de correção inválida.');
+        }
+        return normalizarRegistroHistorico(uso);
+    }
+
     return Object.freeze({
         listar,
         cadastrar,
         editar,
         remover,
-        alternarUso
+        alternarUso,
+        corrigirHistorico
     });
 }
 

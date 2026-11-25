@@ -106,7 +106,7 @@ function AcaoCadastro({ aoPressionar, estilosAcompanhamento }) {
                     height: alturaBase,
                     left: (largura - larguraBase) / 2,
                     top: (56 - alturaBase) / 2,
-                    borderRadius: 16 / escala,
+                    borderRadius: 14 / escala,
                     transform: [{ scale: escala }]
                 }}
             />
@@ -125,7 +125,8 @@ function ContraceptiveTrackingScreen({
     aoDispensarErroUso,
     aoEditar,
     aoRemover,
-    aoAlternarUso
+    aoAlternarUso,
+    aoSalvarEdicaoHistorico
 }) {
     const tema = useTheme();
     const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
@@ -228,6 +229,7 @@ function ContraceptiveTrackingScreen({
                                 aoEditar={aoEditar}
                                 aoRemover={aoRemover}
                                 aoAlternarUso={aoAlternarUso}
+                                aoSalvarEdicaoHistorico={aoSalvarEdicaoHistorico}
                                 aoAtualizarUsos={atualizarUsos}
                             />
                         )}

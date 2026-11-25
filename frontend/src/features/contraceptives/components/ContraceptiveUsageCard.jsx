@@ -160,6 +160,7 @@ function ContraceptiveUsageCard({
     aoEditar,
     aoRemover,
     aoAlternarUso,
+    aoSalvarEdicaoHistorico,
     aoAtualizarUsos
 }) {
     const tema = useTheme();
@@ -473,6 +474,9 @@ function ContraceptiveUsageCard({
                             expandido={historicoExpandido}
                             registros={historico}
                             modo={modoHistorico}
+                            aoSalvarEdicaoHistorico={!removido && aoSalvarEdicaoHistorico
+                                ? (ocorrencia, alteracao) => aoSalvarEdicaoHistorico(anticoncepcional, ocorrencia, alteracao)
+                                : undefined}
                             aoAlternar={() => setHistoricoExpandido((atual) => !atual)}
                         />
                     </View>

@@ -139,6 +139,36 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada,
         }
     }
 
+    async function salvarEdicaoHistorico(anticoncepcional, ocorrencia, alteracao) {
+        const chaveDose = JSON.stringify([String(anticoncepcional.id), ocorrencia.data, ocorrencia.horarioProgramado]);
+        if (operacoesUso.current.has(chaveDose)) throw new Error('Este horário já está sendo atualizado.');
+        operacoesUso.current.add(chaveDose);
+        versaoBusca.current += 1;
+        try {
+            const salvo = await service.corrigirHistorico(anticoncepcional.id, ocorrencia, {
+                ...alteracao, fusoHorario: fusoDoDispositivo()
+            });
+            if (montado.current) setItens((atuais) => atuais.map((item) => {
+                if (item.id !== anticoncepcional.id) return item;
+                const historico = item.historico.map((registro) => registro.id === salvo.id ? salvo : registro);
+                const usosHoje = item.usosHoje.map((uso) => uso.id === salvo.id
+                    ? { ...uso, status: salvo.estado, foraDoPrazo: salvo.estado === 'foraDoPrazo',
+                        confirmacaoForaPrazo: salvo.estado === 'foraDoPrazo' }
+                    : uso);
+                const statusUltimoUso = item.statusUltimoUso === 'pendente'
+                    ? 'pendente' : (usosHoje.at(-1)?.status ?? historico[0]?.estado ?? null);
+                return { ...item, historico, usosHoje, statusUltimoUso };
+            }));
+            return salvo;
+        } catch (falha) {
+            if (falha?.status === 401) onSessaoExpirada?.();
+            throw falha;
+        } finally {
+            operacoesUso.current.delete(chaveDose);
+            versaoBusca.current += 1;
+        }
+    }
+
     async function excluir(id) {
         try {
             const resultado = await service.remover(id);
@@ -177,6 +207,7 @@ function ContraceptiveFlow({ service = serviceLocal, onVoltar, onSessaoExpirada,
         aoDispensarErroUso: () => setErroUso(null),
         aoTentarNovamente: () => carregar(undefined, Boolean(itens.length)),
         aoAlternarUso: alternarUso,
+        aoSalvarEdicaoHistorico: typeof service.corrigirHistorico === 'function' ? salvarEdicaoHistorico : undefined,
         aoEditar: (item) => { setSelecionado(item); setTela('edicao'); },
         aoRemover: (item) => { setErroRemocao(false); setRemocao(item); }
     };
