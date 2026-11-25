@@ -14,7 +14,8 @@ export default function TimeInput({
     aoRemover,
     podeRemover = false,
     desativado = false,
-    estilo
+    estilo,
+    estiloCampo
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -26,7 +27,7 @@ export default function TimeInput({
                 testID="area-campo-horario"
                 disabled={desativado}
                 onPress={() => entradaRef.current?.focus()}
-                style={[estilos.campo, desativado && estilos.desativado]}
+                style={[estilos.campo, estiloCampo, desativado && estilos.desativado]}
             >
                 <Clock
                     size={18}
