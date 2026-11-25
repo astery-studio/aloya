@@ -22,3 +22,12 @@ test('apresenta previsão e abre a explicação de confiabilidade', async () => 
     await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
     expect(aoAbrir).toHaveBeenCalledTimes(1);
 });
+
+test('exibe o aviso educativo padrão sem alerta de incerteza', async () => {
+    await render(<CyclePredictionSummary confiabilidade="alta" />);
+
+    expect(screen.getByText('Previsão')).toHaveStyle({ color: '#C85A44' });
+    expect(screen.getByText('Indisponível')).toBeOnTheScreen();
+    expect(screen.getByText(/não deve ser usada como método contraceptivo/)).toBeOnTheScreen();
+    expect(screen.queryByText('Estimativa incerta')).not.toBeOnTheScreen();
+});
