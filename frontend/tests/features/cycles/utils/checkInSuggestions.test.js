@@ -105,3 +105,7 @@ test('mantém oito opções variadas mesmo com preferências do Diário recolhid
     expect(sugestoes).toHaveLength(LIMITE_SUGESTOES);
     expect(new Set(sugestoes.map(({ categoria }) => categoria.id)).size).toBeGreaterThanOrEqual(4);
 });
+
+test('retorna uma lista vazia quando o catálogo ainda não foi carregado', () => {
+    expect(criarSugestoesCheckIn({ fase: 'folicular' })).toEqual([]);
+});
