@@ -492,6 +492,11 @@ export default function App() {
             return;
         }
 
+        if (aba === 'calendario') {
+            setTelaInterna(telasInternas.calendario);
+            return;
+        }
+
         if (aba === 'diario') {
             setTelaInterna(telasInternas.diario);
 
