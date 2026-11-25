@@ -12,21 +12,18 @@ const estilos = StyleSheet.create({
         borderWidth: 0.7,
         borderColor: '#E6E2D8',
         borderRadius: 28,
-        shadowColor: '#2C4C3B',
-        shadowOffset: { width: 0, height: 20 },
-        shadowOpacity: 0.15,
-        shadowRadius: 18,
-        elevation: 8
+        boxShadow: '0px 20px 36px rgba(44, 76, 59, 0.15)'
     },
     cabecalho: {
-        height: 46,
+        minHeight: 46,
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         gap: 12
     },
-    metricas: { minHeight: 75, flexDirection: 'row', marginTop: 20 },
-    data: { width: 138, flexDirection: 'row', alignItems: 'center', gap: 9 },
+    textosCabecalho: { flexShrink: 1 },
+    metricas: { minHeight: 75, flexDirection: 'row', gap: 16, marginTop: 20 },
+    data: { width: 138, maxWidth: '43%', flexDirection: 'row', alignItems: 'center', gap: 9 },
     secundarias: {
         flex: 1,
         justifyContent: 'center',
@@ -38,7 +35,7 @@ const estilos = StyleSheet.create({
     metrica: { minHeight: 32, flexDirection: 'row', alignItems: 'center', gap: 8 },
     textosMetrica: { flex: 1 },
     aviso: { marginTop: 18 },
-    incerta: { width: '100%', marginTop: 10 }
+    incerta: { marginTop: 18 }
 });
 
 export { estilos };
