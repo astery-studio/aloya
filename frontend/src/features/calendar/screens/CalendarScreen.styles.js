@@ -59,10 +59,10 @@ function criarEstilos(tema) {
             borderRadius: 12,
             backgroundColor: tema.escuro ? '#232926' : '#E3E4DE',
             shadowColor: '#000000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 4,
-            elevation: 2
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 6
         },
         textoVazio: {
             width: '100%',

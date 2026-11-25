@@ -1,6 +1,6 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
-import { useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
@@ -93,6 +93,7 @@ const ITENS_LEGENDA = Object.freeze([
 
 const MENSAGEM_ERRO_CALENDARIO =
     'Não foi possível carregar os dados do calendário. Tente novamente.';
+const TEMPO_REAPARECER_AVISO_MS = 5000;
 
 function normalizarConfianca(valor) {
     if (typeof valor !== 'string') return null;
@@ -127,6 +128,10 @@ function CalendarScreen({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
     const [confiancaVisivel, setConfiancaVisivel] = useState(false);
+    const [avisoVazioVisivel, setAvisoVazioVisivel] = useState(false);
+    const opacidadeAviso = useRef(new Animated.Value(0)).current;
+    const deslocamentoAviso = useRef(new Animated.Value(-10)).current;
+    const temporizadorAviso = useRef(null);
 
     const mesesValidos = Array.isArray(meses) ? meses : [];
     const confiancaValida = normalizarConfianca(confianca);
@@ -139,8 +144,86 @@ function CalendarScreen({
         !existeErro && ['sincronizando', 'pendente', 'falha'].includes(statusSincronizacao);
     const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
+    const animarEntradaAviso = useCallback(() => {
+        opacidadeAviso.stopAnimation();
+        deslocamentoAviso.stopAnimation();
+        opacidadeAviso.setValue(0);
+        deslocamentoAviso.setValue(-10);
+
+        Animated.parallel([
+            Animated.timing(opacidadeAviso, {
+                toValue: 1,
+                duration: 260,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true
+            }),
+            Animated.timing(deslocamentoAviso, {
+                toValue: 0,
+                duration: 260,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true
+            })
+        ]).start();
+    }, [deslocamentoAviso, opacidadeAviso]);
+
+    const animarSaidaAviso = useCallback(() => {
+        opacidadeAviso.stopAnimation();
+        deslocamentoAviso.stopAnimation();
+
+        Animated.parallel([
+            Animated.timing(opacidadeAviso, {
+                toValue: 0,
+                duration: 180,
+                easing: Easing.in(Easing.quad),
+                useNativeDriver: true
+            }),
+            Animated.timing(deslocamentoAviso, {
+                toValue: -8,
+                duration: 180,
+                easing: Easing.in(Easing.quad),
+                useNativeDriver: true
+            })
+        ]).start();
+    }, [deslocamentoAviso, opacidadeAviso]);
+
+    const registrarInteracao = useCallback(() => {
+        if (!estadoVazio) return;
+
+        if (temporizadorAviso.current) {
+            clearTimeout(temporizadorAviso.current);
+        }
+
+        setAvisoVazioVisivel(false);
+        animarSaidaAviso();
+
+        temporizadorAviso.current = setTimeout(() => {
+            setAvisoVazioVisivel(true);
+            animarEntradaAviso();
+            temporizadorAviso.current = null;
+        }, TEMPO_REAPARECER_AVISO_MS);
+    }, [animarEntradaAviso, animarSaidaAviso, estadoVazio]);
+
+    useEffect(() => {
+        if (!estadoVazio) {
+            setAvisoVazioVisivel(false);
+            opacidadeAviso.setValue(0);
+            deslocamentoAviso.setValue(-10);
+            return undefined;
+        }
+
+        setAvisoVazioVisivel(true);
+        animarEntradaAviso();
+
+        return () => {
+            if (temporizadorAviso.current) {
+                clearTimeout(temporizadorAviso.current);
+                temporizadorAviso.current = null;
+            }
+        };
+    }, [animarEntradaAviso, deslocamentoAviso, estadoVazio, opacidadeAviso]);
+
     return (
-        <View style={estilos.tela}>
+        <View testID="calendar-screen" style={estilos.tela} onTouchStart={registrarInteracao}>
             <Header
                 titulo="Calendário"
                 variante="redeApoio"
@@ -201,13 +284,23 @@ function CalendarScreen({
                             />
 
                             {estadoVazio ? (
-                                <View
+                                <Animated.View
                                     pointerEvents="box-none"
-                                    style={estilos.posicionadorAvisoVazio}
+                                    style={[
+                                        estilos.posicionadorAvisoVazio,
+                                        {
+                                            opacity: opacidadeAviso,
+                                            transform: [{ translateY: deslocamentoAviso }]
+                                        }
+                                    ]}
                                 >
                                     <View
                                         testID="calendar-empty-state"
                                         accessibilityRole="alert"
+                                        accessibilityElementsHidden={!avisoVazioVisivel}
+                                        importantForAccessibility={
+                                            avisoVazioVisivel ? 'yes' : 'no-hide-descendants'
+                                        }
                                         style={estilos.avisoVazio}
                                     >
                                         <Text style={estilos.textoVazio}>
@@ -216,7 +309,7 @@ function CalendarScreen({
                                             começar.
                                         </Text>
                                     </View>
-                                </View>
+                                </Animated.View>
                             ) : null}
                         </View>
                     )}
@@ -273,5 +366,11 @@ function CalendarScreen({
     );
 }
 
-export { CalendarScreen, ITENS_LEGENDA, MENSAGEM_ERRO_CALENDARIO, normalizarConfianca };
+export {
+    CalendarScreen,
+    ITENS_LEGENDA,
+    MENSAGEM_ERRO_CALENDARIO,
+    TEMPO_REAPARECER_AVISO_MS,
+    normalizarConfianca
+};
 export default CalendarScreen;

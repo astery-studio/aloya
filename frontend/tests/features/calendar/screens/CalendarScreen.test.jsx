@@ -1,6 +1,9 @@
 import React from 'react';
-import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';
-import { CalendarScreen } from '../../../../src/features/calendar/screens/CalendarScreen';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
+import {
+    CalendarScreen,
+    TEMPO_REAPARECER_AVISO_MS
+} from '../../../../src/features/calendar/screens/CalendarScreen';
 import { estilos } from '../../../../src/features/calendar/screens/CalendarScreen.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -316,10 +319,10 @@ describe('CalendarScreen', () => {
             gap: 9,
             borderRadius: 12,
             backgroundColor: '#E3E4DE',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.08,
-            shadowRadius: 4,
-            elevation: 2
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 6
         });
         expect(estilos.avisoVazio.borderWidth).toBeUndefined();
         expect(estilos.avisoVazio.borderColor).toBeUndefined();
@@ -338,6 +341,44 @@ describe('CalendarScreen', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
 
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    });
+
+    test('oculta o aviso ao tocar na tela e o reapresenta após cinco segundos sem interação', async () => {
+        jest.useFakeTimers();
+
+        try {
+            await render(
+                <CalendarScreen
+                    meses={[{ mes: '2026-10', possuiCiclos: false }]}
+                    aoCadastrarMenstruacao={jest.fn()}
+                />
+            );
+
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', false);
+
+            await fireEvent(screen.getByTestId('calendar-screen'), 'touchStart');
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', true);
+
+            await act(async () => {
+                await jest.advanceTimersByTimeAsync(TEMPO_REAPARECER_AVISO_MS - 1);
+            });
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', true);
+
+            await act(async () => {
+                await jest.advanceTimersByTimeAsync(1);
+            });
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', false);
+        } finally {
+            jest.useRealTimers();
+        }
     });
 
     test('mostra o erro e tenta carregar novamente', async () => {
