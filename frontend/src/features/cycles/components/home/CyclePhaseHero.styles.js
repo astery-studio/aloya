@@ -10,12 +10,13 @@ const CORES_FASE = Object.freeze({
 });
 
 const estilos = StyleSheet.create({
-    container: { width: '100%', alignItems: 'center' },
+    container: { width: '100%', alignItems: 'center', paddingHorizontal: 16 },
     titulo: {
         color: '#222222',
         fontFamily: fontFamilies.bold,
         fontSize: 28,
         fontWeight: '700',
+        includeFontPadding: false,
         lineHeight: 35,
         textAlign: 'center'
     },
@@ -24,6 +25,7 @@ const estilos = StyleSheet.create({
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 16,
+        includeFontPadding: false,
         lineHeight: 24,
         textAlign: 'center'
     }
