@@ -202,15 +202,20 @@ function CalendarScreen({
 
                             {estadoVazio ? (
                                 <View
-                                    testID="calendar-empty-state"
-                                    accessibilityRole="alert"
-                                    style={estilos.avisoVazio}
+                                    pointerEvents="box-none"
+                                    style={estilos.posicionadorAvisoVazio}
                                 >
-                                    <Text style={estilos.textoVazio}>
-                                        Você ainda não possui nenhum ciclo registrado. Toque em{' '}
-                                        <Text style={estilos.textoDestaque}>{"'+'"}</Text> pra
-                                        começar.
-                                    </Text>
+                                    <View
+                                        testID="calendar-empty-state"
+                                        accessibilityRole="alert"
+                                        style={estilos.avisoVazio}
+                                    >
+                                        <Text style={estilos.textoVazio}>
+                                            Você ainda não possui nenhum ciclo registrado. Toque em{' '}
+                                            <Text style={estilos.textoDestaque}>{"'+'"}</Text> pra
+                                            começar.
+                                        </Text>
+                                    </View>
                                 </View>
                             ) : null}
                         </View>

@@ -37,18 +37,25 @@ function criarEstilos(tema) {
             minHeight: 0,
             position: 'relative'
         },
-        avisoVazio: {
+        posicionadorAvisoVazio: {
             position: 'absolute',
             top: 40,
-            right: 20,
-            left: 20,
+            right: 0,
+            left: 0,
             zIndex: 5,
-            minHeight: 80,
-            flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
-            paddingHorizontal: 16,
-            paddingVertical: 14,
+            paddingHorizontal: 20
+        },
+        avisoVazio: {
+            display: 'flex',
+            width: '100%',
+            maxWidth: 349.991,
+            paddingVertical: 10,
+            paddingHorizontal: 12,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: 9,
             borderRadius: 12,
             backgroundColor: tema.escuro ? '#232926' : '#E3E4DE',
             shadowColor: '#000000',

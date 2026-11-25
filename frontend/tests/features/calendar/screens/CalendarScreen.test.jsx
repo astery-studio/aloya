@@ -305,11 +305,15 @@ describe('CalendarScreen', () => {
         expect(screen.getByText("'+'")).toBeOnTheScreen();
         expect(screen.queryByText("'Cadastrar Menstruação'")).toBeNull();
         expect(screen.getByTestId('calendar-empty-state')).toHaveStyle({
-            position: 'absolute',
-            top: 40,
-            right: 20,
-            left: 20,
-            alignItems: 'center',
+            display: 'flex',
+            width: '100%',
+            maxWidth: 349.991,
+            paddingVertical: 10,
+            paddingHorizontal: 12,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: 9,
             borderRadius: 12,
             backgroundColor: '#E3E4DE',
             shadowOffset: { width: 0, height: 2 },
