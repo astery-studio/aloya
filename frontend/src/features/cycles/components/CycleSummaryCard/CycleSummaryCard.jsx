@@ -109,6 +109,7 @@ function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCicl
                     <ConfidenceBadge
                         nivel={confianca}
                         variante="simples"
+                        exibirPrefixo
                         coresPersonalizadas={
                             tema.escuro ? coresConfiabilidadeEscuras[confianca] : undefined
                         }
