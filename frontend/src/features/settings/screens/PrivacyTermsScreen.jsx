@@ -8,22 +8,9 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import { LegalDocument } from '../../legal/components/LegalDocument/LegalDocument';
 import { LegalTabs } from '../../legal/components/LegalTabs/LegalTabs';
 import { CONSULTA_LEGAL_DISPONIVEL } from '../../legal/data/legalConfig';
+import { documentosLegais, normalizarDocumentoInicial } from '../../legal/utils/legalDocuments';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { criarEstilos } from './PrivacyTermsScreen.styles';
-
-const documentos = __DEV__
-    ? Object.fromEntries(
-          Object.entries(require('../../legal/data/legalDocuments.json')).map(([id, documento]) => [
-              id,
-              {
-                  ...documento,
-                  secoes: documento.secoes.filter(
-                      ({ blocos, contatoSuporte }) => blocos.length > 0 || contatoSuporte
-                  )
-              }
-          ])
-      )
-    : null;
 
 const iconesDocumento = { privacy: ShieldCheckIcon, terms: FileTextIcon };
 
@@ -31,8 +18,8 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
     const tema = useTheme();
     const areaSegura = useSafeAreaInsets();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const [selecionado, setSelecionado] = useState(
-        documentoInicial === 'terms' ? 'terms' : 'privacy'
+    const [selecionado, setSelecionado] = useState(() =>
+        normalizarDocumentoInicial(documentoInicial)
     );
     const [secoesAbertas, setSecoesAbertas] = useState(() => ({
         privacy: new Set(),
@@ -72,7 +59,7 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
                 <LegalTabs selecionado={selecionado} onSelecionar={setSelecionado} />
                 <LegalDocument
                     key={selecionado}
-                    documento={documentos[selecionado]}
+                    documento={documentosLegais[selecionado]}
                     abertas={secoesAbertas[selecionado]}
                     onAlterarAbertas={(atualizar) =>
                         setSecoesAbertas((anteriores) => ({
