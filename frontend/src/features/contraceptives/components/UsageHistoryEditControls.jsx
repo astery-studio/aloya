@@ -13,13 +13,14 @@ const opcoes = [
 
 function UsageHistoryEditControls({
     opcaoSelecionada, opcoesDisponiveis, podeSalvar, salvando, erro,
-    aoSelecionarOpcao, aoSalvar, modo = 'calendario'
+    aoSelecionarOpcao, aoSalvar, modo = 'calendario', children, estiloOpcoes
 }) {
     const tema = useTheme();
     const corRemover = tema.escuro ? tema.cores.interface.textoSecundario : '#999999';
     return (
         <View style={{ width: '100%', gap: 10 }}>
-            <View style={{ gap: 10 }}>
+            <View style={[{ gap: 10 }, estiloOpcoes]}>
+                {children}
                 {[opcoes.slice(0, 2), opcoes.slice(2)].map((linha) => (
                     <View key={linha[0][0]} style={{
                         flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center',

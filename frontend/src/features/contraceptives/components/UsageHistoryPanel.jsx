@@ -128,6 +128,32 @@ function UsageHistoryPanel({
     const registrosDoMes = registros.filter(
         (registro) => !registro.data || partesDaDataUso(registro.data)?.chaveMes === mes
     );
+    const calendario = modo === 'calendario';
+    const instrucao = sessao ? (
+        <Text style={estilosUso.instrucaoEdicao}>
+            {calendario ? 'Para editar clique na célula do dia correspondente:' : 'Para editar, selecione o registro correspondente:'}
+        </Text>
+    ) : null;
+    const grade = calendario ? (
+        <UsageCalendar
+            mes={mes}
+            dias={alterado ? registrosDoMes.map((registro) => registro.id === alvo.id
+                ? { ...registro, estado: sessao.opcao } : registro) : registrosDoMes}
+            aoMesAnterior={() => navegarMes(-1)}
+            aoProximoMes={() => navegarMes(1)}
+            emEdicao={Boolean(sessao)}
+            dataSelecionada={sessao?.data}
+            datasEditaveis={new Set(editaveis.map((registro) => registro.data))}
+            aoSelecionarData={selecionarData}
+        />
+    ) : null;
+
+    function navegarMes(deslocamento) {
+        sairDoAlvo(() => {
+            if (sessao) setSessao({});
+            setMes(deslocarMes(mes, deslocamento));
+        });
+    }
 
     return (
         <View style={[estilosUso.painel, expandido && estilosUso.painelExpandido]}>
@@ -152,36 +178,23 @@ function UsageHistoryPanel({
             </View>
             {expandido ? (
                 <View style={estilosUso.conteudoPainel}>
-                    {sessao ? (
-                        <Text style={estilosUso.instrucaoEdicao}>
-                            {modo === 'calendario' ? 'Para editar, selecione o dia correspondente:' : 'Para editar, selecione o registro correspondente:'}
-                        </Text>
-                    ) : null}
-                    {modo === 'calendario' ? (
-                        <UsageCalendar
-                            mes={mes}
-                            dias={alterado ? registrosDoMes.map((registro) => registro.id === alvo.id
-                                ? { ...registro, estado: sessao.opcao } : registro) : registrosDoMes}
-                            aoMesAnterior={() => sairDoAlvo(() => { if (sessao) setSessao({}); setMes(deslocarMes(mes, -1)); })}
-                            aoProximoMes={() => sairDoAlvo(() => { if (sessao) setSessao({}); setMes(deslocarMes(mes, 1)); })}
-                            emEdicao={Boolean(sessao)}
-                            dataSelecionada={sessao?.data}
-                            datasEditaveis={new Set(editaveis.map((registro) => registro.data))}
-                            aoSelecionarData={selecionarData}
-                        />
-                    ) : (
+                    {calendario ? (!sessao && grade) : <>
+                        {instrucao}
                         <ListaDeUsos registros={registros} estilosUso={estilosUso} selecao={sessao?.id}
                             aoSelecionar={sessao && !salvando ? selecionar : undefined} />
-                    )}
-                    {modo === 'calendario' && ocorrenciasDoDia.length > 1 ? (
-                        <ListaDeUsos registros={ocorrenciasDoDia} estilosUso={estilosUso} selecao={sessao.id}
-                            aoSelecionar={salvando ? undefined : selecionar} />
-                    ) : null}
+                    </>}
                     {sessao ? (
                         <UsageHistoryEditControls modo={modo} opcaoSelecionada={sessao.opcao}
                             opcoesDisponiveis={opcoes} podeSalvar={podeSalvar} salvando={salvando}
                             erro={sessao.erro} aoSalvar={salvar}
-                            aoSelecionarOpcao={(opcao) => setSessao({ ...sessao, opcao, erro: null })} />
+                            estiloOpcoes={calendario ? estilosUso.calendarioEmEdicao : undefined}
+                            aoSelecionarOpcao={(opcao) => setSessao({ ...sessao, opcao, erro: null })}>
+                            {calendario ? <>{instrucao}{grade}</> : null}
+                            {calendario && ocorrenciasDoDia.length > 1 ? (
+                                <ListaDeUsos registros={ocorrenciasDoDia} estilosUso={estilosUso} selecao={sessao.id}
+                                    aoSelecionar={salvando ? undefined : selecionar} />
+                            ) : null}
+                        </UsageHistoryEditControls>
                     ) : aoSalvarEdicaoHistorico && editaveis.length ? (
                         <Pressable accessibilityRole="button" style={estilosUso.alterarHistorico}
                             onPress={() => setSessao({})}>

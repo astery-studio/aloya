@@ -80,6 +80,10 @@ function criarEstilosUso(tema) {
             marginBottom: 12, textAlign: 'center', color: interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular, fontSize: 10, lineHeight: 15
         },
+        calendarioEmEdicao: {
+            padding: 8, paddingTop: 18, borderRadius: 12,
+            backgroundColor: tema.escuro ? '#242424' : interfaceTema.fundo
+        },
         alterarHistorico: {
             width: '100%', minHeight: 36, marginTop: 10, padding: 8,
             alignItems: 'center', justifyContent: 'center', borderRadius: 10,
