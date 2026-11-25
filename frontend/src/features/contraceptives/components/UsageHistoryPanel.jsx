@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useUsageHistoryEdit } from '../hooks/useUsageHistoryEdit';
 import { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 import { StatusBadge } from '../../../shared/components/common/StatusBadge/StatusBadge';
 import { CaretDownIcon, CaretUpIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { estadoRegistroUso, formatarDataUso, partesDaDataUso } from '../utils/usageHistory';
 import { UsageCalendar } from './UsageCalendar';
+import { UsageHistoryEditControls } from './UsageHistoryEditControls';
 import { criarEstilosUso } from './usageComponents.styles';
 
 function estadoDoRegistro(registro) {
@@ -22,7 +24,7 @@ function estadoDoRegistro(registro) {
     return normalizado === 'confirmado' ? 'confirmadoHistoricoUso' : null;
 }
 
-function ListaDeUsos({ registros, estilosUso }) {
+function ListaDeUsos({ registros, estilosUso, selecao, aoSelecionar }) {
     return (
         <View style={estilosUso.listaRegistros}>
             {!registros.length ? (
@@ -31,13 +33,22 @@ function ListaDeUsos({ registros, estilosUso }) {
             {registros.map((registro, indice) => {
                 const estado = estadoDoRegistro(registro);
                 const naoConfirmado = estado === 'naoConfirmadoHistoricoUso';
+                const selecionado = selecao !== undefined && selecao === registro.id;
+                const editavel = aoSelecionar && registro.id && estadoRegistroUso(registro);
+                const Linha = editavel ? Pressable : View;
 
                 return (
-                    <View
+                    <Linha
                         key={registro.id ?? `${registro.data}-${registro.horario}-${indice}`}
+                        {...(editavel && {
+                            accessibilityRole: 'button', accessibilityState: { selected: selecionado },
+                            accessibilityLabel: `${formatarDataUso(registro.data)}, ${registro.horarioProgramado ?? registro.horario}, ${rotulosHistorico[estadoRegistroUso(registro)]}`,
+                            onPress: () => aoSelecionar(registro)
+                        })}
                         style={[
                             estilosUso.registro,
-                            naoConfirmado && estilosUso.registroNaoConfirmado
+                            naoConfirmado && estilosUso.registroNaoConfirmado,
+                            selecionado && estilosUso.registroSelecionado
                         ]}
                     >
                         <View style={estilosUso.cabecalhoRegistro}>
@@ -79,7 +90,7 @@ function ListaDeUsos({ registros, estilosUso }) {
                                 </Text>
                             </View>
                         ) : null}
-                    </View>
+                    </Linha>
                 );
             })}
         </View>
@@ -100,10 +111,20 @@ function deslocarMes(mes, deslocamento) {
     return `${data.getUTCFullYear()}-${String(data.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
-function UsageHistoryPanel({ expandido = false, registros = [], modo = 'lista', aoAlternar }) {
+const rotulosHistorico = {
+    confirmado: 'Confirmado', foraDoPrazo: 'Fora do prazo', naoConfirmado: 'Não confirmado'
+};
+
+function UsageHistoryPanel({
+    expandido = false, registros = [], modo = 'lista', aoAlternar, aoSalvarEdicaoHistorico
+}) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
     const [mes, setMes] = useState(() => mesInicial(registros));
+    const {
+        sessao, setSessao, salvando, editaveis, alvo, opcoes, alterado, podeSalvar, ocorrenciasDoDia,
+        sairDoAlvo, selecionar, selecionarData, salvar
+    } = useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico);
     const registrosDoMes = registros.filter(
         (registro) => !registro.data || partesDaDataUso(registro.data)?.chaveMes === mes
     );
@@ -115,7 +136,7 @@ function UsageHistoryPanel({ expandido = false, registros = [], modo = 'lista', 
                     accessibilityRole="button"
                     accessibilityLabel="Histórico de uso"
                     accessibilityState={{ expanded: expandido }}
-                    onPress={aoAlternar}
+                    onPress={() => sairDoAlvo(() => { setSessao(null); aoAlternar?.(); })}
                     style={estilosUso.botaoPainel}
                 >
                     <ChartBarIcon size={13} color={tema.cores.interface.textoSecundario} />
@@ -131,16 +152,42 @@ function UsageHistoryPanel({ expandido = false, registros = [], modo = 'lista', 
             </View>
             {expandido ? (
                 <View style={estilosUso.conteudoPainel}>
+                    {sessao ? (
+                        <Text style={estilosUso.instrucaoEdicao}>
+                            {modo === 'calendario' ? 'Para editar, selecione o dia correspondente:' : 'Para editar, selecione o registro correspondente:'}
+                        </Text>
+                    ) : null}
                     {modo === 'calendario' ? (
                         <UsageCalendar
                             mes={mes}
-                            dias={registrosDoMes}
-                            aoMesAnterior={() => setMes((atual) => deslocarMes(atual, -1))}
-                            aoProximoMes={() => setMes((atual) => deslocarMes(atual, 1))}
+                            dias={alterado ? registrosDoMes.map((registro) => registro.id === alvo.id
+                                ? { ...registro, estado: sessao.opcao } : registro) : registrosDoMes}
+                            aoMesAnterior={() => sairDoAlvo(() => { if (sessao) setSessao({}); setMes(deslocarMes(mes, -1)); })}
+                            aoProximoMes={() => sairDoAlvo(() => { if (sessao) setSessao({}); setMes(deslocarMes(mes, 1)); })}
+                            emEdicao={Boolean(sessao)}
+                            dataSelecionada={sessao?.data}
+                            datasEditaveis={new Set(editaveis.map((registro) => registro.data))}
+                            aoSelecionarData={selecionarData}
                         />
                     ) : (
-                        <ListaDeUsos registros={registros} estilosUso={estilosUso} />
+                        <ListaDeUsos registros={registros} estilosUso={estilosUso} selecao={sessao?.id}
+                            aoSelecionar={sessao && !salvando ? selecionar : undefined} />
                     )}
+                    {modo === 'calendario' && ocorrenciasDoDia.length > 1 ? (
+                        <ListaDeUsos registros={ocorrenciasDoDia} estilosUso={estilosUso} selecao={sessao.id}
+                            aoSelecionar={salvando ? undefined : selecionar} />
+                    ) : null}
+                    {sessao ? (
+                        <UsageHistoryEditControls modo={modo} opcaoSelecionada={sessao.opcao}
+                            opcoesDisponiveis={opcoes} podeSalvar={podeSalvar} salvando={salvando}
+                            erro={sessao.erro} aoSalvar={salvar}
+                            aoSelecionarOpcao={(opcao) => setSessao({ ...sessao, opcao, erro: null })} />
+                    ) : aoSalvarEdicaoHistorico && editaveis.length ? (
+                        <Pressable accessibilityRole="button" style={estilosUso.alterarHistorico}
+                            onPress={() => setSessao({})}>
+                            <Text style={estilosUso.textoAlterarHistorico}>Alterar Histórico</Text>
+                        </Pressable>
+                    ) : null}
                 </View>
             ) : null}
         </View>
