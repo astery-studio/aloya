@@ -110,7 +110,8 @@ function criarEstilos(tema) {
             fontFamily: fontFamilies.bold,
             fontSize: 28,
             fontWeight: '700',
-            lineHeight: 27.5
+            lineHeight: 34,
+            includeFontPadding: false
         },
 
         containerTituloComComplemento: {

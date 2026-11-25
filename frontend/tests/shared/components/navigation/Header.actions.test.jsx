@@ -76,7 +76,8 @@ describe('Header com ações', () => {
         expect(screen.getByRole('header')).toHaveStyle({
             fontSize: 28,
             fontWeight: '700',
-            lineHeight: 27.5
+            lineHeight: 34,
+            includeFontPadding: false
         });
     });
 
