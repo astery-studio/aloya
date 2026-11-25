@@ -183,7 +183,7 @@ describe('SettingsScreen', () => {
         expect(screen.getByText('Notificações')).toBeOnTheScreen();
         expect(screen.getByText('Privacidade e Sobre')).toBeOnTheScreen();
         expect(screen.getByText('Sobre a aplicação')).toBeOnTheScreen();
-        expect(screen.getByText('Políticas de Privacidade')).toBeOnTheScreen();
+        expect(screen.getByText('Privacidade e Termos')).toBeOnTheScreen();
         expect(screen.getByText('Aba ativa: configuracoes')).toBeOnTheScreen();
 
         expect(screen.queryByText('Tela inicial')).toBeNull();
@@ -272,7 +272,7 @@ describe('SettingsScreen', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Políticas de Privacidade'
+                name: 'Privacidade e Termos'
             })
         );
 
