@@ -302,6 +302,8 @@ describe('CalendarScreen', () => {
         expect(
             screen.getByText(/Você ainda não possui nenhum ciclo registrado/u)
         ).toBeOnTheScreen();
+        expect(screen.getByText("'+'")).toBeOnTheScreen();
+        expect(screen.queryByText("'Cadastrar Menstruação'")).toBeNull();
         expect(screen.getByTestId('calendar-empty-state')).toHaveStyle({
             position: 'absolute',
             top: 54,

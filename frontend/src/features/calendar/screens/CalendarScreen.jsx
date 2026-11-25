@@ -209,10 +209,8 @@ function CalendarScreen({
                                     <InfoIcon size={18} color={tema.cores.interface.destaque} />
                                     <Text style={estilos.textoVazio}>
                                         Você ainda não possui nenhum ciclo registrado. Toque em{' '}
-                                        <Text style={estilos.textoDestaque}>
-                                            {"'Cadastrar Menstruação'"}
-                                        </Text>{' '}
-                                        pra começar.
+                                        <Text style={estilos.textoDestaque}>{"'+'"}</Text> pra
+                                        começar.
                                     </Text>
                                 </View>
                             ) : null}
