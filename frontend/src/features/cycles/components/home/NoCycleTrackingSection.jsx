@@ -25,18 +25,20 @@ function NoCycleTrackingSection({
                         subtitulo={subtitulo}
                         icone={
                             <View style={[estilos.icone, { backgroundColor: fundo }]}>
-                                <Icone size={20} color={cor} />
+                                <Icone size={24} color={cor} />
                             </View>
                         }
                         expandido={abertos.has(id)}
                         aoAlternar={() => aoAlternar(id)}
                     >
-                        <Text>{texto}</Text>
+                        <Text style={estilos.descricao}>{texto}</Text>
                         {id === 'anticoncepcional' ? (
                             <ButtonScreen
                                 texto="Abrir Anticoncepcionais"
                                 aoPressionar={aoAbrirAnticoncepcional}
                                 variante="verde"
+                                estilo={estilos.acao}
+                                estiloTexto={estilos.textoAcao}
                             />
                         ) : null}
                     </CycleExpandableCard>
