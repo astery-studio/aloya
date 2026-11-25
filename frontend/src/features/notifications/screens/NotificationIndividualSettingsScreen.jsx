@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { AccessibilityInfo, findNodeHandle, Text, View } from 'react-native';
 import { NavigationField } from '../../../shared/components/common/NavigationField/NavigationField';
 import { SelectionSheet } from '../../../shared/components/feedback/SelectionSheet/SelectionSheet';
 import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
@@ -19,6 +19,16 @@ export function NotificationIndividualSettingsScreen({
     const { cores, escuro } = useTheme();
     const { titulo, grupos } = catalogoNotificacoes[categoriaId];
     const [antecedenciaAberta, definirAntecedenciaAberta] = useState(false);
+    const botaoAntecedencia = useRef(null);
+    const diasSelecionados = useRef(null);
+
+    function aoOcultarAntecedencia() {
+        const identificador = findNodeHandle(botaoAntecedencia.current);
+        if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
+        const dias = diasSelecionados.current;
+        diasSelecionados.current = null;
+        if (dias !== null) onAlterar('antecedenciaProximoCiclo', dias);
+    }
     return (
         <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
             <View style={estilos.lista}>
@@ -29,6 +39,7 @@ export function NotificationIndividualSettingsScreen({
                         {linhas.map(([id, label, tipo]) => {
                             if (tipo === 'horario' || tipo === 'antecedencia') {
                                 return <NavigationField key={id} label={label} desabilitado={ocupado}
+                                    referencia={tipo === 'antecedencia' ? botaoAntecedencia : undefined}
                                     onPress={tipo === 'horario' ? onAbrirHorario
                                         : () => definirAntecedenciaAberta(true)} />;
                             }
@@ -50,9 +61,12 @@ export function NotificationIndividualSettingsScreen({
                 valorSelecionado={valores.antecedenciaProximoCiclo}
                 estiloOpcaoSelecionada={escuro ? undefined : { backgroundColor: '#F0F5F2' }}
                 onFechar={() => definirAntecedenciaAberta(false)}
+                onOcultar={aoOcultarAntecedencia}
+                focarTituloAoAbrir
                 onSelecionar={ocupado ? undefined : (id) => {
+                    if (diasSelecionados.current !== null) return;
+                    diasSelecionados.current = id;
                     definirAntecedenciaAberta(false);
-                    onAlterar('antecedenciaProximoCiclo', id);
                 }}
             />
         </SettingsLayout>

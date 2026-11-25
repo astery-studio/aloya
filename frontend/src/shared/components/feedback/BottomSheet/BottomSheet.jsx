@@ -21,6 +21,7 @@ const permitirInicioDeslize = () => true;
 function BottomSheet({
     visivel,
     onFechar,
+    onExibir,
     onOcultar,
     children,
     bloquearFechamento = false,
@@ -123,6 +124,7 @@ function BottomSheet({
 
         if (visivelAtual.current) {
             animarEntrada();
+            onExibir?.();
         }
     }
 
