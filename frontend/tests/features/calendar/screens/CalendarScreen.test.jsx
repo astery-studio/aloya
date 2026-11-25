@@ -306,11 +306,15 @@ describe('CalendarScreen', () => {
         expect(screen.queryByText("'Cadastrar Menstruação'")).toBeNull();
         expect(screen.getByTestId('calendar-empty-state')).toHaveStyle({
             position: 'absolute',
-            top: 54,
+            top: 40,
             right: 20,
             left: 20,
             alignItems: 'center',
-            borderRadius: 14
+            borderRadius: 14,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 4,
+            elevation: 2
         });
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');

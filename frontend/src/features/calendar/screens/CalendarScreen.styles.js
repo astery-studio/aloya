@@ -39,7 +39,7 @@ function criarEstilos(tema) {
         },
         avisoVazio: {
             position: 'absolute',
-            top: 54,
+            top: 40,
             right: 20,
             left: 20,
             zIndex: 5,
@@ -52,7 +52,12 @@ function criarEstilos(tema) {
             borderWidth: 1,
             borderColor: tema.cores.interface.destaque,
             borderRadius: 14,
-            backgroundColor: tema.escuro ? '#232926' : '#EEF1ED'
+            backgroundColor: tema.escuro ? '#232926' : '#EEF1ED',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 4,
+            elevation: 2
         },
         textoVazio: {
             flex: 1,
