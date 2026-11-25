@@ -2,7 +2,7 @@ function responderComPreferencias(operacao) {
     return async (req, res, next) => {
         try {
             const preferencias = await operacao(req.usuario.id, req.body);
-            return res.json({ preferencias });
+            return res.set('Cache-Control', 'no-store').json({ preferencias });
         } catch (erro) {
             return next(erro);
         }

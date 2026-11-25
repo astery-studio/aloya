@@ -51,7 +51,9 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
     const salvar = (chave, valor) => chamar(1, { chave, valor });
     assert.equal((await chamar(0)).status, 401);
     assert.equal((await chamar(1, { chave: 'ciclo.diario', valor: false, usuarioId: 2 })).status, 422);
-    assert.equal((await (await chamar(1)).json()).preferencias.horarioLembreteDiario, '20:00');
+    const leituraInicial = await chamar(1);
+    assert.equal(leituraInicial.headers.get('cache-control'), 'no-store');
+    assert.equal((await leituraInicial.json()).preferencias.horarioLembreteDiario, '20:00');
     assert.equal(await prisma.preferenciaNotificacao.count(), 1);
     const respostas = await Promise.all([salvar('ciclo.diario', false), salvar('ciclo.diario.resumoSemanal', true), salvar('antecedenciaProximoCiclo', 0)]);
     assert.deepEqual(respostas.map((resposta) => resposta.status), [200, 200, 200]);
