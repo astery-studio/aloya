@@ -136,7 +136,7 @@ function validarDadosAnticoncepcional(entrada, hoje, permitirAliases, aplicarInt
         throw new AppError('Não informe horários repetidos.', 422, 'HORARIO_REPETIDO');
     }
 
-    if (!(tipo === 'pilula' && regraFrequencia.periodicidade === 'diaria') && horarios.length !== 1) {
+    if (horarios.length !== 1) {
         throw new AppError('Este tipo de anticoncepcional aceita exatamente um horário.', 422, 'QUANTIDADE_HORARIOS_INVALIDA');
     }
 

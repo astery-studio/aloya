@@ -30,10 +30,10 @@ test('exige nome e ao menos um horário', () => {
     );
 });
 
-test('aceita múltiplos horários somente para pílula diária', () => {
+test('exige um único horário inclusive para pílula diária', () => {
     expect(
         validarAnticoncepcional({ ...base, horarios: ['08:00', '20:00'] }, '2026-09-24')
-    ).toBeNull();
+    ).toBe('Este tipo de anticoncepcional aceita somente um horário.');
     expect(
         validarAnticoncepcional(
             {

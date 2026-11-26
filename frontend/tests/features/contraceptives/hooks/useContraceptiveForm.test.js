@@ -122,14 +122,14 @@ test('limpa frequência e horários quando o tipo realmente muda', async () => {
     expect(result.current.possuiAlteracoes).toBe(true);
 });
 
-test('preserva múltiplos horários ao trocar a frequência da pílula', async () => {
+test('preserva o horário ao trocar a frequência da pílula', async () => {
     const { result } = await renderHook(() => useContraceptiveForm(jest.fn()));
 
     await act(() => result.current.selecionarTipo('pilula'));
-    await act(() => result.current.alterar('horarios', ['08:30', '18:45']));
+    await act(() => result.current.alterar('horarios', ['08:30']));
     await act(() => result.current.selecionarFrequencia('pilula_21_7'));
 
-    expect(result.current.dados.horarios).toEqual(['08:30', '18:45']);
+    expect(result.current.dados.horarios).toEqual(['08:30']);
     expect(result.current.dados.frequenciaId).toBe('pilula_21_7');
 });
 
@@ -156,6 +156,12 @@ test('envia a edição preservando o identificador original', async () => {
     );
 
     await act(() => result.current.alterar('nome', 'Mercilon atualizado'));
+    await act(async () => {
+        expect(await result.current.enviar()).toBe(false);
+    });
+    expect(result.current.alerta.titulo).toBe('Mantenha apenas um horário');
+    expect(onSubmit).not.toHaveBeenCalled();
+    await act(() => result.current.alterar('horarios', ['20:00']));
 
     let retorno;
 
@@ -170,6 +176,7 @@ test('envia a edição preservando o identificador original', async () => {
             id: '7',
             nome: 'Mercilon atualizado',
             tipo: 'pilula',
+            programacao: expect.objectContaining({ horarios: ['20:00'] }),
             intensidadeAlerta: 'critico'
         })
     );
@@ -182,6 +189,7 @@ test('mantém os dados e mostra a mensagem correta quando a atualização falha'
     );
 
     await act(() => result.current.alterar('nome', 'Mercilon atualizado'));
+    await act(() => result.current.alterar('horarios', ['08:00']));
 
     await act(async () => {
         await result.current.enviar();

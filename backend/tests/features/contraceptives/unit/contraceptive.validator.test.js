@@ -22,9 +22,9 @@ test('exige ao menos um horário nos tipos programados', () => {
     assert.equal(mensagemDe({ ...base, horarios: [] }), 'Informe ao menos um horário de uso.');
 });
 
-test('permite múltiplos horários somente para pílula diária', () => {
-    const pilula = validarCadastroAnticoncepcional({ ...base, horarios: ['08:00', '20:00'] }, hoje);
-    assert.deepEqual(pilula.horarios, ['08:00', '20:00']);
+test('exige um único horário inclusive para pílula diária', () => {
+    assert.match(mensagemDe({ ...base, horarios: ['08:00', '20:00'] }), /exatamente um horário/);
+    assert.deepEqual(validarCadastroAnticoncepcional(base, hoje).horarios, ['08:00']);
     assert.match(mensagemDe({
         ...base, tipo: 'adesivo', frequenciaId: 'adesivo_continuo', horarios: ['08:00', '20:00']
     }), /exatamente um horário/);
