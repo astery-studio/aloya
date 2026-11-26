@@ -55,6 +55,41 @@ afterEach(() => {
     jest.useRealTimers();
 });
 
+test('mostra no calendário o início e os usos confirmados desde o cadastro', async () => {
+    const pilula = {
+        ...registro,
+        frequenciaId: 'pilula_21_7',
+        dataPrimeiroUso: '2026-09-21',
+        horarios: ['08:00'],
+        usosHoje: [],
+        historico: ['2026-09-21', '2026-09-22'].map((data, indice) => ({
+            id: indice + 1,
+            data,
+            horarioProgramado: '08:00',
+            estado: 'confirmado'
+        }))
+    };
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({ anticoncepcionais: [pilula] });
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Yaz');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
+    expect(screen.getByText('Início da medicação em 21/09/2026')).toBeOnTheScreen();
+    expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
+    expect(
+        screen.getByRole('button', { name: 'Dia 21, Confirmado, início da medicação' })
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dia 22, Confirmado' })).toBeOnTheScreen();
+    expect(screen.getByText('Pausa programada')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
+
+    expect(screen.getByRole('button', { name: 'Dia 12, Pausa programada' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dia 18, Pausa programada' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dia 19, sem registro' })).toBeOnTheScreen();
+});
+
 test('salva a correção do Evra pela API e conserva o histórico do Yaz', async () => {
     jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
     const uso = {

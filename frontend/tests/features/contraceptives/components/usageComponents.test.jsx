@@ -278,16 +278,15 @@ test('preserva a tipografia e espaçamento da legenda sem limitar a medição na
     expect(estilosUso.legenda).toMatchObject({
         width: '100%',
         minHeight: 23,
-        flexWrap: 'wrap',
-        columnGap: 8,
-        rowGap: 4,
+        gap: 4,
         paddingTop: 8,
         paddingHorizontal: 13
     });
+    expect(estilosUso.linhaLegenda).toMatchObject({ flexDirection: 'row', gap: 8 });
     expect(estilosUso.itemLegenda).toMatchObject({
         minHeight: 15,
-        flexBasis: '46%',
-        flexShrink: 0,
+        minWidth: 0,
+        flex: 1,
         gap: 4
     });
     expect(estilosUso.itemLegenda.width).toBeUndefined();
@@ -377,20 +376,38 @@ test('o calendário não esconde uma dose não confirmada quando outra dose do d
     expect(screen.getByLabelText('Dia 6, Fora do prazo')).toBeOnTheScreen();
 });
 
+test('distingue pausas programadas dos registros feitos no mesmo dia', async () => {
+    await render(
+        <UsageCalendar
+            mes="2026-09"
+            diaEmPausa={(data) => ['2026-09-23', '2026-09-24'].includes(data)}
+            dias={[{ data: '2026-09-24', estado: 'confirmado' }]}
+        />
+    );
+
+    expect(
+        within(screen.getByTestId('usage-calendar-legend')).getByText('Pausa programada')
+    ).toBeOnTheScreen();
+    expect(screen.getByLabelText('Dia 23, Pausa programada')).toHaveStyle({
+        backgroundColor: estilosUso.marcador_pausa.backgroundColor
+    });
+    expect(screen.getByLabelText('Dia 24, Confirmado')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Dia 25, sem registro')).toBeOnTheScreen();
+});
+
 test('a legenda se adapta em telas estreitas sem reduzir a grade nem cortar os rótulos', async () => {
     await render(<UsageCalendar mes="2026-09" />);
 
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 256.43 });
     expect(screen.getByTestId('usage-calendar').props.onLayout).toBeUndefined();
     expect(screen.getByTestId('usage-calendar-legend')).toHaveStyle({
-        flexWrap: 'wrap',
-        columnGap: 8,
-        rowGap: 4,
-        justifyContent: 'flex-start'
+        gap: 4,
+        paddingHorizontal: 13
     });
     expect(screen.getByText('Confirmado')).toBeOnTheScreen();
     expect(screen.getByText('Fora do prazo')).toBeOnTheScreen();
     expect(screen.getByText('Não confirmado')).toBeOnTheScreen();
+    expect(screen.queryByText('Pausa programada')).toBeNull();
     expect(screen.queryByText('Não sei')).toBeNull();
     ['Confirmado', 'Fora do prazo', 'Não usei', 'Não confirmado'].forEach((rotulo) => {
         const texto = screen.getByText(rotulo);

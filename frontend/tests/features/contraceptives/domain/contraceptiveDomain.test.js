@@ -1,4 +1,8 @@
-import { calcularPeriodosDePausa } from '../../../../src/features/contraceptives/domain/ContraceptiveSchedule';
+import {
+    adicionarDias,
+    calcularPeriodosDePausa,
+    estaEmPausa
+} from '../../../../src/features/contraceptives/domain/ContraceptiveSchedule';
 import {
     obterFrequencia,
     obterFrequencias
@@ -77,4 +81,18 @@ test('calcula pausas subsequentes e não cria pausa no uso contínuo', () => {
     expect(
         calcularPeriodosDePausa('2026-09-01', obterFrequencia('pilula', 'pilula_continuo'))
     ).toEqual([]);
+});
+
+test('reconhece os intervalos salvos e as pausas além dos ciclos já listados', () => {
+    const frequencia = obterFrequencia('pilula', 'pilula_21_7');
+    const programacao = {
+        dataPrimeiroUso: '2026-09-01',
+        periodosPausa: [{ inicio: '2026-09-05', fim: '2026-09-06' }]
+    };
+    const pausaPosterior = adicionarDias(programacao.dataPrimeiroUso, 30 * 28 + 21);
+
+    expect(estaEmPausa('2026-08-31', programacao, frequencia)).toBe(false);
+    expect(estaEmPausa('2026-09-05', programacao, frequencia)).toBe(true);
+    expect(estaEmPausa(pausaPosterior, programacao, frequencia)).toBe(true);
+    expect(estaEmPausa(adicionarDias(pausaPosterior, 7), programacao, frequencia)).toBe(false);
 });
