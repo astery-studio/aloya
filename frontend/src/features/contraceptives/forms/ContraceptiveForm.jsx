@@ -169,6 +169,8 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                             label="Data do primeiro uso"
                             titulo="Data do primeiro uso"
                             valor={dados.dataPrimeiroUso}
+                            dataMaxima={hoje}
+                            destacarHoje
                             aberto={painel === 'primeiroUso'}
                             onAbrir={() => abrirPainel('primeiroUso')}
                             onSelecionar={async (valor) => {
