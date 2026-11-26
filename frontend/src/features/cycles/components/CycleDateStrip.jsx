@@ -32,7 +32,10 @@ function CycleDateStrip({
     const animarRecuperacao = useRef(false);
     const paddingLateral = calcularPaddingLateral(larguraVisivel);
     const indiceInicial = dias.findIndex(({ data }) => data === dataSelecionada);
-    const deslocamentoInicial = Math.max(0, indiceInicial * LARGURA_ITEM);
+    const deslocamentoInicial = useRef({
+        x: Math.max(0, indiceInicial * LARGURA_ITEM),
+        y: 0
+    });
 
     useEffect(() => {
         carregamentos.current = { anteriores: false, posteriores: false };
@@ -98,7 +101,7 @@ function CycleDateStrip({
             ref={lista}
             horizontal
             data={dias}
-            contentOffset={{ x: deslocamentoInicial, y: 0 }}
+            contentOffset={deslocamentoInicial.current}
             keyExtractor={(item) => item.data}
             getItemLayout={(_, index) => ({
                 length: LARGURA_ITEM,
