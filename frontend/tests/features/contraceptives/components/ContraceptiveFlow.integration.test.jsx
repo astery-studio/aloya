@@ -169,11 +169,13 @@ test('apaga somente o registro selecionado após confirmar no modal', async () =
     expect(screen.getByLabelText('Dia 7, Confirmado')).toBeOnTheScreen();
 });
 
-test('pede confirmação antes de apagar definitivamente um anticoncepcional removido', async () => {
+test('confirma a exclusão definitiva e permite tentar novamente após o limite', async () => {
     const removido = { ...registro, id: 2, nome: 'Evra', ativo: false, usosHoje: [] };
+    const mensagemUsuario = 'Muitas remoções em pouco tempo. Aguarde um pouco e tente novamente.';
     const requisicaoAutenticada = jest
         .fn()
         .mockResolvedValueOnce({ anticoncepcionais: [registro, removido] })
+        .mockRejectedValueOnce(Object.assign(new Error(mensagemUsuario), { status: 429, mensagemUsuario }))
         .mockResolvedValueOnce(null);
     await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
     await screen.findByText('Evra');
@@ -193,6 +195,10 @@ test('pede confirmação antes de apagar definitivamente um anticoncepcional rem
         caminho: '/api/anticoncepcionais/2/definitivo'
     });
 
+    expect(await screen.findByText(mensagemUsuario)).toBeOnTheScreen();
+    expect(screen.getByText('Evra')).toBeOnTheScreen();
+
+    await pressionar('Tentar novamente');
     expect(await screen.findByText('Anticoncepcional apagado definitivamente.')).toBeOnTheScreen();
     expect(screen.queryByText('Evra')).toBeNull();
     expect(screen.getByText('Yaz')).toBeOnTheScreen();

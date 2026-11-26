@@ -37,7 +37,7 @@ function ContraceptiveFlow({
     const [selecionado, setSelecionado] = useState(null);
     const [remocao, setRemocao] = useState(null);
     const [removendo, setRemovendo] = useState(false);
-    const [erroRemocao, setErroRemocao] = useState(false);
+    const [erroRemocao, setErroRemocao] = useState(null);
 
     const versaoBusca = useRef(0);
     const montado = useRef(true);
@@ -305,7 +305,7 @@ function ContraceptiveFlow({
     const exclusaoDefinitiva = remocao?.removido || remocao?.ativo === false;
 
     function solicitarRemocao(item) {
-        setErroRemocao(false);
+        setErroRemocao(null);
         setRemocao(item);
     }
 
@@ -314,7 +314,7 @@ function ContraceptiveFlow({
 
         operacaoRemocao.current = true;
         setRemovendo(true);
-        setErroRemocao(false);
+        setErroRemocao(null);
 
         try {
             if (exclusaoDefinitiva) {
@@ -329,7 +329,11 @@ function ContraceptiveFlow({
             setRemocao(null);
         } catch (falha) {
             if (exclusaoDefinitiva && falha?.status === 401) onSessaoExpirada?.();
-            setErroRemocao(true);
+            setErroRemocao(
+                falha?.status === 429
+                    ? falha.mensagemUsuario || 'Aguarde um pouco antes de tentar remover novamente.'
+                    : 'Ocorreu um erro ao excluir. Verifique sua conexão e tente novamente.'
+            );
         } finally {
             operacaoRemocao.current = false;
             setRemovendo(false);
@@ -402,11 +406,7 @@ function ContraceptiveFlow({
                         : undefined
                 }
                 titulo={erroRemocao ? 'Algo deu errado' : tituloRemocao}
-                mensagem={
-                    erroRemocao
-                        ? 'Ocorreu um erro ao excluir. Verifique sua conexão e tente novamente.'
-                        : mensagemRemocao
-                }
+                mensagem={erroRemocao ?? mensagemRemocao}
                 acaoPrincipal={{
                     texto: erroRemocao
                         ? 'Tentar novamente'
