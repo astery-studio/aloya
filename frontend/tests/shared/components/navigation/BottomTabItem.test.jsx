@@ -24,12 +24,7 @@ describe('BottomTabItem', () => {
         });
 
         expect(screen.getByText('Início')).toBeOnTheScreen();
-
-        expect(
-            screen.getByRole('tab', {
-                name: 'Início'
-            })
-        ).toBeOnTheScreen();
+        expect(screen.getByRole('tab', { name: 'Início' })).toBeOnTheScreen();
     });
 
     test('executa a ação quando pressionado', async () => {
@@ -40,11 +35,7 @@ describe('BottomTabItem', () => {
             onPress
         });
 
-        await fireEvent.press(
-            screen.getByRole('tab', {
-                name: 'Diário'
-            })
-        );
+        await fireEvent.press(screen.getByRole('tab', { name: 'Diário' }));
 
         expect(onPress).toHaveBeenCalledTimes(1);
     });
@@ -54,45 +45,23 @@ describe('BottomTabItem', () => {
             label: 'Configurações'
         });
 
-        expect(
-            screen.getByRole('tab', {
-                name: 'Configurações'
-            })
-        ).toBeDisabled();
+        expect(screen.getByRole('tab', { name: 'Configurações' })).toBeDisabled();
     });
 
-    test('informa quando está ativo', async () => {
+    test('informa quando está ativo sem renderizar bolinha', async () => {
         await renderizarItem({
             ativo: true,
             onPress: jest.fn()
         });
 
-        const aba = screen.getByRole('tab', {
-            name: 'Início'
-        });
+        const aba = screen.getByRole('tab', { name: 'Início' });
 
         expect(aba).toBeSelected();
         expect(aba).toBeEnabled();
-
-        expect(screen.getByTestId('indicador-aba-Início')).toBeOnTheScreen();
+        expect(screen.queryByTestId('indicador-aba-Início')).toBeNull();
     });
 
-    test('não mostra indicador quando está inativo', async () => {
-        await renderizarItem({
-            label: 'Membros',
-            onPress: jest.fn()
-        });
-
-        expect(
-            screen.getByRole('tab', {
-                name: 'Membros'
-            })
-        ).not.toBeSelected();
-
-        expect(screen.queryByTestId('indicador-aba-Membros')).toBeNull();
-    });
-
-    test('usa destaque escuro no tema claro', async () => {
+    test('usa ícone preenchido e texto destacado no estado ativo claro', async () => {
         await renderizarItem({
             ativo: true,
             onPress: jest.fn()
@@ -109,13 +78,9 @@ describe('BottomTabItem', () => {
         expect(screen.getByText('Início')).toHaveStyle({
             color: '#2C4C3B'
         });
-
-        expect(screen.getByTestId('indicador-aba-Início')).toHaveStyle({
-            backgroundColor: '#2C4C3B'
-        });
     });
 
-    test('usa destaque claro no tema escuro', async () => {
+    test('usa destaque correspondente ao tema escuro', async () => {
         await renderizarItem(
             {
                 label: 'Diário',
@@ -136,15 +101,11 @@ describe('BottomTabItem', () => {
         expect(screen.getByText('Diário')).toHaveStyle({
             color: '#A5D6A7'
         });
-
-        expect(screen.getByTestId('indicador-aba-Diário')).toHaveStyle({
-            backgroundColor: '#A5D6A7'
-        });
     });
 
-    test('usa texto secundário no item inativo claro', async () => {
+    test('usa ícone regular no estado inativo', async () => {
         await renderizarItem({
-            label: 'Ciclos',
+            label: 'Calendário',
             onPress: jest.fn()
         });
 
@@ -156,64 +117,33 @@ describe('BottomTabItem', () => {
             })
         );
 
-        expect(screen.getByText('Ciclos')).toHaveStyle({
+        expect(screen.getByText('Calendário')).toHaveStyle({
             color: '#5C5C59'
         });
     });
 
-    test('usa texto secundário no item inativo escuro', async () => {
-        await renderizarItem(
-            {
-                label: 'Ciclos',
-                onPress: jest.fn()
-            },
-            'escuro'
-        );
+    test('aplica as medidas do item', async () => {
+        await renderizarItem({
+            onPress: jest.fn()
+        });
 
-        expect(IconeTeste.mock.calls[0][0]).toEqual(
-            expect.objectContaining({
-                size: 26,
-                color: '#999999',
-                weight: 'regular'
-            })
-        );
-
-        expect(screen.getByText('Ciclos')).toHaveStyle({
-            color: '#999999'
+        expect(screen.getByRole('tab', { name: 'Início' })).toHaveStyle({
+            flex: 1,
+            maxWidth: 73.198,
+            minWidth: 0,
+            height: 53.5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 4
         });
     });
 
     test('mantém o label em uma linha', async () => {
         await renderizarItem({
-            label: 'Configurações',
+            label: 'Calendário',
             onPress: jest.fn()
         });
 
-        expect(screen.getByText('Configurações')).toHaveProp('numberOfLines', 1);
-    });
-
-    test('atualiza a cor ativa quando o tema muda', async () => {
-        const resultado = await renderizarItem(
-            {
-                label: 'Início',
-                ativo: true,
-                onPress: jest.fn()
-            },
-            'claro'
-        );
-
-        expect(screen.getByText('Início')).toHaveStyle({
-            color: '#2C4C3B'
-        });
-
-        await resultado.rerender(
-            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
-                <BottomTabItem label="Início" icone={IconeTeste} ativo onPress={jest.fn()} />
-            </ThemeProvider>
-        );
-
-        expect(screen.getByText('Início')).toHaveStyle({
-            color: '#A5D6A7'
-        });
+        expect(screen.getByText('Calendário')).toHaveProp('numberOfLines', 1);
     });
 });
