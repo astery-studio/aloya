@@ -44,9 +44,9 @@ describe.each(['claro', 'escuro'])(
             ],
             [
                 UsageTimeSelector,
-                { horarios: [], permiteMultiplos: true, aberto: true },
+                { horarios: [], aberto: true },
                 'horarios-anticoncepcional-area-segura',
-                'Confirmar horários'
+                'Confirmar horário'
             ],
             [
                 AlertIntensitySelector,
@@ -71,6 +71,12 @@ describe.each(['claro', 'escuro'])(
             });
             expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
             expect(area).toContainElement(screen.getByRole('button', { name: acao }));
+            if (Tela === ContraceptivesScreen) {
+                expect(screen.getByTestId('contraceptives-add-fab').parent).toHaveStyle({
+                    bottom: metricas.insets.bottom + 24,
+                    right: metricas.insets.right + 24
+                });
+            }
         });
 
         test('mantém a área segura quando o registro para edição está indisponível', async () => {

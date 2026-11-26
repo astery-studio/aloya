@@ -54,7 +54,7 @@ function ContraceptiveHomeScreen({
     return (
         <SafeAreaView
             style={estilos.tela}
-            edges={['top', 'left', 'right', 'bottom']}
+            edges={['top', 'left', 'right']}
             testID="usos-home-area-segura"
         >
             <MainLayout

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { TAMANHO_FAB } from '../../../shared/components/common/FloatingActionButton';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
@@ -27,6 +28,7 @@ function criarEstilosAcompanhamento(tema) {
             paddingHorizontal: 21.66,
             paddingBottom: 32
         },
+        espacoFab: { paddingBottom: TAMANHO_FAB + tema.espacamentos.grande + tema.espacamentos.pequeno },
         rotuloSecao: {
             width: '100%',
             height: 34,

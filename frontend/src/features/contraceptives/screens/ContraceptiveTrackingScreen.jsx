@@ -93,6 +93,7 @@ function ContraceptiveTrackingScreen({
     aoDispensarErroUso,
     aoEditar,
     aoRemover,
+    aoApagar,
     aoAlternarUso,
     aoSalvarEdicaoHistorico
 }) {
@@ -104,6 +105,7 @@ function ContraceptiveTrackingScreen({
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
     });
     const secoes = criarSecoes(itens);
+    const exibeFab = !carregando && !erro && typeof aoCadastrarNovo === 'function';
     const quantidadePendentes = itens.reduce(
         (total, item) =>
             total +
@@ -163,6 +165,7 @@ function ContraceptiveTrackingScreen({
                                 anticoncepcional={item}
                                 aoEditar={aoEditar}
                                 aoRemover={aoRemover}
+                                aoApagar={aoApagar}
                                 aoAlternarUso={aoAlternarUso}
                                 aoSalvarEdicaoHistorico={aoSalvarEdicaoHistorico}
                                 aoAtualizarUsos={atualizarUsos}
@@ -171,18 +174,21 @@ function ContraceptiveTrackingScreen({
                         ItemSeparatorComponent={() => (
                             <View style={estilosAcompanhamento.espacoCartao} />
                         )}
-                        contentContainerStyle={estilosAcompanhamento.lista}
+                        contentContainerStyle={[
+                            estilosAcompanhamento.lista,
+                            exibeFab && estilosAcompanhamento.espacoFab
+                        ]}
                         stickySectionHeadersEnabled={false}
                         showsVerticalScrollIndicator={false}
                     />
                 </View>
             )}
 
-            {!carregando && !erro && typeof aoCadastrarNovo === 'function' ? (
+            {exibeFab ? (
                 <FloatingActionButton
                     aoPressionar={aoCadastrarNovo}
                     rotuloAcessibilidade="Cadastrar novo anticoncepcional"
-                    considerarAreaSeguraInferior={false}
+                    considerarAreaSeguraLateral
                     testID="contraceptive-tracking-add-fab"
                 />
             ) : null}
