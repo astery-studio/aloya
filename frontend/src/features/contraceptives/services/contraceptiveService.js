@@ -99,14 +99,19 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
     }
 
     //Cadastra um anticoncepcional enviando somente os campos permitidos.
-    async function cadastrar(anticoncepcional) {
+    async function cadastrar(anticoncepcional, { fusoHorario } = {}) {
+        validarFusoHorario(fusoHorario);
+        const query = fusoHorario ? `?fusoHorario=${encodeURIComponent(fusoHorario)}` : '';
         const resposta = await requisicaoAutenticada({
             metodo: 'POST',
-            caminho: endpoints.anticoncepcionais,
+            caminho: `${endpoints.anticoncepcionais}${query}`,
             corpo: criarCorpoCadastro(anticoncepcional)
         });
 
-        return normalizarAnticoncepcional(resposta.anticoncepcional);
+        const salvo = resposta.anticoncepcional;
+        return Array.isArray(salvo.historico)
+            ? normalizarAnticoncepcionalAcompanhamento(salvo)
+            : normalizarAnticoncepcional(salvo);
     }
 
     //Edita um anticoncepcional da pessoa autenticada e retorna o registro atualizado.

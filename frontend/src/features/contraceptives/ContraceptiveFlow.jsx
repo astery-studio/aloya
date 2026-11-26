@@ -115,7 +115,9 @@ function ContraceptiveFlow({
         setSalvando(true);
 
         try {
-            const salvo = await service.cadastrar(anticoncepcional);
+            const salvo = await service.cadastrar(anticoncepcional, {
+                fusoHorario: fusoDoDispositivo()
+            });
             setItens((atuais) => [salvo, ...atuais]);
             setTela('lista');
             setMensagem('Anticoncepcional cadastrado com sucesso.');
