@@ -3,7 +3,7 @@ import { normalizarHorariosPilula } from '../src/features/contraceptives/service
 
 try {
     const total = await normalizarHorariosPilula(prisma);
-    console.log(`Cadastros de pílula normalizados: ${total}.`);
+    console.info(`Cadastros de pílula normalizados: ${total}.`);
 } finally {
     await prisma.$disconnect();
 }
