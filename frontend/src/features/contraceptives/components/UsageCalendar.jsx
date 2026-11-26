@@ -64,7 +64,7 @@ function ehHoje(ano, numeroMes, dia) {
 }
 
 function UsageCalendar({
-    mes, dias = [], aoMesAnterior, aoProximoMes,
+    mes, dias = [], inicioMedicacao, aoMesAnterior, aoProximoMes,
     emEdicao = false, rodapeEdicao, dataSelecionada, datasEditaveis, editarAntesDe, aoSelecionarData
 }) {
     const tema = useTheme();
@@ -142,6 +142,9 @@ function UsageCalendar({
                                 const rotuloEstado = ESTADOS[estado];
                                 const hoje = ehHoje(ano, numeroMes, dia);
                                 const dataCivil = dia ? `${mes}-${String(dia).padStart(2, '0')}` : null;
+                                const inicio = dia && dataCivil === inicioMedicacao;
+                                const descricaoDia = [rotuloEstado, inicio && 'início da medicação']
+                                    .filter(Boolean).join(', ') || 'sem registro';
                                 const selecionado = emEdicao && dataCivil === dataSelecionada;
                                 const interativa = Boolean(dia) && typeof aoSelecionarData === 'function';
                                 const editavel = interativa
@@ -160,7 +163,7 @@ function UsageCalendar({
                                         })}
                                         accessibilityLabel={
                                             dia
-                                                ? `Dia ${dia}, ${rotuloEstado ?? 'sem registro'}`
+                                                ? `Dia ${dia}, ${descricaoDia}`
                                                 : undefined
                                         }
                                         style={[

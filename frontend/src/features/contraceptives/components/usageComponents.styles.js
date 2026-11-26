@@ -77,6 +77,14 @@ function criarEstilosUso(tema) {
             paddingTop: 8,
             paddingHorizontal: 16
         },
+        inicioMedicacao: {
+            marginBottom: 8,
+            color: interfaceTema.textoSecundario,
+            fontFamily: fontFamilies.medium,
+            fontSize: 11,
+            lineHeight: 16,
+            textAlign: 'center'
+        },
         instrucaoEdicao: {
             marginBottom: 12, textAlign: 'center', color: interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular, fontSize: 10, lineHeight: 15

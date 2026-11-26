@@ -18,7 +18,7 @@ import {
 } from '../../../shared/components/icons/AppIcons';
 import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { obterTipo } from '../constants/contraceptiveOptions';
+import { obterFrequencia, obterTipo } from '../constants/contraceptiveOptions';
 import { estadoRegistroUso } from '../utils/usageHistory';
 import { UsageHistoryPanel } from './UsageHistoryPanel';
 import { criarEstilosCartao } from './ContraceptiveUsageCard.styles';
@@ -219,6 +219,11 @@ function ContraceptiveUsageCard({
         anticoncepcional.tipo
     );
     const modoHistorico = anticoncepcional.tipo === 'pilula' ? 'calendario' : 'lista';
+    const programacao = anticoncepcional.programacao;
+    const frequencia = obterFrequencia(anticoncepcional.tipo, programacao?.frequenciaId);
+    const inicioMedicacao = frequencia?.diasPausa && !frequencia.continuo
+        ? programacao.dataPrimeiroUso
+        : undefined;
 
     useEffect(() => {
         // A API ou o fluxo pode atualizar horários e estados após a montagem do cartão.
@@ -502,7 +507,8 @@ function ContraceptiveUsageCard({
                         <UsageHistoryPanel
                             expandido={historicoExpandido}
                             registros={historico}
-                            horarios={anticoncepcional.programacao?.horarios}
+                            inicioMedicacao={inicioMedicacao}
+                            horarios={programacao?.horarios}
                             usosHoje={usos}
                             modo={modoHistorico}
                             usoUnicoPorDia={anticoncepcional.tipo === 'pilula'}

@@ -110,8 +110,9 @@ function ListaDeUsos({ registros, estilosUso, selecao, aoSelecionar, idsEditavei
     );
 }
 
-function mesInicial(registros) {
-    const partes = registros.map((registro) => partesDaDataUso(registro.data)).find(Boolean);
+function mesInicial(registros, inicioMedicacao) {
+    const partes = registros.map((registro) => partesDaDataUso(registro.data)).find(Boolean)
+        ?? partesDaDataUso(inicioMedicacao);
     const hoje = new Date();
     return (
         partes?.chaveMes ?? `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`
@@ -134,6 +135,7 @@ const rotulosHistorico = {
 function UsageHistoryPanel({
     expandido = false,
     registros = [],
+    inicioMedicacao,
     horarios = [],
     usosHoje = [],
     modo = 'lista',
@@ -150,7 +152,7 @@ function UsageHistoryPanel({
     const registrosExibidos = usoUnicoPorDia
         ? selecionarRegistroDiario(registros, horariosEditaveis[0])
         : registros;
-    const [mes, setMes] = useState(() => mesInicial(registrosExibidos));
+    const [mes, setMes] = useState(() => mesInicial(registrosExibidos, inicioMedicacao));
     const {
         sessao,
         setSessao,
@@ -289,6 +291,7 @@ function UsageHistoryPanel({
     const grade = calendario ? (
         <UsageCalendar
             mes={mes}
+            inicioMedicacao={inicioMedicacao}
             dias={
                 alterado
                     ? [
@@ -338,6 +341,11 @@ function UsageHistoryPanel({
             </View>
             {expandido ? (
                 <View style={estilosUso.conteudoPainel}>
+                    {inicioMedicacao ? (
+                        <Text style={estilosUso.inicioMedicacao}>
+                            {`Início da medicação em ${formatarDataUso(inicioMedicacao)}`}
+                        </Text>
+                    ) : null}
                     {calendario ? (
                         <>
                             {instrucao}
