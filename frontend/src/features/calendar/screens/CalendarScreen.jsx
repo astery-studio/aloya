@@ -12,6 +12,7 @@ import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendShee
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { coresConfiabilidadeEscuras, criarEstilos } from './CalendarScreen.styles';
 import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
+import { CycleConfidenceSheet } from '../../cycles/components/sheets/CycleConfidenceSheet';
 
 const ITENS_LEGENDA = Object.freeze([
     {
@@ -144,6 +145,7 @@ function CalendarScreen({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
+    const [confiabilidadeVisivel, setConfiabilidadeVisivel] = useState(false);
 
     const mesesValidos = Array.isArray(meses) ? meses : [];
     const confiancaValida = normalizarConfianca(confianca);
@@ -185,6 +187,7 @@ function CalendarScreen({
                                     <ConfidenceBadge
                                         nivel={confiancaValida}
                                         variante="simples"
+                                        onPress={() => setConfiabilidadeVisivel(true)}
                                         coresPersonalizadas={
                                             tema.escuro
                                                 ? coresConfiabilidadeEscuras[confiancaValida]
@@ -259,6 +262,12 @@ function CalendarScreen({
                 visivel={legendaVisivel}
                 itens={ITENS_LEGENDA}
                 aoFechar={() => setLegendaVisivel(false)}
+            />
+
+            <CycleConfidenceSheet
+                visivel={confiabilidadeVisivel}
+                nivel={confiancaValida ?? 'baixa'}
+                aoFechar={() => setConfiabilidadeVisivel(false)}
             />
 
             {existeErro ? (

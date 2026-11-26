@@ -65,6 +65,17 @@ describe('gesto integrado do BottomSheet', () => {
         expect(onFechar).toHaveBeenCalledTimes(2);
     });
 
+    test('oculta somente a alça visual e preserva o gesto do painel', async () => {
+        await render(
+            <BottomSheet visivel permitirDeslizarParaFechar exibirAlcaArraste={false}>
+                <Text>Conteúdo</Text>
+            </BottomSheet>
+        );
+
+        expect(screen.queryByTestId('bottom-sheet-area-arraste')).not.toBeOnTheScreen();
+        expect(configuracoes[0].onMoveShouldSetPanResponder(null, { dx: 1, dy: 10 })).toBe(true);
+    });
+
     test('não captura a rolagem interna enquanto o conteúdo estiver fora do topo', async () => {
         const podeIniciarDeslize = jest.fn(() => false);
         await render(

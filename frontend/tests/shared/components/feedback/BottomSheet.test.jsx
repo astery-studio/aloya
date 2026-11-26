@@ -49,6 +49,12 @@ describe('BottomSheet', () => {
         expect(screen.getByText('Conteúdo do painel')).toBeOnTheScreen();
     });
 
+    test('permite manter o painel imóvel quando o teclado abre', async () => {
+        await renderizarBottomSheet({ ajustarAoTeclado: false });
+
+        expect(screen.getByTestId('bottom-sheet-teclado')).not.toHaveProp('behavior');
+    });
+
     test('configura o modal transparente sem animação automática', async () => {
         const resultado = await renderizarBottomSheet();
 

@@ -10,9 +10,9 @@ import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 
 test.each([
     ['menstruacao', 'Fase Menstrual', '#C85A44', 'fill'],
-    ['folicular', 'Fase Folicular', '#3B7150', 'regular'],
+    ['folicular', 'Fase Folicular', '#567062', 'regular'],
     ['ovulacao', 'Fase Ovulatória', '#4A758E', 'regular'],
-    ['lutea', 'Fase Lútea', '#B06D2A', 'regular']
+    ['lutea', 'Fase Lútea', '#D68C3A', 'regular']
 ])('apresenta a fase %s com identidade própria', (fase, rotulo, cor, pesoIcone) => {
     const apresentacao = obterApresentacaoFase(fase);
 

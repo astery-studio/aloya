@@ -15,9 +15,12 @@ function criarEstilos(tema) {
             backgroundColor: cores.superficieElevada
         },
         containerFormulario: {
-            maxWidth: 308,
+            width: 311,
+            maxWidth: '100%',
+            minHeight: 60,
             alignSelf: 'center',
-            borderRadius: 14,
+            borderWidth: 0.698,
+            borderRadius: 12,
             backgroundColor: cores.superficieElevada
         },
         expandido: { borderWidth: 1.41, borderRadius: 14 },
@@ -29,13 +32,29 @@ function criarEstilos(tema) {
             paddingHorizontal: 12,
             gap: 10
         },
-        cabecalhoFormulario: { height: 60, paddingHorizontal: 14 },
+        cabecalhoFormulario: {
+            height: 60,
+            paddingVertical: 10,
+            paddingHorizontal: 12,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10
+        },
         expansao: {
             minWidth: 0,
             minHeight: 44,
             flex: 1,
             flexDirection: 'row',
             alignItems: 'center',
+            gap: 10
+        },
+        expansaoFormulario: {
+            minHeight: 0,
+            width: 'auto',
+            height: 40,
+            flex: 0,
+            flexShrink: 1,
+            justifyContent: 'center',
             gap: 10
         },
         caixaIcone: {
@@ -54,6 +73,7 @@ function criarEstilos(tema) {
             fontSize: 15,
             lineHeight: 21
         },
+        tituloFormulario: { flex: 0, flexShrink: 1 },
         conteudoFormulario: {
             width: '100%',
             gap: 16,

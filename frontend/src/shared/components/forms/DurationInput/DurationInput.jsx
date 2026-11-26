@@ -17,10 +17,25 @@ function decomporDuracao(valorMinutos) {
     };
 }
 
-function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) {
+function DurationInput({
+    valorMinutos,
+    aoAlterar,
+    desabilitado = false,
+    erro,
+    placeholderHoras,
+    placeholderMinutos,
+    corPlaceholder,
+    rotuloHoras = 'hora',
+    rotuloMinutos = 'minutos',
+    estiloEntrada,
+    estiloUnidade,
+    placeholderComoTexto = false,
+    estiloPlaceholder
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const duracao = decomporDuracao(valorMinutos);
+    const exibirPlaceholderComoTexto = placeholderComoTexto && !duracao.horas && !duracao.minutos;
 
     function alterar(parte, texto) {
         const recebido = limitarDoisDigitos(texto);
@@ -34,31 +49,65 @@ function DurationInput({ valorMinutos, aoAlterar, desabilitado = false, erro }) 
         <View>
             <View style={[estilos.container, desabilitado && estilos.desabilitado]}>
                 <View style={estilos.grupo}>
-                    <TextInput
-                        accessibilityLabel="Horas de sono"
-                        editable={!desabilitado}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        selectTextOnFocus
-                        value={duracao.horas}
-                        onChangeText={(texto) => alterar('horas', texto)}
-                        style={estilos.entrada}
-                    />
-                    <Text style={estilos.unidade}>hora</Text>
+                    <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                        <TextInput
+                            accessibilityLabel="Horas de sono"
+                            editable={!desabilitado}
+                            keyboardType="number-pad"
+                            maxLength={2}
+                            selectTextOnFocus
+                            placeholder={placeholderComoTexto ? undefined : placeholderHoras}
+                            placeholderTextColor={corPlaceholder}
+                            value={duracao.horas}
+                            onChangeText={(texto) => alterar('horas', texto)}
+                            style={[
+                                estilos.entrada,
+                                placeholderComoTexto && estilos.entradaSobreposta,
+                                exibirPlaceholderComoTexto && estilos.entradaOculta,
+                                estiloEntrada
+                            ]}
+                        />
+                    </View>
+                    {exibirPlaceholderComoTexto ? null : (
+                        <Text style={[estilos.unidade, estiloUnidade]}>{rotuloHoras}</Text>
+                    )}
                 </View>
                 <View style={estilos.grupo}>
-                    <TextInput
-                        accessibilityLabel="Minutos de sono"
-                        editable={!desabilitado}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        selectTextOnFocus
-                        value={duracao.minutos}
-                        onChangeText={(texto) => alterar('minutos', texto)}
-                        style={estilos.entrada}
-                    />
-                    <Text style={estilos.unidade}>minutos</Text>
+                    <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                        <TextInput
+                            accessibilityLabel="Minutos de sono"
+                            editable={!desabilitado}
+                            keyboardType="number-pad"
+                            maxLength={2}
+                            selectTextOnFocus
+                            placeholder={placeholderComoTexto ? undefined : placeholderMinutos}
+                            placeholderTextColor={corPlaceholder}
+                            value={duracao.minutos}
+                            onChangeText={(texto) => alterar('minutos', texto)}
+                            style={[
+                                estilos.entrada,
+                                placeholderComoTexto && estilos.entradaSobreposta,
+                                exibirPlaceholderComoTexto && estilos.entradaOculta,
+                                estiloEntrada
+                            ]}
+                        />
+                    </View>
+                    {exibirPlaceholderComoTexto ? null : (
+                        <Text style={[estilos.unidade, estiloUnidade]}>{rotuloMinutos}</Text>
+                    )}
                 </View>
+                {exibirPlaceholderComoTexto ? (
+                    <Text
+                        testID="placeholder-tempo-sono"
+                        pointerEvents="none"
+                        style={[estilos.placeholderComUnidade, estiloPlaceholder]}
+                    >
+                        {placeholderHoras}
+                        <Text style={estiloUnidade}> {rotuloHoras} </Text>
+                        {placeholderMinutos}
+                        <Text style={estiloUnidade}> {rotuloMinutos}</Text>
+                    </Text>
+                ) : null}
                 {valorMinutos ? (
                     <Pressable
                         accessibilityRole="button"

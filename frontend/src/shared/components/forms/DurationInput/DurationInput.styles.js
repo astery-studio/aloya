@@ -31,6 +31,22 @@ function criarEstilos(tema) {
             lineHeight: 24,
             textAlign: 'center'
         },
+        areaEntradaSobreposta: {
+            position: 'relative',
+            width: 24,
+            height: 24,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        entradaSobreposta: { width: '100%', height: '100%' },
+        entradaOculta: { opacity: 0 },
+        placeholderComUnidade: {
+            position: 'absolute',
+            width: '100%',
+            height: 24,
+            textAlign: 'center',
+            textAlignVertical: 'center'
+        },
         unidade: {
             color: tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.semibold,

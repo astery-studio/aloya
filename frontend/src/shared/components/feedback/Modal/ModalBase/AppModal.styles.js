@@ -16,8 +16,7 @@ function criarEstilos(tema) {
         },
 
         fundoInterativo: {
-            flex: 1,
-            width: '100%'
+            ...StyleSheet.absoluteFillObject
         },
 
         flexivel: { flex: 1, width: '100%' },

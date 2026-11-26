@@ -50,7 +50,18 @@ function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, aoCriar, es
                 <EmptyState
                     titulo="Nenhum registro visível"
                     mensagem={
-                        'Você ainda pode não ter registros ou as categorias usadas neles podem estar desativadas.\nAtive-as em "Gerenciar categorias" ou toque em "Adicionar novo registro" para começar.'
+                        <>
+                            Você ainda pode não ter registros ou as categorias usadas neles podem
+                            estar desativadas. Ative-as em{' '}
+                            <Text style={estilos.opcaoEstadoVazio}>
+                                &quot;Gerenciar categorias&quot;
+                            </Text>{' '}
+                            ou toque em{' '}
+                            <Text style={estilos.opcaoEstadoVazio}>
+                                &quot;Adicionar novo registro&quot;
+                            </Text>{' '}
+                            para começar.
+                        </>
                     }
                     acao={
                         <ButtonScreen

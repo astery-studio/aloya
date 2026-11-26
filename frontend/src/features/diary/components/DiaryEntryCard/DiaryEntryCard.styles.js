@@ -28,6 +28,12 @@ function criarEstilos(tema) {
             flexDirection: 'row',
             alignItems: 'center'
         },
+        lateralCabecalho: {
+            width: 56,
+            height: 26,
+            alignItems: 'flex-start',
+            justifyContent: 'center'
+        },
         iconeRegistro: {
             width: 26,
             height: 26,
@@ -43,7 +49,14 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 24
         },
-        acoes: { height: 26, flexDirection: 'row', alignItems: 'center', gap: 4 },
+        acoes: {
+            width: 56,
+            height: 26,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 4
+        },
         conteudo: {
             alignSelf: 'stretch',
             marginTop: 6,
@@ -55,16 +68,18 @@ function criarEstilos(tema) {
             color: cores.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 8,
+            fontStyle: 'normal',
+            fontWeight: '700',
             lineHeight: 15,
             letterSpacing: 0.6,
-            textAlign: 'center'
+            textAlign: 'center',
+            textTransform: 'uppercase'
         },
         chips: {
             alignItems: 'center',
             marginTop: 4,
-            paddingVertical: 6,
-            borderBottomWidth: 0.70489,
-            borderBottomColor: cores.separador
+            paddingTop: 6,
+            paddingBottom: 10
         },
         linhaChips: {
             minHeight: 28,
@@ -75,8 +90,8 @@ function criarEstilos(tema) {
         },
         chip: {
             maxWidth: '100%',
-            minHeight: 21.78,
-            height: 21.78,
+            minHeight: 24,
+            height: 24,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -88,17 +103,31 @@ function criarEstilos(tema) {
             borderRadius: tema.radius.circular,
             backgroundColor: cores.superficie
         },
+        iconeChip: {
+            width: 10.89,
+            height: 16.5,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
         textoChip: {
-            color: cores.textoSecundario,
+            height: 16.5,
+            color: tema.escuro ? cores.textoSecundario : '#5C5C59',
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
-            lineHeight: 16
+            fontWeight: '600',
+            lineHeight: 16.5,
+            textAlignVertical: 'center',
+            includeFontPadding: false
         },
         anotacao: {
             gap: 8,
             paddingTop: 12,
-            borderTopWidth: 1,
-            borderTopColor: cores.separador
+            paddingBottom: 12
+        },
+        divisorConteudo: {
+            alignSelf: 'stretch',
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: cores.separador
         },
         textoAnotacao: {
             padding: 10,
@@ -111,6 +140,12 @@ function criarEstilos(tema) {
             fontSize: 11,
             lineHeight: 16
         },
+        containerFase: {
+            alignSelf: 'stretch',
+            paddingTop: 6,
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderTopColor: cores.separador
+        },
         fase: {
             alignSelf: 'stretch',
             minHeight: 26,
@@ -121,13 +156,13 @@ function criarEstilos(tema) {
             gap: 6,
             paddingHorizontal: 14,
             paddingVertical: 0,
-            marginTop: 6,
             borderRadius: 100
         },
         textoFase: {
             flexShrink: 1,
             fontFamily: fontFamilies.semiBold,
             fontSize: 10,
+            fontWeight: '600',
             lineHeight: 19.5,
             textAlign: 'center'
         },

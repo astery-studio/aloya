@@ -4,6 +4,7 @@ import { ArchiveIcon } from 'phosphor-react-native/src/icons/Archive';
 import { ArrowsClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
 import { BellIcon } from 'phosphor-react-native/src/icons/Bell';
 import { CalendarBlankIcon } from 'phosphor-react-native/src/icons/CalendarBlank';
+import { CalendarCheckIcon } from 'phosphor-react-native/src/icons/CalendarCheck';
 import { CalendarDotsIcon } from 'phosphor-react-native/src/icons/CalendarDots';
 import { CaretDownIcon } from 'phosphor-react-native/src/icons/CaretDown';
 import { CaretLeftIcon } from 'phosphor-react-native/src/icons/CaretLeft';
@@ -26,6 +27,9 @@ import { EyeSlashIcon } from 'phosphor-react-native/src/icons/EyeSlash';
 import { FirstAidKitIcon } from 'phosphor-react-native/src/icons/FirstAidKit';
 import { FlowerLotusIcon } from 'phosphor-react-native/src/icons/FlowerLotus';
 import { FlowerTulipIcon } from 'phosphor-react-native/src/icons/FlowerTulip';
+import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
+import { GavelIcon } from 'phosphor-react-native/src/icons/Gavel';
+import { GearIcon } from 'phosphor-react-native/src/icons/Gear';
 import { HandshakeIcon } from 'phosphor-react-native/src/icons/Handshake';
 import { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
 import { HeartbeatIcon } from 'phosphor-react-native/src/icons/Heartbeat';
@@ -43,7 +47,9 @@ import { PencilSimpleIcon } from 'phosphor-react-native/src/icons/PencilSimple';
 import { PersonArmsSpreadIcon } from 'phosphor-react-native/src/icons/PersonArmsSpread';
 import { PillIcon } from 'phosphor-react-native/src/icons/Pill';
 import { RainbowCloudIcon } from 'phosphor-react-native/src/icons/RainbowCloud';
+import { RepeatIcon } from 'phosphor-react-native/src/icons/Repeat';
 import { ShieldCheckIcon } from 'phosphor-react-native/src/icons/ShieldCheck';
+import { ShieldWarningIcon } from 'phosphor-react-native/src/icons/ShieldWarning';
 import { SmileyWinkIcon } from 'phosphor-react-native/src/icons/SmileyWink';
 import { SparkleIcon } from 'phosphor-react-native/src/icons/Sparkle';
 import { SunIcon } from 'phosphor-react-native/src/icons/Sun';
@@ -56,11 +62,10 @@ import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 import { UsersThreeIcon } from 'phosphor-react-native/src/icons/UsersThree';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
+import { WindIcon } from 'phosphor-react-native/src/icons/Wind';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
-import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
-import { GavelIcon } from 'phosphor-react-native/src/icons/Gavel';
-import { ShieldWarningIcon } from 'phosphor-react-native/src/icons/ShieldWarning';
+import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 
 export {
     ArrowLeftIcon,
@@ -68,6 +73,7 @@ export {
     ArrowsClockwiseIcon,
     BellIcon,
     CalendarBlankIcon,
+    CalendarCheckIcon,
     CalendarDotsIcon,
     CaretDownIcon,
     CaretLeftIcon,
@@ -90,6 +96,9 @@ export {
     FirstAidKitIcon,
     FlowerLotusIcon,
     FlowerTulipIcon,
+    FunnelIcon,
+    GavelIcon,
+    GearIcon,
     HandshakeIcon,
     HeartIcon,
     HeartbeatIcon,
@@ -107,7 +116,9 @@ export {
     PersonArmsSpreadIcon,
     PillIcon,
     RainbowCloudIcon,
+    RepeatIcon,
     ShieldCheckIcon,
+    ShieldWarningIcon,
     SmileyWinkIcon,
     SparkleIcon,
     SunIcon,
@@ -120,9 +131,8 @@ export {
     UsersThreeIcon,
     WarningCircleIcon,
     WarningIcon,
+    WindIcon,
     XCircleIcon,
     XIcon,
-    FunnelIcon,
-    GavelIcon,
-    ShieldWarningIcon
+    QuestionIcon
 };
