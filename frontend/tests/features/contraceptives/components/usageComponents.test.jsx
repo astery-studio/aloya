@@ -7,10 +7,12 @@ import { estilosUso } from '../../../../src/features/contraceptives/components/u
 
 test('trata singular, plural e ausência de usos pendentes', async () => {
     const { rerender } = await render(<PendingUsesBanner quantidade={1} />);
+
     expect(screen.getByText('1 uso pendente hoje')).toBeOnTheScreen();
     expect(screen.getByRole('alert', { name: '1 uso pendente hoje' })).toBeOnTheScreen();
 
     await rerender(<PendingUsesBanner quantidade={2} />);
+
     expect(screen.getByText('2 usos pendentes hoje')).toBeOnTheScreen();
     expect(screen.getByRole('alert', { name: '2 usos pendentes hoje' })).toBeOnTheScreen();
 
@@ -52,6 +54,7 @@ test('expande e apresenta registros do histórico em lista', async () => {
     );
 
     await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
     expect(aoAlternar).toHaveBeenCalledTimes(1);
     expect(screen.getByText('07/10/2026')).toBeOnTheScreen();
     expect(screen.getByText('08:00')).toBeOnTheScreen();
@@ -162,6 +165,7 @@ test('apresenta calendário e permite navegar entre meses', async () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Mês anterior' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
+
     expect(anterior).toHaveBeenCalledTimes(1);
     expect(proximo).toHaveBeenCalledTimes(1);
 });
@@ -218,11 +222,13 @@ test('mantém cinco semanas no protótipo e comporta meses com seis semanas', as
     const { rerender } = await render(
         <UsageCalendar mes="2026-09" dias={[]} aoMesAnterior={jest.fn()} aoProximoMes={jest.fn()} />
     );
+
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 256.43 });
 
     await rerender(
         <UsageCalendar mes="2026-08" dias={[]} aoMesAnterior={jest.fn()} aoProximoMes={jest.fn()} />
     );
+
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 291.43 });
 });
 
@@ -278,7 +284,12 @@ test('preserva a tipografia e espaçamento da legenda sem limitar a medição na
         paddingTop: 8,
         paddingHorizontal: 13
     });
-    expect(estilosUso.itemLegenda).toMatchObject({ minHeight: 15, flexBasis: '46%', flexShrink: 0, gap: 4 });
+    expect(estilosUso.itemLegenda).toMatchObject({
+        minHeight: 15,
+        flexBasis: '46%',
+        flexShrink: 0,
+        gap: 4
+    });
     expect(estilosUso.itemLegenda.width).toBeUndefined();
     expect(estilosUso.marcadorLegenda).toMatchObject({
         width: 5.99,
@@ -308,6 +319,7 @@ test('controla o calendário pelo contrato público do painel', async () => {
     );
 
     expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
+
     await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
     expect(screen.getByText('Outubro 2026')).toBeOnTheScreen();
 });
@@ -330,7 +342,9 @@ test('reconhece datas brasileiras, timestamps ISO e os estados equivalentes no c
     expect(screen.getByLabelText('Dia 3, Fora do prazo')).toBeOnTheScreen();
     expect(screen.getByLabelText('Dia 4, Confirmado')).toBeOnTheScreen();
     expect(screen.getByLabelText('Dia 5, Não confirmado')).toBeOnTheScreen();
+
     await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
+
     expect(screen.getByLabelText('Dia 3, Confirmado')).toBeOnTheScreen();
     expect(screen.getByLabelText('Dia 4, sem registro')).toBeOnTheScreen();
 });
@@ -342,6 +356,7 @@ test('a lista apresenta as datas ISO no formato do protótipo', async () => {
             registros={[{ id: '1', data: '2026-09-05', estado: 'confirmado' }]}
         />
     );
+
     expect(screen.getByText('05/09/2026')).toBeOnTheScreen();
 });
 
@@ -357,16 +372,21 @@ test('o calendário não esconde uma dose não confirmada quando outra dose do d
             ]}
         />
     );
+
     expect(screen.getByLabelText('Dia 5, Não confirmado')).toBeOnTheScreen();
     expect(screen.getByLabelText('Dia 6, Fora do prazo')).toBeOnTheScreen();
 });
 
 test('a legenda se adapta em telas estreitas sem reduzir a grade nem cortar os rótulos', async () => {
     await render(<UsageCalendar mes="2026-09" />);
+
     expect(screen.getByTestId('usage-calendar')).toHaveStyle({ minHeight: 256.43 });
     expect(screen.getByTestId('usage-calendar').props.onLayout).toBeUndefined();
     expect(screen.getByTestId('usage-calendar-legend')).toHaveStyle({
-        flexWrap: 'wrap', columnGap: 8, rowGap: 4, justifyContent: 'flex-start'
+        flexWrap: 'wrap',
+        columnGap: 8,
+        rowGap: 4,
+        justifyContent: 'flex-start'
     });
     expect(screen.getByText('Confirmado')).toBeOnTheScreen();
     expect(screen.getByText('Fora do prazo')).toBeOnTheScreen();
