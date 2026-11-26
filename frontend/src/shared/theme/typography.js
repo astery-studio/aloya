@@ -2,7 +2,6 @@
  * Define famílias e estilos tipográficos baseados na fonte DM Sans.
  */
 const fontFamilies = {
-    light: 'DMSans_300Light',
     regular: 'DMSans_400Regular',
     medium: 'DMSans_500Medium',
     semibold: 'DMSans_600SemiBold',

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { CycleDateStrip } from '../../../../src/features/cycles/components/CycleDateStrip';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -20,7 +19,6 @@ test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
     expect(faixa.props.showsHorizontalScrollIndicator).toBe(false);
     expect(faixa.props.windowSize).toBe(5);
     expect(faixa.props.maintainVisibleContentPosition).toEqual({ minIndexForVisible: 1 });
-    expect(faixa.props.onScrollToIndexFailed).toEqual(expect.any(Function));
     expect(screen.getAllByRole('button')).toHaveLength(2);
 });
 
@@ -71,31 +69,6 @@ test('não exige callback para pressionar uma data', async () => {
     expect(() => fireEvent.press(screen.getByRole('button', { name: 'dom, dia 4' }))).not.toThrow();
 });
 
-test('conserva o fundo branco arredondado ao selecionar e desmarcar um dia', async () => {
-    function FaixaComSelecao() {
-        const [dataSelecionada, selecionar] = useState(dias[0].data);
-        return (
-            <CycleDateStrip
-                dias={dias}
-                dataSelecionada={dataSelecionada}
-                aoSelecionarData={selecionar}
-            />
-        );
-    }
-
-    await render(<FaixaComSelecao />);
-    const fundo = () => screen.getByTestId('fundo-dia-2026-10-05');
-    const forma = { borderRadius: 14, backgroundColor: '#FFFFFF', height: 62 };
-    expect(fundo()).toHaveStyle(forma);
-
-    await fireEvent.press(screen.getByRole('button', { name: 'seg, dia 5' }));
-    expect(fundo()).toHaveStyle({ ...forma, opacity: 0 });
-
-    await fireEvent.press(screen.getByRole('button', { name: 'dom, dia 4' }));
-    expect(fundo()).toHaveStyle(forma);
-    expect(fundo()).not.toHaveStyle({ opacity: 0 });
-});
-
 test('apresenta interrogação quando o número do dia não está disponível', async () => {
     await montar({
         dias: [{ data: '2026-10-06', semana: 'ter', fase: 'desconhecida' }],
@@ -111,7 +84,7 @@ const variantes = [
     ['folicular', '#2C4C3B', '#2C4C3B', '#F7F5F0'],
     ['ovulatoria', '#4A758E', '#4A758E', '#F7F5F0'],
     ['lutea', '#D68C3A', '#D68C3A', '#F7F5F0'],
-    ['desconhecida', '#5C5C59', '#E6E2D8', '#F7F5F0']
+    ['desconhecida', '#5C5C59', '#E6E2D8', '#FFFFFF']
 ];
 
 test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, borda, conteudo) => {
@@ -130,18 +103,16 @@ test.each(variantes)('aplica a variante selecionada %s', async (fase, fundo, bor
     });
     expect(screen.getByText('qua')).toHaveStyle({ color: conteudo, opacity: 0.85 });
     expect(screen.getByText('7')).toHaveStyle({ color: conteudo });
-    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({
-        backgroundColor: 'transparent'
-    });
+    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({ backgroundColor: conteudo });
 });
 
-test('mantém a borda da fase no dia não selecionado', async () => {
+test('mantém o estilo neutro no dia não selecionado', async () => {
     await montar({ dataSelecionada: 'outra-data' });
 
     const botao = screen.getByRole('button', { name: 'dom, dia 4' });
-    expect(botao).toHaveStyle({ backgroundColor: '#C85A44', borderColor: '#C85A44' });
+    expect(botao).toHaveStyle({ backgroundColor: '#FFFFFF', borderColor: '#E6E2D8' });
     expect(botao).not.toHaveStyle({ shadowOpacity: 0.04 });
-    expect(screen.getByText('dom')).toHaveStyle({ color: '#5C5C59', includeFontPadding: false });
+    expect(screen.getByText('dom')).toHaveStyle({ color: '#5C5C59', opacity: 0.7 });
     expect(screen.getByText('4')).toHaveStyle({ color: '#5C5C59' });
 });
 
@@ -159,43 +130,3 @@ test('diferencia o indicador de hoje dos demais dias', async () => {
         backgroundColor: 'transparent'
     });
 });
-
-test('exibe a bolinha clara quando hoje também está selecionado', async () => {
-    await montar({
-        dias: [{ data: '2026-10-07', dia: 7, semana: 'qua', fase: 'folicular', hoje: true }],
-        dataSelecionada: '2026-10-07'
-    });
-
-    expect(screen.getByTestId('indicador-2026-10-07')).toHaveStyle({
-        backgroundColor: '#F7F5F0'
-    });
-});
-
-test('não solicita mais datas se a faixa cabe inteira na área visível', async () => {
-    const aoCarregarAnteriores = jest.fn();
-    const aoCarregarPosteriores = jest.fn();
-    await montar({ aoCarregarAnteriores, aoCarregarPosteriores });
-
-    await fireEvent(screen.getByLabelText('Datas do ciclo'), 'scrollEndDrag', {
-        nativeEvent: {
-            contentOffset: { x: 0, y: 0 },
-            contentSize: { width: 100, height: 94 },
-            layoutMeasurement: { width: 390, height: 94 }
-        }
-    });
-
-    expect(aoCarregarAnteriores).not.toHaveBeenCalled();
-    expect(aoCarregarPosteriores).not.toHaveBeenCalled();
-});
-
-test.each([0, 56])(
-    'recupera a posição quando a faixa não mediu os itens (%i)',
-    async (averageItemLength) => {
-        await montar();
-
-        const faixa = screen.getByLabelText('Datas do ciclo');
-        const recuperar = faixa.props.onScrollToIndexFailed;
-        expect(() => recuperar({ index: 1, averageItemLength })).not.toThrow();
-        expect(screen.getByRole('button', { name: 'seg, dia 5' })).toBeSelected();
-    }
-);

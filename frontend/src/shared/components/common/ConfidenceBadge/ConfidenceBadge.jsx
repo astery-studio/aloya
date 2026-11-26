@@ -1,9 +1,9 @@
 //Mostra a confiabilidade dos dados do ciclo nas variantes simples ou composta.
 import { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { useTheme } from '../../../hooks/useTheme';
-import { ChartLineUpIcon, InfoIcon } from '../../icons/AppIcons';
+import { ChartLineUpIcon } from '../../icons/AppIcons';
 import { ConfidenceStatusBar } from './ConfidenceStatusBar';
 import { criarEstilos } from './ConfidenceBadge.styles';
 
@@ -21,16 +21,7 @@ const configuracoesNivel = Object.freeze({
 
 const variantesPermitidas = Object.freeze(['simples', 'composta']);
 
-function ConfidenceBadge({
-    nivel,
-    variante = 'simples',
-    coresPersonalizadas,
-    estilo,
-    onPress,
-    desabilitado = false,
-    rotuloAcessibilidade,
-    exibirPrefixo = false
-}) {
+function ConfidenceBadge({ nivel, variante = 'simples', coresPersonalizadas, estilo }) {
     const tema = useTheme();
     const { estilos, variantes } = useMemo(() => criarEstilos(tema), [tema]);
     const configuracao = configuracoesNivel[nivel];
@@ -46,31 +37,21 @@ function ConfidenceBadge({
     const { rotulo } = configuracao;
     const visual = coresPersonalizadas || variantes[nivel];
     const ehComposta = variante === 'composta';
-    const interativa = typeof onPress === 'function';
-    const Container = interativa ? Pressable : View;
-    const estilosContainer = [
-        estilos.container,
-        ehComposta ? estilos.composta : estilos.simples,
-        { backgroundColor: visual.fundo, borderColor: visual.borda },
-        estilo
-    ];
 
     return (
-        <Container
+        <View
             accessible
-            accessibilityRole={interativa ? 'button' : 'text'}
-            accessibilityLabel={
-                rotuloAcessibilidade ??
-                `${ehComposta ? 'Confiabilidade' : 'Confiança'} ${rotulo.toLowerCase()}`
-            }
-            accessibilityState={interativa ? { disabled: desabilitado } : undefined}
-            disabled={interativa ? desabilitado : undefined}
-            onPress={interativa ? onPress : undefined}
-            style={
-                interativa
-                    ? ({ pressed }) => [estilosContainer, pressed && { opacity: 0.72 }]
-                    : estilosContainer
-            }
+            accessibilityRole="text"
+            accessibilityLabel={`${ehComposta ? 'Confiabilidade' : 'Confiança'} ${rotulo.toLowerCase()}`}
+            style={[
+                estilos.container,
+                ehComposta ? estilos.composta : estilos.simples,
+                {
+                    backgroundColor: visual.fundo,
+                    borderColor: visual.borda
+                },
+                estilo
+            ]}
         >
             {ehComposta ? (
                 <>
@@ -108,7 +89,14 @@ function ConfidenceBadge({
                 </>
             ) : (
                 <>
-                    <ConfidenceStatusBar nivel={nivel} cor={visual.cor} />
+                    <View
+                        style={[
+                            estilos.ponto,
+                            {
+                                backgroundColor: visual.cor
+                            }
+                        ]}
+                    />
 
                     <Text
                         numberOfLines={1}
@@ -119,12 +107,11 @@ function ConfidenceBadge({
                             }
                         ]}
                     >
-                        {exibirPrefixo ? `Confiança ${rotulo}` : rotulo}
+                        Confiança {rotulo}
                     </Text>
-                    <InfoIcon size={16} color={visual.cor} weight="regular" />
                 </>
             )}
-        </Container>
+        </View>
     );
 }
 

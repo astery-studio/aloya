@@ -252,15 +252,13 @@ describe('histórico no diaryService', () => {
             diasRegistrados: 8,
             quantidadeRegistrosFase: 3,
             informacoesSuficientes: true,
-            destaques: [{ categoriaId: 'sintomas_fisicos', valor: ' Fadiga ', ocorrencias: 2 }],
-            sugestoesCheckIn: [{ categoriaId: 'fluxo_menstrual', valor: ' Leve ', ocorrencias: 1 }]
+            destaques: [{ categoriaId: 'sintomas_fisicos', valor: ' Fadiga ', ocorrencias: 2 }]
         };
         const requisicaoAutenticada = jest.fn().mockResolvedValue(resposta);
         const service = criarDiaryService({ requisicaoAutenticada });
         const signal = new AbortController().signal;
         await expect(service.buscarResumo('ovulacao', { signal })).resolves.toMatchObject({
-            destaques: [{ valor: 'Fadiga' }],
-            sugestoesCheckIn: [{ valor: 'Leve', ocorrencias: 1 }]
+            destaques: [{ valor: 'Fadiga' }]
         });
         expect(requisicaoAutenticada).toHaveBeenCalledWith({
             metodo: 'GET',
@@ -276,17 +274,6 @@ describe('histórico no diaryService', () => {
         expect(() =>
             validarResumoDiario(
                 { ...resposta, informacoesSuficientes: true, destaques: [] },
-                'ovulatoria'
-            )
-        ).toThrow('histórico do Diário');
-        expect(() =>
-            validarResumoDiario(
-                {
-                    ...resposta,
-                    sugestoesCheckIn: [
-                        { categoriaId: 'fluxo_menstrual', valor: 'Leve', ocorrencias: 0 }
-                    ]
-                },
                 'ovulatoria'
             )
         ).toThrow('histórico do Diário');

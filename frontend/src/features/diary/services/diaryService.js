@@ -256,34 +256,12 @@ function validarResumoDiario(resposta, faseEsperada) {
                 Number.isSafeInteger(item.ocorrencias) &&
                 item.ocorrencias >= 2
         ) &&
-        (resposta.sugestoesCheckIn === undefined ||
-            (Array.isArray(resposta.sugestoesCheckIn) &&
-                resposta.sugestoesCheckIn.length <= 8 &&
-                resposta.sugestoesCheckIn.every(
-                    (item) =>
-                        ehObjetoSimples(item) &&
-                        typeof item.categoriaId === 'string' &&
-                        !CATEGORIAS_SENSIVEIS_NO_RESUMO.has(item.categoriaId) &&
-                        typeof item.valor === 'string' &&
-                        item.valor.trim().length > 0 &&
-                        Number.isSafeInteger(item.ocorrencias) &&
-                        item.ocorrencias >= 1
-                ))) &&
         (!resposta.informacoesSuficientes || resposta.destaques.length > 0);
     if (!valido) throw erroDeContrato(MENSAGEM_HISTORICO, 'RESPOSTA_RESUMO_DIARIO_INVALIDA');
     return Object.freeze({
         ...resposta,
         destaques: Object.freeze(
             resposta.destaques.map((item) =>
-                Object.freeze({
-                    ...item,
-                    grupo: typeof item.grupo === 'string' ? item.grupo.trim() : null,
-                    valor: item.valor.trim()
-                })
-            )
-        ),
-        sugestoesCheckIn: Object.freeze(
-            (resposta.sugestoesCheckIn ?? []).map((item) =>
                 Object.freeze({
                     ...item,
                     grupo: typeof item.grupo === 'string' ? item.grupo.trim() : null,

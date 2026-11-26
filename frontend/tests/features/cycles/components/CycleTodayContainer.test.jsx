@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CycleTodayContainer } from '../../../../src/features/cycles/screens/CycleTodayContainer';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -46,8 +46,7 @@ test('permite tentar novamente depois de uma falha de carregamento', async () =>
     await act(async () =>
         fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }))
     );
-    await waitFor(() => expect(screen.getByText('29')).toBeOnTheScreen());
-    expect(screen.getByText('outubro')).toBeOnTheScreen();
+    await waitFor(() => expect(screen.getByText('29 de outubro')).toBeOnTheScreen());
     expect(service.buscar).toHaveBeenCalledTimes(2);
 }, 30_000);
 
@@ -56,7 +55,6 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
     await renderizarTela({ service });
 
     const primeiroDia = await screen.findByRole('button', { name: 'sex, dia 2' });
-    const faixaAntes = screen.getByLabelText('Datas do ciclo').props.data;
     fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
 
     expect(primeiroDia).toBeOnTheScreen();
@@ -66,22 +64,18 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
             screen.getByRole('button', { name: 'qua, dia 14' }).props.accessibilityState
         ).toEqual(expect.objectContaining({ selected: true }));
     });
-    expect(screen.getByLabelText('Datas do ciclo').props.data).toBe(faixaAntes);
 }, 30_000);
 
 test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não encontra registros', async () => {
     const service = {
-        buscar: jest.fn().mockResolvedValue({
-            status: 'DADOS_INSUFICIENTES',
-            motivos: ['INICIO_ELEGIVEL_AUSENTE']
-        })
+        buscar: jest.fn().mockResolvedValue({ status: 'DADOS_INSUFICIENTES' })
     };
     const aoCadastrarMenstruacao = jest.fn();
     jest.useFakeTimers().setSystemTime(new Date(2026, 9, 30, 23, 30));
     try {
         await renderizarTela({ service, aoCadastrarMenstruacao });
 
-        expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
+        expect(await screen.findByText('Conheça seu ciclo')).toBeOnTheScreen();
         expect(screen.getByLabelText('Datas do ciclo')).toHaveProp('horizontal', true);
         const inicioDaFaixa = screen.getByLabelText('Datas do ciclo').props.data[0].data;
         await fireEvent.press(screen.getByRole('button', { name: 'qui, dia 29' }));
@@ -106,86 +100,4 @@ test('mantém seleção e rolagem horizontal na tela sem ciclo quando a API não
     } finally {
         jest.useRealTimers();
     }
-});
-
-test('mostra o Diário dentro da rolagem sem ciclo e mantém os atalhos acessíveis', async () => {
-    const service = {
-        buscar: jest.fn().mockResolvedValue({
-            status: 'DADOS_INSUFICIENTES',
-            motivos: ['INICIO_ELEGIVEL_AUSENTE']
-        })
-    };
-    const aoCadastrarDiario = jest.fn();
-    await renderizarTela({ service, aoCadastrarDiario });
-
-    const rolagem = await screen.findByTestId('conteudo-rolavel');
-    expect(within(rolagem).getByTestId('home-sem-ciclo')).toHaveStyle({ gap: 38 });
-    const diario = within(rolagem).getByTestId('diario-home-sem-ciclo');
-    expect(within(diario).getByText('Seu Diário já está disponível')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: /Entenda o ritmo/ })).toHaveProp(
-        'accessibilityState',
-        expect.objectContaining({ expanded: false })
-    );
-    await fireEvent.press(
-        within(diario).getByRole('button', { name: 'Como você está se sentindo?' })
-    );
-    expect(aoCadastrarDiario).toHaveBeenCalledTimes(1);
-    await fireEvent.press(
-        within(diario).getByRole('button', { name: 'Gostaria de fazer uma anotação?' })
-    );
-    expect(await screen.findByText('O que seu corpo está pedindo agora?')).toBeOnTheScreen();
-}, 30_000);
-
-test.each(['ao entrar', 'ao tentar novamente'])(
-    'avisa que a sessão expirou %s',
-    async (momento) => {
-        const falha = Object.assign(new Error('Sessão expirada'), { status: 401 });
-        const buscar = jest.fn().mockRejectedValue(falha);
-        const onSessaoExpirada = jest.fn();
-        if (momento === 'ao tentar novamente') buscar.mockRejectedValueOnce(new Error('Sem rede'));
-
-        await renderizarTela({ service: { buscar }, onSessaoExpirada });
-
-        if (momento === 'ao tentar novamente') {
-            const retry = await screen.findByRole('button', { name: 'Tentar novamente' });
-            await fireEvent.press(retry);
-        }
-
-        await waitFor(() => expect(onSessaoExpirada).toHaveBeenCalledTimes(1));
-        expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
-    }
-);
-
-test('mantém a Home disponível quando uma consulta cancelada devolve AbortError', async () => {
-    const buscar = jest.fn().mockRejectedValue({ name: 'AbortError' });
-    const onSessaoExpirada = jest.fn();
-    await renderizarTela({ service: { buscar }, onSessaoExpirada });
-
-    expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
-    expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
-    expect(onSessaoExpirada).not.toHaveBeenCalled();
-});
-
-test('mantém a mensagem de erro quando a nova tentativa falha', async () => {
-    const buscar = jest.fn().mockRejectedValue(new Error('Sem rede'));
-    await renderizarTela({ service: { buscar } });
-
-    await fireEvent.press(await screen.findByRole('button', { name: 'Tentar novamente' }));
-
-    expect(await screen.findByText('Algo deu errado')).toBeOnTheScreen();
-    expect(buscar).toHaveBeenCalledTimes(2);
-});
-
-test('encerra a nova tentativa sem erro se a consulta for cancelada', async () => {
-    const buscar = jest
-        .fn()
-        .mockRejectedValueOnce(new Error('Sem rede'))
-        .mockRejectedValueOnce({ name: 'AbortError' });
-    await renderizarTela({ service: { buscar } });
-
-    await fireEvent.press(await screen.findByRole('button', { name: 'Tentar novamente' }));
-
-    expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
-    expect(screen.queryByText('Algo deu errado')).not.toBeOnTheScreen();
-    expect(buscar).toHaveBeenCalledTimes(2);
 });

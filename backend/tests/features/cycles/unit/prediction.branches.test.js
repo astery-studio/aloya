@@ -39,24 +39,3 @@ test('trata usuário inexistente sem produzir previsão', async () => {
     });
     await assert.rejects(() => service.buscar(99), { codigo: 'USUARIO_NAO_ENCONTRADO' });
 });
-
-test('usa confiança alta no histórico regular sem emitir aviso de baixa confiança', () => {
-    const registros = [
-        ['2026-05-06', '2026-05-10'],
-        ['2026-06-03', '2026-06-07'],
-        ['2026-07-01', '2026-07-05'],
-        ['2026-07-29', '2026-08-02'],
-        ['2026-08-26', '2026-08-30'],
-        ['2026-09-23', '2026-09-27'],
-        ['2026-10-21', '2026-10-25']
-    ].map(([dataInicio, dataFim]) => ({ dataInicio, dataFim }));
-
-    const previsao = calcularPrevisao({
-        registros,
-        parametros: {},
-        dataReferencia: '2026-10-26'
-    });
-
-    assert.equal(previsao.confiabilidadeMenstrual.nivel, 'ALTA');
-    assert.equal(previsao.avisos.length, 2);
-});

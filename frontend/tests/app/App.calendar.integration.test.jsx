@@ -1,13 +1,13 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert, Linking, TurboModuleRegistry } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
-        CycleTodayContainer: ({ aoAbrirHistorico, aoCadastrarMenstruacao }) =>
+        CycleTodayContainer: ({ aoAbrirCalendario, aoCadastrarMenstruacao }) =>
             ReactInterno.createElement(
                 View,
                 null,
@@ -16,10 +16,10 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                     Pressable,
                     {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir histórico do ciclo',
-                        onPress: aoAbrirHistorico
+                        accessibilityLabel: 'Abrir calendário',
+                        onPress: aoAbrirCalendario
                     },
-                    ReactInterno.createElement(Text, null, 'Histórico')
+                    ReactInterno.createElement(Text, null, 'Calendário')
                 ),
                 ReactInterno.createElement(
                     Pressable,
@@ -118,20 +118,6 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     };
 });
 
-jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
-    const ReactInterno = require('react');
-    const { Pressable } = require('react-native');
-
-    return {
-        CycleHistoryFlow: ({ aoAbrirCalendario }) =>
-            ReactInterno.createElement(Pressable, {
-                accessibilityRole: 'button',
-                accessibilityLabel: 'Ir para o Calendário',
-                onPress: aoAbrirCalendario
-            })
-    };
-});
-
 jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
@@ -215,26 +201,6 @@ describe('App — calendário', () => {
         jest.restoreAllMocks();
     });
 
-    test('usa o IP do bundle do Expo Go quando a URL da API não está configurada', async () => {
-        jest.replaceProperty(process, 'env', { ...process.env, EXPO_PUBLIC_API_URL: '' });
-        const obterModulo = TurboModuleRegistry.get;
-        jest.spyOn(TurboModuleRegistry, 'get').mockImplementation((nome) => {
-            if (nome === 'SourceCode') {
-                return {
-                    getConstants: () => ({ scriptURL: 'http://192.168.0.2:8081/index.bundle' })
-                };
-            }
-            return obterModulo(nome);
-        });
-
-        await renderApp(<App />);
-        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
-        expect(criarServicosApp).toHaveBeenCalledWith({
-            apiUrl: 'http://192.168.0.2:3000',
-            permitirHttpDesenvolvimento: true
-        });
-    });
-
     test('encaminha o dia da Home e limpa a pré-seleção ao entrar pelo Calendário', async () => {
         await renderApp(<App />);
 
@@ -249,8 +215,7 @@ describe('App — calendário', () => {
         expect(await screen.findByText('Data inicial: 2026-10-27')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
-        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para o Calendário' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
 
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));

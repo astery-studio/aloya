@@ -11,16 +11,15 @@ function criarEstilos(tema) {
         },
 
         simples: {
-            height: 34,
-            minWidth: 112.33,
+            height: 24,
             maxWidth: '100%',
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
+            gap: 5,
+            paddingVertical: 3,
             paddingHorizontal: 10,
-            borderWidth: 0.666667,
-            borderRadius: 16
+            borderWidth: 0,
+            borderRadius: tema.radius.switch
         },
 
         composta: {
@@ -41,13 +40,20 @@ function criarEstilos(tema) {
             gap: 6
         },
 
+        ponto: {
+            width: 5.99,
+            height: 5.99,
+            flexShrink: 0,
+            borderRadius: 2.99578
+        },
+
         textoSimples: {
             flexShrink: 1,
-            fontFamily: fontFamilies.medium,
-            fontSize: 14,
+            fontFamily: fontFamilies.semibold,
+            fontSize: 12,
             fontStyle: 'normal',
-            fontWeight: '500',
-            lineHeight: 21,
+            fontWeight: '600',
+            lineHeight: 18,
             includeFontPadding: false
         },
 
@@ -94,19 +100,19 @@ function criarEstilos(tema) {
         : Object.freeze({
               alta: Object.freeze({
                   cor: '#2C4C3B',
-                  fundo: 'rgba(44, 76, 59, 0.1)',
+                  fundo: 'rgba(44, 76, 59, 0.14)',
                   borda: 'rgba(44, 76, 59, 0.333)'
               }),
 
               media: Object.freeze({
-                  cor: '#D68C3A',
-                  fundo: 'rgba(214, 140, 58, 0.1)',
+                  cor: '#8A5A12',
+                  fundo: 'rgba(214, 140, 58, 0.14)',
                   borda: 'rgba(214, 140, 58, 0.333)'
               }),
 
               baixa: Object.freeze({
-                  cor: '#C85A44',
-                  fundo: 'rgba(200, 90, 68, 0.1)',
+                  cor: '#A43F2C',
+                  fundo: 'rgba(200, 90, 68, 0.14)',
                   borda: 'rgba(200, 90, 68, 0.333)'
               })
           });

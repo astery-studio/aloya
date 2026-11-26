@@ -6,17 +6,6 @@ import { obterCategoriasAtivas } from './diaryActiveCategories.js';
 const LIMITE_REGISTROS_ANALISADOS = 12;
 const MINIMO_REGISTROS = 3;
 const MINIMO_OCORRENCIAS = 2;
-const LIMITE_SUGESTOES_CHECK_IN = 8;
-const CATEGORIAS_CHECK_IN = new Set([
-    'fluxo_menstrual',
-    'sintomas_fisicos',
-    'sintomas_emocionais',
-    'sintomas_pre_menstruais',
-    'energia',
-    'qualidade_sono',
-    'digestao',
-    'pele'
-]);
 
 function criarMarcador(categoria, opcao = null) {
     const catalogo = CATEGORIAS_POR_ID.get(categoria.categoriaId);
@@ -105,26 +94,18 @@ function criarDiaryOverviewService({ prisma } = {}) {
                 }
             })
         ]);
-        const marcadores = contarMarcadores(registros, categoriasAtivas).sort(compararDestaques);
-        const destaques = marcadores
+        const destaques = contarMarcadores(registros, categoriasAtivas)
             .filter(({ ocorrencias }) => ocorrencias >= MINIMO_OCORRENCIAS)
+            .sort(compararDestaques)
             .slice(0, 3)
             .map(({ chave, macroOrdem, categoriaOrdem, opcaoOrdem, ...destaque }) => destaque);
-        const sugestoesCheckIn = marcadores
-            .filter(
-                ({ chave, categoriaId }) =>
-                    chave.startsWith('opcao:') && CATEGORIAS_CHECK_IN.has(categoriaId)
-            )
-            .slice(0, LIMITE_SUGESTOES_CHECK_IN)
-            .map(({ chave, macroOrdem, categoriaOrdem, opcaoOrdem, ...sugestao }) => sugestao);
 
         return {
             fase,
             diasRegistrados,
             quantidadeRegistrosFase: registros.length,
             informacoesSuficientes: registros.length >= MINIMO_REGISTROS && destaques.length > 0,
-            destaques,
-            sugestoesCheckIn
+            destaques
         };
     }
 
@@ -136,7 +117,6 @@ export {
     contarMarcadores,
     criarDiaryOverviewService,
     LIMITE_REGISTROS_ANALISADOS,
-    LIMITE_SUGESTOES_CHECK_IN,
     MINIMO_OCORRENCIAS,
     MINIMO_REGISTROS
 };

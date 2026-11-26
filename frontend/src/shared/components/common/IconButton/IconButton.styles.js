@@ -60,13 +60,13 @@ function criarEstilos(tema) {
 
         calendario: Object.freeze({
             container: Object.freeze({
-                backgroundColor: tema.escuro ? '#1E1E1E' : '#FFFFFF',
-                borderWidth: 0.666667,
-                borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : '#E6E2D8',
-                borderRadius: 16
+                backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
+                borderWidth: tema.escuro ? 0.667 : 1,
+                borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
+                borderRadius: tema.radius.onboardingCalendar
             }),
-            icone: tema.escuro ? '#999999' : '#C85A44',
-            tamanhoIcone: 28
+            icone: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
+            tamanhoIcone: 22
         }),
 
         redeApoio: Object.freeze({

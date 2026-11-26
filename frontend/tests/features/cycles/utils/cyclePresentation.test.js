@@ -1,10 +1,4 @@
-import {
-    criarDiasDaFaixa,
-    formatarDataCabecalho,
-    formatarDataLonga,
-    obterDiaCiclo,
-    obterFase
-} from '../../../../src/features/cycles/utils/cyclePresentation';
+import { criarDiasDaFaixa, formatarDataLonga, obterDiaCiclo, obterFase } from '../../../../src/features/cycles/utils/cyclePresentation';
 
 const fases = {
     menstrual: { inicio: '2026-10-01', fim: '2026-10-05' },
@@ -28,7 +22,6 @@ test('gera a faixa inicial com três dias anteriores à data de referência', ()
     expect(dias[15].data).toBe('2026-10-17');
     expect(dias[3].hoje).toBe(true);
     expect(formatarDataLonga('2026-10-14')).toBe('14 de outubro');
-    expect(formatarDataCabecalho('2026-10-14')).toBe('Aloya - 14 de Outubro');
 });
 
 test('gera páginas adicionais em qualquer direção mantendo a referência identificada', () => {
@@ -54,8 +47,4 @@ test('projeta as fases em ciclos seguintes e anteriores ao intervalo inicial', (
 test('infere duração do ciclo pelas fases quando a previsão não informa o valor', () => {
     expect(obterFase('2026-10-29', fases)).toBe('menstrual');
     expect(obterFase('data inválida', fases, 28)).toBe('desconhecida');
-});
-
-test('rejeita dias de calendário que o Date normalizaria para outro mês', () => {
-    expect(formatarDataCabecalho('2026-02-30')).toBe('—');
 });

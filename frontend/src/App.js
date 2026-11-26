@@ -2,17 +2,9 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    BackHandler,
-    Linking,
-    Text,
-    TurboModuleRegistry
-} from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DMSans_300Light } from '@expo-google-fonts/dm-sans/300Light';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
 import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
@@ -77,8 +69,7 @@ function obterBaseUrl() {
         return process.env.EXPO_PUBLIC_API_URL;
     }
 
-    const fonte = __DEV__ ? TurboModuleRegistry.get('SourceCode') : null;
-    const script = fonte?.getConstants?.()?.scriptURL ?? fonte?.scriptURL ?? '';
+    const script = NativeModules.SourceCode?.scriptURL || '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
 
@@ -169,7 +160,6 @@ function EstadoCarregamentoApp() {
 // Inicializa fontes, sessão, serviços e navegação provisória entre as telas.
 export default function App() {
     const [fontes, erroFontes] = useFonts({
-        DMSans_300Light,
         DMSans_400Regular,
         DMSans_500Medium,
         DMSans_600SemiBold,
@@ -659,14 +649,13 @@ export default function App() {
                         setTelaInterna(telasInternas.cadastrarMenstruacao);
                     }}
                     service={configuracao.servicos.cyclePredictionService}
-                    diaryService={configuracao.servicos.diaryService}
                     aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                     aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
                     aoCadastrarDiario={(data) => {
                         setDataInicialDiario(data);
                         setCadastroDiarioVisivel(true);
                     }}
-                    aoAbrirHistorico={() => setTelaInterna(telasInternas.ciclos)}
+                    aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                     aoSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />

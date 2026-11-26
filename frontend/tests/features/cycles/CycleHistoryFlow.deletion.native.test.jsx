@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { Platform } from 'react-native';
 import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 import { CycleHistoryFlow } from '../../../src/features/cycles/CycleHistoryFlow';
-import { CycleTodayContainer } from '../../../src/features/cycles/screens/CycleTodayContainer';
 
 jest.mock('react-native', () => {
     const React = require('react');
@@ -25,31 +23,18 @@ jest.mock('../../../src/features/cycles/hooks/useCycleHistory', () => ({
 }));
 jest.mock('../../../src/features/cycles/screens/CycleHistoryScreen', () => {
     const React = require('react');
-    const { Pressable, Text, View } = require('react-native');
+    const { Pressable, Text } = require('react-native');
     return {
-        CycleHistoryScreen: ({ aoExcluirCiclo, onSelecionarAba }) =>
+        CycleHistoryScreen: ({ aoExcluirCiclo }) =>
             React.createElement(
-                View,
-                null,
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Excluir ciclo do histórico',
-                        onPress: () =>
-                            aoExcluirCiclo({
-                                id: 3,
-                                dataInicio: '2026-08-07',
-                                dataFim: '2026-08-11'
-                            })
-                    },
-                    React.createElement(Text, null, 'Excluir')
-                ),
-                React.createElement(Pressable, {
+                Pressable,
+                {
                     accessibilityRole: 'button',
-                    accessibilityLabel: 'Voltar à Home',
-                    onPress: () => onSelecionarAba('inicio')
-                })
+                    accessibilityLabel: 'Excluir ciclo do histórico',
+                    onPress: () =>
+                        aoExcluirCiclo({ id: 3, dataInicio: '2026-08-07', dataFim: '2026-08-11' })
+                },
+                React.createElement(Text, null, 'Excluir')
             )
     };
 });
@@ -92,34 +77,3 @@ test.each(['ios', 'android'])(
         expect(service.excluirCiclo).toHaveBeenCalledTimes(2);
     }
 );
-
-test('volta automaticamente ao visual sem ciclo ao retornar depois da última exclusão', async () => {
-    const semCiclo = { status: 'DADOS_INSUFICIENTES', motivos: ['INICIO_ELEGIVEL_AUSENTE'] };
-    let previsao = { status: 'DISPONIVEL', proximoInicioEstimado: '2026-08-30' };
-    const service = {
-        buscar: jest.fn(async () => previsao),
-        excluirCiclo: jest.fn(async () => {
-            previsao = semCiclo;
-            return { cicloRemovido: true, possuiCiclos: false, quantidadeCiclos: 0 };
-        })
-    };
-    function Fluxo() {
-        const [tela, setTela] = useState('inicio');
-        return tela === 'inicio' ? (
-            <CycleTodayContainer service={service} aoAbrirHistorico={() => setTela('ciclos')} />
-        ) : (
-            <CycleHistoryFlow service={service} onSelecionarAba={setTela} />
-        );
-    }
-    await render(<Fluxo />);
-    expect(await screen.findByText('Próximo ciclo')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Excluir ciclo do histórico' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Apagar' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Voltar à Home' }));
-    expect(await screen.findByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
-    expect(screen.getByTestId('diario-home-sem-ciclo')).toBeOnTheScreen();
-    expect(screen.queryByText('Próximo ciclo')).toBeNull();
-    expect(service.buscar).toHaveBeenCalledTimes(2);
-}, 30_000);

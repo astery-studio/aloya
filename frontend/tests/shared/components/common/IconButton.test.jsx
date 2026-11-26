@@ -113,20 +113,16 @@ describe('IconButton', () => {
             />
         );
 
-        const botao = screen.getByRole('button', { name: 'Abrir calendário' });
-        expect(botao).toHaveStyle({
-            width: 44,
-            height: 44,
-            backgroundColor: '#FFFFFF',
-            borderWidth: 0.666667,
-            borderColor: '#E6E2D8',
-            borderRadius: 16
-        });
+        expect(
+            screen.getByRole('button', {
+                name: 'Abrir calendário'
+            })
+        ).toHaveStyle(variantes.calendario.container);
 
         expect(IconeTeste).toHaveBeenCalledWith(
             expect.objectContaining({
-                size: 28,
-                color: '#C85A44'
+                size: 22,
+                color: temaClaro.cores.interface.textoSecundario
             }),
             undefined
         );
