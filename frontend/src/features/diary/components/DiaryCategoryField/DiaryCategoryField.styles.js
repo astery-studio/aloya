@@ -9,8 +9,8 @@ function criarEstilos(tema) {
         container: { width: '100%', gap: 8 },
         divisorCategoria: {
             width: '100%',
-            height: 0.7,
-            backgroundColor: cores.borda
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: '#E6E2D8'
         },
         faixaTitulo: {
             width: '100%',
@@ -58,6 +58,32 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             gap: 5
         },
+        entradaValor: {
+            height: 24,
+            padding: 0,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            textAlignVertical: 'center',
+            includeFontPadding: false
+        },
+        placeholderValor: {
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            includeFontPadding: false
+        },
+        unidadeValor: {
+            fontFamily: fontFamilies.bold,
+            fontSize: 13,
+            fontWeight: '700',
+            lineHeight: 24,
+            includeFontPadding: false
+        },
         campoAnotacao: {
             paddingHorizontal: 20,
             borderWidth: 1,
@@ -66,6 +92,7 @@ function criarEstilos(tema) {
         entradaAnotacao: {
             minHeight: 24,
             paddingVertical: 0,
+            paddingHorizontal: 32,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 24,
@@ -78,6 +105,30 @@ function criarEstilos(tema) {
             right: 8,
             zIndex: 1,
             borderRadius: 9
+        },
+        placeholderAnotacao: {
+            position: 'absolute',
+            right: 83,
+            top: 5.995,
+            color: '#4A5899',
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            includeFontPadding: false
+        },
+        medidorAnotacao: {
+            position: 'absolute',
+            width: '100%',
+            paddingHorizontal: 52,
+            opacity: 0,
+            fontFamily: fontFamilies.regular,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center',
+            includeFontPadding: false
         },
         contador: {
             alignSelf: 'flex-end',

@@ -64,6 +64,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             dataSelecionada={dataSelecionada}
             aoSelecionarData={setDataSelecionada}
             aoTentarNovamente={carregar}
+            onSessaoExpirada={onSessaoExpirada}
             aoCadastrarMenstruacao={
                 typeof acoes.aoCadastrarMenstruacao === 'function'
                     ? () => acoes.aoCadastrarMenstruacao(dataSelecionada || obterHojeLocal())

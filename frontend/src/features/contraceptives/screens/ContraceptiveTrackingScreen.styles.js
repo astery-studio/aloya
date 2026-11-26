@@ -6,27 +6,11 @@ function criarEstilosAcompanhamento(tema) {
     const interfaceTema = tema.cores.interface;
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo },
-        cabecalho: {
-            width: '100%',
-            maxWidth: 393.33,
-            alignSelf: 'center',
-            minHeight: 61,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 21.66,
-            paddingVertical: 8.5
-        },
-        botaoVoltar: { width: 44, height: 44, alignItems: 'flex-start', justifyContent: 'center' },
-        titulo: {
+        corpo: {
             flex: 1,
-            color: interfaceTema.textoPrincipal,
-            fontFamily: fontFamilies.bold,
-            fontSize: 26,
-            lineHeight: 39,
-            textAlign: 'center'
+            minHeight: 0,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
-        espacoCabecalho: { width: 44 },
-        corpo: { flex: 1, minHeight: 0 },
         areaBanner: {
             width: '100%',
             maxWidth: 393.33,
@@ -65,7 +49,13 @@ function criarEstilosAcompanhamento(tema) {
             letterSpacing: 0.72
         },
         espacoCartao: { height: 12 },
-        estadoCentral: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+        estadoCentral: {
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
+        },
         mensagemEstado: {
             color: interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
@@ -76,6 +66,7 @@ function criarEstilosAcompanhamento(tema) {
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingHorizontal: 22
         },
         tituloVazio: {
@@ -94,24 +85,7 @@ function criarEstilosAcompanhamento(tema) {
             fontSize: 15,
             lineHeight: 22.5,
             textAlign: 'center'
-        },
-        destaqueVazio: { fontFamily: fontFamilies.bold },
-        // Em fluxo normal: a SafeArea mantém o botão acima da navegação do sistema.
-        rodape: {
-            flexShrink: 0,
-            paddingTop: 12,
-            paddingBottom: 2,
-            backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo,
-            borderTopWidth: 0.70489,
-            borderTopColor: interfaceTema.borda
-        },
-        conteudoRodape: {
-            width: '100%',
-            maxWidth: 393.33,
-            alignSelf: 'center',
-            paddingHorizontal: 21.66
-        },
-        areaAcaoCadastro: { width: '100%', height: 56 }
+        }
     });
 }
 

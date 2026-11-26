@@ -92,6 +92,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
         onSessaoExpirada
     });
     const [expandidas, setExpandidas] = useState({});
+    const [alterado, setAlterado] = useState(false);
     const posicaoRolagem = useRef(0);
     const houveAlteracao = useRef(false);
     const macros = preferencias.catalogo?.macrocategorias ?? [];
@@ -101,6 +102,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
     useEffect(() => {
         if (visivel) {
             setExpandidas({});
+            setAlterado(false);
             houveAlteracao.current = false;
         }
     }, [visivel]);
@@ -108,6 +110,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
     const fechar = useCallback(() => {
         if (houveAlteracao.current) {
             houveAlteracao.current = false;
+            setAlterado(false);
             onAlterado?.();
         }
         onFechar?.();
@@ -118,11 +121,17 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
     }
 
     async function alterarMacrocategoria(id, ativa) {
-        if (await preferencias.alterarMacrocategoria(id, ativa)) houveAlteracao.current = true;
+        if (await preferencias.alterarMacrocategoria(id, ativa)) {
+            houveAlteracao.current = true;
+            setAlterado(true);
+        }
     }
 
     async function alterarCategoria(id, ativa) {
-        if (await preferencias.alterarCategoria(id, ativa)) houveAlteracao.current = true;
+        if (await preferencias.alterarCategoria(id, ativa)) {
+            houveAlteracao.current = true;
+            setAlterado(true);
+        }
     }
 
     const atualizarPosicaoRolagem = useCallback((evento) => {
@@ -137,6 +146,7 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
             onFechar={fechar}
             bloquearFechamento={bloqueado}
             permitirDeslizarParaFechar
+            exibirAlcaArraste={false}
             podeIniciarDeslize={podeIniciarDeslize}
             estiloPainel={estilos.painel}
             corAlca={coresDiario.interface.borda}
@@ -208,9 +218,10 @@ function DiaryCategoriesSheet({ visivel, service, onFechar, onAlterado, onSessao
                     <ButtonScreen
                         texto="Salvar"
                         aoPressionar={fechar}
-                        desativado={bloqueado || !preferencias.catalogo}
+                        desativado={bloqueado || !preferencias.catalogo || !alterado}
                         carregando={bloqueado}
                         estilo={estilos.botaoSalvar}
+                        ajustarFonteAoEspaco={false}
                     />
                 </View>
             </BottomSheetLayout>

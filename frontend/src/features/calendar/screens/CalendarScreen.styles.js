@@ -23,111 +23,89 @@ function criarEstilos(tema) {
             flex: 1,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
-        cabecalho: {
-            display: 'flex',
-            height: 139,
-            paddingTop: 56,
-            paddingRight: 20,
-            paddingBottom: 8,
-            paddingLeft: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexShrink: 0,
-            alignSelf: 'stretch'
+        corpo: {
+            flex: 1,
+            minHeight: 0
         },
-        acaoCabecalho: {
-            width: 32,
-            height: 40,
-            alignItems: 'center',
-            justifyContent: 'center'
+        tagConfianca: {
+            minWidth: 0
         },
-        acaoLegenda: {
-            padding: 8,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        centralizadorCabecalho: {
-            position: 'absolute',
-            top: 56,
-            left: 0,
-            right: 0,
-            height: 75,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        caixaCalendario: {
-            display: 'flex',
-            width: 288,
-            maxWidth: '82%',
-            height: 75,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        tituloEConfianca: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 2
-        },
-        centralizadorConfianca: {
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        titulo: {
-            color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.bold,
-            fontSize: 28,
-            fontWeight: '700',
-            lineHeight: 34,
-            textAlign: 'center'
-        },
-        corIconeCabecalho: tema.cores.interface.textoSecundario,
         conteudo: {
             flex: 1,
             minHeight: 0,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         areaCalendario: {
             flex: 1,
-            minHeight: 0
+            minHeight: 0,
+            position: 'relative'
+        },
+        posicionadorAvisoVazio: {
+            position: 'absolute',
+            top: 40,
+            right: 0,
+            left: 0,
+            zIndex: 5,
+            alignItems: 'center',
+            paddingHorizontal: 15.33
         },
         avisoVazio: {
-            flexShrink: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 9,
-            marginHorizontal: 20,
+            display: 'flex',
+            width: '100%',
+            maxWidth: 349.991,
+            paddingVertical: 10,
             paddingHorizontal: 12,
-            paddingVertical: 11,
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.destaque,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: 9,
             borderRadius: 12,
-            backgroundColor: tema.escuro ? 'transparent' : 'rgba(44, 76, 59, 0.05)'
+            backgroundColor: tema.escuro ? '#232926' : '#E3E4DE',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 6
         },
         textoVazio: {
-            flex: 1,
+            width: '100%',
             color: tema.cores.interface.destaque,
             fontFamily: fontFamilies.medium,
-            fontSize: 13,
-            lineHeight: 19
+            fontSize: 15,
+            fontWeight: '500',
+            lineHeight: 24,
+            textAlign: 'center'
         },
-        botaoCadastrarMenstruacao: tema.escuro ? { backgroundColor: '#C26E5F' } : {},
-        textoCadastrarMenstruacao: tema.escuro ? { color: '#121212' } : {},
-        rodape: {
+        estadoCentral: {
+            width: '100%',
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        },
+        botaoEstado: {
+            width: '100%',
+            height: 56,
+            borderRadius: 12
+        },
+        textoDestaque: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
+        areaSincronizacao: {
+            position: 'absolute',
+            top: 40,
+            right: 0,
+            left: 0,
+            zIndex: 5,
+            alignItems: 'center',
+            paddingHorizontal: 15.33
+        },
+        navegacaoSegura: {
             flexShrink: 0,
-            paddingTop: 20,
-            paddingRight: 24,
-            paddingBottom: 24,
-            paddingLeft: 24,
-            borderTopWidth: 1,
-            borderTopColor: tema.escuro
-                ? 'rgba(255, 255, 255, 0.08)'
-                : tema.cores.interface.separador,
-            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1E1E1E' : '#FFFFFF'
         }
     });
 }

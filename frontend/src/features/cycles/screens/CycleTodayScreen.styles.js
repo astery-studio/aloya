@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { espacamentos, fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
@@ -8,22 +8,27 @@ function criarEstilos(tema) {
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',
-            minHeight: 78,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: espacamentos.medio,
             paddingHorizontal: espacamentos.medio,
-            paddingTop: espacamentos.extraGrande
+            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
+            marginBottom: tema.espacamentosLayout.headerParaConteudo
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
-            ...typography.h2,
+            ...tema.headerTypography.principal,
+            minWidth: 0,
+            flex: 1,
             flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal,
-            fontWeight: '700',
-            lineHeight: 28
+            color: tema.cores.interface.textoPrincipal
         },
-        rolagem: { flexGrow: 1, paddingBottom: espacamentos.medio },
+        rolagem: {
+            flexGrow: 1,
+            paddingBottom: espacamentos.medio
+        },
         carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
         textoCarregando: {
             color: tema.cores.interface.textoSecundario,

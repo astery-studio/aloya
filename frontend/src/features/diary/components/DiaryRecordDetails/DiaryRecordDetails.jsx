@@ -1,11 +1,13 @@
 // Exibe sob demanda os dados autorizados de um registro dentro do modal de detalhes.
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import ButtonPopup from '../../../../shared/components/common/Button/ButtonPopup/ButtonPopup';
+import { RepeatIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { obterCoresDiario } from '../../config/diaryColors';
 import { formatarDataDiario } from '../../utils/diaryDate';
+import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { DiaryDateNavigator } from '../DiaryDateNavigator/DiaryDateNavigator';
 import { DiaryPhaseBadge } from '../DiaryPhaseBadge/DiaryPhaseBadge';
 import { DiaryRecordActions, criarEstiloBotaoAcao } from '../DiaryRecordActions/DiaryRecordActions';
@@ -16,16 +18,6 @@ import {
     valorEscalado
 } from '../DiaryRecordCategorySection/DiaryRecordCategorySection';
 import { criarEstilos } from './DiaryRecordDetails.styles';
-
-// Mede o último elemento real e ignora o padding decorativo no fim do container.
-function precisaAtivarRolagem(limiteConteudo, alturaVisivel) {
-    return (
-        Number.isFinite(limiteConteudo) &&
-        Number.isFinite(alturaVisivel) &&
-        alturaVisivel > 0 &&
-        limiteConteudo > alturaVisivel + 2
-    );
-}
 
 // Valida a identidade e prepara as categorias do detalhe sem persistir dados.
 function normalizarDetalhe(registro) {
@@ -72,11 +64,13 @@ function DiaryRecordDetails({
     const tema = useTheme();
     const cores = obterCoresDiario(tema).interface;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const [limiteConteudo, setLimiteConteudo] = useState(0);
-    const [alturaVisivel, setAlturaVisivel] = useState(0);
     const detalhe = normalizarDetalhe(registro);
     const bloqueado = acaoEmAndamento !== null;
-    const rolagemNecessaria = precisaAtivarRolagem(limiteConteudo, alturaVisivel);
+    const apresentacaoFase = obterApresentacaoFase(detalhe?.fase, tema);
+    const fundoFase =
+        !tema.escuro && ['ovulacao', 'ovulatoria'].includes(detalhe?.fase)
+            ? 'rgba(74, 117, 142, 0.20)'
+            : apresentacaoFase?.fundo;
 
     if (carregando) {
         return (
@@ -111,66 +105,70 @@ function DiaryRecordDetails({
     if (!detalhe) return null;
 
     return (
-        <ScrollView
-            testID="diary-record-details"
-            style={estilos.rolagem}
-            contentContainerStyle={estilos.container}
-            bounces={false}
-            nestedScrollEnabled
-            scrollEnabled={rolagemNecessaria}
-            onLayout={({ nativeEvent }) => setAlturaVisivel(nativeEvent.layout.height)}
-            showsVerticalScrollIndicator={false}
-        >
-            <Text accessibilityRole="header" style={estilos.titulo}>
-                Diário
-            </Text>
-            <DiaryDateNavigator
-                data={detalhe.data}
-                aoAnterior={aoAnterior}
-                aoProximo={aoProximo}
-                anteriorDisponivel={typeof aoAnterior === 'function'}
-                proximoDisponivel={typeof aoProximo === 'function'}
-                desabilitado={bloqueado}
-                compacto
-            />
-            <Text style={estilos.resumoDia}>RESUMO DO DIA</Text>
-            <Text style={estilos.introducao}>{criarIntroducaoRegistro(detalhe)}</Text>
-
-            <View style={estilos.categorias}>
-                {detalhe.categorias.map((categoria) => (
-                    <DiaryRecordCategorySection
-                        key={categoria.id}
-                        categoria={categoria}
-                        estilos={estilos}
-                        cor={cores.destaque}
-                    />
-                ))}
+        <View testID="diary-record-details" style={estilos.detalhes}>
+            <View testID="diary-details-header" style={estilos.cabecalhoFixo}>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Diário
+                </Text>
+                <DiaryDateNavigator
+                    data={detalhe.data}
+                    aoAnterior={aoAnterior}
+                    aoProximo={aoProximo}
+                    anteriorDisponivel={typeof aoAnterior === 'function'}
+                    proximoDisponivel={typeof aoProximo === 'function'}
+                    desabilitado={bloqueado}
+                    compacto
+                    estiloContainer={estilos.navegadorData}
+                    estiloTexto={estilos.textoData}
+                />
             </View>
 
-            <DiaryRecordActions
-                registro={registro}
-                dataFormatada={detalhe.dataFormatada}
-                aoEditar={aoEditar}
-                aoExcluir={aoExcluir}
-                bloqueado={bloqueado}
-                estilos={estilos}
-            />
-
-            <DiaryPhaseBadge
-                fase={detalhe.fase}
-                estilo={estilos.faseRegistro}
-                estiloTexto={estilos.textoFaseRegistro}
-                tamanhoIcone={13}
-            />
-            <View
-                testID="diary-details-end"
-                collapsable={false}
-                style={estilos.areaBotaoOk}
-                onLayout={({ nativeEvent }) => {
-                    const { y, height } = nativeEvent.layout;
-                    setLimiteConteudo(y + height);
-                }}
+            <ScrollView
+                testID="diary-details-scroll"
+                style={estilos.rolagem}
+                contentContainerStyle={estilos.conteudoRolavel}
+                bounces={false}
+                nestedScrollEnabled
+                scrollEnabled
+                showsVerticalScrollIndicator={false}
             >
+                <Text style={estilos.resumoDia}>RESUMO DO DIA</Text>
+                <Text style={estilos.introducao}>{criarIntroducaoRegistro(detalhe)}</Text>
+
+                <View style={estilos.categorias}>
+                    {detalhe.categorias.map((categoria) => (
+                        <DiaryRecordCategorySection
+                            key={categoria.id}
+                            categoria={categoria}
+                            estilos={estilos}
+                            cor={cores.destaque}
+                        />
+                    ))}
+                </View>
+
+                <DiaryRecordActions
+                    registro={registro}
+                    dataFormatada={detalhe.dataFormatada}
+                    aoEditar={aoEditar}
+                    aoExcluir={aoExcluir}
+                    bloqueado={bloqueado}
+                    estilos={estilos}
+                />
+
+                <DiaryPhaseBadge
+                    fase={detalhe.fase}
+                    estilo={estilos.faseRegistro}
+                    estiloTexto={estilos.textoFaseRegistro}
+                    tamanhoIcone={13}
+                    larguraIcone={13}
+                    alturaIcone={13}
+                    icone={RepeatIcon}
+                    cor={apresentacaoFase?.cor}
+                    fundo={fundoFase}
+                />
+            </ScrollView>
+
+            <View testID="diary-details-footer" style={estilos.areaBotaoOk}>
                 <ButtonPopup
                     texto="OK"
                     variante="verde"
@@ -180,7 +178,7 @@ function DiaryRecordDetails({
                     estiloTexto={estilos.textoBotaoOk}
                 />
             </View>
-        </ScrollView>
+        </View>
     );
 }
 
@@ -193,6 +191,5 @@ export {
     formatarDuracao,
     normalizarDetalhe,
     obterCoresCategoria,
-    precisaAtivarRolagem,
     valorEscalado
 };

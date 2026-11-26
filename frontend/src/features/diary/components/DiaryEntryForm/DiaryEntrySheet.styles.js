@@ -13,6 +13,37 @@ function criarEstilos(tema) {
             paddingBottom: 0,
             backgroundColor: cores.superficie
         },
+        navegadorData: { paddingTop: 0 },
+        containerFase: {
+            width: 294,
+            maxWidth: '100%',
+            height: 63.993,
+            alignSelf: 'center',
+            paddingTop: 8,
+            paddingBottom: 20,
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+        tagFase: {
+            height: 35.993,
+            minHeight: 0,
+            marginTop: 0,
+            alignSelf: 'stretch',
+            flexShrink: 0,
+            paddingVertical: 0,
+            paddingHorizontal: 14,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
+            borderRadius: 10
+        },
+        textoFase: {
+            fontFamily: fontFamilies.semibold,
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
+        },
         rolagem: { flex: 1 },
         conteudo: { alignItems: 'center', paddingHorizontal: 16 },
         carregamento: { minHeight: 240, alignItems: 'center', justifyContent: 'center', gap: 12 },
@@ -40,7 +71,7 @@ function criarEstilos(tema) {
             width: '100%',
             maxWidth: 342,
             alignSelf: 'center',
-            marginTop: 20,
+            marginTop: 0,
             marginBottom: 24,
             padding: 16,
             borderWidth: 1.41,
@@ -64,8 +95,9 @@ function criarEstilos(tema) {
             backgroundColor: cores.destaqueSuave
         },
         textoContador: {
-            fontFamily: fontFamilies.semiBold,
+            fontFamily: fontFamilies.bold,
             fontSize: 12,
+            fontWeight: '700',
             lineHeight: 16,
             color: cores.destaque
         },
@@ -79,7 +111,7 @@ function criarEstilos(tema) {
         },
         listaMacros: {
             width: '100%',
-            maxWidth: 308,
+            maxWidth: 311,
             alignSelf: 'center',
             paddingTop: 14
         },

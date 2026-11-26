@@ -13,7 +13,15 @@ import {
 } from '../DiaryFreeTextCategoryField/DiaryFreeTextCategoryField';
 import { criarEstilos } from './DiaryCategoryField.styles';
 
-function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', desabilitado, erro }) {
+function DiaryCategoryField({
+    categoria,
+    valor,
+    aoAlterar,
+    paleta = 'ciclo',
+    desabilitado,
+    erro,
+    exibirDivisor = false
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const paletas = obterCoresDiario(tema).macrocategorias;
@@ -37,6 +45,12 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 desativado={desabilitado}
                 permitirLimpar
                 rotuloAcessibilidade={categoria.nome}
+                placeholder="0"
+                corPlaceholder={cores.icone}
+                estiloEntrada={[estilos.entradaValor, { color: cores.icone }]}
+                estiloUnidade={[estilos.unidadeValor, { color: cores.icone }]}
+                placeholderComoTexto
+                estiloPlaceholder={[estilos.placeholderValor, { color: cores.icone }]}
             />
         );
     } else if (categoria.tipoValor === 'duracao_minutos') {
@@ -46,6 +60,15 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
                 aoAlterar={aoAlterar}
                 desabilitado={desabilitado}
                 erro={erro}
+                placeholderHoras="00"
+                placeholderMinutos="00"
+                corPlaceholder={cores.icone}
+                rotuloHoras="horas"
+                rotuloMinutos="minutos"
+                estiloEntrada={[estilos.entradaValor, { color: cores.icone }]}
+                estiloUnidade={[estilos.unidadeValor, { color: cores.icone }]}
+                placeholderComoTexto
+                estiloPlaceholder={[estilos.placeholderValor, { color: cores.icone }]}
             />
         );
     } else if (categoria.tipoValor === 'texto') {
@@ -63,8 +86,11 @@ function DiaryCategoryField({ categoria, valor, aoAlterar, paleta = 'ciclo', des
     }
     return (
         <View style={estilos.container}>
-            {categoria.id === 'anotacao_livre' ? (
-                <View testID="divisor-anotacao-livre" style={estilos.divisorCategoria} />
+            {exibirDivisor ? (
+                <View
+                    testID={`divisor-categoria-${categoria.id}`}
+                    style={estilos.divisorCategoria}
+                />
             ) : null}
             <View style={[estilos.faixaTitulo, { backgroundColor: cores.fundoCategoria }]}>
                 <Text accessibilityRole="header" style={[estilos.titulo, { color: cores.icone }]}>

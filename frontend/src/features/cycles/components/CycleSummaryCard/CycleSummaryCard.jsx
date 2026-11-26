@@ -1,10 +1,11 @@
 //Centraliza o resumo para manter os estados preenchido e vazio consistentes no histórico.
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { ConfidenceBadge } from '../../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { coresConfiabilidadeEscuras, criarEstilos } from './CycleSummaryCard.styles';
+import { CycleConfidenceSheet } from '../sheets/CycleConfidenceSheet';
 
 const confiancasPermitidas = Object.freeze(['alta', 'media', 'baixa']);
 
@@ -31,6 +32,7 @@ function obterTextoDosCiclos(quantidade) {
 function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCiclos, confianca }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const [confiabilidadeVisivel, setConfiabilidadeVisivel] = useState(false);
 
     if (!confiancasPermitidas.includes(confianca)) {
         throw new Error(`Confiança do resumo de ciclos inválida: ${confianca}`);
@@ -109,12 +111,19 @@ function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCicl
                     <ConfidenceBadge
                         nivel={confianca}
                         variante="simples"
+                        exibirPrefixo
+                        onPress={() => setConfiabilidadeVisivel(true)}
                         coresPersonalizadas={
                             tema.escuro ? coresConfiabilidadeEscuras[confianca] : undefined
                         }
                     />
                 </View>
             </View>
+            <CycleConfidenceSheet
+                visivel={confiabilidadeVisivel}
+                nivel={confianca}
+                aoFechar={() => setConfiabilidadeVisivel(false)}
+            />
         </View>
     );
 }

@@ -53,7 +53,7 @@ function candidatosDaCategoria(categoria) {
     return [];
 }
 
-function apresentarResumoRegistro(registro, categoriasAtivas) {
+function apresentarResumoRegistro(registro, categoriasAtivas, diaCiclo = null) {
     const candidatos = registro.categorias
         .filter(({ categoriaId }) => categoriasAtivas.has(categoriaId))
         .flatMap(candidatosDaCategoria)
@@ -74,6 +74,7 @@ function apresentarResumoRegistro(registro, categoriasAtivas) {
         id: registro.id,
         data: formatarData(registro.dataRegistro),
         fase: registro.faseCicloAssociada,
+        diaCiclo: Number.isSafeInteger(diaCiclo) && diaCiclo > 0 ? diaCiclo : null,
         principais,
         maisQuantidade: Math.max(0, candidatos.length - principais.length),
         trechoAnotacao: criarTrechoAnotacao(anotacao?.valorTexto),

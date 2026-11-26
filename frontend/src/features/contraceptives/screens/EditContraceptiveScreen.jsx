@@ -111,12 +111,16 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
     if (!registroValido) {
         return (
-            <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
-                testID="edicao-anticoncepcional-area-segura">
+            <SafeAreaView
+                style={[estilos.tela, estilos.telaCadastro]}
+                edges={['top', 'left', 'right', 'bottom']}
+                testID="edicao-anticoncepcional-area-segura"
+            >
                 <Header
                     titulo="Editar o Anticoncepcional"
                     variante="comVoltar"
                     onVoltar={aoVoltar}
+                    aplicarSafeAreaSuperior={false}
                 />
 
                 <View style={estilos.vazio}>
@@ -124,7 +128,10 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                         Anticoncepcional indisponível
                     </Text>
 
-                    <Text accessibilityRole="alert" style={[estilos.textoVazio, estilosErro.mensagem]}>
+                    <Text
+                        accessibilityRole="alert"
+                        style={[estilos.textoVazio, estilosErro.mensagem]}
+                    >
                         Não foi possível carregar os dados para edição.
                     </Text>
                 </View>
@@ -133,12 +140,16 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     }
 
     return (
-        <SafeAreaView style={[estilos.tela, estilos.telaCadastro]} edges={['top', 'left', 'right', 'bottom']}
-            testID="edicao-anticoncepcional-area-segura">
+        <SafeAreaView
+            style={[estilos.tela, estilos.telaCadastro]}
+            edges={['top', 'left', 'right', 'bottom']}
+            testID="edicao-anticoncepcional-area-segura"
+        >
             <Header
                 titulo="Editar o Anticoncepcional"
                 variante="comVoltar"
                 onVoltar={ocupado ? undefined : aoVoltar}
+                aplicarSafeAreaSuperior={false}
             />
 
             <ScrollView

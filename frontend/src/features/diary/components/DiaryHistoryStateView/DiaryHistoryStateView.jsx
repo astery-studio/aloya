@@ -4,7 +4,7 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
 import { obterCoresDiario } from '../../config/diaryColors';
 
-function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, aoCriar, estilos, tema }) {
+function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, estilos, tema }) {
     const cores = obterCoresDiario(tema).interface;
     let estado;
 
@@ -50,14 +50,16 @@ function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, aoCriar, es
                 <EmptyState
                     titulo="Nenhum registro visível"
                     mensagem={
-                        'Você ainda pode não ter registros ou as categorias usadas neles podem estar desativadas.\nAtive-as em "Gerenciar categorias" ou toque em "Adicionar novo registro" para começar.'
-                    }
-                    acao={
-                        <ButtonScreen
-                            texto="Adicionar novo registro"
-                            variante="laranja"
-                            aoPressionar={aoCriar}
-                        />
+                        <>
+                            Você ainda pode não ter registros ou as categorias usadas neles podem
+                            estar desativadas. Ative-as em{' '}
+                            <Text style={estilos.opcaoEstadoVazio}>
+                                &quot;Gerenciar categorias&quot;
+                            </Text>{' '}
+                            ou use o{' '}
+                            <Text style={estilos.opcaoEstadoVazio}>botão de adicionar</Text> para
+                            começar.
+                        </>
                     }
                 />
             </View>

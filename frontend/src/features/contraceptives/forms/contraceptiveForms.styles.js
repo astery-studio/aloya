@@ -56,7 +56,12 @@ function criarEstilos(tema) {
         placeholder: { color: interfaceTema.textoSecundario },
         pressionado: { opacity: 0.7 },
         telaFluxo: { flex: 1, backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo },
-        conteudoFluxo: { flex: 1, paddingHorizontal: 24, gap: 12 },
+        conteudoFluxo: {
+            flex: 1,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingHorizontal: 24,
+            gap: 12
+        },
         descricaoFluxo: {
             fontFamily: 'DMSans_400Regular',
             fontSize: 14,

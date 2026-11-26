@@ -1,9 +1,24 @@
 //Garante que dados incompletos nunca produzam um resumo parcialmente preenchido.
-import { screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 
 import { CycleSummaryCard } from '../../../../src/features/cycles/components/CycleSummaryCard/CycleSummaryCard';
 import { estilos } from '../../../../src/features/cycles/components/CycleSummaryCard/CycleSummaryCard.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
+
+jest.mock('../../../../src/features/cycles/components/sheets/CycleConfidenceSheet', () => {
+    const ReactInterno = require('react');
+    const { Text, View } = require('react-native');
+    return {
+        CycleConfidenceSheet: ({ visivel, nivel }) =>
+            visivel
+                ? ReactInterno.createElement(
+                      View,
+                      { testID: 'confidence-sheet' },
+                      ReactInterno.createElement(Text, null, `Confiabilidade ${nivel}`)
+                  )
+                : null
+    };
+});
 
 describe('CycleSummaryCard', () => {
     test('mostra as duas médias quando existem ciclos e métricas válidas', async () => {
@@ -21,7 +36,10 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByLabelText('Ciclo médio: 28 dias')).toBeOnTheScreen();
         expect(screen.getByLabelText('Menstruação média: 5 dias')).toBeOnTheScreen();
         expect(screen.getByText('5 ciclos registrados')).toBeOnTheScreen();
+        expect(screen.getByText('Confiança Alta')).toBeOnTheScreen();
         expect(screen.getByLabelText('Confiança alta')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Confiança alta' }));
+        expect(screen.getByTestId('confidence-sheet')).toBeOnTheScreen();
     });
 
     test('mantém somente quantidade e confiança quando não existem ciclos', async () => {
@@ -30,6 +48,7 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByTestId('cycle-summary-card')).toHaveStyle(estilos.semMetricas);
         expect(screen.queryByTestId('cycle-summary-metrics')).not.toBeOnTheScreen();
         expect(screen.getByText('0 ciclos registrados')).toBeOnTheScreen();
+        expect(screen.getByText('Confiança Baixa')).toBeOnTheScreen();
         expect(screen.getByLabelText('Confiança baixa')).toBeOnTheScreen();
     });
 

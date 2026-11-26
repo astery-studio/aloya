@@ -9,6 +9,7 @@ function criarEstilos(tema) {
             flexGrow: 1,
             gap: tema.espacamentos.extraGrande,
             paddingHorizontal: tema.espacamentos.grande,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.extraGrande,
             backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },
@@ -21,20 +22,28 @@ function criarEstilos(tema) {
         tituloSecao: {
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
-            fontSize: 16,
-            lineHeight: 24,
+            fontSize: 14,
+            fontStyle: 'normal',
+            fontWeight: '500',
+            lineHeight: 19.6,
             includeFontPadding: false
         },
 
-        campo: tema.escuro ? { backgroundColor: '#1E1E1E' } : {},
+        campo: tema.escuro
+            ? {
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
+
         campoComBorda: tema.escuro
             ? {
                   backgroundColor: '#1E1E1E',
                   borderRadius: 12,
-                  borderWidth: tema.escuro ? 0.705 : 0.705,
+                  borderWidth: 0.705,
                   borderColor: '#2C2C2C'
               }
             : {},
+
         grupo: {
             width: '100%',
             overflow: 'hidden',
@@ -45,8 +54,9 @@ function criarEstilos(tema) {
         },
 
         separador: {
-            height: 0.7,
-            marginLeft: 61,
+            width: 288.586,
+            height: 0.991,
+            alignSelf: 'center',
             backgroundColor: tema.cores.interface.borda
         }
     });

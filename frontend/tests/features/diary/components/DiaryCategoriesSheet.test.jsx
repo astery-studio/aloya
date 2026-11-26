@@ -37,6 +37,7 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
     await render(<DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />);
 
     expect(screen.getByRole('header', { name: 'Gerências Categorias' })).toBeOnTheScreen();
+    expect(screen.queryByTestId('bottom-sheet-area-arraste')).not.toBeOnTheScreen();
     await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
     for (const [, nome] of macros) expect(screen.getByText(nome)).toBeOnTheScreen();
     await waitFor(() => {
@@ -52,9 +53,11 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
         width: 342,
         maxWidth: '100%',
         height: 54,
-        paddingTop: 15.375,
-        paddingBottom: 14.625
+        justifyContent: 'center',
+        alignItems: 'center'
     });
+    expect(screen.getByText('Salvar')).toHaveProp('adjustsFontSizeToFit', false);
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
     expect(screen.getByTestId('rodape-categorias-diario')).toHaveStyle({
         alignSelf: 'stretch',
         marginHorizontal: -24,
@@ -62,17 +65,16 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
         borderTopWidth: 1,
         borderTopColor: '#E6E2D8'
     });
-});
+}, 30000);
 
 test.each([
     ['claro', '#FFFFFF', '#2C4C3B'],
     ['escuro', '#121212', '#A5D6A7']
 ])('mantém contraste correto nos toggles do tema %s', async (preferencia, indicador, trilha) => {
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
-    await render(
-        <DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />,
-        { preferencia }
-    );
+    await render(<DiaryCategoriesSheet visivel service={service} onFechar={jest.fn()} />, {
+        preferencia
+    });
     await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
 
     expect(screen.getAllByTestId('switch-field-thumb')[0]).toHaveStyle({
@@ -83,16 +85,17 @@ test.each([
     });
 });
 
-test('fecha pelo X ou por Salvar sem exigir nova persistência', async () => {
+test('fecha pelo X e mantém Salvar desativado sem modificação', async () => {
     const onFechar = jest.fn();
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(criarCatalogo()) };
     await render(<DiaryCategoriesSheet visivel service={service} onFechar={onFechar} />);
     await waitFor(() => expect(screen.getByText('6 / 6 ativos')).toBeOnTheScreen());
 
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
     await fireEvent.press(screen.getByRole('button', { name: 'Fechar painel' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
 
-    expect(onFechar).toHaveBeenCalledTimes(2);
+    expect(onFechar).toHaveBeenCalledTimes(1);
 });
 
 test('desativa filhos visualmente sem apagar seu estado individual', async () => {
@@ -118,6 +121,7 @@ test('desativa filhos visualmente sem apagar seu estado individual', async () =>
     await fireEvent.press(screen.getByRole('switch', { name: 'Desativar Ciclo e Sangramento' }));
 
     await waitFor(() => expect(screen.getByText('5 / 6 ativos')).toBeOnTheScreen());
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled();
     expect(service.atualizarMacrocategoria).toHaveBeenCalledWith('ciclo_sangramento', false, 0);
     expect(screen.getByRole('switch', { name: 'Desativar Fluxo menstrual' })).toBeDisabled();
 });

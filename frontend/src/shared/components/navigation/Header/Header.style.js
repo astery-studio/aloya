@@ -1,7 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies } from '../../../theme';
-
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
@@ -15,125 +13,70 @@ function criarEstilos(tema) {
               }
             : {},
 
-        containerDiario: {
-            width: 390,
-            maxWidth: '100%',
-            flexShrink: 0,
-            flexDirection: 'row',
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: 56,
-            paddingHorizontal: 16,
-            paddingBottom: 12
-        },
-
-        espacamentoSuperior: {
-            height: 56
-        },
-
-        espacamentoSuperiorComVoltar: {
-            height: 48
-        },
-
-        espacamentoSuperiorRedeApoio: {
-            height: 55.99
-        },
-
-        espacamentoSuperiorDiario: {
-            display: 'none',
-            height: 0
-        },
-
         areaTitulo: {
-            minHeight: 66,
             flexDirection: 'row',
-            alignItems: 'flex-start',
+            alignItems: 'center',
+            gap: 12,
             paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-            paddingBottom: 32
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
 
         areaTituloComVoltar: {
-            minHeight: 72,
-            alignItems: 'center',
-            paddingLeft: 12,
-            paddingRight: 60,
-            paddingBottom: 24
+            paddingHorizontal: 12
         },
 
-        areaTituloRedeApoio: {
-            minHeight: 56,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 16,
-            paddingBottom: 12
-        },
-
-        areaTituloDiario: {
-            width: '100%',
-            minHeight: 44,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 0,
-            paddingBottom: 0
+        areaTituloComComplemento: {
+            justifyContent: 'space-between'
         },
 
         titulo: {
             flex: 1,
             flexShrink: 1,
-            ...tema.typography.h1,
+            ...tema.headerTypography.principal,
+            color: tema.cores.interface.textoPrincipal
+        },
+
+        blocoTitulo: {
+            flex: 1,
+            flexShrink: 1,
+            alignItems: 'flex-start'
+        },
+
+        blocoTituloComVoltar: {
+            alignItems: 'center'
+        },
+
+        tituloNoBloco: {
+            ...tema.headerTypography.principal,
             color: tema.cores.interface.textoPrincipal
         },
 
         tituloComVoltar: {
-            fontFamily: fontFamilies.bold,
-            fontSize: 18,
-            fontWeight: '700',
-            lineHeight: 27,
+            ...tema.headerTypography.compacto,
             textAlign: 'center'
         },
 
-        containerTituloRedeApoio: {
-            flex: 1,
-            alignSelf: 'stretch',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'center'
+        tituloComComplemento: {
+            flex: 0,
+            minWidth: 0
         },
 
-        tituloRedeApoio: {
-            flex: 0,
-            fontFamily: fontFamilies.bold,
-            fontSize: 28,
-            fontWeight: '700',
-            lineHeight: 27.5
+        complementoTitulo: {
+            flexShrink: 0,
+            alignItems: 'center'
         },
 
         acoes: {
             flexShrink: 0,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
-            marginLeft: 16
+            gap: 12
         },
 
-        tituloDiario: {
-            fontSize: 28,
-            lineHeight: 34
-        },
-
-        acoesDireita: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            marginTop: -8,
-            marginLeft: 12
-        },
-
-        acoesDireitaDiario: {
-            gap: 16,
-            marginTop: 0,
-            marginLeft: 16
+        acoesComVoltar: {
+            width: 48,
+            height: 48,
+            justifyContent: 'center'
         },
 
         containerVoltar: {
@@ -142,6 +85,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 24
+        },
+
+        espacadorVoltar: {
+            width: 48,
+            height: 48,
+            flexShrink: 0
         },
 
         desabilitado: {

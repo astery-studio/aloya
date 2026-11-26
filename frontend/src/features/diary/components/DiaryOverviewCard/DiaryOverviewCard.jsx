@@ -8,6 +8,42 @@ import { obterApresentacaoFase } from '../../utils/diaryPhasePresentation';
 import { DiaryPhaseIcon } from '../DiaryPhaseIcon/DiaryPhaseIcon';
 import { criarEstilos } from './DiaryOverviewCard.styles';
 
+const APRESENTACAO_RESUMO_FASE = Object.freeze({
+    menstruacao: {
+        corIcone: '#C85A44',
+        corTexto: '#C85A44',
+        corTextoContador: 'rgba(200, 90, 68, 0.80)',
+        corFundoContador: 'rgba(200, 90, 68, 0.20)'
+    },
+    lutea: {
+        corIcone: '#D68C3A',
+        corTexto: '#D68C3A',
+        corTextoContador: 'rgba(214, 140, 58, 0.80)',
+        corFundoContador: 'rgba(214, 140, 58, 0.20)'
+    },
+    folicular: {
+        corIcone: '#567062',
+        corTexto: '#2C4C3B',
+        corTextoContador: 'rgba(44, 76, 59, 0.80)',
+        corFundoContador: 'rgba(44, 76, 59, 0.20)'
+    },
+    ovulacao: {
+        corIcone: '#4A758E',
+        corTexto: '#4A758E',
+        corTextoContador: 'rgba(74, 117, 142, 0.80)',
+        corFundoContador: 'rgba(74, 117, 142, 0.20)'
+    }
+});
+
+const ALIASES_FASE_RESUMO = Object.freeze({
+    menstrual: 'menstruacao',
+    ovulatoria: 'ovulacao'
+});
+
+function obterApresentacaoResumoFase(fase) {
+    return APRESENTACAO_RESUMO_FASE[ALIASES_FASE_RESUMO[fase] ?? fase] ?? null;
+}
+
 // Recebe somente dados já autorizados e retorna o cartão de resumo ou nada quando inválido.
 function DiaryOverviewCard({
     fase,
@@ -21,6 +57,7 @@ function DiaryOverviewCard({
     const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const apresentacao = obterApresentacaoFase(fase, tema);
+    const apresentacaoResumo = obterApresentacaoResumoFase(fase);
 
     if (carregando) {
         return (
@@ -40,6 +77,7 @@ function DiaryOverviewCard({
 
     if (
         !apresentacao ||
+        !apresentacaoResumo ||
         typeof tituloFase !== 'string' ||
         !tituloFase.trim() ||
         typeof descricao !== 'string' ||
@@ -50,7 +88,6 @@ function DiaryOverviewCard({
         return null;
     }
 
-    const { cor } = apresentacao;
     const textoDias = `${diasRegistrados}${contagemParcial ? '+' : ''} ${
         diasRegistrados === 1 && !contagemParcial ? 'dia registrado' : 'dias registrados'
     }`;
@@ -72,18 +109,38 @@ function DiaryOverviewCard({
                     style={estilos.areaIcone}
                     importantForAccessibility="no-hide-descendants"
                 >
-                    <DiaryPhaseIcon fase={fase} size={48} />
+                    <DiaryPhaseIcon fase={fase} size={48} cor={apresentacaoResumo.corIcone} />
                 </View>
                 <View style={estilos.textos}>
-                    <Text style={estilos.titulo}>
+                    <Text
+                        testID="diary-overview-title"
+                        style={[estilos.titulo, { color: apresentacaoResumo.corTexto }]}
+                    >
                         Você está na{' '}
-                        <Text style={[estilos.fase, { color: cor }]}>{tituloFase.trim()}</Text>
+                        <Text
+                            testID="diary-overview-phase"
+                            style={[estilos.fase, { color: apresentacaoResumo.corTexto }]}
+                        >
+                            {tituloFase.trim()}
+                        </Text>
                     </Text>
                     <Text style={estilos.descricao}>{descricao.trim()}</Text>
                 </View>
             </View>
             <View testID="diary-overview-footer" style={estilos.rodape}>
-                <Text style={estilos.quantidade}>{textoDias}</Text>
+                <View
+                    testID="diary-overview-day-counter"
+                    style={[
+                        estilos.contadorDias,
+                        { backgroundColor: apresentacaoResumo.corFundoContador }
+                    ]}
+                >
+                    <Text
+                        style={[estilos.quantidade, { color: apresentacaoResumo.corTextoContador }]}
+                    >
+                        {textoDias}
+                    </Text>
+                </View>
             </View>
         </View>
     );
@@ -91,4 +148,8 @@ function DiaryOverviewCard({
 
 const MemoizedDiaryOverviewCard = memo(DiaryOverviewCard);
 
-export { MemoizedDiaryOverviewCard as DiaryOverviewCard };
+export {
+    APRESENTACAO_RESUMO_FASE,
+    MemoizedDiaryOverviewCard as DiaryOverviewCard,
+    obterApresentacaoResumoFase
+};

@@ -16,6 +16,7 @@ function criarEstilos(tema) {
         conteudo: {
             flexGrow: 1,
             paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.grande,
             backgroundColor: tema.cores.interface.fundo
         },

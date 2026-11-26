@@ -146,6 +146,16 @@ function CycleHistoryScreen({
         />
     );
 
+    const botaoCalendario = (
+        <ButtonScreen
+            texto="Ir para o Calendário"
+            estilo={estilos.botaoCadastrarMenstruacao}
+            estiloTexto={estilos.textoCadastrarMenstruacao}
+            variante="laranja"
+            aoPressionar={aoAbrirCalendario}
+        />
+    );
+
     function renderizarCiclo({ item }) {
         return (
             <View style={estilos.itemDaLista}>
@@ -217,15 +227,7 @@ function CycleHistoryScreen({
                         Comece registrando seu primeiro ciclo pelo calendário.
                     </Text>
 
-                    <View style={estilos.botaoDoEstado}>
-                        <ButtonScreen
-                            texto="Ir para o Calendário"
-                            estilo={estilos.botaoCadastrarMenstruacao}
-                            estiloTexto={estilos.textoCadastrarMenstruacao}
-                            variante="laranja"
-                            aoPressionar={aoAbrirCalendario}
-                        />
-                    </View>
+                    <View style={estilos.botaoDoEstado}>{botaoCalendario}</View>
                 </View>
             </View>
         );
@@ -239,6 +241,7 @@ function CycleHistoryScreen({
                 ListHeaderComponent={
                     <View style={estilos.cabecalhoDaLista}>
                         {resumoDosCiclos}
+                        {botaoCalendario}
                         <DivisorDaLista estilos={estilos} />
                     </View>
                 }
