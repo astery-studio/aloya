@@ -2,15 +2,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 
+import { criarRemocaoAnticoncepcionalRateLimit } from '../../../../src/features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptive.routes.js';
 
 //Inicia uma API temporária e registra a ordem dos middlewares e controllers.
-async function comApi({autenticado = true}, executar) {
+async function comApi({autenticado = true, limitarRemocoes}, executar) {
     const eventos = [];
     const app = express();
 
-    function autenticar(_requisicao, resposta, proximo) {
+    function autenticar(requisicao, resposta, proximo) {
         eventos.push('autenticar');
 
         if (!autenticado) {
@@ -22,6 +24,7 @@ async function comApi({autenticado = true}, executar) {
             });
         }
 
+        requisicao.usuario = { id: 1 };
         proximo();
     }
 
@@ -84,7 +87,7 @@ async function comApi({autenticado = true}, executar) {
         autenticar,
         controller,
         edicaoRateLimit,
-        remocaoRateLimit
+        remocaoRateLimit: limitarRemocoes ?? remocaoRateLimit
     }));
 
     const servidor = app.listen(0);
@@ -101,6 +104,30 @@ async function comApi({autenticado = true}, executar) {
         await new Promise((resolve) => servidor.close(resolve));
     }
 }
+
+test('permite remover e apagar seis anticoncepcionais antes de responder 429', async () => {
+    const limitarRemocoes = criarRemocaoAnticoncepcionalRateLimit({
+        rateLimit,
+        janelaMs: 60_000,
+        limite: 12,
+        logger: { warn() {} }
+    });
+
+    await comApi({ limitarRemocoes }, async (url) => {
+        for (let id = 1; id <= 6; id += 1) {
+            const remocao = await fetch(`${url}/${id}`, { method: 'DELETE' });
+            assert.equal(remocao.status, 200);
+            await remocao.json();
+
+            const exclusao = await fetch(`${url}/${id}/definitivo`, { method: 'DELETE' });
+            assert.equal(exclusao.status, 204);
+        }
+
+        const bloqueio = await fetch(`${url}/7`, { method: 'DELETE' });
+        assert.equal(bloqueio.status, 429);
+        assert.equal((await bloqueio.json()).erro.codigo, 'LIMITE_REMOCOES_ANTICONCEPCIONAL');
+    });
+});
 
 test('executa autenticação, limite de remoção e controller nessa ordem', async () => {
     await comApi({autenticado: true}, async (url, eventos) => {
