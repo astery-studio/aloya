@@ -24,6 +24,9 @@ test('usa o verde da fase folicular e conserva o espaço vazio do símbolo', asy
     await render(<CyclePhaseHero fase="folicular" diaCiclo={8} janelaFertilAtiva />);
 
     expect(screen.getByLabelText('Janela fértil ativa')).toHaveStyle({ borderColor: '#2C4C3B' });
+    expect(
+        screen.getByTestId('cycle-phase-artwork', { includeHiddenElements: true })
+    ).toBeOnTheScreen();
     expect(screen.getByTestId('phase-symbol-slot', { includeHiddenElements: true })).toHaveStyle({
         width: 260,
         height: 284
@@ -34,6 +37,7 @@ test('mostra o título genérico quando a fase ainda não é conhecida', async (
     await render(<CyclePhaseHero fase="fase-nova" />);
 
     expect(screen.getByRole('header', { name: 'Seu ciclo' })).toBeOnTheScreen();
+    expect(screen.queryByTestId('cycle-phase-artwork')).not.toBeOnTheScreen();
     expect(screen.queryByLabelText('Janela fértil ativa')).not.toBeOnTheScreen();
     expect(screen.queryByText(/Dia .* do ciclo/)).not.toBeOnTheScreen();
 });
