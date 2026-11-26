@@ -9,6 +9,7 @@ function useUsageHistoryEdit(
     horarios,
     usoUnicoPorDia,
     usosHoje,
+    inicioMedicacao,
     aoMudarRodape
 ) {
     const [sessao, setSessao] = useState(null);
@@ -32,14 +33,23 @@ function useUsageHistoryEdit(
               .slice(0, 1)
         : [];
 
+    function horariosParaNovoRegistro(dia) {
+        if (!dia || dia > data || (inicioMedicacao && dia < inicioMedicacao)) return [];
+        return dia === data ? horariosHoje : horarios;
+    }
+
+    function podeCriarOcorrencia(dia) {
+        return horariosParaNovoRegistro(dia).length > 0;
+    }
+
     function ocorrenciasEm(dia) {
         const ocorrencias = editaveis.filter((registro) => registro.data === dia);
-        if (!dia || dia > data || (usoUnicoPorDia && ocorrencias.length)) return ocorrencias;
-        const horariosDoDia = dia === data ? horariosHoje : horarios;
+        if (usoUnicoPorDia && ocorrencias.length) return ocorrencias;
+
         const existentes = new Set(ocorrencias.map((registro) => registro.horarioProgramado));
         return [
             ...ocorrencias,
-            ...horariosDoDia
+            ...horariosParaNovoRegistro(dia)
                 .filter((horario) => !existentes.has(horario))
                 .map((horario) => ({
                     id: `novo-${horario}`,
@@ -74,10 +84,7 @@ function useUsageHistoryEdit(
     function selecionarData(dataSelecionada) {
         if (envio.current || dataSelecionada === sessao?.data) return;
         const ocorrencias = ocorrenciasEm(dataSelecionada);
-        if (!ocorrencias.length) {
-            setPopup({ tipo: 'diaIndisponivel' });
-            return;
-        }
+        if (!ocorrencias.length) return;
         if (ocorrencias.length === 1) return selecionar(ocorrencias[0]);
         sairDoAlvo(() => setSessao({ data: dataSelecionada }));
     }
@@ -130,8 +137,7 @@ function useUsageHistoryEdit(
         alterado,
         podeSalvar,
         ocorrenciasDoDia,
-        dataHoje: data,
-        temHorarioHoje: horariosHoje.length > 0,
+        podeCriarOcorrencia,
         sairDoAlvo,
         selecionar,
         selecionarData,

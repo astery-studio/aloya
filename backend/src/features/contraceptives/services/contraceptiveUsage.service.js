@@ -1,4 +1,5 @@
 import { AppError } from '../../../shared/errors/AppError.js';
+import { obterFrequencia } from '../constants/contraceptive.constants.js';
 import { apresentarUsoHistorico } from '../presenters/contraceptive.listing.presenter.js';
 import { validarIdAnticoncepcional } from '../validators/contraceptive.validator.js';
 import { horarioPertenceAgenda } from '../utils/contraceptive.listing.schedule.js';
@@ -160,6 +161,13 @@ function criarContraceptiveUsageService(prisma, { relogio = () => new Date(), av
                     where: { id: anticoncepcionalId, usuarioId, ativo: true }
                 });
                 if (!metodo) throw new AppError('Anticoncepcional não encontrado.', 404, 'ANTICONCEPCIONAL_NAO_ENCONTRADO');
+
+                const frequencia = obterFrequencia(metodo.tipo, metodo.frequencia);
+                if (frequencia?.diasPausa && !frequencia.continuo && metodo.dataInicioUso && dataUsoProgramado < metodo.dataInicioUso) {
+                    throw new AppError(
+                        'Escolha uma data a partir do primeiro uso cadastrado.', 422, 'USO_ANTES_DO_INICIO'
+                    );
+                }
 
                 const horarioValido = data === hoje
                     ? horarioPertenceAgenda(metodo, data, horario)

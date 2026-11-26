@@ -164,8 +164,7 @@ function UsageHistoryPanel({
         alterado,
         podeSalvar,
         ocorrenciasDoDia,
-        dataHoje,
-        temHorarioHoje,
+        podeCriarOcorrencia,
         sairDoAlvo,
         selecionar,
         selecionarData,
@@ -179,6 +178,7 @@ function UsageHistoryPanel({
         horariosEditaveis,
         usoUnicoPorDia,
         usosHoje,
+        inicioMedicacao,
         edicaoDireta ? animarRodape : undefined
     );
     const registrosDoMes = registrosExibidos.filter(
@@ -213,10 +213,6 @@ function UsageHistoryPanel({
     }
 
     const configuracaoPopup = {
-        diaIndisponivel: {
-            titulo: 'Dia indisponível',
-            mensagem: 'Escolha um dia anterior ou o dia atual quando houver um uso programado.'
-        },
         descarte: {
             titulo: 'Descartar alteração?',
             mensagem: 'A edição do histórico ainda não foi salva.',
@@ -248,7 +244,6 @@ function UsageHistoryPanel({
         [...editaveis, ...ocorrenciasDoDia].map((registro) => registro.id)
     );
     const datasEditaveis = new Set(editaveis.map((registro) => registro.data));
-    if (temHorarioHoje) datasEditaveis.add(dataHoje);
 
     const instrucao =
         sessao && !edicaoDireta ? (
@@ -308,7 +303,7 @@ function UsageHistoryPanel({
             rodapeEdicao={controlesEdicao}
             dataSelecionada={sessao?.data}
             datasEditaveis={datasEditaveis}
-            editarAntesDe={horariosEditaveis.length ? dataHoje : undefined}
+            podeCriarOcorrencia={podeCriarOcorrencia}
             aoSelecionarData={
                 aoSalvarEdicaoHistorico && (edicaoDireta || sessao) ? selecionarData : undefined
             }

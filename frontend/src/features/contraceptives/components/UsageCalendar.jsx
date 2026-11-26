@@ -66,7 +66,7 @@ function ehHoje(ano, numeroMes, dia) {
 
 function UsageCalendar({
     mes, dias = [], inicioMedicacao, diaEmPausa, aoMesAnterior, aoProximoMes,
-    emEdicao = false, rodapeEdicao, dataSelecionada, datasEditaveis, editarAntesDe, aoSelecionarData
+    emEdicao = false, rodapeEdicao, dataSelecionada, datasEditaveis, podeCriarOcorrencia, aoSelecionarData
 }) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
@@ -146,12 +146,20 @@ function UsageCalendar({
                                     ?? (dataCivil && diaEmPausa?.(dataCivil) ? 'pausa' : null);
                                 const rotuloEstado = ESTADOS[estado];
                                 const inicio = dia && dataCivil === inicioMedicacao;
-                                const descricaoDia = [rotuloEstado, inicio && 'início da medicação']
-                                    .filter(Boolean).join(', ') || 'sem registro';
+                                const editavelPeloRegistro = datasEditaveis?.has(dataCivil);
+                                const bloqueadoAntesDoInicio = Boolean(
+                                    dataCivil && inicioMedicacao && dataCivil < inicioMedicacao &&
+                                    !registros.has(dia) && !editavelPeloRegistro
+                                );
+                                const descricaoDia = [
+                                    rotuloEstado,
+                                    inicio && 'início da medicação',
+                                    bloqueadoAntesDoInicio && 'antes do início da medicação'
+                                ].filter(Boolean).join(', ') || 'sem registro';
                                 const selecionado = emEdicao && dataCivil === dataSelecionada;
                                 const interativa = Boolean(dia) && typeof aoSelecionarData === 'function';
-                                const editavel = interativa
-                                    && (datasEditaveis?.has(dataCivil) || dataCivil < editarAntesDe);
+                                const desabilitado = interativa && !editavelPeloRegistro
+                                    && !podeCriarOcorrencia?.(dataCivil);
                                 const Celula = interativa ? Pressable : View;
 
                                 return (
@@ -160,8 +168,8 @@ function UsageCalendar({
                                         accessible={Boolean(dia)}
                                         accessibilityRole={interativa ? 'button' : dia ? 'text' : undefined}
                                         {...(interativa && {
-                                            accessibilityState: { selected: selecionado },
-                                            accessibilityHint: editavel ? 'Seleciona o dia' : 'Explica por que o dia não pode ser editado',
+                                            accessibilityState: { selected: selecionado, disabled: desabilitado },
+                                            disabled: desabilitado,
                                             onPress: () => aoSelecionarData?.(dataCivil)
                                         })}
                                         accessibilityLabel={
@@ -172,6 +180,7 @@ function UsageCalendar({
                                         style={[
                                             estilosUso.celulaDia,
                                             hoje && estilosUso.celulaHoje,
+                                            (desabilitado || bloqueadoAntesDoInicio) && estilosUso.celulaDesabilitada,
                                             rotuloEstado && estilosUso[`celula_${estado}`],
                                             selecionado && estilosUso.celulaSelecionada,
                                             selecionado && !rotuloEstado && estilosUso.celulaSelecionadaSemRegistro,

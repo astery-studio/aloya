@@ -281,6 +281,7 @@ function criarEstilosUso(tema) {
             textAlign: 'center'
         },
         numeroDiaHoje: { fontFamily: fontFamilies.bold, fontWeight: '900' },
+        celulaDesabilitada: { opacity: 0.55 },
         diaComEstado: { color: '#FFFFFF' },
         celula_confirmado: { backgroundColor: coresCalendario.confirmado },
         celula_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
