@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
@@ -69,19 +69,15 @@ function ContraceptivesScreen({
                 contentContainerStyle={estilos.lista}
                 ItemSeparatorComponent={() => <View style={estilos.separador} />}
                 ListEmptyComponent={estadoVazio}
-                ListFooterComponent={
-                    carregando || erro ? null : (
-                        <View style={estilos.acao}>
-                            <ButtonScreen
-                                texto="Cadastrar novo anticoncepcional"
-                                variante="verde"
-                                icone={Plus}
-                                aoPressionar={onCadastrarNovo}
-                            />
-                        </View>
-                    )
-                }
             />
+            {!carregando && !erro && typeof onCadastrarNovo === 'function' ? (
+                <FloatingActionButton
+                    aoPressionar={onCadastrarNovo}
+                    rotuloAcessibilidade="Cadastrar novo anticoncepcional"
+                    considerarAreaSeguraInferior={false}
+                    testID="contraceptives-add-fab"
+                />
+            ) : null}
         </SafeAreaView>
     );
 }

@@ -372,6 +372,43 @@ describe('MembersScreen', () => {
         expect(onAdicionarContato).toHaveBeenCalledTimes(1);
     });
 
+    test('mantém o fab disponível quando a rede de apoio está vazia', async () => {
+        mockUseSupportContacts.mockReturnValue(criarEstado({ contatos: [] }));
+
+        await render(<MembersScreen onAdicionarContato={jest.fn()} />);
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Adicionar novo contato à Rede de Apoio'
+            })
+        ).toBeOnTheScreen();
+    });
+
+    test.each([
+        ['durante o carregamento', { carregando: true }],
+        ['quando ocorre erro', { erro: 'Falha ao carregar' }]
+    ])('oculta o fab %s', async (_, estado) => {
+        mockUseSupportContacts.mockReturnValue(criarEstado(estado));
+
+        await render(<MembersScreen onAdicionarContato={jest.fn()} />);
+
+        expect(
+            screen.queryByRole('button', {
+                name: 'Adicionar novo contato à Rede de Apoio'
+            })
+        ).not.toBeOnTheScreen();
+    });
+
+    test('não mostra o fab no modo de contatos acompanhados', async () => {
+        await render(<MembersScreen modoRede="acompanhados" onAdicionarContato={jest.fn()} />);
+
+        expect(
+            screen.queryByRole('button', {
+                name: 'Adicionar novo contato à Rede de Apoio'
+            })
+        ).not.toBeOnTheScreen();
+    });
+
     test('reenvia convite pelo card', async () => {
         const reenviarConvite = jest.fn();
 

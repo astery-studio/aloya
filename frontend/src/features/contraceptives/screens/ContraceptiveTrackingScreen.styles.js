@@ -85,24 +85,7 @@ function criarEstilosAcompanhamento(tema) {
             fontSize: 15,
             lineHeight: 22.5,
             textAlign: 'center'
-        },
-        destaqueVazio: { fontFamily: fontFamilies.bold },
-        // Em fluxo normal: a SafeArea mantém o botão acima da navegação do sistema.
-        rodape: {
-            flexShrink: 0,
-            paddingTop: 12,
-            paddingBottom: 2,
-            backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo,
-            borderTopWidth: 0.70489,
-            borderTopColor: interfaceTema.borda
-        },
-        conteudoRodape: {
-            width: '100%',
-            maxWidth: 393.33,
-            alignSelf: 'center',
-            paddingHorizontal: 21.66
-        },
-        areaAcaoCadastro: { width: '100%', height: 56 }
+        }
     });
 }
 

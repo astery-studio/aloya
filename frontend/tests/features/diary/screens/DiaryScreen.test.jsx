@@ -41,7 +41,6 @@ describe('histórico do Diário', () => {
         expect(estilos.conteudoEstatico.paddingHorizontal).toBe(24);
         expect(estilos.estadoFiltroVazio.paddingHorizontal).toBe(24);
         expect(estilos.lista.paddingHorizontal).toBe(24);
-        expect(estilos.acaoFixa.paddingHorizontal).toBe(24);
     });
 
     test('mostra estado vazio e abre a criação', async () => {
@@ -55,9 +54,11 @@ describe('histórico do Diário', () => {
             screen.getByText(/as categorias usadas neles podem estar desativadas/)
         ).toBeOnTheScreen();
         expect(screen.getByText('"Gerenciar categorias"')).toHaveStyle({ fontWeight: '700' });
-        expect(screen.getByText('"Adicionar novo registro"')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.getByText('botão de adicionar')).toHaveStyle({ fontWeight: '700' });
         expect(screen.queryByText(/desativadas\.\nAtive-as/)).not.toBeOnTheScreen();
-        await fireEvent.press(screen.getByRole('button', { name: 'Adicionar novo registro' }));
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+        );
         expect(aoCriar).toHaveBeenCalledTimes(1);
     });
 
@@ -65,8 +66,10 @@ describe('histórico do Diário', () => {
         const tentar = jest.fn();
         const resultado = await render(<DiaryScreen carregando />);
         expect(screen.getByTestId('diary-loading')).toBeOnTheScreen();
+        expect(screen.queryByTestId('diary-add-fab')).toBeNull();
 
         await resultado.rerender(<DiaryScreen erro="erro seguro" aoTentarNovamente={tentar} />);
+        expect(screen.queryByTestId('diary-add-fab')).toBeNull();
         expect(screen.getByRole('header', { name: 'Ocorreu um erro' })).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
         expect(tentar).toHaveBeenCalledTimes(1);
@@ -135,7 +138,7 @@ describe('histórico do Diário', () => {
         await fireEvent.press(botaoFiltrar);
         await fireEvent.press(botaoCategorias);
         await fireEvent.press(
-            screen.getAllByRole('button', { name: 'Adicionar novo registro' })[0]
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
         );
         await fireEvent.press(screen.getByLabelText('Ver detalhes do registro de 09/11/2026'));
         await fireEvent.press(
@@ -192,6 +195,8 @@ describe('histórico do Diário', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
         expect(remover).toHaveBeenCalledWith('fase:menstrual');
         expect(limpar).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('button', { name: 'Adicionar novo registro' })).toBeOnTheScreen();
+        expect(
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+        ).toBeOnTheScreen();
     });
 });

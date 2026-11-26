@@ -18,8 +18,8 @@ function renderizar(componente) {
     return render(<SafeAreaProvider initialMetrics={metricas}>{componente}</SafeAreaProvider>);
 }
 
-test('deixa a Safe Area superior sob responsabilidade do Header compartilhado', async () => {
-    await renderizar(<ContraceptiveTrackingScreen />);
+test('aplica a área segura superior no Header e mantém o FAB na área protegida', async () => {
+    await renderizar(<ContraceptiveTrackingScreen aoCadastrarNovo={jest.fn()} />);
     const area = screen.getByTestId('anticoncepcionais-area-segura');
     expect(area).toHaveProp('edges', {
         top: 'off',

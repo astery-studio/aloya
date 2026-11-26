@@ -26,26 +26,13 @@ function criarEstilos(tema) {
             width: '100%',
             flex: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            paddingBottom: 76
+            justifyContent: 'center'
         },
 
         botaoEstado: {
             width: '100%',
             height: 56,
             borderRadius: 12
-        },
-
-        textoBotaoEstado: {
-            fontFamily: fontFamilies.semibold,
-            fontSize: 17,
-            fontWeight: '600',
-            lineHeight: 24
-        },
-
-        textoDestaque: {
-            fontFamily: fontFamilies.bold,
-            fontWeight: '700'
         },
 
         textoCarregamento: {

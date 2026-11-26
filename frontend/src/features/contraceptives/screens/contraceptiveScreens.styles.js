@@ -50,10 +50,6 @@ function criarEstilos(tema) {
             color: interfaceTema.textoSecundario
         },
 
-        acao: {
-            marginTop: espacamentos.grande
-        },
-
         acaoExcluir: {
             minHeight: 44,
             marginTop: -16,

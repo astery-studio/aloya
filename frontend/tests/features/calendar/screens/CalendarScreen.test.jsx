@@ -64,6 +64,21 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonSc
     };
 });
 
+jest.mock('../../../../src/shared/components/common/FloatingActionButton', () => {
+    const ReactInterno = require('react');
+    const { Pressable } = require('react-native');
+
+    return {
+        FloatingActionButton: ({ aoPressionar, rotuloAcessibilidade, testID }) =>
+            ReactInterno.createElement(Pressable, {
+                testID,
+                accessibilityRole: 'button',
+                accessibilityLabel: rotuloAcessibilidade,
+                onPress: aoPressionar
+            })
+    };
+});
+
 jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModal', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
@@ -173,17 +188,10 @@ describe('CalendarScreen', () => {
         expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
         expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
         expect(estilos.conteudo).toMatchObject({ paddingTop: 8 });
-        expect(screen.getByTestId('rodape-calendario')).toBeOnTheScreen();
-        expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-add-fab')).toBeOnTheScreen();
         expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
-        expect(estilos.rodape).toMatchObject({
-            flexShrink: 0,
-            borderTopWidth: 1,
-            paddingLeft: 24,
-            paddingRight: 24
-        });
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
         await fireEvent.press(screen.getByRole('button', { name: 'Dia menstrual registrado' }));
         expect(aoEditarCiclo).toHaveBeenCalledWith({
@@ -232,15 +240,35 @@ describe('CalendarScreen', () => {
 
         expect(
             screen.getByText(
-                'Você ainda não possui nenhum ciclo registrado. Toque em ‘Cadastrar Menstruação’ pra começar.'
+                'Você ainda não possui nenhum ciclo registrado. Use o botão de adicionar para começar.'
             )
         ).toBeOnTheScreen();
         expect(screen.queryByTestId('confidence-badge')).toBeNull();
-        expect(screen.getAllByRole('button', { name: 'Cadastrar Menstruação' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
 
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    });
+
+    test('mantém a sincronização visível e oculta o FAB durante carregamento', async () => {
+        const propriedades = {
+            meses: [{ mes: '2026-10', possuiCiclos: true }],
+            aoVoltar: jest.fn(),
+            aoCadastrarMenstruacao: jest.fn(),
+            statusSincronizacao: 'pendente'
+        };
+        const { rerender } = await render(<CalendarScreen {...propriedades} />);
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Alterações salvas neste aparelho. Sincronização pendente.')
+        ).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-add-fab')).toBeOnTheScreen();
+
+        await rerender(<CalendarScreen {...propriedades} carregando />);
+
+        expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
     });
 
     test('mostra o erro e tenta carregar novamente', async () => {
@@ -257,6 +285,7 @@ describe('CalendarScreen', () => {
         );
 
         expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
 
         await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
 

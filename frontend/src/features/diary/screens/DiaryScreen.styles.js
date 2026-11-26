@@ -40,7 +40,7 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 17
         },
-        estadoCentralizado: { flex: 1, justifyContent: 'center', paddingBottom: 56 },
+        estadoCentralizado: { flex: 1, justifyContent: 'center' },
         mensagemEstado: {
             marginTop: 10,
             color: cores.textoSecundario,
@@ -87,18 +87,6 @@ function criarEstilos(tema) {
         lista: {
             paddingHorizontal: espacamentosLayout.margemHorizontalTela,
             paddingBottom: 96
-        },
-        acaoFixa: {
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            left: 0,
-            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
-            paddingTop: 16,
-            paddingBottom: 16,
-            borderTopWidth: 1,
-            borderTopColor: cores.borda,
-            backgroundColor: cores.fundo
         }
     });
 }

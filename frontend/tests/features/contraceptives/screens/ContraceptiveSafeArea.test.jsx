@@ -38,7 +38,7 @@ describe.each(['claro', 'escuro'])(
             ],
             [
                 ContraceptivesScreen,
-                {},
+                { onCadastrarNovo: jest.fn() },
                 'lista-anticoncepcionais-area-segura',
                 'Cadastrar novo anticoncepcional'
             ],
