@@ -1,6 +1,6 @@
 // Apresenta os estados visualmente fiéis do histórico dentro do layout principal do app.
 import { useMemo } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { View } from 'react-native';
 import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 import { GearSixIcon } from 'phosphor-react-native/src/icons/GearSix';
 
@@ -17,12 +17,6 @@ import { DiaryHistoryStateView } from '../components/DiaryHistoryStateView/Diary
 import { DiaryTimeline } from '../components/DiaryTimeline/DiaryTimeline';
 import { possuiFiltrosDiario } from '../utils/diaryFilters';
 import { criarEstilos } from './DiaryScreen.styles';
-
-// Mantém o conjunto trilho + card com a largura de 350 px do protótipo em celulares estreitos.
-function calcularMargemHorizontalTimeline(larguraTela) {
-    if (!Number.isFinite(larguraTela) || larguraTela <= 0) return 20;
-    return Math.max(5, Math.min(20, (larguraTela - 350) / 2));
-}
 
 // Recebe estado e callbacks do fluxo e retorna loading, erro, vazio ou histórico preenchido.
 function DiaryScreen({
@@ -52,9 +46,7 @@ function DiaryScreen({
 }) {
     const tema = useTheme();
     const coresDiario = obterCoresDiario(tema);
-    const { width: larguraTela } = useWindowDimensions();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const margemHorizontalTimeline = calcularMargemHorizontalTimeline(larguraTela);
     const itens = Array.isArray(registros) ? registros : [];
     const possuiErro = typeof erro === 'string' && erro.trim();
     const filtrosAtivos = possuiFiltrosDiario(filtros);
@@ -70,12 +62,8 @@ function DiaryScreen({
                     icone={FunnelIcon}
                     aoPressionar={aoAbrirFiltros}
                     rotuloAcessibilidade="Filtrar histórico do Diário"
-                    variante="selecionado"
-                    corIcone={coresDiario.interface.destaque}
-                    estilo={{
-                        backgroundColor: coresDiario.interface.superficie,
-                        borderColor: coresDiario.interface.borda
-                    }}
+                    variante="redeApoio"
+                    corIcone={tema.cores.interface.destaque}
                 />
             ) : null}
             {typeof aoGerenciarCategorias === 'function' ? (
@@ -83,12 +71,8 @@ function DiaryScreen({
                     icone={GearSixIcon}
                     aoPressionar={aoGerenciarCategorias}
                     rotuloAcessibilidade="Gerenciar categorias do Diário"
-                    variante="selecionado"
-                    corIcone={tema.escuro ? '#EF9A9A' : coresDiario.primaria}
-                    estilo={{
-                        backgroundColor: coresDiario.interface.superficie,
-                        borderColor: coresDiario.interface.borda
-                    }}
+                    variante="redeApoio"
+                    corIcone={tema.cores.marca.primaria}
                 />
             ) : null}
         </>
@@ -156,7 +140,7 @@ function DiaryScreen({
                 aoCarregarMais={aoCarregarMais}
                 aoTentarCarregarMais={aoTentarCarregarMais}
                 ListHeaderComponent={criarCabecalho(true, true)}
-                contentContainerStyle={{ paddingHorizontal: margemHorizontalTimeline }}
+                contentContainerStyle={estilos.lista}
             />
         );
     }
@@ -164,12 +148,10 @@ function DiaryScreen({
     return (
         <MainLayout
             titulo="Diário"
-            varianteHeader="diario"
+            varianteHeader="redeApoio"
             abaAtiva="diario"
             onSelecionarAba={onSelecionarAba}
             acoesHeader={acoesHeader}
-            corFundo={coresDiario.interface.fundo}
-            corTextoHeader={coresDiario.interface.textoPrincipal}
             corFundoNavegacao={coresDiario.interface.superficie}
         >
             <View testID="diary-main-container" style={estilos.tela}>
@@ -187,4 +169,4 @@ function DiaryScreen({
     );
 }
 
-export { calcularMargemHorizontalTimeline, DiaryScreen, DivisorTimeline };
+export { DiaryScreen, DivisorTimeline };

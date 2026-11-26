@@ -19,7 +19,13 @@ export default function NumberInput({
     valorMinimo,
     valorMaximo,
     estilo,
-    permitirLimpar = false
+    permitirLimpar = false,
+    placeholder,
+    corPlaceholder,
+    estiloEntrada,
+    estiloUnidade,
+    placeholderComoTexto = false,
+    estiloPlaceholder
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -29,6 +35,7 @@ export default function NumberInput({
             ? ''
             : String(valor).replace('.', casasDecimais > 0 ? ',' : '.');
     const numeroAtual = texto ? Number(texto.replace(',', '.')) : Number.NaN;
+    const exibirPlaceholderComoTexto = placeholderComoTexto && !texto;
     const comprimentoMaximo = maximoDigitosInteiros + (casasDecimais > 0 ? casasDecimais + 1 : 0);
 
     function alterar(novoTexto) {
@@ -50,24 +57,45 @@ export default function NumberInput({
             style={[estilos.campo, desativado && estilos.desativado, estilo]}
         >
             <View style={estilos.conteudo}>
-                <TextInput
-                    ref={entradaRef}
-                    accessibilityLabel={rotuloAcessibilidade}
-                    accessibilityValue={{
-                        ...(Number.isFinite(valorMinimo) ? { min: valorMinimo } : {}),
-                        ...(Number.isFinite(valorMaximo) ? { max: valorMaximo } : {}),
-                        ...(Number.isFinite(numeroAtual) ? { now: numeroAtual } : {})
-                    }}
-                    editable={!desativado}
-                    keyboardType={casasDecimais > 0 ? 'decimal-pad' : 'number-pad'}
-                    maxLength={comprimentoMaximo}
-                    selectionColor={tema.cores.interface.destaque}
-                    selectTextOnFocus
-                    value={texto}
-                    onChangeText={alterar}
-                    style={estilos.entrada}
-                />
-                <Text style={estilos.unidade}>{unidade}</Text>
+                <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                    <TextInput
+                        ref={entradaRef}
+                        accessibilityLabel={rotuloAcessibilidade}
+                        accessibilityValue={{
+                            ...(Number.isFinite(valorMinimo) ? { min: valorMinimo } : {}),
+                            ...(Number.isFinite(valorMaximo) ? { max: valorMaximo } : {}),
+                            ...(Number.isFinite(numeroAtual) ? { now: numeroAtual } : {})
+                        }}
+                        editable={!desativado}
+                        keyboardType={casasDecimais > 0 ? 'decimal-pad' : 'number-pad'}
+                        maxLength={comprimentoMaximo}
+                        selectionColor={tema.cores.interface.destaque}
+                        selectTextOnFocus
+                        placeholder={placeholderComoTexto ? undefined : placeholder}
+                        placeholderTextColor={corPlaceholder}
+                        value={texto}
+                        onChangeText={alterar}
+                        style={[
+                            estilos.entrada,
+                            placeholderComoTexto && estilos.entradaSobreposta,
+                            exibirPlaceholderComoTexto && estilos.entradaOculta,
+                            estiloEntrada
+                        ]}
+                    />
+                </View>
+                {exibirPlaceholderComoTexto ? null : (
+                    <Text style={[estilos.unidade, estiloUnidade]}>{unidade}</Text>
+                )}
+                {exibirPlaceholderComoTexto ? (
+                    <Text
+                        testID="placeholder-campo-numero"
+                        pointerEvents="none"
+                        style={[estilos.placeholderComUnidade, estiloPlaceholder]}
+                    >
+                        {placeholder}
+                        <Text style={estiloUnidade}> {unidade}</Text>
+                    </Text>
+                ) : null}
                 {permitirLimpar && texto ? (
                     <Pressable
                         accessibilityRole="button"

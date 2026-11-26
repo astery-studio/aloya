@@ -9,11 +9,36 @@ function criarEstilos(tema) {
     const diario = obterCoresDiario(tema);
     const cores = diario.interface;
     return StyleSheet.create({
-        rolagem: { width: '100%', flexShrink: 1 },
-        container: {
+        detalhes: { width: '100%', flexShrink: 1 },
+        cabecalhoFixo: {
             width: '100%',
             alignItems: 'center',
-            padding: 24,
+            paddingTop: 24,
+            paddingHorizontal: 24,
+            gap: 0
+        },
+        navegadorData: {
+            width: 294,
+            maxWidth: '100%',
+            marginTop: 12,
+            padding: 2,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 5
+        },
+        textoData: {
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.semiBold,
+            fontSize: 14,
+            fontWeight: '600',
+            lineHeight: 25.5
+        },
+        rolagem: { width: '100%', flexShrink: 1 },
+        conteudoRolavel: {
+            width: '100%',
+            alignItems: 'center',
+            paddingTop: 12,
+            paddingHorizontal: 24,
             gap: 12
         },
         titulo: {
@@ -83,7 +108,8 @@ function criarEstilos(tema) {
             color: cores.destaque,
             fontFamily: fontFamilies.semiBold,
             fontSize: 8.56,
-            lineHeight: 16
+            fontWeight: '600',
+            lineHeight: 16.5
         },
         anotacao: {
             width: '100%',
@@ -121,22 +147,44 @@ function criarEstilos(tema) {
         },
         botaoAcaoDesativado: { opacity: 0.5 },
         textoBotaoAcao: {
-            color: diario.textoSobrePrimaria,
+            color: '#FFF',
             fontFamily: fontFamilies.semiBold,
             fontSize: 13,
-            lineHeight: 20
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
         },
         faseRegistro: {
             width: '100%',
-            minHeight: 35.99,
-            height: 35.99,
+            minHeight: 35.993,
+            height: 35.993,
             marginTop: 0,
-            paddingVertical: 0
+            alignSelf: 'stretch',
+            paddingVertical: 0,
+            paddingHorizontal: 14,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            borderRadius: 10
         },
-        textoFaseRegistro: { fontSize: 13, lineHeight: 20 },
-        areaBotaoOk: { width: '100%' },
-        botaoOk: {
+        textoFaseRegistro: {
+            fontFamily: fontFamilies.semiBold,
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
+        },
+        areaBotaoOk: {
             width: '100%',
+            flexShrink: 0,
+            paddingTop: 12,
+            paddingHorizontal: 24,
+            paddingBottom: 24,
+            backgroundColor: cores.superficie
+        },
+        botaoOk: {
+            width: 294,
+            maxWidth: '100%',
             height: 52,
             borderRadius: 12,
             backgroundColor: cores.destaque

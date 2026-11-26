@@ -1,5 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { MenstruationRegistrationScreen } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen';
+import { criarEstilos } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const meses = [
@@ -21,6 +23,28 @@ function montar(props = {}, opcoes = {}) {
         opcoes
     );
 }
+
+test('usa o padrão compartilhado dos headers com voltar e separa o conteúdo', async () => {
+    await montar();
+
+    expect(screen.getByRole('header')).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 20,
+        fontWeight: '700',
+        lineHeight: 28,
+        textAlign: 'center'
+    });
+
+    const estilos = criarEstilos(temaClaro);
+
+    expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
+    expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+    expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
+        width: 48,
+        height: 48
+    });
+    expect(estilos.legenda.marginTop).toBe(8);
+});
 
 test('abre no mês atual após carregar os meses, mesmo com um dia anterior pré-selecionado', async () => {
     const propriedades = { hoje: '2026-10-30', datasSelecionadas: ['2026-09-21'] };

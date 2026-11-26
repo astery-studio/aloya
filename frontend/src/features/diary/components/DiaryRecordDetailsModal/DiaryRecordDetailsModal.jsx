@@ -21,6 +21,7 @@ function DiaryRecordDetailsModal({
     aoEditar,
     aoExcluir,
     aoFechar,
+    aoOcultar,
     excluindo = false
 }) {
     const tema = useTheme();
@@ -32,6 +33,7 @@ function DiaryRecordDetailsModal({
             variante="detalhes"
             visivel={visivel}
             aoFechar={excluindo ? undefined : aoFechar}
+            aoOcultar={aoOcultar}
             estilo={{
                 width: 342,
                 maxWidth: '100%',

@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, SectionList, Text, View } from 'react-native';
-import { ArrowLeftIcon } from '../../../shared/components/icons/AppIcons';
+import { ActivityIndicator, SectionList, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import {
     ContraceptiveUsageCard,
@@ -97,8 +97,6 @@ function ContraceptiveTrackingScreen({
     const tema = useTheme();
     const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
     const [usosAtualizados, setUsosAtualizados] = useState({});
-    const [larguraCabecalho, setLarguraCabecalho] = useState(393.33);
-    const tamanhoTitulo = Math.min(26, Math.max(18, ((larguraCabecalho - 131.32) * 26) / 244));
     const itens = anticoncepcionais.map((item) => {
         const atualizacao = usosAtualizados[item.id];
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
@@ -122,36 +120,11 @@ function ContraceptiveTrackingScreen({
 
     return (
         <SafeAreaView
-            edges={['top', 'left', 'right', 'bottom']}
+            edges={['left', 'right', 'bottom']}
             style={estilosAcompanhamento.tela}
             testID="anticoncepcionais-area-segura"
         >
-            <View
-                style={estilosAcompanhamento.cabecalho}
-                onLayout={({ nativeEvent }) => {
-                    if (nativeEvent.layout.width > 0) setLarguraCabecalho(nativeEvent.layout.width);
-                }}
-            >
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Voltar"
-                    onPress={aoVoltar}
-                    hitSlop={10}
-                    style={estilosAcompanhamento.botaoVoltar}
-                >
-                    <ArrowLeftIcon size={24} color={tema.cores.interface.textoSecundario} />
-                </Pressable>
-                <Text
-                    accessibilityRole="header"
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.8}
-                    style={[estilosAcompanhamento.titulo, { fontSize: tamanhoTitulo }]}
-                >
-                    Anticoncepcionais
-                </Text>
-                <View style={estilosAcompanhamento.espacoCabecalho} />
-            </View>
+            <Header titulo="Anticoncepcionais" variante="comVoltar" onVoltar={aoVoltar} />
 
             {carregando ? (
                 <View style={estilosAcompanhamento.estadoCentral}>

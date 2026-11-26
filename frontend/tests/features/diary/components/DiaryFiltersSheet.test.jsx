@@ -4,9 +4,13 @@ import { Keyboard } from 'react-native';
 jest.mock('../../../../src/shared/components/feedback/BottomSheet/BottomSheet', () => {
     const { Pressable } = require('react-native');
     return {
-        BottomSheet: ({ visivel, children, podeIniciarDeslize }) =>
+        BottomSheet: ({ visivel, children, podeIniciarDeslize, exibirAlcaArraste }) =>
             visivel ? (
-                <Pressable testID="sonda-deslize-filtros" onPress={podeIniciarDeslize}>
+                <Pressable
+                    testID="sonda-deslize-filtros"
+                    accessibilityLabel={`Exibir alça: ${String(exibirAlcaArraste)}`}
+                    onPress={podeIniciarDeslize}
+                >
                     {children}
                 </Pressable>
             ) : null
@@ -45,11 +49,34 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
         <DiaryFiltersSheet visivel filtros={{}} service={service} onAplicar={onAplicar} />
     );
     await waitFor(() => expect(screen.getByText('Filtro por Período')).toBeOnTheScreen());
+    expect(screen.getByLabelText('Exibir alça: false')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Limpar' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeDisabled();
 
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '01/01/7777');
     await waitFor(() =>
         expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '01/01/7777')
     );
+    expect(screen.getByRole('button', { name: 'Limpar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toHaveStyle({
+        width: 342,
+        height: 54,
+        paddingTop: 15.375,
+        paddingRight: 0,
+        paddingBottom: 14.625,
+        paddingLeft: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 14
+    });
+    expect(screen.getByText('Aplicar Filtro')).toHaveStyle({
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: '600',
+        lineHeight: 24,
+        textAlign: 'center'
+    });
     fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
     await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent('A data inicial não pode ser futura.')
@@ -81,10 +108,7 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
 
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '01/11/2026');
     await waitFor(() =>
-        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp(
-            'value',
-            '01/11/2026'
-        )
+        expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '01/11/2026')
     );
     fireEvent.changeText(screen.getByLabelText('Data final do filtro'), '12/11/2026');
     await waitFor(() =>
@@ -119,7 +143,23 @@ test('permanece desmontado quando não está visível', async () => {
     expect(screen.queryByText('Filtrar Diário')).not.toBeOnTheScreen();
 });
 
+test('não desloca o painel e fecha o teclado ao iniciar a rolagem', async () => {
+    const fecharTeclado = jest.spyOn(Keyboard, 'dismiss').mockImplementation(jest.fn());
+    const service = { buscarCatalogo: jest.fn().mockResolvedValue(catalogo) };
+
+    await render(<DiaryFiltersSheet visivel filtros={{}} service={service} />);
+    await waitFor(() => expect(screen.getByText('Filtro por Período')).toBeOnTheScreen());
+
+    const rolagem = screen.getByTestId('rolagem-filtros-diario');
+    expect(rolagem).toHaveProp('keyboardDismissMode', 'on-drag');
+
+    fireEvent(rolagem, 'scrollBeginDrag');
+    expect(fecharTeclado).toHaveBeenCalledTimes(1);
+    fecharTeclado.mockRestore();
+});
+
 test('limpa datas, fases e todas as categorias pelos controles do painel', async () => {
+    const onAplicar = jest.fn();
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(catalogo) };
     await render(
         <DiaryFiltersSheet
@@ -131,7 +171,7 @@ test('limpa datas, fases e todas as categorias pelos controles do painel', async
                 categorias: ['fluxo_menstrual']
             }}
             service={service}
-            onAplicar={jest.fn()}
+            onAplicar={onAplicar}
         />
     );
     await waitFor(() => expect(screen.getByText('Filtro por Período')).toBeOnTheScreen());
@@ -163,9 +203,23 @@ test('limpa datas, fases e todas as categorias pelos controles do painel', async
         screen.getByRole('switch', { name: 'Desmarcar todas as categorias de Ciclo e Sangramento' })
     );
 
+    expect(screen.queryByRole('button', { name: 'Limpar' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('switch', { name: 'Filtrar por Fluxo menstrual' }));
+    expect(screen.getByRole('button', { name: 'Limpar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeEnabled();
     await fireEvent.press(screen.getByRole('button', { name: 'Limpar' }));
     expect(screen.getByLabelText('Data de início do filtro')).toHaveProp('value', '');
     expect(screen.getByLabelText('Data final do filtro')).toHaveProp('value', '');
+    expect(onAplicar).toHaveBeenCalledWith(
+        {
+            dataInicio: null,
+            dataFim: null,
+            categorias: [],
+            fases: []
+        },
+        catalogo
+    );
 });
 
 test('mostra loading e erro de catálogo com ações de recuperação', async () => {
@@ -177,9 +231,7 @@ test('mostra loading e erro de catálogo com ações de recuperação', async ()
             .mockImplementationOnce(() => new Promise((_resolve, reject) => (rejeitar = reject)))
             .mockResolvedValueOnce(catalogo)
     };
-    await render(
-        <DiaryFiltersSheet visivel filtros={{}} service={service} onFechar={onFechar} />
-    );
+    await render(<DiaryFiltersSheet visivel filtros={{}} service={service} onFechar={onFechar} />);
     expect(screen.getByText('Carregando filtros do Diário...')).toBeOnTheScreen();
     await waitFor(() => expect(rejeitar).toBeDefined());
     rejeitar(new Error('rede'));

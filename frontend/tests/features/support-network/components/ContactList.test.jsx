@@ -13,6 +13,15 @@ import {
     criarRotuloQuantidade,
     ordenarContatos
 } from '../../../../src/features/support-network/components/ContactList/ContactList';
+import { criarEstilos } from '../../../../src/features/support-network/components/ContactList/ContactList.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
+
+test('mantém o espaçamento inicial dentro da lista e dos estados', () => {
+    const estilos = criarEstilos(temaClaro);
+
+    expect(estilos.conteudoLista.paddingTop).toBe(8);
+    expect(estilos.estadoComCabecalho.paddingTop).toBe(8);
+});
 
 const contatos = [
     {

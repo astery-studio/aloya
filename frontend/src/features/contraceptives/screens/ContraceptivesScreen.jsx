@@ -56,7 +56,12 @@ function ContraceptivesScreen({
             edges={['top', 'left', 'right', 'bottom']}
             testID="lista-anticoncepcionais-area-segura"
         >
-            <Header titulo="Meus Anticoncepcionais" variante="comVoltar" onVoltar={onVoltar} />
+            <Header
+                titulo="Meus Anticoncepcionais"
+                variante="comVoltar"
+                onVoltar={onVoltar}
+                aplicarSafeAreaSuperior={false}
+            />
             <FlatList
                 data={anticoncepcionais}
                 keyExtractor={(item) => item.id}

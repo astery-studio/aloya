@@ -1,6 +1,6 @@
 // Mostra um item individual da navegação inferior.
 import { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text } from 'react-native';
 
 import { useTheme } from '../../../../hooks/useTheme';
 import { criarEstilos } from './BottomTabItem.style';
@@ -35,8 +35,6 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
             <Text numberOfLines={1} style={[estilos.label, ativo && estilos.labelAtiva]}>
                 {label}
             </Text>
-
-            {ativo ? <View testID={`indicador-aba-${label}`} style={estilos.pontoAtivo} /> : null}
         </Pressable>
     );
 }

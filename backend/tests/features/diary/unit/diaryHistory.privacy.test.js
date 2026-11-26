@@ -35,12 +35,14 @@ test('resumo não revela saúde sexual nem altera +N por sua existência', () =>
     };
     const resultado = apresentarResumoRegistro(
         registro,
-        new Set(['atividade_sexual', 'sintomas_fisicos', 'pele', 'cabelo', 'digestao'])
+        new Set(['atividade_sexual', 'sintomas_fisicos', 'pele', 'cabelo', 'digestao']),
+        8
     );
     const serializado = JSON.stringify(resultado);
 
     assert.equal(resultado.principais.length, 3);
     assert.equal(resultado.maisQuantidade, 1);
+    assert.equal(resultado.diaCiclo, 8);
     assert.equal(serializado.includes('atividade_sexual'), false);
     assert.equal(serializado.includes(sexual.opcoes[0].opcaoNome), false);
 });

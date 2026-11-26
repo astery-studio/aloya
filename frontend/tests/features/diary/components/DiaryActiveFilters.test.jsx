@@ -31,6 +31,45 @@ test('exibe todos os critérios e permite remover somente um', async () => {
     expect(screen.getByText('Até 12/11/2026')).toBeOnTheScreen();
     expect(screen.getByText('Fase Folicular')).toBeOnTheScreen();
     expect(screen.getByText('Pele')).toBeOnTheScreen();
+    expect(screen.getByTestId('container-filtro-ativo-categoria:pele')).toHaveStyle({
+        height: 30,
+        paddingHorizontal: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10
+    });
+    expect(screen.getByTestId('filtro-ativo-categoria:pele')).toHaveStyle({
+        paddingVertical: 3,
+        paddingHorizontal: 8,
+        gap: 3,
+        alignSelf: 'stretch',
+        borderRadius: 99,
+        borderWidth: 0.7,
+        borderColor: '#C85A44',
+        backgroundColor: 'transparent'
+    });
+    expect(screen.getByText('Pele')).toHaveStyle({
+        color: '#C85A44',
+        fontSize: 11,
+        fontWeight: '600',
+        lineHeight: 16.5
+    });
+    expect(screen.getByRole('button', { name: 'Limpar filtros' })).toHaveStyle({
+        width: '100%',
+        maxWidth: 350.011,
+        height: 35.99,
+        borderWidth: 1,
+        borderColor: '#C85A44',
+        borderRadius: 10,
+        backgroundColor: 'transparent'
+    });
+    expect(screen.getByText('Limpar filtros')).toHaveStyle({
+        color: '#C85A44',
+        fontSize: 13,
+        fontWeight: '600',
+        lineHeight: 25.5,
+        textAlign: 'center'
+    });
     await fireEvent.press(screen.getByRole('button', { name: 'Remover filtro Pele' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
     expect(aoRemover).toHaveBeenCalledWith('categoria:pele');

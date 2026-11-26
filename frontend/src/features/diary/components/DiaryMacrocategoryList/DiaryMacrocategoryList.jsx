@@ -33,7 +33,7 @@ function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, de
                 return (
                     <DiaryMacrocategorySection
                         key={macro.id}
-                        titulo={macro.nomeCompacto ?? macro.nome}
+                        titulo={macro.nome}
                         icone={apresentacao.icone}
                         iconeProps={apresentacao.iconeProps}
                         paleta={apresentacao.paleta}
@@ -41,10 +41,11 @@ function DiaryMacrocategoryList({ macrocategorias, valores, erros, aoAlterar, de
                         aoAlternar={() => alternar(macro.id)}
                         desabilitado={desabilitado}
                     >
-                        {macro.categorias.map((categoria) => (
+                        {macro.categorias.map((categoria, indice) => (
                             <DiaryCategoryField
                                 key={categoria.id}
                                 categoria={categoria}
+                                exibirDivisor={indice > 0}
                                 valor={valores[categoria.id]}
                                 erro={erros[categoria.id]}
                                 paleta={apresentacao.paleta}

@@ -28,10 +28,12 @@ import {
     ordenarCategorias,
     SupportCategoryList
 } from '../../../../src/features/support-network/components/SupportCategoryList/SupportCategoryList';
+import { criarEstilos } from '../../../../src/features/support-network/components/SupportCategoryList/SupportCategoryList.styles';
 import {
     gruposPermissoes,
     permissoesGerais
 } from '../../../../src/features/support-network/constants/permissionOptions';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 const todasAsPermissoes = [
     ...permissoesGerais.map((permissao) => permissao.id),
@@ -60,6 +62,10 @@ const categorias = [
 ];
 
 describe('SupportCategoryList', () => {
+    test('inicia a lista após o espaçamento padrão do cabeçalho', () => {
+        expect(criarEstilos(temaClaro).conteudoLista.paddingTop).toBe(8);
+    });
+
     test('adapta todos os títulos à maior largura medida sem mudar as posições', async () => {
         await render(<SupportCategoryList categorias={categorias} />);
         const layout = (width) => ({ nativeEvent: { layout: { width, height: 24, x: 0, y: 0 } } });

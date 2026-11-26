@@ -14,6 +14,7 @@ function DiaryDateArrow({ direcao, aoPressionar, desabilitado, compacto = false 
     const anterior = direcao === 'anterior';
     const Icone = anterior ? CaretLeft : CaretRight;
     const rotulo = anterior ? 'Dia anterior' : 'Próximo dia';
+    const tamanhoIcone = compacto ? 16.47 : 20;
 
     return (
         <Pressable
@@ -28,7 +29,13 @@ function DiaryDateArrow({ direcao, aoPressionar, desabilitado, compacto = false 
                 desabilitado && estilos.desabilitado
             ]}
         >
-            <Icone size={compacto ? 16.47 : 20} color={cores.textoSecundario} />
+            <Icone
+                testID={`diary-date-arrow-icon-${direcao}`}
+                size={tamanhoIcone}
+                width={tamanhoIcone}
+                height={tamanhoIcone}
+                color={cores.textoSecundario}
+            />
         </Pressable>
     );
 }

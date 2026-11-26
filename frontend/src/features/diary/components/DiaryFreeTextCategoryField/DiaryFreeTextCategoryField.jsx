@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Keyboard, Pressable, Text } from 'react-native';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
@@ -23,6 +23,17 @@ function DiaryFreeTextCategoryField({
     const coresDiario = obterCoresDiario(tema);
     const [alturaAnotacao, setAlturaAnotacao] = useState(ALTURA_MINIMA_ANOTACAO);
 
+    useEffect(() => {
+        if (!valor) setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
+    }, [valor]);
+
+    function medirLinhas(linhas) {
+        const quantidadeLinhas = Array.isArray(linhas) ? linhas.length : 0;
+        if (quantidadeLinhas === 0) return;
+        const proximaAltura = calcularAlturaAnotacao(quantidadeLinhas * 24);
+        setAlturaAnotacao((atual) => (atual === proximaAltura ? atual : proximaAltura));
+    }
+
     function limpar() {
         setAlturaAnotacao(ALTURA_MINIMA_ANOTACAO);
         Keyboard.dismiss();
@@ -34,7 +45,7 @@ function DiaryFreeTextCategoryField({
             <TextInput
                 value={valor ?? ''}
                 onChangeText={aoAlterar}
-                placeholder="Digite aqui sua nota..."
+                accessibilityLabel="Digite aqui sua nota…"
                 multiline
                 maxLength={limite}
                 desativado={desabilitado}
@@ -42,8 +53,8 @@ function DiaryFreeTextCategoryField({
                     estilos.campoAnotacao,
                     {
                         borderColor: cores.icone,
-                        height: alturaAnotacao + (valor ? 18 : 0),
-                        paddingTop: valor ? 18 : 0
+                        height: alturaAnotacao,
+                        paddingTop: 0
                     }
                 ]}
                 estiloEntrada={[
@@ -51,13 +62,10 @@ function DiaryFreeTextCategoryField({
                     {
                         color: cores.icone,
                         height: alturaAnotacao - 12,
-                        textAlign: valor ? 'justify' : 'center'
+                        textAlign: 'center'
                     }
                 ]}
                 scrollEnabled={false}
-                onContentSizeChange={({ nativeEvent }) =>
-                    setAlturaAnotacao(calcularAlturaAnotacao(nativeEvent.contentSize.height))
-                }
                 acaoDireita={
                     valor ? (
                         <Pressable
@@ -70,9 +78,27 @@ function DiaryFreeTextCategoryField({
                         >
                             <XCircleIcon size={18} color={coresDiario.primaria} />
                         </Pressable>
-                    ) : null
+                    ) : (
+                        <Text
+                            testID="placeholder-anotacao-livre"
+                            pointerEvents="none"
+                            style={[estilos.placeholderAnotacao, { color: cores.icone }]}
+                        >
+                            Digite aqui sua nota…
+                        </Text>
+                    )
                 }
             />
+            {valor ? (
+                <Text
+                    testID="medidor-anotacao-livre"
+                    accessible={false}
+                    onTextLayout={({ nativeEvent }) => medirLinhas(nativeEvent.lines)}
+                    style={[estilos.medidorAnotacao, { color: cores.icone }]}
+                >
+                    {valor}
+                </Text>
+            ) : null}
             <Text style={[estilos.contador, { color: cores.icone }]}>
                 {[...(valor ?? '')].length} / {limite}
             </Text>

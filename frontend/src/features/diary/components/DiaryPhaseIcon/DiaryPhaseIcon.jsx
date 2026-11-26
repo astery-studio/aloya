@@ -7,7 +7,7 @@ import {
     obterApresentacaoFaseRegistro
 } from '../../utils/diaryPhasePresentation';
 
-function DiaryPhaseIcon({ fase, size, aceitarFaseIndefinida = false }) {
+function DiaryPhaseIcon({ fase, size, cor, aceitarFaseIndefinida = false }) {
     const tema = useTheme();
     const apresentacao = aceitarFaseIndefinida
         ? obterApresentacaoFaseRegistro(fase, tema)
@@ -19,7 +19,7 @@ function DiaryPhaseIcon({ fase, size, aceitarFaseIndefinida = false }) {
         <Icone
             testID={`diary-phase-icon-${fase ?? 'indefinida'}`}
             size={size}
-            color={apresentacao.cor}
+            color={cor ?? apresentacao.cor}
             weight={apresentacao.pesoIcone}
         />
     );

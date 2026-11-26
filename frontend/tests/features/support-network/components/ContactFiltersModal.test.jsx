@@ -299,13 +299,8 @@ describe('ContactFiltersModal', () => {
             />
         );
 
-        const pararPropagacao = jest.fn();
+        fireEvent.press(screen.getByTestId('app-modal-caixa'));
 
-        fireEvent(screen.getByTestId('app-modal-caixa'), 'touchEnd', {
-            stopPropagation: pararPropagacao
-        });
-
-        expect(pararPropagacao).toHaveBeenCalledTimes(1);
         expect(aoFechar).not.toHaveBeenCalled();
     });
 

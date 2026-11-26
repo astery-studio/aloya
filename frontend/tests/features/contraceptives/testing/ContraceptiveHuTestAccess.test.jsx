@@ -2,6 +2,11 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { render } from '../mockTheme';
 import { ContraceptiveHuTestAccess } from '../../../../src/features/contraceptives/testing/ContraceptiveHuTestAccess';
+import { estilos } from '../../../../src/features/contraceptives/testing/ContraceptiveHuTestAccess.styles';
+
+test('mantém os 8 dp iniciais no conteúdo da lista provisória', () => {
+    expect(estilos.lista.paddingTop).toBe(8);
+});
 
 const mockEditContraceptiveScreen = jest.fn(() => null);
 

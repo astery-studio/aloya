@@ -69,6 +69,7 @@ describe.each(['claro', 'escuro'])(
                 right: 'additive',
                 bottom: 'additive'
             });
+            expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
             expect(area).toContainElement(screen.getByRole('button', { name: acao }));
         });
 

@@ -1,7 +1,7 @@
 // Define a composição responsiva da tela do Diário e de sua ação fixa.
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies } from '../../../shared/theme';
+import { espacamentosLayout, fontFamilies } from '../../../shared/theme';
 import { obterCoresDiario } from '../config/diaryColors';
 
 // Converte os tokens do tema em estilos da screen e de seus estados.
@@ -13,15 +13,18 @@ function criarEstilos(tema) {
             minHeight: 0,
             alignSelf: 'stretch'
         },
-        conteudoEstatico: { flex: 1, paddingHorizontal: 20 },
+        conteudoEstatico: {
+            flex: 1,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela
+        },
         introducao: {
             width: 350.011,
             maxWidth: '100%',
             alignSelf: 'center',
             alignItems: 'center',
             gap: 8,
-            paddingTop: 8,
-            paddingBottom: 20
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: tema.espacamentosLayout.descricaoParaConteudo
         },
         descricao: {
             width: '100%',
@@ -46,11 +49,15 @@ function criarEstilos(tema) {
             lineHeight: 21,
             textAlign: 'center'
         },
+        opcaoEstadoVazio: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
         estadoFiltroVazio: {
             flex: 1,
             alignItems: 'center',
             paddingTop: 22,
-            paddingHorizontal: 20,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
             paddingBottom: 96
         },
         mensagemFiltroVazio: {
@@ -76,6 +83,10 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 18,
             letterSpacing: 0.72
+        },
+        lista: {
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
+            paddingBottom: 96
         }
     });
 }
