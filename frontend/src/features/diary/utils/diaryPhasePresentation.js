@@ -15,9 +15,9 @@ const FASES_DIARIO = Object.freeze({
     },
     folicular: {
         rotulo: 'Fase Folicular',
-        cor: '#3B7150',
-        fundoIcone: 'rgba(59, 113, 80, 0.10)',
-        fundo: 'rgba(59, 113, 80, 0.16)',
+        cor: '#567062',
+        fundoIcone: 'rgba(86, 112, 98, 0.10)',
+        fundo: 'rgba(86, 112, 98, 0.20)',
         Icone: PlantIcon,
         pesoIcone: 'regular'
     },
@@ -31,9 +31,9 @@ const FASES_DIARIO = Object.freeze({
     },
     lutea: {
         rotulo: 'Fase Lútea',
-        cor: '#B06D2A',
-        fundoIcone: 'rgba(176, 109, 42, 0.10)',
-        fundo: 'rgba(176, 109, 42, 0.16)',
+        cor: '#D68C3A',
+        fundoIcone: 'rgba(214, 140, 58, 0.10)',
+        fundo: 'rgba(214, 140, 58, 0.20)',
         Icone: WavesIcon,
         pesoIcone: 'regular'
     }

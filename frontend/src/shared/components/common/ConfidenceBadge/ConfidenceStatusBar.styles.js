@@ -1,18 +1,18 @@
-import {StyleSheet} from 'react-native'
+import { StyleSheet } from 'react-native';
 
 const estilos = StyleSheet.create({
     container: {
-        width: 18,
+        width: 16,
         height: 12,
         flexDirection: 'row',
         alignItems: 'flex-end',
-        gap: 3
+        gap: 2
     },
 
     barra: {
         width: 4,
         borderRadius: 4
     }
-})
+});
 
-export {estilos}
+export { estilos };

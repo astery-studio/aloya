@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View } from 'react-native';
 
 import { obterApresentacaoFaseRegistro } from '../../utils/diaryPhasePresentation';
@@ -16,6 +17,15 @@ function DiaryTimelineItem({
     estilos
 }) {
     const apresentacao = obterApresentacaoFaseRegistro(item.fase);
+    const [alturaCartao, setAlturaCartao] = useState(122);
+    const centroCartao = alturaCartao / 2;
+
+    function medirCartao({ nativeEvent }) {
+        const altura = nativeEvent?.layout?.height;
+        if (Number.isFinite(altura) && altura > 0 && altura !== alturaCartao) {
+            setAlturaCartao(altura);
+        }
+    }
 
     return (
         <View style={estilos.item}>
@@ -24,25 +34,37 @@ function DiaryTimelineItem({
                 importantForAccessibility="no-hide-descendants"
                 style={estilos.trilho}
             >
-                {indice > 0 ? <View style={estilos.linhaSuperior} /> : null}
-                <View style={estilos.marcador}>
+                {indice > 0 ? (
+                    <View style={[estilos.linhaSuperior, { height: centroCartao }]} />
+                ) : null}
+                <View
+                    testID="diary-timeline-marker"
+                    style={[estilos.marcador, { top: centroCartao - 25 }]}
+                >
                     {apresentacao ? (
                         <DiaryPhaseIcon fase={item.fase} size={24} aceitarFaseIndefinida />
                     ) : null}
                 </View>
-                <View style={estilos.linhaHorizontal} />
-                {indice < quantidade - 1 || temMais ? <View style={estilos.linhaInferior} /> : null}
+                <View
+                    testID="diary-timeline-horizontal-connector"
+                    style={[estilos.linhaHorizontal, { top: centroCartao - 0.5 }]}
+                />
+                {indice < quantidade - 1 || temMais ? (
+                    <View style={[estilos.linhaInferior, { top: centroCartao }]} />
+                ) : null}
             </View>
             <View style={estilos.cartao}>
-                <DiaryEntryCard
-                    registro={item}
-                    aoAbrir={aoAbrir}
-                    aoEditar={aoEditar}
-                    aoExcluir={aoExcluir}
-                    acaoEmAndamento={
-                        String(acaoEmAndamentoId) === String(item.id) ? 'excluir' : null
-                    }
-                />
+                <View testID="diary-timeline-card-layout" onLayout={medirCartao}>
+                    <DiaryEntryCard
+                        registro={item}
+                        aoAbrir={aoAbrir}
+                        aoEditar={aoEditar}
+                        aoExcluir={aoExcluir}
+                        acaoEmAndamento={
+                            String(acaoEmAndamentoId) === String(item.id) ? 'excluir' : null
+                        }
+                    />
+                </View>
             </View>
         </View>
     );

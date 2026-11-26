@@ -139,6 +139,9 @@ test('histórico valida sessão, filtros, cursores e paginação', async () => {
     const prisma = {
         preferenciaMacrocategoriaDiario: { findMany: async () => [] },
         preferenciaCategoriaDiario: { findMany: async () => [] },
+        registroCiclo: {
+            findMany: async () => [{ dataInicio: data('2026-11-01') }]
+        },
         registroDiario: {
             findFirst: async () => (cursorExiste ? { id: 1 } : null),
             findMany: async (consulta) => {
@@ -154,6 +157,7 @@ test('histórico valida sessão, filtros, cursores e paginação', async () => {
     });
     const pagina = await service.listar(1, { limite: 1, cursor: null, filtros });
     assert.equal(pagina.itens.length, 1);
+    assert.equal(pagina.itens[0].diaCiclo, 3);
     assert.ok(pagina.proximoCursor);
     assert.ok(
         consultas[0].where.AND.some((condicao) =>

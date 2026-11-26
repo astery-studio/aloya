@@ -21,9 +21,10 @@ jest.mock(
 jest.mock('../../../../src/features/diary/components/DiaryCategoryField/DiaryCategoryField', () => {
     const { Pressable, Text } = require('react-native');
     return {
-        DiaryCategoryField: ({ categoria, aoAlterar }) => (
+        DiaryCategoryField: ({ categoria, aoAlterar, exibirDivisor }) => (
             <Pressable accessibilityRole="button" onPress={() => aoAlterar(['opcao'])}>
                 <Text>{categoria.nome}</Text>
+                <Text testID={`divisor-${categoria.id}`}>{String(exibirDivisor)}</Text>
             </Pressable>
         )
     };
@@ -51,6 +52,14 @@ const macros = [
     }
 ];
 
+const macroEnergia = {
+    id: 'energia_sono',
+    nome: 'Energia e Sono',
+    nomeCompacto: 'Energia',
+    recolhidaPorPadrao: true,
+    categorias: [{ id: 'energia', nome: 'Energia' }]
+};
+
 test('define a discrição inicial de cada macrocategoria', () => {
     expect(criarEstadoExpandido(macros)).toEqual({ corpo: false, vida: false });
     expect(sincronizarEstadoExpandido({ corpo: true }, ['corpo', 'vida'])).toEqual({
@@ -65,6 +74,15 @@ test('aceita catálogo temporariamente vazio', async () => {
     );
 
     expect(resultado.toJSON()).not.toBeNull();
+});
+
+test('usa o nome completo da macrocategoria no formulário', async () => {
+    await render(
+        <DiaryMacrocategoryList macrocategorias={[macroEnergia]} valores={{}} erros={{}} />
+    );
+
+    expect(screen.getByText('Energia e Sono:false')).toBeOnTheScreen();
+    expect(screen.queryByText('Energia:false')).not.toBeOnTheScreen();
 });
 
 test('expande a seção sensível e encaminha alterações', async () => {
@@ -92,4 +110,28 @@ test('expande a seção sensível e encaminha alterações', async () => {
     );
     expect(screen.getByText('Vida íntima:true')).toBeOnTheScreen();
     expect(screen.getByText('Intimidade')).toBeOnTheScreen();
+});
+
+test('exibe divisor somente a partir da segunda categoria da macrocategoria', async () => {
+    const macro = {
+        id: 'saude',
+        nome: 'Saúde e Acompanhamento',
+        categorias: [
+            { id: 'testes', nome: 'Testes' },
+            { id: 'consultas', nome: 'Consultas' }
+        ]
+    };
+
+    await render(
+        <DiaryMacrocategoryList
+            macrocategorias={[macro]}
+            valores={{}}
+            erros={{}}
+            aoAlterar={jest.fn()}
+        />
+    );
+    await fireEvent.press(screen.getByText('Saúde e Acompanhamento:false'));
+
+    expect(screen.getByTestId('divisor-testes')).toHaveTextContent('false');
+    expect(screen.getByTestId('divisor-consultas')).toHaveTextContent('true');
 });

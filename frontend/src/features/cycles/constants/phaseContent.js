@@ -6,27 +6,51 @@ const dicasPadrao = Object.freeze([
 
 const conteudoPorFase = Object.freeze({
     menstrual: {
-        tituloExplicacao: 'Sobre sua fase',
-        descricao: 'O ciclo recomeça. O corpo libera o revestimento uterino e a energia tende a se voltar para dentro. É um bom momento para reduzir o ritmo e observar como você se sente.',
-        sintomas: ['Sensação de cansaço', 'Sensibilidade corporal', 'Menor disposição', 'Alterações de humor'],
+        tituloExplicacao: 'O início de um novo ciclo',
+        descricao:
+            'Quando não ocorre uma gravidez, a queda dos hormônios estrogênio e progesterona faz com que o útero elimine parte de seu revestimento interno, chamado endométrio. Esse tecido sai do corpo junto com o sangue menstrual. O primeiro dia da menstruação marca o início de um novo ciclo.',
+        sintomas: [
+            'Sensação de cansaço',
+            'Sensibilidade corporal',
+            'Menor disposição',
+            'Alterações de humor'
+        ],
         dicas: dicasPadrao
     },
     folicular: {
-        tituloExplicacao: 'Sobre sua fase',
-        descricao: 'Os níveis hormonais começam a subir e muitas pessoas relatam mais disposição e clareza. É uma janela em que o corpo se prepara gradualmente para a ovulação.',
-        sintomas: ['Aumento de energia', 'Pele mais equilibrada', 'Mais disposição', 'Alterações de humor'],
+        tituloExplicacao: 'Preparação para a ovulação',
+        descricao:
+            'Durante essa fase, pequenos folículos nos ovários começam a se desenvolver, e geralmente um deles amadurece para liberar um óvulo. Ao mesmo tempo, os níveis de estrogênio aumentam, estimulando a reconstrução e o crescimento do revestimento interno do útero. É a preparação do corpo para a ovulação.',
+        sintomas: [
+            'Aumento de energia',
+            'Pele mais equilibrada',
+            'Mais disposição',
+            'Alterações de humor'
+        ],
         dicas: dicasPadrao
     },
     ovulatoria: {
-        tituloExplicacao: 'Sobre sua fase',
-        descricao: 'O óvulo é liberado e o corpo atinge um ponto de maior expansão no ciclo. É a fase em que a fertilidade estimada é mais alta.',
-        sintomas: ['Pico de energia', 'Sensibilidade corporal', 'Alterações de temperatura', 'Mais sociabilidade'],
+        tituloExplicacao: 'A liberação do óvulo',
+        descricao:
+            'A ovulação acontece quando um dos ovários libera um óvulo amadurecido, após um aumento do hormônio LH. O óvulo é captado pela tuba uterina, onde pode ser fecundado por um espermatozoide. Esse é o período de maior possibilidade de gravidez no ciclo, especialmente nos dias anteriores à ovulação e no próprio dia.',
+        sintomas: [
+            'Pico de energia',
+            'Sensibilidade corporal',
+            'Alterações de temperatura',
+            'Mais sociabilidade'
+        ],
         dicas: dicasPadrao
     },
     lutea: {
-        tituloExplicacao: 'Sobre sua fase',
-        descricao: 'Após a ovulação, o corpo entra em uma fase de transição. A energia costuma diminuir gradualmente conforme o ciclo se aproxima do fim.',
-        sintomas: ['Alterações de energia', 'Alterações de humor', 'Sensibilidade corporal', 'Retenção de líquidos'],
+        tituloExplicacao: 'Preparação para uma possível gravidez',
+        descricao:
+            'Depois da ovulação, o folículo que liberou o óvulo se transforma em uma estrutura chamada corpo lúteo. Ela produz principalmente progesterona, um hormônio que ajuda a preparar e manter o revestimento do útero para uma possível gravidez. Se a gravidez não acontece, os níveis hormonais diminuem e uma nova menstruação começa.',
+        sintomas: [
+            'Alterações de energia',
+            'Alterações de humor',
+            'Sensibilidade corporal',
+            'Retenção de líquidos'
+        ],
         dicas: dicasPadrao
     }
 });

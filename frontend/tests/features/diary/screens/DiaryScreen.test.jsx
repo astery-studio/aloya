@@ -1,9 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
-import {
-    calcularMargemHorizontalTimeline,
-    DiaryScreen
-} from '../../../../src/features/diary/screens/DiaryScreen';
+import { DiaryScreen } from '../../../../src/features/diary/screens/DiaryScreen';
 import { criarEstilos } from '../../../../src/features/diary/screens/DiaryScreen.styles';
 import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -37,11 +35,13 @@ describe('histórico do Diário', () => {
         });
     });
 
-    test('preserva a largura do card do protótipo em celulares estreitos', () => {
-        expect(calcularMargemHorizontalTimeline(360)).toBe(5);
-        expect(calcularMargemHorizontalTimeline(390)).toBe(20);
-        expect(calcularMargemHorizontalTimeline(412)).toBe(20);
-        expect(calcularMargemHorizontalTimeline()).toBe(20);
+    test('usa a margem horizontal padrão em todo o conteúdo da tela', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.conteudoEstatico.paddingHorizontal).toBe(24);
+        expect(estilos.estadoFiltroVazio.paddingHorizontal).toBe(24);
+        expect(estilos.lista.paddingHorizontal).toBe(24);
+        expect(estilos.acaoFixa.paddingHorizontal).toBe(24);
     });
 
     test('mostra estado vazio e abre a criação', async () => {
@@ -54,7 +54,9 @@ describe('histórico do Diário', () => {
         expect(
             screen.getByText(/as categorias usadas neles podem estar desativadas/)
         ).toBeOnTheScreen();
-        expect(screen.getByText(/Ative-as em "Gerenciar categorias"/)).toBeOnTheScreen();
+        expect(screen.getByText('"Gerenciar categorias"')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.getByText('"Adicionar novo registro"')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.queryByText(/desativadas\.\nAtive-as/)).not.toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Adicionar novo registro' }));
         expect(aoCriar).toHaveBeenCalledTimes(1);
     });
@@ -102,6 +104,9 @@ describe('histórico do Diário', () => {
         });
         expect(screen.getByText('LINHA DO TEMPO')).toBeOnTheScreen();
         expect(screen.getByText('Atualizando Diário...')).toBeOnTheScreen();
+        expect(
+            StyleSheet.flatten(screen.getByTestId('diary-timeline').props.contentContainerStyle)
+        ).toMatchObject({ paddingHorizontal: 24 });
         const botaoFiltrar = screen.getByRole('button', {
             name: 'Filtrar histórico do Diário'
         });

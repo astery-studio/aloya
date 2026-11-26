@@ -1,5 +1,5 @@
 // Integra histórico, resumo, detalhe, criação, edição e exclusão na entrada da aba Diário.
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 
 import AlertModal from '../../shared/components/feedback/Modal/AlertModal/AlertModal';
@@ -108,6 +108,7 @@ function DiaryFlow({
     );
     const detalhes = useDiaryRecordDetails({ service, onSessaoExpirada });
     const edicao = useDiaryRecordDetails({ service, onSessaoExpirada });
+    const exclusaoAposFecharDetalheRef = useRef(null);
     const registrosAdjacentes = useMemo(
         () => obterRegistrosAdjacentes(historico.registros, detalhes.resumoSelecionado?.id),
         [detalhes.resumoSelecionado?.id, historico.registros]
@@ -141,7 +142,18 @@ function DiaryFlow({
     }
 
     function solicitarExclusao(registro) {
+        if (detalhes.visivel) {
+            exclusaoAposFecharDetalheRef.current = registro;
+            detalhes.fechar();
+            return;
+        }
         exclusao.solicitar(registro);
+    }
+
+    function concluirFechamentoDetalhe() {
+        const registro = exclusaoAposFecharDetalheRef.current;
+        exclusaoAposFecharDetalheRef.current = null;
+        if (registro) exclusao.solicitar(registro);
     }
 
     function aplicarFiltros(proximosFiltros, catalogo) {
@@ -274,6 +286,7 @@ function DiaryFlow({
                 aoEditar={detalhes.registro ? iniciarEdicao : undefined}
                 aoExcluir={detalhes.registro ? solicitarExclusao : undefined}
                 aoFechar={detalhes.fechar}
+                aoOcultar={concluirFechamentoDetalhe}
                 excluindo={exclusao.excluindo}
             />
 

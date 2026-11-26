@@ -6,11 +6,20 @@ import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBadge', () => {
     const ReactInterno = require('react');
-    const { Text } = require('react-native');
+    const { Pressable, Text } = require('react-native');
 
     return {
-        ConfidenceBadge: ({ nivel }) =>
-            ReactInterno.createElement(Text, { testID: 'confidence-badge' }, nivel)
+        ConfidenceBadge: ({ nivel, onPress }) =>
+            ReactInterno.createElement(
+                Pressable,
+                {
+                    testID: 'confidence-badge',
+                    accessibilityRole: 'button',
+                    accessibilityLabel: `Confiança ${nivel}`,
+                    onPress
+                },
+                ReactInterno.createElement(Text, null, nivel)
+            )
     };
 });
 
@@ -22,6 +31,21 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
         return ReactInterno.createElement(View, { testID: 'icone-legenda', ...props });
     }
 }));
+
+jest.mock('../../../../src/features/cycles/components/sheets/CycleConfidenceSheet', () => {
+    const ReactInterno = require('react');
+    const { Text, View } = require('react-native');
+    return {
+        CycleConfidenceSheet: ({ visivel, nivel }) =>
+            visivel
+                ? ReactInterno.createElement(
+                      View,
+                      { testID: 'confidence-sheet' },
+                      ReactInterno.createElement(Text, null, `Confiabilidade ${nivel}`)
+                  )
+                : null
+    };
+});
 
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
     const ReactInterno = require('react');
@@ -144,6 +168,8 @@ describe('CalendarScreen', () => {
             alignItems: 'center',
             justifyContent: 'center'
         });
+        await fireEvent.press(screen.getByRole('button', { name: 'Confiança alta' }));
+        expect(screen.getByTestId('confidence-sheet')).toHaveTextContent('Confiabilidade alta');
         expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
         expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
         expect(estilos.conteudo).toMatchObject({ paddingTop: 8 });

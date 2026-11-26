@@ -45,16 +45,20 @@ describe('CycleHistoryScreen', () => {
         expect(estilos.conteudoDaLista.paddingTop).toBe(8);
     });
 
-    test('mostra o resumo e os ciclos carregados', async () => {
+    test('mostra o resumo e permite abrir o calendário com ciclos registrados', async () => {
+        const aoAbrirCalendario = jest.fn();
         await render(
             <CycleHistoryScreen
                 ciclos={ciclos}
                 resumo={resumoCarregado}
-                aoAbrirCalendario={jest.fn()}
+                aoAbrirCalendario={aoAbrirCalendario}
                 aoEditarCiclo={jest.fn()}
                 aoExcluirCiclo={jest.fn()}
             />
         );
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Ir para o Calendário' }));
+        expect(aoAbrirCalendario).toHaveBeenCalledTimes(1);
 
         expect(screen.getByRole('header', { name: 'Histórico de Ciclos' })).toBeOnTheScreen();
         expect(screen.getByText('28')).toBeOnTheScreen();
@@ -233,7 +237,7 @@ describe('CycleHistoryScreen', () => {
             />
         );
 
-        expect(screen.getByText('Confiança Baixa')).toBeOnTheScreen();
+        expect(screen.getByText('Baixa')).toBeOnTheScreen();
     });
 
     test('encaminha a navegação inferior', async () => {

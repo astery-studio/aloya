@@ -47,6 +47,7 @@ import { PencilSimpleIcon } from 'phosphor-react-native/src/icons/PencilSimple';
 import { PersonArmsSpreadIcon } from 'phosphor-react-native/src/icons/PersonArmsSpread';
 import { PillIcon } from 'phosphor-react-native/src/icons/Pill';
 import { RainbowCloudIcon } from 'phosphor-react-native/src/icons/RainbowCloud';
+import { RepeatIcon } from 'phosphor-react-native/src/icons/Repeat';
 import { ShieldCheckIcon } from 'phosphor-react-native/src/icons/ShieldCheck';
 import { ShieldWarningIcon } from 'phosphor-react-native/src/icons/ShieldWarning';
 import { SmileyWinkIcon } from 'phosphor-react-native/src/icons/SmileyWink';
@@ -61,8 +62,10 @@ import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 import { UsersThreeIcon } from 'phosphor-react-native/src/icons/UsersThree';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
+import { WindIcon } from 'phosphor-react-native/src/icons/Wind';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
+import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 
 export {
     ArrowLeftIcon,
@@ -113,6 +116,7 @@ export {
     PersonArmsSpreadIcon,
     PillIcon,
     RainbowCloudIcon,
+    RepeatIcon,
     ShieldCheckIcon,
     ShieldWarningIcon,
     SmileyWinkIcon,
@@ -127,6 +131,8 @@ export {
     UsersThreeIcon,
     WarningCircleIcon,
     WarningIcon,
+    WindIcon,
     XCircleIcon,
-    XIcon
+    XIcon,
+    QuestionIcon
 };

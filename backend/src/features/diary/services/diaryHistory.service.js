@@ -1,13 +1,20 @@
 import { AppError } from '../../../shared/errors/AppError.js';
-import { formatarData, paraDataCalendario } from '../../cycles/utils/calendar.js';
+import { diferencaDias, formatarData, paraDataCalendario } from '../../cycles/utils/calendar.js';
 import { apresentarResumoRegistro } from '../presenters/diaryHistory.presenter.js';
 import { codificarCursor, decodificarCursor } from '../utils/diaryCursor.js';
 import { obterCategoriasAtivas, validarCategoriasDoFiltro } from './diaryActiveCategories.js';
 import { criarWhereHistorico, SELECAO_RESUMO } from './diaryHistory.query.js';
 
 function criarDiaryHistoryService({ prisma } = {}) {
-    if (!prisma?.registroDiario?.findMany) {
+    if (!prisma?.registroDiario?.findMany || !prisma?.registroCiclo?.findMany) {
         throw new TypeError('Não foi possível configurar o histórico do Diário.');
+    }
+
+    function calcularDiaCiclo(dataRegistro, ciclos) {
+        const ciclo = ciclos.find(({ dataInicio }) => dataInicio <= dataRegistro);
+        if (!ciclo) return null;
+        const dia = diferencaDias(ciclo.dataInicio, dataRegistro) + 1;
+        return Number.isSafeInteger(dia) && dia > 0 ? dia : null;
     }
 
     async function validarCursor(usuarioId, cursor, filtros) {
@@ -47,9 +54,22 @@ function criarDiaryHistoryService({ prisma } = {}) {
         const possuiProxima = registros.length > limite;
         const pagina = registros.slice(0, limite);
         const ultimo = pagina.at(-1);
+        const ciclos = pagina.length
+            ? await prisma.registroCiclo.findMany({
+                  where: { usuarioId, dataInicio: { lte: pagina[0].dataRegistro } },
+                  orderBy: [{ dataInicio: 'desc' }, { id: 'desc' }],
+                  select: { dataInicio: true }
+              })
+            : [];
 
         return {
-            itens: pagina.map((registro) => apresentarResumoRegistro(registro, categoriasAtivas)),
+            itens: pagina.map((registro) =>
+                apresentarResumoRegistro(
+                    registro,
+                    categoriasAtivas,
+                    calcularDiaCiclo(registro.dataRegistro, ciclos)
+                )
+            ),
             proximoCursor:
                 possuiProxima && ultimo
                     ? codificarCursor(
@@ -60,7 +80,7 @@ function criarDiaryHistoryService({ prisma } = {}) {
         };
     }
 
-    return { listar };
+    return { calcularDiaCiclo, listar };
 }
 
 export { criarDiaryHistoryService };

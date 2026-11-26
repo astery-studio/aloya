@@ -41,11 +41,41 @@ describe('DiaryMacrocategorySection', () => {
                 expandido={false}
                 aoAlternar={aoAlternar}
                 desabilitado
+                testID="categoria-registro"
             >
                 <Text>Conteúdo íntimo</Text>
             </DiaryMacrocategorySection>
         );
         const cabecalho = screen.getByRole('button', { name: 'Vida Íntima e Social' });
+        expect(screen.getByTestId('categoria-registro')).toHaveStyle({
+            width: 311,
+            maxWidth: '100%',
+            minHeight: 60,
+            borderWidth: 0.698,
+            borderRadius: 12,
+            backgroundColor: '#FFFFFF'
+        });
+        expect(screen.getByTestId('categoria-registro-cabecalho')).toHaveStyle({
+            height: 60,
+            paddingVertical: 10,
+            paddingHorizontal: 12,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 10
+        });
+        expect(cabecalho).toHaveStyle({
+            minHeight: 0,
+            width: 'auto',
+            height: 40,
+            flex: 0,
+            flexShrink: 1,
+            justifyContent: 'center',
+            gap: 10
+        });
+        expect(screen.getByText('Vida Íntima e Social')).toHaveStyle({
+            flex: 0,
+            flexShrink: 1
+        });
         expect(cabecalho).toBeDisabled();
         expect(cabecalho).toHaveProp('accessibilityState', { expanded: false, disabled: true });
         expect(screen.queryByText('Conteúdo íntimo')).toBeNull();

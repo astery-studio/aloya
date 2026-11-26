@@ -137,8 +137,6 @@ function criarEstilos(tema) {
             width: 342,
             maxWidth: '100%',
             height: 54,
-            paddingTop: 15.375,
-            paddingBottom: 14.625,
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 14

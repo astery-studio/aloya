@@ -93,6 +93,7 @@ export default function OnboardingScreen({
     aoVoltar,
     aoEntrar,
     aoConcluir,
+    aoConsultarDocumentos,
     logo
 }) {
     const [etapa, setEtapa] = useState(0);
@@ -414,6 +415,7 @@ export default function OnboardingScreen({
     if (etapa === 0)
         conteudo = (
             <AccountStep
+                aoConsultarDocumentos={aoConsultarDocumentos}
                 dados={dados}
                 aoAlterar={alterar}
                 aoAvancar={avancarConta}
