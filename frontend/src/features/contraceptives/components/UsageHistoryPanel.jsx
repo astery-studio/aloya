@@ -238,7 +238,7 @@ function UsageHistoryPanel({
         },
         erroExclusao: {
             titulo: 'Não foi possível apagar',
-            mensagem: 'Tente novamente.'
+            mensagem: popup?.mensagem ?? 'Tente novamente.'
         }
     }[popup?.tipo];
     const idsEditaveis = new Set(

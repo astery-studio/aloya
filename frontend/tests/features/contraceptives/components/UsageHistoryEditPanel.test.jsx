@@ -47,6 +47,30 @@ test('calendário exige um horário quando há duas ocorrências no mesmo dia', 
     expect(await screen.findByRole('button', { name: 'Alterar Histórico' })).toBeOnTheScreen();
 });
 
+test('explica um limite temporário sem perder o registro selecionado', async () => {
+    const mensagem = 'Muitas alterações em pouco tempo. Aguarde e tente novamente.';
+    const salvar = jest.fn().mockRejectedValue({ status: 429, mensagemUsuario: mensagem });
+    await render(
+        <UsageHistoryPanel
+            expandido
+            modo="calendario"
+            usoUnicoPorDia
+            registros={[registros[0]]}
+            aoSalvarEdicaoHistorico={salvar}
+        />
+    );
+
+    await pressionar('Dia 6, Confirmado');
+    await pressionar('Apagar registro');
+    await pressionar('Apagar');
+
+    expect(await screen.findByText(mensagem)).toBeOnTheScreen();
+    await pressionar('OK');
+    expect(
+        screen.getByRole('button', { name: 'Dia 6, Confirmado', selected: true })
+    ).toBeOnTheScreen();
+});
+
 test('explica dias indisponíveis e habilita as opções ao tocar em um dia com um único uso', async () => {
     await render(
         <UsageHistoryPanel

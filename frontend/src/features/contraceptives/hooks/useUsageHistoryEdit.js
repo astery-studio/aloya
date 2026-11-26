@@ -90,13 +90,21 @@ function useUsageHistoryEdit(
             await aoSalvarEdicaoHistorico(alvo, alteracao);
             aoMudarRodape?.();
             setSessao(null);
-        } catch {
-            if (alteracao.apagar) setPopup({ tipo: 'erroExclusao' });
-            else
+        } catch (falha) {
+            const mensagemLimite =
+                falha?.status === 429
+                    ? falha.mensagemUsuario ||
+                      'Muitas alterações em pouco tempo. Aguarde e tente novamente.'
+                    : null;
+
+            if (alteracao.apagar) {
+                setPopup({ tipo: 'erroExclusao', mensagem: mensagemLimite });
+            } else {
                 setSessao((atual) => ({
                     ...atual,
-                    erro: 'Não foi possível salvar. Tente novamente.'
+                    erro: mensagemLimite ?? 'Não foi possível salvar. Tente novamente.'
                 }));
+            }
         } finally {
             envio.current = false;
             setSalvando(false);
