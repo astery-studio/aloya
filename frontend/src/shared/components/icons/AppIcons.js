@@ -61,8 +61,10 @@ import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 import { UsersThreeIcon } from 'phosphor-react-native/src/icons/UsersThree';
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
 import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
+import { WindIcon } from 'phosphor-react-native/src/icons/Wind';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
+import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 
 export {
     ArrowLeftIcon,
@@ -127,6 +129,8 @@ export {
     UsersThreeIcon,
     WarningCircleIcon,
     WarningIcon,
+    WindIcon,
     XCircleIcon,
-    XIcon
+    XIcon,
+    QuestionIcon
 };
