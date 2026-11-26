@@ -11,6 +11,7 @@ function DiaryMacrocategorySection({
     aoAlternar,
     acessorioCabecalho,
     desabilitado = false,
+    testID,
     children
 }) {
     return (
@@ -25,6 +26,7 @@ function DiaryMacrocategorySection({
             rotuloAcao={titulo}
             desabilitado={desabilitado}
             variante="formulario"
+            testID={testID}
         >
             {children}
         </DiaryMacrocategoryAccordion>

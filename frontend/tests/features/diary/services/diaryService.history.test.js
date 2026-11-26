@@ -11,6 +11,7 @@ const resumo = {
     id: 4,
     data: '2026-11-04',
     fase: 'menstrual',
+    diaCiclo: 4,
     principais: [
         {
             categoriaId: 'pele',
@@ -57,6 +58,7 @@ describe('histórico no diaryService', () => {
             signal
         });
         expect(pagina.itens[0]).toMatchObject({
+            diaCiclo: 4,
             trechoAnotacao: 'Anotação',
             principais: [
                 {

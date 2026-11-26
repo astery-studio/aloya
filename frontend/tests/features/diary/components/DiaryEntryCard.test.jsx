@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 import {
     DiaryEntryCard,
@@ -12,6 +13,7 @@ const registro = {
     id: 8,
     data: '2026-11-04',
     fase: 'menstrual',
+    diaCiclo: 4,
     principais: [
         {
             categoriaId: 'banheiro',
@@ -43,7 +45,7 @@ describe('DiaryEntryCard', () => {
             { texto: 'Sintomas emocionais' },
             { texto: 'Sintomas pré-menstruais' },
             { texto: 'Fluxo menstrual' },
-            { texto: '+ 2' }
+            { texto: '2' }
         ];
         expect(organizarChipsEmLinhas(itens)).toEqual([
             [itens[0], itens[2]],
@@ -54,7 +56,7 @@ describe('DiaryEntryCard', () => {
             { texto: 'Intestino' },
             { texto: 'Sangramento de Escape' },
             { texto: 'Tempo de Sono' },
-            { texto: '+ 2' }
+            { texto: '2' }
         ];
         expect(organizarChipsEmLinhas(curtos)).toEqual([curtos.slice(0, 2), curtos.slice(2)]);
 
@@ -107,6 +109,32 @@ describe('DiaryEntryCard', () => {
             fontSize: 12,
             lineHeight: 24
         });
+        for (const titulo of ['CATEGORIAS MARCADAS', 'ANOTAÇÃO DO DIA']) {
+            expect(screen.getByText(titulo)).toHaveStyle({
+                color: '#2C4C3B',
+                textAlign: 'center',
+                fontSize: 8,
+                fontStyle: 'normal',
+                fontWeight: '700',
+                lineHeight: 15,
+                letterSpacing: 0.6,
+                textTransform: 'uppercase'
+            });
+        }
+        expect(screen.getByTestId('diary-entry-header-leading')).toHaveStyle({
+            width: 56,
+            alignItems: 'flex-start'
+        });
+        expect(screen.getByTestId('diary-entry-date-area')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
+        expect(screen.getByTestId('diary-entry-header-actions')).toHaveStyle({
+            width: 56,
+            alignItems: 'center',
+            justifyContent: 'flex-end'
+        });
         expect(screen.getByTestId('diary-entry-icon')).toHaveStyle({
             width: 26,
             height: 26,
@@ -115,7 +143,7 @@ describe('DiaryEntryCard', () => {
             borderColor: '#C85A44',
             backgroundColor: 'rgba(200, 90, 68, 0.10)'
         });
-        expect(screen.getByLabelText('Fase Menstrual')).toHaveStyle({
+        expect(screen.getByLabelText('Fase Menstrual - Dia 4 do Ciclo')).toHaveStyle({
             alignSelf: 'stretch',
             height: 26,
             paddingHorizontal: 14,
@@ -124,19 +152,62 @@ describe('DiaryEntryCard', () => {
             borderRadius: 100,
             backgroundColor: 'rgba(200, 90, 68, 0.20)'
         });
-        expect(screen.getByText('Fase Menstrual')).toHaveStyle({
+        expect(screen.getByText('Fase Menstrual - Dia 4 do Ciclo')).toHaveStyle({
             fontSize: 10,
+            fontWeight: '600',
             lineHeight: 19.5
         });
+        expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('width', 13);
+        expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('height', 13);
         expect(screen.getByText('Intestino')).toBeOnTheScreen();
         expect(screen.getByText('Intestino')).toHaveStyle({
+            height: 16.5,
+            color: '#5C5C59',
             fontSize: 8.56,
-            lineHeight: 16
+            fontWeight: '600',
+            lineHeight: 16.5,
+            textAlignVertical: 'center',
+            includeFontPadding: false
         });
         expect(screen.getByText('Sangramento de Escape')).toBeOnTheScreen();
-        expect(screen.getByText('+ 2')).toBeOnTheScreen();
+        expect(screen.getByText('2')).toBeOnTheScreen();
+        expect(screen.queryByText('+ 2')).not.toBeOnTheScreen();
         expect(screen.getAllByTestId('diary-entry-chip-row')).toHaveLength(2);
+        expect(screen.getByTestId('diary-entry-chips')).toHaveStyle({
+            paddingTop: 6,
+            paddingBottom: 10
+        });
+        expect(screen.getAllByTestId('diary-entry-summary-chip')[0]).toHaveStyle({
+            height: 24,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 3
+        });
+        expect(screen.getByTestId('diary-entry-additional-chip')).toHaveStyle({
+            height: 24,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 3
+        });
+        expect(screen.getAllByTestId('diary-entry-chip-icon')[0]).toHaveStyle({
+            width: 10.89,
+            height: 16.5,
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
         expect(screen.getByText('Hoje me senti melhor.')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-entry-categories-note-divider')).toHaveStyle({
+            height: StyleSheet.hairlineWidth
+        });
+        expect(screen.getByTestId('diary-entry-note')).toHaveStyle({
+            paddingTop: 12,
+            paddingBottom: 12
+        });
+        expect(screen.getByTestId('diary-entry-phase-section')).toHaveStyle({
+            alignSelf: 'stretch',
+            paddingTop: 6,
+            borderTopWidth: StyleSheet.hairlineWidth
+        });
 
         await fireEvent.press(screen.getByLabelText('Ver detalhes do registro de 04/11/2026'));
         await fireEvent.press(
@@ -200,7 +271,8 @@ describe('DiaryEntryCard', () => {
 
         await render(<DiaryEntryCard registro={minimo} aoAbrir={jest.fn()} />);
         expect(screen.getByText('Primeiro')).toBeOnTheScreen();
-        expect(screen.getByText('+ 1')).toBeOnTheScreen();
+        expect(screen.getByText('1')).toBeOnTheScreen();
+        expect(screen.queryByText('+ 1')).not.toBeOnTheScreen();
         expect(screen.queryByText('Ignorado')).not.toBeOnTheScreen();
     });
 
@@ -208,7 +280,7 @@ describe('DiaryEntryCard', () => {
         await render(<DiaryEntryCard registro={{ ...registro, fase: null }} />);
 
         expect(screen.getByTestId('diary-entry-card')).toBeOnTheScreen();
-        expect(screen.getByText('Fase não identificada')).toBeOnTheScreen();
+        expect(screen.getByText('Fase não identificada - Dia 4 do Ciclo')).toBeOnTheScreen();
     });
 
     test('compacta o card quando somente dados sigilosos foram registrados', async () => {
@@ -218,6 +290,7 @@ describe('DiaryEntryCard', () => {
                     id: 10,
                     data: '2026-11-02',
                     fase: 'lutea',
+                    diaCiclo: 18,
                     principais: [],
                     maisQuantidade: 0,
                     trechoAnotacao: null
@@ -228,7 +301,19 @@ describe('DiaryEntryCard', () => {
 
         expect(screen.queryByTestId('diary-entry-content')).not.toBeOnTheScreen();
         expect(screen.queryByText('CATEGORIAS MARCADAS')).not.toBeOnTheScreen();
-        expect(screen.getByText('Fase Lútea')).toBeOnTheScreen();
+        expect(screen.getByText('Fase Lútea - Dia 18 do Ciclo')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-entry-icon')).toHaveStyle({
+            borderColor: '#D68C3A',
+            backgroundColor: 'rgba(214, 140, 58, 0.10)'
+        });
+        expect(screen.getByTestId('diary-entry-notebook-icon')).toHaveProp('color', '#D68C3A');
+        expect(screen.getByLabelText('Fase Lútea - Dia 18 do Ciclo')).toHaveStyle({
+            backgroundColor: 'rgba(214, 140, 58, 0.20)'
+        });
+        expect(screen.getByTestId('diary-entry-phase-tag-icon')).toHaveProp('color', '#D68C3A');
+        expect(screen.getByText('Fase Lútea - Dia 18 do Ciclo')).toHaveStyle({
+            color: '#D68C3A'
+        });
     });
 
     test('mostra somente a anotação quando não há categorias públicas', async () => {

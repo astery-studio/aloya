@@ -16,6 +16,7 @@ import {
     FASES_FILTRO,
     FILTROS_DIARIO_VAZIOS,
     formatarDataFiltro,
+    possuiFiltrosDiario,
     validarPeriodoDiario
 } from '../../utils/diaryFilters';
 import { DiaryCategoryFilterGroup } from './DiaryCategoryFilterGroup';
@@ -31,6 +32,15 @@ function criarEdicao(filtros = FILTROS_DIARIO_VAZIOS) {
         categorias: [...(filtros.categorias ?? [])],
         fases: [...(filtros.fases ?? [])]
     };
+}
+
+function edicaoPossuiPreenchimento(edicao) {
+    return Boolean(
+        edicao?.dataInicio?.trim() ||
+        edicao?.dataFim?.trim() ||
+        edicao?.categorias?.length ||
+        edicao?.fases?.length
+    );
 }
 
 function DiaryFiltersSheet({
@@ -51,6 +61,9 @@ function DiaryFiltersSheet({
     const [expandidas, setExpandidas] = useState({});
     const [erroPeriodo, setErroPeriodo] = useState(null);
     const posicaoRolagem = useRef(0);
+    const possuiFiltrosAplicados = possuiFiltrosDiario(filtros);
+    const possuiPreenchimento = edicaoPossuiPreenchimento(edicao);
+    const aplicarDesativado = aplicando || !catalogo.catalogo || !possuiPreenchimento;
 
     useEffect(() => {
         if (!visivel) return;
@@ -79,6 +92,9 @@ function DiaryFiltersSheet({
     function limpar() {
         setEdicao(criarEdicao());
         setErroPeriodo(null);
+        if (possuiFiltrosAplicados) {
+            onAplicar?.(FILTROS_DIARIO_VAZIOS, catalogo.catalogo);
+        }
     }
 
     function aplicar() {
@@ -95,7 +111,9 @@ function DiaryFiltersSheet({
             onFechar={onFechar}
             bloquearFechamento={aplicando}
             permitirDeslizarParaFechar
+            exibirAlcaArraste={false}
             podeIniciarDeslize={podeIniciarDeslize}
+            ajustarAoTeclado={false}
             estiloPainel={estilos.painel}
             corAlca={coresDiario.interface.borda}
         >
@@ -121,6 +139,8 @@ function DiaryFiltersSheet({
                             contentContainerStyle={estilos.conteudo}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
+                            keyboardDismissMode="on-drag"
+                            onScrollBeginDrag={Keyboard.dismiss}
                             onScroll={atualizarPosicaoRolagem}
                             scrollEventThrottle={16}
                         >
@@ -246,21 +266,27 @@ function DiaryFiltersSheet({
                     ) : null}
                 </View>
 
-                <View style={estilos.rodape}>
-                    <ButtonScreen
-                        texto="Limpar"
-                        variante="branco"
-                        aoPressionar={limpar}
-                        desativado={aplicando || !catalogo.catalogo}
-                        estilo={estilos.botaoLimpar}
-                        estiloTexto={estilos.textoLimpar}
-                    />
+                <View style={[estilos.rodape, !possuiPreenchimento && estilos.rodapeSemLimpar]}>
+                    {possuiPreenchimento ? (
+                        <ButtonScreen
+                            texto="Limpar"
+                            variante="branco"
+                            aoPressionar={limpar}
+                            desativado={aplicando || !catalogo.catalogo}
+                            estilo={estilos.botaoLimpar}
+                            estiloTexto={estilos.textoLimpar}
+                        />
+                    ) : null}
                     <ButtonScreen
                         texto="Aplicar Filtro"
                         aoPressionar={aplicar}
-                        desativado={aplicando || !catalogo.catalogo}
+                        desativado={aplicarDesativado}
                         carregando={aplicando}
                         estilo={estilos.botaoAplicar}
+                        estiloTexto={[
+                            estilos.textoAplicar,
+                            aplicarDesativado && estilos.textoAplicarDesativado
+                        ]}
                     />
                 </View>
             </BottomSheetLayout>
@@ -284,4 +310,4 @@ function DiaryFiltersSheet({
     );
 }
 
-export { criarEdicao, DiaryFiltersSheet };
+export { criarEdicao, DiaryFiltersSheet, edicaoPossuiPreenchimento };
