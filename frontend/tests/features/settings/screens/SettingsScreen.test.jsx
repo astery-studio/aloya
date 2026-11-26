@@ -26,7 +26,6 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     return {
         ArrowsClockwiseIcon: IconeTeste,
         BellIcon: IconeTeste,
-        HouseIcon: IconeTeste,
         InfoIcon: IconeTeste,
         GavelIcon: IconeTeste,
         MoonIcon: IconeTeste,
@@ -185,71 +184,77 @@ describe('SettingsScreen', () => {
         });
     });
 
-    test('mostra todas as seções e opções do protótipo', async () => {
+    test('mostra as seções e opções atualizadas', async () => {
         await renderizarTela();
 
         expect(screen.getByText('Configurações')).toBeOnTheScreen();
-
         expect(screen.getByText('Minha Conta')).toBeOnTheScreen();
-
         expect(screen.getByText('Configurações de Perfil')).toBeOnTheScreen();
-
         expect(screen.getByText('Meu Ciclo')).toBeOnTheScreen();
-
         expect(screen.getByText('Parâmetros do Ciclo')).toBeOnTheScreen();
-
-        expect(screen.queryByText('Categorias do Diário')).toBeNull();
-
         expect(screen.getByText('Preferências')).toBeOnTheScreen();
-
         expect(screen.getByText('Modo de Cor')).toBeOnTheScreen();
-
-        expect(screen.getByText('Tela inicial')).toBeOnTheScreen();
-
         expect(screen.getByText('Notificações')).toBeOnTheScreen();
-
         expect(screen.getByText('Privacidade e Sobre')).toBeOnTheScreen();
-
         expect(screen.getByText('Sobre a aplicação')).toBeOnTheScreen();
-
-        expect(screen.getByText('Políticas de Privacidade')).toBeOnTheScreen();
-
+        expect(screen.getByText('Privacidade e Termos')).toBeOnTheScreen();
         expect(screen.getByText('Aba ativa: configuracoes')).toBeOnTheScreen();
+
+        expect(screen.queryByText('Tela inicial')).toBeNull();
+        expect(screen.queryByText('Categorias do Diário')).toBeNull();
+    });
+
+    test('usa a tipografia padrão nos títulos das seções', async () => {
+        await renderizarTela();
+
+        for (const titulo of ['Minha Conta', 'Meu Ciclo', 'Preferências', 'Privacidade e Sobre']) {
+            expect(screen.getByText(titulo)).toHaveStyle({
+                color: '#5C5C59',
+                fontFamily: 'DMSans_500Medium',
+                fontSize: 14,
+                fontStyle: 'normal',
+                fontWeight: '500',
+                lineHeight: 19.6
+            });
+        }
     });
 
     test('mostra responsável legal somente para menor de 16 anos', async () => {
         const onAbrirResponsavelLegal = jest.fn();
 
-        const resultado = await renderizarTela({ menorDe16: false, onAbrirResponsavelLegal });
+        const resultado = await renderizarTela({
+            menorDe16: false,
+            onAbrirResponsavelLegal
+        });
 
         expect(screen.queryByText('Responsável Legal')).toBeNull();
 
         await resultado.unmount();
 
-        await renderizarTela({ menorDe16: true, onAbrirResponsavelLegal });
+        await renderizarTela({
+            menorDe16: true,
+            onAbrirResponsavelLegal
+        });
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Responsável Legal' }));
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Responsável Legal'
+            })
+        );
 
         expect(onAbrirResponsavelLegal).toHaveBeenCalledTimes(1);
     });
 
     test('encaminha separadamente cada ação de navegação', async () => {
         const onAbrirPerfil = jest.fn();
-
         const onAbrirParametrosCiclo = jest.fn();
-
-        const onAbrirTelaInicial = jest.fn();
-
         const onAbrirNotificacoes = jest.fn();
-
         const onAbrirSobre = jest.fn();
-
         const onAbrirPoliticasPrivacidade = jest.fn();
 
         await renderizarTela({
             onAbrirPerfil,
             onAbrirParametrosCiclo,
-            onAbrirTelaInicial,
             onAbrirNotificacoes,
             onAbrirSobre,
             onAbrirPoliticasPrivacidade
@@ -269,12 +274,6 @@ describe('SettingsScreen', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Tela inicial'
-            })
-        );
-
-        await fireEvent.press(
-            screen.getByRole('button', {
                 name: 'Notificações'
             })
         );
@@ -287,20 +286,14 @@ describe('SettingsScreen', () => {
 
         await fireEvent.press(
             screen.getByRole('button', {
-                name: 'Políticas de Privacidade'
+                name: 'Privacidade e Termos'
             })
         );
 
         expect(onAbrirPerfil).toHaveBeenCalledTimes(1);
-
         expect(onAbrirParametrosCiclo).toHaveBeenCalledTimes(1);
-
-        expect(onAbrirTelaInicial).toHaveBeenCalledTimes(1);
-
         expect(onAbrirNotificacoes).toHaveBeenCalledTimes(1);
-
         expect(onAbrirSobre).toHaveBeenCalledTimes(1);
-
         expect(onAbrirPoliticasPrivacidade).toHaveBeenCalledTimes(1);
     });
 
@@ -402,12 +395,6 @@ describe('SettingsScreen', () => {
         expect(
             screen.getByRole('button', {
                 name: 'Parâmetros do Ciclo'
-            })
-        ).toBeDisabled();
-
-        expect(
-            screen.getByRole('button', {
-                name: 'Tela inicial'
             })
         ).toBeDisabled();
 

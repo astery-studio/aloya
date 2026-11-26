@@ -8,10 +8,13 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         item: {
             flex: 1,
+            maxWidth: 73.198,
             minWidth: 0,
-            height: '100%',
+            height: 53.5,
+            flexDirection: 'column',
+            justifyContent: 'center',
             alignItems: 'center',
-            paddingTop: 14
+            gap: 4
         },
 
         desabilitado: {
@@ -19,7 +22,6 @@ function criarEstilos(tema) {
         },
 
         label: {
-            marginTop: 4,
             color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
@@ -31,14 +33,6 @@ function criarEstilos(tema) {
         labelAtiva: {
             color: corAtiva,
             fontFamily: fontFamilies.medium
-        },
-
-        pontoAtivo: {
-            width: 5,
-            height: 5,
-            borderRadius: 3,
-            marginTop: 5,
-            backgroundColor: corAtiva
         }
     });
 }
