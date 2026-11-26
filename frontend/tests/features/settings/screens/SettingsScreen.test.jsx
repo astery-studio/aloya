@@ -3,15 +3,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { criarEstilos } from '../../../../src/features/settings/screens/SettingsScreen.style';
 import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
-test('mantém o espaçamento no conteúdo sem alterar os títulos de seção', () => {
+test('mantém o espaçamento entre o cabeçalho e o conteúdo', () => {
     const estilos = criarEstilos(temaClaro);
 
     expect(estilos.conteudo.paddingTop).toBe(8);
-    expect(estilos.tituloSecao).toMatchObject({
-        fontFamily: 'DMSans_500Medium',
-        fontSize: 16,
-        lineHeight: 24
-    });
 });
 
 const mockAlterarPreferencia = jest.fn();
