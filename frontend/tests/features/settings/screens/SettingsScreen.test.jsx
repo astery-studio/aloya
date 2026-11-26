@@ -1,5 +1,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
+import { criarEstilos } from '../../../../src/features/settings/screens/SettingsScreen.style';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
+
+test('mantém o espaçamento entre o cabeçalho e o conteúdo', () => {
+    const estilos = criarEstilos(temaClaro);
+
+    expect(estilos.conteudo.paddingTop).toBe(8);
+});
+
 const mockAlterarPreferencia = jest.fn();
 
 const mockLimparErro = jest.fn();

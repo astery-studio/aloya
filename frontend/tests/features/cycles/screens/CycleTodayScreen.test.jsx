@@ -212,19 +212,26 @@ test('encaminha todas as interações da tela carregada', async () => {
 });
 
 test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
-    const estilos = criarEstilos(temaClaro, metricas.insets.top);
+    const estilos = criarEstilos(temaClaro);
     expect(estilos.areaRolagem).toMatchObject({ flex: 1 });
-    expect(estilos.cabecalho).toMatchObject({ width: '100%', paddingBottom: 12 });
-    expect(estilos.cabecalho.height).toBeCloseTo(87.99);
-    expect(estilos.cabecalho.paddingTop).toBeCloseTo(31.99);
+    expect(estilos.cabecalho).toMatchObject({
+        width: '100%',
+        paddingTop: 16,
+        paddingBottom: 16,
+        marginBottom: 8
+    });
+    expect(estilos.cabecalho.height).toBeUndefined();
     expect(estilos.titulo).toMatchObject({
+        flex: 1,
         flexShrink: 1,
         fontFamily: 'DMSans_700Bold',
-        fontSize: 24,
-        fontWeight: '700'
+        fontSize: 28,
+        fontWeight: '700',
+        lineHeight: 36,
+        textAlign: 'left'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
-    expect(estilos.rolagem).toEqual({ flexGrow: 1 });
+    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 16 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });
 

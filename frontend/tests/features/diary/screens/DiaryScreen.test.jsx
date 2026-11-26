@@ -24,6 +24,17 @@ const registro = {
 };
 
 describe('histórico do Diário', () => {
+    test('mantém a descrição rolável separada do conteúdo', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.introducao).toMatchObject({ paddingTop: 8, paddingBottom: 24 });
+        expect(estilos.descricao).toMatchObject({
+            fontFamily: 'DMSans_400Regular',
+            fontSize: 15,
+            lineHeight: 22
+        });
+    });
+
     test('usa a margem horizontal padrão em todo o conteúdo da tela', () => {
         const estilos = criarEstilos(temaClaro);
 
@@ -38,6 +49,7 @@ describe('histórico do Diário', () => {
         await render(<DiaryScreen aoCriar={aoCriar} onSelecionarAba={jest.fn()} />);
 
         expect(screen.getByRole('header', { name: 'Diário' })).toBeOnTheScreen();
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
         expect(screen.getByRole('header', { name: 'Nenhum registro visível' })).toBeOnTheScreen();
         expect(
             screen.getByText(/as categorias usadas neles podem estar desativadas/)
@@ -95,10 +107,33 @@ describe('histórico do Diário', () => {
         expect(
             StyleSheet.flatten(screen.getByTestId('diary-timeline').props.contentContainerStyle)
         ).toMatchObject({ paddingHorizontal: 24 });
-        await fireEvent.press(screen.getByRole('button', { name: 'Filtrar histórico do Diário' }));
-        await fireEvent.press(
-            screen.getByRole('button', { name: 'Gerenciar categorias do Diário' })
-        );
+        const botaoFiltrar = screen.getByRole('button', {
+            name: 'Filtrar histórico do Diário'
+        });
+        const botaoCategorias = screen.getByRole('button', {
+            name: 'Gerenciar categorias do Diário'
+        });
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({
+            backgroundColor: '#F7F5F0'
+        });
+        expect(botaoFiltrar).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderWidth: 0.667,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF'
+        });
+        expect(botaoCategorias).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderWidth: 0.667,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF'
+        });
+
+        await fireEvent.press(botaoFiltrar);
+        await fireEvent.press(botaoCategorias);
         await fireEvent.press(
             screen.getAllByRole('button', { name: 'Adicionar novo registro' })[0]
         );

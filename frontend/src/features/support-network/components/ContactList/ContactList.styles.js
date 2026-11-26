@@ -6,7 +6,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         conteudoLista: {
             paddingHorizontal: 20,
-            paddingTop: 18,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: 28
         },
 
@@ -19,7 +19,7 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0,
             paddingHorizontal: 20,
-            paddingTop: 18
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
 
         estadoCentral: {

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ArrowLeftIcon } from '../../icons/AppIcons';
 import { useTheme } from '../../../hooks/useTheme';
@@ -13,22 +14,23 @@ function Header({
     corTexto,
     acoes = null,
     acoesDireita = null,
-    layoutRefatorado = false
+    complementoTitulo = null,
+    aplicarSafeAreaSuperior = true
 }) {
     const tema = useTheme();
+    const insets = useSafeAreaInsets();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
-    const ehDiario = variante === 'diario';
-
-    const ehRedeApoio = variante === 'redeApoio';
-    const voltarRefatorado = temVoltar && layoutRefatorado;
 
     const acoesExibidas = acoesDireita ?? acoes;
-    const temAcoes = !temVoltar && Boolean(acoesExibidas);
+    const temAcoes = temVoltar ? Boolean(acoesDireita) : Boolean(acoesExibidas);
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
+    const paddingTop =
+        (aplicarSafeAreaSuperior ? insets.top : 0) +
+        tema.espacamentosLayout.espacamentoSuperiorHeader;
 
     return (
         <View
@@ -36,30 +38,13 @@ function Header({
             style={[
                 estilos.container,
                 temVoltar && estilos.containerComVoltar,
-                ehDiario && estilos.containerDiario,
-                voltarRefatorado && estilos.containerRefatorado,
+                { paddingTop },
                 corFundo ? { backgroundColor: corFundo } : null
             ]}
         >
-            {!voltarRefatorado && (
-                <View
-                    style={[
-                        estilos.espacamentoSuperior,
-                        temVoltar && estilos.espacamentoSuperiorComVoltar,
-                        ehRedeApoio && estilos.espacamentoSuperiorRedeApoio,
-                        ehDiario && estilos.espacamentoSuperiorDiario
-                    ]}
-                />
-            )}
-
             <View
-                style={[
-                    estilos.areaTitulo,
-                    temVoltar && estilos.areaTituloComVoltar,
-                    ehRedeApoio && estilos.areaTituloRedeApoio,
-                    ehDiario && estilos.areaTituloDiario,
-                    voltarRefatorado && estilos.areaTituloRefatorada
-                ]}
+                testID="header-content"
+                style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}
             >
                 {temVoltar ? (
                     <Pressable
@@ -83,26 +68,25 @@ function Header({
                     </Pressable>
                 ) : null}
 
-                {ehRedeApoio ? (
-                    <View testID="header-title-container" style={estilos.containerTituloRedeApoio}>
+                {complementoTitulo ? (
+                    <View style={[estilos.blocoTitulo, temVoltar && estilos.blocoTituloComVoltar]}>
                         <Text
                             style={[
-                                estilos.titulo,
-                                estilos.tituloRedeApoio,
+                                estilos.tituloNoBloco,
+                                temVoltar && estilos.tituloComVoltar,
                                 corTexto ? { color: corTexto } : null
                             ]}
                             accessibilityRole="header"
                         >
                             {titulo}
                         </Text>
+                        {complementoTitulo}
                     </View>
                 ) : (
                     <Text
                         style={[
                             estilos.titulo,
                             temVoltar && estilos.tituloComVoltar,
-                            voltarRefatorado && estilos.tituloRefatorado,
-                            ehDiario && estilos.tituloDiario,
                             corTexto ? { color: corTexto } : null
                         ]}
                         accessibilityRole="header"
@@ -111,20 +95,20 @@ function Header({
                     </Text>
                 )}
 
-                {voltarRefatorado && (
+                {temVoltar && !temAcoes ? (
                     <View
                         testID="header-back-balance"
                         pointerEvents="none"
                         style={estilos.espacadorVoltar}
                     />
-                )}
+                ) : null}
 
                 {temAcoes ? (
                     <View
                         testID="header-actions"
                         accessibilityRole="toolbar"
                         accessibilityLabel="Ações da tela"
-                        style={[estilos.acoes, ehDiario && estilos.acoesDireitaDiario]}
+                        style={[estilos.acoes, temVoltar && estilos.acoesComVoltar]}
                     >
                         {acoesExibidas}
                     </View>

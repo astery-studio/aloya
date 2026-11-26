@@ -54,7 +54,7 @@ function PrivacyTermsScreen({ documentoInicial, onVoltar }) {
                     onVoltar={onVoltar}
                     variante="comVoltar"
                     corFundo={tema.cores.interface.fundo}
-                    layoutRefatorado
+                    aplicarSafeAreaSuperior={false}
                 />
                 <LegalTabs selecionado={selecionado} onSelecionar={setSelecionado} />
                 <LegalDocument

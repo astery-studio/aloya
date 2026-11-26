@@ -9,6 +9,7 @@ function criarEstilos(tema) {
             flexGrow: 1,
             gap: tema.espacamentos.extraGrande,
             paddingHorizontal: tema.espacamentos.grande,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.extraGrande,
             backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },

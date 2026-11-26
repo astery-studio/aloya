@@ -1,4 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mockArrowLeftIcon = jest.fn(() => null);
 
@@ -9,11 +11,20 @@ jest.mock('phosphor-react-native/src/icons/ArrowLeft', () => ({
 import { Header } from '../../../../src/shared/components/navigation/Header/Header';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
-function renderizarHeader(propriedades = {}, preferencia = 'claro') {
+function criarMetricas(insetSuperior) {
+    return {
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: insetSuperior, right: 0, bottom: 0, left: 0 }
+    };
+}
+
+function renderizarHeader(propriedades = {}, preferencia = 'claro', insetSuperior = 0) {
     return render(
-        <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
-            <Header titulo="Configurações" {...propriedades} />
-        </ThemeProvider>
+        <SafeAreaProvider initialMetrics={criarMetricas(insetSuperior)}>
+            <ThemeProvider preferencia={preferencia} esquemaDoSistema="light">
+                <Header titulo="Configurações" {...propriedades} />
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 }
 
@@ -31,8 +42,51 @@ describe('Header', () => {
 
         expect(titulo).toHaveStyle({
             flex: 1,
-            flexShrink: 1
+            flexShrink: 1,
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 28,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 36,
+            letterSpacing: 0,
+            textAlign: 'left'
         });
+        expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+    });
+
+    test.each([
+        [0, 16],
+        [24, 40],
+        [44, 60],
+        [59, 75]
+    ])('soma 16 dp ao inset superior %i', async (insetSuperior, paddingEsperado) => {
+        await renderizarHeader({}, 'claro', insetSuperior);
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({
+            paddingTop: paddingEsperado
+        });
+    });
+
+    test('não duplica o inset quando a Safe Area já foi aplicada pelo pai', async () => {
+        await renderizarHeader({ aplicarSafeAreaSuperior: false }, 'claro', 59);
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
+    });
+
+    test('permite título longo e fonte ampliada sem altura rígida', async () => {
+        const tituloLongo =
+            'Configurações de acompanhamento e compartilhamento de informações do ciclo';
+
+        await renderizarHeader({ titulo: tituloLongo });
+
+        const titulo = screen.getByRole('header');
+        const estiloConteudo = StyleSheet.flatten(screen.getByTestId('header-content').props.style);
+
+        expect(titulo).toHaveTextContent(tituloLongo);
+        expect(titulo.props.numberOfLines).toBeUndefined();
+        expect(titulo.props.allowFontScaling).not.toBe(false);
+        expect(estiloConteudo.height).toBeUndefined();
+        expect(estiloConteudo.minHeight).toBeUndefined();
     });
 
     test('não mostra botão de voltar na variante padrão', async () => {
@@ -96,7 +150,7 @@ describe('Header', () => {
         });
     });
 
-    test('usa estilo centralizado na variante comVoltar', async () => {
+    test('centraliza o título compacto no eixo da tela na variante comVoltar', async () => {
         await renderizarHeader({
             titulo: 'Editar perfil',
             variante: 'comVoltar',
@@ -104,28 +158,66 @@ describe('Header', () => {
         });
 
         expect(screen.getByRole('header')).toHaveStyle({
-            fontSize: 18,
+            fontFamily: 'DMSans_700Bold',
+            fontSize: 20,
             fontWeight: '700',
-            lineHeight: 27,
+            lineHeight: 28,
             textAlign: 'center'
+        });
+
+        expect(screen.getByTestId('header-content')).toHaveStyle({
+            paddingHorizontal: 12,
+            gap: 12,
+            paddingBottom: 16
+        });
+        expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
+            width: 48,
+            height: 48
+        });
+        expect(screen.getByTestId('header-back-balance')).toHaveStyle({
+            width: 48,
+            height: 48
         });
     });
 
-    test('usa a composição específica do cabeçalho do Diário', async () => {
-        await renderizarHeader({ variante: 'diario', acoesDireita: <></> });
-
-        expect(screen.getByTestId('header-container')).toHaveStyle({
-            width: 390,
-            maxWidth: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: 56,
-            paddingHorizontal: 16,
-            paddingBottom: 12,
-            flexShrink: 0
+    test('mantém o título centralizado quando o header com voltar possui ação direita', async () => {
+        await renderizarHeader({
+            titulo: 'Calendário',
+            variante: 'comVoltar',
+            onVoltar: jest.fn(),
+            acoesDireita: (
+                <Pressable accessibilityRole="button" accessibilityLabel="Abrir legenda">
+                    <Text>Legenda</Text>
+                </Pressable>
+            )
         });
-        expect(screen.getByRole('header')).toHaveStyle({ fontSize: 28, lineHeight: 34 });
+
+        expect(screen.getByRole('header')).toHaveStyle({ textAlign: 'center' });
+        expect(screen.queryByTestId('header-back-balance')).toBeNull();
+        expect(screen.getByTestId('header-actions')).toHaveStyle({
+            width: 48,
+            height: 48,
+            justifyContent: 'center'
+        });
+        expect(screen.getByRole('button', { name: 'Abrir legenda' })).toBeOnTheScreen();
+    });
+
+    test('mantém complemento abaixo do título centralizado sem criar outra variante', async () => {
+        await renderizarHeader({
+            titulo: 'Calendário',
+            variante: 'comVoltar',
+            onVoltar: jest.fn(),
+            complementoTitulo: <Text>Confiança alta</Text>
+        });
+
+        expect(screen.getByRole('header')).toHaveStyle({ textAlign: 'center' });
+        expect(screen.getByText('Confiança alta')).toBeOnTheScreen();
+    });
+
+    test('não reserva o balanceamento do botão nos headers sem voltar', async () => {
+        await renderizarHeader();
+
+        expect(screen.queryByTestId('header-back-balance')).toBeNull();
     });
 
     test('renderiza o ícone de voltar no tema claro', async () => {
@@ -200,9 +292,11 @@ describe('Header', () => {
         });
 
         await resultado.rerender(
-            <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
-                <Header titulo="Configurações" />
-            </ThemeProvider>
+            <SafeAreaProvider initialMetrics={criarMetricas(0)}>
+                <ThemeProvider preferencia="escuro" esquemaDoSistema="light">
+                    <Header titulo="Configurações" />
+                </ThemeProvider>
+            </SafeAreaProvider>
         );
 
         expect(screen.getByRole('header')).toHaveStyle({

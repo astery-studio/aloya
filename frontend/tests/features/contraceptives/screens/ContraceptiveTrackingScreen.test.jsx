@@ -6,6 +6,8 @@ import {
     MENSAGEM_VAZIO,
     criarSecoes
 } from '../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen';
+import { criarEstilosAcompanhamento } from '../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 const metricas = {
     frame: { x: 0, y: 0, width: 393, height: 852 },
@@ -16,11 +18,11 @@ function renderizar(componente) {
     return render(<SafeAreaProvider initialMetrics={metricas}>{componente}</SafeAreaProvider>);
 }
 
-test('protege a listagem e o botão fixo nas quatro bordas nativas', async () => {
+test('deixa a Safe Area superior sob responsabilidade do Header compartilhado', async () => {
     await renderizar(<ContraceptiveTrackingScreen />);
     const area = screen.getByTestId('anticoncepcionais-area-segura');
     expect(area).toHaveProp('edges', {
-        top: 'additive',
+        top: 'off',
         left: 'additive',
         right: 'additive',
         bottom: 'additive'
@@ -39,6 +41,28 @@ test('reproduz o estado vazio e a ação principal do protótipo', async () => {
     expect(screen.getByText(MENSAGEM_VAZIO)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar novo anticoncepcional' }));
     expect(aoCadastrarNovo).toHaveBeenCalledTimes(1);
+});
+
+test('usa o padrão compartilhado dos headers com voltar', async () => {
+    await renderizar(<ContraceptiveTrackingScreen />);
+
+    const titulo = screen.getByRole('header', { name: 'Anticoncepcionais' });
+
+    expect(titulo).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 20,
+        fontWeight: '700',
+        lineHeight: 28,
+        textAlign: 'center'
+    });
+    expect(titulo.props.numberOfLines).toBeUndefined();
+    expect(titulo.props.adjustsFontSizeToFit).toBeUndefined();
+
+    const estilos = criarEstilosAcompanhamento(temaClaro);
+
+    expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 48 });
+    expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+    expect(estilos.corpo.paddingTop).toBe(8);
 });
 
 test('não duplica o cartão que possui doses com estados diferentes', () => {

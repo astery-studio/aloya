@@ -7,7 +7,7 @@ function criarEstilos(tema) {
         container: {
             width: '100%',
             gap: tema.espacamentos.grande,
-            paddingTop: tema.espacamentos.grande
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
         titulo: {
             paddingLeft: 4,

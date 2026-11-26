@@ -16,7 +16,8 @@ function criarEstilos(tema) {
             maxWidth: 350.011,
             alignSelf: 'center',
             alignItems: 'center',
-            gap: 18
+            gap: tema.espacamentosLayout.descricaoParaConteudo,
+            marginBottom: tema.espacamentosLayout.descricaoParaConteudo
         },
 
         descricao: {

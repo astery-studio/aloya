@@ -1,6 +1,6 @@
 //Define somente o visual básico do acesso provisório às HU-021 e HU-022.
 import { StyleSheet } from 'react-native';
-import { cores, espacamentos, fontFamilies } from '../../../shared/theme';
+import { cores, espacamentos, espacamentosLayout, fontFamilies } from '../../../shared/theme';
 
 const estilos = StyleSheet.create({
     tela: {
@@ -11,7 +11,9 @@ const estilos = StyleSheet.create({
     lista: {
         flexGrow: 1,
         gap: espacamentos.medio,
-        padding: espacamentos.grande
+        paddingHorizontal: espacamentos.grande,
+        paddingTop: espacamentosLayout.headerParaConteudo,
+        paddingBottom: espacamentos.grande
     },
 
     item: {

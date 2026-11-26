@@ -9,6 +9,7 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0,
             paddingHorizontal: 22,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.grande
         },
 
@@ -53,6 +54,7 @@ function criarEstilos(tema) {
 
         conteudoDaLista: {
             paddingHorizontal: 22,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.grande
         },
 

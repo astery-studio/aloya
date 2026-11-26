@@ -23,8 +23,8 @@ function criarEstilos(tema) {
             alignSelf: 'center',
             alignItems: 'center',
             gap: 8,
-            paddingTop: 8,
-            paddingBottom: 20
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: tema.espacamentosLayout.descricaoParaConteudo
         },
         descricao: {
             width: '100%',

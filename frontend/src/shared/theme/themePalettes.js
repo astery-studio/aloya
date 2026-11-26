@@ -2,7 +2,7 @@ import { cores } from './colors';
 import { espacamentos, espacamentosLayout } from './spacing';
 import { radius } from './radius';
 import { shadows } from './shadows';
-import { typography } from './typography';
+import { headerTypography, typography } from './typography';
 import { MODOS_TEMA } from './themePreferences';
 
 const interfaceClara = Object.freeze({
@@ -57,6 +57,7 @@ function criarTema(modo, coresInterface) {
         cores: coresDoTema,
         espacamentos,
         espacamentosLayout,
+        headerTypography,
         typography,
         radius,
         shadows

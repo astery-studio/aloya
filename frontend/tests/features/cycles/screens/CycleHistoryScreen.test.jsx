@@ -2,6 +2,8 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 
 import { CycleHistoryScreen } from '../../../../src/features/cycles/screens/CycleHistoryScreen';
+import { criarEstilos } from '../../../../src/features/cycles/screens/CycleHistoryScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const resumoCarregado = Object.freeze({
@@ -36,6 +38,13 @@ const ciclos = Object.freeze([
 ]);
 
 describe('CycleHistoryScreen', () => {
+    test('mantém o espaçamento inicial nos estados e na lista', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.conteudoEstatico.paddingTop).toBe(8);
+        expect(estilos.conteudoDaLista.paddingTop).toBe(8);
+    });
+
     test('mostra o resumo e permite abrir o calendário com ciclos registrados', async () => {
         const aoAbrirCalendario = jest.fn();
         await render(

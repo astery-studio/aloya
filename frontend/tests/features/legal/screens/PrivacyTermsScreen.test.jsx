@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { PrivacyTermsScreen } from '../../../../src/features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
@@ -37,6 +38,23 @@ describe('Privacidade e termos', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
         await fireEvent(screen.getByTestId('consulta-legal'), 'requestClose');
         expect(voltar).toHaveBeenCalledTimes(2);
+    });
+
+    test('aplica a área segura superior no contêiner do modal', async () => {
+        await render(
+            <SafeAreaProvider
+                initialMetrics={{
+                    frame: { x: 0, y: 0, width: 390, height: 844 },
+                    insets: { top: 24, right: 0, bottom: 0, left: 0 }
+                }}
+            >
+                <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                    <PrivacyTermsScreen />
+                </ThemeProvider>
+            </SafeAreaProvider>
+        );
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
     });
 
     test('preserva a posição e as seções abertas de cada documento', async () => {
