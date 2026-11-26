@@ -1,6 +1,9 @@
 import React from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
-import { CalendarScreen } from '../../../../src/features/calendar/screens/CalendarScreen';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
+import {
+    CalendarScreen,
+    TEMPO_REAPARECER_AVISO_MS
+} from '../../../../src/features/calendar/screens/CalendarScreen';
 import { estilos } from '../../../../src/features/calendar/screens/CalendarScreen.styles';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
@@ -9,13 +12,13 @@ jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBa
     const { Pressable, Text } = require('react-native');
 
     return {
-        ConfidenceBadge: ({ nivel, onPress }) =>
+        ConfidenceBadge: ({ nivel, onPress, rotuloAcessibilidade }) =>
             ReactInterno.createElement(
                 Pressable,
                 {
                     testID: 'confidence-badge',
                     accessibilityRole: 'button',
-                    accessibilityLabel: `Confiança ${nivel}`,
+                    accessibilityLabel: rotuloAcessibilidade,
                     onPress
                 },
                 ReactInterno.createElement(Text, null, nivel)
@@ -25,6 +28,11 @@ jest.mock('../../../../src/shared/components/common/ConfidenceBadge/ConfidenceBa
 
 jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     ArrowLeftIcon: () => null,
+    ArrowsClockwiseIcon: (props) => {
+        const ReactInterno = require('react');
+        const { View } = require('react-native');
+        return ReactInterno.createElement(View, { testID: 'icone-sincronizar', ...props });
+    },
     InfoIcon: (props) => {
         const ReactInterno = require('react');
         const { View } = require('react-native');
@@ -32,77 +40,56 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => ({
     }
 }));
 
-jest.mock('../../../../src/features/cycles/components/sheets/CycleConfidenceSheet', () => {
-    const ReactInterno = require('react');
-    const { Text, View } = require('react-native');
-    return {
-        CycleConfidenceSheet: ({ visivel, nivel }) =>
-            visivel
-                ? ReactInterno.createElement(
-                      View,
-                      { testID: 'confidence-sheet' },
-                      ReactInterno.createElement(Text, null, `Confiabilidade ${nivel}`)
-                  )
-                : null
-    };
-});
-
-jest.mock('../../../../src/shared/components/common/Button/ButtonScreen/ButtonScreen', () => {
+jest.mock('../../../../src/shared/components/common/FloatingActionButton', () => {
     const ReactInterno = require('react');
     const { Pressable, Text } = require('react-native');
 
-    return function ButtonScreenMock({ texto, aoPressionar }) {
-        return ReactInterno.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: texto,
-                onPress: aoPressionar
-            },
-            ReactInterno.createElement(Text, null, texto)
-        );
-    };
-});
-
-jest.mock('../../../../src/shared/components/common/FloatingActionButton', () => {
-    const ReactInterno = require('react');
-    const { Pressable } = require('react-native');
-
     return {
-        FloatingActionButton: ({ aoPressionar, rotuloAcessibilidade, testID }) =>
-            ReactInterno.createElement(Pressable, {
-                testID,
-                accessibilityRole: 'button',
-                accessibilityLabel: rotuloAcessibilidade,
-                onPress: aoPressionar
-            })
-    };
-});
-
-jest.mock('../../../../src/shared/components/feedback/Modal/AlertModal/AlertModal', () => {
-    const ReactInterno = require('react');
-    const { Pressable, Text, View } = require('react-native');
-
-    return function AlertModalMock({ visivel, titulo, mensagem, acaoPrincipal }) {
-        if (!visivel) return null;
-
-        return ReactInterno.createElement(
-            View,
-            { testID: 'alert-modal' },
-            ReactInterno.createElement(Text, null, titulo),
-            ReactInterno.createElement(Text, null, mensagem),
+        FloatingActionButton: ({
+            rotuloAcessibilidade,
+            aoPressionar,
+            deslocamentoInferior,
+            testID
+        }) =>
             ReactInterno.createElement(
                 Pressable,
                 {
+                    testID,
                     accessibilityRole: 'button',
-                    accessibilityLabel: acaoPrincipal?.texto,
-                    onPress: acaoPrincipal?.aoPressionar
+                    accessibilityLabel: rotuloAcessibilidade,
+                    onPress: aoPressionar,
+                    deslocamentoInferior
                 },
-                ReactInterno.createElement(Text, null, acaoPrincipal?.texto)
+                ReactInterno.createElement(Text, null, rotuloAcessibilidade)
             )
-        );
     };
 });
+
+jest.mock(
+    '../../../../src/shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar',
+    () => {
+        const ReactInterno = require('react');
+        const { Pressable, Text, View } = require('react-native');
+
+        return {
+            BottomTabBar: ({ abaAtiva, onSelecionar }) =>
+                ReactInterno.createElement(
+                    View,
+                    { testID: 'bottom-tab-bar' },
+                    ReactInterno.createElement(Text, null, `Aba ativa: ${abaAtiva}`),
+                    ReactInterno.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir configurações pelo menu',
+                            onPress: () => onSelecionar?.('configuracoes')
+                        },
+                        ReactInterno.createElement(Text, null, 'Configurações')
+                    )
+                )
+        };
+    }
+);
 
 jest.mock('../../../../src/features/calendar/components/CycleCalendar/CycleCalendar', () => {
     const ReactInterno = require('react');
@@ -154,6 +141,31 @@ jest.mock('../../../../src/features/calendar/components/CycleLegendSheet/CycleLe
     };
 });
 
+jest.mock('../../../../src/features/cycles/components/sheets/CycleConfidenceSheet', () => {
+    const ReactInterno = require('react');
+    const { Pressable, Text, View } = require('react-native');
+
+    return {
+        CycleConfidenceSheet: ({ visivel, nivel, aoFechar }) =>
+            visivel
+                ? ReactInterno.createElement(
+                      View,
+                      { testID: 'cycle-confidence-sheet' },
+                      ReactInterno.createElement(Text, null, `Confiança: ${nivel}`),
+                      ReactInterno.createElement(
+                          Pressable,
+                          {
+                              accessibilityRole: 'button',
+                              accessibilityLabel: 'Fechar explicação',
+                              onPress: aoFechar
+                          },
+                          ReactInterno.createElement(Text, null, 'Fechar')
+                      )
+                  )
+                : null
+    };
+});
+
 describe('CalendarScreen', () => {
     test('mostra calendário, título e confiança', async () => {
         const aoCadastrarMenstruacao = jest.fn();
@@ -172,24 +184,26 @@ describe('CalendarScreen', () => {
         expect(screen.getByText('Calendário')).toBeOnTheScreen();
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.getByTestId('confidence-badge')).toHaveTextContent('alta');
-        expect(screen.getByRole('header', { name: 'Calendário' })).toHaveStyle({
-            fontFamily: 'DMSans_700Bold',
-            fontSize: 20,
-            lineHeight: 28,
-            textAlign: 'center'
-        });
-        expect(screen.getByTestId('centralizador-confianca')).toHaveStyle({
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center'
-        });
-        await fireEvent.press(screen.getByRole('button', { name: 'Confiança alta' }));
-        expect(screen.getByTestId('confidence-sheet')).toHaveTextContent('Confiabilidade alta');
+        const cabecalho = within(screen.getByTestId('header-content'));
+        expect(cabecalho.getByText('Calendário')).toBeOnTheScreen();
+        expect(cabecalho.getByTestId('confidence-badge')).toBeOnTheScreen();
         expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
-        expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+        expect(screen.getByTestId('header-content')).toHaveStyle({
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingBottom: 16
+        });
         expect(estilos.conteudo).toMatchObject({ paddingTop: 8 });
-        expect(screen.getByTestId('calendar-add-fab')).toBeOnTheScreen();
-        expect(screen.queryByTestId('bottom-tab-bar')).toBeNull();
+        expect(screen.queryByTestId('status-sincronizacao-calendario')).toBeNull();
+        expect(screen.getByRole('button', { name: 'Cadastrar menstruação' })).toBeOnTheScreen();
+        expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen();
+        expect(screen.getByText('Aba ativa: calendario')).toBeOnTheScreen();
+        expect(estilos.areaSincronizacao).toMatchObject({
+            position: 'absolute',
+            top: 40,
+            zIndex: 5,
+            paddingHorizontal: 15.33
+        });
 
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
@@ -198,12 +212,8 @@ describe('CalendarScreen', () => {
             data: '2026-10-04',
             registroCicloId: 9
         });
-        expect(screen.getByTestId('acao-legenda-calendario')).toHaveStyle({
-            width: 48,
-            height: 48,
-            alignItems: 'center'
-        });
-        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 21.995);
+        expect(screen.getByTestId('icone-legenda')).toHaveProp('size', 32);
+        expect(screen.getByTestId('icone-legenda')).toHaveProp('color', '#2C4C3B');
     });
 
     test('abre e fecha a legenda pelo botão de informação', async () => {
@@ -226,6 +236,119 @@ describe('CalendarScreen', () => {
         });
     });
 
+    test('encaminha a navegação selecionada no menu inferior', async () => {
+        const onSelecionarAba = jest.fn();
+
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
+                confianca="alta"
+                onSelecionarAba={onSelecionarAba}
+            />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Abrir configurações pelo menu' })
+        );
+
+        expect(onSelecionarAba).toHaveBeenCalledWith('configuracoes');
+    });
+
+    test('abre e fecha a explicação pela tag de confiabilidade', async () => {
+        await render(
+            <CalendarScreen meses={[{ mes: '2026-10', possuiCiclos: true }]} confianca="alta" />
+        );
+
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Explicar confiabilidade do calendário' })
+        );
+
+        expect(screen.getByText('Confiança: alta')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar explicação' }));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('cycle-confidence-sheet')).toBeNull();
+        });
+    });
+
+    test('mostra falha de sincronização, permite tentar novamente e desloca o FAB', async () => {
+        const aoTentarSincronizar = jest.fn();
+
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: true }]}
+                confianca="alta"
+                aoCadastrarMenstruacao={jest.fn()}
+                statusSincronizacao="falha"
+                erroSincronizacao={{
+                    status: 503,
+                    mensagemUsuario: 'Alterações salvas neste aparelho. Falha na sincronização.'
+                }}
+                aoTentarSincronizar={aoTentarSincronizar}
+            />
+        );
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Alterações salvas neste aparelho. Falha na sincronização.')
+        ).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Tentar sincronizar novamente' }));
+
+        expect(aoTentarSincronizar).toHaveBeenCalledTimes(1);
+        expect(screen.getByTestId('calendar-add-fab')).toHaveProp('deslocamentoInferior', 0);
+        expect(screen.getByTestId('sync-status-calendar')).toHaveStyle({
+            maxWidth: 351,
+            height: 64,
+            backgroundColor: '#FBF3E0'
+        });
+    });
+
+    test('prioriza o aviso de sincronização sobre o aviso de ciclo vazio', async () => {
+        const propriedades = {
+            meses: [{ mes: '2026-10', possuiCiclos: false }],
+            statusSincronizacao: 'pendente',
+            aoCadastrarMenstruacao: jest.fn()
+        };
+        const { rerender } = await render(<CalendarScreen {...propriedades} />);
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(screen.getByText(/Sincronização pendente/u)).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-empty-state')).toBeNull();
+        expect(estilos.areaSincronizacao).toMatchObject({
+            top: estilos.posicionadorAvisoVazio.top,
+            right: estilos.posicionadorAvisoVazio.right,
+            left: estilos.posicionadorAvisoVazio.left,
+            paddingHorizontal: estilos.posicionadorAvisoVazio.paddingHorizontal
+        });
+        expect(screen.getByTestId('calendar-add-fab')).toBeOnTheScreen();
+
+        await rerender(<CalendarScreen {...propriedades} carregando />);
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
+    });
+
+    test('mantém a falha como aviso prioritário entre os estados de sincronização', async () => {
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: false }]}
+                statusSincronizacao={['pendente', 'sincronizando', 'falha']}
+                erroSincronizacao={{
+                    status: 503,
+                    mensagemUsuario: 'Alterações salvas neste aparelho. Falha na sincronização.'
+                }}
+                aoTentarSincronizar={jest.fn()}
+            />
+        );
+
+        expect(screen.getByText('Falha na sincronização.')).toBeOnTheScreen();
+        expect(screen.queryByText(/Sincronização pendente/u)).toBeNull();
+        expect(screen.queryByText(/Sincronizando alterações/u)).toBeNull();
+        expect(screen.queryByTestId('calendar-empty-state')).toBeNull();
+    });
+
     test('mostra o estado vazio e chama o atalho de cadastro', async () => {
         const aoCadastrarMenstruacao = jest.fn();
 
@@ -239,11 +362,39 @@ describe('CalendarScreen', () => {
         );
 
         expect(
-            screen.getByText(
-                'Você ainda não possui nenhum ciclo registrado. Use o botão de adicionar para começar.'
-            )
+            screen.getByText(/Você ainda não possui nenhum ciclo registrado/u)
         ).toBeOnTheScreen();
-        expect(screen.queryByTestId('confidence-badge')).toBeNull();
+        expect(screen.getByText("'+'")).toBeOnTheScreen();
+        expect(screen.queryByText("'Cadastrar Menstruação'")).toBeNull();
+        expect(screen.getByTestId('calendar-empty-state')).toHaveStyle({
+            display: 'flex',
+            width: '100%',
+            maxWidth: 349.991,
+            paddingVertical: 10,
+            paddingHorizontal: 12,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: 9,
+            borderRadius: 12,
+            backgroundColor: '#E3E4DE',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 6
+        });
+        expect(estilos.avisoVazio.borderWidth).toBeUndefined();
+        expect(estilos.avisoVazio.borderColor).toBeUndefined();
+        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
+        expect(
+            within(screen.getByTestId('calendar-empty-state')).queryByTestId('icone-legenda')
+        ).toBeNull();
+        expect(
+            within(screen.getByTestId('calendar-empty-state')).getByText(
+                /Você ainda não possui nenhum ciclo registrado/u
+            )
+        ).toHaveStyle({ width: '100%', textAlign: 'center' });
+        expect(screen.getByTestId('confidence-badge')).toHaveTextContent('baixa');
         expect(screen.getAllByRole('button', { name: 'Cadastrar menstruação' })).toHaveLength(1);
 
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar menstruação' }));
@@ -251,24 +402,42 @@ describe('CalendarScreen', () => {
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
     });
 
-    test('mantém a sincronização visível e oculta o FAB durante carregamento', async () => {
-        const propriedades = {
-            meses: [{ mes: '2026-10', possuiCiclos: true }],
-            aoVoltar: jest.fn(),
-            aoCadastrarMenstruacao: jest.fn(),
-            statusSincronizacao: 'pendente'
-        };
-        const { rerender } = await render(<CalendarScreen {...propriedades} />);
+    test('oculta o aviso ao tocar na tela e o reapresenta após cinco segundos sem interação', async () => {
+        jest.useFakeTimers();
 
-        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
-        expect(
-            screen.getByText('Alterações salvas neste aparelho. Sincronização pendente.')
-        ).toBeOnTheScreen();
-        expect(screen.getByTestId('calendar-add-fab')).toBeOnTheScreen();
+        try {
+            await render(
+                <CalendarScreen
+                    meses={[{ mes: '2026-10', possuiCiclos: false }]}
+                    aoCadastrarMenstruacao={jest.fn()}
+                />
+            );
 
-        await rerender(<CalendarScreen {...propriedades} carregando />);
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', false);
 
-        expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
+            await fireEvent(screen.getByTestId('calendar-screen'), 'touchStart');
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', true);
+
+            await act(async () => {
+                await jest.advanceTimersByTimeAsync(TEMPO_REAPARECER_AVISO_MS - 1);
+            });
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', true);
+
+            await act(async () => {
+                await jest.advanceTimersByTimeAsync(1);
+            });
+            expect(
+                screen.getByTestId('calendar-empty-state', { includeHiddenElements: true })
+            ).toHaveProp('accessibilityElementsHidden', false);
+        } finally {
+            jest.useRealTimers();
+        }
     });
 
     test('mostra o erro e tenta carregar novamente', async () => {
@@ -284,31 +453,41 @@ describe('CalendarScreen', () => {
             />
         );
 
-        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-error-state')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        });
+        expect(screen.getByText('Ocorreu um erro')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Não foi possível carregar os dados do calendário. Tente novamente.')
+        ).toBeOnTheScreen();
+        expect(screen.queryByTestId('cycle-calendar')).toBeNull();
+        expect(screen.queryByTestId('confidence-badge')).toBeNull();
         expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
 
         expect(aoTentarNovamente).toHaveBeenCalledTimes(1);
     });
 
-    test('reabre o mesmo erro após uma nova falha, sem reabrir o erro já dispensado', async () => {
+    test('mantém o estado de erro enquanto a falha continuar presente', async () => {
         const props = {
             meses: [{ mes: '2026-10', possuiCiclos: true }],
             confianca: 'alta',
-            aoVoltar: jest.fn()
+            aoTentarNovamente: jest.fn()
         };
         const mensagem = 'Não foi possível carregar os dados do calendário. Tente novamente.';
         const { rerender } = await render(<CalendarScreen {...props} erro={mensagem} />);
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Fechar' }));
-        expect(screen.queryByTestId('alert-modal')).toBeNull();
+        expect(screen.getByTestId('calendar-error-state')).toBeOnTheScreen();
         await rerender(<CalendarScreen {...props} erro={mensagem} />);
-        expect(screen.queryByTestId('alert-modal')).toBeNull();
+        expect(screen.getByTestId('calendar-error-state')).toBeOnTheScreen();
 
         await rerender(<CalendarScreen {...props} />);
-        await rerender(<CalendarScreen {...props} erro={mensagem} />);
-        expect(screen.getByTestId('alert-modal')).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-error-state')).toBeNull();
     });
 
     test('ignora confiança desconhecida', async () => {

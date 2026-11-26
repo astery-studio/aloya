@@ -711,13 +711,13 @@ export default function App() {
                     aoTentarSincronizar={sincronizacaoMenstrual.sincronizar}
                     service={configuracao.servicos.calendarService}
                     onSessaoExpirada={finalizarSessao}
-                    aoVoltar={() => setTelaInterna(telasInternas.inicio)}
                     aoCadastrarMenstruacao={() => {
                         setDataInicialCadastro(null);
                         setRetornoCadastro(telasInternas.calendario);
                         setTelaInterna(telasInternas.cadastrarMenstruacao);
                     }}
                     aoEditarCiclo={abrirEdicaoPeloCalendario}
+                    onSelecionarAba={selecionarAba}
                 />
 
                 {cicloCalendarioEditado ? (

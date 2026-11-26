@@ -6,12 +6,12 @@ import { obterChaveMes, useCalendar } from '../hooks/useCalendar';
 function CalendarScreenContainer({
     service,
     onSessaoExpirada,
-    aoVoltar,
     aoCadastrarMenstruacao,
     aoEditarCiclo,
     statusSincronizacao,
     erroSincronizacao,
-    aoTentarSincronizar
+    aoTentarSincronizar,
+    onSelecionarAba
 }) {
     const estado = useCalendar({ service, onSessaoExpirada });
     const chaveMesAtual = useMemo(() => obterChaveMes(), []);
@@ -32,9 +32,9 @@ function CalendarScreenContainer({
             aoCarregarAnteriores={estado.carregarAnteriores}
             aoCarregarPosteriores={estado.carregarPosteriores}
             aoTentarNovamente={estado.tentarNovamente}
-            aoVoltar={aoVoltar}
             aoCadastrarMenstruacao={aoCadastrarMenstruacao}
             aoEditarCiclo={aoEditarCiclo}
+            onSelecionarAba={onSelecionarAba}
         />
     );
 }

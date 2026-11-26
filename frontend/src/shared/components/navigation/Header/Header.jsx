@@ -23,6 +23,7 @@ function Header({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temVoltar = variante === 'comVoltar';
+    const temComplementoNaLinha = !temVoltar && Boolean(complementoTitulo);
 
     const acoesExibidas = acoesDireita ?? acoes;
     const temAcoes = temVoltar ? Boolean(acoesDireita) : Boolean(acoesExibidas);
@@ -44,7 +45,11 @@ function Header({
         >
             <View
                 testID="header-content"
-                style={[estilos.areaTitulo, temVoltar && estilos.areaTituloComVoltar]}
+                style={[
+                    estilos.areaTitulo,
+                    temVoltar && estilos.areaTituloComVoltar,
+                    temComplementoNaLinha && estilos.areaTituloComComplemento
+                ]}
             >
                 {temVoltar ? (
                     <Pressable
@@ -68,7 +73,7 @@ function Header({
                     </Pressable>
                 ) : null}
 
-                {complementoTitulo ? (
+                {temVoltar && complementoTitulo ? (
                     <View style={[estilos.blocoTitulo, temVoltar && estilos.blocoTituloComVoltar]}>
                         <Text
                             style={[
@@ -87,6 +92,7 @@ function Header({
                         style={[
                             estilos.titulo,
                             temVoltar && estilos.tituloComVoltar,
+                            temComplementoNaLinha && estilos.tituloComComplemento,
                             corTexto ? { color: corTexto } : null
                         ]}
                         accessibilityRole="header"
@@ -94,6 +100,12 @@ function Header({
                         {titulo}
                     </Text>
                 )}
+
+                {temComplementoNaLinha ? (
+                    <View testID="header-title-complement" style={estilos.complementoTitulo}>
+                        {complementoTitulo}
+                    </View>
+                ) : null}
 
                 {temVoltar && !temAcoes ? (
                     <View

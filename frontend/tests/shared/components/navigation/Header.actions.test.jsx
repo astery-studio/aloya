@@ -104,4 +104,28 @@ describe('Header com ações', () => {
             expect(screen.getByTestId('header-actions').children).toHaveLength(quantidade);
         }
     });
+
+    test('distribui título, complemento e ação com o mesmo espaçamento', async () => {
+        await renderizarHeader({
+            variante: 'redeApoio',
+            complementoTitulo: <Text>Confiança alta</Text>,
+            acoes: (
+                <Pressable accessibilityRole="button" accessibilityLabel="Abrir legenda">
+                    <Text>Legenda</Text>
+                </Pressable>
+            )
+        });
+
+        expect(screen.getByTestId('header-content')).toHaveStyle({
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+        });
+        expect(screen.getByRole('header')).toHaveStyle({
+            fontSize: 28,
+            lineHeight: 36,
+            flex: 0
+        });
+        expect(screen.getByTestId('header-title-complement')).toHaveTextContent('Confiança alta');
+        expect(screen.getByRole('button', { name: 'Abrir legenda' })).toBeOnTheScreen();
+    });
 });

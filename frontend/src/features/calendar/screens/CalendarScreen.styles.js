@@ -23,18 +23,13 @@ function criarEstilos(tema) {
             flex: 1,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
-        acaoLegenda: {
-            width: 48,
-            height: 48,
-            alignItems: 'center',
-            justifyContent: 'center'
+        corpo: {
+            flex: 1,
+            minHeight: 0
         },
-        centralizadorConfianca: {
-            alignSelf: 'center',
-            alignItems: 'center',
-            justifyContent: 'center'
+        tagConfianca: {
+            minWidth: 0
         },
-        corIconeCabecalho: tema.cores.interface.textoSecundario,
         conteudo: {
             flex: 1,
             minHeight: 0,
@@ -43,35 +38,74 @@ function criarEstilos(tema) {
         },
         areaCalendario: {
             flex: 1,
-            minHeight: 0
+            minHeight: 0,
+            position: 'relative'
+        },
+        posicionadorAvisoVazio: {
+            position: 'absolute',
+            top: 40,
+            right: 0,
+            left: 0,
+            zIndex: 5,
+            alignItems: 'center',
+            paddingHorizontal: 15.33
         },
         avisoVazio: {
-            flexShrink: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 9,
-            marginHorizontal: 20,
+            display: 'flex',
+            width: '100%',
+            maxWidth: 349.991,
+            paddingVertical: 10,
             paddingHorizontal: 12,
-            paddingVertical: 11,
-            borderWidth: 0.7,
-            borderColor: tema.cores.interface.destaque,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: 9,
             borderRadius: 12,
-            backgroundColor: tema.escuro ? 'transparent' : 'rgba(44, 76, 59, 0.05)'
+            backgroundColor: tema.escuro ? '#232926' : '#E3E4DE',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 6
         },
         textoVazio: {
-            flex: 1,
+            width: '100%',
             color: tema.cores.interface.destaque,
             fontFamily: fontFamilies.medium,
-            fontSize: 13,
-            lineHeight: 19
+            fontSize: 15,
+            fontWeight: '500',
+            lineHeight: 24,
+            textAlign: 'center'
+        },
+        estadoCentral: {
+            width: '100%',
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            paddingBottom: 76
+        },
+        botaoEstado: {
+            width: '100%',
+            height: 56,
+            borderRadius: 12
+        },
+        textoDestaque: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
         },
         areaSincronizacao: {
+            position: 'absolute',
+            top: 40,
+            right: 0,
+            left: 0,
+            zIndex: 5,
+            alignItems: 'center',
+            paddingHorizontal: 15.33
+        },
+        navegacaoSegura: {
             flexShrink: 0,
-            borderTopWidth: 1,
-            borderTopColor: tema.escuro
-                ? 'rgba(255, 255, 255, 0.08)'
-                : tema.cores.interface.separador,
-            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#1E1E1E' : '#FFFFFF'
         }
     });
 }

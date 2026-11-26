@@ -1,19 +1,22 @@
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
-import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
+import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { InfoIcon } from '../../../shared/components/icons/AppIcons';
-import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import { Header } from '../../../shared/components/navigation/Header/Header';
+import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { CycleCalendar } from '../components/CycleCalendar/CycleCalendar';
 import { CycleLegendSheet } from '../components/CycleLegendSheet/CycleLegendSheet';
+import { CycleConfidenceSheet } from '../../cycles/components/sheets/CycleConfidenceSheet';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { coresConfiabilidadeEscuras, criarEstilos } from './CalendarScreen.styles';
 import { SyncStatusIndicator } from '../../cycles/components/SyncStatusIndicator';
-import { CycleConfidenceSheet } from '../../cycles/components/sheets/CycleConfidenceSheet';
 
 const ITENS_LEGENDA = Object.freeze([
     {
@@ -88,6 +91,11 @@ const ITENS_LEGENDA = Object.freeze([
     }
 ]);
 
+const MENSAGEM_ERRO_CALENDARIO =
+    'Não foi possível carregar os dados do calendário. Tente novamente.';
+const TEMPO_REAPARECER_AVISO_MS = 5000;
+const PRIORIDADE_STATUS_SINCRONIZACAO = Object.freeze(['falha', 'sincronizando', 'pendente']);
+
 function normalizarConfianca(valor) {
     if (typeof valor !== 'string') return null;
 
@@ -100,30 +108,10 @@ function normalizarConfianca(valor) {
     return null;
 }
 
-function ErroCalendario({ erro, aoTentarNovamente }) {
-    const [fechado, setFechado] = useState(false);
+function obterStatusSincronizacaoPrioritario(status) {
+    const recebidos = Array.isArray(status) ? status : [status];
 
-    function tentarNovamente() {
-        if (typeof aoTentarNovamente === 'function') {
-            aoTentarNovamente();
-        } else {
-            setFechado(true);
-        }
-    }
-
-    return (
-        <AlertModal
-            erroInterno
-            visivel={!fechado}
-            titulo="Não foi possível carregar o calendário"
-            mensagem={erro}
-            acaoPrincipal={{
-                texto: typeof aoTentarNovamente === 'function' ? 'Tentar novamente' : 'Fechar',
-                aoPressionar: tentarNovamente
-            }}
-            aoFechar={() => setFechado(true)}
-        />
-    );
+    return PRIORIDADE_STATUS_SINCRONIZACAO.find((item) => recebidos.includes(item)) ?? null;
 }
 
 function CalendarScreen({
@@ -136,17 +124,21 @@ function CalendarScreen({
     aoCarregarAnteriores,
     aoCarregarPosteriores,
     aoTentarNovamente,
-    aoVoltar,
     aoCadastrarMenstruacao,
     aoEditarCiclo,
     statusSincronizacao,
     erroSincronizacao,
-    aoTentarSincronizar
+    aoTentarSincronizar,
+    onSelecionarAba
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
-    const [confiabilidadeVisivel, setConfiabilidadeVisivel] = useState(false);
+    const [confiancaVisivel, setConfiancaVisivel] = useState(false);
+    const [avisoVazioVisivel, setAvisoVazioVisivel] = useState(false);
+    const opacidadeAviso = useRef(new Animated.Value(0)).current;
+    const deslocamentoAviso = useRef(new Animated.Value(-10)).current;
+    const temporizadorAviso = useRef(null);
 
     const mesesValidos = Array.isArray(meses) ? meses : [];
     const confiancaValida = normalizarConfianca(confianca);
@@ -155,100 +147,218 @@ function CalendarScreen({
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
     const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
-    const mostrarStatusSincronizacao = ['sincronizando', 'pendente', 'falha'].includes(
-        statusSincronizacao
-    );
+    const statusSincronizacaoPrioritario = obterStatusSincronizacaoPrioritario(statusSincronizacao);
+    const mostrarStatusSincronizacao = !existeErro && Boolean(statusSincronizacaoPrioritario);
+    const mostrarAvisoCicloVazio = estadoVazio && !mostrarStatusSincronizacao;
     const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
 
+    const animarEntradaAviso = useCallback(() => {
+        opacidadeAviso.stopAnimation();
+        deslocamentoAviso.stopAnimation();
+        opacidadeAviso.setValue(0);
+        deslocamentoAviso.setValue(-10);
+
+        Animated.parallel([
+            Animated.timing(opacidadeAviso, {
+                toValue: 1,
+                duration: 260,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true
+            }),
+            Animated.timing(deslocamentoAviso, {
+                toValue: 0,
+                duration: 260,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true
+            })
+        ]).start();
+    }, [deslocamentoAviso, opacidadeAviso]);
+
+    const animarSaidaAviso = useCallback(() => {
+        opacidadeAviso.stopAnimation();
+        deslocamentoAviso.stopAnimation();
+
+        Animated.parallel([
+            Animated.timing(opacidadeAviso, {
+                toValue: 0,
+                duration: 180,
+                easing: Easing.in(Easing.quad),
+                useNativeDriver: true
+            }),
+            Animated.timing(deslocamentoAviso, {
+                toValue: -8,
+                duration: 180,
+                easing: Easing.in(Easing.quad),
+                useNativeDriver: true
+            })
+        ]).start();
+    }, [deslocamentoAviso, opacidadeAviso]);
+
+    const registrarInteracao = useCallback(() => {
+        if (!mostrarAvisoCicloVazio) return;
+
+        if (temporizadorAviso.current) {
+            clearTimeout(temporizadorAviso.current);
+        }
+
+        setAvisoVazioVisivel(false);
+        animarSaidaAviso();
+
+        temporizadorAviso.current = setTimeout(() => {
+            setAvisoVazioVisivel(true);
+            animarEntradaAviso();
+            temporizadorAviso.current = null;
+        }, TEMPO_REAPARECER_AVISO_MS);
+    }, [animarEntradaAviso, animarSaidaAviso, mostrarAvisoCicloVazio]);
+
+    useEffect(() => {
+        if (!mostrarAvisoCicloVazio) {
+            setAvisoVazioVisivel(false);
+            opacidadeAviso.setValue(0);
+            deslocamentoAviso.setValue(-10);
+            return undefined;
+        }
+
+        setAvisoVazioVisivel(true);
+        animarEntradaAviso();
+
+        return () => {
+            if (temporizadorAviso.current) {
+                clearTimeout(temporizadorAviso.current);
+                temporizadorAviso.current = null;
+            }
+        };
+    }, [animarEntradaAviso, deslocamentoAviso, mostrarAvisoCicloVazio, opacidadeAviso]);
+
     return (
-        <View style={estilos.tela}>
+        <View testID="calendar-screen" style={estilos.tela} onTouchStart={registrarInteracao}>
             <Header
                 titulo="Calendário"
-                variante="comVoltar"
-                onVoltar={aoVoltar}
+                variante="redeApoio"
                 complementoTitulo={
-                    !estadoVazio && confiancaValida ? (
-                        <View
-                            testID="centralizador-confianca"
-                            style={estilos.centralizadorConfianca}
-                        >
-                            <ConfidenceBadge
-                                nivel={confiancaValida}
-                                variante="simples"
-                                onPress={() => setConfiabilidadeVisivel(true)}
-                                coresPersonalizadas={
-                                    tema.escuro
-                                        ? coresConfiabilidadeEscuras[confiancaValida]
-                                        : undefined
-                                }
-                            />
-                        </View>
+                    confiancaValida && !existeErro ? (
+                        <ConfidenceBadge
+                            nivel={confiancaValida}
+                            variante="simples"
+                            estilo={estilos.tagConfianca}
+                            onPress={() => setConfiancaVisivel(true)}
+                            rotuloAcessibilidade="Explicar confiabilidade do calendário"
+                            coresPersonalizadas={
+                                tema.escuro
+                                    ? coresConfiabilidadeEscuras[confiancaValida]
+                                    : undefined
+                            }
+                        />
                     ) : null
                 }
-                acoesDireita={
-                    <Pressable
-                        testID="acao-legenda-calendario"
-                        accessibilityRole="button"
-                        accessibilityLabel="Abrir legenda do calendário"
-                        onPress={() => setLegendaVisivel(true)}
-                        hitSlop={8}
-                        style={estilos.acaoLegenda}
-                    >
-                        <InfoIcon size={21.995} color={estilos.corIconeCabecalho} />
-                    </Pressable>
+                acoes={
+                    <IconButton
+                        icone={InfoIcon}
+                        aoPressionar={() => setLegendaVisivel(true)}
+                        rotuloAcessibilidade="Abrir legenda do calendário"
+                        variante="redeApoio"
+                        corIcone={tema.cores.interface.destaque}
+                    />
                 }
             />
 
-            <View style={estilos.conteudo}>
-                <View style={estilos.areaCalendario}>
-                    <CycleCalendar
-                        meses={mesesValidos}
-                        carregando={carregando}
-                        carregandoAnteriores={carregandoAnteriores}
-                        carregandoPosteriores={carregandoPosteriores}
-                        aoCarregarAnteriores={aoCarregarAnteriores}
-                        aoCarregarPosteriores={aoCarregarPosteriores}
-                        aoPressionarDia={aoEditarCiclo}
-                    />
+            <View testID="calendar-body" style={estilos.corpo}>
+                <View style={estilos.conteudo}>
+                    {existeErro ? (
+                        <View testID="calendar-error-state" style={estilos.estadoCentral}>
+                            <EmptyState
+                                titulo="Ocorreu um erro"
+                                mensagem={MENSAGEM_ERRO_CALENDARIO}
+                                variante="erro"
+                                acao={
+                                    <ButtonScreen
+                                        texto="Tentar Novamente"
+                                        aoPressionar={aoTentarNovamente}
+                                        variante="preto"
+                                        estilo={estilos.botaoEstado}
+                                    />
+                                }
+                            />
+                        </View>
+                    ) : (
+                        <View style={estilos.areaCalendario}>
+                            <CycleCalendar
+                                meses={mesesValidos}
+                                carregando={carregando}
+                                carregandoAnteriores={carregandoAnteriores}
+                                carregandoPosteriores={carregandoPosteriores}
+                                aoCarregarAnteriores={aoCarregarAnteriores}
+                                aoCarregarPosteriores={aoCarregarPosteriores}
+                                aoPressionarDia={aoEditarCiclo}
+                            />
+
+                            {mostrarStatusSincronizacao ? (
+                                <View
+                                    testID="status-sincronizacao-calendario"
+                                    style={estilos.areaSincronizacao}
+                                >
+                                    <SyncStatusIndicator
+                                        variante="calendario"
+                                        status={statusSincronizacaoPrioritario}
+                                        mensagem={
+                                            statusSincronizacaoPrioritario === 'falha' &&
+                                            erroSincronizacao?.status
+                                                ? erroSincronizacao.mensagemUsuario
+                                                : undefined
+                                        }
+                                        onTentarNovamente={aoTentarSincronizar}
+                                    />
+                                </View>
+                            ) : mostrarAvisoCicloVazio ? (
+                                <Animated.View
+                                    pointerEvents="box-none"
+                                    style={[
+                                        estilos.posicionadorAvisoVazio,
+                                        {
+                                            opacity: opacidadeAviso,
+                                            transform: [{ translateY: deslocamentoAviso }]
+                                        }
+                                    ]}
+                                >
+                                    <View
+                                        testID="calendar-empty-state"
+                                        accessibilityRole="alert"
+                                        accessibilityElementsHidden={!avisoVazioVisivel}
+                                        importantForAccessibility={
+                                            avisoVazioVisivel ? 'yes' : 'no-hide-descendants'
+                                        }
+                                        style={estilos.avisoVazio}
+                                    >
+                                        <Text style={estilos.textoVazio}>
+                                            Você ainda não possui nenhum ciclo registrado. Toque em{' '}
+                                            <Text style={estilos.textoDestaque}>{"'+'"}</Text> pra
+                                            começar.
+                                        </Text>
+                                    </View>
+                                </Animated.View>
+                            ) : null}
+                        </View>
+                    )}
                 </View>
+
+                {mostrarFab ? (
+                    <FloatingActionButton
+                        rotuloAcessibilidade="Cadastrar menstruação"
+                        aoPressionar={aoCadastrarMenstruacao}
+                        considerarAreaSeguraInferior={false}
+                        deslocamentoInferior={0}
+                        testID="calendar-add-fab"
+                    />
+                ) : null}
             </View>
 
-            {estadoVazio ? (
-                <View accessibilityRole="alert" style={estilos.avisoVazio}>
-                    <InfoIcon size={18} color={tema.cores.interface.destaque} />
-                    <Text style={estilos.textoVazio}>
-                        Você ainda não possui nenhum ciclo registrado. Use o botão de adicionar para
-                        começar.
-                    </Text>
-                </View>
-            ) : null}
-
-            {mostrarStatusSincronizacao ? (
-                <SafeAreaView
-                    testID="status-sincronizacao-calendario"
-                    edges={['bottom']}
-                    style={estilos.areaSincronizacao}
-                >
-                    <SyncStatusIndicator
-                        status={statusSincronizacao}
-                        mensagem={
-                            statusSincronizacao === 'falha' && erroSincronizacao?.status
-                                ? erroSincronizacao.mensagemUsuario
-                                : undefined
-                        }
-                        onTentarNovamente={aoTentarSincronizar}
-                    />
-                </SafeAreaView>
-            ) : null}
-
-            {mostrarFab ? (
-                <FloatingActionButton
-                    aoPressionar={aoCadastrarMenstruacao}
-                    rotuloAcessibilidade="Cadastrar menstruação"
-                    deslocamentoInferior={mostrarStatusSincronizacao ? 50 : 0}
-                    testID="calendar-add-fab"
-                />
-            ) : null}
+            <SafeAreaView
+                testID="calendar-bottom-navigation"
+                edges={['bottom']}
+                style={estilos.navegacaoSegura}
+            >
+                <BottomTabBar abaAtiva="calendario" onSelecionar={onSelecionarAba} />
+            </SafeAreaView>
 
             <CycleLegendSheet
                 visivel={legendaVisivel}
@@ -257,17 +367,21 @@ function CalendarScreen({
             />
 
             <CycleConfidenceSheet
-                visivel={confiabilidadeVisivel}
-                nivel={confiancaValida ?? 'baixa'}
-                aoFechar={() => setConfiabilidadeVisivel(false)}
+                visivel={confiancaVisivel}
+                nivel={confiancaValida}
+                aoFechar={() => setConfiancaVisivel(false)}
             />
-
-            {existeErro ? (
-                <ErroCalendario key={erro} erro={erro} aoTentarNovamente={aoTentarNovamente} />
-            ) : null}
         </View>
     );
 }
 
-export { CalendarScreen, ITENS_LEGENDA, normalizarConfianca };
+export {
+    CalendarScreen,
+    ITENS_LEGENDA,
+    MENSAGEM_ERRO_CALENDARIO,
+    PRIORIDADE_STATUS_SINCRONIZACAO,
+    TEMPO_REAPARECER_AVISO_MS,
+    normalizarConfianca,
+    obterStatusSincronizacaoPrioritario
+};
 export default CalendarScreen;

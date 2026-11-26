@@ -60,6 +60,15 @@ jest.mock('../../../../src/features/calendar/screens/CalendarScreen', () => {
                         onPress: () => props.aoEditarCiclo?.({ registroCicloId: 9 })
                     },
                     ReactInterno.createElement(Text, null, 'Editar ciclo')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir configurações',
+                        onPress: () => props.onSelecionarAba?.('configuracoes')
+                    },
+                    ReactInterno.createElement(Text, null, 'Configurações')
                 )
             )
     };
@@ -157,6 +166,31 @@ describe('CalendarScreenContainer', () => {
         );
         await fireEvent.press(screen.getByRole('button', { name: 'Editar ciclo do dia' }));
         expect(aoEditarCiclo).toHaveBeenCalledWith({ registroCicloId: 9 });
+    });
+
+    test('encaminha a navegação inferior para a tela', async () => {
+        const onSelecionarAba = jest.fn();
+        mockUseCalendar.mockReturnValue({
+            meses: [],
+            carregando: false,
+            carregandoAnteriores: false,
+            carregandoPosteriores: false,
+            erro: null,
+            carregarAnteriores: jest.fn(),
+            carregarPosteriores: jest.fn(),
+            tentarNovamente: jest.fn()
+        });
+
+        await render(
+            <CalendarScreenContainer
+                service={{ buscarMes: jest.fn() }}
+                onSelecionarAba={onSelecionarAba}
+            />
+        );
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir configurações' }));
+
+        expect(onSelecionarAba).toHaveBeenCalledWith('configuracoes');
     });
 
     test('não usa a confiança de um mês que não seja o atual', async () => {

@@ -25,6 +25,10 @@ function criarEstilos(tema) {
             paddingHorizontal: 12
         },
 
+        areaTituloComComplemento: {
+            justifyContent: 'space-between'
+        },
+
         titulo: {
             flex: 1,
             flexShrink: 1,
@@ -50,6 +54,16 @@ function criarEstilos(tema) {
         tituloComVoltar: {
             ...tema.headerTypography.compacto,
             textAlign: 'center'
+        },
+
+        tituloComComplemento: {
+            flex: 0,
+            minWidth: 0
+        },
+
+        complementoTitulo: {
+            flexShrink: 0,
+            alignItems: 'center'
         },
 
         acoes: {
