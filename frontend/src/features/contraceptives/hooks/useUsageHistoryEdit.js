@@ -3,25 +3,53 @@ import { estadoRegistroUso } from '../utils/usageHistory';
 
 const estadosEditaveis = ['confirmado', 'foraDoPrazo', 'naoUsei'];
 
-function useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico, horarios) {
+function useUsageHistoryEdit(
+    registros,
+    aoSalvarEdicaoHistorico,
+    horarios,
+    usoUnicoPorDia,
+    usosHoje,
+    aoMudarRodape
+) {
     const [sessao, setSessao] = useState(null);
     const [salvando, setSalvando] = useState(false);
     const [popup, setPopup] = useState(null);
     const envio = useRef(false);
+
     const hoje = new Date();
     const data = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
     const hora = `${String(hoje.getHours()).padStart(2, '0')}:${String(hoje.getMinutes()).padStart(2, '0')}`;
-    const editaveis = registros.filter((registro) =>
-        registro.id && (registro.data < data || (registro.data === data && registro.horarioProgramado <= hora))
+    const editaveis = registros.filter(
+        (registro) =>
+            registro.id &&
+            (registro.data < data ||
+                (registro.data === data && (usoUnicoPorDia || registro.horarioProgramado <= hora)))
     );
+    const horariosHoje = usoUnicoPorDia
+        ? usosHoje
+              .filter((uso) => uso.data === data)
+              .map((uso) => uso.horario)
+              .slice(0, 1)
+        : [];
+
     function ocorrenciasEm(dia) {
         const ocorrencias = editaveis.filter((registro) => registro.data === dia);
-        if (!dia || dia >= data) return ocorrencias;
+        if (!dia || dia > data || (usoUnicoPorDia && ocorrencias.length)) return ocorrencias;
+        const horariosDoDia = dia === data ? horariosHoje : horarios;
         const existentes = new Set(ocorrencias.map((registro) => registro.horarioProgramado));
-        return [...ocorrencias, ...horarios.filter((horario) => !existentes.has(horario)).map((horario) => ({
-            id: `novo-${horario}`, novo: true, data: dia, horarioProgramado: horario
-        }))];
+        return [
+            ...ocorrencias,
+            ...horariosDoDia
+                .filter((horario) => !existentes.has(horario))
+                .map((horario) => ({
+                    id: `novo-${horario}`,
+                    novo: true,
+                    data: dia,
+                    horarioProgramado: horario
+                }))
+        ];
     }
+
     const ocorrenciasDoDia = ocorrenciasEm(sessao?.data);
     const alvo = ocorrenciasDoDia.find((registro) => registro.id === sessao?.id);
     const opcoes = alvo ? estadosEditaveis : [];
@@ -37,7 +65,10 @@ function useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico, horarios) {
     function selecionar(registro) {
         if (registro.id === sessao?.id && registro.data === sessao.data) return;
         const original = estadoRegistroUso(registro);
-        sairDoAlvo(() => setSessao({ data: registro.data, id: registro.id, original, opcao: original }));
+        sairDoAlvo(() => {
+            if (!sessao || Boolean(alvo?.novo) !== Boolean(registro.novo)) aoMudarRodape?.();
+            setSessao({ data: registro.data, id: registro.id, original, opcao: original });
+        });
     }
 
     function selecionarData(dataSelecionada) {
@@ -57,10 +88,15 @@ function useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico, horarios) {
         setSalvando(true);
         try {
             await aoSalvarEdicaoHistorico(alvo, alteracao);
+            aoMudarRodape?.();
             setSessao(null);
         } catch {
             if (alteracao.apagar) setPopup({ tipo: 'erroExclusao' });
-            else setSessao((atual) => ({ ...atual, erro: 'Não foi possível salvar. Tente novamente.' }));
+            else
+                setSessao((atual) => ({
+                    ...atual,
+                    erro: 'Não foi possível salvar. Tente novamente.'
+                }));
         } finally {
             envio.current = false;
             setSalvando(false);
@@ -77,8 +113,24 @@ function useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico, horarios) {
     }
 
     return {
-        sessao, setSessao, salvando, editaveis, alvo, opcoes, alterado, podeSalvar, ocorrenciasDoDia, dataHoje: data,
-        sairDoAlvo, selecionar, selecionarData, salvar, solicitarExclusao, popup, fecharPopup: () => setPopup(null)
+        sessao,
+        setSessao,
+        salvando,
+        editaveis,
+        alvo,
+        opcoes,
+        alterado,
+        podeSalvar,
+        ocorrenciasDoDia,
+        dataHoje: data,
+        temHorarioHoje: horariosHoje.length > 0,
+        sairDoAlvo,
+        selecionar,
+        selecionarData,
+        salvar,
+        solicitarExclusao,
+        popup,
+        fecharPopup: () => setPopup(null)
     };
 }
 

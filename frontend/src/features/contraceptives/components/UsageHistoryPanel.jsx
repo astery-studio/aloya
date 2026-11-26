@@ -1,12 +1,22 @@
 import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { LayoutAnimation, Pressable, Text, View } from 'react-native';
 import { useUsageHistoryEdit } from '../hooks/useUsageHistoryEdit';
 import { ChartBarIcon } from 'phosphor-react-native/src/icons/ChartBar';
 import { StatusBadge } from '../../../shared/components/common/StatusBadge/StatusBadge';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { CaretDownIcon, CaretUpIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import {
+    CaretDownIcon,
+    CaretUpIcon,
+    WarningCircleIcon
+} from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { estadoRegistroUso, formatarDataUso, partesDaDataUso } from '../utils/usageHistory';
+import { useReducedMotion } from '../../../shared/hooks/useReducedMotion';
+import {
+    estadoRegistroUso,
+    formatarDataUso,
+    partesDaDataUso,
+    selecionarRegistroDiario
+} from '../utils/usageHistory';
 import { UsageCalendar } from './UsageCalendar';
 import { UsageHistoryEditControls } from './UsageHistoryEditControls';
 import { criarEstilosUso } from './usageComponents.styles';
@@ -43,7 +53,8 @@ function ListaDeUsos({ registros, estilosUso, selecao, aoSelecionar, idsEditavei
                     <Linha
                         key={registro.id ?? `${registro.data}-${registro.horario}-${indice}`}
                         {...(editavel && {
-                            accessibilityRole: 'button', accessibilityState: { selected: selecionado },
+                            accessibilityRole: 'button',
+                            accessibilityState: { selected: selecionado },
                             accessibilityLabel: `${formatarDataUso(registro.data)}, ${registro.horarioProgramado ?? registro.horario}, ${rotulosHistorico[estadoRegistroUso(registro)] ?? 'Sem confirmação'}`,
                             onPress: () => aoSelecionar(registro)
                         })}
@@ -114,32 +125,85 @@ function deslocarMes(mes, deslocamento) {
 }
 
 const rotulosHistorico = {
-    confirmado: 'Confirmado', foraDoPrazo: 'Fora do prazo', naoConfirmado: 'Não confirmado',
+    confirmado: 'Confirmado',
+    foraDoPrazo: 'Fora do prazo',
+    naoConfirmado: 'Não confirmado',
     naoUsei: 'Não usei'
 };
 
 function UsageHistoryPanel({
-    expandido = false, registros = [], horarios = [], modo = 'lista', aoAlternar, aoSalvarEdicaoHistorico
+    expandido = false,
+    registros = [],
+    horarios = [],
+    usosHoje = [],
+    modo = 'lista',
+    usoUnicoPorDia = false,
+    aoAlternar,
+    aoSalvarEdicaoHistorico
 }) {
     const tema = useTheme();
+    const reduzirMovimento = useReducedMotion();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
-    const [mes, setMes] = useState(() => mesInicial(registros));
+    const calendario = modo === 'calendario';
+    const edicaoDireta = calendario && usoUnicoPorDia;
+    const horariosEditaveis = usoUnicoPorDia ? horarios.slice(0, 1) : horarios;
+    const registrosExibidos = usoUnicoPorDia
+        ? selecionarRegistroDiario(registros, horariosEditaveis[0])
+        : registros;
+    const [mes, setMes] = useState(() => mesInicial(registrosExibidos));
     const {
-        sessao, setSessao, salvando, editaveis, alvo, opcoes, alterado, podeSalvar, ocorrenciasDoDia, dataHoje,
-        sairDoAlvo, selecionar, selecionarData, salvar, solicitarExclusao, popup, fecharPopup
-    } = useUsageHistoryEdit(registros, aoSalvarEdicaoHistorico, horarios);
-    const registrosDoMes = registros.filter(
+        sessao,
+        setSessao,
+        salvando,
+        editaveis,
+        alvo,
+        opcoes,
+        alterado,
+        podeSalvar,
+        ocorrenciasDoDia,
+        dataHoje,
+        temHorarioHoje,
+        sairDoAlvo,
+        selecionar,
+        selecionarData,
+        salvar,
+        solicitarExclusao,
+        popup,
+        fecharPopup
+    } = useUsageHistoryEdit(
+        registrosExibidos,
+        aoSalvarEdicaoHistorico,
+        horariosEditaveis,
+        usoUnicoPorDia,
+        usosHoje,
+        edicaoDireta ? animarRodape : undefined
+    );
+    const registrosDoMes = registrosExibidos.filter(
         (registro) => !registro.data || partesDaDataUso(registro.data)?.chaveMes === mes
     );
 
+    function animarRodape() {
+        if (reduzirMovimento) return;
+
+        LayoutAnimation.configureNext(
+            LayoutAnimation.create(
+                200,
+                LayoutAnimation.Types.easeInEaseOut,
+                LayoutAnimation.Properties.opacity
+            )
+        );
+    }
+
     function navegarMes(deslocamento) {
         sairDoAlvo(() => {
-            if (sessao) setSessao({});
+            if (sessao) {
+                if (edicaoDireta) animarRodape();
+                setSessao(edicaoDireta ? null : {});
+            }
             setMes(deslocarMes(mes, deslocamento));
         });
     }
 
-    const calendario = modo === 'calendario';
     function confirmarPopup() {
         fecharPopup();
         popup?.aoConfirmar?.();
@@ -148,19 +212,27 @@ function UsageHistoryPanel({
     const configuracaoPopup = {
         diaIndisponivel: {
             titulo: 'Dia indisponível',
-            mensagem: 'Escolha um dia anterior. Para hoje, use os controles de próximos horários.'
+            mensagem: 'Escolha um dia anterior ou o dia atual quando houver um uso programado.'
         },
         descarte: {
             titulo: 'Descartar alteração?',
             mensagem: 'A edição do histórico ainda não foi salva.',
             acaoPrincipal: {
-                texto: 'Descartar', varianteVisual: 'sairSemSalvar', variante: 'branco', aoPressionar: confirmarPopup
+                texto: 'Descartar',
+                varianteVisual: 'sairSemSalvar',
+                variante: 'branco',
+                aoPressionar: confirmarPopup
             },
-            acaoSecundaria: { texto: 'Continuar editando', variante: 'verde', aoPressionar: fecharPopup }
+            acaoSecundaria: {
+                texto: 'Continuar editando',
+                variante: 'verde',
+                aoPressionar: fecharPopup
+            }
         },
         exclusao: {
             titulo: 'Apagar este registro?',
-            mensagem: 'O horário voltará a ficar sem registro. A programação do anticoncepcional será preservada.',
+            mensagem:
+                'O horário voltará a ficar sem registro. A programação do anticoncepcional será preservada.',
             acaoPrincipal: { texto: 'Apagar', variante: 'vermelho', aoPressionar: confirmarPopup },
             acaoSecundaria: { texto: 'Cancelar', variante: 'branco', aoPressionar: fecharPopup }
         },
@@ -169,25 +241,72 @@ function UsageHistoryPanel({
             mensagem: 'Tente novamente.'
         }
     }[popup?.tipo];
-    const idsEditaveis = new Set([...editaveis, ...ocorrenciasDoDia].map((registro) => registro.id));
-    const instrucao = sessao ? (
-        <Text style={estilosUso.instrucaoEdicao}>
-            {calendario ? 'Selecione um dia para alterar o histórico.' : 'Selecione o registro que deseja editar.'}
-        </Text>
+    const idsEditaveis = new Set(
+        [...editaveis, ...ocorrenciasDoDia].map((registro) => registro.id)
+    );
+    const datasEditaveis = new Set(editaveis.map((registro) => registro.data));
+    if (temHorarioHoje) datasEditaveis.add(dataHoje);
+
+    const instrucao =
+        sessao && !edicaoDireta ? (
+            <Text style={estilosUso.instrucaoEdicao}>
+                {calendario
+                    ? 'Selecione um dia para alterar o histórico.'
+                    : 'Selecione o registro que deseja editar.'}
+            </Text>
+        ) : null;
+    const controlesEdicao = sessao ? (
+        <UsageHistoryEditControls
+            modo={modo}
+            opcaoSelecionada={sessao.opcao}
+            opcoesDisponiveis={opcoes}
+            podeSalvar={podeSalvar}
+            salvando={salvando}
+            erro={sessao.erro}
+            aoSalvar={salvar}
+            aoApagarRegistro={alvo && !alvo.novo ? solicitarExclusao : undefined}
+            aoSelecionarOpcao={(opcao) => setSessao({ ...sessao, opcao, erro: null })}
+        >
+            {calendario && ocorrenciasDoDia.length > 1 ? (
+                <>
+                    <Text accessibilityLiveRegion="polite" style={estilosUso.instrucaoEdicao}>
+                        {alvo
+                            ? `Horário selecionado: ${alvo.horarioProgramado}`
+                            : 'Há mais de um uso neste dia. Toque no horário que deseja alterar.'}
+                    </Text>
+                    <ListaDeUsos
+                        registros={ocorrenciasDoDia}
+                        estilosUso={estilosUso}
+                        selecao={sessao.id}
+                        idsEditaveis={idsEditaveis}
+                        aoSelecionar={salvando ? undefined : selecionar}
+                    />
+                </>
+            ) : null}
+        </UsageHistoryEditControls>
     ) : null;
+
     const grade = calendario ? (
         <UsageCalendar
             mes={mes}
-            dias={alterado
-                ? [...registrosDoMes.filter((registro) => registro.id !== alvo.id), { ...alvo, estado: sessao.opcao }]
-                : registrosDoMes}
+            dias={
+                alterado
+                    ? [
+                          ...registrosDoMes.filter((registro) => registro.id !== alvo.id),
+                          { ...alvo, estado: sessao.opcao }
+                      ]
+                    : registrosDoMes
+            }
             aoMesAnterior={() => navegarMes(-1)}
             aoProximoMes={() => navegarMes(1)}
             emEdicao={Boolean(sessao)}
+            rodapeEdicao={controlesEdicao}
             dataSelecionada={sessao?.data}
-            datasEditaveis={new Set(editaveis.map((registro) => registro.data))}
-            editarAntesDe={horarios.length ? dataHoje : undefined}
-            aoSelecionarData={selecionarData}
+            datasEditaveis={datasEditaveis}
+            editarAntesDe={horariosEditaveis.length ? dataHoje : undefined}
+            aoSelecionarData={
+                aoSalvarEdicaoHistorico && (edicaoDireta || sessao) ? selecionarData : undefined
+            }
         />
     ) : null;
 
@@ -198,7 +317,12 @@ function UsageHistoryPanel({
                     accessibilityRole="button"
                     accessibilityLabel="Histórico de uso"
                     accessibilityState={{ expanded: expandido }}
-                    onPress={() => sairDoAlvo(() => { setSessao(null); aoAlternar?.(); })}
+                    onPress={() =>
+                        sairDoAlvo(() => {
+                            setSessao(null);
+                            aoAlternar?.();
+                        })
+                    }
                     style={estilosUso.botaoPainel}
                 >
                     <ChartBarIcon size={13} color={tema.cores.interface.textoSecundario} />
@@ -214,36 +338,33 @@ function UsageHistoryPanel({
             </View>
             {expandido ? (
                 <View style={estilosUso.conteudoPainel}>
-                    {calendario ? (!sessao && grade) : <>
-                        {instrucao}
-                        <ListaDeUsos registros={registros} estilosUso={estilosUso} selecao={sessao?.id}
-                            idsEditaveis={idsEditaveis}
-                            aoSelecionar={sessao && !salvando ? selecionar : undefined} />
-                    </>}
-                    {sessao ? (
-                        <UsageHistoryEditControls modo={modo} opcaoSelecionada={sessao.opcao}
-                            opcoesDisponiveis={opcoes} podeSalvar={podeSalvar} salvando={salvando}
-                            erro={sessao.erro} aoSalvar={salvar}
-                            aoApagarRegistro={alvo && !alvo.novo ? solicitarExclusao : undefined}
-                            estiloOpcoes={calendario ? estilosUso.calendarioEmEdicao : undefined}
-                            aoSelecionarOpcao={(opcao) => setSessao({ ...sessao, opcao, erro: null })}>
-                            {calendario ? <>{instrucao}{grade}</> : null}
-                            {calendario && ocorrenciasDoDia.length > 1 ? (
-                                <>
-                                    <Text accessibilityLiveRegion="polite" style={estilosUso.instrucaoEdicao}>
-                                        {alvo
-                                            ? `Horário selecionado: ${alvo.horarioProgramado}`
-                                            : 'Há mais de um uso neste dia. Toque no horário que deseja alterar.'}
-                                    </Text>
-                                    <ListaDeUsos registros={ocorrenciasDoDia} estilosUso={estilosUso} selecao={sessao.id}
-                                        idsEditaveis={idsEditaveis}
-                                        aoSelecionar={salvando ? undefined : selecionar} />
-                                </>
-                            ) : null}
-                        </UsageHistoryEditControls>
-                    ) : aoSalvarEdicaoHistorico && (editaveis.length || (calendario && horarios.length)) ? (
-                        <Pressable accessibilityRole="button" style={estilosUso.alterarHistorico}
-                            onPress={() => setSessao({})}>
+                    {calendario ? (
+                        <>
+                            {instrucao}
+                            {grade}
+                        </>
+                    ) : (
+                        <>
+                            {instrucao}
+                            <ListaDeUsos
+                                registros={registrosExibidos}
+                                estilosUso={estilosUso}
+                                selecao={sessao?.id}
+                                idsEditaveis={idsEditaveis}
+                                aoSelecionar={sessao && !salvando ? selecionar : undefined}
+                            />
+                        </>
+                    )}
+                    {!calendario && controlesEdicao}
+                    {!sessao &&
+                    !edicaoDireta &&
+                    aoSalvarEdicaoHistorico &&
+                    (editaveis.length || (calendario && horariosEditaveis.length)) ? (
+                        <Pressable
+                            accessibilityRole="button"
+                            style={estilosUso.alterarHistorico}
+                            onPress={() => setSessao({})}
+                        >
                             <Text style={estilosUso.textoAlterarHistorico}>Alterar Histórico</Text>
                         </Pressable>
                     ) : null}

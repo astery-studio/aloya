@@ -45,4 +45,21 @@ function estadoRegistroUso(registro) {
     return estado;
 }
 
-export { partesDaDataUso, formatarDataUso, estadoCalendarioUso, estadoRegistroUso };
+function selecionarRegistroDiario(registros, horarioAtual) {
+    const porDia = new Map();
+    function prioridade(registro) {
+        const estado = estadoRegistroUso(registro);
+        const respostaRegistrada = estado === 'confirmado' || estado === 'foraDoPrazo' || estado === 'naoUsei';
+        const horario = registro.horarioProgramado ?? registro.horario;
+        return (respostaRegistrada ? 2 : 0) + (horario === horarioAtual ? 1 : 0);
+    }
+    for (const registro of registros) {
+        const anterior = porDia.get(registro.data);
+        if (!anterior || prioridade(registro) > prioridade(anterior)) {
+            porDia.set(registro.data, registro);
+        }
+    }
+    return [...porDia.values()];
+}
+
+export { partesDaDataUso, formatarDataUso, estadoCalendarioUso, estadoRegistroUso, selecionarRegistroDiario };

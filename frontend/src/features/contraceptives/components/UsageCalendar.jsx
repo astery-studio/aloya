@@ -65,7 +65,7 @@ function ehHoje(ano, numeroMes, dia) {
 
 function UsageCalendar({
     mes, dias = [], aoMesAnterior, aoProximoMes,
-    emEdicao = false, dataSelecionada, datasEditaveis, editarAntesDe, aoSelecionarData
+    emEdicao = false, rodapeEdicao, dataSelecionada, datasEditaveis, editarAntesDe, aoSelecionarData
 }) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
@@ -143,9 +143,9 @@ function UsageCalendar({
                                 const hoje = ehHoje(ano, numeroMes, dia);
                                 const dataCivil = dia ? `${mes}-${String(dia).padStart(2, '0')}` : null;
                                 const selecionado = emEdicao && dataCivil === dataSelecionada;
-                                const editavel = emEdicao && dia
+                                const interativa = Boolean(dia) && typeof aoSelecionarData === 'function';
+                                const editavel = interativa
                                     && (datasEditaveis?.has(dataCivil) || dataCivil < editarAntesDe);
-                                const interativa = emEdicao && Boolean(dia) && typeof aoSelecionarData === 'function';
                                 const Celula = interativa ? Pressable : View;
 
                                 return (
@@ -190,16 +190,20 @@ function UsageCalendar({
                 </View>
             </View>
 
-            {!emEdicao ? <View testID="usage-calendar-legend" style={estilosUso.legenda}>
-                {ORDEM_LEGENDA.map((estado) => (
-                    <View key={estado} style={estilosUso.itemLegenda}>
-                        <View
-                            style={[estilosUso.marcadorLegenda, estilosUso[`marcador_${estado}`]]}
-                        />
-                        <Text style={estilosUso.textoLegenda}>{ESTADOS[estado]}</Text>
-                    </View>
-                ))}
-            </View> : null}
+            {emEdicao ? (
+                rodapeEdicao && <View style={estilosUso.rodapeEdicao}>{rodapeEdicao}</View>
+            ) : (
+                <View testID="usage-calendar-legend" style={estilosUso.legenda}>
+                    {ORDEM_LEGENDA.map((estado) => (
+                        <View key={estado} style={estilosUso.itemLegenda}>
+                            <View
+                                style={[estilosUso.marcadorLegenda, estilosUso[`marcador_${estado}`]]}
+                            />
+                            <Text style={estilosUso.textoLegenda}>{ESTADOS[estado]}</Text>
+                        </View>
+                    ))}
+                </View>
+            )}
         </View>
     );
 }
