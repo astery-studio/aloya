@@ -367,6 +367,8 @@ describe('ContraceptiveForm - interações', () => {
 
         expect(seletor.label).toBe('Data do primeiro uso');
         expect(seletor.titulo).toBe('Data do primeiro uso');
+        expect(seletor.dataMaxima).toBe('2026-10-02');
+        expect(seletor.destacarHoje).toBe(true);
 
         seletor.onAbrir();
         const resultado = await seletor.onSelecionar('2026-10-01');
