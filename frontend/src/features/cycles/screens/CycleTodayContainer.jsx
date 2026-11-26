@@ -23,7 +23,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
         try {
             const resultado = await service.buscar({ signal: atual.signal });
             setPrevisao(resultado);
-            setDataSelecionada(resultado.dataReferencia || null);
+            setDataSelecionada(obterHojeLocal());
         } catch (falha) {
             if (falha?.name === 'AbortError') return;
             if (falha?.status === 401) onSessaoExpiradaRef.current?.();
@@ -41,7 +41,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             .buscar({ signal: atual.signal })
             .then((resultado) => {
                 setPrevisao(resultado);
-                setDataSelecionada(resultado.dataReferencia || null);
+                setDataSelecionada(obterHojeLocal());
             })
             .catch((falha) => {
                 if (falha?.name === 'AbortError') return;
@@ -61,6 +61,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             previsao={previsao}
             carregando={carregando}
             erro={erro}
+            dataAtual={obterHojeLocal()}
             dataSelecionada={dataSelecionada}
             aoSelecionarData={setDataSelecionada}
             aoTentarNovamente={carregar}

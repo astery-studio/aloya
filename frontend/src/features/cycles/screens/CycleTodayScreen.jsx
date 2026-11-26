@@ -47,6 +47,7 @@ function CycleTodayScreen({
     erro = false,
     erroPrevisao = false,
     erroSincronizacao = false,
+    dataAtual,
     dataSelecionada,
     aoSelecionarData,
     aoTentarNovamente,
@@ -66,7 +67,8 @@ function CycleTodayScreen({
         : tema.cores.marca.secundaria;
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const [sheetAberto, setSheetAberto] = useState(null);
-    const dataBaseDaFaixa = previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
+    const dataBaseDaFaixa =
+        dataAtual || previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
     const referencia = dataSelecionada || dataBaseDaFaixa;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
     const fase = referencia
