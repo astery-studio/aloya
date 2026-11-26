@@ -1,45 +1,53 @@
 import { Pressable, Text, View } from 'react-native';
-import { RewindIcon } from 'phosphor-react-native/src/icons/Rewind';
+import { fontFamilies } from '../../../shared/theme';
 
 function ReturnToTodayButton({ onPress }) {
     const estilos = {
         faixa: {
             width: '100%',
-            height: 38,
             flexDirection: 'row',
+            justifyContent: 'center',
             alignItems: 'center',
-            paddingVertical: 2,
-            paddingHorizontal: 16
+            paddingVertical: 6
         },
         botao: {
-            width: 135,
-            height: 34,
-            alignSelf: 'flex-start',
+            height: 20,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 5,
             paddingHorizontal: 13,
             paddingVertical: 6,
             borderWidth: 1,
-            borderColor: '#AAAAA5',
+            borderColor: 'rgba(214, 140, 58, 0.40)',
             borderStyle: 'dashed',
             borderRadius: 999
         },
-        texto: {
-            color: '#5C5C59',
-            fontFamily: 'DMSans_400Regular',
-            fontSize: 13,
-            fontWeight: '400',
+        textoBase: {
+            color: 'rgba(214, 140, 58, 0.60)',
+            fontSize: 10,
             includeFontPadding: false,
-            lineHeight: 20
+            lineHeight: 19.5
+        },
+        textoVoltar: {
+            fontFamily: fontFamilies.light,
+            fontWeight: '300'
+        },
+        textoHoje: {
+            fontFamily: fontFamilies.medium,
+            fontWeight: '500'
         }
     };
 
     return (
         <View testID="faixa-voltar-hoje" style={estilos.faixa}>
-            <Pressable accessibilityRole="button" onPress={onPress} style={estilos.botao}>
-                <RewindIcon size={13} color="#5C5C59" weight="regular" />
-                <Text style={estilos.texto}>Voltar pra hoje</Text>
+            <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Voltar para hoje"
+                onPress={onPress}
+                style={estilos.botao}
+            >
+                <Text style={[estilos.textoBase, estilos.textoVoltar]}>Voltar para:</Text>
+                <Text style={[estilos.textoBase, estilos.textoHoje]}>Hoje</Text>
             </Pressable>
         </View>
     );

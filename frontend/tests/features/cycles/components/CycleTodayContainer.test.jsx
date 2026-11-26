@@ -75,8 +75,8 @@ test('mantém a faixa de datas estável ao selecionar outro dia', async () => {
             screen.getByRole('button', { name: 'qua, dia 14' }).props.accessibilityState
         ).toEqual(expect.objectContaining({ selected: true }));
     });
-    expect(screen.getByRole('button', { name: 'Voltar pra hoje' })).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Voltar pra hoje' }));
+    expect(screen.getByRole('button', { name: 'Voltar para hoje' })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar para hoje' }));
     await waitFor(() => {
         expect(screen.getByRole('button', { name: 'qui, dia 8' })).toBeSelected();
     });
