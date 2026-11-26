@@ -414,6 +414,24 @@ test('o cartão confirmado distribui badges igualmente a partir do espaço míni
     });
 });
 
+test('a tag Não usei usa o mesmo alinhamento e marcador das outras tags do cartão', async () => {
+    await render(
+        <ContraceptiveUsageCard
+            anticoncepcional={{
+                id: '1',
+                nome: 'Pílula teste',
+                tipo: 'pilula',
+                intensidadeAlerta: 'critico',
+                usosHoje: [{ id: '1', horario: '08:00', status: 'naoUsei' }]
+            }}
+        />
+    );
+
+    const badge = screen.getByLabelText('Não usei');
+    expect(badge).toHaveStyle({ flexDirection: 'row', justifyContent: 'center', width: 155.31 });
+    expect(screen.getAllByText('●')).toHaveLength(2);
+});
+
 test('a validade encerrada do DIU não utiliza o badge verde de ainda no prazo', async () => {
     await render(
         <ContraceptiveUsageCard

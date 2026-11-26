@@ -131,10 +131,14 @@ function AcaoDoCartao({ icone, rotulo, aoPressionar, estilosCartao }) {
     );
 }
 
+function estadoBadgeDoCartao(estado) {
+    return estado === 'naoUsei' ? 'naoUseiNoCartao' : estado;
+}
+
 function larguraMinimaDosBadges(estados) {
     return Math.max(
         ...estados.map((estado) => {
-            const variante = estado === 'naoUsei' ? 'naoConfirmadoHistoricoUso' : estado;
+            const variante = estadoBadgeDoCartao(estado);
             const visual = variantesBadge[variante === 'alertaCrítico' ? 'alertaCritico' : variante];
             if (variante.endsWith('HistoricoUso')) return visual.container.width;
             return (
@@ -157,7 +161,7 @@ function BadgeDoCartao({ estado, larguraMinima, estilosCartao }) {
             ]}
         >
             <StatusBadge
-                estado={estado}
+                estado={estadoBadgeDoCartao(estado)}
                 estilo={
                     estado === 'pendenteDeUso'
                         ? estilosCartao.badgePendente

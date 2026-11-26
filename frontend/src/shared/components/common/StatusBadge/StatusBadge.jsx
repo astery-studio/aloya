@@ -50,6 +50,7 @@ const estados = Object.freeze({
     naoConfirmado: { rotulo: 'Não confirmado', variante: 'naoConfirmadoHistoricoUso' },
     naoConfirmadoHistoricoUso: { rotulo: 'Não confirmado', variante: 'naoConfirmadoHistoricoUso' },
     naoUsei: { rotulo: 'Não usei', variante: 'naoConfirmadoHistoricoUso' },
+    naoUseiNoCartao: { rotulo: 'Não usei', variante: 'naoUseiNoCartao', ponto: true },
     validadeAindaPrazo: { rotulo: '30 meses restantes', variante: 'validadeAindaPrazo' },
     diasMenstruacao: {
         rotulo: '6 dias menstruação',
@@ -84,6 +85,7 @@ const variantesDeUso = new Set([
     'alertaCritico',
     'atrasadoProximosHorarios',
     'confirmado',
+    'naoUseiNoCartao',
     'confirmadoHistoricoUso',
     'confirmadoForaPrazoHistoricoUso',
     'naoConfirmadoHistoricoUso',
