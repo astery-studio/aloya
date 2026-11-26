@@ -70,6 +70,11 @@ async function comApi({autenticado = true}, executar) {
             resposta.status(200).json({
                 mensagem: 'Anticoncepcional removido com sucesso.'
             });
+        },
+
+        apagarDefinitivamente(_requisicao, resposta) {
+            eventos.push('apagarDefinitivamente');
+            resposta.status(204).end();
         }
     };
 

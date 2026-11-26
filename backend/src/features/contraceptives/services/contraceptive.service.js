@@ -217,11 +217,33 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
         });
     }
 
+    async function apagarDefinitivamente(usuarioId, idRecebido) {
+        const id = validarIdAnticoncepcional(idRecebido);
+
+        await prisma.$transaction(async (transacao) => {
+            const resultado = await transacao.anticoncepcional.deleteMany({
+                where: { id, usuarioId, ativo: false }
+            });
+            if (resultado.count !== 1) {
+                throw new AppError(
+                    'Anticoncepcional removido não encontrado.',
+                    404,
+                    'ANTICONCEPCIONAL_NAO_ENCONTRADO'
+                );
+            }
+
+            await transacao.notificacao.deleteMany({
+                where: { usuarioId, tipoOrigem: 'anticoncepcional', origemId: id }
+            });
+        });
+    }
+
     return {
         cadastrar,
         listar,
         editar,
-        remover
+        remover,
+        apagarDefinitivamente
     };
 }
 

@@ -134,6 +134,11 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
         });
     }
 
+    async function apagarDefinitivamente(id) {
+        const caminho = `${criarCaminhoAnticoncepcional(id)}/definitivo`;
+        await requisicaoAutenticada({ metodo: 'DELETE', caminho });
+    }
+
     // Confirma/desmarca somente o horário programado identificado, com timestamp do servidor.
     async function alternarUso({ anticoncepcionalId, data, horario, confirmar, fusoHorario }) {
         const caminho = `${criarCaminhoAnticoncepcional(anticoncepcionalId)}/usos`;
@@ -182,6 +187,7 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
         cadastrar,
         editar,
         remover,
+        apagarDefinitivamente,
         alternarUso,
         corrigirHistorico,
         apagarRegistroHistorico

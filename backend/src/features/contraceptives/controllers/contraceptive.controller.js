@@ -69,11 +69,21 @@ function criarContraceptiveController(service) {
         }
     }
 
+    async function apagarDefinitivamente(requisicao, resposta, proximo) {
+        try {
+            await service.apagarDefinitivamente(requisicao.usuario.id, requisicao.params.id);
+            resposta.status(204).end();
+        } catch (erro) {
+            proximo(erro);
+        }
+    }
+
     return {
         cadastrar,
         listar,
         editar,
-        remover
+        remover,
+        apagarDefinitivamente
     };
 }
 
