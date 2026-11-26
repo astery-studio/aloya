@@ -12,6 +12,7 @@ import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import prismaPackage from '@prisma/client';
 import { criarContraceptiveController } from '../../../../src/features/contraceptives/controllers/contraceptive.controller.js';
 import { criarContraceptiveService } from '../../../../src/features/contraceptives/services/contraceptive.service.js';
+import { criarContraceptiveUsageService } from '../../../../src/features/contraceptives/services/contraceptiveUsage.service.js';
 import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptive.routes.js';
 import { tratarErros } from '../../../../src/shared/middleware/error.middleware.js';
 
@@ -41,6 +42,66 @@ function removerBancoTemporario(diretorio) {
     assert.ok(destino.startsWith(join(base, 'aloya-listagem-hu019-')));
     rmSync(destino, { recursive: true, force: true });
 }
+
+test('grava os usos confirmados entre o início e hoje e mantém as correções', async () => {
+    const { diretorio, caminho } = criarBancoTemporario();
+    const adapter = new PrismaBetterSqlite3({ url: `file:${caminho.replaceAll('\\', '/')}` });
+    const prisma = new PrismaClient({ adapter });
+
+    try {
+        const usuaria = await prisma.usuario.create({
+            data: {
+                nome: 'Usuária Teste',
+                dataNascimento: new Date('2000-01-01T00:00:00Z'),
+                email: 'inicio@example.com',
+                senhaHash: 'hash-de-teste',
+                papel: 'principal',
+                statusConta: 'ativa'
+            }
+        });
+        // Em São Paulo ainda é dia 8, mesmo quando a data UTC já mudou para o dia 9.
+        const relogio = () => new Date('2026-10-09T01:00:00Z');
+        const fusoHorario = 'America/Sao_Paulo';
+        const service = criarContraceptiveService(prisma, relogio);
+        const serviceUsos = criarContraceptiveUsageService(prisma, { relogio });
+        const cadastro = await service.cadastrar(usuaria.id, {
+            nome: 'Método Teste',
+            tipo: 'pilula',
+            frequenciaId: 'pilula_21_7',
+            horarios: ['08:00'],
+            dataPrimeiroUso: '2026-09-10'
+        }, { fusoHorario });
+
+        const salvo = await prisma.anticoncepcional.findUnique({ where: { id: cadastro.id } });
+        assert.equal(salvo.dataInicioUso.toISOString(), '2026-09-10T00:00:00.000Z');
+        assert.equal(cadastro.historico.length, 22);
+        assert.equal(cadastro.historico.at(-1).data, '2026-09-10');
+        assert.deepEqual(cadastro.historico.slice(0, 2).map(({ data }) => data), ['2026-10-08', '2026-09-30']);
+        assert.ok(cadastro.historico.every(({ estado, confirmadoEm }) => estado === 'confirmado' && confirmadoEm === null));
+        assert.equal(cadastro.usosHoje[0].status, 'confirmado');
+
+        const [recarregado] = await service.listar(usuaria.id, { fusoHorario });
+        assert.deepEqual(recarregado.historico, cadastro.historico);
+
+        const primeiroUso = recarregado.historico.at(-1);
+        const segundoUso = recarregado.historico.at(-2);
+        await serviceUsos.corrigirHistorico(usuaria.id, cadastro.id, primeiroUso.id, {
+            estado: 'naoUsei', fusoHorario
+        });
+        await serviceUsos.apagarRegistroHistorico(usuaria.id, cadastro.id, segundoUso.id);
+
+        const diaSeguinte = criarContraceptiveService(prisma, () => agora);
+        const [atualizado] = await diaSeguinte.listar(usuaria.id, { fusoHorario });
+        assert.equal(atualizado.historico.at(-1).estado, 'naoUsei');
+        assert.equal(atualizado.historico.some(({ id }) => id === segundoUso.id), false);
+        assert.equal(atualizado.usosHoje[0].data, '2026-10-09');
+        assert.equal(atualizado.usosHoje[0].status, 'pendente');
+
+    } finally {
+        await prisma.$disconnect();
+        removerBancoTemporario(diretorio);
+    }
+});
 
 test('lista registros removidos e só apaga definitivamente os que pertencem à sessão', async () => {
     const { diretorio, caminho } = criarBancoTemporario();
