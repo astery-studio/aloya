@@ -19,6 +19,7 @@ import {
 import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { obterFrequencia, obterTipo } from '../constants/contraceptiveOptions';
+import { estaEmPausa } from '../domain/ContraceptiveSchedule';
 import { estadoRegistroUso } from '../utils/usageHistory';
 import { UsageHistoryPanel } from './UsageHistoryPanel';
 import { criarEstilosCartao } from './ContraceptiveUsageCard.styles';
@@ -508,6 +509,11 @@ function ContraceptiveUsageCard({
                             expandido={historicoExpandido}
                             registros={historico}
                             inicioMedicacao={inicioMedicacao}
+                            diaEmPausa={
+                                inicioMedicacao
+                                    ? (data) => estaEmPausa(data, programacao, frequencia)
+                                    : undefined
+                            }
                             horarios={programacao?.horarios}
                             usosHoje={usos}
                             modo={modoHistorico}

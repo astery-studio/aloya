@@ -13,9 +13,10 @@ const ESTADOS = Object.freeze({
     confirmado: 'Confirmado',
     foraDoPrazo: 'Fora do prazo',
     naoConfirmado: 'Não confirmado',
-    naoUsei: 'Não usei'
+    naoUsei: 'Não usei',
+    pausa: 'Pausa programada'
 });
-const ORDEM_LEGENDA = ['confirmado', 'foraDoPrazo', 'naoUsei', 'naoConfirmado'];
+const LINHAS_LEGENDA = [['confirmado', 'foraDoPrazo'], ['naoUsei', 'naoConfirmado']];
 const MESES = [
     'Janeiro',
     'Fevereiro',
@@ -64,7 +65,7 @@ function ehHoje(ano, numeroMes, dia) {
 }
 
 function UsageCalendar({
-    mes, dias = [], inicioMedicacao, aoMesAnterior, aoProximoMes,
+    mes, dias = [], inicioMedicacao, diaEmPausa, aoMesAnterior, aoProximoMes,
     emEdicao = false, rodapeEdicao, dataSelecionada, datasEditaveis, editarAntesDe, aoSelecionarData
 }) {
     const tema = useTheme();
@@ -85,6 +86,7 @@ function UsageCalendar({
             registros.set(dia, estado);
     });
     const titulo = `${MESES[numeroMes - 1]} ${ano}`;
+    const linhasLegenda = diaEmPausa ? [...LINHAS_LEGENDA, ['pausa']] : LINHAS_LEGENDA;
 
     return (
         <View
@@ -138,10 +140,11 @@ function UsageCalendar({
                     {semanas.map((semana, indiceSemana) => (
                         <View key={`semana-${indiceSemana}`} style={estilosUso.linhaSemana}>
                             {semana.map((dia, indiceDia) => {
-                                const estado = dia ? registros.get(dia) : null;
-                                const rotuloEstado = ESTADOS[estado];
                                 const hoje = ehHoje(ano, numeroMes, dia);
                                 const dataCivil = dia ? `${mes}-${String(dia).padStart(2, '0')}` : null;
+                                const estado = registros.get(dia)
+                                    ?? (dataCivil && diaEmPausa?.(dataCivil) ? 'pausa' : null);
+                                const rotuloEstado = ESTADOS[estado];
                                 const inicio = dia && dataCivil === inicioMedicacao;
                                 const descricaoDia = [rotuloEstado, inicio && 'início da medicação']
                                     .filter(Boolean).join(', ') || 'sem registro';
@@ -171,7 +174,8 @@ function UsageCalendar({
                                             hoje && estilosUso.celulaHoje,
                                             rotuloEstado && estilosUso[`celula_${estado}`],
                                             selecionado && estilosUso.celulaSelecionada,
-                                            selecionado && !rotuloEstado && estilosUso.celulaSelecionadaSemRegistro
+                                            selecionado && !rotuloEstado && estilosUso.celulaSelecionadaSemRegistro,
+                                            selecionado && estado === 'pausa' && estilosUso.celulaPausaSelecionada
                                         ]}
                                     >
                                         {dia ? (
@@ -179,7 +183,8 @@ function UsageCalendar({
                                                 style={[
                                                     estilosUso.numeroDia,
                                                     hoje && estilosUso.numeroDiaHoje,
-                                                    rotuloEstado && estilosUso.diaComEstado
+                                                    rotuloEstado && estilosUso.diaComEstado,
+                                                    estado === 'pausa' && estilosUso.diaComPausa
                                                 ]}
                                             >
                                                 {dia}
@@ -197,12 +202,17 @@ function UsageCalendar({
                 rodapeEdicao && <View style={estilosUso.rodapeEdicao}>{rodapeEdicao}</View>
             ) : (
                 <View testID="usage-calendar-legend" style={estilosUso.legenda}>
-                    {ORDEM_LEGENDA.map((estado) => (
-                        <View key={estado} style={estilosUso.itemLegenda}>
-                            <View
-                                style={[estilosUso.marcadorLegenda, estilosUso[`marcador_${estado}`]]}
-                            />
-                            <Text style={estilosUso.textoLegenda}>{ESTADOS[estado]}</Text>
+                    {linhasLegenda.map((linha) => (
+                        <View key={linha[0]} style={estilosUso.linhaLegenda}>
+                            {linha.map((estado) => (
+                                <View key={estado} style={estilosUso.itemLegenda}>
+                                    <View style={[
+                                        estilosUso.marcadorLegenda,
+                                        estilosUso[`marcador_${estado}`]
+                                    ]} />
+                                    <Text style={estilosUso.textoLegenda}>{ESTADOS[estado]}</Text>
+                                </View>
+                            ))}
                         </View>
                     ))}
                 </View>

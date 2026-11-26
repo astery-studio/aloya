@@ -286,26 +286,24 @@ function criarEstilosUso(tema) {
         celula_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
         celula_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
         celula_naoUsei: { backgroundColor: coresCalendario.naoUsei },
+        celula_pausa: { backgroundColor: interfaceTema.textoSecundario },
+        celulaPausaSelecionada: { borderColor: interfaceTema.fundo },
+        diaComPausa: { color: interfaceTema.fundo },
         // Duas colunas fixam o alinhamento dos marcadores e deixam cada rótulo crescer.
         legenda: {
             width: '100%',
             minHeight: 23,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
-            columnGap: 8,
-            rowGap: 4,
+            gap: 4,
             paddingTop: 8,
             paddingHorizontal: 13
         },
+        linhaLegenda: { flexDirection: 'row', gap: 8 },
         itemLegenda: {
             minHeight: 15,
+            minWidth: 0,
             flexDirection: 'row',
             alignItems: 'flex-start',
-            flexBasis: '46%',
-            flexGrow: 0,
-            flexShrink: 0,
+            flex: 1,
             gap: 4
         },
         marcadorLegenda: {
@@ -320,6 +318,7 @@ function criarEstilosUso(tema) {
         marcador_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
         marcador_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
         marcador_naoUsei: { backgroundColor: coresCalendario.naoUsei },
+        marcador_pausa: { backgroundColor: interfaceTema.textoSecundario },
         textoLegenda: {
             minHeight: 15,
             flexGrow: 0,

@@ -136,6 +136,7 @@ function UsageHistoryPanel({
     expandido = false,
     registros = [],
     inicioMedicacao,
+    diaEmPausa,
     horarios = [],
     usosHoje = [],
     modo = 'lista',
@@ -292,6 +293,7 @@ function UsageHistoryPanel({
         <UsageCalendar
             mes={mes}
             inicioMedicacao={inicioMedicacao}
+            diaEmPausa={diaEmPausa}
             dias={
                 alterado
                     ? [
