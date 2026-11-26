@@ -2,15 +2,20 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 
 import { criarRotasAnticoncepcionais } from '../../../../src/features/contraceptives/routes/contraceptive.routes.js';
+import {
+    criarEdicaoAnticoncepcionalRateLimit,
+    criarUsoAnticoncepcionalRateLimit
+} from '../../../../src/features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 //Inicia uma API temporária e entrega sua URL ao teste.
-async function comApi({autenticado = true}, executar) {
+async function comApi({ autenticado = true, limitarEdicao, limitarUso }, executar) {
     const eventos = [];
     const app = express();
 
-    function autenticar(_requisicao, resposta, proximo) {
+    function autenticar(requisicao, resposta, proximo) {
         eventos.push('autenticar');
 
         if (!autenticado) {
@@ -22,6 +27,7 @@ async function comApi({autenticado = true}, executar) {
             });
         }
 
+        requisicao.usuario = { id: 1 };
         proximo();
     }
 
@@ -69,12 +75,20 @@ async function comApi({autenticado = true}, executar) {
         }
     };
 
+    const usoController = limitarUso ? {
+        definirConfirmacao(_requisicao, resposta) { resposta.status(200).end(); },
+        corrigirHistorico(_requisicao, resposta) { resposta.status(200).end(); },
+        apagarRegistroHistorico(_requisicao, resposta) { resposta.status(204).end(); }
+    } : undefined;
+
     app.use(express.json());
 
     app.use('/api/anticoncepcionais', criarRotasAnticoncepcionais({
         autenticar,
         controller,
-        edicaoRateLimit
+        edicaoRateLimit: limitarEdicao ?? edicaoRateLimit,
+        usoRateLimit: limitarUso,
+        usoController
     }));
 
     const servidor = app.listen(0);
@@ -153,5 +167,24 @@ test('não limita listagem nem cadastro', async () => {
         ]);
 
         assert.equal(eventos.includes('rateLimit'), false);
+    });
+});
+
+test('permite revisar dois meses de histórico mesmo com o limite de edição ocupado', async () => {
+    const logger = { warn() {} };
+    const limitarEdicao = criarEdicaoAnticoncepcionalRateLimit({
+        rateLimit, logger, janelaMs: 60_000, limite: 1
+    });
+    const limitarUso = criarUsoAnticoncepcionalRateLimit({ rateLimit, logger });
+
+    await comApi({ limitarEdicao, limitarUso }, async (url) => {
+        const editar = () => fetch(`${url}/1`, { method: 'PUT' });
+        assert.equal((await editar()).status, 200);
+        assert.equal((await editar()).status, 429);
+
+        for (let id = 1; id <= 62; id += 1) {
+            const resposta = await fetch(`${url}/1/usos/${id}`, { method: 'DELETE' });
+            assert.equal(resposta.status, 204, `Exclusão ${id}`);
+        }
     });
 });

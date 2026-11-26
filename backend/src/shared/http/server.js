@@ -102,6 +102,7 @@ app.use(
         controller: container.contraceptiveController,
         usoController: container.contraceptiveUsageController,
         edicaoRateLimit: container.edicaoAnticoncepcionalRateLimit,
+        usoRateLimit: container.usoAnticoncepcionalRateLimit,
         remocaoRateLimit: container.remocaoAnticoncepcionalRateLimit
     })
 );

@@ -34,7 +34,13 @@ function validarConfiguracao({rateLimit, janelaMs, limite}, operacao) {
 }
 
 //Configura o limite de edições por usuária autenticada.
-function criarEdicaoAnticoncepcionalRateLimit({rateLimit, janelaMs, limite, logger = console}) {
+function criarEdicaoAnticoncepcionalRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console,
+    mensagemLimite = 'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+}) {
     validarConfiguracao({
         rateLimit,
         janelaMs,
@@ -59,10 +65,21 @@ function criarEdicaoAnticoncepcionalRateLimit({rateLimit, janelaMs, limite, logg
             return resposta.status(429).json({
                 erro: {
                     codigo: 'LIMITE_EDICOES_ANTICONCEPCIONAL',
-                    mensagem: 'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
+                    mensagem: mensagemLimite
                 }
             });
         }
+    });
+}
+
+function criarUsoAnticoncepcionalRateLimit({ rateLimit, logger }) {
+    // Cada dia do histórico é alterado individualmente, inclusive ao revisar um mês inteiro.
+    return criarEdicaoAnticoncepcionalRateLimit({
+        rateLimit,
+        logger,
+        janelaMs: 60_000,
+        limite: 120,
+        mensagemLimite: 'Muitas alterações em pouco tempo. Aguarde até um minuto e tente novamente.'
     });
 }
 
@@ -101,5 +118,6 @@ function criarRemocaoAnticoncepcionalRateLimit({rateLimit, janelaMs, limite, log
 
 export {
     criarEdicaoAnticoncepcionalRateLimit,
+    criarUsoAnticoncepcionalRateLimit,
     criarRemocaoAnticoncepcionalRateLimit
 };
