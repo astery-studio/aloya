@@ -109,7 +109,7 @@ function criarContraceptiveService({ requisicaoAutenticada }) {
         });
 
         const salvo = resposta.anticoncepcional;
-        return Array.isArray(salvo.historico)
+        return fusoHorario && Array.isArray(salvo.historico)
             ? normalizarAnticoncepcionalAcompanhamento(salvo)
             : normalizarAnticoncepcional(salvo);
     }
