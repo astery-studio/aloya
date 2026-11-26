@@ -57,6 +57,17 @@ test('DIU hormonal exige validade atual ou futura e dispensa horário', () => {
     ).toBeNull();
 });
 
+test('aceita hoje e datas passadas para o primeiro uso com pausa e rejeita amanhã', () => {
+    const dados = { ...base, frequenciaId: 'pilula_21_7' };
+    const hoje = '2026-09-24';
+
+    expect(validarAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-23' }, hoje)).toBeNull();
+    expect(validarAnticoncepcional({ ...dados, dataPrimeiroUso: hoje }, hoje)).toBeNull();
+    expect(validarAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-25' }, hoje)).toBe(
+        'A data do primeiro uso deve ser hoje ou anterior.'
+    );
+});
+
 test('calcula pausas subsequentes e não cria pausa no uso contínuo', () => {
     const ciclica = obterFrequencia('pilula', 'pilula_21_7');
     expect(calcularPeriodosDePausa('2026-09-01', ciclica, 2)).toEqual([

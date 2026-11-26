@@ -49,3 +49,14 @@ test('exige primeiro uso em frequência com pausa e aplica alerta crítico', () 
     }, hoje);
     assert.equal(dados.intensidade, 'critico');
 });
+
+test('permite cadastrar uso pausado com início hoje e rejeita data futura', () => {
+    const dados = { ...base, frequenciaId: 'pilula_21_7' };
+    const inicioHoje = validarCadastroAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-24' }, hoje);
+    assert.equal(inicioHoje.dataPrimeiroUso.toISOString(), '2026-09-24T00:00:00.000Z');
+
+    assert.throws(
+        () => validarCadastroAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-25' }, hoje),
+        { status: 422, codigo: 'PRIMEIRO_USO_FUTURO' }
+    );
+});
