@@ -16,22 +16,24 @@ const ROTULOS_DAS_FASES = Object.freeze({
     lutea: 'Ilustração da fase lútea'
 });
 
-function CyclePhaseArtwork({ fase }) {
+function CyclePhaseArtwork({ fase, diaCiclo, duracaoCiclo }) {
     const imagem = IMAGENS_DAS_FASES[fase];
 
     if (!imagem) return null;
 
     return (
         <View testID="cycle-phase-artwork" style={estilos.container}>
-            <Image
-                testID="cycle-phase-image"
-                source={imagem}
-                resizeMode="contain"
-                accessibilityLabel={ROTULOS_DAS_FASES[fase]}
-                style={estilos.imagem}
-            />
+            <View testID="cycle-phase-image-mask" style={estilos.mascara}>
+                <Image
+                    testID="cycle-phase-image"
+                    source={imagem}
+                    resizeMode="contain"
+                    accessibilityLabel={ROTULOS_DAS_FASES[fase]}
+                    style={estilos.imagem}
+                />
+            </View>
             <View pointerEvents="none" style={estilos.moldura}>
-                <CyclePhaseFrame fase={fase} />
+                <CyclePhaseFrame fase={fase} diaCiclo={diaCiclo} duracaoCiclo={duracaoCiclo} />
             </View>
         </View>
     );

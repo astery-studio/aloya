@@ -12,9 +12,14 @@ const NOMES_DAS_FASES = Object.freeze({
     desconhecida: 'Seu ciclo'
 });
 
-function CyclePhaseHero({ fase, diaCiclo, janelaFertilAtiva = false, symbol }) {
+function CyclePhaseHero({ fase, diaCiclo, duracaoCiclo, janelaFertilAtiva = false, symbol }) {
     const faseAtual = Object.hasOwn(NOMES_DAS_FASES, fase) ? fase : 'desconhecida';
-    const simboloDaFase = symbol === undefined ? <CyclePhaseArtwork fase={faseAtual} /> : symbol;
+    const simboloDaFase =
+        symbol === undefined ? (
+            <CyclePhaseArtwork fase={faseAtual} diaCiclo={diaCiclo} duracaoCiclo={duracaoCiclo} />
+        ) : (
+            symbol
+        );
 
     return (
         <View style={estilos.container}>
