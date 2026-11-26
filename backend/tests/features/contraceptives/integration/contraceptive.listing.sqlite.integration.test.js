@@ -97,6 +97,38 @@ test('grava os usos confirmados entre o início e hoje e mantém as correções'
         assert.equal(atualizado.usosHoje[0].data, '2026-10-09');
         assert.equal(atualizado.usosHoje[0].status, 'pendente');
 
+        const criarUsoAntesDoInicio = () => serviceUsos.corrigirHistorico(usuaria.id, cadastro.id, undefined, {
+            data: '2026-09-09', horario: '08:00', estado: 'confirmado', fusoHorario
+        });
+        await assert.rejects(criarUsoAntesDoInicio, { status: 422, codigo: 'USO_ANTES_DO_INICIO' });
+
+        const legado = await prisma.usoAnticoncepcional.create({
+            data: {
+                anticoncepcionalId: cadastro.id,
+                dataUsoProgramado: new Date('2026-09-08T00:00:00.000Z'),
+                horarioProgramado: '08:00',
+                statusUso: 'confirmado'
+            }
+        });
+        const corrigido = await serviceUsos.corrigirHistorico(usuaria.id, cadastro.id, legado.id, {
+            estado: 'naoUsei', fusoHorario
+        });
+        assert.equal(corrigido.estado, 'naoUsei');
+        await serviceUsos.apagarRegistroHistorico(usuaria.id, cadastro.id, legado.id);
+
+        const editado = await service.editar(usuaria.id, cadastro.id, {
+            nome: cadastro.nome,
+            tipo: cadastro.tipo,
+            frequenciaId: cadastro.frequenciaId,
+            horarios: cadastro.horarios,
+            intensidadeAlerta: cadastro.intensidadeAlerta,
+            dataPrimeiroUso: '2026-09-09'
+        });
+        assert.deepEqual(editado.periodosPausa[0], { inicio: '2026-09-30', fim: '2026-10-06' });
+
+        const [depoisDaEdicao] = await service.listar(usuaria.id, { fusoHorario });
+        assert.deepEqual(depoisDaEdicao.historico, atualizado.historico);
+        assert.equal((await criarUsoAntesDoInicio()).estado, 'confirmado');
     } finally {
         await prisma.$disconnect();
         removerBancoTemporario(diretorio);

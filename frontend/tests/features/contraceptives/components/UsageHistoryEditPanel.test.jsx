@@ -14,6 +14,43 @@ async function pressionar(nome) {
     await fireEvent.press(screen.getByRole('button', { name: nome }));
 }
 
+test('bloqueia novos usos antes do início e mantém os registros antigos editáveis', async () => {
+    const antigo = { ...registros[0], data: '2026-09-04' };
+    const salvar = jest.fn().mockResolvedValue({});
+    const painel = (inicioMedicacao) => (
+        <UsageHistoryPanel
+            expandido
+            modo="calendario"
+            usoUnicoPorDia
+            inicioMedicacao={inicioMedicacao}
+            horarios={['08:00']}
+            registros={[antigo]}
+            aoSalvarEdicaoHistorico={salvar}
+        />
+    );
+    const { rerender } = await render(painel('2026-09-06'));
+
+    const anterior = screen.getByRole('button', { name: 'Dia 5, antes do início da medicação' });
+    expect(anterior).toBeDisabled();
+    await fireEvent.press(anterior);
+    expect(screen.queryByRole('button', { name: 'Usei' })).toBeNull();
+
+    await pressionar('Dia 4, Confirmado');
+    expect(screen.getByRole('button', { name: 'Apagar registro' })).toBeEnabled();
+    await pressionar('Não usei');
+    await pressionar('Salvar');
+    expect(salvar).toHaveBeenLastCalledWith(antigo, { estado: 'naoUsei' });
+
+    await rerender(painel('2026-09-05'));
+    await pressionar('Dia 5, início da medicação');
+    await pressionar('Usei');
+    await pressionar('Salvar');
+    expect(salvar).toHaveBeenLastCalledWith(
+        expect.objectContaining({ novo: true, data: '2026-09-05' }),
+        { estado: 'confirmado' }
+    );
+});
+
 test('calendário exige um horário quando há duas ocorrências no mesmo dia', async () => {
     const salvar = jest.fn().mockResolvedValue({});
     await render(
@@ -71,7 +108,7 @@ test('explica um limite temporário sem perder o registro selecionado', async ()
     ).toBeOnTheScreen();
 });
 
-test('explica dias indisponíveis e habilita as opções ao tocar em um dia com um único uso', async () => {
+test('desabilita dias sem opções e deixa editar os registros existentes', async () => {
     await render(
         <UsageHistoryPanel
             expandido
@@ -82,11 +119,9 @@ test('explica dias indisponíveis e habilita as opções ao tocar em um dia com 
     );
 
     await pressionar('Alterar Histórico');
-    await pressionar('Dia 5, sem registro');
-
-    expect(screen.getByText('Dia indisponível')).toBeOnTheScreen();
-
-    await pressionar('OK');
+    const indisponivel = screen.getByRole('button', { name: 'Dia 5, sem registro' });
+    expect(indisponivel).toBeDisabled();
+    await fireEvent.press(indisponivel);
     expect(screen.queryByText('Dia indisponível')).toBeNull();
 
     await pressionar('Dia 6, Confirmado');

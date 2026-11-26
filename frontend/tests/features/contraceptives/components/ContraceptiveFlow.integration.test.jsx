@@ -222,6 +222,12 @@ test('edita o dia atual pelo calendário e atualiza o uso pendente do cartão', 
     const pressionar = async (name) => fireEvent.press(screen.getByRole('button', { name }));
 
     await pressionar('Histórico de uso');
+    const amanha = screen.getByRole('button', { name: 'Dia 10, sem registro' });
+    expect(amanha).toBeDisabled();
+    await fireEvent.press(amanha);
+    expect(screen.queryByText('Dia indisponível')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Usei' })).toBeNull();
+
     await pressionar('Dia 9, sem registro');
 
     expect(screen.queryByText('Dia indisponível')).toBeNull();
