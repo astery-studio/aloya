@@ -26,6 +26,7 @@ import LoginScreen from './features/auth/screens/LoginScreen';
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
 import WelcomeScreen from './features/auth/screens/WelcomeScreen';
 import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
+import { CONSULTA_LEGAL_DISPONIVEL } from './features/legal/data/legalConfig';
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
@@ -51,6 +52,10 @@ import { useTheme } from './shared/hooks/useTheme';
 import { obterToken } from './shared/storage/tokenStorage';
 import { fontFamilies } from './shared/theme';
 import { analisarLinkExterno } from './shared/utils/externalLinks';
+
+const PrivacyTermsScreen = __DEV__
+    ? require('./features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen').PrivacyTermsScreen
+    : null;
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
@@ -177,6 +182,8 @@ export default function App() {
     });
 
     const [telaPublica, setTelaPublica] = useState('boasVindas');
+    const [documentoLegal, setDocumentoLegal] = useState(null);
+    const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
 
@@ -638,6 +645,7 @@ export default function App() {
         if (telaPublica === 'cadastro') {
             conteudo = (
                 <OnboardingScreen
+                    aoConsultarDocumentos={consultarDocumentos}
                     cadastrar={configuracao.servicos.authService.cadastrar}
                     verificarEmailDisponivel={
                         configuracao.servicos.authService.verificarEmailDisponivel
@@ -829,6 +837,9 @@ export default function App() {
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = (
             <SettingsScreen
+                onAbrirPoliticasPrivacidade={
+                    consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
+                }
                 onSelecionarAba={selecionarAba}
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
@@ -920,6 +931,12 @@ export default function App() {
                 onAlterado={() => setRevisaoCategoriasDiario((revisao) => revisao + 1)}
                 onSessaoExpirada={finalizarSessao}
             />
+            {PrivacyTermsScreen && documentoLegal !== null && (
+                <PrivacyTermsScreen
+                    documentoInicial={documentoLegal}
+                    onVoltar={() => setDocumentoLegal(null)}
+                />
+            )}
         </>
     );
 }
