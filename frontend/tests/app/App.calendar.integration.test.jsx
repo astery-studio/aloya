@@ -104,6 +104,15 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                         onPress: () => onSelecionarAba('inicio')
                     },
                     ReactInterno.createElement(Text, null, 'Início')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir calendário pelo menu',
+                        onPress: () => onSelecionarAba('calendario')
+                    },
+                    ReactInterno.createElement(Text, null, 'Calendário')
                 )
             )
     };
@@ -253,5 +262,16 @@ describe('App — calendário', () => {
 
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao Início' }));
         expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+    });
+
+    test('abre o calendário pela rota do menu inferior', async () => {
+        await renderApp(<App />);
+
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário pelo menu' }));
+
+        expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-container')).toBeOnTheScreen();
     });
 });

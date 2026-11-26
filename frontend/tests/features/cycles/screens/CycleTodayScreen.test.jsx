@@ -198,14 +198,14 @@ test('encaminha todas as interações da tela carregada', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
     expect(screen.queryByRole('button', { name: 'Abrir parâmetros do ciclo' })).toBeNull();
     await fireEvent.press(screen.getByRole('button', { name: 'qua, dia 14' }));
-    await fireEvent.press(screen.getByRole('tab', { name: 'Ciclos' }));
+    await fireEvent.press(screen.getByRole('tab', { name: 'Calendário' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Diário' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
 
     expect(acoes.aoAbrirHistorico).toHaveBeenCalledTimes(1);
     expect(acoes.aoSelecionarData).toHaveBeenCalledWith('2026-10-14');
-    expect(acoes.aoSelecionarAba).toHaveBeenCalledWith('ciclos');
+    expect(acoes.aoSelecionarAba).toHaveBeenCalledWith('calendario');
     expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
     expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
     expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
