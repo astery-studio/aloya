@@ -68,12 +68,21 @@ jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn((
 jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => {
     const React = require('react');
     const { Pressable } = require('react-native');
-    return jest.fn(({ aoConsultarDocumentos }) =>
-        React.createElement(Pressable, {
-            accessibilityRole: 'link',
-            accessibilityLabel: 'Consultar no cadastro',
-            onPress: () => aoConsultarDocumentos?.('terms')
-        })
+    return jest.fn(({ aoConsultarDocumentos, aoConcluir }) =>
+        React.createElement(
+            React.Fragment,
+            null,
+            React.createElement(Pressable, {
+                accessibilityRole: 'link',
+                accessibilityLabel: 'Consultar no cadastro',
+                onPress: () => aoConsultarDocumentos?.('terms')
+            }),
+            React.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Concluir cadastro de contato',
+                onPress: () => aoConcluir({ tipoUsuario: 'contato_apoio' })
+            })
+        )
     );
 });
 
@@ -213,7 +222,7 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const { Pressable, Text } = require('react-native');
     return {
         CycleTodayContainer: jest.fn(
-            ({ aoAbrirAnticoncepcional, aoAbrirHistorico, aoCadastrarDiario }) =>
+            ({ aoAbrirAnticoncepcional, aoAbrirHistorico, aoCadastrarDiario, aoSelecionarAba }) =>
                 React.createElement(
                     React.Fragment,
                     null,
@@ -235,7 +244,21 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                         accessibilityRole: 'button',
                         accessibilityLabel: 'Cadastrar no Diário',
                         onPress: () => aoCadastrarDiario('2026-11-05')
-                    })
+                    }),
+                    ...[
+                        ['Abrir configurações', 'configuracoes'],
+                        ['Abrir início', 'inicio'],
+                        ['Abrir ciclos', 'ciclos'],
+                        ['Abrir Diário', 'diario'],
+                        ['Abrir membros', 'membros']
+                    ].map(([rotulo, aba]) =>
+                        React.createElement(Pressable, {
+                            key: aba,
+                            accessibilityRole: 'button',
+                            accessibilityLabel: rotulo,
+                            onPress: () => aoSelecionarAba?.(aba)
+                        })
+                    )
                 )
         )
     };
@@ -546,6 +569,10 @@ describe('App integrado', () => {
             await render(<App />);
             if (entrada)
                 await fireEvent.press(await screen.findByRole('button', { name: entrada }));
+            if (sessao)
+                await fireEvent.press(
+                    await screen.findByRole('button', { name: 'Abrir configurações' })
+                );
             const origem = await screen.findByRole(role, { name: nome });
             await fireEvent.press(origem);
             expect(screen.getByRole('tab', { name: aba, selected: true })).toBeOnTheScreen();
@@ -565,14 +592,30 @@ describe('App integrado', () => {
         expect(servicos.accountService.buscarPerfil).not.toHaveBeenCalled();
     });
 
-    test('restaura a sessão, abre configurações e carrega o perfil', async () => {
+    test('abre a Home após concluir o cadastro de uma conta de contato', async () => {
+        obterToken.mockResolvedValue(null);
+
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para cadastro' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir cadastro de contato' }));
+
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+    });
+
+    test('restaura a sessão, abre a Home e carrega o perfil', async () => {
         obterToken.mockResolvedValue({
             token: 'token-valido'
         });
 
         await render(<App />);
 
-        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Abrir configurações'
+            })
+        );
 
         await fireEvent.press(
             screen.getByRole('button', {
@@ -590,6 +633,8 @@ describe('App integrado', () => {
     test('abre os parâmetros pela tela de configurações', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
 
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir parâmetros' }));
         expect(await screen.findByText('Parâmetros integrados')).toBeOnTheScreen();
@@ -831,6 +876,12 @@ describe('App integrado', () => {
 
         await fireEvent.press(
             await screen.findByRole('button', {
+                name: 'Abrir configurações'
+            })
+        );
+
+        await fireEvent.press(
+            await screen.findByRole('button', {
                 name: 'Abrir perfil'
             })
         );
@@ -845,4 +896,25 @@ describe('App integrado', () => {
 
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
     });
+
+    test.each(['principal', 'contato_apoio', 'principal_e_contato_apoio'])(
+        'mantém a Home como primeira tela para o papel %s',
+        async (papel) => {
+            obterToken.mockResolvedValue({ token: 'token-valido' });
+            servicos.accountService.buscarPerfil.mockResolvedValue({
+                id: 1,
+                nome: 'Julia',
+                email: 'julia@email.com',
+                papel
+            });
+
+            await render(<App />);
+
+            expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+            await waitFor(() => {
+                expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
+            });
+            expect(screen.getByText('Ciclo hoje')).toBeOnTheScreen();
+        }
+    );
 });

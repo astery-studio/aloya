@@ -185,7 +185,7 @@ export default function App() {
     const [documentoLegal, setDocumentoLegal] = useState(null);
     const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
-    const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -282,10 +282,6 @@ export default function App() {
 
             if (requisicaoAtual.current === identificador) {
                 setPerfil(perfilRecebido);
-
-                if (perfilRecebido.papel === 'contato_apoio') {
-                    setTelaInterna(telasInternas.membros);
-                }
             }
         } catch (erro) {
             if (erro?.name === 'AbortError') {
@@ -295,7 +291,7 @@ export default function App() {
             if (erro?.status === 401) {
                 setPerfil(null);
 
-                setTelaInterna(telasInternas.configuracoes);
+                setTelaInterna(telasInternas.inicio);
 
                 setTelaPublica('login');
 
@@ -431,7 +427,7 @@ export default function App() {
         setPerfil(null);
         setErroPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
         setCadastroDiarioVisivel(false);
         setCategoriasDiarioVisiveis(false);
         setDataInicialDiario(null);
@@ -441,14 +437,8 @@ export default function App() {
         carregarPerfil();
     }
 
-    function concluirCadastro(dadosCadastro = {}) {
+    function concluirCadastro() {
         concluirAutenticacao();
-
-        setTelaInterna(
-            dadosCadastro.tipoUsuario === 'contato_apoio'
-                ? telasInternas.membros
-                : telasInternas.inicio
-        );
     }
 
     function finalizarSessao(resultado = {}) {
@@ -462,7 +452,7 @@ export default function App() {
         setErroPerfil(false);
         setCarregandoPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
         setCategoriasDiarioVisiveis(false);
 
         setOrigemNovaCategoria(telasInternas.membros);

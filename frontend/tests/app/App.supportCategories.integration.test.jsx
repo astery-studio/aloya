@@ -44,9 +44,25 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => ({
     CycleHistoryFlow: jest.fn(() => null)
 }));
 
-jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => ({
-    CycleTodayContainer: jest.fn(() => null)
-}));
+jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+
+    return {
+        CycleTodayContainer: jest.fn(({ aoSelecionarAba }) =>
+            React.createElement(
+                View,
+                null,
+                React.createElement(Text, null, 'Home'),
+                React.createElement(Pressable, {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Abrir membros',
+                    onPress: () => aoSelecionarAba('membros')
+                })
+            )
+        )
+    };
+});
 
 jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => ({
     ContraceptiveFlow: jest.fn(() => null)
@@ -555,6 +571,9 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
+        expect(await screen.findByText('Home')).toBeOnTheScreen();
+        await abrirMembros();
+
         expect(await screen.findByText('Contatos recebidos')).toBeOnTheScreen();
         expect(screen.getByText('Convites recebidos conectados')).toBeOnTheScreen();
         expect(screen.queryByText('Tela de Membros')).toBeNull();
@@ -572,6 +591,9 @@ describe('fluxos da Rede de Apoio no App', () => {
         criarServicosApp.mockReturnValue(servicos);
 
         await render(<App />);
+
+        expect(await screen.findByText('Home')).toBeOnTheScreen();
+        await abrirMembros();
 
         await fireEvent.press(
             await screen.findByRole('button', {
@@ -595,6 +617,9 @@ describe('fluxos da Rede de Apoio no App', () => {
         criarServicosApp.mockReturnValue(servicos);
 
         await render(<App />);
+
+        expect(await screen.findByText('Home')).toBeOnTheScreen();
+        await abrirMembros();
 
         await fireEvent.press(
             await screen.findByRole('button', {
