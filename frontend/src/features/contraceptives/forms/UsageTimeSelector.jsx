@@ -73,7 +73,12 @@ function UsageTimeSelector({
                     edges={['top', 'left', 'right', 'bottom']}
                     testID="horarios-anticoncepcional-area-segura"
                 >
-                    <Header titulo="Horários de Uso" variante="comVoltar" onVoltar={onFechar} />
+                    <Header
+                        titulo="Horários de Uso"
+                        variante="comVoltar"
+                        onVoltar={onFechar}
+                        aplicarSafeAreaSuperior={false}
+                    />
                     <View style={estilos.conteudoFluxo}>
                         <Text style={estilos.descricaoFluxo}>
                             {permiteMultiplos

@@ -2,9 +2,17 @@
  * Inicializa os fluxos públicos e a área autenticada da aplicação.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, BackHandler, Linking, NativeModules, Text } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    BackHandler,
+    Linking,
+    Text,
+    TurboModuleRegistry
+} from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { DMSans_300Light } from '@expo-google-fonts/dm-sans/300Light';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
 import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
@@ -18,6 +26,7 @@ import LoginScreen from './features/auth/screens/LoginScreen';
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
 import WelcomeScreen from './features/auth/screens/WelcomeScreen';
 import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
+import { CONSULTA_LEGAL_DISPONIVEL } from './features/legal/data/legalConfig';
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
@@ -44,6 +53,10 @@ import { obterToken } from './shared/storage/tokenStorage';
 import { fontFamilies } from './shared/theme';
 import { analisarLinkExterno } from './shared/utils/externalLinks';
 
+const PrivacyTermsScreen = __DEV__
+    ? require('./features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen').PrivacyTermsScreen
+    : null;
+
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     membros: 'membros',
@@ -69,7 +82,8 @@ function obterBaseUrl() {
         return process.env.EXPO_PUBLIC_API_URL;
     }
 
-    const script = NativeModules.SourceCode?.scriptURL || '';
+    const fonte = __DEV__ ? TurboModuleRegistry.get('SourceCode') : null;
+    const script = fonte?.getConstants?.()?.scriptURL ?? fonte?.scriptURL ?? '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
 
@@ -160,6 +174,7 @@ function EstadoCarregamentoApp() {
 // Inicializa fontes, sessão, serviços e navegação provisória entre as telas.
 export default function App() {
     const [fontes, erroFontes] = useFonts({
+        DMSans_300Light,
         DMSans_400Regular,
         DMSans_500Medium,
         DMSans_600SemiBold,
@@ -167,6 +182,8 @@ export default function App() {
     });
 
     const [telaPublica, setTelaPublica] = useState('boasVindas');
+    const [documentoLegal, setDocumentoLegal] = useState(null);
+    const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
 
@@ -628,6 +645,7 @@ export default function App() {
         if (telaPublica === 'cadastro') {
             conteudo = (
                 <OnboardingScreen
+                    aoConsultarDocumentos={consultarDocumentos}
                     cadastrar={configuracao.servicos.authService.cadastrar}
                     verificarEmailDisponivel={
                         configuracao.servicos.authService.verificarEmailDisponivel
@@ -649,13 +667,14 @@ export default function App() {
                         setTelaInterna(telasInternas.cadastrarMenstruacao);
                     }}
                     service={configuracao.servicos.cyclePredictionService}
+                    diaryService={configuracao.servicos.diaryService}
                     aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
                     aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
                     aoCadastrarDiario={(data) => {
                         setDataInicialDiario(data);
                         setCadastroDiarioVisivel(true);
                     }}
-                    aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
+                    aoAbrirHistorico={() => setTelaInterna(telasInternas.ciclos)}
                     aoSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />
@@ -818,6 +837,9 @@ export default function App() {
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = (
             <SettingsScreen
+                onAbrirPoliticasPrivacidade={
+                    consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
+                }
                 onSelecionarAba={selecionarAba}
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
@@ -909,6 +931,12 @@ export default function App() {
                 onAlterado={() => setRevisaoCategoriasDiario((revisao) => revisao + 1)}
                 onSessaoExpirada={finalizarSessao}
             />
+            {PrivacyTermsScreen && documentoLegal !== null && (
+                <PrivacyTermsScreen
+                    documentoInicial={documentoLegal}
+                    onVoltar={() => setDocumentoLegal(null)}
+                />
+            )}
         </>
     );
 }

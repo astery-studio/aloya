@@ -187,10 +187,13 @@ describe('CalendarScreen', () => {
         const cabecalho = within(screen.getByTestId('header-content'));
         expect(cabecalho.getByText('Calendário')).toBeOnTheScreen();
         expect(cabecalho.getByTestId('confidence-badge')).toBeOnTheScreen();
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
         expect(screen.getByTestId('header-content')).toHaveStyle({
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            paddingBottom: 16
         });
+        expect(estilos.conteudo).toMatchObject({ paddingTop: 8 });
         expect(screen.queryByTestId('status-sincronizacao-calendario')).toBeNull();
         expect(screen.getByRole('button', { name: 'Cadastrar menstruação' })).toBeOnTheScreen();
         expect(screen.getByTestId('bottom-tab-bar')).toBeOnTheScreen();
@@ -303,13 +306,12 @@ describe('CalendarScreen', () => {
     });
 
     test('prioriza o aviso de sincronização sobre o aviso de ciclo vazio', async () => {
-        await render(
-            <CalendarScreen
-                meses={[{ mes: '2026-10', possuiCiclos: false }]}
-                statusSincronizacao="pendente"
-                aoCadastrarMenstruacao={jest.fn()}
-            />
-        );
+        const propriedades = {
+            meses: [{ mes: '2026-10', possuiCiclos: false }],
+            statusSincronizacao: 'pendente',
+            aoCadastrarMenstruacao: jest.fn()
+        };
+        const { rerender } = await render(<CalendarScreen {...propriedades} />);
 
         expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
         expect(screen.getByText(/Sincronização pendente/u)).toBeOnTheScreen();
@@ -320,6 +322,12 @@ describe('CalendarScreen', () => {
             left: estilos.posicionadorAvisoVazio.left,
             paddingHorizontal: estilos.posicionadorAvisoVazio.paddingHorizontal
         });
+        expect(screen.getByTestId('calendar-add-fab')).toBeOnTheScreen();
+
+        await rerender(<CalendarScreen {...propriedades} carregando />);
+
+        expect(screen.getByTestId('status-sincronizacao-calendario')).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-add-fab')).toBeNull();
     });
 
     test('mantém a falha como aviso prioritário entre os estados de sincronização', async () => {

@@ -66,7 +66,12 @@ test('reproduz as medidas exatas definidas para HU-019 e HU-023', () => {
 test('reproduz as medidas exatas definidas para HU-011', () => {
     expect(variantes.diasMenstruacao.container).toMatchObject({ width: 143.41, height: 30.88 });
     expect(variantes.diasCiclo.container).toMatchObject({ width: 146, height: 30.88 });
-    expect(variantes.estimativaIncerta.container).toMatchObject({ width: 316.62, height: 52.41 });
+    expect(variantes.estimativaIncerta.container).toMatchObject({
+        width: 316.62,
+        maxWidth: '100%',
+        height: 'auto',
+        minHeight: 42.41
+    });
 });
 
 test('usa o glifo de nove pixels especificado para os estados com marcador', async () => {
@@ -126,11 +131,21 @@ test('preserva o comportamento e as dimensões das variantes de outras HUs', asy
     expect(screen.getByText('29 dias')).toHaveProp('numberOfLines', 1);
     expect(screen.getByText('29 dias')).toHaveStyle({ width: 45, height: 20 });
     await rerender(<StatusBadge estado="estimativaIncerta" />);
-    expect(screen.getByText('Estimativa incerta')).toHaveStyle({ height: 17 });
-    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toHaveProp(
-        'numberOfLines',
-        1
+    expect(screen.getByText('Estimativa incerta')).toHaveStyle({
+        minHeight: 17,
+        color: '#D68C3A',
+        fontSize: 12,
+        lineHeight: 17
+    });
+    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).not.toHaveProp(
+        'numberOfLines'
     );
+    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toHaveStyle({
+        width: '100%',
+        height: 'auto',
+        flexShrink: 1,
+        fontFamily: 'DMSans_300Light'
+    });
     await rerender(<StatusBadge estado="emAndamento" />);
     expect(screen.getByLabelText('Em andamento')).toHaveStyle(variantes.confirmado.container);
     expect(screen.getByText('Em andamento')).toHaveProp('numberOfLines', 1);

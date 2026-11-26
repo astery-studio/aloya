@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 jest.mock('../../../../src/features/diary/config/diaryOptionPresentation', () => ({
     obterApresentacaoOpcao: jest.fn()
@@ -54,53 +55,155 @@ describe('campos tipados do Diário', () => {
                 valor="36,5"
                 aoAlterar={aoAlterar}
                 erro="Erro"
+                paleta="corpo"
             />
         );
         const entrada = screen.getByLabelText('Temperatura basal');
         expect(entrada).toHaveProp('accessibilityValue', { min: 32, max: 42, now: 36.5 });
+        expect(entrada).not.toHaveProp('placeholder');
+        expect(entrada).toHaveStyle({
+            color: '#2C4C3B',
+            height: 24,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
+        expect(screen.getByText('°C')).toHaveStyle({
+            color: '#2C4C3B',
+            fontSize: 13,
+            fontWeight: '700',
+            lineHeight: 24
+        });
         await fireEvent.changeText(entrada, '37,1');
         expect(aoAlterar).toHaveBeenCalledWith('37,1');
-        await resultado.rerender(<DiaryCategoryField categoria={peso} valor={null} />);
+        await resultado.rerender(
+            <DiaryCategoryField categoria={peso} valor={null} paleta="corpo" />
+        );
         expect(screen.getByLabelText('Peso')).toHaveProp('accessibilityValue', {});
+        expect(screen.getByLabelText('Peso')).not.toHaveProp('placeholder');
+        expect(screen.getByTestId('placeholder-campo-numero')).toHaveTextContent('0 kg');
+        expect(screen.getByTestId('placeholder-campo-numero')).toHaveStyle({
+            color: '#2C4C3B',
+            height: 24,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
+        expect(screen.getByText('kg')).toHaveStyle({
+            color: '#2C4C3B',
+            fontWeight: '700'
+        });
     });
 
     test('renderiza duração e encaminha seu erro', async () => {
-        await render(<DiaryCategoryField categoria={sono} valor={80} erro="Duração inválida" />);
+        const resultado = await render(
+            <DiaryCategoryField
+                categoria={sono}
+                valor={80}
+                erro="Duração inválida"
+                paleta="energia"
+            />
+        );
+        expect(screen.getByLabelText('Minutos de sono')).toHaveStyle({
+            color: '#B07D2A',
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
+        expect(screen.getByText('horas')).toHaveStyle({
+            color: '#B07D2A',
+            fontSize: 13,
+            fontWeight: '700',
+            lineHeight: 24
+        });
+        expect(screen.getByText('minutos')).toHaveStyle({
+            color: '#B07D2A',
+            fontWeight: '700'
+        });
         expect(screen.getByRole('alert')).toHaveTextContent('Duração inválida');
+
+        await resultado.rerender(
+            <DiaryCategoryField categoria={sono} valor={null} paleta="energia" />
+        );
+        expect(screen.getByLabelText('Horas de sono')).not.toHaveProp('placeholder');
+        expect(screen.getByTestId('placeholder-tempo-sono')).toHaveTextContent(
+            '00 horas 00 minutos'
+        );
+        expect(screen.getByTestId('placeholder-tempo-sono')).toHaveStyle({
+            color: '#B07D2A',
+            height: 24,
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
+            textAlign: 'center'
+        });
     });
 
     test('renderiza anotação longa com contador em tempo real', async () => {
         const aoAlterar = jest.fn();
         const resultado = await render(
-            <DiaryCategoryField categoria={nota} valor="Olá" aoAlterar={aoAlterar} paleta="saude" />
+            <DiaryCategoryField
+                categoria={nota}
+                valor="Olá"
+                aoAlterar={aoAlterar}
+                paleta="saude"
+                exibirDivisor
+            />
         );
-        const entrada = screen.getByLabelText('Digite aqui sua nota...');
-        expect(screen.getByTestId('divisor-anotacao-livre')).toBeOnTheScreen();
+        const entrada = screen.getByLabelText('Digite aqui sua nota…');
+        expect(screen.getByTestId('divisor-categoria-anotacao_livre')).toHaveStyle({
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: '#E6E2D8'
+        });
         expect(entrada).toHaveProp('scrollEnabled', false);
         expect(entrada).toHaveStyle({
             minHeight: 24,
             height: 24,
             fontSize: 13,
-            textAlign: 'justify',
+            paddingHorizontal: 32,
+            textAlign: 'center',
             textAlignVertical: 'top',
             color: '#4A5899'
         });
-        await fireEvent(entrada, 'contentSizeChange', {
-            nativeEvent: { contentSize: { height: 100 } }
+        expect(screen.getByTestId('container-campo-texto')).toHaveStyle({
+            height: 36,
+            paddingTop: 0
         });
-        expect(entrada).toHaveStyle({ height: 100 });
-        await fireEvent(entrada, 'contentSizeChange', {
-            nativeEvent: { contentSize: { height: 300 } }
+        await fireEvent(screen.getByTestId('medidor-anotacao-livre'), 'textLayout', {
+            nativeEvent: { lines: [{}, {}, {}, {}] }
         });
-        expect(entrada).toHaveStyle({ height: 300 });
+        expect(entrada).toHaveStyle({ height: 96 });
+        expect(screen.getByTestId('container-campo-texto')).toHaveStyle({ height: 108 });
+        await fireEvent(screen.getByTestId('medidor-anotacao-livre'), 'textLayout', {
+            nativeEvent: { lines: Array.from({ length: 12 }, () => ({})) }
+        });
+        expect(entrada).toHaveStyle({ height: 288 });
         expect(screen.getByText('3 / 5000')).toBeOnTheScreen();
         expect(screen.getByText('3 / 5000')).toHaveStyle({ color: '#4A5899' });
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar anotação livre' }));
         expect(aoAlterar).toHaveBeenLastCalledWith('');
         expect(entrada).toHaveStyle({ height: 24 });
         await fireEvent.changeText(entrada, 'Nova nota');
-        await resultado.rerender(<DiaryCategoryField categoria={nota} valor={null} />);
-        expect(screen.getByLabelText('Digite aqui sua nota...')).toHaveStyle({
+        await resultado.rerender(
+            <DiaryCategoryField categoria={nota} valor={null} paleta="saude" />
+        );
+        expect(screen.getByLabelText('Digite aqui sua nota…')).toHaveStyle({
+            textAlign: 'center'
+        });
+        expect(screen.getByTestId('placeholder-anotacao-livre')).toHaveTextContent(
+            'Digite aqui sua nota…'
+        );
+        expect(screen.getByTestId('placeholder-anotacao-livre')).toHaveStyle({
+            position: 'absolute',
+            right: 83,
+            top: 5.995,
+            color: '#4A5899',
+            fontSize: 13,
+            fontWeight: '400',
+            lineHeight: 24,
             textAlign: 'center'
         });
         expect(screen.getByText('0 / 5000')).toBeOnTheScreen();

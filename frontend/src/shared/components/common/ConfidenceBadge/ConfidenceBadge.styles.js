@@ -12,6 +12,7 @@ function criarEstilos(tema) {
 
         simples: {
             height: 34,
+            minWidth: 112.33,
             maxWidth: '100%',
             flexDirection: 'row',
             alignItems: 'center',
@@ -93,19 +94,19 @@ function criarEstilos(tema) {
         : Object.freeze({
               alta: Object.freeze({
                   cor: '#2C4C3B',
-                  fundo: 'rgba(44, 76, 59, 0.14)',
+                  fundo: 'rgba(44, 76, 59, 0.1)',
                   borda: 'rgba(44, 76, 59, 0.333)'
               }),
 
               media: Object.freeze({
-                  cor: '#8A5A12',
-                  fundo: 'rgba(214, 140, 58, 0.14)',
+                  cor: '#D68C3A',
+                  fundo: 'rgba(214, 140, 58, 0.1)',
                   borda: 'rgba(214, 140, 58, 0.333)'
               }),
 
               baixa: Object.freeze({
-                  cor: '#A43F2C',
-                  fundo: 'rgba(200, 90, 68, 0.14)',
+                  cor: '#C85A44',
+                  fundo: 'rgba(200, 90, 68, 0.1)',
                   borda: 'rgba(200, 90, 68, 0.333)'
               })
           });

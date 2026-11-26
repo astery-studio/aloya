@@ -11,15 +11,38 @@ function CycleDateStrip({
     dataSelecionada,
     aoSelecionarData,
     aoCarregarAnteriores,
-    aoCarregarPosteriores
+    aoCarregarPosteriores,
+    semCiclo = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const carregamentos = useRef({ anteriores: false, posteriores: false });
+    const lista = useRef(null);
+    const dataTocada = useRef(null);
+    const selecaoPosicionada = useRef(null);
 
     useEffect(() => {
         carregamentos.current = { anteriores: false, posteriores: false };
     }, [dias]);
+
+    useEffect(() => {
+        const anterior = selecaoPosicionada.current;
+        if (anterior && anterior.data === dataSelecionada && anterior.semCiclo === semCiclo) return;
+
+        const indice = dias.findIndex(({ data }) => data === dataSelecionada);
+        if (indice < 0) return;
+
+        selecaoPosicionada.current = { data: dataSelecionada, semCiclo };
+        const tocouNoDia = dataTocada.current === dataSelecionada;
+        dataTocada.current = null;
+        if (!tocouNoDia) {
+            lista.current?.scrollToIndex({
+                index: indice,
+                animated: true,
+                viewPosition: semCiclo ? 0 : 0.5
+            });
+        }
+    }, [dataSelecionada, dias, semCiclo]);
 
     function carregarBordas({ nativeEvent }) {
         const { x } = nativeEvent.contentOffset;
@@ -39,8 +62,16 @@ function CycleDateStrip({
         }
     }
 
+    function recuperarRolagem({ index, averageItemLength }) {
+        lista.current?.scrollToOffset({
+            offset: Math.max(0, index * (averageItemLength || LARGURA_ITEM)),
+            animated: true
+        });
+    }
+
     return (
         <FlatList
+            ref={lista}
             horizontal
             data={dias}
             keyExtractor={(item) => item.data}
@@ -53,62 +84,75 @@ function CycleDateStrip({
             maxToRenderPerBatch={10}
             windowSize={5}
             maintainVisibleContentPosition={{ minIndexForVisible: 1 }}
+            onScrollToIndexFailed={recuperarRolagem}
             onScrollEndDrag={carregarBordas}
             onMomentumScrollEnd={carregarBordas}
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
-            style={estilos.container}
+            style={[estilos.container, semCiclo && estilos.containerSemCiclo]}
             contentContainerStyle={estilos.faixa}
             accessibilityLabel="Datas do ciclo"
             renderItem={({ item }) => {
                 const selecionado = item.data === dataSelecionada;
+                const interiorSemFundo = semCiclo || selecionado;
                 return (
                     <Pressable
                         key={item.data}
                         accessibilityRole="button"
                         accessibilityLabel={`${item.semana}, dia ${item.dia ?? '?'}`}
                         accessibilityState={{ selected: selecionado }}
-                        onPress={() => aoSelecionarData?.(item.data)}
+                        onPress={() => {
+                            if (!aoSelecionarData || selecionado) return;
+                            dataTocada.current = item.data;
+                            aoSelecionarData(item.data);
+                        }}
                         style={[
                             estilos.dia,
-                            !selecionado && estilos.diaNaoSelecionado,
+                            semCiclo ? estilos.dia_desconhecida : estilos[`dia_${item.fase}`],
+                            semCiclo && estilos.diaSemCiclo,
                             selecionado && estilos.diaSelecionado,
-                            selecionado && estilos[`diaSelecionado_${item.fase}`]
+                            selecionado &&
+                                (semCiclo || item.fase === 'desconhecida') &&
+                                estilos.diaSelecionadoDesconhecida
                         ]}
                     >
-                        <Text
-                            style={[
-                                estilos.semana,
-                                selecionado && estilos.semanaSelecionada,
-                                selecionado &&
-                                    item.fase === 'desconhecida' &&
-                                    estilos.textoSelecionadoDesconhecido
-                            ]}
-                        >
-                            {item.semana}
-                        </Text>
-                        <Text
-                            style={[
-                                estilos.textoNumero,
-                                selecionado && estilos.numeroSelecionado,
-                                selecionado &&
-                                    item.fase === 'desconhecida' &&
-                                    estilos.textoSelecionadoDesconhecido
-                            ]}
-                        >
-                            {item.dia ?? '?'}
-                        </Text>
                         <View
-                            testID={`indicador-${item.data}`}
                             style={[
-                                estilos.indicador,
-                                item.hoje && estilos.indicadorHoje,
-                                selecionado && estilos.indicadorSelecionado,
-                                selecionado &&
-                                    item.fase === 'desconhecida' &&
-                                    estilos.indicadorSelecionadoDesconhecido
+                                estilos.interior,
+                                interiorSemFundo && estilos.interiorSelecionado
                             ]}
-                        />
+                        >
+                            <View
+                                testID={`fundo-dia-${item.data}`}
+                                pointerEvents="none"
+                                style={[
+                                    estilos.fundoInterior,
+                                    interiorSemFundo && estilos.fundoInteriorOculto
+                                ]}
+                            />
+                            <Text
+                                style={[estilos.semana, selecionado && estilos.semanaSelecionada]}
+                            >
+                                {item.semana}
+                            </Text>
+                            <Text
+                                style={[
+                                    estilos.textoNumero,
+                                    selecionado && estilos.numeroSelecionado
+                                ]}
+                            >
+                                {item.dia ?? '?'}
+                            </Text>
+                            <View
+                                testID={`indicador-${item.data}`}
+                                style={[
+                                    estilos.indicador,
+                                    item.hoje && estilos.indicadorHoje,
+                                    selecionado && estilos.indicadorSelecionado,
+                                    item.hoje && selecionado && estilos.indicadorHojeSelecionado
+                                ]}
+                            />
+                        </View>
                     </Pressable>
                 );
             }}

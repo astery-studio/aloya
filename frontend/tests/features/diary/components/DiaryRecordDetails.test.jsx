@@ -7,7 +7,6 @@ import {
     formatarDuracao,
     normalizarDetalhe,
     obterCoresCategoria,
-    precisaAtivarRolagem,
     valorEscalado
 } from '../../../../src/features/diary/components/DiaryRecordDetails/DiaryRecordDetails';
 import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
@@ -42,13 +41,6 @@ const registro = {
 };
 
 describe('DiaryRecordDetails', () => {
-    test('habilita rolagem somente quando o conteúdo ultrapassa a área visível', () => {
-        expect(precisaAtivarRolagem(400, 500)).toBe(false);
-        expect(precisaAtivarRolagem(501, 500)).toBe(false);
-        expect(precisaAtivarRolagem(503, 500)).toBe(true);
-        expect(precisaAtivarRolagem(600, 0)).toBe(false);
-    });
-
     test('apresenta detalhe autorizado e ações contextualizadas', async () => {
         const aoEditar = jest.fn();
         const aoExcluir = jest.fn();
@@ -62,17 +54,13 @@ describe('DiaryRecordDetails', () => {
             />
         );
 
-        const detalhes = screen.getByTestId('diary-record-details');
-        expect(detalhes).toHaveProp('scrollEnabled', false);
-        await fireEvent(detalhes, 'layout', { nativeEvent: { layout: { height: 500 } } });
-        await fireEvent(screen.getByTestId('diary-details-end'), 'layout', {
-            nativeEvent: { layout: { y: 430, height: 52 } }
-        });
-        expect(screen.getByTestId('diary-record-details')).toHaveProp('scrollEnabled', false);
-        await fireEvent(screen.getByTestId('diary-details-end'), 'layout', {
-            nativeEvent: { layout: { y: 451, height: 52 } }
-        });
-        expect(screen.getByTestId('diary-record-details')).toHaveProp('scrollEnabled', true);
+        expect(screen.getByTestId('diary-details-header')).toHaveStyle({ gap: 0 });
+        expect(screen.getByTestId('diary-details-footer')).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-details-scroll')).toHaveProp('scrollEnabled', true);
+        expect(screen.getByTestId('diary-details-scroll')).toHaveProp('nestedScrollEnabled', true);
+        expect(screen.getByTestId('diary-details-scroll').props.contentContainerStyle).toEqual(
+            expect.objectContaining({ paddingTop: 12 })
+        );
 
         expect(screen.getByText('Espinhas')).toBeOnTheScreen();
         expect(screen.getByText('8 horas e 20 minutos')).toBeOnTheScreen();
@@ -92,19 +80,66 @@ describe('DiaryRecordDetails', () => {
             fontSize: 17,
             lineHeight: 22
         });
-        expect(screen.getByText('28/10/2026')).toHaveStyle({ fontSize: 14, lineHeight: 26 });
+        expect(screen.getByTestId('diary-date-navigator')).toHaveStyle({
+            width: 294,
+            maxWidth: '100%',
+            marginTop: 12,
+            padding: 2,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: 5
+        });
+        expect(screen.getByText('28/10/2026')).toHaveStyle({
+            color: '#5C5C59',
+            fontSize: 14,
+            fontWeight: '600',
+            lineHeight: 25.5
+        });
+        expect(screen.getByTestId('diary-date-arrow-icon-anterior')).toHaveProp('width', 16.47);
+        expect(screen.getByTestId('diary-date-arrow-icon-anterior')).toHaveProp('height', 16.47);
         expect(screen.getByText('No dia 21 do seu ciclo 03 você registrou:')).toBeOnTheScreen();
         expect(screen.getByRole('header', { name: 'PELE' })).toHaveStyle({
             fontSize: 10,
             lineHeight: 15
         });
         expect(screen.getByText('ALTERAÇÃO DO REGISTRO')).toHaveStyle({ color: '#2C4C3B' });
-        expect(screen.getByText('Espinhas')).toHaveStyle({ fontSize: 8.56, lineHeight: 16 });
+        expect(screen.getByText('Espinhas')).toHaveStyle({
+            fontSize: 8.56,
+            fontWeight: '600',
+            lineHeight: 16.5
+        });
         expect(screen.getByRole('button', { name: 'Editar registro de 28/10/2026' })).toHaveStyle({
             height: 35.99,
             borderRadius: 20
         });
+        expect(screen.getByText('Editar')).toHaveStyle({
+            color: '#FFF',
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            textAlign: 'center'
+        });
+        expect(screen.getByLabelText('Fase Lútea')).toHaveStyle({
+            alignSelf: 'stretch',
+            height: 35.993,
+            paddingHorizontal: 14,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 6,
+            borderRadius: 10,
+            backgroundColor: 'rgba(214, 140, 58, 0.20)'
+        });
+        expect(screen.getByText('Fase Lútea')).toHaveStyle({
+            color: '#D68C3A',
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5
+        });
+        expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('width', 13);
+        expect(screen.getByTestId('diary-phase-badge-icon')).toHaveProp('height', 13);
         expect(screen.getByRole('button', { name: 'OK' })).toHaveStyle({
+            width: 294,
+            maxWidth: '100%',
             height: 52,
             borderRadius: 12
         });

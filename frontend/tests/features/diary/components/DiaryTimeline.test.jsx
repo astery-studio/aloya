@@ -2,6 +2,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import { DiaryTimeline } from '../../../../src/features/diary/components/DiaryTimeline/DiaryTimeline';
+import { criarEstilos } from '../../../../src/features/diary/components/DiaryTimeline/DiaryTimeline.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const registros = [
@@ -38,6 +40,14 @@ const registros = [
 ];
 
 describe('DiaryTimeline', () => {
+    test('alinha a bolinha ao início da margem lateral da tela', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.trilho.alignItems).toBe('flex-start');
+        expect(estilos.linhaSuperior.left).toBe(24.5);
+        expect(estilos.linhaInferior.left).toBe(24.5);
+    });
+
     test('virtualiza registros e solicita a próxima página quando permitido', async () => {
         const aoCarregarMais = jest.fn();
         await render(
@@ -97,6 +107,25 @@ describe('DiaryTimeline', () => {
             screen.getByRole('button', { name: 'Tentar carregar mais registros novamente' })
         );
         expect(tentar).toHaveBeenCalledTimes(1);
+    });
+
+    test('centraliza a bolinha e o conector pela altura real de cada card', async () => {
+        await render(<DiaryTimeline registros={registros} />);
+
+        const cartoes = screen.getAllByTestId('diary-timeline-card-layout');
+        const marcadores = screen.getAllByTestId('diary-timeline-marker', {
+            includeHiddenElements: true
+        });
+        const conectores = screen.getAllByTestId('diary-timeline-horizontal-connector', {
+            includeHiddenElements: true
+        });
+
+        await fireEvent(cartoes[0], 'layout', {
+            nativeEvent: { layout: { width: 281, height: 200 } }
+        });
+
+        expect(marcadores[0]).toHaveStyle({ top: 75 });
+        expect(conectores[0]).toHaveStyle({ top: 99.5 });
     });
 
     test('aceita lista vazia, dados inválidos e componentes auxiliares', async () => {

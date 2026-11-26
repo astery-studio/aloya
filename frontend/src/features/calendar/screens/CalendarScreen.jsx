@@ -240,6 +240,7 @@ function CalendarScreen({
                         <ConfidenceBadge
                             nivel={confiancaValida}
                             variante="simples"
+                            estilo={estilos.tagConfianca}
                             onPress={() => setConfiancaVisivel(true)}
                             rotuloAcessibilidade="Explicar confiabilidade do calendário"
                             coresPersonalizadas={

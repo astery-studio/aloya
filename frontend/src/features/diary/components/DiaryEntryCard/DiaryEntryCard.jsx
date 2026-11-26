@@ -4,9 +4,9 @@ import { Pressable, Text, View } from 'react-native';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
-    ArrowsClockwiseIcon,
     NotebookIcon,
     PencilSimpleIcon,
+    RepeatIcon,
     TrashIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -105,6 +105,10 @@ function normalizarRegistro(registro, tema) {
         ...registro,
         dataFormatada,
         apresentacaoFase: fase,
+        diaCiclo:
+            Number.isSafeInteger(registro.diaCiclo) && registro.diaCiclo > 0
+                ? registro.diaCiclo
+                : null,
         principais,
         maisQuantidade:
             quantidadeAdicionalRecebida + Math.max(0, principaisValidos.length - principais.length),
@@ -123,6 +127,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
     const bloqueado = acaoEmAndamento !== null;
     const podeAbrir = typeof aoAbrir === 'function' && !bloqueado;
     const { cor, rotulo } = item.apresentacaoFase;
+    const rotuloFase = item.diaCiclo ? `${rotulo} - Dia ${item.diaCiclo} do Ciclo` : rotulo;
     const possuiCategoriasPublicas = item.principais.length > 0 || item.maisQuantidade > 0;
     const possuiResumoPublico = possuiCategoriasPublicas || Boolean(item.trechoAnotacao);
     const chipsResumo = [
@@ -132,7 +137,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
             principal
         })),
         ...(item.maisQuantidade
-            ? [{ chave: 'mais-categorias', texto: `+ ${item.maisQuantidade}`, contador: true }]
+            ? [{ chave: 'mais-categorias', texto: String(item.maisQuantidade), contador: true }]
             : [])
     ];
     const linhasChips = organizarChipsEmLinhas(chipsResumo);
@@ -145,19 +150,27 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
     return (
         <View testID="diary-entry-card" style={estilos.cartao}>
             <View style={estilos.cabecalho}>
-                <View
-                    testID="diary-entry-icon"
-                    style={[
-                        estilos.iconeRegistro,
-                        {
-                            borderColor: cor,
-                            backgroundColor: item.apresentacaoFase.fundoIcone
-                        }
-                    ]}
-                >
-                    <NotebookIcon size={13} color={cor} weight="regular" />
+                <View testID="diary-entry-header-leading" style={estilos.lateralCabecalho}>
+                    <View
+                        testID="diary-entry-icon"
+                        style={[
+                            estilos.iconeRegistro,
+                            {
+                                borderColor: cor,
+                                backgroundColor: item.apresentacaoFase.fundoIcone
+                            }
+                        ]}
+                    >
+                        <NotebookIcon
+                            testID="diary-entry-notebook-icon"
+                            size={13}
+                            color={cor}
+                            weight="regular"
+                        />
+                    </View>
                 </View>
                 <Pressable
+                    testID="diary-entry-date-area"
                     accessibilityRole="button"
                     accessibilityLabel={`Abrir registro de ${item.dataFormatada}${resumoAcessivel ? `. ${resumoAcessivel}` : ''}`}
                     accessibilityState={{ disabled: !podeAbrir }}
@@ -167,7 +180,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                 >
                     <Text style={estilos.data}>{item.dataFormatada}</Text>
                 </Pressable>
-                <View style={estilos.acoes}>
+                <View testID="diary-entry-header-actions" style={estilos.acoes}>
                     <IconButton
                         icone={PencilSimpleIcon}
                         compacto
@@ -204,7 +217,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                     {possuiCategoriasPublicas ? (
                         <>
                             <Text style={estilos.rotuloSecao}>CATEGORIAS MARCADAS</Text>
-                            <View style={estilos.chips}>
+                            <View testID="diary-entry-chips" style={estilos.chips}>
                                 {linhasChips.map((linha, indiceLinha) => (
                                     <View
                                         key={`linha-${indiceLinha}`}
@@ -234,8 +247,15 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                         </>
                     ) : null}
 
+                    {possuiCategoriasPublicas && item.trechoAnotacao ? (
+                        <View
+                            testID="diary-entry-categories-note-divider"
+                            style={estilos.divisorConteudo}
+                        />
+                    ) : null}
+
                     {item.trechoAnotacao ? (
-                        <View style={estilos.anotacao}>
+                        <View testID="diary-entry-note" style={estilos.anotacao}>
                             <Text style={estilos.rotuloSecao}>ANOTAÇÃO DO DIA</Text>
                             <Text numberOfLines={3} style={estilos.textoAnotacao}>
                                 {item.trechoAnotacao}
@@ -245,13 +265,21 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                 </Pressable>
             ) : null}
 
-            <View
-                accessible
-                accessibilityLabel={rotulo}
-                style={[estilos.fase, { backgroundColor: item.apresentacaoFase.fundo }]}
-            >
-                <ArrowsClockwiseIcon size={13} color={cor} />
-                <Text style={[estilos.textoFase, { color: cor }]}>{rotulo}</Text>
+            <View testID="diary-entry-phase-section" style={estilos.containerFase}>
+                <View
+                    accessible
+                    accessibilityLabel={rotuloFase}
+                    style={[estilos.fase, { backgroundColor: item.apresentacaoFase.fundo }]}
+                >
+                    <RepeatIcon
+                        testID="diary-entry-phase-tag-icon"
+                        size={13}
+                        width={13}
+                        height={13}
+                        color={cor}
+                    />
+                    <Text style={[estilos.textoFase, { color: cor }]}>{rotuloFase}</Text>
+                </View>
             </View>
         </View>
     );

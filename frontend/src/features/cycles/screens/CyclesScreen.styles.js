@@ -7,6 +7,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         conteudo: {
             paddingHorizontal: tema.espacamentos.grande,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.extraGrande
         },
 

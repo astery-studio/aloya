@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
+import { espacamentosLayout } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     conteudo: {
         width: '100%',
-        paddingTop: 8,
+        paddingTop: espacamentosLayout.headerParaConteudo,
         paddingBottom: 24
     },
 

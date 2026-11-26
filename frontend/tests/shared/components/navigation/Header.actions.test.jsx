@@ -1,18 +1,34 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Pressable, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Header } from '../../../../src/shared/components/navigation/Header/Header';
 import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
 
 function renderizarHeader(propriedades = {}) {
     return render(
-        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
-            <Header titulo="Rede de Apoio" {...propriedades} />
-        </ThemeProvider>
+        <SafeAreaProvider
+            initialMetrics={{
+                frame: { x: 0, y: 0, width: 390, height: 844 },
+                insets: { top: 0, right: 0, bottom: 0, left: 0 }
+            }}
+        >
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <Header titulo="Rede de Apoio" {...propriedades} />
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 }
 
 describe('Header com ações', () => {
+    function criarAcao(rotulo) {
+        return (
+            <Pressable accessibilityRole="button" accessibilityLabel={rotulo}>
+                <Text>{rotulo}</Text>
+            </Pressable>
+        );
+    }
+
     test('apresenta as ações ao lado do título', async () => {
         const aoFiltrar = jest.fn();
 
@@ -57,28 +73,36 @@ describe('Header com ações', () => {
         expect(screen.queryByText('Ação incompatível')).toBeNull();
     });
 
-    test('aplica o cabeçalho específico da Rede de Apoio', async () => {
-        await renderizarHeader({
-            variante: 'redeApoio',
-            acoes: (
-                <Pressable accessibilityRole="button" accessibilityLabel="Ação da Rede de Apoio">
-                    <Text>Ação</Text>
-                </Pressable>
-            )
-        });
+    test.each([
+        ['sem ações', 'padrao', null, 0],
+        ['com uma ação', 'redeApoio', criarAcao('Filtrar'), 1],
+        [
+            'com duas ações',
+            'diario',
+            <>
+                {criarAcao('Filtrar')}
+                {criarAcao('Gerenciar')}
+            </>,
+            2
+        ]
+    ])('mantém o mesmo título principal %s', async (_, variante, acoes, quantidade) => {
+        await renderizarHeader({ variante, acoes });
 
-        expect(screen.getByTestId('header-title-container')).toHaveStyle({
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            alignSelf: 'stretch'
-        });
+        const estilo = StyleSheet.flatten(screen.getByRole('header').props.style);
 
-        expect(screen.getByRole('header')).toHaveStyle({
+        expect(estilo).toMatchObject({
+            fontFamily: 'DMSans_700Bold',
             fontSize: 28,
             fontWeight: '700',
-            lineHeight: 34,
-            includeFontPadding: false
+            lineHeight: 36,
+            textAlign: 'left'
         });
+
+        if (quantidade === 0) {
+            expect(screen.queryByTestId('header-actions')).toBeNull();
+        } else {
+            expect(screen.getByTestId('header-actions').children).toHaveLength(quantidade);
+        }
     });
 
     test('distribui título, complemento e ação com o mesmo espaçamento', async () => {
@@ -96,11 +120,12 @@ describe('Header com ações', () => {
             flexDirection: 'row',
             justifyContent: 'space-between'
         });
-        expect(screen.getByTestId('header-title-container')).toHaveStyle({
-            flex: 0,
-            alignSelf: 'center'
+        expect(screen.getByRole('header')).toHaveStyle({
+            fontSize: 28,
+            lineHeight: 36,
+            flex: 0
         });
         expect(screen.getByTestId('header-title-complement')).toHaveTextContent('Confiança alta');
-        expect(screen.getByTestId('header-actions')).toHaveStyle({ marginLeft: 0 });
+        expect(screen.getByRole('button', { name: 'Abrir legenda' })).toBeOnTheScreen();
     });
 });

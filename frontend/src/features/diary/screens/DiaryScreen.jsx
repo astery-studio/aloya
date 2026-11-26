@@ -1,10 +1,10 @@
 // Apresenta os estados visualmente fiéis do histórico dentro do layout principal do app.
 import { useMemo } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { View } from 'react-native';
 import { FunnelIcon } from 'phosphor-react-native/src/icons/Funnel';
 import { GearSixIcon } from 'phosphor-react-native/src/icons/GearSix';
 
-import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
@@ -17,12 +17,6 @@ import { DiaryHistoryStateView } from '../components/DiaryHistoryStateView/Diary
 import { DiaryTimeline } from '../components/DiaryTimeline/DiaryTimeline';
 import { possuiFiltrosDiario } from '../utils/diaryFilters';
 import { criarEstilos } from './DiaryScreen.styles';
-
-// Mantém o conjunto trilho + card com a largura de 350 px do protótipo em celulares estreitos.
-function calcularMargemHorizontalTimeline(larguraTela) {
-    if (!Number.isFinite(larguraTela) || larguraTela <= 0) return 20;
-    return Math.max(5, Math.min(20, (larguraTela - 350) / 2));
-}
 
 // Recebe estado e callbacks do fluxo e retorna loading, erro, vazio ou histórico preenchido.
 function DiaryScreen({
@@ -52,13 +46,12 @@ function DiaryScreen({
 }) {
     const tema = useTheme();
     const coresDiario = obterCoresDiario(tema);
-    const { width: larguraTela } = useWindowDimensions();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const margemHorizontalTimeline = calcularMargemHorizontalTimeline(larguraTela);
     const itens = Array.isArray(registros) ? registros : [];
     const possuiErro = typeof erro === 'string' && erro.trim();
     const filtrosAtivos = possuiFiltrosDiario(filtros);
     const vazio = !carregando && !possuiErro && itens.length === 0;
+    const mostrarFab = !carregando && !possuiErro && typeof aoCriar === 'function';
     const possuiAcoesHeader =
         typeof aoAbrirFiltros === 'function' || typeof aoGerenciarCategorias === 'function';
 
@@ -69,12 +62,8 @@ function DiaryScreen({
                     icone={FunnelIcon}
                     aoPressionar={aoAbrirFiltros}
                     rotuloAcessibilidade="Filtrar histórico do Diário"
-                    variante="selecionado"
-                    corIcone={coresDiario.interface.destaque}
-                    estilo={{
-                        backgroundColor: coresDiario.interface.superficie,
-                        borderColor: coresDiario.interface.borda
-                    }}
+                    variante="redeApoio"
+                    corIcone={tema.cores.interface.destaque}
                 />
             ) : null}
             {typeof aoGerenciarCategorias === 'function' ? (
@@ -82,12 +71,8 @@ function DiaryScreen({
                     icone={GearSixIcon}
                     aoPressionar={aoGerenciarCategorias}
                     rotuloAcessibilidade="Gerenciar categorias do Diário"
-                    variante="selecionado"
-                    corIcone={tema.escuro ? '#EF9A9A' : coresDiario.primaria}
-                    estilo={{
-                        backgroundColor: coresDiario.interface.superficie,
-                        borderColor: coresDiario.interface.borda
-                    }}
+                    variante="redeApoio"
+                    corIcone={tema.cores.marca.primaria}
                 />
             ) : null}
         </>
@@ -137,7 +122,6 @@ function DiaryScreen({
             <DiaryHistoryStateView
                 tipo={filtrosAtivos ? 'filtro-vazio' : 'vazio'}
                 cabecalho={criarCabecalho(filtrosAtivos, false)}
-                aoCriar={aoCriar}
                 estilos={estilos}
                 tema={tema}
             />
@@ -156,10 +140,7 @@ function DiaryScreen({
                 aoCarregarMais={aoCarregarMais}
                 aoTentarCarregarMais={aoTentarCarregarMais}
                 ListHeaderComponent={criarCabecalho(true, true)}
-                contentContainerStyle={[
-                    estilos.lista,
-                    { paddingHorizontal: margemHorizontalTimeline }
-                ]}
+                contentContainerStyle={estilos.lista}
             />
         );
     }
@@ -167,24 +148,25 @@ function DiaryScreen({
     return (
         <MainLayout
             titulo="Diário"
-            varianteHeader="diario"
+            varianteHeader="redeApoio"
             abaAtiva="diario"
             onSelecionarAba={onSelecionarAba}
             acoesHeader={acoesHeader}
-            corFundo={coresDiario.interface.fundo}
-            corTextoHeader={coresDiario.interface.textoPrincipal}
             corFundoNavegacao={coresDiario.interface.superficie}
         >
             <View testID="diary-main-container" style={estilos.tela}>
                 {conteudo}
-                {!carregando && !possuiErro && (!vazio || filtrosAtivos) ? (
-                    <View style={estilos.acaoFixa}>
-                        <ButtonScreen texto="Adicionar novo registro" aoPressionar={aoCriar} />
-                    </View>
+                {mostrarFab ? (
+                    <FloatingActionButton
+                        aoPressionar={aoCriar}
+                        rotuloAcessibilidade="Adicionar novo registro ao Diário"
+                        considerarAreaSeguraInferior={false}
+                        testID="diary-add-fab"
+                    />
                 ) : null}
             </View>
         </MainLayout>
     );
 }
 
-export { calcularMargemHorizontalTimeline, DiaryScreen, DivisorTimeline };
+export { DiaryScreen, DivisorTimeline };

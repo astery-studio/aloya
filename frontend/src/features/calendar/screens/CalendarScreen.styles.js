@@ -27,9 +27,13 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0
         },
+        tagConfianca: {
+            minWidth: 0
+        },
         conteudo: {
             flex: 1,
             minHeight: 0,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
         },
         areaCalendario: {

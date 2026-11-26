@@ -13,38 +13,76 @@ const metricas = {
 };
 
 const anticoncepcional = {
-    id: '1', nome: 'Yaz', tipo: 'pilula', intensidadeAlerta: 'critico',
+    id: '1',
+    nome: 'Yaz',
+    tipo: 'pilula',
+    intensidadeAlerta: 'critico',
     programacao: { horarios: ['08:00'], frequenciaId: 'pilula_continuo' }
 };
 
-describe.each(['claro', 'escuro'])('áreas seguras de anticoncepcionais no tema %s', (preferencia) => {
-    test.each([
-        [NewContraceptiveScreen, {}, 'cadastro-anticoncepcional-area-segura', 'Salvar anticoncepcional'],
-        [EditContraceptiveScreen, { anticoncepcional }, 'edicao-anticoncepcional-area-segura', 'Apagar medicação'],
-        [ContraceptivesScreen, {}, 'lista-anticoncepcionais-area-segura', 'Cadastrar novo anticoncepcional'],
-        [UsageTimeSelector, { horarios: [], permiteMultiplos: true, aberto: true }, 'horarios-anticoncepcional-area-segura', 'Confirmar horários'],
-        [AlertIntensitySelector, { valor: 'critico', aberto: true }, 'intensidade-anticoncepcional-area-segura', 'Confirmar']
-    ])('protege as quatro bordas e a ação de %s', async (Tela, props, testeId, acao) => {
-        await renderWithTheme(
-            <SafeAreaProvider initialMetrics={metricas}>
-                <Tela {...props} />
-            </SafeAreaProvider>,
-            { preferencia }
-        );
+describe.each(['claro', 'escuro'])(
+    'áreas seguras de anticoncepcionais no tema %s',
+    (preferencia) => {
+        test.each([
+            [
+                NewContraceptiveScreen,
+                {},
+                'cadastro-anticoncepcional-area-segura',
+                'Salvar anticoncepcional'
+            ],
+            [
+                EditContraceptiveScreen,
+                { anticoncepcional },
+                'edicao-anticoncepcional-area-segura',
+                'Apagar medicação'
+            ],
+            [
+                ContraceptivesScreen,
+                { onCadastrarNovo: jest.fn() },
+                'lista-anticoncepcionais-area-segura',
+                'Cadastrar novo anticoncepcional'
+            ],
+            [
+                UsageTimeSelector,
+                { horarios: [], permiteMultiplos: true, aberto: true },
+                'horarios-anticoncepcional-area-segura',
+                'Confirmar horários'
+            ],
+            [
+                AlertIntensitySelector,
+                { valor: 'critico', aberto: true },
+                'intensidade-anticoncepcional-area-segura',
+                'Confirmar'
+            ]
+        ])('protege as quatro bordas e a ação de %s', async (Tela, props, testeId, acao) => {
+            await renderWithTheme(
+                <SafeAreaProvider initialMetrics={metricas}>
+                    <Tela {...props} />
+                </SafeAreaProvider>,
+                { preferencia }
+            );
 
-        const area = screen.getByTestId(testeId);
-        expect(area).toHaveProp('edges', {
-            top: 'additive', left: 'additive', right: 'additive', bottom: 'additive'
+            const area = screen.getByTestId(testeId);
+            expect(area).toHaveProp('edges', {
+                top: 'additive',
+                left: 'additive',
+                right: 'additive',
+                bottom: 'additive'
+            });
+            expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
+            expect(area).toContainElement(screen.getByRole('button', { name: acao }));
         });
-        expect(area).toContainElement(screen.getByRole('button', { name: acao }));
-    });
 
-    test('mantém a área segura quando o registro para edição está indisponível', async () => {
-        await renderWithTheme(<EditContraceptiveScreen />, { preferencia });
-        const area = screen.getByTestId('edicao-anticoncepcional-area-segura');
-        expect(area).toHaveProp('edges', {
-            top: 'additive', left: 'additive', right: 'additive', bottom: 'additive'
+        test('mantém a área segura quando o registro para edição está indisponível', async () => {
+            await renderWithTheme(<EditContraceptiveScreen />, { preferencia });
+            const area = screen.getByTestId('edicao-anticoncepcional-area-segura');
+            expect(area).toHaveProp('edges', {
+                top: 'additive',
+                left: 'additive',
+                right: 'additive',
+                bottom: 'additive'
+            });
+            expect(area).toContainElement(screen.getByRole('alert'));
         });
-        expect(area).toContainElement(screen.getByRole('alert'));
-    });
-});
+    }
+);

@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-
 import { fontFamilies } from '../../../../shared/theme';
 
 const CORES = Object.freeze({
