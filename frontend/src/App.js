@@ -91,11 +91,6 @@ function obterTelaAnteriorInterna({
     retornoResponsavelLegal
 }) {
     const retornos = {
-        [telasInternas.configuracoes]: telasInternas.inicio,
-        [telasInternas.calendario]: telasInternas.inicio,
-        [telasInternas.membros]: telasInternas.inicio,
-        [telasInternas.ciclos]: telasInternas.inicio,
-        [telasInternas.diario]: telasInternas.inicio,
         [telasInternas.cadastrarMenstruacao]: retornoCadastro,
         [telasInternas.novoContato]: telasInternas.membros,
         [telasInternas.editarContato]: telasInternas.membros,

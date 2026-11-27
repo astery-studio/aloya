@@ -703,11 +703,12 @@ describe('App integrado', () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir perfil' }));
 
-        expect(screen.getByText('Configurações')).toBeOnTheScreen();
+        expect(await screen.findByText('Perfil: Julia')).toBeOnTheScreen();
         act(() => expect(voltarHardware()).toBe(true));
 
-        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
     });
 
     test('mostra o popup estilizado ao voltar duas vezes na raiz', async () => {
