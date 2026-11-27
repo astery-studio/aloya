@@ -49,13 +49,30 @@ test('guarda escolhas individuais ao alternar o grupo e recarrega antecedência 
     await tocar('Voltar');
     await alternar('Ciclo Menstrual');
     expect(screen.getByRole('switch', { name: 'Ciclo Menstrual', checked: false })).toBeOnTheScreen();
+    await tocar('Personalizar notificações');
+    expect(screen.getByText(/Grupo pausado/)).toBeOnTheScreen();
+    expect(screen.getByRole('switch', {
+        name: 'Próxima menstruação', checked: false, disabled: true
+    })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Quando notificar o próximo ciclo', disabled: true }))
+        .toBeOnTheScreen();
+    const gravacoesAntes = service.atualizar.mock.calls.length;
+    await alternar('Confirmação do início do ciclo');
+    await tocar('Quando notificar o próximo ciclo');
+    expect(service.atualizar).toHaveBeenCalledTimes(gravacoesAntes);
+    expect(screen.queryByRole('button', { name: 'Somente no dia' })).toBeNull();
+    expect(valores['ciclo.menstrual.proxima']).toBe(true);
+    await tocar('Voltar');
     await alternar('Ciclo Menstrual');
     await primeiraTela.unmount();
 
     await montar();
     await tocar('Ciclo e Previsões');
     await tocar('Personalizar notificações');
-    expect(screen.getByRole('switch', { name: 'Próxima menstruação', checked: true })).toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Próxima menstruação', checked: true, disabled: false }))
+        .toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Confirmação do início do ciclo', checked: false, disabled: false }))
+        .toBeOnTheScreen();
     await tocar('Quando notificar o próximo ciclo');
     expect(screen.getByRole('button', { name: 'Somente no dia', selected: true })).toBeOnTheScreen();
     expect(service.buscar).toHaveBeenCalledTimes(2);
