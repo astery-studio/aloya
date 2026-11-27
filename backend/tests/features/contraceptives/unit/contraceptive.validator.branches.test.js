@@ -33,12 +33,12 @@ test('recusa tipos, intensidades, datas e horários malformados', () => {
 test('aceita aliases públicos e normaliza os dados persistidos', () => {
     const dados = validarCadastroAnticoncepcional({
         nome: '  Mercilon  ', tipo: 'pilula', frequencia: 'uso_continuo',
-        horariosProgramados: ['20:00', '08:00'], nivelIntensidadeAlerta: 'leve'
+        horariosProgramados: ['20:00'], nivelIntensidadeAlerta: 'leve'
     }, hoje);
 
     assert.equal(dados.nome, 'Mercilon');
     assert.equal(dados.intensidade, 'leve');
-    assert.deepEqual(dados.horarios, ['08:00', '20:00']);
+    assert.deepEqual(dados.horarios, ['20:00']);
     assert.equal(dados.dataPrimeiroUso.toISOString(), '2026-09-24T00:00:00.000Z');
 });
 

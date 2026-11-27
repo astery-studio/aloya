@@ -19,6 +19,21 @@ function calcularPeriodosDePausa(dataPrimeiroUso, frequencia, quantidade = 12) {
     return periodos;
 }
 
+function estaEmPausa(data, programacao, frequencia) {
+    const { dataPrimeiroUso, periodosPausa = [] } = programacao;
+    if (!dataPrimeiroUso || data < dataPrimeiroUso || !frequencia?.diasPausa || frequencia.continuo) {
+        return false;
+    }
+
+    if (periodosPausa.some((periodo) => periodo && data >= periodo.inicio && data <= periodo.fim)) {
+        return true;
+    }
+
+    const diasDesdeInicio = (Date.parse(data) - Date.parse(dataPrimeiroUso)) / 86_400_000;
+    const diaDoCiclo = diasDesdeInicio % (frequencia.diasUso + frequencia.diasPausa);
+    return diaDoCiclo >= frequencia.diasUso;
+}
+
 function criarProgramacao({ horarios = [], frequencia, dataPrimeiroUso = null }) {
     return Object.freeze({
         horarios: Object.freeze([...horarios].sort()),
@@ -29,4 +44,4 @@ function criarProgramacao({ horarios = [], frequencia, dataPrimeiroUso = null })
     });
 }
 
-export { adicionarDias, calcularPeriodosDePausa, criarProgramacao };
+export { adicionarDias, calcularPeriodosDePausa, criarProgramacao, estaEmPausa };

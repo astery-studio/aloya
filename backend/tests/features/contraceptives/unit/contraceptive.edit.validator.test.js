@@ -33,16 +33,23 @@ test('aceita e normaliza uma edição completa válida', () => {
     const dados = validarEdicaoAnticoncepcional({
         ...pilulaValida,
         nome: '  Mercilon Atualizado  ',
-        horarios: ['20:00', '08:00'],
+        horarios: ['20:00'],
         intensidadeAlerta: 'moderado'
     }, hoje);
 
     assert.equal(dados.nome, 'Mercilon Atualizado');
     assert.equal(dados.tipo, 'pilula');
     assert.equal(dados.intensidade, 'moderado');
-    assert.deepEqual(dados.horarios, ['08:00', '20:00']);
+    assert.deepEqual(dados.horarios, ['20:00']);
     assert.equal(dados.frequencia, 'uso_continuo');
     assert.equal(dados.dataValidade, null);
+});
+
+test('rejeita a edição com dois horários de pílula', () => {
+    const erro = capturarErro(() => validarEdicaoAnticoncepcional({
+        ...pilulaValida, horarios: ['08:00', '20:00']
+    }, hoje));
+    assert.equal(erro?.codigo, 'QUANTIDADE_HORARIOS_INVALIDA');
 });
 
 test('rejeita corpos nulos, listas e valores primitivos', () => {

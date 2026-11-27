@@ -21,6 +21,7 @@ function FloatingActionButton({
     desativado = false,
     carregando = false,
     considerarAreaSeguraInferior = true,
+    considerarAreaSeguraLateral = false,
     ocultarComTeclado = true,
     deslocamentoInferior = 0,
     estilo,
@@ -48,7 +49,12 @@ function FloatingActionButton({
     return (
         <View
             pointerEvents="box-none"
-            style={[estilos.posicionador, { bottom: distanciaInferior }, estilo]}
+            style={[
+                estilos.posicionador,
+                { bottom: distanciaInferior },
+                considerarAreaSeguraLateral && { right: tema.espacamentos.grande + insets.right },
+                estilo
+            ]}
         >
             <Pressable
                 testID={testID}

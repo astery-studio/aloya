@@ -30,6 +30,9 @@ test('aplica a área segura superior no Header e mantém o FAB na área protegid
     expect(area).toContainElement(
         screen.getByRole('button', { name: 'Cadastrar novo anticoncepcional' })
     );
+    expect(screen.getByTestId('contraceptive-tracking-add-fab').parent).toHaveStyle({
+        bottom: metricas.insets.bottom + temaClaro.espacamentos.grande
+    });
 });
 
 test('reproduz o estado vazio e a ação principal do protótipo', async () => {

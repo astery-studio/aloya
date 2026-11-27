@@ -49,6 +49,27 @@ test('converte a resposta da API para o formato exibido pela tela', () => {
     expect(Object.isFrozen(resultado.programacao.horarios)).toBe(true);
 });
 
+test('carrega os usos confirmados da resposta do cadastro e envia o fuso do dispositivo', async () => {
+    const hoje = '2026-09-25';
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({
+        anticoncepcional: {
+            ...registroApi,
+            frequenciaId: 'pilula_21_7',
+            historico: [{ id: 8, data: hoje, horarioProgramado: '08:00', estado: 'confirmado' }],
+            usosHoje: [{ id: 8, data: hoje, horario: '08:00', status: 'confirmado' }]
+        }
+    });
+    const service = criarContraceptiveService({ requisicaoAutenticada });
+
+    const salvo = await service.cadastrar(anticoncepcionalFormulario, { fusoHorario: 'America/Sao_Paulo' });
+
+    expect(requisicaoAutenticada).toHaveBeenCalledWith(expect.objectContaining({
+        metodo: 'POST', caminho: '/api/anticoncepcionais?fusoHorario=America%2FSao_Paulo'
+    }));
+    expect(salvo.historico[0]).toMatchObject({ id: '8', estado: 'confirmado' });
+    expect(salvo.usosHoje[0]).toMatchObject({ id: '8', status: 'confirmado' });
+});
+
 test('envia somente os campos aceitos pelo backend', () => {
     const corpo = criarCorpoCadastro(anticoncepcionalFormulario);
 

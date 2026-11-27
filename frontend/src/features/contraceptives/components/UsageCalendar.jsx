@@ -12,8 +12,11 @@ const SEMANAS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const ESTADOS = Object.freeze({
     confirmado: 'Confirmado',
     foraDoPrazo: 'Fora do prazo',
-    naoConfirmado: 'Não confirmado'
+    naoConfirmado: 'Não confirmado',
+    naoUsei: 'Não usei',
+    pausa: 'Pausa programada'
 });
+const LINHAS_LEGENDA = [['confirmado', 'foraDoPrazo'], ['naoUsei', 'naoConfirmado']];
 const MESES = [
     'Janeiro',
     'Fevereiro',
@@ -61,14 +64,17 @@ function ehHoje(ano, numeroMes, dia) {
     );
 }
 
-function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
+function UsageCalendar({
+    mes, dias = [], inicioMedicacao, diaEmPausa, aoMesAnterior, aoProximoMes,
+    emEdicao = false, rodapeEdicao, dataSelecionada, datasEditaveis, podeCriarOcorrencia, aoSelecionarData
+}) {
     const tema = useTheme();
     const estilosUso = useMemo(() => criarEstilosUso(tema), [tema]);
     const { ano, numeroMes } = obterPartesDoMes(mes);
     const semanas = criarSemanas(ano, numeroMes);
     const possuiSeisSemanas = semanas.length === 6;
     const registros = new Map();
-    const prioridades = { confirmado: 1, foraDoPrazo: 2, naoConfirmado: 3 };
+    const prioridades = { confirmado: 1, foraDoPrazo: 2, naoConfirmado: 3, naoUsei: 4 };
     dias.forEach((item) => {
         const partes = partesDaDataUso(item.data);
         if (partes && partes.chaveMes !== mes) return;
@@ -80,6 +86,7 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
             registros.set(dia, estado);
     });
     const titulo = `${MESES[numeroMes - 1]} ${ano}`;
+    const linhasLegenda = diaEmPausa ? [...LINHAS_LEGENDA, ['pausa']] : LINHAS_LEGENDA;
 
     return (
         <View
@@ -133,24 +140,51 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                     {semanas.map((semana, indiceSemana) => (
                         <View key={`semana-${indiceSemana}`} style={estilosUso.linhaSemana}>
                             {semana.map((dia, indiceDia) => {
-                                const estado = dia ? registros.get(dia) : null;
-                                const rotuloEstado = ESTADOS[estado];
                                 const hoje = ehHoje(ano, numeroMes, dia);
+                                const dataCivil = dia ? `${mes}-${String(dia).padStart(2, '0')}` : null;
+                                const estado = registros.get(dia)
+                                    ?? (dataCivil && diaEmPausa?.(dataCivil) ? 'pausa' : null);
+                                const rotuloEstado = ESTADOS[estado];
+                                const inicio = dia && dataCivil === inicioMedicacao;
+                                const editavelPeloRegistro = datasEditaveis?.has(dataCivil);
+                                const bloqueadoAntesDoInicio = Boolean(
+                                    dataCivil && inicioMedicacao && dataCivil < inicioMedicacao &&
+                                    !registros.has(dia) && !editavelPeloRegistro
+                                );
+                                const descricaoDia = [
+                                    rotuloEstado,
+                                    inicio && 'início da medicação',
+                                    bloqueadoAntesDoInicio && 'antes do início da medicação'
+                                ].filter(Boolean).join(', ') || 'sem registro';
+                                const selecionado = emEdicao && dataCivil === dataSelecionada;
+                                const interativa = Boolean(dia) && typeof aoSelecionarData === 'function';
+                                const desabilitado = interativa && !editavelPeloRegistro
+                                    && !podeCriarOcorrencia?.(dataCivil);
+                                const Celula = interativa ? Pressable : View;
 
                                 return (
-                                    <View
+                                    <Celula
                                         key={`${dia || 'vazio'}-${indiceSemana}-${indiceDia}`}
                                         accessible={Boolean(dia)}
-                                        accessibilityRole={dia ? 'text' : undefined}
+                                        accessibilityRole={interativa ? 'button' : dia ? 'text' : undefined}
+                                        {...(interativa && {
+                                            accessibilityState: { selected: selecionado, disabled: desabilitado },
+                                            disabled: desabilitado,
+                                            onPress: () => aoSelecionarData?.(dataCivil)
+                                        })}
                                         accessibilityLabel={
                                             dia
-                                                ? `Dia ${dia}, ${rotuloEstado ?? 'sem registro'}`
+                                                ? `Dia ${dia}, ${descricaoDia}`
                                                 : undefined
                                         }
                                         style={[
                                             estilosUso.celulaDia,
                                             hoje && estilosUso.celulaHoje,
-                                            rotuloEstado && estilosUso[`celula_${estado}`]
+                                            (desabilitado || bloqueadoAntesDoInicio) && estilosUso.celulaDesabilitada,
+                                            rotuloEstado && estilosUso[`celula_${estado}`],
+                                            selecionado && estilosUso.celulaSelecionada,
+                                            selecionado && !rotuloEstado && estilosUso.celulaSelecionadaSemRegistro,
+                                            selecionado && estado === 'pausa' && estilosUso.celulaPausaSelecionada
                                         ]}
                                     >
                                         {dia ? (
@@ -158,13 +192,14 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                                                 style={[
                                                     estilosUso.numeroDia,
                                                     hoje && estilosUso.numeroDiaHoje,
-                                                    rotuloEstado && estilosUso.diaComEstado
+                                                    rotuloEstado && estilosUso.diaComEstado,
+                                                    estado === 'pausa' && estilosUso.diaComPausa
                                                 ]}
                                             >
                                                 {dia}
                                             </Text>
                                         ) : null}
-                                    </View>
+                                    </Celula>
                                 );
                             })}
                         </View>
@@ -172,16 +207,25 @@ function UsageCalendar({ mes, dias = [], aoMesAnterior, aoProximoMes }) {
                 </View>
             </View>
 
-            <View testID="usage-calendar-legend" style={estilosUso.legenda}>
-                {Object.entries(ESTADOS).map(([estado, rotulo]) => (
-                    <View key={estado} style={estilosUso.itemLegenda}>
-                        <View
-                            style={[estilosUso.marcadorLegenda, estilosUso[`marcador_${estado}`]]}
-                        />
-                        <Text style={estilosUso.textoLegenda}>{rotulo}</Text>
-                    </View>
-                ))}
-            </View>
+            {emEdicao ? (
+                rodapeEdicao && <View style={estilosUso.rodapeEdicao}>{rodapeEdicao}</View>
+            ) : (
+                <View testID="usage-calendar-legend" style={estilosUso.legenda}>
+                    {linhasLegenda.map((linha) => (
+                        <View key={linha[0]} style={estilosUso.linhaLegenda}>
+                            {linha.map((estado) => (
+                                <View key={estado} style={estilosUso.itemLegenda}>
+                                    <View style={[
+                                        estilosUso.marcadorLegenda,
+                                        estilosUso[`marcador_${estado}`]
+                                    ]} />
+                                    <Text style={estilosUso.textoLegenda}>{ESTADOS[estado]}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    ))}
+                </View>
+            )}
         </View>
     );
 }

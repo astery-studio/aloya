@@ -72,13 +72,15 @@ function lerData(data) {
     };
 }
 
-function obterDataInicial(valorSelecionado) {
+function obterDataInicial(valorSelecionado, dataMaxima) {
     const dataSelecionada = lerData(valorSelecionado);
 
     if (dataSelecionada) {
+        const limite = lerData(dataMaxima);
+        const data = limite && dataSelecionada.texto > limite.texto ? limite : dataSelecionada;
         return {
-            ano: dataSelecionada.ano,
-            mes: dataSelecionada.mes
+            ano: data.ano,
+            mes: data.mes
         };
     }
 
@@ -138,6 +140,7 @@ function DiaCalendario({
     nomeDoMes,
     ano,
     selecionado,
+    hoje,
     habilitado,
     salvando,
     onSelecionar,
@@ -153,7 +156,7 @@ function DiaCalendario({
                 onPress={selecionarDia}
                 disabled={!habilitado || salvando}
                 accessibilityRole="button"
-                accessibilityLabel={`Dia ${casa.dia} de ` + `${nomeDoMes} de ${ano}`}
+                accessibilityLabel={`Dia ${casa.dia} de ${nomeDoMes} de ${ano}${hoje ? ', hoje' : ''}`}
                 accessibilityState={{
                     selected: selecionado,
                     disabled: !habilitado || salvando
@@ -182,6 +185,7 @@ function LinhaCalendario({
     nomeDoMes,
     ano,
     valorSelecionado,
+    diaAtual,
     salvando,
     podeSelecionarDia,
     onSelecionar,
@@ -199,14 +203,19 @@ function LinhaCalendario({
                     );
                 }
 
+                const hoje = casa.dia === diaAtual;
+                const habilitado = podeSelecionarDia(casa.data);
+                const selecionado = casa.data === valorSelecionado || (!valorSelecionado && hoje && habilitado);
+
                 return (
                     <DiaCalendarioMemorizado
                         key={casa.data}
                         casa={casa}
                         nomeDoMes={nomeDoMes}
                         ano={ano}
-                        selecionado={casa.data === valorSelecionado}
-                        habilitado={podeSelecionarDia(casa.data)}
+                        selecionado={selecionado}
+                        hoje={hoje}
+                        habilitado={habilitado}
                         salvando={salvando}
                         onSelecionar={onSelecionar}
                         estilos={estilos}
@@ -227,13 +236,16 @@ function DatePickerSheet({
     onFechar,
     dataMinima = null,
     dataMaxima = null,
-    aparenciaCadastro = false
+    aparenciaCadastro = false,
+    destacarHoje = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema, aparenciaCadastro), [tema, aparenciaCadastro]);
     const corSeta =
         tema.escuro && aparenciaCadastro ? '#FFFFFFDE' : tema.cores.interface.textoPrincipal;
-    const [dataVisivel, setDataVisivel] = useState(() => obterDataInicial(valorSelecionado));
+    const [dataVisivel, setDataVisivel] = useState(() =>
+        obterDataInicial(valorSelecionado, dataMaxima)
+    );
     const [listaAberta, setListaAberta] = useState(null);
     const [salvando, setSalvando] = useState(false);
     const [erroSalvar, setErroSalvar] = useState('');
@@ -242,6 +254,11 @@ function DatePickerSheet({
 
     const anoVisivel = dataVisivel.ano;
     const mesVisivel = dataVisivel.mes;
+    const hoje = destacarHoje ? new Date() : null;
+    const diaAtual =
+        hoje?.getFullYear() === anoVisivel && hoje.getMonth() + 1 === mesVisivel
+            ? hoje.getDate()
+            : null;
 
     const limiteMinimoValido = useMemo(() => lerData(dataMinima), [dataMinima]);
     const limiteMaximoValido = useMemo(() => lerData(dataMaxima), [dataMaxima]);
@@ -251,11 +268,11 @@ function DatePickerSheet({
             return;
         }
 
-        setDataVisivel(obterDataInicial(valorSelecionado));
+        setDataVisivel(obterDataInicial(valorSelecionado, dataMaxima));
 
         setListaAberta(null);
         setErroSalvar('');
-    }, [valorSelecionado, visivel]);
+    }, [valorSelecionado, dataMaxima, visivel]);
 
     const podeMostrarMes = useCallback(
         (ano, mes) => {
@@ -612,6 +629,7 @@ function DatePickerSheet({
                                         nomeDoMes={nomeDoMes}
                                         ano={anoVisivel}
                                         valorSelecionado={valorSelecionado}
+                                        diaAtual={diaAtual}
                                         salvando={salvando}
                                         podeSelecionarDia={podeSelecionarDia}
                                         onSelecionar={selecionarDia}

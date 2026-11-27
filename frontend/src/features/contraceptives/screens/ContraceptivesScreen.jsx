@@ -20,6 +20,7 @@ function ContraceptivesScreen({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
+    const exibeFab = !carregando && !erro && typeof onCadastrarNovo === 'function';
     let estadoVazio = (
         <View style={estilos.vazio}>
             <Text style={estilos.tituloVazio}>Nenhum anticoncepcional cadastrado</Text>
@@ -66,15 +67,15 @@ function ContraceptivesScreen({
                 data={anticoncepcionais}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <ContraceptiveCard anticoncepcional={item} />}
-                contentContainerStyle={estilos.lista}
+                contentContainerStyle={[estilos.lista, exibeFab && estilos.espacoFab]}
                 ItemSeparatorComponent={() => <View style={estilos.separador} />}
                 ListEmptyComponent={estadoVazio}
             />
-            {!carregando && !erro && typeof onCadastrarNovo === 'function' ? (
+            {exibeFab ? (
                 <FloatingActionButton
                     aoPressionar={onCadastrarNovo}
                     rotuloAcessibilidade="Cadastrar novo anticoncepcional"
-                    considerarAreaSeguraInferior={false}
+                    considerarAreaSeguraLateral
                     testID="contraceptives-add-fab"
                 />
             ) : null}

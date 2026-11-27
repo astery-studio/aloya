@@ -1,4 +1,6 @@
 import { AppError } from '../../../shared/errors/AppError.js';
+import { obterFrequencia } from '../constants/contraceptive.constants.js';
+import { apresentarUsoHistorico } from '../presenters/contraceptive.listing.presenter.js';
 import { validarIdAnticoncepcional } from '../validators/contraceptive.validator.js';
 import { horarioPertenceAgenda } from '../utils/contraceptive.listing.schedule.js';
 import { validarConfirmacaoUso, dataHoraNoFuso, dataLocalNoFuso, horarioNoFuso, validarFusoHorario } from '../validators/contraceptiveUsage.validator.js';
@@ -36,7 +38,7 @@ function apresentarUsoConfirmacao(uso, fusoHorario = 'UTC', prazoConfigurado = f
         id: String(uso.id),
         data: uso.dataUsoProgramado.toISOString().slice(0, 10),
         horario: uso.horarioProgramado,
-        status: confirmado ? (uso.confirmacaoForaPrazo ? 'foraDoPrazo' : 'confirmado') : 'pendente',
+        status: apresentarUsoHistorico(uso).estado,
         confirmadoEm: timestamp ? timestamp.toISOString() : null,
         horarioConfirmacao: timestamp ? horarioNoFuso(timestamp, fusoHorario) : null,
         confirmacaoForaPrazo: confirmado && uso.confirmacaoForaPrazo,
@@ -112,7 +114,10 @@ function criarContraceptiveUsageService(prisma, { relogio = () => new Date(), av
                         atualizado = { ...uso, ...alteracoes };
                     }
                     // Notificações estão fora do escopo desta etapa: só persiste o uso.
-                    return apresentarUsoConfirmacao(atualizado, fusoHorario, prazoConfigurado);
+                    return {
+                        ...apresentarUsoConfirmacao(atualizado, fusoHorario, prazoConfigurado),
+                        atrasado: ['pendente', 'nao_confirmado', 'nao_sabe'].includes(atualizado.statusUso) && programadoEm < agora
+                    };
                 });
             } catch (erro) {
                 // Corrida de criação/serialização repete a transação, nunca a dose inteira.
@@ -121,7 +126,105 @@ function criarContraceptiveUsageService(prisma, { relogio = () => new Date(), av
             }
         }
     }
-    return { definirConfirmacao };
+
+    async function corrigirHistorico(usuarioId, idRecebido, usoIdRecebido, entrada) {
+        const anticoncepcionalId = validarIdAnticoncepcional(idRecebido);
+        const porHorario = usoIdRecebido === undefined;
+        const campos = porHorario ? ['estado', 'fusoHorario', 'data', 'horario'] : ['estado', 'fusoHorario'];
+        if (!entrada || typeof entrada !== 'object' || Array.isArray(entrada)
+            || Object.keys(entrada).some((campo) => !campos.includes(campo))
+            || !['confirmado', 'foraDoPrazo', 'naoUsei'].includes(entrada.estado)) {
+            throw new AppError('Informe um estado de correção válido.', 422, 'CORRECAO_USO_INVALIDA');
+        }
+
+        const fusoHorario = validarFusoHorario(entrada.fusoHorario);
+        const confirmacaoForaPrazo = entrada.estado === 'foraDoPrazo';
+        const statusUso = entrada.estado === 'naoUsei' ? 'nao_usou' : 'confirmado';
+        const alteracoes = { statusUso, confirmacaoForaPrazo };
+        const agora = relogio();
+
+        if (porHorario) {
+            const { data, horarioProgramado: horario, dataUsoProgramado } = validarConfirmacaoUso({
+                data: entrada.data,
+                horario: entrada.horario,
+                confirmar: true,
+                fusoHorario
+            });
+
+            const hoje = dataLocalNoFuso(agora, fusoHorario);
+            if (data > hoje || !dataHoraNoFuso(data, horario, fusoHorario)) {
+                throw new AppError('Escolha uma data até hoje e um horário válido.', 422, 'USO_NAO_EDITAVEL');
+            }
+
+            return prisma.$transaction(async (transacao) => {
+                const metodo = await transacao.anticoncepcional.findFirst({
+                    where: { id: anticoncepcionalId, usuarioId, ativo: true }
+                });
+                if (!metodo) throw new AppError('Anticoncepcional não encontrado.', 404, 'ANTICONCEPCIONAL_NAO_ENCONTRADO');
+
+                const frequencia = obterFrequencia(metodo.tipo, metodo.frequencia);
+                if (frequencia?.diasPausa && !frequencia.continuo && metodo.dataInicioUso && dataUsoProgramado < metodo.dataInicioUso) {
+                    throw new AppError(
+                        'Escolha uma data a partir do primeiro uso cadastrado.', 422, 'USO_ANTES_DO_INICIO'
+                    );
+                }
+
+                const horarioValido = data === hoje
+                    ? horarioPertenceAgenda(metodo, data, horario)
+                    : Array.isArray(metodo.horariosProgramados) && metodo.horariosProgramados.includes(horario);
+                if (!horarioValido) {
+                    throw new AppError('Escolha um horário do anticoncepcional.', 422, 'USO_FORA_DA_PROGRAMACAO');
+                }
+
+                const ocorrencia = { anticoncepcionalId, dataUsoProgramado, horarioProgramado: horario };
+                const uso = await transacao.usoAnticoncepcional.upsert({
+                    where: { anticoncepcionalId_dataUsoProgramado_horarioProgramado: ocorrencia },
+                    create: { ...ocorrencia, ...alteracoes },
+                    update: alteracoes
+                });
+                return apresentarUsoHistorico(uso);
+            });
+        }
+
+        const usoId = validarIdAnticoncepcional(usoIdRecebido);
+        const where = { id: usoId, anticoncepcionalId, anticoncepcional: { usuarioId, ativo: true } };
+        return prisma.$transaction(async (transacao) => {
+            const uso = await transacao.usoAnticoncepcional.findFirst({ where });
+            if (!uso) throw new AppError('Ocorrência não encontrada.', 404, 'USO_NAO_ENCONTRADO');
+
+            const data = uso.dataUsoProgramado.toISOString().slice(0, 10);
+            const programadoEm = dataHoraNoFuso(data, uso.horarioProgramado, fusoHorario);
+            if (!programadoEm || data > dataLocalNoFuso(agora, fusoHorario)) {
+                throw new AppError('Esta ocorrência não pode ser corrigida.', 422, 'USO_NAO_EDITAVEL');
+            }
+
+            if (uso.statusUso === statusUso && uso.confirmacaoForaPrazo === confirmacaoForaPrazo) {
+                return apresentarUsoHistorico(uso);
+            }
+
+            const resultado = await transacao.usoAnticoncepcional.updateMany({
+                where: { ...where, atualizadoEm: uso.atualizadoEm },
+                data: alteracoes
+            });
+            if (resultado.count !== 1) {
+                throw new AppError('O uso foi alterado. Atualize os dados e tente novamente.', 409, 'CONFLITO_CORRECAO_USO');
+            }
+            return apresentarUsoHistorico({ ...uso, ...alteracoes });
+        });
+    }
+
+    async function apagarRegistroHistorico(usuarioId, idRecebido, usoIdRecebido) {
+        const anticoncepcionalId = validarIdAnticoncepcional(idRecebido);
+        const id = validarIdAnticoncepcional(usoIdRecebido);
+        const resultado = await prisma.usoAnticoncepcional.deleteMany({
+            where: { id, anticoncepcionalId, anticoncepcional: { usuarioId, ativo: true } }
+        });
+        if (resultado.count !== 1) {
+            throw new AppError('Ocorrência não encontrada.', 404, 'USO_NAO_ENCONTRADO');
+        }
+    }
+
+    return { definirConfirmacao, corrigirHistorico, apagarRegistroHistorico };
 }
 
 export { apresentarUsoConfirmacao, criarAvaliadorJanelaEficacia, lerJanelasDeUso, criarContraceptiveUsageService };
