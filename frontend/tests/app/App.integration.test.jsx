@@ -288,6 +288,7 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                 onAbrirPerfil,
                 onAbrirParametrosCiclo,
                 onAbrirNotificacoes,
+                onAbrirNotificacoesContato,
                 onSelecionarAba,
                 onAbrirPoliticasPrivacidade
             }) =>
@@ -304,6 +305,11 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                         Pressable,
                         { accessibilityRole: 'button', onPress: onAbrirNotificacoes },
                         React.createElement(Text, null, 'Notificações')
+                    ),
+                    onAbrirNotificacoesContato && React.createElement(
+                        Pressable,
+                        { accessibilityRole: 'button', onPress: onAbrirNotificacoesContato },
+                        React.createElement(Text, null, 'Notificações como contato de apoio')
                     ),
                     React.createElement(
                         Pressable,
@@ -463,6 +469,18 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
     };
 });
 
+jest.mock('../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen', () => {
+    const React = require('react');
+    const { Pressable, Text } = require('react-native');
+    return {
+        ReceivedContactsScreen: ({ onSelecionarAba }) => React.createElement(
+            Pressable,
+            { accessibilityRole: 'button', onPress: () => onSelecionarAba('configuracoes') },
+            React.createElement(Text, null, 'Abrir configurações')
+        )
+    };
+});
+
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
 import { NewSupportCategoryScreen } from '../../src/features/support-network/screens/NewSupportCategoryScreen';
@@ -522,7 +540,10 @@ function criarServicos() {
             criarCategoria: jest.fn()
         },
         diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() },
-        notificationPreferencesService: { buscar: jest.fn().mockResolvedValue({}) }
+        notificationPreferencesService: { buscar: jest.fn().mockResolvedValue({}) },
+        supportNotificationPreferencesService: {
+            buscar: jest.fn().mockResolvedValue({ chavesDisponiveis: ['redeApoio.convites.recebido'] })
+        }
     };
 }
 
@@ -536,6 +557,39 @@ describe('App integrado', () => {
         expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
         expect(screen.getByText('Configurações')).toBeOnTheScreen();
+    });
+
+    test.each([
+        ['contato_apoio', 'Notificações'],
+        ['principal_e_contato_apoio', 'Notificações como contato de apoio']
+    ])('abre a visão de apoio pelo menu para o papel %s', async (papel, entrada) => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        servicos.accountService.buscarPerfil.mockResolvedValue({ id: 1, papel });
+        await render(<App />);
+        if (papel === 'contato_apoio')
+            await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(await screen.findByRole('button', { name: entrada }));
+        expect(screen.queryByRole('button', { name: 'Ciclo e Previsões' })).toBeNull();
+        expect(screen.getByRole('button', { name: 'Rede de Apoio' })).toBeOnTheScreen();
+        expect(servicos.supportNotificationPreferencesService.buscar).toHaveBeenCalledTimes(1);
+    });
+
+    test('abre a prévia da Rede de Apoio e testa os controles com dados locais', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Teste da tela da Rede de Apoio' }));
+        expect(await screen.findByRole('header', { name: 'Prévia da Rede de Apoio' }))
+            .toBeOnTheScreen();
+        await fireEvent.press(await screen.findByRole('button', { name: 'Personalizar notificações' }));
+        const nome = 'Receber dicas de como apoiar';
+        await fireEvent.press(screen.getByRole('switch', { name: nome, checked: false }));
+        expect(await screen.findByRole('switch', { name: nome, checked: true })).toBeOnTheScreen();
+        expect(screen.queryByRole('switch', { name: 'Vida Íntima e Social' })).toBeNull();
+        expect(servicos.supportNotificationPreferencesService.buscar).not.toHaveBeenCalled();
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+        expect(screen.getByRole('button', { name: 'Teste de notificações' })).toBeOnTheScreen();
     });
 
     beforeEach(() => {
