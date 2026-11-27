@@ -16,7 +16,7 @@ function criarEstilos(tema) {
             paddingVertical: 10,
             paddingHorizontal: 16,
             borderWidth: 0.70489,
-            borderColor: cores.borda,
+            borderColor: tema.escuro ? cores.separador : cores.borda,
             borderRadius: 16,
             backgroundColor: cores.superficie,
             ...tema.shadows.card
@@ -34,6 +34,7 @@ function criarEstilos(tema) {
             alignItems: 'flex-start',
             justifyContent: 'center'
         },
+        lateralSomenteLeitura: { width: 26 },
         iconeRegistro: {
             width: 26,
             height: 26,

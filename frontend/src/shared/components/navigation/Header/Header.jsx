@@ -94,6 +94,7 @@ function Header({
                         style={[
                             estilos.titulo,
                             temVoltar && estilos.tituloComVoltar,
+                            variante === 'inicio' && estilos.tituloInicio,
                             temComplementoNaLinha && estilos.tituloComComplemento,
                             corTexto ? { color: corTexto } : null
                         ]}

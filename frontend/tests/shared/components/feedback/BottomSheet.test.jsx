@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Animated, Text } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -83,6 +84,70 @@ describe('BottomSheet', () => {
         });
 
         expect(onFechar).toHaveBeenCalledTimes(1);
+    });
+
+    test('permite fechar pelo fundo quando essa interação está habilitada', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarBottomSheet({ onFechar, fecharAoTocarFora: true });
+
+        const fundo = screen.getByRole('button', { name: 'Fechar painel' });
+        await fireEvent.press(fundo);
+
+        expect(onFechar).toHaveBeenCalledTimes(1);
+    });
+
+    test('recolhe o painel com animação ao tocar no fundo', async () => {
+        const timing = jest.spyOn(Animated, 'timing').mockReturnValue({
+            start: (concluir) => concluir?.({ finished: true })
+        });
+
+        function SheetControlado() {
+            const [visivel, setVisivel] = useState(true);
+            return (
+                <BottomSheet visivel={visivel} onFechar={() => setVisivel(false)} fecharAoTocarFora>
+                    <Text>Conteúdo controlado</Text>
+                </BottomSheet>
+            );
+        }
+
+        await render(
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <SafeAreaProvider
+                    initialMetrics={{
+                        frame: { x: 0, y: 0, width: 390, height: 844 },
+                        insets: { top: 0, right: 0, bottom: 0, left: 0 }
+                    }}
+                >
+                    <SheetControlado />
+                </SafeAreaProvider>
+            </ThemeProvider>
+        );
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar painel' }));
+
+        expect(timing).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({
+                toValue: 0,
+                duration: 220,
+                useNativeDriver: true
+            })
+        );
+    });
+
+    test('não fecha pelo fundo durante uma operação bloqueada', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarBottomSheet({
+            onFechar,
+            fecharAoTocarFora: true,
+            bloquearFechamento: true
+        });
+
+        await fireEvent.press(screen.getByTestId('bottom-sheet-area-fundo'));
+
+        expect(onFechar).not.toHaveBeenCalled();
     });
 
     test('não fecha quando está bloqueado', async () => {

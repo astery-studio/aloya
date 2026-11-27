@@ -28,6 +28,43 @@ function obterMesPosterior(mes) {
 }
 
 describe('useCalendar', () => {
+    test('remove as previsões já carregadas quando a próxima consulta reduz o acesso', async () => {
+        const service = {
+            buscarMes: jest.fn()
+                .mockImplementationOnce(async ({mes}) => ({
+                    ...criarCalendario(mes),
+                    diasMenstruacao: [`${mes}-02`],
+                    permitePrevisoes: true,
+                    previsao: {periodos: [{ovulacao: `${mes}-16`}]}
+                }))
+                .mockImplementation(async ({mes}) => ({
+                    ...criarCalendario(mes),
+                    permitePrevisoes: false
+                }))
+        }
+        const {result} = await renderHook(() => useCalendar({service, somenteLeitura: true}))
+
+        await waitFor(() => expect(result.current.meses).toHaveLength(2))
+
+        expect(result.current.permitePrevisoes).toBe(false)
+        expect(result.current.meses.every(({previsao}) => previsao === null)).toBe(true)
+        expect(result.current.meses[0].diasMenstruacao).toEqual([`${obterChaveMes()}-02`])
+    })
+
+    test('descarta os meses que estavam visíveis quando o vínculo é revogado', async () => {
+        const service = {
+            buscarMes: jest.fn()
+                .mockImplementationOnce(async ({mes}) => criarCalendario(mes))
+                .mockRejectedValueOnce(Object.assign(new Error('Vínculo revogado'), {status: 403}))
+        }
+        const {result} = await renderHook(() => useCalendar({service, somenteLeitura: true}))
+
+        await waitFor(() => expect(result.current.erro).toBeTruthy())
+
+        expect(result.current.meses).toEqual([])
+        expect(result.current.permitePrevisoes).toBe(false)
+    })
+
     test('busca o mês atual e prepara o mês seguinte para permitir rolagem futura', async () => {
         const mesAtual = obterChaveMes()
         const mesSeguinte = obterMesPosterior(mesAtual)

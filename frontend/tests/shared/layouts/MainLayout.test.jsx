@@ -79,6 +79,13 @@ describe('MainLayout', () => {
         expect(propriedadesNavegacao.onSelecionar).toBe(onSelecionarAba);
     });
 
+    test('permite ocultar a navegação inferior', async () => {
+        await renderizarLayout({ exibirNavegacaoInferior: false });
+
+        expect(BottomTabBar).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('navegacao-segura-main-layout')).not.toBeOnTheScreen();
+    });
+
     test('mantém a estrutura flexível do layout', async () => {
         await renderizarLayout();
 

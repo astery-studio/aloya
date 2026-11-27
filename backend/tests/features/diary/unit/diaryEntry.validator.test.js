@@ -79,3 +79,20 @@ test('rejeita campos desconhecidos e categoria duplicada', () => {
         { codigo: 'CATEGORIA_DIARIO_DUPLICADA' }
     );
 });
+
+test('normaliza a origem persistente do check-in', () => {
+    const base = {
+        data: '2026-11-08',
+        fusoHorario: 'UTC',
+        categorias: [{ categoriaId: 'anotacao_livre', texto: 'a' }]
+    };
+
+    assert.equal(validarCriacaoRegistro(base).checkInRealizado, false);
+    assert.equal(
+        validarCriacaoRegistro({ ...base, checkInRealizado: true }).checkInRealizado,
+        true
+    );
+    assert.throws(() => validarCriacaoRegistro({ ...base, checkInRealizado: 'sim' }), {
+        codigo: 'CHECK_IN_INVALIDO'
+    });
+});

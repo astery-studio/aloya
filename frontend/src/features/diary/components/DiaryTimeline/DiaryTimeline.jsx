@@ -13,6 +13,7 @@ function DiaryTimeline({
     aoAbrir,
     aoEditar,
     aoExcluir,
+    somenteLeitura = false,
     acaoEmAndamentoId = null,
     aoCarregarMais,
     aoTentarCarregarMais,
@@ -54,11 +55,21 @@ function DiaryTimeline({
                     aoAbrir={aoAbrir}
                     aoEditar={aoEditar}
                     aoExcluir={aoExcluir}
+                    somenteLeitura={somenteLeitura}
                     estilos={estilos}
                 />
             );
         },
-        [acaoEmAndamentoId, aoAbrir, aoEditar, aoExcluir, estilos, itens.length, temMais]
+        [
+            acaoEmAndamentoId,
+            aoAbrir,
+            aoEditar,
+            aoExcluir,
+            estilos,
+            itens.length,
+            somenteLeitura,
+            temMais
+        ]
     );
 
     const rodape = (

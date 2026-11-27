@@ -192,6 +192,6 @@ test('combina carregamento, erro do registro e bloqueio durante salvamento', asy
             aoRecarregarRegistro={recarregar}
         />
     );
-    expect(screen.getByText('bloqueado:true;deslize:true')).toBeOnTheScreen();
+    expect(screen.getByText('bloqueado:true;fora:undefined;deslize:true')).toBeOnTheScreen();
     expect(screen.getByText('salvar-bloqueado:true')).toBeOnTheScreen();
 });

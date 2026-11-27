@@ -18,6 +18,7 @@ function useDiaryEntryForm({
     modo = 'criar',
     dataInicial,
     registroInicial,
+    marcarCheckIn = false,
     onCriado,
     onSalvo,
     onSessaoExpirada
@@ -86,68 +87,101 @@ function useDiaryEntryForm({
         setConflitoVersao(false);
     }, []);
 
-    const salvar = useCallback(async () => {
-        const acaoDisponivel = editando
-            ? typeof service?.editarRegistro === 'function'
-            : typeof service?.criarRegistro === 'function';
-        if (salvando || !acaoDisponivel || (editando && !alterado)) return false;
-        const formulario = prepararFormularioDiario({
-            catalogo,
-            valores,
-            data,
-            hoje: obterHojeDiario()
-        });
-        if (editando) {
-            if (formulario.dados.categorias.length > 0) delete formulario.erros.conteudo;
-            formulario.valido = Object.keys(formulario.erros).length === 0;
-        }
-        setErros(formulario.erros);
-        if (!formulario.valido) return false;
+    const executarSalvamento = useCallback(
+        async (valoresParaSalvar, formularioAlterado) => {
+            const acaoDisponivel = editando
+                ? typeof service?.editarRegistro === 'function'
+                : typeof service?.criarRegistro === 'function';
+            if (salvando || !acaoDisponivel || (editando && !formularioAlterado)) return false;
+            const formulario = prepararFormularioDiario({
+                catalogo,
+                valores: valoresParaSalvar,
+                data,
+                hoje: obterHojeDiario(),
+                checkInRealizado: marcarCheckIn
+            });
+            if (editando) {
+                if (formulario.dados.categorias.length > 0) delete formulario.erros.conteudo;
+                formulario.valido = Object.keys(formulario.erros).length === 0;
+            }
+            setErros(formulario.erros);
+            if (!formulario.valido) return false;
 
-        setSalvando(true);
-        setErroSalvamento(null);
-        setConflitoVersao(false);
-        try {
-            const registro = editando
-                ? await service.editarRegistro(
-                      registroInicial.id,
-                      registroInicial.versao,
-                      formulario.dados
-                  )
-                : await service.criarRegistro(formulario.dados);
-            await onSalvo?.(registro);
-            if (!editando) await onCriado?.(registro);
-            return true;
-        } catch (erro) {
-            if (erro?.status === 401) onSessaoExpirada?.();
-            const registroDuplicado =
-                erro?.status === 409 && erro?.codigo === 'REGISTRO_DIARIO_DUPLICADO';
-            const conflitoEdicao = editando && erro?.status === 409 && !registroDuplicado;
-            setConflitoVersao(conflitoEdicao);
-            setErroSalvamento(
-                registroDuplicado
-                    ? MENSAGEM_REGISTRO_DUPLICADO
-                    : conflitoEdicao
-                      ? MENSAGEM_CONFLITO_EDICAO
-                      : MENSAGEM_SALVAMENTO
-            );
-            return false;
-        } finally {
-            setSalvando(false);
-        }
-    }, [
-        alterado,
-        catalogo,
-        data,
-        editando,
-        onCriado,
-        onSalvo,
-        onSessaoExpirada,
-        registroInicial,
-        salvando,
-        service,
-        valores
-    ]);
+            setSalvando(true);
+            setErroSalvamento(null);
+            setConflitoVersao(false);
+            try {
+                const registro = editando
+                    ? await service.editarRegistro(
+                          registroInicial.id,
+                          registroInicial.versao,
+                          formulario.dados
+                      )
+                    : await service.criarRegistro(formulario.dados);
+                await onSalvo?.(registro);
+                if (!editando) await onCriado?.(registro);
+                return true;
+            } catch (erro) {
+                if (erro?.status === 401) onSessaoExpirada?.();
+                const registroDuplicado =
+                    erro?.status === 409 && erro?.codigo === 'REGISTRO_DIARIO_DUPLICADO';
+                const conflitoEdicao = editando && erro?.status === 409 && !registroDuplicado;
+                setConflitoVersao(conflitoEdicao);
+                setErroSalvamento(
+                    registroDuplicado
+                        ? MENSAGEM_REGISTRO_DUPLICADO
+                        : conflitoEdicao
+                          ? MENSAGEM_CONFLITO_EDICAO
+                          : MENSAGEM_SALVAMENTO
+                );
+                return false;
+            } finally {
+                setSalvando(false);
+            }
+        },
+        [
+            catalogo,
+            data,
+            editando,
+            onCriado,
+            onSalvo,
+            onSessaoExpirada,
+            marcarCheckIn,
+            registroInicial,
+            salvando,
+            service
+        ]
+    );
+
+    const salvar = useCallback(
+        () => executarSalvamento(valores, alterado),
+        [alterado, executarSalvamento, valores]
+    );
+
+    const salvarComValores = useCallback(
+        (alteracoes = {}) => {
+            const proximosValores = { ...valores, ...alteracoes };
+            const hoje = obterHojeDiario();
+            const formularioAlterado =
+                !editando ||
+                !registroInicial ||
+                !catalogo ||
+                criarAssinaturaFormulario({
+                    catalogo,
+                    valores: proximosValores,
+                    data,
+                    hoje
+                }) !==
+                    criarAssinaturaFormulario({
+                        catalogo,
+                        valores: valoresIniciais,
+                        data: registroInicial.data,
+                        hoje
+                    });
+            return executarSalvamento(proximosValores, formularioAlterado);
+        },
+        [catalogo, data, editando, executarSalvamento, registroInicial, valores, valoresIniciais]
+    );
 
     return {
         data,
@@ -160,7 +194,8 @@ function useDiaryEntryForm({
         alterado,
         alterarValor,
         limparErroSalvamento,
-        salvar
+        salvar,
+        salvarComValores
     };
 }
 

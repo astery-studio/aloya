@@ -44,6 +44,30 @@ function criarPagina({
     }
 }
 
+test('descarta os ciclos compartilhados se a permissão for revogada entre páginas', async () => {
+    const service = {
+        listarPagina: jest.fn()
+            .mockResolvedValueOnce(criarPagina({ temMais: true, proximoCursor: 'proxima' }))
+            .mockRejectedValueOnce(Object.assign(new Error('Acesso revogado'), { status: 403 }))
+    }
+
+    const { result } = await renderHook(() =>
+        useCycleHistory({ service, historicoCompartilhado: true })
+    )
+
+    expect(result.current.ciclos).toEqual([primeiroCiclo])
+
+    await act(async () => {
+        await result.current.carregarMais()
+    })
+
+    expect(result.current.ciclos).toEqual([])
+    expect(result.current.quantidadeCiclos).toBe(0)
+    expect(result.current.temMais).toBe(false)
+    expect(result.current.erro).toBeTruthy()
+    expect(result.current.erroCarregarMais).toBeNull()
+})
+
 test('carrega automaticamente a primeira página e o resumo', async () => {
     const pagina = criarPagina()
 

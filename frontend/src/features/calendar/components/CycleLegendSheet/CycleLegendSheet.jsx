@@ -97,6 +97,7 @@ function CycleLegendSheet({ visivel, aoFechar, itens }) {
         <BottomSheet
             visivel={visivel}
             onFechar={aoFechar}
+            fecharAoTocarFora
             corPainel={tema.escuro ? '#1E1E1E' : undefined}
         >
             <BottomSheetLayout

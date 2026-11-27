@@ -163,6 +163,27 @@ describe('ContactCard', () => {
         expect(aoAbrirResumo).toHaveBeenCalledWith(conviteRecebido);
     });
 
+    describe.each(['enviado', 'recebido'])('tag de permissões do contato %s', (perspectiva) => {
+        test.each([
+            ['Profissional', conviteRecebido.vinculo],
+            ['Permissões Individuais', { tipo: 'individual', permissoes: ['geral.fase_atual'] }]
+        ])('abre o resumo pela tag %s', async (nome, vinculo) => {
+            const contato = { ...conviteRecebido, status: 'ativo', vinculo };
+            const aoAbrirResumo = jest.fn();
+            await render(
+                <ContactCard
+                    contato={contato}
+                    perspectiva={perspectiva}
+                    aoAbrirResumo={aoAbrirResumo}
+                />
+            );
+
+            await fireEvent.press(screen.getByRole('button', { name: nome }));
+
+            expect(aoAbrirResumo).toHaveBeenCalledWith(contato);
+        });
+    });
+
     test('mostra ações de um contato ativo enviado', async () => {
         const aoAcao = jest.fn();
 
@@ -521,8 +542,8 @@ describe('ContactCard', () => {
         );
 
         expect(screen.getByTestId('contact-card')).toHaveStyle({
-            backgroundColor: '#232926',
-            borderColor: '#4A514D'
+            backgroundColor: '#1E1E1E',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
         });
     });
 

@@ -30,13 +30,14 @@ function ordenarMeses(meses) {
     return [...meses].sort((primeiro, segundo) => primeiro.mes.localeCompare(segundo.mes))
 }
 
-function useCalendar({service, onSessaoExpirada} = {}) {
+function useCalendar({service, onSessaoExpirada, somenteLeitura = false} = {}) {
     const [mesAtual] = useState(obterChaveMes)
     const [meses, setMeses] = useState([])
     const [carregando, setCarregando] = useState(true)
     const [carregandoAnteriores, setCarregandoAnteriores] = useState(false)
     const [carregandoPosteriores, setCarregandoPosteriores] = useState(false)
     const [erro, setErro] = useState(null)
+    const [permitePrevisoes, setPermitePrevisoes] = useState(false)
     const mesesRef = useRef([])
     const requisicoes = useRef(new Map())
     const montado = useRef(false)
@@ -48,7 +49,7 @@ function useCalendar({service, onSessaoExpirada} = {}) {
     }, [meses])
 
     const carregarMes = useCallback(async (mes, tipo = 'inicial') => {
-        if (requisicoes.current.has(mes)) return
+        if (requisicoes.current.has(mes) || (somenteLeitura && requisicoes.current.size > 0)) return
 
         if (mesesRef.current.some(item => item.mes === mes)) return
 
@@ -76,9 +77,18 @@ function useCalendar({service, onSessaoExpirada} = {}) {
 
             if (!montado.current || controlador.signal.aborted) return
 
+            const removerPrevisoes = somenteLeitura && calendario.permitePrevisoes !== true
+            if (somenteLeitura) setPermitePrevisoes(!removerPrevisoes)
+
             setMeses(mesesAtuais => {
                 const semDuplicatas = mesesAtuais.filter(item => item.mes !== calendario.mes)
-                const atualizados = ordenarMeses([...semDuplicatas, calendario])
+                const atualizados = ordenarMeses(
+                    removerPrevisoes
+                        ? [...semDuplicatas, calendario].map(item =>
+                            item.previsao == null ? item : {...item, previsao: null}
+                        )
+                        : [...semDuplicatas, calendario]
+                )
                 mesesRef.current = atualizados
                 return atualizados
             })
@@ -96,17 +106,27 @@ function useCalendar({service, onSessaoExpirada} = {}) {
                 return
             }
 
+            if (somenteLeitura && falha?.status === 403) {
+                mesesRef.current = []
+                setMeses([])
+                setPermitePrevisoes(false)
+                preCarregouMesSeguinte.current = false
+                ultimaFalha.current = {mes: mesAtual, tipo: 'inicial'}
+            }
+
             setErro(falha?.mensagemUsuario || MENSAGEM_ERRO)
         } finally {
-            requisicoes.current.delete(mes)
+            if (requisicoes.current.get(mes) === controlador) {
+                requisicoes.current.delete(mes)
+            }
 
-            if (montado.current) {
+            if (montado.current && !controlador.signal.aborted) {
                 if (tipo === 'inicial') setCarregando(false)
                 if (tipo === 'anterior') setCarregandoAnteriores(false)
                 if (tipo === 'posterior') setCarregandoPosteriores(false)
             }
         }
-    }, [onSessaoExpirada, service])
+    }, [mesAtual, onSessaoExpirada, service, somenteLeitura])
 
     useEffect(() => {
         montado.current = true
@@ -162,6 +182,7 @@ function useCalendar({service, onSessaoExpirada} = {}) {
         carregando,
         carregandoAnteriores,
         carregandoPosteriores,
+        permitePrevisoes,
         erro,
         carregarAnteriores,
         carregarPosteriores,

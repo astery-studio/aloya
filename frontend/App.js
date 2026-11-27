@@ -36,6 +36,13 @@ function AppDemonstracaoHu013() {
 
 export default function App() {
     const demonstrarHu013 = process.env.EXPO_PUBLIC_PREVIEW_HU013 === 'true';
+    if (__DEV__ && process.env.EXPO_PUBLIC_PREVIEW_HU032 === 'true') {
+        const { SharedSupportPreview } = require(
+            './src/features/support-network/testing/SharedSupportPreview'
+        );
+        return <SharedSupportPreview />;
+    }
+
     return (
         <SafeAreaProvider>
             {demonstrarHu013 ? <AppDemonstracaoHu013 /> : <AppPrincipal />}
