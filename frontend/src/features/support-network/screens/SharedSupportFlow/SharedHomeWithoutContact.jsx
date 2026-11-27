@@ -72,7 +72,7 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    textos: { flex: 1, minWidth: 0 },
+    textos: { flex: 1, minWidth: 0, gap: 7 },
     titulo: {
         color: '#222222',
         fontFamily: fontFamilies.regular,
@@ -83,7 +83,6 @@ const estilos = StyleSheet.create({
     },
     descricao: {
         maxWidth: 261.667,
-        paddingTop: 7,
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
         fontSize: 9,
