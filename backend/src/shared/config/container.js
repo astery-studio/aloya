@@ -582,6 +582,7 @@ function criarContainer() {
                 prisma,
                 calendarService: calendarModule.calendarService,
                 currentCycleService: calendarModule.currentCycleService,
+                predictionService,
                 cycleHistoryService,
                 contraceptiveService
             }),

@@ -5,6 +5,7 @@ function criarSharedSupportData({
     prisma,
     calendarService,
     currentCycleService,
+    predictionService,
     cycleHistoryService,
     contraceptiveService
 }) {
@@ -12,9 +13,30 @@ function criarSharedSupportData({
         return { nomeTitular };
     }
 
-    async function fase({ titularId }) {
-        const { faseAtual } = await currentCycleService.buscarEstadoAtual({ usuarioId: titularId });
-        return { faseAtual };
+    async function fase({ titularId, permissoes }) {
+        const estado = await currentCycleService.buscarEstadoAtual({ usuarioId: titularId });
+        const base = { faseAtual: estado.faseAtual, possuiCiclos: estado.possuiCiclos };
+        if (!permissoes?.includes('geral.historico_ciclo') || !estado.possuiCiclos) return base;
+
+        const {
+            fasesEstimadas,
+            duracaoCicloEstimada,
+            proximoInicioEstimado,
+            dataOvulacaoEstimada,
+            janelaFertilEstimada
+        } = await predictionService.buscar(titularId);
+        return {
+            ...base,
+            dataReferencia: estado.dataReferencia,
+            diaDoCiclo: estado.diaDoCiclo,
+            previsao: {
+                fasesEstimadas,
+                duracaoCicloEstimada,
+                proximoInicioEstimado,
+                dataOvulacaoEstimada,
+                janelaFertilEstimada
+            }
+        };
     }
 
     function dicas() {
