@@ -186,6 +186,7 @@ function NewContactFormScreen({
     emailUsuario,
     service,
     categoriasService,
+    contraceptiveService,
     onVoltar,
     onSalvo,
     onSessaoExpirada,
@@ -514,6 +515,8 @@ function NewContactFormScreen({
 
             <IndividualPermissionsForm
                 visivel={permissoesVisiveis}
+                contraceptiveService={contraceptiveService}
+                onSessaoExpirada={onSessaoExpirada}
                 aoFechar={fecharPermissoes}
                 permissoesSelecionadas={rascunhoPermissoes}
                 aoAlterar={definirRascunhoPermissoes}
