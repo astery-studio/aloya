@@ -26,24 +26,31 @@ export function criarPushWorker({
             orderBy: [{ dataHoraProgramada: 'asc' }, { id: 'asc' }],
             take: 50
         });
+
         for (const aviso of avisos) await processarAviso(contexto, aviso, relogio());
+
         await prisma.entregaPush.updateMany({
             where: { status: 'aceita', aceitaEm: { lt: somar(agora, -23 * 60 * minuto) } },
             data: { status: 'sem_recibo', erro: 'ReciboIndisponivel' }
         });
+
         const aceitas = await prisma.entregaPush.findMany({
             where: { status: 'aceita', proximaTentativa: { lte: agora } },
             take: 100
         });
+
         if (!aceitas.length) return;
+
         let recibos;
         try {
             recibos = await provider.recibos(aceitas.map((item) => item.ticket));
         } catch {
             return;
         }
+
         for (const item of aceitas)
             await registrarResultado(prisma, item, recibos?.[item.ticket], agora, true);
     }
+
     return { processar };
 }

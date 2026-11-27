@@ -9,6 +9,7 @@ const somar = (data, ms) => new Date(+data + ms);
 export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso, entrega) {
     const agora = relogio();
     const dispositivo = await obterDispositivoAtivo(prisma, aviso, entrega, agora);
+
     if (
         !dispositivo ||
         !(await elegivel(prisma, aviso, agora)) ||
@@ -22,6 +23,7 @@ export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso,
         });
         return;
     }
+
     const conteudo = await renderizarPush(prisma, aviso, agora);
     const reivindicada = await prisma.entregaPush.updateMany({
         where: { id: entrega.id, status: 'pendente', proximaTentativa: { lte: agora } },
@@ -31,6 +33,7 @@ export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso,
             proximaTentativa: somar(agora, minuto)
         }
     });
+
     if (!reivindicada.count) return;
 
     if (!(await aindaPodeEnviar(prisma, dispositivo, aviso, entrega, relogio()))) {
@@ -49,6 +52,7 @@ export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso,
     } catch {
         // Sem confirmação do provedor, reenviar poderia duplicar o push.
     }
+
     await registrarResultado(
         prisma,
         { ...entrega, tentativas: entrega.tentativas + 1 },

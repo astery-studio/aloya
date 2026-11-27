@@ -6,22 +6,28 @@ import { planejarCompartilhadas } from './sharedPushPlanner.js';
 import { criarExpoPushProvider } from './pushProvider.js';
 import { criarPushWorker } from './pushWorker.js';
 import { inicializarCatalogoNotificacao } from './notificationCatalog.service.js';
+
 if (process.env.PUSH_ENABLED !== 'true')
     throw new Error('Configure PUSH_ENABLED=true para iniciar o worker.');
+
 const worker = criarPushWorker({
     prisma,
     provider: criarExpoPushProvider({ token: process.env.EXPO_PUSH_ACCESS_TOKEN })
 });
+
 let encerrar = false;
 let cursor = 0;
+
 process.once('SIGINT', () => {
     encerrar = true;
 });
 process.once('SIGTERM', () => {
     encerrar = true;
 });
+
 try {
     await inicializarCatalogoNotificacao(prisma);
+
     while (!encerrar) {
         try {
             const contas = await prisma.usuario.findMany({
@@ -34,6 +40,7 @@ try {
                 orderBy: { id: 'asc' },
                 select: { id: true, preferenciaNotificacao: true }
             });
+
             for (const conta of contas) {
                 cursor = conta.id;
                 try {
@@ -47,6 +54,7 @@ try {
                             agora
                         )
                     ]);
+
                     await reconciliarAgendamentos(prisma, conta.id, [
                         ...proprias,
                         ...compartilhadas
@@ -56,11 +64,13 @@ try {
                     console.error(JSON.stringify({ evento: 'push_planejamento_falhou' }));
                 }
             }
+
             if (contas.length < 25) cursor = 0;
             await worker.processar();
         } catch {
             console.error(JSON.stringify({ evento: 'push_processamento_falhou' }));
         }
+
         if (!encerrar) await esperar(15000);
     }
 } finally {

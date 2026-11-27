@@ -7,6 +7,7 @@ export const publico = { id: true, plataforma: true, atualizadoEm: true };
 
 export async function registrarDispositivo(prisma, { id: usuarioId, sessaoId }, entrada) {
     const dados = validar(entrada);
+
     return prisma.$transaction(async (tx) => {
         const sessao = await tx.sessao.findFirst({
             where: {
@@ -17,7 +18,9 @@ export async function registrarDispositivo(prisma, { id: usuarioId, sessaoId }, 
             },
             select: { id: true }
         });
+
         if (!sessao) throw new AppError('Sessão inválida.', 401, 'SESSAO_INVALIDA');
+
         const anterior = await tx.dispositivoPush.findUnique({
             where: { instalacao: dados.instalacao }
         });
@@ -27,10 +30,12 @@ export async function registrarDispositivo(prisma, { id: usuarioId, sessaoId }, 
             anterior.token === dados.token &&
             !anterior.invalidadoEm;
         const vinculo = mesmoVinculo ? anterior.vinculo : randomUUID();
+
         await tx.dispositivoPush.updateMany({
             where: { token: dados.token, instalacao: { not: dados.instalacao } },
             data: { token: `invalidado:${randomUUID()}`, invalidadoEm: new Date() }
         });
+
         const registro = { ...dados, usuarioId, sessaoId, vinculo, invalidadoEm: null };
         const dispositivo = await tx.dispositivoPush.upsert({
             where: { instalacao: dados.instalacao },
@@ -38,6 +43,7 @@ export async function registrarDispositivo(prisma, { id: usuarioId, sessaoId }, 
             update: registro,
             select: publico
         });
+
         if (
             anterior?.usuarioId !== usuarioId &&
             (await tx.dispositivoPush.count({
@@ -46,6 +52,7 @@ export async function registrarDispositivo(prisma, { id: usuarioId, sessaoId }, 
         ) {
             await publicarSeguranca(tx, usuarioId, 'dispositivo.novo', dispositivo.id, new Date());
         }
+
         return dispositivo;
     });
 }

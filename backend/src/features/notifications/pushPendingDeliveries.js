@@ -9,6 +9,7 @@ export async function prepararEntregasPendentes(prisma, aviso, agora) {
         },
         select: { id: true, vinculo: true }
     });
+
     await prisma.entregaPush.createMany({
         data: dispositivos
             .filter(
@@ -25,6 +26,7 @@ export async function prepararEntregasPendentes(prisma, aviso, agora) {
                 proximaTentativa: agora
             }))
     });
+
     await prisma.entregaPush.updateMany({
         where: {
             notificacaoId: aviso.id,
@@ -33,6 +35,7 @@ export async function prepararEntregasPendentes(prisma, aviso, agora) {
         },
         data: { status: 'falha', erro: 'RespostaIndeterminada' }
     });
+
     return prisma.entregaPush.findMany({
         where: {
             notificacaoId: aviso.id,
