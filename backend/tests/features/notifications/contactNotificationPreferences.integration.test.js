@@ -25,11 +25,17 @@ test('limita preferências do contato às permissões vigentes e salva na conta 
     assert.equal((await service.buscar(2))[ativarDicas.chave], true);
     assert.equal((await service.buscar(1))[ativarDicas.chave], false);
 
+    const ligarDiario = await chamar('/contato', 2, { chave: 'redeApoio.diario', valor: true });
+    assert.equal(ligarDiario.status, 200);
+    assert.equal((await ligarDiario.json()).efetivas['redeApoio.diario.energia'], true);
+    assert.equal((await service.buscar(2))['redeApoio.diario.corpo'], false);
+
     await prisma.categoriaPermissao.update({
         where: { id: categoria.id },
         data: { conjuntoDadosVisiveis: [] }
     });
     assert.equal((await chamar('/contato', 2, ativarDicas)).status, 403);
+    assert.equal((await chamar('/contato', 2, { chave: 'redeApoio.diario', valor: true })).status, 403);
     const semPermissoes = await (await chamar('/', 2)).json();
     assert.ok(
         semPermissoes.chavesDisponiveis.every((chave) => chave.startsWith('redeApoio.convites'))
