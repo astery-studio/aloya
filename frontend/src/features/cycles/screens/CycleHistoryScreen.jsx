@@ -119,7 +119,7 @@ function CycleHistoryScreen({
     onVoltar
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema, somenteLeitura), [tema, somenteLeitura]);
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const corCarregamento = tema.escuro
         ? tema.cores.interface.destaque

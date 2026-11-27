@@ -1,16 +1,12 @@
 import { StyleSheet } from 'react-native';
 
-import { espacamentosLayout, fontFamilies } from '../../../../shared/theme';
+import { fontFamilies } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     const { textoPrincipal, textoSecundario } = tema.cores.interface;
 
     return StyleSheet.create({
-        container: {
-            width: '100%',
-            alignItems: 'center',
-            paddingHorizontal: espacamentosLayout.margemHorizontalTela
-        },
+        container: { width: '100%', alignItems: 'center', paddingHorizontal: 24 },
         titulo: {
             color: textoPrincipal,
             fontFamily: fontFamilies.regular,

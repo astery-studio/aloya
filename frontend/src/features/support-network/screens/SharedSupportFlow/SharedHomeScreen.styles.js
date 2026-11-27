@@ -1,11 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { espacamentosLayout, fontFamilies } from '../../../../shared/theme';
+import { fontFamilies } from '../../../../shared/theme';
 
 const estilos = StyleSheet.create({
     conteudo: { flexGrow: 1, paddingTop: 8, paddingBottom: 16 },
     identificacao: { paddingTop: 16, paddingBottom: 16 },
     educacao: { paddingTop: 34 },
-    margemLateral: { paddingHorizontal: espacamentosLayout.margemHorizontalTela },
     rodape: { paddingTop: 34 },
     selo: {
         color: '#2C4C3B',

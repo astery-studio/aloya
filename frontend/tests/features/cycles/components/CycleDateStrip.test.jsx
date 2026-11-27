@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
 import { fireEvent, screen } from '@testing-library/react-native';
 import {
     calcularPaddingLateral,
@@ -36,17 +35,6 @@ test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
     expect(faixa.props.maintainVisibleContentPosition).toEqual({ minIndexForVisible: 1 });
     expect(faixa.props.onScrollToIndexFailed).toEqual(expect.any(Function));
     expect(screen.getAllByRole('button')).toHaveLength(2);
-});
-
-test('recalcula a centralização quando a faixa tem margem lateral', async () => {
-    await montar();
-    const obterPadding = () =>
-        StyleSheet.flatten(screen.getByLabelText('Datas do ciclo').props.contentContainerStyle)
-            .paddingHorizontal;
-    const paddingSemMargem = obterPadding();
-
-    await montar({ margemHorizontal: 24 });
-    expect(obterPadding()).toBe(paddingSemMargem - 24);
 });
 
 test.each([

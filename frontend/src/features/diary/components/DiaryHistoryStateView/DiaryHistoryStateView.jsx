@@ -49,13 +49,7 @@ function DiaryHistoryStateView({
         );
     } else if (tipo === 'filtro-vazio') {
         estado = (
-            <View
-                accessibilityLiveRegion="polite"
-                style={[
-                    estilos.estadoFiltroVazio,
-                    somenteLeitura && estilos.filtroVazioCompartilhado
-                ]}
-            >
+            <View accessibilityLiveRegion="polite" style={estilos.estadoFiltroVazio}>
                 <Text style={estilos.mensagemFiltroVazio}>
                     Nenhum registro encontrado para os filtros aplicados.
                 </Text>

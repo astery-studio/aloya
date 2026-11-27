@@ -30,7 +30,6 @@ function CyclePredictionSummary({
     estimativaIncerta = false,
     aoAbrirConfiabilidade,
     nomeTitular,
-    margemHorizontal,
     corDestaque = '#C85A44'
 }) {
     const proximo = separarData(proximoInicio);
@@ -38,12 +37,7 @@ function CyclePredictionSummary({
     const intervalo = formatarJanelaFertil(janelaFertil);
 
     return (
-        <View
-            style={[
-                estilos.margem,
-                margemHorizontal != null && { paddingHorizontal: margemHorizontal }
-            ]}
-        >
+        <View style={estilos.margem}>
             <View style={estilos.card}>
                 <View style={estilos.cabecalho}>
                     <View style={estilos.textosCabecalho}>

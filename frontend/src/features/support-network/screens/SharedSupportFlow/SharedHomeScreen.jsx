@@ -10,7 +10,6 @@ import {
     SparkleIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
-import { espacamentosLayout } from '../../../../shared/theme';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { CycleDateStrip } from '../../../cycles/components/CycleDateStrip';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
@@ -42,7 +41,6 @@ const GESTOS = [
     ['Respeitar', ShieldCheckIcon],
     ['Ajudar', SparkleIcon]
 ];
-const { margemHorizontalTela } = espacamentosLayout;
 
 function SharedHomeScreen({
     nomeTitular,
@@ -124,7 +122,6 @@ function SharedHomeScreen({
                     <CycleDateStrip
                         dias={dias}
                         dataSelecionada={data}
-                        margemHorizontal={margemHorizontalTela}
                         aoCarregarAnteriores={() => carregarDias('anteriores')}
                         aoCarregarPosteriores={() => carregarDias('posteriores')}
                         aoSelecionarData={fases || semCiclo ? setDataEscolhida : undefined}
@@ -150,7 +147,7 @@ function SharedHomeScreen({
                     />
                 )}
                 {verAnticoncepcionais ? (
-                    <View style={[estilosAcoes.secao, estilos.margemLateral]}>
+                    <View style={estilosAcoes.secao}>
                         <CycleContraceptiveAction
                             texto="Ver Anticoncepcionais"
                             larguraTotal
@@ -159,7 +156,7 @@ function SharedHomeScreen({
                     </View>
                 ) : null}
                 {verFase && status === 'disponivel' && (dicas || ciclo?.possuiCiclos === false) ? (
-                    <View style={[estilosCuidados.secao, estilos.margemLateral]}>
+                    <View style={estilosCuidados.secao}>
                         <CycleHomeCard
                             categoria="Momento do ciclo"
                             corCategoria={corDaFase}
@@ -190,7 +187,6 @@ function SharedHomeScreen({
                 {previsao?.proximoInicioEstimado ? (
                     <CyclePredictionSummary
                         nomeTitular={nomeTitular}
-                        margemHorizontal={margemHorizontalTela}
                         corDestaque={corDaFase}
                         proximoInicio={previsao.proximoInicioEstimado}
                         ovulacaoEstimada={previsao.dataOvulacaoEstimada}
@@ -199,7 +195,7 @@ function SharedHomeScreen({
                 ) : null}
                 {verDicas ? (
                     <>
-                        <View style={[estilosCuidados.secao, estilos.margemLateral]}>
+                        <View style={estilosCuidados.secao}>
                             <Text style={[estilosCuidados.etiqueta, { color: corDaFase }]}>
                                 Cuidado respeitoso
                             </Text>
@@ -230,7 +226,7 @@ function SharedHomeScreen({
                         <CycleEducationSection
                             perspectiva="contato"
                             corDestaque={corDaFase}
-                            estiloSecao={[estilos.educacao, estilos.margemLateral]}
+                            estiloSecao={estilos.educacao}
                             rodape={
                                 <View style={estilos.rodape}>
                                     <Text style={[estilosCuidados.etiqueta, { color: corDaFase }]}>

@@ -2,9 +2,8 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
-function criarEstilosAcompanhamento(tema, somenteLeitura = false) {
+function criarEstilosAcompanhamento(tema) {
     const interfaceTema = tema.cores.interface;
-    const { margemHorizontalTela } = tema.espacamentosLayout;
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : interfaceTema.fundo },
         corpo: {
@@ -25,7 +24,7 @@ function criarEstilosAcompanhamento(tema, somenteLeitura = false) {
             width: '100%',
             maxWidth: 393.33,
             alignSelf: 'center',
-            paddingHorizontal: somenteLeitura ? margemHorizontalTela : 21.66,
+            paddingHorizontal: 21.66,
             paddingBottom: 12
         },
         rotuloSecao: {
@@ -55,7 +54,6 @@ function criarEstilosAcompanhamento(tema, somenteLeitura = false) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 12,
-            paddingHorizontal: somenteLeitura ? margemHorizontalTela : 0,
             paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
         mensagemEstado: {
@@ -69,7 +67,7 @@ function criarEstilosAcompanhamento(tema, somenteLeitura = false) {
             alignItems: 'center',
             justifyContent: 'center',
             paddingTop: tema.espacamentosLayout.headerParaConteudo,
-            paddingHorizontal: somenteLeitura ? margemHorizontalTela : 22
+            paddingHorizontal: 22
         },
         tituloVazio: {
             color: interfaceTema.textoPrincipal,
