@@ -2,6 +2,7 @@ import { canaisNativos, prepararCanalNativo } from './nativeNotificationPresenta
 
 const chaveInstalacao = 'aloya.push.instalacao';
 const chaveDispositivo = 'aloya.push.dispositivo';
+const intervaloRenovacao = 15 * 60_000;
 
 async function obterInstalacao(AsyncStorage) {
     const anterior = await AsyncStorage.getItem(chaveInstalacao);
@@ -15,7 +16,7 @@ async function obterInstalacao(AsyncStorage) {
 
 export async function atualizarRegistro(
     { push, AsyncStorage, service, controller, projectId, plataforma },
-    solicitar
+    { solicitar, tokenNativo, anterior }
 ) {
     if (plataforma === 'android')
         await Promise.all(Object.keys(canaisNativos).map((id) => prepararCanalNativo(push, id)));
@@ -33,19 +34,27 @@ export async function atualizarRegistro(
             await service.remover(dispositivo, controller.signal);
             await AsyncStorage.removeItem(chaveDispositivo);
         }
-        return;
+        return undefined;
     }
 
     const instalacao = await obterInstalacao(AsyncStorage);
-    const { data: token } = await push.getExpoPushTokenAsync({ projectId });
+    // Obter o token nativo novamente dentro do listener pode dispará-lo em sequência.
+    const { data: token } = await push.getExpoPushTokenAsync({
+        projectId,
+        ...(tokenNativo ? { devicePushToken: tokenNativo } : {})
+    });
 
     if (controller.signal.aborted) return;
 
     const fuso = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const id = await service.registrar(
-        { instalacao, token, plataforma: plataforma, fuso },
-        controller.signal
-    );
+    const dados = { instalacao, token, plataforma, fuso };
+    if (
+        anterior &&
+        Date.now() - anterior.registradoEm < intervaloRenovacao &&
+        Object.entries(dados).every(([chave, valor]) => anterior.dados[chave] === valor)
+    ) return anterior;
 
+    const id = await service.registrar(dados, controller.signal);
     if (!controller.signal.aborted) await AsyncStorage.setItem(chaveDispositivo, id);
+    return { dados, registradoEm: Date.now() };
 }
