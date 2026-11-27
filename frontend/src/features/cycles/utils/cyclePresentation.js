@@ -109,6 +109,7 @@ function obterDiaCiclo(data, fases) {
 }
 
 export {
+    adicionarDias,
     criarDiasDaFaixa,
     formatarDataCabecalho,
     formatarDataLonga,

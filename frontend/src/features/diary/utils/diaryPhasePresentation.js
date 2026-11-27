@@ -3,6 +3,7 @@ import { PlantIcon } from 'phosphor-react-native/src/icons/Plant';
 import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import { SunIcon } from 'phosphor-react-native/src/icons/Sun';
 import { WavesIcon } from 'phosphor-react-native/src/icons/Waves';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 
 const FASES_DIARIO = Object.freeze({
     menstruacao: {
@@ -42,27 +43,28 @@ const FASES_DIARIO = Object.freeze({
 const FASES_DIARIO_ESCURAS = Object.freeze({
     menstruacao: {
         ...FASES_DIARIO.menstruacao,
-        cor: '#EF9A9A',
-        fundoIcone: 'rgba(239, 154, 154, 0.10)',
-        fundo: 'rgba(239, 154, 154, 0.20)'
+        cor: coresNoturnasConteudo.coral,
+        fundoIcone: 'rgba(194, 110, 95, 0.10)',
+        fundo: 'rgba(194, 110, 95, 0.20)',
+        textoContador: 'rgba(194, 110, 95, 0.80)'
     },
     folicular: {
         ...FASES_DIARIO.folicular,
-        cor: '#A5D6A7',
+        cor: coresNoturnasConteudo.verde,
         fundoIcone: 'rgba(165, 214, 167, 0.10)',
-        fundo: 'rgba(165, 214, 167, 0.20)'
+        fundo: 'rgba(165, 214, 167, 0.20)',
+        textoContador: 'rgba(165, 214, 167, 0.80)'
     },
     ovulacao: {
         ...FASES_DIARIO.ovulacao,
-        cor: '#90CAF9',
-        fundoIcone: 'rgba(144, 202, 249, 0.10)',
-        fundo: 'rgba(144, 202, 249, 0.20)'
+        cor: '#D68C3A',
+        fundoIcone: 'rgba(214, 140, 58, 0.10)',
+        fundo: 'rgba(214, 140, 58, 0.20)',
+        textoContador: 'rgba(214, 140, 58, 0.80)'
     },
     lutea: {
         ...FASES_DIARIO.lutea,
-        cor: '#FFE082',
-        fundoIcone: 'rgba(255, 224, 130, 0.10)',
-        fundo: 'rgba(255, 224, 130, 0.20)'
+        textoContador: 'rgba(214, 140, 58, 0.80)'
     }
 });
 

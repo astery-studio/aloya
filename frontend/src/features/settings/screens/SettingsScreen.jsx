@@ -29,6 +29,8 @@ function SettingsScreen({
     onAbrirPoliticasPrivacidade,
     onAbrirResponsavelLegal,
     menorDe16 = false,
+    emAcompanhamento = false,
+    abasDisponiveis,
     onSelecionarAba
 }) {
     const tema = useTheme();
@@ -58,6 +60,7 @@ function SettingsScreen({
                 titulo="Configurações"
                 corFundo={tema.escuro ? '#121212' : undefined}
                 abaAtiva="configuracoes"
+                abasDisponiveis={abasDisponiveis}
                 onSelecionarAba={onSelecionarAba}
             >
                 <ScrollView
@@ -86,25 +89,27 @@ function SettingsScreen({
                         />
                     </View>
 
-                    <View style={estilos.secao}>
-                        <Text style={estilos.tituloSecao}>Meu Ciclo</Text>
+                    {!emAcompanhamento ? (
+                        <View style={estilos.secao}>
+                            <Text style={estilos.tituloSecao}>Meu Ciclo</Text>
 
-                        <NavigationField
-                            label="Parâmetros do Ciclo"
-                            coresIcone={
-                                tema.escuro
-                                    ? {
-                                          icone: '#C85A44',
-                                          caixa: 'rgba(255, 171, 145, 0.16)'
-                                      }
-                                    : undefined
-                            }
-                            estilo={estilos.campoComBorda}
-                            icone={ArrowsClockwiseIcon}
-                            paleta="corLaranja"
-                            onPress={onAbrirParametrosCiclo}
-                        />
-                    </View>
+                            <NavigationField
+                                label="Parâmetros do Ciclo"
+                                coresIcone={
+                                    tema.escuro
+                                        ? {
+                                              icone: '#C85A44',
+                                              caixa: 'rgba(255, 171, 145, 0.16)'
+                                          }
+                                        : undefined
+                                }
+                                estilo={estilos.campoComBorda}
+                                icone={ArrowsClockwiseIcon}
+                                paleta="corLaranja"
+                                onPress={onAbrirParametrosCiclo}
+                            />
+                        </View>
+                    ) : null}
 
                     <View style={estilos.secao}>
                         <Text style={estilos.tituloSecao}>Preferências</Text>
@@ -198,7 +203,11 @@ function SettingsScreen({
                             ) : null}
 
                             <NavigationField
-                                label="Privacidade e Termos"
+                                label={
+                                    emAcompanhamento
+                                        ? 'Políticas de Privacidade'
+                                        : 'Privacidade e Termos'
+                                }
                                 coresIcone={
                                     tema.escuro
                                         ? {

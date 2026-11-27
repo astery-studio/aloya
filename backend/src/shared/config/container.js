@@ -100,6 +100,9 @@ import { criarContactInvitationResponseService } from '../../features/support-ne
 import { criarContactInvitationResponseController } from '../../features/support-network/controllers/contactInvitationResponse.controller.js';
 import { criarContactInvitationResponseRateLimit } from '../../features/support-network/middleware/contactInvitationResponseRateLimit.middleware.js';
 import { criarSupportContactService } from '../../features/support-network/services/supportContact.service.js';
+import { criarSharedSupportAccess } from '../../features/support-network/services/sharedSupportAccess.service.js';
+import { criarSharedSupportData } from '../../features/support-network/services/sharedSupportData.service.js';
+import { criarSharedSupportDiary } from '../../features/support-network/services/sharedSupportDiary.service.js';
 import { criarSupportContactController } from '../../features/support-network/controllers/supportContact.controller.js';
 import { criarSupportContactValidator } from '../../features/support-network/validators/supportContact.validator.js';
 import { criarContactInvitationResendService } from '../../features/support-network/services/contactInvitationResend.service.js';
@@ -598,6 +601,23 @@ function criarContainer() {
         contactInvitationController,
         contactInvitationResponseController,
         supportContactController,
+        sharedSupport: {
+            access: criarSharedSupportAccess({ prisma }),
+            data: criarSharedSupportData({
+                prisma,
+                calendarService: calendarModule.calendarService,
+                currentCycleService: calendarModule.currentCycleService,
+                predictionService,
+                cycleHistoryService,
+                contraceptiveService
+            }),
+            diary: criarSharedSupportDiary({
+                prisma,
+                currentCycleService: calendarModule.currentCycleService,
+                diaryOverviewService,
+                diaryDetailService
+            })
+        },
         contactLinkController,
         supportContactRemovalController,
         authMiddleware,

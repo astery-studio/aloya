@@ -18,6 +18,7 @@ function criarCenario(existente = null) {
                     id: 10,
                     dataRegistro: data.dataRegistro,
                     faseCicloAssociada: data.faseCicloAssociada,
+                    checkInRealizado: data.checkInRealizado,
                     versao: 0,
                     categorias: [
                         {
@@ -40,6 +41,8 @@ function criarCenario(existente = null) {
                 return {
                     ...existente,
                     faseCicloAssociada: data.faseCicloAssociada,
+                    checkInRealizado:
+                        data.checkInRealizado === true || existente.checkInRealizado === true,
                     versao: existente.versao + 1,
                     categorias: [
                         ...existente.categorias,
@@ -72,10 +75,11 @@ function criarCenario(existente = null) {
     };
 }
 
-function dados(data, fusoHorario = 'UTC') {
+function dados(data, fusoHorario = 'UTC', checkInRealizado = false) {
     return validarCriacaoRegistro({
         data,
         fusoHorario,
+        ...(checkInRealizado ? { checkInRealizado: true } : {}),
         categorias: [{ categoriaId: 'anotacao_livre', texto: 'Hoje.' }]
     });
 }
@@ -92,6 +96,40 @@ test('cria registro com identidade da sessão e snapshot da fase', async () => {
     assert.equal(cenario.chamadas[0].faseCicloAssociada, 'menstrual');
     assert.equal(resultado.categorias[0].texto, 'Hoje.');
     assert.deepEqual(cenario.chamadasTermicas[0].slice(0, 2), [7, ['2026-11-08']]);
+});
+
+test('persiste o check-in e impede um segundo na mesma data', async () => {
+    const cenario = criarCenario();
+    const service = criarDiaryEntryService({
+        ...cenario,
+        agora: () => new Date('2026-11-08T12:00:00Z')
+    });
+
+    const resultado = await service.criar(7, dados('2026-11-08', 'UTC', true));
+
+    assert.equal(cenario.chamadas[0].checkInRealizado, true);
+    assert.equal(resultado.checkInRealizado, true);
+
+    const existente = {
+        id: 10,
+        dataRegistro: new Date('2026-11-08T00:00:00Z'),
+        faseCicloAssociada: 'folicular',
+        checkInRealizado: true,
+        versao: 2,
+        categorias: [],
+        criadoEm: new Date('2026-11-08T10:00:00Z'),
+        atualizadoEm: new Date('2026-11-08T10:00:00Z')
+    };
+    const duplicado = criarCenario(existente);
+    const serviceDuplicado = criarDiaryEntryService({
+        ...duplicado,
+        agora: () => new Date('2026-11-08T12:00:00Z')
+    });
+
+    await assert.rejects(() => serviceDuplicado.criar(7, dados('2026-11-08', 'UTC', true)), {
+        codigo: 'CHECK_IN_DIARIO_DUPLICADO'
+    });
+    assert.deepEqual(duplicado.chamadas, []);
 });
 
 test('compara data futura no fuso informado', async () => {

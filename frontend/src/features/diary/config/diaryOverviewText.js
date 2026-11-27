@@ -161,11 +161,17 @@ function listarDestaques(destaques = []) {
     return `${valores.slice(0, -1).join(', ')} e ${valores.at(-1)}`;
 }
 
-function criarDescricaoResumo({ fase, resumo }) {
+function criarDescricaoResumo({ fase, resumo, nomeTitular }) {
     if (resumo?.informacoesSuficientes && resumo.destaques?.length) {
-        return `Nos seus registros, você costuma relatar ${listarDestaques(resumo.destaques)}.`;
+        const destaques = listarDestaques(resumo.destaques);
+        if (destaques) {
+            return nomeTitular
+                ? `${nomeTitular} costuma registrar ${destaques}.`
+                : `Nos seus registros, você costuma relatar ${destaques}.`;
+        }
     }
-    return DESCRICOES_PADRAO_POR_FASE[fase];
+    const faseNormalizada = { menstrual: 'menstruacao', ovulatoria: 'ovulacao' }[fase] ?? fase;
+    return DESCRICOES_PADRAO_POR_FASE[faseNormalizada];
 }
 
 export {

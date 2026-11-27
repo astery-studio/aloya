@@ -25,7 +25,7 @@ function unirCiclos(ciclosAtuais, novosCiclos) {
 }
 
 //Controla o estado do histórico enquanto a tela estiver montada.
-function useCycleHistory({ service, onSessaoExpirada } = {}) {
+function useCycleHistory({ service, onSessaoExpirada, historicoCompartilhado = false } = {}) {
     validarService(service);
 
     const [ciclos, setCiclos] = useState([]);
@@ -172,6 +172,15 @@ function useCycleHistory({ service, onSessaoExpirada } = {}) {
                 return false;
             }
 
+            if (historicoCompartilhado && falha?.status === 403) {
+                setCiclos([]);
+                setResumo(RESUMO_INICIAL);
+                setQuantidadeCiclos(0);
+                setPaginacao({ temMais: false, proximoCursor: null });
+                setErro(MENSAGEM_ERRO);
+                return false;
+            }
+
             setErroCarregarMais(MENSAGEM_ERRO);
             return false;
         } finally {
@@ -181,7 +190,7 @@ function useCycleHistory({ service, onSessaoExpirada } = {}) {
                 setCarregandoMais(false);
             }
         }
-    }, [carregando, paginacao, service]);
+    }, [carregando, historicoCompartilhado, paginacao, service]);
 
     useEffect(() => {
         montado.current = true;

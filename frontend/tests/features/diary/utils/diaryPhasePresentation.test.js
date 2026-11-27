@@ -36,7 +36,8 @@ test('apresenta registros antigos sem fase de forma neutra', () => {
 test('apresenta fases e registros antigos com as cores noturnas', () => {
     expect(obterApresentacaoFase('menstrual', temaEscuro)).toBe(FASES_DIARIO_ESCURAS.menstruacao);
     expect(obterApresentacaoFase('folicular', temaEscuro).cor).toBe('#A5D6A7');
-    expect(obterApresentacaoFase('ovulatoria', temaEscuro).cor).toBe('#90CAF9');
-    expect(obterApresentacaoFase('lutea', temaEscuro).cor).toBe('#FFE082');
+    expect(obterApresentacaoFase('menstrual', temaEscuro).cor).toBe('#C26E5F');
+    expect(obterApresentacaoFase('ovulatoria', temaEscuro).cor).toBe('#D68C3A');
+    expect(obterApresentacaoFase('lutea', temaEscuro).cor).toBe('#D68C3A');
     expect(obterApresentacaoFaseRegistro(null, temaEscuro)).toBe(FASE_INDEFINIDA_DIARIO_ESCURA);
 });

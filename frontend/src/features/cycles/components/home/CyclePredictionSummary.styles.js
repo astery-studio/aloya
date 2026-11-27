@@ -24,6 +24,7 @@ const estilos = StyleSheet.create({
     textosCabecalho: { flexShrink: 1 },
     metricas: { minHeight: 75, flexDirection: 'row', gap: 16, marginTop: 20 },
     data: { width: 138, maxWidth: '43%', flexDirection: 'row', alignItems: 'center', gap: 9 },
+    textosData: { flex: 1, minWidth: 0, justifyContent: 'center' },
     secundarias: {
         flex: 1,
         justifyContent: 'center',

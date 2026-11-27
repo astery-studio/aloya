@@ -7,7 +7,7 @@ import { CycleRemovalFeedbackModal } from './components/CycleRemovalFeedbackModa
 import { useCycleRemoval } from './hooks/useCycleRemoval';
 import { obterPeriodo } from './utils/cycleRemovalPresentation';
 
-function CycleHistoryFlow({ service, aoAbrirCalendario, onSelecionarAba, onSessaoExpirada }) {
+function CycleHistoryFlow({ service, onVoltar, onSessaoExpirada }) {
     const historico = useCycleHistory({ service, onSessaoExpirada });
     const [cicloEditado, setCicloEditado] = useState(null);
     const [cicloParaExcluir, setCicloParaExcluir] = useState(null);
@@ -53,10 +53,9 @@ function CycleHistoryFlow({ service, aoAbrirCalendario, onSelecionarAba, onSessa
                 aoTentarNovamente={historico.tentarNovamente}
                 aoCarregarMais={historico.carregarMais}
                 aoTentarCarregarMais={historico.tentarCarregarMais}
-                aoAbrirCalendario={aoAbrirCalendario}
                 aoEditarCiclo={setCicloEditado}
                 aoExcluirCiclo={abrirRemocao}
-                onSelecionarAba={onSelecionarAba}
+                onVoltar={onVoltar}
             />
             <CycleRemovalFeedbackModal
                 visivel={Boolean(cicloParaExcluir)}

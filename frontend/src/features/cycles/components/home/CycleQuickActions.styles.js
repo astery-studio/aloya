@@ -40,6 +40,7 @@ const estilos = StyleSheet.create({
         borderColor: '#E6E2D8',
         paddingHorizontal: 20
     },
+    larguraTotal: { width: '100%' },
     texto: {
         fontFamily: fontFamilies.semibold,
         fontSize: 15,

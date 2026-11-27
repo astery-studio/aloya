@@ -72,38 +72,46 @@ function criarDiaryOverviewService({ prisma } = {}) {
         throw new TypeError('Não foi possível configurar o resumo do Diário.');
     }
 
-    async function buscar(usuarioId, fase) {
+    async function buscar(usuarioId, fase, categoriasPermitidas) {
         if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
             throw new AppError('Sessão inválida.', 401, 'SESSAO_INVALIDA');
         }
-        const [preferenciasMacro, preferenciasCategoria] = await Promise.all([
-            prisma.preferenciaMacrocategoriaDiario.findMany({ where: { usuarioId } }),
-            prisma.preferenciaCategoriaDiario.findMany({ where: { usuarioId } })
-        ]);
-        const categoriasAtivas = obterCategoriasAtivas(preferenciasMacro, preferenciasCategoria);
+        const categoriasAtivas =
+            categoriasPermitidas ??
+            obterCategoriasAtivas(
+                ...(await Promise.all([
+                    prisma.preferenciaMacrocategoriaDiario.findMany({ where: { usuarioId } }),
+                    prisma.preferenciaCategoriaDiario.findMany({ where: { usuarioId } })
+                ]))
+            );
         const possuiCategoriaAtiva = {
             categorias: { some: { categoriaId: { in: [...categoriasAtivas] } } }
         };
         const [diasRegistrados, registros] = await Promise.all([
             prisma.registroDiario.count({ where: { usuarioId, ...possuiCategoriaAtiva } }),
-            prisma.registroDiario.findMany({
-                where: { usuarioId, faseCicloAssociada: fase, ...possuiCategoriaAtiva },
-                orderBy: [{ dataRegistro: 'desc' }, { id: 'desc' }],
-                take: LIMITE_REGISTROS_ANALISADOS,
-                select: {
-                    categorias: {
-                        where: {
-                            categoriaId: { not: 'anotacao_livre' },
-                            categoria: { sensivel: false }
-                        },
-                        select: {
-                            categoriaId: true,
-                            categoriaNome: true,
-                            opcoes: { select: { opcaoId: true, opcaoNome: true } }
-                        }
-                    }
-                }
-            })
+            fase
+                ? prisma.registroDiario.findMany({
+                      where: { usuarioId, faseCicloAssociada: fase, ...possuiCategoriaAtiva },
+                      orderBy: [{ dataRegistro: 'desc' }, { id: 'desc' }],
+                      take: LIMITE_REGISTROS_ANALISADOS,
+                      select: {
+                          categorias: {
+                              where: {
+                                  categoriaId: {
+                                      not: 'anotacao_livre',
+                                      ...(categoriasPermitidas && { in: [...categoriasAtivas] })
+                                  },
+                                  categoria: { sensivel: false }
+                              },
+                              select: {
+                                  categoriaId: true,
+                                  categoriaNome: true,
+                                  opcoes: { select: { opcaoId: true, opcaoNome: true } }
+                              }
+                          }
+                      }
+                  })
+                : []
         ]);
         const marcadores = contarMarcadores(registros, categoriasAtivas).sort(compararDestaques);
         const destaques = marcadores

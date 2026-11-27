@@ -36,10 +36,33 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByLabelText('Ciclo médio: 28 dias')).toBeOnTheScreen();
         expect(screen.getByLabelText('Menstruação média: 5 dias')).toBeOnTheScreen();
         expect(screen.getByText('5 ciclos registrados')).toBeOnTheScreen();
-        expect(screen.getByText('Confiança Alta')).toBeOnTheScreen();
+        expect(screen.getByText('Alta')).toBeOnTheScreen();
         expect(screen.getByLabelText('Confiança alta')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Confiança alta' }));
         expect(screen.getByTestId('confidence-sheet')).toBeOnTheScreen();
+    });
+
+    test('mostra o resumo do titular apoiado sem precisar receber a confiabilidade', async () => {
+        await render(
+            <CycleSummaryCard
+                nomeTitular="Júlia"
+                exibirConfianca={false}
+                cicloMedioDias={28}
+                menstruacaoMediaDias={5}
+                quantidadeCiclos={5}
+            />
+        );
+
+        expect(
+            screen.getByRole('header', { name: 'RESUMO DOS CICLOS DE JÚLIA' })
+        ).toBeOnTheScreen();
+        expect(screen.getByLabelText('Ciclo médio: 28 dias')).toBeOnTheScreen();
+        expect(screen.getByLabelText('Menstruação média: 5 dias')).toBeOnTheScreen();
+        expect(screen.getByText('5 ciclos registrados').parent).toHaveStyle({
+            justifyContent: 'center'
+        });
+        expect(screen.queryByRole('button', { name: /confiança/i })).not.toBeOnTheScreen();
+        expect(screen.queryByTestId('confidence-sheet')).not.toBeOnTheScreen();
     });
 
     test('mantém somente quantidade e confiança quando não existem ciclos', async () => {
@@ -48,7 +71,7 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByTestId('cycle-summary-card')).toHaveStyle(estilos.semMetricas);
         expect(screen.queryByTestId('cycle-summary-metrics')).not.toBeOnTheScreen();
         expect(screen.getByText('0 ciclos registrados')).toBeOnTheScreen();
-        expect(screen.getByText('Confiança Baixa')).toBeOnTheScreen();
+        expect(screen.getByText('Baixa')).toBeOnTheScreen();
         expect(screen.getByLabelText('Confiança baixa')).toBeOnTheScreen();
     });
 

@@ -5,6 +5,22 @@ import {
     rotuloCategoriaResumo
 } from '../../../../src/features/diary/config/diaryOverviewText';
 
+test('reaproveita a descrição geral quando o resumo compartilhado tem só a fase', () => {
+    expect(criarDescricaoResumo({ fase: 'menstrual', nomeTitular: 'Júlia' })).toBe(
+        'Nesta fase, é comum sentir necessidade de descanso e maior sensibilidade.'
+    );
+    expect(
+        criarDescricaoResumo({
+            fase: 'folicular',
+            nomeTitular: 'Júlia',
+            resumo: {
+                informacoesSuficientes: true,
+                destaques: [{ categoriaId: 'energia', valor: 'Com energia' }]
+            }
+        })
+    ).toBe('Júlia costuma registrar boa disposição e energia.');
+});
+
 test('combina destaques em uma frase natural', () => {
     expect(listarDestaques()).toBe('');
     expect(listarDestaques([{ valor: 'Fadiga' }])).toBe('fadiga');
@@ -108,9 +124,7 @@ test('cobre rótulos inválidos, listas longas e resumo sem destaques', () => {
     expect(formatarDestaque({ categoriaId: 'banheiro', grupo: 'outro', valor: 'Urgência' })).toBe(
         'urgência na categoria banheiro'
     );
-    expect(listarDestaques([{ valor: 'A' }, { valor: 'B' }, { valor: 'C' }])).toBe(
-        'a, b e c'
-    );
+    expect(listarDestaques([{ valor: 'A' }, { valor: 'B' }, { valor: 'C' }])).toBe('a, b e c');
     expect(criarDescricaoResumo({ fase: 'lutea', resumo: { informacoesSuficientes: true } })).toBe(
         'Nesta fase, são comuns mudanças de energia, sensibilidade e alterações de humor.'
     );

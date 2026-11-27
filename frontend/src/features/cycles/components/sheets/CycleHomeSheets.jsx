@@ -1,6 +1,8 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useDiaryCatalog } from '../../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../../diary/hooks/useDiaryEntryForm';
 import { useDiaryRecordForDate } from '../../hooks/useDiaryRecordForDate';
+import { calcularCapacidadeAnotacao, montarAnotacaoHome } from '../../utils/diaryReflectionEntry';
 import { CycleConfidenceSheet } from './CycleConfidenceSheet';
 import { CyclePhaseEducationSheet } from './CyclePhaseEducationSheet';
 import { DiaryReflectionSheet } from './DiaryReflectionSheet';
@@ -8,6 +10,7 @@ import { GuidedBreathingSheet } from './GuidedBreathingSheet';
 
 function CycleHomeSheets({ aberto, nivel, fase, data, diaryService, onSessaoExpirada, aoFechar }) {
     const reflexaoAberta = aberto === 'reflexao';
+    const [reflexao, setReflexao] = useState('');
     const catalogo = useDiaryCatalog({
         ativo: reflexaoAberta && Boolean(diaryService),
         service: diaryService,
@@ -28,7 +31,28 @@ function CycleHomeSheets({ aberto, nivel, fase, data, diaryService, onSessaoExpi
         onSalvo: aoFechar,
         onSessaoExpirada
     });
-    const reflexao = formulario.valores.anotacao_livre ?? '';
+    const anotacaoExistente = useMemo(
+        () => existente.record?.categorias?.find(({ id }) => id === 'anotacao_livre')?.texto ?? '',
+        [existente.record]
+    );
+    const capacidadeAnotacao = useMemo(
+        () => calcularCapacidadeAnotacao(anotacaoExistente),
+        [anotacaoExistente]
+    );
+
+    useEffect(() => {
+        setReflexao('');
+    }, [data, reflexaoAberta]);
+
+    function salvarReflexao() {
+        const anotacaoCompleta = montarAnotacaoHome({
+            anotacaoExistente,
+            texto: reflexao
+        });
+        if (!anotacaoCompleta) return false;
+        return formulario.salvarComValores({ anotacao_livre: anotacaoCompleta });
+    }
+
     return (
         <>
             <CycleConfidenceSheet
@@ -44,9 +68,14 @@ function CycleHomeSheets({ aberto, nivel, fase, data, diaryService, onSessaoExpi
             <DiaryReflectionSheet
                 visivel={aberto === 'reflexao'}
                 valor={reflexao}
-                aoAlterar={(valor) => formulario.alterarValor('anotacao_livre', valor)}
-                aoSalvar={formulario.salvar}
+                aoAlterar={setReflexao}
+                aoSalvar={salvarReflexao}
                 aoFechar={aoFechar}
+                limiteCaracteres={capacidadeAnotacao.limiteTexto}
+                limiteContador={capacidadeAnotacao.limiteContador}
+                caracteresEstruturais={capacidadeAnotacao.caracteresEstruturais}
+                totalCaracteresExistentes={capacidadeAnotacao.caracteresExistentes}
+                semEspaco={capacidadeAnotacao.semEspaco}
                 salvando={formulario.salvando || existente.loading}
                 erro={formulario.erros.anotacao_livre ?? formulario.erroSalvamento}
             />

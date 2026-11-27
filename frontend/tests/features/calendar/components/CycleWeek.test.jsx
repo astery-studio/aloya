@@ -8,7 +8,9 @@ import {
 } from '../../../../src/features/calendar/components/CycleCalendar/CycleWeek';
 import {
     criarEstilosCalendario,
-    estilos
+    estilos,
+    estilosTipos,
+    estilosTiposPrevistos
 } from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar.styles';
 import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 
@@ -29,6 +31,55 @@ function criarDia(numero, alteracoes = {}) {
 }
 
 describe('CycleWeek', () => {
+    test('desenha uma faixa única para dias consecutivos da mesma fase e cor', async () => {
+        const semana = [
+            criarDia(1, { tipo: 'folicular', inicioSegmento: true }),
+            criarDia(2, { tipo: 'folicular' }),
+            criarDia(3, { tipo: 'folicular' }),
+            criarDia(4, { tipo: 'folicular', previsto: true, fimSegmento: true }),
+            criarDia(5),
+            criarDia(6, { tipo: 'lutea', inicioSegmento: true, fimSegmento: true }),
+            criarDia(7)
+        ];
+
+        await render(<CycleWeek semana={semana} />);
+
+        expect(screen.getAllByTestId(/^faixa-fase-/u)).toHaveLength(3);
+        const faixaAtual = screen.getByTestId('faixa-fase-2026-10-01-2026-10-03');
+        expect(faixaAtual).toHaveProp('pointerEvents', 'none');
+        expect(faixaAtual).toHaveStyle([
+            estilosTipos.folicular,
+            estilos.inicioSegmento,
+            { left: '0%' }
+        ]);
+        expect(parseFloat(StyleSheet.flatten(faixaAtual.props.style).right)).toBeCloseTo(400 / 7);
+        expect(screen.getByTestId('faixa-fase-2026-10-04-2026-10-04')).toHaveStyle([
+            estilosTiposPrevistos.folicular,
+            estilos.fimSegmento
+        ]);
+    });
+
+    test('usa a cor da fase do tema escuro e arredonda um dia isolado', async () => {
+        const semana = [
+            criarDia(1, { tipo: 'lutea', inicioSegmento: true, fimSegmento: true }),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ];
+        await render(
+            <CycleWeek semana={semana} estilosTema={criarEstilosCalendario(temaEscuro)} />
+        );
+
+        expect(screen.getByTestId('faixa-fase-2026-10-01-2026-10-01')).toHaveStyle([
+            { backgroundColor: '#B87550' },
+            estilos.inicioSegmento,
+            estilos.fimSegmento
+        ]);
+    });
+
     test('mantém exatamente sete posições na semana', async () => {
         const semana = [
             null,
@@ -66,6 +117,11 @@ describe('CycleWeek', () => {
 
         expect(parseFloat(estiloContorno.left)).toBeCloseTo(100 / 7, 10);
         expect(parseFloat(estiloContorno.width)).toBeCloseTo(300 / 7, 10);
+        expect(contorno).toHaveStyle({ borderWidth: 2, borderStyle: 'dashed', borderRadius: 16 });
+        expect(estiloContorno).not.toHaveProperty('borderTopWidth');
+        expect(estiloContorno).not.toHaveProperty('borderRightWidth');
+        expect(estiloContorno).not.toHaveProperty('borderBottomWidth');
+        expect(estiloContorno).not.toHaveProperty('borderLeftWidth');
         expect(contorno).toHaveStyle(estilos.janelaFertilAtual);
     });
 

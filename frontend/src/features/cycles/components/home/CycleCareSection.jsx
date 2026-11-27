@@ -1,12 +1,8 @@
-import { Pressable, Text, View } from 'react-native';
-import {
-    CaretRightIcon,
-    NotebookIcon,
-    QuestionIcon,
-    WindIcon
-} from '../../../../shared/components/icons/AppIcons';
+import { Text, View } from 'react-native';
+import { NotebookIcon, QuestionIcon, WindIcon } from '../../../../shared/components/icons/AppIcons';
 import { CONTEUDO_POR_FASE } from '../sheets/CyclePhaseEducationSheet.content';
 import { estilos } from './CycleCareSection.styles';
+import { CycleHomeCard } from './CycleHomeCard';
 
 const CUIDADOS = Object.freeze([
     {
@@ -70,23 +66,21 @@ function CycleCareSection({
                     const { id, categoria, titulo, descricao } = cuidado;
                     const { Icone } = visual;
                     return (
-                        <Pressable
+                        <CycleHomeCard
                             key={id}
-                            accessibilityLabel={`${categoria}. ${titulo}. ${descricao}. Abrir para a fase ${fase}.`}
-                            accessibilityRole="button"
-                            onPress={callbacks[id]}
-                            style={estilos.card}
-                        >
-                            <View style={[estilos.caixaIcone, { backgroundColor: visual.fundo }]}>
-                                <Icone size={24} color={visual.cor} weight={visual.weight} />
-                            </View>
-                            <View style={estilos.textos}>
-                                <Text style={estilos.categoria}>{categoria}</Text>
-                                <Text style={estilos.titulo}>{titulo}</Text>
-                                <Text style={estilos.descricao}>{descricao}</Text>
-                            </View>
-                            <CaretRightIcon size={20} color="#222222" />
-                        </Pressable>
+                            categoria={categoria}
+                            titulo={titulo}
+                            descricao={descricao}
+                            rotuloAcessibilidade={`${categoria}. ${titulo}. ${descricao}. Abrir para a fase ${fase}.`}
+                            aoPressionar={callbacks[id]}
+                            icone={
+                                <View
+                                    style={[estilos.caixaIcone, { backgroundColor: visual.fundo }]}
+                                >
+                                    <Icone size={24} color={visual.cor} weight={visual.weight} />
+                                </View>
+                            }
+                        />
                     );
                 })}
             </View>

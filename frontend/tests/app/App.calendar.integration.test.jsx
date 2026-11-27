@@ -132,11 +132,11 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     const { Pressable } = require('react-native');
 
     return {
-        CycleHistoryFlow: ({ aoAbrirCalendario }) =>
+        CycleHistoryFlow: ({ onVoltar }) =>
             ReactInterno.createElement(Pressable, {
                 accessibilityRole: 'button',
-                accessibilityLabel: 'Ir para o Calendário',
-                onPress: aoAbrirCalendario
+                accessibilityLabel: 'Voltar do histórico',
+                onPress: onVoltar
             })
     };
 });
@@ -264,7 +264,8 @@ describe('App — calendário', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
 
         await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
-        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para o Calendário' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Voltar do histórico' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário pelo menu' }));
 
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
@@ -282,6 +283,8 @@ describe('App — calendário', () => {
 
     test('abre o calendário pela rota do menu inferior', async () => {
         await renderApp(<App />);
+
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
 
         await fireEvent.press(
             await screen.findByRole('button', { name: 'Abrir calendário pelo menu' })

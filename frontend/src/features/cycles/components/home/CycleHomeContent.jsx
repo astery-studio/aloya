@@ -14,7 +14,12 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
     const corDaFase = CORES_FASE[fase] ?? CORES_FASE.desconhecida;
     return (
         <View style={estilos.conteudo}>
-            <CyclePhaseHero fase={fase} diaCiclo={diaCiclo} janelaFertilAtiva={janelaFertilAtiva} />
+            <CyclePhaseHero
+                fase={fase}
+                diaCiclo={diaCiclo}
+                duracaoCiclo={previsao?.duracaoCicloEstimada}
+                janelaFertilAtiva={janelaFertilAtiva}
+            />
             <CycleQuickActions {...callbacks} />
             <CyclePredictionSummary
                 proximoInicio={previsao.proximoInicioEstimado}
@@ -36,7 +41,7 @@ function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada })
                     date={dataSelecionada}
                     fase={fase}
                     service={diaryService}
-                    onOpenDiary={callbacks.aoAbrirDiario}
+                    onOpenDiary={callbacks.aoEditarDiario}
                     onSessionExpired={onSessaoExpirada}
                     corDestaque={corDaFase}
                 />

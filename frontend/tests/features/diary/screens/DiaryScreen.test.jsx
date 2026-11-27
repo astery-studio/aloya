@@ -43,6 +43,22 @@ describe('histórico do Diário', () => {
         expect(estilos.lista.paddingHorizontal).toBe(24);
     });
 
+    test('mantém o respiro antes do resumo compartilhado e reutiliza a linha do tempo', async () => {
+        await render(
+            <DiaryScreen
+                somenteLeitura
+                resumo={{ nomeTitular: 'Júlia', diasRegistrados: 1 }}
+                registros={[{ ...registro, diaCiclo: 9 }]}
+            />
+        );
+
+        expect(screen.getByTestId('diary-history-header')).toHaveStyle({ paddingTop: 16 });
+        expect(screen.getByText('RESUMO DO DIÁRIO DE JÚLIA')).toBeOnTheScreen();
+        expect(screen.getByText('LINHA DO TEMPO')).toBeOnTheScreen();
+        expect(screen.getByText('Fase Folicular - Dia 9 do Ciclo')).toBeOnTheScreen();
+        expect(screen.queryByText(/Conheça melhor seu corpo/)).toBeNull();
+    });
+
     test('mostra estado vazio e abre a criação', async () => {
         const aoCriar = jest.fn();
         await render(<DiaryScreen aoCriar={aoCriar} onSelecionarAba={jest.fn()} />);

@@ -18,6 +18,10 @@ function SupportNetworkScreen({
     onGerenciarResponsavel,
     onSelecionarAba,
     onSessaoExpirada,
+    onVisualizarContato,
+    vinculoVisualizadoId,
+    modoRede = 'apoio',
+    onSelecionarModoRede,
     ...membersProps
 }) {
     const tema = useTheme();
@@ -28,7 +32,6 @@ function SupportNetworkScreen({
     });
     const [emailVisivel, setEmailVisivel] = useState(false);
     const [reenvioConfirmado, setReenvioConfirmado] = useState(false);
-    const [modoRede, setModoRede] = useState('apoio');
 
     async function reenviarEmail() {
         const enviado = await consentimento.reenviar();
@@ -80,9 +83,11 @@ function SupportNetworkScreen({
                     service={receivedContactsService}
                     exibirSeletor
                     modoRede={modoRede}
-                    onSelecionarModoRede={setModoRede}
+                    onSelecionarModoRede={onSelecionarModoRede}
                     onSelecionarAba={onSelecionarAba}
                     onSessaoExpirada={onSessaoExpirada}
+                    onVisualizarContato={onVisualizarContato}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
                 />
             );
         }
@@ -91,7 +96,7 @@ function SupportNetworkScreen({
             <MembersScreen
                 {...membersProps}
                 modoRede={modoRede}
-                onSelecionarModoRede={setModoRede}
+                onSelecionarModoRede={onSelecionarModoRede}
                 onSelecionarAba={onSelecionarAba}
                 onSessaoExpirada={onSessaoExpirada}
             />

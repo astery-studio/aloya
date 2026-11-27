@@ -95,7 +95,8 @@ function ContraceptiveTrackingScreen({
     aoRemover,
     aoApagar,
     aoAlternarUso,
-    aoSalvarEdicaoHistorico
+    aoSalvarEdicaoHistorico,
+    somenteLeitura = false
 }) {
     const tema = useTheme();
     const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
@@ -105,7 +106,7 @@ function ContraceptiveTrackingScreen({
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
     });
     const secoes = criarSecoes(itens);
-    const exibeFab = !carregando && !erro && typeof aoCadastrarNovo === 'function';
+    const exibeFab = !somenteLeitura && !carregando && !erro && typeof aoCadastrarNovo === 'function';
     const quantidadePendentes = itens.reduce(
         (total, item) =>
             total +
@@ -140,11 +141,15 @@ function ContraceptiveTrackingScreen({
             ) : !itens.length ? (
                 <View style={estilosAcompanhamento.estadoVazio}>
                     <Text style={estilosAcompanhamento.tituloVazio}>Nenhum anticoncepcional</Text>
-                    <Text style={estilosAcompanhamento.mensagemVazio}>{MENSAGEM_VAZIO}</Text>
+                    <Text style={estilosAcompanhamento.mensagemVazio}>
+                        {somenteLeitura
+                            ? 'Ainda não há dados suficientes para exibir aqui.'
+                            : MENSAGEM_VAZIO}
+                    </Text>
                 </View>
             ) : (
                 <View style={estilosAcompanhamento.corpo}>
-                    {quantidadePendentes ? (
+                    {!somenteLeitura && quantidadePendentes > 0 ? (
                         <View style={estilosAcompanhamento.areaBanner}>
                             <PendingUsesBanner quantidade={quantidadePendentes} />
                         </View>
@@ -163,6 +168,7 @@ function ContraceptiveTrackingScreen({
                         renderItem={({ item }) => (
                             <ContraceptiveUsageCard
                                 anticoncepcional={item}
+                                somenteLeitura={somenteLeitura}
                                 aoEditar={aoEditar}
                                 aoRemover={aoRemover}
                                 aoApagar={aoApagar}

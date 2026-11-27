@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Keyboard, Pressable, Text, View } from 'react-native';
 import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
@@ -6,7 +6,6 @@ import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { estilos } from './DiaryReflectionSheet.styles';
 
 const PERGUNTA = 'O que seu corpo está pedindo agora?';
-const LIMITE_REFLEXAO = 5000;
 
 function DiaryReflectionSheet({
     visivel,
@@ -14,19 +13,35 @@ function DiaryReflectionSheet({
     aoAlterar,
     aoSalvar,
     aoFechar,
+    limiteCaracteres = 100,
+    limiteContador = 100,
+    caracteresEstruturais = 8,
+    totalCaracteresExistentes = 0,
+    semEspaco = false,
     salvando = false,
     erro
 }) {
+    const quantidadeCaracteres = [...valor].length;
+    const quantidadeContador = Math.min(limiteContador, quantidadeCaracteres);
+    const limiteAtingido =
+        totalCaracteresExistentes + caracteresEstruturais + quantidadeContador >= 5000;
+
     return (
         <BottomSheet
             visivel={visivel}
             onFechar={aoFechar}
             bloquearFechamento={salvando}
+            fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
             corPainel="#FFFFFF"
         >
-            <View style={estilos.conteudo}>
+            <Pressable
+                accessible={false}
+                testID="diary-reflection-content"
+                onPress={Keyboard.dismiss}
+                style={estilos.conteudo}
+            >
                 <View style={estilos.cabecalho}>
                     <View style={estilos.icone}>
                         <QuestionIcon color="#4A758E" size={28} weight="regular" />
@@ -37,38 +52,49 @@ function DiaryReflectionSheet({
                     {PERGUNTA}
                 </Text>
                 <View style={estilos.formulario}>
-                    <View style={estilos.campo}>
-                        <TextInput
-                            accessibilityLabel={PERGUNTA}
-                            placeholder="Escreva livremente..."
-                            value={valor}
-                            onChangeText={aoAlterar}
-                            multiline
-                            maxLength={LIMITE_REFLEXAO}
-                            desativado={salvando}
-                            erro={erro}
-                            estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
-                            estiloEntrada={estilos.textoEntrada}
-                        />
-                        <Text
-                            accessibilityLiveRegion="polite"
-                            style={[estilos.contador, valor && estilos.contadorPreenchido]}
-                        >
-                            {[...valor].length} / {LIMITE_REFLEXAO}
+                    {semEspaco ? (
+                        <Text accessibilityRole="alert" style={estilos.mensagemSemEspaco}>
+                            Você não tem mais espaço para anotações no Diário.
                         </Text>
-                    </View>
+                    ) : (
+                        <View style={estilos.campo}>
+                            <TextInput
+                                accessibilityLabel={PERGUNTA}
+                                placeholder="Escreva livremente..."
+                                value={valor}
+                                onChangeText={aoAlterar}
+                                multiline
+                                sanitizar={(texto) =>
+                                    [...texto].slice(0, limiteCaracteres).join('')
+                                }
+                                desativado={salvando}
+                                erro={erro}
+                                estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
+                                estiloEntrada={estilos.textoEntrada}
+                            />
+                            <Text
+                                accessibilityLiveRegion="polite"
+                                style={[
+                                    estilos.contador,
+                                    limiteAtingido && estilos.contadorLimiteAtingido
+                                ]}
+                            >
+                                {quantidadeContador} / {limiteContador}
+                            </Text>
+                        </View>
+                    )}
                     <ButtonScreen
                         texto="Salvar no Diário"
                         aoPressionar={aoSalvar}
-                        desativado={!valor.trim()}
+                        desativado={semEspaco || !valor.trim()}
                         carregando={salvando}
                         estilo={[estilos.botao, valor.trim() && estilos.botaoAtivo]}
                         estiloTexto={estilos.textoBotao}
                     />
                 </View>
-            </View>
+            </Pressable>
         </BottomSheet>
     );
 }
 
-export { DiaryReflectionSheet, LIMITE_REFLEXAO, PERGUNTA };
+export { DiaryReflectionSheet, PERGUNTA };

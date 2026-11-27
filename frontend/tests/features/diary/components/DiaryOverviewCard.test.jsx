@@ -106,6 +106,54 @@ describe('DiaryOverviewCard', () => {
         }
     );
 
+    test('usa a paleta noturna da fase sem alterar a opacidade do contador', async () => {
+        await render(
+            <DiaryOverviewCard
+                fase="menstrual"
+                tituloFase="Fase Menstrual"
+                descricao="Descrição da fase."
+                diasRegistrados={2}
+            />,
+            { preferencia: 'escuro' }
+        );
+
+        expect(screen.getByTestId('diary-overview-card')).toHaveStyle({
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            backgroundColor: '#1E1E1E'
+        });
+        expect(screen.getByTestId('diary-overview-title')).toHaveStyle({ color: '#C26E5F' });
+        expect(screen.getByText('2 dias registrados')).toHaveStyle({
+            color: 'rgba(194, 110, 95, 0.80)'
+        });
+    });
+
+    test('identifica a pessoa acompanhada e remove a fase quando a autorização muda', async () => {
+        const resumo = {
+            nomeTitular: 'Júlia',
+            fase: 'folicular',
+            tituloFase: 'Fase Folicular',
+            descricao: 'Júlia costuma registrar aumento de energia.',
+            diasRegistrados: 4
+        };
+        const { rerender } = await render(<DiaryOverviewCard {...resumo} exibirFase />);
+
+        expect(screen.getByText('RESUMO DO DIÁRIO DE JÚLIA')).toBeOnTheScreen();
+        expect(screen.getByText(/Júlia está na/)).toBeOnTheScreen();
+        expect(screen.getByText(resumo.descricao)).toBeOnTheScreen();
+
+        await rerender(<DiaryOverviewCard {...resumo} />);
+
+        expect(screen.queryByTestId('diary-overview-content')).not.toBeOnTheScreen();
+        expect(screen.queryByText(resumo.descricao)).not.toBeOnTheScreen();
+        expect(screen.getByText('4 dias registrados')).toBeOnTheScreen();
+        expect(
+            screen.getByLabelText('Resumo do Diário de Júlia. 4 dias registrados.')
+        ).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-overview-day-counter')).toHaveStyle({
+            backgroundColor: '#E6E2D8'
+        });
+    });
+
     test('trata singular, loading e resumo inválido', async () => {
         const resultado = await render(
             <DiaryOverviewCard

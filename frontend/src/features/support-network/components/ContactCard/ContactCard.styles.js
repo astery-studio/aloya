@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
@@ -13,9 +14,11 @@ function criarEstilos(tema) {
             paddingHorizontal: 17.4,
             paddingTop: 16,
             paddingBottom: 17,
-            backgroundColor: tema.cores.interface.superficie,
-            borderWidth: 0.705,
-            borderColor: tema.cores.interface.borda,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
+            borderWidth: tema.escuro ? 0.7 : 0.705,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
             borderRadius: 16
         },
 
@@ -205,7 +208,7 @@ function criarEstilos(tema) {
         },
 
         tituloSecao: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             fontWeight: '700',
@@ -264,7 +267,7 @@ function criarEstilos(tema) {
         },
 
         tituloPendente: {
-            color: tema.escuro ? '#E4B15F' : '#B07D2A',
+            color: tema.escuro ? coresNoturnasConteudo.amarelo : '#B07D2A',
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             fontWeight: '700',
@@ -336,7 +339,7 @@ function criarEstilos(tema) {
             flex: 1,
             paddingHorizontal: 14,
             borderRadius: 10,
-            backgroundColor: '#2C4C3B'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
         },
 
         containerReenvio: {
@@ -355,7 +358,7 @@ function criarEstilos(tema) {
             flex: 1,
             paddingHorizontal: 14,
             borderRadius: 10,
-            backgroundColor: '#2C4C3B'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
         },
 
         botaoResumo: {
@@ -364,7 +367,7 @@ function criarEstilos(tema) {
             minHeight: 36,
             paddingHorizontal: 14,
             borderRadius: 10,
-            backgroundColor: '#C85A44'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44'
         },
 
         containerBotaoResumo: {
@@ -379,7 +382,7 @@ function criarEstilos(tema) {
         },
 
         textoBotao: {
-            color: '#FFFFFF',
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF',
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             fontWeight: '600',

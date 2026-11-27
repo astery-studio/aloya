@@ -33,6 +33,18 @@ test('Home sem histórico usa hoje como seleção inicial', async () => {
     expect(abrir).toHaveBeenCalledWith('2026-10-30');
 });
 
+test('seleciona hoje ao entrar mesmo quando a API usa outra data de referência', async () => {
+    const service = {
+        buscar: async () => ({ status: 'DISPONIVEL', dataReferencia: '2026-10-20' })
+    };
+
+    await render(<CycleTodayContainer service={service} />);
+    await waitFor(() => expect(mockProps.carregando).toBe(false));
+
+    expect(mockProps.dataAtual).toBe('2026-10-30');
+    expect(mockProps.dataSelecionada).toBe('2026-10-30');
+});
+
 test('encaminha ao Diário a data selecionada na Home', async () => {
     const abrir = jest.fn();
     const service = {
