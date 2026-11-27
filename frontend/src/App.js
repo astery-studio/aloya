@@ -808,8 +808,7 @@ export default function App() {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
-                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                onSelecionarAba={selecionarAba}
+                onVoltar={() => setTelaInterna(telasInternas.inicio)}
                 onSessaoExpirada={finalizarSessao}
             />
         );

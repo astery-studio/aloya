@@ -15,6 +15,7 @@ function MainLayout({
     acoesHeader = null,
     abaAtiva,
     onSelecionarAba,
+    exibirNavegacaoInferior = true,
     usarAreaSeguraInferior = true,
     children,
     corFundo,
@@ -67,7 +68,7 @@ function MainLayout({
                 {children}
             </View>
 
-            {usarAreaSeguraInferior ? (
+            {exibirNavegacaoInferior && usarAreaSeguraInferior ? (
                 <SafeAreaView
                     testID="navegacao-segura-main-layout"
                     edges={['bottom']}
@@ -78,9 +79,9 @@ function MainLayout({
                 >
                     {navegacaoInferior}
                 </SafeAreaView>
-            ) : (
+            ) : exibirNavegacaoInferior ? (
                 navegacaoInferior
-            )}
+            ) : null}
         </View>
     );
 }

@@ -45,22 +45,25 @@ describe('CycleHistoryScreen', () => {
         expect(estilos.conteudoDaLista.paddingTop).toBe(8);
     });
 
-    test('mostra o resumo e permite abrir o calendário com ciclos registrados', async () => {
-        const aoAbrirCalendario = jest.fn();
+    test('mostra o resumo com ciclos registrados sem acesso provisório ao calendário', async () => {
+        const onVoltar = jest.fn();
         await render(
             <CycleHistoryScreen
                 ciclos={ciclos}
                 resumo={resumoCarregado}
-                aoAbrirCalendario={aoAbrirCalendario}
+                onVoltar={onVoltar}
                 aoEditarCiclo={jest.fn()}
                 aoExcluirCiclo={jest.fn()}
             />
         );
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Ir para o Calendário' }));
-        expect(aoAbrirCalendario).toHaveBeenCalledTimes(1);
-
         expect(screen.getByRole('header', { name: 'Histórico de Ciclos' })).toBeOnTheScreen();
+        expect(
+            screen.queryByRole('button', { name: 'Ir para o Calendário' })
+        ).not.toBeOnTheScreen();
+        expect(screen.queryAllByRole('tab')).toHaveLength(0);
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+        expect(onVoltar).toHaveBeenCalledTimes(1);
         expect(screen.getByText('28')).toBeOnTheScreen();
         expect(screen.getByText('5')).toBeOnTheScreen();
         expect(screen.getByText('2 ciclos registrados')).toBeOnTheScreen();
@@ -69,14 +72,11 @@ describe('CycleHistoryScreen', () => {
         expect(screen.getByText('07 Ago até 03 Set')).toBeOnTheScreen();
     });
 
-    test('mostra o estado vazio e abre o calendário', async () => {
-        const aoAbrirCalendario = jest.fn();
-
+    test('mostra o estado vazio sem botão provisório do calendário', async () => {
         await render(
             <CycleHistoryScreen
                 ciclos={[]}
                 resumo={resumoVazio}
-                aoAbrirCalendario={aoAbrirCalendario}
                 aoEditarCiclo={jest.fn()}
                 aoExcluirCiclo={jest.fn()}
             />
@@ -88,13 +88,9 @@ describe('CycleHistoryScreen', () => {
             screen.getByText('Comece registrando seu primeiro ciclo pelo calendário.')
         ).toBeOnTheScreen();
 
-        await fireEvent.press(
-            screen.getByRole('button', {
-                name: 'Ir para o Calendário'
-            })
-        );
-
-        expect(aoAbrirCalendario).toHaveBeenCalledTimes(1);
+        expect(
+            screen.queryByRole('button', { name: 'Ir para o Calendário' })
+        ).not.toBeOnTheScreen();
     });
 
     test('mostra uma mensagem segura no estado de erro', async () => {
@@ -240,9 +236,7 @@ describe('CycleHistoryScreen', () => {
         expect(screen.getByText('Confiança Baixa')).toBeOnTheScreen();
     });
 
-    test('encaminha a navegação inferior', async () => {
-        const onSelecionarAba = jest.fn();
-
+    test('não apresenta navegação inferior', async () => {
         await render(
             <CycleHistoryScreen
                 ciclos={[]}
@@ -250,17 +244,10 @@ describe('CycleHistoryScreen', () => {
                 aoAbrirCalendario={jest.fn()}
                 aoEditarCiclo={jest.fn()}
                 aoExcluirCiclo={jest.fn()}
-                onSelecionarAba={onSelecionarAba}
             />
         );
 
-        await fireEvent.press(
-            screen.getByRole('tab', {
-                name: 'Início'
-            })
-        );
-
-        expect(onSelecionarAba).toHaveBeenCalledWith('inicio');
+        expect(screen.queryAllByRole('tab')).toHaveLength(0);
     });
 
     test('solicita a próxima página ao chegar perto do fim', async () => {

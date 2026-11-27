@@ -112,10 +112,9 @@ function CycleHistoryScreen({
     aoTentarNovamente,
     aoCarregarMais,
     aoTentarCarregarMais,
-    aoAbrirCalendario,
     aoEditarCiclo,
     aoExcluirCiclo,
-    onSelecionarAba
+    onVoltar
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -143,16 +142,6 @@ function CycleHistoryScreen({
             menstruacaoMediaDias={resumoSeguro.menstruacaoMediaDias}
             quantidadeCiclos={resumoSeguro.quantidadeCiclos}
             confianca={resumoSeguro.confianca}
-        />
-    );
-
-    const botaoCalendario = (
-        <ButtonScreen
-            texto="Ir para o Calendário"
-            estilo={estilos.botaoCadastrarMenstruacao}
-            estiloTexto={estilos.textoCadastrarMenstruacao}
-            variante="laranja"
-            aoPressionar={aoAbrirCalendario}
         />
     );
 
@@ -226,8 +215,6 @@ function CycleHistoryScreen({
                     <Text style={estilos.mensagemDoEstado}>
                         Comece registrando seu primeiro ciclo pelo calendário.
                     </Text>
-
-                    <View style={estilos.botaoDoEstado}>{botaoCalendario}</View>
                 </View>
             </View>
         );
@@ -241,7 +228,6 @@ function CycleHistoryScreen({
                 ListHeaderComponent={
                     <View style={estilos.cabecalhoDaLista}>
                         {resumoDosCiclos}
-                        {botaoCalendario}
                         <DivisorDaLista estilos={estilos} />
                     </View>
                 }
@@ -269,9 +255,10 @@ function CycleHistoryScreen({
     return (
         <MainLayout
             titulo="Histórico de Ciclos"
+            varianteHeader="comVoltar"
+            onVoltar={onVoltar}
             corFundo={tema.escuro ? '#121212' : undefined}
-            abaAtiva="ciclos"
-            onSelecionarAba={onSelecionarAba}
+            exibirNavegacaoInferior={false}
         >
             {conteudo}
         </MainLayout>

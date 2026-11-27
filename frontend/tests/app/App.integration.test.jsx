@@ -115,15 +115,15 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     const { Pressable, Text } = require('react-native');
 
     return {
-        CycleHistoryFlow: jest.fn(({ aoAbrirCalendario }) =>
+        CycleHistoryFlow: jest.fn(({ onVoltar }) =>
             React.createElement(
                 React.Fragment,
                 null,
                 React.createElement(Text, null, 'Histórico de ciclos integrado'),
                 React.createElement(Pressable, {
                     accessibilityRole: 'button',
-                    accessibilityLabel: 'Ir para o Calendário',
-                    onPress: aoAbrirCalendario
+                    accessibilityLabel: 'Voltar do histórico',
+                    onPress: onVoltar
                 })
             )
         )
@@ -249,6 +249,7 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                         ['Abrir configurações', 'configuracoes'],
                         ['Abrir início', 'inicio'],
                         ['Abrir ciclos', 'ciclos'],
+                        ['Abrir calendário', 'calendario'],
                         ['Abrir Diário', 'diario'],
                         ['Abrir membros', 'membros']
                     ].map(([rotulo, aba]) =>
@@ -661,8 +662,7 @@ describe('App integrado', () => {
         expect(CycleHistoryFlow).toHaveBeenCalledWith(
             expect.objectContaining({
                 service: servicos.cycleHistoryService,
-                aoAbrirCalendario: expect.any(Function),
-                onSelecionarAba: expect.any(Function),
+                onVoltar: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),
             undefined
@@ -705,7 +705,8 @@ describe('App integrado', () => {
 
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
         await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
-        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para o Calendário' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Voltar do histórico' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir calendário' }));
         await fireEvent.press(
             await screen.findByRole('button', { name: 'Editar menstruação do calendário' })
         );

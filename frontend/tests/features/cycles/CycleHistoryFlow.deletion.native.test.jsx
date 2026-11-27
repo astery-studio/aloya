@@ -27,7 +27,7 @@ jest.mock('../../../src/features/cycles/screens/CycleHistoryScreen', () => {
     const React = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
-        CycleHistoryScreen: ({ aoExcluirCiclo, onSelecionarAba }) =>
+        CycleHistoryScreen: ({ aoExcluirCiclo, onVoltar }) =>
             React.createElement(
                 View,
                 null,
@@ -48,7 +48,7 @@ jest.mock('../../../src/features/cycles/screens/CycleHistoryScreen', () => {
                 React.createElement(Pressable, {
                     accessibilityRole: 'button',
                     accessibilityLabel: 'Voltar à Home',
-                    onPress: () => onSelecionarAba('inicio')
+                    onPress: onVoltar
                 })
             )
     };
@@ -108,7 +108,7 @@ test('volta automaticamente ao visual sem ciclo ao retornar depois da última ex
         return tela === 'inicio' ? (
             <CycleTodayContainer service={service} aoAbrirHistorico={() => setTela('ciclos')} />
         ) : (
-            <CycleHistoryFlow service={service} onSelecionarAba={setTela} />
+            <CycleHistoryFlow service={service} onVoltar={() => setTela('inicio')} />
         );
     }
     await render(<Fluxo />);
