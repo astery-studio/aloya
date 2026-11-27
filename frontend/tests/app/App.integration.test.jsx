@@ -2,7 +2,7 @@
  * Confere a ligação entre autenticação, sessão persistida e os fluxos internos.
  */
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { BackHandler, Linking } from 'react-native';
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
@@ -438,11 +438,12 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                         { accessibilityRole: 'button', onPress: onAbrirNotificacoes },
                         React.createElement(Text, null, 'Notificações')
                     ),
-                    onAbrirNotificacoesContato && React.createElement(
-                        Pressable,
-                        { accessibilityRole: 'button', onPress: onAbrirNotificacoesContato },
-                        React.createElement(Text, null, 'Notificações como contato de apoio')
-                    ),
+                    onAbrirNotificacoesContato &&
+                        React.createElement(
+                            Pressable,
+                            { accessibilityRole: 'button', onPress: onAbrirNotificacoesContato },
+                            React.createElement(Text, null, 'Notificações como contato de apoio')
+                        ),
                     React.createElement(
                         Pressable,
                         {
@@ -666,13 +667,16 @@ function criarServicos() {
         diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() },
         notificationPreferencesService: { buscar: jest.fn().mockResolvedValue({}) },
         supportNotificationPreferencesService: {
-            buscar: jest.fn().mockResolvedValue({ chavesDisponiveis: ['redeApoio.convites.recebido'] })
+            buscar: jest
+                .fn()
+                .mockResolvedValue({ chavesDisponiveis: ['redeApoio.convites.recebido'] })
         }
     };
 }
 
 describe('App integrado', () => {
     let servicos;
+    let voltarHardware;
 
     test('abre Notificações pela ação de Configurações e volta ao menu', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
@@ -706,6 +710,12 @@ describe('App integrado', () => {
         expect(screen.queryByRole('button', { name: 'Teste da tela da Rede de Apoio' })).toBeNull();
         await fireEvent.press(screen.getByRole('button', { name: 'Teste de notificações' }));
         expect(screen.getByRole('header', { name: 'Teste de notificações' })).toBeOnTheScreen();
+
+        await act(() => expect(voltarHardware()).toBe(true));
+        expect(screen.getByRole('header', { name: 'Notificações' })).toBeOnTheScreen();
+
+        await act(() => expect(voltarHardware()).toBe(true));
+        expect(screen.getByText('Configurações')).toBeOnTheScreen();
     });
 
     beforeEach(() => {
@@ -717,6 +727,13 @@ describe('App integrado', () => {
         jest.spyOn(Linking, 'addEventListener').mockReturnValue({
             remove: jest.fn()
         });
+        const handlersVoltar = new Set();
+        voltarHardware = () => [...handlersVoltar].reverse().some((handler) => handler());
+        jest.spyOn(BackHandler, 'addEventListener').mockImplementation((evento, handler) => {
+            if (evento === 'hardwareBackPress') handlersVoltar.add(handler);
+            return { remove: () => handlersVoltar.delete(handler) };
+        });
+        jest.spyOn(BackHandler, 'exitApp').mockImplementation(() => {});
     });
 
     afterEach(() => {
@@ -766,6 +783,18 @@ describe('App integrado', () => {
         expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
     });
 
+    test('deixa o botão físico sob responsabilidade do fluxo de cadastro', async () => {
+        obterToken.mockResolvedValue(null);
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para cadastro' }));
+
+        await act(() => {
+            expect(voltarHardware()).toBe(false);
+            expect(voltarHardware()).toBe(false);
+        });
+        expect(screen.queryByText('Deseja sair do Aloya?')).toBeNull();
+    });
+
     test('restaura a sessão, abre a Home e carrega o perfil', async () => {
         obterToken.mockResolvedValue({
             token: 'token-valido'
@@ -792,6 +821,48 @@ describe('App integrado', () => {
         });
 
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
+    });
+
+    test('abre a Home depois de concluir o login', async () => {
+        obterToken.mockResolvedValue(null);
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para login' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir login' }));
+
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+    });
+
+    test('volta somente uma tela pelo botão físico', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir perfil' }));
+
+        expect(await screen.findByText('Perfil: Julia')).toBeOnTheScreen();
+        await act(() => expect(voltarHardware()).toBe(true));
+
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+    });
+
+    test('mostra o popup estilizado ao voltar duas vezes na raiz', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await screen.findByText('Ciclo hoje');
+
+        await act(() => {
+            expect(voltarHardware()).toBe(true);
+            expect(voltarHardware()).toBe(true);
+        });
+
+        expect(await screen.findByText('Deseja sair do Aloya?')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Tem certeza de que deseja fechar o aplicativo?')
+        ).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+        expect(screen.queryByText('Deseja sair do Aloya?')).toBeNull();
+        expect(BackHandler.exitApp).not.toHaveBeenCalled();
     });
 
     test('restaura o vínculo ao reabrir o app e apaga a seleção ao parar de visualizar', async () => {
@@ -1074,7 +1145,7 @@ describe('App integrado', () => {
         expect(screen.queryByText('Edição do Diário: 18')).not.toBeOnTheScreen();
     });
 
-    test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {
+    test('volta às boas-vindas depois de sair da conta', async () => {
         obterToken.mockResolvedValue(null);
 
         await render(<App />);
@@ -1109,7 +1180,9 @@ describe('App integrado', () => {
             })
         );
 
-        expect(await screen.findByText('Login')).toBeOnTheScreen();
+        expect(await screen.findByRole('button', { name: 'Ir para cadastro' })).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Ir para login' })).toBeOnTheScreen();
+        expect(screen.queryByText('Login')).not.toBeOnTheScreen();
 
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
     });

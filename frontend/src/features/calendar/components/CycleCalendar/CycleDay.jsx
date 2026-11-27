@@ -69,12 +69,11 @@ function ConteudoDia({ dia, estilos, corIconeMarcado }) {
 }
 
 function CycleDay({ dia, aoPressionarDia, estilosTema = estilosTemaClaro }) {
-    const { estilos, estilosTipos, estilosTiposPrevistos, corIconeMarcado } = estilosTema;
+    const { estilos, corIconeMarcado } = estilosTema;
 
     if (!dia) return <View style={estilos.celulaDia} />;
 
     const interativo = Boolean(dia.registroCicloId && typeof aoPressionarDia === 'function');
-    const estiloTipo = dia.previsto ? estilosTiposPrevistos[dia.tipo] : estilosTipos[dia.tipo];
     const rotuloAcessibilidade = criarRotuloAcessibilidade(dia);
 
     function pressionar() {
@@ -84,18 +83,6 @@ function CycleDay({ dia, aoPressionarDia, estilosTema = estilosTemaClaro }) {
 
     return (
         <View style={estilos.celulaDia}>
-            {dia.tipo ? (
-                <View
-                    testID={`fundo-dia-${dia.data}`}
-                    pointerEvents="none"
-                    style={[
-                        estilos.segmentoDia,
-                        estiloTipo,
-                        dia.inicioSegmento && estilos.inicioSegmento,
-                        dia.fimSegmento && estilos.fimSegmento
-                    ]}
-                />
-            ) : null}
             {interativo ? (
                 <Pressable
                     onPress={pressionar}

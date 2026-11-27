@@ -118,7 +118,7 @@ describe('previsão do backend até a grade do calendário', () => {
         expect(screen.getByLabelText('Dia 6 de outubro de 2026, provável fase folicular')).toBeOnTheScreen()
         expect(screen.getByLabelText('Dia 12 de outubro de 2026, provável ovulação, provável janela fértil')).toBeOnTheScreen()
         expect(screen.getByLabelText('Dia 13 de outubro de 2026, provável fase lútea')).toBeOnTheScreen()
-        expect(screen.getByTestId('fundo-dia-2026-10-06')).toHaveStyle({
+        expect(screen.getByTestId('faixa-fase-2026-10-06-2026-10-10')).toHaveStyle({
             backgroundColor: 'rgba(44, 76, 59, 0.56)'
         })
         expect(screen.queryAllByRole('button')).toHaveLength(0)

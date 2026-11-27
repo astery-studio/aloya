@@ -1,9 +1,31 @@
-//Agrupa sete dias e desenha trechos contínuos da janela fértil.
+//Agrupa sete dias e desenha as faixas de fase e da janela fértil.
 import { memo, useMemo } from 'react';
 import { View } from 'react-native';
 
 import { CycleDay } from './CycleDay';
 import { estilosTemaClaro } from './CycleCalendar.styles';
+
+function obterFaixasFase(semana) {
+    const faixas = [];
+
+    semana.forEach((dia, indice) => {
+        if (!dia?.tipo) return;
+
+        const faixa = faixas.at(-1);
+        if (
+            faixa?.fim === indice - 1 &&
+            faixa.diaInicial.tipo === dia.tipo &&
+            faixa.diaInicial.previsto === dia.previsto
+        ) {
+            faixa.fim = indice;
+            return;
+        }
+
+        faixas.push({ inicio: indice, fim: indice, diaInicial: dia });
+    });
+
+    return faixas;
+}
 
 function obterTrechosFerteis(semana) {
     const trechos = [];
@@ -47,11 +69,34 @@ function obterTrechosFerteis(semana) {
 }
 
 function CycleWeek({ semana, aoPressionarDia, estilosTema = estilosTemaClaro }) {
-    const { estilos } = estilosTema;
+    const { estilos, estilosTipos, estilosTiposPrevistos } = estilosTema;
+    const faixasFase = useMemo(() => obterFaixasFase(semana), [semana]);
     const trechosFerteis = useMemo(() => obterTrechosFerteis(semana), [semana]);
 
     return (
         <View style={estilos.semana}>
+            {faixasFase.map(({ inicio, fim, diaInicial }) => {
+                const diaFinal = semana[fim];
+                const cores = diaInicial.previsto ? estilosTiposPrevistos : estilosTipos;
+
+                return (
+                    <View
+                        key={diaInicial.data}
+                        testID={`faixa-fase-${diaInicial.data}-${diaFinal.data}`}
+                        pointerEvents="none"
+                        style={[
+                            estilos.faixaFase,
+                            cores[diaInicial.tipo],
+                            diaInicial.inicioSegmento && estilos.inicioSegmento,
+                            diaFinal.fimSegmento && estilos.fimSegmento,
+                            {
+                                left: `${(inicio / 7) * 100}%`,
+                                right: `${((6 - fim) / 7) * 100}%`
+                            }
+                        ]}
+                    />
+                );
+            })}
             {semana.map((dia, indice) => (
                 <CycleDay
                     key={dia?.data ?? `vazio-${indice}`}

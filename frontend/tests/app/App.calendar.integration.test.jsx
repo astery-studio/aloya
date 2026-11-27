@@ -286,7 +286,9 @@ describe('App — calendário', () => {
 
         expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário pelo menu' }));
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Abrir calendário pelo menu' })
+        );
 
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
         expect(screen.getByTestId('calendar-container')).toBeOnTheScreen();
