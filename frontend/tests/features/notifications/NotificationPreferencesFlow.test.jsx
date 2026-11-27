@@ -47,6 +47,28 @@ test('abre a tela temporária no desenvolvimento e volta para Notificações', a
     expect(onVoltar).not.toHaveBeenCalled();
 });
 
+test('mantém a categoria aberta e recupera as preferências após uma falha de leitura', async () => {
+    let concluirLeitura;
+    const buscar = jest.fn()
+        .mockRejectedValueOnce(new Error('falha de leitura'))
+        .mockImplementationOnce(() => new Promise((resolver) => { concluirLeitura = resolver; }));
+
+    await montar({ buscar });
+    await tocar('Ciclo e Previsões');
+    expect(screen.getByRole('header', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Algo deu errado' })).toBeOnTheScreen();
+    expect(screen.getByText('Não foi possível carregar suas preferências de notificação.'))
+        .toBeOnTheScreen();
+
+    await tocar('Tentar novamente');
+    expect(buscar).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText('Carregando preferências')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Tentar novamente' })).toBeNull();
+
+    await act(async () => concluirLeitura(iniciais));
+    expect(screen.getByRole('switch', { name: 'Diário' })).toBeOnTheScreen();
+}, 60_000);
+
 test('confirma o horário, preserva a alteração com erro e bloqueia repetição durante o envio', async () => {
     let rejeitar;
     const atualizar = jest.fn()
