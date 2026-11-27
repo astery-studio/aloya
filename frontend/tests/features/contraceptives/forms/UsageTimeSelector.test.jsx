@@ -1,4 +1,4 @@
-//Testa abertura, edição, inclusão, remoção e confirmação dos horários de uso.
+// Testa o horário de uso e a redução de cadastros antigos a um horário.
 import { act, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { render } from '../mockTheme';
 import { UsageTimeSelector } from '../../../../src/features/contraceptives/forms/UsageTimeSelector';
@@ -61,26 +61,14 @@ jest.mock('../../../../src/shared/components/forms/TimeInput', () => {
     };
 });
 
-jest.mock('../../../../src/shared/components/common/Button/ButtonDashed', () => {
-    const { Pressable, Text } = require('react-native');
-
-    return {
-        __esModule: true,
-        default: ({ texto, aoPressionar }) => (
-            <Pressable accessibilityRole="button" accessibilityLabel={texto} onPress={aoPressionar}>
-                <Text>{texto}</Text>
-            </Pressable>
-        )
-    };
-});
-
 jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => {
     const { Pressable, Text } = require('react-native');
 
     return {
         __esModule: true,
-        default: ({ texto, aoPressionar }) => (
-            <Pressable accessibilityRole="button" accessibilityLabel={texto} onPress={aoPressionar}>
+        default: ({ texto, aoPressionar, desativado }) => (
+            <Pressable accessibilityRole="button" accessibilityLabel={texto} onPress={aoPressionar}
+                disabled={desativado} accessibilityState={{ disabled: desativado }}>
                 <Text>{texto}</Text>
             </Pressable>
         )
@@ -118,7 +106,6 @@ test('mostra o resumo dos horários e abre o seletor', async () => {
     await render(
         <UsageTimeSelector
             horarios={['08:00', '20:00']}
-            permiteMultiplos
             aberto={false}
             onAbrir={onAbrir}
             onConfirmar={jest.fn()}
@@ -141,7 +128,6 @@ test('mostra placeholder quando não existem horários', async () => {
     await render(
         <UsageTimeSelector
             horarios={[]}
-            permiteMultiplos={false}
             aberto={false}
             onAbrir={jest.fn()}
             onConfirmar={jest.fn()}
@@ -163,7 +149,6 @@ test('edita e confirma um único horário', async () => {
     await render(
         <UsageTimeSelector
             horarios={['08:00']}
-            permiteMultiplos={false}
             aberto
             onAbrir={jest.fn()}
             onConfirmar={onConfirmar}
@@ -192,7 +177,7 @@ test('edita e confirma um único horário', async () => {
 
     await usuario.press(
         screen.getByRole('button', {
-            name: 'Confirmar horários'
+            name: 'Confirmar horário'
         })
     );
 
@@ -207,7 +192,6 @@ test('começa com um horário vazio e permite preenchê-lo', async () => {
     await render(
         <UsageTimeSelector
             horarios={[]}
-            permiteMultiplos={false}
             aberto
             onAbrir={jest.fn()}
             onConfirmar={onConfirmar}
@@ -227,81 +211,25 @@ test('começa com um horário vazio e permite preenchê-lo', async () => {
 
     await usuario.press(
         screen.getByRole('button', {
-            name: 'Confirmar horários'
+            name: 'Confirmar horário'
         })
     );
 
     expect(onConfirmar).toHaveBeenCalledWith(['08:00']);
 });
 
-test('adiciona e remove horários quando múltiplos são permitidos', async () => {
+test('pede a escolha do horário ao editar um cadastro antigo', async () => {
     const usuario = userEvent.setup();
     const onConfirmar = jest.fn();
-
     await render(
-        <UsageTimeSelector
-            horarios={['08:00']}
-            permiteMultiplos
-            aberto
-            onAbrir={jest.fn()}
-            onConfirmar={onConfirmar}
-            onFechar={jest.fn()}
-        />
+        <UsageTimeSelector horarios={['08:00', '20:00']} aberto onConfirmar={onConfirmar} />
     );
 
-    expect(
-        screen.getByText(
-            'Defina os horários em que você toma sua pílula.\nVocê pode adicionar mais de um lembrete por dia.'
-        )
-    ).toBeOnTheScreen();
-
-    expect(
-        screen.queryByRole('button', {
-            name: 'Remover horário 08:00'
-        })
-    ).not.toBeOnTheScreen();
-
-    await usuario.press(
-        screen.getByRole('button', {
-            name: 'Adicionar horário'
-        })
-    );
-
-    await waitFor(() => {
-        expect(
-            screen.getByRole('button', {
-                name: 'Remover horário vazio'
-            })
-        ).toBeOnTheScreen();
-    });
-
-    expect(
-        screen.getByRole('button', {
-            name: 'Remover horário 08:00'
-        })
-    ).toBeOnTheScreen();
-
-    await usuario.press(
-        screen.getByRole('button', {
-            name: 'Remover horário vazio'
-        })
-    );
-
-    await waitFor(() => {
-        expect(
-            screen.queryByRole('button', {
-                name: 'Remover horário vazio'
-            })
-        ).not.toBeOnTheScreen();
-    });
-
-    await usuario.press(
-        screen.getByRole('button', {
-            name: 'Confirmar horários'
-        })
-    );
-
-    expect(onConfirmar).toHaveBeenCalledWith(['08:00']);
+    expect(screen.getByRole('button', { name: 'Confirmar horário' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Adicionar horário' })).toBeNull();
+    await usuario.press(screen.getByRole('button', { name: 'Remover horário 08:00' }));
+    await usuario.press(screen.getByRole('button', { name: 'Confirmar horário' }));
+    expect(onConfirmar).toHaveBeenCalledWith(['20:00']);
 });
 
 test('restaura os horários recebidos sempre que o painel abre', async () => {
@@ -311,7 +239,6 @@ test('restaura os horários recebidos sempre que o painel abre', async () => {
     const resultado = await render(
         <UsageTimeSelector
             horarios={['08:00']}
-            permiteMultiplos={false}
             aberto={false}
             onAbrir={jest.fn()}
             onConfirmar={onConfirmar}
@@ -322,7 +249,6 @@ test('restaura os horários recebidos sempre que o painel abre', async () => {
     await resultado.rerender(
         <UsageTimeSelector
             horarios={['20:00']}
-            permiteMultiplos={false}
             aberto
             onAbrir={jest.fn()}
             onConfirmar={onConfirmar}
@@ -340,7 +266,7 @@ test('restaura os horários recebidos sempre que o painel abre', async () => {
 
     await usuario.press(
         screen.getByRole('button', {
-            name: 'Confirmar horários'
+            name: 'Confirmar horário'
         })
     );
 
@@ -354,7 +280,6 @@ test('fecha o painel pelo cabeçalho', async () => {
     await render(
         <UsageTimeSelector
             horarios={['08:00']}
-            permiteMultiplos={false}
             aberto
             onAbrir={jest.fn()}
             onConfirmar={jest.fn()}
@@ -375,7 +300,6 @@ test('encaminha corretamente as propriedades para o campo de horário', async ()
     await render(
         <UsageTimeSelector
             horarios={['08:00', '20:00']}
-            permiteMultiplos
             aberto
             onAbrir={jest.fn()}
             onConfirmar={jest.fn()}
@@ -413,7 +337,6 @@ test.each(['25:00', '12:60', '24:00'])(
         await render(
             <UsageTimeSelector
                 horarios={[]}
-                permiteMultiplos={false}
                 aberto
                 onConfirmar={onConfirmar}
                 onFechar={jest.fn()}
@@ -423,11 +346,11 @@ test.each(['25:00', '12:60', '24:00'])(
         expect(
             screen.getByText('Informe um horário válido entre 00:00 e 23:59.')
         ).toBeOnTheScreen();
-        await userEvent.setup().press(screen.getByRole('button', { name: 'Confirmar horários' }));
+        await userEvent.setup().press(screen.getByRole('button', { name: 'Confirmar horário' }));
         expect(onConfirmar).not.toHaveBeenCalled();
         await act(async () => mockTimeInput.mock.calls.at(-1)[0].onChangeText('23:59'));
         expect(screen.queryByText('Informe um horário válido entre 00:00 e 23:59.')).toBeNull();
-        await userEvent.setup().press(screen.getByRole('button', { name: 'Confirmar horários' }));
+        await userEvent.setup().press(screen.getByRole('button', { name: 'Confirmar horário' }));
         expect(onConfirmar).toHaveBeenCalledWith(['23:59']);
     }
 );
@@ -437,37 +360,13 @@ test.each(['', '08:'])('não confirma um horário vazio ou incompleto: %s', asyn
     await render(
         <UsageTimeSelector
             horarios={[horario]}
-            permiteMultiplos={false}
             aberto
             onConfirmar={onConfirmar}
             onFechar={jest.fn()}
         />
     );
     expect(screen.queryByRole('alert')).toBeNull();
-    await userEvent.setup().press(screen.getByRole('button', { name: 'Confirmar horários' }));
+    await userEvent.setup().press(screen.getByRole('button', { name: 'Confirmar horário' }));
     expect(screen.getByRole('alert')).toBeOnTheScreen();
     expect(onConfirmar).not.toHaveBeenCalled();
-});
-
-test('mostra duplicidade antes de confirmar e permite corrigir removendo o horário repetido', async () => {
-    const usuario = userEvent.setup();
-    const onConfirmar = jest.fn();
-    await render(
-        <UsageTimeSelector
-            horarios={['08:00']}
-            permiteMultiplos
-            aberto
-            onConfirmar={onConfirmar}
-            onFechar={jest.fn()}
-        />
-    );
-    await usuario.press(screen.getByRole('button', { name: 'Adicionar horário' }));
-    await act(async () => mockTimeInput.mock.calls.at(-1)[0].onChangeText('08:00'));
-    expect(screen.getAllByText('Não adicione horários repetidos.')).toHaveLength(2);
-    await usuario.press(screen.getByRole('button', { name: 'Confirmar horários' }));
-    expect(onConfirmar).not.toHaveBeenCalled();
-    await usuario.press(screen.getAllByRole('button', { name: 'Remover horário 08:00' })[1]);
-    expect(screen.queryByText('Não adicione horários repetidos.')).toBeNull();
-    await usuario.press(screen.getByRole('button', { name: 'Confirmar horários' }));
-    expect(onConfirmar).toHaveBeenCalledWith(['08:00']);
 });

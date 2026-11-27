@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native';
 
 const COR_FAB = '#C85A44';
 const COR_ICONE_FAB = '#FFFFFF';
+const TAMANHO_FAB = 56;
 
 function criarEstilos(tema) {
     return {
@@ -12,8 +13,8 @@ function criarEstilos(tema) {
                 zIndex: 1
             },
             botao: {
-                width: 56,
-                height: 56,
+                width: TAMANHO_FAB,
+                height: TAMANHO_FAB,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 28,
@@ -40,4 +41,4 @@ function criarEstilos(tema) {
     };
 }
 
-export { COR_FAB, COR_ICONE_FAB, criarEstilos };
+export { COR_FAB, COR_ICONE_FAB, TAMANHO_FAB, criarEstilos };

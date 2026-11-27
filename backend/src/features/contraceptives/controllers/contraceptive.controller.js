@@ -3,10 +3,10 @@ function criarContraceptiveController(service) {
     //Cadastra um anticoncepcional para a usuária autenticada.
     async function cadastrar(requisicao, resposta, proximo) {
         try {
-            const anticoncepcional = await service.cadastrar(
-                requisicao.usuario.id,
-                requisicao.body
-            );
+            const fusoHorario = requisicao.query?.fusoHorario;
+            const anticoncepcional = fusoHorario === undefined
+                ? await service.cadastrar(requisicao.usuario.id, requisicao.body)
+                : await service.cadastrar(requisicao.usuario.id, requisicao.body, { fusoHorario });
 
             resposta.status(201).json({
                 mensagem: 'Anticoncepcional cadastrado com sucesso.',
@@ -69,11 +69,21 @@ function criarContraceptiveController(service) {
         }
     }
 
+    async function apagarDefinitivamente(requisicao, resposta, proximo) {
+        try {
+            await service.apagarDefinitivamente(requisicao.usuario.id, requisicao.params.id);
+            resposta.status(204).end();
+        } catch (erro) {
+            proximo(erro);
+        }
+    }
+
     return {
         cadastrar,
         listar,
         editar,
-        remover
+        remover,
+        apagarDefinitivamente
     };
 }
 

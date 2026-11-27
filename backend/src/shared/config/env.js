@@ -76,11 +76,11 @@ const edicaoAnticoncepcionalRateLimitMaximo = Number(
 );
 
 const remocaoAnticoncepcionalRateLimitJanelaMs = Number(
-    process.env.REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_JANELA_MS || 900000
+    process.env.REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_JANELA_MS || 60_000
 );
 
 const remocaoAnticoncepcionalRateLimitMaximo = Number(
-    process.env.REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO || 5
+    process.env.REMOCAO_ANTICONCEPCIONAL_RATE_LIMIT_MAXIMO || 12
 );
 
 if (!Number.isInteger(cadastroRateLimitJanelaMs) || cadastroRateLimitJanelaMs <= 0) {

@@ -18,7 +18,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     const [salvando, setSalvando] = useState(false);
     const [excluindo, setExcluindo] = useState(false);
     const [confirmacaoExclusaoVisivel, setConfirmacaoExclusaoVisivel] = useState(false);
-    const [erroExclusaoVisivel, setErroExclusaoVisivel] = useState(false);
+    const [erroExclusao, setErroExclusao] = useState(null);
     const [sucesso, setSucesso] = useState(null);
     const operacaoEmAndamento = useRef(null);
     const telaMontada = useRef(true);
@@ -64,7 +64,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     function solicitarExclusao() {
         if (operacaoEmAndamento.current || ocupado || typeof aoExcluir !== 'function') return;
 
-        setErroExclusaoVisivel(false);
+        setErroExclusao(null);
         setConfirmacaoExclusaoVisivel(true);
     }
 
@@ -75,7 +75,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
         operacaoEmAndamento.current = 'exclusao';
         setExcluindo(true);
-        setErroExclusaoVisivel(false);
+        setErroExclusao(null);
 
         try {
             await aoExcluir(anticoncepcional.id);
@@ -85,10 +85,14 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             setConfirmacaoExclusaoVisivel(false);
             setSucesso('exclusao');
             return true;
-        } catch {
+        } catch (falha) {
             if (telaMontada.current) {
                 setConfirmacaoExclusaoVisivel(false);
-                setErroExclusaoVisivel(true);
+                setErroExclusao(
+                    falha?.status === 429
+                        ? falha.mensagemUsuario || 'Aguarde um pouco antes de tentar remover novamente.'
+                        : 'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
+                );
             }
 
             return false;
@@ -209,13 +213,13 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
             <SimpleModal
                 erroInterno
-                visivel={erroExclusaoVisivel}
-                aoFechar={excluindo ? undefined : () => setErroExclusaoVisivel(false)}
+                visivel={Boolean(erroExclusao)}
+                aoFechar={excluindo ? undefined : () => setErroExclusao(null)}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.interface.textoSecundario}
                 fundoIcone="#EDEDED"
                 titulo="Algo deu errado"
-                mensagem="Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente."
+                mensagem={erroExclusao}
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
@@ -226,7 +230,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                 acaoSecundaria={{
                     texto: 'Voltar',
                     variante: 'branco',
-                    aoPressionar: () => setErroExclusaoVisivel(false),
+                    aoPressionar: () => setErroExclusao(null),
                     desativado: excluindo
                 }}
             />

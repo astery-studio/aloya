@@ -3,9 +3,11 @@ import { AppError } from '../../../shared/errors/AppError.js';
 import { calcularPeriodosPausa } from '../utils/contraceptive.schedule.js';
 import { apresentarAnticoncepcional } from '../presenters/contraceptive.presenter.js';
 import { apresentarAnticoncepcionalListagem, ordenarAnticoncepcionaisListagem } from '../presenters/contraceptive.listing.presenter.js';
-import { validarFusoHorario } from '../validators/contraceptiveUsage.validator.js';
+import { dataLocalNoFuso, validarFusoHorario } from '../validators/contraceptiveUsage.validator.js';
 import { sincronizarNotificacoesEdicao } from '../utils/contraceptive.notifications.js';
+import { dataCivil, usoOcorreNaData } from '../utils/contraceptive.listing.schedule.js';
 import {
+    dataUtc,
     validarCadastroAnticoncepcional,
     validarEdicaoAnticoncepcional,
     validarIdAnticoncepcional
@@ -27,6 +29,19 @@ function prepararDadosPersistencia(dados) {
         dataValidade: dados.dataValidade,
         nivelIntensidadeAlerta: dados.intensidade
     };
+}
+
+function gerarUsosConfirmados(registro, hoje) {
+    const usos = [];
+    const horarioProgramado = registro.horariosProgramados[0];
+
+    for (const dia = new Date(registro.dataInicioUso); dia <= hoje; dia.setUTCDate(dia.getUTCDate() + 1)) {
+        if (usoOcorreNaData(registro, dataCivil(dia))) {
+            usos.push({ dataUsoProgramado: new Date(dia), horarioProgramado, statusUso: 'confirmado' });
+        }
+    }
+
+    return usos;
 }
 
 //Recebe duas datas opcionais e informa se representam o mesmo instante.
@@ -56,18 +71,29 @@ function possuiAlteracaoReal(registroAtual, dadosNovos) {
 //Recebe o Prisma e um relógio injetável e devolve as operações de anticoncepcionais.
 function criarContraceptiveService(prisma, relogio = () => new Date()) {
     //Valida e cadastra um anticoncepcional vinculado exclusivamente à usuária autenticada.
-    async function cadastrar(usuarioId, entrada) {
-        const dados = validarCadastroAnticoncepcional(entrada, relogio());
+    async function cadastrar(usuarioId, entrada, { fusoHorario } = {}) {
+        const agora = relogio();
+        const fuso = validarFusoHorario(fusoHorario);
+        const hoje = dataUtc(dataLocalNoFuso(agora, fuso));
+        const dados = validarCadastroAnticoncepcional(entrada, hoje);
         const dadosPersistencia = prepararDadosPersistencia(dados);
+        const usoPausado = Boolean(dados.regraFrequencia?.diasPausa && !dados.regraFrequencia.continuo);
+        const usos = usoPausado ? gerarUsosConfirmados(dadosPersistencia, hoje) : [];
 
         const registro = await prisma.anticoncepcional.create({
             data: {
                 usuarioId,
-                ...dadosPersistencia
-            }
+                ...dadosPersistencia,
+                ...(usos.length ? { usos: { createMany: { data: usos } } } : {})
+            },
+            ...(usoPausado ? { include: { usos: true } } : {})
         });
 
-        return apresentarAnticoncepcional(registro, relogio());
+        const cadastro = apresentarAnticoncepcional(registro, agora);
+        if (!usoPausado) return cadastro;
+
+        const { historico, usosHoje, statusUltimoUso } = apresentarAnticoncepcionalListagem(registro, agora, fuso);
+        return { ...cadastro, historico, usosHoje, statusUltimoUso };
     }
 
     //Lista os registros e seus usos sem produzir gravações durante a leitura.
@@ -217,11 +243,33 @@ function criarContraceptiveService(prisma, relogio = () => new Date()) {
         });
     }
 
+    async function apagarDefinitivamente(usuarioId, idRecebido) {
+        const id = validarIdAnticoncepcional(idRecebido);
+
+        await prisma.$transaction(async (transacao) => {
+            const resultado = await transacao.anticoncepcional.deleteMany({
+                where: { id, usuarioId, ativo: false }
+            });
+            if (resultado.count !== 1) {
+                throw new AppError(
+                    'Anticoncepcional removido não encontrado.',
+                    404,
+                    'ANTICONCEPCIONAL_NAO_ENCONTRADO'
+                );
+            }
+
+            await transacao.notificacao.deleteMany({
+                where: { usuarioId, tipoOrigem: 'anticoncepcional', origemId: id }
+            });
+        });
+    }
+
     return {
         cadastrar,
         listar,
         editar,
-        remover
+        remover,
+        apagarDefinitivamente
     };
 }
 

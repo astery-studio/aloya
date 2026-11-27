@@ -137,7 +137,9 @@ function useContraceptiveForm(onSubmit, anticoncepcionalInicial = null) {
         if (mensagem) {
             const titulo = mensagem.includes('nome')
                 ? 'Nome não informado'
-                : mensagem.includes('horário')
+                : mensagem.includes('somente um horário')
+                    ? 'Mantenha apenas um horário'
+                    : mensagem.includes('horário')
                     ? 'Horário não informado'
                     : 'Revise os dados';
 
@@ -187,7 +189,6 @@ function useContraceptiveForm(onSubmit, anticoncepcionalInicial = null) {
         abrir: setPainel,
         fecharPainel: () => setPainel(null),
         fecharAlerta: () => setAlerta(null),
-        permiteMultiplos: dados.tipo === 'pilula',
         exigePrimeiroUso: Boolean(frequencia?.diasPausa && !frequencia.continuo)
     };
 }

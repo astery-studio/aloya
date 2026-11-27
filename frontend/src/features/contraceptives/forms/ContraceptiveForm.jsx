@@ -1,6 +1,6 @@
 //Mostra o formulário compartilhado pelo cadastro e pela edição de anticoncepcionais.
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { FilePlus, WarningCircle } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import FormField from '../../../shared/components/forms/FormField';
@@ -34,7 +34,10 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
 
     //Abre um painel somente quando nenhuma operação de salvamento está acontecendo.
     function abrirPainel(nomePainel) {
-        if (!salvando) form.abrir(nomePainel);
+        if (salvando) return;
+
+        Keyboard.dismiss();
+        form.abrir(nomePainel);
     }
 
     //Abre o painel de nome com uma cópia do valor atual.
@@ -42,7 +45,7 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
         if (salvando) return;
 
         setNomeTemporario(dados.nome);
-        form.abrir('nome');
+        abrirPainel('nome');
     }
 
     //Aplica o nome temporário ao formulário e fecha o painel.
@@ -141,7 +144,6 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                     <UsageTimeSelector
                         aparenciaCadastro
                         horarios={dados.horarios}
-                        permiteMultiplos={form.permiteMultiplos}
                         aberto={painel === 'horarios'}
                         onAbrir={() => abrirPainel('horarios')}
                         onConfirmar={(valor) => {
@@ -167,6 +169,8 @@ function ContraceptiveForm({ onSubmit, anticoncepcional = null, salvando = false
                             label="Data do primeiro uso"
                             titulo="Data do primeiro uso"
                             valor={dados.dataPrimeiroUso}
+                            dataMaxima={hoje}
+                            destacarHoje
                             aberto={painel === 'primeiroUso'}
                             onAbrir={() => abrirPainel('primeiroUso')}
                             onSelecionar={async (valor) => {

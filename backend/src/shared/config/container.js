@@ -57,7 +57,8 @@ import { criarPredictionController } from '../../features/cycles/controllers/pre
 
 import {
     criarEdicaoAnticoncepcionalRateLimit,
-    criarRemocaoAnticoncepcionalRateLimit
+    criarRemocaoAnticoncepcionalRateLimit,
+    criarUsoAnticoncepcionalRateLimit
 } from '../../features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 import { criarCalendarModule } from '../../features/calendar/calendar.module.js';
@@ -469,6 +470,8 @@ function criarContainer() {
         limite: env.edicaoAnticoncepcionalRateLimitMaximo
     });
 
+    const usoAnticoncepcionalRateLimit = criarUsoAnticoncepcionalRateLimit({ rateLimit });
+
     const remocaoAnticoncepcionalRateLimit = criarRemocaoAnticoncepcionalRateLimit({
         rateLimit,
         janelaMs: env.remocaoAnticoncepcionalRateLimitJanelaMs,
@@ -594,6 +597,7 @@ function criarContainer() {
         exclusaoContaRateLimit,
         passwordRecoveryController,
         edicaoAnticoncepcionalRateLimit,
+        usoAnticoncepcionalRateLimit,
         remocaoAnticoncepcionalRateLimit,
         diaryCatalogController,
         diaryEntryController,

@@ -126,7 +126,7 @@ test('retorna erro controlado sem registrar dados sensíveis', () => {
     assert.deepEqual(resposta.corpoRecebido, {
         erro: {
             codigo: 'LIMITE_REMOCOES_ANTICONCEPCIONAL',
-            mensagem: 'Muitas remoções em pouco tempo. Aguarde alguns minutos e tente novamente.'
+            mensagem: 'Muitas remoções em pouco tempo. Aguarde um pouco e tente novamente.'
         }
     });
 

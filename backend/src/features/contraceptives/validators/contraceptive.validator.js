@@ -136,17 +136,28 @@ function validarDadosAnticoncepcional(entrada, hoje, permitirAliases, aplicarInt
         throw new AppError('Não informe horários repetidos.', 422, 'HORARIO_REPETIDO');
     }
 
-    if (!(tipo === 'pilula' && regraFrequencia.periodicidade === 'diaria') && horarios.length !== 1) {
+    if (horarios.length !== 1) {
         throw new AppError('Este tipo de anticoncepcional aceita exatamente um horário.', 422, 'QUANTIDADE_HORARIOS_INVALIDA');
     }
 
-    let dataPrimeiroUso = entrada?.dataPrimeiroUso ? dataUtc(entrada.dataPrimeiroUso) : null;
+    const dataPrimeiroUso = entrada?.dataPrimeiroUso ? dataUtc(entrada.dataPrimeiroUso) : null;
+    const dataAtual = dataUtc(hoje.toISOString().slice(0, 10));
 
     if (regraFrequencia.diasPausa && !dataPrimeiroUso) {
         throw new AppError('Informe a data do primeiro uso.', 422, 'PRIMEIRO_USO_OBRIGATORIO');
     }
 
-    dataPrimeiroUso ??= new Date(`${hoje.toISOString().slice(0, 10)}T00:00:00.000Z`);
+    if (regraFrequencia.diasPausa && dataPrimeiroUso > dataAtual) {
+        throw new AppError(
+            'A data do primeiro uso deve ser hoje ou anterior.', 422, 'PRIMEIRO_USO_FUTURO'
+        );
+    }
+
+    if (regraFrequencia.diasPausa && dataPrimeiroUso.getUTCFullYear() < 1900) {
+        throw new AppError(
+            'Informe uma data do primeiro uso a partir de 1900.', 422, 'PRIMEIRO_USO_INVALIDO'
+        );
+    }
 
     return {
         nome,
@@ -155,7 +166,7 @@ function validarDadosAnticoncepcional(entrada, hoje, permitirAliases, aplicarInt
         horarios: [...horarios].sort(),
         regraFrequencia,
         frequencia: regraFrequencia.valor,
-        dataPrimeiroUso,
+        dataPrimeiroUso: dataPrimeiroUso ?? dataAtual,
         dataValidade: null
     };
 }

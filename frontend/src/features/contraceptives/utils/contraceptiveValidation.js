@@ -27,10 +27,13 @@ function validarAnticoncepcional(dados, hoje = dataIsoHoje()) {
     }
     if (horarios.some((horario) => !horarioValido(horario))) return 'Informe um horário de uso válido.';
     if (new Set(horarios).size !== horarios.length) return 'Não adicione horários repetidos.';
-    if (!(dados.tipo === 'pilula' && frequencia.periodicidade === 'diaria') && horarios.length > 1) {
+    if (horarios.length > 1) {
         return 'Este tipo de anticoncepcional aceita somente um horário.';
     }
-    if (frequencia.diasPausa && !dados.dataPrimeiroUso) return 'Informe a data do primeiro uso.';
+    if (frequencia.diasPausa) {
+        if (!dados.dataPrimeiroUso) return 'Informe a data do primeiro uso.';
+        if (dados.dataPrimeiroUso > hoje) return 'A data do primeiro uso deve ser hoje ou anterior.';
+    }
     return null;
 }
 

@@ -1,5 +1,5 @@
 import { Animated, Text } from 'react-native';
-import { act, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '../../../../src/shared/components/feedback/BottomSheet/BottomSheet';
@@ -134,13 +134,24 @@ describe('BottomSheet', () => {
         expect(timing.mock.calls[0][1]).toEqual(
             expect.objectContaining({
                 toValue: 1,
-                duration: 280,
+                duration: 220,
                 useNativeDriver: true,
                 isInteraction: false
             })
         );
 
         expect(iniciar).toHaveBeenCalledTimes(1);
+    });
+
+    test('usa a altura medida do painel como distância da animação', async () => {
+        const setValue = jest.spyOn(Animated.Value.prototype, 'setValue');
+        await renderizarBottomSheet();
+
+        await fireEvent(screen.getByTestId('bottom-sheet-painel'), 'layout', {
+            nativeEvent: { layout: { x: 0, y: 0, width: 390, height: 236 } }
+        });
+
+        expect(setValue).toHaveBeenCalledWith(236);
     });
 
     test('inicia a animação de saída', async () => {
@@ -262,6 +273,9 @@ describe('BottomSheet', () => {
         expect(screen.getByTestId('bottom-sheet-painel')).toHaveStyle({
             backgroundColor: '#FFFFFF',
             overflow: 'hidden'
+        });
+        expect(screen.getByTestId('bottom-sheet-painel')).toHaveProp('edges', {
+            top: 'off', bottom: 'maximum', left: 'maximum', right: 'maximum'
         });
     });
 

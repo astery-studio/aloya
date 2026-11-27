@@ -127,6 +127,9 @@ enum StatusUso {
   confirmado
   pendente
   nao_confirmado
+  nao_usou
+  // Compatibilidade de leitura com históricos gravados antes da remoção da opção.
+  nao_sabe
 }
 
 enum StatusVinculoRedeApoio {

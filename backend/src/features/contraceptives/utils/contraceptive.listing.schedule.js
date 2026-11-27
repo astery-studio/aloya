@@ -95,6 +95,7 @@ function proximoUsoListagem(registro, agora, fusoHorario = 'UTC') {
 
 export {
     dataCivil,
+    horariosDaAgenda,
     horarioPertenceAgenda,
     listarUsosAgendadosHoje,
     proximoUsoListagem,

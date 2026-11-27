@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Text, View } from 'react-native';
+import { Modal, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
@@ -52,7 +52,7 @@ function AlertIntensitySelector({
                         onVoltar={onFechar}
                         aplicarSafeAreaSuperior={false}
                     />
-                    <View style={estilos.conteudoFluxo}>
+                    <ScrollView contentContainerStyle={estilos.conteudoFluxo}>
                         <Text style={estilos.descricaoFluxo}>
                             Escolha como quer ser lembrada de tomar seu anticoncepcional.
                         </Text>
@@ -71,7 +71,7 @@ function AlertIntensitySelector({
                                 );
                             })}
                         </View>
-                    </View>
+                    </ScrollView>
                     <View style={estilos.acaoFixa}>
                         <ButtonScreen
                             texto="Confirmar"

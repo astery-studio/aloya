@@ -10,6 +10,7 @@ function criarEstilosCartao(tema) {
             maxWidth: 350.01,
             alignSelf: 'center',
             overflow: 'hidden',
+            paddingTop: 3,
             backgroundColor: tema.escuro ? '#1E1E1E' : interfaceTema.superficie,
             borderWidth: 1.40978,
             borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : interfaceTema.borda,
@@ -40,13 +41,12 @@ function criarEstilosCartao(tema) {
         textoBadgePendente: tema.escuro ? { color: '#FFE082' } : {},
         textoBadgeAlerta: tema.escuro ? { color: '#90CAF9' } : {},
         cardConfirmado: { borderWidth: 0.70489 },
-        faixaSuperior: { width: '100%', height: 3, backgroundColor: interfaceTema.separador },
-        conteudo: { width: '100%', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 14.41 },
+        conteudo: { width: '100%', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12 },
         conteudoValidade: { paddingBottom: 29.47 },
         conteudoRemovido: { opacity: 0.75 },
         cabecalho: {
             width: '100%',
-            minHeight: 44,
+            minHeight: 50,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10
@@ -60,7 +60,7 @@ function criarEstilosCartao(tema) {
             borderWidth: 0.70489,
             borderColor: tema.escuro ? '#2C2C2C' : interfaceTema.borda,
             borderRadius: 10,
-            backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.superficieElevada
+            backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.fundo
         },
         identificacao: { flex: 1, minWidth: 0 },
         nome: {
@@ -100,9 +100,9 @@ function criarEstilosCartao(tema) {
         },
         divisor: {
             width: '100%',
-            height: 1.40978,
+            height: 0.705,
             marginTop: 11.3,
-            backgroundColor: interfaceTema.separador
+            backgroundColor: tema.escuro ? interfaceTema.separador : '#F0EDE7'
         },
         blocoUsos: { width: '100%', marginTop: 7 },
         rotuloSecao: {

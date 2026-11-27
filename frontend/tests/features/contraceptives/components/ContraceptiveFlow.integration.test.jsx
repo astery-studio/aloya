@@ -55,12 +55,222 @@ afterEach(() => {
     jest.useRealTimers();
 });
 
+test('mostra no calendário o início e os usos confirmados desde o cadastro', async () => {
+    const pilula = {
+        ...registro,
+        frequenciaId: 'pilula_21_7',
+        dataPrimeiroUso: '2026-09-21',
+        horarios: ['08:00'],
+        usosHoje: [],
+        historico: ['2026-09-21', '2026-09-22'].map((data, indice) => ({
+            id: indice + 1,
+            data,
+            horarioProgramado: '08:00',
+            estado: 'confirmado'
+        }))
+    };
+    const requisicaoAutenticada = jest.fn().mockResolvedValue({ anticoncepcionais: [pilula] });
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Yaz');
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
+    expect(screen.getByText('Início da medicação em 21/09/2026')).toBeOnTheScreen();
+    expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
+    expect(
+        screen.getByRole('button', { name: 'Dia 21, Confirmado, início da medicação' })
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dia 22, Confirmado' })).toBeOnTheScreen();
+    expect(screen.getByText('Pausa programada')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
+
+    expect(screen.getByRole('button', { name: 'Dia 12, Pausa programada' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dia 18, Pausa programada' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dia 19, sem registro' })).toBeOnTheScreen();
+});
+
+test('salva a correção do Evra pela API e conserva o histórico do Yaz', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
+    const uso = {
+        id: '11',
+        data: '2026-10-08',
+        horarioProgramado: '08:00',
+        confirmadoEm: '2026-10-08T11:02:00.000Z',
+        estado: 'confirmado'
+    };
+    const evra = { ...registro, id: 2, nome: 'Evra', tipo: 'adesivo', historico: [uso] };
+    const yaz = { ...registro, historico: [{ ...uso, id: '12' }] };
+    const requisicaoAutenticada = jest
+        .fn()
+        .mockResolvedValueOnce({ anticoncepcionais: [evra, yaz] })
+        .mockResolvedValueOnce({ uso: { ...uso, estado: 'foraDoPrazo' } });
+
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Evra');
+
+    const paineis = screen.getAllByRole('button', { name: 'Histórico de uso' });
+
+    await fireEvent.press(paineis[0]);
+    await fireEvent.press(paineis[1]);
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Alterar Histórico' })[0]);
+    await fireEvent.press(screen.getByRole('button', { name: '08/10/2026, 08:00, Confirmado' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Usei fora do prazo' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
+
+    expect(requisicaoAutenticada).toHaveBeenNthCalledWith(2, {
+        metodo: 'PATCH',
+        caminho: '/api/anticoncepcionais/2/usos/11',
+        corpo: { estado: 'foraDoPrazo', fusoHorario: expect.any(String) }
+    });
+    expect(await screen.findByText('Confirmado fora do prazo')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Dia 8, Confirmado')).toBeOnTheScreen();
+});
+
+test('apaga somente o registro selecionado após confirmar no modal', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
+    const uso = {
+        id: '11',
+        data: '2026-10-08',
+        horarioProgramado: '08:00',
+        confirmadoEm: null,
+        estado: 'naoUsei'
+    };
+    const outroUso = { ...uso, id: '12', data: '2026-10-07', estado: 'confirmado' };
+    const requisicaoAutenticada = jest
+        .fn()
+        .mockResolvedValueOnce({
+            anticoncepcionais: [{ ...registro, horarios: ['08:00'], historico: [uso, outroUso] }]
+        })
+        .mockResolvedValueOnce(null);
+
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Yaz');
+
+    const pressionar = async (name) => fireEvent.press(screen.getByRole('button', { name }));
+
+    await pressionar('Histórico de uso');
+    await pressionar('Dia 8, Não usei');
+    await pressionar('Apagar registro');
+
+    expect(screen.getByText('Apagar este registro?')).toBeOnTheScreen();
+
+    await pressionar('Cancelar');
+    expect(requisicaoAutenticada).toHaveBeenCalledTimes(1);
+
+    await pressionar('Apagar registro');
+    await pressionar('Apagar');
+
+    expect(requisicaoAutenticada).toHaveBeenNthCalledWith(2, {
+        metodo: 'DELETE',
+        caminho: '/api/anticoncepcionais/1/usos/11'
+    });
+    expect(await screen.findByLabelText('Dia 8, sem registro')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Dia 7, Confirmado')).toBeOnTheScreen();
+});
+
+test('confirma a exclusão definitiva e permite tentar novamente após o limite', async () => {
+    const removido = { ...registro, id: 2, nome: 'Evra', ativo: false, usosHoje: [] };
+    const mensagemUsuario = 'Muitas remoções em pouco tempo. Aguarde um pouco e tente novamente.';
+    const requisicaoAutenticada = jest
+        .fn()
+        .mockResolvedValueOnce({ anticoncepcionais: [registro, removido] })
+        .mockRejectedValueOnce(Object.assign(new Error(mensagemUsuario), { status: 429, mensagemUsuario }))
+        .mockResolvedValueOnce(null);
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Evra');
+
+    const pressionar = async (name) => fireEvent.press(screen.getByRole('button', { name }));
+    await pressionar('Apagar Evra definitivamente');
+    expect(screen.getByText('Apagar definitivamente?')).toBeOnTheScreen();
+    expect(screen.getByText(/histórico de uso serão apagados/)).toBeOnTheScreen();
+
+    await pressionar('Cancelar');
+    expect(requisicaoAutenticada).toHaveBeenCalledTimes(1);
+
+    await pressionar('Apagar Evra definitivamente');
+    await pressionar('Apagar');
+    expect(requisicaoAutenticada).toHaveBeenNthCalledWith(2, {
+        metodo: 'DELETE',
+        caminho: '/api/anticoncepcionais/2/definitivo'
+    });
+
+    expect(await screen.findByText(mensagemUsuario)).toBeOnTheScreen();
+    expect(screen.getByText('Evra')).toBeOnTheScreen();
+
+    await pressionar('Tentar novamente');
+    expect(await screen.findByText('Anticoncepcional apagado definitivamente.')).toBeOnTheScreen();
+    expect(screen.queryByText('Evra')).toBeNull();
+    expect(screen.getByText('Yaz')).toBeOnTheScreen();
+});
+
+test('edita o dia atual pelo calendário e atualiza o uso pendente do cartão', async () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 18, 29));
+    const uso = {
+        id: '13',
+        data: '2026-10-09',
+        horarioProgramado: '20:00',
+        confirmadoEm: null,
+        estado: 'confirmado'
+    };
+    const requisicaoAutenticada = jest
+        .fn()
+        .mockResolvedValueOnce({
+            anticoncepcionais: [
+                { ...registro, horarios: ['20:00'], usosHoje: [registro.usosHoje[1]] }
+            ]
+        })
+        .mockResolvedValueOnce({ uso });
+
+    await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
+    await screen.findByText('Yaz');
+
+    const pressionar = async (name) => fireEvent.press(screen.getByRole('button', { name }));
+
+    await pressionar('Histórico de uso');
+    const amanha = screen.getByRole('button', { name: 'Dia 10, sem registro' });
+    expect(amanha).toBeDisabled();
+    await fireEvent.press(amanha);
+    expect(screen.queryByText('Dia indisponível')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Usei' })).toBeNull();
+
+    await pressionar('Dia 9, sem registro');
+
+    expect(screen.queryByText('Dia indisponível')).toBeNull();
+
+    await pressionar('Usei');
+    await pressionar('Salvar');
+
+    expect(requisicaoAutenticada).toHaveBeenNthCalledWith(2, {
+        metodo: 'PATCH',
+        caminho: '/api/anticoncepcionais/1/usos',
+        corpo: {
+            data: '2026-10-09',
+            horario: '20:00',
+            estado: 'confirmado',
+            fusoHorario: expect.any(String)
+        }
+    });
+    expect(await screen.findByLabelText('Dia 9, Confirmado')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /Desmarcar uso/i })).toBeOnTheScreen();
+});
+
 test('API → normalizador → tela: confirma, atualiza histórico/calendário e desmarca sem recarregar', async () => {
     jest.useFakeTimers().setSystemTime(new Date(2026, 9, 9, 12));
     const confirmadoEm = '2026-10-09T12:34:56.789Z';
     const requisicaoAutenticada = jest
         .fn()
-        .mockResolvedValueOnce({ anticoncepcionais: [registro] })
+        .mockResolvedValueOnce({
+            anticoncepcionais: [
+                {
+                    ...registro,
+                    usosHoje: registro.usosHoje.map((uso) => ({
+                        ...uso,
+                        atrasado: uso.horario === '08:00'
+                    }))
+                }
+            ]
+        })
         .mockResolvedValueOnce({
             uso: {
                 id: 10,
@@ -82,11 +292,19 @@ test('API → normalizador → tela: confirma, atualiza histórico/calendário e
                 prazoConfigurado: true
             }
         });
+
     await renderizar({ service: criarContraceptiveService({ requisicaoAutenticada }) });
     await screen.findByText('2 usos pendentes hoje');
+
+    expect(screen.getAllByText('Atrasado')).toHaveLength(1);
+
     await fireEvent.press(screen.getAllByRole('button', { name: 'Marcar Uso' })[0]);
+
     await waitFor(() => expect(screen.getByText('1 uso pendente hoje')).toBeOnTheScreen());
+    expect(screen.queryByText('Atrasado')).toBeNull();
+
     await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
     expect(screen.getByLabelText('Dia 9, Fora do prazo')).toBeOnTheScreen();
     expect(requisicaoAutenticada).toHaveBeenNthCalledWith(
         2,
@@ -100,7 +318,9 @@ test('API → normalizador → tela: confirma, atualiza histórico/calendário e
             })
         })
     );
+
     await fireEvent.press(screen.getByRole('button', { name: 'Desmarcar Uso' }));
+
     await waitFor(() => expect(screen.getByText('2 usos pendentes hoje')).toBeOnTheScreen());
     expect(screen.getByLabelText('Dia 9, sem registro')).toBeOnTheScreen();
     expect(requisicaoAutenticada).toHaveBeenCalledTimes(3);
@@ -124,14 +344,17 @@ test('a Home tem controles por horário, mantém DIU sem marcação e publica fe
         ]),
         alternarUso: jest.fn().mockReturnValue(aguardar)
     };
+
     await renderizar({ service, inicio: true });
     await screen.findByText('Anticoncepcionais de hoje');
     await screen.findByText('2 usos pendentes hoje');
+
     expect(screen.getAllByRole('button', { name: 'Marcar Uso' })).toHaveLength(2);
     const { evento: acao } = await iniciarPressao(
         screen.getAllByRole('button', { name: 'Marcar Uso' })[0]
     );
     await waitFor(() => expect(screen.getByText('1 uso pendente hoje')).toBeOnTheScreen());
+
     await act(async () => {
         resolver({
             uso: {
@@ -144,10 +367,17 @@ test('a Home tem controles por horário, mantém DIU sem marcação e publica fe
         });
         await acao;
     });
+
     expect(screen.getByTestId('usos-home-area-segura')).toHaveProp('edges', {
         top: 'additive',
         left: 'additive',
         right: 'additive',
+        bottom: 'off'
+    });
+    expect(screen.getByTestId('navegacao-segura-main-layout')).toHaveProp('edges', {
+        top: 'off',
+        left: 'off',
+        right: 'off',
         bottom: 'additive'
     });
     const mirena = screen.getByLabelText('Mirena, DIU hormonal');
@@ -160,9 +390,11 @@ test('erro de rede desfaz apenas a tentativa e não informa sucesso sem persist�
         listar: jest.fn().mockResolvedValue([{ ...registro, id: '1' }]),
         alternarUso: jest.fn().mockRejectedValue(new Error('rede'))
     };
+
     await renderizar({ service });
     await screen.findByText('2 usos pendentes hoje');
     await fireEvent.press(screen.getAllByRole('button', { name: 'Marcar Uso' })[0]);
+
     await waitFor(() => expect(screen.getByText('2 usos pendentes hoje')).toBeOnTheScreen());
     expect(screen.queryByRole('button', { name: 'Desmarcar Uso' })).toBeNull();
 });
@@ -174,15 +406,20 @@ test('a trava por dose permanece após mover o cartão entre seções e impede u
         listar: jest.fn().mockResolvedValue([unicoUso]),
         alternarUso: jest.fn().mockReturnValue(confirmacao.promessa)
     };
+
     await renderizar({ service });
     await screen.findByText('1 uso pendente hoje');
+
     const { evento: marcar } = await iniciarPressao(
         screen.getByRole('button', { name: 'Marcar Uso' })
     );
+
     await screen.findByRole('button', { name: 'Desmarcar Uso' });
     await fireEvent.press(screen.getByRole('button', { name: 'Desmarcar Uso' }));
+
     expect(service.alternarUso).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: 'Desmarcar Uso' })).toBeOnTheScreen();
+
     await act(async () => {
         confirmacao.resolver({
             uso: {
@@ -195,6 +432,7 @@ test('a trava por dose permanece após mover o cartão entre seções e impede u
         });
         await marcar;
     });
+
     expect(screen.queryByText('1 uso pendente hoje')).toBeNull();
 });
 
@@ -209,16 +447,21 @@ test('dois horários distintos podem persistir em paralelo sem perder a confirma
                 horario === '08:00' ? primeira.promessa : segunda.promessa
             )
     };
+
     await renderizar({ service });
     await screen.findByText('2 usos pendentes hoje');
+
     const { evento: marcarPrimeira } = await iniciarPressao(
         screen.getAllByRole('button', { name: 'Marcar Uso' })[0]
     );
+
     await screen.findByText('1 uso pendente hoje');
+
     const { evento: marcarSegunda } = await iniciarPressao(
         screen.getByRole('button', { name: 'Marcar Uso' })
     );
     await waitFor(() => expect(service.alternarUso).toHaveBeenCalledTimes(2));
+
     await act(async () => {
         segunda.resolver({
             uso: {
@@ -243,6 +486,7 @@ test('dois horários distintos podem persistir em paralelo sem perder a confirma
         });
         await marcarPrimeira;
     });
+
     await waitFor(() =>
         expect(screen.getAllByRole('button', { name: 'Desmarcar Uso' })).toHaveLength(2)
     );
@@ -268,12 +512,15 @@ test.each([true, false])(
                 .mockReturnValueOnce(buscaAntiga.promessa),
             alternarUso: jest.fn().mockReturnValue(confirmacao.promessa)
         };
+
         await renderizar({ service });
         await screen.findByText('1 uso pendente hoje');
         await act(async () => aoAppState('active'));
+
         const { evento: tentativa } = await iniciarPressao(
             screen.getByRole('button', { name: 'Marcar Uso' })
         );
+
         await screen.findByRole('button', { name: 'Desmarcar Uso' });
         await act(async () => {
             if (sucesso)
@@ -303,6 +550,7 @@ test.each([true, false])(
                       ]
                   }
               ];
+
         await act(async () => buscaAntiga.resolver(snapshot));
         if (sucesso)
             expect(screen.getByRole('button', { name: 'Desmarcar Uso' })).toBeOnTheScreen();

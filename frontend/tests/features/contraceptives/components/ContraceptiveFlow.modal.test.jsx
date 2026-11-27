@@ -31,6 +31,7 @@ jest.mock('../../../../src/features/contraceptives/screens/NewContraceptiveScree
 
 test('exibe o sucesso com o popup simples existente', async () => {
     await render(<ContraceptiveFlow />);
+
     await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar' }));
 
