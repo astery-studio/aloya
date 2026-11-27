@@ -19,11 +19,16 @@ function criarEstilos(tema) {
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
-            ...tema.headerTypography.principal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 24,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 27.5,
+            textAlign: 'left',
             minWidth: 0,
             flex: 1,
             flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal
+            color: '#222222'
         },
         rolagem: {
             flexGrow: 1,

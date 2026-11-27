@@ -225,9 +225,10 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
         flex: 1,
         flexShrink: 1,
         fontFamily: 'DMSans_700Bold',
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: '700',
-        lineHeight: 36,
+        lineHeight: 27.5,
+        color: '#222222',
         textAlign: 'left'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
