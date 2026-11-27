@@ -5,6 +5,7 @@ import {
 } from './notificationPreferenceFields.js';
 import { inicializarCatalogoNotificacao } from './notificationCatalog.service.js';
 import { permiteNotificacao } from './notificationEvents.service.js';
+import { buscarChavesContato } from './contactNotificationOptions.js';
 
 const select = {
     ajustesPorEvento: true,
@@ -55,14 +56,13 @@ export function criarNotificationPreferencesService(prisma) {
         return buscarNoBanco(cliente, usuarioId);
     }
 
-    async function atualizar(usuarioId, entrada) {
+    async function atualizar(usuarioId, entrada, autorizar) {
         const alteracao = validarAlteracao(entrada);
+        const { chave, valor } = alteracao;
+        const cancelar = valor === false && chave !== 'previaDetalhada';
 
-        if (alteracao.valor !== false || alteracao.chave === 'previaDetalhada') {
-            return gravar(prisma, usuarioId, alteracao);
-        }
+        if (!cancelar && !autorizar) return gravar(prisma, usuarioId, alteracao);
 
-        const { chave } = alteracao;
         const evento =
             {
                 cicloPrevisoesAtivo: 'ciclo',
@@ -72,17 +72,15 @@ export function criarNotificationPreferencesService(prisma) {
             }[chave] ?? chave;
 
         return prisma.$transaction(async (tx) => {
+            if (autorizar) await autorizar(tx, chave);
             const preferencias = await gravar(tx, usuarioId, alteracao);
 
-            await tx.notificacao.updateMany({
-                where: {
+            if (cancelar) {
+                await cancelarAgendadas(tx, {
                     usuarioId,
-                    statusEnvio: 'agendada',
-                    dataHoraDisparo: null,
                     OR: [{ evento }, { evento: { startsWith: `${evento}.` } }]
-                },
-                data: { statusEnvio: 'cancelada' }
-            });
+                });
+            }
 
             return preferencias;
         });
@@ -99,15 +97,7 @@ export function criarNotificationPreferencesService(prisma) {
                 data: { ...camposExistentes, ajustesPorEvento: {} }
             });
 
-            await tx.notificacao.updateMany({
-                where: {
-                    usuarioId,
-                    evento: { in: desativados },
-                    statusEnvio: 'agendada',
-                    dataHoraDisparo: null
-                },
-                data: { statusEnvio: 'cancelada' }
-            });
+            await cancelarAgendadas(tx, { usuarioId, evento: { in: desativados } });
 
             return buscarNoBanco(tx, usuarioId);
         });
@@ -115,8 +105,18 @@ export function criarNotificationPreferencesService(prisma) {
 
     return {
         buscar: (usuarioId) => buscarNoBanco(prisma, usuarioId),
+        buscarChavesContato: (usuarioId, cliente = prisma) => buscarChavesContato(cliente, usuarioId),
         buscarCatalogo: () => inicializarCatalogoNotificacao(prisma),
         atualizar,
         restaurar
     };
+}
+
+async function cancelarAgendadas(tx, criterio) {
+    const where = { ...criterio, statusEnvio: 'agendada', dataHoraDisparo: null };
+    await tx.entregaPush.updateMany({
+        where: { status: 'pendente', notificacao: where },
+        data: { status: 'cancelada' }
+    });
+    await tx.notificacao.updateMany({ where, data: { statusEnvio: 'cancelada' } });
 }

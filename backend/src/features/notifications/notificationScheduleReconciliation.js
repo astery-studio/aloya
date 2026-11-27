@@ -1,7 +1,12 @@
+import { permiteNotificacao } from './notificationEvents.service.js';
+
 export async function reconciliarAgendamentos(prisma, usuarioId, candidatos) {
     for (const aviso of candidatos) {
         const { evento, ocorrencia, dataHoraProgramada, expiraEm, origemId } = aviso;
         await prisma.$transaction(async (tx) => {
+            const preferencia = await tx.preferenciaNotificacao.findUnique({ where: { usuarioId } });
+            if (!permiteNotificacao(preferencia, evento)) return;
+
             const where = { usuarioId, evento, ocorrencia };
             const anterior = await tx.notificacao.findFirst({
                 where,
