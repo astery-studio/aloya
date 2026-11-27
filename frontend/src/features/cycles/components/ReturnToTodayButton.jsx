@@ -11,8 +11,9 @@ function ReturnToTodayButton({ onPress }) {
             paddingVertical: 6
         },
         botao: {
-            height: 20,
+            minHeight: 34,
             flexDirection: 'row',
+            justifyContent: 'center',
             alignItems: 'center',
             gap: 5,
             paddingHorizontal: 13,
@@ -26,7 +27,7 @@ function ReturnToTodayButton({ onPress }) {
             color: 'rgba(214, 140, 58, 0.60)',
             fontSize: 10,
             includeFontPadding: false,
-            lineHeight: 19.5
+            lineHeight: 20
         },
         textoVoltar: {
             fontFamily: fontFamilies.light,
