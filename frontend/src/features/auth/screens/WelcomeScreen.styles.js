@@ -2,7 +2,7 @@
  * Define a composição visual da tela inicial de autenticação.
  */
 import { StyleSheet } from 'react-native';
-import { espacamentos, fontFamilies } from '../../../shared/theme';
+import { espacamentos } from '../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -15,12 +15,10 @@ function criarEstilos(tema) {
             flex: 1,
             justifyContent: 'center'
         },
-        reservaLogo: {
-            color: tema.cores.interface.textoPrincipal,
-            fontFamily: fontFamilies.bold,
-            fontSize: 26,
-            letterSpacing: 1.04,
-            lineHeight: 39
+        imagemLogo: {
+            width: '100%',
+            maxWidth: 320,
+            aspectRatio: 1
         },
         acoes: {
             gap: 12,

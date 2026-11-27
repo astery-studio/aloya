@@ -1074,7 +1074,7 @@ describe('App integrado', () => {
         expect(screen.queryByText('Edição do Diário: 18')).not.toBeOnTheScreen();
     });
 
-    test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {
+    test('volta às boas-vindas depois de sair da conta', async () => {
         obterToken.mockResolvedValue(null);
 
         await render(<App />);
@@ -1109,7 +1109,9 @@ describe('App integrado', () => {
             })
         );
 
-        expect(await screen.findByText('Login')).toBeOnTheScreen();
+        expect(await screen.findByRole('button', { name: 'Ir para cadastro' })).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Ir para login' })).toBeOnTheScreen();
+        expect(screen.queryByText('Login')).not.toBeOnTheScreen();
 
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
     });
