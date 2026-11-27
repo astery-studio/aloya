@@ -1,21 +1,29 @@
 import { endpoints } from '../../shared/services/api/endpoints';
 
-export function criarNotificationPreferencesService({ requisicaoAutenticada }) {
+export function criarNotificationPreferencesService({ requisicaoAutenticada, contato = false }) {
+    const caminho = contato
+        ? `${endpoints.preferenciasNotificacao}/contato`
+        : endpoints.preferenciasNotificacao;
+
+    function apresentar({ preferencias, chavesDisponiveis, efetivas }) {
+        return { ...preferencias, chavesDisponiveis, efetivas };
+    }
+
     async function buscar({ signal } = {}) {
         const resposta = await requisicaoAutenticada({
-            caminho: endpoints.preferenciasNotificacao,
+            caminho,
             signal
         });
-        return resposta.preferencias;
+        return apresentar(resposta);
     }
 
     async function atualizar(alteracao) {
         const resposta = await requisicaoAutenticada({
             metodo: 'PATCH',
-            caminho: endpoints.preferenciasNotificacao,
+            caminho,
             corpo: alteracao
         });
-        return resposta.preferencias;
+        return apresentar(resposta);
     }
 
     return { buscar, atualizar };
