@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -37,7 +38,9 @@ function criarEstilos(tema) {
 
         textoCarregamento: {
             marginTop: 14,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',
@@ -55,7 +58,9 @@ function criarEstilos(tema) {
         },
 
         textoAtualizacao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             fontWeight: '400',
@@ -75,12 +80,16 @@ function criarEstilos(tema) {
             minWidth: 16,
             height: 1,
             flex: 1,
-            backgroundColor: tema.cores.interface.separador
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.borda
+                : tema.cores.interface.separador
         },
 
         tituloGrupo: {
             flexShrink: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontWeight: '700',
@@ -98,7 +107,9 @@ function criarEstilos(tema) {
         mensagemFiltroVazio: {
             width: '100%',
             paddingTop: 18,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',

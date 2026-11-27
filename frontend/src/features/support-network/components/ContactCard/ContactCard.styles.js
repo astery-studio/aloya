@@ -95,7 +95,9 @@ function criarEstilos(tema) {
         },
 
         nomePendente: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
@@ -123,7 +125,9 @@ function criarEstilos(tema) {
 
         nomeAtivo: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
@@ -173,7 +177,9 @@ function criarEstilos(tema) {
 
         nome: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
@@ -247,13 +253,17 @@ function criarEstilos(tema) {
         },
 
         rotuloInformacao: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontWeight: '500'
         },
 
         valorInformacao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400'
         },
@@ -300,7 +310,9 @@ function criarEstilos(tema) {
         },
 
         tituloInativo: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             fontWeight: '700',

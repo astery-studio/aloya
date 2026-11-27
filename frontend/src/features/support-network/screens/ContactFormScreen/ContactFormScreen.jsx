@@ -496,7 +496,14 @@ function NewContactFormScreen({
                             accessibilityLabel="Carregando formulário de contato"
                             style={estilos.carregamento}
                         >
-                            <ActivityIndicator size="large" color={tema.cores.interface.destaque} />
+                            <ActivityIndicator
+                                size="large"
+                                color={
+                                    tema.escuro
+                                        ? coresNoturnasConteudo.verde
+                                        : tema.cores.interface.destaque
+                                }
+                            />
                         </View>
                     ) : (
                         <ContactForm
