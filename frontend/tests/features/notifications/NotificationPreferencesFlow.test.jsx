@@ -37,11 +37,15 @@ test('abre as três categorias, percorre as seções e volta à origem', async (
 });
 
 test('abre a tela temporária no desenvolvimento e volta para Notificações', async () => {
-    const onVoltar = await montar({ buscar: jest.fn().mockResolvedValue(iniciais) });
+    const onVoltar = await montar({ buscar: jest.fn().mockResolvedValue({
+        ...iniciais,
+        efetivas: { 'redeApoio.convites.respondido': true, 'redeApoio.dicas.apoio': false }
+    }) });
     await tocar('Teste de notificações');
     expect(screen.getByRole('header', { name: 'Teste de notificações' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Convite aceito' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Convite recusado' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Dica de apoio na fase menstrual' })).toBeNull();
     await tocar('Voltar');
     expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
     expect(onVoltar).not.toHaveBeenCalled();

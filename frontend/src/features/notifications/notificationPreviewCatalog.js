@@ -29,6 +29,14 @@ const variantes = {
     ]
 };
 
+export function previaPermitida(codigo, efetivas) {
+    if (codigo.startsWith('seguranca.')) return true;
+
+    const base = codigo.split('.').slice(0, 3).join('.');
+    const chave = base === 'ciclo.diario.lembreteDiarioAtivo' ? 'lembreteDiarioAtivo' : base;
+    return efetivas?.[chave] === true;
+}
+
 export function listarPreviews() {
     const categorias = Object.entries(catalogoNotificacoes).map(
         ([categoria, { titulo, grupos }]) => ({

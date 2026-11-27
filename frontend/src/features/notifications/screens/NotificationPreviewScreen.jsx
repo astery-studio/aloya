@@ -3,19 +3,32 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { exibirPrevia, listarPreviews } from '../notificationPreview';
+import { previaPermitida } from '../notificationPreviewCatalog';
 
 import { NotificationPreviewCategory } from './NotificationPreviewCategory';
 import { NotificationPreviewFeedback } from './NotificationPreviewFeedback';
 
 const categorias = listarPreviews();
 
-export function NotificationPreviewScreen({ onVoltar }) {
+export function NotificationPreviewScreen({ efetivas, buscarPreferencias, onVoltar }) {
     const { cores, typography } = useTheme();
     const [estado, definirEstado] = useState(null);
     const [ocupado, definirOcupado] = useState(false);
+    const [efetivasAtualizadas, definirEfetivasAtualizadas] = useState(efetivas);
     const emAndamento = useRef(false);
 
     const textoSecundario = [typography.bodyDefault, { color: cores.interface.textoSecundario }];
+    const categoriasVisiveis = categorias
+        .map(({ grupos, ...categoria }) => ({
+            ...categoria,
+            grupos: grupos
+                .map(({ nome, tipos }) => ({
+                    nome,
+                    tipos: tipos.filter(([codigo]) => previaPermitida(codigo, efetivasAtualizadas))
+                }))
+                .filter(({ tipos }) => tipos.length > 0)
+        }))
+        .filter(({ grupos }) => grupos.length > 0);
 
     async function testar(codigo, rotulo, canal) {
         if (emAndamento.current) return;
@@ -29,6 +42,11 @@ export function NotificationPreviewScreen({ onVoltar }) {
                 rotulo,
                 canal,
                 plataforma: Platform.OS,
+                autorizar: async (tipo) => {
+                    const preferencias = await buscarPreferencias();
+                    definirEfetivasAtualizadas(preferencias.efetivas);
+                    return previaPermitida(tipo, preferencias.efetivas);
+                },
                 sdk: ['android', 'ios'].includes(Platform.OS)
                     ? await import('expo-notifications')
                     : null
@@ -47,14 +65,14 @@ export function NotificationPreviewScreen({ onVoltar }) {
             <View style={estilos.lista}>
                 <Text style={textoSecundario}>
                     Toque em um tipo para ver uma prévia nativa neste aparelho. O teste usa dados
-                    fictícios e funciona sem enviar push pelo servidor.
+                    fictícios e mostra os tipos habilitados em Notificações.
                 </Text>
                 {estado && (
                     <NotificationPreviewFeedback
                         {...{ estado, textoSecundario, typography, cores }}
                     />
                 )}
-                {categorias.map(({ titulo, canal, grupos }) => (
+                {categoriasVisiveis.map(({ titulo, canal, grupos }) => (
                     <NotificationPreviewCategory
                         key={canal}
                         {...{ titulo, canal, grupos, ocupado, testar, typography, cores }}

@@ -7,7 +7,7 @@ import { conteudoDaPrevia } from './notificationPreviewContent';
 export { conteudoDaPrevia } from './notificationPreviewContent';
 export { listarPreviews } from './notificationPreviewCatalog';
 
-export async function exibirPrevia({ codigo, rotulo, canal, plataforma, sdk }) {
+export async function exibirPrevia({ codigo, rotulo, canal, plataforma, sdk, autorizar }) {
     if (!['android', 'ios'].includes(plataforma)) return 'plataforma';
     if (plataforma === 'android') {
         await prepararCanalNativo(sdk, canal);
@@ -26,6 +26,8 @@ export async function exibirPrevia({ codigo, rotulo, canal, plataforma, sdk }) {
         const canalNativo = await sdk.getNotificationChannelAsync(canal);
         if (canalNativo?.importance === sdk.AndroidImportance.NONE) return 'canal';
     }
+
+    if (autorizar && !(await autorizar(codigo))) return 'desativada';
 
     configurarApresentacaoNativa(sdk, plataforma);
     await sdk.scheduleNotificationAsync({

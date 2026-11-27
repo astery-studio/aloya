@@ -22,3 +22,12 @@ test('não agenda em plataforma sem suporte, permissão negada ou canal bloquead
     expect(await exibirPrevia({ ...aviso, plataforma: 'android', sdk })).toBe('canal');
     expect(sdk.scheduleNotificationAsync).not.toHaveBeenCalled();
 });
+
+test('não agenda a prévia quando o aviso deixou de estar habilitado', async () => {
+    const sdk = criarSdk();
+    const autorizar = jest.fn().mockResolvedValue(false);
+    expect(await exibirPrevia({ ...aviso, plataforma: 'android', sdk, autorizar }))
+        .toBe('desativada');
+    expect(autorizar).toHaveBeenCalledWith(aviso.codigo);
+    expect(sdk.scheduleNotificationAsync).not.toHaveBeenCalled();
+});
