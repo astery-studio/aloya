@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { ActivityIndicator, SectionList, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -106,7 +107,8 @@ function ContraceptiveTrackingScreen({
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
     });
     const secoes = criarSecoes(itens);
-    const exibeFab = !somenteLeitura && !carregando && !erro && typeof aoCadastrarNovo === 'function';
+    const exibeFab =
+        !somenteLeitura && !carregando && !erro && typeof aoCadastrarNovo === 'function';
     const quantidadePendentes = itens.reduce(
         (total, item) =>
             total +
@@ -129,11 +131,19 @@ function ContraceptiveTrackingScreen({
             style={estilosAcompanhamento.tela}
             testID="anticoncepcionais-area-segura"
         >
-            <Header titulo="Anticoncepcionais" variante="comVoltar" onVoltar={aoVoltar} />
+            <Header
+                titulo="Anticoncepcionais"
+                variante="comVoltar"
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
+                onVoltar={aoVoltar}
+            />
 
             {carregando ? (
                 <View style={estilosAcompanhamento.estadoCentral}>
-                    <ActivityIndicator size="large" color={tema.escuro ? '#F08A75' : '#C85A44'} />
+                    <ActivityIndicator
+                        size="large"
+                        color={tema.escuro ? coresNoturnasConteudo.coral : '#C85A44'}
+                    />
                     <Text style={estilosAcompanhamento.mensagemEstado}>
                         Carregando anticoncepcionais...
                     </Text>

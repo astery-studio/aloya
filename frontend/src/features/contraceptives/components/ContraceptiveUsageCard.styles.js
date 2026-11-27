@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
@@ -66,14 +67,18 @@ function criarEstilosCartao(tema) {
         identificacaoSomenteLeitura: { paddingRight: 36 + 10 },
         textoCentralizado: { textAlign: 'center' },
         nome: {
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontWeight: '700',
             fontSize: 16,
             lineHeight: 24
         },
         tipo: {
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400',
             fontSize: 13,
@@ -141,7 +146,9 @@ function criarEstilosCartao(tema) {
             flexShrink: 1
         },
         horario: {
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontWeight: '700',
             fontSize: 14,
@@ -151,7 +158,9 @@ function criarEstilosCartao(tema) {
         horarioConfirmadoSomenteLeitura: { alignItems: 'center' },
         confirmadoAs: {
             marginLeft: 17,
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400',
             fontSize: 11,
@@ -200,7 +209,9 @@ function criarEstilosCartao(tema) {
         textoValidade: {
             flex: 1,
             minWidth: 125,
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontWeight: '400',
             fontSize: 13,
