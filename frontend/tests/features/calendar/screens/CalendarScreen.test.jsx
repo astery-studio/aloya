@@ -427,6 +427,22 @@ describe('CalendarScreen', () => {
         expect(aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
     });
 
+    test('aplica a paleta noturna ao aviso de ciclo vazio', async () => {
+        await render(
+            <CalendarScreen
+                meses={[{ mes: '2026-10', possuiCiclos: false }]}
+                aoCadastrarMenstruacao={jest.fn()}
+            />,
+            { preferencia: 'escuro' }
+        );
+
+        const aviso = screen.getByTestId('calendar-empty-state');
+        expect(aviso).toHaveStyle({ backgroundColor: '#1E1E1E' });
+        expect(
+            within(aviso).getByText(/Você ainda não possui nenhum ciclo registrado/u)
+        ).toHaveStyle({ color: '#A5D6A7' });
+    });
+
     test('oculta o aviso ao tocar na tela e o reapresenta após cinco segundos sem interação', async () => {
         jest.useFakeTimers();
 
