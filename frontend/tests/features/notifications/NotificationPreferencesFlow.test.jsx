@@ -6,17 +6,40 @@ import { ThemeProvider } from '../../../src/shared/theme/ThemeProvider';
 const iniciais = { horarioLembreteDiario: '20:00', antecedenciaProximoCiclo: 2, lembreteDiarioAtivo: true };
 const tocar = (nome) => fireEvent.press(screen.getByRole('button', { name: nome }));
 
-async function montar(service, contato = false) {
+const contraceptivosIniciais = {
+    listar: async () => [{ id: '1', tipo: 'diu_hormonal', dataValidade: '2030-01-01' }]
+};
+
+async function montar(service, contato = false, contraceptiveService = contraceptivosIniciais) {
     const onVoltar = jest.fn();
     await render(
         <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 0, left: 0, right: 0 }}>
             <ThemeProvider preferencia="claro" esquemaDoSistema="light">
-                <NotificationPreferencesFlow service={service} contato={contato} onVoltar={onVoltar} />
+                <NotificationPreferencesFlow
+                    service={service}
+                    contraceptiveService={contraceptiveService}
+                    contato={contato}
+                    onVoltar={onVoltar}
+                />
             </ThemeProvider>
         </SafeAreaInsetsContext.Provider>
     );
     return onVoltar;
 }
+
+test('explica o limite de alterações e preserva a preferência pendente', async () => {
+    const atualizar = jest.fn().mockRejectedValueOnce({ status: 429 })
+        .mockResolvedValue({ ...iniciais, 'ciclo.menstrual': false });
+    await montar({ buscar: jest.fn().mockResolvedValue(iniciais), atualizar });
+    await tocar('Ciclo e Previsões');
+    await fireEvent.press(screen.getByRole('switch', { name: 'Ciclo Menstrual' }));
+    expect(await screen.findByText('Muitas alterações seguidas')).toBeOnTheScreen();
+    await tocar('Tentar novamente');
+    expect(atualizar.mock.calls).toEqual([
+        [{ chave: 'ciclo.menstrual', valor: false }],
+        [{ chave: 'ciclo.menstrual', valor: false }]
+    ]);
+});
 
 test('abre as três categorias, percorre as seções e volta à origem', async () => {
     const onVoltar = await montar({ buscar: jest.fn().mockResolvedValue(iniciais) });
@@ -26,7 +49,7 @@ test('abre as três categorias, percorre as seções e volta à origem', async (
         ['Rede de Apoio', 'Consentimento Parental', 'Aplicações e trocas']
     ]) {
         await tocar(categoria);
-        expect(screen.getByRole('switch', { name: ultimoGrupo })).toBeOnTheScreen();
+        expect(await screen.findByRole('switch', { name: ultimoGrupo })).toBeOnTheScreen();
         await tocar('Personalizar notificações');
         expect(screen.getByRole('switch', { name: ultimoEvento })).toBeOnTheScreen();
         await tocar('Voltar');
@@ -34,6 +57,47 @@ test('abre as três categorias, percorre as seções e volta à origem', async (
     }
     await tocar('Voltar');
     expect(onVoltar).toHaveBeenCalledTimes(1);
+});
+
+test('abre o cadastro de anticoncepcional quando não há métodos e atualiza ao voltar', async () => {
+    let metodos = [{ id: '1', tipo: 'anel_vaginal', ativo: false }];
+    const listar = jest.fn(async () => metodos);
+    await montar({ buscar: jest.fn().mockResolvedValue(iniciais) }, false, { listar });
+    await tocar('Anticoncepcional');
+    expect(await screen.findByText('Nenhum anticoncepcional cadastrado')).toBeOnTheScreen();
+    expect(screen.queryByRole('switch')).toBeNull();
+    const adicionar = screen.getByRole('button', { name: 'Cadastrar novo anticoncepcional' });
+    expect(adicionar).toHaveProp('testID', 'anticoncepcional-notificacoes-adicionar');
+    expect(screen.queryByText('Cadastrar anticoncepcional')).toBeNull();
+    await fireEvent.press(adicionar);
+    expect(await screen.findByRole('header', { name: 'Cadastro de Anticoncepcional' }))
+        .toBeOnTheScreen();
+
+    metodos = [{ id: '2', tipo: 'injetavel' }];
+    await tocar('Voltar');
+    expect(await screen.findByRole('switch', { name: 'Anticoncepcional Injetável' }))
+        .toBeOnTheScreen();
+    expect(screen.queryByRole('switch', { name: 'Anel Vaginal' })).toBeNull();
+});
+
+test('mostra os tipos cadastrados nos controles de grupo e individuais', async () => {
+    const listar = jest.fn().mockResolvedValue([
+        { id: '1', tipo: 'injetavel' },
+        { id: '2', tipo: 'adesivo' },
+        { id: '3', tipo: 'anel_vaginal', removido: true }
+    ]);
+    await montar({ buscar: jest.fn().mockResolvedValue(iniciais) }, false, { listar });
+    await tocar('Anticoncepcional');
+    expect(await screen.findByRole('switch', { name: 'Anticoncepcional Injetável' }))
+        .toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Adesivo Anticoncepcional' })).toBeOnTheScreen();
+    expect(screen.queryByRole('switch', { name: 'Anel Vaginal' })).toBeNull();
+    expect(screen.queryByRole('switch', { name: 'DIU Hormonal' })).toBeNull();
+
+    await tocar('Personalizar notificações');
+    expect(screen.getByRole('switch', { name: 'Aplicação programada para hoje' })).toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Troca do adesivo' })).toBeOnTheScreen();
+    expect(screen.queryByRole('switch', { name: 'Retirada do anel' })).toBeNull();
 });
 
 test('contato personaliza apenas os grupos e avisos autorizados', async () => {
@@ -80,16 +144,17 @@ test('revalida as opções da Rede de Apoio ao abrir a configuração individual
     expect(screen.queryByRole('switch', { name: 'Receber dicas de como apoiar' })).toBeNull();
 });
 
-test('abre a tela temporária no desenvolvimento e volta para Notificações', async () => {
-    const onVoltar = await montar({ buscar: jest.fn().mockResolvedValue({
-        ...iniciais,
-        efetivas: { 'redeApoio.convites.respondido': true, 'redeApoio.dicas.apoio': false }
-    }) });
+test('abre o catálogo completo de testes mesmo com a API indisponível', async () => {
+    const buscar = jest.fn().mockRejectedValue(new Error('API indisponível'));
+    const onVoltar = await montar({ buscar });
     await tocar('Teste de notificações');
     expect(screen.getByRole('header', { name: 'Teste de notificações' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Convite aceito' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Convite recusado' })).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: 'Dica de apoio na fase menstrual' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Dica de apoio na fase menstrual' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Retirada do anel' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Novo dispositivo' })).toBeOnTheScreen();
+    expect(buscar).toHaveBeenCalledTimes(1);
     await tocar('Voltar');
     expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
     expect(onVoltar).not.toHaveBeenCalled();
