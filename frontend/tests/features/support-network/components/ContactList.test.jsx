@@ -45,6 +45,10 @@ test('separa o contato em visualização e permite trocar apenas para outro vín
     expect(aoAbrirResumo).toHaveBeenCalledWith(contatos[0]);
     await fireEvent.press(screen.getByRole('button', { name: 'Visualizar dados de Maria' }));
     expect(aoVisualizar).toHaveBeenCalledWith(segundoAtivo);
+    await fireEvent.press(
+        screen.getByRole('button', { name: 'Parar de visualizar dados de Beatriz' })
+    );
+    expect(aoVisualizar).toHaveBeenLastCalledWith(null);
 });
 
 const contatos = [

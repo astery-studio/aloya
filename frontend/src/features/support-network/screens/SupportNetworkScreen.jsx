@@ -19,6 +19,7 @@ function SupportNetworkScreen({
     onSelecionarAba,
     onSessaoExpirada,
     onVisualizarContato,
+    modoRedeInicial = 'apoio',
     ...membersProps
 }) {
     const tema = useTheme();
@@ -29,7 +30,7 @@ function SupportNetworkScreen({
     });
     const [emailVisivel, setEmailVisivel] = useState(false);
     const [reenvioConfirmado, setReenvioConfirmado] = useState(false);
-    const [modoRede, setModoRede] = useState('apoio');
+    const [modoRede, setModoRede] = useState(modoRedeInicial);
 
     async function reenviarEmail() {
         const enviado = await consentimento.reenviar();

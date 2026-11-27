@@ -594,22 +594,28 @@ function ContactCard({
             ) : null}
 
             {perspectivaSegura === 'recebido' && estado === 'ativo' && aoVisualizar ? (
-                emVisualizacao ? null : (
-                    <View style={[estilos.containerBotaoResumo, estilos.containerBotaoResumoAtivo]}>
-                        <ButtonScreen
-                            texto="Mudar para visualizar este Contato"
-                            variante="laranja"
-                            icone={UserIcon}
-                            tamanhoIcone={13}
-                            corConteudo="#FFFFFF"
-                            aoPressionar={() => aoVisualizar(contato)}
-                            rotuloAcessibilidade={`Visualizar dados de ${identificacao}`}
-                            desativado={bloqueado}
-                            estilo={estilos.botaoResumo}
-                            estiloTexto={estilos.textoBotao}
-                        />
-                    </View>
-                )
+                <View style={[estilos.containerBotaoResumo, estilos.containerBotaoResumoAtivo]}>
+                    <ButtonScreen
+                        texto={
+                            emVisualizacao
+                                ? 'Parar de visualizar este Contato'
+                                : 'Mudar para visualizar este Contato'
+                        }
+                        variante="laranja"
+                        icone={UserIcon}
+                        tamanhoIcone={13}
+                        corConteudo="#FFFFFF"
+                        aoPressionar={() => aoVisualizar(emVisualizacao ? null : contato)}
+                        rotuloAcessibilidade={
+                            emVisualizacao
+                                ? `Parar de visualizar dados de ${identificacao}`
+                                : `Visualizar dados de ${identificacao}`
+                        }
+                        desativado={bloqueado}
+                        estilo={estilos.botaoResumo}
+                        estiloTexto={estilos.textoBotao}
+                    />
+                </View>
             ) : (
                 <View
                     testID="contact-summary-button-container"

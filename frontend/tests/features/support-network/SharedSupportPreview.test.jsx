@@ -149,6 +149,17 @@ test('troca a pessoa visualizada sem voltar ao ciclo da própria conta', async (
     await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar dados de Maria' }));
     expect(await screen.findByLabelText('Acompanhando Maria')).toBeOnTheScreen();
     expect(screen.queryByLabelText('Acompanhando Júlia')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
+    await fireEvent.press(
+        await screen.findByRole('button', { name: 'Parar de visualizar dados de Maria' })
+    );
+    expect(screen.queryByText('CONTATO EM VISUALIZAÇÃO')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Visualizar dados de Maria' })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Início' }));
+    expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
+    expect(screen.queryByLabelText('Acompanhando Maria')).toBeNull();
 });
 
 test('mostra o acesso revogado como vazio e permite escolher outro contato', async () => {

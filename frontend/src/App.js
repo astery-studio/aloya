@@ -198,6 +198,7 @@ export default function App() {
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
     const [vinculoVisualizadoId, setVinculoVisualizadoId] = useState(null);
+    const [modoRedeInicial, setModoRedeInicial] = useState('apoio');
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -443,6 +444,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.inicio);
         setVinculoVisualizadoId(null);
+        setModoRedeInicial('apoio');
         setCadastroDiarioVisivel(false);
         setRegistroDiarioEdicao(null);
         setCategoriasDiarioVisiveis(false);
@@ -470,6 +472,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.inicio);
         setVinculoVisualizadoId(null);
+        setModoRedeInicial('apoio');
         setCategoriasDiarioVisiveis(false);
         setCadastroDiarioVisivel(false);
         setRegistroDiarioEdicao(null);
@@ -487,6 +490,11 @@ export default function App() {
     }, []);
 
     function visualizarContato(contato) {
+        if (contato === null) {
+            setModoRedeInicial('acompanhados');
+            setVinculoVisualizadoId(null);
+            return;
+        }
         if (contato?.status !== 'ativo' || !Number.isSafeInteger(contato.id) || contato.id <= 0) {
             return;
         }
@@ -495,6 +503,7 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
+        if (aba !== telasInternas.membros) setModoRedeInicial('apoio');
         if (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') {
             if (ABAS_ACOMPANHAMENTO.has(aba)) setTelaInterna(aba);
             return;
@@ -790,6 +799,7 @@ export default function App() {
                 />
             ) : (
                 <SupportNetworkScreen
+                    modoRedeInicial={modoRedeInicial}
                     parentalConsentService={configuracao.servicos.parentalConsentService}
                     receivedContactsService={configuracao.servicos.receivedContactsService}
                     onVisualizarContato={visualizarContato}

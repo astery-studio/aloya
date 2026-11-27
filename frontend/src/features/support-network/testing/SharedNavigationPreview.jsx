@@ -53,9 +53,9 @@ function SharedNavigationPreview({ revogado = false }) {
                 service={servicos.recebidos}
                 vinculoVisualizadoId={vinculoId}
                 onSelecionarAba={setTela}
-                onVisualizarContato={({ id }) => {
-                    setVinculoId(id);
-                    setTela('inicio');
+                onVisualizarContato={(contato) => {
+                    setVinculoId(contato?.id ?? null);
+                    if (contato) setTela('inicio');
                 }}
             />
         );
