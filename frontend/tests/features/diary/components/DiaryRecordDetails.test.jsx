@@ -41,6 +41,29 @@ const registro = {
 };
 
 describe('DiaryRecordDetails', () => {
+    test('mostra nome, dados compartilhados e somente as ações de consulta', async () => {
+        const aoAnterior = jest.fn();
+        await render(
+            <DiaryRecordDetails
+                registro={registro}
+                nomeTitular="Júlia"
+                somenteLeitura
+                aoAnterior={aoAnterior}
+                aoEditar={jest.fn()}
+                aoExcluir={jest.fn()}
+                aoFechar={jest.fn()}
+            />
+        );
+
+        expect(screen.getByRole('header', { name: 'Diário de Júlia' })).toBeOnTheScreen();
+        expect(screen.getByText('No dia 21 do ciclo 03 Júlia registrou:')).toBeOnTheScreen();
+        expect(screen.getByText('Espinhas')).toBeOnTheScreen();
+        expect(screen.queryByText('ALTERAÇÃO DO REGISTRO')).not.toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Próximo dia' })).not.toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Dia anterior' }));
+        expect(aoAnterior).toHaveBeenCalledTimes(1);
+    });
+
     test('apresenta detalhe autorizado e ações contextualizadas', async () => {
         const aoEditar = jest.fn();
         const aoExcluir = jest.fn();
