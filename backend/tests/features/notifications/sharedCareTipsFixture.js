@@ -1,3 +1,6 @@
+import { criarNotificationPreferencesService } from '../../../src/features/notifications/notificationPreferences.service.js';
+import { reconciliarAgendamentos } from '../../../src/features/notifications/notificationPlanner.js';
+import { planejarCompartilhadas } from '../../../src/features/notifications/sharedPushPlanner.js';
 import { criarPushWorker } from '../../../src/features/notifications/pushWorker.js';
 import { registrarDispositivo } from '../../../src/features/notifications/pushDeviceRegistration.js';
 import { aparelho, criarBanco } from './pushWorkerFixture.js';
@@ -57,4 +60,23 @@ export function criarWorkerDeTeste(prisma, relogio) {
         }
     });
     return { worker, enviados };
+}
+
+export const eventoDicas = 'redeApoio.dicas.apoio';
+
+export async function prepararAgendaDicas(t) {
+    const { prisma, darPermissao } = await criarVinculoDeTeste(t);
+    const preferencias = criarNotificationPreferencesService(prisma);
+    await darPermissao(['geral.dicas']);
+    await preferencias.atualizar(2, { chave: eventoDicas, valor: true });
+    const preferencia = await prisma.preferenciaNotificacao.findUnique({ where: { usuarioId: 2 } });
+    const agenda = await planejarCompartilhadas(
+        prisma,
+        2,
+        preferencia,
+        new Date('2026-10-01T20:00Z')
+    );
+    await reconciliarAgendamentos(prisma, 2, agenda);
+    const agora = new Date('2026-10-02T23:10Z');
+    return { prisma, darPermissao, preferencias, agenda, agora };
 }
