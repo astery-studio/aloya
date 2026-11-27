@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
@@ -11,12 +12,14 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             paddingHorizontal: 10,
             paddingVertical: 4,
-            backgroundColor: tema.cores.interface.destaqueSuave,
+            backgroundColor: tema.escuro
+                ? 'rgba(165, 214, 167, 0.10)'
+                : tema.cores.interface.destaqueSuave,
             borderRadius: 999
         },
 
         texto: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.semibold,
             fontSize: 12,
             fontWeight: '600',
