@@ -34,6 +34,7 @@ function criarEstilos(tema) {
             alignItems: 'flex-start',
             justifyContent: 'center'
         },
+        lateralSomenteLeitura: { width: 26 },
         iconeRegistro: {
             width: 26,
             height: 26,

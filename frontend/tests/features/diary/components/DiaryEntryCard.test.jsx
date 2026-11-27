@@ -40,6 +40,34 @@ const registro = {
 };
 
 describe('DiaryEntryCard', () => {
+    test('abre detalhes no modo somente leitura e mantém registros sem fase compartilhada', async () => {
+        const aoAbrir = jest.fn();
+        const { fase: _fase, ...semFase } = registro;
+        const { rerender } = await render(
+            <DiaryEntryCard
+                registro={registro}
+                somenteLeitura
+                aoAbrir={aoAbrir}
+                aoEditar={jest.fn()}
+                aoExcluir={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('diary-entry-phase-section')).toBeOnTheScreen();
+        await fireEvent.press(
+            screen.getByRole('button', { name: /Abrir registro de 04\/11\/2026/ })
+        );
+        expect(aoAbrir).toHaveBeenCalledWith(registro);
+
+        await rerender(<DiaryEntryCard registro={semFase} somenteLeitura aoAbrir={aoAbrir} />);
+        expect(screen.getByTestId('diary-entry-card')).toBeOnTheScreen();
+        expect(screen.getByText('Intestino')).toBeOnTheScreen();
+        expect(screen.queryByTestId('diary-entry-phase-section')).not.toBeOnTheScreen();
+        expect(
+            screen.queryByRole('button', { name: /Editar registro|Excluir registro/ })
+        ).not.toBeOnTheScreen();
+    });
+
     test('equilibra tags longas em duas linhas sem quebras isoladas', () => {
         const itens = [
             { texto: 'Sintomas emocionais' },
