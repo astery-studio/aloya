@@ -83,7 +83,10 @@ module.exports = ({ config = staticConfig } = {}) => {
         },
         android: {
             ...config.android,
-            package: 'com.aloya.app'
+            package: 'com.aloya.app',
+            ...(process.env.GOOGLE_SERVICES_JSON
+                ? { googleServicesFile: process.env.GOOGLE_SERVICES_JSON }
+                : {})
         },
         plugins: configureBuildProperties(config.plugins || [], usesCleartextTraffic),
         extra: {

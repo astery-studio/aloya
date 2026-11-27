@@ -3,6 +3,20 @@
  */
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 
+test('propaga a espera indicada no Retry-After para respostas 429', async () => {
+    const cliente = criarApiClient({
+        baseUrl: 'https://api',
+        fetchImpl: async () => ({
+            ok: false,
+            status: 429,
+            headers: { get: (nome) => nome === 'Retry-After' ? '42' : null },
+            json: async () => ({ erro: { codigo: 'LIMITE_DISPOSITIVOS_NOTIFICACAO' } })
+        })
+    });
+    await expect(cliente.requisicao({ caminho: '/api/dispositivos-notificacao' }))
+        .rejects.toMatchObject({ status: 429, tentarAposMs: 42_000 });
+});
+
 test.each(['envio', 'leitura'])(
     'encerra %s travado mesmo quando o transporte ignora cancelamento',
     async (etapa) => {

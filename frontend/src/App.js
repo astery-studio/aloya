@@ -31,6 +31,8 @@ import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
+import { NotificationPreferencesFlow } from './features/notifications/NotificationPreferencesFlow';
+import { useNativePush } from './features/notifications/useNativePush';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
@@ -59,6 +61,8 @@ const PrivacyTermsScreen = __DEV__
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
+    notificacoes: 'notificacoes',
+    notificacoesContato: 'notificacoesContato',
     membros: 'membros',
     novoContato: 'novoContato',
     editarContato: 'editarContato',
@@ -251,6 +255,17 @@ export default function App() {
     const sincronizacaoMenstrual = useMenstruationSync({
         fila: configuracao.servicos?.menstruationSyncQueue,
         ativo: estadoSessao === 'autenticada'
+    });
+
+    const navegarPush = useCallback((destino) => {
+        const destinos = ['ciclos', 'diario', 'anticoncepcionais', 'membros', 'configuracoes'];
+        if (destinos.includes(destino)) setTelaInterna(telasInternas[destino]);
+    }, []);
+
+    useNativePush({
+        ativo: estadoSessao === 'autenticada' && Boolean(perfil),
+        service: configuracao.servicos?.pushDeviceService,
+        navegar: navegarPush
     });
 
     useEffect(() => {
@@ -771,6 +786,7 @@ export default function App() {
                 emailUsuario={perfil?.email}
                 service={configuracao.servicos.contactInvitationService}
                 categoriasService={configuracao.servicos.supportCategoryService}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
                 onRascunhoAlterado={setRascunhoNovoContato}
                 onVoltar={() => {
                     setRascunhoNovoContato(null);
@@ -790,6 +806,7 @@ export default function App() {
                 contatoId={contatoEdicao?.id}
                 dadosIniciais={contatoEdicao}
                 service={configuracao.servicos.contactLinkService}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
                 onVoltar={() => {
                     setContatoEdicao(null);
                     setTelaInterna(telasInternas.membros);
@@ -841,6 +858,18 @@ export default function App() {
                     consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
                 }
                 onSelecionarAba={selecionarAba}
+                onAbrirNotificacoes={() =>
+                    setTelaInterna(
+                        perfil?.papel === 'contato_apoio'
+                            ? telasInternas.notificacoesContato
+                            : telasInternas.notificacoes
+                    )
+                }
+                onAbrirNotificacoesContato={
+                    perfil?.papel === 'principal_e_contato_apoio'
+                        ? () => setTelaInterna(telasInternas.notificacoesContato)
+                        : undefined
+                }
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
@@ -854,6 +883,24 @@ export default function App() {
                     setRetornoResponsavelLegal(telasInternas.configuracoes);
                     setTelaInterna(telasInternas.responsavelLegal);
                 }}
+            />
+        );
+    } else if ([telasInternas.notificacoes, telasInternas.notificacoesContato].includes(telaInterna)) {
+        const contato =
+            telaInterna === telasInternas.notificacoesContato || perfil?.papel === 'contato_apoio';
+
+        conteudo = (
+            <NotificationPreferencesFlow
+                key={telaInterna}
+                contato={contato}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
+                service={
+                    contato
+                        ? configuracao.servicos.supportNotificationPreferencesService
+                        : configuracao.servicos.notificationPreferencesService
+                }
+                onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.responsavelLegal) {

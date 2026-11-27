@@ -49,6 +49,8 @@ function criarSupportContactRemovalService({ prisma, now = () => new Date() } = 
             data: {
                 usuarioId: vinculo.contatoId,
                 tipoOrigem: 'rede_apoio',
+                evento: 'redeApoio.convites.acessoRevogado',
+                ocorrencia: `${vinculo.id}:${instante.toISOString()}`,
                 origemId: vinculo.id,
                 dataHoraProgramada: instante,
                 statusEnvio: 'agendada'

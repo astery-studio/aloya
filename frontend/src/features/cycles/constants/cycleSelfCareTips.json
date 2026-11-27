@@ -1,0 +1,58 @@
+{
+  "menstrual": [
+    {
+      "title": "Um pouco de calor para as cólicas",
+      "body": "Se as cólicas incomodarem, uma bolsa morna envolvida em um pano pode ajudar. Use uma temperatura confortável para a pele."
+    },
+    {
+      "title": "Movimento leve, no seu ritmo",
+      "body": "Se estiver com vontade de se movimentar, uma caminhada tranquila pode ajudar a aliviar o desconforto menstrual."
+    },
+    {
+      "title": "Como foi seu fluxo hoje?",
+      "body": "Se quiser, anote no Diário como foi o sangramento e se sentiu dor. Esses registros ajudam você a lembrar como foi cada ciclo."
+    }
+  ],
+  "folicular": [
+    {
+      "title": "Que tal uma refeição com ferro?",
+      "body": "Feijão e lentilha são fontes de ferro. Se fizer sentido na sua rotina, experimente combinar um deles com uma fruta rica em vitamina C, como a laranja."
+    },
+    {
+      "title": "Escolha um movimento que combine com seu dia",
+      "body": "Uma caminhada, um alongamento ou sua atividade habitual podem caber na rotina. Ajuste o ritmo pelo que você sente hoje."
+    },
+    {
+      "title": "Um momento para olhar seu Diário",
+      "body": "Que tal rever os registros da última menstruação? Comparar duração, fluxo e desconforto ao longo dos ciclos pode ajudar a reconhecer seu padrão."
+    }
+  ],
+  "ovulatoria": [
+    {
+      "title": "Percebeu alguma mudança no corrimento?",
+      "body": "Perto da ovulação, o corrimento pode ficar mais transparente e escorregadio. Se quiser, anote a mudança no Diário."
+    },
+    {
+      "title": "A previsão pode variar",
+      "body": "Mesmo em ciclos regulares, o dia da ovulação pode mudar. Use o calendário para acompanhar seus registros e siga seu método contraceptivo habitual, se for o caso."
+    },
+    {
+      "title": "Observe os sinais do seu corpo",
+      "body": "Se notar uma mudança no corrimento ou um desconforto leve, você pode anotar quando aconteceu. Um sinal isolado não confirma a ovulação."
+    }
+  ],
+  "lutea": [
+    {
+      "title": "Que tal cuidar do seu sono?",
+      "body": "Sentiu mais cansaço hoje? Se puder, reserve um tempo para descansar e tente manter um horário regular para dormir."
+    },
+    {
+      "title": "Uma pausa para você",
+      "body": "Se bateu uma tensão hoje, experimente fazer uma pausa. Alguns minutos de respiração tranquila ou de alongamento leve podem ajudar a relaxar."
+    },
+    {
+      "title": "Como você se sentiu hoje?",
+      "body": "Se notou mudanças de humor, inchaço ou sensibilidade nas mamas, você pode anotar no Diário. Quando a menstruação começar, compare as datas para perceber se isso se repete."
+    }
+  ]
+}

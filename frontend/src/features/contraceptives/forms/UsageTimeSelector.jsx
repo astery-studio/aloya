@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ContraceptiveModal } from '../components/ContraceptiveModal';
 import { Clock } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import TimeInput from '../../../shared/components/forms/TimeInput';
@@ -65,7 +66,7 @@ function UsageTimeSelector({
                 corIcone="#2C4C3B"
                 fundoIcone="#EEF4F0"
             />
-            <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
+            <ContraceptiveModal visible={aberto} animationType="slide" onRequestClose={onFechar}>
                 <SafeAreaView
                     style={estilos.telaFluxo}
                     edges={['top', 'left', 'right', 'bottom']}
@@ -115,7 +116,7 @@ function UsageTimeSelector({
                         <ButtonScreen texto="Confirmar horário" desativado={temporarios.length > 1} aoPressionar={confirmar} />
                     </View>
                 </SafeAreaView>
-            </Modal>
+            </ContraceptiveModal>
         </>
     );
 }

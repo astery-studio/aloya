@@ -58,6 +58,12 @@ test('lista as seis macros no sheet e expande suas categorias', async () => {
     });
     expect(screen.getByText('Salvar')).toHaveProp('adjustsFontSizeToFit', false);
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+    const painel = screen.getByTestId('bottom-sheet-painel');
+    expect(painel).toHaveProp('edges', {
+        top: 'off', bottom: 'maximum', left: 'maximum', right: 'maximum'
+    });
+    expect(painel).not.toHaveStyle({ paddingBottom: 0 });
+    expect(painel).toContainElement(screen.getByRole('button', { name: 'Salvar' }));
     expect(screen.getByTestId('rodape-categorias-diario')).toHaveStyle({
         alignSelf: 'stretch',
         marginHorizontal: -24,

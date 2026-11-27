@@ -23,6 +23,7 @@ const bordasDoPainel = { bottom: 'maximum', left: 'maximum', right: 'maximum' };
 function BottomSheet({
     visivel,
     onFechar,
+    onExibir,
     onOcultar,
     children,
     bloquearFechamento = false,
@@ -123,6 +124,7 @@ function BottomSheet({
 
         if (visivelAtual.current) {
             animarEntrada();
+            onExibir?.();
         }
     }
 

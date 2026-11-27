@@ -14,6 +14,8 @@ function SwitchField({
     desabilitado = false,
     somenteControle = false,
     rotuloAcessibilidade,
+    dicaAcessibilidade = 'Ativa ou desativa esta permissão',
+    tituloSemLimite = false,
     estilo,
     estiloTitulo
 }) {
@@ -108,7 +110,7 @@ function SwitchField({
             disabled={estaDesabilitado}
             accessibilityRole="switch"
             accessibilityLabel={rotuloDoInterruptor}
-            accessibilityHint={'Ativa ou desativa esta permissão'}
+            accessibilityHint={dicaAcessibilidade}
             accessibilityState={{
                 checked: estaAtivo,
                 disabled: estaDesabilitado
@@ -126,7 +128,7 @@ function SwitchField({
                     estaDesabilitado && estilos.tituloDesabilitado,
                     estiloTitulo
                 ]}
-                numberOfLines={2}
+                numberOfLines={tituloSemLimite ? undefined : 2}
             >
                 {titulo}
             </Text>

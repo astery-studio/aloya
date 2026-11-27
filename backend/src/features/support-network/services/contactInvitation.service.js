@@ -249,6 +249,8 @@ function criarContactInvitationService({
                     data: {
                         usuarioId: usuarioConvidado.id,
                         tipoOrigem: 'rede_apoio',
+                        evento: 'redeApoio.convites.recebido',
+                        ocorrencia: `${convite.id}:${convite.dataEnvio.toISOString()}`,
                         origemId: convite.id,
                         dataHoraProgramada: convite.dataEnvio,
                         statusEnvio: 'agendada'

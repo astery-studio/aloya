@@ -7,6 +7,7 @@ function criarPasswordRecoveryService({
     passwordService,
     emailService,
     baseUrl,
+    publicarSeguranca,
     now = () => new Date(),
     logger = console
 }) {
@@ -24,20 +25,27 @@ function criarPasswordRecoveryService({
 
         const token = tokenService.gerarTokenRecuperacao(usuario);
 
-        await prisma.$transaction([
-            prisma.recuperacaoSenha.updateMany({
+        const invalidar = (cliente) => cliente.recuperacaoSenha.updateMany({
                 where: { usuarioId: usuario.id, statusLink: 'pendente' },
                 data: { statusLink: 'revogado' }
-            }),
-            prisma.recuperacaoSenha.create({
+            });
+        const criar = (cliente) => cliente.recuperacaoSenha.create({
                 data: {
                     usuarioId: usuario.id,
                     tokenRecuperacaoHash: token.tokenHash,
                     validadeToken: token.validadeToken,
                     statusLink: 'pendente'
                 }
-            })
-        ]);
+            });
+        if (publicarSeguranca) {
+            await prisma.$transaction(async (tx) => {
+                await invalidar(tx);
+                const registro = await criar(tx);
+                await publicarSeguranca(tx, usuario.id, 'senha.recuperacao', registro.id, now());
+            });
+        } else {
+            await prisma.$transaction([invalidar(prisma), criar(prisma)]);
+        }
 
         void emailService.enviarEmailRecuperacaoSenha({
             email: usuario.email,
@@ -110,6 +118,7 @@ function criarPasswordRecoveryService({
                 where: { usuarioId: recuperacao.usuarioId, revogadaEm: null },
                 data: { revogadaEm: usadoEm }
             });
+            await publicarSeguranca?.(tx, recuperacao.usuarioId, 'senha.redefinida', recuperacao.id, usadoEm);
         });
 
         return { mensagem: 'Senha redefinida com sucesso. Faça login com sua nova senha.' };

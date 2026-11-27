@@ -80,6 +80,8 @@ test('move categoria para permissões individuais alteradas e agenda notificaç�
     assert.deepEqual(estado.notificacoes[0].data, {
         usuarioId: 22,
         tipoOrigem: 'rede_apoio',
+        evento: 'redeApoio.convites.acessoAtualizado',
+        ocorrencia: `9:${versao.toISOString()}`,
         origemId: 9,
         dataHoraProgramada: agora,
         statusEnvio: 'agendada'

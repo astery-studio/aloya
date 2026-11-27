@@ -14,7 +14,6 @@ function criarEstilos(tema) {
             height: 734.16,
             maxHeight: '92%',
             alignSelf: 'center',
-            paddingBottom: 0,
             backgroundColor: superficie
         },
         areaConteudo: {
@@ -170,11 +169,9 @@ function criarEstilos(tema) {
         botaoAplicar: {
             width: 342,
             maxWidth: '100%',
-            height: 54,
-            paddingTop: 15.375,
-            paddingRight: 0,
-            paddingBottom: 14.625,
-            paddingLeft: 0,
+            height: 'auto',
+            minHeight: 54,
+            paddingVertical: 12,
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 14

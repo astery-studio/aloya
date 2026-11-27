@@ -101,6 +101,8 @@ test('notificação de revogação não expõe motivo, categoria ou permissões'
 
     assert.deepEqual(Object.keys(estado.notificacao.data).sort(), [
         'dataHoraProgramada',
+        'evento',
+        'ocorrencia',
         'origemId',
         'statusEnvio',
         'tipoOrigem',

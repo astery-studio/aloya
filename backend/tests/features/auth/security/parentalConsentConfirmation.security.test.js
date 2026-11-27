@@ -121,6 +121,8 @@ test('a notificação parental não contém e-mail, token ou dados privados', as
 
     assert.deepEqual(Object.keys(notificacao.data).sort(), [
         'dataHoraProgramada',
+        'evento',
+        'ocorrencia',
         'origemId',
         'statusEnvio',
         'tipoOrigem',

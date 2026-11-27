@@ -24,6 +24,7 @@ function SettingsScreen({
     onAbrirPerfil,
     onAbrirParametrosCiclo,
     onAbrirNotificacoes,
+    onAbrirNotificacoesContato,
     onAbrirSobre,
     onAbrirPoliticasPrivacidade,
     onAbrirResponsavelLegal,
@@ -133,6 +134,20 @@ function SettingsScreen({
                                 paleta="corLaranja"
                                 onPress={onAbrirNotificacoes}
                             />
+                            {onAbrirNotificacoesContato && (
+                                <>
+                                    <Separador estilos={estilos} />
+                                    <NavigationField
+                                        label="Notificações como contato de apoio"
+                                        labelSemLimite
+                                        estilo={estilos.campo}
+                                        icone={BellIcon}
+                                        variante="semBorda"
+                                        paleta="corAzul"
+                                        onPress={onAbrirNotificacoesContato}
+                                    />
+                                </>
+                            )}
                         </View>
                     </View>
 
