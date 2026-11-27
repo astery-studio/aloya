@@ -7,7 +7,12 @@ test('lista uma dica prática para o contato em cada fase da Rede de Apoio', () 
         .map(([codigo, rotulo]) => conteudoDaPrevia(codigo, rotulo));
     expect(dicas).toHaveLength(4);
     expect(new Set(dicas.map(({ body }) => body)).size).toBe(4);
-    expect(dicas[0].body).toContain('assumir alguma tarefa');
+    expect(dicas.map(({ body }) => body)).toEqual([
+        expect.stringContaining('bolsa térmica'),
+        expect.stringContaining('repor os itens'),
+        expect.stringContaining('quando começou e quanto durou'),
+        expect.stringContaining('fazer o jantar ou cuidar da louça')
+    ]);
 });
 
 test('oferece três dicas diferentes por fase na barra de notificações', () => {

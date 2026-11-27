@@ -55,7 +55,7 @@ test('agenda dicas para o contato e revalida consentimento e permissão antes do
     await worker.processar();
     assert.equal(enviados.length, 1);
     assert.equal(enviados[0].to, dispositivo.token);
-    assert.match(enviados[0].body, /assumir alguma tarefa/);
+    assert.match(enviados[0].body, /bolsa térmica/);
     assert.doesNotMatch(`${enviados[0].title} ${enviados[0].body}`, /menstrual|Teste/);
 
     await prefs.atualizar(2, { chave: evento, valor: false });

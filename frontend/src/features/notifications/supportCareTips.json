@@ -1,18 +1,18 @@
 {
   "menstrual": {
-    "title": "Um jeito simples de aliviar o dia",
-    "body": "Se a pessoa que você apoia estiver com desconforto, pergunte se ela prefere descansar ou se você pode assumir alguma tarefa."
+    "title": "Um pouco de conforto à mão",
+    "body": "Se ela estiver desconfortável, deixe água e uma manta por perto ou prepare a bolsa térmica que ela costuma usar."
   },
   "folicular": {
-    "title": "Combine como você pode ajudar",
-    "body": "Em um momento tranquilo, pergunte que tipo de ajuda faz sentido para a pessoa que você apoia. Assim, vocês podem combinar o que funciona para ela."
+    "title": "Cuide da próxima reposição",
+    "body": "Vai passar no mercado? Se ela quiser, aproveite para repor os itens de cuidado que já usa e prefere ter à mão."
   },
   "ovulatoria": {
-    "title": "Pergunte como a pessoa está",
-    "body": "Uma mensagem simples pode abrir espaço para conversar. Pergunte como a pessoa está se sentindo e deixe que ela escolha o que quer compartilhar."
+    "title": "Ajude a lembrar de um detalhe",
+    "body": "Se ela comentar um incômodo passageiro e quiser registrar, ajude a anotar quando começou e quanto durou. A anotação fica com ela."
   },
   "lutea": {
-    "title": "Ofereça companhia ou espaço",
-    "body": "Se o dia estiver mais puxado, pergunte se a pessoa prefere conversar, ter companhia ou descansar. Deixe que ela escolha o que ajuda hoje."
+    "title": "Tire uma pendência da lista",
+    "body": "Que tal fazer o jantar ou cuidar da louça hoje? Escolha uma tarefa que vocês já dividem e deixe uma coisa a menos na lista dela."
   }
 }
