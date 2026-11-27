@@ -492,7 +492,7 @@ export default function App() {
         concluirAutenticacao();
     }
 
-    const finalizarSessao = useCallback((resultado = {}) => {
+    const finalizarSessao = useCallback((resultado = {}, telaDeRetorno = 'login') => {
         contaComVisualizacaoRestaurada.current = null;
         requisicaoAtual.current += 1;
 
@@ -516,7 +516,7 @@ export default function App() {
         setRascunhoNovoContato(null);
         setContatoEdicao(null);
 
-        setTelaPublica('login');
+        setTelaPublica(telaDeRetorno);
 
         setMensagemLogin(resultado?.mensagem || null);
 
@@ -1057,7 +1057,7 @@ export default function App() {
                 excluirConta={configuracao.servicos.accountService.excluirConta}
                 encerrarSessao={configuracao.servicos.authService.encerrarSessao}
                 onContaExcluida={finalizarSessao}
-                onSessaoEncerrada={finalizarSessao}
+                onSessaoEncerrada={() => finalizarSessao({}, 'boasVindas')}
             />
         );
     }
