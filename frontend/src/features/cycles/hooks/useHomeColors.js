@@ -14,6 +14,7 @@ const correspondencias = {
     '#5C5C59': paleta.textoSecundario,
     '#847F76': paleta.textoSecundario,
     '#A8A49C': paleta.textoSecundario,
+    '#D8D4CC': '#424242',
     '#AAAAA5': paleta.textoSecundario,
     '#FDF6F3': paleta.fundo,
     '#E6E2D8': paleta.borda,
