@@ -1,5 +1,6 @@
 //Representa um ciclo registrado e mantém seus estados visuais consistentes no histórico.
 import { useMemo } from 'react';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { Text, View } from 'react-native';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
@@ -54,10 +55,10 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const coresDoCiclo = {
-        ativa: tema.escuro ? tema.cores.interface.destaque : '#2C4C3B',
+        ativa: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B',
         desativada: tema.cores.interface.textoDesabilitado
     };
-    const corDoAviso = tema.escuro ? '#F2B45F' : '#B97D22';
+    const corDoAviso = tema.escuro ? coresNoturnasConteudo.amarelo : '#B97D22';
     const cicloSeguro = ciclo && typeof ciclo === 'object' ? ciclo : {};
     const numero = normalizarNumeroDoCiclo(cicloSeguro.numero);
     const periodo = normalizarPeriodo(cicloSeguro.periodo);

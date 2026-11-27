@@ -1,5 +1,6 @@
 //Preserva as medidas e diferenças visuais dos ciclos concluído, em andamento e incerto.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -7,8 +8,8 @@ const LARGURA_NUMERO = 28;
 const ESPACO_IDENTIFICACAO = 20;
 
 function criarEstilos(tema) {
-    const corAviso = tema.escuro ? '#F2B45F' : '#B97D22';
-    const corMenstruacao = tema.escuro ? '#EF9A9A' : tema.cores.marca.primaria;
+    const corAviso = tema.escuro ? coresNoturnasConteudo.amarelo : '#B97D22';
+    const corMenstruacao = tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria;
 
     return StyleSheet.create({
         container: {
@@ -64,13 +65,13 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: tema.escuro
-                ? tema.cores.interface.destaqueSuave
+                ? 'rgba(165, 214, 167, 0.10)'
                 : tema.cores.icones.configuracoes.verde.caixa,
             borderRadius: 9
         },
 
         textoDoNumero: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 13,
             fontStyle: 'normal',
@@ -224,7 +225,7 @@ function criarEstilos(tema) {
             marginBottom: 14,
             paddingHorizontal: 13,
             paddingVertical: 8,
-            backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.14)' : 'rgba(214, 140, 58, 0.14)',
+            backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.14)' : 'rgba(214, 140, 58, 0.14)',
             borderWidth: 0.7,
             borderColor: 'rgba(214, 140, 58, 0.5)',
             borderRadius: 10
