@@ -28,6 +28,7 @@ function SupportNetworkScreen({
     const tema = useTheme();
     const corFundo = tema.escuro ? coresNoturnasConteudo.fundo : undefined;
     const corIconeEmail = tema.escuro ? coresNoturnasConteudo.coral : '#C85A44';
+    const fundoIconeEmail = tema.escuro ? 'rgba(194, 110, 95, 0.10)' : '#F7EDE5';
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const consentimento = useParentalConsent({
         service: parentalConsentService,
@@ -62,7 +63,14 @@ function SupportNetworkScreen({
                     accessibilityLabel="Verificando autorização da Rede de Apoio"
                     style={estilos.estado}
                 >
-                    <ActivityIndicator color={tema.cores.interface.destaque} size="large" />
+                    <ActivityIndicator
+                        color={
+                            tema.escuro
+                                ? coresNoturnasConteudo.verde
+                                : tema.cores.interface.destaque
+                        }
+                        size="large"
+                    />
                     <Text style={estilos.textoEstado}>Verificando autorização...</Text>
                 </View>
             </MainLayout>
@@ -133,7 +141,7 @@ function SupportNetworkScreen({
                 aoFechar={() => setEmailVisivel(false)}
                 icone={EnvelopeIcon}
                 corIcone={corIconeEmail}
-                fundoIcone="#F7EDE5"
+                fundoIcone={fundoIconeEmail}
                 titulo="E-mail enviado"
                 mensagem={
                     <>
@@ -160,7 +168,7 @@ function SupportNetworkScreen({
                 aoFechar={fecharConfirmacaoReenvio}
                 icone={EnvelopeIcon}
                 corIcone={corIconeEmail}
-                fundoIcone="#F7EDE5"
+                fundoIcone={fundoIconeEmail}
                 titulo="E-mail enviado"
                 mensagem={
                     <>

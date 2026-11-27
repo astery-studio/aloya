@@ -6,6 +6,7 @@ import { EditFieldSheet } from '../../../../shared/components/feedback/EditField
 import SimpleModal from '../../../../shared/components/feedback/Modal/SimpleModal';
 import { EnvelopeIcon, WarningCircleIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { SettingsLayout } from '../../../settings/layouts/SettingsLayout/SettingsLayout';
 import { ProfileField } from '../../../settings/profile/ProfileField';
 import { useParentalConsent } from '../../hooks/useParentalConsent';
@@ -89,7 +90,11 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
 
     return (
         <>
-            <SettingsLayout titulo="Responsável Legal" onVoltar={onVoltar}>
+            <SettingsLayout
+                titulo="Responsável Legal"
+                onVoltar={onVoltar}
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
+            >
                 <View style={estilos.container}>
                     <View style={estilos.secao}>
                         <Text style={estilos.tituloSecao}>Responsável legal cadastrado</Text>
@@ -114,8 +119,16 @@ function ParentalConsentScreen({ service, emailUsuario, onVoltar, onSessaoExpira
                                     autoCorrect={false}
                                     maxLength={254}
                                     placeholder="Digite aqui o e-mail"
-                                    placeholderTextColor="#5C5C59"
-                                    selectionColor={tema.cores.interface.destaque}
+                                    placeholderTextColor={
+                                        tema.escuro
+                                            ? coresNoturnasConteudo.textoSecundario
+                                            : '#5C5C59'
+                                    }
+                                    selectionColor={
+                                        tema.escuro
+                                            ? coresNoturnasConteudo.verde
+                                            : tema.cores.interface.destaque
+                                    }
                                     style={estilos.entradaCadastro}
                                 />
                             </View>

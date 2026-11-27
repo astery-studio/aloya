@@ -74,7 +74,14 @@ function ParentalConsentRestrictedScreen({
 
                 {carregando ? (
                     <View accessibilityLabel="Atualizando autorização" style={estilos.atualizando}>
-                        <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
+                        <ActivityIndicator
+                            size="small"
+                            color={
+                                tema.escuro
+                                    ? coresNoturnasConteudo.verde
+                                    : tema.cores.interface.destaque
+                            }
+                        />
                     </View>
                 ) : null}
             </View>

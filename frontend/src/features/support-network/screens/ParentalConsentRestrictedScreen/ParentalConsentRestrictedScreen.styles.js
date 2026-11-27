@@ -83,7 +83,9 @@ function criarEstilos(tema) {
         mensagemCartao: {
             width: '100%',
             maxWidth: 294,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -94,10 +96,11 @@ function criarEstilos(tema) {
             width: '100%',
             maxWidth: 294,
             height: 52,
-            borderRadius: 12
+            borderRadius: 12,
+            ...(tema.escuro && { backgroundColor: coresNoturnasConteudo.verde })
         },
         textoBotao: {
-            color: '#FFFFFF',
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF',
             fontFamily: fontFamilies.medium,
             fontSize: 16,
             fontWeight: '500',
