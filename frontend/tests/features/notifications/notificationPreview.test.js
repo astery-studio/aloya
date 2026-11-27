@@ -8,7 +8,7 @@ import { aviso, criarSdk } from './notificationPreviewFixture';
 test('lista todos os tipos, separa variantes e omite os editores de horário e de antecedência', () => {
     const tipos = listarPreviews().flatMap(({ grupos }) => grupos.flatMap(({ tipos }) => tipos));
     const chaves = tipos.map(([codigo]) => codigo);
-    expect(new Set(chaves).size).toBe(64);
+    expect(new Set(chaves).size).toBe(78);
     expect(chaves).not.toEqual(
         expect.arrayContaining([
             'ciclo.diario.horarioLembreteDiario',
@@ -36,10 +36,28 @@ test('solicita apresentação imediata no canal nativo e usa dados fictícios', 
         shouldShowList: true
     });
     expect(sdk.scheduleNotificationAsync).toHaveBeenCalledWith({
+        identifier: `aloya-previa:${aviso.codigo}`,
         content: expect.objectContaining({
             title: 'Que tal atualizar seu diário hoje?',
             data: { previaLocal: true }
         }),
         trigger: { channelId: 'ciclo' }
     });
+});
+
+test('repetir uma dica usa o mesmo identificador e cada opção tem o seu', async () => {
+    const sdk = criarSdk();
+    const previa = { ...aviso, plataforma: 'android', sdk };
+    const diario = 'ciclo.dicas.folicular.3';
+    const movimento = 'ciclo.dicas.folicular.2';
+
+    for (const codigo of [diario, diario, movimento]) {
+        await exibirPrevia({ ...previa, codigo });
+    }
+
+    expect(sdk.scheduleNotificationAsync.mock.calls.map(([pedido]) => pedido.identifier)).toEqual([
+        `aloya-previa:${diario}`,
+        `aloya-previa:${diario}`,
+        `aloya-previa:${movimento}`
+    ]);
 });

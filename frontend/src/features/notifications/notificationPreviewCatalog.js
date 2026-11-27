@@ -1,4 +1,5 @@
 import { catalogoNotificacoes } from './notificationCatalog';
+import dicasPorFase from '../cycles/constants/cycleSelfCareTips.json';
 
 const canais = {
     ciclo: 'ciclo',
@@ -9,11 +10,22 @@ const canais = {
 const variantes = {
     'ciclo.menstrual.proxima': [
         ['ciclo.menstrual.proxima', 'Próxima menstruação — confiabilidade alta'],
-        ['ciclo.menstrual.proxima.mediaBaixa', 'Próxima menstruação — confiabilidade média/baixa']
+        ['ciclo.menstrual.proxima.media', 'Próxima menstruação — confiabilidade média'],
+        ['ciclo.menstrual.proxima.baixa', 'Próxima menstruação — confiabilidade baixa']
     ],
     'redeApoio.convites.respondido': [
         ['redeApoio.convites.respondido.aceito', 'Convite aceito'],
         ['redeApoio.convites.respondido.recusado', 'Convite recusado']
+    ],
+    'redeApoio.dicas.apoio': [
+        ['redeApoio.dicas.apoio.menstrual', 'Dica de apoio na fase menstrual'],
+        ['redeApoio.dicas.apoio.folicular', 'Dica de apoio na fase folicular'],
+        ['redeApoio.dicas.apoio.ovulatoria', 'Dica de apoio na fase ovulatória'],
+        ['redeApoio.dicas.apoio.lutea', 'Dica de apoio na fase lútea']
+    ],
+    'redeApoio.anticoncepcional.aplicacoesTrocas': [
+        ['redeApoio.anticoncepcional.aplicacoesTrocas', 'Aplicação compartilhada'],
+        ['redeApoio.anticoncepcional.aplicacoesTrocas.troca', 'Troca compartilhada']
     ]
 };
 
@@ -28,6 +40,12 @@ export function listarPreviews() {
                     .filter(([, , tipo]) => tipo !== 'antecedencia' && tipo !== 'horario')
                     .flatMap(([id, rotulo]) => {
                         const codigo = `${categoria}.${grupo}.${id}`;
+                        if (categoria === 'ciclo' && grupo === 'dicas') {
+                            return dicasPorFase[id].map(({ title }, indice) => [
+                                `${codigo}.${indice + 1}`,
+                                `${rotulo} — ${title}`
+                            ]);
+                        }
                         return variantes[codigo] ?? [[codigo, rotulo]];
                     })
             }))
