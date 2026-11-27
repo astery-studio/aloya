@@ -36,9 +36,17 @@ function DiaryHistoryHeader({
 }) {
     const cores = obterCoresDiario(tema).interface;
     return (
-        <View style={estilos.cabecalhoLista}>
+        <View
+            testID="diary-history-header"
+            style={[
+                estilos.cabecalhoLista,
+                somenteLeitura && (mostrarConteudo || atualizando) && estilos.cabecalhoCompartilhado
+            ]}
+        >
             {!somenteLeitura || atualizando ? (
-                <View style={estilos.introducao}>
+                <View
+                    style={somenteLeitura ? estilos.atualizandoCompartilhado : estilos.introducao}
+                >
                     {!somenteLeitura ? (
                         <Text style={estilos.descricao}>
                             Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao

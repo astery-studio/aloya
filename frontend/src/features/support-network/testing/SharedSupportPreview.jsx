@@ -219,6 +219,7 @@ const REGISTROS_DIARIO = [
         id: 2,
         data: '2026-10-28',
         fase: 'lutea',
+        diaCiclo: 21,
         principais: [
             { categoriaId: 'pele', valor: 'Pele', macrocategoriaId: 'corpo_sintomas_fisicos' },
             {
