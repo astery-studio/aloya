@@ -10,19 +10,16 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 
 import { AppThemeRoot } from '../../../app/AppThemeRoot';
 import { CalendarScreenContainer } from '../../calendar/screens/CalendarScreenContainer';
+import { adicionarDias } from '../../cycles/utils/cyclePresentation';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveTrackingScreen } from '../../contraceptives/screens/ContraceptiveTrackingScreen';
-import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
 import { normalizarFiltrosDiario } from '../../diary/utils/diaryFilters';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
-import { SharedPermissionGate } from '../components/SharedPermissionGate/SharedPermissionGate';
-import { SupportedCycleHero } from '../components/SupportedCycleHero/SupportedCycleHero';
-import { SupportedPersonIndicator } from '../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
 import { SharedCycleHistoryScreen } from '../screens/SharedCycleHistoryScreen/SharedCycleHistoryScreen';
 import { SharedDiaryScreen } from '../screens/SharedDiaryScreen/SharedDiaryScreen';
+import { SharedHomeScreen } from '../screens/SharedSupportFlow/SharedHomeScreen';
 import { SharedNavigationPreview } from './SharedNavigationPreview';
 
 const NOME = 'Júlia';
@@ -101,6 +98,33 @@ const CENARIOS_CICLO = [
     { id: 'lutea', rotulo: 'Lútea', dia: 16 },
     { id: 'sem-ciclo', rotulo: 'Sem ciclo' }
 ];
+
+function criarCicloPrevia({ id, dia }) {
+    const hoje = obterHojeLocal();
+    if (!dia) return { possuiCiclos: false, dataReferencia: hoje };
+    const inicio = adicionarDias(hoje, 1 - dia);
+    const data = (diaCiclo) => adicionarDias(inicio, diaCiclo - 1);
+    const intervalo = (primeiro, ultimo) => ({ inicio: data(primeiro), fim: data(ultimo) });
+    return {
+        possuiCiclos: true,
+        dataReferencia: hoje,
+        faseAtual: id,
+        diaDoCiclo: dia,
+        previsao: {
+            duracaoCicloEstimada: 28,
+            fasesEstimadas: {
+                menstrual: intervalo(1, 5),
+                folicularPosMenstrual: intervalo(6, 13),
+                ovulatoria: { data: data(14) },
+                lutea: intervalo(15, 28)
+            },
+            proximoInicioEstimado: data(29),
+            dataOvulacaoEstimada: data(14),
+            janelaFertilEstimada: intervalo(9, 15)
+        }
+    };
+}
+
 const CICLOS = [
     {
         id: '5',
@@ -442,143 +466,99 @@ function ConteudoPrevia() {
     }
 
     return (
-        <MainLayout titulo="Início" exibirNavegacaoInferior={false}>
-            <ScrollView contentContainerStyle={estilos.conteudo}>
-                {aviso}
-                {tela === 'inicio' ? (
-                    <>
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={[estilos.inset, estilos.cenarios]}
-                        >
-                            {CENARIOS_CICLO.map((opcao) => {
-                                const selecionado = opcao.id === cenario.id;
-                                const {
-                                    destaque,
-                                    superficie,
-                                    borda,
-                                    textoSobreDestaque,
-                                    textoPrincipal
-                                } = tema.cores.interface;
-                                return (
-                                    <Pressable
-                                        key={opcao.id}
-                                        accessibilityRole="button"
-                                        accessibilityLabel={`Prévia da arte: ${opcao.rotulo}`}
-                                        accessibilityState={{ selected: selecionado }}
-                                        onPress={() => setCenario(opcao)}
-                                        style={[
-                                            estilos.cenario,
-                                            {
-                                                borderColor: borda,
-                                                backgroundColor: selecionado ? destaque : superficie
-                                            }
-                                        ]}
+        <SharedHomeScreen
+            key={cenario.id}
+            nomeTitular={NOME}
+            permissoes={permissoes}
+            ciclo={criarCicloPrevia(cenario)}
+            status="disponivel"
+            onSelecionarAba={(aba) => {
+                if (aba === 'ciclos') abrirHistorico('preenchido');
+                if (aba === 'calendario') abrirCalendario('preenchido');
+                if (aba === 'diario' || aba === 'anticoncepcionais') setTela(aba);
+                if (aba === 'membros') setTela('trocarContato');
+            }}
+            ferramentasPrevia={
+                <View style={[estilos.inset, estilos.cenarios]}>
+                    {aviso}
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={[estilos.inset, estilos.cenarios]}
+                    >
+                        {CENARIOS_CICLO.map((opcao) => {
+                            const selecionado = opcao.id === cenario.id;
+                            const {
+                                destaque,
+                                superficie,
+                                borda,
+                                textoSobreDestaque,
+                                textoPrincipal
+                            } = tema.cores.interface;
+                            return (
+                                <Pressable
+                                    key={opcao.id}
+                                    accessibilityRole="button"
+                                    accessibilityLabel={`Prévia da arte: ${opcao.rotulo}`}
+                                    accessibilityState={{ selected: selecionado }}
+                                    onPress={() => setCenario(opcao)}
+                                    style={[
+                                        estilos.cenario,
+                                        {
+                                            borderColor: borda,
+                                            backgroundColor: selecionado ? destaque : superficie
+                                        }
+                                    ]}
+                                >
+                                    <Text
+                                        style={{
+                                            color: selecionado ? textoSobreDestaque : textoPrincipal
+                                        }}
                                     >
-                                        <Text
-                                            style={{
-                                                color: selecionado
-                                                    ? textoSobreDestaque
-                                                    : textoPrincipal
-                                            }}
-                                        >
-                                            {opcao.rotulo}
-                                        </Text>
-                                    </Pressable>
-                                );
-                            })}
-                        </ScrollView>
-                        <SupportedPersonIndicator nome={NOME} />
-                        <View style={[estilos.inset, estilos.cenarios]}>
-                            <ButtonScreen
-                                texto="Testar troca de pessoa"
-                                aoPressionar={() => setTela('trocarContato')}
-                            />
-                            <ButtonScreen
-                                texto="Testar acesso revogado"
-                                aoPressionar={() => setTela('acessoRevogado')}
-                            />
-                        </View>
-                        <SupportedCycleHero
-                            nomeTitular={NOME}
-                            fase={cenario.id}
-                            possuiDadosCiclo={Boolean(cenario.dia)}
-                            diaCiclo={cenario.dia}
-                            duracaoCiclo={28}
-                            exibirFase={permissoes.includes('geral.fase_atual')}
+                                        {opcao.rotulo}
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
+                    </ScrollView>
+                    <View style={[estilos.inset, estilos.cenarios]}>
+                        <ButtonScreen
+                            texto="Testar troca de pessoa"
+                            aoPressionar={() => setTela('trocarContato')}
                         />
-                        <SharedPermissionGate
-                            permissoes={permissoes}
-                            permissao="geral.anticoncepcionais"
-                        >
-                            <View style={estilos.inset}>
-                                <ButtonScreen
-                                    texto="Ver Anticoncepcionais"
-                                    variante="verde"
-                                    aoPressionar={() => setTela('anticoncepcionais')}
-                                />
-                            </View>
-                        </SharedPermissionGate>
-                        <SharedPermissionGate
-                            permissoes={permissoes}
-                            permissao="geral.historico_ciclo"
-                        >
-                            <View style={estilos.inset}>
-                                <ButtonScreen
-                                    texto="Ver Histórico de Ciclos"
-                                    aoPressionar={() => abrirHistorico('preenchido')}
-                                />
-                                <View style={[estilos.cenarios, estilos.cenariosHistorico]}>
-                                    <ButtonScreen
-                                        texto="Histórico vazio"
-                                        aoPressionar={() => abrirHistorico('vazio')}
-                                    />
-                                    <ButtonScreen
-                                        texto="Erro no histórico"
-                                        aoPressionar={() => abrirHistorico('erro')}
-                                    />
-                                </View>
-                            </View>
-                        </SharedPermissionGate>
-                        <SharedPermissionGate
-                            permissoes={permissoes}
-                            permissao="geral.historico_ciclo"
-                        >
-                            <View style={[estilos.inset, estilos.cenarios]}>
-                                <ButtonScreen
-                                    texto="Ver Calendário"
-                                    aoPressionar={() => abrirCalendario('preenchido')}
-                                />
-                                <ButtonScreen
-                                    texto="Calendário sem previsões"
-                                    aoPressionar={() => abrirCalendario('historico')}
-                                />
-                                <ButtonScreen
-                                    texto="Calendário vazio"
-                                    aoPressionar={() => abrirCalendario('vazio')}
-                                />
-                                <ButtonScreen
-                                    texto="Erro no calendário"
-                                    aoPressionar={() => abrirCalendario('erro')}
-                                />
-                            </View>
-                        </SharedPermissionGate>
-                        <SharedPermissionGate permissoes={permissoes} permissao="corpo.pele">
-                            <View style={estilos.inset}>
-                                <ButtonScreen
-                                    texto="Ver Diário"
-                                    aoPressionar={() => setTela('diario')}
-                                />
-                            </View>
-                        </SharedPermissionGate>
-                        <SharedPermissionGate permissoes={permissoes} permissao="geral.dicas">
-                            <CycleEducationSection perspectiva="contato" />
-                        </SharedPermissionGate>
-                    </>
-                ) : null}
-            </ScrollView>
-        </MainLayout>
+                        <ButtonScreen
+                            texto="Testar acesso revogado"
+                            aoPressionar={() => setTela('acessoRevogado')}
+                        />
+                    </View>
+                    <ButtonScreen
+                        texto="Histórico vazio"
+                        aoPressionar={() => abrirHistorico('vazio')}
+                    />
+                    <ButtonScreen
+                        texto="Erro no histórico"
+                        aoPressionar={() => abrirHistorico('erro')}
+                    />
+                    <ButtonScreen
+                        texto="Ver Calendário"
+                        aoPressionar={() => abrirCalendario('preenchido')}
+                    />
+                    <ButtonScreen
+                        texto="Calendário sem previsões"
+                        aoPressionar={() => abrirCalendario('historico')}
+                    />
+                    <ButtonScreen
+                        texto="Calendário vazio"
+                        aoPressionar={() => abrirCalendario('vazio')}
+                    />
+                    <ButtonScreen
+                        texto="Erro no calendário"
+                        aoPressionar={() => abrirCalendario('erro')}
+                    />
+                    <ButtonScreen texto="Ver Diário" aoPressionar={() => setTela('diario')} />
+                </View>
+            }
+        />
     );
 }
 
@@ -598,11 +578,9 @@ function SharedSupportPreview() {
 }
 
 const estilos = StyleSheet.create({
-    conteudo: { gap: 16, paddingBottom: 24 },
     aviso: { textAlign: 'center', paddingHorizontal: 16 },
     inset: { paddingHorizontal: 16 },
     cenarios: { gap: 8 },
-    cenariosHistorico: { marginTop: 8 },
     cenario: { borderWidth: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 }
 });
 

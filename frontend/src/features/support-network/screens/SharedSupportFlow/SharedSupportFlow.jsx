@@ -1,19 +1,14 @@
-import { ScrollView, StyleSheet } from 'react-native';
-
-import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { CalendarScreenContainer } from '../../../calendar/screens/CalendarScreenContainer';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveTrackingScreen } from '../../../contraceptives/screens/ContraceptiveTrackingScreen';
-import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 import { formatarDataCabecalho } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
-import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
-import { SupportedPersonIndicator } from '../../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { useSharedContent } from '../../hooks/useSharedContent';
 import { useSharedSupportAccess } from '../../hooks/useSharedSupportAccess';
 import { SharedCycleHistoryScreen } from '../SharedCycleHistoryScreen/SharedCycleHistoryScreen';
 import { SharedDiaryScreen } from '../SharedDiaryScreen/SharedDiaryScreen';
+import { SharedHomeScreen } from './SharedHomeScreen';
 import { SharedHomeWithoutContact } from './SharedHomeWithoutContact';
 
 const TITULOS = {
@@ -27,7 +22,6 @@ const TITULOS = {
 const PERMISSAO_FASE = 'geral.fase_atual';
 const PERMISSAO_HISTORICO = 'geral.historico_ciclo';
 const PERMISSAO_ANTICONCEPCIONAIS = 'geral.anticoncepcionais';
-const PERMISSAO_DICAS = 'geral.dicas';
 
 function temDiario(permissoes) {
     return permissoes.some((id) => !id.startsWith('geral.'));
@@ -36,50 +30,17 @@ function temDiario(permissoes) {
 function InicioCompartilhado({ acesso, consultas, onSelecionarAba }) {
     const { nomeTitular, permissoes } = acesso;
     const verFase = permissoes.includes(PERMISSAO_FASE);
-    const verDicas = permissoes.includes(PERMISSAO_DICAS);
-    const estadoFase = useSharedContent(verFase ? consultas.fase : null);
-    const fase = estadoFase.dados?.faseAtual?.toLowerCase();
+    const estado = useSharedContent(verFase ? consultas.fase : null);
 
     return (
-        <ScrollView contentContainerStyle={estilos.conteudo}>
-            <SupportedPersonIndicator nome={nomeTitular} />
-            {verFase && estadoFase.status !== 'disponivel' ? (
-                <SharedContentState
-                    status={estadoFase.status}
-                    aoTentarNovamente={estadoFase.recarregar}
-                />
-            ) : (
-                <SupportedCycleHero
-                    nomeTitular={nomeTitular}
-                    fase={fase}
-                    possuiDadosCiclo={Boolean(fase)}
-                    exibirFase={verFase}
-                />
-            )}
-            {permissoes.includes(PERMISSAO_ANTICONCEPCIONAIS) ? (
-                <ButtonScreen
-                    texto="Ver Anticoncepcionais"
-                    aoPressionar={() => onSelecionarAba('anticoncepcionais')}
-                />
-            ) : null}
-            {permissoes.includes(PERMISSAO_HISTORICO) ? (
-                <ButtonScreen
-                    texto="Ver Histórico de Ciclos"
-                    aoPressionar={() => onSelecionarAba('ciclos')}
-                />
-            ) : null}
-            {verDicas ? <CycleEducationSection perspectiva="contato" /> : null}
-            {!permissoes.some((id) =>
-                [
-                    PERMISSAO_FASE,
-                    PERMISSAO_ANTICONCEPCIONAIS,
-                    PERMISSAO_HISTORICO,
-                    PERMISSAO_DICAS
-                ].includes(id)
-            ) ? (
-                <SharedContentState />
-            ) : null}
-        </ScrollView>
+        <SharedHomeScreen
+            nomeTitular={nomeTitular}
+            permissoes={permissoes}
+            ciclo={estado.dados}
+            status={estado.status}
+            aoTentarNovamente={estado.recarregar}
+            onSelecionarAba={onSelecionarAba}
+        />
     );
 }
 
@@ -115,6 +76,17 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
     const subtela = tela === 'ciclos' || tela === 'anticoncepcionais';
 
     if (acesso.status === 'disponivel') {
+        if (tela === 'inicio') {
+            return (
+                <InicioCompartilhado
+                    key={acesso.assinatura}
+                    acesso={acesso}
+                    consultas={consultas}
+                    onSelecionarAba={onSelecionarAba}
+                />
+            );
+        }
+
         if (tela === 'anticoncepcionais' && permissoes.includes(PERMISSAO_ANTICONCEPCIONAIS)) {
             return (
                 <AnticoncepcionaisCompartilhados
@@ -170,13 +142,6 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
         >
             {homeSemContato ? (
                 <SharedHomeWithoutContact />
-            ) : conteudoDisponivel && tela === 'inicio' ? (
-                <InicioCompartilhado
-                    key={acesso.assinatura}
-                    acesso={acesso}
-                    consultas={consultas}
-                    onSelecionarAba={onSelecionarAba}
-                />
             ) : (
                 <SharedContentState
                     status={conteudoDisponivel ? 'vazio' : acesso.status}
@@ -186,9 +151,5 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
         </MainLayout>
     );
 }
-
-const estilos = StyleSheet.create({
-    conteudo: { flexGrow: 1, gap: 16, paddingHorizontal: 16, paddingBottom: 24 }
-});
 
 export { SharedSupportFlow };

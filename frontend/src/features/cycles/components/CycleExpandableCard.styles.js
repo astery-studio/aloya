@@ -25,6 +25,7 @@ const estilos = StyleSheet.create({
     desabilitado: { opacity: 0.45 },
     titleArea: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
     textos: { flex: 1 },
+    linhaRotulo: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
     rotulo: {
         color: '#4A758E',
         fontFamily: fontFamilies.bold,

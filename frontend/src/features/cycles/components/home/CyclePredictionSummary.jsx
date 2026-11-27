@@ -29,6 +29,7 @@ function CyclePredictionSummary({
     confiabilidade,
     estimativaIncerta = false,
     aoAbrirConfiabilidade,
+    nomeTitular,
     corDestaque = '#C85A44'
 }) {
     const proximo = separarData(proximoInicio);
@@ -42,14 +43,16 @@ function CyclePredictionSummary({
                     <View style={estilos.textosCabecalho}>
                         <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
-                            Próximo ciclo
+                            {nomeTitular ? `Próximo ciclo de ${nomeTitular}` : 'Próximo ciclo'}
                         </Text>
                     </View>
-                    <ConfidenceBadge
-                        nivel={confiabilidade}
-                        onPress={aoAbrirConfiabilidade}
-                        exibirPrefixo={false}
-                    />
+                    {!nomeTitular ? (
+                        <ConfidenceBadge
+                            nivel={confiabilidade}
+                            onPress={aoAbrirConfiabilidade}
+                            exibirPrefixo={false}
+                        />
+                    ) : null}
                 </View>
                 <View style={estilos.metricas}>
                     <View style={estilos.data}>
@@ -81,11 +84,13 @@ function CyclePredictionSummary({
                         />
                     </View>
                 </View>
-                <CycleEducationalDisclaimer
-                    texto={AVISO_PREVISAO}
-                    variante="contraceptiva"
-                    style={estilos.aviso}
-                />
+                {!nomeTitular ? (
+                    <CycleEducationalDisclaimer
+                        texto={AVISO_PREVISAO}
+                        variante="contraceptiva"
+                        style={estilos.aviso}
+                    />
+                ) : null}
                 {estimativaIncerta ? (
                     <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
                 ) : null}

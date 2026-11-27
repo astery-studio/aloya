@@ -5,35 +5,33 @@ import { useTheme } from '../../../../shared/hooks/useTheme';
 import { fontFamilies } from '../../../../shared/theme';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 
-function SharedHomeWithoutContact() {
+function SharedHomeNotice() {
     const { cores } = useTheme();
     const { superficie, borda, textoPrincipal, textoSecundario } = cores.interface;
 
     return (
+        <View style={[estilos.aviso, { backgroundColor: superficie, borderColor: borda }]}>
+            <View style={estilos.icone}>
+                <HeartIcon color="#B87622" size={22} />
+            </View>
+            <View style={estilos.textos}>
+                <Text style={[estilos.titulo, { color: textoPrincipal }]}>
+                    Cada corpo tem seu próprio ritmo.
+                </Text>
+                <Text style={[estilos.descricao, { color: textoSecundario }]}>
+                    O ciclo menstrual pode variar, assim como os sintomas e as necessidades de cada
+                    pessoa. As fases não determinam o humor, a personalidade ou o comportamento de
+                    alguém. O melhor apoio começa com diálogo e respeito.
+                </Text>
+            </View>
+        </View>
+    );
+}
+
+function SharedHomeWithoutContact() {
+    return (
         <ScrollView contentContainerStyle={estilos.conteudo} showsVerticalScrollIndicator={false}>
-            <CycleEducationSection
-                perspectiva="contato"
-                rodape={
-                    <View
-                        style={[estilos.aviso, { backgroundColor: superficie, borderColor: borda }]}
-                    >
-                        <View style={estilos.icone}>
-                            <HeartIcon color="#B87622" size={22} />
-                        </View>
-                        <View style={estilos.textos}>
-                            <Text style={[estilos.titulo, { color: textoPrincipal }]}>
-                                Cada corpo tem seu próprio ritmo.
-                            </Text>
-                            <Text style={[estilos.descricao, { color: textoSecundario }]}>
-                                O ciclo menstrual pode variar, assim como os sintomas e as
-                                necessidades de cada pessoa. As fases não determinam o humor, a
-                                personalidade ou o comportamento de alguém. O melhor apoio começa
-                                com diálogo e respeito.
-                            </Text>
-                        </View>
-                    </View>
-                }
-            />
+            <CycleEducationSection perspectiva="contato" rodape={<SharedHomeNotice />} />
         </ScrollView>
     );
 }
@@ -62,4 +60,4 @@ const estilos = StyleSheet.create({
     descricao: { fontFamily: fontFamilies.regular, fontSize: 10, lineHeight: 14 }
 });
 
-export { SharedHomeWithoutContact };
+export { SharedHomeNotice, SharedHomeWithoutContact };
