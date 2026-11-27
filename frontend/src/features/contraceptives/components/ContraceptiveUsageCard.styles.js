@@ -63,6 +63,8 @@ function criarEstilosCartao(tema) {
             backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.superficieElevada
         },
         identificacao: { flex: 1, minWidth: 0 },
+        identificacaoSomenteLeitura: { paddingRight: 46 },
+        textoCentralizado: { textAlign: 'center' },
         nome: {
             color: interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
@@ -90,6 +92,7 @@ function criarEstilosCartao(tema) {
             marginTop: 12
         },
         badgesConfirmado: { columnGap: 5.99 },
+        badgesSomenteLeitura: { justifyContent: 'center' },
         espacoBadge: {
             flexGrow: 1,
             flexShrink: 0,
@@ -116,6 +119,7 @@ function criarEstilosCartao(tema) {
         },
         rotuloUsados: tema.escuro ? { color: '#999999' } : {},
         rotuloProximosHorarios: tema.escuro ? { color: '#999999' } : {},
+        rotuloSomenteLeitura: { textAlign: 'center', marginBottom: 4 },
         linhaUso: {
             width: '100%',
             minHeight: 35.99,
@@ -127,6 +131,11 @@ function criarEstilosCartao(tema) {
         linhaUsoSeparada: {
             paddingTop: 14,
             marginTop: 14,
+            borderTopWidth: 0.70489,
+            borderTopColor: interfaceTema.separador
+        },
+        linhaSomenteLeitura: { justifyContent: 'center' },
+        linhaSomenteLeituraSeparada: {
             borderTopWidth: 0.70489,
             borderTopColor: interfaceTema.separador
         },

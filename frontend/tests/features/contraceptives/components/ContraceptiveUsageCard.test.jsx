@@ -35,6 +35,36 @@ test('exibe os dados, horários e ações do cartão', async () => {
     expect(aoRemover).toHaveBeenCalledTimes(1);
 });
 
+test('no modo somente leitura mostra horários e último uso sem ações ou intensidade', async () => {
+    await render(
+        <ContraceptiveUsageCard
+            somenteLeitura
+            anticoncepcional={{
+                id: '1',
+                nome: 'Yaz',
+                tipo: 'pilula',
+                horarios: ['08:00', '20:00'],
+                intensidadeAlerta: 'moderado',
+                statusUltimoUso: 'foraDoPrazo',
+                historico: [{ id: 'u1', data: '2026-09-03', estado: 'foraDoPrazo' }]
+            }}
+            aoEditar={jest.fn()}
+            aoRemover={jest.fn()}
+            aoAlternarUso={jest.fn()}
+        />
+    );
+
+    expect(screen.getByText('08:00')).toBeOnTheScreen();
+    expect(screen.getByText('20:00')).toBeOnTheScreen();
+    expect(screen.getByText('Confirmado fora do prazo')).toBeOnTheScreen();
+    expect(screen.queryByText('Alerta Moderado')).not.toBeOnTheScreen();
+    expect(
+        screen.queryByRole('button', { name: /Editar|Remover|Marcar Uso/i })
+    ).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+    expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
+});
+
 test('marca e reverte o uso quando a persistência falha', async () => {
     const aoAlternarUso = jest.fn().mockRejectedValue(new Error('rede'));
     await render(
