@@ -46,7 +46,9 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center'
         },
         mes: {
-            paddingHorizontal: 8
+            paddingHorizontal: 8,
+            // Preserva a altura do mês usada pelo getItemLayout.
+            paddingBottom: 8.991
         },
         cabecalhoMes: {
             flexDirection: 'row',
@@ -74,12 +76,6 @@ function criarEstilosCalendario(tema) {
             fontWeight: '400',
             lineHeight: 18
         },
-        divisorMes: {
-            alignSelf: 'stretch',
-            height: 0.991,
-            marginTop: 8,
-            backgroundColor: tema.cores.interface.separador
-        },
         semana: {
             position: 'relative',
             flexDirection: 'row',
@@ -101,20 +97,18 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center',
             zIndex: 2
         },
-        segmentoDia: {
+        faixaFase: {
             position: 'absolute',
             top: 3.998,
-            right: 0,
-            bottom: 3.998,
-            left: 0
+            bottom: 3.998
         },
         inicioSegmento: {
-            left: 4.273,
+            marginLeft: 4.273,
             borderTopLeftRadius: 99,
             borderBottomLeftRadius: 99
         },
         fimSegmento: {
-            right: 4.273,
+            marginRight: 4.273,
             borderTopRightRadius: 99,
             borderBottomRightRadius: 99
         },
@@ -151,10 +145,8 @@ function criarEstilosCalendario(tema) {
             position: 'absolute',
             top: 0,
             bottom: 0,
-            borderTopWidth: 2,
-            borderRightWidth: 2,
-            borderBottomWidth: 2,
-            borderLeftWidth: 2,
+            // O Android aplica o tracejado a um contorno arredondado com largura e cor uniformes.
+            borderWidth: 2,
             borderStyle: 'dashed',
             borderRadius: 16,
             zIndex: 3

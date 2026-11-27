@@ -23,7 +23,7 @@ describe('CycleMonth', () => {
         expect(screen.getByText('1')).toBeOnTheScreen()
         expect(screen.getByText('31')).toBeOnTheScreen()
         expect(screen.getByTestId('mes-2026-10')).toBeOnTheScreen()
-        expect(screen.getByTestId('divisor-mes-2026-10')).toBeOnTheScreen()
+        expect(screen.queryByTestId('divisor-mes-2026-10')).toBeNull()
     })
 
     test('mostra cinco semanas para outubro de 2026', async () => {
@@ -32,7 +32,7 @@ describe('CycleMonth', () => {
         const arvore = resultado.toJSON()
 
         expect(mes.semanas).toHaveLength(5)
-        expect(arvore.children).toHaveLength(7)
+        expect(arvore.children).toHaveLength(6)
     })
 
     test('encaminha a edição de uma menstruação registrada', async () => {
