@@ -44,10 +44,37 @@ jest.mock(
     () => {
         const { Pressable, Text } = require('react-native');
         return {
-            ReceivedContactsScreen: ({ onVisualizarContato }) => (
-                <Pressable accessibilityRole="button" onPress={() => onVisualizarContato(null)}>
-                    <Text>Parar visualização</Text>
-                </Pressable>
+            ReceivedContactsScreen: ({
+                onVisualizarContato,
+                vinculoVisualizadoId,
+                exibirSeletor,
+                onSelecionarModoRede
+            }) => (
+                <>
+                    {exibirSeletor ? (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => onSelecionarModoRede('apoio')}
+                        >
+                            <Text>Abrir contatos de apoio</Text>
+                        </Pressable>
+                    ) : null}
+                    {vinculoVisualizadoId ? (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => onVisualizarContato(null)}
+                        >
+                            <Text>Parar visualização</Text>
+                        </Pressable>
+                    ) : (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => onVisualizarContato({ id: 9, status: 'ativo' })}
+                        >
+                            <Text>Visualizar contato</Text>
+                        </Pressable>
+                    )}
+                </>
             )
         };
     }
@@ -462,7 +489,7 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba, onVisualizarContato }) =>
+        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba, onSelecionarModoRede }) =>
             React.createElement(
                 View,
                 null,
@@ -471,9 +498,9 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
                     Pressable,
                     {
                         accessibilityRole: 'button',
-                        onPress: () => onVisualizarContato({ id: 9, status: 'ativo' })
+                        onPress: () => onSelecionarModoRede('acompanhados')
                     },
-                    React.createElement(Text, null, 'Visualizar contato')
+                    React.createElement(Text, null, 'Abrir contatos acompanhados')
                 ),
                 React.createElement(
                     Pressable,
@@ -498,14 +525,9 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
     };
 });
 
-jest.mock('../../src/features/support-network/screens/SupportNetworkScreen', () => {
-    const React = require('react');
-    const { MembersScreen } = require('../../src/features/support-network/screens/MembersScreen');
-
-    return {
-        SupportNetworkScreen: (props) => React.createElement(MembersScreen, props)
-    };
-});
+jest.mock('../../src/features/support-network/hooks/useParentalConsent', () => ({
+    useParentalConsent: () => ({ status: { acessoLiberado: true } })
+}));
 
 jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen', () => {
     const React = require('react');
@@ -725,6 +747,9 @@ describe('App integrado', () => {
 
         const primeira = await render(<App />);
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Abrir contatos acompanhados' })
+        );
         await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar contato' }));
         expect(await screen.findByText('Acompanhando vínculo 9')).toBeOnTheScreen();
         expect(salvarSeguro).toHaveBeenCalledWith('rede-apoio.visualizacao.1', '9');
@@ -733,8 +758,16 @@ describe('App integrado', () => {
         const segunda = await render(<App />);
         expect(await screen.findByText('Acompanhando vínculo 9')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Contatos acompanhados' }));
-        await fireEvent.press(screen.getByRole('button', { name: 'Parar visualização' }));
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Abrir contatos de apoio' })
+        );
         expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir contatos acompanhados' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Parar visualização' }));
+        expect(
+            await screen.findByRole('button', { name: 'Abrir contatos de apoio' })
+        ).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Visualizar contato' })).toBeOnTheScreen();
         expect(removerSeguro).toHaveBeenCalledWith('rede-apoio.visualizacao.1');
         await segunda.unmount();
 

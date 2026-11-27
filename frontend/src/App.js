@@ -204,7 +204,7 @@ export default function App() {
     const [vinculoVisualizadoId, setVinculoVisualizadoId] = useState(null);
     const contaComVisualizacaoRestaurada = useRef(null);
     const gravandoVisualizacao = useRef(false);
-    const [modoRedeInicial, setModoRedeInicial] = useState('apoio');
+    const [modoRede, setModoRede] = useState('apoio');
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -308,6 +308,7 @@ export default function App() {
                 if (requisicaoAtual.current !== identificador) return;
                 contaComVisualizacaoRestaurada.current = perfilRecebido.id;
                 setVinculoVisualizadoId(vinculo);
+                if (vinculo !== null) setModoRede('acompanhados');
             }
 
             setPerfil(perfilRecebido);
@@ -319,6 +320,7 @@ export default function App() {
             if (erro?.status === 401) {
                 contaComVisualizacaoRestaurada.current = null;
                 setVinculoVisualizadoId(null);
+                setModoRede('apoio');
                 setPerfil(null);
 
                 setTelaInterna(telasInternas.inicio);
@@ -460,7 +462,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.inicio);
         setVinculoVisualizadoId(null);
-        setModoRedeInicial('apoio');
+        setModoRede('apoio');
         setCadastroDiarioVisivel(false);
         setRegistroDiarioEdicao(null);
         setCategoriasDiarioVisiveis(false);
@@ -489,7 +491,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.inicio);
         setVinculoVisualizadoId(null);
-        setModoRedeInicial('apoio');
+        setModoRede('apoio');
         setCategoriasDiarioVisiveis(false);
         setCadastroDiarioVisivel(false);
         setRegistroDiarioEdicao(null);
@@ -521,8 +523,8 @@ export default function App() {
             await salvarVinculoVisualizado(perfil.id, vinculo);
             if (requisicaoAtual.current !== requisicao) return;
             setVinculoVisualizadoId(vinculo);
-            if (vinculo === null) setModoRedeInicial('acompanhados');
-            else setTelaInterna(telasInternas.inicio);
+            setModoRede('acompanhados');
+            if (vinculo !== null) setTelaInterna(telasInternas.inicio);
         } catch {
             if (requisicaoAtual.current === requisicao) {
                 Alert.alert('Não foi possível atualizar a visualização. Tente novamente.');
@@ -533,7 +535,6 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
-        if (aba !== telasInternas.membros) setModoRedeInicial('apoio');
         if (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') {
             if (ABAS_ACOMPANHAMENTO.has(aba)) setTelaInterna(aba);
             return;
@@ -819,7 +820,7 @@ export default function App() {
         );
     } else if (telaInterna === telasInternas.membros) {
         conteudo =
-            perfil?.papel === 'contato_apoio' || vinculoVisualizadoId !== null ? (
+            perfil?.papel === 'contato_apoio' ? (
                 <ReceivedContactsScreen
                     service={configuracao.servicos.receivedContactsService}
                     vinculoVisualizadoId={vinculoVisualizadoId}
@@ -829,7 +830,9 @@ export default function App() {
                 />
             ) : (
                 <SupportNetworkScreen
-                    modoRedeInicial={modoRedeInicial}
+                    modoRede={modoRede}
+                    onSelecionarModoRede={setModoRede}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
                     parentalConsentService={configuracao.servicos.parentalConsentService}
                     receivedContactsService={configuracao.servicos.receivedContactsService}
                     onVisualizarContato={visualizarContato}
