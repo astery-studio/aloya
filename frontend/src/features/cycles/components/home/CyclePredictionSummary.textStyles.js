@@ -25,13 +25,16 @@ const textos = StyleSheet.create({
         fontFamily: fontFamilies.bold,
         fontSize: 50,
         includeFontPadding: false,
-        lineHeight: 50,
+        lineHeight: 60,
+        textAlignVertical: 'center',
         letterSpacing: -3
     },
     mes: {
         color: '#222222',
         fontFamily: fontFamilies.bold,
         fontSize: 14,
+        flexShrink: 1,
+        width: '100%',
         includeFontPadding: false,
         lineHeight: 21
     },

@@ -18,6 +18,15 @@ test('apresenta previsão e abre a explicação de confiabilidade', async () => 
 
     expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
     expect(screen.getByText('Previsão')).toHaveStyle({ color: '#2C4C3B' });
+    expect(screen.getByText('28')).toHaveStyle({
+        fontSize: 50,
+        lineHeight: 60,
+        textAlignVertical: 'center'
+    });
+    expect(screen.getByText('novembro')).toHaveProp('numberOfLines', 1);
+    expect(screen.getByText('novembro')).toHaveProp('adjustsFontSizeToFit', true);
+    expect(screen.getByText('novembro')).toHaveProp('minimumFontScale', 0.5);
+    expect(screen.getByText('novembro')).toHaveStyle({ flexShrink: 1, width: '100%' });
     expect(screen.getByText('10–15 de novembro')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Confiança média' }));
     expect(aoAbrir).toHaveBeenCalledTimes(1);

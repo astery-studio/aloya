@@ -54,8 +54,15 @@ function CyclePredictionSummary({
                 <View style={estilos.metricas}>
                     <View style={estilos.data}>
                         <Text style={textos.dia}>{proximo.dia}</Text>
-                        <View style={estilos.textosMetrica}>
-                            <Text style={textos.mes}>{proximo.mes}</Text>
+                        <View style={estilos.textosData}>
+                            <Text
+                                adjustsFontSizeToFit
+                                minimumFontScale={0.5}
+                                numberOfLines={1}
+                                style={textos.mes}
+                            >
+                                {proximo.mes}
+                            </Text>
                             <Text style={textos.estimativa}>estimativa</Text>
                         </View>
                     </View>
