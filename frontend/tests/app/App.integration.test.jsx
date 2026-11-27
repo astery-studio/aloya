@@ -574,22 +574,13 @@ describe('App integrado', () => {
         expect(servicos.supportNotificationPreferencesService.buscar).toHaveBeenCalledTimes(1);
     });
 
-    test('abre a prévia da Rede de Apoio e testa os controles com dados locais', async () => {
+    test('mantém o teste de notificações e retira o atalho de prévia da Rede de Apoio', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
         await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
-        await fireEvent.press(screen.getByRole('button', { name: 'Teste da tela da Rede de Apoio' }));
-        expect(await screen.findByRole('header', { name: 'Prévia da Rede de Apoio' }))
-            .toBeOnTheScreen();
-        await fireEvent.press(await screen.findByRole('button', { name: 'Personalizar notificações' }));
-        const nome = 'Receber dicas de como apoiar';
-        await fireEvent.press(screen.getByRole('switch', { name: nome, checked: false }));
-        expect(await screen.findByRole('switch', { name: nome, checked: true })).toBeOnTheScreen();
-        expect(screen.queryByRole('switch', { name: 'Vida Íntima e Social' })).toBeNull();
-        expect(servicos.supportNotificationPreferencesService.buscar).not.toHaveBeenCalled();
-        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
-        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
-        expect(screen.getByRole('button', { name: 'Teste de notificações' })).toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Teste da tela da Rede de Apoio' })).toBeNull();
+        await fireEvent.press(screen.getByRole('button', { name: 'Teste de notificações' }));
+        expect(screen.getByRole('header', { name: 'Teste de notificações' })).toBeOnTheScreen();
     });
 
     beforeEach(() => {
