@@ -40,7 +40,18 @@ const ALIASES_FASE_RESUMO = Object.freeze({
     ovulatoria: 'ovulacao'
 });
 
-function obterApresentacaoResumoFase(fase) {
+function obterApresentacaoResumoFase(fase, tema) {
+    if (tema?.escuro) {
+        const faseEscura = obterApresentacaoFase(fase, tema);
+        return faseEscura
+            ? {
+                  corIcone: faseEscura.cor,
+                  corTexto: faseEscura.cor,
+                  corTextoContador: faseEscura.textoContador,
+                  corFundoContador: faseEscura.fundo
+              }
+            : null;
+    }
     return APRESENTACAO_RESUMO_FASE[ALIASES_FASE_RESUMO[fase] ?? fase] ?? null;
 }
 
@@ -57,7 +68,7 @@ function DiaryOverviewCard({
     const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const apresentacao = obterApresentacaoFase(fase, tema);
-    const apresentacaoResumo = obterApresentacaoResumoFase(fase);
+    const apresentacaoResumo = obterApresentacaoResumoFase(fase, tema);
 
     if (carregando) {
         return (

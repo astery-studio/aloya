@@ -10,8 +10,8 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         cartao: {
             overflow: 'hidden',
-            borderWidth: 1,
-            borderColor: cores.borda,
+            borderWidth: tema.escuro ? 0.7 : 1,
+            borderColor: tema.escuro ? cores.separador : cores.borda,
             borderRadius: tema.radius.grande,
             backgroundColor: cores.superficie
         },

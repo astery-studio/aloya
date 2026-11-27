@@ -10,6 +10,7 @@ import {
     TrashIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { formatarDataDiario } from '../../utils/diaryDate';
 import { obterApresentacaoFaseRegistro } from '../../utils/diaryPhasePresentation';
 import { DiaryAdditionalCategoriesChip } from '../DiaryAdditionalCategoriesChip/DiaryAdditionalCategoriesChip';
@@ -183,6 +184,7 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                 <View testID="diary-entry-header-actions" style={estilos.acoes}>
                     <IconButton
                         icone={PencilSimpleIcon}
+                        corIcone={tema.escuro ? coresNoturnasConteudo.textoSecundario : undefined}
                         compacto
                         tamanhoCompacto={26}
                         tamanhoIconeCompacto={13}
@@ -193,6 +195,9 @@ function DiaryEntryCard({ registro, aoAbrir, aoEditar, aoExcluir, acaoEmAndament
                     {typeof aoExcluir === 'function' ? (
                         <IconButton
                             icone={TrashIcon}
+                            corIcone={
+                                tema.escuro ? coresNoturnasConteudo.textoSecundario : undefined
+                            }
                             compacto
                             tamanhoCompacto={26}
                             tamanhoIconeCompacto={13}
