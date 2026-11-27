@@ -23,6 +23,7 @@ import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.r
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
 import { criarContactInvitationRoutes } from '../../features/support-network/routes/contactInvitation.routes.js';
 import { criarSupportContactRoutes } from '../../features/support-network/routes/supportContact.routes.js';
+import { criarSharedSupportRoutes } from '../../features/support-network/routes/sharedSupport.routes.js';
 import { criarContactLinkRoutes } from '../../features/support-network/routes/contactLink.routes.js';
 import { criarSupportContactRemovalRoutes } from '../../features/support-network/routes/supportContactRemoval.routes.js';
 
@@ -188,6 +189,16 @@ app.use(
         rateLimit: container.contactInvitationRateLimit,
         responseRateLimit: container.contactInvitationResponseRateLimit,
         controller: container.supportContactController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSharedSupportRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        sharedSupport: container.sharedSupport
     })
 );
 
