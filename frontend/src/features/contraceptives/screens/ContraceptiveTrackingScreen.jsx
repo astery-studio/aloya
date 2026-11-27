@@ -92,7 +92,8 @@ function ContraceptiveTrackingScreen({
     aoDispensarErroUso,
     aoEditar,
     aoRemover,
-    aoAlternarUso
+    aoAlternarUso,
+    somenteLeitura = false
 }) {
     const tema = useTheme();
     const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
@@ -136,7 +137,11 @@ function ContraceptiveTrackingScreen({
             ) : !itens.length ? (
                 <View style={estilosAcompanhamento.estadoVazio}>
                     <Text style={estilosAcompanhamento.tituloVazio}>Nenhum anticoncepcional</Text>
-                    <Text style={estilosAcompanhamento.mensagemVazio}>{MENSAGEM_VAZIO}</Text>
+                    <Text style={estilosAcompanhamento.mensagemVazio}>
+                        {somenteLeitura
+                            ? 'Ainda não há dados suficientes para exibir aqui.'
+                            : MENSAGEM_VAZIO}
+                    </Text>
                 </View>
             ) : (
                 <View style={estilosAcompanhamento.corpo}>
@@ -159,6 +164,7 @@ function ContraceptiveTrackingScreen({
                         renderItem={({ item }) => (
                             <ContraceptiveUsageCard
                                 anticoncepcional={item}
+                                somenteLeitura={somenteLeitura}
                                 aoEditar={aoEditar}
                                 aoRemover={aoRemover}
                                 aoAlternarUso={aoAlternarUso}
@@ -175,7 +181,7 @@ function ContraceptiveTrackingScreen({
                 </View>
             )}
 
-            {!carregando && !erro && typeof aoCadastrarNovo === 'function' ? (
+            {!somenteLeitura && !carregando && !erro && typeof aoCadastrarNovo === 'function' ? (
                 <FloatingActionButton
                     aoPressionar={aoCadastrarNovo}
                     rotuloAcessibilidade="Cadastrar novo anticoncepcional"

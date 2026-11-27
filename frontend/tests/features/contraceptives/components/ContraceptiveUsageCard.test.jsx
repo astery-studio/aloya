@@ -46,6 +46,10 @@ test('no modo somente leitura mostra horários, último uso e nível de alerta a
                 horarios: ['08:00', '20:00'],
                 intensidadeAlerta: 'moderado',
                 statusUltimoUso: 'foraDoPrazo',
+                usosHoje: [
+                    { id: 'u1', horario: '08:00', status: 'confirmado' },
+                    { id: 'u2', horario: '20:00', status: 'foraDoPrazo' }
+                ],
                 historico: [{ id: 'u1', data: '2026-09-03', estado: 'foraDoPrazo' }]
             }}
             aoEditar={jest.fn()}
@@ -56,7 +60,7 @@ test('no modo somente leitura mostra horários, último uso e nível de alerta a
 
     expect(screen.getByText('08:00')).toBeOnTheScreen();
     expect(screen.getByText('20:00')).toBeOnTheScreen();
-    expect(screen.getByText('Confirmado fora do prazo')).toBeOnTheScreen();
+    expect(screen.getByText('Confirmado')).toBeOnTheScreen();
     expect(screen.getByText('Alerta Moderado')).toBeOnTheScreen();
     expect(
         screen.queryByRole('button', { name: /Editar|Remover|Marcar Uso/i })

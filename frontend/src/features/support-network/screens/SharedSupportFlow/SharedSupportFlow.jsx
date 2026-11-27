@@ -4,7 +4,7 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { CalendarScreenContainer } from '../../../calendar/screens/CalendarScreenContainer';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
-import { ContraceptiveUsageCard } from '../../../contraceptives/components/ContraceptiveUsageCard';
+import { ContraceptiveTrackingScreen } from '../../../contraceptives/screens/ContraceptiveTrackingScreen';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 import { formatarDataCabecalho } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
@@ -83,24 +83,18 @@ function InicioCompartilhado({ acesso, consultas, onSelecionarAba }) {
     );
 }
 
-function AnticoncepcionaisCompartilhados({ consultar }) {
+function AnticoncepcionaisCompartilhados({ consultar, aoVoltar }) {
     const estado = useSharedContent(consultar);
 
-    if (!estado.dados?.length) {
-        return (
-            <SharedContentState
-                status={estado.status === 'disponivel' ? 'vazio' : estado.status}
-                aoTentarNovamente={estado.recarregar}
-            />
-        );
-    }
-
     return (
-        <ScrollView contentContainerStyle={estilos.conteudo}>
-            {estado.dados.map((item) => (
-                <ContraceptiveUsageCard key={item.id} anticoncepcional={item} somenteLeitura />
-            ))}
-        </ScrollView>
+        <ContraceptiveTrackingScreen
+            somenteLeitura
+            anticoncepcionais={estado.dados}
+            carregando={estado.status === 'carregando'}
+            erro={estado.status === 'erro'}
+            aoTentarNovamente={estado.recarregar}
+            aoVoltar={aoVoltar}
+        />
     );
 }
 
@@ -121,6 +115,15 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
     const subtela = tela === 'ciclos' || tela === 'anticoncepcionais';
 
     if (acesso.status === 'disponivel') {
+        if (tela === 'anticoncepcionais' && permissoes.includes(PERMISSAO_ANTICONCEPCIONAIS)) {
+            return (
+                <AnticoncepcionaisCompartilhados
+                    key={acesso.assinatura}
+                    consultar={consultas.anticoncepcionais}
+                    aoVoltar={voltar}
+                />
+            );
+        }
         if (tela === 'calendario' && historicoPermitido) {
             return (
                 <CalendarScreenContainer
@@ -173,13 +176,6 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
                     acesso={acesso}
                     consultas={consultas}
                     onSelecionarAba={onSelecionarAba}
-                />
-            ) : conteudoDisponivel &&
-              tela === 'anticoncepcionais' &&
-              permissoes.includes(PERMISSAO_ANTICONCEPCIONAIS) ? (
-                <AnticoncepcionaisCompartilhados
-                    key={acesso.assinatura}
-                    consultar={consultas.anticoncepcionais}
                 />
             ) : (
                 <SharedContentState

@@ -77,6 +77,36 @@ test('não duplica o cartão que possui doses com estados diferentes', () => {
     expect(criarSecoes([item])).toEqual([{ titulo: 'NÃO USADOS', data: [item] }]);
 });
 
+test('usa as seções e o aviso do titular no acompanhamento compartilhado', async () => {
+    await renderizar(
+        <ContraceptiveTrackingScreen
+            somenteLeitura
+            aoCadastrarNovo={jest.fn()}
+            aoAlternarUso={jest.fn()}
+            anticoncepcionais={[
+                {
+                    id: '1',
+                    nome: 'Yaz',
+                    tipo: 'pilula',
+                    intensidadeAlerta: 'moderado',
+                    usosHoje: [{ id: 'u1', horario: '08:00', status: 'pendente', atrasado: true }]
+                },
+                { id: '2', nome: 'Mirena', tipo: 'diu_hormonal' }
+            ]}
+        />
+    );
+
+    expect(screen.getByText('1 uso pendente hoje')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'NÃO USADOS' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'USADOS' })).toBeOnTheScreen();
+    expect(screen.getByText('Alerta Moderado')).toBeOnTheScreen();
+    expect(screen.getByText('08:00')).toBeOnTheScreen();
+    expect(screen.getByText('Atrasado')).toBeOnTheScreen();
+    expect(
+        screen.queryByRole('button', { name: /Editar|Remover|Marcar Uso|Cadastrar novo/ })
+    ).toBeNull();
+});
+
 test('o banner não conta doses de removidos nem de DIU, mas inclui o anel conforme o protótipo vigente', async () => {
     await renderizar(
         <ContraceptiveTrackingScreen

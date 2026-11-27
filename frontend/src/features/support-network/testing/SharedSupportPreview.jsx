@@ -11,7 +11,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { AppThemeRoot } from '../../../app/AppThemeRoot';
 import { CalendarScreenContainer } from '../../calendar/screens/CalendarScreenContainer';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
-import { ContraceptiveUsageCard } from '../../contraceptives/components/ContraceptiveUsageCard';
+import { ContraceptiveTrackingScreen } from '../../contraceptives/screens/ContraceptiveTrackingScreen';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
 import { normalizarFiltrosDiario } from '../../diary/utils/diaryFilters';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
@@ -30,10 +30,6 @@ const PERMISSOES_DEMONSTRACAO = [
     ...permissoesGerais,
     ...gruposPermissoes.flatMap(({ permissoes }) => permissoes)
 ].map(({ id }) => id);
-const TITULOS = {
-    inicio: 'Início',
-    anticoncepcionais: 'Anticoncepcionais'
-};
 const ANTICONCEPCIONAIS_PREVIA = [
     {
         id: 'yaz',
@@ -42,7 +38,10 @@ const ANTICONCEPCIONAIS_PREVIA = [
         intensidadeAlerta: 'moderado',
         horarios: ['08:00', '20:00'],
         statusUltimoUso: 'pendente',
-        usosHoje: [{ id: 'yaz-manha', horario: '08:00', atrasado: true, status: 'pendente' }],
+        usosHoje: [
+            { id: 'yaz-manha', horario: '08:00', atrasado: true, status: 'pendente' },
+            { id: 'yaz-noite', horario: '20:00', status: 'pendente' }
+        ],
         historico: [
             { id: 'yaz-06', data: '2026-09-06', horarioProgramado: '08:00', estado: 'confirmado' },
             {
@@ -62,6 +61,7 @@ const ANTICONCEPCIONAIS_PREVIA = [
         intensidadeAlerta: 'leve',
         horarios: ['09:30'],
         statusUltimoUso: 'pendente',
+        usosHoje: [{ id: 'evra-hoje', horario: '09:30', status: 'pendente' }],
         historico: [
             { id: 'evra-01', data: '2026-09-01', horarioProgramado: '09:30', estado: 'confirmado' }
         ]
@@ -431,13 +431,18 @@ function ConteudoPrevia() {
         );
     }
 
+    if (tela === 'anticoncepcionais') {
+        return (
+            <ContraceptiveTrackingScreen
+                somenteLeitura
+                anticoncepcionais={ANTICONCEPCIONAIS_PREVIA}
+                aoVoltar={() => setTela('inicio')}
+            />
+        );
+    }
+
     return (
-        <MainLayout
-            titulo={TITULOS[tela]}
-            varianteHeader={tela === 'anticoncepcionais' ? 'comVoltar' : 'padrao'}
-            onVoltar={tela === 'anticoncepcionais' ? () => setTela('inicio') : undefined}
-            exibirNavegacaoInferior={false}
-        >
+        <MainLayout titulo="Início" exibirNavegacaoInferior={false}>
             <ScrollView contentContainerStyle={estilos.conteudo}>
                 {aviso}
                 {tela === 'inicio' ? (
@@ -572,40 +577,6 @@ function ConteudoPrevia() {
                         </SharedPermissionGate>
                     </>
                 ) : null}
-                {tela === 'anticoncepcionais' ? (
-                    <View style={[estilos.inset, estilos.lista]}>
-                        <Text
-                            accessibilityRole="header"
-                            style={[estilos.aviso, { color: tema.cores.interface.textoSecundario }]}
-                        >
-                            NÃO USADOS
-                        </Text>
-                        {ANTICONCEPCIONAIS_PREVIA.filter(
-                            (item) => item.statusUltimoUso === 'pendente'
-                        ).map((item) => (
-                            <ContraceptiveUsageCard
-                                key={item.id}
-                                anticoncepcional={item}
-                                somenteLeitura
-                            />
-                        ))}
-                        <Text
-                            accessibilityRole="header"
-                            style={[estilos.aviso, { color: tema.cores.interface.textoSecundario }]}
-                        >
-                            USADOS
-                        </Text>
-                        {ANTICONCEPCIONAIS_PREVIA.filter(
-                            (item) => item.statusUltimoUso !== 'pendente'
-                        ).map((item) => (
-                            <ContraceptiveUsageCard
-                                key={item.id}
-                                anticoncepcional={item}
-                                somenteLeitura
-                            />
-                        ))}
-                    </View>
-                ) : null}
             </ScrollView>
         </MainLayout>
     );
@@ -632,8 +603,7 @@ const estilos = StyleSheet.create({
     inset: { paddingHorizontal: 16 },
     cenarios: { gap: 8 },
     cenariosHistorico: { marginTop: 8 },
-    cenario: { borderWidth: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
-    lista: { gap: 12 }
+    cenario: { borderWidth: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 }
 });
 
 export { SharedSupportPreview };
