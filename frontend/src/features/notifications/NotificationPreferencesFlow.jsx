@@ -23,12 +23,10 @@ export function NotificationPreferencesFlow({
     service,
     contraceptiveService,
     contato = false,
-    previaContato = false,
-    onAbrirTesteContato,
     onVoltar,
     onSessaoExpirada
 }) {
-    const [categoriaId, definirCategoria] = useState(previaContato ? 'redeApoio' : null);
+    const [categoriaId, definirCategoria] = useState(null);
     const [pagina, definirPagina] = useState('grupo');
     const categoriaAnticoncepcional = categoriaId === 'anticoncepcional';
     const emCadastro = pagina === 'cadastrarAnticoncepcional';
@@ -45,7 +43,7 @@ export function NotificationPreferencesFlow({
 
     const { valores, erroLeitura, erroGravacao, salvando, salvar, recarregar, descartarFalha } =
         useNotificationPreferences(service, {
-            atualizarAoRetomar: !previaContato && categoriaId === 'redeApoio'
+            atualizarAoRetomar: categoriaId === 'redeApoio'
         });
 
     const voltar = useCallback(() => {
@@ -57,9 +55,8 @@ export function NotificationPreferencesFlow({
         else if (!categoriaId) onVoltar();
         else if (pagina === 'horario') definirPagina('individual');
         else if (pagina === 'individual') definirPagina('grupo');
-        else if (previaContato) onVoltar();
         else definirCategoria(null);
-    }, [categoriaId, emCadastro, onVoltar, pagina, previaContato, recarregarMetodos, salvando]);
+    }, [categoriaId, emCadastro, onVoltar, pagina, recarregarMetodos, salvando]);
 
     useEffect(() => {
         const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -95,7 +92,6 @@ export function NotificationPreferencesFlow({
                     definirCategoria(id);
                 }}
                 onAbrirTeste={__DEV__ && !contato ? () => definirPagina('teste') : undefined}
-                onAbrirTesteContato={__DEV__ && !contato ? onAbrirTesteContato : undefined}
                 onVoltar={voltar}
             />
         );
@@ -147,7 +143,7 @@ export function NotificationPreferencesFlow({
     if (categoriaAnticoncepcional) categoria = categoriaNotificacoesAnticoncepcional(metodos);
     const props = {
         categoriaId,
-        categoria: previaContato ? { ...categoria, titulo: 'Prévia da Rede de Apoio' } : categoria,
+        categoria,
         valores,
         ocupado: salvando,
         onAlterar: alterar,
@@ -172,7 +168,7 @@ export function NotificationPreferencesFlow({
                 <NotificationGroupSettingsScreen
                     {...props}
                     onAbrirIndividual={() => {
-                        if (categoriaId === 'redeApoio' && !previaContato) recarregar();
+                        if (categoriaId === 'redeApoio') recarregar();
                         definirPagina('individual');
                     }}
                 />
