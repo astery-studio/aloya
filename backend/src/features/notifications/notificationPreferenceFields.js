@@ -15,6 +15,7 @@ export const gruposNotificacao = {
     'redeApoio.convites':
         'recebido respondido renovado acessoAtualizado acessoRevogado proximoExpiracao expirado contaExcluida',
     'redeApoio.ciclo': 'registro resumo',
+    'redeApoio.dicas': 'apoio',
     'redeApoio.diario': 'ciclo corpo emocional energia vidaIntima saude',
     'redeApoio.consentimento': 'confirmado expirado',
     'redeApoio.anticoncepcional':

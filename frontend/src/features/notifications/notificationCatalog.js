@@ -40,7 +40,7 @@ const anticoncepcional = {
 
 const redeApoio = {
     titulo: 'Rede de Apoio',
-    ordemGrupo: ['convites', 'ciclo', 'diario', 'anticoncepcional', 'consentimento'],
+    ordemGrupo: ['convites', 'ciclo', 'dicas', 'diario', 'anticoncepcional', 'consentimento'],
     grupos: {
         convites: ['Convites', [
             ['recebido', 'Novo convite recebido'], ['respondido', 'Convite aceito ou recusado'],
@@ -49,6 +49,7 @@ const redeApoio = {
             ['expirado', 'Convite expirado'], ['contaExcluida', 'Conta do contato excluída']
         ]],
         ciclo: ['Ciclo Compartilhado', [['registro', 'Novo registro menstrual'], ['resumo', 'Resumo semanal do ciclo']]],
+        dicas: ['Dicas de Apoio', [['apoio', 'Receber dicas de como apoiar']]],
         diario: ['Diário Compartilhado', [
             ['ciclo', 'Ciclo e Sangramento'], ['corpo', 'Corpo e Sintomas Físicos'],
             ['emocional', 'Emocional'], ['energia', 'Energia e Sono'],

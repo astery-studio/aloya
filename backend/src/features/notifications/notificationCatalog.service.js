@@ -1,5 +1,7 @@
 import { gruposNotificacao, valoresIniciais } from './notificationPreferenceFields.js';
 
+const versao = 2;
+
 const nomesCategorias = {
     ciclo: 'Ciclo e Previsões',
     anticoncepcional: 'Anticoncepcional',
@@ -38,8 +40,8 @@ const catalogo = {
 
 export async function inicializarCatalogoNotificacao(prisma) {
     const { dados } = await prisma.catalogoNotificacao.upsert({
-        where: { versao: 1 },
-        create: { versao: 1, dados: catalogo },
+        where: { versao },
+        create: { versao, dados: catalogo },
         update: {}
     });
     return dados;

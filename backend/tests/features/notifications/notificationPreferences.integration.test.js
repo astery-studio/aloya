@@ -85,9 +85,12 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
     assert.equal((await prisma.preferenciaNotificacao.findUnique({ where: { usuarioId: 2 } })).antecedenciaAvisoTroca, 7);
 
     const padroes = () => fetch(`${url}padroes`, { headers: { authorization: '1' } });
-    assert.equal((await (await padroes()).json()).categorias.length, 4);
+    await prisma.catalogoNotificacao.create({ data: { versao: 1, dados: { categorias: [] } } });
+    const catalogoAtual = await (await padroes()).json();
+    assert.equal(catalogoAtual.categorias.length, 4);
+    assert.equal(catalogoAtual.preferencias['redeApoio.dicas.apoio'], false);
     assert.equal((await padroes()).status, 200);
-    assert.equal(await prisma.catalogoNotificacao.count(), 1);
+    assert.equal(await prisma.catalogoNotificacao.count(), 2);
 
     const restauracao = await fetch(`${url}restaurar`, {
         method: 'POST',
