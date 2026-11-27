@@ -45,8 +45,9 @@ export async function planejarCompartilhadas(prisma, usuarioId, preferencia, ago
     const inserir = (aviso) => candidatos.set(`${aviso.evento}|${aviso.ocorrencia}`, aviso);
 
     for (const vinculo of vinculos) {
-        const permissoes =
-            vinculo.categoria?.conjuntoDadosVisiveis ?? vinculo.permissoesIndividuais;
+        const permissoes = vinculo.categoria
+            ? vinculo.categoria.conjuntoDadosVisiveis
+            : vinculo.permissoesIndividuais;
         if (!Array.isArray(permissoes)) continue;
 
         await agendarDicasCompartilhadas({

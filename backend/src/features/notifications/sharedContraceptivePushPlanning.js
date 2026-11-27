@@ -1,5 +1,7 @@
 import { permiteNotificacao } from './notificationEvents.service.js';
 import { planejarConta } from './notificationPlanner.js';
+import { permiteAlertasCompartilhados } from './sharedNotificationPermissions.js';
+
 function tipoCompartilhado(evento) {
     if (evento === 'anticoncepcional.rotina.horario') return 'horario';
     if (evento.startsWith('anticoncepcional.naoConfirmado.')) {
@@ -26,10 +28,7 @@ export async function agendarAnticoncepcionalCompartilhado({
     inserir
 }) {
     const titularId = vinculo.titularId;
-    if (
-        permissoes.includes('geral.anticoncepcionais') &&
-        permissoes.includes('geral.alerta_anticoncepcional')
-    ) {
+    if (permiteAlertasCompartilhados(permissoes)) {
         const autoriza = (evento) => {
             const tipo = tipoCompartilhado(evento);
             return tipo && permiteNotificacao(preferencia, `redeApoio.anticoncepcional.${tipo}`);

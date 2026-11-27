@@ -1,8 +1,8 @@
-import { calcularIdade } from '../../shared/utils/date.utils.js';
 import { criarPredictionService } from '../cycles/services/prediction.service.js';
 import { dataHoraNoFuso } from '../contraceptives/validators/contraceptiveUsage.validator.js';
 import { diaMs, somarDias } from './notificationPlanningContext.js';
 import { permiteNotificacao } from './notificationEvents.service.js';
+import { permiteDicasCompartilhadas } from './sharedNotificationPermissions.js';
 
 const evento = 'redeApoio.dicas.apoio';
 
@@ -17,12 +17,9 @@ export async function agendarDicasCompartilhadas({
     usuarioId,
     inserir
 }) {
-    if (!permissoes.includes('geral.dicas') || !permiteNotificacao(preferencia, evento)) return;
-
-    const idade = calcularIdade(vinculo.titular.dataNascimento, agora);
     if (
-        idade === null ||
-        (idade < 16 && vinculo.titular.consentimentoParental?.statusConsentimento !== 'liberado')
+        !permiteDicasCompartilhadas(vinculo.titular, permissoes, agora) ||
+        !permiteNotificacao(preferencia, evento)
     )
         return;
 
