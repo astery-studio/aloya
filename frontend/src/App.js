@@ -46,6 +46,7 @@ import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from './features/diary/DiaryFlow';
 import { DiaryCategoriesSheet } from './features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet';
 import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
+import AlertModal from './shared/components/feedback/Modal/AlertModal/AlertModal';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
@@ -79,6 +80,39 @@ const telasInternas = Object.freeze({
     diario: 'diario',
     inicio: 'inicio'
 });
+
+const INTERVALO_DUPLO_VOLTAR_MS = 2000;
+
+function obterTelaAnteriorInterna({
+    tela,
+    origemNovaCategoria,
+    retornoCadastro,
+    retornoParametros,
+    retornoResponsavelLegal
+}) {
+    const retornos = {
+        [telasInternas.configuracoes]: telasInternas.inicio,
+        [telasInternas.calendario]: telasInternas.inicio,
+        [telasInternas.membros]: telasInternas.inicio,
+        [telasInternas.ciclos]: telasInternas.inicio,
+        [telasInternas.diario]: telasInternas.inicio,
+        [telasInternas.cadastrarMenstruacao]: retornoCadastro,
+        [telasInternas.novoContato]: telasInternas.membros,
+        [telasInternas.editarContato]: telasInternas.membros,
+        [telasInternas.categoriasPermissao]: telasInternas.membros,
+        [telasInternas.notificacoes]: telasInternas.configuracoes,
+        [telasInternas.notificacoesContato]: telasInternas.configuracoes,
+        [telasInternas.previaNotificacoesContato]: telasInternas.notificacoesContato,
+        [telasInternas.responsavelLegal]: retornoResponsavelLegal,
+        [telasInternas.parametrosCiclo]: retornoParametros,
+        [telasInternas.novaCategoria]: origemNovaCategoria,
+        [telasInternas.anticoncepcionais]: telasInternas.inicio,
+        [telasInternas.alterarSenha]: telasInternas.perfil,
+        [telasInternas.perfil]: telasInternas.configuracoes
+    };
+
+    return retornos[tela] ?? null;
+}
 
 // Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
@@ -189,7 +223,7 @@ export default function App() {
     const [documentoLegal, setDocumentoLegal] = useState(null);
     const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
-    const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -227,9 +261,13 @@ export default function App() {
 
     const [revisaoCalendario, setRevisaoCalendario] = useState(0);
 
+    const [saidaVisivel, setSaidaVisivel] = useState(false);
+
     const requisicaoAtual = useRef(0);
 
     const controladorPerfilAtual = useRef(null);
+
+    const ultimoVoltarNaRaiz = useRef(0);
 
     const apiUrl = obterBaseUrl();
 
@@ -402,24 +440,99 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (estadoSessao !== 'anonima') {
-                return false;
+        ultimoVoltarNaRaiz.current = 0;
+    }, [telaInterna, telaPublica]);
+
+    useEffect(() => {
+        function confirmarSaidaAoVoltarDuasVezes() {
+            const agora = Date.now();
+
+            if (agora - ultimoVoltarNaRaiz.current > INTERVALO_DUPLO_VOLTAR_MS) {
+                ultimoVoltarNaRaiz.current = agora;
+                return true;
             }
 
-            const destino = obterDestinoDeRetorno(telaPublica);
-
-            if (!destino) {
-                return false;
-            }
-
-            setTelaPublica(destino);
-
+            ultimoVoltarNaRaiz.current = 0;
+            setSaidaVisivel(true);
             return true;
+        }
+
+        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (saidaVisivel) {
+                setSaidaVisivel(false);
+                return true;
+            }
+
+            if (documentoLegal !== null) {
+                setDocumentoLegal(null);
+                return true;
+            }
+
+            if (estadoSessao === 'anonima') {
+                const destino = obterDestinoDeRetorno(telaPublica);
+
+                if (destino) {
+                    setTelaPublica(destino);
+                    return true;
+                }
+
+                return confirmarSaidaAoVoltarDuasVezes();
+            }
+
+            if (estadoSessao !== 'autenticada') return false;
+
+            if (cicloCalendarioEditado) {
+                setCicloCalendarioEditado(null);
+                return true;
+            }
+
+            if (categoriasDiarioVisiveis) {
+                setCategoriasDiarioVisiveis(false);
+                return true;
+            }
+
+            if (cadastroDiarioVisivel) {
+                setCadastroDiarioVisivel(false);
+                setDataInicialDiario(null);
+                return true;
+            }
+
+            const contatoNaRaiz =
+                perfil?.papel === 'contato_apoio' && telaInterna === telasInternas.membros;
+            const destino = contatoNaRaiz
+                ? null
+                : obterTelaAnteriorInterna({
+                      tela: telaInterna,
+                      origemNovaCategoria,
+                      retornoCadastro,
+                      retornoParametros,
+                      retornoResponsavelLegal
+                  });
+
+            if (destino) {
+                setTelaInterna(destino);
+                return true;
+            }
+
+            return confirmarSaidaAoVoltarDuasVezes();
         });
 
         return () => inscricao.remove();
-    }, [estadoSessao, telaPublica]);
+    }, [
+        cadastroDiarioVisivel,
+        categoriasDiarioVisiveis,
+        cicloCalendarioEditado,
+        documentoLegal,
+        estadoSessao,
+        origemNovaCategoria,
+        perfil?.papel,
+        retornoCadastro,
+        retornoParametros,
+        retornoResponsavelLegal,
+        saidaVisivel,
+        telaInterna,
+        telaPublica
+    ]);
 
     function renderizarComTema(conteudo) {
         return (
@@ -446,7 +559,7 @@ export default function App() {
         setPerfil(null);
         setErroPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
         setCadastroDiarioVisivel(false);
         setCategoriasDiarioVisiveis(false);
         setDataInicialDiario(null);
@@ -477,7 +590,7 @@ export default function App() {
         setErroPerfil(false);
         setCarregandoPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
         setCategoriasDiarioVisiveis(false);
 
         setOrigemNovaCategoria(telasInternas.membros);
@@ -885,7 +998,9 @@ export default function App() {
                 }}
             />
         );
-    } else if ([telasInternas.notificacoes, telasInternas.notificacoesContato].includes(telaInterna)) {
+    } else if (
+        [telasInternas.notificacoes, telasInternas.notificacoesContato].includes(telaInterna)
+    ) {
         const contato =
             telaInterna === telasInternas.notificacoesContato || perfil?.papel === 'contato_apoio';
 
@@ -984,6 +1099,23 @@ export default function App() {
                     onVoltar={() => setDocumentoLegal(null)}
                 />
             )}
+            <AlertModal
+                variante="confirmacao"
+                visivel={saidaVisivel}
+                aoFechar={() => setSaidaVisivel(false)}
+                titulo="Deseja sair do Aloya?"
+                mensagem="Tem certeza de que deseja fechar o aplicativo?"
+                acaoPrincipal={{
+                    texto: 'Sair',
+                    variante: 'verde',
+                    aoPressionar: () => BackHandler.exitApp()
+                }}
+                acaoSecundaria={{
+                    texto: 'Cancelar',
+                    variante: 'branco',
+                    aoPressionar: () => setSaidaVisivel(false)
+                }}
+            />
         </>
     );
 }
