@@ -26,7 +26,12 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
         id, nome: 'Teste', email: `conta-${id}@example.com`, dataNascimento: new Date('2000-01-01'),
         senhaHash: 'teste', statusConta: 'ativa', papel: 'principal'
     } });
-    await prisma.preferenciaNotificacao.create({ data: { usuarioId: 2, horarioLembreteDiario: '18:00', antecedenciaAvisoTroca: 7 } });
+    await prisma.preferenciaNotificacao.create({ data: {
+        usuarioId: 2,
+        horarioLembreteDiario: '18:00',
+        antecedenciaAvisoTroca: 7,
+        ajustesPorEvento: { 'ciclo.menstrual': false, 'ciclo.menstrual.proxima': true }
+    } });
     const app = express();
     app.use(express.json());
     app.use(criarNotificationPreferencesRoutes({
@@ -64,13 +69,16 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
             dataHoraProgramada: new Date('2030-01-01')
         }))
     });
+    assert.equal((await salvar('ciclo.diario', false)).status, 200);
     const respostas = await Promise.all([
-        salvar('ciclo.diario', false), salvar('ciclo.diario.resumoSemanal', true),
+        salvar('ciclo.diario.resumoSemanal', true),
         salvar('antecedenciaProximoCiclo', 0), salvar('horarioLembreteDiario', '21:30')
     ]);
-    assert.deepEqual(respostas.map((resposta) => resposta.status), [200, 200, 200, 200]);
-    const { preferencias } = await (await chamar(1)).json();
-    assert.equal(preferencias['ciclo.diario'], false);
+    assert.deepEqual(respostas.map((resposta) => resposta.status), [200, 200, 200]);
+    const { preferencias, efetivas } = await (await chamar(1)).json();
+    assert.equal(efetivas['ciclo.diario.resumoSemanal'], true);
+    assert.equal(efetivas['ciclo.diario.comparacaoPeriodos'], false);
+    assert.equal(efetivas.lembreteDiarioAtivo, false);
     assert.equal(preferencias['ciclo.diario.resumoSemanal'], true);
     assert.equal(preferencias.antecedenciaProximoCiclo, 0);
     assert.equal(preferencias.horarioLembreteDiario, '21:30');
@@ -80,9 +88,20 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
         ['cancelada', 'agendada']
     );
     assert.equal((await salvar('ciclo.diario', true)).status, 200);
-    assert.equal((await (await chamar(1)).json()).preferencias['ciclo.diario.resumoSemanal'], true);
+    const { efetivas: grupoLigado } = await (await chamar(1)).json();
+    assert.equal(grupoLigado['ciclo.diario.resumoSemanal'], true);
+    assert.equal(grupoLigado['ciclo.diario.comparacaoPeriodos'], true);
+    assert.equal(grupoLigado.lembreteDiarioAtivo, true);
+    const individualDesligado = await (await salvar('lembreteDiarioAtivo', false)).json();
+    assert.equal(individualDesligado.efetivas.lembreteDiarioAtivo, false);
+    assert.equal(individualDesligado.efetivas['ciclo.diario.resumoSemanal'], true);
     assert.equal((await (await chamar(2)).json()).preferencias.horarioLembreteDiario, '18:00');
     assert.equal((await prisma.preferenciaNotificacao.findUnique({ where: { usuarioId: 2 } })).antecedenciaAvisoTroca, 7);
+    const legado = await chamar(2, { chave: 'ciclo.menstrual.confirmacao', valor: true });
+    assert.equal(legado.status, 200);
+    const { efetivas: individuais } = await legado.json();
+    assert.equal(individuais['ciclo.menstrual.confirmacao'], true);
+    assert.equal(individuais['ciclo.menstrual.proxima'], false);
 
     const padroes = () => fetch(`${url}padroes`, { headers: { authorization: '1' } });
     await prisma.catalogoNotificacao.create({ data: { versao: 1, dados: { categorias: [] } } });
