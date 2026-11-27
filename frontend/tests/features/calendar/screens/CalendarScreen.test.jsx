@@ -167,6 +167,28 @@ jest.mock('../../../../src/features/cycles/components/sheets/CycleConfidenceShee
 });
 
 describe('CalendarScreen', () => {
+    test('mostra o calendário compartilhado sem ações de edição nem confiabilidade', async () => {
+        await render(
+            <CalendarScreen
+                somenteLeitura
+                permitePrevisoes={false}
+                meses={[{ mes: '2026-11', possuiCiclos: true }]}
+                confianca="alta"
+                aoCadastrarMenstruacao={jest.fn()}
+                aoEditarCiclo={jest.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
+        expect(screen.queryByTestId('calendar-add-fab')).not.toBeOnTheScreen();
+        expect(screen.queryByTestId('confidence-badge')).not.toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Dia menstrual registrado' })).toBeNull();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir legenda do calendário' }));
+
+        expect(screen.getByText('Itens: 1')).toBeOnTheScreen();
+    });
+
     test('mostra calendário, título e confiança', async () => {
         const aoCadastrarMenstruacao = jest.fn();
         const aoEditarCiclo = jest.fn();

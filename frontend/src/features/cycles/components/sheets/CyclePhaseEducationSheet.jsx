@@ -4,13 +4,14 @@ import { CycleEducationalDisclaimer } from '../home/CycleEducationalDisclaimer';
 import { AVISO_EDUCATIVO, CONTEUDO_POR_FASE } from './CyclePhaseEducationSheet.content';
 import { estilos } from './CyclePhaseEducationSheet.styles';
 
-function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
+function CyclePhaseEducationSheet({ visivel, fase, aoFechar, rotulo = 'Conheça seu ciclo' }) {
     const conteudo = CONTEUDO_POR_FASE[fase] ?? CONTEUDO_POR_FASE.menstrual;
     const { Icone } = conteudo;
     return (
         <BottomSheet
             visivel={visivel}
             onFechar={aoFechar}
+            fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
             corPainel="#FFFFFF"
@@ -20,7 +21,7 @@ function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
                     <View style={[estilos.icone, { backgroundColor: conteudo.fundo }]}>
                         <Icone size={28} color={conteudo.cor} weight={conteudo.weight} />
                     </View>
-                    <Text style={estilos.rotulo}>Conheça seu ciclo</Text>
+                    <Text style={estilos.rotulo}>{rotulo}</Text>
                 </View>
                 <Text accessibilityRole="header" style={estilos.titulo}>
                     {conteudo.titulo}

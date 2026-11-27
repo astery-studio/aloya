@@ -33,6 +33,7 @@ describe('tema escuro da Rede de Apoio', () => {
         expect(fundos.ciclo.backgroundColor).toBe(temaEscuro.cores.interface.destaqueSuave);
         expect(contador.container.backgroundColor).toBe(temaEscuro.cores.interface.destaqueSuave);
         expect(contador.texto.color).toBe(temaEscuro.cores.interface.destaque);
-        expect(membros.descricao.color).toBe(temaEscuro.cores.interface.textoSecundario);
+        expect(membros.container.backgroundColor).toBe('#121212');
+        expect(membros.descricao.color).toBe('#999999');
     });
 });

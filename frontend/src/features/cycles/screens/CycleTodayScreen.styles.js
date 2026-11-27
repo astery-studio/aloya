@@ -3,8 +3,10 @@ import { espacamentos, fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
+    const backgroundColor = tema.escuro ? '#121212' : tema.cores.interface.fundo;
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo },
+        tela: { flex: 1, backgroundColor },
+        fundo: { backgroundColor },
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',
@@ -14,19 +16,24 @@ function criarEstilos(tema) {
             gap: espacamentos.medio,
             paddingHorizontal: espacamentos.medio,
             paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
-            marginBottom: tema.espacamentosLayout.headerParaConteudo
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
-            ...tema.headerTypography.principal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 24,
+            fontStyle: 'normal',
+            fontWeight: '700',
+            lineHeight: 27.5,
+            textAlign: 'left',
             minWidth: 0,
             flex: 1,
             flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal
+            color: '#222222'
         },
         rolagem: {
             flexGrow: 1,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: espacamentos.medio
         },
         carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },

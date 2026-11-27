@@ -16,24 +16,34 @@ const PHASES = Object.freeze(
 function CycleEducationSection({
     faseSelecionada,
     aoSelecionarFase,
-    conteudos = CONTEUDOS_EDUCATIVOS
+    conteudos = CONTEUDOS_EDUCATIVOS,
+    perspectiva = 'titular',
+    corDestaque,
+    estiloSecao,
+    rodape
 }) {
     const [faseLocal, setFaseLocal] = useState('menstrual');
-    const idSelecionado = faseSelecionada ?? faseLocal;
-    const selected = conteudos[idSelecionado] ?? conteudos.menstrual;
-    const fases = Object.entries(conteudos).map(([id, conteudo]) => ({ id, ...conteudo }));
+    const ehContato = perspectiva === 'contato';
+    const conteudoEducativo = ehContato ? CONTEUDOS_EDUCATIVOS : conteudos;
+    const idSelecionado = ehContato ? faseLocal : (faseSelecionada ?? faseLocal);
+    const selected = conteudoEducativo[idSelecionado] ?? conteudoEducativo.menstrual;
+    const fases = Object.entries(conteudoEducativo).map(([id, conteudo]) => ({ id, ...conteudo }));
     const selecionar = (id) => {
         setFaseLocal(id);
         aoSelecionarFase?.(id);
     };
     return (
-        <View style={estilos.secao}>
-            <Text style={textos.etiqueta}>Conteúdo educativo</Text>
+        <View style={[estilos.secao, estiloSecao]}>
+            <Text style={[textos.etiqueta, corDestaque && { color: corDestaque }]}>
+                {ehContato ? 'Conhecimento sem expectativas' : 'Conteúdo educativo'}
+            </Text>
             <Text accessibilityRole="header" style={textos.titulo}>
-                Conheça as fases do ciclo
+                {ehContato ? 'Entenda cada fase' : 'Conheça as fases do ciclo'}
             </Text>
             <Text style={textos.introducao}>
-                Uma apresentação geral — nenhuma fase está sendo atribuída a você.
+                {ehContato
+                    ? 'Conhecer o funcionamento do ciclo pode ajudar você a compreender melhor o corpo, sem criar expectativas sobre como alguém deve se sentir.'
+                    : 'Uma apresentação geral — nenhuma fase está sendo atribuída a você.'}
             </Text>
             <ScrollView
                 horizontal
@@ -65,14 +75,18 @@ function CycleEducationSection({
                 ))}
             </ScrollView>
             <View style={estilos.artigo}>
-                <Text style={[textos.visao, { color: selected.cor }]}>Visão educativa</Text>
+                <Text style={[textos.visao, { color: corDestaque ?? selected.cor }]}>
+                    Visão educativa
+                </Text>
                 <Text style={textos.tituloArtigo}>{selected.titulo}</Text>
                 <Text style={textos.descricao}>{selected.texto}</Text>
             </View>
-            <CycleEducationalDisclaimer
-                texto="As fases podem se sobrepor biologicamente e não possuem duração fixa para todas as pessoas."
-                style={estilos.aviso}
-            />
+            {rodape ?? (
+                <CycleEducationalDisclaimer
+                    texto="As fases podem se sobrepor biologicamente e não possuem duração fixa para todas as pessoas."
+                    style={estilos.aviso}
+                />
+            )}
         </View>
     );
 }

@@ -91,13 +91,13 @@ function metricaResumoEhValida(valor) {
 }
 
 //Valida e congela o resumo calculado pelo backend.
-function normalizarResumo(resumo, quantidadeCiclos) {
+function normalizarResumo(resumo, quantidadeCiclos, compartilhado) {
     const valido =
         ehObjetoSimples(resumo) &&
         metricaResumoEhValida(resumo.cicloMedioDias) &&
         metricaResumoEhValida(resumo.menstruacaoMediaDias) &&
         resumo.quantidadeCiclos === quantidadeCiclos &&
-        confiancasPermitidas.includes(resumo.confianca);
+        (compartilhado || confiancasPermitidas.includes(resumo.confianca));
 
     if (!valido) {
         throw criarErroResposta();
@@ -107,7 +107,7 @@ function normalizarResumo(resumo, quantidadeCiclos) {
         cicloMedioDias: resumo.cicloMedioDias,
         menstruacaoMediaDias: resumo.menstruacaoMediaDias,
         quantidadeCiclos: resumo.quantidadeCiclos,
-        confianca: resumo.confianca
+        ...(compartilhado ? {} : { confianca: resumo.confianca })
     });
 }
 
@@ -241,7 +241,7 @@ function normalizarCicloEdicao(ciclo) {
 }
 
 //Valida o envelope da API e congela a página.
-function normalizarPagina(resposta, limiteSolicitado) {
+function normalizarPagina(resposta, limiteSolicitado, { compartilhado = false } = {}) {
     if (
         !ehObjetoSimples(resposta) ||
         !Array.isArray(resposta.ciclos) ||
@@ -270,7 +270,7 @@ function normalizarPagina(resposta, limiteSolicitado) {
     }
 
     const ciclos = Object.freeze(resposta.ciclos.map(normalizarCicloHistorico));
-    const resumo = normalizarResumo(resposta.resumo, resposta.quantidadeCiclos);
+    const resumo = normalizarResumo(resposta.resumo, resposta.quantidadeCiclos, compartilhado);
 
     return Object.freeze({
         ciclos,
@@ -337,5 +337,6 @@ export {
     criarCycleHistoryService,
     criarCaminhoCiclo,
     normalizarCicloHistorico,
+    normalizarPagina,
     normalizarCicloEdicao
 };

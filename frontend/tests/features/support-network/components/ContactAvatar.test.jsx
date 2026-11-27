@@ -176,7 +176,7 @@ describe('ContactAvatar', () => {
         ).toHaveProp('importantForAccessibility', 'no-hide-descendants');
     });
 
-    test('preserva a identidade visual no modo escuro', async () => {
+    test('preserva a escolha de azul com a paleta noturna', async () => {
         await render(
             <ContactAvatar iconeId="arco_iris" corId="azul" rotuloAcessibilidade="Avatar azul" />,
             {
@@ -185,11 +185,11 @@ describe('ContactAvatar', () => {
         );
 
         expect(screen.getByTestId('contact-avatar')).toHaveStyle({
-            backgroundColor: 'rgba(74, 117, 142, 0.14)',
-            borderColor: 'rgba(74, 117, 142, 0.72)'
+            backgroundColor: 'rgba(144, 202, 249, 0.14)',
+            borderColor: 'rgba(144, 202, 249, 0.72)'
         });
 
-        expect(screen.getByTestId('contact-avatar-icon-arco_iris')).toHaveProp('color', '#4A758E');
+        expect(screen.getByTestId('contact-avatar-icon-arco_iris')).toHaveProp('color', '#90CAF9');
     });
 
     test.each([

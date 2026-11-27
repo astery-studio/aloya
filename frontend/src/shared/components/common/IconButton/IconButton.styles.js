@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     const estilos = StyleSheet.create({
@@ -71,12 +72,14 @@ function criarEstilos(tema) {
 
         redeApoio: Object.freeze({
             container: Object.freeze({
-                backgroundColor: tema.cores.interface.superficie,
+                backgroundColor: tema.escuro
+                    ? coresNoturnasConteudo.superficie
+                    : tema.cores.interface.superficie,
                 borderWidth: 0.667,
-                borderColor: tema.cores.interface.borda,
+                borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
                 borderRadius: 16
             }),
-            icone: tema.cores.interface.destaque,
+            icone: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             tamanhoIcone: 32
         }),
 

@@ -29,6 +29,7 @@ function CyclePredictionSummary({
     confiabilidade,
     estimativaIncerta = false,
     aoAbrirConfiabilidade,
+    nomeTitular,
     corDestaque = '#C85A44'
 }) {
     const proximo = separarData(proximoInicio);
@@ -42,7 +43,7 @@ function CyclePredictionSummary({
                     <View style={estilos.textosCabecalho}>
                         <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
-                            Próximo ciclo
+                            {nomeTitular ? `Próximo ciclo de ${nomeTitular}` : 'Próximo ciclo'}
                         </Text>
                     </View>
                     <ConfidenceBadge
@@ -54,8 +55,15 @@ function CyclePredictionSummary({
                 <View style={estilos.metricas}>
                     <View style={estilos.data}>
                         <Text style={textos.dia}>{proximo.dia}</Text>
-                        <View style={estilos.textosMetrica}>
-                            <Text style={textos.mes}>{proximo.mes}</Text>
+                        <View style={estilos.textosData}>
+                            <Text
+                                adjustsFontSizeToFit
+                                minimumFontScale={0.5}
+                                numberOfLines={1}
+                                style={textos.mes}
+                            >
+                                {proximo.mes}
+                            </Text>
                             <Text style={textos.estimativa}>estimativa</Text>
                         </View>
                     </View>
@@ -74,13 +82,17 @@ function CyclePredictionSummary({
                         />
                     </View>
                 </View>
-                <CycleEducationalDisclaimer
-                    texto={AVISO_PREVISAO}
-                    variante="contraceptiva"
-                    style={estilos.aviso}
-                />
-                {estimativaIncerta ? (
-                    <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
+                {!nomeTitular ? (
+                    <>
+                        <CycleEducationalDisclaimer
+                            texto={AVISO_PREVISAO}
+                            variante="contraceptiva"
+                            style={estilos.aviso}
+                        />
+                        {estimativaIncerta ? (
+                            <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
+                        ) : null}
+                    </>
                 ) : null}
             </View>
         </View>

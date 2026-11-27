@@ -56,12 +56,12 @@ describe('ContactStatusBadge', () => {
         });
 
         expect(screen.getByTestId('contact-status-badge')).toHaveStyle({
-            backgroundColor: 'rgba(159, 214, 182, 0.14)',
-            borderColor: 'rgba(159, 214, 182, 0.4)'
+            backgroundColor: 'rgba(165, 214, 167, 0.14)',
+            borderColor: 'rgba(165, 214, 167, 0.4)'
         });
 
         expect(screen.getByText('Ativo')).toHaveStyle({
-            color: '#9FD6B6'
+            color: '#A5D6A7'
         });
     });
 

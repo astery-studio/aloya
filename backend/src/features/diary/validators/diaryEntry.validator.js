@@ -3,7 +3,7 @@ import { ehDataCalendarioValida } from '../../cycles/utils/calendar.js';
 import { CATEGORIAS_POR_ID } from '../catalog/diaryCatalog.lookup.js';
 import { validarCategoriaPreenchida } from './diaryCategory.validator.js';
 
-const CAMPOS_PERMITIDOS = new Set(['data', 'fusoHorario', 'categorias']);
+const CAMPOS_PERMITIDOS = new Set(['data', 'fusoHorario', 'categorias', 'checkInRealizado']);
 
 function validarFusoHorario(valor) {
     if (typeof valor !== 'string' || valor.length === 0 || valor.length > 100) {
@@ -31,6 +31,9 @@ function validarCriacaoRegistro(corpo) {
     if (!ehDataCalendarioValida(corpo.data)) {
         throw new AppError('Informe uma data válida.', 422, 'DATA_REGISTRO_INVALIDA');
     }
+    if (Object.hasOwn(corpo, 'checkInRealizado') && typeof corpo.checkInRealizado !== 'boolean') {
+        throw new AppError('Informe um estado de check-in válido.', 422, 'CHECK_IN_INVALIDO');
+    }
     if (
         !Array.isArray(corpo.categorias) ||
         corpo.categorias.length === 0 ||
@@ -48,7 +51,8 @@ function validarCriacaoRegistro(corpo) {
     return {
         data: corpo.data,
         fusoHorario: validarFusoHorario(corpo.fusoHorario),
-        categorias
+        categorias,
+        checkInRealizado: corpo.checkInRealizado === true
     };
 }
 

@@ -16,6 +16,7 @@ function DiaryDateNavigator({
     anteriorDisponivel = true,
     proximoDisponivel = true,
     desabilitado = false,
+    ocultarSetasIndisponiveis = false,
     compacto = false,
     estiloContainer,
     estiloTexto
@@ -25,17 +26,31 @@ function DiaryDateNavigator({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const dataFormatada = formatarDataDiario(data);
 
+    function renderizarSeta(direcao, disponivel, aoPressionar) {
+        if (ocultarSetasIndisponiveis && !disponivel) {
+            return (
+                <View
+                    pointerEvents="none"
+                    style={[estilos.botaoSeta, compacto && estilos.botaoSetaCompacto]}
+                />
+            );
+        }
+        return (
+            <DiaryDateArrow
+                direcao={direcao}
+                aoPressionar={aoPressionar}
+                desabilitado={desabilitado || !disponivel}
+                compacto={compacto}
+            />
+        );
+    }
+
     return (
         <View
             testID="diary-date-navigator"
             style={[estilos.container, compacto && estilos.containerCompacto, estiloContainer]}
         >
-            <DiaryDateArrow
-                direcao="anterior"
-                aoPressionar={aoAnterior}
-                desabilitado={desabilitado || !anteriorDisponivel}
-                compacto={compacto}
-            />
+            {renderizarSeta('anterior', anteriorDisponivel, aoAnterior)}
             <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Selecionar data. Atual: ${dataFormatada}`}
@@ -49,12 +64,7 @@ function DiaryDateNavigator({
                 </Text>
                 {aoAbrirSeletor ? <CaretDown size={15} color={cores.textoPrincipal} /> : null}
             </Pressable>
-            <DiaryDateArrow
-                direcao="proximo"
-                aoPressionar={aoProximo}
-                desabilitado={desabilitado || !proximoDisponivel}
-                compacto={compacto}
-            />
+            {renderizarSeta('proximo', proximoDisponivel, aoProximo)}
         </View>
     );
 }

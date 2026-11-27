@@ -28,8 +28,8 @@ describe('contratos do serviço do Diário', () => {
     test.each([
         null,
         {},
-        { id: 0, data: '2026-11-09', categorias: [] },
-        { id: 1, data: 9, categorias: [] },
+        { id: 0, data: '2026-11-09', checkInRealizado: false, categorias: [] },
+        { id: 1, data: 9, checkInRealizado: false, categorias: [] },
         { id: 1, data: '2026-11-09' }
     ])('rejeita registro inválido %#', (resposta) => {
         expect(() => validarRegistro(resposta)).toThrow(
@@ -38,7 +38,12 @@ describe('contratos do serviço do Diário', () => {
     });
 
     test('aceita o registro criado', () => {
-        const registro = { id: 1, data: '2026-11-09', categorias: [] };
+        const registro = {
+            id: 1,
+            data: '2026-11-09',
+            checkInRealizado: false,
+            categorias: []
+        };
         expect(validarRegistro(registro)).toBe(registro);
     });
 });

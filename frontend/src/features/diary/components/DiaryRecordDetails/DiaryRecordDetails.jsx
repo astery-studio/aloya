@@ -39,13 +39,17 @@ function normalizarDetalhe(registro) {
     };
 }
 
-function criarIntroducaoRegistro(detalhe) {
+function criarIntroducaoRegistro(detalhe, nome) {
     const dia = detalhe?.ciclo?.dia;
     const numero = detalhe?.ciclo?.numero;
     if (Number.isSafeInteger(dia) && dia > 0 && Number.isSafeInteger(numero) && numero > 0) {
-        return `No dia ${dia} do seu ciclo ${String(numero).padStart(2, '0')} você registrou:`;
+        const cicloFormatado = String(numero).padStart(2, '0');
+        if (nome) {
+            return `No dia ${String(dia).padStart(2, '0')} do ciclo ${cicloFormatado} ${nome} registrou:`;
+        }
+        return `No dia ${dia} do seu ciclo ${cicloFormatado} você registrou:`;
     }
-    return 'Neste dia você registrou:';
+    return `Neste dia ${nome || 'você'} registrou:`;
 }
 
 // Compõe loading, erro ou conteúdo completo e devolve as ações disponíveis.
@@ -59,12 +63,15 @@ function DiaryRecordDetails({
     aoFechar,
     aoAnterior,
     aoProximo,
-    acaoEmAndamento = null
+    acaoEmAndamento = null,
+    nomeTitular,
+    somenteLeitura = false
 }) {
     const tema = useTheme();
     const cores = obterCoresDiario(tema).interface;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const detalhe = normalizarDetalhe(registro);
+    const nome = typeof nomeTitular === 'string' ? nomeTitular.trim() : '';
     const bloqueado = acaoEmAndamento !== null;
     const apresentacaoFase = obterApresentacaoFase(detalhe?.fase, tema);
     const fundoFase =
@@ -108,7 +115,7 @@ function DiaryRecordDetails({
         <View testID="diary-record-details" style={estilos.detalhes}>
             <View testID="diary-details-header" style={estilos.cabecalhoFixo}>
                 <Text accessibilityRole="header" style={estilos.titulo}>
-                    Diário
+                    {nome ? `Diário de ${nome}` : 'Diário'}
                 </Text>
                 <DiaryDateNavigator
                     data={detalhe.data}
@@ -116,6 +123,7 @@ function DiaryRecordDetails({
                     aoProximo={aoProximo}
                     anteriorDisponivel={typeof aoAnterior === 'function'}
                     proximoDisponivel={typeof aoProximo === 'function'}
+                    ocultarSetasIndisponiveis={somenteLeitura}
                     desabilitado={bloqueado}
                     compacto
                     estiloContainer={estilos.navegadorData}
@@ -133,7 +141,11 @@ function DiaryRecordDetails({
                 showsVerticalScrollIndicator={false}
             >
                 <Text style={estilos.resumoDia}>RESUMO DO DIA</Text>
-                <Text style={estilos.introducao}>{criarIntroducaoRegistro(detalhe)}</Text>
+                <Text style={estilos.introducao}>
+                    {somenteLeitura && !nome
+                        ? 'Registros compartilhados deste dia:'
+                        : criarIntroducaoRegistro(detalhe, nome)}
+                </Text>
 
                 <View style={estilos.categorias}>
                     {detalhe.categorias.map((categoria) => (
@@ -146,14 +158,16 @@ function DiaryRecordDetails({
                     ))}
                 </View>
 
-                <DiaryRecordActions
-                    registro={registro}
-                    dataFormatada={detalhe.dataFormatada}
-                    aoEditar={aoEditar}
-                    aoExcluir={aoExcluir}
-                    bloqueado={bloqueado}
-                    estilos={estilos}
-                />
+                {somenteLeitura ? null : (
+                    <DiaryRecordActions
+                        registro={registro}
+                        dataFormatada={detalhe.dataFormatada}
+                        aoEditar={aoEditar}
+                        aoExcluir={aoExcluir}
+                        bloqueado={bloqueado}
+                        estilos={estilos}
+                    />
+                )}
 
                 <DiaryPhaseBadge
                     fase={detalhe.fase}

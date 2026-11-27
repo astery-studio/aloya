@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 // Coordena a consulta e a resposta aos convites recebidos da Rede de Apoio.
 import { useCallback, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -39,7 +40,10 @@ function ReceivedContactsScreen({
     service,
     onVoltar,
     onSelecionarAba,
+    abasDisponiveis,
     onSessaoExpirada,
+    onVisualizarContato,
+    vinculoVisualizadoId,
     exibirSeletor = false,
     modoRede = 'acompanhados',
     onSelecionarModoRede
@@ -174,7 +178,6 @@ function ReceivedContactsScreen({
             aoPressionar={() => definirFiltrosAbertos(true)}
             rotuloAcessibilidade="Filtrar contatos acompanhados"
             variante="redeApoio"
-            corIcone={tema.cores.interface.destaque}
         />
     );
 
@@ -182,10 +185,18 @@ function ReceivedContactsScreen({
         <>
             <MainLayout
                 titulo={exibirSeletor ? 'Rede de Apoio' : 'Contatos'}
-                varianteHeader={exibirSeletor ? 'redeApoio' : onVoltar ? 'comVoltar' : 'padrao'}
-                acoesHeader={exibirSeletor ? acaoFiltro : null}
+                varianteHeader={
+                    onVoltar
+                        ? 'comVoltar'
+                        : exibirSeletor || onVisualizarContato
+                          ? 'redeApoio'
+                          : 'padrao'
+                }
+                acoesHeader={exibirSeletor || onVisualizarContato ? acaoFiltro : null}
                 onVoltar={onVoltar}
                 abaAtiva="membros"
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
+                abasDisponiveis={abasDisponiveis}
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="received-contacts-screen" style={estilos.tela}>
@@ -199,6 +210,8 @@ function ReceivedContactsScreen({
                             filtroAtivo={possuiFiltros}
                             rotuloFiltro={rotuloFiltros}
                             aoAcao={tratarAcao}
+                            aoVisualizar={onVisualizarContato}
+                            vinculoVisualizadoId={vinculoVisualizadoId}
                             aoAbrirResumo={abrirResumo}
                             aoTentarNovamente={estado.tentarNovamente}
                             contatoEmAndamentoId={estado.contatoEmAndamentoId}

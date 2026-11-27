@@ -59,6 +59,7 @@ function NewDiaryEntrySheet({
             visivel={visivel}
             onFechar={onFechar}
             bloquearFechamento={formulario.salvando}
+            fecharAoTocarFora
             permitirDeslizarParaFechar
             podeIniciarDeslize={podeIniciarDeslize}
             estiloPainel={estilos.painel}

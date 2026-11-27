@@ -65,6 +65,13 @@ function criarDiaryEntryService({
                         categorias: { include: { opcoes: true, medicaoTemperatura: true } }
                     }
                 });
+                if (existente?.checkInRealizado && dados.checkInRealizado) {
+                    throw new AppError(
+                        'O check-in desta data já foi realizado.',
+                        409,
+                        'CHECK_IN_DIARIO_DUPLICADO'
+                    );
+                }
                 if (
                     existente?.categorias.some(({ categoriaId }) =>
                         categoriasAtivas.has(categoriaId)
@@ -83,6 +90,7 @@ function criarDiaryEntryService({
                           where: { id: existente.id, usuarioId, versao: existente.versao },
                           data: {
                               faseCicloAssociada: fase,
+                              ...(dados.checkInRealizado ? { checkInRealizado: true } : {}),
                               versao: { increment: 1 },
                               categorias: { create: montarCategorias(dados.categorias) }
                           },
@@ -95,6 +103,7 @@ function criarDiaryEntryService({
                               usuarioId,
                               dataRegistro,
                               faseCicloAssociada: fase,
+                              checkInRealizado: dados.checkInRealizado,
                               categorias: { create: montarCategorias(dados.categorias) }
                           },
                           include: {

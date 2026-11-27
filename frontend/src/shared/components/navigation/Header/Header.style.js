@@ -56,6 +56,11 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
 
+        tituloInicio: {
+            fontSize: 24,
+            lineHeight: 27.5
+        },
+
         tituloComComplemento: {
             flex: 0,
             minWidth: 0

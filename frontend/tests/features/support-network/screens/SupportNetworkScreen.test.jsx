@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const mockUseParentalConsent = jest.fn();
@@ -93,14 +94,19 @@ describe('SupportNetworkScreen', () => {
     test('alterna entre apoio e acompanhados usando serviços independentes', async () => {
         mockUseParentalConsent.mockReturnValue(estado({ status: { acessoLiberado: true } }));
 
-        await render(
-            envolverComProviders(
+        function RedeControlada() {
+            const [modoRede, setModoRede] = useState('apoio');
+            return (
                 <SupportNetworkScreen
                     receivedContactsService={{ nome: 'recebidos' }}
+                    modoRede={modoRede}
+                    onSelecionarModoRede={setModoRede}
                     onSelecionarAba={jest.fn()}
                 />
-            )
-        );
+            );
+        }
+
+        await render(envolverComProviders(<RedeControlada />));
 
         await fireEvent.press(screen.getByRole('button', { name: 'Abrir acompanhados' }));
 

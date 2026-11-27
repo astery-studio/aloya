@@ -78,4 +78,16 @@ describe('payload do formulário do Diário', () => {
         expect(resultado.valido).toBe(false);
         expect(resultado.erros.data).toBe('A data do registro não pode ser no futuro.');
     });
+
+    test('marca somente o payload originado pelo check-in', () => {
+        const resultado = prepararFormularioDiario({
+            catalogo,
+            valores: { sintomas: ['colica'] },
+            data: '2026-11-09',
+            hoje: '2026-11-09',
+            checkInRealizado: true
+        });
+
+        expect(resultado.dados.checkInRealizado).toBe(true);
+    });
 });
