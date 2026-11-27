@@ -13,8 +13,14 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.sobreposicao
         },
 
+        areaExterna: {
+            width: '100%',
+            flex: 1,
+            zIndex: 1
+        },
+
         painel: {
-            zIndex: 1,
+            zIndex: 2,
             maxHeight: '90%',
             overflow: 'hidden',
             paddingBottom: tema.espacamentos.grande,

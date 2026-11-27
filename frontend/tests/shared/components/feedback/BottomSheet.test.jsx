@@ -145,7 +145,7 @@ describe('BottomSheet', () => {
             bloquearFechamento: true
         });
 
-        await fireEvent.press(screen.getByTestId('bottom-sheet-fundo'));
+        await fireEvent.press(screen.getByTestId('bottom-sheet-area-fundo'));
 
         expect(onFechar).not.toHaveBeenCalled();
     });
