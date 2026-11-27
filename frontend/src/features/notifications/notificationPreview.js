@@ -29,6 +29,7 @@ export async function exibirPrevia({ codigo, rotulo, canal, plataforma, sdk }) {
 
     configurarApresentacaoNativa(sdk, plataforma);
     await sdk.scheduleNotificationAsync({
+        identifier: `aloya-previa:${codigo}`,
         content: conteudoDaPrevia(codigo, rotulo),
         trigger: plataforma === 'android' ? { channelId: canal } : null
     });
