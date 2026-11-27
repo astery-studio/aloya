@@ -796,6 +796,7 @@ export default function App() {
                 emailUsuario={perfil?.email}
                 service={configuracao.servicos.contactInvitationService}
                 categoriasService={configuracao.servicos.supportCategoryService}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
                 onRascunhoAlterado={setRascunhoNovoContato}
                 onVoltar={() => {
                     setRascunhoNovoContato(null);
@@ -815,6 +816,7 @@ export default function App() {
                 contatoId={contatoEdicao?.id}
                 dadosIniciais={contatoEdicao}
                 service={configuracao.servicos.contactLinkService}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
                 onVoltar={() => {
                     setContatoEdicao(null);
                     setTelaInterna(telasInternas.membros);
@@ -911,6 +913,7 @@ export default function App() {
             <NotificationPreferencesFlow
                 key={telaInterna}
                 contato={contato}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
                 service={
                     contato
                         ? configuracao.servicos.supportNotificationPreferencesService
