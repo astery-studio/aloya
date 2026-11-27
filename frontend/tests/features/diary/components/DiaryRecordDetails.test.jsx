@@ -56,6 +56,12 @@ describe('DiaryRecordDetails', () => {
         );
 
         expect(screen.getByRole('header', { name: 'Diário de Júlia' })).toBeOnTheScreen();
+        expect(screen.getByTestId('diary-date-navigator')).toHaveStyle({
+            marginTop: 12,
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingHorizontal: 2
+        });
         expect(screen.getByText('No dia 21 do ciclo 03 Júlia registrou:')).toBeOnTheScreen();
         expect(screen.getByText('Espinhas')).toBeOnTheScreen();
         expect(screen.queryByText('ALTERAÇÃO DO REGISTRO')).not.toBeOnTheScreen();
