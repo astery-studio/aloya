@@ -27,6 +27,7 @@ const textos = StyleSheet.create({
         includeFontPadding: false,
         lineHeight: 60,
         textAlignVertical: 'center',
+        transform: [{ translateY: 3.5 }],
         letterSpacing: -3
     },
     mes: {

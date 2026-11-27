@@ -21,7 +21,8 @@ test('apresenta previsão e abre a explicação de confiabilidade', async () => 
     expect(screen.getByText('28')).toHaveStyle({
         fontSize: 50,
         lineHeight: 60,
-        textAlignVertical: 'center'
+        textAlignVertical: 'center',
+        transform: [{ translateY: 3.5 }]
     });
     expect(screen.getByText('novembro')).toHaveProp('numberOfLines', 1);
     expect(screen.getByText('novembro')).toHaveProp('adjustsFontSizeToFit', true);
