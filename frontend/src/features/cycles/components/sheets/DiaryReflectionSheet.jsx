@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Keyboard, Pressable, Text, View } from 'react-native';
 import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
@@ -17,6 +17,9 @@ function DiaryReflectionSheet({
     salvando = false,
     erro
 }) {
+    const quantidadeCaracteres = [...valor].length;
+    const limiteAtingido = quantidadeCaracteres >= LIMITE_REFLEXAO;
+
     return (
         <BottomSheet
             visivel={visivel}
@@ -27,7 +30,12 @@ function DiaryReflectionSheet({
             estiloPainel={estilos.painel}
             corPainel="#FFFFFF"
         >
-            <View style={estilos.conteudo}>
+            <Pressable
+                accessible={false}
+                testID="diary-reflection-content"
+                onPress={Keyboard.dismiss}
+                style={estilos.conteudo}
+            >
                 <View style={estilos.cabecalho}>
                     <View style={estilos.icone}>
                         <QuestionIcon color="#4A758E" size={28} weight="regular" />
@@ -53,9 +61,12 @@ function DiaryReflectionSheet({
                         />
                         <Text
                             accessibilityLiveRegion="polite"
-                            style={[estilos.contador, valor && estilos.contadorPreenchido]}
+                            style={[
+                                estilos.contador,
+                                limiteAtingido && estilos.contadorLimiteAtingido
+                            ]}
                         >
-                            {[...valor].length} / {LIMITE_REFLEXAO}
+                            {quantidadeCaracteres} / {LIMITE_REFLEXAO}
                         </Text>
                     </View>
                     <ButtonScreen
@@ -67,7 +78,7 @@ function DiaryReflectionSheet({
                         estiloTexto={estilos.textoBotao}
                     />
                 </View>
-            </View>
+            </Pressable>
         </BottomSheet>
     );
 }

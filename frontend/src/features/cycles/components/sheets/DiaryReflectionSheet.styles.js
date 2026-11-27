@@ -68,12 +68,12 @@ const estilos = StyleSheet.create({
         position: 'absolute',
         right: 13,
         bottom: 8,
-        color: '#A8A49C',
+        color: '#AAAAA5',
         fontFamily: fontFamilies.medium,
         fontSize: 10,
         lineHeight: 15
     },
-    contadorPreenchido: { color: '#C85A44' },
+    contadorLimiteAtingido: { color: '#C85A44' },
     botao: {
         height: 54,
         borderRadius: 14

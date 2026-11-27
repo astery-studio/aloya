@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { Keyboard } from 'react-native';
 import { CycleConfidenceSheet } from '../../../../src/features/cycles/components/sheets/CycleConfidenceSheet';
 import { CyclePhaseEducationSheet } from '../../../../src/features/cycles/components/sheets/CyclePhaseEducationSheet';
 import { DiaryReflectionSheet } from '../../../../src/features/cycles/components/sheets/DiaryReflectionSheet';
@@ -64,8 +65,41 @@ test('habilita a reflexão preenchida e delega o salvamento', async () => {
         screen.getByRole('header', { name: 'O que seu corpo está pedindo agora?' })
     ).toBeOnTheScreen();
     expect(screen.getByText('17 / 5000')).toBeOnTheScreen();
+    expect(screen.getByText('17 / 5000')).toHaveStyle({ color: '#AAAAA5' });
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
     expect(aoSalvar).toHaveBeenCalledTimes(1);
+});
+
+test('destaca o contador somente quando a anotação atinge o limite', async () => {
+    await render(
+        <DiaryReflectionSheet
+            visivel
+            valor={'a'.repeat(5000)}
+            aoAlterar={jest.fn()}
+            aoSalvar={jest.fn()}
+            aoFechar={jest.fn()}
+        />
+    );
+
+    expect(screen.getByText('5000 / 5000')).toHaveStyle({ color: '#C85A44' });
+});
+
+test('fecha o teclado ao tocar fora do campo de anotação', async () => {
+    const dispensarTeclado = jest.spyOn(Keyboard, 'dismiss').mockImplementation(jest.fn());
+    await render(
+        <DiaryReflectionSheet
+            visivel
+            valor="Uma anotação"
+            aoAlterar={jest.fn()}
+            aoSalvar={jest.fn()}
+            aoFechar={jest.fn()}
+        />
+    );
+
+    await fireEvent.press(screen.getByTestId('diary-reflection-content'));
+
+    expect(dispensarTeclado).toHaveBeenCalledTimes(1);
+    dispensarTeclado.mockRestore();
 });
 
 test('mantém instrução textual quando o movimento é reduzido', async () => {
