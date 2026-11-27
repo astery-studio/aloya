@@ -405,6 +405,22 @@ function criarContainer() {
         limite: env.configuracoesContaRateLimitMaximo
     });
 
+    const notificationPreferencesRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: 120,
+        evento: 'limite_preferencias_notificacao',
+        codigo: 'LIMITE_PREFERENCIAS_NOTIFICACAO'
+    });
+
+    const pushDevicesRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo,
+        evento: 'limite_alteracoes_dispositivos_notificacao',
+        codigo: 'LIMITE_DISPOSITIVOS_NOTIFICACAO'
+    });
+
     const diaryPreferencesRateLimit = criarDiaryPreferencesRateLimit({
         rateLimit,
         janelaMs: env.diarioPreferenciasRateLimitJanelaMs,
@@ -590,6 +606,8 @@ function criarContainer() {
         emailRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
+        notificationPreferencesRateLimit,
+        pushDevicesRateLimit,
         diaryPreferencesRateLimit,
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,
