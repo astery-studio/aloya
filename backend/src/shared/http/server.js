@@ -113,13 +113,13 @@ app.use(
 app.use('/api/preferencias-notificacao', criarNotificationPreferencesRoutes({
     Router: express.Router,
     autenticar: container.authMiddleware.autenticar,
-    rateLimit: container.configuracoesContaRateLimit,
+    rateLimit: container.notificationPreferencesRateLimit,
     service: container.notificationPreferencesService
 }));
 
 app.use('/api/dispositivos-notificacao', criarPushDevicesRoutes({
     Router: express.Router, prisma, autenticar: container.authMiddleware.autenticar,
-    rateLimit: container.configuracoesContaRateLimit
+    rateLimit: container.pushDevicesRateLimit
 }));
 
 app.use(
