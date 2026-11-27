@@ -16,7 +16,7 @@ function criarSharedSupportData({
     async function fase({ titularId, permissoes }) {
         const estado = await currentCycleService.buscarEstadoAtual({ usuarioId: titularId });
         const base = { faseAtual: estado.faseAtual, possuiCiclos: estado.possuiCiclos };
-        if (!permissoes?.includes('geral.historico_ciclo') || !estado.possuiCiclos) return base;
+        if (!estado.possuiCiclos) return base;
 
         const {
             fasesEstimadas,
@@ -27,13 +27,21 @@ function criarSharedSupportData({
             confiabilidadeMenstrual,
             status
         } = await predictionService.buscar(titularId);
-        return {
+        const cicloCompartilhado = {
             ...base,
             dataReferencia: estado.dataReferencia,
             diaDoCiclo: estado.diaDoCiclo,
-            previsao: {
+            faixaCiclo: {
                 fasesEstimadas,
                 duracaoCicloEstimada,
+                temPrevisao: status !== 'DADOS_INSUFICIENTES'
+            }
+        };
+        if (!permissoes?.includes('geral.historico_ciclo')) return cicloCompartilhado;
+
+        return {
+            ...cicloCompartilhado,
+            previsao: {
                 proximoInicioEstimado,
                 dataOvulacaoEstimada,
                 janelaFertilEstimada,

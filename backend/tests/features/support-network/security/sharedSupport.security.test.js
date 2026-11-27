@@ -211,6 +211,7 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
                 return {
                     proximoInicioEstimado: '2026-12-02',
                     duracaoCicloEstimada: 28,
+                    fasesEstimadas: { lutea: { inicio: '2026-11-12', fim: '2026-11-25' } },
                     confiabilidadeMenstrual: { nivel: 'ALTA', motivos: ['INTERNO'] },
                     status: 'DISPONIVEL'
                 };
@@ -231,7 +232,18 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
             ]
         }
     });
-    assert.deepEqual(await data.fase(vinculo), { faseAtual: 'LUTEA', possuiCiclos: true });
+    const somenteFase = await data.fase(vinculo);
+    assert.deepEqual(somenteFase, {
+        faseAtual: 'LUTEA',
+        possuiCiclos: true,
+        dataReferencia: '2026-11-13',
+        diaDoCiclo: 16,
+        faixaCiclo: {
+            fasesEstimadas: { lutea: { inicio: '2026-11-12', fim: '2026-11-25' } },
+            duracaoCicloEstimada: 28,
+            temPrevisao: true
+        }
+    });
     const faseComHistorico = await data.fase({
         titularId: 4, permissoes: ['geral.fase_atual', 'geral.historico_ciclo']
     });
