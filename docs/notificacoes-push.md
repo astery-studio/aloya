@@ -60,4 +60,17 @@ O catálogo de tipos usa as chaves do catálogo de preferências. A versão é i
 
 Os templates usam o protótipo de push atualizado, incluindo variantes de resposta ao convite e os exemplos da HU-034 a HU-037. O padrão é título e corpo discretos com somente o ID do aviso no payload de navegação. Para uma conta adulta, a API permite optar por `previaDetalhada` onde existe template detalhado. O protótipo de preferências não oferece um controle para essa opção. Alertas com conteúdo sensível, mensagens de menores e detalhes sem fonte autorizada mantêm uma variante discreta. A barra, o agrupamento, a aparência e a visibilidade do banner pertencem ao sistema operacional.
 
+### Dicas de autocuidado
+
+As dicas seguem seus próprios switches por fase. Em fases de vários dias, podem sair no segundo, quarto e sexto dia, dentro do intervalo estimado. Para a ovulação, o calendário aponta um único dia estimado e o agendador escolhe uma dica para essa data. A prévia discreta indica a seção **Dicas para hoje** no ciclo. A detalhada apresenta o texto da dica.
+
+- **Menstrual:** calor moderado, movimento leve e registro de fluxo e desconforto. [Ensaio sobre calor e cólicas](https://pubmed.ncbi.nlm.nih.gov/11239634/) · [Orientações do NHS sobre dor menstrual](https://www.nhs.uk/symptoms/period-pain/)
+- **Folicular:** fontes alimentares de ferro, movimento no próprio ritmo e revisão dos registros do ciclo. [NIH sobre ferro na alimentação](https://ods.od.nih.gov/factsheets/Iron-Consumer/) · [Revisão sobre fase do ciclo e exercício](https://pubmed.ncbi.nlm.nih.gov/32661839/) · [Office on Women’s Health sobre acompanhamento do ciclo](https://womenshealth.gov/menstrual-cycle/your-menstrual-cycle)
+- **Ovulatória:** observar mudanças no corrimento e considerar a variação da data estimada. [ACOG sobre sinais do ciclo](https://www.acog.org/womens-health/faqs/evaluating-infertility) · [Estudo prospectivo sobre a variação da janela fértil](https://www.bmj.com/content/321/7271/1259)
+- **Lútea:** cuidar do sono, fazer pausas de relaxamento e registrar sintomas para perceber recorrências. [Orientações do NHS sobre sintomas pré-menstruais](https://www.nhs.uk/conditions/pre-menstrual-syndrome/)
+
+### Dicas para a Rede de Apoio
+
+O contato pode ativar **Receber dicas de como apoiar** em **Notificações → Rede de Apoio → Personalizar notificações**. O titular precisa conceder **Receber dicas** no vínculo individual ou na categoria do contato. Com o vínculo ativo e o consentimento parental liberado quando necessário, a agenda prevê um aviso por fase. A dica é agendada para o segundo dia da fase, ou para o único dia disponível, às 20h no fuso do contato. A permissão é conferida novamente antes do envio. A mensagem orienta quem apoia sem exibir nome, fase, datas ou sintomas da pessoa apoiada. [Orientações do NHS sobre escuta e apoio prático](https://www.nhs.uk/every-mind-matters/supporting-others/helping-others/)
+
 Consulte o [procedimento de execução e verificação](notificacoes-push-operacao.md).

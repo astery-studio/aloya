@@ -4,6 +4,7 @@ import {
 } from '../contraceptives/validators/contraceptiveUsage.validator.js';
 import { agendarAnticoncepcionalCompartilhado } from './sharedContraceptivePushPlanning.js';
 import { agendarResumosCompartilhados } from './sharedSummaryPushPlanning.js';
+import { agendarDicasCompartilhadas } from './sharedCareTipPlanning.js';
 
 const diaMs = 86400000;
 
@@ -13,7 +14,9 @@ export async function planejarCompartilhadas(prisma, usuarioId, preferencia, ago
         orderBy: [{ atualizadoEm: 'desc' }, { id: 'asc' }],
         select: { fuso: true }
     });
+
     if (!aparelho) return [];
+
     const { fuso } = aparelho;
     const dataLocal = dataLocalNoFuso(agora, fuso);
     const data = new Date(dataLocal);
@@ -26,8 +29,18 @@ export async function planejarCompartilhadas(prisma, usuarioId, preferencia, ago
 
     const vinculos = await prisma.vinculoRedeApoio.findMany({
         where: { contatoId: usuarioId, status: 'ativo', titular: { statusConta: 'ativa' } },
-        include: { categoria: true, titular: { select: { preferenciaNotificacao: true } } }
+        include: {
+            categoria: true,
+            titular: {
+                select: {
+                    preferenciaNotificacao: true,
+                    dataNascimento: true,
+                    consentimentoParental: { select: { statusConsentimento: true } }
+                }
+            }
+        }
     });
+
     const candidatos = new Map();
     const inserir = (aviso) => candidatos.set(`${aviso.evento}|${aviso.ocorrencia}`, aviso);
 
@@ -35,6 +48,19 @@ export async function planejarCompartilhadas(prisma, usuarioId, preferencia, ago
         const permissoes =
             vinculo.categoria?.conjuntoDadosVisiveis ?? vinculo.permissoesIndividuais;
         if (!Array.isArray(permissoes)) continue;
+
+        await agendarDicasCompartilhadas({
+            prisma,
+            vinculo,
+            permissoes,
+            preferencia,
+            agora,
+            hoje: dataLocal,
+            fuso,
+            usuarioId,
+            inserir
+        });
+
         await agendarAnticoncepcionalCompartilhado({
             prisma,
             vinculo,
@@ -45,6 +71,7 @@ export async function planejarCompartilhadas(prisma, usuarioId, preferencia, ago
             usuarioId,
             inserir
         });
+
         if (!horaResumo) continue;
         await agendarResumosCompartilhados({
             prisma,
@@ -58,5 +85,6 @@ export async function planejarCompartilhadas(prisma, usuarioId, preferencia, ago
             inserir
         });
     }
+
     return [...candidatos.values()];
 }
