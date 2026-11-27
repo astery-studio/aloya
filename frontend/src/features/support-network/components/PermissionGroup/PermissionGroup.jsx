@@ -14,6 +14,7 @@ import {
     UsersIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import PermissionItem from '../PermissionItem/PermissionItem';
 import { criarEstilos } from './PermissionGroup.styles';
 
@@ -25,16 +26,16 @@ function obterPaleta(paleta, tema, aparenciaNovaCategoria) {
     if (!tema.escuro) return paletaBase;
 
     const coresEscuras = {
-        ciclo: '#F08A75',
-        corpo: '#9FD6B6',
+        ciclo: coresNoturnasConteudo.coral,
+        corpo: coresNoturnasConteudo.verde,
         emocional: '#C7A7E8',
-        energia: '#F2B45F',
+        energia: coresNoturnasConteudo.amarelo,
         vidaIntima: '#E59ABB',
-        saude: '#AEBBEF'
+        saude: coresNoturnasConteudo.azul
     };
     const cor = coresEscuras[paleta] ?? coresEscuras.ciclo;
     const coresCadastro = {
-        ciclo: { icone: '#EF9A9A', fundoIcone: 'rgba(239, 154, 154, 0.16)' },
+        ciclo: { icone: coresNoturnasConteudo.coral, fundoIcone: 'rgba(194, 110, 95, 0.16)' },
         corpo: { icone: '#A5D6A7', fundoIcone: 'rgba(165, 214, 167, 0.16)' },
         emocional: { icone: '#B39DDB', fundoIcone: 'rgba(179, 157, 219, 0.16)' },
         energia: { icone: '#FFE082', fundoIcone: 'rgba(255, 224, 130, 0.16)' },
@@ -46,8 +47,8 @@ function obterPaleta(paleta, tema, aparenciaNovaCategoria) {
     return {
         ...paletaBase,
         icone: cor,
-        fundoIcone: tema.cores.interface.superficieElevada,
-        fundoExpandido: tema.cores.interface.destaqueSuave,
+        fundoIcone: coresNoturnasConteudo.superficie,
+        fundoExpandido: 'rgba(165, 214, 167, 0.10)',
         bordaExpandida: cor,
         ...(aparenciaNovaCategoria
             ? { ...coresCadastroAtivas, fundoExpandido: coresCadastroAtivas.fundoIcone }

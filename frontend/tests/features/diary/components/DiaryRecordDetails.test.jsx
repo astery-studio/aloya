@@ -142,7 +142,7 @@ describe('DiaryRecordDetails', () => {
             borderRadius: 20
         });
         expect(screen.getByText('Editar')).toHaveStyle({
-            color: '#FFF',
+            color: '#FFFFFF',
             fontSize: 13,
             fontWeight: '600',
             lineHeight: 19.5,
@@ -306,7 +306,7 @@ describe('DiaryRecordDetails', () => {
             fundo: 'rgba(74, 88, 153, 0.1)',
             texto: '#4A5899'
         });
-        expect(obterCoresCategoria('fluxo', '#123', 'Ciclo', temaEscuro).texto).toBe('#EF9A9A');
+        expect(obterCoresCategoria('fluxo', '#123', 'Ciclo', temaEscuro).texto).toBe('#C26E5F');
         expect(obterCoresCategoria('pele', '#123', 'Corpo', temaEscuro).texto).toBe('#A5D6A7');
         expect(obterCoresCategoria('humor', '#123', 'Emocional', temaEscuro).texto).toBe('#B59DDB');
         expect(obterCoresCategoria('sono', '#123', 'Energia', temaEscuro).texto).toBe('#FFE082');
@@ -318,6 +318,27 @@ describe('DiaryRecordDetails', () => {
 
         await resultado.rerender(<DiaryRecordDetails registro={{ id: 0 }} aoFechar={fechar} />);
         expect(screen.queryByTestId('diary-record-details')).not.toBeOnTheScreen();
+    });
+
+    test('aplica o contraste noturno aos botões de edição e exclusão', async () => {
+        await render(
+            <DiaryRecordDetails
+                registro={registro}
+                aoEditar={jest.fn()}
+                aoExcluir={jest.fn()}
+                aoFechar={jest.fn()}
+            />,
+            { preferencia: 'escuro' }
+        );
+
+        for (const acao of ['Editar', 'Excluir']) {
+            expect(
+                screen.getByRole('button', { name: `${acao} registro de 28/10/2026` })
+            ).toHaveStyle({
+                backgroundColor: '#C26E5F'
+            });
+            expect(screen.getByText(acao)).toHaveStyle({ color: '#121212' });
+        }
     });
 
     test('aceita editar ou excluir como ação isolada', async () => {

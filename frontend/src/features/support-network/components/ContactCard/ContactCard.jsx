@@ -239,7 +239,7 @@ function ContactCard({
                             importantForAccessibility="no"
                             style={estilos.iconePendente}
                         >
-                            <EnvelopeIcon size={16} color="#5C5C59" weight="regular" />
+                            <EnvelopeIcon size={16} color={corAcao} weight="regular" />
                         </View>
 
                         <View style={estilos.containerNomePendente}>
@@ -321,7 +321,7 @@ function ContactCard({
                                 importantForAccessibility="no"
                                 style={estilos.iconePendente}
                             >
-                                <EnvelopeIcon size={16} color="#5C5C59" weight="regular" />
+                                <EnvelopeIcon size={16} color={corAcao} weight="regular" />
                             </View>
                         ) : (
                             <View style={estilos.avatarCabecalho}>

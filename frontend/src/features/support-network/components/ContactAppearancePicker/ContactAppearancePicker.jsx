@@ -4,17 +4,20 @@ import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { ChecksIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import {
     COR_ICONE_NAO_SELECIONADO,
     OPCOES_COR_CONTATO,
     OPCOES_ICONE_CONTATO,
     corContatoEhValida,
-    iconeContatoEhValido
+    iconeContatoEhValido,
+    obterOpcaoCorContato
 } from '../../constants/contactAppearanceOptions';
 import { ICONES_POR_ID } from '../ContactAvatar/ContactAvatar';
 import { criarEstilos } from './ContactAppearancePicker.styles';
 
 const CORES_COM_MARCADOR_ESCURO = Object.freeze(['branco', 'laranja', 'cinza']);
+const CORES_CLAREADAS_NO_NOTURNO = Object.freeze(['verde', 'coral', 'azul']);
 const ICONES_POR_LINHA = 5;
 
 function dividirEmLinhas(opcoes, quantidadePorLinha = ICONES_POR_LINHA) {
@@ -52,8 +55,11 @@ function calcularTamanhosAparencia(larguraTela) {
     });
 }
 
-function obterCorMarcador(corId) {
-    return CORES_COM_MARCADOR_ESCURO.includes(corId) ? '#222222' : '#FFFFFF';
+function obterCorMarcador(corId, escuro = false) {
+    const marcadorEscuro =
+        CORES_COM_MARCADOR_ESCURO.includes(corId) ||
+        (escuro && CORES_CLAREADAS_NO_NOTURNO.includes(corId));
+    return marcadorEscuro ? '#222222' : '#FFFFFF';
 }
 
 function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = false }) {
@@ -141,7 +147,9 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                             size={tamanhos.tamanhoIcone}
                                             color={
                                                 selecionado
-                                                    ? tema.cores.interface.textoSobreDestaque
+                                                    ? tema.escuro
+                                                        ? coresNoturnasConteudo.fundo
+                                                        : tema.cores.interface.textoSobreDestaque
                                                     : COR_ICONE_NAO_SELECIONADO
                                             }
                                             weight="regular"
@@ -165,6 +173,7 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                 >
                     {OPCOES_COR_CONTATO.map((opcao) => {
                         const selecionada = opcao.id === corSelecionada;
+                        const { cor, fundo } = obterOpcaoCorContato(opcao.id, tema.escuro);
 
                         return (
                             <Pressable
@@ -187,8 +196,7 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                         minHeight: tamanhos.tamanhoQuadroCor,
                                         maxWidth: tamanhos.tamanhoQuadroCor,
                                         maxHeight: tamanhos.tamanhoQuadroCor,
-                                        backgroundColor:
-                                            opcao.id === 'branco' ? opcao.fundo : opcao.cor,
+                                        backgroundColor: opcao.id === 'branco' ? fundo : cor,
                                         borderColor: tema.cores.interface.borda
                                     },
                                     selecionada && estilos.opcaoCorSelecionada,
@@ -200,7 +208,7 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                     <ChecksIcon
                                         testID={`marcador-cor-contato-${opcao.id}`}
                                         size={Math.min(18, tamanhos.tamanhoQuadroCor - 8)}
-                                        color={obterCorMarcador(opcao.id)}
+                                        color={obterCorMarcador(opcao.id, tema.escuro)}
                                         weight="bold"
                                     />
                                 ) : null}

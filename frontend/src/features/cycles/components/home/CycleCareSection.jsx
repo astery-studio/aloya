@@ -1,7 +1,8 @@
 import { Text, View } from 'react-native';
 import { NotebookIcon, QuestionIcon, WindIcon } from '../../../../shared/components/icons/AppIcons';
 import { CONTEUDO_POR_FASE } from '../sheets/CyclePhaseEducationSheet.content';
-import { estilos } from './CycleCareSection.styles';
+import { useHomeColors } from '../../hooks/useHomeColors';
+import { estilos as estilosClaros } from './CycleCareSection.styles';
 import { CycleHomeCard } from './CycleHomeCard';
 
 const CUIDADOS = Object.freeze([
@@ -43,6 +44,7 @@ function CycleCareSection({
     aoAbrirReflexao,
     aoAbrirEducacao
 }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
     const visualEducativo = CONTEUDO_POR_FASE[fase] ?? {
         Icone: NotebookIcon,
         cor: '#C85A44',
@@ -56,7 +58,9 @@ function CycleCareSection({
     };
     return (
         <View style={estilos.secao}>
-            <Text style={[estilos.etiqueta, { color: corDestaque }]}>Para o seu momento</Text>
+            <Text style={[estilos.etiqueta, { color: adaptarCor(corDestaque) }]}>
+                Para o seu momento
+            </Text>
             <Text accessibilityRole="header" style={estilos.tituloSecao}>
                 Cuidados para hoje
             </Text>
@@ -75,9 +79,12 @@ function CycleCareSection({
                             aoPressionar={callbacks[id]}
                             icone={
                                 <View
-                                    style={[estilos.caixaIcone, { backgroundColor: visual.fundo }]}
+                                     style={[
+                                         estilos.caixaIcone,
+                                         { backgroundColor: adaptarCor(visual.fundo, 'backgroundColor') }
+                                     ]}
                                 >
-                                    <Icone size={24} color={visual.cor} weight={visual.weight} />
+                                     <Icone size={24} color={adaptarCor(visual.cor)} weight={visual.weight} />
                                 </View>
                             }
                         />

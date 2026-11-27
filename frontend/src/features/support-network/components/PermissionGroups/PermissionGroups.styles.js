@@ -1,6 +1,7 @@
 //Define a organização da seção que reúne todos os grupos de permissões.
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
@@ -22,7 +23,9 @@ function criarEstilos(tema) {
 
         titulo: {
             flex: 1,
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 20,
             fontWeight: '700',
@@ -44,7 +47,9 @@ function criarEstilos(tema) {
         },
 
         textoEstado: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 20,
@@ -58,7 +63,7 @@ function criarEstilos(tema) {
         },
 
         textoTentarNovamente: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 14,
             lineHeight: 20

@@ -2,6 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -16,7 +17,9 @@ function criarEstilos(tema) {
         },
 
         titulo: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
             fontSize: 15,
             fontWeight: '500',
@@ -43,15 +46,19 @@ function criarEstilos(tema) {
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
             borderRadius: 9
         },
 
         opcaoIconeSelecionada: {
-            backgroundColor: tema.cores.interface.destaque,
-            borderColor: tema.cores.interface.destaque
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.verde
+                : tema.cores.interface.destaque,
+            borderColor: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque
         },
 
         gradeCores: {

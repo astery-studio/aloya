@@ -1,8 +1,9 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { ChartLineUpIcon } from '../../../../shared/components/icons/AppIcons';
-import { CORES, estilos } from './CycleConfidenceSheet.styles';
+import { CORES, estilos as estilosClaros } from './CycleConfidenceSheet.styles';
 
 const EXPLICACOES = Object.freeze({
     baixa: 'O histórico disponível ainda é limitado para gerar estimativas mais confiáveis, e as datas previstas podem variar bastante. Continue registrando seus ciclos para melhorar a qualidade das próximas previsões.',
@@ -12,6 +13,7 @@ const EXPLICACOES = Object.freeze({
 const ROTULOS = Object.freeze({ baixa: 'Baixa', media: 'Média', alta: 'Alta' });
 
 function CycleConfidenceSheet({ visivel, nivel, aoFechar }) {
+    const { estilos, cor: adaptarCor, escuro } = useHomeColors(estilosClaros);
     const nivelInicial = Object.hasOwn(EXPLICACOES, nivel) ? nivel : 'baixa';
     const [atual, setAtual] = useState(nivelInicial);
     useEffect(() => {
@@ -25,12 +27,21 @@ function CycleConfidenceSheet({ visivel, nivel, aoFechar }) {
             fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
-            corPainel="#FFFFFF"
+            corPainel={adaptarCor('#FFFFFF', 'backgroundColor')}
         >
             <View style={estilos.conteudo}>
                 <View style={estilos.cabecalho}>
-                    <View style={[estilos.icone, { backgroundColor: cores.fundo }]}>
-                        <ChartLineUpIcon size={28} color={cores.destaque} weight="bold" />
+                    <View
+                        style={[
+                            estilos.icone,
+                            { backgroundColor: adaptarCor(cores.fundo, 'backgroundColor') }
+                        ]}
+                    >
+                        <ChartLineUpIcon
+                            size={28}
+                            color={adaptarCor(cores.destaque)}
+                            weight="bold"
+                        />
                     </View>
                     <Text style={estilos.nivel}>
                         Confiabilidade {ROTULOS[atual].toLocaleLowerCase('pt-BR')}
@@ -55,13 +66,14 @@ function CycleConfidenceSheet({ visivel, nivel, aoFechar }) {
                                 onPress={() => setAtual(item)}
                                 style={[
                                     estilos.opcao,
-                                    selecionado && { backgroundColor: cores.destaque }
+                                    selecionado && { backgroundColor: adaptarCor(cores.destaque) }
                                 ]}
                             >
                                 <Text
                                     style={[
                                         estilos.textoOpcao,
-                                        selecionado && estilos.textoSelecionado
+                                        selecionado && estilos.textoSelecionado,
+                                        selecionado && escuro && { color: adaptarCor('#FDF6F3') }
                                     ]}
                                 >
                                     {ROTULOS[item]}

@@ -1,6 +1,6 @@
-import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { Animated, Easing, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -136,7 +136,8 @@ function CalendarScreen({
     abasDisponiveis
 }) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const corFundo = tema.escuro && somenteLeitura ? coresNoturnasConteudo.fundo : undefined;
+    const estilos = useMemo(() => criarEstilos(tema, corFundo), [tema, corFundo]);
     const [legendaVisivel, setLegendaVisivel] = useState(false);
     const [confiancaVisivel, setConfiancaVisivel] = useState(false);
     const [avisoVazioVisivel, setAvisoVazioVisivel] = useState(false);
@@ -244,6 +245,7 @@ function CalendarScreen({
         <View testID="calendar-screen" style={estilos.tela} onTouchStart={registrarInteracao}>
             <Header
                 titulo="Calendário"
+                corFundo={corFundo}
                 variante="redeApoio"
                 complementoTitulo={
                     !somenteLeitura && confiancaValida && !existeErro ? (
@@ -266,12 +268,8 @@ function CalendarScreen({
                         icone={InfoIcon}
                         aoPressionar={() => setLegendaVisivel(true)}
                         rotuloAcessibilidade="Abrir legenda do calendário"
-                        variante="redeApoio"
-                        corIcone={
-                            tema.escuro
-                                ? coresNoturnasConteudo.coral
-                                : tema.cores.interface.destaque
-                        }
+                        variante="redeApoioSecundario"
+                        corIcone={tema.escuro ? undefined : tema.cores.interface.destaque}
                     />
                 }
             />
@@ -314,6 +312,7 @@ function CalendarScreen({
                         <View style={estilos.areaCalendario}>
                             <CycleCalendar
                                 meses={mesesValidos}
+                                corFundo={corFundo}
                                 carregando={carregando}
                                 carregandoAnteriores={carregandoAnteriores}
                                 carregandoPosteriores={carregandoPosteriores}

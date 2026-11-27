@@ -1,8 +1,10 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { DropIcon, NotebookIcon, PillIcon } from '../../../../shared/components/icons/AppIcons';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { NoCycleHero } from './NoCycleHero';
-import { estilos } from './NoCycleStartSection.styles';
+import { estilos as estilosClaros } from './NoCycleStartSection.styles';
 
 function MenstruationIcon(props) {
     return <DropIcon {...props} weight="fill" />;
@@ -14,6 +16,8 @@ function NoCycleStartSection({
     aoAbrirDiario,
     aoAbrirAnticoncepcional
 }) {
+    const { estilos, escuro } = useHomeColors(estilosClaros);
+    const corConteudo = escuro ? coresNoturnasConteudo.fundo : undefined;
     return (
         <>
             <NoCycleHero motivoSemPrevisao={motivoSemPrevisao} />
@@ -27,6 +31,7 @@ function NoCycleStartSection({
                 </Text>
                 <ButtonScreen
                     texto="Cadastrar Menstruação"
+                    corConteudo={corConteudo}
                     icone={MenstruationIcon}
                     tamanhoIcone={20}
                     aoPressionar={aoCadastrarMenstruacao}
@@ -47,6 +52,7 @@ function NoCycleStartSection({
                 <View style={estilos.acoes}>
                     <ButtonScreen
                         texto="Diário"
+                        corConteudo={corConteudo}
                         icone={NotebookIcon}
                         tamanhoIcone={20}
                         aoPressionar={aoAbrirDiario}
@@ -56,6 +62,7 @@ function NoCycleStartSection({
                     />
                     <ButtonScreen
                         texto="Anticoncepcional"
+                        corConteudo={corConteudo}
                         icone={PillIcon}
                         tamanhoIcone={20}
                         aoPressionar={aoAbrirAnticoncepcional}

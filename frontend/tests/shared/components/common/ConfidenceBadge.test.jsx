@@ -137,9 +137,9 @@ describe('ConfidenceBadge', () => {
     });
 
     test.each([
-        ['alta', 'Confiabilidade alta', '#9FD6B6'],
-        ['media', 'Confiabilidade média', '#F2B45F'],
-        ['baixa', 'Confiabilidade baixa', '#F08A75']
+        ['alta', 'Confiabilidade alta', '#A5D6A7'],
+        ['media', 'Confiabilidade média', '#D68C3A'],
+        ['baixa', 'Confiabilidade baixa', '#C26E5F']
     ])('aplica a cor acessível do nível %s no modo escuro', async (nivel, rotulo, cor) => {
         const visualEscuro = criarEstilos(temaEscuro);
 

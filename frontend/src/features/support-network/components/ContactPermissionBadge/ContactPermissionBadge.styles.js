@@ -15,10 +15,7 @@ const CORES_CLARAS = Object.freeze({
 });
 
 const CORES_ESCURAS = Object.freeze({
-    categoria: Object.freeze({
-        conteudo: '#F2B45F',
-        fundo: 'rgba(242, 180, 95, 0.20)'
-    }),
+    categoria: CORES_CLARAS.categoria,
     individual: Object.freeze({
         conteudo: coresNoturnasConteudo.azul,
         fundo: 'rgba(144, 202, 249, 0.20)'

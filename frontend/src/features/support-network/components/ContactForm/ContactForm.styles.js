@@ -2,6 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -17,7 +18,9 @@ function criarEstilos(tema) {
 
         tituloSecao: {
             marginBottom: 2,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
             fontSize: 15,
             fontWeight: '500',
@@ -29,8 +32,10 @@ function criarEstilos(tema) {
             width: '100%'
         },
 
+        botaoCategoriaAtivo: tema.escuro ? { backgroundColor: coresNoturnasConteudo.verde } : {},
+
         textoBotaoPermissao: {
-            color: '#FFFFFF',
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF',
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             fontStyle: 'normal',
@@ -52,7 +57,7 @@ function criarEstilos(tema) {
         erroEmail: {
             width: '100%',
             alignSelf: 'stretch',
-            color: '#C85A44',
+            color: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44',
             textAlign: 'left'
         },
 

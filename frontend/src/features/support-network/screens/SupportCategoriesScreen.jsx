@@ -6,6 +6,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { BellIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { DeleteSupportCategoryModal } from '../components/DeleteSupportCategoryModal/DeleteSupportCategoryModal';
 import { SupportCategoryList } from '../components/SupportCategoryList/SupportCategoryList';
 import { useDeleteSupportCategory } from '../hooks/useDeleteSupportCategory';
@@ -135,7 +136,12 @@ function SupportCategoriesScreen({
                 edges={['bottom']}
                 style={estilos.tela}
             >
-                <Header titulo="Categorias de Permissão" variante="comVoltar" onVoltar={onVoltar} />
+                <Header
+                    titulo="Categorias de Permissão"
+                    variante="comVoltar"
+                    corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
+                    onVoltar={onVoltar}
+                />
 
                 <SupportCategoryList
                     categorias={estado.categorias}

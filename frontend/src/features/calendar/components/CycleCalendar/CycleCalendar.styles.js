@@ -1,13 +1,17 @@
 //Centraliza os estilos visuais dos componentes do calendário.
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
-function criarEstilosCalendario(tema) {
+function criarEstilosCalendario(
+    tema,
+    corFundo = tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+) {
     const estilos = StyleSheet.create({
         calendario: {
             flex: 1,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         cabecalhoSemana: {
             flexDirection: 'row',
@@ -15,13 +19,15 @@ function criarEstilosCalendario(tema) {
             paddingVertical: 10,
             borderTopWidth: StyleSheet.hairlineWidth,
             borderBottomWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
+            backgroundColor: corFundo,
             zIndex: 4
         },
         nomeDiaSemana: {
             flex: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             lineHeight: 20,
@@ -61,7 +67,9 @@ function criarEstilosCalendario(tema) {
             marginBottom: 8
         },
         nomeMes: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             fontStyle: 'normal',
@@ -69,7 +77,9 @@ function criarEstilosCalendario(tema) {
             lineHeight: 22.5
         },
         anoMes: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             fontStyle: 'normal',
@@ -121,7 +131,7 @@ function criarEstilosCalendario(tema) {
             alignItems: 'flex-start'
         },
         numeroDia: {
-            color: tema.escuro ? tema.cores.interface.textoSecundario : 'rgba(34, 34, 34, 0.70)',
+            color: tema.escuro ? coresNoturnasConteudo.textoSecundario : 'rgba(34, 34, 34, 0.70)',
             textAlign: 'center',
             fontFamily: fontFamilies.regular,
             fontSize: 13,
@@ -196,7 +206,7 @@ function criarEstilosCalendario(tema) {
         estilos,
         estilosTipos,
         estilosTiposPrevistos,
-        corCarregamento: tema.escuro ? tema.cores.interface.destaque : tema.cores.marca.primaria,
+        corCarregamento: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.marca.primaria,
         corIconeMarcado: '#FFFFFF'
     });
 }

@@ -4,6 +4,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { CheckIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { gruposPermissoes, permissoesGerais } from '../../constants/permissionOptions';
 import { criarEstilos } from './PermissionBulkSelector.styles';
 
@@ -63,7 +64,10 @@ function alternarConjunto({ idsDoConjunto, permissoesSelecionadas, todasSelecion
 }
 
 function PermissionBulkSelector({
-    permissoesSelecionadas = [], idsGerais = IDS_PERMISSOES_GERAIS, aoAlterar, desabilitado = false
+    permissoesSelecionadas = [],
+    idsGerais = IDS_PERMISSOES_GERAIS,
+    aoAlterar,
+    desabilitado = false
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -115,7 +119,11 @@ function PermissionBulkSelector({
                     <CheckIcon
                         testID={`check-permissoes-${identificador}`}
                         size={15}
-                        color={tema.cores.interface.textoSobreDestaque}
+                        color={
+                            tema.escuro
+                                ? coresNoturnasConteudo.fundo
+                                : tema.cores.interface.textoSobreDestaque
+                        }
                         weight="bold"
                     />
                 ) : null}

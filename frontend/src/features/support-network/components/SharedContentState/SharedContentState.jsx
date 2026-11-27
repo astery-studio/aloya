@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function SharedContentState({ status = 'vazio', aoTentarNovamente, mensagemErro }) {
     const tema = useTheme();
@@ -13,10 +14,13 @@ function SharedContentState({ status = 'vazio', aoTentarNovamente, mensagemErro 
             {status === 'carregando' ? (
                 <ActivityIndicator
                     accessibilityLabel="Carregando dados compartilhados"
-                    color={tema.cores.interface.destaque}
+                    color={
+                        tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque
+                    }
                 />
             ) : (
                 <EmptyState
+                    usarPaletaNoturnaConteudo
                     titulo={erro ? 'Ocorreu um erro' : 'Nada para exibir'}
                     mensagem={
                         erro

@@ -29,3 +29,16 @@ test('usa a apresentação de primeiro acesso quando o motivo é desconhecido', 
     await render(<NoCycleHomeContent motivoSemPrevisao="motivo-inesperado" />);
     expect(screen.getByText('Seu ciclo, sua descoberta.')).toBeOnTheScreen();
 });
+
+test('usa superfícies escuras e ações com contraste na Home sem ciclo', async () => {
+    await render(<NoCycleHomeContent aoCadastrarMenstruacao={jest.fn()} />, {
+        preferencia: 'escuro'
+    });
+
+    expect(screen.getByTestId('diario-home-sem-ciclo')).toHaveStyle({
+        backgroundColor: '#1E1E1E',
+        borderColor: 'rgba(255, 255, 255, 0.08)'
+    });
+    expect(screen.getByText('Seu Diário já está disponível')).toHaveStyle({ color: '#999999' });
+    expect(screen.getByText('Cadastrar Menstruação')).toHaveStyle({ color: '#121212' });
+});

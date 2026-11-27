@@ -2,6 +2,7 @@ const coresNoturnasConteudo = Object.freeze({
     fundo: '#121212',
     superficie: '#1E1E1E',
     borda: 'rgba(255, 255, 255, 0.08)',
+    textoPrincipal: '#E3E3E3',
     textoSecundario: '#999999',
     verde: '#A5D6A7',
     coral: '#C26E5F',

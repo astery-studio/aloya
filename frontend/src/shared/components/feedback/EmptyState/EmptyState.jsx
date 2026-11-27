@@ -5,9 +5,18 @@ import { criarEstilos } from './EmptyState.styles';
 
 const variantesPermitidas = Object.freeze(['vazio', 'erro', 'apresentacao']);
 
-function EmptyState({ titulo, mensagem, acao, variante = 'vazio' }) {
+function EmptyState({
+    titulo,
+    mensagem,
+    acao,
+    variante = 'vazio',
+    usarPaletaNoturnaConteudo = false
+}) {
     const tema = useTheme();
-    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilos = useMemo(
+        () => criarEstilos(tema, usarPaletaNoturnaConteudo),
+        [tema, usarPaletaNoturnaConteudo]
+    );
 
     if (!variantesPermitidas.includes(variante)) {
         throw new Error(`Variante de EmptyState inválida: ${variante}`);

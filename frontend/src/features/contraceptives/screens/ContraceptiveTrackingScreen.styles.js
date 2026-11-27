@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { TAMANHO_FAB } from '../../../shared/components/common/FloatingActionButton';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
@@ -28,7 +29,9 @@ function criarEstilosAcompanhamento(tema) {
             paddingHorizontal: 21.66,
             paddingBottom: 32
         },
-        espacoFab: { paddingBottom: TAMANHO_FAB + tema.espacamentos.grande + tema.espacamentos.pequeno },
+        espacoFab: {
+            paddingBottom: TAMANHO_FAB + tema.espacamentos.grande + tema.espacamentos.pequeno
+        },
         rotuloSecao: {
             width: '100%',
             height: 34,
@@ -41,10 +44,12 @@ function criarEstilosAcompanhamento(tema) {
         linhaRotulo: {
             flex: 1,
             height: StyleSheet.hairlineWidth,
-            backgroundColor: interfaceTema.separador
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.borda : interfaceTema.separador
         },
         textoRotulo: {
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             lineHeight: 18,
@@ -59,7 +64,9 @@ function criarEstilosAcompanhamento(tema) {
             paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
         mensagemEstado: {
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             lineHeight: 22
@@ -72,7 +79,9 @@ function criarEstilosAcompanhamento(tema) {
             paddingHorizontal: 22
         },
         tituloVazio: {
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             lineHeight: 27,
@@ -82,7 +91,9 @@ function criarEstilosAcompanhamento(tema) {
             width: '100%',
             maxWidth: 310,
             paddingTop: 10,
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             lineHeight: 22.5,

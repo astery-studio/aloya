@@ -345,8 +345,7 @@ function MembersScreen({
                 icone={UserCircleGearIcon}
                 aoPressionar={onAbrirCategorias}
                 rotuloAcessibilidade="Abrir categorias de permissão"
-                variante="redeApoio"
-                corIcone={tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria}
+                variante="redeApoioSecundario"
             />
         </>
     );

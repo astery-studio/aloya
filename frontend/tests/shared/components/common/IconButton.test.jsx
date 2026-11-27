@@ -270,14 +270,17 @@ describe('IconButton', () => {
         expect(IconeTeste).toHaveBeenCalledWith(expect.objectContaining({ size: 16 }), undefined);
     });
 
-    test('usa a paleta noturna padronizada na variante de cabeçalho da Rede de Apoio', () => {
-        expect(criarEstilos(temaEscuro).variantes.redeApoio).toMatchObject({
+    test.each([
+        ['redeApoio', '#A5D6A7'],
+        ['redeApoioSecundario', '#C26E5F']
+    ])('usa a paleta noturna padronizada na variante de cabeçalho %s', (variante, cor) => {
+        expect(criarEstilos(temaEscuro).variantes[variante]).toMatchObject({
             container: {
                 backgroundColor: '#1E1E1E',
                 borderWidth: 0.667,
                 borderColor: 'rgba(255, 255, 255, 0.08)'
             },
-            icone: '#A5D6A7'
+            icone: cor
         });
     });
 

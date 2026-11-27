@@ -5,6 +5,7 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { ShieldWarningIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { criarEstilos } from './ParentalConsentRestrictedScreen.styles';
 
 function ParentalConsentRestrictedScreen({
@@ -18,12 +19,21 @@ function ParentalConsentRestrictedScreen({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     return (
-        <MainLayout titulo="Rede de Apoio" abaAtiva="membros" onSelecionarAba={aoSelecionarAba}>
+        <MainLayout
+            titulo="Rede de Apoio"
+            abaAtiva="membros"
+            corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
+            onSelecionarAba={aoSelecionarAba}
+        >
             <View testID="parental-consent-restricted" style={estilos.container}>
                 <View testID="parental-consent-card" style={estilos.cartao}>
                     <View style={estilos.cabecalhoCartao}>
                         <View style={estilos.caixaIcone}>
-                            <ShieldWarningIcon size={25.993} color="#FFFFFF" weight="regular" />
+                            <ShieldWarningIcon
+                                size={25.993}
+                                color={tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF'}
+                                weight="regular"
+                            />
                         </View>
 
                         <Text style={estilos.rotuloRestrito}>ACESSO RESTRITO</Text>
@@ -64,7 +74,14 @@ function ParentalConsentRestrictedScreen({
 
                 {carregando ? (
                     <View accessibilityLabel="Atualizando autorização" style={estilos.atualizando}>
-                        <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
+                        <ActivityIndicator
+                            size="small"
+                            color={
+                                tema.escuro
+                                    ? coresNoturnasConteudo.verde
+                                    : tema.cores.interface.destaque
+                            }
+                        />
                     </View>
                 ) : null}
             </View>

@@ -5,6 +5,7 @@ import { useCallback, useMemo } from 'react';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { criarEstilosErro } from '../../../../shared/theme/errorStateStyles';
 import { ContactCard } from '../ContactCard/ContactCard';
 import { criarEstilos } from './ContactList.styles';
@@ -178,6 +179,7 @@ function ContactList({
     rotuloFiltro = 'FILTROS APLICADOS'
 }) {
     const tema = useTheme();
+    const destaque = tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque;
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
@@ -268,12 +270,12 @@ function ContactList({
                 accessibilityLiveRegion="polite"
                 style={estilos.atualizacao}
             >
-                <ActivityIndicator color={tema.cores.interface.destaque} size="small" />
+                <ActivityIndicator color={destaque} size="small" />
 
                 <Text style={estilos.textoAtualizacao}>Atualizando contatos...</Text>
             </View>
         );
-    }, [atualizando, estilos, tema.cores.interface.destaque]);
+    }, [atualizando, destaque, estilos]);
 
     const renderizarCabecalho = useCallback(
         () => (
@@ -319,7 +321,7 @@ function ContactList({
                     accessibilityLiveRegion="polite"
                     style={estilos.estadoCentral}
                 >
-                    <ActivityIndicator color={tema.cores.interface.destaque} size="large" />
+                    <ActivityIndicator color={destaque} size="large" />
 
                     <Text style={estilos.textoCarregamento}>Carregando contatos...</Text>
                 </View>
@@ -334,6 +336,7 @@ function ContactList({
 
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo="Ocorreu um erro"
                         mensagem={MENSAGEM_ERRO}
                         variante="erro"
@@ -362,6 +365,7 @@ function ContactList({
 
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo={
                             aoVisualizar
                                 ? 'Nada para exibir'

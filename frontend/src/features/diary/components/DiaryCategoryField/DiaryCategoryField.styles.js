@@ -10,7 +10,7 @@ function criarEstilos(tema) {
         divisorCategoria: {
             width: '100%',
             height: StyleSheet.hairlineWidth,
-            backgroundColor: '#E6E2D8'
+            backgroundColor: tema.escuro ? cores.separador : '#E6E2D8'
         },
         faixaTitulo: {
             width: '100%',

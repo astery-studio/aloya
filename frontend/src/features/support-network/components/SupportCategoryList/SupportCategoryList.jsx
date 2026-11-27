@@ -6,6 +6,7 @@ import { CategoryTitleMetrics } from '../CategoryTitleMetrics/CategoryTitleMetri
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { criarEstilosErro } from '../../../../shared/theme/errorStateStyles';
 import { gruposPermissoes, permissoesGerais } from '../../constants/permissionOptions';
 import { SupportCategoryCard } from '../SupportCategoryCard/SupportCategoryCard';
@@ -121,6 +122,7 @@ function SupportCategoryList({
     desabilitado = false
 }) {
     const tema = useTheme();
+    const destaque = tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
 
@@ -204,7 +206,7 @@ function SupportCategoryList({
                 accessibilityLiveRegion="polite"
                 style={estilos.atualizacao}
             >
-                <ActivityIndicator color={tema.cores.interface.destaque} size="small" />
+                <ActivityIndicator color={destaque} size="small" />
 
                 <Text style={estilos.textoAtualizacao}>Atualizando categorias...</Text>
             </View>
@@ -220,7 +222,7 @@ function SupportCategoryList({
                     accessibilityLiveRegion="polite"
                     style={estilos.estadoCentral}
                 >
-                    <ActivityIndicator color={tema.cores.interface.destaque} size="large" />
+                    <ActivityIndicator color={destaque} size="large" />
 
                     <Text style={estilos.textoCarregamento}>Carregando categorias...</Text>
                 </View>
@@ -231,6 +233,7 @@ function SupportCategoryList({
             return (
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo="Ocorreu um erro"
                         mensagem={MENSAGEM_ERRO}
                         variante="erro"
@@ -253,6 +256,7 @@ function SupportCategoryList({
             return (
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo="Nenhuma categoria registrada"
                         mensagem="Você ainda não criou nenhuma categoria de permissão. Toque em 'Criar nova categoria' para organizar sua Rede de Apoio."
                         variante="vazio"

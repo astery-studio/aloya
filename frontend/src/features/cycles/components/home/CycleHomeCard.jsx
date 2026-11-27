@@ -5,7 +5,8 @@ import {
     CaretRightIcon,
     CaretUpIcon
 } from '../../../../shared/components/icons/AppIcons';
-import { estilos } from './CycleCareSection.styles';
+import { useHomeColors } from '../../hooks/useHomeColors';
+import { estilos as estilosClaros } from './CycleCareSection.styles';
 
 function CycleHomeCard({
     categoria,
@@ -17,6 +18,7 @@ function CycleHomeCard({
     estilosOpcao,
     children
 }) {
+    const { estilos, cor } = useHomeColors(estilosClaros);
     const [expandido, setExpandido] = useState(false);
     const alternavel = Boolean(children);
     const IconeAcao = alternavel ? (expandido ? CaretUpIcon : CaretDownIcon) : CaretRightIcon;
@@ -30,7 +32,7 @@ function CycleHomeCard({
                     <Text style={[estilos.descricao, estilosOpcao?.descricao]}>{descricao}</Text>
                 ) : null}
             </View>
-            {aoPressionar || alternavel ? <IconeAcao size={20} color="#222222" /> : null}
+            {aoPressionar || alternavel ? <IconeAcao size={20} color={cor('#222222')} /> : null}
         </>
     );
 

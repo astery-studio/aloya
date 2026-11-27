@@ -25,6 +25,7 @@ function IndicadorCarregamento({ rotulo, estilosTema, inicial = false }) {
 }
 
 function CycleCalendar({
+    corFundo,
     meses,
     carregando = false,
     carregandoAnteriores = false,
@@ -34,7 +35,7 @@ function CycleCalendar({
     aoPressionarDia
 }) {
     const tema = useTheme();
-    const estilosTema = useMemo(() => criarEstilosCalendario(tema), [tema]);
+    const estilosTema = useMemo(() => criarEstilosCalendario(tema, corFundo), [tema, corFundo]);
     const { estilos } = estilosTema;
     const listaRef = useRef(null);
     const [hoje] = useState(obterHojeLocal);

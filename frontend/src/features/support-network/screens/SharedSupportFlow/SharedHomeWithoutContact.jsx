@@ -1,30 +1,22 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { HeartIcon } from '../../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../../shared/hooks/useTheme';
 import { fontFamilies } from '../../../../shared/theme';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
+import { useHomeColors } from '../../../cycles/hooks/useHomeColors';
 
 function SharedHomeNotice() {
-    const { cores, escuro } = useTheme();
-    const { superficie, borda, textoPrincipal, textoSecundario } = cores.interface;
+    const { estilos } = useHomeColors(estilosClaros);
 
     return (
         <View style={estilos.areaAviso}>
-            <View
-                style={[
-                    estilos.aviso,
-                    escuro && { backgroundColor: superficie, borderColor: borda }
-                ]}
-            >
+            <View style={estilos.aviso}>
                 <View style={estilos.icone}>
                     <HeartIcon color="#D68C3A" size={24} />
                 </View>
                 <View style={estilos.textos}>
-                    <Text style={[estilos.titulo, escuro && { color: textoPrincipal }]}>
-                        Cada corpo tem seu próprio ritmo.
-                    </Text>
-                    <Text style={[estilos.descricao, escuro && { color: textoSecundario }]}>
+                    <Text style={estilos.titulo}>Cada corpo tem seu próprio ritmo.</Text>
+                    <Text style={estilos.descricao}>
                         O ciclo menstrual pode variar, assim como os sintomas e as necessidades de
                         cada pessoa. As fases não determinam o humor, a personalidade ou o
                         comportamento de alguém. O melhor apoio começa com diálogo e respeito.
@@ -37,13 +29,16 @@ function SharedHomeNotice() {
 
 function SharedHomeWithoutContact() {
     return (
-        <ScrollView contentContainerStyle={estilos.conteudo} showsVerticalScrollIndicator={false}>
+        <ScrollView
+            contentContainerStyle={estilosClaros.conteudo}
+            showsVerticalScrollIndicator={false}
+        >
             <CycleEducationSection perspectiva="contato" rodape={<SharedHomeNotice />} />
         </ScrollView>
     );
 }
 
-const estilos = StyleSheet.create({
+const estilosClaros = StyleSheet.create({
     conteudo: { paddingTop: 28, paddingBottom: 24 },
     areaAviso: {
         width: '100%',

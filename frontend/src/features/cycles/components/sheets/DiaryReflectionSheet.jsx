@@ -3,7 +3,8 @@ import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
-import { estilos } from './DiaryReflectionSheet.styles';
+import { useHomeColors } from '../../hooks/useHomeColors';
+import { estilos as estilosClaros } from './DiaryReflectionSheet.styles';
 
 const PERGUNTA = 'O que seu corpo está pedindo agora?';
 
@@ -21,6 +22,7 @@ function DiaryReflectionSheet({
     salvando = false,
     erro
 }) {
+    const { estilos, cor: adaptarCor, escuro } = useHomeColors(estilosClaros);
     const quantidadeCaracteres = [...valor].length;
     const quantidadeContador = Math.min(limiteContador, quantidadeCaracteres);
     const limiteAtingido =
@@ -34,7 +36,7 @@ function DiaryReflectionSheet({
             fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
-            corPainel="#FFFFFF"
+            corPainel={adaptarCor('#FFFFFF', 'backgroundColor')}
         >
             <Pressable
                 accessible={false}
@@ -44,7 +46,7 @@ function DiaryReflectionSheet({
             >
                 <View style={estilos.cabecalho}>
                     <View style={estilos.icone}>
-                        <QuestionIcon color="#4A758E" size={28} weight="regular" />
+                        <QuestionIcon color={adaptarCor('#4A758E')} size={28} weight="regular" />
                     </View>
                     <Text style={estilos.rotulo}>Uma pergunta para hoje</Text>
                 </View>
@@ -71,6 +73,10 @@ function DiaryReflectionSheet({
                                 erro={erro}
                                 estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
                                 estiloEntrada={estilos.textoEntrada}
+                                {...(escuro && {
+                                    placeholderTextColor: adaptarCor('#5C5C59'),
+                                    selectionColor: adaptarCor('#2C4C3B')
+                                })}
                             />
                             <Text
                                 accessibilityLiveRegion="polite"
@@ -85,6 +91,7 @@ function DiaryReflectionSheet({
                     )}
                     <ButtonScreen
                         texto="Salvar no Diário"
+                        corConteudo={escuro && valor.trim() ? adaptarCor('#FDF6F3') : undefined}
                         aoPressionar={aoSalvar}
                         desativado={semEspaco || !valor.trim()}
                         carregando={salvando}

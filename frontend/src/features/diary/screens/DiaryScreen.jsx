@@ -72,8 +72,7 @@ function DiaryScreen({
                     icone={GearSixIcon}
                     aoPressionar={aoGerenciarCategorias}
                     rotuloAcessibilidade="Gerenciar categorias do Diário"
-                    variante="redeApoio"
-                    corIcone={tema.escuro ? coresDiario.primaria : tema.cores.marca.primaria}
+                    variante="redeApoioSecundario"
                 />
             ) : null}
         </>

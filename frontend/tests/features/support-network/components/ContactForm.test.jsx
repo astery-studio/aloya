@@ -138,6 +138,8 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
         carregando,
         icone: Icone,
         tamanhoIcone,
+        corConteudo,
+        estilo,
         estiloTexto
     }) {
         return React.createElement(
@@ -150,9 +152,10 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
                     busy: carregando
                 },
                 disabled: desativado || carregando,
-                onPress: aoPressionar
+                onPress: aoPressionar,
+                style: estilo
             },
-            Icone ? React.createElement(Icone, { size: tamanhoIcone }) : null,
+            Icone ? React.createElement(Icone, { size: tamanhoIcone, color: corConteudo }) : null,
             React.createElement(Text, { style: estiloTexto }, texto)
         );
     };
@@ -227,6 +230,18 @@ describe('ContactForm', () => {
             fontWeight: '600',
             lineHeight: 21
         });
+    });
+
+    test('aplica a paleta noturna ao botão de cadastrar categoria', async () => {
+        await render(<ContactForm dados={dadosCategoria} aoCriarCategoria={jest.fn()} />, {
+            preferencia: 'escuro'
+        });
+
+        expect(screen.getByRole('button', { name: 'Cadastrar categoria nova' })).toHaveStyle({
+            backgroundColor: '#A5D6A7'
+        });
+        expect(screen.getByText('Cadastrar Categoria Nova')).toHaveStyle({ color: '#121212' });
+        expect(screen.getByTestId('UsersIcon')).toHaveProp('color', '#121212');
     });
 
     test('encaminha alteração de e-mail', async () => {

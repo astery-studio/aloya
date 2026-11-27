@@ -6,6 +6,7 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { UserGearIcon, UsersIcon } from '../../../../shared/components/icons/AppIcons';
 import EmailInput from '../../../../shared/components/forms/EmailInput';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { corContatoEhValida, iconeContatoEhValido } from '../../constants/contactAppearanceOptions';
 import { ContactAppearancePicker } from '../ContactAppearancePicker/ContactAppearancePicker';
 import { normalizarPermissoesSelecionadas } from '../PermissionBulkSelector/PermissionBulkSelector';
@@ -117,6 +118,8 @@ function ContactForm({
     const camposBloqueados = carregando || typeof aoAlterar !== 'function';
 
     const formularioValido = dadosPreparados !== null;
+    const categoriaDesabilitada =
+        carregando || !permitirCriarCategoria || typeof aoCriarCategoria !== 'function';
 
     const salvarBloqueado =
         carregando ||
@@ -229,12 +232,12 @@ function ContactForm({
                     tamanhoIcone={18}
                     variante="verde"
                     aoPressionar={criarCategoria}
-                    desativado={
-                        carregando ||
-                        !permitirCriarCategoria ||
-                        typeof aoCriarCategoria !== 'function'
-                    }
-                    estilo={estilos.botaoPermissao}
+                    desativado={categoriaDesabilitada}
+                    corConteudo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
+                    estilo={[
+                        estilos.botaoPermissao,
+                        !categoriaDesabilitada && estilos.botaoCategoriaAtivo
+                    ]}
                     estiloTexto={estilos.textoBotaoPermissao}
                 />
 

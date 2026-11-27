@@ -26,13 +26,24 @@ const metricas = {
     insets: { top: 24, right: 0, bottom: 24, left: 0 }
 };
 
-function renderizar(propriedades = {}) {
+function renderizar(propriedades = {}, opcoes) {
     return render(
         <SafeAreaProvider initialMetrics={metricas}>
             <CycleTodayScreen {...propriedades} />
-        </SafeAreaProvider>
+        </SafeAreaProvider>,
+        opcoes
     );
 }
+
+test('aplica as correspondências noturnas à previsão e às ações da Home', async () => {
+    await renderizar({ previsao, aoCadastrarMenstruacao: jest.fn() }, { preferencia: 'escuro' });
+
+    expect(screen.getByText('Previsão')).toHaveStyle({ color: '#A5D6A7' });
+    expect(screen.getByText('Cadastrar Menstruação')).toHaveStyle({ color: '#121212' });
+    expect(screen.getByRole('button', { name: 'qui, dia 8' })).toHaveStyle({
+        backgroundColor: '#A5D6A7'
+    });
+});
 
 test('apresenta o estado de carregamento sem exibir erro simultâneo', async () => {
     await renderizar({ carregando: true, erro: true });

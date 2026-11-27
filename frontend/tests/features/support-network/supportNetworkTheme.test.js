@@ -15,12 +15,12 @@ describe('tema escuro da Rede de Apoio', () => {
         const grupo = criarEstilosGrupo(temaEscuro);
         const grupos = criarEstilosGrupos(temaEscuro);
 
-        expect(gerais.titulo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
+        expect(gerais.titulo.color).toBe('#E3E3E3');
         expect(grupo.container).toMatchObject({
-            backgroundColor: temaEscuro.cores.interface.superficie,
-            borderColor: temaEscuro.cores.interface.borda
+            backgroundColor: '#1E1E1E',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
         });
-        expect(grupos.titulo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
+        expect(grupos.titulo.color).toBe('#E3E3E3');
     });
 
     test('mantém contraste dos itens ativos, contador e tela de membros', () => {
@@ -29,10 +29,10 @@ describe('tema escuro da Rede de Apoio', () => {
         const contador = criarEstilosContador(temaEscuro);
         const membros = criarEstilosMembros(temaEscuro);
 
-        expect(item.tituloAtivo.color).toBe(temaEscuro.cores.interface.textoPrincipal);
-        expect(fundos.ciclo.backgroundColor).toBe(temaEscuro.cores.interface.destaqueSuave);
-        expect(contador.container.backgroundColor).toBe(temaEscuro.cores.interface.destaqueSuave);
-        expect(contador.texto.color).toBe(temaEscuro.cores.interface.destaque);
+        expect(item.tituloAtivo.color).toBe('#E3E3E3');
+        expect(fundos.ciclo.backgroundColor).toBe('rgba(165, 214, 167, 0.10)');
+        expect(contador.container.backgroundColor).toBe('rgba(165, 214, 167, 0.10)');
+        expect(contador.texto.color).toBe('#A5D6A7');
         expect(membros.container.backgroundColor).toBe('#121212');
         expect(membros.descricao.color).toBe('#999999');
     });

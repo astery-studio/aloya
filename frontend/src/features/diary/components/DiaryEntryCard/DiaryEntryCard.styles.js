@@ -15,7 +15,7 @@ function criarEstilos(tema) {
             overflow: 'hidden',
             paddingVertical: 10,
             paddingHorizontal: 16,
-            borderWidth: 0.70489,
+            borderWidth: tema.escuro ? 0.7 : 0.70489,
             borderColor: tema.escuro ? cores.separador : cores.borda,
             borderRadius: 16,
             backgroundColor: cores.superficie,

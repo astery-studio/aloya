@@ -1,16 +1,36 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { ConfidenceBadge } from '../../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
 import { StatusBadge } from '../../../../shared/components/common/StatusBadge/StatusBadge';
 import { SparkleIcon, SunIcon } from '../../../../shared/components/icons/AppIcons';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { formatarJanelaFertil, separarData } from '../../utils/cyclePredictionFormat';
 import { CycleEducationalDisclaimer } from './CycleEducationalDisclaimer';
-import { estilos } from './CyclePredictionSummary.styles';
-import { textos } from './CyclePredictionSummary.textStyles';
+import { estilos as estilosClaros } from './CyclePredictionSummary.styles';
+import { textos as textosClaros } from './CyclePredictionSummary.textStyles';
 
 const AVISO_PREVISAO =
     'Esta é uma estimativa baseada no seu histórico e não deve ser usada como método contraceptivo.';
 
-function Metrica({ Icone, rotulo, valor, cor }) {
+const CONFIABILIDADE_NOTURNA = {
+    baixa: {
+        cor: coresNoturnasConteudo.coral,
+        fundo: 'rgba(194, 110, 95, 0.14)',
+        borda: 'rgba(194, 110, 95, 0.45)'
+    },
+    media: {
+        cor: '#D68C3A',
+        fundo: 'rgba(214, 140, 58, 0.14)',
+        borda: 'rgba(214, 140, 58, 0.45)'
+    },
+    alta: {
+        cor: coresNoturnasConteudo.verde,
+        fundo: 'rgba(165, 214, 167, 0.14)',
+        borda: 'rgba(165, 214, 167, 0.45)'
+    }
+};
+
+function Metrica({ Icone, rotulo, valor, cor, estilos, textos }) {
     return (
         <View style={estilos.metrica}>
             <Icone size={20} color={cor} weight="fill" />
@@ -32,6 +52,8 @@ function CyclePredictionSummary({
     nomeTitular,
     corDestaque = '#C85A44'
 }) {
+    const { estilos, cor: adaptarCor, escuro } = useHomeColors(estilosClaros);
+    const { estilos: textos } = useHomeColors(textosClaros);
     const proximo = separarData(proximoInicio);
     const ovulacao = separarData(ovulacaoEstimada);
     const intervalo = formatarJanelaFertil(janelaFertil);
@@ -41,13 +63,18 @@ function CyclePredictionSummary({
             <View style={estilos.card}>
                 <View style={estilos.cabecalho}>
                     <View style={estilos.textosCabecalho}>
-                        <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
+                        <Text style={[textos.previsao, { color: adaptarCor(corDestaque) }]}>
+                            Previsão
+                        </Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
                             {nomeTitular ? `Próximo ciclo de ${nomeTitular}` : 'Próximo ciclo'}
                         </Text>
                     </View>
                     <ConfidenceBadge
                         nivel={confiabilidade}
+                        coresPersonalizadas={
+                            escuro ? CONFIABILIDADE_NOTURNA[confiabilidade] : undefined
+                        }
                         onPress={aoAbrirConfiabilidade}
                         exibirPrefixo={false}
                     />
@@ -72,13 +99,17 @@ function CyclePredictionSummary({
                             Icone={SunIcon}
                             rotulo="Ovulação prevista"
                             valor={`${ovulacao.dia} de ${ovulacao.mes}`}
-                            cor="#4A758E"
+                            cor={adaptarCor('#4A758E')}
+                            estilos={estilos}
+                            textos={textos}
                         />
                         <Metrica
                             Icone={SparkleIcon}
                             rotulo="Janela fértil estimada"
                             valor={intervalo}
-                            cor="#222222"
+                            cor={adaptarCor('#222222')}
+                            estilos={estilos}
+                            textos={textos}
                         />
                     </View>
                 </View>

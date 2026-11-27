@@ -11,6 +11,7 @@ import {
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
+import { obterCoresDiario } from '../../config/diaryColors';
 import { formatarDataDiario } from '../../utils/diaryDate';
 import {
     obterApresentacaoFase,
@@ -139,13 +140,14 @@ function DiaryEntryCard({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const item = normalizarRegistro(registro, tema, somenteLeitura);
+    const cores = obterCoresDiario(tema).interface;
 
     if (!item) return null;
 
     const bloqueado = acaoEmAndamento !== null;
     const podeAbrir = typeof aoAbrir === 'function' && !bloqueado;
     const fase = item.apresentacaoFase;
-    const cor = fase?.cor ?? tema.cores.interface.textoSecundario;
+    const cor = fase?.cor ?? cores.textoSecundario;
     const rotuloFase =
         fase && (item.diaCiclo ? `${fase.rotulo} - Dia ${item.diaCiclo} do Ciclo` : fase.rotulo);
     const possuiCategoriasPublicas = item.principais.length > 0 || item.maisQuantidade > 0;
@@ -183,7 +185,7 @@ function DiaryEntryCard({
                             estilos.iconeRegistro,
                             {
                                 borderColor: cor,
-                                backgroundColor: fase?.fundoIcone ?? tema.cores.interface.fundo
+                                backgroundColor: fase?.fundoIcone ?? cores.fundo
                             }
                         ]}
                     >

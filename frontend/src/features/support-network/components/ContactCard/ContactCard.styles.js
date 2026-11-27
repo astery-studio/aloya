@@ -79,9 +79,9 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             alignItems: 'center',
             borderWidth: 0.705,
-            borderColor: '#5C5C59',
+            borderColor: tema.escuro ? coresNoturnasConteudo.textoSecundario : '#5C5C59',
             borderRadius: 10,
-            backgroundColor: 'rgba(92, 92, 89, 0.20)'
+            backgroundColor: tema.escuro ? 'rgba(153, 153, 153, 0.20)' : 'rgba(92, 92, 89, 0.20)'
         },
 
         containerNomePendente: {
@@ -95,7 +95,9 @@ function criarEstilos(tema) {
         },
 
         nomePendente: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
@@ -123,7 +125,9 @@ function criarEstilos(tema) {
 
         nomeAtivo: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
@@ -173,7 +177,9 @@ function criarEstilos(tema) {
 
         nome: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 16,
             fontWeight: '700',
@@ -247,13 +253,17 @@ function criarEstilos(tema) {
         },
 
         rotuloInformacao: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontWeight: '500'
         },
 
         valorInformacao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400'
         },
@@ -300,7 +310,9 @@ function criarEstilos(tema) {
         },
 
         tituloInativo: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             fontWeight: '700',

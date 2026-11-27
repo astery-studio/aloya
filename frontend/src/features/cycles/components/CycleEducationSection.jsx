@@ -1,9 +1,10 @@
+import { useHomeColors } from '../hooks/useHomeColors';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { CONTEUDOS_EDUCATIVOS } from '../constants/cycleEducationContent';
 import { CycleEducationalDisclaimer } from './home/CycleEducationalDisclaimer';
-import { estilos } from './CycleEducationSection.styles';
-import { textos } from './CycleEducationSection.textStyles';
+import { estilos as estilosClaros } from './CycleEducationSection.styles';
+import { textos as textosClaros } from './CycleEducationSection.textStyles';
 
 const PHASES = Object.freeze(
     Object.entries(CONTEUDOS_EDUCATIVOS).map(([id, conteudo]) => ({
@@ -22,6 +23,8 @@ function CycleEducationSection({
     estiloSecao,
     rodape
 }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
+    const { estilos: textos } = useHomeColors(textosClaros);
     const [faseLocal, setFaseLocal] = useState('menstrual');
     const ehContato = perspectiva === 'contato';
     const conteudoEducativo = ehContato ? CONTEUDOS_EDUCATIVOS : conteudos;
@@ -60,22 +63,24 @@ function CycleEducationSection({
                         onPress={() => selecionar(phase.id)}
                         style={[
                             estilos.fase,
-                            phase.id === idSelecionado && { borderColor: phase.cor }
+                            phase.id === idSelecionado && { borderColor: adaptarCor(phase.cor) }
                         ]}
                     >
                         <View testID={`icone-fase-educativa-${phase.id}`} style={estilos.icone}>
                             <phase.Icone
                                 size={24}
-                                color={phase.cor}
+                                color={adaptarCor(phase.cor)}
                                 weight={phase.weight ?? 'fill'}
                             />
                         </View>
-                        <Text style={[textos.nomeFase, { color: phase.cor }]}>{phase.label}</Text>
+                        <Text style={[textos.nomeFase, { color: adaptarCor(phase.cor) }]}>
+                            {phase.label}
+                        </Text>
                     </Pressable>
                 ))}
             </ScrollView>
             <View style={estilos.artigo}>
-                <Text style={[textos.visao, { color: corDestaque ?? selected.cor }]}>
+                <Text style={[textos.visao, { color: adaptarCor(corDestaque ?? selected.cor) }]}>
                     Visão educativa
                 </Text>
                 <Text style={textos.tituloArtigo}>{selected.titulo}</Text>

@@ -117,6 +117,20 @@ describe('ContactPermissionBadge', () => {
         });
     });
 
+    test('mantém a cor de categoria no modo escuro', async () => {
+        await render(
+            <ContactPermissionBadge
+                vinculo={{ tipo: 'categoria', nomeCategoria: 'Profissional' }}
+            />,
+            { preferencia: 'escuro' }
+        );
+
+        expect(screen.getByTestId('contact-permission-badge')).toHaveStyle({
+            backgroundColor: 'rgba(214, 140, 58, 0.20)'
+        });
+        expect(screen.getByText('Profissional')).toHaveStyle({ color: '#D68C3A' });
+    });
+
     test('aplica a identidade individual no modo escuro', async () => {
         await render(
             <ContactPermissionBadge

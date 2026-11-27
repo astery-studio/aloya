@@ -2,6 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -11,9 +12,11 @@ function criarEstilos(tema) {
             paddingTop: 18,
             paddingBottom: 16,
             alignItems: 'center',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
             borderRadius: 14
         },
 
@@ -30,7 +33,9 @@ function criarEstilos(tema) {
         descricao: {
             maxWidth: 280,
             marginTop: 6,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -53,16 +58,20 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 12,
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             borderWidth: 1,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
             borderRadius: 12
         },
 
         textoOpcao: {
             minWidth: 0,
             flex: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             fontWeight: '600',
@@ -78,22 +87,30 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             backgroundColor: 'transparent',
             borderWidth: 1.5,
-            borderColor: tema.cores.interface.textoSecundario,
+            borderColor: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             borderRadius: 12
         },
 
         indicadorAtivo: {
-            backgroundColor: tema.cores.interface.destaque,
-            borderColor: tema.cores.interface.destaque
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.verde
+                : tema.cores.interface.destaque,
+            borderColor: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque
         },
 
         indicadorParcial: {
             backgroundColor: 'transparent',
-            borderColor: tema.cores.interface.textoSecundario
+            borderColor: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario
         },
 
         tracoParcial: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             fontWeight: '700',

@@ -1,7 +1,8 @@
+import { useHomeColors } from '../hooks/useHomeColors';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { CaretDownIcon, CaretUpIcon } from '../../../shared/components/icons/AppIcons';
-import { estilos } from './CycleExpandableCard.styles';
+import { estilos as estilosClaros } from './CycleExpandableCard.styles';
 
 function CycleExpandableCard({
     titulo,
@@ -16,6 +17,7 @@ function CycleExpandableCard({
     children,
     initiallyExpanded = false
 }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
     const [localExpanded, setLocalExpanded] = useState(initiallyExpanded);
     const expanded = typeof expandido === 'boolean' ? expandido : localExpanded;
     const alternar = () => {
@@ -45,7 +47,12 @@ function CycleExpandableCard({
                     {icone}
                     <View style={estilos.textos}>
                         {rotulo ? (
-                            <Text style={[estilos.rotulo, corRotulo && { color: corRotulo }]}>
+                            <Text
+                                style={[
+                                    estilos.rotulo,
+                                    corRotulo && { color: adaptarCor(corRotulo) }
+                                ]}
+                            >
                                 {rotulo}
                             </Text>
                         ) : null}
@@ -61,7 +68,7 @@ function CycleExpandableCard({
                         {subtitulo ? <Text style={estilos.subtitle}>{subtitulo}</Text> : null}
                     </View>
                 </View>
-                <Icon size={comResumo ? 20 : 22} color="#222222" />
+                <Icon size={comResumo ? 20 : 22} color={adaptarCor('#222222')} />
             </Pressable>
             {expanded ? (
                 <View style={[estilos.content, comResumo && estilos.contentComResumo]}>

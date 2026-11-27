@@ -143,6 +143,17 @@ describe('CycleLegendSheet', () => {
         });
     });
 
+    test('aplica a paleta noturna ao marcador da janela fértil e à descrição', async () => {
+        await render(<CycleLegendSheet visivel itens={itensLegenda} aoFechar={jest.fn()} />, {
+            preferencia: 'escuro'
+        });
+
+        expect(screen.getByTestId('marcador-legenda-janelaFertil-real')).toHaveStyle({
+            backgroundColor: '#1E1E1E'
+        });
+        expect(screen.getByText('Dias de menstruação')).toHaveStyle({ color: '#999999' });
+    });
+
     test('fecha pelo botão do cabeçalho', async () => {
         const aoFechar = jest.fn();
 

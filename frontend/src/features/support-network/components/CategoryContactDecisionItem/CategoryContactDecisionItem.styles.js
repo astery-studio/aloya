@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -12,13 +13,17 @@ function criarEstilos(tema) {
             borderWidth: 1.4,
             borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.04)' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput,
-            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             gap: 16
         },
 
         nome: {
             alignSelf: 'center',
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 17,
             fontWeight: '700',

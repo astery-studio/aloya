@@ -5,6 +5,7 @@ import { Platform, ScrollView, Text, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
 import { ContraceptiveFlow } from '../../../contraceptives/ContraceptiveFlow';
 import { ContraceptiveModal } from '../../../contraceptives/components/ContraceptiveModal';
@@ -121,6 +122,7 @@ function IndividualPermissionsForm({
     const painel = (
         <BottomSheet
             visivel={painelVisivel}
+            corPainel={tema.escuro ? coresNoturnasConteudo.superficie : undefined}
             onFechar={aoFechar}
             onOcultar={() => {
                 // Abre a área quando o painel nativo termina de fechar.
@@ -132,6 +134,7 @@ function IndividualPermissionsForm({
         >
             <BottomSheetLayout
                 titulo="Permissões Individuais"
+                corFundo={tema.escuro ? coresNoturnasConteudo.superficie : undefined}
                 onFechar={aoFechar}
                 bloquearFechamento={carregando}
             >

@@ -1,4 +1,6 @@
 //Centraliza as opções visuais permitidas para identificar contatos da Rede de Apoio.
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
+
 const COR_ICONE_NAO_SELECIONADO = '#A8A49C';
 
 const OPCOES_ICONE_CONTATO = Object.freeze([
@@ -96,6 +98,24 @@ const OPCOES_COR_CONTATO = Object.freeze([
     })
 ]);
 
+const APARENCIA_ESCURA = Object.freeze({
+    coral: {
+        cor: coresNoturnasConteudo.coral,
+        fundo: 'rgba(194, 110, 95, 0.14)',
+        borda: 'rgba(194, 110, 95, 0.72)'
+    },
+    verde: {
+        cor: coresNoturnasConteudo.verde,
+        fundo: 'rgba(165, 214, 167, 0.14)',
+        borda: 'rgba(165, 214, 167, 0.72)'
+    },
+    azul: {
+        cor: coresNoturnasConteudo.azul,
+        fundo: 'rgba(144, 202, 249, 0.14)',
+        borda: 'rgba(144, 202, 249, 0.72)'
+    }
+});
+
 const IDS_ICONES_CONTATO = Object.freeze(OPCOES_ICONE_CONTATO.map(({ id }) => id));
 
 const IDS_CORES_CONTATO = Object.freeze(OPCOES_COR_CONTATO.map(({ id }) => id));
@@ -104,8 +124,10 @@ function obterOpcaoIconeContato(iconeId) {
     return OPCOES_ICONE_CONTATO.find(({ id }) => id === iconeId) ?? OPCOES_ICONE_CONTATO[0];
 }
 
-function obterOpcaoCorContato(corId) {
-    return OPCOES_COR_CONTATO.find(({ id }) => id === corId) ?? OPCOES_COR_CONTATO[0];
+function obterOpcaoCorContato(corId, escuro = false) {
+    const opcao = OPCOES_COR_CONTATO.find(({ id }) => id === corId) ?? OPCOES_COR_CONTATO[0];
+    const coresEscuras = escuro ? APARENCIA_ESCURA[opcao.id] : undefined;
+    return coresEscuras ? { ...opcao, ...coresEscuras } : opcao;
 }
 
 function iconeContatoEhValido(iconeId) {

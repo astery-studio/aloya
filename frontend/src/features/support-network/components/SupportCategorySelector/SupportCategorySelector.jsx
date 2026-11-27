@@ -10,6 +10,7 @@ import {
     UsersThreeIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { criarEstilos } from './SupportCategorySelector.styles';
 
 function idCategoriaEhValido(id) {
@@ -84,6 +85,7 @@ function SupportCategorySelector({
     inicialmenteExpandido = false
 }) {
     const tema = useTheme();
+    const corDestaque = tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const [expandido, definirExpandido] = useState(inicialmenteExpandido === true);
@@ -129,7 +131,7 @@ function SupportCategorySelector({
                 <View style={estilos.estado}>
                     <ActivityIndicator
                         accessibilityLabel="Carregando categorias"
-                        color={tema.cores.interface.destaque}
+                        color={corDestaque}
                         size="small"
                     />
 
@@ -219,14 +221,18 @@ function SupportCategorySelector({
                                 <CheckCircleIcon
                                     testID={`categoria-selecionada-${categoria.id}`}
                                     size={22}
-                                    color="#2C4C3B"
+                                    color={tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'}
                                     weight="fill"
                                 />
                             ) : (
                                 <CircleIcon
                                     testID={`categoria-nao-selecionada-${categoria.id}`}
                                     size={22}
-                                    color="#D8D4CC"
+                                    color={
+                                        tema.escuro
+                                            ? coresNoturnasConteudo.textoSecundario
+                                            : '#D8D4CC'
+                                    }
                                     weight="regular"
                                 />
                             )}
@@ -273,7 +279,7 @@ function SupportCategorySelector({
                     <UsersThreeIcon
                         testID="icone-categorias-cadastradas"
                         size={18}
-                        color={tema.cores.interface.destaque}
+                        color={corDestaque}
                         weight="regular"
                     />
                 </View>
@@ -288,7 +294,7 @@ function SupportCategorySelector({
                 <IconeExpansao
                     testID={expandido ? 'icone-recolher-categorias' : 'icone-expandir-categorias'}
                     size={18}
-                    color={tema.cores.interface.destaque}
+                    color={corDestaque}
                     weight="regular"
                 />
             </Pressable>

@@ -5,6 +5,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleHomeContent } from '../components/home/CycleHomeContent';
 import { CycleHomeHeader } from '../components/home/CycleHomeHeader';
@@ -55,7 +56,7 @@ function CycleTodayScreen({
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const corCarregamento = tema.escuro
-        ? tema.cores.interface.destaque
+        ? coresNoturnasConteudo.verde
         : tema.cores.marca.secundaria;
     const [sheetAberto, setSheetAberto] = useState(null);
     const dataBaseDaFaixa =

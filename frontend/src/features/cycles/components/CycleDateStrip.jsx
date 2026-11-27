@@ -123,6 +123,7 @@ function CycleDateStrip({
             renderItem={({ item }) => {
                 const selecionado = item.data === dataSelecionada;
                 const interiorSemFundo = semCiclo || selecionado;
+                const selecionadoComFase = selecionado && !semCiclo && item.fase !== 'desconhecida';
                 return (
                     <Pressable
                         key={item.data}
@@ -159,14 +160,19 @@ function CycleDateStrip({
                                 ]}
                             />
                             <Text
-                                style={[estilos.semana, selecionado && estilos.semanaSelecionada]}
+                                style={[
+                                    estilos.semana,
+                                    selecionado && estilos.semanaSelecionada,
+                                    selecionadoComFase && estilos.textoSelecionadoComFase
+                                ]}
                             >
                                 {item.semana}
                             </Text>
                             <Text
                                 style={[
                                     estilos.textoNumero,
-                                    selecionado && estilos.numeroSelecionado
+                                    selecionado && estilos.numeroSelecionado,
+                                    selecionadoComFase && estilos.textoSelecionadoComFase
                                 ]}
                             >
                                 {item.dia ?? '?'}
@@ -177,7 +183,10 @@ function CycleDateStrip({
                                     estilos.indicador,
                                     item.hoje && estilos.indicadorHoje,
                                     selecionado && estilos.indicadorSelecionado,
-                                    item.hoje && selecionado && estilos.indicadorHojeSelecionado
+                                    item.hoje && selecionado && estilos.indicadorHojeSelecionado,
+                                    item.hoje &&
+                                        selecionadoComFase &&
+                                        estilos.indicadorHojeSelecionadoComFase
                                 ]}
                             />
                         </View>

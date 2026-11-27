@@ -3,9 +3,17 @@ import { HandHeartIcon } from 'phosphor-react-native/src/icons/HandHeart';
 import { Text, View } from 'react-native';
 import { HandshakeIcon } from '../../../../shared/components/icons/AppIcons';
 import { CycleHomeCard } from '../../../cycles/components/home/CycleHomeCard';
-import { estilos } from './SharedCycleCareSection.styles';
+import { useHomeColors } from '../../../cycles/hooks/useHomeColors';
+import { estilos as estilosClaros } from './SharedCycleCareSection.styles';
 
 function SharedCycleCareSection({ nomeTitular }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
+    const estilosOpcao = {
+        card: estilos.opcao,
+        linha: estilos.linhaOpcao,
+        titulo: estilos.tituloOpcao,
+        descricao: estilos.descricaoOpcao
+    };
     const orientacoes = [
         {
             titulo: `Pergunte como ${nomeTitular} está`,
@@ -49,9 +57,14 @@ function SharedCycleCareSection({ nomeTitular }) {
                             descricao="Toque para explorar"
                             estilosOpcao={estilosOpcao}
                             icone={
-                                <View style={[estilos.caixaIcone, { backgroundColor: fundo }]}>
+                                <View
+                                    style={[
+                                        estilos.caixaIcone,
+                                        { backgroundColor: adaptarCor(fundo, 'backgroundColor') }
+                                    ]}
+                                >
                                     <View style={estilos.areaIcone}>
-                                        <Icone size={22} color={cor} weight="regular" />
+                                        <Icone size={22} color={adaptarCor(cor)} weight="regular" />
                                     </View>
                                 </View>
                             }
@@ -64,12 +77,5 @@ function SharedCycleCareSection({ nomeTitular }) {
         </View>
     );
 }
-
-const estilosOpcao = {
-    card: estilos.opcao,
-    linha: estilos.linhaOpcao,
-    titulo: estilos.tituloOpcao,
-    descricao: estilos.descricaoOpcao
-};
 
 export { SharedCycleCareSection };

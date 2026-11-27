@@ -1,7 +1,9 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { DropIcon, NotepadIcon, PillIcon } from '../../../../shared/components/icons/AppIcons';
-import { estilos } from './CycleQuickActions.styles';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
+import { estilos as estilosClaros } from './CycleQuickActions.styles';
 
 function MenstruationIcon(props) {
     return <DropIcon {...props} weight="fill" />;
@@ -12,6 +14,7 @@ function CycleContraceptiveAction({
     texto = 'Anticoncepcional',
     larguraTotal = false
 }) {
+    const { estilos, escuro } = useHomeColors(estilosClaros);
     return (
         <ButtonScreen
             texto={texto}
@@ -19,6 +22,7 @@ function CycleContraceptiveAction({
             tamanhoIcone={20}
             aoPressionar={aoPressionar}
             variante="verde"
+            corConteudo={escuro ? coresNoturnasConteudo.fundo : undefined}
             estilo={[
                 estilos.secundaria,
                 estilos.anticoncepcional,
@@ -30,10 +34,13 @@ function CycleContraceptiveAction({
 }
 
 function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
+    const { estilos, escuro } = useHomeColors(estilosClaros);
+    const corConteudo = escuro ? coresNoturnasConteudo.fundo : undefined;
     return (
         <View style={estilos.secao}>
             <ButtonScreen
                 texto="Cadastrar Menstruação"
+                corConteudo={corConteudo}
                 icone={MenstruationIcon}
                 tamanhoIcone={20}
                 aoPressionar={aoCadastrarMenstruacao}
@@ -43,6 +50,7 @@ function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAntic
             <View style={estilos.linha}>
                 <ButtonScreen
                     texto="Diário"
+                    corConteudo={corConteudo}
                     icone={NotepadIcon}
                     tamanhoIcone={20}
                     aoPressionar={aoAbrirDiario}

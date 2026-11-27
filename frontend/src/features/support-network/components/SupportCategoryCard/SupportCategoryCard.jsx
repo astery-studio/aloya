@@ -10,6 +10,7 @@ import {
     UsersIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { criarEstilos } from './SupportCategoryCard.styles';
 
 function normalizarQuantidadeContatos(quantidade) {
@@ -32,6 +33,7 @@ function SupportCategoryCard({
     acaoEmAndamento = null
 }) {
     const tema = useTheme();
+    const destaque = tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque;
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const nome = typeof categoria?.nome === 'string' ? categoria.nome.trim() : '';
@@ -82,11 +84,7 @@ function SupportCategoryCard({
                     accessibilityElementsHidden
                     style={estilos.caixaIcone}
                 >
-                    <UserCheckIcon
-                        size={18}
-                        color={tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque}
-                        weight="regular"
-                    />
+                    <UserCheckIcon size={18} color={destaque} weight="regular" />
                 </View>
 
                 <View style={estilos.textos}>
@@ -121,7 +119,7 @@ function SupportCategoryCard({
                         <View style={estilos.areaAcao}>
                             <ActivityIndicator
                                 accessibilityLabel={`Editando categoria ${nome}`}
-                                color={tema.cores.interface.destaque}
+                                color={destaque}
                                 size="small"
                             />
                         </View>
@@ -162,7 +160,7 @@ function SupportCategoryCard({
                 accessibilityLabel={criarRotuloContatos(quantidadeSegura)}
                 style={estilos.contatos}
             >
-                <UsersIcon size={22} color={tema.cores.interface.destaque} weight="regular" />
+                <UsersIcon size={22} color={destaque} weight="regular" />
 
                 <Text style={estilos.textoContatos}>
                     <Text style={estilos.quantidadeContatos}>{quantidadeSegura}</Text>

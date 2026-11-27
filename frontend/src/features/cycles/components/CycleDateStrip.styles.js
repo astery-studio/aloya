@@ -1,8 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { espacamentos, radius, shadows, typography } from '../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     const corSelecionada = tema.escuro ? '#FFFFFF' : '#F7F5F0';
+    const { coral, verde, azul, superficie, borda, fundo } = coresNoturnasConteudo;
+    const menstrual = tema.escuro ? coral : '#C85A44';
+    const folicular = tema.escuro ? verde : '#2C4C3B';
+    const ovulatoria = tema.escuro ? azul : '#4A758E';
 
     return StyleSheet.create({
         container: {
@@ -23,16 +28,19 @@ function criarEstilos(tema) {
             borderRadius: radius.onboardingCalendar,
             borderWidth: 0.666667
         },
-        dia_menstrual: { backgroundColor: '#C85A44', borderColor: '#C85A44' },
-        dia_folicular: { backgroundColor: '#2C4C3B', borderColor: '#2C4C3B' },
-        dia_ovulatoria: { backgroundColor: '#4A758E', borderColor: '#4A758E' },
+        dia_menstrual: { backgroundColor: menstrual, borderColor: menstrual },
+        dia_folicular: { backgroundColor: folicular, borderColor: folicular },
+        dia_ovulatoria: { backgroundColor: ovulatoria, borderColor: ovulatoria },
         dia_lutea: { backgroundColor: '#D68C3A', borderColor: '#D68C3A' },
-        dia_desconhecida: { backgroundColor: '#FFFFFF', borderColor: '#E6E2D8' },
+        dia_desconhecida: {
+            backgroundColor: tema.escuro ? superficie : '#FFFFFF',
+            borderColor: tema.escuro ? borda : '#E6E2D8'
+        },
         diaSemCiclo: { paddingTop: 10 },
         diaSelecionado: { ...shadows.cardSuave, paddingTop: 10 },
         diaSelecionadoDesconhecida: {
-            backgroundColor: '#5C5C59',
-            borderColor: '#E6E2D8'
+            backgroundColor: tema.escuro ? '#424242' : '#5C5C59',
+            borderColor: tema.escuro ? borda : '#E6E2D8'
         },
         interior: {
             width: 42,
@@ -47,7 +55,7 @@ function criarEstilos(tema) {
             right: 0,
             height: 62,
             borderRadius: 14,
-            backgroundColor: '#FFFFFF'
+            backgroundColor: tema.escuro ? superficie : '#FFFFFF'
         },
         fundoInteriorOculto: { opacity: 0 },
         interiorSelecionado: {
@@ -71,6 +79,7 @@ function criarEstilos(tema) {
             ...typography.numberCompactStrong,
             color: tema.escuro ? '#E3E3E3' : corSelecionada
         },
+        textoSelecionadoComFase: tema.escuro ? { color: fundo } : {},
         indicador: {
             width: 5,
             height: 5,
@@ -80,7 +89,8 @@ function criarEstilos(tema) {
         },
         indicadorHoje: { backgroundColor: tema.cores.interface.textoPrincipal },
         indicadorSelecionado: { backgroundColor: 'transparent' },
-        indicadorHojeSelecionado: { backgroundColor: corSelecionada }
+        indicadorHojeSelecionado: { backgroundColor: corSelecionada },
+        indicadorHojeSelecionadoComFase: tema.escuro ? { backgroundColor: fundo } : {}
     });
 }
 

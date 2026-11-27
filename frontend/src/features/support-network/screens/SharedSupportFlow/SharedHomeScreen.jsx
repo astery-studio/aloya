@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { CycleDateStrip } from '../../../cycles/components/CycleDateStrip';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
@@ -36,6 +38,7 @@ function SharedHomeScreen({
     onSelecionarAba,
     ferramentasPrevia
 }) {
+    const { escuro } = useTheme();
     const [dataEscolhida, setDataEscolhida] = useState(null);
     const [faseDoSheet, setFaseDoSheet] = useState(null);
     const [confiabilidadeAberta, setConfiabilidadeAberta] = useState(false);
@@ -70,6 +73,7 @@ function SharedHomeScreen({
     return (
         <MainLayout
             abaAtiva="inicio"
+            corFundo={escuro ? coresNoturnasConteudo.fundo : undefined}
             onSelecionarAba={onSelecionarAba}
             cabecalho={
                 <CycleHomeHeader

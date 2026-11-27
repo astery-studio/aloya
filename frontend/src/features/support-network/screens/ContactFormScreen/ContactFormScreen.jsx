@@ -8,6 +8,7 @@ import {
     WarningCircleIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { SettingsLayout } from '../../../settings/layouts/SettingsLayout/SettingsLayout';
 import { ContactForm } from '../../components/ContactForm/ContactForm';
 import { IndividualPermissionsForm } from '../../components/IndividualPermissionsForm/IndividualPermissionsForm';
@@ -486,7 +487,7 @@ function NewContactFormScreen({
             <SettingsLayout
                 titulo="Novo Contato"
                 onVoltar={voltar}
-                corFundo={tema.escuro ? tema.cores.interface.fundo : undefined}
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
             >
                 <View style={estilos.conteudo}>
                     {carregandoCategorias ? (
@@ -495,7 +496,14 @@ function NewContactFormScreen({
                             accessibilityLabel="Carregando formulário de contato"
                             style={estilos.carregamento}
                         >
-                            <ActivityIndicator size="large" color={tema.cores.interface.destaque} />
+                            <ActivityIndicator
+                                size="large"
+                                color={
+                                    tema.escuro
+                                        ? coresNoturnasConteudo.verde
+                                        : tema.cores.interface.destaque
+                                }
+                            />
                         </View>
                     ) : (
                         <ContactForm

@@ -1,6 +1,7 @@
 // Define o cabeçalho compacto e a distribuição vertical da tela do calendário.
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 const coresConfiabilidadeEscuras = Object.freeze({
@@ -17,11 +18,11 @@ const coresConfiabilidadeEscuras = Object.freeze({
     alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
 });
 
-function criarEstilos(tema) {
+function criarEstilos(tema, corFundo = tema.escuro ? '#1C1B19' : tema.cores.interface.fundo) {
     return StyleSheet.create({
         tela: {
             flex: 1,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         corpo: {
             flex: 1,
@@ -34,7 +35,7 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0,
             paddingTop: tema.espacamentosLayout.headerParaConteudo,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         areaCalendario: {
             flex: 1,
@@ -61,7 +62,7 @@ function criarEstilos(tema) {
             alignItems: 'flex-start',
             gap: 9,
             borderRadius: 12,
-            backgroundColor: tema.escuro ? '#232926' : '#E3E4DE',
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.superficie : '#E3E4DE',
             shadowColor: '#000000',
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.18,
@@ -70,7 +71,7 @@ function criarEstilos(tema) {
         },
         textoVazio: {
             width: '100%',
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.medium,
             fontSize: 15,
             fontWeight: '500',

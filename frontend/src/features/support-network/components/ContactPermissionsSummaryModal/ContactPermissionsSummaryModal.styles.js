@@ -8,6 +8,7 @@ function criarEstilos(tema) {
         modal: {
             width: '100%',
             maxWidth: 342,
+            ...(tema.escuro && { backgroundColor: coresNoturnasConteudo.superficie }),
             borderRadius: 20,
             boxShadow: '0 8px 40px 0 rgba(34, 34, 34, 0.12)'
         },
@@ -53,7 +54,9 @@ function criarEstilos(tema) {
         descricao: {
             width: 294,
             maxWidth: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -65,7 +68,9 @@ function criarEstilos(tema) {
         mensagemVazia: {
             width: 294,
             maxWidth: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -111,7 +116,9 @@ function criarEstilos(tema) {
         textoItem: {
             minWidth: 0,
             flex: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 11,
             fontWeight: '400',
@@ -120,13 +127,17 @@ function criarEstilos(tema) {
         },
 
         textoItemDestaque: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontWeight: '700'
         },
 
         textoItemComplemento: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400'
         },

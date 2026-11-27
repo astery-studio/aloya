@@ -1,4 +1,5 @@
 import Svg, { Circle, Path } from 'react-native-svg';
+import { useHomeColors } from '../../hooks/useHomeColors';
 
 const TAMANHO_MOLDURA = 260;
 const CENTRO_MOLDURA = TAMANHO_MOLDURA / 2;
@@ -60,6 +61,7 @@ function criarSegmentosDaMoldura({ fase, duracaoCiclo, diaCiclo }) {
 }
 
 function CyclePhaseFrame({ fase, duracaoCiclo, diaCiclo, exibirContornoSemDuracao = false }) {
+    const { cor } = useHomeColors();
     const segmentos = criarSegmentosDaMoldura({ fase, duracaoCiclo, diaCiclo });
 
     const corContorno = exibirContornoSemDuracao && !segmentos.length && CORES_DAS_FASES[fase];
@@ -79,7 +81,7 @@ function CyclePhaseFrame({ fase, duracaoCiclo, diaCiclo, exibirContornoSemDuraca
                     cx={CENTRO_MOLDURA}
                     cy={CENTRO_MOLDURA}
                     r={RAIO_MOLDURA}
-                    stroke={corContorno}
+                    stroke={cor(corContorno)}
                     strokeWidth={2}
                 />
             ) : null}
@@ -88,7 +90,7 @@ function CyclePhaseFrame({ fase, duracaoCiclo, diaCiclo, exibirContornoSemDuraca
                     key={indice}
                     testID="cycle-phase-frame-segment"
                     d={segmento.d}
-                    stroke={segmento.cor}
+                    stroke={cor(segmento.cor)}
                     strokeWidth={2}
                     strokeLinecap="round"
                 />
