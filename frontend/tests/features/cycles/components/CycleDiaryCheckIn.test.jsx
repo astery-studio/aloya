@@ -65,6 +65,7 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
     expect(screen.getByText('Como você está se sentindo hoje?')).toBeOnTheScreen();
     expect(screen.getByText('Check-in gentil')).toHaveStyle({ color: '#4A758E' });
     expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toBeDisabled();
+    expect(mockFormOptions.marcarCheckIn).toBe(true);
     expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toHaveStyle({
         width: '100%',
         height: 36,
@@ -106,6 +107,24 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
         height: 36,
         borderRadius: 10
     });
+});
+
+test('mantém o check-in concluído ao recarregar o registro persistido do dia', async () => {
+    mockExistingRecord = {
+        id: 9,
+        data: '2026-10-08',
+        versao: 2,
+        checkInRealizado: true,
+        categorias: []
+    };
+
+    await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} onOpenDiary={jest.fn()} />);
+
+    expect(
+        screen.getByText('Você realizou seu check-in com sucesso. Verifique os detalhes no diário:')
+    ).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Salvar no Diário' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Diário' })).toBeEnabled();
 });
 
 test('permite complementar silenciosamente o registro já existente para a data', async () => {

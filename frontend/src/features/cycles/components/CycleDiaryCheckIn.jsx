@@ -37,6 +37,7 @@ function CycleDiaryCheckIn({
         modo: existing.record ? 'editar' : 'criar',
         dataInicial: date,
         registroInicial: existing.record,
+        marcarCheckIn: true,
         onCriado: () => setSaved(true),
         onSalvo: () => setSaved(true),
         onSessaoExpirada: onSessionExpired
@@ -61,7 +62,7 @@ function CycleDiaryCheckIn({
 
     const salvarDesativado = !valid || Boolean(existing.record && !form.alterado);
     const aplicarVisualDesativado = salvarDesativado && !tema.escuro;
-    const checkInRealizado = saved;
+    const checkInRealizado = saved || existing.record?.checkInRealizado === true;
 
     return (
         <View style={estilos.margem}>

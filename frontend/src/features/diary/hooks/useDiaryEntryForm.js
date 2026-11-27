@@ -18,6 +18,7 @@ function useDiaryEntryForm({
     modo = 'criar',
     dataInicial,
     registroInicial,
+    marcarCheckIn = false,
     onCriado,
     onSalvo,
     onSessaoExpirada
@@ -95,7 +96,8 @@ function useDiaryEntryForm({
             catalogo,
             valores,
             data,
-            hoje: obterHojeDiario()
+            hoje: obterHojeDiario(),
+            checkInRealizado: marcarCheckIn
         });
         if (editando) {
             if (formulario.dados.categorias.length > 0) delete formulario.erros.conteudo;
@@ -143,6 +145,7 @@ function useDiaryEntryForm({
         onCriado,
         onSalvo,
         onSessaoExpirada,
+        marcarCheckIn,
         registroInicial,
         salvando,
         service,
