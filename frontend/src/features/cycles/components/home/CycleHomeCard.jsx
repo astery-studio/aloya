@@ -12,8 +12,6 @@ function CycleHomeCard({
     titulo,
     descricao,
     icone,
-    selo,
-    corCategoria,
     aoPressionar,
     rotuloAcessibilidade,
     children
@@ -25,14 +23,7 @@ function CycleHomeCard({
         <>
             {icone}
             <View style={estilos.textos}>
-                <View style={selo ? estilos.linhaCategoria : undefined}>
-                    {categoria ? (
-                        <Text style={[estilos.categoria, corCategoria && { color: corCategoria }]}>
-                            {categoria}
-                        </Text>
-                    ) : null}
-                    {selo}
-                </View>
+                {categoria ? <Text style={estilos.categoria}>{categoria}</Text> : null}
                 <Text style={estilos.titulo}>{titulo}</Text>
                 {descricao ? <Text style={estilos.descricao}>{descricao}</Text> : null}
             </View>

@@ -30,6 +30,7 @@ import {
     obterFase
 } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
+import { SharedCycleMomentCard } from '../../components/SharedCycleMomentCard/SharedCycleMomentCard';
 import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
 import { SupportedPersonIndicator } from '../../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { SharedHomeNotice } from './SharedHomeWithoutContact';
@@ -156,33 +157,19 @@ function SharedHomeScreen({
                     </View>
                 ) : null}
                 {verFase && status === 'disponivel' && (dicas || ciclo?.possuiCiclos === false) ? (
-                    <View style={estilosCuidados.secao}>
-                        <CycleHomeCard
-                            categoria="Momento do ciclo"
-                            corCategoria={corDaFase}
-                            titulo={
-                                semCiclo
-                                    ? `${nomeTitular} não possui ciclo cadastrado`
-                                    : NOMES_DAS_FASES[fase]
-                            }
-                            descricao={
-                                podeAbrirMomento
-                                    ? (dicas.descricao.match(/^[^.]+\./u)?.[0] ?? dicas.descricao)
-                                    : undefined
-                            }
-                            selo={
-                                podeAbrirMomento ? (
-                                    <Text style={estilos.selo}>Informação autorizada</Text>
-                                ) : null
-                            }
-                            rotuloAcessibilidade={
-                                podeAbrirMomento
-                                    ? `Momento do ciclo. ${NOMES_DAS_FASES[fase]}. Informação autorizada`
-                                    : undefined
-                            }
-                            aoPressionar={podeAbrirMomento ? () => setFaseDoSheet(fase) : undefined}
-                        />
-                    </View>
+                    <SharedCycleMomentCard
+                        titulo={
+                            semCiclo
+                                ? `${nomeTitular} não possui ciclo cadastrado`
+                                : NOMES_DAS_FASES[fase]
+                        }
+                        descricao={
+                            podeAbrirMomento
+                                ? (dicas.descricao.match(/^[^.]+\./u)?.[0] ?? dicas.descricao)
+                                : undefined
+                        }
+                        aoPressionar={podeAbrirMomento ? () => setFaseDoSheet(fase) : undefined}
+                    />
                 ) : null}
                 {previsao?.proximoInicioEstimado ? (
                     <CyclePredictionSummary

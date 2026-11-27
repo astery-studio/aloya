@@ -27,6 +27,15 @@ test('abre o sheet padrão da fase pela informação autorizada', async () => {
     await render(<SharedSupportPreview />);
 
     const momento = screen.getByRole('button', { name: /Momento do ciclo.*Informação autorizada/ });
+    expect(momento).toHaveStyle({ maxWidth: 358, padding: 18, borderRadius: 27 });
+    expect(within(momento).getByText('Momento do ciclo')).toHaveStyle({
+        color: '#D68C3A',
+        fontSize: 9
+    });
+    expect(within(momento).getByText('Informação autorizada')).toHaveStyle({
+        color: '#2C4C3B',
+        fontSize: 7
+    });
     await fireEvent.press(momento);
     expect(await screen.findByText('Conheça o ciclo')).toBeOnTheScreen();
     expect(await screen.findByRole('header', { name: 'Por que “folicular”?' })).toBeOnTheScreen();
