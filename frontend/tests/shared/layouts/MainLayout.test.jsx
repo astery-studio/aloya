@@ -121,6 +121,9 @@ describe('MainLayout', () => {
         expect(screen.getByTestId('conteudo-main-layout')).toHaveStyle({
             backgroundColor: '#181C1A'
         });
+        expect(screen.getByTestId('navegacao-segura-main-layout')).toHaveStyle({
+            backgroundColor: '#1E1E1E'
+        });
     });
 
     test('atualiza o fundo quando o tema muda', async () => {

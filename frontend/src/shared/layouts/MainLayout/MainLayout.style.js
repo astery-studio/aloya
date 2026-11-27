@@ -1,5 +1,6 @@
 // Define a estrutura visual do layout principal das telas internas.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -17,7 +18,9 @@ function criarEstilos(tema) {
         navegacaoSegura: {
             width: '100%',
             flexShrink: 0,
-            backgroundColor: tema.cores.interface.superficieElevada
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficieElevada
         }
     });
 }
