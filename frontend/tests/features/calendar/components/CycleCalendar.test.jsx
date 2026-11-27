@@ -30,6 +30,19 @@ describe('CycleCalendar', () => {
         expect(resultado.queryByRole('button', { name: /menstruação registrada/ })).toBeNull();
     });
 
+    test('aplica a paleta noturna ao cabeçalho da grade compartilhada', async () => {
+        const resultado = await render(
+            <CycleCalendar meses={[criarMes('2026-10')]} corFundo="#121212" />,
+            { preferencia: 'escuro' }
+        );
+
+        expect(resultado.getByLabelText('Dias da semana')).toHaveStyle({
+            backgroundColor: '#121212',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
+        });
+        expect(resultado.getByText('Dom')).toHaveStyle({ color: '#999999' });
+    });
+
     test('mantém o primeiro mês no topo antes de qualquer interação', async () => {
         const resultado = await render(<CycleCalendar meses={[criarMes('2026-10')]} />);
 
