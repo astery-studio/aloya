@@ -6,7 +6,7 @@ import {
     DMSans_600SemiBold,
     DMSans_700Bold
 } from '@expo-google-fonts/dm-sans';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AppThemeRoot } from '../../../app/AppThemeRoot';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
@@ -17,6 +17,7 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { SharedPermissionGate } from '../components/SharedPermissionGate/SharedPermissionGate';
+import { SupportedCycleHero } from '../components/SupportedCycleHero/SupportedCycleHero';
 import { SupportedPersonIndicator } from '../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
 
@@ -26,6 +27,13 @@ const PERMISSOES_DEMONSTRACAO = [
     ...gruposPermissoes.flatMap(({ permissoes }) => permissoes)
 ].map(({ id }) => id);
 const TITULOS = { inicio: 'Início', historico: 'Histórico de Ciclos', diario: 'Diário' };
+const CENARIOS_CICLO = [
+    { id: 'folicular', rotulo: 'Folicular', dia: 9 },
+    { id: 'menstrual', rotulo: 'Menstrual', dia: 3 },
+    { id: 'ovulatoria', rotulo: 'Ovulatória', dia: 14 },
+    { id: 'lutea', rotulo: 'Lútea', dia: 16 },
+    { id: 'sem-ciclo', rotulo: 'Sem ciclo' }
+];
 const CICLOS = [
     {
         numero: 5,
@@ -51,6 +59,7 @@ const CICLOS = [
 
 function ConteudoPrevia() {
     const [tela, setTela] = useState('inicio');
+    const [cenario, setCenario] = useState(CENARIOS_CICLO[0]);
     const tema = useTheme();
     const permissoes = PERMISSOES_DEMONSTRACAO;
 
@@ -67,7 +76,57 @@ function ConteudoPrevia() {
                 </Text>
                 {tela === 'inicio' ? (
                     <>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={[estilos.inset, estilos.cenarios]}
+                        >
+                            {CENARIOS_CICLO.map((opcao) => {
+                                const selecionado = opcao.id === cenario.id;
+                                const {
+                                    destaque,
+                                    superficie,
+                                    borda,
+                                    textoSobreDestaque,
+                                    textoPrincipal
+                                } = tema.cores.interface;
+                                return (
+                                    <Pressable
+                                        key={opcao.id}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`Prévia da arte: ${opcao.rotulo}`}
+                                        accessibilityState={{ selected: selecionado }}
+                                        onPress={() => setCenario(opcao)}
+                                        style={[
+                                            estilos.cenario,
+                                            {
+                                                borderColor: borda,
+                                                backgroundColor: selecionado ? destaque : superficie
+                                            }
+                                        ]}
+                                    >
+                                        <Text
+                                            style={{
+                                                color: selecionado
+                                                    ? textoSobreDestaque
+                                                    : textoPrincipal
+                                            }}
+                                        >
+                                            {opcao.rotulo}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </ScrollView>
                         <SupportedPersonIndicator nome={NOME} />
+                        <SupportedCycleHero
+                            nomeTitular={NOME}
+                            fase={cenario.id}
+                            possuiDadosCiclo={Boolean(cenario.dia)}
+                            diaCiclo={cenario.dia}
+                            duracaoCiclo={28}
+                            exibirFase={permissoes.includes('geral.fase_atual')}
+                        />
                         <SharedPermissionGate
                             permissoes={permissoes}
                             permissao="geral.historico_ciclo"
@@ -142,6 +201,8 @@ const estilos = StyleSheet.create({
     conteudo: { gap: 16, paddingBottom: 24 },
     aviso: { textAlign: 'center', paddingHorizontal: 16 },
     inset: { paddingHorizontal: 16 },
+    cenarios: { gap: 8 },
+    cenario: { borderWidth: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
     lista: { gap: 12 }
 });
 

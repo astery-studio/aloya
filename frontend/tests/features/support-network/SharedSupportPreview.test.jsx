@@ -9,6 +9,10 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     await render(<SharedSupportPreview />);
 
     expect(screen.getByLabelText('Acompanhando Júlia')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Prévia da arte: Sem ciclo' }));
+    expect(screen.getByTestId('supported-cycle-artwork-empty')).toBeOnTheScreen();
+    expect(screen.queryByRole('header', { name: 'Fase Folicular' })).not.toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Ver Histórico de Ciclos' }));
     expect(screen.getByText('RESUMO DOS CICLOS DE JÚLIA')).toBeOnTheScreen();
