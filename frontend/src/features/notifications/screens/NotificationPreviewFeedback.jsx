@@ -4,7 +4,6 @@ const orientacoes = {
     plataforma: 'Abra o Aloya em um celular Android ou iOS para testar.',
     permissao: 'As notificações estão desativadas para o Aloya.',
     canal: 'Este canal está desativado nas configurações do aparelho.',
-    desativada: 'Este aviso está desativado ou indisponível para sua conta.',
     erro: 'Não consegui mostrar a prévia. Confira se está usando uma build do Aloya no celular.'
 };
 
