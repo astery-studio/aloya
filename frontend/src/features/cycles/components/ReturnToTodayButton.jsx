@@ -18,13 +18,16 @@ function ReturnToTodayButton({ onPress }) {
             gap: 5,
             paddingHorizontal: 13,
             paddingVertical: 6,
-            borderWidth: 1,
-            borderColor: 'rgba(214, 140, 58, 0.40)',
-            borderStyle: 'dashed',
-            borderRadius: 999
+            borderRadius: 999,
+            backgroundColor: '#D68C3A',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 5
         },
         textoBase: {
-            color: 'rgba(214, 140, 58, 0.60)',
+            color: '#FFFFFF',
             fontSize: 10,
             includeFontPadding: false,
             lineHeight: 20

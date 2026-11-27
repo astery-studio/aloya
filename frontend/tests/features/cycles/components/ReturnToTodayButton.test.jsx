@@ -19,19 +19,24 @@ test('retorna para a data de referência pela ação acessível', async () => {
         paddingVertical: 6,
         paddingHorizontal: 13,
         gap: 5,
-        borderColor: 'rgba(214, 140, 58, 0.40)',
-        borderStyle: 'dashed',
-        borderRadius: 999
+        borderRadius: 999,
+        backgroundColor: '#D68C3A',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        elevation: 5
     });
+    expect(botao).not.toHaveStyle({ borderWidth: 1 });
     expect(screen.queryByTestId('phosphor-react-native-rewind-regular')).not.toBeOnTheScreen();
     expect(screen.getByText('Voltar para:')).toHaveStyle({
-        color: 'rgba(214, 140, 58, 0.60)',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '300',
         lineHeight: 20
     });
     expect(screen.getByText('Hoje')).toHaveStyle({
-        color: 'rgba(214, 140, 58, 0.60)',
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: '500',
         lineHeight: 20
