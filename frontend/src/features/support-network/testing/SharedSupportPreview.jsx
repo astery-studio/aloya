@@ -14,8 +14,10 @@ import { CycleHistoryCard } from '../../cycles/components/CycleHistoryCard/Cycle
 import { CycleSummaryCard } from '../../cycles/components/CycleSummaryCard/CycleSummaryCard';
 import { DiaryTimelineDivider } from '../../diary/components/DiaryHistoryHeader/DiaryHistoryHeader';
 import { DiaryOverviewCard } from '../../diary/components/DiaryOverviewCard/DiaryOverviewCard';
+import { DiaryRecordDetailsModal } from '../../diary/components/DiaryRecordDetailsModal/DiaryRecordDetailsModal';
 import { DiaryTimeline } from '../../diary/components/DiaryTimeline/DiaryTimeline';
 import { criarEstilos as criarEstilosDiario } from '../../diary/screens/DiaryScreen.styles';
+import { obterRegistrosAdjacentes } from '../../diary/utils/diaryRecordNavigation';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
@@ -102,29 +104,148 @@ const REGISTROS_DIARIO = [
     }
 ];
 
+const DETALHES_DIARIO = {
+    1: {
+        ciclo: { dia: 1, numero: 4 },
+        categorias: [
+            {
+                id: 'banheiro',
+                nome: 'Intestino',
+                macrocategoria: 'Corpo e Sintomas Físicos',
+                opcoes: [{ grupo: 'intestino', nome: 'Dificuldade para evacuar' }]
+            },
+            {
+                id: 'sangramento_escape',
+                nome: 'Sangramento de escape',
+                macrocategoria: 'Ciclo e Sangramento',
+                opcoes: [
+                    { grupo: 'cor', nome: 'Vermelho escuro' },
+                    { grupo: 'intensidade', nome: 'Moderado' }
+                ]
+            },
+            {
+                id: 'tempo_sono',
+                nome: 'Tempo de sono',
+                macrocategoria: 'Energia e Sono',
+                duracaoMinutos: 740
+            },
+            {
+                id: 'atividade_sexual',
+                nome: 'Atividade sexual (com parceiro/a)',
+                macrocategoria: 'Vida Íntima e Social',
+                opcoes: [
+                    { grupo: 'tipo', nome: 'Penetração vaginal' },
+                    { grupo: 'contracepcao', nome: 'Preservativo externo' },
+                    { grupo: 'contracepcao', nome: 'Lubrificante' }
+                ]
+            },
+            {
+                id: 'desejo_libido',
+                nome: 'Desejo/Libido',
+                macrocategoria: 'Vida Íntima e Social',
+                opcoes: [{ grupo: 'resposta_sexual', nome: 'Orgasmo' }]
+            }
+        ]
+    },
+    2: {
+        ciclo: { dia: 21, numero: 3 },
+        categorias: [
+            {
+                id: 'pele',
+                nome: 'Pele',
+                macrocategoria: 'Corpo e Sintomas Físicos',
+                opcoes: [{ grupo: 'caracteristicas', nome: 'Espinhas' }]
+            },
+            {
+                id: 'sintomas_pre_menstruais',
+                nome: 'Sintomas pré-menstruais',
+                macrocategoria: 'Emocional',
+                opcoes: [
+                    { grupo: 'sintomas', nome: 'Sensibilidade emocional' },
+                    { grupo: 'sintomas', nome: 'Oscilações de humor' }
+                ]
+            },
+            {
+                id: 'vida_social',
+                nome: 'Vida social',
+                macrocategoria: 'Vida Íntima e Social',
+                opcoes: [
+                    { grupo: 'relacionamentos', nome: 'Aproximação' },
+                    { grupo: 'relacionamentos', nome: 'Saudade' }
+                ]
+            },
+            {
+                id: 'atividade_sexual',
+                nome: 'Atividade sexual (com parceiro/a)',
+                macrocategoria: 'Vida Íntima e Social',
+                opcoes: [
+                    { grupo: 'tipo', nome: 'Sexo oral' },
+                    { grupo: 'tipo', nome: 'Fricção entre corpos' }
+                ]
+            },
+            {
+                id: 'desejo_libido',
+                nome: 'Desejo/Libido',
+                macrocategoria: 'Vida Íntima e Social',
+                opcoes: [
+                    { grupo: 'desejo', nome: 'Desejo espontâneo' },
+                    { grupo: 'desejo', nome: 'Fantasias' }
+                ]
+            },
+            {
+                id: 'anotacao_livre',
+                nome: 'Anotação do dia',
+                macrocategoria: 'Saúde e Acompanhamento',
+                texto: 'Hoje tirei um tempo para descansar. Pela manhã, me senti mais cansada e decidi respeitar o meu ritmo. À tarde, fiz uma caminhada leve e terminei o dia mais tranquila.'
+            }
+        ]
+    }
+};
+
 function DiarioPrevia({ permissoes, aviso }) {
     const tema = useTheme();
+    const [registroAberto, setRegistroAberto] = useState(null);
+    const adjacentes = obterRegistrosAdjacentes(REGISTROS_DIARIO, registroAberto?.id);
+    const detalhe = registroAberto
+        ? { ...registroAberto, ...DETALHES_DIARIO[registroAberto.id] }
+        : null;
 
     return (
-        <DiaryTimeline
-            registros={REGISTROS_DIARIO}
-            somenteLeitura
-            contentContainerStyle={estilos.inset}
-            ListHeaderComponent={
-                <View style={estilos.lista}>
-                    {aviso}
-                    <DiaryOverviewCard
-                        nomeTitular={NOME}
-                        fase="folicular"
-                        tituloFase="Fase Folicular"
-                        descricao="Júlia costuma registrar aumento de energia, secreção clara de ovo e humor motivado."
-                        diasRegistrados={4}
-                        exibirFase={permissoes.includes('geral.fase_atual')}
-                    />
-                    <DiaryTimelineDivider estilos={criarEstilosDiario(tema)} />
-                </View>
-            }
-        />
+        <>
+            <DiaryTimeline
+                registros={REGISTROS_DIARIO}
+                somenteLeitura
+                aoAbrir={setRegistroAberto}
+                contentContainerStyle={estilos.inset}
+                ListHeaderComponent={
+                    <View style={estilos.lista}>
+                        {aviso}
+                        <DiaryOverviewCard
+                            nomeTitular={NOME}
+                            fase="folicular"
+                            tituloFase="Fase Folicular"
+                            descricao="Júlia costuma registrar aumento de energia, secreção clara de ovo e humor motivado."
+                            diasRegistrados={4}
+                            exibirFase={permissoes.includes('geral.fase_atual')}
+                        />
+                        <DiaryTimelineDivider estilos={criarEstilosDiario(tema)} />
+                    </View>
+                }
+            />
+            <DiaryRecordDetailsModal
+                visivel={Boolean(detalhe)}
+                registro={detalhe}
+                nomeTitular={NOME}
+                somenteLeitura
+                aoAnterior={
+                    adjacentes.anterior ? () => setRegistroAberto(adjacentes.anterior) : undefined
+                }
+                aoProximo={
+                    adjacentes.proximo ? () => setRegistroAberto(adjacentes.proximo) : undefined
+                }
+                aoFechar={() => setRegistroAberto(null)}
+            />
+        </>
     );
 }
 

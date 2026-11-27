@@ -25,4 +25,13 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     expect(screen.getAllByTestId('diary-entry-card')).toHaveLength(2);
     expect(screen.getByText('Hoje tirei um tempo para descansar.')).toBeOnTheScreen();
     expect(screen.queryByTestId('diary-entry-header-actions')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: /Abrir registro de 04\/11\/2026/ }));
+    expect(screen.getByRole('header', { name: 'Diário de Júlia' })).toBeOnTheScreen();
+    expect(screen.getByText('No dia 01 do ciclo 04 Júlia registrou:')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Próximo dia' })).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Dia anterior' }));
+    expect(screen.getByText('No dia 21 do ciclo 03 Júlia registrou:')).toBeOnTheScreen();
+    expect(screen.getByText('Espinhas')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
+    expect(screen.queryByRole('header', { name: 'Diário de Júlia' })).not.toBeOnTheScreen();
 });
