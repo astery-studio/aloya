@@ -23,7 +23,10 @@ describe('CycleCalendar', () => {
             />
         );
 
-        expect(resultado.getByTestId('fundo-dia-2026-10-04')).toBeOnTheScreen();
+        expect(resultado.getByTestId('faixa-fase-2026-10-04-2026-10-04')).toBeOnTheScreen();
+        expect(
+            resultado.getByLabelText('Dia 4 de outubro de 2026, menstruação registrada')
+        ).toBeOnTheScreen();
         expect(resultado.queryByRole('button', { name: /menstruação registrada/ })).toBeNull();
     });
 
