@@ -3,24 +3,38 @@ import { atualizarRegistro } from './nativePushDevice';
 export function criarSincronizacaoPush(contexto) {
     const { controller } = contexto;
     let registrando = false;
-    let renovar = false;
+    let pendente = false;
+    let tokenNativoAtual;
+    let registroAtual;
+    let bloqueadoAte = 0;
 
-    async function sincronizar(solicitar = false) {
+    async function sincronizar({ solicitar = false, tokenNativo } = {}) {
+        if (controller.signal.aborted) return;
+        if (tokenNativo) {
+            if (tokenNativo.data === tokenNativoAtual?.data) return;
+            tokenNativoAtual = tokenNativo;
+        }
+        if (Date.now() < bloqueadoAte) return;
         if (registrando) {
-            renovar = true;
+            pendente = true;
             return;
         }
 
         registrando = true;
 
         try {
-            await atualizarRegistro(contexto, solicitar);
-        } catch {
-            // Tenta sincronizar novamente ao voltar para o app ou quando o token mudar.
+            registroAtual = await atualizarRegistro(contexto, {
+                solicitar,
+                tokenNativo: tokenNativoAtual,
+                anterior: registroAtual
+            });
+        } catch (erro) {
+            if (erro?.status === 429)
+                bloqueadoAte = Date.now() + (erro.tentarAposMs ?? 60_000);
         } finally {
             registrando = false;
-            if (renovar && !controller.signal.aborted) {
-                renovar = false;
+            if (pendente) {
+                pendente = false;
                 void sincronizar();
             }
         }
