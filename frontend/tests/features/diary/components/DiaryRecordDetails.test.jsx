@@ -320,6 +320,27 @@ describe('DiaryRecordDetails', () => {
         expect(screen.queryByTestId('diary-record-details')).not.toBeOnTheScreen();
     });
 
+    test('aplica o contraste noturno aos botões de edição e exclusão', async () => {
+        await render(
+            <DiaryRecordDetails
+                registro={registro}
+                aoEditar={jest.fn()}
+                aoExcluir={jest.fn()}
+                aoFechar={jest.fn()}
+            />,
+            { preferencia: 'escuro' }
+        );
+
+        for (const acao of ['Editar', 'Excluir']) {
+            expect(
+                screen.getByRole('button', { name: `${acao} registro de 28/10/2026` })
+            ).toHaveStyle({
+                backgroundColor: '#C26E5F'
+            });
+            expect(screen.getByText(acao)).toHaveStyle({ color: '#121212' });
+        }
+    });
+
     test('aceita editar ou excluir como ação isolada', async () => {
         const resultado = await render(
             <DiaryRecordDetails registro={registro} aoEditar={jest.fn()} aoFechar={jest.fn()} />

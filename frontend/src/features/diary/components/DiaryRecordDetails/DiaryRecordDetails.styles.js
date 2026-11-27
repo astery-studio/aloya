@@ -147,7 +147,7 @@ function criarEstilos(tema) {
         },
         botaoAcaoDesativado: { opacity: 0.5 },
         textoBotaoAcao: {
-            color: '#FFF',
+            color: diario.textoSobrePrimaria,
             fontFamily: fontFamilies.semiBold,
             fontSize: 13,
             fontWeight: '600',
