@@ -51,7 +51,8 @@ function criarEstilos(tema) {
             borderColor: tema.escuro ? coresNoturnasConteudo.fundo : '#E6E2D8'
         },
         botaoNaoSelecionado: {
-            backgroundColor: '#F0EDE7'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.superficie : '#F0EDE7',
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : '#E6E2D8'
         },
         botaoPressionado: {
             opacity: 0.72
@@ -68,7 +69,9 @@ function criarEstilos(tema) {
             color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF'
         },
         textoNaoSelecionado: {
-            color: tema.cores.interface.textoSecundario
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario
         }
     });
 }
