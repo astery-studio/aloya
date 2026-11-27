@@ -13,22 +13,8 @@ import { CalendarScreenContainer } from '../../calendar/screens/CalendarScreenCo
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveUsageCard } from '../../contraceptives/components/ContraceptiveUsageCard';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
-import { DiaryActiveFilters } from '../../diary/components/DiaryActiveFilters/DiaryActiveFilters';
-import { DiaryFiltersSheet } from '../../diary/components/DiaryFiltersSheet/DiaryFiltersSheet';
-import { DiaryTimelineDivider } from '../../diary/components/DiaryHistoryHeader/DiaryHistoryHeader';
-import { DiaryOverviewCard } from '../../diary/components/DiaryOverviewCard/DiaryOverviewCard';
-import { DiaryRecordDetailsModal } from '../../diary/components/DiaryRecordDetailsModal/DiaryRecordDetailsModal';
-import { DiaryTimeline } from '../../diary/components/DiaryTimeline/DiaryTimeline';
-import { criarEstilos as criarEstilosDiario } from '../../diary/screens/DiaryScreen.styles';
-import {
-    FILTROS_DIARIO_VAZIOS,
-    normalizarFiltrosDiario,
-    possuiFiltrosDiario
-} from '../../diary/utils/diaryFilters';
-import { obterRegistrosAdjacentes } from '../../diary/utils/diaryRecordNavigation';
+import { normalizarFiltrosDiario } from '../../diary/utils/diaryFilters';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
-import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
-import { FunnelIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { SharedPermissionGate } from '../components/SharedPermissionGate/SharedPermissionGate';
@@ -36,6 +22,7 @@ import { SupportedCycleHero } from '../components/SupportedCycleHero/SupportedCy
 import { SupportedPersonIndicator } from '../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
 import { SharedCycleHistoryScreen } from '../screens/SharedCycleHistoryScreen/SharedCycleHistoryScreen';
+import { SharedDiaryScreen } from '../screens/SharedDiaryScreen/SharedDiaryScreen';
 import { SharedNavigationPreview } from './SharedNavigationPreview';
 
 const NOME = 'Júlia';
@@ -45,7 +32,6 @@ const PERMISSOES_DEMONSTRACAO = [
 ].map(({ id }) => id);
 const TITULOS = {
     inicio: 'Início',
-    diario: 'Diário',
     anticoncepcionais: 'Anticoncepcionais'
 };
 const ANTICONCEPCIONAIS_PREVIA = [
@@ -105,12 +91,6 @@ const CATALOGO_PREVIA = {
         }))
     }))
 };
-const SERVICO_FILTROS_PREVIA = { buscarCatalogo: async () => CATALOGO_PREVIA };
-const ROTULOS_CATEGORIAS = Object.fromEntries(
-    CATALOGO_PREVIA.macrocategorias.flatMap(({ categorias }) =>
-        categorias.map(({ id, nome }) => [id, nome])
-    )
-);
 const CENARIOS_CICLO = [
     { id: 'folicular', rotulo: 'Folicular', dia: 9 },
     { id: 'menstrual', rotulo: 'Menstrual', dia: 3 },
@@ -355,128 +335,40 @@ const DETALHES_DIARIO = {
     }
 };
 
-function DiarioPrevia({ permissoes, aviso, filtroAberto, aoFecharFiltro, aoVoltar }) {
-    const tema = useTheme();
-    const [registroAberto, setRegistroAberto] = useState(null);
-    const [filtros, setFiltros] = useState(FILTROS_DIARIO_VAZIOS);
-    const estilosDiario = criarEstilosDiario(tema);
-    const filtrosAtivos = possuiFiltrosDiario(filtros);
-    const registros = REGISTROS_DIARIO.filter(
-        ({ id, data, fase }) =>
-            (!filtros.dataInicio || data >= filtros.dataInicio) &&
-            (!filtros.dataFim || data <= filtros.dataFim) &&
-            (!filtros.fases.length || filtros.fases.includes(fase)) &&
-            (!filtros.categorias.length ||
-                DETALHES_DIARIO[id].categorias.some((categoria) =>
-                    filtros.categorias.includes(categoria.id)
-                ))
-    );
-    const adjacentes = obterRegistrosAdjacentes(registros, registroAberto?.id);
-    const detalhe = registroAberto
-        ? { ...registroAberto, ...DETALHES_DIARIO[registroAberto.id] }
-        : null;
-
-    function removerFiltro(id) {
-        const [tipo, valor] = id.split(':');
-        if (tipo === 'categoria') {
-            setFiltros((atuais) => ({
-                ...atuais,
-                categorias: atuais.categorias.filter((item) => item !== valor)
-            }));
-        } else if (tipo === 'fase') {
-            setFiltros((atuais) => ({
-                ...atuais,
-                fases: atuais.fases.filter((item) => item !== valor)
-            }));
-        } else if (tipo === 'dataInicio' || tipo === 'dataFim') {
-            setFiltros((atuais) => ({ ...atuais, [tipo]: null }));
-        }
+const SERVICO_DIARIO_PREVIA = {
+    buscarCatalogo: async () => CATALOGO_PREVIA,
+    buscarResumo: async () => ({
+        fase: 'folicular',
+        diasRegistrados: 4,
+        informacoesSuficientes: true,
+        destaques: [
+            { categoriaId: 'energia', valor: 'Aumento de energia' },
+            { categoriaId: 'secrecao_corrimento', grupo: 'cor', valor: 'Clara de ovo' },
+            { categoriaId: 'sintomas_emocionais', valor: 'Motivado' }
+        ]
+    }),
+    buscarDetalhe: async (id) => ({
+        ...REGISTROS_DIARIO.find((registro) => registro.id === id),
+        ...DETALHES_DIARIO[id]
+    }),
+    async listarHistorico({ filtros }) {
+        const { dataInicio, dataFim, categorias, fases } = normalizarFiltrosDiario(filtros);
+        const itens = REGISTROS_DIARIO.filter(
+            ({ id, data, fase }) =>
+                (!dataInicio || data >= dataInicio) &&
+                (!dataFim || data <= dataFim) &&
+                (!fases.length || fases.includes(fase)) &&
+                (!categorias.length ||
+                    DETALHES_DIARIO[id].categorias.some(({ id }) => categorias.includes(id)))
+        );
+        return { itens, proximoCursor: null };
     }
-
-    return (
-        <>
-            <DiaryTimeline
-                registros={registros}
-                somenteLeitura
-                aoAbrir={setRegistroAberto}
-                contentContainerStyle={estilos.inset}
-                ListHeaderComponent={
-                    <View style={estilos.lista}>
-                        {aviso}
-                        <Pressable accessibilityRole="button" onPress={aoVoltar}>
-                            <Text style={{ color: tema.cores.interface.destaque }}>
-                                Voltar à prévia do Início
-                            </Text>
-                        </Pressable>
-                        {filtrosAtivos ? (
-                            <DiaryActiveFilters
-                                filtros={filtros}
-                                rotulosCategorias={ROTULOS_CATEGORIAS}
-                                quantidadeResultados={registros.length}
-                                aoLimpar={() => setFiltros(FILTROS_DIARIO_VAZIOS)}
-                                aoRemover={removerFiltro}
-                            />
-                        ) : (
-                            <DiaryOverviewCard
-                                nomeTitular={NOME}
-                                fase="folicular"
-                                tituloFase="Fase Folicular"
-                                descricao="Júlia costuma registrar aumento de energia, secreção clara de ovo e humor motivado."
-                                diasRegistrados={4}
-                                exibirFase={permissoes.includes('geral.fase_atual')}
-                            />
-                        )}
-                        {filtrosAtivos ? null : <DiaryTimelineDivider estilos={estilosDiario} />}
-                        {filtrosAtivos && !registros.length ? (
-                            <Text
-                                accessibilityLiveRegion="polite"
-                                style={estilosDiario.mensagemFiltroVazio}
-                            >
-                                Nenhum registro encontrado para os filtros aplicados.
-                            </Text>
-                        ) : null}
-                    </View>
-                }
-            />
-            <DiaryFiltersSheet
-                visivel={filtroAberto}
-                filtros={filtros}
-                service={SERVICO_FILTROS_PREVIA}
-                categoriasPermitidas={permissoes
-                    .filter((id) => !id.startsWith('geral.'))
-                    .map((id) => id.split('.')[1])}
-                exibirFiltroFases={
-                    permissoes.includes('geral.fase_atual') &&
-                    permissoes.includes('geral.historico_ciclo')
-                }
-                onFechar={aoFecharFiltro}
-                onAplicar={(aplicados) => {
-                    setFiltros(normalizarFiltrosDiario(aplicados));
-                    aoFecharFiltro();
-                }}
-            />
-            <DiaryRecordDetailsModal
-                visivel={Boolean(detalhe)}
-                registro={detalhe}
-                nomeTitular={NOME}
-                somenteLeitura
-                aoAnterior={
-                    adjacentes.anterior ? () => setRegistroAberto(adjacentes.anterior) : undefined
-                }
-                aoProximo={
-                    adjacentes.proximo ? () => setRegistroAberto(adjacentes.proximo) : undefined
-                }
-                aoFechar={() => setRegistroAberto(null)}
-            />
-        </>
-    );
-}
+};
 
 function ConteudoPrevia() {
     const [tela, setTela] = useState('inicio');
     const [servicoCalendario, setServicoCalendario] = useState(null);
     const [servicoHistorico, setServicoHistorico] = useState(null);
-    const [filtroAberto, setFiltroAberto] = useState(false);
     const [cenario, setCenario] = useState(CENARIOS_CICLO[0]);
     const tema = useTheme();
     const permissoes = PERMISSOES_DEMONSTRACAO;
@@ -511,6 +403,20 @@ function ConteudoPrevia() {
         );
     }
 
+    if (tela === 'diario') {
+        return (
+            <SharedDiaryScreen
+                nomeTitular={NOME}
+                permissoes={permissoes}
+                service={SERVICO_DIARIO_PREVIA}
+                onSelecionarAba={(aba) => {
+                    if (aba === 'inicio') setTela('inicio');
+                    if (aba === 'calendario') abrirCalendario('preenchido');
+                }}
+            />
+        );
+    }
+
     if (tela === 'historico') {
         return (
             <SharedCycleHistoryScreen
@@ -526,206 +432,177 @@ function ConteudoPrevia() {
             titulo={TITULOS[tela]}
             varianteHeader={tela === 'anticoncepcionais' ? 'comVoltar' : 'padrao'}
             onVoltar={tela === 'anticoncepcionais' ? () => setTela('inicio') : undefined}
-            acoesHeader={
-                tela === 'diario' ? (
-                    <IconButton
-                        icone={FunnelIcon}
-                        variante="redeApoio"
-                        corIcone={tema.cores.interface.destaque}
-                        rotuloAcessibilidade="Filtrar histórico do Diário"
-                        aoPressionar={() => setFiltroAberto(true)}
-                    />
-                ) : null
-            }
             exibirNavegacaoInferior={false}
         >
-            {tela === 'diario' ? (
-                <DiarioPrevia
-                    permissoes={permissoes}
-                    aviso={aviso}
-                    filtroAberto={filtroAberto}
-                    aoFecharFiltro={() => setFiltroAberto(false)}
-                    aoVoltar={() => setTela('inicio')}
-                />
-            ) : (
-                <ScrollView contentContainerStyle={estilos.conteudo}>
-                    {aviso}
-                    {tela === 'inicio' ? (
-                        <>
-                            <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={[estilos.inset, estilos.cenarios]}
-                            >
-                                {CENARIOS_CICLO.map((opcao) => {
-                                    const selecionado = opcao.id === cenario.id;
-                                    const {
-                                        destaque,
-                                        superficie,
-                                        borda,
-                                        textoSobreDestaque,
-                                        textoPrincipal
-                                    } = tema.cores.interface;
-                                    return (
-                                        <Pressable
-                                            key={opcao.id}
-                                            accessibilityRole="button"
-                                            accessibilityLabel={`Prévia da arte: ${opcao.rotulo}`}
-                                            accessibilityState={{ selected: selecionado }}
-                                            onPress={() => setCenario(opcao)}
-                                            style={[
-                                                estilos.cenario,
-                                                {
-                                                    borderColor: borda,
-                                                    backgroundColor: selecionado
-                                                        ? destaque
-                                                        : superficie
-                                                }
-                                            ]}
+            <ScrollView contentContainerStyle={estilos.conteudo}>
+                {aviso}
+                {tela === 'inicio' ? (
+                    <>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={[estilos.inset, estilos.cenarios]}
+                        >
+                            {CENARIOS_CICLO.map((opcao) => {
+                                const selecionado = opcao.id === cenario.id;
+                                const {
+                                    destaque,
+                                    superficie,
+                                    borda,
+                                    textoSobreDestaque,
+                                    textoPrincipal
+                                } = tema.cores.interface;
+                                return (
+                                    <Pressable
+                                        key={opcao.id}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`Prévia da arte: ${opcao.rotulo}`}
+                                        accessibilityState={{ selected: selecionado }}
+                                        onPress={() => setCenario(opcao)}
+                                        style={[
+                                            estilos.cenario,
+                                            {
+                                                borderColor: borda,
+                                                backgroundColor: selecionado ? destaque : superficie
+                                            }
+                                        ]}
+                                    >
+                                        <Text
+                                            style={{
+                                                color: selecionado
+                                                    ? textoSobreDestaque
+                                                    : textoPrincipal
+                                            }}
                                         >
-                                            <Text
-                                                style={{
-                                                    color: selecionado
-                                                        ? textoSobreDestaque
-                                                        : textoPrincipal
-                                                }}
-                                            >
-                                                {opcao.rotulo}
-                                            </Text>
-                                        </Pressable>
-                                    );
-                                })}
-                            </ScrollView>
-                            <SupportedPersonIndicator nome={NOME} />
-                            <View style={[estilos.inset, estilos.cenarios]}>
+                                            {opcao.rotulo}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </ScrollView>
+                        <SupportedPersonIndicator nome={NOME} />
+                        <View style={[estilos.inset, estilos.cenarios]}>
+                            <ButtonScreen
+                                texto="Testar troca de pessoa"
+                                aoPressionar={() => setTela('trocarContato')}
+                            />
+                            <ButtonScreen
+                                texto="Testar acesso revogado"
+                                aoPressionar={() => setTela('acessoRevogado')}
+                            />
+                        </View>
+                        <SupportedCycleHero
+                            nomeTitular={NOME}
+                            fase={cenario.id}
+                            possuiDadosCiclo={Boolean(cenario.dia)}
+                            diaCiclo={cenario.dia}
+                            duracaoCiclo={28}
+                            exibirFase={permissoes.includes('geral.fase_atual')}
+                        />
+                        <SharedPermissionGate
+                            permissoes={permissoes}
+                            permissao="geral.anticoncepcionais"
+                        >
+                            <View style={estilos.inset}>
                                 <ButtonScreen
-                                    texto="Testar troca de pessoa"
-                                    aoPressionar={() => setTela('trocarContato')}
-                                />
-                                <ButtonScreen
-                                    texto="Testar acesso revogado"
-                                    aoPressionar={() => setTela('acessoRevogado')}
+                                    texto="Ver Anticoncepcionais"
+                                    variante="verde"
+                                    aoPressionar={() => setTela('anticoncepcionais')}
                                 />
                             </View>
-                            <SupportedCycleHero
-                                nomeTitular={NOME}
-                                fase={cenario.id}
-                                possuiDadosCiclo={Boolean(cenario.dia)}
-                                diaCiclo={cenario.dia}
-                                duracaoCiclo={28}
-                                exibirFase={permissoes.includes('geral.fase_atual')}
+                        </SharedPermissionGate>
+                        <SharedPermissionGate
+                            permissoes={permissoes}
+                            permissao="geral.historico_ciclo"
+                        >
+                            <View style={estilos.inset}>
+                                <ButtonScreen
+                                    texto="Ver Histórico de Ciclos"
+                                    aoPressionar={() => abrirHistorico('preenchido')}
+                                />
+                                <View style={[estilos.cenarios, estilos.cenariosHistorico]}>
+                                    <ButtonScreen
+                                        texto="Histórico vazio"
+                                        aoPressionar={() => abrirHistorico('vazio')}
+                                    />
+                                    <ButtonScreen
+                                        texto="Erro no histórico"
+                                        aoPressionar={() => abrirHistorico('erro')}
+                                    />
+                                </View>
+                            </View>
+                        </SharedPermissionGate>
+                        <SharedPermissionGate
+                            permissoes={permissoes}
+                            permissao="geral.historico_ciclo"
+                        >
+                            <View style={[estilos.inset, estilos.cenarios]}>
+                                <ButtonScreen
+                                    texto="Ver Calendário"
+                                    aoPressionar={() => abrirCalendario('preenchido')}
+                                />
+                                <ButtonScreen
+                                    texto="Calendário sem previsões"
+                                    aoPressionar={() => abrirCalendario('historico')}
+                                />
+                                <ButtonScreen
+                                    texto="Calendário vazio"
+                                    aoPressionar={() => abrirCalendario('vazio')}
+                                />
+                                <ButtonScreen
+                                    texto="Erro no calendário"
+                                    aoPressionar={() => abrirCalendario('erro')}
+                                />
+                            </View>
+                        </SharedPermissionGate>
+                        <SharedPermissionGate permissoes={permissoes} permissao="corpo.pele">
+                            <View style={estilos.inset}>
+                                <ButtonScreen
+                                    texto="Ver Diário"
+                                    aoPressionar={() => setTela('diario')}
+                                />
+                            </View>
+                        </SharedPermissionGate>
+                        <SharedPermissionGate permissoes={permissoes} permissao="geral.dicas">
+                            <CycleEducationSection perspectiva="contato" />
+                        </SharedPermissionGate>
+                    </>
+                ) : null}
+                {tela === 'anticoncepcionais' ? (
+                    <View style={[estilos.inset, estilos.lista]}>
+                        <Text
+                            accessibilityRole="header"
+                            style={[estilos.aviso, { color: tema.cores.interface.textoSecundario }]}
+                        >
+                            NÃO USADOS
+                        </Text>
+                        {ANTICONCEPCIONAIS_PREVIA.filter(
+                            (item) => item.statusUltimoUso === 'pendente'
+                        ).map((item) => (
+                            <ContraceptiveUsageCard
+                                key={item.id}
+                                anticoncepcional={item}
+                                somenteLeitura
                             />
-                            <SharedPermissionGate
-                                permissoes={permissoes}
-                                permissao="geral.anticoncepcionais"
-                            >
-                                <View style={estilos.inset}>
-                                    <ButtonScreen
-                                        texto="Ver Anticoncepcionais"
-                                        variante="verde"
-                                        aoPressionar={() => setTela('anticoncepcionais')}
-                                    />
-                                </View>
-                            </SharedPermissionGate>
-                            <SharedPermissionGate
-                                permissoes={permissoes}
-                                permissao="geral.historico_ciclo"
-                            >
-                                <View style={estilos.inset}>
-                                    <ButtonScreen
-                                        texto="Ver Histórico de Ciclos"
-                                        aoPressionar={() => abrirHistorico('preenchido')}
-                                    />
-                                    <View style={[estilos.cenarios, estilos.cenariosHistorico]}>
-                                        <ButtonScreen
-                                            texto="Histórico vazio"
-                                            aoPressionar={() => abrirHistorico('vazio')}
-                                        />
-                                        <ButtonScreen
-                                            texto="Erro no histórico"
-                                            aoPressionar={() => abrirHistorico('erro')}
-                                        />
-                                    </View>
-                                </View>
-                            </SharedPermissionGate>
-                            <SharedPermissionGate
-                                permissoes={permissoes}
-                                permissao="geral.historico_ciclo"
-                            >
-                                <View style={[estilos.inset, estilos.cenarios]}>
-                                    <ButtonScreen
-                                        texto="Ver Calendário"
-                                        aoPressionar={() => abrirCalendario('preenchido')}
-                                    />
-                                    <ButtonScreen
-                                        texto="Calendário sem previsões"
-                                        aoPressionar={() => abrirCalendario('historico')}
-                                    />
-                                    <ButtonScreen
-                                        texto="Calendário vazio"
-                                        aoPressionar={() => abrirCalendario('vazio')}
-                                    />
-                                    <ButtonScreen
-                                        texto="Erro no calendário"
-                                        aoPressionar={() => abrirCalendario('erro')}
-                                    />
-                                </View>
-                            </SharedPermissionGate>
-                            <SharedPermissionGate permissoes={permissoes} permissao="corpo.pele">
-                                <View style={estilos.inset}>
-                                    <ButtonScreen
-                                        texto="Ver Diário"
-                                        aoPressionar={() => setTela('diario')}
-                                    />
-                                </View>
-                            </SharedPermissionGate>
-                            <SharedPermissionGate permissoes={permissoes} permissao="geral.dicas">
-                                <CycleEducationSection perspectiva="contato" />
-                            </SharedPermissionGate>
-                        </>
-                    ) : null}
-                    {tela === 'anticoncepcionais' ? (
-                        <View style={[estilos.inset, estilos.lista]}>
-                            <Text
-                                accessibilityRole="header"
-                                style={[
-                                    estilos.aviso,
-                                    { color: tema.cores.interface.textoSecundario }
-                                ]}
-                            >
-                                NÃO USADOS
-                            </Text>
-                            {ANTICONCEPCIONAIS_PREVIA.filter(
-                                (item) => item.statusUltimoUso === 'pendente'
-                            ).map((item) => (
-                                <ContraceptiveUsageCard
-                                    key={item.id}
-                                    anticoncepcional={item}
-                                    somenteLeitura
-                                />
-                            ))}
-                            <Text
-                                accessibilityRole="header"
-                                style={[
-                                    estilos.aviso,
-                                    { color: tema.cores.interface.textoSecundario }
-                                ]}
-                            >
-                                USADOS
-                            </Text>
-                            {ANTICONCEPCIONAIS_PREVIA.filter(
-                                (item) => item.statusUltimoUso !== 'pendente'
-                            ).map((item) => (
-                                <ContraceptiveUsageCard
-                                    key={item.id}
-                                    anticoncepcional={item}
-                                    somenteLeitura
-                                />
-                            ))}
-                        </View>
-                    ) : null}
-                </ScrollView>
-            )}
+                        ))}
+                        <Text
+                            accessibilityRole="header"
+                            style={[estilos.aviso, { color: tema.cores.interface.textoSecundario }]}
+                        >
+                            USADOS
+                        </Text>
+                        {ANTICONCEPCIONAIS_PREVIA.filter(
+                            (item) => item.statusUltimoUso !== 'pendente'
+                        ).map((item) => (
+                            <ContraceptiveUsageCard
+                                key={item.id}
+                                anticoncepcional={item}
+                                somenteLeitura
+                            />
+                        ))}
+                    </View>
+                ) : null}
+            </ScrollView>
         </MainLayout>
     );
 }
