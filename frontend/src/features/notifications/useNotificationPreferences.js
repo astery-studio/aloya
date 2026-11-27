@@ -43,7 +43,7 @@ export function useNotificationPreferences(service, { atualizarAoRetomar = false
 
     async function salvar(alteracao) {
         if (envioAtivo.current || !valores) return false;
-        if (valores[alteracao.chave] === alteracao.valor) return true;
+        if (typeof alteracao.valor !== 'boolean' && valores[alteracao.chave] === alteracao.valor) return true;
 
         envioAtivo.current = true;
         definirSalvando(true);
