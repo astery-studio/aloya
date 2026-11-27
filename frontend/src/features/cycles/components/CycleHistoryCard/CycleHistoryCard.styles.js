@@ -140,7 +140,8 @@ function criarEstilos(tema) {
         },
 
         indicadoresSomenteLeitura: {
-            paddingHorizontal: 26
+            paddingHorizontal: 26,
+            flexWrap: 'nowrap'
         },
 
         indicador: {
@@ -155,6 +156,12 @@ function criarEstilos(tema) {
             paddingHorizontal: 10,
             borderWidth: 0.8,
             borderRadius: 999
+        },
+
+        indicadorSomenteLeitura: {
+            flexBasis: 0,
+            flexShrink: 1,
+            paddingHorizontal: 6
         },
 
         indicadorMenstruacao: {
@@ -188,6 +195,10 @@ function criarEstilos(tema) {
             fontWeight: '400',
             lineHeight: 20,
             includeFontPadding: false
+        },
+
+        valorSomenteLeitura: {
+            flexShrink: 1
         },
 
         textoMenstruacao: {

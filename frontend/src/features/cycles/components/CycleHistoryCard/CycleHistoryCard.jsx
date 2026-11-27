@@ -156,6 +156,7 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }
 
             <View style={estilos.conteudoInferior}>
                 <View
+                    testID="cycle-history-indicators"
                     style={[
                         estilos.indicadores,
                         somenteLeitura && estilos.indicadoresSomenteLeitura
@@ -169,11 +170,20 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }
                                 ? 'Dias de menstruação não informados'
                                 : `${obterTextoDosDias(diasMenstruais)} de menstruação`
                         }
-                        style={[estilos.indicador, estilos.indicadorMenstruacao]}
+                        style={[
+                            estilos.indicador,
+                            somenteLeitura && estilos.indicadorSomenteLeitura,
+                            estilos.indicadorMenstruacao
+                        ]}
                     >
                         <Text
                             numberOfLines={1}
-                            style={[estilos.valorDoIndicador, estilos.textoMenstruacao]}
+                            adjustsFontSizeToFit={somenteLeitura}
+                            style={[
+                                estilos.valorDoIndicador,
+                                somenteLeitura && estilos.valorSomenteLeitura,
+                                estilos.textoMenstruacao
+                            ]}
                         >
                             {diasMenstruais === null ? '—' : obterTextoDosDias(diasMenstruais)}
                         </Text>
@@ -198,6 +208,7 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }
                         }
                         style={[
                             estilos.indicador,
+                            somenteLeitura && estilos.indicadorSomenteLeitura,
                             estilos.indicadorCiclo,
                             !duracaoDisponivel && estilos.indicadorIndisponivel
                         ]}
@@ -209,8 +220,11 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }
                         />
 
                         <Text
+                            numberOfLines={somenteLeitura ? 1 : undefined}
+                            adjustsFontSizeToFit={somenteLeitura}
                             style={[
                                 estilos.valorDoIndicador,
+                                somenteLeitura && estilos.valorSomenteLeitura,
                                 estilos.textoCiclo,
                                 !duracaoDisponivel && estilos.textoIndisponivel
                             ]}
