@@ -40,6 +40,25 @@ test('valida, corrige e salva um registro', async () => {
     expect(result.current.salvando).toBe(false);
 });
 
+test('salva valores compostos por um fluxo especializado sem alterar o formulário comum', async () => {
+    const registro = { id: 1, data: '2026-11-09', categorias: [] };
+    const service = { criarRegistro: jest.fn().mockResolvedValue(registro) };
+    const { result } = await renderHook(() =>
+        useDiaryEntryForm({ ativo: true, catalogo, service })
+    );
+
+    await act(async () =>
+        expect(await result.current.salvarComValores({ sintomas: ['colica'] })).toBe(true)
+    );
+
+    expect(service.criarRegistro).toHaveBeenCalledWith({
+        data: '2026-11-09',
+        fusoHorario: expect.any(String),
+        categorias: [{ categoriaId: 'sintomas', opcoes: ['colica'] }]
+    });
+    expect(result.current.valores).toEqual({});
+});
+
 test('reinicia os valores sempre que o modal abre', async () => {
     const { result, rerender } = await renderHook(
         ({ ativo }) => useDiaryEntryForm({ ativo, catalogo }),

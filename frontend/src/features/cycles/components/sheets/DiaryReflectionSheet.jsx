@@ -6,7 +6,6 @@ import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
 import { estilos } from './DiaryReflectionSheet.styles';
 
 const PERGUNTA = 'O que seu corpo está pedindo agora?';
-const LIMITE_REFLEXAO = 5000;
 
 function DiaryReflectionSheet({
     visivel,
@@ -14,11 +13,18 @@ function DiaryReflectionSheet({
     aoAlterar,
     aoSalvar,
     aoFechar,
+    limiteCaracteres = 100,
+    limiteContador = 100,
+    caracteresEstruturais = 8,
+    totalCaracteresExistentes = 0,
+    semEspaco = false,
     salvando = false,
     erro
 }) {
     const quantidadeCaracteres = [...valor].length;
-    const limiteAtingido = quantidadeCaracteres >= LIMITE_REFLEXAO;
+    const quantidadeContador = Math.min(limiteContador, quantidadeCaracteres);
+    const limiteAtingido =
+        totalCaracteresExistentes + caracteresEstruturais + quantidadeContador >= 5000;
 
     return (
         <BottomSheet
@@ -46,33 +52,41 @@ function DiaryReflectionSheet({
                     {PERGUNTA}
                 </Text>
                 <View style={estilos.formulario}>
-                    <View style={estilos.campo}>
-                        <TextInput
-                            accessibilityLabel={PERGUNTA}
-                            placeholder="Escreva livremente..."
-                            value={valor}
-                            onChangeText={aoAlterar}
-                            multiline
-                            maxLength={LIMITE_REFLEXAO}
-                            desativado={salvando}
-                            erro={erro}
-                            estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
-                            estiloEntrada={estilos.textoEntrada}
-                        />
-                        <Text
-                            accessibilityLiveRegion="polite"
-                            style={[
-                                estilos.contador,
-                                limiteAtingido && estilos.contadorLimiteAtingido
-                            ]}
-                        >
-                            {quantidadeCaracteres} / {LIMITE_REFLEXAO}
+                    {semEspaco ? (
+                        <Text accessibilityRole="alert" style={estilos.mensagemSemEspaco}>
+                            Você não tem mais espaço para anotações no Diário.
                         </Text>
-                    </View>
+                    ) : (
+                        <View style={estilos.campo}>
+                            <TextInput
+                                accessibilityLabel={PERGUNTA}
+                                placeholder="Escreva livremente..."
+                                value={valor}
+                                onChangeText={aoAlterar}
+                                multiline
+                                sanitizar={(texto) =>
+                                    [...texto].slice(0, limiteCaracteres).join('')
+                                }
+                                desativado={salvando}
+                                erro={erro}
+                                estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
+                                estiloEntrada={estilos.textoEntrada}
+                            />
+                            <Text
+                                accessibilityLiveRegion="polite"
+                                style={[
+                                    estilos.contador,
+                                    limiteAtingido && estilos.contadorLimiteAtingido
+                                ]}
+                            >
+                                {quantidadeContador} / {limiteContador}
+                            </Text>
+                        </View>
+                    )}
                     <ButtonScreen
                         texto="Salvar no Diário"
                         aoPressionar={aoSalvar}
-                        desativado={!valor.trim()}
+                        desativado={semEspaco || !valor.trim()}
                         carregando={salvando}
                         estilo={[estilos.botao, valor.trim() && estilos.botaoAtivo]}
                         estiloTexto={estilos.textoBotao}
@@ -83,4 +97,4 @@ function DiaryReflectionSheet({
     );
 }
 
-export { DiaryReflectionSheet, LIMITE_REFLEXAO, PERGUNTA };
+export { DiaryReflectionSheet, PERGUNTA };

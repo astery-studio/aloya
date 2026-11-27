@@ -76,6 +76,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
                     ? () => acoes.aoCadastrarDiario(dataSelecionada || obterHojeLocal())
                     : undefined
             }
+            aoEditarDiario={acoes.aoEditarDiario}
         />
     );
 }

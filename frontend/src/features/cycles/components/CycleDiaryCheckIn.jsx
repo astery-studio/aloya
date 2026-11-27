@@ -22,7 +22,7 @@ function CycleDiaryCheckIn({
     corDestaque = '#C85A44'
 }) {
     const tema = useTheme();
-    const [saved, setSaved] = useState(false);
+    const [savedRecord, setSavedRecord] = useState(null);
     const catalog = useDiaryCatalog({
         ativo: Boolean(service),
         service,
@@ -38,8 +38,8 @@ function CycleDiaryCheckIn({
         dataInicial: date,
         registroInicial: existing.record,
         marcarCheckIn: true,
-        onCriado: () => setSaved(true),
-        onSalvo: () => setSaved(true),
+        onCriado: setSavedRecord,
+        onSalvo: setSavedRecord,
         onSessaoExpirada: onSessionExpired
     });
     const registeredIds = useMemo(
@@ -49,7 +49,7 @@ function CycleDiaryCheckIn({
             ),
         [existing.record]
     );
-    useEffect(() => setSaved(false), [date]);
+    useEffect(() => setSavedRecord(null), [date]);
     if (!service) return null;
     const valid = catalog.catalogo
         ? prepararFormularioDiario({
@@ -62,7 +62,8 @@ function CycleDiaryCheckIn({
 
     const salvarDesativado = !valid || Boolean(existing.record && !form.alterado);
     const aplicarVisualDesativado = salvarDesativado && !tema.escuro;
-    const checkInRealizado = saved || existing.record?.checkInRealizado === true;
+    const registroDoCheckIn = savedRecord ?? existing.record;
+    const checkInRealizado = Boolean(savedRecord) || existing.record?.checkInRealizado === true;
 
     return (
         <View style={estilos.margem}>
@@ -96,7 +97,7 @@ function CycleDiaryCheckIn({
                             icone={NotebookIcon}
                             tamanhoIcone={18}
                             corConteudo="#FFFFFF"
-                            aoPressionar={onOpenDiary}
+                            aoPressionar={() => onOpenDiary?.(registroDoCheckIn)}
                             estilo={estilos.botao}
                             estiloTexto={estilos.textoBotao}
                         />

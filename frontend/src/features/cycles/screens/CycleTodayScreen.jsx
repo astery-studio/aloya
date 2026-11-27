@@ -54,6 +54,7 @@ function CycleTodayScreen({
     aoVoltar,
     aoCadastrarMenstruacao,
     aoCadastrarDiario,
+    aoEditarDiario,
     aoAbrirAnticoncepcional,
     aoAbrirHistorico,
     aoSelecionarAba,
@@ -121,6 +122,7 @@ function CycleTodayScreen({
     const callbacksHome = {
         aoCadastrarMenstruacao,
         aoAbrirDiario: aoCadastrarDiario,
+        aoEditarDiario,
         aoAbrirAnticoncepcional,
         aoAbrirConfiabilidade: () => setSheetAberto('confiabilidade'),
         aoAbrirRespiracao: () => setSheetAberto('respiracao'),

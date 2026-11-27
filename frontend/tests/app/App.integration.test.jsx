@@ -183,6 +183,27 @@ jest.mock('../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntryS
     };
 });
 
+jest.mock('../../src/features/diary/components/EditDiaryEntrySheet/EditDiaryEntrySheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        EditDiaryEntrySheet: jest.fn(({ visivel, registro, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, `Edição do Diário: ${registro.id}`),
+                      React.createElement(Pressable, {
+                          accessibilityRole: 'button',
+                          accessibilityLabel: 'Fechar edição do Diário',
+                          onPress: onFechar
+                      })
+                  )
+                : null
+        )
+    };
+});
+
 jest.mock('../../src/features/cycles/CycleEditFlow', () => {
     const React = require('react');
     const { Text } = require('react-native');
@@ -222,7 +243,13 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const { Pressable, Text } = require('react-native');
     return {
         CycleTodayContainer: jest.fn(
-            ({ aoAbrirAnticoncepcional, aoAbrirHistorico, aoCadastrarDiario, aoSelecionarAba }) =>
+            ({
+                aoAbrirAnticoncepcional,
+                aoAbrirHistorico,
+                aoCadastrarDiario,
+                aoEditarDiario,
+                aoSelecionarAba
+            }) =>
                 React.createElement(
                     React.Fragment,
                     null,
@@ -244,6 +271,17 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                         accessibilityRole: 'button',
                         accessibilityLabel: 'Cadastrar no Diário',
                         onPress: () => aoCadastrarDiario('2026-11-05')
+                    }),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Editar check-in no Diário',
+                        onPress: () =>
+                            aoEditarDiario({
+                                id: 18,
+                                data: '2026-11-05',
+                                versao: 1,
+                                categorias: []
+                            })
                     }),
                     ...[
                         ['Abrir configurações', 'configuracoes'],
@@ -856,6 +894,20 @@ describe('App integrado', () => {
 
         await fireEvent.press(screen.getByRole('button', { name: 'Fechar cadastro do Diário' }));
         expect(screen.queryByText('Cadastro do Diário aberto')).not.toBeOnTheScreen();
+    });
+
+    test('abre a edição do registro ao acessar o Diário pelo check-in concluído', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Editar check-in no Diário' }));
+
+        expect(await screen.findByText('Edição do Diário: 18')).toBeOnTheScreen();
+        expect(screen.queryByText('Cadastro do Diário aberto')).not.toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição do Diário' }));
+        expect(screen.queryByText('Edição do Diário: 18')).not.toBeOnTheScreen();
     });
 
     test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {

@@ -43,6 +43,7 @@ import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from './features/diary/DiaryFlow';
 import { DiaryCategoriesSheet } from './features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet';
+import { EditDiaryEntrySheet } from './features/diary/components/EditDiaryEntrySheet/EditDiaryEntrySheet';
 import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
@@ -200,6 +201,8 @@ export default function App() {
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
     const [dataInicialDiario, setDataInicialDiario] = useState(null);
     const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
+    const [registroDiarioEdicao, setRegistroDiarioEdicao] = useState(null);
+    const [revisaoDiarioHome, setRevisaoDiarioHome] = useState(0);
     const [categoriasDiarioVisiveis, setCategoriasDiarioVisiveis] = useState(false);
     const [revisaoCategoriasDiario, setRevisaoCategoriasDiario] = useState(0);
 
@@ -429,6 +432,7 @@ export default function App() {
 
         setTelaInterna(telasInternas.inicio);
         setCadastroDiarioVisivel(false);
+        setRegistroDiarioEdicao(null);
         setCategoriasDiarioVisiveis(false);
         setDataInicialDiario(null);
 
@@ -454,6 +458,9 @@ export default function App() {
 
         setTelaInterna(telasInternas.inicio);
         setCategoriasDiarioVisiveis(false);
+        setCadastroDiarioVisivel(false);
+        setRegistroDiarioEdicao(null);
+        setDataInicialDiario(null);
 
         setOrigemNovaCategoria(telasInternas.membros);
         setRascunhoNovoContato(null);
@@ -650,7 +657,7 @@ export default function App() {
         conteudo = (
             <>
                 <CycleTodayContainer
-                    key={sincronizacaoMenstrual.revisao}
+                    key={`${sincronizacaoMenstrual.revisao}-${revisaoDiarioHome}`}
                     aoCadastrarMenstruacao={(data) => {
                         setDataInicialCadastro(data);
                         setRetornoCadastro(telasInternas.inicio);
@@ -664,6 +671,7 @@ export default function App() {
                         setDataInicialDiario(data);
                         setCadastroDiarioVisivel(true);
                     }}
+                    aoEditarDiario={setRegistroDiarioEdicao}
                     aoAbrirHistorico={() => setTelaInterna(telasInternas.ciclos)}
                     aoSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
@@ -676,6 +684,18 @@ export default function App() {
                     onFechar={() => {
                         setCadastroDiarioVisivel(false);
                         setDataInicialDiario(null);
+                    }}
+                    onSessaoExpirada={finalizarSessao}
+                />
+                <EditDiaryEntrySheet
+                    visivel={Boolean(registroDiarioEdicao)}
+                    registro={registroDiarioEdicao}
+                    service={configuracao.servicos.diaryService}
+                    calendarService={configuracao.servicos.calendarService}
+                    onFechar={() => setRegistroDiarioEdicao(null)}
+                    onSalvo={() => {
+                        setRegistroDiarioEdicao(null);
+                        setRevisaoDiarioHome((revisao) => revisao + 1);
                     }}
                     onSessaoExpirada={finalizarSessao}
                 />

@@ -44,6 +44,14 @@ const estilos = StyleSheet.create({
     formulario: {
         gap: 13
     },
+    mensagemSemEspaco: {
+        color: '#5C5C59',
+        fontFamily: fontFamilies.regular,
+        fontSize: 14,
+        lineHeight: 21,
+        paddingVertical: 20,
+        textAlign: 'center'
+    },
     campo: {
         height: 123,
         position: 'relative'

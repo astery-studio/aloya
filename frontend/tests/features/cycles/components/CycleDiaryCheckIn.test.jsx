@@ -53,11 +53,12 @@ beforeEach(() => {
 });
 
 test('usa o formulário real do Diário sem liberar registro vazio', async () => {
+    const onOpenDiary = jest.fn();
     await render(
         <CycleDiaryCheckIn
             date="2026-10-08"
             service={{}}
-            onOpenDiary={jest.fn()}
+            onOpenDiary={onOpenDiary}
             corDestaque="#4A758E"
         />
     );
@@ -97,7 +98,14 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
         includeFontPadding: false
     });
 
-    await act(async () => mockOnCreated());
+    const registroCriado = {
+        id: 10,
+        data: '2026-10-08',
+        versao: 1,
+        checkInRealizado: true,
+        categorias: []
+    };
+    await act(async () => mockOnCreated(registroCriado));
     expect(
         screen.getByText('Você realizou seu check-in com sucesso. Verifique os detalhes no diário:')
     ).toBeOnTheScreen();
@@ -107,6 +115,8 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
         height: 36,
         borderRadius: 10
     });
+    await fireEvent.press(screen.getByRole('button', { name: 'Diário' }));
+    expect(onOpenDiary).toHaveBeenCalledWith(registroCriado);
 });
 
 test('mantém o check-in concluído ao recarregar o registro persistido do dia', async () => {
@@ -118,13 +128,16 @@ test('mantém o check-in concluído ao recarregar o registro persistido do dia',
         categorias: []
     };
 
-    await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} onOpenDiary={jest.fn()} />);
+    const onOpenDiary = jest.fn();
+    await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} onOpenDiary={onOpenDiary} />);
 
     expect(
         screen.getByText('Você realizou seu check-in com sucesso. Verifique os detalhes no diário:')
     ).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Salvar no Diário' })).not.toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Diário' })).toBeEnabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Diário' }));
+    expect(onOpenDiary).toHaveBeenCalledWith(mockExistingRecord);
 });
 
 test('permite complementar silenciosamente o registro já existente para a data', async () => {
@@ -201,7 +214,13 @@ test('habilita a edição após alterar o dia e não repete itens registrados', 
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
     expect(salvar).toHaveBeenCalledTimes(1);
 
-    await act(() => mockFormOptions.onSalvo());
+    await act(() =>
+        mockFormOptions.onSalvo({
+            ...mockExistingRecord,
+            checkInRealizado: true,
+            categorias: []
+        })
+    );
     expect(
         screen.getByText('Você realizou seu check-in com sucesso. Verifique os detalhes no diário:')
     ).toBeOnTheScreen();
