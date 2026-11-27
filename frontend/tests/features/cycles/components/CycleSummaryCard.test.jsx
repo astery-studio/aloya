@@ -36,7 +36,7 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByLabelText('Ciclo médio: 28 dias')).toBeOnTheScreen();
         expect(screen.getByLabelText('Menstruação média: 5 dias')).toBeOnTheScreen();
         expect(screen.getByText('5 ciclos registrados')).toBeOnTheScreen();
-        expect(screen.getByText('Confiança Alta')).toBeOnTheScreen();
+        expect(screen.getByText('Alta')).toBeOnTheScreen();
         expect(screen.getByLabelText('Confiança alta')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Confiança alta' }));
         expect(screen.getByTestId('confidence-sheet')).toBeOnTheScreen();
@@ -48,7 +48,7 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByTestId('cycle-summary-card')).toHaveStyle(estilos.semMetricas);
         expect(screen.queryByTestId('cycle-summary-metrics')).not.toBeOnTheScreen();
         expect(screen.getByText('0 ciclos registrados')).toBeOnTheScreen();
-        expect(screen.getByText('Confiança Baixa')).toBeOnTheScreen();
+        expect(screen.getByText('Baixa')).toBeOnTheScreen();
         expect(screen.getByLabelText('Confiança baixa')).toBeOnTheScreen();
     });
 

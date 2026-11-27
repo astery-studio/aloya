@@ -233,7 +233,7 @@ describe('CycleHistoryScreen', () => {
             />
         );
 
-        expect(screen.getByText('Confiança Baixa')).toBeOnTheScreen();
+        expect(screen.getByText('Baixa')).toBeOnTheScreen();
     });
 
     test('não apresenta navegação inferior', async () => {
