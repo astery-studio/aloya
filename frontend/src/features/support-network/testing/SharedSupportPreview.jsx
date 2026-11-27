@@ -9,6 +9,8 @@ import {
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AppThemeRoot } from '../../../app/AppThemeRoot';
+import { CalendarScreenContainer } from '../../calendar/screens/CalendarScreenContainer';
+import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveUsageCard } from '../../contraceptives/components/ContraceptiveUsageCard';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
 import { DiaryActiveFilters } from '../../diary/components/DiaryActiveFilters/DiaryActiveFilters';
@@ -165,6 +167,48 @@ function criarServicoHistoricoPrevia(cenario) {
                 quantidadeCiclos: ciclos.length,
                 paginacao: { temMais, proximoCursor: temMais ? '2' : null }
             };
+        }
+    };
+}
+
+const ABAS_CALENDARIO_PREVIA = ['calendario', 'inicio', 'diario'];
+
+function criarServicoCalendarioPrevia(cenario) {
+    let falharNaPrimeiraConsulta = cenario === 'erro';
+    const hoje = obterHojeLocal();
+
+    return {
+        async buscarMes({ mes }) {
+            if (falharNaPrimeiraConsulta) {
+                falharNaPrimeiraConsulta = false;
+                throw new Error('Falha simulada na prévia');
+            }
+
+            const possuiCiclos = cenario !== 'vazio';
+            const permitePrevisoes = cenario !== 'historico';
+            const previsto = mes > hoje.slice(0, 7);
+            const data = (dia) => `${mes}-${String(dia).padStart(2, '0')}`;
+            const intervalo = (inicio, fim) => ({ inicio: data(inicio), fim: data(fim) });
+            const diasMenstruacao = possuiCiclos
+                ? [4, 5, 6, 7, 8].map(data).filter((dia) => dia <= hoje)
+                : [];
+            const previsao =
+                permitePrevisoes && possuiCiclos
+                    ? {
+                          periodos: [
+                              {
+                                  previsto,
+                                  faseMenstrual: intervalo(4, 8),
+                                  faseFolicular: intervalo(9, 17),
+                                  ovulacao: data(18),
+                                  janelaFertil: intervalo(13, 19),
+                                  faseLutea: intervalo(19, 28)
+                              }
+                          ]
+                      }
+                    : null;
+
+            return { mes, possuiCiclos, diasMenstruacao, permitePrevisoes, previsao };
         }
     };
 }
@@ -429,6 +473,7 @@ function DiarioPrevia({ permissoes, aviso, filtroAberto, aoFecharFiltro, aoVolta
 
 function ConteudoPrevia() {
     const [tela, setTela] = useState('inicio');
+    const [servicoCalendario, setServicoCalendario] = useState(null);
     const [servicoHistorico, setServicoHistorico] = useState(null);
     const [filtroAberto, setFiltroAberto] = useState(false);
     const [cenario, setCenario] = useState(CENARIOS_CICLO[0]);
@@ -443,6 +488,22 @@ function ConteudoPrevia() {
     function abrirHistorico(cenarioHistorico) {
         setServicoHistorico(criarServicoHistoricoPrevia(cenarioHistorico));
         setTela('historico');
+    }
+
+    function abrirCalendario(cenarioCalendario) {
+        setServicoCalendario(criarServicoCalendarioPrevia(cenarioCalendario));
+        setTela('calendario');
+    }
+
+    if (tela === 'calendario') {
+        return (
+            <CalendarScreenContainer
+                service={servicoCalendario}
+                somenteLeitura
+                abasDisponiveis={ABAS_CALENDARIO_PREVIA}
+                onSelecionarAba={setTela}
+            />
+        );
     }
 
     if (tela === 'historico') {
@@ -570,6 +631,29 @@ function ConteudoPrevia() {
                                             aoPressionar={() => abrirHistorico('erro')}
                                         />
                                     </View>
+                                </View>
+                            </SharedPermissionGate>
+                            <SharedPermissionGate
+                                permissoes={permissoes}
+                                permissao="geral.historico_ciclo"
+                            >
+                                <View style={[estilos.inset, estilos.cenarios]}>
+                                    <ButtonScreen
+                                        texto="Ver Calendário"
+                                        aoPressionar={() => abrirCalendario('preenchido')}
+                                    />
+                                    <ButtonScreen
+                                        texto="Calendário sem previsões"
+                                        aoPressionar={() => abrirCalendario('historico')}
+                                    />
+                                    <ButtonScreen
+                                        texto="Calendário vazio"
+                                        aoPressionar={() => abrirCalendario('vazio')}
+                                    />
+                                    <ButtonScreen
+                                        texto="Erro no calendário"
+                                        aoPressionar={() => abrirCalendario('erro')}
+                                    />
                                 </View>
                             </SharedPermissionGate>
                             <SharedPermissionGate permissoes={permissoes} permissao="corpo.pele">

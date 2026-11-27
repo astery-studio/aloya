@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, within } from '@testing-library/react-native';
 
 import { SharedSupportPreview } from '../../../src/features/support-network/testing/SharedSupportPreview';
 import { renderWithTheme as render } from '../../helpers/renderWithTheme';
@@ -80,4 +80,42 @@ test('mostra o histórico compartilhado vazio e permite recuperar de um erro', a
 
     await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
     expect(screen.getByText('RESUMO DOS CICLOS DE JÚLIA')).toBeOnTheScreen();
+});
+
+test('permite testar o calendário, a legenda, o estado vazio e a nova tentativa', async () => {
+    await render(<SharedSupportPreview />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver Calendário' }));
+    expect(await screen.findByTestId('cycle-calendar-list')).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Calendário', selected: true })).toBeOnTheScreen();
+    expect(screen.queryByTestId('calendar-add-fab')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir legenda do calendário' }));
+    expect(await screen.findByTestId('item-legenda-lutea-prevista')).toBeOnTheScreen();
+    await fireEvent.press(
+        within(screen.getByTestId('bottom-sheet-cabecalho')).getByRole('button', {
+            name: 'Fechar painel'
+        })
+    );
+    await fireEvent.press(screen.getByRole('tab', { name: 'Início' }));
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Calendário sem previsões' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir legenda do calendário' }));
+    expect(await screen.findByTestId('item-legenda-menstruacao-real')).toBeOnTheScreen();
+    expect(screen.queryByTestId('item-legenda-lutea-prevista')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId('bottom-sheet-area-fundo'));
+    await fireEvent.press(screen.getByRole('tab', { name: 'Início' }));
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Calendário vazio' }));
+    expect(await screen.findByText('Nada para exibir')).toBeOnTheScreen();
+    expect(screen.queryByTestId('cycle-calendar-list')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Início' }));
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Erro no calendário' }));
+    expect(await screen.findByTestId('calendar-error-state')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
+    expect(await screen.findByTestId('cycle-calendar-list')).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Diário' }));
+    expect(screen.getByText('RESUMO DO DIÁRIO DE JÚLIA')).toBeOnTheScreen();
 });
