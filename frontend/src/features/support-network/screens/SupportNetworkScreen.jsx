@@ -18,6 +18,7 @@ function SupportNetworkScreen({
     onGerenciarResponsavel,
     onSelecionarAba,
     onSessaoExpirada,
+    onVisualizarContato,
     ...membersProps
 }) {
     const tema = useTheme();
@@ -83,6 +84,7 @@ function SupportNetworkScreen({
                     onSelecionarModoRede={setModoRede}
                     onSelecionarAba={onSelecionarAba}
                     onSessaoExpirada={onSessaoExpirada}
+                    onVisualizarContato={onVisualizarContato}
                 />
             );
         }

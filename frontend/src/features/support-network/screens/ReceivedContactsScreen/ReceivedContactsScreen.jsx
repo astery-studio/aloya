@@ -39,7 +39,10 @@ function ReceivedContactsScreen({
     service,
     onVoltar,
     onSelecionarAba,
+    abasDisponiveis,
     onSessaoExpirada,
+    onVisualizarContato,
+    vinculoVisualizadoId,
     exibirSeletor = false,
     modoRede = 'acompanhados',
     onSelecionarModoRede
@@ -182,10 +185,17 @@ function ReceivedContactsScreen({
         <>
             <MainLayout
                 titulo={exibirSeletor ? 'Rede de Apoio' : 'Contatos'}
-                varianteHeader={exibirSeletor ? 'redeApoio' : onVoltar ? 'comVoltar' : 'padrao'}
-                acoesHeader={exibirSeletor ? acaoFiltro : null}
+                varianteHeader={
+                    onVoltar
+                        ? 'comVoltar'
+                        : exibirSeletor || onVisualizarContato
+                          ? 'redeApoio'
+                          : 'padrao'
+                }
+                acoesHeader={exibirSeletor || onVisualizarContato ? acaoFiltro : null}
                 onVoltar={onVoltar}
                 abaAtiva="membros"
+                abasDisponiveis={abasDisponiveis}
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="received-contacts-screen" style={estilos.tela}>
@@ -199,6 +209,8 @@ function ReceivedContactsScreen({
                             filtroAtivo={possuiFiltros}
                             rotuloFiltro={rotuloFiltros}
                             aoAcao={tratarAcao}
+                            aoVisualizar={onVisualizarContato}
+                            vinculoVisualizadoId={vinculoVisualizadoId}
                             aoAbrirResumo={abrirResumo}
                             aoTentarNovamente={estado.tentarNovamente}
                             contatoEmAndamentoId={estado.contatoEmAndamentoId}

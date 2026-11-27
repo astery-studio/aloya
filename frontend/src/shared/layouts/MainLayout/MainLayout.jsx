@@ -15,6 +15,7 @@ function MainLayout({
     acoesHeader = null,
     abaAtiva,
     onSelecionarAba,
+    abasDisponiveis,
     exibirNavegacaoInferior = true,
     usarAreaSeguraInferior = true,
     children,
@@ -27,7 +28,13 @@ function MainLayout({
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
+    const navegacaoInferior = (
+        <BottomTabBar
+            abaAtiva={abaAtiva}
+            onSelecionar={onSelecionarAba}
+            abasDisponiveis={abasDisponiveis}
+        />
+    );
     const cabecalho = (
         <Header
             titulo={titulo}

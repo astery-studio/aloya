@@ -119,24 +119,38 @@ function criarRotuloQuantidade(quantidade) {
     return quantidade === 1 ? '1 CONTATO' : `${quantidade} CONTATOS`;
 }
 
-function criarItensAgrupados(contatos) {
+function criarItensAgrupados(contatos, { modoAcompanhamento, vinculoVisualizadoId } = {}) {
     const contatosOrdenados = ordenarContatos(contatos);
 
-    return GRUPOS_CONTATOS.flatMap((grupo) => {
-        const itensDoGrupo = contatosOrdenados.filter((contato) => contato.status === grupo.status);
+    const grupos = modoAcompanhamento
+        ? [
+              { status: 'pendente', titulo: 'CONVITES' },
+              { status: 'ativo', titulo: 'CONTATO EM VISUALIZAÇÃO', selecionado: true },
+              { status: 'ativo', titulo: 'ATIVOS', selecionado: false }
+          ]
+        : GRUPOS_CONTATOS;
 
-        if (itensDoGrupo.length === 0) {
+    return grupos.flatMap((grupo) => {
+        const itensDoGrupo = contatosOrdenados.filter((contato) => contato.status === grupo.status);
+        const itensVisiveis =
+            grupo.selecionado === undefined
+                ? itensDoGrupo
+                : itensDoGrupo.filter(
+                      ({ id }) => (id === vinculoVisualizadoId) === grupo.selecionado
+                  );
+
+        if (itensVisiveis.length === 0) {
             return [];
         }
 
         return [
             {
                 tipo: 'cabecalho',
-                id: `cabecalho-${grupo.status}`,
+                id: grupo.selecionado ? 'cabecalho-visualizado' : `cabecalho-${grupo.status}`,
                 titulo: grupo.titulo,
-                quantidade: itensDoGrupo.length
+                quantidade: grupo.selecionado ? null : itensVisiveis.length
             },
-            ...itensDoGrupo.map((contato) => ({
+            ...itensVisiveis.map((contato) => ({
                 tipo: 'contato',
                 id: `contato-${contato.id}`,
                 contato
@@ -153,6 +167,8 @@ function ContactList({
     erro = null,
     filtroAtivo = false,
     aoAcao,
+    aoVisualizar,
+    vinculoVisualizadoId,
     aoAbrirResumo,
     aoTentarNovamente,
     contatoEmAndamentoId = null,
@@ -167,7 +183,14 @@ function ContactList({
 
     const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
 
-    const itens = useMemo(() => criarItensAgrupados(contatos), [contatos]);
+    const itens = useMemo(
+        () =>
+            criarItensAgrupados(contatos, {
+                modoAcompanhamento: Boolean(aoVisualizar),
+                vinculoVisualizadoId
+            }),
+        [aoVisualizar, contatos, vinculoVisualizadoId]
+    );
 
     const possuiContatos = itens.some((item) => item.tipo === 'contato');
 
@@ -183,18 +206,20 @@ function ContactList({
     const renderizarItem = useCallback(
         ({ item }) => {
             if (item.tipo === 'cabecalho') {
+                const quantidade =
+                    item.quantidade === null ? null : criarRotuloQuantidade(item.quantidade);
                 return (
                     <View
                         accessibilityRole="header"
-                        accessibilityLabel={`${item.titulo}, ${criarRotuloQuantidade(
-                            item.quantidade
-                        )}`}
+                        accessibilityLabel={
+                            quantidade ? `${item.titulo}, ${quantidade}` : item.titulo
+                        }
                         style={estilos.cabecalhoGrupo}
                     >
                         <View style={estilos.linhaGrupo} />
 
                         <Text style={estilos.tituloGrupo}>
-                            {item.titulo} ({criarRotuloQuantidade(item.quantidade)})
+                            {quantidade ? `${item.titulo} (${quantidade})` : item.titulo}
                         </Text>
 
                         <View style={estilos.linhaGrupo} />
@@ -209,6 +234,8 @@ function ContactList({
                     contato={item.contato}
                     perspectiva={perspectiva}
                     aoAcao={aoAcao}
+                    aoVisualizar={aoVisualizar}
+                    emVisualizacao={item.contato.id === vinculoVisualizadoId}
                     aoAbrirResumo={aoAbrirResumo}
                     acaoEmAndamento={contatoEmAndamento ? acaoEmAndamento : null}
                     desabilitado={desabilitado}
@@ -219,10 +246,12 @@ function ContactList({
             acaoEmAndamento,
             aoAbrirResumo,
             aoAcao,
+            aoVisualizar,
             contatoEmAndamentoId,
             desabilitado,
             estilos,
-            perspectiva
+            perspectiva,
+            vinculoVisualizadoId
         ]
     );
 
@@ -333,8 +362,20 @@ function ContactList({
 
                 <View style={estilos.estadoCentral}>
                     <EmptyState
-                        titulo={recebido ? 'Nenhum convite recebido' : 'Nenhum contato'}
-                        mensagem={recebido ? MENSAGEM_VAZIA_RECEBIDA : MENSAGEM_VAZIA_ENVIADA}
+                        titulo={
+                            aoVisualizar
+                                ? 'Nada para exibir'
+                                : recebido
+                                  ? 'Nenhum convite recebido'
+                                  : 'Nenhum contato'
+                        }
+                        mensagem={
+                            aoVisualizar
+                                ? 'Ainda não há dados suficientes para exibir aqui.'
+                                : recebido
+                                  ? MENSAGEM_VAZIA_RECEBIDA
+                                  : MENSAGEM_VAZIA_ENVIADA
+                        }
                         variante="vazio"
                     />
                 </View>
