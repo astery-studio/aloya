@@ -120,6 +120,7 @@ function ContactLinkEditFlow({
     contatoId,
     dadosIniciais,
     service,
+    contraceptiveService,
     onVoltar,
     onSalvo,
     onSessaoExpirada,
@@ -344,6 +345,8 @@ function ContactLinkEditFlow({
 
             <IndividualPermissionsForm
                 visivel={permissoesVisiveis}
+                contraceptiveService={contraceptiveService}
+                onSessaoExpirada={onSessaoExpirada}
                 aoFechar={() => !salvando && definirPermissoesVisiveis(false)}
                 permissoesSelecionadas={rascunhoPermissoes}
                 aoAlterar={definirRascunhoPermissoes}
