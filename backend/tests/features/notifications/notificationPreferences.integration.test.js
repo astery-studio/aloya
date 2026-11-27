@@ -55,6 +55,15 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
     assert.equal(leituraInicial.headers.get('cache-control'), 'no-store');
     assert.equal((await leituraInicial.json()).preferencias.horarioLembreteDiario, '20:00');
     assert.equal(await prisma.preferenciaNotificacao.count(), 1);
+    await prisma.notificacao.createMany({
+        data: [1, 2].map((usuarioId) => ({
+            usuarioId,
+            tipoOrigem: 'lembrete_diario',
+            evento: 'ciclo.diario.lembrete',
+            ocorrencia: 'teste',
+            dataHoraProgramada: new Date('2030-01-01')
+        }))
+    });
     const respostas = await Promise.all([
         salvar('ciclo.diario', false), salvar('ciclo.diario.resumoSemanal', true),
         salvar('antecedenciaProximoCiclo', 0), salvar('horarioLembreteDiario', '21:30')
@@ -65,8 +74,27 @@ test('API SQLite mantém preferências por conta e preserva escolhas em atualiza
     assert.equal(preferencias['ciclo.diario.resumoSemanal'], true);
     assert.equal(preferencias.antecedenciaProximoCiclo, 0);
     assert.equal(preferencias.horarioLembreteDiario, '21:30');
+    const alertas = await prisma.notificacao.findMany({ orderBy: { usuarioId: 'asc' } });
+    assert.deepEqual(
+        alertas.map((alerta) => alerta.statusEnvio),
+        ['cancelada', 'agendada']
+    );
     assert.equal((await salvar('ciclo.diario', true)).status, 200);
     assert.equal((await (await chamar(1)).json()).preferencias['ciclo.diario.resumoSemanal'], true);
     assert.equal((await (await chamar(2)).json()).preferencias.horarioLembreteDiario, '18:00');
     assert.equal((await prisma.preferenciaNotificacao.findUnique({ where: { usuarioId: 2 } })).antecedenciaAvisoTroca, 7);
+
+    const padroes = () => fetch(`${url}padroes`, { headers: { authorization: '1' } });
+    assert.equal((await (await padroes()).json()).categorias.length, 4);
+    assert.equal((await padroes()).status, 200);
+    assert.equal(await prisma.catalogoNotificacao.count(), 1);
+
+    const restauracao = await fetch(`${url}restaurar`, {
+        method: 'POST',
+        headers: { authorization: '1' }
+    });
+    assert.equal(restauracao.status, 200);
+    const restauradas = await restauracao.json();
+    assert.equal(restauradas.preferencias.horarioLembreteDiario, '20:00');
+    assert.equal(restauradas.efetivas['ciclo.diario.resumoSemanal'], false);
 });
