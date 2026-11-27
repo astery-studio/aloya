@@ -97,20 +97,18 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center',
             zIndex: 2
         },
-        segmentoDia: {
+        faixaFase: {
             position: 'absolute',
             top: 3.998,
-            right: 0,
-            bottom: 3.998,
-            left: 0
+            bottom: 3.998
         },
         inicioSegmento: {
-            left: 4.273,
+            marginLeft: 4.273,
             borderTopLeftRadius: 99,
             borderBottomLeftRadius: 99
         },
         fimSegmento: {
-            right: 4.273,
+            marginRight: 4.273,
             borderTopRightRadius: 99,
             borderBottomRightRadius: 99
         },
