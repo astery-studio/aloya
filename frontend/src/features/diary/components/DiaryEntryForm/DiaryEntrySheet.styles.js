@@ -10,7 +10,6 @@ function criarEstilos(tema) {
         painel: {
             height: '92%',
             maxHeight: '92%',
-            paddingBottom: 0,
             backgroundColor: cores.superficie
         },
         navegadorData: { paddingTop: 0 },
@@ -131,6 +130,7 @@ function criarEstilos(tema) {
         },
         textoBotaoDesativado: { color: cores.textoDesabilitado },
         rodape: {
+            flexShrink: 0,
             paddingHorizontal: 24,
             paddingTop: 12,
             paddingBottom: 20,
