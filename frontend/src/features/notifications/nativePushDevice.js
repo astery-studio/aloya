@@ -19,10 +19,12 @@ export async function atualizarRegistro(
 ) {
     if (plataforma === 'android')
         await Promise.all(Object.keys(canaisNativos).map((id) => prepararCanalNativo(push, id)));
+
     let permissao = await push.getPermissionsAsync();
     if (solicitar && permissao.canAskAgain && permissao.status === 'undetermined') {
         permissao = await push.requestPermissionsAsync();
     }
+
     if (controller.signal.aborted) return;
 
     if (!permissao.granted && permissao.ios?.status !== push.IosAuthorizationStatus.PROVISIONAL) {
@@ -36,11 +38,14 @@ export async function atualizarRegistro(
 
     const instalacao = await obterInstalacao(AsyncStorage);
     const { data: token } = await push.getExpoPushTokenAsync({ projectId });
+
     if (controller.signal.aborted) return;
+
     const fuso = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const id = await service.registrar(
         { instalacao, token, plataforma: plataforma, fuso },
         controller.signal
     );
+
     if (!controller.signal.aborted) await AsyncStorage.setItem(chaveDispositivo, id);
 }

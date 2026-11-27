@@ -14,12 +14,15 @@ export function NotificationPreviewScreen({ onVoltar }) {
     const [estado, definirEstado] = useState(null);
     const [ocupado, definirOcupado] = useState(false);
     const emAndamento = useRef(false);
+
     const textoSecundario = [typography.bodyDefault, { color: cores.interface.textoSecundario }];
 
     async function testar(codigo, rotulo, canal) {
         if (emAndamento.current) return;
+
         emAndamento.current = true;
         definirOcupado(true);
+
         try {
             const resultado = await exibirPrevia({
                 codigo,

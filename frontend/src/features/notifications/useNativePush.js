@@ -9,6 +9,7 @@ export function useNativePush({ ativo, service, navegar }) {
     useEffect(() => {
         const projectId =
             Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+
         if (
             !ativo ||
             !service ||
@@ -26,6 +27,7 @@ export function useNativePush({ ativo, service, navegar }) {
                 import('expo-notifications'),
                 import('@react-native-async-storage/async-storage')
             ]);
+
             if (controller.signal.aborted) return;
 
             configurarApresentacaoNativa(push, Platform.OS);
@@ -57,11 +59,13 @@ export function useNativePush({ ativo, service, navegar }) {
                     }
                 })
             );
+
             void sincronizar(true);
             await abrir(await push.getLastNotificationResponseAsync());
         }
 
         void iniciar().catch(() => {});
+
         return () => {
             controller.abort();
             assinaturas.forEach((assinatura) => assinatura.remove());

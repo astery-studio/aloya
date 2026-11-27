@@ -6,14 +6,21 @@ export function useNotificationPreferences(service) {
     const [tentativaLeitura, definirTentativaLeitura] = useState(0);
     const [erroGravacao, definirErroGravacao] = useState(null);
     const [salvando, definirSalvando] = useState(false);
+
     const envioAtivo = useRef(false);
 
     useEffect(() => {
         const controller = new AbortController();
+
         service.buscar({ signal: controller.signal }).then(
-            (resposta) => { if (!controller.signal.aborted) definirValores(resposta); },
-            (erro) => { if (!controller.signal.aborted) definirErroLeitura(erro); }
+            (resposta) => {
+                if (!controller.signal.aborted) definirValores(resposta);
+            },
+            (erro) => {
+                if (!controller.signal.aborted) definirErroLeitura(erro);
+            }
         );
+
         return () => controller.abort();
     }, [service, tentativaLeitura]);
 
@@ -25,8 +32,10 @@ export function useNotificationPreferences(service) {
     async function salvar(alteracao) {
         if (envioAtivo.current) return false;
         if (valores[alteracao.chave] === alteracao.valor) return true;
+
         envioAtivo.current = true;
         definirSalvando(true);
+
         try {
             definirValores(await service.atualizar(alteracao));
             definirErroGravacao(null);

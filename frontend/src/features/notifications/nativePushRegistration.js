@@ -10,7 +10,9 @@ export function criarSincronizacaoPush(contexto) {
             renovar = true;
             return;
         }
+
         registrando = true;
+
         try {
             await atualizarRegistro(contexto, solicitar);
         } catch {
@@ -23,5 +25,6 @@ export function criarSincronizacaoPush(contexto) {
             }
         }
     }
+
     return sincronizar;
 }
