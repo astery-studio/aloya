@@ -32,6 +32,8 @@ function criarEstilos(tema) {
             width: '100%'
         },
 
+        botaoCategoriaAtivo: tema.escuro ? { backgroundColor: coresNoturnasConteudo.verde } : {},
+
         textoBotaoPermissao: {
             color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF',
             fontFamily: fontFamilies.semibold,

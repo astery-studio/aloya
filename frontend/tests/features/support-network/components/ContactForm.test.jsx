@@ -229,6 +229,18 @@ describe('ContactForm', () => {
         });
     });
 
+    test('aplica a paleta noturna ao botão de cadastrar categoria', async () => {
+        await render(<ContactForm dados={dadosCategoria} aoCriarCategoria={jest.fn()} />, {
+            preferencia: 'escuro'
+        });
+
+        expect(screen.getByRole('button', { name: 'Cadastrar categoria nova' })).toHaveStyle({
+            backgroundColor: '#A5D6A7'
+        });
+        expect(screen.getByText('Cadastrar Categoria Nova')).toHaveStyle({ color: '#121212' });
+        expect(screen.getByTestId('UsersIcon')).toHaveProp('color', '#121212');
+    });
+
     test('encaminha alteração de e-mail', async () => {
         const aoAlterar = jest.fn();
 
