@@ -11,13 +11,15 @@ function DiaryEntrySummaryChip({ principal, estilos, tema }) {
     const IconeMacro = macro.icone;
 
     return (
-        <View style={estilos.chip}>
-            <IconeMacro
-                accessible={false}
-                size={10.89}
-                color={cor}
-                weight={macro.iconeProps?.weight ?? 'regular'}
-            />
+        <View testID="diary-entry-summary-chip" style={estilos.chip}>
+            <View testID="diary-entry-chip-icon" style={estilos.iconeChip}>
+                <IconeMacro
+                    accessible={false}
+                    size={10.89}
+                    color={cor}
+                    weight={macro.iconeProps?.weight ?? 'regular'}
+                />
+            </View>
             <Text style={estilos.textoChip}>{principal.valor.trim()}</Text>
         </View>
     );

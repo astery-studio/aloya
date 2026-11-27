@@ -6,7 +6,7 @@ function criarEstilos(tema) {
     return StyleSheet.create({
         conteudoLista: {
             paddingHorizontal: 20,
-            paddingTop: 18,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: 28
         },
 
@@ -19,33 +19,20 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0,
             paddingHorizontal: 20,
-            paddingTop: 18
+            paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
 
         estadoCentral: {
             width: '100%',
             flex: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            paddingBottom: 76
+            justifyContent: 'center'
         },
 
         botaoEstado: {
             width: '100%',
             height: 56,
             borderRadius: 12
-        },
-
-        textoBotaoEstado: {
-            fontFamily: fontFamilies.semibold,
-            fontSize: 17,
-            fontWeight: '600',
-            lineHeight: 24
-        },
-
-        textoDestaque: {
-            fontFamily: fontFamilies.bold,
-            fontWeight: '700'
         },
 
         textoCarregamento: {

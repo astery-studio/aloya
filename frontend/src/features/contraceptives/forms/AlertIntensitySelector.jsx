@@ -50,6 +50,7 @@ function AlertIntensitySelector({
                         titulo="Intensidade do Alerta"
                         variante="comVoltar"
                         onVoltar={onFechar}
+                        aplicarSafeAreaSuperior={false}
                     />
                     <View style={estilos.conteudoFluxo}>
                         <Text style={estilos.descricaoFluxo}>

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import {
@@ -200,8 +201,6 @@ function MembersScreen({
         [estadoCategorias.categorias, filtros]
     );
 
-    const possuiContatosRegistrados = Array.isArray(estado.contatos) && estado.contatos.length > 0;
-
     function abrirFiltros() {
         setFiltrosAbertos(true);
     }
@@ -377,7 +376,6 @@ function MembersScreen({
                             contatoEmAndamentoId={estado.contatoEmAndamentoId}
                             acaoEmAndamento={estado.acaoEmAndamento}
                             desabilitado={Boolean(estado.acaoEmAndamento)}
-                            aoAdicionarContato={onAdicionarContato}
                             cabecalho={
                                 <View style={estilos.apresentacao}>
                                     <Text style={estilos.descricao}>
@@ -406,17 +404,16 @@ function MembersScreen({
                         />
                     </View>
 
-                    {possuiContatosRegistrados ? (
-                        <View style={estilos.acaoPrincipal}>
-                            <ButtonScreen
-                                texto="Adicionar novo contato"
-                                variante="laranja"
-                                aoPressionar={onAdicionarContato}
-                                rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
-                                estilo={estilos.botaoAdicionar}
-                                estiloTexto={estilos.textoBotaoAdicionar}
-                            />
-                        </View>
+                    {modoRede === 'apoio' &&
+                    !estado.carregando &&
+                    !estado.erro &&
+                    typeof onAdicionarContato === 'function' ? (
+                        <FloatingActionButton
+                            aoPressionar={onAdicionarContato}
+                            rotuloAcessibilidade="Adicionar novo contato à Rede de Apoio"
+                            considerarAreaSeguraInferior={false}
+                            testID="support-network-add-fab"
+                        />
                     ) : null}
                 </View>
             </MainLayout>

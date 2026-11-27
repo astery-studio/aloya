@@ -18,17 +18,20 @@ export default function AccountStep({
     aoAvancar,
     aoVoltar,
     aoEntrar,
+    aoConsultarDocumentos,
     carregando,
     erros = {}
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const aparenciaCampo = tema.escuro ? {
-        estilo: estilos.campo,
-        estiloEntrada: estilos.textoCampo,
-        estiloLabel: estilos.labelCampo,
-        placeholderTextColor: '#999999'
-    } : {};
+    const aparenciaCampo = tema.escuro
+        ? {
+              estilo: estilos.campo,
+              estiloEntrada: estilos.textoCampo,
+              estiloLabel: estilos.labelCampo,
+              placeholderTextColor: '#999999'
+          }
+        : {};
     const alterarNome = useCallback((nome) => aoAlterar({ nome }), [aoAlterar]);
     const alterarEmail = useCallback((email) => aoAlterar({ email }), [aoAlterar]);
     const alterarSenha = useCallback((senha) => aoAlterar({ senha }), [aoAlterar]);
@@ -36,6 +39,10 @@ export default function AccountStep({
         (confirmacao) => aoAlterar({ confirmacao }),
         [aoAlterar]
     );
+    function alternarAceite() {
+        aoAlterar({ aceitouTermos: !dados.aceitouTermos });
+    }
+
     const preenchido = Boolean(
         dados.nome.trim() &&
         dados.email.trim() &&
@@ -82,8 +89,19 @@ export default function AccountStep({
                     erro={erros.nome}
                     onChangeText={alterarNome}
                 />
-                <EmailInput {...aparenciaCampo} value={dados.email} erro={erros.email} onChangeText={alterarEmail} />
-                <PasswordInput {...aparenciaCampo} corIcone={tema.escuro ? '#999999' : undefined} value={dados.senha} erro={erros.senha} onChangeText={alterarSenha} />
+                <EmailInput
+                    {...aparenciaCampo}
+                    value={dados.email}
+                    erro={erros.email}
+                    onChangeText={alterarEmail}
+                />
+                <PasswordInput
+                    {...aparenciaCampo}
+                    corIcone={tema.escuro ? '#999999' : undefined}
+                    value={dados.senha}
+                    erro={erros.senha}
+                    onChangeText={alterarSenha}
+                />
                 <PasswordInput
                     {...aparenciaCampo}
                     corIcone={tema.escuro ? '#999999' : undefined}
@@ -93,26 +111,43 @@ export default function AccountStep({
                     onChangeText={alterarConfirmacao}
                 />
             </View>
-            <Pressable
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: dados.aceitouTermos }}
-                onPress={() => aoAlterar({ aceitouTermos: !dados.aceitouTermos })}
-                style={estilos.termos}
-            >
-                <View style={[estilos.caixa, dados.aceitouTermos && estilos.caixaMarcada]}>
+            <View style={estilos.termos}>
+                <Pressable
+                    accessibilityRole="checkbox"
+                    accessibilityLabel="Li e concordo com os Termos e Política de Privacidade"
+                    accessibilityState={{ checked: dados.aceitouTermos }}
+                    onPress={alternarAceite}
+                    hitSlop={8}
+                    style={[estilos.caixa, dados.aceitouTermos && estilos.caixaMarcada]}
+                >
                     {dados.aceitouTermos ? (
                         <Check
                             size={11}
                             weight="bold"
-                            color={tema.escuro ? '#121212' : tema.cores.interface.textoSobreDestaque}
+                            color={
+                                tema.escuro ? '#121212' : tema.cores.interface.textoSobreDestaque
+                            }
                         />
                     ) : null}
-                </View>
+                </Pressable>
                 <Text style={estilos.textoTermos}>
-                    Li e concordo com os{' '}
-                    <Text style={estilos.linkTermos}>Termos e Política de Privacidade</Text>
+                    <Text onPress={alternarAceite} suppressHighlighting>
+                        Li e concordo com os{' '}
+                    </Text>
+                    <Text
+                        style={estilos.linkTermos}
+                        suppressHighlighting
+                        accessibilityRole={aoConsultarDocumentos ? 'link' : undefined}
+                        onPress={
+                            aoConsultarDocumentos
+                                ? () => aoConsultarDocumentos('terms')
+                                : alternarAceite
+                        }
+                    >
+                        Termos e Política de Privacidade
+                    </Text>
                 </Text>
-            </Pressable>
+            </View>
             <Button
                 texto="Avançar"
                 aoPressionar={aoAvancar}

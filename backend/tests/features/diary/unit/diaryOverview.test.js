@@ -47,6 +47,20 @@ test('personaliza somente após padrão repetido em três registros da fase', as
                 valor: 'Cólicas leves',
                 ocorrencias: 2
             }
+        ],
+        sugestoesCheckIn: [
+            {
+                categoriaId: 'sintomas_fisicos',
+                grupo: null,
+                valor: 'Cólicas leves',
+                ocorrencias: 2
+            },
+            {
+                categoriaId: 'sintomas_fisicos',
+                grupo: null,
+                valor: 'Fadiga',
+                ocorrencias: 1
+            }
         ]
     });
 });
@@ -58,7 +72,15 @@ test('mantém fallback quando a amostra ou repetição é insuficiente', async (
             { categorias: [categoria('fadiga', 'Fadiga')] }
         ])
     });
-    assert.equal((await service.buscar(3, 'lutea')).informacoesSuficientes, false);
+    const resumo = await service.buscar(3, 'lutea');
+    assert.equal(resumo.informacoesSuficientes, false);
+    assert.deepEqual(
+        resumo.sugestoesCheckIn.map(({ valor, ocorrencias }) => ({ valor, ocorrencias })),
+        [
+            { valor: 'Cólicas leves', ocorrencias: 1 },
+            { valor: 'Fadiga', ocorrencias: 1 }
+        ]
+    );
 });
 
 test('conta e analisa somente registros com categorias atualmente ativas', async () => {
@@ -250,4 +272,30 @@ test('valida fase, sessão, configuração e controller', async () => {
         erros.push(erro)
     );
     assert.equal(erros.length, 1);
+});
+
+test('limita o check-in e preserva o valor observado uma única vez', async () => {
+    const opcoes = Array.from({ length: 10 }, (_, indice) =>
+        categoria(`opcao-${indice}`, `Sintoma ${indice}`)
+    );
+    const prisma = prismaCom([
+        { categorias: [opcoes[9]] },
+        { categorias: opcoes }
+    ]);
+    const buscarRegistros = prisma.registroDiario.findMany;
+    prisma.registroDiario.findMany = async (consulta) => {
+        assert.equal(consulta.where.usuarioId, 3);
+        assert.equal(consulta.where.faseCicloAssociada, 'lutea');
+        assert.equal(consulta.take, 12);
+        return buscarRegistros();
+    };
+
+    const service = criarDiaryOverviewService({ prisma });
+    const resumo = await service.buscar(3, 'lutea');
+
+    assert.equal(resumo.informacoesSuficientes, false);
+    assert.deepEqual(
+        resumo.sugestoesCheckIn.map(({ valor, ocorrencias }) => [valor, ocorrencias]),
+        [['Sintoma 9', 2], ...opcoes.slice(0, 7).map(({ opcoes }) => [opcoes[0].opcaoNome, 1])]
+    );
 });

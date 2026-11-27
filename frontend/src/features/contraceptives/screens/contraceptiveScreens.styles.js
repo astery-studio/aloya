@@ -1,6 +1,6 @@
 //Define os estilos compartilhados pelas telas do fluxo de anticoncepcionais.
 import { StyleSheet } from 'react-native';
-import { espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { espacamentos, espacamentosLayout, fontFamilies, typography } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
@@ -14,12 +14,15 @@ function criarEstilos(tema) {
         telaCadastro: tema.escuro ? { backgroundColor: '#121212' } : {},
 
         conteudoFormulario: {
+            paddingTop: espacamentosLayout.headerParaConteudo,
             paddingBottom: espacamentos.grande
         },
 
         lista: {
             flexGrow: 1,
-            padding: espacamentos.grande
+            paddingHorizontal: espacamentos.grande,
+            paddingTop: espacamentosLayout.headerParaConteudo,
+            paddingBottom: espacamentos.grande
         },
 
         separador: {
@@ -45,10 +48,6 @@ function criarEstilos(tema) {
             ...typography.bodyDefault,
             textAlign: 'center',
             color: interfaceTema.textoSecundario
-        },
-
-        acao: {
-            marginTop: espacamentos.grande
         },
 
         acaoExcluir: {

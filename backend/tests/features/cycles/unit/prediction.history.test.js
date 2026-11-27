@@ -77,3 +77,13 @@ test('identifica somente ambiguidades presentes nos registros', () => {
         { dataInicio: inicio, dataFim: null }
     ]), ['INICIOS_DUPLICADOS', 'FIM_ANTERIOR_AO_INICIO']);
 });
+
+test('mantém um início elegível quando a data final é inválida', () => {
+    const registros = [{ dataInicio: '2026-10-01', dataFim: '2026-10-32' }];
+
+    assert.deepEqual(selecionarRegistrosElegiveis(registros, '2026-10-05'), {
+        registros: [{ dataInicio: '2026-10-01', dataFim: null }],
+        ambiguidades: ['FIM_INVALIDO_IGNORADO']
+    });
+    assert.equal(registros[0].dataFim, '2026-10-32');
+});

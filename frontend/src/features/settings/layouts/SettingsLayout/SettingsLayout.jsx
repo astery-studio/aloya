@@ -70,8 +70,8 @@ function SettingsLayout({
                         testID="rodape-fixo-settings-layout"
                         style={[
                             estilos.rodapeFixo,
-                                corFundo ? { backgroundColor: corFundo } : null,
-                                estiloRodapeFixo
+                            corFundo ? { backgroundColor: corFundo } : null,
+                            estiloRodapeFixo
                         ]}
                     >
                         {rodape}

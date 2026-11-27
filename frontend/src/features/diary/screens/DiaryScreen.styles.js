@@ -1,7 +1,7 @@
 // Define a composição responsiva da tela do Diário e de sua ação fixa.
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies } from '../../../shared/theme';
+import { espacamentosLayout, fontFamilies } from '../../../shared/theme';
 import { obterCoresDiario } from '../config/diaryColors';
 
 // Converte os tokens do tema em estilos da screen e de seus estados.
@@ -13,15 +13,18 @@ function criarEstilos(tema) {
             minHeight: 0,
             alignSelf: 'stretch'
         },
-        conteudoEstatico: { flex: 1, paddingHorizontal: 20 },
+        conteudoEstatico: {
+            flex: 1,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela
+        },
         introducao: {
             width: 350.011,
             maxWidth: '100%',
             alignSelf: 'center',
             alignItems: 'center',
             gap: 8,
-            paddingTop: 8,
-            paddingBottom: 20
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: tema.espacamentosLayout.descricaoParaConteudo
         },
         descricao: {
             width: '100%',
@@ -37,7 +40,7 @@ function criarEstilos(tema) {
             fontSize: 12,
             lineHeight: 17
         },
-        estadoCentralizado: { flex: 1, justifyContent: 'center', paddingBottom: 56 },
+        estadoCentralizado: { flex: 1, justifyContent: 'center' },
         mensagemEstado: {
             marginTop: 10,
             color: cores.textoSecundario,
@@ -46,11 +49,15 @@ function criarEstilos(tema) {
             lineHeight: 21,
             textAlign: 'center'
         },
+        opcaoEstadoVazio: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
         estadoFiltroVazio: {
             flex: 1,
             alignItems: 'center',
             paddingTop: 22,
-            paddingHorizontal: 20,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
             paddingBottom: 96
         },
         mensagemFiltroVazio: {
@@ -77,18 +84,9 @@ function criarEstilos(tema) {
             lineHeight: 18,
             letterSpacing: 0.72
         },
-        lista: { paddingBottom: 96 },
-        acaoFixa: {
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            left: 0,
-            paddingHorizontal: 20,
-            paddingTop: 16,
-            paddingBottom: 16,
-            borderTopWidth: 1,
-            borderTopColor: cores.borda,
-            backgroundColor: cores.fundo
+        lista: {
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
+            paddingBottom: 96
         }
     });
 }

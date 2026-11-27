@@ -1,9 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
-import {
-    calcularMargemHorizontalTimeline,
-    DiaryScreen
-} from '../../../../src/features/diary/screens/DiaryScreen';
+import { DiaryScreen } from '../../../../src/features/diary/screens/DiaryScreen';
+import { criarEstilos } from '../../../../src/features/diary/screens/DiaryScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const registro = {
@@ -24,11 +24,23 @@ const registro = {
 };
 
 describe('histórico do Diário', () => {
-    test('preserva a largura do card do protótipo em celulares estreitos', () => {
-        expect(calcularMargemHorizontalTimeline(360)).toBe(5);
-        expect(calcularMargemHorizontalTimeline(390)).toBe(20);
-        expect(calcularMargemHorizontalTimeline(412)).toBe(20);
-        expect(calcularMargemHorizontalTimeline()).toBe(20);
+    test('mantém a descrição rolável separada do conteúdo', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.introducao).toMatchObject({ paddingTop: 8, paddingBottom: 24 });
+        expect(estilos.descricao).toMatchObject({
+            fontFamily: 'DMSans_400Regular',
+            fontSize: 15,
+            lineHeight: 22
+        });
+    });
+
+    test('usa a margem horizontal padrão em todo o conteúdo da tela', () => {
+        const estilos = criarEstilos(temaClaro);
+
+        expect(estilos.conteudoEstatico.paddingHorizontal).toBe(24);
+        expect(estilos.estadoFiltroVazio.paddingHorizontal).toBe(24);
+        expect(estilos.lista.paddingHorizontal).toBe(24);
     });
 
     test('mostra estado vazio e abre a criação', async () => {
@@ -36,12 +48,17 @@ describe('histórico do Diário', () => {
         await render(<DiaryScreen aoCriar={aoCriar} onSelecionarAba={jest.fn()} />);
 
         expect(screen.getByRole('header', { name: 'Diário' })).toBeOnTheScreen();
+        expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
         expect(screen.getByRole('header', { name: 'Nenhum registro visível' })).toBeOnTheScreen();
         expect(
             screen.getByText(/as categorias usadas neles podem estar desativadas/)
         ).toBeOnTheScreen();
-        expect(screen.getByText(/Ative-as em "Gerenciar categorias"/)).toBeOnTheScreen();
-        await fireEvent.press(screen.getByRole('button', { name: 'Adicionar novo registro' }));
+        expect(screen.getByText('"Gerenciar categorias"')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.getByText('botão de adicionar')).toHaveStyle({ fontWeight: '700' });
+        expect(screen.queryByText(/desativadas\.\nAtive-as/)).not.toBeOnTheScreen();
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+        );
         expect(aoCriar).toHaveBeenCalledTimes(1);
     });
 
@@ -49,8 +66,10 @@ describe('histórico do Diário', () => {
         const tentar = jest.fn();
         const resultado = await render(<DiaryScreen carregando />);
         expect(screen.getByTestId('diary-loading')).toBeOnTheScreen();
+        expect(screen.queryByTestId('diary-add-fab')).toBeNull();
 
         await resultado.rerender(<DiaryScreen erro="erro seguro" aoTentarNovamente={tentar} />);
+        expect(screen.queryByTestId('diary-add-fab')).toBeNull();
         expect(screen.getByRole('header', { name: 'Ocorreu um erro' })).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
         expect(tentar).toHaveBeenCalledTimes(1);
@@ -88,12 +107,38 @@ describe('histórico do Diário', () => {
         });
         expect(screen.getByText('LINHA DO TEMPO')).toBeOnTheScreen();
         expect(screen.getByText('Atualizando Diário...')).toBeOnTheScreen();
-        await fireEvent.press(screen.getByRole('button', { name: 'Filtrar histórico do Diário' }));
+        expect(
+            StyleSheet.flatten(screen.getByTestId('diary-timeline').props.contentContainerStyle)
+        ).toMatchObject({ paddingHorizontal: 24 });
+        const botaoFiltrar = screen.getByRole('button', {
+            name: 'Filtrar histórico do Diário'
+        });
+        const botaoCategorias = screen.getByRole('button', {
+            name: 'Gerenciar categorias do Diário'
+        });
+
+        expect(screen.getByTestId('header-container')).toHaveStyle({
+            backgroundColor: '#F7F5F0'
+        });
+        expect(botaoFiltrar).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderWidth: 0.667,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF'
+        });
+        expect(botaoCategorias).toHaveStyle({
+            width: 44,
+            height: 44,
+            borderWidth: 0.667,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF'
+        });
+
+        await fireEvent.press(botaoFiltrar);
+        await fireEvent.press(botaoCategorias);
         await fireEvent.press(
-            screen.getByRole('button', { name: 'Gerenciar categorias do Diário' })
-        );
-        await fireEvent.press(
-            screen.getAllByRole('button', { name: 'Adicionar novo registro' })[0]
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
         );
         await fireEvent.press(screen.getByLabelText('Ver detalhes do registro de 09/11/2026'));
         await fireEvent.press(
@@ -150,6 +195,8 @@ describe('histórico do Diário', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
         expect(remover).toHaveBeenCalledWith('fase:menstrual');
         expect(limpar).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('button', { name: 'Adicionar novo registro' })).toBeOnTheScreen();
+        expect(
+            screen.getByRole('button', { name: 'Adicionar novo registro ao Diário' })
+        ).toBeOnTheScreen();
     });
 });

@@ -16,7 +16,9 @@ function DiaryDateNavigator({
     anteriorDisponivel = true,
     proximoDisponivel = true,
     desabilitado = false,
-    compacto = false
+    compacto = false,
+    estiloContainer,
+    estiloTexto
 }) {
     const tema = useTheme();
     const cores = obterCoresDiario(tema).interface;
@@ -24,7 +26,10 @@ function DiaryDateNavigator({
     const dataFormatada = formatarDataDiario(data);
 
     return (
-        <View style={[estilos.container, compacto && estilos.containerCompacto]}>
+        <View
+            testID="diary-date-navigator"
+            style={[estilos.container, compacto && estilos.containerCompacto, estiloContainer]}
+        >
             <DiaryDateArrow
                 direcao="anterior"
                 aoPressionar={aoAnterior}
@@ -39,7 +44,7 @@ function DiaryDateNavigator({
                 onPress={aoAbrirSeletor}
                 style={[estilos.data, compacto && estilos.dataCompacta]}
             >
-                <Text style={[estilos.texto, compacto && estilos.textoCompacto]}>
+                <Text style={[estilos.texto, compacto && estilos.textoCompacto, estiloTexto]}>
                     {dataFormatada}
                 </Text>
                 {aoAbrirSeletor ? <CaretDown size={15} color={cores.textoPrincipal} /> : null}

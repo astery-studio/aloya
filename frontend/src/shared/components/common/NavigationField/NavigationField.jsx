@@ -36,7 +36,11 @@ function NavigationField({
     labelSemLimite = false,
     referencia,
     estilo,
-    coresIcone
+    coresIcone,
+    estiloTexto,
+    estiloCaixaIcone,
+    tamanhoIcone,
+    corSeta: corSetaPersonalizada
 }) {
     const tema = useTheme();
 
@@ -54,7 +58,8 @@ function NavigationField({
         ? tema.cores.interface.textoDesabilitado
         : tema.cores.neutras.bordaTracejada;
 
-    const corSeta = ehBotao ? tema.cores.interface.textoSecundario : corSetaNormal;
+    const corSeta =
+        corSetaPersonalizada ?? (ehBotao ? tema.cores.interface.textoSecundario : corSetaNormal);
 
     return (
         <Pressable
@@ -82,18 +87,19 @@ function NavigationField({
                         ehBotao && estilos.caixaIconeBotao,
                         {
                             backgroundColor: coresDoIcone.caixa
-                        }
+                        },
+                        estiloCaixaIcone
                     ]}
                 >
                     <Icone
-                        size={semBorda || ehBotao ? 24 : 20}
+                        size={tamanhoIcone ?? (semBorda || ehBotao ? 24 : 20)}
                         color={coresDoIcone.icone}
                         weight="regular"
                     />
                 </View>
             ) : null}
 
-            <Text style={estilos.label} numberOfLines={labelSemLimite ? undefined : 2}>
+            <Text style={[estilos.label, estiloTexto]} numberOfLines={labelSemLimite ? undefined : 2}>
                 {label}
             </Text>
 

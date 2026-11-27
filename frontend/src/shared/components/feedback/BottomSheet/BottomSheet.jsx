@@ -29,7 +29,9 @@ function BottomSheet({
     corAlca,
     estiloPainel,
     permitirDeslizarParaFechar = false,
-    podeIniciarDeslize = permitirInicioDeslize
+    exibirAlcaArraste = true,
+    podeIniciarDeslize = permitirInicioDeslize,
+    ajustarAoTeclado = true
 }) {
     const tema = useTheme();
     const insets = useSafeAreaInsets();
@@ -191,8 +193,9 @@ function BottomSheet({
             onRequestClose={solicitarFechamento}
         >
             <KeyboardAvoidingView
+                testID="bottom-sheet-teclado"
                 style={estilos.tela}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                behavior={ajustarAoTeclado && Platform.OS === 'ios' ? 'padding' : undefined}
             >
                 <Animated.View
                     testID="bottom-sheet-fundo"
@@ -225,7 +228,7 @@ function BottomSheet({
                         }
                     ]}
                 >
-                    {permitirDeslizarParaFechar ? (
+                    {permitirDeslizarParaFechar && exibirAlcaArraste ? (
                         <View
                             testID="bottom-sheet-area-arraste"
                             accessibilityRole="adjustable"

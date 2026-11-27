@@ -18,7 +18,7 @@ function criarEstilos(tema) {
 
         conteudoLista: {
             paddingHorizontal: 20,
-            paddingTop: 20,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: 24
         },
 
