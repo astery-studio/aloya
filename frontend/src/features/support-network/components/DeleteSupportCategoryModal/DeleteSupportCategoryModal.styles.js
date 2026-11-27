@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -27,12 +28,16 @@ function criarEstilos(tema) {
             borderWidth: 1.4,
             borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.04)' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput,
-            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             gap: 14
         },
 
         tituloAplicar: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 17,
             fontWeight: '700',
@@ -41,7 +46,9 @@ function criarEstilos(tema) {
         },
 
         descricaoAplicar: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -63,11 +70,15 @@ function criarEstilos(tema) {
         linha: {
             flex: 1,
             height: 1,
-            backgroundColor: tema.cores.interface.separador
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.borda
+                : tema.cores.interface.separador
         },
 
         textoSeparador: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontWeight: '700',
@@ -86,8 +97,10 @@ function criarEstilos(tema) {
             paddingTop: 14,
             paddingBottom: 4,
             borderTopWidth: 1,
-            borderTopColor: tema.escuro ? 'rgba(230, 226, 216, 0.12)' : tema.cores.interface.borda,
-            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
+            borderTopColor: tema.escuro ? 'rgba(255, 255, 255, 0.12)' : tema.cores.interface.borda,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie
         },
 
         botaoConfirmarAtivo: tema.escuro ? { backgroundColor: '#EF9A9A' } : {},

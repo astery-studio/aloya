@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -16,7 +17,9 @@ function criarEstilos(tema) {
             borderWidth: 1.4,
             borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.04)' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput,
-            backgroundColor: tema.escuro ? '#242424' : tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -28,7 +31,7 @@ function criarEstilos(tema) {
         },
 
         opcaoSelecionadaManter: {
-            borderColor: tema.cores.interface.destaque
+            borderColor: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque
         },
 
         fundoPerigo: {
@@ -67,8 +70,10 @@ function criarEstilos(tema) {
         },
 
         indicadorManter: {
-            borderColor: tema.cores.interface.destaque,
-            backgroundColor: tema.cores.interface.destaque
+            borderColor: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.verde
+                : tema.cores.interface.destaque
         },
 
         indicadorTodosSelecionados: tema.escuro
@@ -78,11 +83,15 @@ function criarEstilos(tema) {
             width: 8,
             height: 8,
             borderRadius: 4,
-            backgroundColor: tema.cores.interface.textoSobreDestaque
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.fundo
+                : tema.cores.interface.textoSobreDestaque
         },
 
         titulo: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',
@@ -96,13 +105,15 @@ function criarEstilos(tema) {
         },
 
         tituloManter: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.semibold,
             fontWeight: '600'
         },
 
         descricao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             fontWeight: '400',

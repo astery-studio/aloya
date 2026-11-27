@@ -1,5 +1,6 @@
 //Define a lista, os estados e a ação fixa das categorias de permissão.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -37,7 +38,9 @@ function criarEstilos(tema) {
 
         textoCarregamento: {
             marginTop: 14,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             lineHeight: 22
@@ -53,7 +56,9 @@ function criarEstilos(tema) {
         },
 
         textoAtualizacao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             lineHeight: 20
@@ -66,7 +71,7 @@ function criarEstilos(tema) {
             paddingBottom: 16,
             backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.borda
+            borderTopColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda
         }
     });
 }

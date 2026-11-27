@@ -1,5 +1,6 @@
 //Define a apresentação dos cartões da lista de categorias de permissão.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
@@ -12,9 +13,11 @@ function criarEstilos(tema) {
             paddingTop: 16,
             paddingBottom: 14,
             gap: 14,
-            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             borderWidth: 1.5,
-            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
             borderRadius: tema.radius.grande
         },
 
@@ -61,7 +64,9 @@ function criarEstilos(tema) {
 
         nome: {
             width: '100%',
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 18,
             fontWeight: '700',
@@ -80,7 +85,9 @@ function criarEstilos(tema) {
 
         resumo: {
             width: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             fontWeight: '400',
@@ -106,7 +113,9 @@ function criarEstilos(tema) {
         divisor: {
             width: '100%',
             height: 1,
-            backgroundColor: tema.cores.interface.separador
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.borda
+                : tema.cores.interface.separador
         },
 
         contatos: {
@@ -118,7 +127,9 @@ function criarEstilos(tema) {
         },
 
         textoContatos: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',
@@ -127,7 +138,9 @@ function criarEstilos(tema) {
         },
 
         quantidadeContatos: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontWeight: '700'
         }

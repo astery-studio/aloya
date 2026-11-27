@@ -27,7 +27,6 @@ import {
     criarRotuloContatos,
     SupportCategoryCard
 } from '../../../../src/features/support-network/components/SupportCategoryCard/SupportCategoryCard';
-import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 
 const categoria = Object.freeze({
     id: 7,
@@ -206,7 +205,7 @@ describe('SupportCategoryCard', () => {
         });
 
         expect(screen.getByTestId('support-category-name')).toHaveStyle({
-            color: temaEscuro.cores.interface.textoPrincipal
+            color: '#E3E3E3'
         });
     });
 });
