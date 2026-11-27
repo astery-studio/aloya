@@ -37,6 +37,10 @@ import { ContactFormScreen } from './features/support-network/screens/ContactFor
 import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
 import { SupportNetworkScreen } from './features/support-network/screens/SupportNetworkScreen';
 import { SharedSupportFlow } from './features/support-network/screens/SharedSupportFlow/SharedSupportFlow';
+import {
+    lerVinculoVisualizado,
+    salvarVinculoVisualizado
+} from './features/support-network/services/sharedViewingStorage';
 import { ehMenorDe16 } from './features/support-network/utils/age';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
@@ -198,6 +202,8 @@ export default function App() {
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
     const [vinculoVisualizadoId, setVinculoVisualizadoId] = useState(null);
+    const contaComVisualizacaoRestaurada = useRef(null);
+    const gravandoVisualizacao = useRef(false);
     const [modoRedeInicial, setModoRedeInicial] = useState('apoio');
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
@@ -295,15 +301,24 @@ export default function App() {
                 signal: controlador.signal
             });
 
-            if (requisicaoAtual.current === identificador) {
-                setPerfil(perfilRecebido);
+            if (requisicaoAtual.current !== identificador) return;
+
+            if (perfilRecebido.id !== contaComVisualizacaoRestaurada.current) {
+                const vinculo = await lerVinculoVisualizado(perfilRecebido.id).catch(() => null);
+                if (requisicaoAtual.current !== identificador) return;
+                contaComVisualizacaoRestaurada.current = perfilRecebido.id;
+                setVinculoVisualizadoId(vinculo);
             }
+
+            setPerfil(perfilRecebido);
         } catch (erro) {
-            if (erro?.name === 'AbortError') {
+            if (erro?.name === 'AbortError' || requisicaoAtual.current !== identificador) {
                 return;
             }
 
             if (erro?.status === 401) {
+                contaComVisualizacaoRestaurada.current = null;
+                setVinculoVisualizadoId(null);
                 setPerfil(null);
 
                 setTelaInterna(telasInternas.inicio);
@@ -438,6 +453,7 @@ export default function App() {
     }
 
     function concluirAutenticacao() {
+        contaComVisualizacaoRestaurada.current = null;
         setMensagemLogin(null);
         setPerfil(null);
         setErroPerfil(false);
@@ -460,6 +476,7 @@ export default function App() {
     }
 
     const finalizarSessao = useCallback((resultado = {}) => {
+        contaComVisualizacaoRestaurada.current = null;
         requisicaoAtual.current += 1;
 
         controladorPerfilAtual.current?.abort();
@@ -489,17 +506,30 @@ export default function App() {
         setEstadoSessao('anonima');
     }, []);
 
-    function visualizarContato(contato) {
-        if (contato === null) {
-            setModoRedeInicial('acompanhados');
-            setVinculoVisualizadoId(null);
+    async function visualizarContato(contato) {
+        if (gravandoVisualizacao.current || !perfil?.id) return;
+        if (
+            contato !== null &&
+            (contato?.status !== 'ativo' || !Number.isSafeInteger(contato.id) || contato.id <= 0)
+        ) {
             return;
         }
-        if (contato?.status !== 'ativo' || !Number.isSafeInteger(contato.id) || contato.id <= 0) {
-            return;
+        const vinculo = contato?.id ?? null;
+        const requisicao = requisicaoAtual.current;
+        gravandoVisualizacao.current = true;
+        try {
+            await salvarVinculoVisualizado(perfil.id, vinculo);
+            if (requisicaoAtual.current !== requisicao) return;
+            setVinculoVisualizadoId(vinculo);
+            if (vinculo === null) setModoRedeInicial('acompanhados');
+            else setTelaInterna(telasInternas.inicio);
+        } catch {
+            if (requisicaoAtual.current === requisicao) {
+                Alert.alert('Não foi possível atualizar a visualização. Tente novamente.');
+            }
+        } finally {
+            gravandoVisualizacao.current = false;
         }
-        setVinculoVisualizadoId(contato.id);
-        setTelaInterna(telasInternas.inicio);
     }
 
     function selecionarAba(aba) {

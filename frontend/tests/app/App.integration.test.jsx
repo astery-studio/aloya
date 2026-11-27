@@ -15,6 +15,43 @@ jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({ DMSans_600SemiBold:
 jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({ DMSans_700Bold: 'bold' }));
 jest.mock('../../src/app/createAppServices', () => ({ criarServicosApp: jest.fn() }));
 jest.mock('../../src/shared/storage/tokenStorage', () => ({ obterToken: jest.fn() }));
+jest.mock('../../src/shared/storage/secureStorage', () => ({
+    lerSeguro: jest.fn(),
+    salvarSeguro: jest.fn(),
+    removerSeguro: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/screens/SharedSupportFlow/SharedSupportFlow', () => {
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        SharedSupportFlow: ({ vinculoId, onSelecionarAba }) => (
+            <View>
+                <Text>
+                    {vinculoId === null
+                        ? 'Home de acompanhamento'
+                        : `Acompanhando vínculo ${vinculoId}`}
+                </Text>
+                <Pressable accessibilityRole="button" onPress={() => onSelecionarAba('membros')}>
+                    <Text>Contatos acompanhados</Text>
+                </Pressable>
+            </View>
+        )
+    };
+});
+
+jest.mock(
+    '../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen',
+    () => {
+        const { Pressable, Text } = require('react-native');
+        return {
+            ReceivedContactsScreen: ({ onVisualizarContato }) => (
+                <Pressable accessibilityRole="button" onPress={() => onVisualizarContato(null)}>
+                    <Text>Parar visualização</Text>
+                </Pressable>
+            )
+        };
+    }
+);
 
 jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
     const React = require('react');
@@ -425,11 +462,19 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba }) =>
+        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba, onVisualizarContato }) =>
             React.createElement(
                 View,
                 null,
                 React.createElement(Text, null, 'Tela de Membros'),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        onPress: () => onVisualizarContato({ id: 9, status: 'ativo' })
+                    },
+                    React.createElement(Text, null, 'Visualizar contato')
+                ),
                 React.createElement(
                     Pressable,
                     {
@@ -526,6 +571,7 @@ import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from '../../src/features/diary/DiaryFlow';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
+import { lerSeguro, removerSeguro, salvarSeguro } from '../../src/shared/storage/secureStorage';
 
 //Cria os serviços usados pelo App durante os testes de integração.
 function criarServicos() {
@@ -586,6 +632,7 @@ describe('App integrado', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        lerSeguro.mockResolvedValue(null);
         servicos = criarServicos();
         criarServicosApp.mockReturnValue(servicos);
         jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
@@ -667,6 +714,34 @@ describe('App integrado', () => {
         });
 
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
+    });
+
+    test('restaura o vínculo ao reabrir o app e apaga a seleção ao parar de visualizar', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        const armazenamento = new Map();
+        lerSeguro.mockImplementation(async (chave) => armazenamento.get(chave) ?? null);
+        salvarSeguro.mockImplementation(async (chave, valor) => armazenamento.set(chave, valor));
+        removerSeguro.mockImplementation(async (chave) => armazenamento.delete(chave));
+
+        const primeira = await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar contato' }));
+        expect(await screen.findByText('Acompanhando vínculo 9')).toBeOnTheScreen();
+        expect(salvarSeguro).toHaveBeenCalledWith('rede-apoio.visualizacao.1', '9');
+        await primeira.unmount();
+
+        const segunda = await render(<App />);
+        expect(await screen.findByText('Acompanhando vínculo 9')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Contatos acompanhados' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Parar visualização' }));
+        expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
+        expect(removerSeguro).toHaveBeenCalledWith('rede-apoio.visualizacao.1');
+        await segunda.unmount();
+
+        await render(<App />);
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+        await waitFor(() => expect(lerSeguro).toHaveBeenCalledTimes(3));
+        expect(screen.queryByText('Acompanhando vínculo 9')).toBeNull();
     });
 
     test('abre os parâmetros pela tela de configurações', async () => {
@@ -963,11 +1038,12 @@ describe('App integrado', () => {
 
             await render(<App />);
 
-            expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+            const home = papel === 'contato_apoio' ? 'Home de acompanhamento' : 'Ciclo hoje';
+            expect(await screen.findByText(home)).toBeOnTheScreen();
             await waitFor(() => {
                 expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
             });
-            expect(screen.getByText('Ciclo hoje')).toBeOnTheScreen();
+            expect(screen.getByText(home)).toBeOnTheScreen();
         }
     );
 });
