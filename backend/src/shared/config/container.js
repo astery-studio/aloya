@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import { env } from './env.js';
 import { prisma } from './prisma.js';
 import { criarNotificationPreferencesService } from '../../features/notifications/notificationPreferences.service.js';
+import { publicarSeguranca } from '../../features/notifications/securityPushEvents.js';
 import { criarCycleRegistrationModule } from '../../features/cycles/cycleRegistration.module.js';
 
 import * as dateUtils from '../utils/date.utils.js';
@@ -58,7 +59,8 @@ import { criarPredictionController } from '../../features/cycles/controllers/pre
 
 import {
     criarEdicaoAnticoncepcionalRateLimit,
-    criarRemocaoAnticoncepcionalRateLimit
+    criarRemocaoAnticoncepcionalRateLimit,
+    criarUsoAnticoncepcionalRateLimit
 } from '../../features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 import { criarCalendarModule } from '../../features/calendar/calendar.module.js';
@@ -204,7 +206,8 @@ function criarContainer() {
         tokenService,
         passwordService,
         emailService,
-        baseUrl: env.passwordResetBaseUrl
+        baseUrl: env.passwordResetBaseUrl,
+        publicarSeguranca
     });
 
     const passwordRecoveryValidator = criarPasswordRecoveryValidator();
@@ -226,7 +229,8 @@ function criarContainer() {
         prisma,
         passwordService,
         parentalConsentService,
-        dateUtils
+        dateUtils,
+        publicarSeguranca
     });
 
     const accountDeletionService = criarAccountDeletionService({
@@ -490,6 +494,8 @@ function criarContainer() {
         limite: env.edicaoAnticoncepcionalRateLimitMaximo
     });
 
+    const usoAnticoncepcionalRateLimit = criarUsoAnticoncepcionalRateLimit({ rateLimit });
+
     const remocaoAnticoncepcionalRateLimit = criarRemocaoAnticoncepcionalRateLimit({
         rateLimit,
         janelaMs: env.remocaoAnticoncepcionalRateLimitJanelaMs,
@@ -635,6 +641,7 @@ function criarContainer() {
         exclusaoContaRateLimit,
         passwordRecoveryController,
         edicaoAnticoncepcionalRateLimit,
+        usoAnticoncepcionalRateLimit,
         remocaoAnticoncepcionalRateLimit,
         diaryCatalogController,
         diaryEntryController,

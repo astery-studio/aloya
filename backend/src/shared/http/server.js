@@ -106,6 +106,7 @@ app.use(
         controller: container.contraceptiveController,
         usoController: container.contraceptiveUsageController,
         edicaoRateLimit: container.edicaoAnticoncepcionalRateLimit,
+        usoRateLimit: container.usoAnticoncepcionalRateLimit,
         remocaoRateLimit: container.remocaoAnticoncepcionalRateLimit
     })
 );
@@ -114,8 +115,7 @@ app.use('/api/preferencias-notificacao', criarNotificationPreferencesRoutes({
     Router: express.Router,
     autenticar: container.authMiddleware.autenticar,
     rateLimit: container.notificationPreferencesRateLimit,
-    service: container.notificationPreferencesService,
-    somenteContato: true
+    service: container.notificationPreferencesService
 }));
 
 app.use('/api/dispositivos-notificacao', criarPushDevicesRoutes({

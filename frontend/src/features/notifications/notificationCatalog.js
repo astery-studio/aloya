@@ -1,6 +1,48 @@
+const ciclo = {
+    titulo: 'Ciclo e Previsões',
+    grupos: {
+        menstrual: ['Ciclo Menstrual', [
+            ['proxima', 'Próxima menstruação'], ['confirmacao', 'Confirmação do início do ciclo'],
+            ['antecedenciaProximoCiclo', 'Quando notificar o próximo ciclo', 'antecedencia']
+        ]],
+        fases: ['Mudanças de Fase', [
+            ['menstrual', 'Início da fase menstrual'], ['folicular', 'Início da fase folicular'],
+            ['ovulatoria', 'Início da fase ovulatória'], ['lutea', 'Início da fase lútea']
+        ]],
+        dicas: ['Dicas de Autocuidado', [
+            ['menstrual', 'Dicas da fase menstrual'], ['folicular', 'Dicas da fase folicular'],
+            ['ovulatoria', 'Dicas da fase ovulatória'], ['lutea', 'Dicas da fase lútea']
+        ]],
+        diario: ['Diário', [
+            ['lembreteDiarioAtivo', 'Lembrete diário', 'legado'],
+            ['horarioLembreteDiario', 'Horário do lembrete diário', 'horario'],
+            ['resumoSemanal', 'Resumo semanal'], ['comparacaoPeriodos', 'Comparação de períodos']
+        ]]
+    }
+};
+
+const anticoncepcional = {
+    titulo: 'Anticoncepcional',
+    grupos: {
+        rotina: ['Rotina de Uso', [
+            ['horario', 'Horário programado'], ['inicioPausa', 'Início da pausa'],
+            ['fimPausa', 'Fim da pausa'], ['retomada', 'Retomada do uso']
+        ]],
+        naoConfirmado: ['Uso Não Confirmado', [
+            ['aviso', 'Primeiro aviso'], ['moderados', 'Reenvios moderados'],
+            ['criticos', 'Reenvios críticos'], ['fimJanela', 'Fim da janela de eficácia']
+        ]],
+        injetavel: ['Anticoncepcional Injetável', [['proxima', 'Aplicação se aproximando'], ['hoje', 'Aplicação programada para hoje']]],
+        adesivo: ['Adesivo Anticoncepcional', [['troca', 'Troca do adesivo'], ['retirada', 'Retirada para pausa'], ['novo', 'Novo adesivo após a pausa']]],
+        anel: ['Anel Vaginal', [['retirada', 'Retirada do anel'], ['insercao', 'Inserção após a pausa'], ['troca', 'Troca do anel']]],
+        diu: ['DIU Hormonal', [['proxima', 'Troca se aproximando'], ['data', 'Data da troca']]],
+        validade: ['Validade', [['proxima', 'Validade se aproximando'], ['atingida', 'Validade atingida']]]
+    }
+};
+
 const redeApoio = {
     titulo: 'Rede de Apoio',
-    ordemGrupo: ['convites', 'ciclo', 'dicas', 'diario', 'anticoncepcional'],
+    ordemGrupo: ['convites', 'ciclo', 'dicas', 'diario', 'anticoncepcional', 'consentimento'],
     grupos: {
         convites: ['Convites', [
             ['recebido', 'Novo convite recebido'], ['respondido', 'Convite aceito ou recusado'],
@@ -15,6 +57,7 @@ const redeApoio = {
             ['emocional', 'Emocional'], ['energia', 'Energia e Sono'],
             ['vidaIntima', 'Vida Íntima e Social'], ['saude', 'Saúde e Acompanhamento']
         ]],
+        consentimento: ['Consentimento Parental', [['confirmado', 'Autorização confirmada'], ['expirado', 'Solicitação expirada']]],
         anticoncepcional: ['Anticoncepcional Compartilhado', [
             ['horario', 'Horário programado'], ['naoConfirmado', 'Uso não confirmado'],
             ['moderados', 'Reenvios moderados'], ['criticos', 'Reenvios críticos'],
@@ -22,6 +65,34 @@ const redeApoio = {
         ]]
     }
 };
+
+export const catalogoNotificacoes = { ciclo, anticoncepcional, redeApoio };
+
+const gruposPorMetodo = {
+    injetavel: 'injetavel',
+    adesivo: 'adesivo',
+    anel_vaginal: 'anel',
+    diu_hormonal: 'diu'
+};
+
+export function categoriaNotificacoesAnticoncepcional(metodos) {
+    const gruposVisiveis = new Set();
+    for (const { tipo, dataValidade } of metodos) {
+        if (Object.hasOwn(gruposPorMetodo, tipo)) gruposVisiveis.add(gruposPorMetodo[tipo]);
+        if (tipo !== 'diu_hormonal') {
+            gruposVisiveis.add('rotina');
+            gruposVisiveis.add('naoConfirmado');
+        }
+        if (tipo === 'diu_hormonal' || dataValidade) gruposVisiveis.add('validade');
+    }
+
+    return {
+        ...anticoncepcional,
+        grupos: Object.fromEntries(
+            Object.entries(anticoncepcional.grupos).filter(([grupo]) => gruposVisiveis.has(grupo))
+        )
+    };
+}
 
 export function categoriaNotificacoesContato(chavesDisponiveis) {
     const chaves = new Set(chavesDisponiveis);

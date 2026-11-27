@@ -62,7 +62,9 @@ function alternarConjunto({ idsDoConjunto, permissoesSelecionadas, todasSelecion
     return IDS_TODAS_PERMISSOES.filter((permissaoId) => novasPermissoes.has(permissaoId));
 }
 
-function PermissionBulkSelector({ permissoesSelecionadas = [], aoAlterar, desabilitado = false }) {
+function PermissionBulkSelector({
+    permissoesSelecionadas = [], idsGerais = IDS_PERMISSOES_GERAIS, aoAlterar, desabilitado = false
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
@@ -76,7 +78,7 @@ function PermissionBulkSelector({ permissoesSelecionadas = [], aoAlterar, desabi
         [permissoesNormalizadas]
     );
 
-    const estadoGerais = obterEstadoDoConjunto(IDS_PERMISSOES_GERAIS, permissoesAtivas);
+    const estadoGerais = obterEstadoDoConjunto(idsGerais, permissoesAtivas);
 
     const estadoAcesso = obterEstadoDoConjunto(IDS_PERMISSOES_ACESSO, permissoesAtivas);
 
@@ -151,7 +153,7 @@ function PermissionBulkSelector({ permissoesSelecionadas = [], aoAlterar, desabi
                         disabled: bloqueado
                     }}
                     disabled={bloqueado}
-                    onPress={() => alterarConjunto(IDS_PERMISSOES_GERAIS, estadoGerais)}
+                    onPress={() => alterarConjunto(idsGerais, estadoGerais)}
                     style={({ pressed }) => [
                         estilos.opcao,
                         pressed && !bloqueado && estilos.pressionado

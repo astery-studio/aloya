@@ -134,6 +134,10 @@ const variantes = Object.freeze({
         },
         texto: { ...textoPadrao, width: 63, color: cores.sucesso }
     },
+    naoUseiNoCartao: {
+        container: { ...containerUso, width: 155.31, backgroundColor: '#E6E2D8' },
+        texto: { ...textoPadrao, width: 52, color: '#5C5C59' }
+    },
     alertaCritico: {
         container: {
             ...containerUso,
@@ -345,6 +349,10 @@ function criarVariantes(tema) {
         confirmado: combinarVariante(variantes.confirmado, {
             container: { backgroundColor: fundoSucesso },
             texto: { color: coresAtivas.sucesso }
+        }),
+        naoUseiNoCartao: combinarVariante(variantes.naoUseiNoCartao, {
+            container: { backgroundColor: tema.cores.interface.separador },
+            texto: { color: tema.cores.interface.textoSecundario }
         }),
         alertaCritico: combinarVariante(variantes.alertaCritico, {
             container: { backgroundColor: fundoInformacao },

@@ -22,7 +22,7 @@ function normalizarUsoAcompanhamento(uso) {
         horarioConfirmacao: horarioDaConfirmacao(confirmadoEm),
         foraDoPrazo,
         confirmacaoForaPrazo: foraDoPrazo,
-        ...(uso.atrasado !== undefined ? { atrasado: uso.atrasado === true } : {}),
+        ...(typeof uso.atrasado === 'boolean' ? { atrasado: uso.atrasado } : {}),
         ...(uso.prazoConfigurado !== undefined ? { prazoConfigurado: uso.prazoConfigurado } : {})
     });
 }

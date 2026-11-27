@@ -1,0 +1,18 @@
+{
+  "menstrual": {
+    "title": "Um pouco de conforto à mão",
+    "body": "Se ela estiver desconfortável, deixe água e uma manta por perto ou prepare a bolsa térmica que ela costuma usar."
+  },
+  "folicular": {
+    "title": "Cuide da próxima reposição",
+    "body": "Vai passar no mercado? Se ela quiser, aproveite para repor os itens de cuidado que já usa e prefere ter à mão."
+  },
+  "ovulatoria": {
+    "title": "Ajude a lembrar de um detalhe",
+    "body": "Se ela comentar um incômodo passageiro e quiser registrar, ajude a anotar quando começou e quanto durou. A anotação fica com ela."
+  },
+  "lutea": {
+    "title": "Tire uma pendência da lista",
+    "body": "Que tal fazer o jantar ou cuidar da louça hoje? Escolha uma tarefa que vocês já dividem e deixe uma coisa a menos na lista dela."
+  }
+}

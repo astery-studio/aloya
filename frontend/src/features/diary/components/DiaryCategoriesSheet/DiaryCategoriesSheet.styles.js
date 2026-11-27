@@ -13,7 +13,6 @@ function criarEstilos(tema) {
             height: 734,
             maxHeight: '92%',
             alignSelf: 'center',
-            paddingBottom: 0,
             backgroundColor: superficie
         },
         areaConteudo: {

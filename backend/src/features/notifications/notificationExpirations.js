@@ -2,13 +2,7 @@ import { agendarEvento, permiteNotificacao } from './notificationEvents.service.
 
 const dia = 86400000;
 
-export async function planejarExpiracoes(
-    prisma,
-    usuarioId,
-    preferencia,
-    agora,
-    { incluirConsentimento = true } = {}
-) {
+export async function planejarExpiracoes(prisma, usuarioId, preferencia, agora) {
     const proximidade = 'redeApoio.convites.proximoExpiracao';
     const expirado = 'redeApoio.convites.expirado';
     const consentimentoExpirado = 'redeApoio.consentimento.expirado';
@@ -56,7 +50,7 @@ export async function planejarExpiracoes(
         }
     }
 
-    if (incluirConsentimento && permiteNotificacao(preferencia, consentimentoExpirado)) {
+    if (permiteNotificacao(preferencia, consentimentoExpirado)) {
         const consentimento = await prisma.consentimentoParental.findFirst({
             where: {
                 titularMenorId: usuarioId,

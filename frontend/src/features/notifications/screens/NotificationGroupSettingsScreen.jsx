@@ -3,10 +3,11 @@ import { NavigationField } from '../../../shared/components/common/NavigationFie
 import SwitchField from '../../../shared/components/forms/SwitchField/SwitchField';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
+import { catalogoNotificacoes } from '../notificationCatalog';
 import { estilos } from './notificationSettingsStyles';
 
 export function NotificationGroupSettingsScreen({
-    categoria,
+    categoriaId, categoria = catalogoNotificacoes[categoriaId],
     valores, ocupado, onAlterar, onAbrirIndividual, onVoltar
 }) {
     const { cores } = useTheme();
@@ -18,10 +19,11 @@ export function NotificationGroupSettingsScreen({
                 <View style={estilos.secao}>
                     <Text accessibilityRole="header" style={estiloTitulo}>Configuração em grupo</Text>
                     {ordemGrupo.map((grupoId) => {
-                        const chave = `redeApoio.${grupoId}`;
+                        const chave = `${categoriaId}.${grupoId}`;
                         const [nome, linhas] = grupos[grupoId];
-                        const ativo = linhas.some(([id]) => {
-                            const evento = `${chave}.${id}`;
+                        const ativo = linhas.some(([id, , tipo]) => {
+                            if (tipo === 'horario' || tipo === 'antecedencia') return false;
+                            const evento = tipo === 'legado' ? id : `${chave}.${id}`;
                             return valores.efetivas?.[evento] ?? (valores[chave] !== false && valores[evento] === true);
                         });
                         return (

@@ -14,6 +14,7 @@ function BottomSheetLayout({
     corFundo,
     corIconeFechar,
     children,
+    referenciaTitulo,
     estiloTitulo
 }) {
     const tema = useTheme();
@@ -40,6 +41,7 @@ function BottomSheetLayout({
                 ]}
             >
                 <Text
+                    ref={referenciaTitulo}
                     accessibilityRole="header"
                     style={[estilos.titulo, compacto && estilos.tituloCompacto, estiloTitulo]}
                 >

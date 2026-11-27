@@ -52,6 +52,7 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
     expect(screen.getByLabelText('Exibir alça: false')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Limpar' })).not.toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeDisabled();
+    expect(screen.getByText('Aplicar Filtro')).toHaveProp('adjustsFontSizeToFit', false);
 
     fireEvent.changeText(screen.getByLabelText('Data de início do filtro'), '01/01/7777');
     await waitFor(() =>
@@ -61,11 +62,9 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
     expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Aplicar Filtro' })).toHaveStyle({
         width: 342,
-        height: 54,
-        paddingTop: 15.375,
-        paddingRight: 0,
-        paddingBottom: 14.625,
-        paddingLeft: 0,
+        height: 'auto',
+        minHeight: 54,
+        paddingVertical: 12,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 14

@@ -4,7 +4,7 @@ import { criarNotificationPreferencesService } from '../../../src/features/notif
 import { tratarErros } from '../../../src/shared/middleware/error.middleware.js';
 import { criarBanco } from './pushWorkerFixture.js';
 
-export async function prepararApiContato(t, { somenteContato = false } = {}) {
+export async function prepararApiContato(t) {
     const prisma = await criarBanco(t);
     const service = criarNotificationPreferencesService(prisma);
     await prisma.usuario.update({ where: { id: 2 }, data: { papel: 'contato_apoio' } });
@@ -33,7 +33,6 @@ export async function prepararApiContato(t, { somenteContato = false } = {}) {
         criarNotificationPreferencesRoutes({
             Router: express.Router,
             service,
-            somenteContato,
             rateLimit: (_req, _res, next) => next(),
             autenticar: async (req, res, next) => {
                 const id = Number(req.get('authorization'));

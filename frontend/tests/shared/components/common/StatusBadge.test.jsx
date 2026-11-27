@@ -111,17 +111,22 @@ test.each([
     });
 });
 
-test.each(['confirmadoHistorico', 'confirmadoHistoricoUso'])(
-    'dimensiona %s pelo texto sem quebrar Confirmado',
-    async (estado) => {
+test.each([
+    ['confirmadoHistorico', 'Confirmado', 81, 23],
+    ['confirmadoHistoricoUso', 'Confirmado', 81, 23],
+    ['atrasadoProximosHorarios', 'Atrasado', 60, 17],
+    ['atrasado', 'Atrasado', 60, 17]
+])(
+    'dimensiona %s pelo texto sem quebrar o rótulo',
+    async (estado, rotulo, minWidth, minHeight) => {
         await renderWithTheme(<StatusBadge estado={estado} />);
-        expect(screen.getByLabelText('Confirmado')).toHaveStyle({
+        expect(screen.getByLabelText(rotulo)).toHaveStyle({
             width: 'auto',
-            minWidth: 81,
-            minHeight: 23
+            minWidth,
+            minHeight
         });
-        expect(screen.getByText('Confirmado')).toHaveProp('numberOfLines', 1);
-        expect(screen.getByText('Confirmado')).toHaveStyle({ width: 'auto', flexShrink: 0 });
+        expect(screen.getByText(rotulo)).toHaveProp('numberOfLines', 1);
+        expect(screen.getByText(rotulo)).toHaveStyle({ width: 'auto', flexShrink: 0 });
     }
 );
 

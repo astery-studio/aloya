@@ -1,18 +1,27 @@
 //Compõe a edição de permissões individuais dentro do painel inferior compartilhado.
-import { useCallback, useMemo } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Platform, ScrollView, Text, View } from 'react-native';
 
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { useTheme } from '../../../../shared/hooks/useTheme';
 import { BottomSheetLayout } from '../../../../shared/layouts/BottomSheet/BottomSheetLayout';
+import { ContraceptiveFlow } from '../../../contraceptives/ContraceptiveFlow';
+import { ContraceptiveModal } from '../../../contraceptives/components/ContraceptiveModal';
+import { permissoesGerais } from '../../constants/permissionOptions';
+import { useActiveContraceptives } from '../../../contraceptives/hooks/useActiveContraceptives';
 import { GeneralPermissions } from '../GeneralPermissions/GeneralPermissions';
 import { PermissionGroups } from '../PermissionGroups/PermissionGroups';
 import {
     PermissionBulkSelector,
     normalizarPermissoesSelecionadas
 } from '../PermissionBulkSelector/PermissionBulkSelector';
+import { ContraceptivePermissionsContext } from './ContraceptivePermissionsContext';
 import { criarEstilos } from './IndividualPermissionsForm.styles';
+
+const permissoesSemAnticoncepcional = permissoesGerais.filter(
+    ({ id }) => id !== 'geral.anticoncepcionais' && id !== 'geral.alerta_anticoncepcional'
+);
 
 function IndividualPermissionsForm({
     visivel,
@@ -22,10 +31,21 @@ function IndividualPermissionsForm({
     aoSalvar,
     alterado = false,
     carregando = false,
-    erro = null
+    erro = null,
+    contraceptiveService,
+    onSessaoExpirada
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const [areaAnticoncepcionais, definirAreaAnticoncepcionais] = useState(null);
+    const painelVisivel = visivel === true && areaAnticoncepcionais === null;
+    const { metodos, falhou, recarregar } = useActiveContraceptives({
+        ativo: painelVisivel,
+        service: contraceptiveService,
+        onSessaoExpirada
+    });
+    const opcoesGerais =
+        contraceptiveService && !metodos?.length ? permissoesSemAnticoncepcional : permissoesGerais;
 
     const permissoesNormalizadas = useMemo(
         () => normalizarPermissoesSelecionadas(permissoesSelecionadas),
@@ -93,10 +113,20 @@ function IndividualPermissionsForm({
         return aoSalvar(permissoesNormalizadas);
     }, [aoSalvar, permissoesNormalizadas, salvamentoBloqueado]);
 
-    return (
+    function voltarDaArea() {
+        recarregar();
+        definirAreaAnticoncepcionais(Platform.OS === 'ios' ? 'fechando' : null);
+    }
+
+    const painel = (
         <BottomSheet
-            visivel={visivel === true}
+            visivel={painelVisivel}
             onFechar={aoFechar}
+            onOcultar={() => {
+                // Abre a área quando o painel nativo termina de fechar.
+                if (areaAnticoncepcionais === 'abrindo') definirAreaAnticoncepcionais('aberta');
+                else if (contraceptiveService) recarregar();
+            }}
             bloquearFechamento={carregando}
             estiloPainel={estilos.painel}
         >
@@ -115,6 +145,7 @@ function IndividualPermissionsForm({
                     >
                         <PermissionBulkSelector
                             permissoesSelecionadas={permissoesNormalizadas}
+                            idsGerais={opcoesGerais.map(({ id }) => id)}
                             aoAlterar={alterarListaCompleta}
                             desabilitado={edicaoBloqueada}
                         />
@@ -129,11 +160,25 @@ function IndividualPermissionsForm({
 
                         <GeneralPermissions
                             aparenciaNovaCategoria
+                            opcoes={opcoesGerais}
                             coresInterruptor={coresInterruptor}
                             permissoesSelecionadas={permissoesNormalizadas}
                             aoAlterar={alterarPermissaoGeral}
                             desabilitado={edicaoBloqueada}
                         />
+
+                        {contraceptiveService && (
+                            <ContraceptivePermissionsContext
+                                metodos={metodos}
+                                falhou={falhou}
+                                recarregar={recarregar}
+                                abrirArea={
+                                    edicaoBloqueada
+                                        ? undefined
+                                        : () => definirAreaAnticoncepcionais('abrindo')
+                                }
+                            />
+                        )}
 
                         <PermissionGroups
                             aparenciaNovaCategoria
@@ -168,6 +213,25 @@ function IndividualPermissionsForm({
                 </View>
             </BottomSheetLayout>
         </BottomSheet>
+    );
+
+    return (
+        <>
+            {painel}
+            {['aberta', 'fechando'].includes(areaAnticoncepcionais) && (
+                <ContraceptiveModal
+                    visible={areaAnticoncepcionais === 'aberta'}
+                    onRequestClose={voltarDaArea}
+                    onDismiss={() => definirAreaAnticoncepcionais(null)}
+                >
+                    <ContraceptiveFlow
+                        service={contraceptiveService}
+                        onVoltar={voltarDaArea}
+                        onSessaoExpirada={onSessaoExpirada}
+                    />
+                </ContraceptiveModal>
+            )}
+        </>
     );
 }
 

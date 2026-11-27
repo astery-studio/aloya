@@ -59,6 +59,7 @@ jest.mock('../../../../src/shared/layouts/BottomSheet/BottomSheetLayout', () => 
 });
 
 import { DatePickerSheet } from '../../../../src/shared/components/feedback/DatePickerSheet/DatePickerSheet';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 const mensagemDeErro = 'Não foi possível salvar a data. Tente novamente.';
 
 describe('DatePickerSheet', () => {
@@ -88,6 +89,53 @@ describe('DatePickerSheet', () => {
         expect(screen.getByText('Dom')).toBeOnTheScreen();
 
         expect(screen.getByText('Sáb')).toBeOnTheScreen();
+    });
+
+    test('usa a seleção padrão para hoje até que uma data seja informada', async () => {
+        jest.useFakeTimers().setSystemTime(new Date(2026, 8, 24, 12));
+        try {
+            const onSelecionar = jest.fn().mockResolvedValue(true);
+            const props = {
+                visivel: true,
+                destacarHoje: true,
+                dataMaxima: '2026-09-24',
+                onSelecionar,
+                onFechar: jest.fn()
+            };
+            const { rerender } = await render(<DatePickerSheet {...props} />);
+
+            const hoje = screen.getByRole('button', { name: 'Dia 24 de Setembro de 2026, hoje' });
+            expect(hoje).toHaveStyle({ backgroundColor: temaClaro.cores.marca.primaria });
+            expect(hoje).toBeEnabled();
+            expect(hoje).toBeSelected();
+            expect(onSelecionar).not.toHaveBeenCalled();
+            expect(screen.getByRole('button', { name: 'Dia 25 de Setembro de 2026' })).toBeDisabled();
+
+            await fireEvent.press(hoje);
+            expect(onSelecionar).toHaveBeenCalledWith('2026-09-24');
+
+            await rerender(<DatePickerSheet {...props} valorSelecionado="2026-09-21" />);
+            const diaAtual = screen.getByRole('button', { name: 'Dia 24 de Setembro de 2026, hoje' });
+            expect(diaAtual).not.toBeSelected();
+            expect(screen.getByRole('button', { name: 'Dia 21 de Setembro de 2026' })).toBeSelected();
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    test('abre no mês do limite quando a data já salva está depois dele', async () => {
+        await render(
+            <DatePickerSheet
+                visivel
+                valorSelecionado="2026-12-10"
+                dataMaxima="2026-09-24"
+                onSelecionar={jest.fn()}
+                onFechar={jest.fn()}
+            />
+        );
+
+        expect(screen.getByText('Setembro')).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Dia 24 de Setembro de 2026' })).toBeEnabled();
     });
 
     test('navega entre meses e anos', async () => {

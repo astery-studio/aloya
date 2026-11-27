@@ -12,7 +12,33 @@ function criarContraceptiveUsageController(service) {
             proximo(falha);
         }
     }
-    return { definirConfirmacao };
+    async function corrigirHistorico(requisicao, resposta, proximo) {
+        try {
+            const uso = await service.corrigirHistorico(
+                requisicao.usuario.id, requisicao.params.id, requisicao.params.usoId, requisicao.body
+            );
+            resposta.status(200).json({ uso });
+        } catch (erro) {
+            if (erro instanceof AppError) return proximo(erro);
+            const falha = new AppError('Não foi possível corrigir o histórico.', 500, 'ERRO_CORRIGIR_HISTORICO');
+            falha.cause = erro;
+            proximo(falha);
+        }
+    }
+    async function apagarRegistroHistorico(requisicao, resposta, proximo) {
+        try {
+            await service.apagarRegistroHistorico(
+                requisicao.usuario.id, requisicao.params.id, requisicao.params.usoId
+            );
+            resposta.status(204).end();
+        } catch (erro) {
+            if (erro instanceof AppError) return proximo(erro);
+            const falha = new AppError('Não foi possível apagar o registro.', 500, 'ERRO_APAGAR_REGISTRO');
+            falha.cause = erro;
+            proximo(falha);
+        }
+    }
+    return { definirConfirmacao, corrigirHistorico, apagarRegistroHistorico };
 }
 
 export { criarContraceptiveUsageController };

@@ -34,6 +34,7 @@ function NavigationField({
     paleta = 'corVerde',
     desabilitado = false,
     labelSemLimite = false,
+    referencia,
     estilo,
     coresIcone,
     estiloTexto,
@@ -62,6 +63,7 @@ function NavigationField({
 
     return (
         <Pressable
+            ref={referencia}
             onPress={onPress}
             disabled={estaDesabilitado}
             accessibilityRole="button"

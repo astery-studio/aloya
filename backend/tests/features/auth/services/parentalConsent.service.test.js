@@ -206,6 +206,8 @@ test('libera a Rede de Apoio ao confirmar token válido', async () => {
     assert.deepEqual(notificacoes[0].data, {
         usuarioId: 1,
         tipoOrigem: 'rede_apoio',
+        evento: 'redeApoio.consentimento.confirmado',
+        ocorrencia: agora.toISOString(),
         origemId: 10,
         dataHoraProgramada: agora,
         statusEnvio: 'agendada'

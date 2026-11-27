@@ -323,6 +323,7 @@ function DiaryFiltersSheet({
                     ) : null}
                     <ButtonScreen
                         texto="Aplicar Filtro"
+                        ajustarFonteAoEspaco={false}
                         aoPressionar={aplicar}
                         desativado={aplicarDesativado}
                         carregando={aplicando}

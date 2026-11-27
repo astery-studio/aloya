@@ -8,7 +8,6 @@ const somar = (data, ms) => new Date(+data + ms);
 export function criarPushWorker({
     prisma,
     provider,
-    prefixoEvento,
     relogio = () => new Date(),
     elegivel = podeProcessar
 }) {
@@ -18,7 +17,7 @@ export function criarPushWorker({
         const agora = relogio();
         const avisos = await prisma.notificacao.findMany({
             where: {
-                evento: prefixoEvento ? { startsWith: prefixoEvento } : { not: null },
+                evento: { not: null },
                 statusEnvio: 'agendada',
                 dataHoraProgramada: { lte: agora },
                 OR: [{ processandoAte: null }, { processandoAte: { lte: agora } }]

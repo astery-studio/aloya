@@ -337,6 +337,10 @@ describe('createAppServices', () => {
             cycleRegistrationService: {
                 registrar: expect.any(Function)
             },
+            notificationPreferencesService: {
+                buscar: expect.any(Function),
+                atualizar: expect.any(Function)
+            },
             supportNotificationPreferencesService: {
                 buscar: expect.any(Function),
                 atualizar: expect.any(Function)

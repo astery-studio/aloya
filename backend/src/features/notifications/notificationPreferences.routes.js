@@ -57,26 +57,18 @@ function responderComPreferencias(service, operacao, rotaContato = false) {
     };
 }
 
-export function criarNotificationPreferencesRoutes({
-    Router,
-    autenticar,
-    rateLimit,
-    service,
-    somenteContato = false
-}) {
+export function criarNotificationPreferencesRoutes({ Router, autenticar, rateLimit, service }) {
     const rotas = Router();
+    rotas.get('/', autenticar, responderComPreferencias(service, 'buscar'));
     rotas.get('/contato', autenticar, responderComPreferencias(service, 'buscar', true));
+    rotas.get('/padroes', autenticar, responderPadroes(service));
+    rotas.patch('/', autenticar, rateLimit, responderComPreferencias(service, 'atualizar'));
     rotas.patch(
         '/contato',
         autenticar,
         rateLimit,
         responderComPreferencias(service, 'atualizar', true)
     );
-    if (somenteContato) return rotas;
-
-    rotas.get('/', autenticar, responderComPreferencias(service, 'buscar'));
-    rotas.get('/padroes', autenticar, responderPadroes(service));
-    rotas.patch('/', autenticar, rateLimit, responderComPreferencias(service, 'atualizar'));
     rotas.post('/restaurar', autenticar, rateLimit, responderComPreferencias(service, 'restaurar'));
     return rotas;
 }

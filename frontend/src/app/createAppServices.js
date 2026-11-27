@@ -177,6 +177,7 @@ function criarServicosApp({
         contraceptiveService,
         cycleHistoryService,
         diaryService,
+        notificationPreferencesService: criarNotificationPreferencesService({ requisicaoAutenticada }),
         supportNotificationPreferencesService: criarNotificationPreferencesService({
             requisicaoAutenticada,
             contato: true

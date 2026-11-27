@@ -22,9 +22,9 @@ test('exige ao menos um horário nos tipos programados', () => {
     assert.equal(mensagemDe({ ...base, horarios: [] }), 'Informe ao menos um horário de uso.');
 });
 
-test('permite múltiplos horários somente para pílula diária', () => {
-    const pilula = validarCadastroAnticoncepcional({ ...base, horarios: ['08:00', '20:00'] }, hoje);
-    assert.deepEqual(pilula.horarios, ['08:00', '20:00']);
+test('exige um único horário inclusive para pílula diária', () => {
+    assert.match(mensagemDe({ ...base, horarios: ['08:00', '20:00'] }), /exatamente um horário/);
+    assert.deepEqual(validarCadastroAnticoncepcional(base, hoje).horarios, ['08:00']);
     assert.match(mensagemDe({
         ...base, tipo: 'adesivo', frequenciaId: 'adesivo_continuo', horarios: ['08:00', '20:00']
     }), /exatamente um horário/);
@@ -48,4 +48,15 @@ test('exige primeiro uso em frequência com pausa e aplica alerta crítico', () 
         ...base, frequenciaId: 'pilula_21_7', dataPrimeiroUso: '2026-09-01'
     }, hoje);
     assert.equal(dados.intensidade, 'critico');
+});
+
+test('permite cadastrar uso pausado com início hoje e rejeita data futura', () => {
+    const dados = { ...base, frequenciaId: 'pilula_21_7' };
+    const inicioHoje = validarCadastroAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-24' }, hoje);
+    assert.equal(inicioHoje.dataPrimeiroUso.toISOString(), '2026-09-24T00:00:00.000Z');
+
+    assert.throws(
+        () => validarCadastroAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-25' }, hoje),
+        { status: 422, codigo: 'PRIMEIRO_USO_FUTURO' }
+    );
 });

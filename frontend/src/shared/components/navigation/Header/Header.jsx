@@ -12,6 +12,7 @@ function Header({
     onVoltar,
     corFundo,
     corTexto,
+    alturaEspacamentoSuperior,
     acoes = null,
     acoesDireita = null,
     complementoTitulo = null,
@@ -30,8 +31,9 @@ function Header({
 
     const voltarDesabilitado = typeof onVoltar !== 'function';
     const paddingTop =
-        (aplicarSafeAreaSuperior ? insets.top : 0) +
-        tema.espacamentosLayout.espacamentoSuperiorHeader;
+        alturaEspacamentoSuperior ??
+        ((aplicarSafeAreaSuperior ? insets.top : 0) +
+            tema.espacamentosLayout.espacamentoSuperiorHeader);
 
     return (
         <View

@@ -31,6 +31,7 @@ test('exibe os dados, horários e ações do cartão', async () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Editar Yaz' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Remover Yaz' }));
+
     expect(aoEditar).toHaveBeenCalledTimes(1);
     expect(aoRemover).toHaveBeenCalledTimes(1);
 });
@@ -98,6 +99,7 @@ test('marca e reverte o uso quando a persistência falha', async () => {
     );
 
     await fireEvent.press(screen.getByRole('button', { name: 'Marcar Uso' }));
+
     await waitFor(() =>
         expect(screen.getByRole('button', { name: 'Marcar Uso' })).toBeOnTheScreen()
     );
@@ -134,6 +136,7 @@ test('o anel permite marcação e desmarcação conforme o protótipo vigente', 
             aoAlternarUso={jest.fn().mockResolvedValue()}
         />
     );
+
     expect(screen.getByRole('button', { name: 'Desmarcar Uso' })).toBeOnTheScreen();
     expect(screen.getByText('10:02')).toBeOnTheScreen();
 });
@@ -163,6 +166,7 @@ test('não apresenta o aviso técnico de prazo ao confirmar uso sem prazo config
             }}
         />
     );
+
     expect(screen.getByRole('button', { name: 'Desmarcar Uso' })).toBeOnTheScreen();
     expect(screen.queryByText(/Prazo para classificar atraso/)).toBeNull();
 });
@@ -192,6 +196,7 @@ test('mantém o histórico consultável do anticoncepcional removido e oculta as
     expect(screen.queryByRole('button', { name: 'Remover Depo-Provera' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Marcar Uso' })).toBeNull();
     expect(screen.queryByText('Pendente de Uso')).toBeNull();
+
     await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
     expect(screen.getByText('Não houve confirmação')).toBeOnTheScreen();
 });
@@ -214,6 +219,7 @@ test('publica a atualização imediata e o rollback para sincronizar o banner e 
     );
 
     await fireEvent.press(screen.getByRole('button', { name: 'Marcar Uso' }));
+
     await waitFor(() => expect(aoAtualizarUsos).toHaveBeenCalledTimes(2));
     expect(aoAtualizarUsos.mock.calls[0][1]).toEqual([
         expect.objectContaining({
@@ -257,9 +263,11 @@ test('a falha de uma dose não desfaz a confirmação de outra dose independente
         screen.getAllByRole('button', { name: 'Marcar Uso' })[0]
     );
     await waitFor(() => expect(aoAlternarUso).toHaveBeenCalledTimes(1));
+
     await fireEvent.press(screen.getByRole('button', { name: 'Marcar Uso' }));
     await act(async () => rejeitarPrimeiraDose(new Error('rede')));
     await primeiraConfirmacao;
+
     expect(screen.getByRole('button', { name: 'Marcar Uso' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Desmarcar Uso' })).toBeOnTheScreen();
     expect(aoAlternarUso.mock.calls[1][1]).toMatchObject({ id: 'u2', horario: '20:00' });
@@ -274,6 +282,7 @@ test('reflete atualizações de usos recebidas depois da montagem', async () => 
         historico: []
     };
     const resultado = await render(<ContraceptiveUsageCard anticoncepcional={anticoncepcional} />);
+
     expect(screen.getByRole('button', { name: 'Marcar Uso' })).toBeDisabled();
 
     await resultado.rerender(
@@ -291,6 +300,7 @@ test('reflete atualizações de usos recebidas depois da montagem', async () => 
             }}
         />
     );
+
     expect(screen.getByRole('button', { name: 'Desmarcar Uso' })).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Marcar Uso' })).toBeNull();
 });
@@ -317,6 +327,7 @@ test('o histórico da pílula usa calendário mesmo quando o registro contém o 
     );
 
     await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
     expect(screen.getByTestId('usage-calendar')).toBeOnTheScreen();
     expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
     expect(screen.queryByText('Horário programado:')).toBeNull();
@@ -350,6 +361,7 @@ test.each([
         );
 
         await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
         expect(screen.queryByTestId('usage-calendar')).toBeNull();
         expect(screen.getByText('04/09/2026')).toBeOnTheScreen();
         expect(screen.getByText('Horário programado:')).toBeOnTheScreen();
@@ -363,7 +375,9 @@ test('o anel mantém histórico em lista acessível mesmo sem usos ou registros'
             anticoncepcional={{ id: '1', nome: 'NuvaRing', tipo: 'anel_vaginal' }}
         />
     );
+
     await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
+
     expect(screen.getByRole('button', { name: 'Histórico de uso' })).toHaveProp(
         'accessibilityState',
         { expanded: true }
@@ -385,6 +399,7 @@ test.each([true, false])(
                 }}
             />
         );
+
         expect(screen.queryByRole('button', { name: 'Histórico de uso' })).toBeNull();
         expect(screen.queryByTestId('usage-calendar')).toBeNull();
     }
@@ -402,6 +417,7 @@ test('os badges mantêm sua largura e fonte, com quebra de linha em cartões est
             }}
         />
     );
+
     expect(screen.getByTestId('usage-card-badges')).toHaveStyle({
         flexDirection: 'row',
         flexWrap: 'wrap'
@@ -431,6 +447,7 @@ test('o cartão confirmado distribui badges igualmente a partir do espaço míni
             }}
         />
     );
+
     expect(screen.getByTestId('usage-card-badge-confirmado')).toHaveStyle({
         minWidth: 91,
         flexBasis: 91,
@@ -441,6 +458,24 @@ test('o cartão confirmado distribui badges igualmente a partir do espaço míni
         flexBasis: 91,
         flexShrink: 0
     });
+});
+
+test('a tag Não usei usa o mesmo alinhamento e marcador das outras tags do cartão', async () => {
+    await render(
+        <ContraceptiveUsageCard
+            anticoncepcional={{
+                id: '1',
+                nome: 'Pílula teste',
+                tipo: 'pilula',
+                intensidadeAlerta: 'critico',
+                usosHoje: [{ id: '1', horario: '08:00', status: 'naoUsei' }]
+            }}
+        />
+    );
+
+    const badge = screen.getByLabelText('Não usei');
+    expect(badge).toHaveStyle({ flexDirection: 'row', justifyContent: 'center', width: 155.31 });
+    expect(screen.getAllByText('●')).toHaveLength(2);
 });
 
 test('a validade encerrada do DIU não utiliza o badge verde de ainda no prazo', async () => {
@@ -456,6 +491,7 @@ test('a validade encerrada do DIU não utiliza o badge verde de ainda no prazo',
             }}
         />
     );
+
     expect(screen.getByText('Validade encerrada')).toHaveProp('accessibilityRole', 'alert');
     expect(screen.queryByText('Ainda no prazo')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Marcar Uso' })).toBeNull();
@@ -472,6 +508,7 @@ test('preserva o alias de alerta crítico com acento ao dimensionar os badges', 
             }}
         />
     );
+
     expect(screen.getByLabelText('Alerta Crítico')).toBeOnTheScreen();
 });
 
@@ -486,6 +523,7 @@ test('um método desconhecido não oferece um histórico incompatível', async (
             }}
         />
     );
+
     expect(screen.queryByRole('button', { name: 'Histórico de uso' })).toBeNull();
 });
 
@@ -504,7 +542,9 @@ test.each(['25:00', '12:60', '8:00', '', null])(
                 aoAlternarUso={aoAlternarUso}
             />
         );
+
         expect(screen.getByRole('button', { name: 'Marcar Uso' })).toBeDisabled();
+
         await fireEvent.press(screen.getByRole('button', { name: 'Marcar Uso' }));
         expect(aoAlternarUso).not.toHaveBeenCalled();
     }
@@ -523,7 +563,9 @@ test('conserva compatibilidade com uso sem horário informado pelo serviço lega
             aoAlternarUso={aoAlternarUso}
         />
     );
+
     expect(screen.getByRole('button', { name: 'Marcar Uso' })).not.toBeDisabled();
+
     await fireEvent.press(screen.getByRole('button', { name: 'Marcar Uso' }));
     expect(aoAlternarUso).toHaveBeenCalledTimes(1);
 });

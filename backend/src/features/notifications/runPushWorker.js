@@ -1,7 +1,7 @@
 import { setTimeout as esperar } from 'node:timers/promises';
 import { prisma } from '../../shared/config/prisma.js';
 import { planejarExpiracoes } from './notificationExpirations.js';
-import { reconciliarAgendamentos } from './notificationScheduleReconciliation.js';
+import { planejarConta, reconciliarAgendamentos } from './notificationPlanner.js';
 import { planejarCompartilhadas } from './sharedPushPlanner.js';
 import { criarExpoPushProvider } from './pushProvider.js';
 import { criarPushWorker } from './pushWorker.js';
@@ -12,7 +12,6 @@ if (process.env.PUSH_ENABLED !== 'true')
 
 const worker = criarPushWorker({
     prisma,
-    prefixoEvento: 'redeApoio.',
     provider: criarExpoPushProvider({ token: process.env.EXPO_PUSH_ACCESS_TOKEN })
 });
 
@@ -46,16 +45,21 @@ try {
                 cursor = conta.id;
                 try {
                     const agora = new Date();
-                    const compartilhadas = await planejarCompartilhadas(
-                        prisma,
-                        conta.id,
-                        conta.preferenciaNotificacao,
-                        agora
-                    );
-                    await reconciliarAgendamentos(prisma, conta.id, compartilhadas);
-                    await planejarExpiracoes(prisma, conta.id, conta.preferenciaNotificacao, agora, {
-                        incluirConsentimento: false
-                    });
+                    const [proprias, compartilhadas] = await Promise.all([
+                        planejarConta(prisma, conta.id, conta.preferenciaNotificacao, agora),
+                        planejarCompartilhadas(
+                            prisma,
+                            conta.id,
+                            conta.preferenciaNotificacao,
+                            agora
+                        )
+                    ]);
+
+                    await reconciliarAgendamentos(prisma, conta.id, [
+                        ...proprias,
+                        ...compartilhadas
+                    ]);
+                    await planejarExpiracoes(prisma, conta.id, conta.preferenciaNotificacao, agora);
                 } catch {
                     console.error(JSON.stringify({ evento: 'push_planejamento_falhou' }));
                 }

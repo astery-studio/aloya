@@ -1,6 +1,6 @@
 // Mostra opções disponíveis dentro de um BottomSheet.
-import { useMemo } from 'react';
-import { FlatList, Text } from 'react-native';
+import { useMemo, useRef } from 'react';
+import { AccessibilityInfo, findNodeHandle, FlatList, Text } from 'react-native';
 
 import { ButtonSelection } from '../../common/Button/ButtonSelection/ButtonSelection';
 import { useTheme } from '../../../hooks/useTheme';
@@ -19,6 +19,8 @@ function SelectionSheet({
     valorSelecionado,
     onSelecionar,
     onFechar,
+    onOcultar,
+    focarTituloAoAbrir = false,
     varianteOpcao = 'lista',
     corFundo,
     estiloPainel,
@@ -31,6 +33,12 @@ function SelectionSheet({
 
     const corDoFundo = corFundo ?? (tema.escuro ? '#242424' : undefined);
     const selecaoDesabilitada = typeof onSelecionar !== 'function';
+    const referenciaTitulo = useRef(null);
+
+    function focarTitulo() {
+        const identificador = findNodeHandle(referenciaTitulo.current);
+        if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
+    }
 
     function renderizarOpcao({ item }) {
         function selecionarOpcao() {
@@ -61,11 +69,14 @@ function SelectionSheet({
         <BottomSheet
             visivel={visivel}
             onFechar={onFechar}
+            onExibir={focarTituloAoAbrir ? focarTitulo : undefined}
+            onOcultar={onOcultar}
             corPainel={corDoFundo}
             estiloPainel={[estilos.painel, estiloPainel]}
         >
             <BottomSheetLayout
                 titulo={titulo}
+                referenciaTitulo={referenciaTitulo}
                 onFechar={onFechar}
                 corFundo={corDoFundo}
                 estiloTitulo={estilos.textoOpcao}

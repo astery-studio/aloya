@@ -9,7 +9,8 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import {
     ContraceptiveUsageCard,
     criarUsos,
-    usoConfirmado
+    usoConfirmado,
+    usoPendente
 } from '../components/ContraceptiveUsageCard';
 import { PendingUsesBanner } from '../components/PendingUsesBanner';
 import { criarEstilosAcompanhamento } from './ContraceptiveTrackingScreen.styles';
@@ -92,7 +93,9 @@ function ContraceptiveTrackingScreen({
     aoDispensarErroUso,
     aoEditar,
     aoRemover,
+    aoApagar,
     aoAlternarUso,
+    aoSalvarEdicaoHistorico,
     somenteLeitura = false
 }) {
     const tema = useTheme();
@@ -103,12 +106,13 @@ function ContraceptiveTrackingScreen({
         return atualizacao?.origem === item ? { ...item, usosHoje: atualizacao.usos } : item;
     });
     const secoes = criarSecoes(itens);
+    const exibeFab = !somenteLeitura && !carregando && !erro && typeof aoCadastrarNovo === 'function';
     const quantidadePendentes = itens.reduce(
         (total, item) =>
             total +
             (item.removido || item.ativo === false
                 ? 0
-                : criarUsos(item).filter((uso) => !usoConfirmado(uso)).length),
+                : criarUsos(item).filter(usoPendente).length),
         0
     );
 
@@ -167,25 +171,30 @@ function ContraceptiveTrackingScreen({
                                 somenteLeitura={somenteLeitura}
                                 aoEditar={aoEditar}
                                 aoRemover={aoRemover}
+                                aoApagar={aoApagar}
                                 aoAlternarUso={aoAlternarUso}
+                                aoSalvarEdicaoHistorico={aoSalvarEdicaoHistorico}
                                 aoAtualizarUsos={atualizarUsos}
                             />
                         )}
                         ItemSeparatorComponent={() => (
                             <View style={estilosAcompanhamento.espacoCartao} />
                         )}
-                        contentContainerStyle={estilosAcompanhamento.lista}
+                        contentContainerStyle={[
+                            estilosAcompanhamento.lista,
+                            exibeFab && estilosAcompanhamento.espacoFab
+                        ]}
                         stickySectionHeadersEnabled={false}
                         showsVerticalScrollIndicator={false}
                     />
                 </View>
             )}
 
-            {!somenteLeitura && !carregando && !erro && typeof aoCadastrarNovo === 'function' ? (
+            {exibeFab ? (
                 <FloatingActionButton
                     aoPressionar={aoCadastrarNovo}
                     rotuloAcessibilidade="Cadastrar novo anticoncepcional"
-                    considerarAreaSeguraInferior={false}
+                    considerarAreaSeguraLateral
                     testID="contraceptive-tracking-add-fab"
                 />
             ) : null}

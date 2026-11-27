@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
@@ -9,6 +10,7 @@ import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 
 const estilos = StyleSheet.create({
+    tela: { flex: 1 },
     estado: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }
 });
 
@@ -49,6 +51,27 @@ export function NotificationPreferencesLoading({
                 )}
             </View>
         </SettingsLayout>
+    );
+}
+
+export function NoContraceptivesForNotifications({ onVoltar, onCadastrar }) {
+    return (
+        <View style={estilos.tela}>
+            <SettingsLayout titulo="Anticoncepcional" onVoltar={onVoltar} respeitarEntalhe>
+                <View style={estilos.estado}>
+                    <EmptyState
+                        titulo="Nenhum anticoncepcional cadastrado"
+                        mensagem="Use o botão de adicionar para cadastrar um anticoncepcional e escolher os avisos que quer receber."
+                    />
+                </View>
+            </SettingsLayout>
+            <FloatingActionButton
+                aoPressionar={onCadastrar}
+                rotuloAcessibilidade="Cadastrar novo anticoncepcional"
+                considerarAreaSeguraLateral
+                testID="anticoncepcional-notificacoes-adicionar"
+            />
+        </View>
     );
 }
 

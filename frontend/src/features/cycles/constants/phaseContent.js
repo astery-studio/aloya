@@ -1,8 +1,4 @@
-const dicasPadrao = Object.freeze([
-    'Observe como seu corpo está se sentindo hoje.',
-    'Reserve alguns minutos para descansar.',
-    'Continue registrando suas percepções ao longo do ciclo.'
-]);
+import dicasPorFase from './cycleSelfCareTips.json';
 
 const conteudoPorFase = Object.freeze({
     menstrual: {
@@ -15,7 +11,7 @@ const conteudoPorFase = Object.freeze({
             'Menor disposição',
             'Alterações de humor'
         ],
-        dicas: dicasPadrao
+        dicas: dicasPorFase.menstrual.map(({ body }) => body)
     },
     folicular: {
         tituloExplicacao: 'Preparação para a ovulação',
@@ -27,7 +23,7 @@ const conteudoPorFase = Object.freeze({
             'Mais disposição',
             'Alterações de humor'
         ],
-        dicas: dicasPadrao
+        dicas: dicasPorFase.folicular.map(({ body }) => body)
     },
     ovulatoria: {
         tituloExplicacao: 'A liberação do óvulo',
@@ -39,7 +35,7 @@ const conteudoPorFase = Object.freeze({
             'Alterações de temperatura',
             'Mais sociabilidade'
         ],
-        dicas: dicasPadrao
+        dicas: dicasPorFase.ovulatoria.map(({ body }) => body)
     },
     lutea: {
         tituloExplicacao: 'Preparação para uma possível gravidez',
@@ -51,7 +47,7 @@ const conteudoPorFase = Object.freeze({
             'Sensibilidade corporal',
             'Retenção de líquidos'
         ],
-        dicas: dicasPadrao
+        dicas: dicasPorFase.lutea.map(({ body }) => body)
     }
 });
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ContraceptiveModal } from '../components/ContraceptiveModal';
 import { Bell } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { ButtonSelection } from '../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
@@ -40,7 +41,7 @@ function AlertIntensitySelector({
                 icone={Bell}
                 coresNoturnas={{ icone: '#EF9A9A', caixa: 'rgba(239, 154, 154, 0.16)' }}
             />
-            <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
+            <ContraceptiveModal visible={aberto} animationType="slide" onRequestClose={onFechar}>
                 <SafeAreaView
                     style={estilos.telaFluxo}
                     edges={['top', 'left', 'right', 'bottom']}
@@ -52,7 +53,7 @@ function AlertIntensitySelector({
                         onVoltar={onFechar}
                         aplicarSafeAreaSuperior={false}
                     />
-                    <View style={estilos.conteudoFluxo}>
+                    <ScrollView contentContainerStyle={estilos.conteudoFluxo}>
                         <Text style={estilos.descricaoFluxo}>
                             Escolha como quer ser lembrada de tomar seu anticoncepcional.
                         </Text>
@@ -71,7 +72,7 @@ function AlertIntensitySelector({
                                 );
                             })}
                         </View>
-                    </View>
+                    </ScrollView>
                     <View style={estilos.acaoFixa}>
                         <ButtonScreen
                             texto="Confirmar"
@@ -79,7 +80,7 @@ function AlertIntensitySelector({
                         />
                     </View>
                 </SafeAreaView>
-            </Modal>
+            </ContraceptiveModal>
         </>
     );
 }

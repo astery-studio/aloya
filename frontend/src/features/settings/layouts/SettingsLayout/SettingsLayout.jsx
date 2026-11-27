@@ -1,7 +1,7 @@
 // Organiza cabeçalho, conteúdo e rodapé das telas internas de configurações.
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Header } from '../../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -13,11 +13,13 @@ function SettingsLayout({
     children,
     rodape,
     rodapeFixo = false,
+    estiloRodapeFixo,
     respeitarEntalhe = false,
     testeId = 'settings-layout',
     corFundo
 }) {
     const tema = useTheme();
+    const insets = useContext(SafeAreaInsetsContext);
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
@@ -29,7 +31,13 @@ function SettingsLayout({
             edges={respeitarEntalhe ? ['bottom', 'left', 'right'] : ['bottom']}
             style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
         >
-            <Header titulo={titulo} corFundo={corFundo} variante="comVoltar" onVoltar={onVoltar} />
+            <Header
+                titulo={titulo}
+                corFundo={corFundo}
+                variante="comVoltar"
+                onVoltar={onVoltar}
+                alturaEspacamentoSuperior={respeitarEntalhe ? Math.max(48, insets?.top ?? 0) : undefined}
+            />
 
             <KeyboardAvoidingView
                 testID="teclado-settings-layout"
@@ -62,7 +70,8 @@ function SettingsLayout({
                         testID="rodape-fixo-settings-layout"
                         style={[
                             estilos.rodapeFixo,
-                            corFundo ? { backgroundColor: corFundo } : null
+                            corFundo ? { backgroundColor: corFundo } : null,
+                            estiloRodapeFixo
                         ]}
                     >
                         {rodape}
