@@ -140,7 +140,7 @@ function SharedHomeScreen({
                 {previsao?.proximoInicioEstimado ? (
                     <CyclePredictionSummary
                         confiabilidade={confiabilidade}
-                        estimativaIncerta={modelo.previsaoIncerta}
+                        nomeTitular={nomeTitular}
                         aoAbrirConfiabilidade={() => setConfiabilidadeAberta(true)}
                         corDestaque={corDaFase}
                         proximoInicio={previsao.proximoInicioEstimado}

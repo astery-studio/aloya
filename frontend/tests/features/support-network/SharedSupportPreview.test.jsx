@@ -18,7 +18,8 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
     expect(screen.getByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
     expect(screen.getByText('Dia 9 do ciclo de Júlia')).toBeOnTheScreen();
     expect(screen.getAllByTestId('cycle-phase-frame-segment')).toHaveLength(28);
-    expect(screen.getByRole('header', { name: 'Próximo ciclo' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Próximo ciclo de Júlia' })).toBeOnTheScreen();
+    expect(screen.queryByText(/não deve ser usada como método contraceptivo/)).toBeNull();
     expect(screen.getByRole('button', { name: 'Confiança média' })).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Como oferecer apoio hoje?' })).toBeOnTheScreen();
     expect(
@@ -27,7 +28,7 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Prévia da arte: Sem ciclo' }));
     expect(screen.getByTestId('supported-cycle-artwork-empty')).toBeOnTheScreen();
     expect(screen.queryByRole('header', { name: 'Fase Folicular' })).not.toBeOnTheScreen();
-    expect(screen.queryByRole('header', { name: 'Próximo ciclo' })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('header', { name: 'Próximo ciclo de Júlia' })).not.toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
 });
 
@@ -58,7 +59,7 @@ test('com acesso só à fase, permite navegar pelos dias do ciclo acompanhado', 
 
     expect(screen.getByRole('header', { name: formatarDataCabecalho(hoje) })).toBeOnTheScreen();
     expect(screen.getByText('Dia 16 do ciclo de Júlia')).toBeOnTheScreen();
-    expect(screen.queryByRole('header', { name: 'Próximo ciclo' })).toBeNull();
+    expect(screen.queryByRole('header', { name: 'Próximo ciclo de Júlia' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Ver Histórico de Ciclos' })).toBeNull();
     await fireEvent.press(
         screen.getByRole('button', { name: new RegExp(`dia ${Number(amanha.slice(-2))}$`) })

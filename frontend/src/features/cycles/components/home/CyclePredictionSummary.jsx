@@ -29,6 +29,7 @@ function CyclePredictionSummary({
     confiabilidade,
     estimativaIncerta = false,
     aoAbrirConfiabilidade,
+    nomeTitular,
     corDestaque = '#C85A44'
 }) {
     const proximo = separarData(proximoInicio);
@@ -42,7 +43,7 @@ function CyclePredictionSummary({
                     <View style={estilos.textosCabecalho}>
                         <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
-                            Próximo ciclo
+                            {nomeTitular ? `Próximo ciclo de ${nomeTitular}` : 'Próximo ciclo'}
                         </Text>
                     </View>
                     <ConfidenceBadge
@@ -81,13 +82,17 @@ function CyclePredictionSummary({
                         />
                     </View>
                 </View>
-                <CycleEducationalDisclaimer
-                    texto={AVISO_PREVISAO}
-                    variante="contraceptiva"
-                    style={estilos.aviso}
-                />
-                {estimativaIncerta ? (
-                    <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
+                {!nomeTitular ? (
+                    <>
+                        <CycleEducationalDisclaimer
+                            texto={AVISO_PREVISAO}
+                            variante="contraceptiva"
+                            style={estilos.aviso}
+                        />
+                        {estimativaIncerta ? (
+                            <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
+                        ) : null}
+                    </>
                 ) : null}
             </View>
         </View>
