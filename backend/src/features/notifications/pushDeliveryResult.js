@@ -53,5 +53,14 @@ export async function registrarResultado(
             });
     }
 
+    if (dados.status === 'pendente') {
+        const reagendada = await prisma.entregaPush.updateMany({
+            where: { id: entrega.id, notificacao: { statusEnvio: 'agendada' } },
+            data: dados
+        });
+        if (reagendada.count) return;
+        dados = { status: 'cancelada' };
+    }
+
     await prisma.entregaPush.update({ where: { id: entrega.id }, data: dados });
 }

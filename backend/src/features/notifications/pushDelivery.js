@@ -12,7 +12,6 @@ export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso,
 
     if (
         !dispositivo ||
-        !(await elegivel(prisma, aviso, agora)) ||
         !(await prisma.notificacao.count({
             where: { id: aviso.id, statusEnvio: 'agendada' }
         }))
@@ -36,7 +35,11 @@ export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso,
 
     if (!reivindicada.count) return;
 
-    if (!(await aindaPodeEnviar(prisma, dispositivo, aviso, entrega, relogio()))) {
+    const instanteEnvio = relogio();
+    if (
+        !(await elegivel(prisma, aviso, instanteEnvio)) ||
+        !(await aindaPodeEnviar(prisma, dispositivo, aviso, entrega, instanteEnvio))
+    ) {
         await prisma.entregaPush.update({
             where: { id: entrega.id },
             data: { status: 'cancelada' }
@@ -47,7 +50,7 @@ export async function enviarPush({ prisma, provider, relogio, elegivel }, aviso,
     let resposta;
     try {
         resposta = await provider.enviar(
-            criarPayloadPush(aviso, dispositivo.token, agora, conteudo)
+            criarPayloadPush(aviso, dispositivo.token, instanteEnvio, conteudo)
         );
     } catch {
         // Sem confirmação do provedor, reenviar poderia duplicar o push.

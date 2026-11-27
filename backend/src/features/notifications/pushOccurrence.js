@@ -24,9 +24,20 @@ export async function processarAviso(contexto, aviso, agora) {
         });
 
     if (prazo(aviso) <= agora) return finalizar({ statusEnvio: 'expirada' });
-    if (!(await elegivel(prisma, aviso, agora))) return finalizar({ statusEnvio: 'cancelada' });
+    if (!(await elegivel(prisma, aviso, agora))) {
+        await prisma.entregaPush.updateMany({
+            where: { notificacaoId: aviso.id, status: 'pendente' },
+            data: { status: 'cancelada' }
+        });
+        return finalizar({ statusEnvio: 'cancelada' });
+    }
 
-    const pendentes = await prepararEntregasPendentes(prisma, aviso, agora);
+    const pendentes = await prisma.$transaction(async (tx) => {
+        if (!(await tx.notificacao.count({ where: { ...onde, processandoAte: lease } })))
+            return null;
+        return prepararEntregasPendentes(tx, aviso, agora);
+    });
+    if (!pendentes) return;
     await Promise.all(pendentes.map((entrega) => enviarPush(contexto, aviso, entrega)));
 
     const entregas = await prisma.entregaPush.findMany({ where: { notificacaoId: aviso.id } });
@@ -35,8 +46,9 @@ export async function processarAviso(contexto, aviso, agora) {
     if (!entregas.length) return finalizar({ processandoAte: lease });
 
     const aceita = entregas.some((e) => ['aceita', 'encaminhada'].includes(e.status));
+    const cancelada = entregas.every((e) => e.status === 'cancelada');
     return finalizar({
-        statusEnvio: aceita ? 'enviada' : 'falha',
+        statusEnvio: aceita ? 'enviada' : cancelada ? 'cancelada' : 'falha',
         dataHoraDisparo: aceita ? agora : null
     });
 }

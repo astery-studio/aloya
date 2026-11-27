@@ -25,13 +25,14 @@ export async function podeProcessar(prisma, aviso, agora, { aoAbrir = false } = 
             'seguranca.email.alterado',
             'seguranca.dispositivo.novo'
         ].includes(evento);
+    if (!permiteNotificacao(usuario.preferenciaNotificacao, evento)) return false;
+
     if (aoAbrir && evento.startsWith('ciclo.')) return true;
     if (aoAbrir && evento.startsWith('anticoncepcional.')) {
         return Boolean(
             await prisma.anticoncepcional.count({ where: { id: origemId, usuarioId, ativo: true } })
         );
     }
-    if (!permiteNotificacao(usuario.preferenciaNotificacao, evento)) return false;
     if (evento.startsWith('redeApoio.')) {
         const administrativo = await podeProcessarRedeDeApoio(prisma, aviso, agora);
         if (administrativo !== null) return administrativo;
