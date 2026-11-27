@@ -14,6 +14,8 @@ import { criarCyclePredictionService } from '../features/cycles/services/cyclePr
 import { criarCycleRegistrationService } from '../features/cycles/services/cycleRegistrationService';
 import { criarCycleRemovalService } from '../features/cycles/services/cycleRemovalService';
 import { criarDiaryService } from '../features/diary/services/diaryService';
+import { criarNotificationPreferencesService } from '../features/notifications/notificationPreferencesService';
+import { criarPushDeviceService } from '../features/notifications/pushDeviceService';
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
 import { criarContactInvitationService } from '../features/support-network/services/contactInvitationService';
@@ -175,6 +177,11 @@ function criarServicosApp({
         contraceptiveService,
         cycleHistoryService,
         diaryService,
+        supportNotificationPreferencesService: criarNotificationPreferencesService({
+            requisicaoAutenticada,
+            contato: true
+        }),
+        pushDeviceService: criarPushDeviceService({ requisicaoAutenticada }),
         supportCategoryService,
         contactInvitationService,
         contactLinkService,

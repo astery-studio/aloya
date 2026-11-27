@@ -337,6 +337,15 @@ describe('createAppServices', () => {
             cycleRegistrationService: {
                 registrar: expect.any(Function)
             },
+            supportNotificationPreferencesService: {
+                buscar: expect.any(Function),
+                atualizar: expect.any(Function)
+            },
+            pushDeviceService: {
+                registrar: expect.any(Function),
+                remover: expect.any(Function),
+                resolverDestino: expect.any(Function)
+            },
             menstruationSyncQueue: {
                 adicionar: expect.any(Function),
                 listar: expect.any(Function),

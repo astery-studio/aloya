@@ -414,12 +414,19 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                 onAbrirPerfil,
                 onAbrirParametrosCiclo,
                 onSelecionarAba,
-                onAbrirPoliticasPrivacidade
+                onAbrirPoliticasPrivacidade,
+                onAbrirNotificacoesContato
             }) =>
                 React.createElement(
                     View,
                     null,
                     React.createElement(Text, null, 'Configurações'),
+                    onAbrirNotificacoesContato &&
+                        React.createElement(Pressable, {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Notificações como contato de apoio',
+                            onPress: onAbrirNotificacoesContato
+                        }),
                     React.createElement(Pressable, {
                         accessibilityRole: 'button',
                         accessibilityLabel: 'Consultar em configurações',
@@ -665,6 +672,28 @@ describe('App integrado', () => {
 
     afterEach(() => {
         jest.restoreAllMocks();
+    });
+
+    test('abre preferências exclusivas de contato para uma conta com os dois papéis', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        const perfil = await servicos.accountService.buscarPerfil();
+        servicos.accountService.buscarPerfil.mockResolvedValue({
+            ...perfil,
+            papel: 'principal_e_contato_apoio'
+        });
+        servicos.supportNotificationPreferencesService = {
+            buscar: jest.fn().mockResolvedValue({ chavesDisponiveis: [] })
+        };
+
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Notificações como contato de apoio' })
+        );
+
+        expect(await screen.findByText('Rede de Apoio')).toBeOnTheScreen();
+        expect(screen.queryByText('Ciclo e Previsões')).toBeNull();
+        expect(servicos.supportNotificationPreferencesService.buscar).toHaveBeenCalled();
     });
 
     test.each([

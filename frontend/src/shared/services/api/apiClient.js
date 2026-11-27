@@ -85,6 +85,10 @@ function criarApiClient({ baseUrl, fetchImpl = fetch, timeoutMs = 10000 }) {
             erro.status = resposta.status;
             erro.codigo = dados?.erro?.codigo;
             erro.detalhes = dados?.erro?.detalhes;
+            if (resposta.status === 429) {
+                const aguardar = resposta.headers?.get?.('Retry-After');
+                if (aguardar && /^\d+$/.test(aguardar)) erro.tentarAposMs = Number(aguardar) * 1000;
+            }
             throw erro;
         }
 

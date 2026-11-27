@@ -31,6 +31,8 @@ import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
+import { NotificationPreferencesFlow } from './features/notifications/NotificationPreferencesFlow';
+import { useNativePush } from './features/notifications/useNativePush';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
@@ -78,6 +80,7 @@ const telasInternas = Object.freeze({
     cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
     responsavelLegal: 'responsavelLegal',
+    notificacoesContato: 'notificacoesContato',
     diario: 'diario',
     inicio: 'inicio'
 });
@@ -272,6 +275,16 @@ export default function App() {
     const sincronizacaoMenstrual = useMenstruationSync({
         fila: configuracao.servicos?.menstruationSyncQueue,
         ativo: estadoSessao === 'autenticada'
+    });
+
+    const navegarPush = useCallback((destino) => {
+        if (destino === 'membros') setTelaInterna(telasInternas.membros);
+    }, []);
+
+    useNativePush({
+        ativo: estadoSessao === 'autenticada' && Boolean(perfil),
+        service: configuracao.servicos?.pushDeviceService,
+        navegar: navegarPush
     });
 
     useEffect(() => {
@@ -936,6 +949,16 @@ export default function App() {
                 }
                 onSelecionarAba={selecionarAba}
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
+                onAbrirNotificacoes={
+                    perfil?.papel === 'contato_apoio'
+                        ? () => setTelaInterna(telasInternas.notificacoesContato)
+                        : undefined
+                }
+                onAbrirNotificacoesContato={
+                    perfil?.papel === 'principal_e_contato_apoio'
+                        ? () => setTelaInterna(telasInternas.notificacoesContato)
+                        : undefined
+                }
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
 
@@ -948,6 +971,14 @@ export default function App() {
                     setRetornoResponsavelLegal(telasInternas.configuracoes);
                     setTelaInterna(telasInternas.responsavelLegal);
                 }}
+            />
+        );
+    } else if (telaInterna === telasInternas.notificacoesContato) {
+        conteudo = (
+            <NotificationPreferencesFlow
+                service={configuracao.servicos.supportNotificationPreferencesService}
+                onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.responsavelLegal) {

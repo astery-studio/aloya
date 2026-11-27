@@ -13,6 +13,7 @@ function SettingsLayout({
     children,
     rodape,
     rodapeFixo = false,
+    respeitarEntalhe = false,
     testeId = 'settings-layout',
     corFundo
 }) {
@@ -25,7 +26,7 @@ function SettingsLayout({
     return (
         <SafeAreaView
             testID={testeId}
-            edges={['bottom']}
+            edges={respeitarEntalhe ? ['bottom', 'left', 'right'] : ['bottom']}
             style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
         >
             <Header titulo={titulo} corFundo={corFundo} variante="comVoltar" onVoltar={onVoltar} />
