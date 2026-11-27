@@ -11,12 +11,22 @@ const categorias = [
     { id: 'redeApoio', label: 'Rede de Apoio', icone: UsersThreeIcon, paleta: 'corAzul' }
 ];
 
-export function NotificationsScreen({ onAbrirCategoria, onAbrirTeste, onVoltar }) {
+export function NotificationsScreen({
+    contato = false,
+    onAbrirCategoria,
+    onAbrirTeste,
+    onAbrirTesteContato,
+    onVoltar
+}) {
     const { cores, typography } = useTheme();
+    const categoriasVisiveis = contato ? categorias.filter(({ id }) => id === 'redeApoio') : categorias;
+
     return (
         <SettingsLayout titulo="Notificações" onVoltar={onVoltar} respeitarEntalhe>
             <Text style={[typography.bodyDefault, { color: cores.interface.textoSecundario }]}>
-                {'Fique por dentro do que importa! Personalize suas notificações e escolha quais lembretes, atualizações e avisos deseja receber.'}
+                {contato
+                    ? 'Escolha os avisos que quer receber como contato da Rede de Apoio. Os controles disponíveis dependem das permissões que você recebeu.'
+                    : 'Fique por dentro do que importa! Personalize suas notificações e escolha quais lembretes, atualizações e avisos deseja receber.'}
             </Text>
             <View style={estilos.lista}>
                 <Text
@@ -25,11 +35,18 @@ export function NotificationsScreen({ onAbrirCategoria, onAbrirTeste, onVoltar }
                 >
                     Tipo de Notificações
                 </Text>
-                {categorias.map(({ id, ...campo }) => (
+                {categoriasVisiveis.map(({ id, ...campo }) => (
                     <NavigationField key={id} {...campo} labelSemLimite onPress={() => onAbrirCategoria(id)} />
                 ))}
                 {onAbrirTeste && (
                     <NavigationField label="Teste de notificações" labelSemLimite onPress={onAbrirTeste} />
+                )}
+                {onAbrirTesteContato && (
+                    <NavigationField
+                        label="Teste da tela da Rede de Apoio"
+                        labelSemLimite
+                        onPress={onAbrirTesteContato}
+                    />
                 )}
             </View>
         </SettingsLayout>

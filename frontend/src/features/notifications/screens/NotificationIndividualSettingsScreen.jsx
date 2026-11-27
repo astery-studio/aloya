@@ -14,10 +14,11 @@ const opcoesAntecedencia = [
 ];
 
 export function NotificationIndividualSettingsScreen({
-    categoriaId, valores, ocupado, onAlterar, onAbrirHorario, onVoltar
+    categoriaId, categoria = catalogoNotificacoes[categoriaId],
+    valores, ocupado, onAlterar, onAbrirHorario, onVoltar
 }) {
     const { cores, escuro } = useTheme();
-    const { titulo, grupos } = catalogoNotificacoes[categoriaId];
+    const { titulo, grupos } = categoria;
     const [antecedenciaAberta, definirAntecedenciaAberta] = useState(false);
     const botaoAntecedencia = useRef(null);
     const diasSelecionados = useRef(null);

@@ -65,3 +65,27 @@ const redeApoio = {
 };
 
 export const catalogoNotificacoes = { ciclo, anticoncepcional, redeApoio };
+
+export function categoriaNotificacoesContato(chavesDisponiveis) {
+    const chaves = new Set(chavesDisponiveis);
+    const grupos = Object.fromEntries(
+        Object.entries(redeApoio.grupos)
+            .map(([id, [nome, eventos]]) => {
+                const visiveis = eventos
+                    .filter(([evento]) => chaves.has(`redeApoio.${id}.${evento}`))
+                    .map((linha) =>
+                        id === 'convites' && linha[0] === 'contaExcluida'
+                            ? ['contaExcluida', 'Conta da pessoa apoiada excluída']
+                            : linha
+                    );
+                return [id, [nome, visiveis]];
+            })
+            .filter(([, [, eventos]]) => eventos.length > 0)
+    );
+
+    return {
+        ...redeApoio,
+        grupos,
+        ordemGrupo: redeApoio.ordemGrupo.filter((id) => Object.hasOwn(grupos, id))
+    };
+}

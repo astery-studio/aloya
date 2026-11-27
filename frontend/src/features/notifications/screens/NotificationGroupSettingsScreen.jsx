@@ -7,10 +7,11 @@ import { catalogoNotificacoes } from '../notificationCatalog';
 import { estilos } from './notificationSettingsStyles';
 
 export function NotificationGroupSettingsScreen({
-    categoriaId, valores, ocupado, onAlterar, onAbrirIndividual, onVoltar
+    categoriaId, categoria = catalogoNotificacoes[categoriaId],
+    valores, ocupado, onAlterar, onAbrirIndividual, onVoltar
 }) {
     const { cores } = useTheme();
-    const { titulo, grupos, ordemGrupo = Object.keys(grupos) } = catalogoNotificacoes[categoriaId];
+    const { titulo, grupos, ordemGrupo = Object.keys(grupos) } = categoria;
     const estiloTitulo = [estilos.titulo, { color: cores.interface.textoSecundario }];
     return (
         <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
