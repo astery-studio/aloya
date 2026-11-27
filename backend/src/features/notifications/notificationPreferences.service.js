@@ -3,6 +3,8 @@ import {
     validarAlteracao,
     valoresIniciais
 } from './notificationPreferenceFields.js';
+import { inicializarCatalogoNotificacao } from './notificationCatalog.service.js';
+import { permiteNotificacao } from './notificationEvents.service.js';
 
 const select = {
     ajustesPorEvento: true,
@@ -80,5 +82,33 @@ export function criarNotificationPreferencesService(prisma) {
         });
     }
 
-    return { buscar: (usuarioId) => buscarNoBanco(prisma, usuarioId), atualizar };
+    async function restaurar(usuarioId) {
+        const desativados = Object.keys(valoresIniciais).filter(
+            (chave) => chave.split('.').length === 3 && !permiteNotificacao(null, chave)
+        );
+
+        return prisma.$transaction(async (tx) => {
+            await tx.preferenciaNotificacao.updateMany({
+                where: { usuarioId },
+                data: { ...camposExistentes, ajustesPorEvento: {} }
+            });
+            await tx.notificacao.updateMany({
+                where: {
+                    usuarioId,
+                    evento: { in: desativados },
+                    statusEnvio: 'agendada',
+                    dataHoraDisparo: null
+                },
+                data: { statusEnvio: 'cancelada' }
+            });
+            return buscarNoBanco(tx, usuarioId);
+        });
+    }
+
+    return {
+        buscar: (usuarioId) => buscarNoBanco(prisma, usuarioId),
+        buscarCatalogo: () => inicializarCatalogoNotificacao(prisma),
+        atualizar,
+        restaurar
+    };
 }
