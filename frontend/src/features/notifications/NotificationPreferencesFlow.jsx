@@ -4,7 +4,7 @@ import {
     NotificationPreferencesLoading,
     NotificationSaveError
 } from './components/NotificationPreferencesFeedback';
-import { catalogoNotificacoes } from './notificationCatalog';
+import { catalogoNotificacoes, categoriaNotificacoesContato } from './notificationCatalog';
 import { NotificationGroupSettingsScreen } from './screens/NotificationGroupSettingsScreen';
 import { NotificationIndividualSettingsScreen } from './screens/NotificationIndividualSettingsScreen';
 import { NotificationPreviewScreen } from './screens/NotificationPreviewScreen';
@@ -12,12 +12,21 @@ import { NotificationsScreen } from './screens/NotificationsScreen';
 import { NotificationTimeScreen } from './screens/NotificationTimeScreen';
 import { useNotificationPreferences } from './useNotificationPreferences';
 
-export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirada }) {
-    const [categoriaId, definirCategoria] = useState(null);
+export function NotificationPreferencesFlow({
+    service,
+    contato = false,
+    previaContato = false,
+    onAbrirTesteContato,
+    onVoltar,
+    onSessaoExpirada
+}) {
+    const [categoriaId, definirCategoria] = useState(previaContato ? 'redeApoio' : null);
     const [pagina, definirPagina] = useState('grupo');
 
     const { valores, erroLeitura, erroGravacao, salvando, salvar, recarregar, descartarFalha } =
-        useNotificationPreferences(service);
+        useNotificationPreferences(service, {
+            atualizarAoRetomar: !previaContato && (categoriaId === 'redeApoio' || pagina === 'teste')
+        });
 
     const voltar = useCallback(() => {
         if (salvando) return;
@@ -25,8 +34,9 @@ export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirad
         else if (!categoriaId) onVoltar();
         else if (pagina === 'horario') definirPagina('individual');
         else if (pagina === 'individual') definirPagina('grupo');
+        else if (previaContato) onVoltar();
         else definirCategoria(null);
-    }, [categoriaId, onVoltar, pagina, salvando]);
+    }, [categoriaId, onVoltar, pagina, previaContato, salvando]);
 
     useEffect(() => {
         const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -49,13 +59,36 @@ export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirad
         }
     }
 
-    if (__DEV__ && pagina === 'teste') return <NotificationPreviewScreen onVoltar={voltar} />;
+    if (__DEV__ && !contato && pagina === 'teste') {
+        return valores ? (
+            <NotificationPreviewScreen
+                efetivas={valores.efetivas}
+                buscarPreferencias={service.buscar}
+                onVoltar={voltar}
+            />
+        ) : (
+            <NotificationPreferencesLoading
+                titulo="Teste de notificações"
+                erro={erroLeitura}
+                onVoltar={voltar}
+                onRecarregar={recarregar}
+            />
+        );
+    }
 
     if (!categoriaId)
         return (
             <NotificationsScreen
-                onAbrirCategoria={definirCategoria}
-                onAbrirTeste={__DEV__ ? () => definirPagina('teste') : undefined}
+                contato={contato}
+                onAbrirCategoria={(id) => {
+                    if (id === 'redeApoio') recarregar();
+                    definirCategoria(id);
+                }}
+                onAbrirTeste={__DEV__ && !contato ? () => {
+                    recarregar();
+                    definirPagina('teste');
+                } : undefined}
+                onAbrirTesteContato={__DEV__ && !contato ? onAbrirTesteContato : undefined}
                 onVoltar={voltar}
             />
         );
@@ -70,7 +103,19 @@ export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirad
             />
         );
 
-    const props = { categoriaId, valores, ocupado: salvando, onAlterar: alterar, onVoltar: voltar };
+    const filtrarRedeApoio = categoriaId === 'redeApoio'
+        && (contato || Array.isArray(valores.chavesDisponiveis));
+    const categoria = filtrarRedeApoio
+        ? categoriaNotificacoesContato(valores.chavesDisponiveis)
+        : catalogoNotificacoes[categoriaId];
+    const props = {
+        categoriaId,
+        categoria: previaContato ? { ...categoria, titulo: 'Prévia da Rede de Apoio' } : categoria,
+        valores,
+        ocupado: salvando,
+        onAlterar: alterar,
+        onVoltar: voltar
+    };
 
     return (
         <>
@@ -89,7 +134,10 @@ export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirad
             ) : (
                 <NotificationGroupSettingsScreen
                     {...props}
-                    onAbrirIndividual={() => definirPagina('individual')}
+                    onAbrirIndividual={() => {
+                        if (categoriaId === 'redeApoio' && !previaContato) recarregar();
+                        definirPagina('individual');
+                    }}
                 />
             )}
 
