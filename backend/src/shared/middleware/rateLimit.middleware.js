@@ -117,7 +117,14 @@ function criarContaLoginRateLimit({ rateLimit, janelaMs, limite, logger = consol
 }
 
 // Limita alterações dos dados da conta por usuário autenticado.
-function criarConfiguracoesContaRateLimit({ rateLimit, janelaMs, limite, logger = console }) {
+function criarConfiguracoesContaRateLimit({
+    rateLimit,
+    janelaMs,
+    limite,
+    logger = console,
+    evento = 'limite_alteracoes_configuracoes_conta',
+    codigo = 'LIMITE_ALTERACOES_CONTA'
+}) {
     return rateLimit({
         windowMs: janelaMs,
         limit: limite,
@@ -126,14 +133,14 @@ function criarConfiguracoesContaRateLimit({ rateLimit, janelaMs, limite, logger 
         keyGenerator: (req) => `usuario:${req.usuario.id}`,
         handler: (req, res) => {
             logger.warn({
-                evento: 'limite_alteracoes_configuracoes_conta',
+                evento,
                 usuarioId: req.usuario.id,
                 metodo: req.method,
                 rota: req.originalUrl
             });
             return res.status(429).json({
                 erro: {
-                    codigo: 'LIMITE_ALTERACOES_CONTA',
+                    codigo,
                     mensagem:
                         'Muitas alterações em pouco tempo. Aguarde alguns minutos e tente novamente.'
                 }
