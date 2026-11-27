@@ -20,6 +20,7 @@ function SharedContentState({ status = 'vazio', aoTentarNovamente, mensagemErro 
                 />
             ) : (
                 <EmptyState
+                    usarPaletaNoturnaConteudo
                     titulo={erro ? 'Ocorreu um erro' : 'Nada para exibir'}
                     mensagem={
                         erro

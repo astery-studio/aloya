@@ -1,7 +1,10 @@
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../theme';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
-function criarEstilos(tema) {
+function criarEstilos(tema, usarPaletaNoturnaConteudo = false) {
+    const usarCoresDeConteudo = tema.escuro && usarPaletaNoturnaConteudo;
+    const cores = usarCoresDeConteudo ? coresNoturnasConteudo : tema.cores.interface;
     return StyleSheet.create({
         container: { width: '100%', alignItems: 'center' },
         vazio: { gap: 20 },
@@ -9,7 +12,7 @@ function criarEstilos(tema) {
         apresentacao: { gap: 24 },
         textos: { width: '100%', alignItems: 'center' },
         titulo: {
-            color: tema.cores.interface.textoPrincipal,
+            color: cores.textoPrincipal,
             fontFamily: fontFamilies.bold,
             textAlign: 'center'
         },
@@ -17,7 +20,7 @@ function criarEstilos(tema) {
         titulo_erro: { fontSize: 18, lineHeight: 27 },
         titulo_apresentacao: { fontSize: 22, lineHeight: 30 },
         mensagem: {
-            color: tema.cores.interface.textoSecundario,
+            color: cores.textoSecundario,
             fontFamily: fontFamilies.regular,
             textAlign: 'center'
         },
@@ -26,7 +29,7 @@ function criarEstilos(tema) {
             paddingTop: 10,
             fontSize: 15,
             lineHeight: 22,
-            color: tema.escuro ? '#99999999' : tema.cores.interface.textoSecundario
+            color: tema.escuro && !usarCoresDeConteudo ? '#99999999' : cores.textoSecundario
         },
         mensagem_apresentacao: { paddingTop: 8, fontSize: 15, lineHeight: 24 },
         acao: { width: '100%' }

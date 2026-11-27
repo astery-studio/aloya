@@ -233,6 +233,7 @@ function SupportCategoryList({
             return (
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo="Ocorreu um erro"
                         mensagem={MENSAGEM_ERRO}
                         variante="erro"
@@ -255,6 +256,7 @@ function SupportCategoryList({
             return (
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo="Nenhuma categoria registrada"
                         mensagem="Você ainda não criou nenhuma categoria de permissão. Toque em 'Criar nova categoria' para organizar sua Rede de Apoio."
                         variante="vazio"

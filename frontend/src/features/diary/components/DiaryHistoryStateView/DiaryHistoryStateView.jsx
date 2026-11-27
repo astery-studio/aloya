@@ -30,6 +30,7 @@ function DiaryHistoryStateView({
         estado = (
             <View style={estilos.estadoCentralizado}>
                 <EmptyState
+                    usarPaletaNoturnaConteudo
                     variante="erro"
                     titulo="Ocorreu um erro"
                     mensagem={
@@ -59,6 +60,7 @@ function DiaryHistoryStateView({
         estado = (
             <View style={estilos.estadoCentralizado}>
                 <EmptyState
+                    usarPaletaNoturnaConteudo
                     titulo={somenteLeitura ? 'Nada para exibir' : 'Nenhum registro visível'}
                     mensagem={
                         somenteLeitura ? (

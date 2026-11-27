@@ -10,6 +10,7 @@ export function ContraceptivePermissionsContext({ metodos, falhou, recarregar, a
     if (falhou)
         return (
             <EmptyState
+                usarPaletaNoturnaConteudo
                 variante="erro"
                 titulo="Não foi possível carregar os anticoncepcionais"
                 mensagem="Tente novamente para ver as permissões disponíveis."
@@ -22,6 +23,7 @@ export function ContraceptivePermissionsContext({ metodos, falhou, recarregar, a
     if (metodos.length === 0)
         return (
             <EmptyState
+                usarPaletaNoturnaConteudo
                 titulo="Nenhum anticoncepcional cadastrado"
                 mensagem="Cadastre um anticoncepcional para configurar o acesso e os alertas."
                 acao={

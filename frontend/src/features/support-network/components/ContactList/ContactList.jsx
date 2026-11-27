@@ -336,6 +336,7 @@ function ContactList({
 
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo="Ocorreu um erro"
                         mensagem={MENSAGEM_ERRO}
                         variante="erro"
@@ -364,6 +365,7 @@ function ContactList({
 
                 <View style={estilos.estadoCentral}>
                     <EmptyState
+                        usarPaletaNoturnaConteudo
                         titulo={
                             aoVisualizar
                                 ? 'Nada para exibir'
