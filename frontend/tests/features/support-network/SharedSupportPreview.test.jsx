@@ -28,6 +28,7 @@ test('abre o sheet padrão da fase pela informação autorizada', async () => {
 
     const momento = screen.getByRole('button', { name: /Momento do ciclo.*Informação autorizada/ });
     await fireEvent.press(momento);
+    expect(await screen.findByText('Conheça o ciclo')).toBeOnTheScreen();
     expect(await screen.findByRole('header', { name: 'Por que “folicular”?' })).toBeOnTheScreen();
 });
 

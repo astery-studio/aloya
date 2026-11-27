@@ -266,6 +266,7 @@ function SharedHomeScreen({
                 <CyclePhaseEducationSheet
                     visivel={Boolean(faseDoSheet)}
                     fase={faseDoSheet ?? fase}
+                    rotulo="Conheça o ciclo"
                     aoFechar={() => setFaseDoSheet(null)}
                 />
             ) : null}
