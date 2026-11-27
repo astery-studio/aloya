@@ -291,10 +291,10 @@ describe('ContactAppearancePicker', () => {
         );
 
         expect(screen.getByTestId('opcao-icone-contato-escudo')).toHaveStyle({
-            backgroundColor: '#9FD6B6',
-            borderColor: '#9FD6B6'
+            backgroundColor: '#A5D6A7',
+            borderColor: '#A5D6A7'
         });
 
-        expect(screen.getByTestId('icone-opcao-contato-escudo')).toHaveProp('color', '#152018');
+        expect(screen.getByTestId('icone-opcao-contato-escudo')).toHaveProp('color', '#121212');
     });
 });

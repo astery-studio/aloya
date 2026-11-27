@@ -4,6 +4,7 @@ import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { ChecksIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import {
     COR_ICONE_NAO_SELECIONADO,
     OPCOES_COR_CONTATO,
@@ -146,7 +147,9 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                             size={tamanhos.tamanhoIcone}
                                             color={
                                                 selecionado
-                                                    ? tema.cores.interface.textoSobreDestaque
+                                                    ? tema.escuro
+                                                        ? coresNoturnasConteudo.fundo
+                                                        : tema.cores.interface.textoSobreDestaque
                                                     : COR_ICONE_NAO_SELECIONADO
                                             }
                                             weight="regular"
@@ -193,8 +196,7 @@ function ContactAppearancePicker({ iconeId, corId, aoAlterar, desabilitado = fal
                                         minHeight: tamanhos.tamanhoQuadroCor,
                                         maxWidth: tamanhos.tamanhoQuadroCor,
                                         maxHeight: tamanhos.tamanhoQuadroCor,
-                                        backgroundColor:
-                                            opcao.id === 'branco' ? fundo : cor,
+                                        backgroundColor: opcao.id === 'branco' ? fundo : cor,
                                         borderColor: tema.cores.interface.borda
                                     },
                                     selecionada && estilos.opcaoCorSelecionada,

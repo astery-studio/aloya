@@ -235,10 +235,10 @@ describe('PermissionBulkSelector', () => {
         );
 
         expect(screen.getByTestId('indicador-permissoes-gerais')).toHaveStyle({
-            backgroundColor: '#9FD6B6',
-            borderColor: '#9FD6B6'
+            backgroundColor: '#A5D6A7',
+            borderColor: '#A5D6A7'
         });
 
-        expect(screen.getByTestId('check-permissoes-gerais')).toHaveProp('color', '#152018');
+        expect(screen.getByTestId('check-permissoes-gerais')).toHaveProp('color', '#121212');
     });
 });

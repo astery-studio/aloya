@@ -1,6 +1,7 @@
 //Define o visual das permissões individuais exibidas dentro dos grupos.
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
@@ -23,13 +24,17 @@ function criarEstilos(tema) {
         },
 
         tituloAtivo: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontWeight: '500'
         },
 
         tituloInativo: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400'
         }
@@ -37,7 +42,7 @@ function criarEstilos(tema) {
 }
 
 function criarFundosAtivos(tema) {
-    const fundoEscuro = tema.cores.interface.destaqueSuave;
+    const fundoEscuro = 'rgba(165, 214, 167, 0.10)';
     return StyleSheet.create({
         ciclo: {
             backgroundColor: tema.escuro ? fundoEscuro : tema.cores.redeApoio.ciclo.fundoExpandido

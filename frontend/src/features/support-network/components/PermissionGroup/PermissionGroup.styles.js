@@ -1,6 +1,7 @@
 //Define a aparência fechada e expandida dos grupos de permissões.
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 function criarEstilos(tema, aparenciaNovaCategoria = false) {
@@ -9,10 +10,11 @@ function criarEstilos(tema, aparenciaNovaCategoria = false) {
             width: '100%',
             alignSelf: 'stretch',
             overflow: 'hidden',
-            backgroundColor:
-                tema.escuro && aparenciaNovaCategoria ? '#1E1E1E' : tema.cores.interface.superficie,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
             borderRadius: 14
         },
 
@@ -23,8 +25,9 @@ function criarEstilos(tema, aparenciaNovaCategoria = false) {
             alignItems: 'center',
             paddingHorizontal: 14,
             gap: 10,
-            backgroundColor:
-                tema.escuro && aparenciaNovaCategoria ? '#1E1E1E' : tema.cores.interface.superficie
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie
         },
 
         areaExpansao: {
@@ -56,7 +59,9 @@ function criarEstilos(tema, aparenciaNovaCategoria = false) {
         },
 
         titulo: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             fontWeight: '600',
@@ -65,7 +70,9 @@ function criarEstilos(tema, aparenciaNovaCategoria = false) {
         },
 
         contagem: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             fontWeight: '400',
@@ -85,7 +92,7 @@ function criarEstilos(tema, aparenciaNovaCategoria = false) {
 
         itemComSeparador: {
             borderTopWidth: 0.7,
-            borderTopColor: tema.cores.interface.borda
+            borderTopColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda
         }
     });
 }

@@ -18,7 +18,9 @@ function criarEstilos(tema) {
 
         tituloSecao: {
             marginBottom: 2,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
             fontSize: 15,
             fontWeight: '500',
@@ -31,7 +33,7 @@ function criarEstilos(tema) {
         },
 
         textoBotaoPermissao: {
-            color: '#FFFFFF',
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF',
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             fontStyle: 'normal',

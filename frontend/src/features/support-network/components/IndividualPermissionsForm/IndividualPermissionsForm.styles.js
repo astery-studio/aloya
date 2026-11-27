@@ -2,6 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -36,11 +37,15 @@ function criarEstilos(tema) {
         linha: {
             height: 1,
             flex: 1,
-            backgroundColor: tema.cores.interface.separador
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.borda
+                : tema.cores.interface.separador
         },
 
         textoSeparador: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontWeight: '700',
@@ -64,9 +69,13 @@ function criarEstilos(tema) {
             width: '100%',
             paddingTop: 14,
             paddingBottom: 2,
-            backgroundColor: tema.cores.interface.superficieElevada,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficieElevada,
             borderTopWidth: 1,
-            borderTopColor: tema.cores.interface.separador
+            borderTopColor: tema.escuro
+                ? coresNoturnasConteudo.borda
+                : tema.cores.interface.separador
         }
     });
 }
