@@ -208,7 +208,12 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
         predictionService: {
             buscar(titularId) {
                 assert.equal(titularId, 4);
-                return { proximoInicioEstimado: '2026-12-02', duracaoCicloEstimada: 28, nivelConfianca: 'alta' };
+                return {
+                    proximoInicioEstimado: '2026-12-02',
+                    duracaoCicloEstimada: 28,
+                    confiabilidadeMenstrual: { nivel: 'ALTA', motivos: ['INTERNO'] },
+                    status: 'DISPONIVEL'
+                };
             }
         },
         contraceptiveService: {
@@ -232,7 +237,8 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
     });
     assert.equal(faseComHistorico.diaDoCiclo, 16);
     assert.equal(faseComHistorico.previsao.proximoInicioEstimado, '2026-12-02');
-    assert.equal(Object.hasOwn(faseComHistorico.previsao, 'nivelConfianca'), false);
+    assert.deepEqual(faseComHistorico.previsao.confiabilidadeMenstrual, { nivel: 'ALTA' });
+    assert.equal(faseComHistorico.previsao.status, 'DISPONIVEL');
     assert.deepEqual(data.dicas().fases, ['menstrual', 'folicular', 'ovulatoria', 'lutea']);
     const historicoAutorizado = { titularId: 4, permissoes: ['geral.historico_ciclo'] };
     assert.deepEqual(await data.calendario(historicoAutorizado, { mes: '2026-11' }), {

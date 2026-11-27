@@ -23,7 +23,9 @@ function criarSharedSupportData({
             duracaoCicloEstimada,
             proximoInicioEstimado,
             dataOvulacaoEstimada,
-            janelaFertilEstimada
+            janelaFertilEstimada,
+            confiabilidadeMenstrual,
+            status
         } = await predictionService.buscar(titularId);
         return {
             ...base,
@@ -34,7 +36,11 @@ function criarSharedSupportData({
                 duracaoCicloEstimada,
                 proximoInicioEstimado,
                 dataOvulacaoEstimada,
-                janelaFertilEstimada
+                janelaFertilEstimada,
+                confiabilidadeMenstrual: confiabilidadeMenstrual
+                    ? { nivel: confiabilidadeMenstrual.nivel }
+                    : null,
+                status
             }
         };
     }
