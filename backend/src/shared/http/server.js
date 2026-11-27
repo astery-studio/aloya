@@ -114,7 +114,8 @@ app.use('/api/preferencias-notificacao', criarNotificationPreferencesRoutes({
     Router: express.Router,
     autenticar: container.authMiddleware.autenticar,
     rateLimit: container.notificationPreferencesRateLimit,
-    service: container.notificationPreferencesService
+    service: container.notificationPreferencesService,
+    somenteContato: true
 }));
 
 app.use('/api/dispositivos-notificacao', criarPushDevicesRoutes({

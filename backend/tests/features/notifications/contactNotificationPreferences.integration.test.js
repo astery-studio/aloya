@@ -2,6 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { prepararApiContato } from './contactNotificationPreferencesFixture.js';
 
+test('publica somente as preferências de contato quando a integração é restrita à Rede de Apoio', async (t) => {
+    const { chamar } = await prepararApiContato(t, { somenteContato: true });
+
+    assert.equal((await chamar('/contato', 2)).status, 200);
+    assert.equal((await chamar('/', 2)).status, 404);
+    assert.equal((await chamar('/padroes', 2)).status, 404);
+    assert.equal((await chamar('/restaurar', 2, undefined, 'POST')).status, 404);
+});
+
 test('limita preferências do contato às permissões vigentes e salva na conta autenticada', async (t) => {
     const { prisma, service, categoria, chamar } = await prepararApiContato(t);
 
