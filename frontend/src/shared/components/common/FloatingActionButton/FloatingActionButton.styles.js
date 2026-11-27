@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
 const COR_FAB = '#C85A44';
 const COR_ICONE_FAB = '#FFFFFF';
@@ -19,7 +20,7 @@ function criarEstilos(tema) {
                 borderRadius: 28,
                 borderWidth: 2,
                 borderColor: 'transparent',
-                backgroundColor: COR_FAB,
+                backgroundColor: tema.escuro ? coresNoturnasConteudo.coral : COR_FAB,
                 ...tema.shadows.cardSuave,
                 shadowOffset: { width: 0, height: 6 },
                 shadowOpacity: 0.22,
@@ -36,7 +37,7 @@ function criarEstilos(tema) {
                 borderColor: tema.cores.interface.textoPrincipal
             }
         }),
-        corIcone: COR_ICONE_FAB
+        corIcone: tema.escuro ? coresNoturnasConteudo.fundo : COR_ICONE_FAB
     };
 }
 

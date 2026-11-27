@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 // Orquestra calendário, cabeçalho, legenda e estados de erro ou vazio.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Text, View } from 'react-native';
@@ -266,7 +267,11 @@ function CalendarScreen({
                         aoPressionar={() => setLegendaVisivel(true)}
                         rotuloAcessibilidade="Abrir legenda do calendário"
                         variante="redeApoio"
-                        corIcone={tema.cores.interface.destaque}
+                        corIcone={
+                            tema.escuro
+                                ? coresNoturnasConteudo.coral
+                                : tema.cores.interface.destaque
+                        }
                     />
                 }
             />
