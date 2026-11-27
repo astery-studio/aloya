@@ -1,5 +1,6 @@
 import {
     camposExistentes,
+    gruposNotificacao,
     validarAlteracao,
     valoresIniciais
 } from './notificationPreferenceFields.js';
@@ -24,6 +25,12 @@ function apresentar(registro) {
     return { ...valoresIniciais, ...ajustesPorEvento, ...legado };
 }
 
+function chavesDoGrupo(grupo) {
+    const chaves = gruposNotificacao[grupo].split(' ').map((evento) => `${grupo}.${evento}`);
+    if (grupo === 'ciclo.diario') chaves.push('lembreteDiarioAtivo');
+    return chaves;
+}
+
 export function criarNotificationPreferencesService(prisma) {
     async function buscarNoBanco(cliente, usuarioId) {
         return apresentar(
@@ -42,8 +49,12 @@ export function criarNotificationPreferencesService(prisma) {
             return apresentar(registro);
         }
 
-        // O SQLite mescla a chave em uma operação atômica, sem sobrescrever escolhas paralelas.
-        const ajuste = JSON.stringify({ [chave]: valor });
+        return gravarAjustes(cliente, usuarioId, { [chave]: valor });
+    }
+
+    async function gravarAjustes(cliente, usuarioId, ajustes) {
+        // O SQLite mescla as escolhas em uma operação atômica.
+        const ajuste = JSON.stringify(ajustes);
         const atualizadoEm = new Date().toISOString();
         await cliente.$executeRaw`
             INSERT INTO preferencias_notificacao (usuario_id, ajustes_por_evento, atualizado_em)
@@ -56,12 +67,26 @@ export function criarNotificationPreferencesService(prisma) {
         return buscarNoBanco(cliente, usuarioId);
     }
 
+    async function gravarGrupo(cliente, usuarioId, grupo, ajustes) {
+        if (grupo === 'ciclo.diario' && Object.hasOwn(ajustes, 'lembreteDiarioAtivo')) {
+            const { lembreteDiarioAtivo, ...demais } = ajustes;
+            await gravar(cliente, usuarioId, { chave: 'lembreteDiarioAtivo', valor: lembreteDiarioAtivo });
+            return gravarAjustes(cliente, usuarioId, demais);
+        }
+        return gravarAjustes(cliente, usuarioId, ajustes);
+    }
+
     async function atualizar(usuarioId, entrada, autorizar) {
         const alteracao = validarAlteracao(entrada);
         const { chave, valor } = alteracao;
         const cancelar = valor === false && chave !== 'previaDetalhada';
+        const emGrupo = Object.hasOwn(gruposNotificacao, chave);
+        const grupo = chave === 'lembreteDiarioAtivo' ? 'ciclo.diario' : chave.slice(0, chave.lastIndexOf('.'));
+        const ativandoIndividual = valor === true && Object.hasOwn(gruposNotificacao, grupo);
 
-        if (!cancelar && !autorizar) return gravar(prisma, usuarioId, alteracao);
+        if (!cancelar && !autorizar && !emGrupo && !ativandoIndividual) {
+            return gravar(prisma, usuarioId, alteracao);
+        }
 
         const evento =
             {
@@ -72,8 +97,32 @@ export function criarNotificationPreferencesService(prisma) {
             }[chave] ?? chave;
 
         return prisma.$transaction(async (tx) => {
-            if (autorizar) await autorizar(tx, chave);
-            const preferencias = await gravar(tx, usuarioId, alteracao);
+            const permitidas = await autorizar?.(tx, chave);
+            let preferencias;
+
+            if (emGrupo || ativandoIndividual) {
+                const grupoAlterado = emGrupo ? chave : grupo;
+                const chaves = chavesDoGrupo(grupoAlterado);
+                const ajustes = {};
+
+                // Contas antigas podem ter escolhas ligadas que o grupo desligado mascarava.
+                if (valor && (await buscarNoBanco(tx, usuarioId))[grupoAlterado] === false) {
+                    for (const opcao of chaves) ajustes[opcao] = false;
+                }
+
+                if (emGrupo) {
+                    for (const opcao of chaves) {
+                        if (!permitidas || permitidas.includes(opcao)) ajustes[opcao] = valor;
+                    }
+                    ajustes[grupoAlterado] = valor;
+                } else {
+                    ajustes[grupoAlterado] = true;
+                    ajustes[chave] = true;
+                }
+                preferencias = await gravarGrupo(tx, usuarioId, grupoAlterado, ajustes);
+            } else {
+                preferencias = await gravar(tx, usuarioId, alteracao);
+            }
 
             if (cancelar) {
                 await cancelarAgendadas(tx, {
