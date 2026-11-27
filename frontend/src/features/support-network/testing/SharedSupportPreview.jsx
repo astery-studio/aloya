@@ -36,6 +36,7 @@ import { SupportedCycleHero } from '../components/SupportedCycleHero/SupportedCy
 import { SupportedPersonIndicator } from '../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
 import { SharedCycleHistoryScreen } from '../screens/SharedCycleHistoryScreen/SharedCycleHistoryScreen';
+import { SharedNavigationPreview } from './SharedNavigationPreview';
 
 const NOME = 'Júlia';
 const PERMISSOES_DEMONSTRACAO = [
@@ -495,6 +496,10 @@ function ConteudoPrevia() {
         setTela('calendario');
     }
 
+    if (tela === 'trocarContato' || tela === 'acessoRevogado') {
+        return <SharedNavigationPreview revogado={tela === 'acessoRevogado'} />;
+    }
+
     if (tela === 'calendario') {
         return (
             <CalendarScreenContainer
@@ -592,6 +597,16 @@ function ConteudoPrevia() {
                                 })}
                             </ScrollView>
                             <SupportedPersonIndicator nome={NOME} />
+                            <View style={[estilos.inset, estilos.cenarios]}>
+                                <ButtonScreen
+                                    texto="Testar troca de pessoa"
+                                    aoPressionar={() => setTela('trocarContato')}
+                                />
+                                <ButtonScreen
+                                    texto="Testar acesso revogado"
+                                    aoPressionar={() => setTela('acessoRevogado')}
+                                />
+                            </View>
                             <SupportedCycleHero
                                 nomeTitular={NOME}
                                 fase={cenario.id}

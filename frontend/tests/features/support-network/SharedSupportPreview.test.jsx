@@ -119,3 +119,35 @@ test('permite testar o calendário, a legenda, o estado vazio e a nova tentativa
     await fireEvent.press(screen.getByRole('tab', { name: 'Diário' }));
     expect(screen.getByText('RESUMO DO DIÁRIO DE JÚLIA')).toBeOnTheScreen();
 });
+
+test('troca a pessoa visualizada sem voltar ao ciclo da própria conta', async () => {
+    await render(<SharedSupportPreview />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Testar troca de pessoa' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar dados de Júlia' }));
+    expect(await screen.findByLabelText('Acompanhando Júlia')).toBeOnTheScreen();
+    expect(await screen.findByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Config.' }));
+    expect(screen.getByText('Configurações de Perfil')).toBeOnTheScreen();
+    expect(screen.queryByText('Parâmetros do Ciclo')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
+    expect(await screen.findByText('CONTATO EM VISUALIZAÇÃO')).toBeOnTheScreen();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar dados de Maria' }));
+    expect(await screen.findByLabelText('Acompanhando Maria')).toBeOnTheScreen();
+    expect(screen.queryByLabelText('Acompanhando Júlia')).not.toBeOnTheScreen();
+});
+
+test('mostra o acesso revogado como vazio e permite escolher outro contato', async () => {
+    await render(<SharedSupportPreview />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Testar acesso revogado' }));
+    expect(await screen.findByText('Nada para exibir')).toBeOnTheScreen();
+    expect(screen.queryByLabelText('Acompanhando Júlia')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
+    expect(screen.queryByRole('button', { name: 'Visualizar dados de Júlia' })).toBeNull();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar dados de Maria' }));
+    expect(await screen.findByLabelText('Acompanhando Maria')).toBeOnTheScreen();
+});
