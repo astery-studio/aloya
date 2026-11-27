@@ -16,24 +16,31 @@ const PHASES = Object.freeze(
 function CycleEducationSection({
     faseSelecionada,
     aoSelecionarFase,
-    conteudos = CONTEUDOS_EDUCATIVOS
+    conteudos = CONTEUDOS_EDUCATIVOS,
+    perspectiva = 'titular'
 }) {
     const [faseLocal, setFaseLocal] = useState('menstrual');
-    const idSelecionado = faseSelecionada ?? faseLocal;
-    const selected = conteudos[idSelecionado] ?? conteudos.menstrual;
-    const fases = Object.entries(conteudos).map(([id, conteudo]) => ({ id, ...conteudo }));
+    const ehContato = perspectiva === 'contato';
+    const conteudoEducativo = ehContato ? CONTEUDOS_EDUCATIVOS : conteudos;
+    const idSelecionado = ehContato ? faseLocal : (faseSelecionada ?? faseLocal);
+    const selected = conteudoEducativo[idSelecionado] ?? conteudoEducativo.menstrual;
+    const fases = Object.entries(conteudoEducativo).map(([id, conteudo]) => ({ id, ...conteudo }));
     const selecionar = (id) => {
         setFaseLocal(id);
         aoSelecionarFase?.(id);
     };
     return (
         <View style={estilos.secao}>
-            <Text style={textos.etiqueta}>Conteúdo educativo</Text>
+            <Text style={textos.etiqueta}>
+                {ehContato ? 'Conhecimento sem expectativas' : 'Conteúdo educativo'}
+            </Text>
             <Text accessibilityRole="header" style={textos.titulo}>
-                Conheça as fases do ciclo
+                {ehContato ? 'Entenda cada fase' : 'Conheça as fases do ciclo'}
             </Text>
             <Text style={textos.introducao}>
-                Uma apresentação geral — nenhuma fase está sendo atribuída a você.
+                {ehContato
+                    ? 'Conhecer o funcionamento do ciclo pode ajudar você a compreender melhor o corpo, sem criar expectativas sobre como alguém deve se sentir.'
+                    : 'Uma apresentação geral — nenhuma fase está sendo atribuída a você.'}
             </Text>
             <ScrollView
                 horizontal
