@@ -1,5 +1,6 @@
 //Define o visual das variantes simples e composta da confiabilidade.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../theme';
 
@@ -11,15 +12,16 @@ function criarEstilos(tema) {
         },
 
         simples: {
-            height: 24,
+            height: 34,
+            minWidth: 112.33,
             maxWidth: '100%',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 5,
-            paddingVertical: 3,
+            justifyContent: 'center',
+            gap: 8,
             paddingHorizontal: 10,
-            borderWidth: 0,
-            borderRadius: tema.radius.switch
+            borderWidth: 0.666667,
+            borderRadius: 16
         },
 
         composta: {
@@ -40,20 +42,13 @@ function criarEstilos(tema) {
             gap: 6
         },
 
-        ponto: {
-            width: 5.99,
-            height: 5.99,
-            flexShrink: 0,
-            borderRadius: 2.99578
-        },
-
         textoSimples: {
             flexShrink: 1,
-            fontFamily: fontFamilies.semibold,
-            fontSize: 12,
+            fontFamily: fontFamilies.medium,
+            fontSize: 14,
             fontStyle: 'normal',
-            fontWeight: '600',
-            lineHeight: 18,
+            fontWeight: '500',
+            lineHeight: 21,
             includeFontPadding: false
         },
 
@@ -82,37 +77,37 @@ function criarEstilos(tema) {
     const variantes = tema.escuro
         ? Object.freeze({
               alta: Object.freeze({
-                  cor: '#9FD6B6',
-                  fundo: 'rgba(159, 214, 182, 0.14)',
-                  borda: 'rgba(159, 214, 182, 0.45)'
+                  cor: coresNoturnasConteudo.verde,
+                  fundo: 'rgba(165, 214, 167, 0.14)',
+                  borda: 'rgba(165, 214, 167, 0.45)'
               }),
               media: Object.freeze({
-                  cor: '#F2B45F',
-                  fundo: 'rgba(242, 180, 95, 0.14)',
-                  borda: 'rgba(242, 180, 95, 0.45)'
+                  cor: '#D68C3A',
+                  fundo: 'rgba(214, 140, 58, 0.14)',
+                  borda: 'rgba(214, 140, 58, 0.45)'
               }),
               baixa: Object.freeze({
-                  cor: '#F08A75',
-                  fundo: 'rgba(240, 138, 117, 0.14)',
-                  borda: 'rgba(240, 138, 117, 0.45)'
+                  cor: coresNoturnasConteudo.coral,
+                  fundo: 'rgba(194, 110, 95, 0.14)',
+                  borda: 'rgba(194, 110, 95, 0.45)'
               })
           })
         : Object.freeze({
               alta: Object.freeze({
                   cor: '#2C4C3B',
-                  fundo: 'rgba(44, 76, 59, 0.14)',
+                  fundo: 'rgba(44, 76, 59, 0.1)',
                   borda: 'rgba(44, 76, 59, 0.333)'
               }),
 
               media: Object.freeze({
-                  cor: '#8A5A12',
-                  fundo: 'rgba(214, 140, 58, 0.14)',
+                  cor: '#D68C3A',
+                  fundo: 'rgba(214, 140, 58, 0.1)',
                   borda: 'rgba(214, 140, 58, 0.333)'
               }),
 
               baixa: Object.freeze({
-                  cor: '#A43F2C',
-                  fundo: 'rgba(200, 90, 68, 0.14)',
+                  cor: '#C85A44',
+                  fundo: 'rgba(200, 90, 68, 0.1)',
                   borda: 'rgba(200, 90, 68, 0.333)'
               })
           });

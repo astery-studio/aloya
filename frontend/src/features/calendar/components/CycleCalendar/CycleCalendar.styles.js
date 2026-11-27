@@ -1,13 +1,17 @@
 //Centraliza os estilos visuais dos componentes do calendário.
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
-function criarEstilosCalendario(tema) {
+function criarEstilosCalendario(
+    tema,
+    corFundo = tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+) {
     const estilos = StyleSheet.create({
         calendario: {
             flex: 1,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         cabecalhoSemana: {
             flexDirection: 'row',
@@ -15,13 +19,15 @@ function criarEstilosCalendario(tema) {
             paddingVertical: 10,
             borderTopWidth: StyleSheet.hairlineWidth,
             borderBottomWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.cores.interface.fundo,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
+            backgroundColor: corFundo,
             zIndex: 4
         },
         nomeDiaSemana: {
             flex: 1,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             lineHeight: 20,
@@ -32,7 +38,7 @@ function criarEstilosCalendario(tema) {
         },
         conteudoLista: {
             flexGrow: 1,
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-start'
         },
         carregamentoInicial: {
             flex: 1,
@@ -46,7 +52,9 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center'
         },
         mes: {
-            paddingHorizontal: 8
+            paddingHorizontal: 8,
+            // Preserva a altura do mês usada pelo getItemLayout.
+            paddingBottom: 8.991
         },
         cabecalhoMes: {
             flexDirection: 'row',
@@ -59,7 +67,9 @@ function criarEstilosCalendario(tema) {
             marginBottom: 8
         },
         nomeMes: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontSize: 15,
             fontStyle: 'normal',
@@ -67,18 +77,14 @@ function criarEstilosCalendario(tema) {
             lineHeight: 22.5
         },
         anoMes: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             fontStyle: 'normal',
             fontWeight: '400',
             lineHeight: 18
-        },
-        divisorMes: {
-            alignSelf: 'stretch',
-            height: 0.991,
-            marginTop: 8,
-            backgroundColor: tema.cores.interface.separador
         },
         semana: {
             position: 'relative',
@@ -101,20 +107,18 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center',
             zIndex: 2
         },
-        segmentoDia: {
+        faixaFase: {
             position: 'absolute',
             top: 3.998,
-            right: 0,
-            bottom: 3.998,
-            left: 0
+            bottom: 3.998
         },
         inicioSegmento: {
-            left: 4.273,
+            marginLeft: 4.273,
             borderTopLeftRadius: 99,
             borderBottomLeftRadius: 99
         },
         fimSegmento: {
-            right: 4.273,
+            marginRight: 4.273,
             borderTopRightRadius: 99,
             borderBottomRightRadius: 99
         },
@@ -127,7 +131,7 @@ function criarEstilosCalendario(tema) {
             alignItems: 'flex-start'
         },
         numeroDia: {
-            color: tema.escuro ? tema.cores.interface.textoSecundario : 'rgba(34, 34, 34, 0.70)',
+            color: tema.escuro ? coresNoturnasConteudo.textoSecundario : 'rgba(34, 34, 34, 0.70)',
             textAlign: 'center',
             fontFamily: fontFamilies.regular,
             fontSize: 13,
@@ -151,23 +155,17 @@ function criarEstilosCalendario(tema) {
             position: 'absolute',
             top: 0,
             bottom: 0,
-            borderTopWidth: 2,
-            borderRightWidth: 2,
-            borderBottomWidth: 2,
-            borderLeftWidth: 2,
+            // O Android aplica o tracejado a um contorno arredondado com largura e cor uniformes.
+            borderWidth: 2,
             borderStyle: 'dashed',
             borderRadius: 16,
             zIndex: 3
         },
         janelaFertilAtual: {
-            borderColor: tema.escuro
-                ? tema.cores.interface.textoSecundario
-                : 'rgba(34, 34, 34, 0.70)'
+            borderColor: tema.escuro ? '#9E9C96' : 'rgba(34, 34, 34, 0.70)'
         },
         janelaFertilPrevista: {
-            borderColor: tema.escuro
-                ? tema.cores.interface.textoDesabilitado
-                : 'rgba(34, 34, 34, 0.42)'
+            borderColor: tema.escuro ? 'rgba(158, 156, 150, 0.40)' : 'rgba(34, 34, 34, 0.42)'
         },
         pressionado: {
             opacity: 0.72
@@ -176,31 +174,31 @@ function criarEstilosCalendario(tema) {
 
     const estilosTipos = StyleSheet.create({
         menstruacao: {
-            backgroundColor: tema.escuro ? '#A84432' : 'rgba(200, 90, 68, 0.90)'
+            backgroundColor: tema.escuro ? '#A8524A' : 'rgba(200, 90, 68, 0.90)'
         },
         folicular: {
-            backgroundColor: tema.escuro ? '#2C4C3B' : 'rgba(44, 76, 59, 0.90)'
+            backgroundColor: tema.escuro ? '#52665E' : 'rgba(44, 76, 59, 0.90)'
         },
         ovulacao: {
-            backgroundColor: tema.escuro ? '#3E6578' : 'rgba(74, 117, 142, 0.90)'
+            backgroundColor: tema.escuro ? '#5A7382' : 'rgba(74, 117, 142, 0.90)'
         },
         lutea: {
-            backgroundColor: tema.escuro ? '#8A5A12' : 'rgba(214, 140, 58, 0.90)'
+            backgroundColor: tema.escuro ? '#B87550' : 'rgba(214, 140, 58, 0.90)'
         }
     });
 
     const estilosTiposPrevistos = StyleSheet.create({
         menstruacao: {
-            backgroundColor: tema.escuro ? 'rgba(168, 68, 50, 0.78)' : 'rgba(200, 90, 68, 0.58)'
+            backgroundColor: tema.escuro ? 'rgba(168, 82, 74, 0.60)' : 'rgba(200, 90, 68, 0.58)'
         },
         folicular: {
-            backgroundColor: tema.escuro ? 'rgba(44, 76, 59, 0.78)' : 'rgba(44, 76, 59, 0.56)'
+            backgroundColor: tema.escuro ? 'rgba(82, 102, 94, 0.60)' : 'rgba(44, 76, 59, 0.56)'
         },
         ovulacao: {
-            backgroundColor: tema.escuro ? 'rgba(62, 101, 120, 0.78)' : 'rgba(74, 117, 142, 0.56)'
+            backgroundColor: tema.escuro ? 'rgba(90, 115, 130, 0.60)' : 'rgba(74, 117, 142, 0.56)'
         },
         lutea: {
-            backgroundColor: tema.escuro ? 'rgba(138, 90, 18, 0.82)' : 'rgba(214, 140, 58, 0.58)'
+            backgroundColor: tema.escuro ? 'rgba(184, 117, 80, 0.60)' : 'rgba(214, 140, 58, 0.58)'
         }
     });
 
@@ -208,7 +206,7 @@ function criarEstilosCalendario(tema) {
         estilos,
         estilosTipos,
         estilosTiposPrevistos,
-        corCarregamento: tema.escuro ? tema.cores.interface.destaque : tema.cores.marca.primaria,
+        corCarregamento: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.marca.primaria,
         corIconeMarcado: '#FFFFFF'
     });
 }

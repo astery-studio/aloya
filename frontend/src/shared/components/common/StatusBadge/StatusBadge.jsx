@@ -49,6 +49,8 @@ const estados = Object.freeze({
     },
     naoConfirmado: { rotulo: 'Não confirmado', variante: 'naoConfirmadoHistoricoUso' },
     naoConfirmadoHistoricoUso: { rotulo: 'Não confirmado', variante: 'naoConfirmadoHistoricoUso' },
+    naoUsei: { rotulo: 'Não usei', variante: 'naoConfirmadoHistoricoUso' },
+    naoUseiNoCartao: { rotulo: 'Não usei', variante: 'naoUseiNoCartao', ponto: true },
     validadeAindaPrazo: { rotulo: '30 meses restantes', variante: 'validadeAindaPrazo' },
     diasMenstruacao: {
         rotulo: '6 dias menstruação',
@@ -83,13 +85,14 @@ const variantesDeUso = new Set([
     'alertaCritico',
     'atrasadoProximosHorarios',
     'confirmado',
+    'naoUseiNoCartao',
     'confirmadoHistoricoUso',
     'confirmadoForaPrazoHistoricoUso',
     'naoConfirmadoHistoricoUso',
     'validadeAindaPrazo'
 ]);
 
-function StatusBadge({ estado, rotulo }) {
+function StatusBadge({ estado, rotulo, estilo, corConteudo }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const variantes = useMemo(() => criarVariantes(tema), [tema]);
@@ -102,8 +105,9 @@ function StatusBadge({ estado, rotulo }) {
     const visual = variantes[configuracao.variante];
     const texto = rotulo || configuracao.rotulo;
     const ajustarTextoDeUso = estado !== 'emAndamento' && variantesDeUso.has(configuracao.variante);
-    const confirmadoNoHistorico =
-        configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado';
+    const textoSemQuebra =
+        configuracao.variante === 'atrasadoProximosHorarios' ||
+        (configuracao.variante === 'confirmadoHistoricoUso' && texto === 'Confirmado');
 
     if (configuracao.estimativa) {
         const acessibilidade = `${texto}. ${configuracao.descricao}`;
@@ -113,16 +117,12 @@ function StatusBadge({ estado, rotulo }) {
                 accessible
                 accessibilityRole="text"
                 accessibilityLabel={acessibilidade}
-                style={[estilos.container, visual.container]}
+                style={[estilos.container, visual.container, estilo]}
             >
-                <WarningCircleIcon size={18} color={visual.texto.color} />
+                <WarningCircleIcon size={18} color={visual.texto.color} weight="fill" />
                 <View style={estilos.conteudoEstimativa}>
-                    <Text numberOfLines={1} style={estilos.tituloEstimativa}>
-                        {texto}
-                    </Text>
-                    <Text numberOfLines={1} style={estilos.descricaoEstimativa}>
-                        {configuracao.descricao}
-                    </Text>
+                    <Text style={estilos.tituloEstimativa}>{texto}</Text>
+                    <Text style={estilos.descricaoEstimativa}>{configuracao.descricao}</Text>
                 </View>
             </View>
         );
@@ -141,7 +141,8 @@ function StatusBadge({ estado, rotulo }) {
                 estilos.container,
                 visual.container,
                 ajustarTextoDeUso && dimensoesFlexiveis(visual.container),
-                confirmadoNoHistorico && { width: 'auto', minWidth: visual.container.width }
+                textoSemQuebra && { width: 'auto', minWidth: visual.container.width },
+                estilo
             ]}
         >
             {configuracao.iconeCiclo ? (
@@ -151,7 +152,7 @@ function StatusBadge({ estado, rotulo }) {
                 <Text
                     style={[
                         estilos.ponto,
-                        { color: visual.texto.color },
+                        { color: corConteudo ?? visual.texto.color },
                         ajustarTextoDeUso && { includeFontPadding: false }
                     ]}
                 >
@@ -159,12 +160,13 @@ function StatusBadge({ estado, rotulo }) {
                 </Text>
             ) : null}
             <Text
-                numberOfLines={confirmadoNoHistorico || !ajustarTextoDeUso ? 1 : undefined}
+                numberOfLines={textoSemQuebra || !ajustarTextoDeUso ? 1 : undefined}
                 style={[
                     estilos.texto,
                     visual.texto,
                     ajustarTextoDeUso && textoFlexivel(visual.texto),
-                    confirmadoNoHistorico && { flexShrink: 0 }
+                    textoSemQuebra && { flexShrink: 0 },
+                    corConteudo && { color: corConteudo }
                 ]}
             >
                 {valor || texto}

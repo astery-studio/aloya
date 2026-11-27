@@ -18,7 +18,8 @@ import {
 } from '../../../shared/components/icons/AppIcons';
 import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { useTheme } from '../../../shared/hooks/useTheme';
-import { obterTipo } from '../constants/contraceptiveOptions';
+import { obterFrequencia, obterTipo } from '../constants/contraceptiveOptions';
+import { estaEmPausa } from '../domain/ContraceptiveSchedule';
 import { estadoRegistroUso } from '../utils/usageHistory';
 import { UsageHistoryPanel } from './UsageHistoryPanel';
 import { criarEstilosCartao } from './ContraceptiveUsageCard.styles';
@@ -36,6 +37,11 @@ const ROTULOS_TIPO = Object.freeze({
     anel_vaginal: 'Anel vaginal',
     diu_hormonal: 'DIU hormonal'
 });
+const BADGES_ULTIMO_USO = Object.freeze({
+    confirmado: 'confirmado',
+    foraDoPrazo: 'confirmadoForaPrazoHistoricoUso',
+    naoConfirmado: 'naoConfirmadoHistoricoUso'
+});
 
 function criarUsos(anticoncepcional) {
     if (anticoncepcional.tipo === 'diu_hormonal') return [];
@@ -51,6 +57,27 @@ function criarUsos(anticoncepcional) {
 
 function usoConfirmado(uso) {
     return ['confirmado', 'confirmadoForaDoPrazo', 'foraDoPrazo'].includes(uso.status);
+}
+
+function usoPendente(uso) {
+    return uso.status !== 'naoUsei' && !usoConfirmado(uso);
+}
+
+function determinarEstadoUso(usos, possuiUsoPendente, ultimoEstado, tipo) {
+    if (possuiUsoPendente) return 'pendenteDeUso';
+
+    if (usos.length) {
+        const usoNaoRealizadoHoje = usos.some((uso) => uso.status === 'naoUsei');
+        return usoNaoRealizadoHoje ? 'naoUsei' : 'confirmado';
+    }
+
+    if (ultimoEstado === 'pendente') return 'pendenteDeUso';
+
+    const estadoAnterior = estadoRegistroUso({ estado: ultimoEstado });
+    if (estadoAnterior === 'naoConfirmado') return 'naoConfirmadoHistoricoUso';
+    if (estadoAnterior === 'naoUsei') return 'naoUsei';
+
+    return estadoAnterior || tipo === 'diu_hormonal' ? 'confirmado' : null;
 }
 
 function horarioUsoInvalido(uso) {
@@ -110,11 +137,16 @@ function AcaoDoCartao({ icone, rotulo, aoPressionar, estilosCartao }) {
     );
 }
 
+function estadoBadgeDoCartao(estado) {
+    return estado === 'naoUsei' ? 'naoUseiNoCartao' : estado;
+}
+
 function larguraMinimaDosBadges(estados) {
     return Math.max(
         ...estados.map((estado) => {
-            const visual = variantesBadge[estado === 'alertaCrítico' ? 'alertaCritico' : estado];
-            if (estado.endsWith('HistoricoUso')) return visual.container.width;
+            const variante = estadoBadgeDoCartao(estado);
+            const visual = variantesBadge[variante === 'alertaCrítico' ? 'alertaCritico' : variante];
+            if (variante.endsWith('HistoricoUso')) return visual.container.width;
             return (
                 visual.texto.width +
                 visual.container.paddingHorizontal * 2 +
@@ -134,7 +166,23 @@ function BadgeDoCartao({ estado, larguraMinima, estilosCartao }) {
                 { minWidth: larguraMinima, flexBasis: larguraMinima }
             ]}
         >
-            <StatusBadge estado={estado} />
+            <StatusBadge
+                estado={estadoBadgeDoCartao(estado)}
+                estilo={
+                    estado === 'pendenteDeUso'
+                        ? estilosCartao.badgePendente
+                        : estado.startsWith('alerta')
+                        ? estilosCartao.badgeAlerta
+                        : undefined
+                }
+                corConteudo={
+                    estado === 'pendenteDeUso'
+                        ? estilosCartao.textoBadgePendente.color
+                        : estado.startsWith('alerta')
+                        ? estilosCartao.textoBadgeAlerta.color
+                        : undefined
+                }
+            />
         </View>
     );
 }
@@ -143,44 +191,51 @@ function ContraceptiveUsageCard({
     anticoncepcional,
     aoEditar,
     aoRemover,
+    aoApagar,
     aoAlternarUso,
-    aoAtualizarUsos
+    aoSalvarEdicaoHistorico,
+    aoAtualizarUsos,
+    somenteLeitura = false
 }) {
     const tema = useTheme();
     const estilosCartao = useMemo(() => criarEstilosCartao(tema), [tema]);
     const [historicoExpandido, setHistoricoExpandido] = useState(false);
+
     const usosRecebidos = useMemo(() => criarUsos(anticoncepcional), [anticoncepcional]);
     const [usos, setUsos] = useState(usosRecebidos);
     const usosAtuais = useRef(usos);
     const operacoesPendentes = useRef(new Set());
+
     const IconeTipo = ICONES_TIPO[anticoncepcional.tipo] ?? PillIcon;
     const tipo =
         ROTULOS_TIPO[anticoncepcional.tipo] ??
         obterTipo(anticoncepcional.tipo)?.label ??
         anticoncepcional.tipo;
+
     const historico = anticoncepcional.historico ?? [];
     const removido = Boolean(anticoncepcional.removido || anticoncepcional.ativo === false);
-    const possuiUsoPendente = usos.some((uso) => !usoConfirmado(uso));
+
+    const possuiUsoPendente = usos.some(usoPendente);
     const possuiUsoConfirmado = usos.some(usoConfirmado);
     const ultimoEstado = anticoncepcional.statusUltimoUso ?? historico[0]?.estado;
     const estadoUltimoNormalizado = estadoRegistroUso({ estado: ultimoEstado });
-    const estadoUso = usos.length
-        ? possuiUsoPendente
-            ? 'pendenteDeUso'
-            : 'confirmado'
-        : ultimoEstado === 'pendente'
-          ? 'pendenteDeUso'
-          : estadoUltimoNormalizado === 'naoConfirmado'
-            ? 'naoConfirmadoHistoricoUso'
-            : estadoUltimoNormalizado || anticoncepcional.tipo === 'diu_hormonal'
-              ? 'confirmado'
-              : null;
-    const alerta = estadoAlerta(anticoncepcional.intensidadeAlerta);
-    const larguraMinimaBadge = larguraMinimaDosBadges([estadoUso, alerta].filter(Boolean));
+    const estadoUso =
+        somenteLeitura && !usos.length && estadoUltimoNormalizado
+            ? BADGES_ULTIMO_USO[estadoUltimoNormalizado]
+            : determinarEstadoUso(usos, possuiUsoPendente, ultimoEstado, anticoncepcional.tipo);
+    const { intensidadeAlerta } = anticoncepcional;
+    const alerta = somenteLeitura && !intensidadeAlerta ? null : estadoAlerta(intensidadeAlerta);
+    const estadosBadge = [estadoUso, alerta].filter(Boolean);
+    const larguraMinimaBadge = estadosBadge.length ? larguraMinimaDosBadges(estadosBadge) : 0;
     const permiteHistorico = ['pilula', 'injetavel', 'adesivo', 'anel_vaginal'].includes(
         anticoncepcional.tipo
     );
     const modoHistorico = anticoncepcional.tipo === 'pilula' ? 'calendario' : 'lista';
+    const programacao = anticoncepcional.programacao;
+    const frequencia = obterFrequencia(anticoncepcional.tipo, programacao?.frequenciaId);
+    const inicioMedicacao = frequencia?.diasPausa && !frequencia.continuo
+        ? programacao.dataPrimeiroUso
+        : undefined;
 
     useEffect(() => {
         // A API ou o fluxo pode atualizar horários e estados após a montagem do cartão.
@@ -197,6 +252,7 @@ function ContraceptiveUsageCard({
 
     async function alternarUso(uso) {
         if (
+            somenteLeitura ||
             typeof aoAlternarUso !== 'function' ||
             horarioUsoInvalido(uso) ||
             operacoesPendentes.current.has(uso.id)
@@ -209,13 +265,13 @@ function ContraceptiveUsageCard({
             usosAtuais.current.map((item) =>
                 item.id === uso.id
                     ? {
-                          ...item,
-                          status: confirmar ? 'confirmado' : 'pendente',
-                          horarioConfirmacao: confirmar
-                              ? `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`
-                              : null,
-                          confirmadoEm: confirmar ? agora.toISOString() : null
-                      }
+                        ...item,
+                        status: confirmar ? 'confirmado' : 'pendente',
+                        horarioConfirmacao: confirmar
+                            ? `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`
+                            : null,
+                        confirmadoEm: confirmar ? agora.toISOString() : null
+                    }
                     : item
             )
         );
@@ -241,11 +297,14 @@ function ContraceptiveUsageCard({
         <View
             style={[
                 estilosCartao.card,
-                !possuiUsoPendente && !removido && estilosCartao.cardConfirmado
+                !possuiUsoPendente &&
+                    (!somenteLeitura || estadoUso !== 'pendenteDeUso') &&
+                    !removido &&
+                    estilosCartao.cardConfirmado,
+                !removido && estilosCartao.cardAtivo
             ]}
             accessibilityLabel={`${anticoncepcional.nome}, ${tipo}${removido ? ', removido' : ''}`}
         >
-            <View style={estilosCartao.faixaSuperior} />
             <View
                 style={[
                     estilosCartao.conteudo,
@@ -257,10 +316,12 @@ function ContraceptiveUsageCard({
                 ]}
             >
                 <View style={estilosCartao.cabecalho}>
-                    <View style={estilosCartao.iconeTipo}>
+                    <View
+                        style={[estilosCartao.iconeTipo, !removido && estilosCartao.iconeTipoAtivo]}
+                    >
                         <IconeTipo
                             size={16}
-                            color={tema.cores.interface.textoSecundario}
+                            color={tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario}
                             weight={
                                 anticoncepcional.tipo === 'anel_vaginal' ||
                                 anticoncepcional.tipo === 'diu_hormonal'
@@ -269,11 +330,30 @@ function ContraceptiveUsageCard({
                             }
                         />
                     </View>
-                    <View style={estilosCartao.identificacao}>
-                        <Text style={estilosCartao.nome}>{anticoncepcional.nome}</Text>
-                        <Text style={estilosCartao.tipo}>{tipo}</Text>
+                    <View
+                        style={[
+                            estilosCartao.identificacao,
+                            somenteLeitura && estilosCartao.identificacaoSomenteLeitura
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                estilosCartao.nome,
+                                somenteLeitura && estilosCartao.textoCentralizado
+                            ]}
+                        >
+                            {anticoncepcional.nome}
+                        </Text>
+                        <Text
+                            style={[
+                                estilosCartao.tipo,
+                                somenteLeitura && estilosCartao.textoCentralizado
+                            ]}
+                        >
+                            {tipo}
+                        </Text>
                     </View>
-                    {!removido ? (
+                    {!removido && !somenteLeitura ? (
                         <View style={estilosCartao.acoes}>
                             <AcaoDoCartao
                                 estilosCartao={estilosCartao}
@@ -290,6 +370,15 @@ function ContraceptiveUsageCard({
                                 aoPressionar={
                                     aoRemover ? () => aoRemover(anticoncepcional) : undefined
                                 }
+                            />
+                        </View>
+                    ) : removido && !somenteLeitura && aoApagar ? (
+                        <View style={estilosCartao.acoes}>
+                            <AcaoDoCartao
+                                estilosCartao={estilosCartao}
+                                icone={TrashIcon}
+                                rotulo={`Apagar ${anticoncepcional.nome} definitivamente`}
+                                aoPressionar={() => aoApagar(anticoncepcional)}
                             />
                         </View>
                     ) : null}
@@ -312,11 +401,13 @@ function ContraceptiveUsageCard({
                         ) : (
                             <Text style={estilosCartao.tipo}>Sem usos registrados</Text>
                         )}
-                        <BadgeDoCartao
-                            estilosCartao={estilosCartao}
-                            estado={alerta}
-                            larguraMinima={larguraMinimaBadge}
-                        />
+                        {alerta ? (
+                            <BadgeDoCartao
+                                estilosCartao={estilosCartao}
+                                estado={alerta}
+                                larguraMinima={larguraMinimaBadge}
+                            />
+                        ) : null}
                     </View>
                 ) : null}
 
@@ -357,14 +448,23 @@ function ContraceptiveUsageCard({
 
                 {!removido && possuiUsoPendente ? (
                     <View style={estilosCartao.blocoUsos}>
-                        <Text style={estilosCartao.rotuloSecao}>PRÓXIMOS HORÁRIOS</Text>
+                        <Text
+                            style={[
+                                estilosCartao.rotuloSecao,
+                                estilosCartao.rotuloProximosHorarios,
+                                somenteLeitura && estilosCartao.textoCentralizado
+                            ]}
+                        >
+                            PRÓXIMOS HORÁRIOS
+                        </Text>
                         {usos
-                            .filter((uso) => !usoConfirmado(uso))
+                            .filter(usoPendente)
                             .map((uso, indice) => (
                                 <View
                                     key={uso.id}
                                     style={[
                                         estilosCartao.linhaUso,
+                                        somenteLeitura && estilosCartao.linhaUsoSomenteLeitura,
                                         indice > 0 && estilosCartao.linhaUsoSeparada
                                     ]}
                                 >
@@ -378,15 +478,17 @@ function ContraceptiveUsageCard({
                                             <StatusBadge estado="atrasadoProximosHorarios" />
                                         ) : null}
                                     </View>
-                                    <AcaoDeUso
-                                        estilosCartao={estilosCartao}
-                                        confirmado={false}
-                                        desativado={
-                                            typeof aoAlternarUso !== 'function' ||
-                                            horarioUsoInvalido(uso)
-                                        }
-                                        aoPressionar={() => alternarUso(uso)}
-                                    />
+                                    {somenteLeitura ? null : (
+                                        <AcaoDeUso
+                                            estilosCartao={estilosCartao}
+                                            confirmado={false}
+                                            desativado={
+                                                typeof aoAlternarUso !== 'function' ||
+                                                horarioUsoInvalido(uso)
+                                            }
+                                            aoPressionar={() => alternarUso(uso)}
+                                        />
+                                    )}
                                 </View>
                             ))}
                     </View>
@@ -394,7 +496,9 @@ function ContraceptiveUsageCard({
 
                 {!removido && possuiUsoConfirmado ? (
                     <View style={estilosCartao.blocoUsos}>
-                        <Text style={estilosCartao.rotuloSecao}>USADOS</Text>
+                        <Text style={[estilosCartao.rotuloSecao, estilosCartao.rotuloUsados]}>
+                            USADOS
+                        </Text>
                         {usos.filter(usoConfirmado).map((uso, indice) => (
                             <View
                                 key={uso.id}
@@ -403,7 +507,13 @@ function ContraceptiveUsageCard({
                                     indice > 0 && estilosCartao.linhaUsoSeparada
                                 ]}
                             >
-                                <View style={estilosCartao.horarioConfirmado}>
+                                <View
+                                    style={[
+                                        estilosCartao.horarioConfirmado,
+                                        somenteLeitura &&
+                                            estilosCartao.horarioConfirmadoSomenteLeitura
+                                    ]}
+                                >
                                     <View style={estilosCartao.horarioComIcone}>
                                         <ClockIcon
                                             size={11}
@@ -412,7 +522,13 @@ function ContraceptiveUsageCard({
                                         <Text style={estilosCartao.horario}>{uso.horario}</Text>
                                     </View>
                                     {uso.horarioConfirmacao ? (
-                                        <Text style={estilosCartao.confirmadoAs}>
+                                        <Text
+                                            style={[
+                                                estilosCartao.confirmadoAs,
+                                                somenteLeitura &&
+                                                    estilosCartao.confirmacaoSomenteLeitura
+                                            ]}
+                                        >
                                             Confirmado às{' '}
                                             <Text style={estilosCartao.horaConfirmacao}>
                                                 {uso.horarioConfirmacao}
@@ -420,15 +536,17 @@ function ContraceptiveUsageCard({
                                         </Text>
                                     ) : null}
                                 </View>
-                                <AcaoDeUso
-                                    estilosCartao={estilosCartao}
-                                    confirmado
-                                    desativado={
-                                        typeof aoAlternarUso !== 'function' ||
-                                        horarioUsoInvalido(uso)
-                                    }
-                                    aoPressionar={() => alternarUso(uso)}
-                                />
+                                {somenteLeitura ? null : (
+                                    <AcaoDeUso
+                                        estilosCartao={estilosCartao}
+                                        confirmado
+                                        desativado={
+                                            typeof aoAlternarUso !== 'function' ||
+                                            horarioUsoInvalido(uso)
+                                        }
+                                        aoPressionar={() => alternarUso(uso)}
+                                    />
+                                )}
                             </View>
                         ))}
                     </View>
@@ -444,7 +562,19 @@ function ContraceptiveUsageCard({
                         <UsageHistoryPanel
                             expandido={historicoExpandido}
                             registros={historico}
+                            inicioMedicacao={inicioMedicacao}
+                            diaEmPausa={
+                                inicioMedicacao
+                                    ? (data) => estaEmPausa(data, programacao, frequencia)
+                                    : undefined
+                            }
+                            horarios={programacao?.horarios}
+                            usosHoje={usos}
                             modo={modoHistorico}
+                            usoUnicoPorDia={anticoncepcional.tipo === 'pilula'}
+                            aoSalvarEdicaoHistorico={!somenteLeitura && !removido && aoSalvarEdicaoHistorico
+                                ? (ocorrencia, alteracao) => aoSalvarEdicaoHistorico(anticoncepcional, ocorrencia, alteracao)
+                                : undefined}
                             aoAlternar={() => setHistoricoExpandido((atual) => !atual)}
                         />
                     </View>
@@ -454,4 +584,4 @@ function ContraceptiveUsageCard({
     );
 }
 
-export { ContraceptiveUsageCard, criarUsos, usoConfirmado };
+export { ContraceptiveUsageCard, criarUsos, usoConfirmado, usoPendente };

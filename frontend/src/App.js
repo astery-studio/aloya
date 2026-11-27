@@ -7,11 +7,12 @@ import {
     Alert,
     BackHandler,
     Linking,
-    NativeModules,
-    Text
+    Text,
+    TurboModuleRegistry
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { DMSans_300Light } from '@expo-google-fonts/dm-sans/300Light';
 import { DMSans_400Regular } from '@expo-google-fonts/dm-sans/400Regular';
 import { DMSans_500Medium } from '@expo-google-fonts/dm-sans/500Medium';
 import { DMSans_600SemiBold } from '@expo-google-fonts/dm-sans/600SemiBold';
@@ -25,16 +26,33 @@ import LoginScreen from './features/auth/screens/LoginScreen';
 import ResetPasswordScreen from './features/auth/screens/ResetPasswordScreen';
 import WelcomeScreen from './features/auth/screens/WelcomeScreen';
 import { obterDestinoDeRetorno } from './features/auth/utils/authNavigation';
+import { CONSULTA_LEGAL_DISPONIVEL } from './features/legal/data/legalConfig';
 import OnboardingScreen from './features/onboarding/screens/OnboardingScreen';
 import { ChangePasswordScreen } from './features/settings/screens/ChangePasswordScreen';
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
+import { NotificationPreferencesFlow } from './features/notifications/NotificationPreferencesFlow';
+import { useNativePush } from './features/notifications/useNativePush';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
-import { MembersScreen } from './features/support-network/screens/MembersScreen';
+import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
+import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
+import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
+import { SupportNetworkScreen } from './features/support-network/screens/SupportNetworkScreen';
+import { SharedSupportFlow } from './features/support-network/screens/SharedSupportFlow/SharedSupportFlow';
+import {
+    lerVinculoVisualizado,
+    salvarVinculoVisualizado
+} from './features/support-network/services/sharedViewingStorage';
+import { ehMenorDe16 } from './features/support-network/utils/age';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
 import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
+import { DiaryFlow } from './features/diary/DiaryFlow';
+import { DiaryCategoriesSheet } from './features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet';
+import { EditDiaryEntrySheet } from './features/diary/components/EditDiaryEntrySheet/EditDiaryEntrySheet';
+import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
+import AlertModal from './shared/components/feedback/Modal/AlertModal/AlertModal';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
 import { MenstruationRegistrationContainer } from './features/cycles/screens/MenstruationRegistrationContainer';
@@ -42,10 +60,19 @@ import { useMenstruationSync } from './features/cycles/hooks/useMenstruationSync
 import { useTheme } from './shared/hooks/useTheme';
 import { obterToken } from './shared/storage/tokenStorage';
 import { fontFamilies } from './shared/theme';
+import { analisarLinkExterno } from './shared/utils/externalLinks';
+
+const PrivacyTermsScreen = __DEV__
+    ? require('./features/legal/screens/PrivacyTermsScreen/PrivacyTermsScreen').PrivacyTermsScreen
+    : null;
 
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
+    notificacoes: 'notificacoes',
+    notificacoesContato: 'notificacoesContato',
     membros: 'membros',
+    novoContato: 'novoContato',
+    editarContato: 'editarContato',
     categoriasPermissao: 'categoriasPermissao',
     ciclos: 'ciclos',
     perfil: 'perfil',
@@ -55,15 +82,54 @@ const telasInternas = Object.freeze({
     calendario: 'calendario',
     cadastrarMenstruacao: 'cadastrarMenstruacao',
     parametrosCiclo: 'parametrosCiclo',
+    responsavelLegal: 'responsavelLegal',
+    diario: 'diario',
     inicio: 'inicio'
 });
+
+const INTERVALO_DUPLO_VOLTAR_MS = 2000;
+const TELAS_NOTIFICACOES = new Set([telasInternas.notificacoes, telasInternas.notificacoesContato]);
+
+function obterTelaAnteriorInterna({
+    tela,
+    origemNovaCategoria,
+    retornoCadastro,
+    retornoParametros,
+    retornoResponsavelLegal
+}) {
+    const retornos = {
+        [telasInternas.cadastrarMenstruacao]: retornoCadastro,
+        [telasInternas.novoContato]: telasInternas.membros,
+        [telasInternas.editarContato]: telasInternas.membros,
+        [telasInternas.categoriasPermissao]: telasInternas.membros,
+        [telasInternas.responsavelLegal]: retornoResponsavelLegal,
+        [telasInternas.parametrosCiclo]: retornoParametros,
+        [telasInternas.novaCategoria]: origemNovaCategoria,
+        [telasInternas.anticoncepcionais]: telasInternas.inicio,
+        [telasInternas.alterarSenha]: telasInternas.perfil,
+        [telasInternas.perfil]: telasInternas.configuracoes
+    };
+
+    return retornos[tela] ?? null;
+}
+
+const TELAS_COMPARTILHADAS = new Set([
+    'inicio',
+    'calendario',
+    'diario',
+    'ciclos',
+    'anticoncepcionais'
+]);
+const ABAS_ACOMPANHAMENTO = new Set(['membros', 'configuracoes', ...TELAS_COMPARTILHADAS]);
 
 // Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
     if (process.env.EXPO_PUBLIC_API_URL) {
         return process.env.EXPO_PUBLIC_API_URL;
     }
-    const script = NativeModules.SourceCode?.scriptURL || '';
+
+    const fonte = __DEV__ ? TurboModuleRegistry.get('SourceCode') : null;
+    const script = fonte?.getConstants?.()?.scriptURL ?? fonte?.scriptURL ?? '';
 
     const host = script.match(/^[a-z][a-z\d+.-]*:\/\/([^/:]+)/i)?.[1];
 
@@ -73,15 +139,8 @@ function obterBaseUrl() {
 
     return 'http://10.0.2.2:3000';
 }
-
 function permitirHttpParaTeste() {
     return process.env.EXPO_PUBLIC_ALLOW_HTTP_FOR_TESTING === 'true';
-}
-
-function obterTokenRecuperacao(url) {
-    const token = url?.match(/[?&]token=([^&]+)/)?.[1];
-
-    return token ? decodeURIComponent(token) : null;
 }
 
 // Verifica se o armazenamento seguro retornou uma sessão com token válido.
@@ -161,6 +220,7 @@ function EstadoCarregamentoApp() {
 // Inicializa fontes, sessão, serviços e navegação provisória entre as telas.
 export default function App() {
     const [fontes, erroFontes] = useFonts({
+        DMSans_300Light,
         DMSans_400Regular,
         DMSans_500Medium,
         DMSans_600SemiBold,
@@ -168,14 +228,36 @@ export default function App() {
     });
 
     const [telaPublica, setTelaPublica] = useState('boasVindas');
+    const [documentoLegal, setDocumentoLegal] = useState(null);
+    const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
-    const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
+    const [vinculoVisualizadoId, setVinculoVisualizadoId] = useState(null);
+    const contaComVisualizacaoRestaurada = useRef(null);
+    const gravandoVisualizacao = useRef(false);
+    const [modoRede, setModoRede] = useState('apoio');
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
     const [retornoParametros, setRetornoParametros] = useState(telasInternas.configuracoes);
+
+    const [retornoResponsavelLegal, setRetornoResponsavelLegal] = useState(
+        telasInternas.configuracoes
+    );
+
     const [retornoCadastro, setRetornoCadastro] = useState(telasInternas.inicio);
+
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
+    const [dataInicialDiario, setDataInicialDiario] = useState(null);
+    const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
+    const [registroDiarioEdicao, setRegistroDiarioEdicao] = useState(null);
+    const [revisaoDiarioHome, setRevisaoDiarioHome] = useState(0);
+    const [categoriasDiarioVisiveis, setCategoriasDiarioVisiveis] = useState(false);
+    const [revisaoCategoriasDiario, setRevisaoCategoriasDiario] = useState(0);
+
+    const [rascunhoNovoContato, setRascunhoNovoContato] = useState(null);
+
+    const [contatoEdicao, setContatoEdicao] = useState(null);
 
     const [estadoSessao, setEstadoSessao] = useState('verificando');
 
@@ -193,9 +275,13 @@ export default function App() {
 
     const [revisaoCalendario, setRevisaoCalendario] = useState(0);
 
+    const [saidaVisivel, setSaidaVisivel] = useState(false);
+
     const requisicaoAtual = useRef(0);
 
     const controladorPerfilAtual = useRef(null);
+
+    const ultimoVoltarNaRaiz = useRef(0);
 
     const apiUrl = obterBaseUrl();
 
@@ -221,6 +307,17 @@ export default function App() {
     const sincronizacaoMenstrual = useMenstruationSync({
         fila: configuracao.servicos?.menstruationSyncQueue,
         ativo: estadoSessao === 'autenticada'
+    });
+
+    const navegarPush = useCallback((destino) => {
+        const destinos = ['ciclos', 'diario', 'anticoncepcionais', 'membros', 'configuracoes'];
+        if (destinos.includes(destino)) setTelaInterna(telasInternas[destino]);
+    }, []);
+
+    useNativePush({
+        ativo: estadoSessao === 'autenticada' && Boolean(perfil),
+        service: configuracao.servicos?.pushDeviceService,
+        navegar: navegarPush
     });
 
     useEffect(() => {
@@ -250,18 +347,29 @@ export default function App() {
                 signal: controlador.signal
             });
 
-            if (requisicaoAtual.current === identificador) {
-                setPerfil(perfilRecebido);
+            if (requisicaoAtual.current !== identificador) return;
+
+            if (perfilRecebido.id !== contaComVisualizacaoRestaurada.current) {
+                const vinculo = await lerVinculoVisualizado(perfilRecebido.id).catch(() => null);
+                if (requisicaoAtual.current !== identificador) return;
+                contaComVisualizacaoRestaurada.current = perfilRecebido.id;
+                setVinculoVisualizadoId(vinculo);
+                if (vinculo !== null) setModoRede('acompanhados');
             }
+
+            setPerfil(perfilRecebido);
         } catch (erro) {
-            if (erro?.name === 'AbortError') {
+            if (erro?.name === 'AbortError' || requisicaoAtual.current !== identificador) {
                 return;
             }
 
             if (erro?.status === 401) {
+                contaComVisualizacaoRestaurada.current = null;
+                setVinculoVisualizadoId(null);
+                setModoRede('apoio');
                 setPerfil(null);
 
-                setTelaInterna(telasInternas.configuracoes);
+                setTelaInterna(telasInternas.inicio);
 
                 setTelaPublica('login');
 
@@ -322,13 +430,19 @@ export default function App() {
 
     useEffect(() => {
         function abrirLink({ url }) {
-            const token = obterTokenRecuperacao(url);
+            const destino = analisarLinkExterno(url);
 
-            if (token) {
-                setTokenRecuperacao(token);
+            if (destino?.tipo === 'recuperacao_senha') {
+                setTokenRecuperacao(destino.token);
 
                 setTelaPublica('redefinirSenha');
 
+                setEstadoSessao('anonima');
+            }
+
+            if (destino?.tipo === 'convite_rede_apoio') {
+                setTokenRecuperacao(null);
+                setTelaPublica('cadastro');
                 setEstadoSessao('anonima');
             }
         }
@@ -347,16 +461,105 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (estadoSessao !== 'anonima') return false;
-            const destino = obterDestinoDeRetorno(telaPublica);
-            if (!destino) return false;
-            setTelaPublica(destino);
+        ultimoVoltarNaRaiz.current = 0;
+    }, [telaInterna, telaPublica]);
+
+    useEffect(() => {
+        function confirmarSaidaAoVoltarDuasVezes() {
+            const agora = Date.now();
+
+            if (agora - ultimoVoltarNaRaiz.current > INTERVALO_DUPLO_VOLTAR_MS) {
+                ultimoVoltarNaRaiz.current = agora;
+                return true;
+            }
+
+            ultimoVoltarNaRaiz.current = 0;
+            setSaidaVisivel(true);
             return true;
+        }
+
+        const inscricao = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (saidaVisivel) {
+                setSaidaVisivel(false);
+                return true;
+            }
+
+            if (documentoLegal !== null) {
+                setDocumentoLegal(null);
+                return true;
+            }
+
+            if (estadoSessao === 'anonima') {
+                // O cadastro controla a confirmação de descarte dos dados preenchidos.
+                if (telaPublica === 'cadastro') return false;
+
+                const destino = obterDestinoDeRetorno(telaPublica);
+
+                if (destino) {
+                    setTelaPublica(destino);
+                    return true;
+                }
+
+                return confirmarSaidaAoVoltarDuasVezes();
+            }
+
+            if (estadoSessao !== 'autenticada') return false;
+
+            // O fluxo de notificações trata a navegação entre suas próprias telas.
+            if (TELAS_NOTIFICACOES.has(telaInterna)) return false;
+
+            if (cicloCalendarioEditado) {
+                setCicloCalendarioEditado(null);
+                return true;
+            }
+
+            if (categoriasDiarioVisiveis) {
+                setCategoriasDiarioVisiveis(false);
+                return true;
+            }
+
+            if (cadastroDiarioVisivel) {
+                setCadastroDiarioVisivel(false);
+                setDataInicialDiario(null);
+                return true;
+            }
+
+            const contatoNaRaiz =
+                perfil?.papel === 'contato_apoio' && telaInterna === telasInternas.membros;
+            const destino = contatoNaRaiz
+                ? null
+                : obterTelaAnteriorInterna({
+                      tela: telaInterna,
+                      origemNovaCategoria,
+                      retornoCadastro,
+                      retornoParametros,
+                      retornoResponsavelLegal
+                  });
+
+            if (destino) {
+                setTelaInterna(destino);
+                return true;
+            }
+
+            return confirmarSaidaAoVoltarDuasVezes();
         });
 
         return () => inscricao.remove();
-    }, [estadoSessao, telaPublica]);
+    }, [
+        cadastroDiarioVisivel,
+        categoriasDiarioVisiveis,
+        cicloCalendarioEditado,
+        documentoLegal,
+        estadoSessao,
+        origemNovaCategoria,
+        perfil?.papel,
+        retornoCadastro,
+        retornoParametros,
+        retornoResponsavelLegal,
+        saidaVisivel,
+        telaInterna,
+        telaPublica
+    ]);
 
     function renderizarComTema(conteudo) {
         return (
@@ -379,11 +582,18 @@ export default function App() {
     }
 
     function concluirAutenticacao() {
+        contaComVisualizacaoRestaurada.current = null;
         setMensagemLogin(null);
         setPerfil(null);
         setErroPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
+        setVinculoVisualizadoId(null);
+        setModoRede('apoio');
+        setCadastroDiarioVisivel(false);
+        setRegistroDiarioEdicao(null);
+        setCategoriasDiarioVisiveis(false);
+        setDataInicialDiario(null);
 
         setEstadoSessao('autenticada');
 
@@ -392,10 +602,10 @@ export default function App() {
 
     function concluirCadastro() {
         concluirAutenticacao();
-        setTelaInterna(telasInternas.inicio);
     }
 
-    function finalizarSessao(resultado = {}) {
+    const finalizarSessao = useCallback((resultado = {}, telaDeRetorno = 'login') => {
+        contaComVisualizacaoRestaurada.current = null;
         requisicaoAtual.current += 1;
 
         controladorPerfilAtual.current?.abort();
@@ -406,18 +616,57 @@ export default function App() {
         setErroPerfil(false);
         setCarregandoPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
+        setVinculoVisualizadoId(null);
+        setModoRede('apoio');
+        setCategoriasDiarioVisiveis(false);
+        setCadastroDiarioVisivel(false);
+        setRegistroDiarioEdicao(null);
+        setDataInicialDiario(null);
 
         setOrigemNovaCategoria(telasInternas.membros);
+        setRascunhoNovoContato(null);
+        setContatoEdicao(null);
 
-        setTelaPublica('login');
+        setTelaPublica(telaDeRetorno);
 
         setMensagemLogin(resultado?.mensagem || null);
 
         setEstadoSessao('anonima');
+    }, []);
+
+    async function visualizarContato(contato) {
+        if (gravandoVisualizacao.current || !perfil?.id) return;
+        if (
+            contato !== null &&
+            (contato?.status !== 'ativo' || !Number.isSafeInteger(contato.id) || contato.id <= 0)
+        ) {
+            return;
+        }
+        const vinculo = contato?.id ?? null;
+        const requisicao = requisicaoAtual.current;
+        gravandoVisualizacao.current = true;
+        try {
+            await salvarVinculoVisualizado(perfil.id, vinculo);
+            if (requisicaoAtual.current !== requisicao) return;
+            setVinculoVisualizadoId(vinculo);
+            setModoRede('acompanhados');
+            if (vinculo !== null) setTelaInterna(telasInternas.inicio);
+        } catch {
+            if (requisicaoAtual.current === requisicao) {
+                Alert.alert('Não foi possível atualizar a visualização. Tente novamente.');
+            }
+        } finally {
+            gravandoVisualizacao.current = false;
+        }
     }
 
     function selecionarAba(aba) {
+        if (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') {
+            if (ABAS_ACOMPANHAMENTO.has(aba)) setTelaInterna(aba);
+            return;
+        }
+
         if (aba === 'inicio') {
             setTelaInterna(telasInternas.inicio);
 
@@ -430,8 +679,20 @@ export default function App() {
             return;
         }
 
+        if (aba === 'calendario') {
+            setTelaInterna(telasInternas.calendario);
+
+            return;
+        }
+
         if (aba === 'ciclos') {
             setTelaInterna(telasInternas.ciclos);
+
+            return;
+        }
+
+        if (aba === 'diario') {
+            setTelaInterna(telasInternas.diario);
 
             return;
         }
@@ -451,6 +712,7 @@ export default function App() {
                 finalizarSessao({
                     mensagem: 'Sua sessão expirou. Entre novamente.'
                 });
+
                 return;
             }
 
@@ -464,6 +726,7 @@ export default function App() {
 
     function abrirNovaCategoria(origem) {
         setOrigemNovaCategoria(origem);
+
         setTelaInterna(telasInternas.novaCategoria);
     }
 
@@ -471,8 +734,35 @@ export default function App() {
         setTelaInterna(origemNovaCategoria);
     }
 
+    function selecionarCategoriaCriadaNoContato(categoria) {
+        const identificadorValido =
+            Number.isSafeInteger(categoria?.id) ||
+            (typeof categoria?.id === 'string' && categoria.id.trim().length > 0);
+
+        if (!identificadorValido) {
+            return;
+        }
+
+        if (origemNovaCategoria === telasInternas.editarContato) {
+            setContatoEdicao((contatoAtual) => ({
+                ...(contatoAtual && typeof contatoAtual === 'object' ? contatoAtual : {}),
+                categoriaId: categoria.id
+            }));
+            return;
+        }
+
+        if (origemNovaCategoria !== telasInternas.novoContato) return;
+
+        setRascunhoNovoContato((rascunhoAtual) => ({
+            ...(rascunhoAtual && typeof rascunhoAtual === 'object' ? rascunhoAtual : {}),
+            categoriaId: categoria.id,
+            permissoesIndividuais: []
+        }));
+    }
+
     function abrirParametrosCiclo(origem) {
         setRetornoParametros(origem);
+
         setTelaInterna(telasInternas.parametrosCiclo);
     }
 
@@ -541,6 +831,7 @@ export default function App() {
         if (telaPublica === 'cadastro') {
             conteudo = (
                 <OnboardingScreen
+                    aoConsultarDocumentos={consultarDocumentos}
                     cadastrar={configuracao.servicos.authService.cadastrar}
                     verificarEmailDisponivel={
                         configuracao.servicos.authService.verificarEmailDisponivel
@@ -551,22 +842,67 @@ export default function App() {
                 />
             );
         }
-    } else if (telaInterna === telasInternas.inicio) {
+    } else if (
+        (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') &&
+        TELAS_COMPARTILHADAS.has(telaInterna)
+    ) {
         conteudo = (
-            <CycleTodayContainer
-                key={sincronizacaoMenstrual.revisao}
-                aoCadastrarMenstruacao={(data) => {
-                    setDataInicialCadastro(data);
-                    setRetornoCadastro(telasInternas.inicio);
-                    setTelaInterna(telasInternas.cadastrarMenstruacao);
-                }}
-                service={configuracao.servicos.cyclePredictionService}
-                aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
-                aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
-                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                aoSelecionarAba={selecionarAba}
+            <SharedSupportFlow
+                key={vinculoVisualizadoId}
+                vinculoId={vinculoVisualizadoId}
+                tela={telaInterna}
+                service={configuracao.servicos.sharedSupportService}
+                onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
             />
+        );
+    } else if (telaInterna === telasInternas.inicio) {
+        conteudo = (
+            <>
+                <CycleTodayContainer
+                    key={`${sincronizacaoMenstrual.revisao}-${revisaoDiarioHome}`}
+                    aoCadastrarMenstruacao={(data) => {
+                        setDataInicialCadastro(data);
+                        setRetornoCadastro(telasInternas.inicio);
+                        setTelaInterna(telasInternas.cadastrarMenstruacao);
+                    }}
+                    service={configuracao.servicos.cyclePredictionService}
+                    diaryService={configuracao.servicos.diaryService}
+                    aoVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                    aoAbrirAnticoncepcional={() => setTelaInterna(telasInternas.anticoncepcionais)}
+                    aoCadastrarDiario={(data) => {
+                        setDataInicialDiario(data);
+                        setCadastroDiarioVisivel(true);
+                    }}
+                    aoEditarDiario={setRegistroDiarioEdicao}
+                    aoAbrirHistorico={() => setTelaInterna(telasInternas.ciclos)}
+                    aoSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+                <NewDiaryEntrySheet
+                    visivel={cadastroDiarioVisivel}
+                    dataInicial={dataInicialDiario}
+                    service={configuracao.servicos.diaryService}
+                    calendarService={configuracao.servicos.calendarService}
+                    onFechar={() => {
+                        setCadastroDiarioVisivel(false);
+                        setDataInicialDiario(null);
+                    }}
+                    onSessaoExpirada={finalizarSessao}
+                />
+                <EditDiaryEntrySheet
+                    visivel={Boolean(registroDiarioEdicao)}
+                    registro={registroDiarioEdicao}
+                    service={configuracao.servicos.diaryService}
+                    calendarService={configuracao.servicos.calendarService}
+                    onFechar={() => setRegistroDiarioEdicao(null)}
+                    onSalvo={() => {
+                        setRegistroDiarioEdicao(null);
+                        setRevisaoDiarioHome((revisao) => revisao + 1);
+                    }}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            </>
         );
     } else if (telaInterna === telasInternas.cadastrarMenstruacao) {
         conteudo = (
@@ -584,17 +920,19 @@ export default function App() {
                 <CalendarScreenContainer
                     key={`${revisaoCalendario}-${sincronizacaoMenstrual.revisao}`}
                     statusSincronizacao={sincronizacaoMenstrual.status}
+                    erroSincronizacao={sincronizacaoMenstrual.erro}
                     aoTentarSincronizar={sincronizacaoMenstrual.sincronizar}
                     service={configuracao.servicos.calendarService}
                     onSessaoExpirada={finalizarSessao}
-                    aoVoltar={() => setTelaInterna(telasInternas.inicio)}
                     aoCadastrarMenstruacao={() => {
                         setDataInicialCadastro(null);
                         setRetornoCadastro(telasInternas.calendario);
                         setTelaInterna(telasInternas.cadastrarMenstruacao);
                     }}
                     aoEditarCiclo={abrirEdicaoPeloCalendario}
+                    onSelecionarAba={selecionarAba}
                 />
+
                 {cicloCalendarioEditado ? (
                     <CycleEditFlow
                         key={cicloCalendarioEditado.id}
@@ -608,11 +946,81 @@ export default function App() {
             </>
         );
     } else if (telaInterna === telasInternas.membros) {
+        conteudo =
+            perfil?.papel === 'contato_apoio' ? (
+                <ReceivedContactsScreen
+                    service={configuracao.servicos.receivedContactsService}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
+                    onVisualizarContato={visualizarContato}
+                    onSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            ) : (
+                <SupportNetworkScreen
+                    modoRede={modoRede}
+                    onSelecionarModoRede={setModoRede}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
+                    parentalConsentService={configuracao.servicos.parentalConsentService}
+                    receivedContactsService={configuracao.servicos.receivedContactsService}
+                    onVisualizarContato={visualizarContato}
+                    service={configuracao.servicos.supportContactService}
+                    categoriasService={configuracao.servicos.supportCategoryService}
+                    onGerenciarResponsavel={() => {
+                        setRetornoResponsavelLegal(telasInternas.membros);
+                        setTelaInterna(telasInternas.responsavelLegal);
+                    }}
+                    onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
+                    onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
+                    onAdicionarContato={(dadosIniciais = null) => {
+                        setRascunhoNovoContato(dadosIniciais);
+                        setTelaInterna(telasInternas.novoContato);
+                    }}
+                    onAlterarVinculo={(contato) => {
+                        setContatoEdicao(contato);
+                        setTelaInterna(telasInternas.editarContato);
+                    }}
+                    onSelecionarAba={selecionarAba}
+                    onSessaoExpirada={finalizarSessao}
+                />
+            );
+    } else if (telaInterna === telasInternas.novoContato) {
         conteudo = (
-            <MembersScreen
-                onAbrirCategorias={() => setTelaInterna(telasInternas.categoriasPermissao)}
-                onCriarCategoria={() => abrirNovaCategoria(telasInternas.membros)}
-                onSelecionarAba={selecionarAba}
+            <ContactFormScreen
+                dadosIniciais={rascunhoNovoContato}
+                emailUsuario={perfil?.email}
+                service={configuracao.servicos.contactInvitationService}
+                categoriasService={configuracao.servicos.supportCategoryService}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
+                onRascunhoAlterado={setRascunhoNovoContato}
+                onVoltar={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onSalvo={() => {
+                    setRascunhoNovoContato(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.novoContato)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.editarContato) {
+        conteudo = (
+            <ContactFormScreen
+                contatoId={contatoEdicao?.id}
+                dadosIniciais={contatoEdicao}
+                service={configuracao.servicos.contactLinkService}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
+                onVoltar={() => {
+                    setContatoEdicao(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onSalvo={() => {
+                    setContatoEdicao(null);
+                    setTelaInterna(telasInternas.membros);
+                }}
+                onCriarCategoria={() => abrirNovaCategoria(telasInternas.editarContato)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.categoriasPermissao) {
@@ -624,22 +1032,50 @@ export default function App() {
                 onCriar={() => abrirNovaCategoria(telasInternas.categoriasPermissao)}
                 onEditar={(categoria) => Alert.alert('Editar categoria', categoria.nome)}
                 onExcluir={(categoria) => Alert.alert('Excluir categoria', categoria.nome)}
+                diaryService={configuracao.servicos.diaryService}
             />
         );
     } else if (telaInterna === telasInternas.ciclos) {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
+                onVoltar={() => setTelaInterna(telasInternas.inicio)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.diario) {
+        conteudo = (
+            <DiaryFlow
+                key={`diario-${revisaoCategoriasDiario}`}
+                service={configuracao.servicos.diaryService}
                 calendarService={configuracao.servicos.calendarService}
-                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
                 onSelecionarAba={selecionarAba}
                 onSessaoExpirada={finalizarSessao}
+                aoGerenciarCategorias={() => setCategoriasDiarioVisiveis(true)}
             />
         );
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = (
             <SettingsScreen
+                emAcompanhamento={
+                    vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio'
+                }
+                onAbrirPoliticasPrivacidade={
+                    consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
+                }
                 onSelecionarAba={selecionarAba}
+                onAbrirNotificacoes={() =>
+                    setTelaInterna(
+                        perfil?.papel === 'contato_apoio'
+                            ? telasInternas.notificacoesContato
+                            : telasInternas.notificacoes
+                    )
+                }
+                onAbrirNotificacoesContato={
+                    perfil?.papel === 'principal_e_contato_apoio'
+                        ? () => setTelaInterna(telasInternas.notificacoesContato)
+                        : undefined
+                }
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
@@ -648,6 +1084,38 @@ export default function App() {
                         carregarPerfil();
                     }
                 }}
+                menorDe16={ehMenorDe16(perfil?.dataNascimento)}
+                onAbrirResponsavelLegal={() => {
+                    setRetornoResponsavelLegal(telasInternas.configuracoes);
+                    setTelaInterna(telasInternas.responsavelLegal);
+                }}
+            />
+        );
+    } else if (TELAS_NOTIFICACOES.has(telaInterna)) {
+        const contato =
+            telaInterna === telasInternas.notificacoesContato || perfil?.papel === 'contato_apoio';
+
+        conteudo = (
+            <NotificationPreferencesFlow
+                key={telaInterna}
+                contato={contato}
+                contraceptiveService={configuracao.servicos.contraceptiveService}
+                service={
+                    contato
+                        ? configuracao.servicos.supportNotificationPreferencesService
+                        : configuracao.servicos.notificationPreferencesService
+                }
+                onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
+    } else if (telaInterna === telasInternas.responsavelLegal) {
+        conteudo = (
+            <ParentalConsentScreen
+                service={configuracao.servicos.parentalConsentService}
+                emailUsuario={perfil?.email}
+                onVoltar={() => setTelaInterna(retornoResponsavelLegal)}
+                onSessaoExpirada={finalizarSessao}
             />
         );
     } else if (telaInterna === telasInternas.parametrosCiclo) {
@@ -663,8 +1131,10 @@ export default function App() {
             <NewSupportCategoryScreen
                 criarCategoria={configuracao.servicos.supportCategoryService.criarCategoria}
                 onVoltar={retornarDaNovaCategoria}
+                onCategoriaCriada={selecionarCategoriaCriadaNoContato}
                 onConcluido={retornarDaNovaCategoria}
                 onSessaoExpirada={finalizarSessao}
+                diaryService={configuracao.servicos.diaryService}
             />
         );
     } else if (telaInterna === telasInternas.anticoncepcionais) {
@@ -699,10 +1169,44 @@ export default function App() {
                 excluirConta={configuracao.servicos.accountService.excluirConta}
                 encerrarSessao={configuracao.servicos.authService.encerrarSessao}
                 onContaExcluida={finalizarSessao}
-                onSessaoEncerrada={finalizarSessao}
+                onSessaoEncerrada={() => finalizarSessao({}, 'boasVindas')}
             />
         );
     }
 
-    return renderizarComTema(conteudo);
+    return renderizarComTema(
+        <>
+            {conteudo}
+            <DiaryCategoriesSheet
+                visivel={categoriasDiarioVisiveis}
+                service={configuracao.servicos.diaryService}
+                onFechar={() => setCategoriasDiarioVisiveis(false)}
+                onAlterado={() => setRevisaoCategoriasDiario((revisao) => revisao + 1)}
+                onSessaoExpirada={finalizarSessao}
+            />
+            {PrivacyTermsScreen && documentoLegal !== null && (
+                <PrivacyTermsScreen
+                    documentoInicial={documentoLegal}
+                    onVoltar={() => setDocumentoLegal(null)}
+                />
+            )}
+            <AlertModal
+                variante="confirmacao"
+                visivel={saidaVisivel}
+                aoFechar={() => setSaidaVisivel(false)}
+                titulo="Deseja sair do Aloya?"
+                mensagem="Tem certeza de que deseja fechar o aplicativo?"
+                acaoPrincipal={{
+                    texto: 'Sair',
+                    variante: 'verde',
+                    aoPressionar: () => BackHandler.exitApp()
+                }}
+                acaoSecundaria={{
+                    texto: 'Cancelar',
+                    variante: 'branco',
+                    aoPressionar: () => setSaidaVisivel(false)
+                }}
+            />
+        </>
+    );
 }

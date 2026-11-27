@@ -1,6 +1,8 @@
 //Define o formato seguro dos dados de perfil recebidos da API
 const diasPorMes = Object.freeze([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]);
 
+const papeisPermitidos = new Set(['principal', 'contato_apoio', 'principal_e_contato_apoio']);
+
 function anoEhBissexto(ano) {
     return ano % 400 === 0 || (ano % 4 === 0 && ano % 100 !== 0);
 }
@@ -71,6 +73,7 @@ function criarUserProfile(respostaApi) {
         dados.id > 0 &&
         typeof dados.nome === 'string' &&
         typeof dados.email === 'string' &&
+        papeisPermitidos.has(dados.papel) &&
         (dados.identidadeGenero === null || typeof dados.identidadeGenero === 'string') &&
         dataNascimentoEhValida(dados.dataNascimento) &&
         typeof dados.atualizadoEm === 'string' &&
@@ -84,6 +87,7 @@ function criarUserProfile(respostaApi) {
         id: dados.id,
         nome: dados.nome,
         email: dados.email,
+        papel: dados.papel,
         identidadeGenero: dados.identidadeGenero,
         dataNascimento: dados.dataNascimento,
         atualizadoEm: dados.atualizadoEm,

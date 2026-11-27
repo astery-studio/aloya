@@ -1,12 +1,13 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking, TurboModuleRegistry } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const ReactInterno = require('react');
     const { Pressable, Text, View } = require('react-native');
     return {
-        CycleTodayContainer: ({ aoAbrirCalendario, aoCadastrarMenstruacao }) =>
+        CycleTodayContainer: ({ aoAbrirHistorico, aoCadastrarMenstruacao, aoSelecionarAba }) =>
             ReactInterno.createElement(
                 View,
                 null,
@@ -15,10 +16,10 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                     Pressable,
                     {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir calendário',
-                        onPress: aoAbrirCalendario
+                        accessibilityLabel: 'Abrir histórico do ciclo',
+                        onPress: aoAbrirHistorico
                     },
-                    ReactInterno.createElement(Text, null, 'Calendário')
+                    ReactInterno.createElement(Text, null, 'Histórico')
                 ),
                 ReactInterno.createElement(
                     Pressable,
@@ -28,6 +29,15 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
                         onPress: () => aoCadastrarMenstruacao('2026-10-27')
                     },
                     ReactInterno.createElement(Text, null, 'Cadastrar')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir calendário pelo menu',
+                        onPress: () => aoSelecionarAba('calendario')
+                    },
+                    ReactInterno.createElement(Text, null, 'Calendário')
                 )
             )
     };
@@ -103,8 +113,31 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
                         onPress: () => onSelecionarAba('inicio')
                     },
                     ReactInterno.createElement(Text, null, 'Início')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir calendário pelo menu',
+                        onPress: () => onSelecionarAba('calendario')
+                    },
+                    ReactInterno.createElement(Text, null, 'Calendário')
                 )
             )
+    };
+});
+
+jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
+    const ReactInterno = require('react');
+    const { Pressable } = require('react-native');
+
+    return {
+        CycleHistoryFlow: ({ onVoltar }) =>
+            ReactInterno.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Voltar do histórico',
+                onPress: onVoltar
+            })
     };
 });
 
@@ -113,7 +146,7 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        CalendarScreenContainer: ({ service, aoVoltar, aoCadastrarMenstruacao }) =>
+        CalendarScreenContainer: ({ service, aoCadastrarMenstruacao, onSelecionarAba }) =>
             ReactInterno.createElement(
                 View,
                 { testID: 'calendar-container' },
@@ -128,19 +161,28 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
                     Pressable,
                     {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Voltar ao Início',
-                        onPress: aoVoltar
+                        accessibilityLabel: 'Cadastrar Menstruação',
+                        onPress: aoCadastrarMenstruacao
                     },
-                    ReactInterno.createElement(Text, null, 'Voltar')
+                    ReactInterno.createElement(Text, null, 'Cadastrar Menstruação')
                 ),
                 ReactInterno.createElement(
                     Pressable,
                     {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Cadastrar Menstruação',
-                        onPress: aoCadastrarMenstruacao
+                        accessibilityLabel: 'Abrir configurações pelo menu do calendário',
+                        onPress: () => onSelecionarAba?.('configuracoes')
                     },
-                    ReactInterno.createElement(Text, null, 'Cadastrar Menstruação')
+                    ReactInterno.createElement(Text, null, 'Configurações')
+                ),
+                ReactInterno.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Abrir Início pelo menu do calendário',
+                        onPress: () => onSelecionarAba?.('inicio')
+                    },
+                    ReactInterno.createElement(Text, null, 'Início')
                 )
             )
     };
@@ -149,6 +191,14 @@ jest.mock('../../src/features/calendar/screens/CalendarScreenContainer', () => {
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
+
+const metricasSafeArea = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, right: 0, bottom: 0, left: 0 }
+};
+
+const renderApp = (componente) =>
+    render(<SafeAreaProvider initialMetrics={metricasSafeArea}>{componente}</SafeAreaProvider>);
 
 describe('App — calendário', () => {
     let servicos;
@@ -183,12 +233,28 @@ describe('App — calendário', () => {
         jest.restoreAllMocks();
     });
 
+    test('usa o IP do bundle do Expo Go quando a URL da API não está configurada', async () => {
+        jest.replaceProperty(process, 'env', { ...process.env, EXPO_PUBLIC_API_URL: '' });
+        const obterModulo = TurboModuleRegistry.get;
+        jest.spyOn(TurboModuleRegistry, 'get').mockImplementation((nome) => {
+            if (nome === 'SourceCode') {
+                return {
+                    getConstants: () => ({ scriptURL: 'http://192.168.0.2:8081/index.bundle' })
+                };
+            }
+            return obterModulo(nome);
+        });
+
+        await renderApp(<App />);
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+        expect(criarServicosApp).toHaveBeenCalledWith({
+            apiUrl: 'http://192.168.0.2:3000',
+            permitirHttpDesenvolvimento: true
+        });
+    });
+
     test('encaminha o dia da Home e limpa a pré-seleção ao entrar pelo Calendário', async () => {
-        await render(<App />);
-
-        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
-
-        await fireEvent.press(screen.getByRole('button', { name: 'Abrir início' }));
+        await renderApp(<App />);
 
         expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
         expect(screen.queryByTestId('diario-provisorio')).toBeNull();
@@ -197,7 +263,9 @@ describe('App — calendário', () => {
         expect(await screen.findByText('Data inicial: 2026-10-27')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Voltar do histórico' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir calendário pelo menu' }));
 
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
@@ -207,7 +275,30 @@ describe('App — calendário', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar do cadastro' }));
         expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
 
-        await fireEvent.press(screen.getByRole('button', { name: 'Voltar ao Início' }));
+        await fireEvent.press(
+            screen.getByRole('button', { name: 'Abrir Início pelo menu do calendário' })
+        );
         expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+    });
+
+    test('abre o calendário pela rota do menu inferior', async () => {
+        await renderApp(<App />);
+
+        expect(await screen.findByText('Aloya - Seu Ciclo Hoje')).toBeOnTheScreen();
+
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Abrir calendário pelo menu' })
+        );
+
+        expect(await screen.findByText('Calendário conectado à API')).toBeOnTheScreen();
+        expect(screen.getByTestId('calendar-container')).toBeOnTheScreen();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Abrir configurações pelo menu do calendário'
+            })
+        );
+
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
     });
 });

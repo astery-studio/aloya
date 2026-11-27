@@ -58,7 +58,7 @@ function criarEstilos(tema) {
         erro: {
             ...tema.typography.caption,
             marginTop: tema.espacamentos.pequeno,
-            color: tema.cores.feedback.erro
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro
         },
 
         espacoBotaoSalvar: {

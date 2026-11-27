@@ -1,0 +1,146 @@
+import { useHomeColors } from '../hooks/useHomeColors';
+import { useEffect, useMemo, useState } from 'react';
+import { Text, View } from 'react-native';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { NotebookIcon } from '../../../shared/components/icons/AppIcons';
+import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
+import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
+import { useDiaryOverview } from '../../diary/hooks/useDiaryOverview';
+import { obterHojeDiario } from '../../diary/utils/diaryDate';
+import { criarValoresIniciaisEdicao } from '../../diary/utils/diaryEditForm';
+import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
+import { useDiaryRecordForDate } from '../hooks/useDiaryRecordForDate';
+import { CompactDiaryOptions } from './home/CompactDiaryOptions';
+import { estilos as estilosClaros } from './CycleDiaryCheckIn.styles';
+
+function CycleDiaryCheckIn({
+    date,
+    fase,
+    service,
+    onOpenDiary,
+    onSessionExpired,
+    corDestaque = '#C85A44'
+}) {
+    const { estilos, escuro, cor } = useHomeColors(estilosClaros);
+    const textoEstado = escuro ? { color: cor('#5C5C59') } : undefined;
+    const [savedRecord, setSavedRecord] = useState(null);
+    const catalog = useDiaryCatalog({
+        ativo: Boolean(service),
+        service,
+        onSessaoExpirada: onSessionExpired
+    });
+    const overview = useDiaryOverview({ fase, service, onSessaoExpirada: onSessionExpired });
+    const existing = useDiaryRecordForDate({ date, service, onSessionExpired });
+    const form = useDiaryEntryForm({
+        ativo: Boolean(catalog.catalogo),
+        catalogo: catalog.catalogo,
+        service,
+        modo: existing.record ? 'editar' : 'criar',
+        dataInicial: date,
+        registroInicial: existing.record,
+        marcarCheckIn: true,
+        onCriado: setSavedRecord,
+        onSalvo: setSavedRecord,
+        onSessaoExpirada: onSessionExpired
+    });
+    const registeredIds = useMemo(
+        () =>
+            Object.values(criarValoresIniciaisEdicao(existing.record)).flatMap((value) =>
+                Array.isArray(value) ? value : []
+            ),
+        [existing.record]
+    );
+    useEffect(() => setSavedRecord(null), [date]);
+    if (!service) return null;
+    const valid = catalog.catalogo
+        ? prepararFormularioDiario({
+              catalogo: catalog.catalogo,
+              valores: form.valores,
+              data: form.data,
+              hoje: obterHojeDiario()
+          }).valido
+        : false;
+
+    const salvarDesativado = !valid || Boolean(existing.record && !form.alterado);
+    const aplicarVisualDesativado = salvarDesativado && !escuro;
+    const registroDoCheckIn = savedRecord ?? existing.record;
+    const checkInRealizado = Boolean(savedRecord) || existing.record?.checkInRealizado === true;
+
+    return (
+        <View style={estilos.margem}>
+            <View style={estilos.cartao}>
+                <Text style={[estilos.rotulo, { color: cor(corDestaque) }]}>Check-in gentil</Text>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Como você está se sentindo hoje?
+                </Text>
+                <Text style={estilos.descricao}>
+                    {checkInRealizado
+                        ? 'Você realizou seu check-in com sucesso. Verifique os detalhes no diário:'
+                        : 'Escolha quantos itens fizerem sentido para você.'}
+                </Text>
+                <View style={estilos.conteudo}>
+                    {catalog.carregando || existing.loading ? (
+                        <Text style={textoEstado}>Carregando seu check-in...</Text>
+                    ) : null}
+                    {catalog.erro ? (
+                        <>
+                            <Text accessibilityRole="alert" style={textoEstado}>
+                                {catalog.erro}
+                            </Text>
+                            <ButtonScreen
+                                texto="Tentar novamente"
+                                aoPressionar={catalog.recarregar}
+                            />
+                        </>
+                    ) : null}
+                    {checkInRealizado && !existing.loading ? (
+                        <ButtonScreen
+                            texto="Diário"
+                            variante="verde"
+                            icone={NotebookIcon}
+                            tamanhoIcone={18}
+                            corConteudo={escuro ? cor('#FDF6F3') : '#FFFFFF'}
+                            aoPressionar={() => onOpenDiary?.(registroDoCheckIn)}
+                            estilo={[estilos.botao, escuro && { backgroundColor: cor('#2C4C3B') }]}
+                            estiloTexto={estilos.textoBotao}
+                        />
+                    ) : null}
+                    {catalog.catalogo && !existing.loading && !checkInRealizado ? (
+                        <>
+                            <CompactDiaryOptions
+                                catalogo={catalog.catalogo}
+                                fase={fase}
+                                destaques={overview.resumo?.sugestoesCheckIn ?? []}
+                                idsExcluidos={registeredIds}
+                                valores={form.valores}
+                                aoAlterar={form.alterarValor}
+                                desabilitado={form.salvando}
+                            />
+                            {form.erroSalvamento ? (
+                                <Text accessibilityRole="alert" style={textoEstado}>
+                                    {form.erroSalvamento}
+                                </Text>
+                            ) : null}
+                            <ButtonScreen
+                                texto="Salvar no Diário"
+                                aoPressionar={form.salvar}
+                                carregando={form.salvando}
+                                desativado={salvarDesativado}
+                                estilo={[
+                                    estilos.botao,
+                                    aplicarVisualDesativado && estilos.botaoDesativado
+                                ]}
+                                estiloTexto={[
+                                    estilos.textoBotao,
+                                    aplicarVisualDesativado && estilos.textoBotaoDesativado
+                                ]}
+                            />
+                        </>
+                    ) : null}
+                </View>
+            </View>
+        </View>
+    );
+}
+
+export { CycleDiaryCheckIn };

@@ -1,0 +1,178 @@
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+const mockUseParentalConsent = jest.fn();
+
+jest.mock('../../../../src/features/support-network/hooks/useParentalConsent', () => ({
+    useParentalConsent: (...argumentos) => mockUseParentalConsent(...argumentos)
+}));
+
+jest.mock('../../../../src/features/support-network/screens/MembersScreen', () => {
+    const React = require('react');
+    const { Pressable, Text } = require('react-native');
+
+    return {
+        MembersScreen: ({ onSelecionarModoRede }) => (
+            <>
+                <Text>Lista liberada</Text>
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Abrir acompanhados"
+                    onPress={() => onSelecionarModoRede('acompanhados')}
+                />
+            </>
+        )
+    };
+});
+
+jest.mock(
+    '../../../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen',
+    () => {
+        const { Text } = require('react-native');
+
+        return {
+            ReceivedContactsScreen: ({ service, exibirSeletor }) => (
+                <Text>{`Acompanhados:${service?.nome}:${String(exibirSeletor)}`}</Text>
+            )
+        };
+    }
+);
+
+import { SupportNetworkScreen } from '../../../../src/features/support-network/screens/SupportNetworkScreen';
+import { ThemeProvider } from '../../../../src/shared/theme/ThemeProvider';
+
+const metricas = {
+    frame: { x: 0, y: 0, width: 390, height: 844 },
+    insets: { top: 0, right: 0, bottom: 0, left: 0 }
+};
+
+function envolverComProviders(conteudo) {
+    return (
+        <SafeAreaProvider initialMetrics={metricas}>
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                {conteudo}
+            </ThemeProvider>
+        </SafeAreaProvider>
+    );
+}
+
+function estado(overrides = {}) {
+    return {
+        status: null,
+        carregando: false,
+        atualizando: false,
+        enviando: false,
+        erro: null,
+        erroEnvio: null,
+        resultadoEnvio: null,
+        atualizarStatus: jest.fn(),
+        solicitar: jest.fn(),
+        reenviar: jest.fn(),
+        limparFeedback: jest.fn(),
+        ...overrides
+    };
+}
+
+function renderizar() {
+    return render(
+        envolverComProviders(
+            <SupportNetworkScreen onSelecionarAba={jest.fn()} onGerenciarResponsavel={jest.fn()} />
+        )
+    );
+}
+
+describe('SupportNetworkScreen', () => {
+    test('libera a lista quando não existe restrição', async () => {
+        mockUseParentalConsent.mockReturnValue(estado({ status: { acessoLiberado: true } }));
+
+        await renderizar();
+
+        expect(screen.getByText('Lista liberada')).toBeOnTheScreen();
+    });
+
+    test('alterna entre apoio e acompanhados usando serviços independentes', async () => {
+        mockUseParentalConsent.mockReturnValue(estado({ status: { acessoLiberado: true } }));
+
+        function RedeControlada() {
+            const [modoRede, setModoRede] = useState('apoio');
+            return (
+                <SupportNetworkScreen
+                    receivedContactsService={{ nome: 'recebidos' }}
+                    modoRede={modoRede}
+                    onSelecionarModoRede={setModoRede}
+                    onSelecionarAba={jest.fn()}
+                />
+            );
+        }
+
+        await render(envolverComProviders(<RedeControlada />));
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir acompanhados' }));
+
+        expect(screen.getByText('Acompanhados:recebidos:true')).toBeOnTheScreen();
+    });
+
+    test('centraliza o card sem rolagem e abre o e-mail pendente', async () => {
+        mockUseParentalConsent.mockReturnValue(
+            estado({
+                status: {
+                    acessoLiberado: false,
+                    emailResponsavelInformado: true,
+                    emailResponsavelLegal: 'responsavel@exemplo.com'
+                }
+            })
+        );
+
+        await renderizar();
+
+        expect(
+            screen.queryByText('Pessoas que fazem parte da sua rede de cuidado e apoio.')
+        ).toBeNull();
+        expect(screen.getByTestId('parental-consent-restricted')).toHaveStyle({
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        });
+        expect(screen.getByTestId('parental-consent-card')).toHaveStyle({
+            width: '100%',
+            maxWidth: 342,
+            alignSelf: 'center',
+            borderRadius: 20,
+            borderWidth: 0.7
+        });
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Visualizar E-mail' }));
+
+        expect(screen.getByText('E-mail enviado')).toBeOnTheScreen();
+        expect(screen.getByText(/responsavel@exemplo.com/)).toBeOnTheScreen();
+    });
+
+    test('reenvia a autorização e mostra a confirmação somente com OK', async () => {
+        const reenviar = jest.fn().mockResolvedValue(true);
+
+        mockUseParentalConsent.mockReturnValue(
+            estado({
+                status: {
+                    acessoLiberado: false,
+                    emailResponsavelInformado: true,
+                    emailResponsavelLegal: 'responsavel@exemplo.com'
+                },
+                reenviar
+            })
+        );
+
+        await renderizar();
+        await fireEvent.press(screen.getByRole('button', { name: 'Visualizar E-mail' }));
+
+        await act(async () => {
+            fireEvent.press(screen.getByRole('button', { name: 'Enviar Novamente' }));
+        });
+
+        expect(reenviar).toHaveBeenCalledTimes(1);
+        expect(screen.getByText(/responsavel@exemplo.com/)).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'OK' })).toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Entendi' })).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Enviar Novamente' })).toBeNull();
+    });
+});

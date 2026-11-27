@@ -1,4 +1,8 @@
-import { calcularPeriodosDePausa } from '../../../../src/features/contraceptives/domain/ContraceptiveSchedule';
+import {
+    adicionarDias,
+    calcularPeriodosDePausa,
+    estaEmPausa
+} from '../../../../src/features/contraceptives/domain/ContraceptiveSchedule';
 import {
     obterFrequencia,
     obterFrequencias
@@ -30,10 +34,10 @@ test('exige nome e ao menos um horário', () => {
     );
 });
 
-test('aceita múltiplos horários somente para pílula diária', () => {
+test('exige um único horário inclusive para pílula diária', () => {
     expect(
         validarAnticoncepcional({ ...base, horarios: ['08:00', '20:00'] }, '2026-09-24')
-    ).toBeNull();
+    ).toBe('Este tipo de anticoncepcional aceita somente um horário.');
     expect(
         validarAnticoncepcional(
             {
@@ -57,6 +61,17 @@ test('DIU hormonal exige validade atual ou futura e dispensa horário', () => {
     ).toBeNull();
 });
 
+test('aceita hoje e datas passadas para o primeiro uso com pausa e rejeita amanhã', () => {
+    const dados = { ...base, frequenciaId: 'pilula_21_7' };
+    const hoje = '2026-09-24';
+
+    expect(validarAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-23' }, hoje)).toBeNull();
+    expect(validarAnticoncepcional({ ...dados, dataPrimeiroUso: hoje }, hoje)).toBeNull();
+    expect(validarAnticoncepcional({ ...dados, dataPrimeiroUso: '2026-09-25' }, hoje)).toBe(
+        'A data do primeiro uso deve ser hoje ou anterior.'
+    );
+});
+
 test('calcula pausas subsequentes e não cria pausa no uso contínuo', () => {
     const ciclica = obterFrequencia('pilula', 'pilula_21_7');
     expect(calcularPeriodosDePausa('2026-09-01', ciclica, 2)).toEqual([
@@ -66,4 +81,18 @@ test('calcula pausas subsequentes e não cria pausa no uso contínuo', () => {
     expect(
         calcularPeriodosDePausa('2026-09-01', obterFrequencia('pilula', 'pilula_continuo'))
     ).toEqual([]);
+});
+
+test('reconhece os intervalos salvos e as pausas além dos ciclos já listados', () => {
+    const frequencia = obterFrequencia('pilula', 'pilula_21_7');
+    const programacao = {
+        dataPrimeiroUso: '2026-09-01',
+        periodosPausa: [{ inicio: '2026-09-05', fim: '2026-09-06' }]
+    };
+    const pausaPosterior = adicionarDias(programacao.dataPrimeiroUso, 30 * 28 + 21);
+
+    expect(estaEmPausa('2026-08-31', programacao, frequencia)).toBe(false);
+    expect(estaEmPausa('2026-09-05', programacao, frequencia)).toBe(true);
+    expect(estaEmPausa(pausaPosterior, programacao, frequencia)).toBe(true);
+    expect(estaEmPausa(adicionarDias(pausaPosterior, 7), programacao, frequencia)).toBe(false);
 });

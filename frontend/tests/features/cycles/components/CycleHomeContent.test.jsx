@@ -1,0 +1,267 @@
+import { fireEvent, screen } from '@testing-library/react-native';
+import { CycleHomeContent } from '../../../../src/features/cycles/components/CycleHomeContent';
+import { estilos } from '../../../../src/features/cycles/components/CycleHomeContent.styles';
+import { conteudoPorFase } from '../../../../src/features/cycles/constants/phaseContent';
+import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
+
+const previsao = {
+    status: 'DISPONIVEL',
+    proximoInicioEstimado: '2026-10-29',
+    dataOvulacaoEstimada: '2026-10-14',
+    janelaFertilEstimada: { inicio: '2026-10-09', fim: '2026-10-14' },
+    confiabilidadeMenstrual: { nivel: 'BAIXA' }
+};
+
+test('exibe previsão, confiança e aviso médico', async () => {
+    await render(<CycleHomeContent fase="folicular" diaCiclo={8} previsao={previsao} />);
+
+    expect(screen.getByText('Fase Folicular')).toBeOnTheScreen();
+    expect(screen.getByText('29 de outubro')).toBeOnTheScreen();
+    expect(screen.getByText('CONFIABILIDADE')).toBeOnTheScreen();
+    expect(screen.getByText('Baixa')).toBeOnTheScreen();
+    expect(screen.getByText(/não substitui orientação médica/)).toBeOnTheScreen();
+});
+
+test('mantém o estado sem dados dentro da HU-013', async () => {
+    await render(<CycleHomeContent aoCadastrarMenstruacao={jest.fn()} />);
+    expect(screen.getByText('Conheça seu ciclo')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Cadastrar Menstruação' })).toBeEnabled();
+});
+
+test.each([
+    ['menstrual', 'Fase Menstrual', 'O início de um novo ciclo', 'Sensação de cansaço'],
+    ['folicular', 'Fase Folicular', 'Preparação para a ovulação', 'Aumento de energia'],
+    ['ovulatoria', 'Fase Ovulatória', 'A liberação do óvulo', 'Pico de energia'],
+    ['lutea', 'Fase Lútea', 'Preparação para uma possível gravidez', 'Retenção de líquidos']
+])('exibe conteúdo completo da fase %s', async (fase, titulo, subtitulo, sintoma) => {
+    await render(
+        <CycleHomeContent
+            fase={fase}
+            diaCiclo={8}
+            previsao={{ ...previsao, confiabilidadeMenstrual: { nivel: 'ALTA' } }}
+            conteudoDaFase={conteudoPorFase[fase]}
+        />
+    );
+
+    expect(screen.getByText(titulo)).toBeOnTheScreen();
+    expect(screen.getByText(titulo)).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontWeight: '700'
+    });
+    expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
+    expect(screen.getAllByText(subtitulo)).not.toHaveLength(0);
+    const sobreFase = screen.getByRole('button', { name: subtitulo });
+    const sintomasComuns = screen.getByRole('button', { name: 'Sintomas comuns' });
+    const dicasHoje = screen.getByRole('button', { name: 'Dicas para hoje' });
+    expect(sobreFase.props.accessibilityState.expanded).toBe(false);
+    expect(sintomasComuns.props.accessibilityState.expanded).toBe(false);
+    expect(dicasHoje.props.accessibilityState.expanded).toBe(false);
+    expect(screen.queryByText(conteudoPorFase[fase].descricao)).not.toBeOnTheScreen();
+    expect(screen.queryByText(sintoma)).not.toBeOnTheScreen();
+    await fireEvent.press(sobreFase);
+    await fireEvent.press(sintomasComuns);
+    await fireEvent.press(dicasHoje);
+    expect(screen.getByText(conteudoPorFase[fase].descricao)).toBeOnTheScreen();
+    expect(screen.getByText(sintoma)).toBeOnTheScreen();
+    expect(sintomasComuns.props.accessibilityState.expanded).toBe(true);
+    for (const dica of conteudoPorFase[fase].dicas) {
+        expect(screen.getByText(dica)).toBeOnTheScreen();
+    }
+});
+
+test('executa as três ações do painel com previsão', async () => {
+    const acoes = {
+        aoCadastrarMenstruacao: jest.fn(),
+        aoCadastrarDiario: jest.fn(),
+        aoAbrirAnticoncepcional: jest.fn()
+    };
+    await render(<CycleHomeContent previsao={previsao} {...acoes} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
+
+    expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
+});
+
+test('prioriza a janela fértil recebida por prop e aceita confiança média', async () => {
+    const janelaFertil = { inicio: '2026-09-08', fim: '2026-09-14' };
+    await render(
+        <CycleHomeContent
+            previsao={{ ...previsao, confiabilidadeMenstrual: { nivel: 'MEDIA' } }}
+            janelaFertil={janelaFertil}
+        />
+    );
+
+    expect(screen.getByText('Média')).toBeOnTheScreen();
+    expect(screen.getByText('8 de setembro até 14 de setembro')).toBeOnTheScreen();
+    expect(screen.queryByText('Estimativa incerta')).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Continue registrando seus ciclos/)).not.toBeOnTheScreen();
+});
+
+test('explica previsão parcial sem confiança nem janela fértil', async () => {
+    await render(
+        <CycleHomeContent
+            previsao={{
+                ...previsao,
+                status: 'PARCIALMENTE_DISPONIVEL',
+                confiabilidadeMenstrual: undefined,
+                janelaFertilEstimada: undefined
+            }}
+        />
+    );
+
+    expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
+    expect(screen.getByText('Os dados deste ciclo podem ser imprecisos.')).toBeOnTheScreen();
+    expect(screen.getByText('Indisponível')).toBeOnTheScreen();
+    expect(screen.getByText('Baixa')).toBeOnTheScreen();
+});
+
+test('sinaliza como incerta uma previsão ultrapassada', async () => {
+    await render(<CycleHomeContent previsao={{ ...previsao, status: 'PREVISAO_ULTRAPASSADA' }} />);
+    expect(screen.getByText('Estimativa incerta')).toBeOnTheScreen();
+});
+
+test('trata fase inválida como ciclo desconhecido', async () => {
+    await render(<CycleHomeContent fase="inexistente" previsao={previsao} />);
+
+    expect(screen.getByText('Seu ciclo')).toBeOnTheScreen();
+    expect(screen.queryByLabelText(/símbolo/i)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Dia \d+ do ciclo/)).not.toBeOnTheScreen();
+    expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
+});
+
+test('orienta novos registros quando a confiança é baixa', async () => {
+    await render(<CycleHomeContent previsao={previsao} />);
+
+    expect(screen.getByText(/Continue registrando seus ciclos/)).toBeOnTheScreen();
+    expect(screen.getByText('9 de outubro até 14 de outubro')).toBeOnTheScreen();
+});
+
+test('não confunde fase folicular com janela fértil ativa', async () => {
+    await render(
+        <CycleHomeContent fase="folicular" janelaFertilAtiva={false} previsao={previsao} />
+    );
+    expect(screen.queryByText('Você está na janela fértil.')).not.toBeOnTheScreen();
+});
+
+test('oferece ações e recursos completos quando ainda não há ciclo', async () => {
+    const acoes = {
+        aoCadastrarMenstruacao: jest.fn(),
+        aoCadastrarDiario: jest.fn(),
+        aoAbrirAnticoncepcional: jest.fn()
+    };
+    await render(<CycleHomeContent {...acoes} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Menstruação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Anticoncepcional' }));
+
+    expect(acoes.aoCadastrarMenstruacao).toHaveBeenCalledTimes(1);
+    expect(acoes.aoCadastrarDiario).toHaveBeenCalledTimes(1);
+    expect(acoes.aoAbrirAnticoncepcional).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Fases do ciclo')).toBeOnTheScreen();
+    expect(screen.getByText('Janela fértil')).toBeOnTheScreen();
+    expect(screen.getByText('Próxima menstruação')).toBeOnTheScreen();
+    expect(screen.getByText('Sintomas e bem-estar')).toBeOnTheScreen();
+    expect(screen.getByText('Conheça as fases do ciclo')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Fases do ciclo' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Janela fértil' }));
+    expect(screen.getByText(/orientações para cada momento/)).toBeOnTheScreen();
+    expect(screen.getByText(/previsões baseadas no seu histórico/)).toBeOnTheScreen();
+});
+
+test('mantém cartões e avisos fluidos em larguras reduzidas', () => {
+    expect(estilos.destaqueFertil).toMatchObject({ width: '100%', minHeight: 68 });
+    expect(estilos.avisoConfiabilidade).toMatchObject({ width: '100%', minHeight: 62 });
+    expect(estilos.textoAvisoBaixa).toMatchObject({ flex: 1, maxWidth: 226 });
+    expect(estilos.rotuloPrevisao.letterSpacing).toBe(1.44);
+    expect(estilos.rotuloPrevisaoSecundaria).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 12,
+        letterSpacing: 1.2
+    });
+    expect(estilos.valorOvulacao).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 18,
+        lineHeight: 27
+    });
+    expect(estilos.valorSecundario).toMatchObject({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 15,
+        lineHeight: 21
+    });
+    expect(estilos.acoes.gap).toBe(16);
+    expect(estilos.acoesSemCiclo.gap).toBe(16);
+    expect(estilos.secaoPrevisao.paddingTop).toBe(24);
+    expect(estilos.cartaoProximoCiclo).toMatchObject({ rowGap: 16, columnGap: 12 });
+    expect(estilos.dataProximoCiclo).toMatchObject({ flex: 1, minWidth: 140, gap: 4 });
+    expect(estilos.previsoesSecundarias).toMatchObject({ flexWrap: 'wrap' });
+    expect(estilos.cartaoSecundario).toMatchObject({ flex: 1, minWidth: 130 });
+    expect(estilos.sintoma).toMatchObject({ flexGrow: 1, flexBasis: '47%', minWidth: 130 });
+    expect(estilos.cartaoIntroducao).toMatchObject({ minHeight: 666 });
+    expect(estilos.recurso).toMatchObject({ minHeight: 92 });
+});
+
+test('declara os pesos tipográficos especificados para os textos da HU-013', () => {
+    expect(estilos).toMatchObject({
+        tituloFase: { fontWeight: '700' },
+        diaCiclo: { fontWeight: '400' },
+        tituloDestaqueFertil: { fontWeight: '700' },
+        textoDestaqueFertil: { fontWeight: '400' },
+        rotuloPrevisao: { fontWeight: '700' },
+        rotuloPrevisaoSecundaria: { fontWeight: '700' },
+        valorPrincipal: { fontWeight: '700' },
+        valorOvulacao: { fontWeight: '700' },
+        tituloAvisoConfiabilidade: { fontWeight: '700' },
+        textoAvisoConfiabilidade: { fontWeight: '400' },
+        textoAvisoBaixa: { fontWeight: '400' },
+        valorSecundario: { fontWeight: '700' },
+        aviso: { fontWeight: '400' },
+        tituloSecao: { fontWeight: '700' },
+        descricaoFase: { fontWeight: '400' },
+        textoSintoma: { fontWeight: '500' },
+        textoNumeroDica: { fontWeight: '700' },
+        textoDica: { fontWeight: '400' },
+        chamadaRecursos: { fontWeight: '700' },
+        tituloRecurso: { fontWeight: '700' },
+        descricaoRecurso: { fontWeight: '400' }
+    });
+});
+
+test.each([
+    [
+        'BAIXA',
+        'baixa',
+        'Baixa',
+        '#EF9A9A',
+        'rgba(239, 154, 154, 0.16)',
+        'rgba(239, 154, 154, 0.33)'
+    ],
+    [
+        'MEDIA',
+        'média',
+        'Média',
+        '#FFE082',
+        'rgba(255, 224, 130, 0.16)',
+        'rgba(255, 224, 130, 0.33)'
+    ],
+    ['ALTA', 'alta', 'Alta', '#A5D6A7', 'rgba(165, 214, 167, 0.14)', 'rgba(165, 214, 167, 0.33)']
+])(
+    'aplica as cores da confiabilidade %s no modo noturno',
+    async (nivel, acessibilidade, rotulo, cor, fundo, borda) => {
+        await render(
+            <CycleHomeContent previsao={{ ...previsao, confiabilidadeMenstrual: { nivel } }} />,
+            { preferencia: 'escuro' }
+        );
+        expect(screen.getByLabelText('Confiabilidade ' + acessibilidade)).toHaveStyle({
+            borderRadius: 16,
+            borderWidth: 0.667,
+            backgroundColor: fundo,
+            borderColor: borda
+        });
+        expect(screen.getByText(rotulo)).toHaveStyle({ color: cor });
+    }
+);

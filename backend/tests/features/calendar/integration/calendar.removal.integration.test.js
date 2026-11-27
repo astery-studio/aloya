@@ -80,9 +80,9 @@ async function criarCenario(
     }
     const calendario = criarCalendarModule({ prisma }).calendarService;
     const remocao = criarCycleRemovalModule({ prisma }).service;
-    const buscar = async (mes = '2026-07') => {
+    const buscar = async (mes = '2026-07', hoje = '2026-10-30') => {
         const resposta = await calendario.buscarMes({ usuarioId: 1, mes });
-        return { resposta, grade: normalizarMes(resposta, '2026-10-30') };
+        return { resposta, grade: normalizarMes(resposta, hoje) };
     };
     const remover = (dia) => remocao.removerDia({ usuarioId: 1, cicloId: 10, data: julho(dia) });
     return { prisma, remocao, buscar, remover };
@@ -187,22 +187,32 @@ test('remoção mantém as fases históricas pelo próximo início real e as pro
     const agosto = await buscar('2026-08');
     assert.equal(localizar(agosto.grade, 3).tipo, 'ovulacao');
     assert.equal(localizar(agosto.grade, 4).tipo, 'lutea');
-    const setembro = await buscar('2026-09');
+    const setembro = await buscar('2026-09', '2026-08-30');
     assert.ok(
         setembro.grade.semanas
             .flat()
             .filter(Boolean)
             .some((dia) => dia.tipo === 'menstruacao' && dia.previsto)
     );
+    const setembroPassado = await buscar('2026-09');
+    assert.ok(
+        setembroPassado.grade.semanas
+            .flat()
+            .filter(Boolean)
+            .every((dia) => dia.tipo !== 'menstruacao')
+    );
 });
 
-test('ciclo aberto conserva os dias menstruais assumidos quando ainda não existe fim registrado', async (t) => {
+test('ciclo aberto mantém o dia confirmado e oculta a menstruação estimada que já passou', async (t) => {
     const { buscar } = await criarCenario(t, { posterior: false, dias: [21], aberto: true });
     const { grade } = await buscar();
     assert.equal(localizar(grade, 21).tipo, 'menstruacao');
     assert.equal(localizar(grade, 21).registroCicloId, 10);
-    assert.equal(localizar(grade, 22).tipo, 'menstruacao');
-    assert.equal(localizar(grade, 22).registroCicloId, 10);
+    assert.equal(localizar(grade, 22).tipo, null);
+    assert.equal(localizar(grade, 22).registroCicloId, null);
+    const { grade: gradeNoDia } = await buscar('2026-07', '2026-07-22');
+    assert.equal(localizar(gradeNoDia, 22).tipo, 'menstruacao');
+    assert.equal(localizar(gradeNoDia, 22).registroCicloId, 10);
 });
 
 test('dois ciclos no mesmo mês preservam as fases do primeiro e os dias removidos', async (t) => {

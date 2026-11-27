@@ -3,6 +3,20 @@
  */
 import { criarApiClient } from '../../src/shared/services/api/apiClient';
 
+test('propaga a espera indicada no Retry-After para respostas 429', async () => {
+    const cliente = criarApiClient({
+        baseUrl: 'https://api',
+        fetchImpl: async () => ({
+            ok: false,
+            status: 429,
+            headers: { get: (nome) => nome === 'Retry-After' ? '42' : null },
+            json: async () => ({ erro: { codigo: 'LIMITE_DISPOSITIVOS_NOTIFICACAO' } })
+        })
+    });
+    await expect(cliente.requisicao({ caminho: '/api/dispositivos-notificacao' }))
+        .rejects.toMatchObject({ status: 429, tentarAposMs: 42_000 });
+});
+
 test.each(['envio', 'leitura'])(
     'encerra %s travado mesmo quando o transporte ignora cancelamento',
     async (etapa) => {
@@ -11,13 +25,11 @@ test.each(['envio', 'leitura'])(
             const fetchImpl =
                 etapa === 'envio'
                     ? jest.fn(() => new Promise(() => {}))
-                    : jest
-                          .fn()
-                          .mockResolvedValue({
-                              ok: true,
-                              status: 200,
-                              json: () => new Promise(() => {})
-                          });
+                    : jest.fn().mockResolvedValue({
+                          ok: true,
+                          status: 200,
+                          json: () => new Promise(() => {})
+                      });
             const cliente = criarApiClient({ baseUrl: 'http://api', fetchImpl, timeoutMs: 1000 });
             const resultado = expect(
                 cliente.requisicao({ caminho: '/categoria', metodo: 'POST' })
@@ -46,6 +58,22 @@ test('envia chave de idempotência preservada nas retentativas', async () => {
         'https://api/registrations',
         expect.objectContaining({
             headers: expect.objectContaining({ 'Idempotency-Key': 'menstrual-123' })
+        })
+    );
+});
+
+test('envia If-Match sem permitir que o corpo controle os cabeçalhos', async () => {
+    const fetchImpl = jest.fn().mockResolvedValue({ ok: true, status: 204 });
+    const cliente = criarApiClient({ baseUrl: 'https://api', fetchImpl });
+    await cliente.requisicao({
+        caminho: '/api/diario/registros/4',
+        metodo: 'DELETE',
+        ifMatch: '"2"'
+    });
+    expect(fetchImpl).toHaveBeenCalledWith(
+        'https://api/api/diario/registros/4',
+        expect.objectContaining({
+            headers: expect.objectContaining({ 'If-Match': '"2"' })
         })
     );
 });

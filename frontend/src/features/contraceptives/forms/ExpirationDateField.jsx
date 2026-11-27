@@ -8,18 +8,43 @@ function paraExibicao(iso) {
     return `${dia}/${mes}/${ano}`;
 }
 
-function ExpirationDateField({ valor, aberto, onAbrir, onSelecionar, onFechar, dataMinima, label = 'Data de Validade', titulo = 'Data de Validade' }) {
+function ExpirationDateField({
+    aparenciaCadastro = false,
+    corIconeNoturno,
+    valor,
+    aberto,
+    onAbrir,
+    onSelecionar,
+    onFechar,
+    dataMinima,
+    dataMaxima,
+    destacarHoje = false,
+    label = 'Data de Validade',
+    titulo = 'Data de Validade'
+}) {
     return (
         <>
             <SelectorField
+                aparenciaCadastro={aparenciaCadastro}
                 label={label}
                 valor={paraExibicao(valor)}
                 placeholder="DD/MM/AAAA"
                 onPress={onAbrir}
                 icone={CalendarBlank}
+                coresNoturnas={corIconeNoturno ? { icone: corIconeNoturno } : undefined}
                 fundoIcone="transparent"
             />
-            <DatePickerSheet visivel={aberto} titulo={titulo} valorSelecionado={valor} dataMinima={dataMinima} onSelecionar={onSelecionar} onFechar={onFechar} />
+            <DatePickerSheet
+                aparenciaCadastro={aparenciaCadastro}
+                visivel={aberto}
+                titulo={titulo}
+                valorSelecionado={valor}
+                dataMinima={dataMinima}
+                dataMaxima={dataMaxima}
+                destacarHoje={destacarHoje}
+                onSelecionar={onSelecionar}
+                onFechar={onFechar}
+            />
         </>
     );
 }

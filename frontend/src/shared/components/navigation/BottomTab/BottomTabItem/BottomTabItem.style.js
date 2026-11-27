@@ -3,15 +3,18 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../theme';
 
 function criarEstilos(tema) {
-    const corAtiva = tema.cores.interface.destaque;
+    const corAtiva = tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque;
 
     return StyleSheet.create({
         item: {
             flex: 1,
+            maxWidth: 73.198,
             minWidth: 0,
-            height: '100%',
+            height: 53.5,
+            flexDirection: 'column',
+            justifyContent: 'center',
             alignItems: 'center',
-            paddingTop: 14
+            gap: 4
         },
 
         desabilitado: {
@@ -19,8 +22,7 @@ function criarEstilos(tema) {
         },
 
         label: {
-            marginTop: 4,
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#999999' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 12,
             lineHeight: 18,
@@ -31,14 +33,6 @@ function criarEstilos(tema) {
         labelAtiva: {
             color: corAtiva,
             fontFamily: fontFamilies.medium
-        },
-
-        pontoAtivo: {
-            width: 5,
-            height: 5,
-            borderRadius: 3,
-            marginTop: 5,
-            backgroundColor: corAtiva
         }
     });
 }

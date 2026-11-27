@@ -7,6 +7,8 @@ import ButtonPopup from '../../../common/Button/ButtonPopup';
 import PasswordInput from '../../../forms/PasswordInput';
 import AppModal from '../AppModal';
 import { estilos } from './AlertModal.styles';
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarAparenciaErroInterno } from '../InternalErrorModal.styles';
 
 function ignorarFechamento() {}
 
@@ -22,9 +24,12 @@ export default function AlertModal({
     aoAlterarSenha,
     erroSenha,
     acaoPrincipal,
-    acaoSecundaria
+    acaoSecundaria,
+    aparencia: aparenciaInformada = {},
+    erroInterno = false
 }) {
     const comSenha = variante === 'comSenha';
+    const confirmacao = variante === 'confirmacao';
     const senhaAtual = typeof senha === 'string' ? senha : '';
     const Icone = icone === undefined ? (comSenha ? LockKeyIcon : WarningCircleIcon) : icone;
     const acaoPadrao =
@@ -44,7 +49,7 @@ export default function AlertModal({
     );
     const fechamentoDoModal = carregando ? ignorarFechamento : aoFechar;
 
-    if (!['padrao', 'comSenha'].includes(variante)) {
+    if (!['padrao', 'comSenha', 'confirmacao'].includes(variante)) {
         throw new Error(`Variante de AlertModal inválida: ${variante}`);
     }
 
@@ -60,15 +65,38 @@ export default function AlertModal({
         throw new Error('AlertModal precisa de pelo menos uma ação ou de uma função aoFechar.');
     }
 
+    const tema = useTheme();
+    const aparenciaConfirmacao = confirmacao
+        ? {
+              fundoIcone: tema.escuro ? tema.cores.interface.separador : '#F5EDE3',
+              corIcone: tema.cores.marca.primaria,
+              icone: { borderRadius: 12 }
+          }
+        : {};
+    const aparenciaErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
+    const aparencia = {
+        ...aparenciaConfirmacao,
+        ...aparenciaInformada,
+        ...aparenciaErro,
+        icone: [aparenciaConfirmacao.icone, aparenciaInformada.icone, aparenciaErro.icone]
+    };
+
     return (
         <AppModal
-            variante={comSenha ? 'acao' : 'alerta'}
+            variante={comSenha || confirmacao || erroInterno ? 'acao' : 'alerta'}
             visivel={visivel}
             aoFechar={fechamentoDoModal}
             icone={Icone}
             titulo={titulo}
             mensagem={mensagem}
             destaque={destaque}
+            estilo={aparencia.modal}
+            fundoIcone={aparencia.fundoIcone}
+            corIcone={aparencia.corIcone}
+            estiloIcone={aparencia.icone}
+            estiloCabecalho={aparencia.cabecalho}
+            estiloIconeCabecalho={aparencia.iconeCabecalho}
+            corIconeCabecalho={aparencia.corIconeCabecalho}
         >
             {comSenha ? (
                 <View style={estilos.campoSenha}>
@@ -78,6 +106,17 @@ export default function AlertModal({
                         value={senhaAtual}
                         onChangeText={aoAlterarSenha}
                         variante="popup"
+                        estilo={aparencia.senha?.campo}
+                        estiloFocado={aparencia.senha?.campoFocado}
+                        estiloEntrada={[
+                            aparencia.senha?.texto,
+                            senhaAtual.length > 0 && aparencia.senha?.textoPreenchido
+                        ]}
+                        estiloEntradaFocada={aparencia.senha?.textoFocado}
+                        corIcone={aparencia.senha?.corIcone}
+                        {...(aparencia.senha?.corPlaceholder
+                            ? { placeholderTextColor: aparencia.senha.corPlaceholder }
+                            : {})}
                         desativado={carregando}
                         autoComplete="current-password"
                         textContentType="password"
@@ -88,7 +127,11 @@ export default function AlertModal({
                         <Text
                             accessibilityRole="alert"
                             accessibilityLiveRegion="polite"
-                            style={estilos.erroSenha}
+                            style={[
+                                estilos.erroSenha,
+                                aparencia.erroSenha,
+                                tema.escuro && { color: '#EF9A9A' }
+                            ]}
                         >
                             {erroSenha}
                         </Text>
@@ -104,7 +147,15 @@ export default function AlertModal({
                     desativado={principalDesativada}
                     carregando={carregando}
                     rotuloAcessibilidade={principal.rotuloAcessibilidade}
-                    estilo={{ width: '100%' }}
+                    estilo={[
+                        { width: '100%' },
+                        aparencia.botaoPrincipal,
+                        principalDesativada && aparencia.botaoPrincipalDesativado
+                    ]}
+                    estiloTexto={[
+                        aparencia.textoPrincipal,
+                        principalDesativada && aparencia.textoPrincipalDesativado
+                    ]}
                 />
             ) : null}
 
@@ -116,7 +167,8 @@ export default function AlertModal({
                     desativado={secundaria.desativado || carregando}
                     carregando={secundaria.carregando}
                     rotuloAcessibilidade={secundaria.rotuloAcessibilidade}
-                    estilo={{ width: '100%' }}
+                    estilo={[{ width: '100%' }, aparencia.botaoSecundario]}
+                    estiloTexto={aparencia.textoSecundario}
                 />
             ) : null}
         </AppModal>

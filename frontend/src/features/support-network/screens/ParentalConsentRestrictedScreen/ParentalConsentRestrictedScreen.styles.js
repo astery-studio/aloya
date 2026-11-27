@@ -1,0 +1,120 @@
+import { StyleSheet } from 'react-native';
+
+import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
+
+function criarEstilos(tema) {
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 24,
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.fundo : tema.cores.interface.fundo
+        },
+        cartao: {
+            width: '100%',
+            maxWidth: 342,
+            alignSelf: 'center',
+            overflow: 'hidden',
+            borderWidth: 0.7,
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : '#E6E2D8',
+            borderRadius: 20,
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie
+        },
+        cabecalhoCartao: {
+            width: '100%',
+            paddingTop: 28,
+            paddingHorizontal: 24,
+            paddingBottom: 20,
+            alignItems: 'center',
+            gap: 12,
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
+        },
+        caixaIcone: {
+            width: 52,
+            height: 52,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 26,
+            backgroundColor: 'rgba(255, 255, 255, 0.12)'
+        },
+        rotuloRestrito: {
+            color: tema.escuro ? 'rgba(18, 18, 18, 0.70)' : 'rgba(255, 255, 255, 0.70)',
+            fontFamily: fontFamilies.semibold,
+            fontSize: 13,
+            fontWeight: '600',
+            lineHeight: 19.5,
+            letterSpacing: 0.78,
+            textTransform: 'uppercase'
+        },
+        conteudoCartao: {
+            width: '100%',
+            paddingHorizontal: 24,
+            paddingTop: 24,
+            paddingBottom: 28,
+            alignItems: 'center',
+            gap: 20
+        },
+        blocoTexto: {
+            width: '100%',
+            alignItems: 'center'
+        },
+        containerTitulo: {
+            width: '100%',
+            alignItems: 'center'
+        },
+        tituloCartao: {
+            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 17,
+            fontWeight: '700',
+            lineHeight: 22.1,
+            textAlign: 'center'
+        },
+        containerMensagem: {
+            width: '100%',
+            paddingTop: 10,
+            alignItems: 'center'
+        },
+        mensagemCartao: {
+            width: '100%',
+            maxWidth: 294,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 14,
+            fontWeight: '400',
+            lineHeight: 21.7,
+            textAlign: 'center'
+        },
+        botao: {
+            width: '100%',
+            maxWidth: 294,
+            height: 52,
+            borderRadius: 12,
+            ...(tema.escuro && { backgroundColor: coresNoturnasConteudo.verde })
+        },
+        textoBotao: {
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF',
+            fontFamily: fontFamilies.medium,
+            fontSize: 16,
+            fontWeight: '500',
+            lineHeight: 24,
+            textAlign: 'center'
+        },
+        atualizando: {
+            position: 'absolute',
+            right: 0,
+            bottom: 16,
+            left: 0,
+            alignItems: 'center'
+        }
+    });
+}
+
+export { criarEstilos };

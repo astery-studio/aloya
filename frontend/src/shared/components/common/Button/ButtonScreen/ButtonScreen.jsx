@@ -8,9 +8,13 @@ export default function ButtonScreen({
     desativado = false,
     carregando = false,
     icone,
+    tamanhoIcone,
+    corConteudo,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto,
+    ajustarFonteAoEspaco = true
 }) {
     const semAcao = typeof aoPressionar !== 'function';
     const estaDesativado = desativado || semAcao;
@@ -25,9 +29,13 @@ export default function ButtonScreen({
             desativado={estaDesativado}
             carregando={carregando}
             icone={icone}
+            tamanhoIcone={tamanhoIcone}
+            corConteudo={corConteudo}
             posicaoIcone={posicaoIcone}
             rotuloAcessibilidade={rotuloAcessibilidade}
             estilo={estilo}
+            estiloTexto={estiloTexto}
+            ajustarFonteAoEspaco={ajustarFonteAoEspaco}
         />
     );
 }

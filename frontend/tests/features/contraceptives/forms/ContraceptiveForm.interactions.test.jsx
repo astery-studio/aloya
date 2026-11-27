@@ -174,7 +174,6 @@ function criarControle(sobrescritas = {}) {
         hoje: '2026-10-02',
         modoEdicao: false,
         podeEnviar: true,
-        permiteMultiplos: false,
         exigePrimeiroUso: false,
         alterar: jest.fn(),
         abrir: jest.fn(),
@@ -325,10 +324,8 @@ describe('ContraceptiveForm - interações', () => {
         expect(mockFrequencySelector).not.toHaveBeenCalled();
     });
 
-    test('configura frequência e horários de um método com lembretes', async () => {
-        const controle = criarControle({
-            permiteMultiplos: true
-        });
+    test('configura frequência e horário de um método com lembrete', async () => {
+        const controle = criarControle();
 
         mockUseContraceptiveForm.mockReturnValue(controle);
 
@@ -345,11 +342,11 @@ describe('ContraceptiveForm - interações', () => {
         expect(controle.selecionarFrequencia).toHaveBeenCalledWith('pilula_21_dias');
 
         horarios.onAbrir();
-        horarios.onConfirmar(['09:30', '21:30']);
+        horarios.onConfirmar(['09:30']);
         horarios.onFechar();
 
         expect(controle.abrir).toHaveBeenCalledWith('horarios');
-        expect(controle.alterar).toHaveBeenCalledWith('horarios', ['09:30', '21:30']);
+        expect(controle.alterar).toHaveBeenCalledWith('horarios', ['09:30']);
         expect(controle.fecharPainel).toHaveBeenCalledTimes(3);
     });
 
@@ -370,6 +367,8 @@ describe('ContraceptiveForm - interações', () => {
 
         expect(seletor.label).toBe('Data do primeiro uso');
         expect(seletor.titulo).toBe('Data do primeiro uso');
+        expect(seletor.dataMaxima).toBe('2026-10-02');
+        expect(seletor.destacarHoje).toBe(true);
 
         seletor.onAbrir();
         const resultado = await seletor.onSelecionar('2026-10-01');

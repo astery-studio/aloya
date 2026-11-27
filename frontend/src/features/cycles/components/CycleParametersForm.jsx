@@ -44,6 +44,14 @@ function CycleParametersForm({
                 aoPressionar={onSalvar}
                 desativado={!podeSalvar}
                 carregando={salvando}
+                estilo={
+                    (!podeSalvar || salvando || typeof onSalvar !== 'function') &&
+                    estilos.botaoSalvarDesativado
+                }
+                estiloTexto={
+                    (!podeSalvar || salvando || typeof onSalvar !== 'function') &&
+                    estilos.textoSalvarDesativado
+                }
             />
         </View>
     );

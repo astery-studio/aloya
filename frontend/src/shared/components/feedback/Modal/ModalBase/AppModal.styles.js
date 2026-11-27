@@ -15,6 +15,10 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.sobreposicao
         },
 
+        fundoInterativo: {
+            ...StyleSheet.absoluteFillObject
+        },
+
         flexivel: { flex: 1, width: '100%' },
 
         rolagem: {
@@ -41,6 +45,14 @@ function criarEstilos(tema) {
         },
 
         caixaAcao: {
+            ...tema.shadows.popup
+        },
+
+        caixaDetalhes: {
+            maxHeight: '96%',
+            flexShrink: 1,
+            paddingTop: 28,
+            paddingBottom: 24,
             ...tema.shadows.popup
         },
 

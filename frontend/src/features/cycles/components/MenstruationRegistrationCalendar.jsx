@@ -84,7 +84,16 @@ function MenstruationRegistrationCalendar({
                                 const ponta = selecionado && (!uneAntes || !uneDepois);
                                 const registrado = Boolean(dia.registroCicloId || dia.local);
                                 const desativado = bloqueado || dia.futuro;
-                                const rotulo = `${dia.dia} de ${NOMES_MESES[mes.mes - 1].toLowerCase()} de ${mes.ano}${registrado ? ', menstruação registrada' : selecionado ? ', selecionado' : dia.futuro ? ', data futura' : ''}`;
+                                const estado = dia.local
+                                    ? ', menstruação aguardando sincronização'
+                                    : registrado
+                                      ? ', menstruação registrada'
+                                      : selecionado
+                                        ? ', selecionado'
+                                        : dia.futuro
+                                          ? ', data futura'
+                                          : '';
+                                const rotulo = `${dia.dia} de ${NOMES_MESES[mes.mes - 1].toLowerCase()} de ${mes.ano}${estado}`;
                                 return (
                                     <View key={dia.data} style={estilos.celula}>
                                         {selecionado && (
@@ -139,7 +148,7 @@ function MenstruationRegistrationCalendar({
                                             {(registrado || ponta) && (
                                                 <DropIcon
                                                     size={9}
-                                                    weight="fill"
+                                                    weight={dia.local ? 'regular' : 'fill'}
                                                     color={
                                                         ponta
                                                             ? '#FFFFFF'

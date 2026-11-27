@@ -1,32 +1,47 @@
 import { StyleSheet } from 'react-native';
-import { espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { espacamentos, fontFamilies } from '../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
+    const backgroundColor = tema.escuro ? coresNoturnasConteudo.fundo : tema.cores.interface.fundo;
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.cores.interface.fundo },
+        tela: { flex: 1, backgroundColor },
+        fundo: { backgroundColor },
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',
-            minHeight: 78,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: espacamentos.medio,
             paddingHorizontal: espacamentos.medio,
-            paddingTop: espacamentos.extraGrande
+            paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
-            ...typography.h2,
-            flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal,
+            fontFamily: fontFamilies.bold,
+            fontSize: 24,
+            fontStyle: 'normal',
             fontWeight: '700',
-            lineHeight: 28
+            lineHeight: 27.5,
+            textAlign: 'left',
+            minWidth: 0,
+            flex: 1,
+            flexShrink: 1,
+            color: tema.escuro ? coresNoturnasConteudo.textoPrincipal : '#222222'
         },
-        rolagem: { flexGrow: 1, paddingBottom: espacamentos.medio },
+        rolagem: {
+            flexGrow: 1,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: espacamentos.medio
+        },
         carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
         textoCarregando: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',

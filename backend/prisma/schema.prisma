@@ -76,6 +76,26 @@ enum FaseCiclo {
   lutea
 }
 
+enum TipoValorDiario {
+  opcoes
+  decimal_escalado
+  duracao_minutos
+  texto
+}
+
+enum EstadoAnaliseTermica {
+  elevacao_detectada
+  inconclusivo
+  medicao_nao_utilizada
+  nenhuma_elevacao_identificada
+  dados_insuficientes
+}
+
+enum EstadoUsoMedicaoTermica {
+  elegivel
+  nao_utilizada_interferencia
+}
+
 enum TipoAnticoncepcional {
   pilula
   injetavel
@@ -107,6 +127,9 @@ enum StatusUso {
   confirmado
   pendente
   nao_confirmado
+  nao_usou
+  // Compatibilidade de leitura com históricos gravados antes da remoção da opção.
+  nao_sabe
 }
 
 enum StatusVinculoRedeApoio {
@@ -130,11 +153,13 @@ enum StatusMensagem {
 
 enum TipoOrigemNotificacao {
   proximidade_ciclo
+  confirmacao_ciclo
   mudanca_fase
   lembrete_diario
   anticoncepcional
   resposta_suporte
   rede_apoio
+  seguranca
 }
 
 enum StatusEnvioNotificacao {
@@ -142,6 +167,7 @@ enum StatusEnvioNotificacao {
   enviada
   cancelada
   falha
+  expirada
 }
 
 // ============================================================
@@ -168,19 +194,24 @@ model Usuario {
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
-  confirmacoesEmail        ConfirmacaoEmail[]
-  sessoes                  Sessao[]
-  recuperacoesSenha        RecuperacaoSenha[]
-  consentimentoParental    ConsentimentoParental?
-  registrosCiclo           RegistroCiclo[]
-  sincronizacoesMenstruais SincronizacaoMenstrual[]
-  previsao                 Previsao?
-  registrosDiario          RegistroDiario[]
-  anticoncepcionais        Anticoncepcional[]
-  categoriasPermissao      CategoriaPermissao[]
-  preferenciaNotificacao   PreferenciaNotificacao?
-  notificacoes             Notificacao[]
-  conversaSuporte          Conversa?
+  confirmacoesEmail           ConfirmacaoEmail[]
+  sessoes                     Sessao[]
+  recuperacoesSenha           RecuperacaoSenha[]
+  consentimentoParental       ConsentimentoParental?
+  registrosCiclo              RegistroCiclo[]
+  analisesTermicas            AnaliseTermicaCiclo[]
+  sincronizacoesMenstruais    SincronizacaoMenstrual[]
+  previsao                    Previsao?
+  registrosDiario             RegistroDiario[]
+  configuracaoDiario          ConfiguracaoDiario?
+  preferenciasMacroDiario     PreferenciaMacrocategoriaDiario[]
+  preferenciasCategoriaDiario PreferenciaCategoriaDiario[]
+  anticoncepcionais           Anticoncepcional[]
+  categoriasPermissao         CategoriaPermissao[]
+  preferenciaNotificacao      PreferenciaNotificacao?
+  notificacoes                Notificacao[]
+  dispositivosPush            DispositivoPush[]
+  conversaSuporte             Conversa?
 
   vinculosComoTitular VinculoRedeApoio[] @relation("VinculoTitular")
   vinculosComoContato VinculoRedeApoio[] @relation("VinculoContato")
@@ -278,7 +309,8 @@ model RegistroCiclo {
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
   diasMenstruacao   DiaMenstruacao[]
-  previsoesBaseadas Previsao[]       @relation("PrevisaoBaseadaNoCiclo")
+  previsoesBaseadas Previsao[]            @relation("PrevisaoBaseadaNoCiclo")
+  analisesTermicas  AnaliseTermicaCiclo[]
 
   @@unique([usuarioId, dataInicio])
   @@map("registros_ciclo")
@@ -349,6 +381,89 @@ model Previsao {
 // DIÁRIO
 // ============================================================
 
+model MacrocategoriaDiario {
+  id           String  @id
+  nome         String
+  nomeCompacto String? @map("nome_compacto")
+  ordem        Int     @unique
+  sensivel     Boolean @default(false)
+
+  categorias   CategoriaDiario[]
+  preferencias PreferenciaMacrocategoriaDiario[]
+
+  @@map("macrocategorias_diario")
+}
+
+model CategoriaDiario {
+  id               String               @id
+  macrocategoriaId String               @map("macrocategoria_id")
+  macrocategoria   MacrocategoriaDiario @relation(fields: [macrocategoriaId], references: [id], onDelete: Restrict)
+  nome             String
+  ordem            Int
+  tipoValor        TipoValorDiario      @default(opcoes) @map("tipo_valor")
+  sensivel         Boolean              @default(false)
+
+  opcoes       OpcaoDiario[]
+  preferencias PreferenciaCategoriaDiario[]
+  registros    RegistroDiarioCategoria[]
+
+  @@unique([macrocategoriaId, ordem])
+  @@index([macrocategoriaId])
+  @@map("categorias_diario")
+}
+
+model OpcaoDiario {
+  id          String          @id
+  categoriaId String          @map("categoria_id")
+  categoria   CategoriaDiario @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  grupo       String?
+  nome        String
+  ordem       Int
+
+  registros RegistroDiarioOpcao[]
+
+  @@unique([categoriaId, ordem])
+  @@index([categoriaId])
+  @@map("opcoes_diario")
+}
+
+model ConfiguracaoDiario {
+  usuarioId Int     @id @map("usuario_id")
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  versao    Int     @default(0)
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@map("configuracoes_diario")
+}
+
+model PreferenciaMacrocategoriaDiario {
+  usuarioId        Int                  @map("usuario_id")
+  usuario          Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  macrocategoriaId String               @map("macrocategoria_id")
+  macrocategoria   MacrocategoriaDiario @relation(fields: [macrocategoriaId], references: [id], onDelete: Restrict)
+  ativa            Boolean              @default(true)
+  atualizadoEm     DateTime             @updatedAt @map("atualizado_em")
+
+  @@id([usuarioId, macrocategoriaId])
+  @@index([macrocategoriaId])
+  @@map("preferencias_macrocategorias_diario")
+}
+
+model PreferenciaCategoriaDiario {
+  usuarioId   Int             @map("usuario_id")
+  usuario     Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  categoriaId String          @map("categoria_id")
+  categoria   CategoriaDiario @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  ativa       Boolean         @default(true)
+  atualizadoEm DateTime       @updatedAt @map("atualizado_em")
+
+  @@id([usuarioId, categoriaId])
+  @@index([categoriaId])
+  @@map("preferencias_categorias_diario")
+}
+
 model RegistroDiario {
   id        Int     @id @default(autoincrement())
   usuarioId Int     @map("usuario_id")
@@ -371,12 +486,93 @@ model RegistroDiario {
   // Snapshot histórico: não deve ser recalculado quando a previsão mudar.
   faseCicloAssociada         FaseCiclo? @map("fase_ciclo_associada")
   possivelOvulacaoConfirmada Boolean    @default(false) @map("possivel_ovulacao_confirmada")
+  checkInRealizado           Boolean    @default(false) @map("check_in_realizado")
+  versao                     Int        @default(0)
 
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
 
+  categorias RegistroDiarioCategoria[]
+
   @@unique([usuarioId, dataRegistro])
+  @@index([usuarioId, dataRegistro, id])
   @@map("registros_diario")
+}
+
+model RegistroDiarioCategoria {
+  id          Int             @id @default(autoincrement())
+  registroId  Int             @map("registro_id")
+  registro    RegistroDiario  @relation(fields: [registroId], references: [id], onDelete: Cascade)
+  categoriaId String          @map("categoria_id")
+  categoria   CategoriaDiario @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+
+  macrocategoriaNome  String  @map("macrocategoria_nome")
+  categoriaNome       String  @map("categoria_nome")
+  valorEscalado       Int?    @map("valor_escalado")
+  casasDecimais       Int?    @map("casas_decimais")
+  valorDuracaoMinutos Int?    @map("valor_duracao_minutos")
+  valorTexto          String? @map("valor_texto")
+
+  opcoes             RegistroDiarioOpcao[]
+  medicaoTemperatura MedicaoTemperaturaBasal?
+
+  @@unique([registroId, categoriaId])
+  @@index([categoriaId, registroId])
+  @@map("registros_diario_categorias")
+}
+
+model RegistroDiarioOpcao {
+  id                  Int                     @id @default(autoincrement())
+  registroCategoriaId Int                     @map("registro_categoria_id")
+  registroCategoria   RegistroDiarioCategoria @relation(fields: [registroCategoriaId], references: [id], onDelete: Cascade)
+  opcaoId             String                  @map("opcao_id")
+  opcao               OpcaoDiario             @relation(fields: [opcaoId], references: [id], onDelete: Restrict)
+  grupo               String?
+  opcaoNome           String                  @map("opcao_nome")
+
+  @@unique([registroCategoriaId, opcaoId])
+  @@index([opcaoId])
+  @@map("registros_diario_opcoes")
+}
+
+model MedicaoTemperaturaBasal {
+  registroCategoriaId Int                     @id @map("registro_categoria_id")
+  registroCategoria   RegistroDiarioCategoria @relation(fields: [registroCategoriaId], references: [id], onDelete: Cascade)
+  valorOriginal       String                  @default("") @map("valor_original")
+  unidade             String                  @default("celsius")
+  precisaoCasas       Int                     @default(1) @map("precisao_casas")
+  perturbada          Boolean                 @default(false)
+  motivoPerturbacao   String?                 @map("motivo_perturbacao")
+  estadoUtilizacao    EstadoUsoMedicaoTermica @default(elegivel) @map("estado_utilizacao")
+  criadoEm            DateTime                @default(now()) @map("criado_em")
+  atualizadoEm        DateTime                @updatedAt @map("atualizado_em")
+
+  @@map("medicoes_temperatura_basal")
+}
+
+model AnaliseTermicaCiclo {
+  id                Int                  @id @default(autoincrement())
+  usuarioId         Int                  @map("usuario_id")
+  usuario           Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  registroCicloId   Int                  @map("registro_ciclo_id")
+  registroCiclo     RegistroCiclo        @relation(fields: [registroCicloId], references: [id], onDelete: Cascade)
+  algoritmo         String
+  versaoAlgoritmo   String               @map("versao_algoritmo")
+  variante          String
+  disponibilidade   String
+  estado            EstadoAnaliseTermica
+  provisorio        Boolean              @default(true)
+  janelasAvaliaveis Int                  @default(0) @map("janelas_avaliaveis")
+  configuracao      Json
+  sequencias        Json
+  evidenciaAplicada Boolean              @default(false) @map("evidencia_aplicada")
+  avaliadoAte       DateTime?            @map("avaliado_ate")
+  criadoEm          DateTime             @default(now()) @map("criado_em")
+  atualizadoEm      DateTime             @updatedAt @map("atualizado_em")
+
+  @@unique([registroCicloId, versaoAlgoritmo, variante, disponibilidade])
+  @@index([usuarioId, registroCicloId])
+  @@map("analises_termicas_ciclo")
 }
 
 // ============================================================
@@ -478,6 +674,11 @@ model VinculoRedeApoio {
   // O validator deve garantir um array de identificadores permitidos.
   permissoesIndividuais Json @default("[]") @map("permissoes_individuais")
 
+  // Identificação visual escolhida pela titular para o contato.
+  // Os valores são validados pelo backend antes da persistência.
+  iconeId String @default("pessoa") @map("icone_id")
+  corId   String @default("branco") @map("cor_id")
+
   status StatusVinculoRedeApoio @default(pendente)
 
   tokenConviteHash String?   @unique @map("token_convite_hash")
@@ -514,8 +715,9 @@ model PreferenciaNotificacao {
   // O validator deve garantir rigorosamente o formato HH:mm.
   horarioLembreteDiario String @default("20:00") @map("horario_lembrete_diario")
 
-  antecedenciaProximoCiclo Int @default(2) @map("antecedencia_proximo_ciclo")
-  antecedenciaAvisoTroca   Int @default(7) @map("antecedencia_aviso_troca")
+  antecedenciaProximoCiclo Int  @default(2) @map("antecedencia_proximo_ciclo")
+  antecedenciaAvisoTroca   Int  @default(7) @map("antecedencia_aviso_troca")
+  ajustesPorEvento         Json @default("{}") @map("ajustes_por_evento")
 
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
@@ -531,7 +733,12 @@ model Notificacao {
   tipoOrigem TipoOrigemNotificacao @map("tipo_origem")
 
   // Referência polimórfica: a integridade deve ser validada pelo service.
-  origemId Int? @map("origem_id")
+  origemId       Int?          @map("origem_id")
+  evento         String?
+  ocorrencia     String?
+  expiraEm       DateTime?     @map("expira_em")
+  processandoAte DateTime?     @map("processando_ate")
+  entregas       EntregaPush[]
 
   dataHoraProgramada DateTime  @map("data_hora_programada")
   dataHoraDisparo    DateTime? @map("data_hora_disparo")
@@ -541,9 +748,56 @@ model Notificacao {
 
   criadoEm DateTime @default(now()) @map("criado_em")
 
+  @@unique([usuarioId, evento, ocorrencia])
   @@index([usuarioId, statusEnvio])
   @@index([statusEnvio, dataHoraProgramada])
   @@map("notificacoes")
+}
+
+model DispositivoPush {
+  id           String        @id
+  usuarioId    Int           @map("usuario_id")
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  sessaoId     Int           @map("sessao_id")
+  instalacao   String        @unique
+  token        String        @unique
+  plataforma   String
+  fuso         String
+  vinculo      String
+  invalidadoEm DateTime?     @map("invalidado_em")
+  atualizadoEm DateTime      @updatedAt @map("atualizado_em")
+  entregas     EntregaPush[]
+
+  @@index([usuarioId, invalidadoEm])
+  @@index([sessaoId])
+  @@map("dispositivos_push")
+}
+
+model EntregaPush {
+  id               Int             @id @default(autoincrement())
+  notificacaoId    Int             @map("notificacao_id")
+  notificacao      Notificacao     @relation(fields: [notificacaoId], references: [id], onDelete: Cascade)
+  dispositivoId    String          @map("dispositivo_id")
+  dispositivo      DispositivoPush @relation(fields: [dispositivoId], references: [id], onDelete: Cascade)
+  vinculo          String
+  status           String          @default("pendente")
+  tentativas       Int             @default(0)
+  proximaTentativa DateTime        @map("proxima_tentativa")
+  ticket           String?
+  aceitaEm         DateTime?       @map("aceita_em")
+  erro             String?
+  atualizadoEm     DateTime        @updatedAt @map("atualizado_em")
+
+  @@unique([notificacaoId, dispositivoId, vinculo])
+  @@index([status, proximaTentativa])
+  @@map("entregas_push")
+}
+
+model CatalogoNotificacao {
+  versao Int  @id
+  dados  Json
+
+  @@map("catalogos_notificacao")
 }
 
 // ============================================================

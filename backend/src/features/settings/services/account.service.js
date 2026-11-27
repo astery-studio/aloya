@@ -3,12 +3,14 @@ function criarAccountService({
     passwordService,
     parentalConsentService,
     dateUtils,
+    publicarSeguranca,
     now = () => new Date()
 }) {
     const selectConfiguracoes = {
         id: true,
         nome: true,
         email: true,
+        papel: true,
         genero: true,
         dataNascimento: true,
         temaVisual: true,
@@ -36,6 +38,8 @@ function criarAccountService({
             id: usuario.id,
             nome: usuario.nome,
             email: usuario.email,
+
+            papel: usuario.papel,
 
             identidadeGenero: usuario.genero,
 
@@ -181,6 +185,19 @@ function criarAccountService({
                         select: selectConfiguracoes
                     });
 
+                    if (alteracoes.email !== undefined) {
+                        await tx.vinculoRedeApoio.updateMany({
+                            where: {
+                                contatoId: usuarioId
+                            },
+                            data: {
+                                emailConvidado: alteracoes.email
+                            }
+                        });
+                        await publicarSeguranca?.(tx, usuarioId, 'email.alterado',
+                            usuario.atualizadoEm.toISOString(), momentoAtual);
+                    }
+
                     if (passouASerMenorDe16) {
                         await parentalConsentService.reativarAposCorrecaoNascimento(tx, usuarioId);
                     }
@@ -318,6 +335,7 @@ function criarAccountService({
                     }
                 });
 
+                await publicarSeguranca?.(tx, usuarioId, 'senha.alterada', momentoAtual.toISOString(), momentoAtual);
                 return sessoes.count;
             }
         );

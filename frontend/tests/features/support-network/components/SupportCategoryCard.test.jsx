@@ -26,8 +26,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
 import {
     criarRotuloContatos,
     SupportCategoryCard
-} from '../../../../src/features/support-network/components/SupportCategoryCard';
-import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
+} from '../../../../src/features/support-network/components/SupportCategoryCard/SupportCategoryCard';
 
 const categoria = Object.freeze({
     id: 7,
@@ -201,12 +200,12 @@ describe('SupportCategoryCard', () => {
         );
 
         expect(screen.getByTestId('support-category-card')).toHaveStyle({
-            backgroundColor: temaEscuro.cores.interface.superficie,
-            borderColor: temaEscuro.cores.interface.borda
+            backgroundColor: '#1E1E1E',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
         });
 
         expect(screen.getByTestId('support-category-name')).toHaveStyle({
-            color: temaEscuro.cores.interface.textoPrincipal
+            color: '#E3E3E3'
         });
     });
 });

@@ -7,20 +7,28 @@ import { DropIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { criarEstilos } from './CycleRemovalFeedbackModal.styles';
 
-function IconeAlerta({ erro = false }) {
+function IconeAlerta({ erro = false, cor, fundoTransparente = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const corContorno = erro
-        ? tema.cores.interface.textoSecundario
-        : tema.escuro
-          ? '#EE9297'
-          : '#C85A44';
-    const corAlerta = tema.escuro ? '#F39A9D' : '#B43D3D';
+    const corContorno =
+        cor ??
+        (erro
+            ? tema.escuro
+                ? '#EF9A9A'
+                : tema.cores.interface.textoSecundario
+            : tema.escuro
+              ? '#E3E3E3'
+              : '#C85A44');
+    const corAlerta = cor ?? (tema.escuro ? (erro ? '#EF9A9A' : '#E3E3E3') : '#B43D3D');
 
     return (
         <View
             testID={erro ? 'icone-alerta-erro' : 'icone-alerta-confirmacao'}
-            style={[estilos.areaIcone, erro ? estilos.fundoErro : estilos.fundoConfirmacao]}
+            style={[
+                estilos.areaIcone,
+                erro ? estilos.fundoErro : estilos.fundoConfirmacao,
+                fundoTransparente && { backgroundColor: 'transparent' }
+            ]}
         >
             <Svg width={22} height={22} viewBox="0 0 24 24" accessibilityElementsHidden>
                 <Circle cx={12} cy={12} r={10} fill="none" stroke={corContorno} strokeWidth={1.5} />
@@ -37,8 +45,9 @@ function IconeAlerta({ erro = false }) {
     );
 }
 
-function IconeConfirmacao() {
-    return <IconeAlerta />;
+function IconeConfirmacao({ color }) {
+    const tema = useTheme();
+    return <IconeAlerta cor={tema.escuro ? color : undefined} fundoTransparente={tema.escuro} />;
 }
 
 function IconeErro() {
@@ -50,8 +59,8 @@ function IconeSucesso() {
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     return (
-        <View style={[estilos.areaIcone, estilos.fundoConfirmacao]}>
-            <DropIcon size={22} color={tema.escuro ? '#EE9297' : '#C85A44'} weight="regular" />
+        <View testID="icone-sucesso-ciclo" style={[estilos.areaIcone, estilos.fundoSucesso]}>
+            <DropIcon size={22} color={tema.escuro ? '#E3E3E3' : '#C85A44'} weight="regular" />
         </View>
     );
 }
@@ -70,6 +79,7 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'confirmacao') {
         return (
             <SimpleModal
+                varianteVisual="confirmacaoCiclo"
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onCancelar}
@@ -96,6 +106,7 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'erro') {
         return (
             <SimpleModal
+                erroInterno
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={carregando ? undefined : onFechar}
@@ -122,6 +133,7 @@ function CycleRemovalFeedbackModal({
     if (tipo === 'sucesso-excluir' || tipo === 'sucesso-atualizar') {
         return (
             <SimpleModal
+                varianteVisual="sucessoCiclo"
                 visivel={visivel}
                 aoOcultar={onOcultar}
                 aoFechar={onFechar}
@@ -144,4 +156,4 @@ function CycleRemovalFeedbackModal({
     return null;
 }
 
-export { CycleRemovalFeedbackModal, IconeAlerta };
+export { CycleRemovalFeedbackModal, IconeAlerta, IconeSucesso };

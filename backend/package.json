@@ -7,16 +7,19 @@
   "scripts": {
     "db:validate-migrations": "node scripts/validate-migrations.js",
     "db:prepare": "prisma generate && prisma migrate deploy",
+    "db:normalize-pill-schedules": "node scripts/normalize-pill-schedules.js",
     "dev": "node --watch src/shared/http/server.js",
     "format": "prettier --write \"**/*.{js,json,md,ts}\"",
     "format:check": "prettier --check \"**/*.{js,json,md,ts}\"",
     "format:check:ci": "prettier --check eslint.config.js package.json \"scripts/**/*.js\" \"../.github/**/*.yml\" \"../docs/ci-cd.md\" \"../package.json\"",
     "lint": "eslint . --max-warnings=0",
     "start": "node src/shared/http/server.js",
+    "push:worker": "node src/features/notifications/runPushWorker.js",
     "start:prepared": "prisma generate && prisma migrate deploy && node src/shared/http/server.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
     "test:coverage": "node --test --experimental-test-coverage",
+    "test:coverage:diary": "node --test --experimental-test-coverage --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 --test-coverage-include=src/features/diary/**/*.js tests/features/diary/unit/*.test.js",
     "postinstall": "prisma generate"
   },
   "keywords": [],
@@ -49,6 +52,7 @@
     "fast-uri": "3.1.9",
     "ip-address": "10.7.5",
     "mysql2": "3.24.5",
-    "qs": "6.16.0"
+    "qs": "6.17.1",
+    "effect": "3.22.5"
   }
 }

@@ -11,7 +11,8 @@ export default function ButtonDashed({
     desativado = false,
     carregando = false,
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto
 }) {
     return (
         <Button
@@ -25,6 +26,7 @@ export default function ButtonDashed({
             icone={Plus}
             rotuloAcessibilidade={rotuloAcessibilidade}
             estilo={estilo}
+            estiloTexto={estiloTexto}
         />
     );
 }

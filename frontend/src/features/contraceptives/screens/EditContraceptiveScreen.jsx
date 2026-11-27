@@ -6,6 +6,7 @@ import { PillIcon, WarningCircleIcon } from '../../../shared/components/icons/Ap
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { ContraceptiveForm } from '../forms/ContraceptiveForm';
 import { criarEstilos } from './contraceptiveScreens.styles';
 
@@ -13,10 +14,11 @@ import { criarEstilos } from './contraceptiveScreens.styles';
 function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoVoltar }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const [salvando, setSalvando] = useState(false);
     const [excluindo, setExcluindo] = useState(false);
     const [confirmacaoExclusaoVisivel, setConfirmacaoExclusaoVisivel] = useState(false);
-    const [erroExclusaoVisivel, setErroExclusaoVisivel] = useState(false);
+    const [erroExclusao, setErroExclusao] = useState(null);
     const [sucesso, setSucesso] = useState(null);
     const operacaoEmAndamento = useRef(null);
     const telaMontada = useRef(true);
@@ -62,7 +64,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     function solicitarExclusao() {
         if (operacaoEmAndamento.current || ocupado || typeof aoExcluir !== 'function') return;
 
-        setErroExclusaoVisivel(false);
+        setErroExclusao(null);
         setConfirmacaoExclusaoVisivel(true);
     }
 
@@ -73,7 +75,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
         operacaoEmAndamento.current = 'exclusao';
         setExcluindo(true);
-        setErroExclusaoVisivel(false);
+        setErroExclusao(null);
 
         try {
             await aoExcluir(anticoncepcional.id);
@@ -83,10 +85,14 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             setConfirmacaoExclusaoVisivel(false);
             setSucesso('exclusao');
             return true;
-        } catch {
+        } catch (falha) {
             if (telaMontada.current) {
                 setConfirmacaoExclusaoVisivel(false);
-                setErroExclusaoVisivel(true);
+                setErroExclusao(
+                    falha?.status === 429
+                        ? falha.mensagemUsuario || 'Aguarde um pouco antes de tentar remover novamente.'
+                        : 'Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente.'
+                );
             }
 
             return false;
@@ -109,12 +115,16 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
 
     if (!registroValido) {
         return (
-            <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
-                testID="edicao-anticoncepcional-area-segura">
+            <SafeAreaView
+                style={[estilos.tela, estilos.telaCadastro]}
+                edges={['top', 'left', 'right', 'bottom']}
+                testID="edicao-anticoncepcional-area-segura"
+            >
                 <Header
                     titulo="Editar o Anticoncepcional"
                     variante="comVoltar"
                     onVoltar={aoVoltar}
+                    aplicarSafeAreaSuperior={false}
                 />
 
                 <View style={estilos.vazio}>
@@ -122,7 +132,10 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                         Anticoncepcional indisponível
                     </Text>
 
-                    <Text accessibilityRole="alert" style={estilos.textoVazio}>
+                    <Text
+                        accessibilityRole="alert"
+                        style={[estilos.textoVazio, estilosErro.mensagem]}
+                    >
                         Não foi possível carregar os dados para edição.
                     </Text>
                 </View>
@@ -131,12 +144,16 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
     }
 
     return (
-        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
-            testID="edicao-anticoncepcional-area-segura">
+        <SafeAreaView
+            style={[estilos.tela, estilos.telaCadastro]}
+            edges={['top', 'left', 'right', 'bottom']}
+            testID="edicao-anticoncepcional-area-segura"
+        >
             <Header
                 titulo="Editar o Anticoncepcional"
                 variante="comVoltar"
                 onVoltar={ocupado ? undefined : aoVoltar}
+                aplicarSafeAreaSuperior={false}
             />
 
             <ScrollView
@@ -170,6 +187,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             </ScrollView>
 
             <SimpleModal
+                varianteVisual="sairSemSalvar"
                 visivel={confirmacaoExclusaoVisivel}
                 aoFechar={excluindo ? undefined : () => setConfirmacaoExclusaoVisivel(false)}
                 icone={WarningCircleIcon}
@@ -186,6 +204,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                 }}
                 acaoSecundaria={{
                     texto: 'Cancelar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: () => setConfirmacaoExclusaoVisivel(false),
                     desativado: excluindo
@@ -193,13 +212,14 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
             />
 
             <SimpleModal
-                visivel={erroExclusaoVisivel}
-                aoFechar={excluindo ? undefined : () => setErroExclusaoVisivel(false)}
+                erroInterno
+                visivel={Boolean(erroExclusao)}
+                aoFechar={excluindo ? undefined : () => setErroExclusao(null)}
                 icone={WarningCircleIcon}
                 corIcone={tema.cores.interface.textoSecundario}
                 fundoIcone="#EDEDED"
                 titulo="Algo deu errado"
-                mensagem="Ocorreu um erro ao deletar. Verifique sua conexão e tente novamente."
+                mensagem={erroExclusao}
                 acaoPrincipal={{
                     texto: 'Tentar novamente',
                     variante: 'preto',
@@ -210,7 +230,7 @@ function EditContraceptiveScreen({ anticoncepcional, aoAtualizar, aoExcluir, aoV
                 acaoSecundaria={{
                     texto: 'Voltar',
                     variante: 'branco',
-                    aoPressionar: () => setErroExclusaoVisivel(false),
+                    aoPressionar: () => setErroExclusao(null),
                     desativado: excluindo
                 }}
             />

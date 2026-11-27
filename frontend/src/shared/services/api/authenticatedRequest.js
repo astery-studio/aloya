@@ -11,7 +11,40 @@ function criarErroSessaoAusente() {
     return erro;
 }
 
-function criarRequisicaoAutenticada({ requisicao, obterCredencial, removerCredencial }) {
+// O armazenamento nativo pode não responder; a espera precisa terminar mesmo sem resposta.
+async function aguardarArmazenamento(operacao, signal, timeoutMs) {
+    let temporizador;
+    let cancelar;
+    const interrupcao = new Promise((_, rejeitar) => {
+        cancelar = () => {
+            const erro = new Error('Requisição cancelada.');
+            erro.name = 'AbortError';
+            rejeitar(erro);
+        };
+        temporizador = setTimeout(() => {
+            const erro = new Error('Não foi possível acessar sua sessão. Tente novamente.');
+            erro.codigo = 'TEMPO_ARMAZENAMENTO_ESGOTADO';
+            erro.mensagemUsuario = erro.message;
+            rejeitar(erro);
+        }, timeoutMs);
+        signal?.addEventListener('abort', cancelar, { once: true });
+    });
+
+    try {
+        if (signal?.aborted) cancelar();
+        return await Promise.race([signal?.aborted ? interrupcao : operacao(), interrupcao]);
+    } finally {
+        clearTimeout(temporizador);
+        signal?.removeEventListener('abort', cancelar);
+    }
+}
+
+function criarRequisicaoAutenticada({
+    requisicao,
+    obterCredencial,
+    removerCredencial,
+    timeoutMs = 15000
+}) {
     if (
         typeof requisicao !== 'function' ||
         typeof obterCredencial !== 'function' ||
@@ -21,7 +54,7 @@ function criarRequisicaoAutenticada({ requisicao, obterCredencial, removerCreden
     }
 
     return async function requisicaoAutenticada(opcoes = {}) {
-        const sessao = await obterCredencial();
+        const sessao = await aguardarArmazenamento(obterCredencial, opcoes.signal, timeoutMs);
         if (opcoes.signal?.aborted) {
             const erro = new Error('Requisição cancelada.');
             erro.name = 'AbortError';
@@ -30,7 +63,9 @@ function criarRequisicaoAutenticada({ requisicao, obterCredencial, removerCreden
         const token = sessao?.token;
 
         if (typeof token !== 'string' || !token.trim()) {
-            await removerCredencial().catch(() => undefined);
+            await aguardarArmazenamento(removerCredencial, opcoes.signal, timeoutMs).catch(
+                () => undefined
+            );
             throw criarErroSessaoAusente();
         }
 
@@ -48,7 +83,9 @@ function criarRequisicaoAutenticada({ requisicao, obterCredencial, removerCreden
                 erro?.status === 401 && codigosDeSessaoInvalida.has(erro?.codigo);
 
             if (sessaoInvalida) {
-                await removerCredencial().catch(() => undefined);
+                await aguardarArmazenamento(removerCredencial, opcoes.signal, timeoutMs).catch(
+                    () => undefined
+                );
             }
 
             throw erro;

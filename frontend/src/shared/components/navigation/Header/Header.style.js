@@ -1,7 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-import { fontFamilies } from '../../../theme';
-
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
@@ -9,43 +7,81 @@ function criarEstilos(tema) {
             backgroundColor: tema.cores.interface.fundo
         },
 
-        espacamentoSuperior: {
-            height: 56
-        },
-
-        espacamentoSuperiorComVoltar: {
-            height: 48
-        },
+        containerComVoltar: tema.escuro
+            ? {
+                  backgroundColor: '#121212'
+              }
+            : {},
 
         areaTitulo: {
-            minHeight: 66,
             flexDirection: 'row',
-            alignItems: 'flex-start',
+            alignItems: 'center',
+            gap: 12,
             paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
-            paddingBottom: 32
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
 
         areaTituloComVoltar: {
-            minHeight: 72,
-            alignItems: 'center',
-            paddingLeft: 12,
-            paddingRight: 60,
-            paddingBottom: 24
+            paddingHorizontal: 12
+        },
+
+        areaTituloComComplemento: {
+            justifyContent: 'space-between'
         },
 
         titulo: {
             flex: 1,
             flexShrink: 1,
-            ...tema.typography.h1,
+            ...tema.headerTypography.principal,
+            color: tema.cores.interface.textoPrincipal
+        },
+
+        blocoTitulo: {
+            flex: 1,
+            flexShrink: 1,
+            alignItems: 'flex-start'
+        },
+
+        blocoTituloComVoltar: {
+            alignItems: 'center'
+        },
+
+        tituloNoBloco: {
+            ...tema.headerTypography.principal,
             color: tema.cores.interface.textoPrincipal
         },
 
         tituloComVoltar: {
-            fontFamily: fontFamilies.bold,
-            fontSize: 18,
-            fontWeight: '700',
-            lineHeight: 27,
+            ...tema.headerTypography.compacto,
             textAlign: 'center'
+        },
+
+        tituloInicio: {
+            fontSize: 24,
+            lineHeight: 27.5
+        },
+
+        tituloComComplemento: {
+            flex: 0,
+            minWidth: 0
+        },
+
+        complementoTitulo: {
+            flexShrink: 0,
+            alignItems: 'center'
+        },
+
+        acoes: {
+            flexShrink: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12
+        },
+
+        acoesComVoltar: {
+            width: 48,
+            height: 48,
+            justifyContent: 'center'
         },
 
         containerVoltar: {
@@ -54,6 +90,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 24
+        },
+
+        espacadorVoltar: {
+            width: 48,
+            height: 48,
+            flexShrink: 0
         },
 
         desabilitado: {

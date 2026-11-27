@@ -335,6 +335,8 @@ test('permite personalizar o título e mostra placeholder sem data', async () =>
             onFechar={jest.fn()}
             label="Data do primeiro uso"
             titulo="Escolher primeiro uso"
+            dataMaxima="2026-10-02"
+            destacarHoje
         />
     );
 
@@ -344,7 +346,11 @@ test('permite personalizar o título e mostra placeholder sem data', async () =>
         })
     ).toBeOnTheScreen();
 
-    expect(mockDatePickerSheet.mock.calls.at(-1)[0].titulo).toBe('Escolher primeiro uso');
+    expect(mockDatePickerSheet.mock.calls.at(-1)[0]).toMatchObject({
+        titulo: 'Escolher primeiro uso',
+        dataMaxima: '2026-10-02',
+        destacarHoje: true
+    });
 });
 
 test('seleciona temporariamente uma intensidade e confirma somente no botão', async () => {

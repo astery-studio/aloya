@@ -1,15 +1,19 @@
 // Confirma o logout e encerra a sessão no servidor e no armazenamento seguro.
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import ButtonPopup from '../../../shared/components/common/Button/ButtonPopup';
 import AlertModal from '../../../shared/components/feedback/Modal/AlertModal/AlertModal';
 import AppModal from '../../../shared/components/feedback/Modal/AppModal';
 import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { cores } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilos } from './LogoutConfirmation.styles';
 
 function ignorarFechamento() {}
 
 function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerrada }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [carregando, setCarregando] = useState(false);
     const [erroVisivel, setErroVisivel] = useState(false);
 
@@ -37,10 +41,13 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
         <>
             <AppModal
                 variante="simples"
+                estilo={estilos.caixa}
                 visivel={visivel && !erroVisivel}
                 aoFechar={carregando ? ignorarFechamento : onFechar}
                 icone={WarningCircleIcon}
-                corIcone={cores.marca.primaria}
+                corIcone={tema.escuro ? '#E3E3E3' : cores.marca.primaria}
+                fundoIcone={tema.escuro ? 'rgba(255, 255, 255, 0.08)' : undefined}
+                estiloIcone={estilos.icone}
                 titulo="Sair da Conta"
                 mensagem="Você deverá realizar login novamente para acessar sua conta."
                 destaque="Deseja continuar?"
@@ -50,9 +57,8 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
                     variante="branco"
                     aoPressionar={confirmarLogout}
                     carregando={carregando}
-                    estilo={{
-                        width: '100%'
-                    }}
+                    estilo={[{ width: '100%' }, estilos.botaoSair]}
+                    estiloTexto={estilos.textoSair}
                 />
 
                 <ButtonPopup
@@ -67,6 +73,7 @@ function LogoutConfirmation({ visivel, onFechar, encerrarSessao, onSessaoEncerra
             </AppModal>
 
             <AlertModal
+                erroInterno
                 visivel={erroVisivel}
                 aoFechar={() => setErroVisivel(false)}
                 titulo="Não foi possível sair"

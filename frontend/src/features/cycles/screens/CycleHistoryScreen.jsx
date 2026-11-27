@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { CycleHistoryCard } from '../components/CycleHistoryCard/CycleHistoryCard';
 import { CycleSummaryCard } from '../components/CycleSummaryCard/CycleSummaryCard';
 import { criarEstilos } from './CycleHistoryScreen.styles';
@@ -108,16 +109,18 @@ function CycleHistoryScreen({
     erro,
     erroCarregarMais,
     temMais = false,
+    somenteLeitura = false,
+    nomeTitular,
     aoTentarNovamente,
     aoCarregarMais,
     aoTentarCarregarMais,
-    aoAbrirCalendario,
     aoEditarCiclo,
     aoExcluirCiclo,
-    onSelecionarAba
+    onVoltar
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const corCarregamento = tema.escuro
         ? tema.cores.interface.destaque
         : tema.cores.marca.secundaria;
@@ -129,6 +132,9 @@ function CycleHistoryScreen({
     const possuiErroCarregarMais =
         typeof erroCarregarMais === 'string' && erroCarregarMais.trim().length > 0;
     const estaVazio = ciclosSeguros.length === 0;
+    const mensagemErro = somenteLeitura
+        ? 'Não foi possível carregar histórico de ciclos. Tente novamente.'
+        : 'Não foi possível carregar seu histórico de ciclos. Tente novamente.';
     const podeCarregarMais =
         temMais &&
         !carregandoMais &&
@@ -137,6 +143,8 @@ function CycleHistoryScreen({
 
     const resumoDosCiclos = (
         <CycleSummaryCard
+            nomeTitular={nomeTitular}
+            exibirConfianca={!somenteLeitura}
             cicloMedioDias={resumoSeguro.cicloMedioDias}
             menstruacaoMediaDias={resumoSeguro.menstruacaoMediaDias}
             quantidadeCiclos={resumoSeguro.quantidadeCiclos}
@@ -149,6 +157,7 @@ function CycleHistoryScreen({
             <View style={estilos.itemDaLista}>
                 <CycleHistoryCard
                     ciclo={item}
+                    somenteLeitura={somenteLeitura}
                     aoEditar={aoEditarCiclo}
                     aoExcluir={aoExcluirCiclo}
                 />
@@ -161,7 +170,7 @@ function CycleHistoryScreen({
     if (carregando) {
         conteudo = (
             <View style={estilos.conteudoEstatico}>
-                {resumoDosCiclos}
+                {!somenteLeitura && resumoDosCiclos}
 
                 <View
                     testID="cycle-history-loading"
@@ -177,22 +186,24 @@ function CycleHistoryScreen({
     } else if (possuiErro) {
         conteudo = (
             <View style={estilos.conteudoEstatico}>
-                {resumoDosCiclos}
+                {!somenteLeitura && resumoDosCiclos}
 
                 <View
                     accessible
                     accessibilityRole="alert"
-                    accessibilityLabel="Ocorreu um erro. Não foi possível carregar seu histórico de ciclos. Tente novamente."
+                    accessibilityLabel={`Ocorreu um erro. ${mensagemErro}`}
                     style={estilos.estadoCentralizado}
                 >
                     <Text style={estilos.tituloDoEstado}>Ocorreu um erro</Text>
 
-                    <Text style={estilos.mensagemDoEstado}>
-                        Não foi possível carregar seu histórico de ciclos. Tente novamente.
+                    <Text style={[estilos.mensagemDoEstado, estilosErro.mensagem]}>
+                        {mensagemErro}
                     </Text>
 
                     <View style={estilos.botaoDoEstado}>
                         <ButtonScreen
+                            estilo={estilosErro.botao}
+                            estiloTexto={estilosErro.textoBotao}
                             texto="Tentar Novamente"
                             variante="preto"
                             aoPressionar={aoTentarNovamente}
@@ -204,22 +215,18 @@ function CycleHistoryScreen({
     } else if (estaVazio) {
         conteudo = (
             <View style={estilos.conteudoEstatico}>
-                {resumoDosCiclos}
+                {!somenteLeitura && resumoDosCiclos}
 
                 <View style={estilos.estadoCentralizado}>
-                    <Text style={estilos.tituloDoEstado}>Nenhum ciclo registrado</Text>
-
-                    <Text style={estilos.mensagemDoEstado}>
-                        Comece registrando seu primeiro ciclo pelo calendário.
+                    <Text style={estilos.tituloDoEstado}>
+                        {somenteLeitura ? 'Nada para exibir' : 'Nenhum ciclo registrado'}
                     </Text>
 
-                    <View style={estilos.botaoDoEstado}>
-                        <ButtonScreen
-                            texto="Ir para o Calendário"
-                            variante="laranja"
-                            aoPressionar={aoAbrirCalendario}
-                        />
-                    </View>
+                    <Text style={estilos.mensagemDoEstado}>
+                        {somenteLeitura
+                            ? 'Ainda não há dados suficientes para exibir aqui.'
+                            : 'Comece registrando seu primeiro ciclo pelo calendário.'}
+                    </Text>
                 </View>
             </View>
         );
@@ -260,8 +267,10 @@ function CycleHistoryScreen({
     return (
         <MainLayout
             titulo="Histórico de Ciclos"
-            abaAtiva="ciclos"
-            onSelecionarAba={onSelecionarAba}
+            varianteHeader="comVoltar"
+            onVoltar={onVoltar}
+            corFundo={tema.escuro ? '#121212' : undefined}
+            exibirNavegacaoInferior={false}
         >
             {conteudo}
         </MainLayout>

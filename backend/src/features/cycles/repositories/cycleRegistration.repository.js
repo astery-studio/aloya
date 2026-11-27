@@ -1,3 +1,5 @@
+import { excluirCiclosUnidos } from '../services/cycleMerge.service.js';
+import { agruparDias } from '../utils/cycleContinuity.js';
 import { AppError } from '../../../shared/errors/AppError.js';
 import {
     adicionarDias,
@@ -7,8 +9,9 @@ import {
 } from '../utils/calendar.js';
 import { calcularPrevisao } from '../utils/prediction.js';
 import { permiteHistorico, selecionarPeriodo } from '../utils/cycleRegistration.js';
+import { agendarEvento, permiteNotificacao } from '../../notifications/notificationEvents.service.js';
 
-function criarCycleRegistrationRepository({ prisma }) {
+function criarCycleRegistrationRepository({ prisma, thermalRecalculation } = {}) {
     if (typeof prisma?.$transaction !== 'function')
         throw new TypeError('Repositório de registro menstrual inválido.');
 
@@ -46,24 +49,41 @@ function criarCycleRegistrationRepository({ prisma }) {
                         diasMenstruacao: { orderBy: { data: 'asc' } }
                     }
                 });
-                const { registro } = selecionarPeriodo(registros, inicio, fim);
-                const dataInicio =
+                const { registro, registrosParaUnir } = selecionarPeriodo(registros, inicio, fim);
+                let dataInicio =
                     registro && formatarData(registro.dataInicio) < inicio
                         ? registro.dataInicio
                         : paraDataCalendario(inicio);
                 const ultimo = registro?.diasMenstruacao.at(-1)?.data;
-                const dataFim =
+                let dataFim =
                     ultimo && formatarData(ultimo) > fim ? ultimo : paraDataCalendario(fim);
-                const duracaoMenstruacao =
+                let duracaoMenstruacao =
                     (registro?.diasMenstruacao.length ?? 0) + diferencaDias(inicio, fim) + 1;
+                const novosDias = Array.from({ length: diferencaDias(inicio, fim) + 1 }, (_, i) =>
+                    paraDataCalendario(adicionarDias(inicio, i))
+                );
+                let diasParaGravar = novosDias;
+                if (registrosParaUnir.length) {
+                    diasParaGravar = agruparDias([
+                        ...novosDias,
+                        ...[registro, ...registrosParaUnir].flatMap((item) =>
+                            item.diasMenstruacao.map((dia) => dia.data)
+                        )
+                    ]).flat();
+                    dataInicio = diasParaGravar[0];
+                    dataFim = diasParaGravar.at(-1);
+                    duracaoMenstruacao = diasParaGravar.length;
+                    await excluirCiclosUnidos(tx, usuarioId, registrosParaUnir);
+                    await tx.diaMenstruacao.deleteMany({ where: { registroCicloId: registro.id } });
+                }
                 const dados = { dataInicio, dataFim, duracaoMenstruacao };
                 const ciclo = registro
                     ? await tx.registroCiclo.update({ where: { id: registro.id }, data: dados })
                     : await tx.registroCiclo.create({ data: { usuarioId, ...dados } });
                 await tx.diaMenstruacao.createMany({
-                    data: Array.from({ length: diferencaDias(inicio, fim) + 1 }, (_, i) => ({
+                    data: diasParaGravar.map((data) => ({
                         registroCicloId: ciclo.id,
-                        data: paraDataCalendario(adicionarDias(inicio, i)),
+                        data,
                         statusSincronizacao: 'sincronizado'
                     }))
                 });
@@ -107,6 +127,8 @@ function criarCycleRegistrationRepository({ prisma }) {
                     parametros: usuario,
                     dataReferencia: formatarData(agora)
                 });
+                const ocorrencia = JSON.stringify([usuarioId, chave]);
+                const eventoCompartilhado = 'redeApoio.ciclo.registro';
                 const vinculos = await tx.vinculoRedeApoio.findMany({
                     where: {
                         titularId: usuarioId,
@@ -120,21 +142,23 @@ function criarCycleRegistrationRepository({ prisma }) {
                             ]
                         }
                     },
-                    include: { categoria: true }
+                    include: {
+                        categoria: true,
+                        contato: { select: { preferenciaNotificacao: true } }
+                    }
                 });
                 const contatos = [
-                    ...new Set(vinculos.filter(permiteHistorico).map((v) => v.contatoId))
+                    ...new Set(vinculos.filter((vinculo) =>
+                        permiteHistorico(vinculo) &&
+                        permiteNotificacao(vinculo.contato.preferenciaNotificacao, eventoCompartilhado)
+                    ).map((vinculo) => vinculo.contatoId))
                 ];
-                if (contatos.length)
-                    await tx.notificacao.createMany({
-                        data: contatos.map((contatoId) => ({
-                            usuarioId: contatoId,
-                            tipoOrigem: 'rede_apoio',
-                            origemId: ciclo.id,
-                            dataHoraProgramada: agora,
-                            statusEnvio: 'agendada'
-                        }))
+                for (const contatoId of contatos) {
+                    await agendarEvento(tx, {
+                        usuarioId: contatoId, evento: eventoCompartilhado, ocorrencia,
+                        tipoOrigem: 'rede_apoio', origemId: ciclo.id, dataHoraProgramada: agora
                     });
+                }
                 const atualizado = atualizados.find((item) => item.id === ciclo.id);
                 const resultado = {
                     mensagem: 'Registro de menstruação adicionado com sucesso.',
@@ -155,6 +179,7 @@ function criarCycleRegistrationRepository({ prisma }) {
                 await tx.sincronizacaoMenstrual.create({
                     data: { usuarioId, chave, solicitacao, resultado }
                 });
+                await thermalRecalculation?.recalcularTodos(usuarioId, tx);
                 return resultado;
             });
         } catch (erro) {

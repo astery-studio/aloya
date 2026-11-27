@@ -12,35 +12,84 @@ function MainLayout({
     titulo,
     varianteHeader = 'padrao',
     onVoltar,
+    acoesHeader = null,
+    cabecalho: cabecalhoPersonalizado,
     abaAtiva,
     onSelecionarAba,
+    abasDisponiveis,
+    exibirNavegacaoInferior = true,
     usarAreaSeguraInferior = true,
-    children
+    children,
+    corFundo,
+    corTextoHeader,
+    corFundoNavegacao,
+    aplicarSafeAreaSuperiorHeader = true
 }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
+
+    const navegacaoInferior = (
+        <BottomTabBar
+            abaAtiva={abaAtiva}
+            onSelecionar={onSelecionarAba}
+            abasDisponiveis={abasDisponiveis}
+        />
+    );
+    const cabecalho = cabecalhoPersonalizado ?? (
+        <Header
+            titulo={titulo}
+            variante={varianteHeader}
+            onVoltar={onVoltar}
+            corFundo={corFundo}
+            corTexto={corTextoHeader}
+            acoes={acoesHeader}
+            aplicarSafeAreaSuperior={aplicarSafeAreaSuperiorHeader}
+        />
+    );
 
     return (
-        <View testID="main-layout" style={estilos.container}>
-            <Header titulo={titulo} variante={varianteHeader} onVoltar={onVoltar} />
+        <View
+            testID="main-layout"
+            style={[
+                estilos.container,
+                corFundo
+                    ? {
+                          backgroundColor: corFundo
+                      }
+                    : null
+            ]}
+        >
+            {cabecalho}
 
-            <View testID="conteudo-main-layout" style={estilos.conteudo}>
+            <View
+                testID="conteudo-main-layout"
+                style={[
+                    estilos.conteudo,
+                    corFundo
+                        ? {
+                              backgroundColor: corFundo
+                          }
+                        : null
+                ]}
+            >
                 {children}
             </View>
 
-            {usarAreaSeguraInferior ? (
+            {exibirNavegacaoInferior && usarAreaSeguraInferior ? (
                 <SafeAreaView
                     testID="navegacao-segura-main-layout"
                     edges={['bottom']}
-                    style={estilos.navegacaoSegura}
+                    style={[
+                        estilos.navegacaoSegura,
+                        corFundoNavegacao ? { backgroundColor: corFundoNavegacao } : null
+                    ]}
                 >
                     {navegacaoInferior}
                 </SafeAreaView>
-            ) : (
+            ) : exibirNavegacaoInferior ? (
                 navegacaoInferior
-            )}
+            ) : null}
         </View>
     );
 }

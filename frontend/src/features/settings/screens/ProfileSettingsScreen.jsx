@@ -11,6 +11,7 @@ import { GenderSelector } from '../profile/GenderSelector';
 import { ProfileSettings } from '../profile/ProfileSettings';
 import { SettingsLayout } from '../layouts/SettingsLayout/SettingsLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { isValidDate } from '../../../shared/utils/validation/isValidDate';
 import { isValidEmail } from '../../../shared/utils/validation/isValidEmail';
 import { criarEstilos } from './ProfileSettingsScreen.style';
@@ -108,6 +109,7 @@ function ProfileSettingsScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const chavePerfil = obterChavePerfil(perfil);
     const [dadosOriginais, setDadosOriginais] = useState(() => copiarDadosPerfil(perfil));
     const [dadosAtuais, setDadosAtuais] = useState(() => copiarDadosPerfil(perfil));
@@ -293,7 +295,11 @@ function ProfileSettingsScreen({
 
     if (carregando) {
         return (
-            <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
+            <SettingsLayout
+                titulo="Configurações de Perfil"
+                onVoltar={onVoltar}
+                corFundo={tema.escuro ? '#121212' : undefined}
+            >
                 <View style={estilos.estadoTela}>
                     <ActivityIndicator size="small" color={tema.cores.interface.destaque} />
                     <Text style={estilos.textoEstado}>Carregando seus dados...</Text>
@@ -304,21 +310,29 @@ function ProfileSettingsScreen({
 
     if (erroCarregamento || !perfilEhValido(perfil)) {
         return (
-            <SettingsLayout titulo="Configurações de Perfil" onVoltar={onVoltar}>
+            <SettingsLayout
+                titulo="Configurações de Perfil"
+                onVoltar={onVoltar}
+                corFundo={tema.escuro ? '#121212' : undefined}
+            >
                 <View style={estilos.estadoTela}>
                     <Text accessibilityRole="header" style={estilos.tituloErro}>
                         Ocorreu um erro
                     </Text>
-                    <Text accessibilityRole="alert" style={estilos.mensagemErro}>
+                    <Text
+                        accessibilityRole="alert"
+                        style={[estilos.mensagemErro, estilosErro.mensagem]}
+                    >
                         Não foi possível carregar suas configurações de perfil. Tente novamente.
                     </Text>
 
                     {typeof onRecarregar === 'function' ? (
                         <ButtonScreen
+                            estiloTexto={estilosErro.textoBotao}
                             texto="Tentar Novamente"
                             variante="preto"
                             aoPressionar={onRecarregar}
-                            estilo={estilos.botaoErro}
+                            estilo={[estilos.botaoErro, estilosErro.botao]}
                         />
                     ) : null}
                 </View>
@@ -330,6 +344,7 @@ function ProfileSettingsScreen({
         <>
             <SettingsLayout
                 titulo="Configurações de Perfil"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={tentarVoltar}
                 rodape={rodape}
             >
@@ -344,6 +359,10 @@ function ProfileSettingsScreen({
             </SettingsLayout>
 
             <EditFieldSheet
+                estiloCaixaCampo={estilos.caixaCampoEdicao}
+                estiloCampo={estilos.textoCampoEdicao}
+                corFundo={tema.escuro ? '#242424' : undefined}
+                estiloPainel={estilos.painelEdicao}
                 visivel={campoEditado !== null}
                 titulo={
                     campoEditado === 'email'
@@ -364,6 +383,10 @@ function ProfileSettingsScreen({
             />
 
             <GenderSelector
+                estiloOpcaoSelecionada={estilos.opcaoSelecionada}
+                estiloTextoOpcaoSelecionada={estilos.textoOpcaoSelecionada}
+                corFundo={tema.escuro ? '#242424' : undefined}
+                estiloPainel={estilos.painelEdicao}
                 visivel={generoVisivel}
                 valorSelecionado={dadosAtuais.identidadeGenero}
                 onSelecionar={selecionarGenero}
@@ -393,6 +416,7 @@ function ProfileSettingsScreen({
                 mensagem="Você tem atualizações não salvas. Deseja mesmo sair?"
                 acaoPrincipal={{
                     texto: 'Sair sem salvar',
+                    varianteVisual: 'sairSemSalvar',
                     variante: 'branco',
                     aoPressionar: sairSemSalvar
                 }}
@@ -404,6 +428,7 @@ function ProfileSettingsScreen({
             />
 
             <SimpleModal
+                erroInterno
                 visivel={erroSalvarVisivel}
                 aoFechar={() => setErroSalvarVisivel(false)}
                 icone={WarningCircleIcon}

@@ -1,7 +1,7 @@
 // Organiza cabeçalho, conteúdo e rodapé das telas internas de configurações.
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context';
 
 import { Header } from '../../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -13,31 +13,44 @@ function SettingsLayout({
     children,
     rodape,
     rodapeFixo = false,
-    testeId = 'settings-layout'
+    estiloRodapeFixo,
+    respeitarEntalhe = false,
+    testeId = 'settings-layout',
+    corFundo
 }) {
     const tema = useTheme();
+    const insets = useContext(SafeAreaInsetsContext);
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const temRodape = rodape !== undefined && rodape !== null;
 
     return (
-        <SafeAreaView testID={testeId} edges={['bottom']} style={estilos.container}>
+        <SafeAreaView
+            testID={testeId}
+            edges={respeitarEntalhe ? ['bottom', 'left', 'right'] : ['bottom']}
+            style={[estilos.container, corFundo ? { backgroundColor: corFundo } : null]}
+        >
             <Header
                 titulo={titulo}
+                corFundo={corFundo}
                 variante="comVoltar"
                 onVoltar={onVoltar}
-                usarEspacamentoSuperior
+                alturaEspacamentoSuperior={respeitarEntalhe ? Math.max(48, insets?.top ?? 0) : undefined}
             />
 
             <KeyboardAvoidingView
                 testID="teclado-settings-layout"
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={estilos.areaInterativa}
+                style={[estilos.areaInterativa, corFundo ? { backgroundColor: corFundo } : null]}
             >
                 <ScrollView
                     testID="rolagem-settings-layout"
-                    contentContainerStyle={estilos.conteudo}
+                    contentContainerStyle={
+                        corFundo
+                            ? [estilos.conteudo, { backgroundColor: corFundo }]
+                            : estilos.conteudo
+                    }
                     keyboardShouldPersistTaps="handled"
                     keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
                     contentInsetAdjustmentBehavior="never"
@@ -53,7 +66,14 @@ function SettingsLayout({
                 </ScrollView>
 
                 {temRodape && rodapeFixo ? (
-                    <View testID="rodape-fixo-settings-layout" style={estilos.rodapeFixo}>
+                    <View
+                        testID="rodape-fixo-settings-layout"
+                        style={[
+                            estilos.rodapeFixo,
+                            corFundo ? { backgroundColor: corFundo } : null,
+                            estiloRodapeFixo
+                        ]}
+                    >
                         {rodape}
                     </View>
                 ) : null}

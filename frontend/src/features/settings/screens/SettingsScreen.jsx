@@ -5,7 +5,7 @@ import { ScrollView, Text, View } from 'react-native';
 import {
     ArrowsClockwiseIcon,
     BellIcon,
-    HouseIcon,
+    GavelIcon,
     InfoIcon,
     ShieldCheckIcon,
     UserIcon,
@@ -23,10 +23,14 @@ import { criarEstilos } from './SettingsScreen.style';
 function SettingsScreen({
     onAbrirPerfil,
     onAbrirParametrosCiclo,
-    onAbrirTelaInicial,
     onAbrirNotificacoes,
+    onAbrirNotificacoesContato,
     onAbrirSobre,
     onAbrirPoliticasPrivacidade,
+    onAbrirResponsavelLegal,
+    menorDe16 = false,
+    emAcompanhamento = false,
+    abasDisponiveis,
     onSelecionarAba
 }) {
     const tema = useTheme();
@@ -54,7 +58,9 @@ function SettingsScreen({
         <>
             <MainLayout
                 titulo="Configurações"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 abaAtiva="configuracoes"
+                abasDisponiveis={abasDisponiveis}
                 onSelecionarAba={onSelecionarAba}
             >
                 <ScrollView
@@ -68,22 +74,42 @@ function SettingsScreen({
 
                         <NavigationField
                             label="Configurações de Perfil"
+                            coresIcone={
+                                tema.escuro
+                                    ? {
+                                          icone: '#A5D6A7',
+                                          caixa: 'rgba(165, 214, 167, 0.16)'
+                                      }
+                                    : undefined
+                            }
+                            estilo={estilos.campoComBorda}
                             icone={UserIcon}
                             paleta="corVerde"
                             onPress={onAbrirPerfil}
                         />
                     </View>
 
-                    <View style={estilos.secao}>
-                        <Text style={estilos.tituloSecao}>Meu Ciclo</Text>
+                    {!emAcompanhamento ? (
+                        <View style={estilos.secao}>
+                            <Text style={estilos.tituloSecao}>Meu Ciclo</Text>
 
-                        <NavigationField
-                            label="Parâmetros do Ciclo"
-                            icone={ArrowsClockwiseIcon}
-                            paleta="corLaranja"
-                            onPress={onAbrirParametrosCiclo}
-                        />
-                    </View>
+                            <NavigationField
+                                label="Parâmetros do Ciclo"
+                                coresIcone={
+                                    tema.escuro
+                                        ? {
+                                              icone: '#C85A44',
+                                              caixa: 'rgba(255, 171, 145, 0.16)'
+                                          }
+                                        : undefined
+                                }
+                                estilo={estilos.campoComBorda}
+                                icone={ArrowsClockwiseIcon}
+                                paleta="corLaranja"
+                                onPress={onAbrirParametrosCiclo}
+                            />
+                        </View>
+                    ) : null}
 
                     <View style={estilos.secao}>
                         <Text style={estilos.tituloSecao}>Preferências</Text>
@@ -98,22 +124,35 @@ function SettingsScreen({
                             <Separador estilos={estilos} />
 
                             <NavigationField
-                                label="Tela inicial"
-                                icone={HouseIcon}
-                                variante="semBorda"
-                                paleta="corVerde"
-                                onPress={onAbrirTelaInicial}
-                            />
-
-                            <Separador estilos={estilos} />
-
-                            <NavigationField
                                 label="Notificações"
+                                coresIcone={
+                                    tema.escuro
+                                        ? {
+                                              icone: '#C85A44',
+                                              caixa: 'rgba(255, 171, 145, 0.16)'
+                                          }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={BellIcon}
                                 variante="semBorda"
                                 paleta="corLaranja"
                                 onPress={onAbrirNotificacoes}
                             />
+                            {onAbrirNotificacoesContato && (
+                                <>
+                                    <Separador estilos={estilos} />
+                                    <NavigationField
+                                        label="Notificações como contato de apoio"
+                                        labelSemLimite
+                                        estilo={estilos.campo}
+                                        icone={BellIcon}
+                                        variante="semBorda"
+                                        paleta="corAzul"
+                                        onPress={onAbrirNotificacoesContato}
+                                    />
+                                </>
+                            )}
                         </View>
                     </View>
 
@@ -123,6 +162,15 @@ function SettingsScreen({
                         <View style={estilos.grupo}>
                             <NavigationField
                                 label="Sobre a aplicação"
+                                coresIcone={
+                                    tema.escuro
+                                        ? {
+                                              icone: '#B39DDB',
+                                              caixa: 'rgba(179, 157, 219, 0.16)'
+                                          }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={InfoIcon}
                                 variante="semBorda"
                                 paleta="corAzul"
@@ -131,8 +179,44 @@ function SettingsScreen({
 
                             <Separador estilos={estilos} />
 
+                            {menorDe16 ? (
+                                <>
+                                    <NavigationField
+                                        label="Responsável Legal"
+                                        coresIcone={
+                                            tema.escuro
+                                                ? {
+                                                      icone: '#FFAB91',
+                                                      caixa: 'rgba(255, 171, 145, 0.16)'
+                                                  }
+                                                : undefined
+                                        }
+                                        estilo={estilos.campo}
+                                        icone={GavelIcon}
+                                        variante="semBorda"
+                                        paleta="corLaranja"
+                                        onPress={onAbrirResponsavelLegal}
+                                    />
+
+                                    <Separador estilos={estilos} />
+                                </>
+                            ) : null}
+
                             <NavigationField
-                                label="Políticas de Privacidade"
+                                label={
+                                    emAcompanhamento
+                                        ? 'Políticas de Privacidade'
+                                        : 'Privacidade e Termos'
+                                }
+                                coresIcone={
+                                    tema.escuro
+                                        ? {
+                                              icone: '#A5D6A7',
+                                              caixa: 'rgba(165, 214, 167, 0.16)'
+                                          }
+                                        : undefined
+                                }
+                                estilo={estilos.campo}
                                 icone={ShieldCheckIcon}
                                 variante="semBorda"
                                 paleta="corVerde"
@@ -152,6 +236,7 @@ function SettingsScreen({
             />
 
             <SimpleModal
+                erroInterno
                 visivel={Boolean(erro)}
                 aoFechar={limparErro}
                 icone={WarningCircleIcon}

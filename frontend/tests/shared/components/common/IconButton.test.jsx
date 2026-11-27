@@ -100,6 +100,7 @@ describe('IconButton', () => {
             disabled: false,
             selected: true
         });
+        expect(IconeTeste).toHaveBeenCalledWith(expect.objectContaining({ size: 28 }), undefined);
     });
 
     test('usa a variante de calendário do protótipo', async () => {
@@ -112,16 +113,45 @@ describe('IconButton', () => {
             />
         );
 
-        expect(
-            screen.getByRole('button', {
-                name: 'Abrir calendário'
-            })
-        ).toHaveStyle(variantes.calendario.container);
+        const botao = screen.getByRole('button', { name: 'Abrir calendário' });
+        expect(botao).toHaveStyle({
+            width: 44,
+            height: 44,
+            backgroundColor: '#FFFFFF',
+            borderWidth: 0.666667,
+            borderColor: '#E6E2D8',
+            borderRadius: 16
+        });
 
         expect(IconeTeste).toHaveBeenCalledWith(
             expect.objectContaining({
-                size: 22,
-                color: temaClaro.cores.interface.textoSecundario
+                size: 28,
+                color: '#C85A44'
+            }),
+            undefined
+        );
+    });
+
+    test('usa a variante da Rede de Apoio com ícone de 32 pixels', async () => {
+        await render(
+            <IconButton
+                icone={IconeTeste}
+                aoPressionar={jest.fn()}
+                rotuloAcessibilidade="Filtrar contatos"
+                variante="redeApoio"
+            />
+        );
+
+        expect(
+            screen.getByRole('button', {
+                name: 'Filtrar contatos'
+            })
+        ).toHaveStyle(variantes.redeApoio.container);
+
+        expect(IconeTeste).toHaveBeenCalledWith(
+            expect.objectContaining({
+                size: 32,
+                weight: 'regular'
             }),
             undefined
         );
@@ -225,6 +255,35 @@ describe('IconButton', () => {
         expect(botao).toHaveProp('hitSlop', 4);
     });
 
+    test('oferece apresentação compacta com área efetiva de toque preservada', async () => {
+        await render(
+            <IconButton
+                icone={IconeTeste}
+                compacto
+                aoPressionar={jest.fn()}
+                rotuloAcessibilidade="Editar registro"
+            />
+        );
+        const botao = screen.getByRole('button', { name: 'Editar registro' });
+        expect(botao).toHaveStyle({ width: 32, height: 32 });
+        expect(botao).toHaveProp('hitSlop', 6);
+        expect(IconeTeste).toHaveBeenCalledWith(expect.objectContaining({ size: 16 }), undefined);
+    });
+
+    test.each([
+        ['redeApoio', '#A5D6A7'],
+        ['redeApoioSecundario', '#C26E5F']
+    ])('usa a paleta noturna padronizada na variante de cabeçalho %s', (variante, cor) => {
+        expect(criarEstilos(temaEscuro).variantes[variante]).toMatchObject({
+            container: {
+                backgroundColor: '#1E1E1E',
+                borderWidth: 0.667,
+                borderColor: 'rgba(255, 255, 255, 0.08)'
+            },
+            icone: cor
+        });
+    });
+
     test('usa superfície, borda e ícone do modo escuro', async () => {
         const visualEscuro = criarEstilos(temaEscuro);
 
@@ -246,7 +305,7 @@ describe('IconButton', () => {
 
         expect(IconeTeste).toHaveBeenCalledWith(
             expect.objectContaining({
-                color: '#C4C8C5'
+                color: '#999999'
             }),
             undefined
         );

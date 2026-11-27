@@ -1,16 +1,22 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import { CalendarBlankIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { CycleDateStrip } from '../components/CycleDateStrip';
-import { CycleForecastPanel } from '../components/CycleForecastPanel';
+import { CycleHomeContent } from '../components/home/CycleHomeContent';
+import { CycleHomeHeader } from '../components/home/CycleHomeHeader';
+import { NoCycleHomeContent } from '../components/home/NoCycleHomeContent';
+import { CycleHomeSheets } from '../components/sheets/CycleHomeSheets';
+import { ReturnToTodayButton } from '../components/ReturnToTodayButton';
 import { conteudoPorFase } from '../constants/phaseContent';
+import { useCycleDateRange } from '../hooks/useCycleDateRange';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
-import { criarDiasDaFaixa, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
+import { criarCycleHomeViewModel } from '../utils/cycleHomeViewModel';
+import { obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleTodayScreen.styles';
 
 const CONFIGURACOES_ERRO = Object.freeze({
@@ -23,8 +29,6 @@ const CONFIGURACOES_ERRO = Object.freeze({
         mensagem: 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
     })
 });
-const DIAS_POR_PAGINA = 14;
-const FAIXA_INICIAL = Object.freeze({ deslocamentoInicial: -3, quantidade: 16 });
 
 function CycleTodayScreen({
     ciclo,
@@ -35,75 +39,70 @@ function CycleTodayScreen({
     erro = false,
     erroPrevisao = false,
     erroSincronizacao = false,
+    dataAtual,
     dataSelecionada,
     aoSelecionarData,
     aoTentarNovamente,
     aoVoltar,
     aoCadastrarMenstruacao,
-    aoAbrirDiario,
+    aoCadastrarDiario,
+    aoEditarDiario,
     aoAbrirAnticoncepcional,
-    aoAbrirCalendario,
-    aoSelecionarAba
+    aoAbrirHistorico,
+    aoSelecionarAba,
+    diaryService,
+    onSessaoExpirada
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const corCarregamento = tema.escuro
-        ? tema.cores.interface.destaque
+        ? coresNoturnasConteudo.verde
         : tema.cores.marca.secundaria;
-    const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
-    const dataBaseDaFaixa = previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
+    const [sheetAberto, setSheetAberto] = useState(null);
+    const dataBaseDaFaixa =
+        dataAtual || previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
     const referencia = dataSelecionada || dataBaseDaFaixa;
     const fases = previsao?.fasesEstimadas || ciclo?.fasesEstimadas || ciclo?.fases;
     const fase = referencia
         ? obterFase(referencia, fases, previsao?.duracaoCicloEstimada)
         : 'desconhecida';
-    const faixaAtual =
-        faixaDias.dataBase === dataBaseDaFaixa
-            ? faixaDias
-            : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-    const dias = dataBaseDaFaixa
-        ? criarDiasDaFaixa(
-              dataBaseDaFaixa,
-              fases,
-              faixaAtual.deslocamentoInicial,
-              faixaAtual.quantidade,
-              previsao?.duracaoCicloEstimada
-          )
-        : [];
-    const carregarDias = (direcao) =>
-        setFaixaDias((atual) => {
-            const base =
-                atual.dataBase === dataBaseDaFaixa
-                    ? atual
-                    : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-            return {
-                ...base,
-                deslocamentoInicial:
-                    direcao === 'anteriores'
-                        ? base.deslocamentoInicial - DIAS_POR_PAGINA
-                        : base.deslocamentoInicial,
-                quantidade: base.quantidade + DIAS_POR_PAGINA
-            };
-        });
-    const semDados = !previsao || previsao.status === 'DADOS_INSUFICIENTES';
+    const { dias, carregarDias } = useCycleDateRange({
+        dataBase: dataBaseDaFaixa,
+        fases,
+        duracaoCiclo: previsao?.duracaoCicloEstimada
+    });
+    const home = criarCycleHomeViewModel({
+        previsao,
+        fase,
+        dataSelecionada: referencia,
+        janelaFertil
+    });
+    const semPrevisao = home.estado !== 'comCiclo';
     const tipoErro = erroSincronizacao ? 'sincronizacao' : erroPrevisao || erro ? 'previsao' : null;
     const configuracaoErro = CONFIGURACOES_ERRO[tipoErro] || CONFIGURACOES_ERRO.previsao;
+    const fecharSheet = () => setSheetAberto(null);
+    const callbacksHome = {
+        aoCadastrarMenstruacao,
+        aoAbrirDiario: aoCadastrarDiario,
+        aoEditarDiario,
+        aoAbrirAnticoncepcional,
+        aoAbrirConfiabilidade: () => setSheetAberto('confiabilidade'),
+        aoAbrirRespiracao: () => setSheetAberto('respiracao'),
+        aoAbrirReflexao: () => setSheetAberto('reflexao'),
+        aoAbrirEducacao: () => setSheetAberto('educacao')
+    };
+    const modeloHome = {
+        ...home,
+        dataSelecionada: referencia,
+        diaCiclo: obterDiaCiclo(referencia, fases),
+        janelaFertil,
+        previsao,
+        conteudoDaFase: conteudoDaFase ?? conteudoPorFase[fase]
+    };
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
-            {!carregando ? (
-                <View style={estilos.cabecalho}>
-                    <Text style={estilos.titulo}>Aloya - Seu Ciclo Hoje</Text>
-                    <View style={estilos.acoesCabecalho}>
-                        <IconButton
-                            icone={CalendarBlankIcon}
-                            aoPressionar={aoAbrirCalendario}
-                            rotuloAcessibilidade="Abrir calendário"
-                            variante="calendario"
-                        />
-                    </View>
-                </View>
-            ) : null}
+            <CycleHomeHeader data={referencia} aoAbrirHistorico={aoAbrirHistorico} />
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}>
                     <ActivityIndicator size="large" color={corCarregamento} />
@@ -123,24 +122,36 @@ function CycleTodayScreen({
                             aoSelecionarData={aoSelecionarData}
                             aoCarregarAnteriores={() => carregarDias('anteriores')}
                             aoCarregarPosteriores={() => carregarDias('posteriores')}
+                            semCiclo={semPrevisao}
                         />
                     ) : null}
-                    <CycleForecastPanel
-                        fase={fase}
-                        diaCiclo={obterDiaCiclo(referencia, fases)}
-                        janelaFertil={janelaFertil}
-                        previsao={semDados ? null : previsao}
-                        conteudoDaFase={conteudoDaFase ?? conteudoPorFase[fase]}
-                        aoCadastrarMenstruacao={aoCadastrarMenstruacao}
-                        aoAbrirDiario={aoAbrirDiario}
-                        aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
-                    />
+                    {referencia !== dataBaseDaFaixa ? (
+                        <ReturnToTodayButton onPress={() => aoSelecionarData?.(dataBaseDaFaixa)} />
+                    ) : null}
+                    {!semPrevisao ? (
+                        <CycleHomeContent
+                            modelo={modeloHome}
+                            callbacks={callbacksHome}
+                            diaryService={diaryService}
+                            onSessaoExpirada={onSessaoExpirada}
+                        />
+                    ) : (
+                        <NoCycleHomeContent
+                            motivoSemPrevisao={
+                                home.estado === 'dadosInsuficientes'
+                                    ? 'dadosInsuficientes'
+                                    : 'primeiroUso'
+                            }
+                            {...callbacksHome}
+                        />
+                    )}
                 </ScrollView>
             )}
             <SafeAreaView edges={['bottom']} style={estilos.navegacaoSegura}>
                 <BottomTabBar abaAtiva="inicio" onSelecionar={aoSelecionarAba} />
             </SafeAreaView>
             <SimpleModal
+                erroInterno
                 visivel={!carregando && Boolean(tipoErro)}
                 aoFechar={aoVoltar}
                 icone={WarningCircleIcon}
@@ -154,6 +165,15 @@ function CycleTodayScreen({
                     aoPressionar: aoTentarNovamente
                 }}
                 acaoSecundaria={{ texto: 'Voltar', variante: 'branco', aoPressionar: aoVoltar }}
+            />
+            <CycleHomeSheets
+                aberto={sheetAberto}
+                nivel={home.nivelConfiabilidade ?? 'baixa'}
+                fase={fase}
+                data={referencia}
+                diaryService={diaryService}
+                onSessaoExpirada={onSessaoExpirada}
+                aoFechar={fecharSheet}
             />
         </SafeAreaView>
     );

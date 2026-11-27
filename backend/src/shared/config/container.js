@@ -6,6 +6,8 @@ import rateLimit from 'express-rate-limit';
 
 import { env } from './env.js';
 import { prisma } from './prisma.js';
+import { criarNotificationPreferencesService } from '../../features/notifications/notificationPreferences.service.js';
+import { publicarSeguranca } from '../../features/notifications/securityPushEvents.js';
 import { criarCycleRegistrationModule } from '../../features/cycles/cycleRegistration.module.js';
 
 import * as dateUtils from '../utils/date.utils.js';
@@ -16,8 +18,7 @@ import {
     criarConfiguracoesContaRateLimit,
     criarAlteracaoSenhaRateLimit,
     criarExclusaoContaRateLimit,
-    criarEmailRateLimit,
-    criarLoginRateLimit
+    criarEmailRateLimit
 } from '../middleware/rateLimit.middleware.js';
 
 import { criarPasswordService } from '../../features/auth/services/password.service.js';
@@ -58,7 +59,8 @@ import { criarPredictionController } from '../../features/cycles/controllers/pre
 
 import {
     criarEdicaoAnticoncepcionalRateLimit,
-    criarRemocaoAnticoncepcionalRateLimit
+    criarRemocaoAnticoncepcionalRateLimit,
+    criarUsoAnticoncepcionalRateLimit
 } from '../../features/contraceptives/middleware/contraceptiveRateLimit.middleware.js';
 
 import { criarCalendarModule } from '../../features/calendar/calendar.module.js';
@@ -87,6 +89,31 @@ import { criarPermissionCategoryDeletionService } from '../../features/support-n
 import { criarPermissionCategoryDeletionValidator } from '../../features/support-network/validators/permissionCategoryDeletion.validator.js';
 import { criarPermissionCategoryDeletionController } from '../../features/support-network/controllers/permissionCategoryDeletion.controller.js';
 import { criarPermissionCategoryDeletionRateLimit } from '../../features/support-network/middleware/permissionCategoryDeletionRateLimit.middleware.js';
+import { criarContactInvitationPermissionService } from '../../features/support-network/services/contactInvitationPermission.service.js';
+import { criarContactInvitationTokenService } from '../../features/support-network/services/contactInvitationToken.service.js';
+import { criarContactInvitationService } from '../../features/support-network/services/contactInvitation.service.js';
+import { criarContactInvitationValidator } from '../../features/support-network/validators/contactInvitation.validator.js';
+import { criarContactInvitationController } from '../../features/support-network/controllers/contactInvitation.controller.js';
+import { criarContactInvitationRateLimit } from '../../features/support-network/middleware/contactInvitationRateLimit.middleware.js';
+import { criarContactRegistrationValidator } from '../../features/support-network/validators/contactRegistration.validator.js';
+import { criarContactInvitationResponseService } from '../../features/support-network/services/contactInvitationResponse.service.js';
+import { criarContactInvitationResponseController } from '../../features/support-network/controllers/contactInvitationResponse.controller.js';
+import { criarContactInvitationResponseRateLimit } from '../../features/support-network/middleware/contactInvitationResponseRateLimit.middleware.js';
+import { criarSupportContactService } from '../../features/support-network/services/supportContact.service.js';
+import { criarSharedSupportAccess } from '../../features/support-network/services/sharedSupportAccess.service.js';
+import { criarSharedSupportData } from '../../features/support-network/services/sharedSupportData.service.js';
+import { criarSharedSupportDiary } from '../../features/support-network/services/sharedSupportDiary.service.js';
+import { criarSupportContactController } from '../../features/support-network/controllers/supportContact.controller.js';
+import { criarSupportContactValidator } from '../../features/support-network/validators/supportContact.validator.js';
+import { criarContactInvitationResendService } from '../../features/support-network/services/contactInvitationResend.service.js';
+import { criarContactLinkService } from '../../features/support-network/services/contactLink.service.js';
+import { criarContactLinkValidator } from '../../features/support-network/validators/contactLink.validator.js';
+import { criarContactLinkController } from '../../features/support-network/controllers/contactLink.controller.js';
+import { criarContactLinkRateLimit } from '../../features/support-network/middleware/contactLinkRateLimit.middleware.js';
+import { criarSupportContactRemovalService } from '../../features/support-network/services/supportContactRemoval.service.js';
+import { criarSupportContactRemovalValidator } from '../../features/support-network/validators/supportContactRemoval.validator.js';
+import { criarSupportContactRemovalController } from '../../features/support-network/controllers/supportContactRemoval.controller.js';
+import { criarSupportContactRemovalRateLimit } from '../../features/support-network/middleware/supportContactRemovalRateLimit.middleware.js';
 
 import { criarAccountService } from '../../features/settings/services/account.service.js';
 
@@ -107,6 +134,28 @@ import { criarAccountController } from '../../features/settings/controllers/acco
 import { criarAccountDeletionController } from '../../features/settings/controllers/accountDeletion.controller.js';
 
 import { criarLogoutController } from '../../features/auth/controllers/logout.controller.js';
+import { criarDiaryCatalogBootstrap } from '../../features/diary/services/diaryCatalogBootstrap.service.js';
+import { criarDiaryCatalogService } from '../../features/diary/services/diaryCatalog.service.js';
+import { criarDiaryPreferencesService } from '../../features/diary/services/diaryPreferences.service.js';
+import { criarDiaryCatalogController } from '../../features/diary/controllers/diaryCatalog.controller.js';
+import { validarAtualizacaoPreferencia } from '../../features/diary/validators/diaryPreferences.validator.js';
+import { criarDiaryPhaseService } from '../../features/diary/services/diaryPhase.service.js';
+import { criarDiaryEntryService } from '../../features/diary/services/diaryEntry.service.js';
+import { criarDiaryEntryController } from '../../features/diary/controllers/diaryEntry.controller.js';
+import { validarCriacaoRegistro } from '../../features/diary/validators/diaryEntry.validator.js';
+import { criarDiaryHistoryService } from '../../features/diary/services/diaryHistory.service.js';
+import { criarDiaryDetailService } from '../../features/diary/services/diaryDetail.service.js';
+import { criarDiaryHistoryController } from '../../features/diary/controllers/diaryHistory.controller.js';
+import { criarDiaryOverviewService } from '../../features/diary/services/diaryOverview.service.js';
+import { criarDiaryOverviewController } from '../../features/diary/controllers/diaryOverview.controller.js';
+import { validarResumoDiario } from '../../features/diary/validators/diaryOverview.validator.js';
+import { validarHistorico } from '../../features/diary/validators/diaryHistory.validator.js';
+import { validarLotePreferencias } from '../../features/diary/validators/diaryPreferencesBatch.validator.js';
+import { criarDiaryEditService } from '../../features/diary/services/diaryEdit.service.js';
+import { criarDiaryDeletionService } from '../../features/diary/services/diaryDeletion.service.js';
+import { criarDiaryMutationController } from '../../features/diary/controllers/diaryMutation.controller.js';
+import { criarThermalRecalculationService } from '../../features/diary/thermal/thermalRecalculation.service.js';
+import { criarDiaryPreferencesRateLimit } from '../../features/diary/middleware/diaryPreferencesRateLimit.middleware.js';
 
 import { criarAuthMiddleware } from '../middleware/auth.middleware.js';
 
@@ -157,7 +206,8 @@ function criarContainer() {
         tokenService,
         passwordService,
         emailService,
-        baseUrl: env.passwordResetBaseUrl
+        baseUrl: env.passwordResetBaseUrl,
+        publicarSeguranca
     });
 
     const passwordRecoveryValidator = criarPasswordRecoveryValidator();
@@ -179,7 +229,8 @@ function criarContainer() {
         prisma,
         passwordService,
         parentalConsentService,
-        dateUtils
+        dateUtils,
+        publicarSeguranca
     });
 
     const accountDeletionService = criarAccountDeletionService({
@@ -192,6 +243,7 @@ function criarContainer() {
     });
 
     const contraceptiveService = criarContraceptiveService(prisma);
+    const notificationPreferencesService = criarNotificationPreferencesService(prisma);
     const contraceptiveUsageService = criarContraceptiveUsageService(prisma, {
         avaliarJanelaEficacia: criarAvaliadorJanelaEficacia(lerJanelasDeUso())
     });
@@ -202,6 +254,54 @@ function criarContainer() {
         prisma
     });
 
+    const diaryCatalogBootstrap = criarDiaryCatalogBootstrap({ prisma });
+    const diaryCatalogService = criarDiaryCatalogService({ prisma });
+    const diaryPreferencesService = criarDiaryPreferencesService({
+        prisma,
+        bootstrap: diaryCatalogBootstrap
+    });
+    const diaryCatalogController = criarDiaryCatalogController({
+        catalogService: diaryCatalogService,
+        preferencesService: diaryPreferencesService,
+        validarLote: validarLotePreferencias
+    });
+    const diaryPhaseService = criarDiaryPhaseService({ prisma });
+    const thermalRecalculation = criarThermalRecalculationService();
+    const diaryEntryService = criarDiaryEntryService({
+        prisma,
+        bootstrap: diaryCatalogBootstrap,
+        phaseService: diaryPhaseService,
+        thermalRecalculation
+    });
+    const diaryEntryController = criarDiaryEntryController({
+        service: diaryEntryService,
+        validarCriacao: validarCriacaoRegistro
+    });
+    const diaryHistoryService = criarDiaryHistoryService({ prisma });
+    const diaryDetailService = criarDiaryDetailService({ prisma });
+    const diaryHistoryController = criarDiaryHistoryController({
+        historyService: diaryHistoryService,
+        detailService: diaryDetailService,
+        validarHistorico
+    });
+    const diaryOverviewService = criarDiaryOverviewService({ prisma });
+    const diaryOverviewController = criarDiaryOverviewController({
+        service: diaryOverviewService,
+        validarResumo: validarResumoDiario
+    });
+    const diaryEditService = criarDiaryEditService({
+        prisma,
+        bootstrap: diaryCatalogBootstrap,
+        phaseService: diaryPhaseService,
+        thermalRecalculation
+    });
+    const diaryDeletionService = criarDiaryDeletionService({ prisma, thermalRecalculation });
+    const diaryMutationController = criarDiaryMutationController({
+        editService: diaryEditService,
+        deletionService: diaryDeletionService,
+        validarEdicao: validarCriacaoRegistro
+    });
+
     const cycleHistoryRepository = criarCycleHistoryRepository({
         prisma
     });
@@ -210,9 +310,9 @@ function criarContainer() {
         repository: cycleHistoryRepository
     });
 
-    const cycleRemovalModule = criarCycleRemovalModule({ prisma });
+    const cycleRemovalModule = criarCycleRemovalModule({ prisma, thermalRecalculation });
     const cycleEditValidator = criarCycleEditValidator();
-    const cycleEditService = criarCycleEditService({ prisma });
+    const cycleEditService = criarCycleEditService({ prisma, thermalRecalculation });
 
     const predictionService = criarPredictionService({ prisma });
 
@@ -230,6 +330,30 @@ function criarContainer() {
     const permissionCategoryDeletionService = criarPermissionCategoryDeletionService({
         prisma
     });
+    const contactInvitationPermissionService = criarContactInvitationPermissionService({ prisma });
+    const contactInvitationTokenService = criarContactInvitationTokenService({
+        crypto,
+        baseUrl: env.supportInvitationBaseUrl
+    });
+    const contactInvitationService = criarContactInvitationService({
+        prisma,
+        permissionService: contactInvitationPermissionService,
+        tokenService: contactInvitationTokenService,
+        emailService
+    });
+    const contactInvitationResponseService = criarContactInvitationResponseService({
+        prisma,
+        tokenService: contactInvitationTokenService,
+        passwordService
+    });
+    const supportContactService = criarSupportContactService({ prisma });
+    const contactInvitationResendService = criarContactInvitationResendService({
+        prisma,
+        tokenService: contactInvitationTokenService,
+        emailService
+    });
+    const contactLinkService = criarContactLinkService({ prisma });
+    const supportContactRemovalService = criarSupportContactRemovalService({ prisma });
 
     const authValidator = criarAuthValidator({
         dateUtils
@@ -245,6 +369,11 @@ function criarContainer() {
 
     const permissionCategoryValidator = criarPermissionCategoryValidator();
     const permissionCategoryDeletionValidator = criarPermissionCategoryDeletionValidator();
+    const contactInvitationValidator = criarContactInvitationValidator();
+    const contactRegistrationValidator = criarContactRegistrationValidator();
+    const supportContactValidator = criarSupportContactValidator();
+    const contactLinkValidator = criarContactLinkValidator();
+    const supportContactRemovalValidator = criarSupportContactRemovalValidator();
 
     const authMiddleware = criarAuthMiddleware({
         tokenService,
@@ -259,12 +388,6 @@ function criarContainer() {
         rateLimit,
         janelaMs: env.cadastroRateLimitJanelaMs,
         limite: env.cadastroRateLimitMaximo
-    });
-
-    const loginRateLimit = criarLoginRateLimit({
-        rateLimit,
-        janelaMs: env.loginRateLimitJanelaMs,
-        limite: env.loginRateLimitMaximo
     });
 
     const contaLoginRateLimit = criarContaLoginRateLimit({
@@ -285,6 +408,28 @@ function criarContainer() {
         limite: env.configuracoesContaRateLimitMaximo
     });
 
+    const notificationPreferencesRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: 120,
+        evento: 'limite_preferencias_notificacao',
+        codigo: 'LIMITE_PREFERENCIAS_NOTIFICACAO'
+    });
+
+    const pushDevicesRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo,
+        evento: 'limite_alteracoes_dispositivos_notificacao',
+        codigo: 'LIMITE_DISPOSITIVOS_NOTIFICACAO'
+    });
+
+    const diaryPreferencesRateLimit = criarDiaryPreferencesRateLimit({
+        rateLimit,
+        janelaMs: env.diarioPreferenciasRateLimitJanelaMs,
+        limite: env.diarioPreferenciasRateLimitMaximo
+    });
+
     const permissionCategoryRateLimit = criarPermissionCategoryRateLimit({
         rateLimit,
         janelaMs: env.configuracoesContaRateLimitJanelaMs,
@@ -298,6 +443,34 @@ function criarContainer() {
     });
 
     const permissionCategoryDeletionRateLimit = criarPermissionCategoryDeletionRateLimit({
+        rateLimit,
+        janelaMs: env.exclusaoContaRateLimitJanelaMs,
+        limite: env.exclusaoContaRateLimitMaximo
+    });
+    const contactInvitationLookupRateLimit = criarContactInvitationRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo,
+        codigo: 'LIMITE_CONSULTAS_CONTATO',
+        mensagem: 'Muitas consultas de contato. Aguarde alguns minutos e tente novamente.',
+        evento: 'limite_consulta_contato_rede_apoio'
+    });
+    const contactInvitationRateLimit = criarContactInvitationRateLimit({
+        rateLimit,
+        janelaMs: env.supportInvitationRateLimitJanelaMs,
+        limite: env.supportInvitationRateLimitMaximo
+    });
+    const contactInvitationResponseRateLimit = criarContactInvitationResponseRateLimit({
+        rateLimit,
+        janelaMs: env.emailRateLimitJanelaMs,
+        limite: env.emailRateLimitMaximo
+    });
+    const contactLinkRateLimit = criarContactLinkRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo
+    });
+    const supportContactRemovalRateLimit = criarSupportContactRemovalRateLimit({
         rateLimit,
         janelaMs: env.exclusaoContaRateLimitJanelaMs,
         limite: env.exclusaoContaRateLimitMaximo
@@ -320,6 +493,8 @@ function criarContainer() {
         janelaMs: env.edicaoAnticoncepcionalRateLimitJanelaMs,
         limite: env.edicaoAnticoncepcionalRateLimitMaximo
     });
+
+    const usoAnticoncepcionalRateLimit = criarUsoAnticoncepcionalRateLimit({ rateLimit });
 
     const remocaoAnticoncepcionalRateLimit = criarRemocaoAnticoncepcionalRateLimit({
         rateLimit,
@@ -376,15 +551,44 @@ function criarContainer() {
         permissionCategoryDeletionValidator,
         permissionCategoryValidator
     });
+    const contactInvitationController = criarContactInvitationController({
+        service: contactInvitationService,
+        validator: contactInvitationValidator
+    });
+    const contactInvitationResponseController = criarContactInvitationResponseController({
+        service: contactInvitationResponseService,
+        invitationValidator: contactInvitationValidator,
+        registrationValidator: contactRegistrationValidator
+    });
+    const supportContactController = criarSupportContactController({
+        service: supportContactService,
+        resendService: contactInvitationResendService,
+        responseService: contactInvitationResponseService,
+        validator: supportContactValidator
+    });
+    const contactLinkController = criarContactLinkController({
+        service: contactLinkService,
+        contactValidator: supportContactValidator,
+        linkValidator: contactLinkValidator
+    });
+    const supportContactRemovalController = criarSupportContactRemovalController({
+        service: supportContactRemovalService,
+        contactValidator: supportContactValidator,
+        removalValidator: supportContactRemovalValidator
+    });
 
     return {
         authController,
-        cycleRegistrationController: criarCycleRegistrationModule({ prisma }).controller,
+        cycleRegistrationController: criarCycleRegistrationModule({
+            prisma,
+            thermalRecalculation
+        }).controller,
         accountController,
         cycleParametersController,
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        notificationPreferencesService,
         contraceptiveUsageController,
         calendarController: calendarModule.calendarController,
         cycleHistoryController,
@@ -394,21 +598,57 @@ function criarContainer() {
         predictionController,
         permissionCategoryController,
         permissionCategoryDeletionController,
+        contactInvitationController,
+        contactInvitationResponseController,
+        supportContactController,
+        sharedSupport: {
+            access: criarSharedSupportAccess({ prisma }),
+            data: criarSharedSupportData({
+                prisma,
+                calendarService: calendarModule.calendarService,
+                currentCycleService: calendarModule.currentCycleService,
+                predictionService,
+                cycleHistoryService,
+                contraceptiveService
+            }),
+            diary: criarSharedSupportDiary({
+                prisma,
+                currentCycleService: calendarModule.currentCycleService,
+                diaryOverviewService,
+                diaryDetailService
+            })
+        },
+        contactLinkController,
+        supportContactRemovalController,
         authMiddleware,
         parentalConsentMiddleware,
         cadastroRateLimit,
         emailRateLimit,
-        loginRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
+        notificationPreferencesRateLimit,
+        pushDevicesRateLimit,
+        diaryPreferencesRateLimit,
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,
         permissionCategoryDeletionRateLimit,
+        contactInvitationLookupRateLimit,
+        contactInvitationRateLimit,
+        contactInvitationResponseRateLimit,
+        contactLinkRateLimit,
+        supportContactRemovalRateLimit,
         alteracaoSenhaRateLimit,
         exclusaoContaRateLimit,
         passwordRecoveryController,
         edicaoAnticoncepcionalRateLimit,
-        remocaoAnticoncepcionalRateLimit
+        usoAnticoncepcionalRateLimit,
+        remocaoAnticoncepcionalRateLimit,
+        diaryCatalogController,
+        diaryEntryController,
+        diaryHistoryController,
+        diaryOverviewController,
+        diaryMutationController,
+        validarAtualizacaoPreferencia
     };
 }
 

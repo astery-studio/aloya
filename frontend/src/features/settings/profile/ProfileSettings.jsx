@@ -33,6 +33,7 @@ function ProfileSettings({
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
     const camposBloqueados = bloqueado || salvando;
+    const salvarDesativado = !podeSalvar || camposBloqueados || typeof onSalvar !== 'function';
 
     return (
         <View style={estilos.container}>
@@ -75,8 +76,14 @@ function ProfileSettings({
 
                 <NavigationField
                     label="Alterar Senha"
+                    estilo={estilos.campoAlterarSenha}
                     icone={LockKeyIcon}
                     paleta="corAzul"
+                    coresIcone={
+                        tema.escuro
+                            ? { caixa: 'rgba(179, 157, 219, 0.16)', icone: '#B39DDB' }
+                            : undefined
+                    }
                     onPress={onAlterarSenha}
                     desabilitado={camposBloqueados}
                 />
@@ -86,7 +93,9 @@ function ProfileSettings({
                 texto="Salvar alterações"
                 variante="verde"
                 aoPressionar={onSalvar}
-                desativado={!podeSalvar || camposBloqueados}
+                desativado={salvarDesativado}
+                estilo={salvarDesativado && estilos.botaoSalvarDesativado}
+                estiloTexto={salvarDesativado && estilos.textoSalvarDesativado}
                 carregando={salvando}
             />
         </View>

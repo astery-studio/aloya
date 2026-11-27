@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus } from 'phosphor-react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
 import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import { ContraceptiveCard } from '../components/ContraceptiveCard';
 import { criarEstilos } from './contraceptiveScreens.styles';
 
@@ -18,6 +19,8 @@ function ContraceptivesScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
+    const exibeFab = !carregando && !erro && typeof onCadastrarNovo === 'function';
     let estadoVazio = (
         <View style={estilos.vazio}>
             <Text style={estilos.tituloVazio}>Nenhum anticoncepcional cadastrado</Text>
@@ -37,8 +40,10 @@ function ContraceptivesScreen({
         estadoVazio = (
             <View style={estilos.vazio}>
                 <Text style={estilos.tituloVazio}>Não foi possível carregar</Text>
-                <Text style={estilos.textoVazio}>{erro}</Text>
+                <Text style={[estilos.textoVazio, estilosErro.mensagem]}>{erro}</Text>
                 <ButtonScreen
+                    estilo={estilosErro.botao}
+                    estiloTexto={estilosErro.textoBotao}
                     texto="Tentar novamente"
                     variante="preto"
                     aoPressionar={onTentarNovamente}
@@ -47,29 +52,33 @@ function ContraceptivesScreen({
         );
 
     return (
-        <SafeAreaView style={estilos.tela} edges={['top', 'left', 'right', 'bottom']}
-            testID="lista-anticoncepcionais-area-segura">
-            <Header titulo="Meus Anticoncepcionais" variante="comVoltar" onVoltar={onVoltar} />
+        <SafeAreaView
+            style={estilos.tela}
+            edges={['top', 'left', 'right', 'bottom']}
+            testID="lista-anticoncepcionais-area-segura"
+        >
+            <Header
+                titulo="Meus Anticoncepcionais"
+                variante="comVoltar"
+                onVoltar={onVoltar}
+                aplicarSafeAreaSuperior={false}
+            />
             <FlatList
                 data={anticoncepcionais}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <ContraceptiveCard anticoncepcional={item} />}
-                contentContainerStyle={estilos.lista}
+                contentContainerStyle={[estilos.lista, exibeFab && estilos.espacoFab]}
                 ItemSeparatorComponent={() => <View style={estilos.separador} />}
                 ListEmptyComponent={estadoVazio}
-                ListFooterComponent={
-                    carregando || erro ? null : (
-                        <View style={estilos.acao}>
-                            <ButtonScreen
-                                texto="Cadastrar novo anticoncepcional"
-                                variante="verde"
-                                icone={Plus}
-                                aoPressionar={onCadastrarNovo}
-                            />
-                        </View>
-                    )
-                }
             />
+            {exibeFab ? (
+                <FloatingActionButton
+                    aoPressionar={onCadastrarNovo}
+                    rotuloAcessibilidade="Cadastrar novo anticoncepcional"
+                    considerarAreaSeguraLateral
+                    testID="contraceptives-add-fab"
+                />
+            ) : null}
         </SafeAreaView>
     );
 }

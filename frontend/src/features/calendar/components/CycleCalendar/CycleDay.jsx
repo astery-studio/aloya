@@ -29,7 +29,8 @@ function criarRotuloAcessibilidade(dia) {
     const menstruacaoRegistrada =
         dia.menstruacaoRegistrada ?? Boolean(dia.registroCicloId && !dia.previsto);
 
-    if (menstruacaoRegistrada) partes.push('menstruação registrada');
+    if (dia.local) partes.push('menstruação aguardando sincronização');
+    else if (menstruacaoRegistrada) partes.push('menstruação registrada');
     else if (dia.tipo) partes.push(`${dia.previsto ? 'provável ' : ''}${rotulosPorTipo[dia.tipo]}`);
     if (dia.janelaFertil)
         partes.push(dia.janelaFertilPrevista ? 'provável janela fértil' : 'janela fértil');
@@ -48,7 +49,9 @@ function ConteudoDia({ dia, estilos, corIconeMarcado }) {
                     <Icone
                         color={corIconeMarcado}
                         size={10.992}
-                        weight={dia.tipo === TIPOS_DIA.menstruacao ? 'fill' : 'regular'}
+                        weight={
+                            dia.tipo === TIPOS_DIA.menstruacao && !dia.local ? 'fill' : 'regular'
+                        }
                     />
                 </View>
             ) : null}
@@ -66,12 +69,11 @@ function ConteudoDia({ dia, estilos, corIconeMarcado }) {
 }
 
 function CycleDay({ dia, aoPressionarDia, estilosTema = estilosTemaClaro }) {
-    const { estilos, estilosTipos, estilosTiposPrevistos, corIconeMarcado } = estilosTema;
+    const { estilos, corIconeMarcado } = estilosTema;
 
     if (!dia) return <View style={estilos.celulaDia} />;
 
     const interativo = Boolean(dia.registroCicloId && typeof aoPressionarDia === 'function');
-    const estiloTipo = dia.previsto ? estilosTiposPrevistos[dia.tipo] : estilosTipos[dia.tipo];
     const rotuloAcessibilidade = criarRotuloAcessibilidade(dia);
 
     function pressionar() {
@@ -81,18 +83,6 @@ function CycleDay({ dia, aoPressionarDia, estilosTema = estilosTemaClaro }) {
 
     return (
         <View style={estilos.celulaDia}>
-            {dia.tipo ? (
-                <View
-                    testID={`fundo-dia-${dia.data}`}
-                    pointerEvents="none"
-                    style={[
-                        estilos.segmentoDia,
-                        estiloTipo,
-                        dia.inicioSegmento && estilos.inicioSegmento,
-                        dia.fimSegmento && estilos.fimSegmento
-                    ]}
-                />
-            ) : null}
             {interativo ? (
                 <Pressable
                     onPress={pressionar}

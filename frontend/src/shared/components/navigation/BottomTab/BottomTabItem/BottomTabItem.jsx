@@ -1,6 +1,6 @@
 // Mostra um item individual da navegação inferior.
 import { useMemo } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text } from 'react-native';
 
 import { useTheme } from '../../../../hooks/useTheme';
 import { criarEstilos } from './BottomTabItem.style';
@@ -10,9 +10,9 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const corAtiva = tema.cores.interface.destaque;
+    const corAtiva = tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque;
 
-    const corInativa = tema.cores.interface.textoSecundario;
+    const corInativa = tema.escuro ? '#999999' : tema.cores.interface.textoSecundario;
 
     const corDoItem = ativo ? corAtiva : corInativa;
 
@@ -35,8 +35,6 @@ function BottomTabItem({ icone: Icone, label, ativo = false, onPress }) {
             <Text numberOfLines={1} style={[estilos.label, ativo && estilos.labelAtiva]}>
                 {label}
             </Text>
-
-            {ativo ? <View testID={`indicador-aba-${label}`} style={estilos.pontoAtivo} /> : null}
         </Pressable>
     );
 }

@@ -90,6 +90,7 @@ export default function LoginScreen({
                 />
             </AuthLayout>
             <SimpleModal
+                erroInterno={!erroValidacao}
                 visivel={Boolean(erro || erroValidacao)}
                 aoFechar={limparAviso}
                 icone={LockKey}

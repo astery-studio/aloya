@@ -13,11 +13,16 @@ function SelectorField({
     navegar = false,
     icone: Icone,
     corIcone = '#C85A44',
-    fundoIcone = '#FDF0EC'
+    fundoIcone = '#FDF0EC',
+    aparenciaCadastro = false,
+    coresNoturnas
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const Seta = navegar ? CaretRight : CaretDown;
+    const usarCoresNoturnas = tema.escuro && aparenciaCadastro;
+    const corDoIcone = usarCoresNoturnas ? (coresNoturnas?.icone ?? corIcone) : corIcone;
+    const fundoDoIcone = usarCoresNoturnas ? (coresNoturnas?.caixa ?? fundoIcone) : fundoIcone;
     return (
         <FormField
             label={label}
@@ -26,11 +31,15 @@ function SelectorField({
                     accessibilityRole="button"
                     accessibilityLabel={`${label}: ${valor || placeholder}`}
                     onPress={onPress}
-                    style={({ pressed }) => [estilos.campoSeletor, pressed && estilos.pressionado]}
+                    style={({ pressed }) => [
+                        estilos.campoSeletor,
+                        aparenciaCadastro && estilos.campoCadastro,
+                        pressed && estilos.pressionado
+                    ]}
                 >
                     {Icone ? (
-                        <View style={[estilos.caixaIconeCampo, { backgroundColor: fundoIcone }]}>
-                            <Icone size={20} color={corIcone} />
+                        <View style={[estilos.caixaIconeCampo, { backgroundColor: fundoDoIcone }]}>
+                            <Icone size={20} color={corDoIcone} />
                         </View>
                     ) : null}
                     <Text

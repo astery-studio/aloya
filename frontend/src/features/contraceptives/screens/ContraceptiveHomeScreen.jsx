@@ -6,10 +6,11 @@ import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import { fontFamilies } from '../../../shared/theme';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
 import {
     ContraceptiveUsageCard,
     criarUsos,
-    usoConfirmado
+    usoPendente
 } from '../components/ContraceptiveUsageCard';
 import { PendingUsesBanner } from '../components/PendingUsesBanner';
 import { MENSAGEM_ERRO_CARREGAR } from './ContraceptiveTrackingScreen';
@@ -29,6 +30,7 @@ function ContraceptiveHomeScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
     const [usosAtualizados, setUsosAtualizados] = useState({});
     const ativos = anticoncepcionais
         .filter((item) => item.ativo !== false && !item.removido)
@@ -41,7 +43,7 @@ function ContraceptiveHomeScreen({
         (item) => criarUsos(item).length || item.tipo === 'diu_hormonal'
     );
     const pendentes = itensHoje.reduce(
-        (total, item) => total + criarUsos(item).filter((uso) => !usoConfirmado(uso)).length,
+        (total, item) => total + criarUsos(item).filter(usoPendente).length,
         0
     );
     function atualizarUsos(item, usos) {
@@ -52,10 +54,15 @@ function ContraceptiveHomeScreen({
     return (
         <SafeAreaView
             style={estilos.tela}
-            edges={['top', 'left', 'right', 'bottom']}
+            edges={['top', 'left', 'right']}
             testID="usos-home-area-segura"
         >
-            <MainLayout titulo="Início" abaAtiva="inicio" onSelecionarAba={onSelecionarAba}>
+            <MainLayout
+                titulo="Início"
+                abaAtiva="inicio"
+                onSelecionarAba={onSelecionarAba}
+                aplicarSafeAreaSuperiorHeader={false}
+            >
                 <ScrollView
                     contentContainerStyle={estilos.conteudo}
                     showsVerticalScrollIndicator={false}
@@ -69,10 +76,15 @@ function ContraceptiveHomeScreen({
                         <>
                             {erro ? (
                                 <View style={estilos.feedback}>
-                                    <Text accessibilityRole="alert" style={estilos.mensagem}>
+                                    <Text
+                                        accessibilityRole="alert"
+                                        style={[estilos.mensagem, estilosErro.mensagem]}
+                                    >
                                         {MENSAGEM_ERRO_CARREGAR}
                                     </Text>
                                     <ButtonScreen
+                                        estilo={estilosErro.botao}
+                                        estiloTexto={estilosErro.textoBotao}
                                         texto="Tentar novamente"
                                         variante="preto"
                                         aoPressionar={aoTentarNovamente}
@@ -81,7 +93,10 @@ function ContraceptiveHomeScreen({
                             ) : null}
                             {erroUso ? (
                                 <View style={estilos.feedback}>
-                                    <Text accessibilityRole="alert" style={estilos.mensagem}>
+                                    <Text
+                                        accessibilityRole="alert"
+                                        style={[estilos.mensagem, estilosErro.mensagem]}
+                                    >
                                         Não foi possível atualizar o uso do anticoncepcional no
                                         momento. Tente novamente.
                                     </Text>
@@ -125,7 +140,13 @@ function criarEstilos(tema) {
     const interfaceTema = tema.cores.interface;
     return StyleSheet.create({
         tela: { flex: 1, backgroundColor: interfaceTema.fundo },
-        conteudo: { padding: 21.66, gap: 12, alignItems: 'center' },
+        conteudo: {
+            paddingHorizontal: 21.66,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: 21.66,
+            gap: 12,
+            alignItems: 'center'
+        },
         titulo: {
             width: '100%',
             maxWidth: 350.01,
@@ -144,4 +165,4 @@ function criarEstilos(tema) {
     });
 }
 
-export { ContraceptiveHomeScreen };
+export { ContraceptiveHomeScreen, criarEstilos };

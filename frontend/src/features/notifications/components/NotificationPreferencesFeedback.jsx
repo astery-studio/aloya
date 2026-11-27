@@ -1,0 +1,97 @@
+import { useMemo } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
+import { FloatingActionButton } from '../../../shared/components/common/FloatingActionButton';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
+import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
+import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { criarEstilosErro } from '../../../shared/theme/errorStateStyles';
+import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
+
+const estilos = StyleSheet.create({
+    tela: { flex: 1 },
+    estado: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }
+});
+
+export function NotificationPreferencesLoading({
+    titulo,
+    erro,
+    onVoltar,
+    onRecarregar,
+    mensagemErro = 'Não foi possível carregar suas preferências de notificação.',
+    rotuloCarregamento = 'Carregando preferências'
+}) {
+    const tema = useTheme();
+    const estilosErro = useMemo(() => criarEstilosErro(tema), [tema]);
+
+    return (
+        <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
+            <View accessibilityLiveRegion="polite" style={estilos.estado}>
+                {erro ? (
+                    <EmptyState
+                        variante="erro"
+                        titulo="Algo deu errado"
+                        mensagem={mensagemErro}
+                        acao={
+                            <ButtonScreen
+                                texto="Tentar novamente"
+                                variante="preto"
+                                estilo={estilosErro.botao}
+                                estiloTexto={estilosErro.textoBotao}
+                                aoPressionar={onRecarregar}
+                            />
+                        }
+                    />
+                ) : (
+                    <ActivityIndicator
+                        accessibilityLabel={rotuloCarregamento}
+                        color={tema.cores.interface.destaque}
+                    />
+                )}
+            </View>
+        </SettingsLayout>
+    );
+}
+
+export function NoContraceptivesForNotifications({ onVoltar, onCadastrar }) {
+    return (
+        <View style={estilos.tela}>
+            <SettingsLayout titulo="Anticoncepcional" onVoltar={onVoltar} respeitarEntalhe>
+                <View style={estilos.estado}>
+                    <EmptyState
+                        titulo="Nenhum anticoncepcional cadastrado"
+                        mensagem="Use o botão de adicionar para cadastrar um anticoncepcional e escolher os avisos que quer receber."
+                    />
+                </View>
+            </SettingsLayout>
+            <FloatingActionButton
+                aoPressionar={onCadastrar}
+                rotuloAcessibilidade="Cadastrar novo anticoncepcional"
+                considerarAreaSeguraLateral
+                testID="anticoncepcional-notificacoes-adicionar"
+            />
+        </View>
+    );
+}
+
+export function NotificationSaveError({ visivel, salvando, limiteAtingido, onTentar, onVoltar }) {
+    return (
+        <SimpleModal
+            erroInterno
+            visivel={visivel}
+            aoFechar={onVoltar}
+            icone={WarningCircleIcon}
+            titulo={limiteAtingido ? 'Muitas alterações seguidas' : 'Algo deu errado'}
+            mensagem={limiteAtingido
+                ? 'Aguarde alguns minutos antes de tentar salvar de novo.'
+                : 'Ocorreu um erro ao salvar. Verifique sua conexão e tente novamente.'}
+            acaoPrincipal={{
+                texto: 'Tentar novamente',
+                carregando: salvando,
+                aoPressionar: onTentar
+            }}
+            acaoSecundaria={{ texto: 'Voltar', desativado: salvando, aoPressionar: onVoltar }}
+        />
+    );
+}

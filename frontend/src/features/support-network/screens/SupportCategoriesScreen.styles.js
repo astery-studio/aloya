@@ -6,7 +6,7 @@ function criarEstilos(tema) {
         tela: {
             flex: 1,
             width: '100%',
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         }
     });
 }

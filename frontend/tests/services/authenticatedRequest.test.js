@@ -1,6 +1,85 @@
 //Testa a inclusão segura do token e a limpeza de sessões inválidas nas requisições privadas.
 import { criarRequisicaoAutenticada } from '../../src/shared/services/api/authenticatedRequest';
 
+test('encerra leitura da sessão travada sem enviar a requisição nem usar resposta tardia', async () => {
+    jest.useFakeTimers();
+    try {
+        let liberar;
+        const dependencias = criarDependencias();
+        dependencias.obterCredencial.mockReturnValue(
+            new Promise((resolve) => {
+                liberar = resolve;
+            })
+        );
+        const requisicao = criarRequisicaoAutenticada({ ...dependencias, timeoutMs: 1000 });
+        const resultado = expect(
+            requisicao({ caminho: '/api/diario/registros' })
+        ).rejects.toMatchObject({
+            codigo: 'TEMPO_ARMAZENAMENTO_ESGOTADO',
+            mensagemUsuario: 'Não foi possível acessar sua sessão. Tente novamente.'
+        });
+        await jest.advanceTimersByTimeAsync(1000);
+        await resultado;
+        liberar({ token: 'resposta-tardia' });
+        await Promise.resolve();
+        expect(dependencias.requisicao).not.toHaveBeenCalled();
+        expect(jest.getTimerCount()).toBe(0);
+        dependencias.obterCredencial.mockResolvedValue({ token: 'nova-sessao' });
+        await expect(requisicao({ caminho: '/api/diario/registros' })).resolves.toEqual({
+            sucesso: true
+        });
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test('cancela imediatamente mesmo quando a leitura da sessão não responde', async () => {
+    jest.useFakeTimers();
+    try {
+        const dependencias = criarDependencias();
+        dependencias.obterCredencial.mockReturnValue(new Promise(() => {}));
+        const controle = new AbortController();
+        const resultado = expect(
+            criarRequisicaoAutenticada(dependencias)({
+                caminho: '/api/diario/catalogo',
+                signal: controle.signal
+            })
+        ).rejects.toMatchObject({ name: 'AbortError' });
+        controle.abort();
+        await resultado;
+        expect(dependencias.requisicao).not.toHaveBeenCalled();
+        expect(jest.getTimerCount()).toBe(0);
+    } finally {
+        jest.useRealTimers();
+    }
+});
+
+test.each(['ausente', 'expirada'])(
+    'não fica carregando se a limpeza da sessão %s travar',
+    async (estado) => {
+        jest.useFakeTimers();
+        try {
+            const dependencias = criarDependencias(estado === 'ausente' ? { sessao: null } : {});
+            if (estado === 'expirada')
+                dependencias.requisicao.mockRejectedValue({
+                    status: 401,
+                    codigo: 'TOKEN_INVALIDO'
+                });
+            dependencias.removerCredencial.mockReturnValue(new Promise(() => {}));
+            const resultado = expect(
+                criarRequisicaoAutenticada({ ...dependencias, timeoutMs: 1000 })({
+                    caminho: '/api/diario/registros'
+                })
+            ).rejects.toMatchObject({ status: 401 });
+            await jest.advanceTimersByTimeAsync(1000);
+            await resultado;
+            expect(jest.getTimerCount()).toBe(0);
+        } finally {
+            jest.useRealTimers();
+        }
+    }
+);
+
 test('não envia operação expirada enquanto aguardava a sessão segura', async () => {
     let liberar;
     const controle = new AbortController();

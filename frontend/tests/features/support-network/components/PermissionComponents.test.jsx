@@ -1,5 +1,5 @@
 //Cobre estados alternativos dos controles de permissões da Rede de Apoio.
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { View } from 'react-native';
 
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
@@ -28,11 +28,11 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     };
 });
 
-import { GeneralPermissions } from '../../../../src/features/support-network/components/GeneralPermissions';
-import PermissionCounter from '../../../../src/features/support-network/components/PermissionCounter';
-import PermissionGroup from '../../../../src/features/support-network/components/PermissionGroup';
-import { PermissionGroups } from '../../../../src/features/support-network/components/PermissionGroups';
-import PermissionItem from '../../../../src/features/support-network/components/PermissionItem';
+import { GeneralPermissions } from '../../../../src/features/support-network/components/GeneralPermissions/GeneralPermissions';
+import PermissionCounter from '../../../../src/features/support-network/components/PermissionCounter/PermissionCounter';
+import PermissionGroup from '../../../../src/features/support-network/components/PermissionGroup/PermissionGroup';
+import { PermissionGroups } from '../../../../src/features/support-network/components/PermissionGroups/PermissionGroups';
+import PermissionItem from '../../../../src/features/support-network/components/PermissionItem/PermissionItem';
 import SwitchField from '../../../../src/shared/components/forms/SwitchField/SwitchField';
 
 const permissoes = [
@@ -239,5 +239,42 @@ describe('componentes de permissões', () => {
                 name: 'Ativar todas as permissões de Ciclo e Sangramento'
             })
         ).toBeDisabled();
+    });
+
+    test('oculta categorias desativadas e preserva permissões antigas', async () => {
+        const aoAlterar = jest.fn();
+        const diaryService = {
+            buscarCatalogo: jest.fn().mockResolvedValue({
+                macrocategorias: [
+                    {
+                        categorias: [
+                            { id: 'fluxo_menstrual', ativaEfetiva: true },
+                            { id: 'sangramento_escape', ativaEfetiva: false }
+                        ]
+                    }
+                ]
+            })
+        };
+        await render(
+            <PermissionGroups
+                diaryService={diaryService}
+                permissoesSelecionadas={['ciclo.sangramento_escape']}
+                aoAlterar={aoAlterar}
+            />
+        );
+
+        await waitFor(() =>
+            expect(screen.getByRole('button', { name: 'Ciclo e Sangramento' })).toBeOnTheScreen()
+        );
+        await fireEvent.press(screen.getByRole('button', { name: 'Ciclo e Sangramento' }));
+
+        expect(screen.getByRole('switch', { name: 'Fluxo menstrual' })).toBeOnTheScreen();
+        expect(screen.queryByRole('switch', { name: 'Sangramento de escape' })).toBeNull();
+
+        await fireEvent.press(screen.getByRole('switch', { name: 'Fluxo menstrual' }));
+        expect(aoAlterar).toHaveBeenCalledWith([
+            'ciclo.sangramento_escape',
+            'ciclo.fluxo_menstrual'
+        ]);
     });
 });

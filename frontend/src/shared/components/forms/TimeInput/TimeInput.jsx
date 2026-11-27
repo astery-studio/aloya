@@ -14,7 +14,8 @@ export default function TimeInput({
     aoRemover,
     podeRemover = false,
     desativado = false,
-    estilo
+    estilo,
+    estiloCampo
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -26,9 +27,12 @@ export default function TimeInput({
                 testID="area-campo-horario"
                 disabled={desativado}
                 onPress={() => entradaRef.current?.focus()}
-                style={[estilos.campo, desativado && estilos.desativado]}
+                style={[estilos.campo, estiloCampo, desativado && estilos.desativado]}
             >
-                <Clock size={18} color={tema.cores.interface.textoPrincipal} />
+                <Clock
+                    size={18}
+                    color={tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal}
+                />
                 <TextInput
                     ref={entradaRef}
                     accessibilityLabel="Horário"
@@ -36,7 +40,9 @@ export default function TimeInput({
                     keyboardType="number-pad"
                     maxLength={5}
                     placeholder="HH:MM"
-                    placeholderTextColor={tema.cores.interface.textoSecundario}
+                    placeholderTextColor={
+                        tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario
+                    }
                     selectionColor={tema.cores.interface.destaque}
                     value={valor}
                     onChangeText={(texto) => onChangeText?.(formatTime(texto))}
@@ -55,7 +61,7 @@ export default function TimeInput({
                         desativado && estilos.desativado
                     ]}
                 >
-                    <Trash size={20} color={tema.cores.feedback.erro} />
+                    <Trash size={20} color={tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro} />
                 </Pressable>
             )}
         </View>

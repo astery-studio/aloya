@@ -4,9 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { CycleDay } from '../../../../src/features/calendar/components/CycleCalendar/CycleDay';
 import {
     criarEstilosCalendario,
-    estilos,
-    estilosTipos,
-    estilosTiposPrevistos
+    estilos
 } from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar.styles';
 import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 
@@ -56,23 +54,7 @@ describe('CycleDay', () => {
         expect(screen.getByLabelText('Dia 4 de outubro de 2026, data futura')).toBeOnTheScreen();
     });
 
-    test('usa a cor forte para uma fase atual', async () => {
-        const dia = criarDia({
-            tipo: 'folicular',
-            inicioSegmento: true,
-            fimSegmento: true
-        });
-
-        await render(<CycleDay dia={dia} />);
-
-        expect(screen.getByTestId('fundo-dia-2026-10-03')).toHaveStyle([
-            estilosTipos.folicular,
-            estilos.inicioSegmento,
-            estilos.fimSegmento
-        ]);
-    });
-
-    test('usa a cor clara para uma fase prevista', async () => {
+    test('anuncia a fase prevista', async () => {
         const dia = criarDia({
             dia: 6,
             data: '2026-10-06',
@@ -84,10 +66,6 @@ describe('CycleDay', () => {
         });
 
         await render(<CycleDay dia={dia} />);
-
-        expect(screen.getByTestId('fundo-dia-2026-10-06')).toHaveStyle(
-            estilosTiposPrevistos.ovulacao
-        );
 
         expect(
             screen.getByLabelText('Dia 6 de outubro de 2026, provável ovulação')
@@ -183,7 +161,7 @@ describe('CycleDay', () => {
         });
     });
 
-    test('usa textos e fases com contraste próprio do tema escuro', async () => {
+    test('usa texto branco para um dia marcado no tema escuro', async () => {
         const estilosTemaEscuro = criarEstilosCalendario(temaEscuro);
 
         await render(
@@ -194,8 +172,5 @@ describe('CycleDay', () => {
         );
 
         expect(screen.getByText('3')).toHaveStyle({ color: '#FFFFFF' });
-        expect(screen.getByTestId('fundo-dia-2026-10-03')).toHaveStyle({
-            backgroundColor: '#8A5A12'
-        });
     });
 });

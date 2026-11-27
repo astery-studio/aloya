@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
 const cores = Object.freeze({
@@ -62,10 +63,14 @@ function criarEstilos(tema) {
         marcadorJanela: {
             borderWidth: 1.5,
             borderStyle: 'dashed',
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie
         },
         diaJanela: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.medium,
             fontSize: 10,
             lineHeight: 12
@@ -78,7 +83,9 @@ function criarEstilos(tema) {
             alignItems: 'flex-start'
         },
         nome: {
-            color: tema.cores.interface.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal,
             fontFamily: fontFamilies.semibold,
             fontSize: 15,
             fontStyle: 'normal',
@@ -86,7 +93,9 @@ function criarEstilos(tema) {
             lineHeight: 22.5
         },
         descricao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 13,
             fontStyle: 'normal',
@@ -113,3 +122,21 @@ const fundosPrevistos = Object.freeze({
 });
 
 export { cores, criarEstilos, estilos, fundosPrevistos, fundosReais };
+
+const fundosReaisEscuros = Object.freeze({
+    menstruacao: '#A8524A',
+    folicular: '#52665E',
+    ovulacao: '#5A7382',
+    lutea: '#B87550'
+});
+
+export { fundosReaisEscuros };
+
+const fundosPrevistosEscuros = Object.freeze({
+    menstruacao: 'rgba(168, 82, 74, 0.60)',
+    folicular: 'rgba(82, 102, 94, 0.60)',
+    ovulacao: 'rgba(90, 115, 130, 0.60)',
+    lutea: 'rgba(184, 117, 80, 0.60)'
+});
+
+export { fundosPrevistosEscuros };

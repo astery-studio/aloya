@@ -1,6 +1,10 @@
 /**
  * Compõe mensagens simples com até duas ações a partir de AppModal e ButtonPopup.
  */
+import { useMemo } from 'react';
+import { useTheme } from '../../../../hooks/useTheme';
+import { criarEstilos } from './SimpleModal.styles';
+import { criarAparenciaErroInterno } from '../InternalErrorModal.styles';
 import ButtonPopup from '../../../common/Button/ButtonPopup/ButtonPopup';
 import AppModal from '../ModalBase/AppModal';
 
@@ -17,8 +21,20 @@ export default function SimpleModal({
     titulo,
     mensagem,
     acaoPrincipal,
-    acaoSecundaria
+    acaoSecundaria,
+    varianteVisual,
+    erroInterno = false
 }) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const visualErro = erroInterno ? criarAparenciaErroInterno(tema) : {};
+    const confirmacaoCiclo = varianteVisual === 'confirmacaoCiclo';
+    const feedbackCiclo = confirmacaoCiclo || varianteVisual === 'sucessoCiclo';
+    const sairDaConta = varianteVisual === 'sairDaConta';
+    const sairSemSalvar =
+        varianteVisual === 'sairSemSalvar' ||
+        [acaoPrincipal, acaoSecundaria].some((acao) => acao?.varianteVisual === 'sairSemSalvar');
+
     return (
         <AppModal
             variante="simples"
@@ -26,9 +42,18 @@ export default function SimpleModal({
             aoFechar={aoFechar}
             aoOcultar={aoOcultar}
             icone={icone}
-            corIcone={corIcone}
-            fundoIcone={fundoIcone}
-            estiloIcone={estiloIcone}
+            corIcone={visualErro.corIcone ?? (tema.escuro ? '#E3E3E3' : corIcone)}
+            fundoIcone={
+                visualErro.fundoIcone ?? (tema.escuro ? 'rgba(255, 255, 255, 0.08)' : fundoIcone)
+            }
+            estiloIcone={[estiloIcone, estilos.icone, visualErro.icone]}
+            estilo={[
+                estilos.caixa,
+                confirmacaoCiclo && estilos.caixaConfirmacaoCiclo,
+                visualErro.modal,
+                (sairSemSalvar || sairDaConta) && estilos.caixaSairSemSalvar,
+                sairDaConta && estilos.caixaSairDaConta
+            ]}
             titulo={titulo}
             mensagem={mensagem}
         >
@@ -39,7 +64,19 @@ export default function SimpleModal({
                     variante={acaoPrincipal.variante || 'verde'}
                     desativado={acaoPrincipal.desativado}
                     carregando={acaoPrincipal.carregando}
-                    estilo={larguraTotal}
+                    estilo={[
+                        larguraTotal,
+                        visualErro.botaoPrincipal,
+                        feedbackCiclo && estilos.botaoPrincipalCiclo,
+                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
+                            estilos.botaoSairSemSalvar
+                    ]}
+                    estiloTexto={[
+                        visualErro.textoPrincipal,
+                        feedbackCiclo && estilos.textoPrincipalCiclo,
+                        acaoPrincipal.varianteVisual === 'sairSemSalvar' &&
+                            estilos.textoSairSemSalvar
+                    ]}
                 />
             )}
             {acaoSecundaria && (
@@ -49,7 +86,19 @@ export default function SimpleModal({
                     variante={acaoSecundaria.variante || 'branco'}
                     desativado={acaoSecundaria.desativado}
                     carregando={acaoSecundaria.carregando}
-                    estilo={larguraTotal}
+                    estilo={[
+                        larguraTotal,
+                        visualErro.botaoSecundario,
+                        feedbackCiclo && estilos.botaoSecundarioCiclo,
+                        (acaoSecundaria.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
+                            estilos.botaoSairSemSalvar
+                    ]}
+                    estiloTexto={[
+                        visualErro.textoSecundario,
+                        feedbackCiclo && estilos.textoSecundarioCiclo,
+                        (acaoSecundaria.varianteVisual === 'sairSemSalvar' || sairDaConta) &&
+                            estilos.textoSairSemSalvar
+                    ]}
                 />
             )}
         </AppModal>

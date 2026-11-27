@@ -7,11 +7,11 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { BellIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
-import { CategoryImpactConfirmationModal } from '../components/CategoryImpactConfirmationModal';
+import { CategoryImpactConfirmationModal } from '../components/CategoryImpactConfirmationModal/CategoryImpactConfirmationModal';
 import {
     prepararCategoriaParaSalvar,
     SupportCategoryForm
-} from '../components/SupportCategoryForm';
+} from '../components/SupportCategoryForm/SupportCategoryForm';
 import { estilos } from './EditSupportCategoryScreen.styles';
 
 const ALERTA_NOME = Object.freeze({
@@ -176,7 +176,8 @@ function EditSupportCategoryScreen({
     onVoltar,
     onCategoriaAtualizada,
     onConcluido,
-    onSessaoExpirada
+    onSessaoExpirada,
+    diaryService
 }) {
     const tema = useTheme();
     const categoriaInicialValida = categoriaEhEditavel(categoria);
@@ -463,6 +464,7 @@ function EditSupportCategoryScreen({
         <>
             <SettingsLayout
                 titulo="Atualizar Categoria"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={voltar}
                 rodapeFixo
                 rodape={
@@ -492,6 +494,7 @@ function EditSupportCategoryScreen({
                         </View>
                     ) : (
                         <SupportCategoryForm
+                            aparenciaNovaCategoria
                             dados={dados}
                             aoAlterar={alterarDados}
                             aoSalvar={executarAtualizacao}
@@ -499,6 +502,8 @@ function EditSupportCategoryScreen({
                             carregando={salvando}
                             bloqueado={!servicoDisponivel || categoriaBase === null}
                             exibirAcao={false}
+                            diaryService={diaryService}
+                            onSessaoExpirada={onSessaoExpirada}
                         />
                     )}
                 </View>
@@ -513,6 +518,7 @@ function EditSupportCategoryScreen({
             />
 
             <SimpleModal
+                erroInterno={Boolean(alertaErro?.recuperavel)}
                 visivel={alertaErro !== null}
                 aoFechar={fecharErro}
                 icone={WarningCircleIcon}

@@ -1,0 +1,96 @@
+// Define a composição responsiva da tela do Diário e de sua ação fixa.
+import { StyleSheet } from 'react-native';
+
+import { espacamentosLayout, fontFamilies } from '../../../shared/theme';
+import { obterCoresDiario } from '../config/diaryColors';
+
+// Converte os tokens do tema em estilos da screen e de seus estados.
+function criarEstilos(tema) {
+    const cores = obterCoresDiario(tema).interface;
+    return StyleSheet.create({
+        tela: {
+            flex: 1,
+            minHeight: 0,
+            alignSelf: 'stretch'
+        },
+        conteudoEstatico: {
+            flex: 1,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela
+        },
+        introducao: {
+            width: 350.011,
+            maxWidth: '100%',
+            alignSelf: 'center',
+            alignItems: 'center',
+            gap: 8,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
+            paddingBottom: tema.espacamentosLayout.descricaoParaConteudo
+        },
+        descricao: {
+            width: '100%',
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 15,
+            lineHeight: 22
+        },
+        atualizando: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+        textoAtualizando: {
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 12,
+            lineHeight: 17
+        },
+        estadoCentralizado: { flex: 1, justifyContent: 'center' },
+        mensagemEstado: {
+            marginTop: 10,
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 14,
+            lineHeight: 21,
+            textAlign: 'center'
+        },
+        opcaoEstadoVazio: {
+            fontFamily: fontFamilies.bold,
+            fontWeight: '700'
+        },
+        estadoFiltroVazio: {
+            flex: 1,
+            alignItems: 'center',
+            paddingTop: 22,
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
+            paddingBottom: 96
+        },
+        mensagemFiltroVazio: {
+            maxWidth: 310,
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.regular,
+            fontSize: 16,
+            lineHeight: 24,
+            textAlign: 'center'
+        },
+        cabecalhoLista: { gap: 0, paddingTop: 0 },
+        cabecalhoCompartilhado: { paddingTop: tema.espacamentos.medio },
+        atualizandoCompartilhado: { alignItems: 'center', marginBottom: tema.espacamentos.pequeno },
+        divisor: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            paddingTop: 20,
+            paddingBottom: 24
+        },
+        linhaDivisor: { flex: 1, height: 1, backgroundColor: cores.borda },
+        textoDivisor: {
+            color: cores.textoSecundario,
+            fontFamily: fontFamilies.bold,
+            fontSize: 12,
+            lineHeight: 18,
+            letterSpacing: 0.72
+        },
+        lista: {
+            paddingHorizontal: espacamentosLayout.margemHorizontalTela,
+            paddingBottom: 96
+        }
+    });
+}
+
+export { criarEstilos };

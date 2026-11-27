@@ -17,9 +17,13 @@ function Button({
     desativado = false,
     carregando = false,
     icone: Icone,
+    tamanhoIcone = 18,
+    corConteudo: corConteudoPersonalizada,
     posicaoIcone = 'esquerda',
     rotuloAcessibilidade,
-    estilo
+    estilo,
+    estiloTexto,
+    ajustarFonteAoEspaco = true
 }) {
     const tema = useTheme();
 
@@ -44,8 +48,10 @@ function Button({
     const bloqueado = desativado || carregando;
 
     const corConteudo = desativado
-        ? tema.cores.interface.textoDesabilitado
-        : varianteAtual.texto.color;
+        ? tema.escuro
+            ? '#757575'
+            : tema.cores.interface.textoDesabilitado
+        : corConteudoPersonalizada || varianteAtual.texto.color;
 
     function renderizarConteudo() {
         if (carregando) {
@@ -55,10 +61,15 @@ function Button({
         return (
             <View style={estilos.conteudo}>
                 {Icone && posicaoIcone === 'esquerda' ? (
-                    <Icone color={corConteudo} size={18} />
+                    <View style={estilos.caixaIcone}>
+                        <Icone color={corConteudo} size={tamanhoIcone} />
+                    </View>
                 ) : null}
 
                 <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={ajustarFonteAoEspaco}
+                    minimumFontScale={0.72}
                     style={[
                         estilos.texto,
                         tamanhoAtual.texto,
@@ -67,14 +78,17 @@ function Button({
                             ? {
                                   color: corConteudo
                               }
-                            : null
+                            : null,
+                        estiloTexto
                     ]}
                 >
                     {texto}
                 </Text>
 
                 {Icone && posicaoIcone === 'direita' ? (
-                    <Icone color={corConteudo} size={18} />
+                    <View style={estilos.caixaIcone}>
+                        <Icone color={corConteudo} size={tamanhoIcone} />
+                    </View>
                 ) : null}
             </View>
         );

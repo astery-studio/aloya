@@ -1,6 +1,6 @@
 // Mostra opções disponíveis dentro de um BottomSheet.
-import { useMemo } from 'react';
-import { FlatList, Text } from 'react-native';
+import { useMemo, useRef } from 'react';
+import { AccessibilityInfo, findNodeHandle, FlatList, Text } from 'react-native';
 
 import { ButtonSelection } from '../../common/Button/ButtonSelection/ButtonSelection';
 import { useTheme } from '../../../hooks/useTheme';
@@ -19,13 +19,26 @@ function SelectionSheet({
     valorSelecionado,
     onSelecionar,
     onFechar,
-    varianteOpcao = 'lista'
+    onOcultar,
+    focarTituloAoAbrir = false,
+    varianteOpcao = 'lista',
+    corFundo,
+    estiloPainel,
+    estiloOpcaoSelecionada,
+    estiloTextoOpcaoSelecionada
 }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
+    const corDoFundo = corFundo ?? (tema.escuro ? '#242424' : undefined);
     const selecaoDesabilitada = typeof onSelecionar !== 'function';
+    const referenciaTitulo = useRef(null);
+
+    function focarTitulo() {
+        const identificador = findNodeHandle(referenciaTitulo.current);
+        if (identificador) AccessibilityInfo.setAccessibilityFocus(identificador);
+    }
 
     function renderizarOpcao({ item }) {
         function selecionarOpcao() {
@@ -35,6 +48,13 @@ function SelectionSheet({
         return (
             <ButtonSelection
                 label={item.label}
+                estiloTexto={estilos.textoOpcao}
+                estiloDescricao={estilos.textoOpcao}
+                estiloSelecionado={[estilos.opcaoSelecionada, estiloOpcaoSelecionada]}
+                estiloTextoSelecionado={[
+                    estilos.textoOpcaoSelecionada,
+                    estiloTextoOpcaoSelecionada
+                ]}
                 descricao={item.descricao}
                 icone={item.icone}
                 selected={item.id === valorSelecionado}
@@ -46,8 +66,21 @@ function SelectionSheet({
     }
 
     return (
-        <BottomSheet visivel={visivel} onFechar={onFechar}>
-            <BottomSheetLayout titulo={titulo} onFechar={onFechar}>
+        <BottomSheet
+            visivel={visivel}
+            onFechar={onFechar}
+            onExibir={focarTituloAoAbrir ? focarTitulo : undefined}
+            onOcultar={onOcultar}
+            corPainel={corDoFundo}
+            estiloPainel={[estilos.painel, estiloPainel]}
+        >
+            <BottomSheetLayout
+                titulo={titulo}
+                referenciaTitulo={referenciaTitulo}
+                onFechar={onFechar}
+                corFundo={corDoFundo}
+                estiloTitulo={estilos.textoOpcao}
+            >
                 <FlatList
                     testID="selection-sheet-list"
                     data={Array.isArray(opcoes) ? opcoes : []}
@@ -56,7 +89,7 @@ function SelectionSheet({
                     extraData={valorSelecionado}
                     initialNumToRender={7}
                     windowSize={5}
-                    style={estilos.lista}
+                    style={[estilos.lista, corDoFundo ? { backgroundColor: corDoFundo } : null]}
                     contentContainerStyle={estilos.conteudoLista}
                     ListEmptyComponent={
                         <Text style={estilos.mensagemVazia}>Nenhuma opção disponível.</Text>

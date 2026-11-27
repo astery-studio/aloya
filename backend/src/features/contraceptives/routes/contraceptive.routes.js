@@ -21,6 +21,7 @@ function criarRotasAnticoncepcionais({
     rotas.post('/', controller.cadastrar);
     rotas.put('/:id', edicaoRateLimit, controller.editar);
     rotas.delete('/:id', remocaoRateLimit, controller.remover);
+    rotas.delete('/:id/definitivo', remocaoRateLimit, controller.apagarDefinitivamente);
 
     return rotas;
 }

@@ -12,7 +12,10 @@ function BottomSheetLayout({
     bloquearFechamento = false,
     compacto = false,
     corFundo,
-    children
+    corIconeFechar,
+    children,
+    referenciaTitulo,
+    estiloTitulo
 }) {
     const tema = useTheme();
 
@@ -38,8 +41,9 @@ function BottomSheetLayout({
                 ]}
             >
                 <Text
+                    ref={referenciaTitulo}
                     accessibilityRole="header"
-                    style={[estilos.titulo, compacto && estilos.tituloCompacto]}
+                    style={[estilos.titulo, compacto && estilos.tituloCompacto, estiloTitulo]}
                 >
                     {titulo}
                 </Text>
@@ -60,7 +64,7 @@ function BottomSheetLayout({
                 >
                     <XIcon
                         size={24}
-                        color={tema.cores.interface.textoSecundario}
+                        color={corIconeFechar ?? tema.cores.interface.textoSecundario}
                         weight="regular"
                     />
                 </Pressable>

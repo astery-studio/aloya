@@ -1,0 +1,446 @@
+import { createContext, useContext, useMemo } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { ConfidenceBadge } from '../../../shared/components/common/ConfidenceBadge/ConfidenceBadge';
+import { EmptyState } from '../../../shared/components/feedback/EmptyState/EmptyState';
+import {
+    ArrowsClockwiseIcon,
+    CalendarDotsIcon,
+    DropIcon,
+    HeartbeatIcon,
+    NotepadIcon,
+    PillIcon,
+    SparkleIcon,
+    SunIcon,
+    WarningCircleIcon,
+    WarningIcon
+} from '../../../shared/components/icons/AppIcons';
+import { cores } from '../../../shared/theme';
+import { useTheme } from '../../../shared/hooks/useTheme';
+import { formatarDataLonga } from '../utils/cyclePresentation';
+import { criarEstilos } from './CycleHomeContent.styles';
+import { CycleExpandableCard } from './CycleExpandableCard';
+import { CycleEducationSection } from './CycleEducationSection';
+import { PhaseSymbolSlot } from './PhaseSymbolSlot';
+
+const CycleForecastVisualContext = createContext(null);
+
+function useCycleForecastVisual() {
+    const visual = useContext(CycleForecastVisualContext);
+    if (!visual) throw new Error('O painel de previsão precisa de configuração visual.');
+    return visual;
+}
+
+const AVISO_MEDICO =
+    'Esta é uma estimativa baseada no seu histórico e não substitui orientação médica nem garante eficácia como método contraceptivo.';
+const ROTULOS = {
+    menstrual: 'Fase Menstrual',
+    folicular: 'Fase Folicular',
+    ovulatoria: 'Fase Ovulatória',
+    lutea: 'Fase Lútea',
+    desconhecida: 'Seu ciclo'
+};
+const SUBTITULOS = {
+    menstrual: 'O início de um novo ciclo',
+    folicular: 'Preparação para a ovulação',
+    ovulatoria: 'A liberação do óvulo',
+    lutea: 'Preparação para uma possível gravidez',
+    desconhecida: 'Acompanhe seu corpo ao longo do ciclo'
+};
+function criarCoresDaPrevisao(tema) {
+    const coresForma = {
+        menstrual: tema.escuro ? '#A8524A' : cores.marca.primaria,
+        folicular: tema.escuro ? '#52665E' : cores.ciclo.formaFolicular,
+        ovulatoria: tema.escuro ? '#5A7382' : cores.feedback.informacao,
+        lutea: tema.escuro ? '#B87550' : cores.feedback.aviso,
+        desconhecida: tema.cores.interface.textoSecundario
+    };
+
+    return {
+        coresForma,
+        coresIconeDestaqueFertil: {
+            folicular: tema.escuro ? '#9FD6B6' : cores.ciclo.formaFolicular,
+            ovulatoria: tema.escuro ? '#8FC4DD' : cores.feedback.informacao
+        },
+        coresConfiabilidade: tema.escuro
+            ? {
+                  baixa: {
+                      cor: '#EF9A9A',
+                      fundo: 'rgba(239, 154, 154, 0.16)',
+                      borda: 'rgba(239, 154, 154, 0.33)'
+                  },
+                  media: {
+                      cor: '#FFE082',
+                      fundo: 'rgba(255, 224, 130, 0.16)',
+                      borda: 'rgba(255, 224, 130, 0.33)'
+                  },
+                  alta: {
+                      cor: '#A5D6A7',
+                      fundo: 'rgba(165, 214, 167, 0.14)',
+                      borda: 'rgba(165, 214, 167, 0.33)'
+                  }
+              }
+            : null,
+        coresConteudo: {
+            ...coresForma,
+            folicular: tema.escuro ? '#52665E' : cores.ciclo.conteudoFolicular
+        },
+        corIconePrevisaoOvulacao: tema.escuro ? '#90CAF9' : coresForma.ovulatoria,
+        corAviso: tema.escuro ? '#F2B45F' : cores.feedback.aviso,
+        corIconeEscuro: tema.escuro ? '#B39DDB' : cores.ciclo.iconeEscuro
+    };
+}
+
+function criarRecursosSemCiclo(visual) {
+    return [
+        {
+            titulo: 'Fases do ciclo',
+            descricao:
+                'Menstrual, folicular, ovulatória e lútea com orientações para cada momento.',
+            Icone: ArrowsClockwiseIcon,
+            cor: visual.coresForma.folicular
+        },
+        {
+            titulo: 'Janela fértil',
+            descricao:
+                'Saiba seus dias de maior fertilidade com previsões baseadas no seu histórico.',
+            Icone: SparkleIcon,
+            cor: visual.corAviso,
+            peso: 'fill'
+        },
+        {
+            titulo: 'Próxima menstruação',
+            descricao: 'Estimativa da data do seu próximo ciclo, ficando mais precisa com o tempo.',
+            Icone: CalendarDotsIcon,
+            cor: visual.corAviso
+        },
+        {
+            titulo: 'Sintomas e bem-estar',
+            descricao: 'Registre como você se sente e descubra padrões ao longo do ciclo.',
+            Icone: HeartbeatIcon,
+            cor: visual.coresForma.folicular
+        }
+    ];
+}
+
+function BotaoAcao({ texto, Icone, destaque = false, aoPressionar }) {
+    const { estilos } = useCycleForecastVisual();
+    return (
+        <ButtonScreen
+            texto={texto}
+            icone={Icone}
+            variante={destaque ? 'laranja' : 'verde'}
+            aoPressionar={aoPressionar}
+            rotuloAcessibilidade={texto}
+            estilo={[estilos.botaoAcao, destaque && estilos.botaoCadastrarMenstruacao]}
+            estiloTexto={destaque && estilos.textoCadastrarMenstruacao}
+        />
+    );
+}
+
+function GotaPreenchidaIcon(props) {
+    const { estilos } = useCycleForecastVisual();
+    const corTexto = StyleSheet.flatten(estilos.textoCadastrarMenstruacao)?.color;
+    return <DropIcon {...props} color={corTexto ?? props.color} weight="fill" />;
+}
+
+function PainelPrevisao({ previsao, janelaFertil }) {
+    const { estilos, corAviso, corIconeEscuro, corIconePrevisaoOvulacao, coresConfiabilidade } =
+        useCycleForecastVisual();
+    const nivel = previsao.confiabilidadeMenstrual?.nivel?.toLowerCase() || 'baixa';
+    const janela = janelaFertil ?? previsao.janelaFertilEstimada;
+    const incerta = ['PARCIALMENTE_DISPONIVEL', 'PREVISAO_ULTRAPASSADA'].includes(previsao.status);
+
+    return (
+        <View style={estilos.secaoPrevisao}>
+            <View
+                style={[
+                    estilos.cartaoProximoCiclo,
+                    (incerta || nivel === 'baixa') && estilos.cartaoProximoCicloComAviso
+                ]}
+            >
+                <View style={estilos.dataProximoCiclo}>
+                    <Text style={estilos.rotuloPrevisao}>Próximo ciclo</Text>
+                    <Text style={estilos.valorPrincipal}>
+                        {formatarDataLonga(previsao.proximoInicioEstimado)}
+                    </Text>
+                </View>
+                <ConfidenceBadge
+                    nivel={nivel}
+                    variante="composta"
+                    coresPersonalizadas={coresConfiabilidade?.[nivel]}
+                    estilo={estilos.indicadorConfiabilidade}
+                />
+                {incerta ? (
+                    <View style={estilos.avisoConfiabilidade}>
+                        <WarningIcon size={18} color={corAviso} />
+                        <View style={estilos.textosAvisoConfiabilidade}>
+                            <Text style={estilos.tituloAvisoConfiabilidade}>
+                                Estimativa incerta
+                            </Text>
+                            <Text style={estilos.textoAvisoConfiabilidade}>
+                                Os dados deste ciclo podem ser imprecisos.
+                            </Text>
+                        </View>
+                    </View>
+                ) : null}
+                {!incerta && nivel === 'baixa' ? (
+                    <View style={estilos.avisoConfiabilidade}>
+                        <WarningCircleIcon size={18} color={corAviso} weight="fill" />
+                        <Text style={estilos.textoAvisoBaixa}>
+                            Continue registrando seus ciclos para que suas previsões fiquem cada vez
+                            mais precisas.
+                        </Text>
+                    </View>
+                ) : null}
+            </View>
+            <View style={estilos.previsoesSecundarias}>
+                <View style={estilos.cartaoSecundario}>
+                    <View style={estilos.cabecalhoCartaoSecundario}>
+                        <SunIcon size={18} color={corIconePrevisaoOvulacao} weight="fill" />
+                        <Text style={estilos.rotuloPrevisaoSecundaria}>Ovulação</Text>
+                    </View>
+                    <Text style={estilos.valorOvulacao}>
+                        {formatarDataLonga(previsao.dataOvulacaoEstimada)}
+                    </Text>
+                </View>
+                <View style={estilos.cartaoSecundario}>
+                    <View style={estilos.cabecalhoCartaoSecundario}>
+                        <SparkleIcon size={18} color={corIconeEscuro} weight="fill" />
+                        <Text style={estilos.rotuloPrevisaoSecundaria}>Janela fértil</Text>
+                    </View>
+                    <Text style={estilos.valorSecundario}>
+                        {janela
+                            ? `${formatarDataLonga(janela.inicio)} até ${formatarDataLonga(janela.fim)}`
+                            : 'Indisponível'}
+                    </Text>
+                </View>
+            </View>
+            <Text style={estilos.aviso}>{AVISO_MEDICO}</Text>
+        </View>
+    );
+}
+
+function ConteudoFase({ conteudo, fase }) {
+    const { estilos, coresConteudo } = useCycleForecastVisual();
+    if (!conteudo) return null;
+    const cor = coresConteudo[fase];
+    return (
+        <View>
+            <CycleExpandableCard title={conteudo.tituloExplicacao}>
+                <View style={estilos.secaoTexto}>
+                    <View style={estilos.textoComMarcador}>
+                        <View style={[estilos.marcador, { backgroundColor: cor }]} />
+                        <Text style={estilos.descricaoFase}>{conteudo.descricao}</Text>
+                    </View>
+                </View>
+            </CycleExpandableCard>
+            <CycleExpandableCard title="Sintomas comuns">
+                <View style={estilos.secaoSintomas}>
+                    <View style={estilos.listaSintomas}>
+                        {conteudo.sintomas.map((sintoma) => (
+                            <View key={sintoma} style={estilos.sintoma}>
+                                <View style={[estilos.marcadorSintoma, { backgroundColor: cor }]} />
+                                <Text style={estilos.textoSintoma}>{sintoma}</Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            </CycleExpandableCard>
+            <CycleExpandableCard title="Dicas para hoje">
+                <View style={estilos.secaoDicas}>
+                    {conteudo.dicas.map((dica, indice) => (
+                        <View key={dica} style={estilos.dica}>
+                            <View style={estilos.numeroDica}>
+                                <Text style={[estilos.textoNumeroDica, { color: cor }]}>
+                                    {indice + 1}
+                                </Text>
+                            </View>
+                            <Text style={estilos.textoDica}>{dica}</Text>
+                        </View>
+                    ))}
+                </View>
+            </CycleExpandableCard>
+        </View>
+    );
+}
+
+function EstadoSemCiclo({
+    dadosInsuficientes,
+    aoCadastrarMenstruacao,
+    aoCadastrarDiario,
+    aoAbrirAnticoncepcional
+}) {
+    const visual = useCycleForecastVisual();
+    const { estilos } = visual;
+    const recursosSemCiclo = criarRecursosSemCiclo(visual);
+    return (
+        <View style={estilos.estadoSemCiclo}>
+            <View style={estilos.cartaoIntroducao}>
+                <PhaseSymbolSlot compact />
+                <EmptyState
+                    variante="apresentacao"
+                    titulo={
+                        dadosInsuficientes ? 'Continue registrando seu ciclo' : 'Conheça seu ciclo'
+                    }
+                    mensagem={
+                        dadosInsuficientes
+                            ? 'Ainda precisamos de mais registros para criar previsões personalizadas.'
+                            : 'Registre sua menstruação e descubra padrões, previsões e insights personalizados sobre o seu corpo.'
+                    }
+                    acao={
+                        <View style={estilos.acoesSemCiclo}>
+                            <BotaoAcao
+                                texto="Cadastrar Menstruação"
+                                Icone={GotaPreenchidaIcon}
+                                destaque
+                                aoPressionar={aoCadastrarMenstruacao}
+                            />
+                            <BotaoAcao
+                                texto="Cadastrar no Diário"
+                                Icone={NotepadIcon}
+                                aoPressionar={aoCadastrarDiario}
+                            />
+                            <BotaoAcao
+                                texto="Anticoncepcional"
+                                Icone={PillIcon}
+                                aoPressionar={aoAbrirAnticoncepcional}
+                            />
+                        </View>
+                    }
+                />
+            </View>
+            <CycleEducationSection />
+            <Text style={estilos.chamadaRecursos}>O QUE VOCÊ VAI ACOMPANHAR</Text>
+            <View style={estilos.recursos}>
+                {recursosSemCiclo.map(({ titulo, descricao, Icone, cor, peso = 'regular' }) => (
+                    <CycleExpandableCard key={titulo} title={titulo}>
+                        <View style={estilos.recurso}>
+                            <View style={estilos.iconeRecurso}>
+                                <Icone size={20} color={cor} weight={peso} />
+                            </View>
+                            <Text style={estilos.descricaoRecurso}>{descricao}</Text>
+                        </View>
+                    </CycleExpandableCard>
+                ))}
+            </View>
+        </View>
+    );
+}
+
+function CycleHomeContent({
+    estado,
+    dataSelecionada,
+    janelaFertilAtiva,
+    fase = 'desconhecida',
+    diaCiclo,
+    janelaFertil,
+    previsao,
+    conteudoDaFase,
+    aoCadastrarMenstruacao,
+    aoCadastrarDiario,
+    aoAbrirAnticoncepcional,
+    diaryService,
+    onSessaoExpirada
+}) {
+    const tema = useTheme();
+    const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const coresDaPrevisao = useMemo(() => criarCoresDaPrevisao(tema), [tema]);
+    const visual = useMemo(() => ({ estilos, ...coresDaPrevisao }), [coresDaPrevisao, estilos]);
+    const DiaryCheckIn = diaryService ? require('./CycleDiaryCheckIn').CycleDiaryCheckIn : null;
+
+    const estadoAtual = estado ?? (previsao ? 'comCiclo' : 'semCiclo');
+    if (estadoAtual !== 'comCiclo')
+        return (
+            <CycleForecastVisualContext.Provider value={visual}>
+                <EstadoSemCiclo
+                    dadosInsuficientes={estadoAtual === 'dadosInsuficientes'}
+                    aoCadastrarMenstruacao={aoCadastrarMenstruacao}
+                    aoCadastrarDiario={aoCadastrarDiario}
+                    aoAbrirAnticoncepcional={aoAbrirAnticoncepcional}
+                />
+            </CycleForecastVisualContext.Provider>
+        );
+    const faseAtual = Object.hasOwn(ROTULOS, fase) ? fase : 'desconhecida';
+    const emJanelaFertil = janelaFertilAtiva ?? ['folicular', 'ovulatoria'].includes(faseAtual);
+    return (
+        <CycleForecastVisualContext.Provider value={visual}>
+            <View style={estilos.conteudo}>
+                <View style={[estilos.heroiFase, emJanelaFertil && estilos.heroiFaseFertil]}>
+                    <PhaseSymbolSlot />
+                    <Text accessibilityRole="header" style={estilos.tituloFase}>
+                        {ROTULOS[faseAtual]}
+                    </Text>
+                    <Text style={estilos.diaCiclo}>{SUBTITULOS[faseAtual]}</Text>
+                    {diaCiclo ? (
+                        <Text style={estilos.diaCiclo}>Dia {diaCiclo} do ciclo</Text>
+                    ) : null}
+                    {emJanelaFertil ? (
+                        <View
+                            style={[
+                                estilos.destaqueFertil,
+                                { borderColor: visual.coresForma[faseAtual] },
+                                faseAtual === 'folicular'
+                                    ? estilos.destaqueFertilFolicular
+                                    : estilos.destaqueFertilOvulatoria
+                            ]}
+                        >
+                            <View
+                                style={[
+                                    estilos.iconeDestaqueFertil,
+                                    faseAtual === 'folicular'
+                                        ? estilos.iconeDestaqueFertilFolicular
+                                        : estilos.iconeDestaqueFertilOvulatoria
+                                ]}
+                            >
+                                <SparkleIcon
+                                    size={22}
+                                    color={visual.coresIconeDestaqueFertil[faseAtual]}
+                                    weight="fill"
+                                />
+                            </View>
+                            <View>
+                                <Text style={estilos.tituloDestaqueFertil}>Janela fértil</Text>
+                                <Text style={estilos.textoDestaqueFertil}>
+                                    Você está na janela fértil.
+                                </Text>
+                            </View>
+                        </View>
+                    ) : null}
+                </View>
+                <View style={estilos.acoes}>
+                    <BotaoAcao
+                        texto="Cadastrar Menstruação"
+                        Icone={GotaPreenchidaIcon}
+                        destaque
+                        aoPressionar={aoCadastrarMenstruacao}
+                    />
+                    <BotaoAcao
+                        texto="Cadastrar no Diário"
+                        Icone={NotepadIcon}
+                        aoPressionar={aoCadastrarDiario}
+                    />
+                    <BotaoAcao
+                        texto="Anticoncepcional"
+                        Icone={PillIcon}
+                        aoPressionar={aoAbrirAnticoncepcional}
+                    />
+                </View>
+                <PainelPrevisao previsao={previsao} janelaFertil={janelaFertil} />
+                {diaryService ? (
+                    <DiaryCheckIn
+                        date={dataSelecionada}
+                        fase={faseAtual}
+                        service={diaryService}
+                        onOpenDiary={aoCadastrarDiario}
+                        onSessionExpired={onSessaoExpirada}
+                        corDestaque={visual.coresConteudo[faseAtual]}
+                    />
+                ) : null}
+                <ConteudoFase conteudo={conteudoDaFase} fase={faseAtual} />
+            </View>
+        </CycleForecastVisualContext.Provider>
+    );
+}
+
+export { AVISO_MEDICO, CycleHomeContent };

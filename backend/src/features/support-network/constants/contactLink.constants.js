@@ -1,0 +1,15 @@
+const TIPO_VINCULO_CATEGORIA = 'categoria';
+const TIPO_VINCULO_INDIVIDUAL = 'individual';
+const TIPOS_VINCULO = Object.freeze([TIPO_VINCULO_CATEGORIA, TIPO_VINCULO_INDIVIDUAL]);
+
+const MENSAGEM_ERRO_ATUALIZACAO_VINCULO =
+    'Não foi possível atualizar o vínculo deste contato. Tente novamente.';
+const MENSAGEM_SUCESSO_ATUALIZACAO_VINCULO = 'Vínculo atualizado com sucesso.';
+
+export {
+    MENSAGEM_ERRO_ATUALIZACAO_VINCULO,
+    MENSAGEM_SUCESSO_ATUALIZACAO_VINCULO,
+    TIPO_VINCULO_CATEGORIA,
+    TIPO_VINCULO_INDIVIDUAL,
+    TIPOS_VINCULO
+};

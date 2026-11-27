@@ -34,12 +34,18 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
 });
 
 import { CycleParametersForm } from '../../../../src/features/cycles/components/CycleParametersForm';
+import { criarEstilos } from '../../../../src/features/cycles/components/CycleParametersForm.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 const valores = {
     duracaoCicloInformada: 28,
     duracaoMenstruacaoInformada: 5,
     duracaoLuteaInformada: 14
 };
+
+test('usa o mesmo respiro inicial do formulário de novo contato', () => {
+    expect(criarEstilos(temaClaro).container.paddingTop).toBe(8);
+});
 
 test('apresenta os três campos e mantém salvar desabilitado', async () => {
     await render(<CycleParametersForm valores={valores} onAlterar={jest.fn()} />);

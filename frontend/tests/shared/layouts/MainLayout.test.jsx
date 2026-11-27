@@ -58,6 +58,12 @@ describe('MainLayout', () => {
         expect(propriedadesHeader.onVoltar).toBe(onVoltar);
     });
 
+    test('informa ao Header quando o pai já aplicou a Safe Area superior', async () => {
+        await renderizarLayout({ aplicarSafeAreaSuperiorHeader: false });
+
+        expect(Header.mock.calls[0][0].aplicarSafeAreaSuperior).toBe(false);
+    });
+
     test('envia os dados corretos para a navegação inferior', async () => {
         const onSelecionarAba = jest.fn();
 
@@ -71,6 +77,13 @@ describe('MainLayout', () => {
         expect(propriedadesNavegacao.abaAtiva).toBe('ciclos');
 
         expect(propriedadesNavegacao.onSelecionar).toBe(onSelecionarAba);
+    });
+
+    test('permite ocultar a navegação inferior', async () => {
+        await renderizarLayout({ exibirNavegacaoInferior: false });
+
+        expect(BottomTabBar).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('navegacao-segura-main-layout')).not.toBeOnTheScreen();
     });
 
     test('mantém a estrutura flexível do layout', async () => {
@@ -107,6 +120,9 @@ describe('MainLayout', () => {
 
         expect(screen.getByTestId('conteudo-main-layout')).toHaveStyle({
             backgroundColor: '#181C1A'
+        });
+        expect(screen.getByTestId('navegacao-segura-main-layout')).toHaveStyle({
+            backgroundColor: '#1E1E1E'
         });
     });
 

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
@@ -10,19 +11,43 @@ function criarEstilosCartao(tema) {
             maxWidth: 350.01,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: interfaceTema.superficie,
+            paddingTop: 3,
+            backgroundColor: tema.escuro ? '#1E1E1E' : interfaceTema.superficie,
             borderWidth: 1.40978,
-            borderColor: interfaceTema.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : interfaceTema.borda,
             borderRadius: 16
         },
+        cardAtivo: tema.escuro
+            ? {
+                  borderRadius: 16,
+                  borderWidth: 1.41,
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
+        iconeTipoAtivo: tema.escuro
+            ? {
+                  borderRadius: 10,
+                  borderWidth: 0.705,
+                  borderColor: '#2C2C2C',
+                  backgroundColor: '#2C2C2C'
+              }
+            : {},
+        badgePendente: tema.escuro
+            ? { borderRadius: 99, backgroundColor: 'rgba(255, 224, 130, 0.16)' }
+            : {},
+        badgeAlerta: tema.escuro
+            ? { borderRadius: 99, backgroundColor: 'rgba(144, 202, 249, 0.20)' }
+            : {},
+        textoBadgePendente: tema.escuro ? { color: '#FFE082' } : {},
+        textoBadgeAlerta: tema.escuro ? { color: '#90CAF9' } : {},
         cardConfirmado: { borderWidth: 0.70489 },
-        faixaSuperior: { width: '100%', height: 3, backgroundColor: interfaceTema.separador },
-        conteudo: { width: '100%', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 14.41 },
+        conteudo: { width: '100%', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12 },
         conteudoValidade: { paddingBottom: 29.47 },
         conteudoRemovido: { opacity: 0.75 },
         cabecalho: {
             width: '100%',
-            minHeight: 44,
+            minHeight: 50,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10
@@ -34,20 +59,26 @@ function criarEstilosCartao(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             borderWidth: 0.70489,
-            borderColor: interfaceTema.borda,
+            borderColor: tema.escuro ? '#2C2C2C' : interfaceTema.borda,
             borderRadius: 10,
-            backgroundColor: interfaceTema.superficieElevada
+            backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.fundo
         },
         identificacao: { flex: 1, minWidth: 0 },
+        identificacaoSomenteLeitura: { paddingRight: 36 + 10 },
+        textoCentralizado: { textAlign: 'center' },
         nome: {
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontWeight: '700',
             fontSize: 16,
             lineHeight: 24
         },
         tipo: {
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400',
             fontSize: 13,
@@ -76,9 +107,9 @@ function criarEstilosCartao(tema) {
         },
         divisor: {
             width: '100%',
-            height: 1.40978,
+            height: 0.705,
             marginTop: 11.3,
-            backgroundColor: interfaceTema.separador
+            backgroundColor: tema.escuro ? interfaceTema.separador : '#F0EDE7'
         },
         blocoUsos: { width: '100%', marginTop: 7 },
         rotuloSecao: {
@@ -90,6 +121,8 @@ function criarEstilosCartao(tema) {
             letterSpacing: 0.6,
             marginBottom: 15
         },
+        rotuloUsados: tema.escuro ? { color: '#999999' } : {},
+        rotuloProximosHorarios: tema.escuro ? { color: '#999999' } : {},
         linhaUso: {
             width: '100%',
             minHeight: 35.99,
@@ -104,6 +137,7 @@ function criarEstilosCartao(tema) {
             borderTopWidth: 0.70489,
             borderTopColor: interfaceTema.separador
         },
+        linhaUsoSomenteLeitura: { justifyContent: 'center' },
         horarioComIcone: {
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -112,22 +146,28 @@ function criarEstilosCartao(tema) {
             flexShrink: 1
         },
         horario: {
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
             fontWeight: '700',
             fontSize: 14,
             lineHeight: 21
         },
         horarioConfirmado: { flex: 1, minWidth: 0, gap: 2 },
+        horarioConfirmadoSomenteLeitura: { alignItems: 'center' },
         confirmadoAs: {
             marginLeft: 17,
-            color: interfaceTema.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontWeight: '400',
             fontSize: 11,
             lineHeight: 16
         },
         horaConfirmacao: { fontFamily: fontFamilies.semibold, fontWeight: '600' },
+        confirmacaoSomenteLeitura: { marginLeft: 0, textAlign: 'center' },
         espacoBotaoUso: {
             height: 35.99,
             flexShrink: 0,
@@ -163,13 +203,15 @@ function criarEstilosCartao(tema) {
             gap: 6,
             paddingVertical: 8,
             paddingHorizontal: 12,
-            backgroundColor: interfaceTema.superficieElevada,
+            backgroundColor: tema.escuro ? '#242424' : interfaceTema.superficieElevada,
             borderRadius: 10
         },
         textoValidade: {
             flex: 1,
             minWidth: 125,
-            color: interfaceTema.textoPrincipal,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.regular,
             fontWeight: '400',
             fontSize: 13,

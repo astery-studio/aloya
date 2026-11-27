@@ -19,13 +19,21 @@ function criarEstilos(tema) {
         },
 
         conteudo: {
+            width: '100%',
             alignItems: 'center',
             flexDirection: 'row',
             gap: 8,
             justifyContent: 'center'
         },
 
+        caixaIcone: {
+            flexShrink: 0,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+
         texto: {
+            flexShrink: 1,
             textAlign: 'center'
         },
 
@@ -39,7 +47,7 @@ function criarEstilos(tema) {
         },
 
         desativado: {
-            backgroundColor: tema.cores.interface.separador,
+            backgroundColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.separador,
             borderColor: tema.cores.interface.borda,
             borderStyle: 'solid'
         }
@@ -77,11 +85,11 @@ function criarVariantes(tema) {
     return {
         laranja: {
             container: {
-                backgroundColor: COR_LARANJA_ACESSIVEL
+                backgroundColor: tema.escuro ? '#C26E5F' : COR_LARANJA_ACESSIVEL
             },
 
             texto: {
-                color: '#FFFFFF'
+                color: tema.escuro ? '#121212' : '#FFFFFF'
             }
         },
 

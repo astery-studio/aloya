@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     const estilos = StyleSheet.create({
@@ -13,6 +14,14 @@ function criarEstilos(tema) {
             borderRadius: tema.radius.buttonAndInput
         },
 
+        containerCompacto: {
+            width: 32,
+            minWidth: 32,
+            height: 32,
+            minHeight: 32,
+            borderRadius: 8
+        },
+
         pressionado: {
             opacity: 0.65,
             transform: [
@@ -21,6 +30,15 @@ function criarEstilos(tema) {
                 }
             ]
         }
+    });
+
+    const botaoCabecalho = Object.freeze({
+        backgroundColor: tema.escuro
+            ? coresNoturnasConteudo.superficie
+            : tema.cores.interface.superficie,
+        borderWidth: 0.667,
+        borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
+        borderRadius: 16
     });
 
     const variantes = Object.freeze({
@@ -46,18 +64,31 @@ function criarEstilos(tema) {
                 borderWidth: 1,
                 borderColor: tema.cores.interface.borda
             }),
-            icone: tema.cores.interface.textoSecundario
+            icone: tema.cores.interface.textoSecundario,
+            tamanhoIcone: 28
         }),
 
         calendario: Object.freeze({
             container: Object.freeze({
-                backgroundColor: tema.cores.interface.superficie,
-                borderWidth: 1,
-                borderColor: tema.cores.interface.borda,
-                borderRadius: tema.radius.onboardingCalendar
+                backgroundColor: tema.escuro ? '#1E1E1E' : '#FFFFFF',
+                borderWidth: 0.666667,
+                borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : '#E6E2D8',
+                borderRadius: 16
             }),
-            icone: tema.cores.interface.textoSecundario,
-            tamanhoIcone: 22
+            icone: tema.escuro ? '#999999' : '#C85A44',
+            tamanhoIcone: 28
+        }),
+
+        redeApoio: Object.freeze({
+            container: botaoCabecalho,
+            icone: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
+            tamanhoIcone: 32
+        }),
+
+        redeApoioSecundario: Object.freeze({
+            container: botaoCabecalho,
+            icone: tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria,
+            tamanhoIcone: 32
         }),
 
         desativado: Object.freeze({

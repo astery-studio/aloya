@@ -1,5 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { MenstruationRegistrationScreen } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen';
+import { criarEstilos } from '../../../../src/features/cycles/screens/MenstruationRegistrationScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const meses = [
@@ -21,6 +23,28 @@ function montar(props = {}, opcoes = {}) {
         opcoes
     );
 }
+
+test('usa o padrão compartilhado dos headers com voltar e separa o conteúdo', async () => {
+    await montar();
+
+    expect(screen.getByRole('header')).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 20,
+        fontWeight: '700',
+        lineHeight: 28,
+        textAlign: 'center'
+    });
+
+    const estilos = criarEstilos(temaClaro);
+
+    expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 16 });
+    expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+    expect(screen.getByRole('button', { name: 'Voltar' })).toHaveStyle({
+        width: 48,
+        height: 48
+    });
+    expect(estilos.legenda.marginTop).toBe(8);
+});
 
 test('abre no mês atual após carregar os meses, mesmo com um dia anterior pré-selecionado', async () => {
     const propriedades = { hoje: '2026-10-30', datasSelecionadas: ['2026-09-21'] };
@@ -136,13 +160,34 @@ test('aplica o modo escuro ao fundo, orientação e dias selecionados', async ()
     );
 
     expect(screen.getByTestId('tela-cadastro-menstruacao')).toHaveStyle({
-        backgroundColor: '#181C1A'
+        backgroundColor: '#1C1B19'
     });
     expect(screen.getByTestId('orientacao-cadastro-menstruacao')).toHaveStyle({
-        backgroundColor: 'transparent',
-        borderColor: '#9FD6B6'
+        backgroundColor: 'rgba(165, 214, 167, 0.05)',
+        borderColor: '#A5D6A7'
     });
     expect(screen.getByTestId('selecao-2026-09-21')).toHaveStyle({
         backgroundColor: 'rgba(212, 119, 105, 0.28)'
     });
+});
+
+test('dia 4 salvo localmente orienta a sincronizar e não informa ciclo existente', async () => {
+    const sincronizar = jest.fn();
+    const alternar = jest.fn();
+    await montar({
+        meses: [{ mes: '2026-11', diasMenstruacao: [], datasLocais: ['2026-11-04'] }],
+        hoje: '2026-11-09',
+        onAlternarData: alternar,
+        onSincronizarPendentes: sincronizar
+    });
+    await fireEvent.press(
+        screen.getByRole('button', {
+            name: '4 de novembro de 2026, menstruação aguardando sincronização'
+        })
+    );
+    expect(screen.getByText('Registro aguardando sincronização')).toBeOnTheScreen();
+    expect(screen.queryByText('Ciclo existente')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Sincronizar' }));
+    expect(sincronizar).toHaveBeenCalledTimes(1);
+    expect(alternar).not.toHaveBeenCalled();
 });

@@ -60,7 +60,7 @@ jest.mock('../../../../src/shared/layouts/BottomSheet/BottomSheetLayout', () => 
     };
 });
 
-import { DeleteSupportCategoryModal } from '../../../../src/features/support-network/components/DeleteSupportCategoryModal';
+import { DeleteSupportCategoryModal } from '../../../../src/features/support-network/components/DeleteSupportCategoryModal/DeleteSupportCategoryModal';
 import { ACOES_EXCLUSAO_CATEGORIA } from '../../../../src/features/support-network/constants/categoryDeletionOptions';
 
 const categoria = Object.freeze({

@@ -3,6 +3,7 @@ import { fontFamilies } from '../../../theme';
 
 const cores = Object.freeze({
     aviso: '#B07D2A',
+    estimativaIncerta: '#D68C3A',
     informacao: '#4A758E',
     sucesso: '#2C4C3B'
 });
@@ -46,27 +47,34 @@ const estilosBase = {
     },
     texto: { flexShrink: 0 },
     conteudoEstimativa: {
-        width: 226.68,
-        height: 33,
-        alignItems: 'center'
+        flex: 1,
+        minWidth: 0,
+        minHeight: 33,
+        alignItems: 'flex-start',
+        justifyContent: 'center'
     },
     tituloEstimativa: {
         alignSelf: 'stretch',
-        height: 17,
-        fontFamily: fontFamilies.bold,
-        fontWeight: '700',
-        fontSize: 13,
+        minHeight: 17,
+        fontFamily: fontFamilies.medium,
+        fontWeight: '500',
+        fontSize: 12,
         lineHeight: 17,
-        color: cores.aviso
+        includeFontPadding: false,
+        color: cores.estimativaIncerta
     },
     descricaoEstimativa: {
-        width: 228,
-        height: 15,
-        fontFamily: fontFamilies.regular,
-        fontWeight: '400',
-        fontSize: 11,
+        width: '100%',
+        height: 'auto',
+        minHeight: 15,
+        flexShrink: 1,
+        fontFamily: fontFamilies.light,
+        fontWeight: '300',
+        fontSize: 10,
         lineHeight: 14,
-        color: cores.aviso
+        includeFontPadding: false,
+        paddingTop: 1,
+        color: cores.estimativaIncerta
     }
 };
 
@@ -125,6 +133,10 @@ const variantes = Object.freeze({
             backgroundColor: 'rgba(44, 76, 59, 0.1)'
         },
         texto: { ...textoPadrao, width: 63, color: cores.sucesso }
+    },
+    naoUseiNoCartao: {
+        container: { ...containerUso, width: 155.31, backgroundColor: '#E6E2D8' },
+        texto: { ...textoPadrao, width: 52, color: '#5C5C59' }
     },
     alertaCritico: {
         container: {
@@ -257,17 +269,19 @@ const variantes = Object.freeze({
     estimativaIncerta: {
         container: {
             width: 316.62,
-            height: 52.41,
+            maxWidth: '100%',
+            height: 'auto',
+            minHeight: 42.41,
             justifyContent: 'flex-start',
             gap: 15,
-            paddingVertical: 9,
+            paddingVertical: 4,
             paddingHorizontal: 12,
-            backgroundColor: '#FBF3E0',
+            backgroundColor: 'rgba(214, 140, 58, 0.1)',
             borderWidth: 0.70489,
             borderColor: 'rgba(214, 140, 58, 0.3)',
-            borderRadius: 10
+            borderRadius: 15
         },
-        texto: { color: cores.aviso }
+        texto: { color: cores.estimativaIncerta }
     }
 });
 
@@ -289,11 +303,11 @@ function criarEstilos(tema) {
         ...estilosBase,
         tituloEstimativa: {
             ...estilosBase.tituloEstimativa,
-            color: coresAtivas.aviso
+            color: coresAtivas.estimativaIncerta ?? coresAtivas.aviso
         },
         descricaoEstimativa: {
             ...estilosBase.descricaoEstimativa,
-            color: coresAtivas.aviso
+            color: coresAtivas.estimativaIncerta ?? coresAtivas.aviso
         }
     });
 }
@@ -335,6 +349,10 @@ function criarVariantes(tema) {
         confirmado: combinarVariante(variantes.confirmado, {
             container: { backgroundColor: fundoSucesso },
             texto: { color: coresAtivas.sucesso }
+        }),
+        naoUseiNoCartao: combinarVariante(variantes.naoUseiNoCartao, {
+            container: { backgroundColor: tema.cores.interface.separador },
+            texto: { color: tema.cores.interface.textoSecundario }
         }),
         alertaCritico: combinarVariante(variantes.alertaCritico, {
             container: { backgroundColor: fundoInformacao },

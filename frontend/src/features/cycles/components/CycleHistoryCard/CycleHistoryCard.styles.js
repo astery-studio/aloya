@@ -1,11 +1,15 @@
 //Preserva as medidas e diferenças visuais dos ciclos concluído, em andamento e incerto.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../../shared/theme';
 
+const LARGURA_NUMERO = 28;
+const ESPACO_IDENTIFICACAO = 20;
+
 function criarEstilos(tema) {
-    const corAviso = tema.escuro ? '#F2B45F' : '#B97D22';
-    const corMenstruacao = tema.escuro ? '#F08A75' : tema.cores.marca.primaria;
+    const corAviso = tema.escuro ? coresNoturnasConteudo.amarelo : '#B97D22';
+    const corMenstruacao = tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria;
 
     return StyleSheet.create({
         container: {
@@ -13,9 +17,9 @@ function criarEstilos(tema) {
             maxWidth: 350,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             borderRadius: 16
         },
 
@@ -25,6 +29,10 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             paddingHorizontal: 16,
             paddingVertical: 12
+        },
+
+        cabecalhoSomenteLeitura: {
+            minHeight: 60
         },
 
         cabecalhoEmAndamento: {
@@ -43,23 +51,27 @@ function criarEstilos(tema) {
             minWidth: 0,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 20
+            gap: ESPACO_IDENTIFICACAO
+        },
+
+        identificacaoSomenteLeitura: {
+            paddingRight: LARGURA_NUMERO + ESPACO_IDENTIFICACAO
         },
 
         numero: {
-            width: 28,
+            width: LARGURA_NUMERO,
             height: 28,
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: tema.escuro
-                ? tema.cores.interface.destaqueSuave
+                ? 'rgba(165, 214, 167, 0.10)'
                 : tema.cores.icones.configuracoes.verde.caixa,
             borderRadius: 9
         },
 
         textoDoNumero: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.bold,
             fontSize: 13,
             fontStyle: 'normal',
@@ -95,6 +107,10 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        textoCentralizado: {
+            textAlign: 'center'
+        },
+
         acoes: {
             flexShrink: 0,
             flexDirection: 'row',
@@ -124,6 +140,11 @@ function criarEstilos(tema) {
             paddingBottom: 12
         },
 
+        indicadoresSomenteLeitura: {
+            paddingHorizontal: 26,
+            flexWrap: 'nowrap'
+        },
+
         indicador: {
             minWidth: 0,
             height: 31,
@@ -136,6 +157,12 @@ function criarEstilos(tema) {
             paddingHorizontal: 10,
             borderWidth: 0.8,
             borderRadius: 999
+        },
+
+        indicadorSomenteLeitura: {
+            flexBasis: 0,
+            flexShrink: 1,
+            paddingHorizontal: 6
         },
 
         indicadorMenstruacao: {
@@ -171,6 +198,10 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        valorSomenteLeitura: {
+            flexShrink: 1
+        },
+
         textoMenstruacao: {
             color: corMenstruacao
         },
@@ -194,7 +225,7 @@ function criarEstilos(tema) {
             marginBottom: 14,
             paddingHorizontal: 13,
             paddingVertical: 8,
-            backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.14)' : 'rgba(214, 140, 58, 0.14)',
+            backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.14)' : 'rgba(214, 140, 58, 0.14)',
             borderWidth: 0.7,
             borderColor: 'rgba(214, 140, 58, 0.5)',
             borderRadius: 10

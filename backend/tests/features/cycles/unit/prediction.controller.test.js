@@ -34,3 +34,22 @@ test('prepara mensagem segura para falha interna', async () => {
         assert.equal(erro.mensagemUsuario, MENSAGEM_ERRO);
     });
 });
+
+test('preserva a mensagem de um erro de domínio já classificado', async () => {
+    const falha = Object.assign(new Error('Sessão inválida'), { status: 401 });
+    const controller = criarPredictionController({
+        predictionService: {
+            buscar: async () => {
+                throw falha;
+            }
+        }
+    });
+
+    let encaminhado;
+    await controller.buscar({ usuario: { id: 8 } }, {}, (erro) => {
+        encaminhado = erro;
+    });
+
+    assert.equal(encaminhado, falha);
+    assert.equal(encaminhado.mensagemUsuario, undefined);
+});

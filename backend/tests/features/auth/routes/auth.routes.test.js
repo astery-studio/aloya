@@ -4,9 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import {
-    criarAuthRoutes
-} from '../../../../src/features/auth/routes/auth.routes.js';
+import { criarAuthRoutes } from '../../../../src/features/auth/routes/auth.routes.js';
 
 function criarDependencias() {
     function cadastrar() {}
@@ -19,7 +17,6 @@ function criarDependencias() {
     function autenticar() {}
     function cadastroRateLimit() {}
     function emailRateLimit() {}
-    function loginRateLimit() {}
     function contaLoginRateLimit() {}
     function solicitarRecuperacao() {}
     function validarTokenRecuperacao() {}
@@ -41,7 +38,8 @@ function criarDependencias() {
         },
         cadastroRateLimit,
         emailRateLimit,
-        loginRateLimit,
+        loginRateLimitJanelaMs: 900000,
+        loginRateLimitMaximo: 5,
         contaLoginRateLimit,
         passwordRecoveryController: {
             solicitar: solicitarRecuperacao,
@@ -53,11 +51,7 @@ function criarDependencias() {
 }
 
 function buscarRota(router, caminho) {
-    return router.stack.find(
-        (camada) =>
-            camada.route &&
-            camada.route.path === caminho
-    ).route;
+    return router.stack.find((camada) => camada.route && camada.route.path === caminho).route;
 }
 
 test('protege a rota de cadastro com rate limit', () => {
@@ -68,10 +62,7 @@ test('protege a rota de cadastro com rate limit', () => {
     assert.equal(rota.methods.post, true);
     assert.deepEqual(
         rota.stack.map((camada) => camada.handle),
-        [
-            dependencias.cadastroRateLimit,
-            dependencias.authController.cadastrar
-        ]
+        [dependencias.cadastroRateLimit, dependencias.authController.cadastrar]
     );
 });
 
@@ -81,31 +72,23 @@ test('protege a rota de login com rate limit', () => {
     const rota = buscarRota(router, '/login');
 
     assert.equal(rota.methods.post, true);
-    assert.deepEqual(
-        rota.stack.map((camada) => camada.handle),
-        [
-            dependencias.loginRateLimit,
-            dependencias.contaLoginRateLimit,
-            dependencias.authController.realizarLogin
-        ]
-    );
+    const manipuladores = rota.stack.map((camada) => camada.handle);
+    assert.equal(typeof manipuladores[0], 'function');
+    assert.equal(manipuladores[1], dependencias.contaLoginRateLimit);
+    assert.equal(manipuladores[2], dependencias.authController.realizarLogin);
 });
 
 test('exige autenticação para consultar o consentimento', () => {
     const dependencias = criarDependencias();
     const router = criarAuthRoutes(dependencias);
-    const rota = buscarRota(
-        router,
-        '/parental-consent/status'
-    );
+    const rota = buscarRota(router, '/parental-consent/status');
 
     assert.equal(rota.methods.get, true);
     assert.deepEqual(
         rota.stack.map((camada) => camada.handle),
         [
             dependencias.authMiddleware.autenticar,
-            dependencias.authController
-                .consultarStatusConsentimento
+            dependencias.authController.consultarStatusConsentimento
         ]
     );
 });
@@ -113,10 +96,7 @@ test('exige autenticação para consultar o consentimento', () => {
 test('protege solicitação de consentimento e limita e-mails', () => {
     const dependencias = criarDependencias();
     const router = criarAuthRoutes(dependencias);
-    const rota = buscarRota(
-        router,
-        '/parental-consent/request'
-    );
+    const rota = buscarRota(router, '/parental-consent/request');
 
     assert.equal(rota.methods.post, true);
     assert.deepEqual(
@@ -124,8 +104,7 @@ test('protege solicitação de consentimento e limita e-mails', () => {
         [
             dependencias.authMiddleware.autenticar,
             dependencias.emailRateLimit,
-            dependencias.authController
-                .solicitarConsentimento
+            dependencias.authController.solicitarConsentimento
         ]
     );
 });
@@ -133,10 +112,7 @@ test('protege solicitação de consentimento e limita e-mails', () => {
 test('protege reenvio de consentimento e limita e-mails', () => {
     const dependencias = criarDependencias();
     const router = criarAuthRoutes(dependencias);
-    const rota = buscarRota(
-        router,
-        '/parental-consent/resend'
-    );
+    const rota = buscarRota(router, '/parental-consent/resend');
 
     assert.equal(rota.methods.post, true);
     assert.deepEqual(
@@ -144,8 +120,7 @@ test('protege reenvio de consentimento e limita e-mails', () => {
         [
             dependencias.authMiddleware.autenticar,
             dependencias.emailRateLimit,
-            dependencias.authController
-                .reenviarConsentimento
+            dependencias.authController.reenviarConsentimento
         ]
     );
 });
@@ -153,26 +128,16 @@ test('protege reenvio de consentimento e limita e-mails', () => {
 test('mantém pública somente a confirmação por token', () => {
     const dependencias = criarDependencias();
     const router = criarAuthRoutes(dependencias);
-    const rota = buscarRota(
-        router,
-        '/parental-consent/:token'
-    );
+    const rota = buscarRota(router, '/parental-consent/:token');
 
     assert.equal(rota.methods.get, true);
     assert.deepEqual(
         rota.stack.map((camada) => camada.handle),
-        [
-            dependencias.authController
-                .confirmarConsentimento
-        ]
+        [dependencias.authController.confirmarConsentimento]
     );
 
     assert.equal(
-        rota.stack.some(
-            (camada) =>
-                camada.handle ===
-                dependencias.authMiddleware.autenticar
-        ),
+        rota.stack.some((camada) => camada.handle === dependencias.authMiddleware.autenticar),
         false
     );
 });
@@ -185,26 +150,17 @@ test('protege a verificação de e-mail com rate limit', () => {
     assert.equal(rota.methods.post, true);
     assert.deepEqual(
         rota.stack.map((camada) => camada.handle),
-        [
-            dependencias.cadastroRateLimit,
-            dependencias.authController.verificarEmail
-        ]
+        [dependencias.cadastroRateLimit, dependencias.authController.verificarEmail]
     );
 });
 
 test('limita solicitações de recuperação por e-mail', () => {
     const dependencias = criarDependencias();
-    const rota = buscarRota(
-        criarAuthRoutes(dependencias),
-        '/password-recovery/request'
-    );
+    const rota = buscarRota(criarAuthRoutes(dependencias), '/password-recovery/request');
 
     assert.deepEqual(
         rota.stack.map((camada) => camada.handle),
-        [
-            dependencias.emailRateLimit,
-            dependencias.passwordRecoveryController.solicitar
-        ]
+        [dependencias.emailRateLimit, dependencias.passwordRecoveryController.solicitar]
     );
 });
 
@@ -218,19 +174,13 @@ test('expõe validação e redefinição da senha', () => {
     assert.equal(redefinir.methods.post, true);
     assert.deepEqual(
         redefinir.stack.map((camada) => camada.handle),
-        [
-            dependencias.emailRateLimit,
-            dependencias.passwordRecoveryController.redefinir
-        ]
+        [dependencias.emailRateLimit, dependencias.passwordRecoveryController.redefinir]
     );
 });
 
 test('expõe a página intermediária para abrir o aplicativo', () => {
     const dependencias = criarDependencias();
-    const rota = buscarRota(
-        criarAuthRoutes(dependencias),
-        '/password-recovery/open'
-    );
+    const rota = buscarRota(criarAuthRoutes(dependencias), '/password-recovery/open');
 
     assert.equal(rota.methods.get, true);
     assert.deepEqual(

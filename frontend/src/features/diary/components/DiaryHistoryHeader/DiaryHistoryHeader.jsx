@@ -1,0 +1,82 @@
+import { ActivityIndicator, Text, View } from 'react-native';
+
+import { obterCoresDiario } from '../../config/diaryColors';
+import { DiaryActiveFilters } from '../DiaryActiveFilters/DiaryActiveFilters';
+import { DiaryOverviewCard } from '../DiaryOverviewCard/DiaryOverviewCard';
+
+function DiaryTimelineDivider({ estilos }) {
+    return (
+        <View
+            accessible
+            accessibilityRole="header"
+            accessibilityLabel="Linha do tempo"
+            style={estilos.divisor}
+        >
+            <View style={estilos.linhaDivisor} />
+            <Text style={estilos.textoDivisor}>LINHA DO TEMPO</Text>
+            <View style={estilos.linhaDivisor} />
+        </View>
+    );
+}
+
+function DiaryHistoryHeader({
+    atualizando,
+    resumo,
+    filtrosAtivos,
+    filtros,
+    rotulosCategorias,
+    quantidadeResultados,
+    aoRemoverFiltro,
+    aoLimparFiltros,
+    mostrarConteudo = true,
+    mostrarDivisor = true,
+    somenteLeitura = false,
+    estilos,
+    tema
+}) {
+    const cores = obterCoresDiario(tema).interface;
+    return (
+        <View
+            testID="diary-history-header"
+            style={[
+                estilos.cabecalhoLista,
+                somenteLeitura && (mostrarConteudo || atualizando) && estilos.cabecalhoCompartilhado
+            ]}
+        >
+            {!somenteLeitura || atualizando ? (
+                <View
+                    style={somenteLeitura ? estilos.atualizandoCompartilhado : estilos.introducao}
+                >
+                    {!somenteLeitura ? (
+                        <Text style={estilos.descricao}>
+                            Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao
+                            longo do seu ciclo.
+                        </Text>
+                    ) : null}
+                    {atualizando ? (
+                        <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
+                            <ActivityIndicator size="small" color={cores.destaque} />
+                            <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
+                        </View>
+                    ) : null}
+                </View>
+            ) : null}
+            {mostrarConteudo && filtrosAtivos ? (
+                <DiaryActiveFilters
+                    filtros={filtros}
+                    rotulosCategorias={rotulosCategorias}
+                    quantidadeResultados={quantidadeResultados}
+                    aoRemover={aoRemoverFiltro}
+                    aoLimpar={aoLimparFiltros}
+                />
+            ) : mostrarConteudo && resumo ? (
+                <DiaryOverviewCard {...resumo} />
+            ) : null}
+            {mostrarConteudo && mostrarDivisor && !filtrosAtivos ? (
+                <DiaryTimelineDivider estilos={estilos} />
+            ) : null}
+        </View>
+    );
+}
+
+export { DiaryHistoryHeader, DiaryTimelineDivider };

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTheme } from '../../../shared/hooks/useTheme';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { CycleParametersFeedback } from '../components/CycleParametersFeedback';
 import { CycleParametersForm } from '../components/CycleParametersForm';
@@ -6,6 +7,7 @@ import { CycleParametersStateView } from '../components/CycleParametersStateView
 import { useCycleParameters } from '../hooks/useCycleParameters';
 
 function CycleParametersScreen({ service, onVoltar, onSessaoExpirada, onParametrosAtualizados }) {
+    const tema = useTheme();
     const [saidaSemSalvar, setSaidaSemSalvar] = useState(false);
     const parametros = useCycleParameters({
         service,
@@ -43,7 +45,11 @@ function CycleParametersScreen({ service, onVoltar, onSessaoExpirada, onParametr
 
     return (
         <>
-            <SettingsLayout titulo="Parâmetros do Ciclo" onVoltar={tentarVoltar}>
+            <SettingsLayout
+                titulo="Parâmetros do Ciclo"
+                onVoltar={tentarVoltar}
+                corFundo={tema.escuro ? '#121212' : undefined}
+            >
                 {conteudo}
             </SettingsLayout>
             <CycleParametersFeedback

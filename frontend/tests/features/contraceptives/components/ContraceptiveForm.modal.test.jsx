@@ -81,7 +81,6 @@ const base = {
     fecharAlerta: jest.fn(),
     selecionarTipo: jest.fn(),
     selecionarFrequencia: jest.fn(),
-    permiteMultiplos: false,
     exigePrimeiroUso: false
 };
 

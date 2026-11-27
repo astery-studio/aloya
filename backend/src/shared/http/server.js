@@ -21,9 +21,18 @@ import { criarCycleEditRoutes } from '../../features/cycles/routes/cycleEdit.rou
 import { criarPredictionRoutes } from '../../features/cycles/routes/prediction.routes.js';
 
 import { criarPermissionCategoryRoutes } from '../../features/support-network/routes/permissionCategory.routes.js';
+import { criarContactInvitationRoutes } from '../../features/support-network/routes/contactInvitation.routes.js';
+import { criarSupportContactRoutes } from '../../features/support-network/routes/supportContact.routes.js';
+import { criarSharedSupportRoutes } from '../../features/support-network/routes/sharedSupport.routes.js';
+import { criarContactLinkRoutes } from '../../features/support-network/routes/contactLink.routes.js';
+import { criarSupportContactRemovalRoutes } from '../../features/support-network/routes/supportContactRemoval.routes.js';
 
 import { criarAccountRoutes } from '../../features/settings/routes/account.routes.js';
 import { criarCycleParametersRoutes } from '../../features/settings/routes/cycleParameters.routes.js';
+import { criarDiaryRoutes } from '../../features/diary/routes/diary.routes.js';
+import { criarNotificationPreferencesRoutes } from '../../features/notifications/notificationPreferences.routes.js';
+import { criarPushDevicesRoutes } from '../../features/notifications/pushDevices.routes.js';
+import { prisma } from '../config/prisma.js';
 
 import { criarLogoutRoutes } from '../../features/auth/routes/logout.routes.js';
 
@@ -61,7 +70,8 @@ app.use(
         authMiddleware: container.authMiddleware,
         cadastroRateLimit: container.cadastroRateLimit,
         emailRateLimit: container.emailRateLimit,
-        loginRateLimit: container.loginRateLimit,
+        loginRateLimitJanelaMs: env.loginRateLimitJanelaMs,
+        loginRateLimitMaximo: env.loginRateLimitMaximo,
         contaLoginRateLimit: container.contaLoginRateLimit
     })
 );
@@ -96,9 +106,22 @@ app.use(
         controller: container.contraceptiveController,
         usoController: container.contraceptiveUsageController,
         edicaoRateLimit: container.edicaoAnticoncepcionalRateLimit,
+        usoRateLimit: container.usoAnticoncepcionalRateLimit,
         remocaoRateLimit: container.remocaoAnticoncepcionalRateLimit
     })
 );
+
+app.use('/api/preferencias-notificacao', criarNotificationPreferencesRoutes({
+    Router: express.Router,
+    autenticar: container.authMiddleware.autenticar,
+    rateLimit: container.notificationPreferencesRateLimit,
+    service: container.notificationPreferencesService
+}));
+
+app.use('/api/dispositivos-notificacao', criarPushDevicesRoutes({
+    Router: express.Router, prisma, autenticar: container.authMiddleware.autenticar,
+    rateLimit: container.pushDevicesRateLimit
+}));
 
 app.use(
     '/api/cycles',
@@ -160,11 +183,85 @@ app.use(
 );
 
 app.use(
+    '/support-network',
+    criarContactInvitationRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        lookupRateLimit: container.contactInvitationLookupRateLimit,
+        rateLimit: container.contactInvitationRateLimit,
+        responseRateLimit: container.contactInvitationResponseRateLimit,
+        controller: container.contactInvitationController,
+        responseController: container.contactInvitationResponseController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSupportContactRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactInvitationRateLimit,
+        responseRateLimit: container.contactInvitationResponseRateLimit,
+        controller: container.supportContactController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSharedSupportRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        sharedSupport: container.sharedSupport
+    })
+);
+
+app.use(
+    '/support-network',
+    criarContactLinkRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.contactLinkRateLimit,
+        controller: container.contactLinkController
+    })
+);
+
+app.use(
+    '/support-network',
+    criarSupportContactRemovalRoutes({
+        Router: express.Router,
+        authMiddleware: container.authMiddleware,
+        parentalConsentMiddleware: container.parentalConsentMiddleware,
+        rateLimit: container.supportContactRemovalRateLimit,
+        controller: container.supportContactRemovalController
+    })
+);
+
+app.use(
     '/api/cycles',
     criarCycleRegistrationRoutes({
         Router: express.Router,
         authMiddleware: container.authMiddleware,
         controller: container.cycleRegistrationController
+    })
+);
+
+app.use(
+    '/api/diario',
+    criarDiaryRoutes({
+        Router: express.Router,
+        autenticar: container.authMiddleware.autenticar,
+        catalogController: container.diaryCatalogController,
+        entryController: container.diaryEntryController,
+        historyController: container.diaryHistoryController,
+        overviewController: container.diaryOverviewController,
+        mutationController: container.diaryMutationController,
+        validarPreferencia: container.validarAtualizacaoPreferencia,
+        rateLimit: container.configuracoesContaRateLimit,
+        preferencesRateLimit: container.diaryPreferencesRateLimit
     })
 );
 

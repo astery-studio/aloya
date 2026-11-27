@@ -12,7 +12,7 @@ function criarEstilos(tema) {
             gap: 12,
             paddingHorizontal: 13,
             paddingVertical: 9,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
 
         desabilitado: {
@@ -25,7 +25,9 @@ function criarEstilos(tema) {
             flexShrink: 0,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: tema.cores.icones.configuracoes.azul.caixa,
+            backgroundColor: tema.escuro
+                ? 'rgba(179, 157, 219, 0.16)'
+                : tema.cores.icones.configuracoes.azul.caixa,
             borderRadius: 10
         },
 

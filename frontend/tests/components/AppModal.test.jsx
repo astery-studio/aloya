@@ -1,7 +1,7 @@
 /**
  * Testes das variantes, conteúdo e tema do AppModal.
  */
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import AppModal from '../../src/shared/components/feedback/Modal/AppModal';
@@ -136,6 +136,33 @@ describe('AppModal', () => {
         expect(screen.getByTestId('app-modal-fundo')).toHaveStyle({
             backgroundColor: 'rgba(0, 0, 0, 0.68)'
         });
+    });
+
+    test('permite desativar somente a rolagem externa', async () => {
+        await renderizarModal({
+            rolagemExternaHabilitada: false,
+            children: <Text>Conteúdo com rolagem própria</Text>
+        });
+
+        expect(screen.getByTestId('app-modal-scroll')).toHaveProp('scrollEnabled', false);
+    });
+
+    test('mantém o fundo fora da árvore de gestos do conteúdo', async () => {
+        await renderizarModal({
+            variante: 'detalhes',
+            children: <Text>Conteúdo rolável</Text>
+        });
+
+        expect(screen.getByTestId('app-modal-fundo-interativo')).not.toHaveProp('onPress');
+        expect(screen.getByText('Conteúdo rolável')).toBeOnTheScreen();
+    });
+
+    test('fecha pelo fundo somente quando essa interação está habilitada', async () => {
+        const aoFechar = jest.fn();
+        await renderizarModal({ fecharAoTocarFora: true, aoFechar });
+
+        fireEvent.press(screen.getByRole('button', { name: 'Fechar modal' }));
+        expect(aoFechar).toHaveBeenCalledTimes(1);
     });
 
     test('expõe o término do fechamento nativo para transições entre modais', async () => {

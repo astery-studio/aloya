@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { InfoIcon } from 'phosphor-react-native/src/icons/Info';
 import { DropIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal/SimpleModal';
+import { Header } from '../../../shared/components/navigation/Header/Header';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { MenstruationRegistrationCalendar } from '../components/MenstruationRegistrationCalendar';
@@ -36,19 +36,29 @@ function MenstruationRegistrationScreen({
     onSalvar,
     onVoltar,
     onTentarNovamente,
+    onSincronizarPendentes,
     onFecharFeedback,
     onCarregarAnteriores,
     hoje = obterHojeLocal()
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const [conflitoLocal, setConflitoLocal] = useState(false);
+    const [conflitoLocal, setConflitoLocal] = useState(null);
     const conflito =
-        conflitoLocal ||
+        conflitoLocal === 'conflito' ||
         ['CONFLITO_REGISTRO_MENSTRUAL', 'SOBREPOSICAO_CICLO'].includes(erro?.codigo);
-    const feedback = conflito ? 'conflito' : erro ? 'erro' : sucesso ? 'sucesso' : null;
+    const pendente = conflitoLocal === 'pendente' || erro?.codigo === 'REGISTRO_MENSTRUAL_PENDENTE';
+    const feedback = pendente
+        ? 'pendente'
+        : conflito
+          ? 'conflito'
+          : erro
+            ? 'erro'
+            : sucesso
+              ? 'sucesso'
+              : null;
     const fecharFeedback = () => {
-        setConflitoLocal(false);
+        setConflitoLocal(null);
         onFecharFeedback?.();
     };
     const selecionadas = Array.isArray(datasSelecionadas) ? datasSelecionadas : [];
@@ -57,25 +67,12 @@ function MenstruationRegistrationScreen({
         selecionadas.length > 0 &&
         selecionadas.every((data) => /^\d{4}-\d{2}-\d{2}$/.test(data) && data <= hoje);
     return (
-        <SafeAreaView
-            testID="tela-cadastro-menstruacao"
-            edges={['top', 'bottom']}
-            style={estilos.tela}
-        >
-            <View style={estilos.cabecalho}>
-                <Text accessibilityRole="header" style={estilos.titulo}>
-                    Cadastrar menstruação
-                </Text>
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Voltar"
-                    disabled={salvando || typeof onVoltar !== 'function'}
-                    onPress={onVoltar}
-                    style={estilos.voltar}
-                >
-                    <ArrowLeftIcon size={24} color={estilos.corIconeCabecalho} />
-                </Pressable>
-            </View>
+        <SafeAreaView testID="tela-cadastro-menstruacao" edges={['bottom']} style={estilos.tela}>
+            <Header
+                titulo="Cadastrar menstruação"
+                variante="comVoltar"
+                onVoltar={salvando ? undefined : onVoltar}
+            />
             <View style={estilos.legenda}>
                 <View style={estilos.itemLegenda}>
                     <View style={estilos.simboloAnterior} />
@@ -100,7 +97,7 @@ function MenstruationRegistrationScreen({
                 bloqueado={salvando}
                 onAlternarData={onAlternarData}
                 onIniciarFaixa={onIniciarFaixa}
-                onConflito={() => setConflitoLocal(true)}
+                onConflito={(dia) => setConflitoLocal(dia.local ? 'pendente' : 'conflito')}
                 onCarregarAnteriores={onCarregarAnteriores}
             />
             {mesesValidos.length === 0 && <Text style={estilos.vazio}>Nenhum mês disponível.</Text>}
@@ -131,6 +128,7 @@ function MenstruationRegistrationScreen({
                 />
             </View>
             <SimpleModal
+                erroInterno={feedback === 'erro'}
                 visivel={Boolean(feedback)}
                 aoFechar={fecharFeedback}
                 icone={
@@ -146,26 +144,43 @@ function MenstruationRegistrationScreen({
                 }
                 corIcone={feedback === 'erro' ? estilos.corIconeErro : estilos.corIconeFeedback}
                 titulo={
-                    feedback === 'conflito'
-                        ? 'Ciclo existente'
-                        : feedback === 'erro'
-                          ? 'Algo deu errado'
-                          : 'Menstruação cadastrada'
+                    feedback === 'pendente'
+                        ? 'Registro aguardando sincronização'
+                        : feedback === 'conflito'
+                          ? 'Ciclo existente'
+                          : feedback === 'erro'
+                            ? 'Algo deu errado'
+                            : 'Menstruação cadastrada'
                 }
                 mensagem={
-                    feedback === 'conflito'
-                        ? 'Este dia já pertence a outro ciclo registrado. Para corrigi-lo, edite o ciclo existente em vez de criar um novo registro.'
-                        : feedback === 'erro'
-                          ? 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
-                          : undefined
+                    feedback === 'pendente'
+                        ? 'Este registro foi salvo neste aparelho. Ele aparecerá no Histórico de Ciclos após a sincronização.'
+                        : feedback === 'conflito'
+                          ? 'Este dia já pertence a outro ciclo registrado. Para corrigi-lo, edite o ciclo existente em vez de criar um novo registro.'
+                          : feedback === 'erro'
+                            ? 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
+                            : undefined
                 }
                 acaoPrincipal={{
-                    texto: feedback === 'erro' ? 'Tentar novamente' : 'OK',
+                    texto:
+                        feedback === 'pendente'
+                            ? 'Sincronizar'
+                            : feedback === 'erro'
+                              ? 'Tentar novamente'
+                              : 'OK',
                     variante: feedback === 'erro' ? 'preto' : 'verde',
-                    aoPressionar: feedback === 'erro' ? onTentarNovamente : fecharFeedback
+                    aoPressionar:
+                        feedback === 'pendente'
+                            ? () => {
+                                  fecharFeedback();
+                                  onSincronizarPendentes?.();
+                              }
+                            : feedback === 'erro'
+                              ? onTentarNovamente
+                              : fecharFeedback
                 }}
                 acaoSecundaria={
-                    feedback === 'erro'
+                    ['erro', 'pendente'].includes(feedback)
                         ? { texto: 'Voltar', variante: 'branco', aoPressionar: fecharFeedback }
                         : undefined
                 }

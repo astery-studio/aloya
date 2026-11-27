@@ -2,8 +2,11 @@
  * Confere a ligação entre autenticação, sessão persistida e os fluxos internos.
  */
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { BackHandler, Linking } from 'react-native';
+import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 
+jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn() }));
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
 jest.mock('expo-status-bar', () => ({ StatusBar: jest.fn(() => null) }));
 jest.mock('@expo-google-fonts/dm-sans/400Regular', () => ({ DMSans_400Regular: 'regular' }));
@@ -12,20 +15,99 @@ jest.mock('@expo-google-fonts/dm-sans/600SemiBold', () => ({ DMSans_600SemiBold:
 jest.mock('@expo-google-fonts/dm-sans/700Bold', () => ({ DMSans_700Bold: 'bold' }));
 jest.mock('../../src/app/createAppServices', () => ({ criarServicosApp: jest.fn() }));
 jest.mock('../../src/shared/storage/tokenStorage', () => ({ obterToken: jest.fn() }));
+jest.mock('../../src/shared/storage/secureStorage', () => ({
+    lerSeguro: jest.fn(),
+    salvarSeguro: jest.fn(),
+    removerSeguro: jest.fn()
+}));
+
+jest.mock('../../src/features/support-network/screens/SharedSupportFlow/SharedSupportFlow', () => {
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        SharedSupportFlow: ({ vinculoId, onSelecionarAba }) => (
+            <View>
+                <Text>
+                    {vinculoId === null
+                        ? 'Home de acompanhamento'
+                        : `Acompanhando vínculo ${vinculoId}`}
+                </Text>
+                <Pressable accessibilityRole="button" onPress={() => onSelecionarAba('membros')}>
+                    <Text>Contatos acompanhados</Text>
+                </Pressable>
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => onSelecionarAba('configuracoes')}
+                >
+                    <Text>Abrir configurações</Text>
+                </Pressable>
+            </View>
+        )
+    };
+});
+
+jest.mock(
+    '../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen',
+    () => {
+        const { Pressable, Text } = require('react-native');
+        return {
+            ReceivedContactsScreen: ({
+                onVisualizarContato,
+                vinculoVisualizadoId,
+                exibirSeletor,
+                onSelecionarModoRede
+            }) => (
+                <>
+                    {exibirSeletor ? (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => onSelecionarModoRede('apoio')}
+                        >
+                            <Text>Abrir contatos de apoio</Text>
+                        </Pressable>
+                    ) : null}
+                    {vinculoVisualizadoId ? (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => onVisualizarContato(null)}
+                        >
+                            <Text>Parar visualização</Text>
+                        </Pressable>
+                    ) : (
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => onVisualizarContato({ id: 9, status: 'ativo' })}
+                        >
+                            <Text>Visualizar contato</Text>
+                        </Pressable>
+                    )}
+                </>
+            )
+        };
+    }
+);
 
 jest.mock('../../src/features/auth/screens/WelcomeScreen', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
 
-    return jest.fn(({ aoEntrar }) =>
+    return jest.fn(({ aoEntrar, aoCriarConta }) =>
         React.createElement(
-            Pressable,
-            {
+            React.Fragment,
+            null,
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Ir para login',
+                    onPress: aoEntrar
+                },
+                React.createElement(Text, null, 'Boas-vindas')
+            ),
+            React.createElement(Pressable, {
                 accessibilityRole: 'button',
-                accessibilityLabel: 'Ir para login',
-                onPress: aoEntrar
-            },
-            React.createElement(Text, null, 'Boas-vindas')
+                accessibilityLabel: 'Ir para cadastro',
+                onPress: aoCriarConta
+            })
         )
     );
 });
@@ -36,20 +118,43 @@ jest.mock('../../src/features/auth/screens/LoginScreen', () => {
 
     return jest.fn(({ aoEntrar }) =>
         React.createElement(
-            Pressable,
-            {
-                accessibilityRole: 'button',
-                accessibilityLabel: 'Concluir login',
-                onPress: aoEntrar
-            },
-            React.createElement(Text, null, 'Login')
+            React.Fragment,
+            null,
+            React.createElement(
+                Pressable,
+                {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Concluir login',
+                    onPress: aoEntrar
+                },
+                React.createElement(Text, null, 'Login')
+            )
         )
     );
 });
 
 jest.mock('../../src/features/auth/screens/ForgotPasswordScreen', () => jest.fn(() => null));
 jest.mock('../../src/features/auth/screens/ResetPasswordScreen', () => jest.fn(() => null));
-jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => jest.fn(() => null));
+jest.mock('../../src/features/onboarding/screens/OnboardingScreen', () => {
+    const React = require('react');
+    const { Pressable } = require('react-native');
+    return jest.fn(({ aoConsultarDocumentos, aoConcluir }) =>
+        React.createElement(
+            React.Fragment,
+            null,
+            React.createElement(Pressable, {
+                accessibilityRole: 'link',
+                accessibilityLabel: 'Consultar no cadastro',
+                onPress: () => aoConsultarDocumentos?.('terms')
+            }),
+            React.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Concluir cadastro de contato',
+                onPress: () => aoConcluir({ tipoUsuario: 'contato_apoio' })
+            })
+        )
+    );
+});
 
 jest.mock('../../src/features/settings/screens/ChangePasswordScreen', () => ({
     ChangePasswordScreen: jest.fn(() => null)
@@ -77,11 +182,94 @@ jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => {
 
 jest.mock('../../src/features/cycles/CycleHistoryFlow', () => {
     const React = require('react');
-    const { Text } = require('react-native');
+    const { Pressable, Text } = require('react-native');
 
     return {
-        CycleHistoryFlow: jest.fn(() =>
-            React.createElement(Text, null, 'Histórico de ciclos integrado')
+        CycleHistoryFlow: jest.fn(({ onVoltar }) =>
+            React.createElement(
+                React.Fragment,
+                null,
+                React.createElement(Text, null, 'Histórico de ciclos integrado'),
+                React.createElement(Pressable, {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Voltar do histórico',
+                    onPress: onVoltar
+                })
+            )
+        )
+    };
+});
+
+jest.mock('../../src/features/diary/DiaryFlow', () => {
+    const React = require('react');
+    const { Text } = require('react-native');
+    return { DiaryFlow: jest.fn(() => React.createElement(Text, null, 'Diário integrado')) };
+});
+
+jest.mock('../../src/features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        DiaryCategoriesSheet: jest.fn(({ visivel, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, 'Categorias do Diário integradas'),
+                      React.createElement(Pressable, {
+                          accessibilityRole: 'button',
+                          accessibilityLabel: 'Fechar categorias do Diário',
+                          onPress: onFechar
+                      })
+                  )
+                : null
+        )
+    };
+});
+
+jest.mock('../../src/features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        NewDiaryEntrySheet: jest.fn(({ visivel, dataInicial, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, 'Cadastro do Diário aberto'),
+                      React.createElement(Text, null, `Data do Diário: ${dataInicial}`),
+                      React.createElement(
+                          Pressable,
+                          {
+                              accessibilityRole: 'button',
+                              accessibilityLabel: 'Fechar cadastro do Diário',
+                              onPress: onFechar
+                          },
+                          React.createElement(Text, null, 'Fechar')
+                      )
+                  )
+                : null
+        )
+    };
+});
+
+jest.mock('../../src/features/diary/components/EditDiaryEntrySheet/EditDiaryEntrySheet', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+    return {
+        EditDiaryEntrySheet: jest.fn(({ visivel, registro, onFechar }) =>
+            visivel
+                ? React.createElement(
+                      View,
+                      null,
+                      React.createElement(Text, null, `Edição do Diário: ${registro.id}`),
+                      React.createElement(Pressable, {
+                          accessibilityRole: 'button',
+                          accessibilityLabel: 'Fechar edição do Diário',
+                          onPress: onFechar
+                      })
+                  )
+                : null
         )
     };
 });
@@ -124,25 +312,63 @@ jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
     const React = require('react');
     const { Pressable, Text } = require('react-native');
     return {
-        CycleTodayContainer: jest.fn(({ aoAbrirAnticoncepcional, aoAbrirCalendario }) =>
-            React.createElement(
-                React.Fragment,
-                null,
+        CycleTodayContainer: jest.fn(
+            ({
+                aoAbrirAnticoncepcional,
+                aoAbrirHistorico,
+                aoCadastrarDiario,
+                aoEditarDiario,
+                aoSelecionarAba
+            }) =>
                 React.createElement(
-                    Pressable,
-                    {
+                    React.Fragment,
+                    null,
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Anticoncepcional',
+                            onPress: aoAbrirAnticoncepcional
+                        },
+                        React.createElement(Text, null, 'Ciclo hoje')
+                    ),
+                    React.createElement(Pressable, {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Anticoncepcional',
-                        onPress: aoAbrirAnticoncepcional
-                    },
-                    React.createElement(Text, null, 'Ciclo hoje')
-                ),
-                React.createElement(Pressable, {
-                    accessibilityRole: 'button',
-                    accessibilityLabel: 'Calendário',
-                    onPress: aoAbrirCalendario
-                })
-            )
+                        accessibilityLabel: 'Abrir histórico do ciclo',
+                        onPress: aoAbrirHistorico
+                    }),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Cadastrar no Diário',
+                        onPress: () => aoCadastrarDiario('2026-11-05')
+                    }),
+                    React.createElement(Pressable, {
+                        accessibilityRole: 'button',
+                        accessibilityLabel: 'Editar check-in no Diário',
+                        onPress: () =>
+                            aoEditarDiario({
+                                id: 18,
+                                data: '2026-11-05',
+                                versao: 1,
+                                categorias: []
+                            })
+                    }),
+                    ...[
+                        ['Abrir configurações', 'configuracoes'],
+                        ['Abrir início', 'inicio'],
+                        ['Abrir ciclos', 'ciclos'],
+                        ['Abrir calendário', 'calendario'],
+                        ['Abrir Diário', 'diario'],
+                        ['Abrir membros', 'membros']
+                    ].map(([rotulo, aba]) =>
+                        React.createElement(Pressable, {
+                            key: aba,
+                            accessibilityRole: 'button',
+                            accessibilityLabel: rotulo,
+                            onPress: () => aoSelecionarAba?.(aba)
+                        })
+                    )
+                )
         )
     };
 });
@@ -189,57 +415,90 @@ jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        SettingsScreen: jest.fn(({ onAbrirPerfil, onAbrirParametrosCiclo, onSelecionarAba }) =>
-            React.createElement(
-                View,
-                null,
-                React.createElement(Text, null, 'Configurações'),
+        SettingsScreen: jest.fn(
+            ({
+                onAbrirPerfil,
+                onAbrirParametrosCiclo,
+                onAbrirNotificacoes,
+                onAbrirNotificacoesContato,
+                onSelecionarAba,
+                onAbrirPoliticasPrivacidade
+            }) =>
                 React.createElement(
-                    Pressable,
-                    {
+                    View,
+                    null,
+                    React.createElement(Text, null, 'Configurações'),
+                    React.createElement(Pressable, {
                         accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir parâmetros',
-                        onPress: onAbrirParametrosCiclo
-                    },
-                    React.createElement(Text, null, 'Parâmetros')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir perfil',
-                        onPress: onAbrirPerfil
-                    },
-                    React.createElement(Text, null, 'Perfil')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir membros',
-                        onPress: () => onSelecionarAba?.('membros')
-                    },
-                    React.createElement(Text, null, 'Membros')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir ciclos',
-                        onPress: () => onSelecionarAba?.('ciclos')
-                    },
-                    React.createElement(Text, null, 'Ciclos')
-                ),
-                React.createElement(
-                    Pressable,
-                    {
-                        accessibilityRole: 'button',
-                        accessibilityLabel: 'Abrir início',
-                        onPress: () => onSelecionarAba?.('inicio')
-                    },
-                    React.createElement(Text, null, 'Início')
+                        accessibilityLabel: 'Consultar em configurações',
+                        onPress: onAbrirPoliticasPrivacidade
+                    }),
+                    React.createElement(
+                        Pressable,
+                        { accessibilityRole: 'button', onPress: onAbrirNotificacoes },
+                        React.createElement(Text, null, 'Notificações')
+                    ),
+                    onAbrirNotificacoesContato &&
+                        React.createElement(
+                            Pressable,
+                            { accessibilityRole: 'button', onPress: onAbrirNotificacoesContato },
+                            React.createElement(Text, null, 'Notificações como contato de apoio')
+                        ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir parâmetros',
+                            onPress: onAbrirParametrosCiclo
+                        },
+                        React.createElement(Text, null, 'Parâmetros')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir perfil',
+                            onPress: onAbrirPerfil
+                        },
+                        React.createElement(Text, null, 'Perfil')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir membros',
+                            onPress: () => onSelecionarAba?.('membros')
+                        },
+                        React.createElement(Text, null, 'Membros')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir ciclos',
+                            onPress: () => onSelecionarAba?.('ciclos')
+                        },
+                        React.createElement(Text, null, 'Ciclos')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir início',
+                            onPress: () => onSelecionarAba?.('inicio')
+                        },
+                        React.createElement(Text, null, 'Início')
+                    ),
+                    React.createElement(
+                        Pressable,
+                        {
+                            accessibilityRole: 'button',
+                            accessibilityLabel: 'Abrir Diário',
+                            onPress: () => onSelecionarAba?.('diario')
+                        },
+                        React.createElement(Text, null, 'Diário')
+                    )
                 )
-            )
         )
     };
 });
@@ -249,11 +508,19 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
     const { Pressable, Text, View } = require('react-native');
 
     return {
-        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba }) =>
+        MembersScreen: jest.fn(({ onCriarCategoria, onSelecionarAba, onSelecionarModoRede }) =>
             React.createElement(
                 View,
                 null,
                 React.createElement(Text, null, 'Tela de Membros'),
+                React.createElement(
+                    Pressable,
+                    {
+                        accessibilityRole: 'button',
+                        onPress: () => onSelecionarModoRede('acompanhados')
+                    },
+                    React.createElement(Text, null, 'Abrir contatos acompanhados')
+                ),
                 React.createElement(
                     Pressable,
                     {
@@ -276,6 +543,10 @@ jest.mock('../../src/features/support-network/screens/MembersScreen', () => {
         )
     };
 });
+
+jest.mock('../../src/features/support-network/hooks/useParentalConsent', () => ({
+    useParentalConsent: () => ({ status: { acessoLiberado: true } })
+}));
 
 jest.mock('../../src/features/support-network/screens/NewSupportCategoryScreen', () => {
     const React = require('react');
@@ -336,9 +607,12 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
 
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
+import { NewSupportCategoryScreen } from '../../src/features/support-network/screens/NewSupportCategoryScreen';
 import { CycleEditFlow } from '../../src/features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from '../../src/features/cycles/CycleHistoryFlow';
+import { DiaryFlow } from '../../src/features/diary/DiaryFlow';
 import { obterToken } from '../../src/shared/storage/tokenStorage';
+import { lerSeguro, removerSeguro, salvarSeguro } from '../../src/shared/storage/secureStorage';
 
 //Cria os serviços usados pelo App durante os testes de integração.
 function criarServicos() {
@@ -389,26 +663,105 @@ function criarServicos() {
         },
         supportCategoryService: {
             criarCategoria: jest.fn()
+        },
+        diaryService: { buscarCatalogo: jest.fn(), criarRegistro: jest.fn() },
+        notificationPreferencesService: { buscar: jest.fn().mockResolvedValue({}) },
+        supportNotificationPreferencesService: {
+            buscar: jest
+                .fn()
+                .mockResolvedValue({ chavesDisponiveis: ['redeApoio.convites.recebido'] })
         }
     };
 }
 
 describe('App integrado', () => {
     let servicos;
+    let voltarHardware;
+
+    test('abre Notificações pela ação de Configurações e volta ao menu', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
+        expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+        expect(screen.getByText('Configurações')).toBeOnTheScreen();
+    });
+
+    test.each([
+        ['contato_apoio', 'Notificações'],
+        ['principal_e_contato_apoio', 'Notificações como contato de apoio']
+    ])('abre a visão de apoio pelo menu para o papel %s', async (papel, entrada) => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        servicos.accountService.buscarPerfil.mockResolvedValue({ id: 1, papel });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(await screen.findByRole('button', { name: entrada }));
+        expect(screen.queryByRole('button', { name: 'Ciclo e Previsões' })).toBeNull();
+        expect(screen.getByRole('button', { name: 'Rede de Apoio' })).toBeOnTheScreen();
+        expect(servicos.supportNotificationPreferencesService.buscar).toHaveBeenCalledTimes(1);
+    });
+
+    test('mantém o teste de notificações e retira o atalho de prévia da Rede de Apoio', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
+        expect(screen.queryByRole('button', { name: 'Teste da tela da Rede de Apoio' })).toBeNull();
+        await fireEvent.press(screen.getByRole('button', { name: 'Teste de notificações' }));
+        expect(screen.getByRole('header', { name: 'Teste de notificações' })).toBeOnTheScreen();
+
+        await act(() => expect(voltarHardware()).toBe(true));
+        expect(screen.getByRole('header', { name: 'Notificações' })).toBeOnTheScreen();
+
+        await act(() => expect(voltarHardware()).toBe(true));
+        expect(screen.getByText('Configurações')).toBeOnTheScreen();
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();
+        lerSeguro.mockResolvedValue(null);
         servicos = criarServicos();
         criarServicosApp.mockReturnValue(servicos);
         jest.spyOn(Linking, 'getInitialURL').mockResolvedValue(null);
         jest.spyOn(Linking, 'addEventListener').mockReturnValue({
             remove: jest.fn()
         });
+        const handlersVoltar = new Set();
+        voltarHardware = () => [...handlersVoltar].reverse().some((handler) => handler());
+        jest.spyOn(BackHandler, 'addEventListener').mockImplementation((evento, handler) => {
+            if (evento === 'hardwareBackPress') handlersVoltar.add(handler);
+            return { remove: () => handlersVoltar.delete(handler) };
+        });
+        jest.spyOn(BackHandler, 'exitApp').mockImplementation(() => {});
     });
 
     afterEach(() => {
         jest.restoreAllMocks();
     });
+
+    test.each([
+        [null, 'Ir para cadastro', 'Consultar no cadastro', 'link', 'Termos de uso'],
+        [{ token: 'token-valido' }, null, 'Consultar em configurações', 'button', 'Privacidade']
+    ])(
+        'abre e fecha documentos sem desmontar sua origem (%s, %s)',
+        async (sessao, entrada, nome, role, aba) => {
+            obterToken.mockResolvedValue(sessao);
+            await render(<App />);
+            if (entrada)
+                await fireEvent.press(await screen.findByRole('button', { name: entrada }));
+            if (sessao)
+                await fireEvent.press(
+                    await screen.findByRole('button', { name: 'Abrir configurações' })
+                );
+            const origem = await screen.findByRole(role, { name: nome });
+            await fireEvent.press(origem);
+            expect(screen.getByRole('tab', { name: aba, selected: true })).toBeOnTheScreen();
+            await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+            expect(screen.getByRole(role, { name: nome })).toBe(origem);
+            if (!sessao) expect(servicos.accountService.buscarPerfil).not.toHaveBeenCalled();
+        }
+    );
 
     test('mantém o fluxo público quando não existe sessão', async () => {
         obterToken.mockResolvedValue(null);
@@ -420,14 +773,42 @@ describe('App integrado', () => {
         expect(servicos.accountService.buscarPerfil).not.toHaveBeenCalled();
     });
 
-    test('restaura a sessão, abre configurações e carrega o perfil', async () => {
+    test('abre a Home após concluir o cadastro de uma conta de contato', async () => {
+        obterToken.mockResolvedValue(null);
+
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para cadastro' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir cadastro de contato' }));
+
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+    });
+
+    test('deixa o botão físico sob responsabilidade do fluxo de cadastro', async () => {
+        obterToken.mockResolvedValue(null);
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para cadastro' }));
+
+        await act(() => {
+            expect(voltarHardware()).toBe(false);
+            expect(voltarHardware()).toBe(false);
+        });
+        expect(screen.queryByText('Deseja sair do Aloya?')).toBeNull();
+    });
+
+    test('restaura a sessão, abre a Home e carrega o perfil', async () => {
         obterToken.mockResolvedValue({
             token: 'token-valido'
         });
 
         await render(<App />);
 
-        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+
+        await fireEvent.press(
+            screen.getByRole('button', {
+                name: 'Abrir configurações'
+            })
+        );
 
         await fireEvent.press(
             screen.getByRole('button', {
@@ -442,9 +823,92 @@ describe('App integrado', () => {
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
     });
 
+    test('abre a Home depois de concluir o login', async () => {
+        obterToken.mockResolvedValue(null);
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Ir para login' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Concluir login' }));
+
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+    });
+
+    test('volta somente uma tela pelo botão físico', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir perfil' }));
+
+        expect(await screen.findByText('Perfil: Julia')).toBeOnTheScreen();
+        await act(() => expect(voltarHardware()).toBe(true));
+
+        expect(await screen.findByText('Configurações')).toBeOnTheScreen();
+    });
+
+    test('mostra o popup estilizado ao voltar duas vezes na raiz', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await screen.findByText('Ciclo hoje');
+
+        await act(() => {
+            expect(voltarHardware()).toBe(true);
+            expect(voltarHardware()).toBe(true);
+        });
+
+        expect(await screen.findByText('Deseja sair do Aloya?')).toBeOnTheScreen();
+        expect(
+            screen.getByText('Tem certeza de que deseja fechar o aplicativo?')
+        ).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+        expect(screen.queryByText('Deseja sair do Aloya?')).toBeNull();
+        expect(BackHandler.exitApp).not.toHaveBeenCalled();
+    });
+
+    test('restaura o vínculo ao reabrir o app e apaga a seleção ao parar de visualizar', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        const armazenamento = new Map();
+        lerSeguro.mockImplementation(async (chave) => armazenamento.get(chave) ?? null);
+        salvarSeguro.mockImplementation(async (chave, valor) => armazenamento.set(chave, valor));
+        removerSeguro.mockImplementation(async (chave) => armazenamento.delete(chave));
+
+        const primeira = await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir membros' }));
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Abrir contatos acompanhados' })
+        );
+        await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar contato' }));
+        expect(await screen.findByText('Acompanhando vínculo 9')).toBeOnTheScreen();
+        expect(salvarSeguro).toHaveBeenCalledWith('rede-apoio.visualizacao.1', '9');
+        await primeira.unmount();
+
+        const segunda = await render(<App />);
+        expect(await screen.findByText('Acompanhando vínculo 9')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Contatos acompanhados' }));
+        await fireEvent.press(
+            await screen.findByRole('button', { name: 'Abrir contatos de apoio' })
+        );
+        expect(await screen.findByText('Tela de Membros')).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir contatos acompanhados' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Parar visualização' }));
+        expect(
+            await screen.findByRole('button', { name: 'Abrir contatos de apoio' })
+        ).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Visualizar contato' })).toBeOnTheScreen();
+        expect(removerSeguro).toHaveBeenCalledWith('rede-apoio.visualizacao.1');
+        await segunda.unmount();
+
+        await render(<App />);
+        expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
+        await waitFor(() => expect(lerSeguro).toHaveBeenCalledTimes(3));
+        expect(screen.queryByText('Acompanhando vínculo 9')).toBeNull();
+    });
+
     test('abre os parâmetros pela tela de configurações', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
 
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir parâmetros' }));
         expect(await screen.findByText('Parâmetros integrados')).toBeOnTheScreen();
@@ -471,13 +935,41 @@ describe('App integrado', () => {
         expect(CycleHistoryFlow).toHaveBeenCalledWith(
             expect.objectContaining({
                 service: servicos.cycleHistoryService,
-                calendarService: servicos.calendarService,
-                aoAbrirCalendario: expect.any(Function),
-                onSelecionarAba: expect.any(Function),
+                onVoltar: expect.any(Function),
                 onSessaoExpirada: expect.any(Function)
             }),
             undefined
         );
+    });
+
+    test('abre o Diário integrado pelo menu', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir Diário' }));
+
+        expect(await screen.findByText('Diário integrado')).toBeOnTheScreen();
+        expect(DiaryFlow).toHaveBeenCalledWith(
+            expect.objectContaining({
+                service: servicos.diaryService,
+                calendarService: servicos.calendarService,
+                onSelecionarAba: expect.any(Function),
+                onSessaoExpirada: expect.any(Function),
+                aoGerenciarCategorias: expect.any(Function)
+            }),
+            undefined
+        );
+    });
+
+    test('abre categorias pelo Diário e retorna à origem', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir Diário' }));
+
+        await act(() => DiaryFlow.mock.calls.at(-1)[0].aoGerenciarCategorias());
+        expect(await screen.findByText('Categorias do Diário integradas')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar categorias do Diário' }));
+        expect(await screen.findByText('Diário integrado')).toBeOnTheScreen();
     });
 
     test('abre a edição de menstruação ao tocar no ciclo do calendário', async () => {
@@ -485,7 +977,9 @@ describe('App integrado', () => {
         await render(<App />);
 
         await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
-        await fireEvent.press(screen.getByRole('button', { name: 'Calendário' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Abrir histórico do ciclo' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Voltar do histórico' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir calendário' }));
         await fireEvent.press(
             await screen.findByRole('button', { name: 'Editar menstruação do calendário' })
         );
@@ -525,6 +1019,10 @@ describe('App integrado', () => {
         );
 
         expect(await screen.findByText('Nova categoria')).toBeOnTheScreen();
+        expect(NewSupportCategoryScreen).toHaveBeenCalledWith(
+            expect.objectContaining({ diaryService: servicos.diaryService }),
+            undefined
+        );
     });
 
     test('volta da criação de categoria para membros', async () => {
@@ -618,7 +1116,36 @@ describe('App integrado', () => {
         expect(await screen.findByText('Ciclo hoje')).toBeOnTheScreen();
     });
 
-    test('entra pelas boas-vindas e retorna ao login depois de encerrar a sessão', async () => {
+    test('abre diretamente o cadastro do Diário pela tela inicial', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar no Diário' }));
+
+        expect(await screen.findByText('Cadastro do Diário aberto')).toBeOnTheScreen();
+        expect(screen.getByText('Data do Diário: 2026-11-05')).toBeOnTheScreen();
+        expect(screen.getByText('Ciclo hoje')).toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar cadastro do Diário' }));
+        expect(screen.queryByText('Cadastro do Diário aberto')).not.toBeOnTheScreen();
+    });
+
+    test('abre a edição do registro ao acessar o Diário pelo check-in concluído', async () => {
+        obterToken.mockResolvedValue({ token: 'token-valido' });
+        await render(<App />);
+
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir início' }));
+        await fireEvent.press(screen.getByRole('button', { name: 'Editar check-in no Diário' }));
+
+        expect(await screen.findByText('Edição do Diário: 18')).toBeOnTheScreen();
+        expect(screen.queryByText('Cadastro do Diário aberto')).not.toBeOnTheScreen();
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar edição do Diário' }));
+        expect(screen.queryByText('Edição do Diário: 18')).not.toBeOnTheScreen();
+    });
+
+    test('volta às boas-vindas depois de sair da conta', async () => {
         obterToken.mockResolvedValue(null);
 
         await render(<App />);
@@ -637,6 +1164,12 @@ describe('App integrado', () => {
 
         await fireEvent.press(
             await screen.findByRole('button', {
+                name: 'Abrir configurações'
+            })
+        );
+
+        await fireEvent.press(
+            await screen.findByRole('button', {
                 name: 'Abrir perfil'
             })
         );
@@ -647,8 +1180,32 @@ describe('App integrado', () => {
             })
         );
 
-        expect(await screen.findByText('Login')).toBeOnTheScreen();
+        expect(await screen.findByRole('button', { name: 'Ir para cadastro' })).toBeOnTheScreen();
+        expect(screen.getByRole('button', { name: 'Ir para login' })).toBeOnTheScreen();
+        expect(screen.queryByText('Login')).not.toBeOnTheScreen();
 
         expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
     });
+
+    test.each(['principal', 'contato_apoio', 'principal_e_contato_apoio'])(
+        'mantém a Home como primeira tela para o papel %s',
+        async (papel) => {
+            obterToken.mockResolvedValue({ token: 'token-valido' });
+            servicos.accountService.buscarPerfil.mockResolvedValue({
+                id: 1,
+                nome: 'Julia',
+                email: 'julia@email.com',
+                papel
+            });
+
+            await render(<App />);
+
+            const home = papel === 'contato_apoio' ? 'Home de acompanhamento' : 'Ciclo hoje';
+            expect(await screen.findByText(home)).toBeOnTheScreen();
+            await waitFor(() => {
+                expect(servicos.accountService.buscarPerfil).toHaveBeenCalledTimes(1);
+            });
+            expect(screen.getByText(home)).toBeOnTheScreen();
+        }
+    );
 });

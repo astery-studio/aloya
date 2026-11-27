@@ -6,6 +6,8 @@ import {
     MENSAGEM_VAZIO,
     criarSecoes
 } from '../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen';
+import { criarEstilosAcompanhamento } from '../../../../src/features/contraceptives/screens/ContraceptiveTrackingScreen.styles';
+import { temaClaro } from '../../../../src/shared/theme/themePalettes';
 
 const metricas = {
     frame: { x: 0, y: 0, width: 393, height: 852 },
@@ -16,11 +18,11 @@ function renderizar(componente) {
     return render(<SafeAreaProvider initialMetrics={metricas}>{componente}</SafeAreaProvider>);
 }
 
-test('protege a listagem e o botão fixo nas quatro bordas nativas', async () => {
-    await renderizar(<ContraceptiveTrackingScreen />);
+test('aplica a área segura superior no Header e mantém o FAB na área protegida', async () => {
+    await renderizar(<ContraceptiveTrackingScreen aoCadastrarNovo={jest.fn()} />);
     const area = screen.getByTestId('anticoncepcionais-area-segura');
     expect(area).toHaveProp('edges', {
-        top: 'additive',
+        top: 'off',
         left: 'additive',
         right: 'additive',
         bottom: 'additive'
@@ -28,6 +30,9 @@ test('protege a listagem e o botão fixo nas quatro bordas nativas', async () =>
     expect(area).toContainElement(
         screen.getByRole('button', { name: 'Cadastrar novo anticoncepcional' })
     );
+    expect(screen.getByTestId('contraceptive-tracking-add-fab').parent).toHaveStyle({
+        bottom: metricas.insets.bottom + temaClaro.espacamentos.grande
+    });
 });
 
 test('reproduz o estado vazio e a ação principal do protótipo', async () => {
@@ -41,6 +46,28 @@ test('reproduz o estado vazio e a ação principal do protótipo', async () => {
     expect(aoCadastrarNovo).toHaveBeenCalledTimes(1);
 });
 
+test('usa o padrão compartilhado dos headers com voltar', async () => {
+    await renderizar(<ContraceptiveTrackingScreen />);
+
+    const titulo = screen.getByRole('header', { name: 'Anticoncepcionais' });
+
+    expect(titulo).toHaveStyle({
+        fontFamily: 'DMSans_700Bold',
+        fontSize: 20,
+        fontWeight: '700',
+        lineHeight: 28,
+        textAlign: 'center'
+    });
+    expect(titulo.props.numberOfLines).toBeUndefined();
+    expect(titulo.props.adjustsFontSizeToFit).toBeUndefined();
+
+    const estilos = criarEstilosAcompanhamento(temaClaro);
+
+    expect(screen.getByTestId('header-container')).toHaveStyle({ paddingTop: 48 });
+    expect(screen.getByTestId('header-content')).toHaveStyle({ paddingBottom: 16 });
+    expect(estilos.corpo.paddingTop).toBe(8);
+});
+
 test('não duplica o cartão que possui doses com estados diferentes', () => {
     const item = {
         id: 'yaz',
@@ -51,6 +78,40 @@ test('não duplica o cartão que possui doses com estados diferentes', () => {
         ]
     };
     expect(criarSecoes([item])).toEqual([{ titulo: 'NÃO USADOS', data: [item] }]);
+});
+
+test('no acompanhamento, mantém as seções e centraliza o card sem o aviso de pendências', async () => {
+    await renderizar(
+        <ContraceptiveTrackingScreen
+            somenteLeitura
+            aoCadastrarNovo={jest.fn()}
+            aoAlternarUso={jest.fn()}
+            anticoncepcionais={[
+                {
+                    id: '1',
+                    nome: 'Yaz',
+                    tipo: 'pilula',
+                    intensidadeAlerta: 'moderado',
+                    usosHoje: [{ id: 'u1', horario: '08:00', status: 'pendente', atrasado: true }]
+                },
+                { id: '2', nome: 'Mirena', tipo: 'diu_hormonal' }
+            ]}
+        />
+    );
+
+    expect(screen.queryByText('1 uso pendente hoje')).toBeNull();
+    expect(screen.getByRole('header', { name: 'NÃO USADOS' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'USADOS' })).toBeOnTheScreen();
+    expect(screen.getByText('Alerta Moderado')).toBeOnTheScreen();
+    expect(screen.getByText('08:00')).toBeOnTheScreen();
+    expect(screen.getByText('Yaz')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByText('Pílula')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByText('PRÓXIMOS HORÁRIOS')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByText('08:00').parent.parent).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByText('Atrasado')).toBeOnTheScreen();
+    expect(
+        screen.queryByRole('button', { name: /Editar|Remover|Marcar Uso|Cadastrar novo/ })
+    ).toBeNull();
 });
 
 test('o banner não conta doses de removidos nem de DIU, mas inclui o anel conforme o protótipo vigente', async () => {

@@ -63,6 +63,14 @@ function criarPrismaMock(usuario) {
                     count: 0
                 };
             }
+        },
+
+        vinculoRedeApoio: {
+            async updateMany() {
+                return {
+                    count: 0
+                };
+            }
         }
     };
 

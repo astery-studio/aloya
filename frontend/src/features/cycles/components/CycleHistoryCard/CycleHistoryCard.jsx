@@ -1,5 +1,6 @@
 //Representa um ciclo registrado e mantém seus estados visuais consistentes no histórico.
 import { useMemo } from 'react';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { Text, View } from 'react-native';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
@@ -50,14 +51,14 @@ function obterTextoDosDias(quantidade) {
     return quantidade === 1 ? '1 dia' : `${quantidade} dias`;
 }
 
-function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
+function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const coresDoCiclo = {
-        ativa: tema.escuro ? tema.cores.interface.destaque : '#2C4C3B',
+        ativa: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B',
         desativada: tema.cores.interface.textoDesabilitado
     };
-    const corDoAviso = tema.escuro ? '#F2B45F' : '#B97D22';
+    const corDoAviso = tema.escuro ? coresNoturnasConteudo.amarelo : '#B97D22';
     const cicloSeguro = ciclo && typeof ciclo === 'object' ? ciclo : {};
     const numero = normalizarNumeroDoCiclo(cicloSeguro.numero);
     const periodo = normalizarPeriodo(cicloSeguro.periodo);
@@ -83,9 +84,20 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
 
     return (
         <View testID="cycle-history-card" style={estilos.container}>
-            <View style={[estilos.cabecalho, estaEmAndamento && estilos.cabecalhoEmAndamento]}>
+            <View
+                style={[
+                    estilos.cabecalho,
+                    somenteLeitura && estilos.cabecalhoSomenteLeitura,
+                    estaEmAndamento && estilos.cabecalhoEmAndamento
+                ]}
+            >
                 <View style={estilos.linhaDoCabecalho}>
-                    <View style={estilos.identificacao}>
+                    <View
+                        style={[
+                            estilos.identificacao,
+                            somenteLeitura && estilos.identificacaoSomenteLeitura
+                        ]}
+                    >
                         <View
                             accessible
                             accessibilityRole="text"
@@ -96,38 +108,61 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
                         </View>
 
                         <View style={estilos.textos}>
-                            <Text numberOfLines={2} style={estilos.periodo}>
+                            <Text
+                                numberOfLines={2}
+                                style={[
+                                    estilos.periodo,
+                                    somenteLeitura && estilos.textoCentralizado
+                                ]}
+                            >
                                 {periodo}
                             </Text>
 
                             {estaEmAndamento ? (
-                                <Text style={estilos.status}>Em andamento</Text>
+                                <Text
+                                    style={[
+                                        estilos.status,
+                                        somenteLeitura && estilos.textoCentralizado
+                                    ]}
+                                >
+                                    Em andamento
+                                </Text>
                             ) : null}
                         </View>
                     </View>
 
-                    <View style={estilos.acoes}>
-                        <IconButton
-                            icone={PencilSimpleIcon}
-                            aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
-                            rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
-                            variante="neutro"
-                        />
+                    {somenteLeitura ? null : (
+                        <View style={estilos.acoes}>
+                            <IconButton
+                                icone={PencilSimpleIcon}
+                                corIcone={tema.escuro ? '#999999' : undefined}
+                                aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
+                                rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
+                                variante="neutro"
+                            />
 
-                        <IconButton
-                            icone={TrashIcon}
-                            aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
-                            rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
-                            variante="neutro"
-                        />
-                    </View>
+                            <IconButton
+                                icone={TrashIcon}
+                                corIcone={tema.escuro ? '#999999' : undefined}
+                                aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
+                                rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
+                                variante="neutro"
+                            />
+                        </View>
+                    )}
                 </View>
             </View>
 
             <View style={estilos.separador} />
 
             <View style={estilos.conteudoInferior}>
-                <View style={estilos.indicadores}>
+                <View
+                    testID="cycle-history-indicators"
+                    style={[
+                        estilos.indicadores,
+                        somenteLeitura && estilos.indicadoresSomenteLeitura
+                    ]}
+                >
                     <View
                         accessible
                         accessibilityRole="text"
@@ -136,11 +171,20 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
                                 ? 'Dias de menstruação não informados'
                                 : `${obterTextoDosDias(diasMenstruais)} de menstruação`
                         }
-                        style={[estilos.indicador, estilos.indicadorMenstruacao]}
+                        style={[
+                            estilos.indicador,
+                            somenteLeitura && estilos.indicadorSomenteLeitura,
+                            estilos.indicadorMenstruacao
+                        ]}
                     >
                         <Text
                             numberOfLines={1}
-                            style={[estilos.valorDoIndicador, estilos.textoMenstruacao]}
+                            adjustsFontSizeToFit={somenteLeitura}
+                            style={[
+                                estilos.valorDoIndicador,
+                                somenteLeitura && estilos.valorSomenteLeitura,
+                                estilos.textoMenstruacao
+                            ]}
                         >
                             {diasMenstruais === null ? '—' : obterTextoDosDias(diasMenstruais)}
                         </Text>
@@ -165,6 +209,7 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
                         }
                         style={[
                             estilos.indicador,
+                            somenteLeitura && estilos.indicadorSomenteLeitura,
                             estilos.indicadorCiclo,
                             !duracaoDisponivel && estilos.indicadorIndisponivel
                         ]}
@@ -176,8 +221,11 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
                         />
 
                         <Text
+                            numberOfLines={somenteLeitura ? 1 : undefined}
+                            adjustsFontSizeToFit={somenteLeitura}
                             style={[
                                 estilos.valorDoIndicador,
+                                somenteLeitura && estilos.valorSomenteLeitura,
                                 estilos.textoCiclo,
                                 !duracaoDisponivel && estilos.textoIndisponivel
                             ]}

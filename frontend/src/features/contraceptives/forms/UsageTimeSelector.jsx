@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ContraceptiveModal } from '../components/ContraceptiveModal';
 import { Clock } from 'phosphor-react-native';
-import ButtonDashed from '../../../shared/components/common/Button/ButtonDashed';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen';
 import TimeInput from '../../../shared/components/forms/TimeInput';
 import { Header } from '../../../shared/components/navigation/Header/Header';
@@ -11,7 +11,14 @@ import { horarioValido } from '../../../shared/utils/validation/isValidTime';
 import { SelectorField } from './SelectorField';
 import { criarEstilos } from './contraceptiveForms.styles';
 
-function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConfirmar, onFechar }) {
+function UsageTimeSelector({
+    aparenciaCadastro = false,
+    horarios,
+    aberto,
+    onAbrir,
+    onConfirmar,
+    onFechar
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [temporarios, setTemporarios] = useState(horarios.length ? horarios : ['']);
@@ -41,33 +48,43 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
     }
     function confirmar() {
         setTentouConfirmar(true);
-        if (temporarios.some((horario) => erroHorario(horario))) return;
+        if (temporarios.length !== 1 || temporarios.some((horario) => erroHorario(horario))) return;
         onConfirmar(temporarios);
     }
 
     return (
         <>
             <SelectorField
+                aparenciaCadastro={aparenciaCadastro}
                 label="Horário"
                 valor={resumo}
                 placeholder="Defina o horário"
                 onPress={onAbrir}
                 navegar
                 icone={Clock}
+                coresNoturnas={{ icone: '#A5D6A7', caixa: 'rgba(165, 214, 167, 0.16)' }}
                 corIcone="#2C4C3B"
                 fundoIcone="#EEF4F0"
             />
-            <Modal visible={aberto} animationType="slide" onRequestClose={onFechar}>
-                <SafeAreaView style={estilos.telaFluxo} edges={['top', 'left', 'right', 'bottom']}
-                    testID="horarios-anticoncepcional-area-segura">
-                    <Header titulo="Horários de Uso" variante="comVoltar" onVoltar={onFechar} />
-                    <View style={estilos.conteudoFluxo}>
+            <ContraceptiveModal visible={aberto} animationType="slide" onRequestClose={onFechar}>
+                <SafeAreaView
+                    style={estilos.telaFluxo}
+                    edges={['top', 'left', 'right', 'bottom']}
+                    testID="horarios-anticoncepcional-area-segura"
+                >
+                    <Header
+                        titulo="Horário de Uso"
+                        variante="comVoltar"
+                        onVoltar={onFechar}
+                        aplicarSafeAreaSuperior={false}
+                    />
+                    <View style={[estilos.conteudoFluxo, estilos.areaHorarios]}>
                         <Text style={estilos.descricaoFluxo}>
-                            {permiteMultiplos
-                                ? 'Defina os horários em que você toma sua pílula.\nVocê pode adicionar mais de um lembrete por dia.'
+                            {temporarios.length > 1
+                                ? 'Este anticoncepcional aceita um horário. Remova os outros para manter o horário de sua escolha.'
                                 : 'Defina o horário em que você usa seu anticoncepcional.'}
                         </Text>
-                        <View style={estilos.listaHorariosFluxo}>
+                        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={estilos.listaHorariosFluxo}>
                             {temporarios.map((horario, indice) => {
                                 const erro =
                                     tentouConfirmar || horario.length >= 5
@@ -78,7 +95,7 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
                                         <TimeInput
                                             valor={horario}
                                             onChangeText={(valor) => atualizar(indice, valor)}
-                                            podeRemover={permiteMultiplos && temporarios.length > 1}
+                                            podeRemover={temporarios.length > 1}
                                             aoRemover={() => remover(indice)}
                                         />
                                         {erro ? (
@@ -93,19 +110,13 @@ function UsageTimeSelector({ horarios, permiteMultiplos, aberto, onAbrir, onConf
                                     </View>
                                 );
                             })}
-                            {permiteMultiplos ? (
-                                <ButtonDashed
-                                    texto="Adicionar horário"
-                                    aoPressionar={() => setTemporarios((atuais) => [...atuais, ''])}
-                                />
-                            ) : null}
-                        </View>
+                        </ScrollView>
                     </View>
                     <View style={estilos.acaoFixa}>
-                        <ButtonScreen texto="Confirmar horários" aoPressionar={confirmar} />
+                        <ButtonScreen texto="Confirmar horário" desativado={temporarios.length > 1} aoPressionar={confirmar} />
                     </View>
                 </SafeAreaView>
-            </Modal>
+            </ContraceptiveModal>
         </>
     );
 }

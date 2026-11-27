@@ -1,0 +1,502 @@
+{
+  "privacy": {
+    "id": "privacy",
+    "titulo": "Política de Privacidade do Aloya",
+    "estadoEditorial": "minuta",
+    "dataRedacao": "25/11/2026",
+    "resumo": "Esta política explica como o Aloya usa dados da sua conta, do acompanhamento menstrual, do Diário, dos registros de anticoncepcionais e da Rede de Apoio. Você encontra aqui as regras de compartilhamento, os controles disponíveis e os seus direitos sobre esses dados.",
+    "secoes": [
+      {
+        "id": "responsavel",
+        "numero": 2,
+        "titulo": "Quem é responsável",
+        "blocos": []
+      },
+      {
+        "id": "abrangencia",
+        "numero": 3,
+        "titulo": "A quem se aplica",
+        "blocos": [
+          {
+            "texto": "Esta política abrange o uso do aplicativo e o tratamento nos fluxos de cadastro, acompanhamento menstrual, Diário, registro de anticoncepcionais e Rede de Apoio. Também se aplica a dados de pessoas convidadas ou indicadas como responsáveis, inclusive antes da criação de uma conta."
+          }
+        ]
+      },
+      {
+        "id": "dados-coletados",
+        "numero": 4,
+        "titulo": "Informações que coletamos",
+        "blocos": [
+          {
+            "enfase": "Cadastro e perfil.",
+            "texto": "No cadastro comum, você informa nome, e-mail, data de nascimento e senha. Você pode continuar sem informar a última menstruação. A identidade de gênero e as informações iniciais sobre a duração do ciclo ou da menstruação são opcionais nos fluxos em que aparecem."
+          },
+          {
+            "enfase": "Registros de saúde e do Diário.",
+            "texto": "Quando você usa esses recursos, pode informar datas e dias de menstruação, sintomas, humor, sono, vida sexual, consultas, exames, peso, temperatura basal e anotações. No acompanhamento do anticoncepcional, pode registrar o método, a programação e as suas confirmações de uso."
+          },
+          {
+            "enfase": "Rede de Apoio.",
+            "texto": "Tratamos o endereço de e-mail indicado para enviar um convite ou pedir autorização parental. O recurso registra informações sobre convites, respostas, vínculos e permissões."
+          },
+          {
+            "enfase": "Dados técnicos.",
+            "texto": "O serviço gera identificadores e estados de sessão, datas de operação e registros de sincronização. Se o aplicativo enviar o nome do dispositivo na solicitação, o serviço pode recebê-lo."
+          }
+        ]
+      },
+      {
+        "id": "dados-sensiveis",
+        "numero": 5,
+        "titulo": "Dados de saúde e vida íntima",
+        "blocos": [
+          {
+            "texto": "Informações sobre saúde ou vida sexual são dados pessoais sensíveis. Datas do ciclo, registros de anticoncepcionais, anotações e resultados calculados também podem revelar informações sensíveis. Isso depende do que você registra e do que é possível inferir desses dados."
+          },
+          {
+            "texto": "A temperatura basal que você registra pode ser processada com informações sobre a medição para gerar uma análise experimental interna. Na configuração analisada, essa análise não altera o nível de confiabilidade exibido."
+          }
+        ]
+      },
+      {
+        "id": "origem-dos-dados",
+        "numero": 6,
+        "titulo": "De onde vêm as informações",
+        "blocos": [
+          {
+            "texto": "Você fornece informações ao criar ou editar a conta, preencher registros ou indicar um contato. Pessoas convidadas e responsáveis podem fornecer uma resposta. Ao usar o serviço, são gerados dados técnicos e informações derivadas, como duração de ciclos, resumos, estimativas e idade calculada com base na data de nascimento informada."
+          },
+          {
+            "texto": "O aplicativo também trata preferências de apresentação, como tema e escolha das categorias exibidas no Diário. Ocultar uma categoria pode manter os registros anteriores."
+          }
+        ]
+      },
+      {
+        "id": "finalidades",
+        "numero": 7,
+        "titulo": "Para que usamos os dados",
+        "blocos": [
+          {
+            "texto": "Usamos informações de cadastro e sessão para operar a conta, verificar o acesso e permitir recuperação de senha. Usamos os dados informados para manter o histórico, organizar o Diário e o acompanhamento do anticoncepcional e gerar estimativas a partir dos dados disponíveis."
+          },
+          {
+            "texto": "As preferências ajustam a apresentação do aplicativo. Dados de convites e permissões ajudam a administrar os vínculos e a verificar quem pode acessar informações autorizadas. O serviço também usa dados para sincronizar registros menstruais e enviar mensagens de recuperação de senha, convite ou autorização parental."
+          }
+        ]
+      },
+      {
+        "id": "bases-legais",
+        "numero": 8,
+        "titulo": "Bases legais do tratamento",
+        "blocos": []
+      },
+      {
+        "id": "estimativas",
+        "numero": 9,
+        "titulo": "Como calculamos as estimativas",
+        "blocos": [
+          {
+            "texto": "O Aloya usa as datas que você registra para estimar a próxima menstruação e, quando houver dados e condições para o cálculo, as fases, a ovulação e a janela fértil. O cálculo considera durações do seu histórico ou, conforme o caso, valores informados por você ou usados como ponto de partida. Os resultados podem mudar quando você corrige ou acrescenta registros."
+          },
+          {
+            "texto": "O nível de confiabilidade considera a origem, a quantidade e a variação dos dados usados. Ele descreve o histórico disponível. Datas e fases estimadas podem diferir do que acontece no ciclo."
+          },
+          {
+            "texto": "O aplicativo usa a idade calculada a partir da data de nascimento informada para aplicar a regra de acesso à Rede de Apoio."
+          }
+        ]
+      },
+      {
+        "id": "armazenamento",
+        "numero": 10,
+        "titulo": "Onde os dados ficam",
+        "blocos": [
+          {
+            "texto": "O serviço mantém informações da conta e registros em um banco de dados. O aplicativo usa o armazenamento protegido do aparelho para guardar a credencial de sessão e dados de registros menstruais pendentes de envio. A confirmação técnica da sincronização pode manter informações do registro enviado e do resultado devolvido, como uma estimativa."
+          }
+        ]
+      },
+      {
+        "id": "seguranca",
+        "numero": 11,
+        "titulo": "Como protegemos as informações",
+        "blocos": [
+          {
+            "texto": "A senha é guardada no servidor como um código de verificação calculado a partir dela. O serviço verifica se a sessão está válida e se o acesso solicitado é permitido. Na Rede de Apoio, verifica também o vínculo e a permissão para consultar o histórico menstrual."
+          }
+        ]
+      },
+      {
+        "id": "compartilhamento",
+        "numero": 12,
+        "titulo": "Quando compartilhamos informações",
+        "blocos": [
+          {
+            "texto": "O envio de mensagens de recuperação, convite ou autorização parental usa um serviço de e-mail. Ele recebe o endereço de destino e o conteúdo necessário ao envio, que pode incluir um link. Na Rede de Apoio, o acesso de um contato segue os limites descritos a seguir."
+          }
+        ]
+      },
+      {
+        "id": "rede-de-apoio",
+        "numero": 13,
+        "titulo": "Rede de Apoio e controle do acesso",
+        "blocos": [
+          {
+            "texto": "Um convite inicia o processo de participação. A consulta ao histórico menstrual depende do aceite, de um vínculo ativo e da permissão correspondente. Quando essa consulta está disponível e autorizada, as informações podem incluir os identificadores dos registros, as datas, a duração e os dias de menstruação registrados."
+          },
+          {
+            "texto": "Você pode alterar a permissão ou encerrar o vínculo pelos controles da Rede. A retirada impede novas consultas que dependam daquela permissão ou daquele vínculo. Informações que a pessoa já viu ou copiou podem continuar com ela."
+          }
+        ]
+      },
+      {
+        "id": "servicos-externos",
+        "numero": 14,
+        "titulo": "Serviços externos",
+        "blocos": [
+          {
+            "texto": "O envio de e-mails depende do serviço de entrega. Ao abrir uma mensagem ou página de confirmação vinculada a esses fluxos, o programa que exibe o conteúdo pode solicitar recursos externos, como fontes de texto."
+          }
+        ]
+      },
+      {
+        "id": "transferencias",
+        "numero": 15,
+        "titulo": "Tratamento fora do Brasil",
+        "blocos": []
+      },
+      {
+        "id": "notificacoes-e-permissoes",
+        "numero": 16,
+        "titulo": "Mensagens e permissões do aparelho",
+        "blocos": [
+          {
+            "texto": "A recuperação de senha, os convites e os pedidos de autorização parental podem gerar mensagens por e-mail. O recebimento depende do endereço informado e dos serviços que enviam e recebem a mensagem."
+          }
+        ]
+      },
+      {
+        "id": "retencao",
+        "numero": 17,
+        "titulo": "Por quanto tempo os dados ficam guardados",
+        "blocos": [
+          {
+            "texto": "Histórico, sessões, registros de sincronização e informações ligadas a vínculos têm formas diferentes de armazenamento e descarte. A validade de um link ou o término de uma sessão diz respeito ao seu uso e pode terminar antes do descarte do registro correspondente."
+          }
+        ]
+      },
+      {
+        "id": "exclusao",
+        "numero": 18,
+        "titulo": "Como excluir registros ou a conta",
+        "blocos": [
+          {
+            "texto": "No histórico menstrual e no Diário, você pode usar os controles de exclusão dos registros disponíveis. Ao retirar um método do acompanhamento de anticoncepcionais, ele deixa de ficar ativo e o histórico de uso permanece."
+          },
+          {
+            "texto": "Para excluir a conta, abra o perfil com a sessão ativa, selecione a opção de exclusão e confirme a senha. O pedido concluído encerra o acesso e remove a conta e os registros associados do banco principal, conforme o tipo de registro. Um contato pode receber um aviso na própria conta sobre o encerramento de um vínculo. No aparelho usado para excluir, o aplicativo tenta remover a credencial da sessão."
+          },
+          {
+            "texto": "O encerramento da conta e a remoção de um registro afetam os dados mantidos no serviço de formas diferentes. Registros técnicos de sincronização, cópias de segurança e mensagens já enviadas podem ter outro ciclo de guarda."
+          }
+        ]
+      },
+      {
+        "id": "direitos",
+        "numero": 19,
+        "titulo": "Seus direitos sobre os dados",
+        "blocos": [
+          {
+            "texto": "Você pode pedir confirmação de que seus dados são tratados, acesso a eles e correção de informações incompletas, inexatas ou desatualizadas. Também pode pedir anonimização, bloqueio ou exclusão de dados desnecessários, excessivos ou tratados em desacordo com a lei."
+          },
+          {
+            "texto": "A LGPD prevê também portabilidade nos limites da regulamentação aplicável, informação sobre com quem houve compartilhamento e, quando o tratamento se basear em consentimento, informação sobre a possibilidade e as consequências de recusá-lo, revogação e exclusão dos dados tratados com esse fundamento, observadas as exceções legais."
+          },
+          {
+            "texto": "Nas hipóteses legais, você pode se opor a um tratamento feito sem seu consentimento em desacordo com a LGPD e pedir revisão de decisão tomada unicamente com base em tratamento automatizado que afete seus interesses. Você pode peticionar à ANPD e, quando aplicável, aos órgãos de defesa do consumidor."
+          },
+          {
+            "texto": "Para confirmação do tratamento ou acesso aos dados, a LGPD prevê resposta simplificada imediata ou declaração completa em até 15 dias a partir do pedido, observadas as condições legais."
+          }
+        ]
+      },
+      {
+        "id": "consentimentos",
+        "numero": 20,
+        "titulo": "Ciência, consentimento e preferências",
+        "blocos": [
+          {
+            "texto": "A Política de Privacidade explica como os dados são tratados. O aceite dos Termos diz respeito às condições de uso. Quando o tratamento depender de consentimento, a sua escolha deve se referir à finalidade informada. A autorização dada a um contato na Rede controla o que ele pode consultar pelo recurso."
+          }
+        ]
+      },
+      {
+        "id": "menores",
+        "numero": 21,
+        "titulo": "Crianças e adolescentes",
+        "blocos": [
+          {
+            "texto": "Para a conta principal cuja data de nascimento indique idade inferior a 16 anos, o acesso à Rede de Apoio depende de uma confirmação pelo fluxo de autorização parental. Essa regra se aplica à Rede de Apoio."
+          }
+        ]
+      },
+      {
+        "id": "atualizacoes",
+        "numero": 22,
+        "titulo": "Atualizações desta política",
+        "blocos": [
+          {
+            "texto": "Quando a lei exigir, mudanças relevantes no tratamento devem ser informadas de forma clara e destacada. Se o tratamento depender de consentimento, você poderá revogá-lo quando discordar de alteração nas informações previstas em lei."
+          }
+        ]
+      },
+      {
+        "id": "contato",
+        "numero": 23,
+        "titulo": "Contato e atendimento de privacidade",
+        "contatoSuporte": true,
+        "blocos": []
+      }
+    ]
+  },
+  "terms": {
+    "id": "terms",
+    "titulo": "Termos de Uso do Aloya",
+    "estadoEditorial": "minuta",
+    "dataRedacao": "25/11/2026",
+    "resumo": "Estes Termos explicam como usar o Aloya para registrar informações do ciclo, organizar o Diário e participar da Rede de Apoio. Eles também descrevem o que as estimativas podem informar, quais são seus limites e como encerrar a conta.",
+    "secoes": [
+      {
+        "id": "responsavel-e-finalidade",
+        "numero": 2,
+        "titulo": "O Aloya e sua finalidade",
+        "blocos": [
+          {
+            "texto": "O Aloya ajuda você a organizar informações sobre o ciclo menstrual, registrar observações no Diário e acompanhar o uso de anticoncepcionais que você informa. A Rede de Apoio permite gerenciar convites e permissões de compartilhamento."
+          }
+        ]
+      },
+      {
+        "id": "aceite",
+        "numero": 3,
+        "titulo": "Aceite dos Termos",
+        "blocos": [
+          {
+            "texto": "O aceite dos Termos se refere às condições de uso do Aloya. A Política de Privacidade informa como os dados são tratados. Quando uma operação depender de consentimento, a escolha se refere à finalidade informada. A confirmação de um convite da Rede de Apoio tem efeito na participação nesse recurso."
+          }
+        ]
+      },
+      {
+        "id": "elegibilidade",
+        "numero": 4,
+        "titulo": "Quem pode usar",
+        "blocos": [
+          {
+            "texto": "A conta principal e a participação como contato da Rede de Apoio têm fluxos diferentes. Quando a conta principal indica idade inferior a 16 anos, o acesso à Rede depende da confirmação pelo fluxo de autorização parental."
+          }
+        ]
+      },
+      {
+        "id": "cadastro",
+        "numero": 5,
+        "titulo": "Cadastro e gerenciamento da conta",
+        "blocos": [
+          {
+            "texto": "No cadastro comum, informe seu nome, e-mail, data de nascimento e senha. A data da última menstruação é opcional. Você pode atualizar as informações disponíveis no perfil. A pessoa convidada para a Rede de Apoio segue o fluxo do convite."
+          }
+        ]
+      },
+      {
+        "id": "credenciais",
+        "numero": 6,
+        "titulo": "Acesso à conta e senha",
+        "blocos": [
+          {
+            "texto": "Você entra com e-mail e senha. Se esquecer a senha, pode solicitar um link de recuperação por e-mail. Use o link dentro do prazo indicado no fluxo. Sair do aplicativo no aparelho e encerrar outras sessões da conta são ações com efeitos diferentes. Proteja sua senha e evite encaminhar links de recuperação."
+          }
+        ]
+      },
+      {
+        "id": "funcionalidades",
+        "numero": 7,
+        "titulo": "O que você pode fazer",
+        "blocos": [
+          {
+            "texto": "Use o calendário e o histórico para acompanhar registros menstruais. No Diário, você pode anotar sintomas e outras observações. O acompanhamento de anticoncepcionais permite organizar a programação e confirmar usos manualmente. A Rede de Apoio tem controles para convites, vínculos e permissões."
+          }
+        ]
+      },
+      {
+        "id": "seus-registros",
+        "numero": 8,
+        "titulo": "Informações que você fornece",
+        "blocos": [
+          {
+            "texto": "Os registros do Diário e as confirmações de uso do anticoncepcional refletem o que você informa. Confira as datas e corrija os registros quando necessário. Uma data que você registrou e uma data calculada pelo Aloya têm origens diferentes."
+          }
+        ]
+      },
+      {
+        "id": "acompanhamento-menstrual",
+        "numero": 9,
+        "titulo": "Acompanhamento menstrual",
+        "blocos": [
+          {
+            "texto": "Você pode registrar os dias de menstruação, consultar o histórico e corrigir registros. Com mudanças no histórico, o aplicativo pode recalcular as datas. Se os dados forem insuficientes ou incompatíveis com as condições usadas no cálculo, algumas estimativas podem ficar indisponíveis."
+          }
+        ]
+      },
+      {
+        "id": "previsoes",
+        "numero": 10,
+        "titulo": "Previsões de menstruação, fases e ovulação",
+        "blocos": [
+          {
+            "texto": "O Aloya calcula datas e fases estimadas com base no histórico disponível e, em algumas situações, em durações informadas ou valores usados como ponto de partida. O ciclo pode variar, mesmo quando os registros anteriores seguem um padrão. A data estimada de ovulação é um resultado de calendário. Ela não confirma que houve ovulação."
+          }
+        ]
+      },
+      {
+        "id": "confiabilidade",
+        "numero": 11,
+        "titulo": "O que significa a confiabilidade",
+        "blocos": [
+          {
+            "texto": "O nível considera de onde vêm as durações usadas, a quantidade de registros e a variação entre eles. Mesmo quando o nível indicado é alto, o resultado continua sendo estimado. O nível não informa a chance de a data estar correta."
+          }
+        ]
+      },
+      {
+        "id": "janela-fertil",
+        "numero": 12,
+        "titulo": "Janela fértil e planejamento reprodutivo",
+        "blocos": [
+          {
+            "texto": "A janela fértil mostrada é uma faixa estimada que termina na data estimada de ovulação. Pode haver possibilidade de gravidez fora da faixa exibida. Use essa informação apenas como referência de acompanhamento. Não use essa estimativa para prevenir gravidez, confirmar ovulação ou tomar decisões sobre quando tentar engravidar."
+          }
+        ]
+      },
+      {
+        "id": "saude-e-limitacoes",
+        "numero": 13,
+        "titulo": "Informações de saúde e limites de uso",
+        "blocos": [
+          {
+            "texto": "As explicações sobre as fases do ciclo são gerais. Use os registros e as estimativas para acompanhar o que você anotou. O Aloya não oferece diagnóstico ou orientação de tratamento e não substitui uma avaliação de saúde."
+          },
+          {
+            "texto": "A confirmação de uso de anticoncepcional organiza o horário ou o uso que você informou. Ela não mede a eficácia do método e não orienta como agir após atraso ou esquecimento. Para decisões sobre um método, sintomas ou tratamento, procure orientação de um profissional de saúde."
+          }
+        ]
+      },
+      {
+        "id": "rede-de-apoio",
+        "numero": 14,
+        "titulo": "Participação na Rede de Apoio",
+        "blocos": [
+          {
+            "texto": "Você escolhe se envia um convite. A pessoa convidada escolhe se aceita. A consulta ao histórico menstrual exige vínculo ativo e permissão correspondente, quando a consulta estiver disponível. Alterar a permissão ou encerrar o vínculo impede novas consultas que dependam daquele acesso. Informações já vistas ou copiadas podem continuar com a pessoa que as recebeu."
+          },
+          {
+            "texto": "Respeite as escolhas de participação da outra pessoa. Evite pressioná-la a compartilhar informações ou tentar acessar registros sem autorização."
+          }
+        ]
+      },
+      {
+        "id": "notificacoes",
+        "numero": 15,
+        "titulo": "Mensagens e alertas",
+        "blocos": [
+          {
+            "texto": "Se pedir recuperação de senha ou participar de um fluxo de convite ou autorização parental, você poderá receber um e-mail. O envio e o recebimento dependem do serviço de e-mail e do endereço informado. Para situações urgentes, use os serviços de atendimento apropriados."
+          }
+        ]
+      },
+      {
+        "id": "condutas",
+        "numero": 16,
+        "titulo": "Uso seguro da conta e da Rede",
+        "blocos": [
+          {
+            "texto": "Use sua própria conta. No compartilhamento, respeite as permissões concedidas e a privacidade de quem compartilha. Proteja suas credenciais e evite divulgar registros de saúde de outra pessoa sem autorização."
+          }
+        ]
+      },
+      {
+        "id": "direitos-e-responsabilidades",
+        "numero": 17,
+        "titulo": "Direitos e responsabilidades",
+        "blocos": [
+          {
+            "texto": "Os direitos previstos em lei continuam aplicáveis. Os limites descritos para estimativas, sincronização, e-mails e compartilhamento orientam o uso desses recursos. As responsabilidades pelo serviço permanecem sujeitas à legislação aplicável."
+          }
+        ]
+      },
+      {
+        "id": "propriedade-intelectual",
+        "numero": 18,
+        "titulo": "Software, marca e conteúdos",
+        "blocos": []
+      },
+      {
+        "id": "dependencias",
+        "numero": 19,
+        "titulo": "Serviços externos",
+        "blocos": [
+          {
+            "texto": "Recursos ligados à conta e à Rede de Apoio dependem de comunicação com o serviço. Para abrir um link de convite ou de recuperação, você também pode depender do aplicativo de e-mail, do navegador e das configurações do aparelho."
+          }
+        ]
+      },
+      {
+        "id": "disponibilidade",
+        "numero": 20,
+        "titulo": "Conexão e sincronização",
+        "blocos": [
+          {
+            "texto": "Se a conexão falhar ao registrar dias de menstruação, o aplicativo pode guardar a alteração como pendente para tentar enviá-la depois. Enquanto o envio não for concluído, o registro pode ainda não estar no histórico mantido pelo serviço. Outros fluxos, como login e Rede de Apoio, dependem de conexão com o serviço."
+          }
+        ]
+      },
+      {
+        "id": "condicoes-comerciais",
+        "numero": 21,
+        "titulo": "Condições comerciais",
+        "blocos": []
+      },
+      {
+        "id": "encerramento",
+        "numero": 22,
+        "titulo": "Como excluir a conta",
+        "blocos": [
+          {
+            "texto": "Com a sessão ativa, abra o perfil, escolha a opção de exclusão e confirme a senha. Quando o pedido é concluído, você perde o acesso à conta e os vínculos associados são tratados pelo serviço. Um contato pode receber um aviso sobre o encerramento do vínculo. Sair da sessão mantém a conta, e sair da Rede afeta a participação nesse recurso. A Política de Privacidade explica os efeitos sobre os dados no banco principal, no aparelho e nas demais cópias."
+          }
+        ]
+      },
+      {
+        "id": "alteracoes",
+        "numero": 23,
+        "titulo": "Alterações dos Termos",
+        "blocos": []
+      },
+      {
+        "id": "conflitos",
+        "numero": 24,
+        "titulo": "Legislação e resolução de conflitos",
+        "blocos": [
+          {
+            "texto": "Você mantém o direito de recorrer às autoridades e aos meios de proteção previstos na legislação, inclusive aos órgãos de defesa do consumidor quando aplicável."
+          }
+        ]
+      },
+      {
+        "id": "contato",
+        "numero": 25,
+        "titulo": "Contato e suporte",
+        "contatoSuporte": true,
+        "blocos": []
+      }
+    ]
+  }
+}

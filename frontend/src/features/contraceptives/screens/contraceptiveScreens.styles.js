@@ -1,6 +1,7 @@
 //Define os estilos compartilhados pelas telas do fluxo de anticoncepcionais.
 import { StyleSheet } from 'react-native';
-import { espacamentos, fontFamilies, typography } from '../../../shared/theme';
+import { TAMANHO_FAB } from '../../../shared/components/common/FloatingActionButton';
+import { espacamentos, espacamentosLayout, fontFamilies, typography } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
@@ -11,14 +12,20 @@ function criarEstilos(tema) {
             backgroundColor: interfaceTema.fundo
         },
 
+        telaCadastro: tema.escuro ? { backgroundColor: '#121212' } : {},
+
         conteudoFormulario: {
+            paddingTop: espacamentosLayout.headerParaConteudo,
             paddingBottom: espacamentos.grande
         },
 
         lista: {
             flexGrow: 1,
-            padding: espacamentos.grande
+            paddingHorizontal: espacamentos.grande,
+            paddingTop: espacamentosLayout.headerParaConteudo,
+            paddingBottom: espacamentos.grande
         },
+        espacoFab: { paddingBottom: TAMANHO_FAB + espacamentos.grande + espacamentos.pequeno },
 
         separador: {
             height: espacamentos.medio
@@ -45,10 +52,6 @@ function criarEstilos(tema) {
             color: interfaceTema.textoSecundario
         },
 
-        acao: {
-            marginTop: espacamentos.grande
-        },
-
         acaoExcluir: {
             minHeight: 44,
             marginTop: -16,
@@ -59,7 +62,7 @@ function criarEstilos(tema) {
         },
 
         textoExcluir: {
-            color: tema.escuro ? '#FF9B88' : tema.cores.feedback.erro,
+            color: tema.escuro ? '#EF9A9A' : tema.cores.feedback.erro,
             fontFamily: fontFamilies.regular,
             fontSize: 14,
             lineHeight: 21,

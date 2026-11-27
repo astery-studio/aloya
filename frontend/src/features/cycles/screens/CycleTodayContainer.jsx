@@ -8,6 +8,11 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(false);
     const controlador = useRef(null);
+    const onSessaoExpiradaRef = useRef(onSessaoExpirada);
+
+    useEffect(() => {
+        onSessaoExpiradaRef.current = onSessaoExpirada;
+    }, [onSessaoExpirada]);
 
     const carregar = useCallback(async () => {
         controlador.current?.abort();
@@ -18,15 +23,15 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
         try {
             const resultado = await service.buscar({ signal: atual.signal });
             setPrevisao(resultado);
-            setDataSelecionada(resultado.dataReferencia || null);
+            setDataSelecionada(obterHojeLocal());
         } catch (falha) {
             if (falha?.name === 'AbortError') return;
-            if (falha?.status === 401) onSessaoExpirada?.();
+            if (falha?.status === 401) onSessaoExpiradaRef.current?.();
             else setErro(true);
         } finally {
             if (controlador.current === atual) setCarregando(false);
         }
-    }, [onSessaoExpirada, service]);
+    }, [service]);
 
     useEffect(() => {
         const atual = new AbortController();
@@ -36,11 +41,11 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             .buscar({ signal: atual.signal })
             .then((resultado) => {
                 setPrevisao(resultado);
-                setDataSelecionada(resultado.dataReferencia || null);
+                setDataSelecionada(obterHojeLocal());
             })
             .catch((falha) => {
                 if (falha?.name === 'AbortError') return;
-                if (falha?.status === 401) onSessaoExpirada?.();
+                if (falha?.status === 401) onSessaoExpiradaRef.current?.();
                 else setErro(true);
             })
             .finally(() => {
@@ -48,7 +53,7 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             });
 
         return () => atual.abort();
-    }, [onSessaoExpirada, service]);
+    }, [service]);
 
     return (
         <CycleTodayScreen
@@ -56,14 +61,22 @@ function CycleTodayContainer({ service, onSessaoExpirada, ...acoes }) {
             previsao={previsao}
             carregando={carregando}
             erro={erro}
+            dataAtual={obterHojeLocal()}
             dataSelecionada={dataSelecionada}
             aoSelecionarData={setDataSelecionada}
             aoTentarNovamente={carregar}
+            onSessaoExpirada={onSessaoExpirada}
             aoCadastrarMenstruacao={
                 typeof acoes.aoCadastrarMenstruacao === 'function'
                     ? () => acoes.aoCadastrarMenstruacao(dataSelecionada || obterHojeLocal())
                     : undefined
             }
+            aoCadastrarDiario={
+                typeof acoes.aoCadastrarDiario === 'function'
+                    ? () => acoes.aoCadastrarDiario(dataSelecionada || obterHojeLocal())
+                    : undefined
+            }
+            aoEditarDiario={acoes.aoEditarDiario}
         />
     );
 }

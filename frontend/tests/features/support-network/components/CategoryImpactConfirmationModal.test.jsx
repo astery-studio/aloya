@@ -16,7 +16,7 @@ jest.mock('../../../../src/shared/components/icons/AppIcons', () => {
     };
 });
 
-import { CategoryImpactConfirmationModal } from '../../../../src/features/support-network/components/CategoryImpactConfirmationModal';
+import { CategoryImpactConfirmationModal } from '../../../../src/features/support-network/components/CategoryImpactConfirmationModal/CategoryImpactConfirmationModal';
 
 describe('CategoryImpactConfirmationModal', () => {
     test('não mostra o modal quando está invisível', async () => {

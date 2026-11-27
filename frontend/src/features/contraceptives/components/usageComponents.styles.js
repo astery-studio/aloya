@@ -6,11 +6,15 @@ import { temaClaro } from '../../../shared/theme/themePalettes';
 const coresHistorico = Object.freeze({
     confirmado: 'rgba(44, 76, 59, 0.8)',
     foraDoPrazo: 'rgba(214, 140, 58, 0.8)',
-    naoConfirmado: 'rgba(200, 90, 68, 0.8)'
+    naoConfirmado: 'rgba(200, 90, 68, 0.8)',
+    naoUsei: '#A65140'
 });
 
 function criarEstilosUso(tema) {
     const interfaceTema = tema.cores.interface;
+    const coresCalendario = tema.escuro
+        ? { ...coresHistorico, confirmado: '#A5D6A7CC', foraDoPrazo: '#FFE082CC', naoConfirmado: '#EF9A9ACC' }
+        : coresHistorico;
     return StyleSheet.create({
         banner: {
             width: '100%',
@@ -26,9 +30,9 @@ function criarEstilosUso(tema) {
             paddingVertical: 9,
             paddingHorizontal: 14,
             borderRadius: 10,
-            backgroundColor: '#FBF3E0',
+            backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.16)' : '#FBF3E0',
             borderWidth: 0.70489,
-            borderColor: '#E8C97A'
+            borderColor: tema.escuro ? 'rgba(255, 224, 130, 0.30)' : '#E8C97A'
         },
         textoBanner: {
             minWidth: 142,
@@ -36,7 +40,7 @@ function criarEstilosUso(tema) {
             flexGrow: 0,
             flexShrink: 1,
             includeFontPadding: false,
-            color: '#B07D2A',
+            color: tema.escuro ? '#FFE082' : '#B07D2A',
             fontFamily: fontFamilies.semibold,
             fontWeight: '600',
             fontSize: 13,
@@ -73,6 +77,30 @@ function criarEstilosUso(tema) {
             paddingTop: 8,
             paddingHorizontal: 16
         },
+        inicioMedicacao: {
+            marginBottom: 8,
+            color: interfaceTema.textoSecundario,
+            fontFamily: fontFamilies.medium,
+            fontSize: 11,
+            lineHeight: 16,
+            textAlign: 'center'
+        },
+        instrucaoEdicao: {
+            marginBottom: 12, textAlign: 'center', color: interfaceTema.textoSecundario,
+            fontFamily: fontFamilies.regular, fontSize: 10, lineHeight: 15
+        },
+        alterarHistorico: {
+            width: '100%', minHeight: 36, marginTop: 10, padding: 8,
+            alignItems: 'center', justifyContent: 'center', borderRadius: 10,
+            backgroundColor: interfaceTema.destaque
+        },
+        textoAlterarHistorico: {
+            color: interfaceTema.textoSobreDestaque, fontFamily: fontFamilies.semibold,
+            fontSize: 13, lineHeight: 20, textAlign: 'center'
+        },
+        registroSelecionado: { borderWidth: 2, borderStyle: 'dashed', borderColor: interfaceTema.destaque },
+        celulaSelecionada: { borderWidth: 2, borderStyle: 'dashed', borderColor: '#FFFFFF' },
+        celulaSelecionadaSemRegistro: { borderColor: interfaceTema.destaque },
         listaRegistros: { width: '100%', alignItems: 'flex-start', gap: 6 },
         registro: {
             width: '100%',
@@ -171,10 +199,11 @@ function criarEstilosUso(tema) {
             flexGrow: 0,
             flexShrink: 0,
             padding: 8,
-            backgroundColor: tema.escuro ? interfaceTema.superficieElevada : interfaceTema.fundo,
+            backgroundColor: tema.escuro ? '#242424' : interfaceTema.fundo,
             borderRadius: 12
         },
         calendarioSeisSemanas: { minHeight: 291.43 },
+        rodapeEdicao: { width: '100%', paddingTop: 8 },
         cabecalhoCalendario: {
             width: '100%',
             minHeight: 22,
@@ -252,28 +281,30 @@ function criarEstilosUso(tema) {
             textAlign: 'center'
         },
         numeroDiaHoje: { fontFamily: fontFamilies.bold, fontWeight: '900' },
+        celulaDesabilitada: { opacity: 0.55 },
         diaComEstado: { color: '#FFFFFF' },
-        celula_confirmado: { backgroundColor: coresHistorico.confirmado },
-        celula_foraDoPrazo: { backgroundColor: coresHistorico.foraDoPrazo },
-        celula_naoConfirmado: { backgroundColor: coresHistorico.naoConfirmado },
-        // Cada item mede seu texto nativo. Se faltar espaço, a legenda cresce por linhas.
+        celula_confirmado: { backgroundColor: coresCalendario.confirmado },
+        celula_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
+        celula_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
+        celula_naoUsei: { backgroundColor: coresCalendario.naoUsei },
+        celula_pausa: { backgroundColor: interfaceTema.textoSecundario },
+        celulaPausaSelecionada: { borderColor: interfaceTema.fundo },
+        diaComPausa: { color: interfaceTema.fundo },
+        // Duas colunas fixam o alinhamento dos marcadores e deixam cada rótulo crescer.
         legenda: {
             width: '100%',
             minHeight: 23,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 10,
+            gap: 4,
             paddingTop: 8,
             paddingHorizontal: 13
         },
+        linhaLegenda: { flexDirection: 'row', gap: 8 },
         itemLegenda: {
             minHeight: 15,
+            minWidth: 0,
             flexDirection: 'row',
-            alignItems: 'center',
-            flexGrow: 0,
-            flexShrink: 0,
+            alignItems: 'flex-start',
+            flex: 1,
             gap: 4
         },
         marcadorLegenda: {
@@ -281,15 +312,18 @@ function criarEstilosUso(tema) {
             height: 5.99,
             flexGrow: 0,
             flexShrink: 0,
+            marginTop: 4.5,
             borderRadius: 2.99578
         },
-        marcador_confirmado: { backgroundColor: coresHistorico.confirmado },
-        marcador_foraDoPrazo: { backgroundColor: coresHistorico.foraDoPrazo },
-        marcador_naoConfirmado: { backgroundColor: coresHistorico.naoConfirmado },
+        marcador_confirmado: { backgroundColor: coresCalendario.confirmado },
+        marcador_foraDoPrazo: { backgroundColor: coresCalendario.foraDoPrazo },
+        marcador_naoConfirmado: { backgroundColor: coresCalendario.naoConfirmado },
+        marcador_naoUsei: { backgroundColor: coresCalendario.naoUsei },
+        marcador_pausa: { backgroundColor: interfaceTema.textoSecundario },
         textoLegenda: {
             minHeight: 15,
             flexGrow: 0,
-            flexShrink: 0,
+            flexShrink: 1,
             includeFontPadding: false,
             color: interfaceTema.textoSecundario,
             fontFamily: fontFamilies.regular,

@@ -11,9 +11,9 @@ function criarEstilos(tema) {
             maxWidth: 350,
             alignSelf: 'center',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.borda,
             borderRadius: 16
         },
 
@@ -25,17 +25,37 @@ function criarEstilos(tema) {
             height: 100
         },
 
+        comMetricasFlexivel: {
+            height: 'auto',
+            minHeight: 210.4
+        },
+
+        semMetricasFlexivel: {
+            height: 'auto',
+            minHeight: 100
+        },
+
         cabecalho: {
             width: '100%',
             height: 50.82,
             justifyContent: 'center',
             paddingHorizontal: 20,
             borderBottomWidth: 1.41,
-            borderBottomColor: tema.cores.interface.borda
+            borderBottomColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         cabecalhoCentralizado: {
             alignItems: 'center'
+        },
+
+        cabecalhoFlexivel: {
+            height: 'auto',
+            minHeight: 50.82,
+            paddingVertical: 10
+        },
+
+        tituloCentralizado: {
+            textAlign: 'center'
         },
 
         cabecalhoAlinhado: {
@@ -44,7 +64,7 @@ function criarEstilos(tema) {
 
         titulo: {
             maxWidth: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 12,
             fontStyle: 'normal',
@@ -59,7 +79,7 @@ function criarEstilos(tema) {
             height: 103.6,
             flexDirection: 'row',
             borderBottomWidth: 1.41,
-            borderBottomColor: tema.cores.interface.borda
+            borderBottomColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         metrica: {
@@ -71,7 +91,7 @@ function criarEstilos(tema) {
 
         metricaComSeparador: {
             borderRightWidth: 0.99,
-            borderRightColor: tema.cores.interface.borda
+            borderRightColor: tema.escuro ? '#FFFFFF14' : tema.cores.interface.borda
         },
 
         rotuloMetrica: {
@@ -133,6 +153,10 @@ function criarEstilos(tema) {
             fontWeight: '400',
             lineHeight: 19.5,
             includeFontPadding: false
+        },
+
+        rodapeCentralizado: {
+            justifyContent: 'center'
         },
 
         caixaDaTag: {

@@ -85,3 +85,27 @@ test('development enables cleartext only through the explicit testing flag', () 
         }
     );
 });
+
+test('native builds follow the system appearance in every build environment', () => {
+    const packageConfig = require('./package.json');
+    assert.ok(packageConfig.dependencies['expo-system-ui']);
+    assert.ok(require.resolve('expo-system-ui/package.json'));
+
+    for (const appEnvironment of ['development', 'preview', 'production']) {
+        withEnvironment(
+            { APP_ENV: appEnvironment, EXPO_PUBLIC_API_URL: 'https://api.aloya.example' },
+            () => {
+                const config = buildAppConfig({ config: staticConfig });
+                assert.equal(config.userInterfaceStyle, 'automatic');
+                assert.equal(
+                    config.ios.userInterfaceStyle ?? config.userInterfaceStyle,
+                    'automatic'
+                );
+                assert.equal(
+                    config.android.userInterfaceStyle ?? config.userInterfaceStyle,
+                    'automatic'
+                );
+            }
+        );
+    }
+});

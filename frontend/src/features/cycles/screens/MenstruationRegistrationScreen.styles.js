@@ -7,36 +7,10 @@ function criarEstilos(tema) {
     const faixa = tema.escuro ? 'rgba(212, 119, 105, 0.28)' : '#F6D8D1';
 
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.cores.interface.fundo },
-        cabecalho: {
-            minHeight: 67,
-            paddingHorizontal: 20,
-            paddingTop: 12,
-            paddingBottom: 16,
-            justifyContent: 'center',
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.separador
-        },
-        titulo: {
-            textAlign: 'center',
-            marginLeft: 24,
-            fontFamily: fontFamilies.bold,
-            fontSize: 18,
-            lineHeight: 39,
-            color: tema.cores.interface.textoPrincipal
-        },
-        voltar: {
-            position: 'absolute',
-            left: 10,
-            top: 13,
-            width: 44,
-            height: 44,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        corIconeCabecalho: tema.cores.interface.textoPrincipal,
+        tela: { flex: 1, backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo },
         legenda: {
             minHeight: 40,
+            marginTop: tema.espacamentosLayout.headerParaConteudo,
             paddingHorizontal: 24,
             paddingVertical: 8,
             flexDirection: 'row',
@@ -142,9 +116,9 @@ function criarEstilos(tema) {
             paddingHorizontal: 14,
             paddingVertical: 12,
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.destaque,
+            borderColor: tema.escuro ? '#A5D6A7' : tema.cores.interface.destaque,
             borderRadius: 12,
-            backgroundColor: tema.escuro ? 'transparent' : '#EFEFE8'
+            backgroundColor: tema.escuro ? 'rgba(165, 214, 167, 0.05)' : '#EFEFE8'
         },
         textoAjuda: {
             flex: 1,
@@ -158,8 +132,8 @@ function criarEstilos(tema) {
             paddingTop: 24,
             paddingBottom: 20,
             borderTopWidth: StyleSheet.hairlineWidth,
-            borderColor: tema.cores.interface.separador,
-            backgroundColor: tema.escuro ? '#1D211F' : tema.cores.interface.fundo
+            borderColor: tema.escuro ? 'rgba(255, 255, 255, 0.08)' : tema.cores.interface.separador,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.fundo
         },
         salvar: { minHeight: 56, borderRadius: 12 },
         iconeFeedback: { borderRadius: 14 },

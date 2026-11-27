@@ -188,11 +188,11 @@ describe('SelectionSheet', () => {
         );
 
         expect(screen.getByText('Nenhuma opção disponível.')).toHaveStyle({
-            color: '#C4C8C5'
+            color: '#FFFFFFDE'
         });
 
         expect(screen.getByTestId('selection-sheet-list')).toHaveStyle({
-            backgroundColor: '#2B322E'
+            backgroundColor: '#242424'
         });
     });
 

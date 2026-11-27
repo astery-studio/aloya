@@ -8,7 +8,7 @@ import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen'
 import {
     prepararCategoriaParaSalvar,
     SupportCategoryForm
-} from '../components/SupportCategoryForm';
+} from '../components/SupportCategoryForm/SupportCategoryForm';
 import { SettingsLayout } from '../../settings/layouts/SettingsLayout/SettingsLayout';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { estilos } from './NewSupportCategoryScreen.styles';
@@ -162,7 +162,8 @@ function NewSupportCategoryScreen({
     onVoltar,
     onCategoriaCriada,
     onConcluido,
-    onSessaoExpirada
+    onSessaoExpirada,
+    diaryService
 }) {
     const tema = useTheme();
     const corDestaque = tema.escuro ? '#F08A75' : tema.cores.marca.primaria;
@@ -331,6 +332,7 @@ function NewSupportCategoryScreen({
         <>
             <SettingsLayout
                 titulo="Nova Categoria"
+                corFundo={tema.escuro ? '#121212' : undefined}
                 onVoltar={voltar}
                 rodapeFixo
                 rodape={
@@ -349,6 +351,7 @@ function NewSupportCategoryScreen({
             >
                 <View style={estilos.conteudo}>
                     <SupportCategoryForm
+                        aparenciaNovaCategoria
                         dados={dados}
                         aoAlterar={alterarDados}
                         aoSalvar={salvarCategoria}
@@ -356,11 +359,14 @@ function NewSupportCategoryScreen({
                         carregando={carregando}
                         bloqueado={!servicoDisponivel}
                         exibirAcao={false}
+                        diaryService={diaryService}
+                        onSessaoExpirada={onSessaoExpirada}
                     />
                 </View>
             </SettingsLayout>
 
             <SimpleModal
+                erroInterno={Boolean(alertaErro?.recuperavel)}
                 visivel={alertaErro !== null}
                 aoFechar={fecharAlertaErro}
                 icone={WarningCircleIcon}

@@ -1,5 +1,5 @@
 import { FREQUENCIAS } from '../constants/contraceptive.constants.js';
-import { dataLocalNoFuso } from '../validators/contraceptiveUsage.validator.js';
+import { dataHoraNoFuso, dataLocalNoFuso } from '../validators/contraceptiveUsage.validator.js';
 import {
     dataCivil,
     listarUsosAgendadosHoje,
@@ -12,7 +12,8 @@ function timestamp(valor) {
 
 function estadoDoUso(uso) {
     if (uso.statusUso === 'confirmado') return uso.confirmacaoForaPrazo ? 'foraDoPrazo' : 'confirmado';
-    if (uso.statusUso === 'nao_confirmado') return 'naoConfirmado';
+    if (['nao_confirmado', 'nao_sabe'].includes(uso.statusUso)) return 'naoConfirmado';
+    if (uso.statusUso === 'nao_usou') return 'naoUsei';
     return 'pendente';
 }
 
@@ -21,7 +22,8 @@ function apresentarUsoHistorico(uso) {
         id: String(uso.id),
         data: dataCivil(uso.dataUsoProgramado),
         horarioProgramado: uso.horarioProgramado,
-        confirmadoEm: timestamp(uso.horarioRealConfirmacao),
+        confirmadoEm: ['nao_usou', 'nao_sabe'].includes(uso.statusUso)
+            ? null : timestamp(uso.horarioRealConfirmacao),
         estado: estadoDoUso(uso)
     };
 }
@@ -63,7 +65,12 @@ function apresentarAnticoncepcionalListagem(registro, agora = new Date(), fusoHo
             apresentarUsoDoDia(uso)
         ]));
     const usosHoje = listarUsosAgendadosHoje(registro, agora, fusoHorario)
-        .map((uso) => usosPersistidos.get(uso.id) ?? uso);
+        .map((agendado) => {
+            const uso = usosPersistidos.get(agendado.id) ?? agendado;
+            const pendente = uso.status === 'pendente' || uso.status === 'naoConfirmado';
+            const programadoEm = pendente ? dataHoraNoFuso(uso.data, uso.horario, fusoHorario) : null;
+            return { ...uso, atrasado: Boolean(programadoEm && programadoEm < agora) };
+        });
     const possuiPendenciaHoje = usosHoje.some((uso) => uso.status === 'pendente' || uso.status === 'naoConfirmado');
     const ultimoUso = historico[0] ?? null;
 

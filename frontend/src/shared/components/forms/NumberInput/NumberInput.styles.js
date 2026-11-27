@@ -6,7 +6,7 @@ import { fontFamilies } from '../../../theme';
 
 function criarEstilos(tema) {
     const texto = {
-        color: tema.cores.interface.textoPrincipal,
+        color: tema.escuro ? '#FFFFFF' : tema.cores.interface.textoPrincipal,
         fontFamily: fontFamilies.regular,
         fontSize: 16,
         fontWeight: '400',
@@ -26,9 +26,10 @@ function criarEstilos(tema) {
             borderRadius: tema.radius.buttonAndInput,
             borderWidth: 1.41,
             borderColor: tema.cores.interface.destaque,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie
         },
         conteudo: {
+            width: '100%',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -41,7 +42,24 @@ function criarEstilos(tema) {
             textAlign: 'center',
             textAlignVertical: 'center'
         },
-        unidade: { ...texto },
+        areaEntradaSobreposta: {
+            position: 'relative',
+            width: 32,
+            height: 24,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        entradaSobreposta: { width: '100%', height: '100%' },
+        entradaOculta: { opacity: 0 },
+        placeholderComUnidade: {
+            position: 'absolute',
+            width: '100%',
+            height: 24,
+            textAlign: 'center',
+            textAlignVertical: 'center'
+        },
+        unidade: { ...texto, fontFamily: fontFamilies.semibold },
+        limpar: { position: 'absolute', right: 18 },
         desativado: { opacity: 0.55 }
     });
 }

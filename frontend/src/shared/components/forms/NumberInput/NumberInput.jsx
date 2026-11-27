@@ -2,9 +2,11 @@
  * Campo numérico controlado que mantém a unidade visível e não editável.
  */
 import { useMemo, useRef } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
+import { XCircleIcon } from 'phosphor-react-native';
 import { useTheme } from '../../../hooks/useTheme';
 import { criarEstilos } from './NumberInput.styles';
+import { converterEntradaNumerica } from './numberInputValue';
 
 export default function NumberInput({
     valor,
@@ -12,16 +14,38 @@ export default function NumberInput({
     unidade = 'Dias',
     desativado = false,
     rotuloAcessibilidade = 'Duração em dias',
-    estilo
+    casasDecimais = 0,
+    maximoDigitosInteiros = 2,
+    valorMinimo,
+    valorMaximo,
+    estilo,
+    permitirLimpar = false,
+    placeholder,
+    corPlaceholder,
+    estiloEntrada,
+    estiloUnidade,
+    placeholderComoTexto = false,
+    estiloPlaceholder
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const entradaRef = useRef(null);
-    const texto = valor === null || valor === undefined ? '' : String(valor);
+    const texto =
+        valor === null || valor === undefined
+            ? ''
+            : String(valor).replace('.', casasDecimais > 0 ? ',' : '.');
+    const numeroAtual = texto ? Number(texto.replace(',', '.')) : Number.NaN;
+    const exibirPlaceholderComoTexto = placeholderComoTexto && !texto;
+    const comprimentoMaximo = maximoDigitosInteiros + (casasDecimais > 0 ? casasDecimais + 1 : 0);
 
     function alterar(novoTexto) {
-        const numeros = novoTexto.replace(/\D/g, '').slice(0, 2);
-        aoAlterar?.(numeros ? Number(numeros) : null);
+        aoAlterar?.(converterEntradaNumerica(novoTexto, casasDecimais, maximoDigitosInteiros));
+    }
+
+    function limpar() {
+        entradaRef.current?.blur();
+        Keyboard.dismiss();
+        aoAlterar?.(null);
     }
 
     return (
@@ -33,19 +57,56 @@ export default function NumberInput({
             style={[estilos.campo, desativado && estilos.desativado, estilo]}
         >
             <View style={estilos.conteudo}>
-                <TextInput
-                    ref={entradaRef}
-                    accessibilityLabel={rotuloAcessibilidade}
-                    editable={!desativado}
-                    keyboardType="number-pad"
-                    maxLength={2}
-                    selectionColor={tema.cores.interface.destaque}
-                    selectTextOnFocus
-                    value={texto}
-                    onChangeText={alterar}
-                    style={estilos.entrada}
-                />
-                <Text style={estilos.unidade}>{unidade}</Text>
+                <View style={placeholderComoTexto ? estilos.areaEntradaSobreposta : null}>
+                    <TextInput
+                        ref={entradaRef}
+                        accessibilityLabel={rotuloAcessibilidade}
+                        accessibilityValue={{
+                            ...(Number.isFinite(valorMinimo) ? { min: valorMinimo } : {}),
+                            ...(Number.isFinite(valorMaximo) ? { max: valorMaximo } : {}),
+                            ...(Number.isFinite(numeroAtual) ? { now: numeroAtual } : {})
+                        }}
+                        editable={!desativado}
+                        keyboardType={casasDecimais > 0 ? 'decimal-pad' : 'number-pad'}
+                        maxLength={comprimentoMaximo}
+                        selectionColor={tema.cores.interface.destaque}
+                        selectTextOnFocus
+                        placeholder={placeholderComoTexto ? undefined : placeholder}
+                        placeholderTextColor={corPlaceholder}
+                        value={texto}
+                        onChangeText={alterar}
+                        style={[
+                            estilos.entrada,
+                            placeholderComoTexto && estilos.entradaSobreposta,
+                            exibirPlaceholderComoTexto && estilos.entradaOculta,
+                            estiloEntrada
+                        ]}
+                    />
+                </View>
+                {exibirPlaceholderComoTexto ? null : (
+                    <Text style={[estilos.unidade, estiloUnidade]}>{unidade}</Text>
+                )}
+                {exibirPlaceholderComoTexto ? (
+                    <Text
+                        testID="placeholder-campo-numero"
+                        pointerEvents="none"
+                        style={[estilos.placeholderComUnidade, estiloPlaceholder]}
+                    >
+                        {placeholder}
+                        <Text style={estiloUnidade}> {unidade}</Text>
+                    </Text>
+                ) : null}
+                {permitirLimpar && texto ? (
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={`Limpar ${rotuloAcessibilidade}`}
+                        hitSlop={8}
+                        onPress={limpar}
+                        style={estilos.limpar}
+                    >
+                        <XCircleIcon size={18} color={tema.cores.marca.primaria} />
+                    </Pressable>
+                ) : null}
             </View>
         </Pressable>
     );

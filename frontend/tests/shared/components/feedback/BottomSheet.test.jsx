@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Animated, Text } from 'react-native';
-import { act, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '../../../../src/shared/components/feedback/BottomSheet/BottomSheet';
@@ -49,6 +50,12 @@ describe('BottomSheet', () => {
         expect(screen.getByText('Conteúdo do painel')).toBeOnTheScreen();
     });
 
+    test('permite manter o painel imóvel quando o teclado abre', async () => {
+        await renderizarBottomSheet({ ajustarAoTeclado: false });
+
+        expect(screen.getByTestId('bottom-sheet-teclado')).not.toHaveProp('behavior');
+    });
+
     test('configura o modal transparente sem animação automática', async () => {
         const resultado = await renderizarBottomSheet();
 
@@ -77,6 +84,70 @@ describe('BottomSheet', () => {
         });
 
         expect(onFechar).toHaveBeenCalledTimes(1);
+    });
+
+    test('permite fechar pelo fundo quando essa interação está habilitada', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarBottomSheet({ onFechar, fecharAoTocarFora: true });
+
+        const fundo = screen.getByRole('button', { name: 'Fechar painel' });
+        await fireEvent.press(fundo);
+
+        expect(onFechar).toHaveBeenCalledTimes(1);
+    });
+
+    test('recolhe o painel com animação ao tocar no fundo', async () => {
+        const timing = jest.spyOn(Animated, 'timing').mockReturnValue({
+            start: (concluir) => concluir?.({ finished: true })
+        });
+
+        function SheetControlado() {
+            const [visivel, setVisivel] = useState(true);
+            return (
+                <BottomSheet visivel={visivel} onFechar={() => setVisivel(false)} fecharAoTocarFora>
+                    <Text>Conteúdo controlado</Text>
+                </BottomSheet>
+            );
+        }
+
+        await render(
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <SafeAreaProvider
+                    initialMetrics={{
+                        frame: { x: 0, y: 0, width: 390, height: 844 },
+                        insets: { top: 0, right: 0, bottom: 0, left: 0 }
+                    }}
+                >
+                    <SheetControlado />
+                </SafeAreaProvider>
+            </ThemeProvider>
+        );
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Fechar painel' }));
+
+        expect(timing).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({
+                toValue: 0,
+                duration: 220,
+                useNativeDriver: true
+            })
+        );
+    });
+
+    test('não fecha pelo fundo durante uma operação bloqueada', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarBottomSheet({
+            onFechar,
+            fecharAoTocarFora: true,
+            bloquearFechamento: true
+        });
+
+        await fireEvent.press(screen.getByTestId('bottom-sheet-area-fundo'));
+
+        expect(onFechar).not.toHaveBeenCalled();
     });
 
     test('não fecha quando está bloqueado', async () => {
@@ -128,13 +199,24 @@ describe('BottomSheet', () => {
         expect(timing.mock.calls[0][1]).toEqual(
             expect.objectContaining({
                 toValue: 1,
-                duration: 280,
+                duration: 220,
                 useNativeDriver: true,
                 isInteraction: false
             })
         );
 
         expect(iniciar).toHaveBeenCalledTimes(1);
+    });
+
+    test('usa a altura medida do painel como distância da animação', async () => {
+        const setValue = jest.spyOn(Animated.Value.prototype, 'setValue');
+        await renderizarBottomSheet();
+
+        await fireEvent(screen.getByTestId('bottom-sheet-painel'), 'layout', {
+            nativeEvent: { layout: { x: 0, y: 0, width: 390, height: 236 } }
+        });
+
+        expect(setValue).toHaveBeenCalledWith(236);
     });
 
     test('inicia a animação de saída', async () => {
@@ -256,6 +338,9 @@ describe('BottomSheet', () => {
         expect(screen.getByTestId('bottom-sheet-painel')).toHaveStyle({
             backgroundColor: '#FFFFFF',
             overflow: 'hidden'
+        });
+        expect(screen.getByTestId('bottom-sheet-painel')).toHaveProp('edges', {
+            top: 'off', bottom: 'maximum', left: 'maximum', right: 'maximum'
         });
     });
 

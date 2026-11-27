@@ -9,8 +9,9 @@ function criarEstilos(tema) {
             flexGrow: 1,
             gap: tema.espacamentos.extraGrande,
             paddingHorizontal: tema.espacamentos.grande,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.extraGrande,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo
         },
 
         secao: {
@@ -21,23 +22,41 @@ function criarEstilos(tema) {
         tituloSecao: {
             color: tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.medium,
-            fontSize: 16,
-            lineHeight: 24,
+            fontSize: 14,
+            fontStyle: 'normal',
+            fontWeight: '500',
+            lineHeight: 19.6,
             includeFontPadding: false
         },
+
+        campo: tema.escuro
+            ? {
+                  backgroundColor: '#1E1E1E'
+              }
+            : {},
+
+        campoComBorda: tema.escuro
+            ? {
+                  backgroundColor: '#1E1E1E',
+                  borderRadius: 12,
+                  borderWidth: 0.705,
+                  borderColor: '#2C2C2C'
+              }
+            : {},
 
         grupo: {
             width: '100%',
             overflow: 'hidden',
-            backgroundColor: tema.cores.interface.superficie,
+            backgroundColor: tema.escuro ? '#1E1E1E' : tema.cores.interface.superficie,
             borderWidth: 0.7,
-            borderColor: tema.cores.interface.borda,
+            borderColor: tema.escuro ? '#2C2C2C' : tema.cores.interface.borda,
             borderRadius: tema.radius.buttonAndInput
         },
 
         separador: {
-            height: 0.7,
-            marginLeft: 61,
+            width: 288.586,
+            height: 0.991,
+            alignSelf: 'center',
             backgroundColor: tema.cores.interface.borda
         }
     });

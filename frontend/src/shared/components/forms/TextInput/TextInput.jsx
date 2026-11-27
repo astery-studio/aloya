@@ -19,6 +19,10 @@ function TextInput({
     acaoDireita,
     estilo,
     erro,
+    destacarErro = true,
+    estiloErro,
+    estiloEntrada,
+    estiloLabel,
     sanitizar = manterTexto,
     ...outrasProps
 }) {
@@ -41,20 +45,23 @@ function TextInput({
             onPress={() => entradaRef.current?.focus()}
             style={[estilos.grupoCampo, rotuloExterno && estilos.grupo]}
         >
-            {rotuloExterno && <Text style={estilos.rotuloExterno}>{label}</Text>}
+            {rotuloExterno && <Text style={[estilos.rotuloExterno, estiloLabel]}>{label}</Text>}
             <View
+                testID="container-campo-texto"
                 style={[
                     estilos.container,
                     preenchido && variante === 'padrao' && estilos.preenchido,
                     variante === 'categoria' && estilos.categoria,
                     variante === 'popup' && estilos.popup,
                     desativado && estilos.desativado,
-                    erro && estilos.containerErro,
+                    erro && destacarErro && estilos.containerErro,
                     estilo
                 ]}
             >
                 <View style={estilos.conteudo}>
-                    {rotuloInterno && <Text style={estilos.rotuloFlutuante}>{label}</Text>}
+                    {rotuloInterno && (
+                        <Text style={[estilos.rotuloFlutuante, estiloLabel]}>{label}</Text>
+                    )}
                     <EntradaNativa
                         ref={entradaRef}
                         accessibilityLabel={label || placeholder}
@@ -64,14 +71,14 @@ function TextInput({
                         selectionColor={tema.cores.interface.destaque}
                         value={value}
                         onChangeText={(texto) => onChangeText?.(sanitizar(texto))}
-                        style={estilos.entrada}
+                        style={[estilos.entrada, estiloEntrada]}
                         {...outrasProps}
                     />
                 </View>
                 {acaoDireita}
             </View>
             {erro ? (
-                <Text accessibilityRole="alert" style={estilos.erro}>
+                <Text accessibilityRole="alert" style={[estilos.erro, estiloErro]}>
                     {erro}
                 </Text>
             ) : null}

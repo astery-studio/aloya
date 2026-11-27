@@ -5,14 +5,26 @@ import { criarContraceptiveService } from '../features/contraceptives/services/c
 import { criarCycleHistoryService } from '../features/cycles/services/cycleHistoryService';
 import { obterIdentidadeMenstrual } from '../features/cycles/services/menstruationIdentity';
 import { criarMenstruationSyncQueue } from '../features/cycles/services/menstruationSyncQueue';
-import { comRegistrosPendentes } from '../features/cycles/services/pendingCalendarService';
+import {
+    comRegistrosPendentes,
+    registroJaConfirmado
+} from '../features/cycles/services/pendingCalendarService';
 import { criarCycleParametersService } from '../features/cycles/services/cycleParametersService';
 import { criarCyclePredictionService } from '../features/cycles/services/cyclePredictionService';
 import { criarCycleRegistrationService } from '../features/cycles/services/cycleRegistrationService';
 import { criarCycleRemovalService } from '../features/cycles/services/cycleRemovalService';
+import { criarDiaryService } from '../features/diary/services/diaryService';
+import { criarNotificationPreferencesService } from '../features/notifications/notificationPreferencesService';
+import { criarPushDeviceService } from '../features/notifications/pushDeviceService';
 import { criarAccountService } from '../features/settings/services/accountService';
 import { criarThemePreferenceService } from '../features/settings/services/themePreferenceService';
+import { criarContactInvitationService } from '../features/support-network/services/contactInvitationService';
+import { criarContactLinkService } from '../features/support-network/services/contactLinkService';
+import { criarReceivedContactsService } from '../features/support-network/services/receivedContactsService';
+import { criarSharedSupportService } from '../features/support-network/services/sharedSupportService';
+import { criarParentalConsentService } from '../features/support-network/services/parentalConsentService';
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService';
+import { criarSupportContactService } from '../features/support-network/services/supportContactService';
 import { criarApiClient } from '../shared/services/api/apiClient';
 import { criarRequisicaoAutenticada } from '../shared/services/api/authenticatedRequest';
 import { lerSeguro, salvarSeguro } from '../shared/storage/secureStorage';
@@ -27,6 +39,7 @@ function validarApiUrl(apiUrl, permitirHttpDesenvolvimento = false) {
     }
 
     const url = new URL(apiUrl.trim());
+
     const protocoloPermitido =
         url.protocol === 'https:' || (permitirHttpDesenvolvimento && url.protocol === 'http:');
 
@@ -44,6 +57,7 @@ function criarServicosApp({
     permitirHttpDesenvolvimento = false
 } = {}) {
     const baseUrl = validarApiUrl(apiUrl, permitirHttpDesenvolvimento);
+
     const { requisicao } = criarApiClient({
         baseUrl,
         fetchImpl,
@@ -61,38 +75,95 @@ function criarServicosApp({
         requisicaoAutenticada,
         removerCredencialLocal: removerToken
     });
+
     const accountService = criarAccountService({
         requisicaoAutenticada,
         removerCredencialLocal: removerToken
     });
-    const themePreferenceService = criarThemePreferenceService({ requisicaoAutenticada });
-    const calendarServiceBase = criarCalendarService({ requisicaoAutenticada });
-    const contraceptiveService = criarContraceptiveService({ requisicaoAutenticada });
-    const cycleHistoryServiceBase = criarCycleHistoryService({ requisicaoAutenticada });
-    const cycleRemovalService = criarCycleRemovalService({ requisicaoAutenticada });
+    const themePreferenceService = criarThemePreferenceService({
+        requisicaoAutenticada
+    });
+
+    const calendarServiceBase = criarCalendarService({
+        requisicaoAutenticada
+    });
+
+    const contraceptiveService = criarContraceptiveService({
+        requisicaoAutenticada
+    });
+
+    const cycleHistoryServiceBase = criarCycleHistoryService({
+        requisicaoAutenticada
+    });
+
+    const cycleRemovalService = criarCycleRemovalService({
+        requisicaoAutenticada
+    });
+    const diaryService = criarDiaryService({ requisicaoAutenticada });
 
     const calendarServiceComRemocao = Object.freeze({
         ...calendarServiceBase,
         removerDia: cycleRemovalService.removerDia,
         excluirCiclo: cycleRemovalService.excluirCiclo
     });
+
     const cycleHistoryService = Object.freeze({
         ...cycleHistoryServiceBase,
         removerDia: cycleRemovalService.removerDia,
         excluirCiclo: cycleRemovalService.excluirCiclo
     });
 
-    const supportCategoryService = criarSupportCategoryService({ requisicaoAutenticada });
-    const cyclePredictionService = criarCyclePredictionService({ requisicaoAutenticada });
-    const cycleParametersService = criarCycleParametersService({ requisicaoAutenticada });
-    const cycleRegistrationService = criarCycleRegistrationService({ requisicaoAutenticada });
+    const supportCategoryService = criarSupportCategoryService({
+        requisicaoAutenticada
+    });
+
+    const contactInvitationService = criarContactInvitationService({
+        requisicaoAutenticada
+    });
+
+    const contactLinkService = criarContactLinkService({
+        requisicaoAutenticada
+    });
+
+    const supportContactService = criarSupportContactService({
+        requisicaoAutenticada
+    });
+
+    const receivedContactsService = criarReceivedContactsService({
+        requisicaoAutenticada
+    });
+
+    const parentalConsentService = criarParentalConsentService({
+        requisicaoAutenticada
+    });
+
+    const cyclePredictionService = criarCyclePredictionService({
+        requisicaoAutenticada
+    });
+
+    const cycleParametersService = criarCycleParametersService({
+        requisicaoAutenticada
+    });
+
+    const cycleRegistrationService = criarCycleRegistrationService({
+        requisicaoAutenticada
+    });
+
     const menstruationSyncQueue = criarMenstruationSyncQueue({
         ler: lerSeguro,
         salvar: salvarSeguro,
         registrar: cycleRegistrationService.registrar,
+        jaConfirmado: ({ inicio, fim, identidade }) =>
+            registroJaConfirmado({
+                service: calendarServiceBase,
+                inicio,
+                fim,
+                validarCredencial: (sessao) => obterIdentidadeMenstrual(sessao) === identidade
+            }),
         identificar: async () => obterIdentidadeMenstrual(await obterToken()),
         criarChave: () => `menstrual-${Date.now()}-${Math.random().toString(36).slice(2, 14)}`
     });
+
     const calendarService = comRegistrosPendentes({
         service: calendarServiceComRemocao,
         fila: menstruationSyncQueue
@@ -105,7 +176,20 @@ function criarServicosApp({
         calendarService,
         contraceptiveService,
         cycleHistoryService,
+        diaryService,
+        notificationPreferencesService: criarNotificationPreferencesService({ requisicaoAutenticada }),
+        supportNotificationPreferencesService: criarNotificationPreferencesService({
+            requisicaoAutenticada,
+            contato: true
+        }),
+        pushDeviceService: criarPushDeviceService({ requisicaoAutenticada }),
         supportCategoryService,
+        contactInvitationService,
+        contactLinkService,
+        supportContactService,
+        receivedContactsService,
+        sharedSupportService: criarSharedSupportService({ requisicaoAutenticada }),
+        parentalConsentService,
         cyclePredictionService,
         cycleParametersService,
         cycleRegistrationService,
