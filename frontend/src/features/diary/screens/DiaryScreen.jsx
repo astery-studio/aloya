@@ -21,6 +21,7 @@ import { criarEstilos } from './DiaryScreen.styles';
 // Recebe estado e callbacks do fluxo e retorna loading, erro, vazio ou histórico preenchido.
 function DiaryScreen({
     resumo,
+    somenteLeitura = false,
     registros = [],
     carregando = false,
     atualizando = false,
@@ -51,7 +52,8 @@ function DiaryScreen({
     const possuiErro = typeof erro === 'string' && erro.trim();
     const filtrosAtivos = possuiFiltrosDiario(filtros);
     const vazio = !carregando && !possuiErro && itens.length === 0;
-    const mostrarFab = !carregando && !possuiErro && typeof aoCriar === 'function';
+    const mostrarFab =
+        !somenteLeitura && !carregando && !possuiErro && typeof aoCriar === 'function';
     const possuiAcoesHeader =
         typeof aoAbrirFiltros === 'function' || typeof aoGerenciarCategorias === 'function';
 
@@ -91,6 +93,7 @@ function DiaryScreen({
                 aoLimparFiltros={aoLimparFiltros}
                 mostrarConteudo={mostrarConteudo}
                 mostrarDivisor={mostrarDivisor}
+                somenteLeitura={somenteLeitura}
                 estilos={estilos}
                 tema={tema}
             />
@@ -102,6 +105,7 @@ function DiaryScreen({
         conteudo = (
             <DiaryHistoryStateView
                 tipo="carregando"
+                somenteLeitura={somenteLeitura}
                 cabecalho={criarCabecalho(false)}
                 estilos={estilos}
                 tema={tema}
@@ -111,6 +115,7 @@ function DiaryScreen({
         conteudo = (
             <DiaryHistoryStateView
                 tipo="erro"
+                somenteLeitura={somenteLeitura}
                 cabecalho={criarCabecalho(false)}
                 aoTentarNovamente={aoTentarNovamente}
                 estilos={estilos}
@@ -121,6 +126,7 @@ function DiaryScreen({
         conteudo = (
             <DiaryHistoryStateView
                 tipo={filtrosAtivos ? 'filtro-vazio' : 'vazio'}
+                somenteLeitura={somenteLeitura}
                 cabecalho={criarCabecalho(filtrosAtivos, false)}
                 estilos={estilos}
                 tema={tema}
@@ -130,6 +136,7 @@ function DiaryScreen({
         conteudo = (
             <DiaryTimeline
                 registros={itens}
+                somenteLeitura={somenteLeitura}
                 aoAbrir={aoAbrirRegistro}
                 aoEditar={aoEditarRegistro}
                 aoExcluir={aoExcluirRegistro}

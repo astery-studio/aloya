@@ -30,24 +30,29 @@ function DiaryHistoryHeader({
     aoLimparFiltros,
     mostrarConteudo = true,
     mostrarDivisor = true,
+    somenteLeitura = false,
     estilos,
     tema
 }) {
     const cores = obterCoresDiario(tema).interface;
     return (
         <View style={estilos.cabecalhoLista}>
-            <View style={estilos.introducao}>
-                <Text style={estilos.descricao}>
-                    Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao longo do
-                    seu ciclo.
-                </Text>
-                {atualizando ? (
-                    <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
-                        <ActivityIndicator size="small" color={cores.destaque} />
-                        <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
-                    </View>
-                ) : null}
-            </View>
+            {!somenteLeitura || atualizando ? (
+                <View style={estilos.introducao}>
+                    {!somenteLeitura ? (
+                        <Text style={estilos.descricao}>
+                            Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao
+                            longo do seu ciclo.
+                        </Text>
+                    ) : null}
+                    {atualizando ? (
+                        <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
+                            <ActivityIndicator size="small" color={cores.destaque} />
+                            <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
+                        </View>
+                    ) : null}
+                </View>
+            ) : null}
             {mostrarConteudo && filtrosAtivos ? (
                 <DiaryActiveFilters
                     filtros={filtros}

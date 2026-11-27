@@ -52,6 +52,7 @@ function criarConsultasCompartilhadas(consultar) {
             }
         },
         diario: {
+            buscarResumo: ({ signal }) => consultar('/diario/resumo', { signal }),
             buscarCatalogo: ({ signal } = {}) => consultar('/diario/catalogo', { signal }),
             buscarDetalhe: (id, { signal }) => consultar(`/diario/${validarId(id)}`, { signal }),
             listarHistorico({ filtros, cursor, signal }) {

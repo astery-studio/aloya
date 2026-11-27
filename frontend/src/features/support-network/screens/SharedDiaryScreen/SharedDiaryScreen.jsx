@@ -1,17 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
-import { FunnelIcon } from '../../../../shared/components/icons/AppIcons';
-import { useTheme } from '../../../../shared/hooks/useTheme';
-import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
-import { DiaryActiveFilters } from '../../../diary/components/DiaryActiveFilters/DiaryActiveFilters';
 import { DiaryFiltersSheet } from '../../../diary/components/DiaryFiltersSheet/DiaryFiltersSheet';
-import { DiaryOverviewCard } from '../../../diary/components/DiaryOverviewCard/DiaryOverviewCard';
 import { DiaryRecordDetailsModal } from '../../../diary/components/DiaryRecordDetailsModal/DiaryRecordDetailsModal';
-import { DiaryTimeline } from '../../../diary/components/DiaryTimeline/DiaryTimeline';
+import { listarDestaques } from '../../../diary/config/diaryOverviewText';
 import { useDiaryHistory } from '../../../diary/hooks/useDiaryHistory';
-import { FILTROS_DIARIO_VAZIOS, possuiFiltrosDiario } from '../../../diary/utils/diaryFilters';
+import { DiaryScreen } from '../../../diary/screens/DiaryScreen';
+import { FILTROS_DIARIO_VAZIOS } from '../../../diary/utils/diaryFilters';
+import { obterApresentacaoFase } from '../../../diary/utils/diaryPhasePresentation';
 import { obterRegistrosAdjacentes } from '../../../diary/utils/diaryRecordNavigation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
 import { gruposPermissoes } from '../../constants/permissionOptions';
@@ -23,8 +19,7 @@ const ROTULOS_CATEGORIAS = Object.fromEntries(
     )
 );
 
-function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba, abasDisponiveis }) {
-    const tema = useTheme();
+function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba }) {
     const [filtros, setFiltros] = useState(FILTROS_DIARIO_VAZIOS);
     const [filtroAberto, setFiltroAberto] = useState(false);
     const [registroId, setRegistroId] = useState(null);
@@ -38,9 +33,14 @@ function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba, 
         [registroId, service]
     );
     const detalhe = useSharedContent(registroId ? buscarDetalhe : null);
+    const resumo = useSharedContent(service.buscarResumo);
     const adjacentes = obterRegistrosAdjacentes(historico.registros, registroId);
-    const filtrosAtivos = possuiFiltrosDiario(filtros);
-    const erro = historico.erro || historico.erroFiltro;
+    const permiteFase = permissoes.includes('geral.fase_atual');
+    const fase = permiteFase ? resumo.dados?.fase : null;
+    const destaques =
+        fase && resumo.dados?.informacoesSuficientes
+            ? listarDestaques(resumo.dados.destaques)
+            : null;
 
     function removerFiltro(id) {
         const [tipo, valor] = id.split(':');
@@ -56,60 +56,39 @@ function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba, 
     }
 
     return (
-        <MainLayout
-            titulo="Diário"
-            varianteHeader="redeApoio"
-            abaAtiva="diario"
-            abasDisponiveis={abasDisponiveis}
-            onSelecionarAba={onSelecionarAba}
-            acoesHeader={
-                <IconButton
-                    icone={FunnelIcon}
-                    variante="redeApoio"
-                    corIcone={tema.cores.interface.destaque}
-                    rotuloAcessibilidade="Filtrar histórico do Diário"
-                    aoPressionar={() => setFiltroAberto(true)}
-                />
-            }
-        >
-            {erro || historico.carregando ? (
-                <SharedContentState
-                    status={erro ? 'erro' : 'carregando'}
-                    aoTentarNovamente={historico.recarregar}
-                />
-            ) : historico.registros.length || filtrosAtivos ? (
-                <DiaryTimeline
-                    registros={historico.registros}
-                    somenteLeitura
-                    aoAbrir={({ id }) => setRegistroId(id)}
-                    temMais={historico.temMais}
-                    carregandoMais={historico.carregandoMais}
-                    erroCarregarMais={historico.erroCarregarMais}
-                    aoCarregarMais={historico.carregarMais}
-                    aoTentarCarregarMais={historico.tentarCarregarMais}
-                    contentContainerStyle={estilos.conteudo}
-                    ListHeaderComponent={
-                        filtrosAtivos ? (
-                            <DiaryActiveFilters
-                                filtros={filtros}
-                                rotulosCategorias={ROTULOS_CATEGORIAS}
-                                quantidadeResultados={historico.registros.length}
-                                aoLimpar={() => setFiltros(FILTROS_DIARIO_VAZIOS)}
-                                aoRemover={removerFiltro}
-                            />
-                        ) : (
-                            <DiaryOverviewCard
-                                nomeTitular={nomeTitular}
-                                diasRegistrados={historico.registros.length}
-                                contagemParcial={historico.temMais}
-                            />
-                        )
-                    }
-                    ListFooterComponent={historico.registros.length ? null : <SharedContentState />}
-                />
-            ) : (
-                <SharedContentState />
-            )}
+        <>
+            <DiaryScreen
+                somenteLeitura
+                resumo={{
+                    nomeTitular,
+                    fase,
+                    tituloFase: obterApresentacaoFase(fase)?.rotulo,
+                    exibirFase: permiteFase,
+                    descricao: destaques ? `${nomeTitular} costuma registrar ${destaques}.` : null,
+                    diasRegistrados:
+                        resumo.dados?.diasRegistrados ??
+                        new Set(historico.registros.map(({ data }) => data)).size,
+                    contagemParcial: !resumo.dados && historico.temMais,
+                    carregando: resumo.status === 'carregando'
+                }}
+                registros={historico.registros}
+                carregando={historico.carregando}
+                atualizando={historico.atualizando}
+                carregandoMais={historico.carregandoMais}
+                erro={historico.erro || historico.erroFiltro}
+                erroCarregarMais={historico.erroCarregarMais}
+                temMais={historico.temMais}
+                aoTentarNovamente={historico.recarregar}
+                aoCarregarMais={historico.carregarMais}
+                aoTentarCarregarMais={historico.tentarCarregarMais}
+                aoAbrirRegistro={({ id }) => setRegistroId(id)}
+                filtros={filtros}
+                rotulosCategoriasFiltro={ROTULOS_CATEGORIAS}
+                aoAbrirFiltros={() => setFiltroAberto(true)}
+                aoRemoverFiltro={removerFiltro}
+                aoLimparFiltros={() => setFiltros(FILTROS_DIARIO_VAZIOS)}
+                onSelecionarAba={onSelecionarAba}
+            />
             <DiaryFiltersSheet
                 visivel={filtroAberto}
                 filtros={filtros}
@@ -146,12 +125,11 @@ function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba, 
                     <SharedContentState status="erro" aoTentarNovamente={detalhe.recarregar} />
                 </View>
             ) : null}
-        </MainLayout>
+        </>
     );
 }
 
 const estilos = StyleSheet.create({
-    conteudo: { paddingHorizontal: 16 },
     falhaDetalhe: { minHeight: 140 }
 });
 
