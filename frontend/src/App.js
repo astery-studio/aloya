@@ -466,7 +466,7 @@ export default function App() {
         );
     }
 
-    function finalizarSessao(resultado = {}) {
+    function finalizarSessao(resultado = {}, telaDeRetorno = 'login') {
         requisicaoAtual.current += 1;
 
         controladorPerfilAtual.current?.abort();
@@ -484,7 +484,7 @@ export default function App() {
         setRascunhoNovoContato(null);
         setContatoEdicao(null);
 
-        setTelaPublica('login');
+        setTelaPublica(telaDeRetorno);
 
         setMensagemLogin(resultado?.mensagem || null);
 
@@ -963,7 +963,7 @@ export default function App() {
                 excluirConta={configuracao.servicos.accountService.excluirConta}
                 encerrarSessao={configuracao.servicos.authService.encerrarSessao}
                 onContaExcluida={finalizarSessao}
-                onSessaoEncerrada={finalizarSessao}
+                onSessaoEncerrada={() => finalizarSessao({}, 'boasVindas')}
             />
         );
     }
