@@ -177,6 +177,10 @@ function criarServicosApp({
         cycleHistoryService,
         diaryService,
         notificationPreferencesService: criarNotificationPreferencesService({ requisicaoAutenticada }),
+        supportNotificationPreferencesService: criarNotificationPreferencesService({
+            requisicaoAutenticada,
+            contato: true
+        }),
         pushDeviceService: criarPushDeviceService({ requisicaoAutenticada }),
         supportCategoryService,
         contactInvitationService,

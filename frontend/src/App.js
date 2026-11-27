@@ -32,6 +32,7 @@ import { ChangePasswordScreen } from './features/settings/screens/ChangePassword
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { NotificationPreferencesFlow } from './features/notifications/NotificationPreferencesFlow';
+import { criarPreviaPreferenciasContato } from './features/notifications/notificationContactPreviewService';
 import { useNativePush } from './features/notifications/useNativePush';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
@@ -62,6 +63,8 @@ const PrivacyTermsScreen = __DEV__
 const telasInternas = Object.freeze({
     configuracoes: 'configuracoes',
     notificacoes: 'notificacoes',
+    notificacoesContato: 'notificacoesContato',
+    previaNotificacoesContato: 'previaNotificacoesContato',
     membros: 'membros',
     novoContato: 'novoContato',
     editarContato: 'editarContato',
@@ -189,6 +192,14 @@ export default function App() {
     const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const previaPreferenciasContato = useMemo(
+        () =>
+            __DEV__ && telaInterna === telasInternas.previaNotificacoesContato
+                ? criarPreviaPreferenciasContato()
+                : null,
+        [telaInterna]
+    );
+
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -855,7 +866,18 @@ export default function App() {
                     consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
                 }
                 onSelecionarAba={selecionarAba}
-                onAbrirNotificacoes={() => setTelaInterna(telasInternas.notificacoes)}
+                onAbrirNotificacoes={() =>
+                    setTelaInterna(
+                        perfil?.papel === 'contato_apoio'
+                            ? telasInternas.notificacoesContato
+                            : telasInternas.notificacoes
+                    )
+                }
+                onAbrirNotificacoesContato={
+                    perfil?.papel === 'principal_e_contato_apoio'
+                        ? () => setTelaInterna(telasInternas.notificacoesContato)
+                        : undefined
+                }
                 onAbrirParametrosCiclo={() => abrirParametrosCiclo(telasInternas.configuracoes)}
                 onAbrirPerfil={() => {
                     setTelaInterna(telasInternas.perfil);
@@ -871,11 +893,33 @@ export default function App() {
                 }}
             />
         );
-    } else if (telaInterna === telasInternas.notificacoes) {
+    } else if (__DEV__ && previaPreferenciasContato) {
         conteudo = (
             <NotificationPreferencesFlow
-                service={configuracao.servicos.notificationPreferencesService}
+                key={telasInternas.previaNotificacoesContato}
+                contato
+                previaContato
+                service={previaPreferenciasContato}
+                onVoltar={() => setTelaInterna(telasInternas.notificacoes)}
+            />
+        );
+    } else if ([telasInternas.notificacoes, telasInternas.notificacoesContato].includes(telaInterna)) {
+        const contato =
+            telaInterna === telasInternas.notificacoesContato || perfil?.papel === 'contato_apoio';
+
+        conteudo = (
+            <NotificationPreferencesFlow
+                key={telaInterna}
+                contato={contato}
+                service={
+                    contato
+                        ? configuracao.servicos.supportNotificationPreferencesService
+                        : configuracao.servicos.notificationPreferencesService
+                }
                 onVoltar={() => setTelaInterna(telasInternas.configuracoes)}
+                onAbrirTesteContato={
+                    __DEV__ ? () => setTelaInterna(telasInternas.previaNotificacoesContato) : undefined
+                }
                 onSessaoExpirada={finalizarSessao}
             />
         );
