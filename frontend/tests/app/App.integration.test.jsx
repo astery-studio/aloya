@@ -34,6 +34,12 @@ jest.mock('../../src/features/support-network/screens/SharedSupportFlow/SharedSu
                 <Pressable accessibilityRole="button" onPress={() => onSelecionarAba('membros')}>
                     <Text>Contatos acompanhados</Text>
                 </Pressable>
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => onSelecionarAba('configuracoes')}
+                >
+                    <Text>Abrir configurações</Text>
+                </Pressable>
             </View>
         )
     };
@@ -598,18 +604,6 @@ jest.mock('../../src/features/settings/screens/ProfileSettingsScreen', () => {
     };
 });
 
-jest.mock('../../src/features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen', () => {
-    const React = require('react');
-    const { Pressable, Text } = require('react-native');
-    return {
-        ReceivedContactsScreen: ({ onSelecionarAba }) => React.createElement(
-            Pressable,
-            { accessibilityRole: 'button', onPress: () => onSelecionarAba('configuracoes') },
-            React.createElement(Text, null, 'Abrir configurações')
-        )
-    };
-});
-
 import App from '../../src/App';
 import { criarServicosApp } from '../../src/app/createAppServices';
 import { NewSupportCategoryScreen } from '../../src/features/support-network/screens/NewSupportCategoryScreen';
@@ -683,6 +677,7 @@ describe('App integrado', () => {
     test('abre Notificações pela ação de Configurações e volta ao menu', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
         await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
         expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
         await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
@@ -696,8 +691,7 @@ describe('App integrado', () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         servicos.accountService.buscarPerfil.mockResolvedValue({ id: 1, papel });
         await render(<App />);
-        if (papel === 'contato_apoio')
-            await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
         await fireEvent.press(await screen.findByRole('button', { name: entrada }));
         expect(screen.queryByRole('button', { name: 'Ciclo e Previsões' })).toBeNull();
         expect(screen.getByRole('button', { name: 'Rede de Apoio' })).toBeOnTheScreen();
@@ -707,6 +701,7 @@ describe('App integrado', () => {
     test('mantém o teste de notificações e retira o atalho de prévia da Rede de Apoio', async () => {
         obterToken.mockResolvedValue({ token: 'token-valido' });
         await render(<App />);
+        await fireEvent.press(await screen.findByRole('button', { name: 'Abrir configurações' }));
         await fireEvent.press(await screen.findByRole('button', { name: 'Notificações' }));
         expect(screen.queryByRole('button', { name: 'Teste da tela da Rede de Apoio' })).toBeNull();
         await fireEvent.press(screen.getByRole('button', { name: 'Teste de notificações' }));
