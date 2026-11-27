@@ -477,7 +477,17 @@ function ContactCard({
                 </View>
             ) : estado === 'ativo' ? (
                 <View style={estilos.containerTagAtivo}>
-                    <ContactPermissionBadge vinculo={vinculo} />
+                    <ContactPermissionBadge
+                        vinculo={vinculo}
+                        aoPressionar={
+                            perspectivaSegura === 'recebido' &&
+                            vinculo.tipo === 'individual' &&
+                            typeof aoAbrirResumo === 'function'
+                                ? abrirResumo
+                                : undefined
+                        }
+                        desabilitado={bloqueado}
+                    />
                 </View>
             ) : contatoEnviadoInativo ? (
                 <View style={estilos.containerTituloInativo}>

@@ -26,12 +26,14 @@ test('mantém o espaçamento inicial dentro da lista e dos estados', () => {
 test('separa o contato em visualização e permite trocar apenas para outro vínculo ativo', async () => {
     const segundoAtivo = { ...contatos[0], id: 12, identificacao: 'Maria' };
     const aoVisualizar = jest.fn();
+    const aoAbrirResumo = jest.fn();
 
     await render(
         <ContactList
             contatos={[...contatos.slice(0, 2), segundoAtivo]}
             perspectiva="recebido"
             aoVisualizar={aoVisualizar}
+            aoAbrirResumo={aoAbrirResumo}
             vinculoVisualizadoId={contatos[0].id}
         />
     );
@@ -39,6 +41,8 @@ test('separa o contato em visualização e permite trocar apenas para outro vín
     expect(screen.getByText('CONTATO EM VISUALIZAÇÃO')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Visualizar dados de Beatriz' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Visualizar dados de Carlos' })).toBeNull();
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Permissões Individuais' })[0]);
+    expect(aoAbrirResumo).toHaveBeenCalledWith(contatos[0]);
     await fireEvent.press(screen.getByRole('button', { name: 'Visualizar dados de Maria' }));
     expect(aoVisualizar).toHaveBeenCalledWith(segundoAtivo);
 });
