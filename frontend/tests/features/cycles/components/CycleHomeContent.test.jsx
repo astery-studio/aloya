@@ -64,10 +64,9 @@ test.each([
     expect(screen.getByText(conteudoPorFase[fase].descricao)).toBeOnTheScreen();
     expect(screen.getByText(sintoma)).toBeOnTheScreen();
     expect(sintomasComuns.props.accessibilityState.expanded).toBe(true);
-    expect(screen.getByText('Observe como seu corpo está se sentindo hoje.')).toBeOnTheScreen();
-    expect(
-        screen.getByText('Continue registrando suas percepções ao longo do ciclo.')
-    ).toBeOnTheScreen();
+    for (const dica of conteudoPorFase[fase].dicas) {
+        expect(screen.getByText(dica)).toBeOnTheScreen();
+    }
 });
 
 test('executa as três ações do painel com previsão', async () => {

@@ -22,7 +22,9 @@ export async function planejarConta(
         autoriza,
         fusoAlternativo
     );
+
     if (!contexto) return [];
+
     const { hoje, amanha, porDia, resultado } = contexto;
     const politicasClinicas = lerPoliticaDeAlertas();
     const recuo = Math.max(
@@ -31,6 +33,7 @@ export async function planejarConta(
             Math.ceil(politica.at(-1).atraso / 1440)
         )
     );
+
     const [previsao, registrosDiario, metodos] = await Promise.all([
         criarPredictionService({ prisma, agora: () => new Date(`${hoje}T12:00:00Z`) }).buscar(
             usuarioId
@@ -51,7 +54,8 @@ export async function planejarConta(
             }
         })
     ]);
-    planejarCiclo({ previsao, registrosDiario, hoje, amanha, preferencia, porDia, autoriza });
+
+    planejarCiclo({ previsao, registrosDiario, hoje, amanha, preferencia, porDia });
     for (const metodo of metodos) {
         planejarAnticoncepcional(metodo, {
             ...contexto,
@@ -63,5 +67,6 @@ export async function planejarConta(
             politicasClinicas
         });
     }
+
     return resultado;
 }
