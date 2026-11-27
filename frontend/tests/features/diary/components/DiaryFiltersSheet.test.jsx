@@ -137,6 +137,54 @@ test('filtra somente categorias ativas e aplica período, fase e categoria', asy
     fecharTeclado.mockRestore();
 }, 30000);
 
+test('omite fases e categorias sem acesso e remove seleções antigas ao aplicar', async () => {
+    const onAplicar = jest.fn();
+    const service = {
+        buscarCatalogo: jest.fn().mockResolvedValue({
+            macrocategorias: [
+                {
+                    id: 'ciclo_sangramento',
+                    nome: 'Ciclo e Sangramento',
+                    categorias: [
+                        { id: 'fluxo_menstrual', nome: 'Fluxo menstrual' },
+                        { id: 'secrecao', nome: 'Secreção' }
+                    ]
+                }
+            ]
+        })
+    };
+    await render(
+        <DiaryFiltersSheet
+            visivel
+            filtros={{ categorias: ['fluxo_menstrual', 'secrecao'], fases: ['folicular'] }}
+            service={service}
+            categoriasPermitidas={['fluxo_menstrual']}
+            exibirFiltroFases={false}
+            onAplicar={onAplicar}
+        />
+    );
+
+    await fireEvent.press(
+        await screen.findByRole('button', { name: 'Expandir Ciclo e Sangramento' })
+    );
+    expect(screen.queryByText('Filtro por Fases')).not.toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Filtrar por Fluxo menstrual' })).toBeChecked();
+    expect(screen.queryByText('Secreção')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
+    expect(onAplicar).toHaveBeenCalledWith(
+        { dataInicio: null, dataFim: null, categorias: ['fluxo_menstrual'], fases: [] },
+        expect.objectContaining({
+            macrocategorias: [
+                expect.objectContaining({
+                    categorias: [
+                        { id: 'fluxo_menstrual', nome: 'Fluxo menstrual', ativaEfetiva: true }
+                    ]
+                })
+            ]
+        })
+    );
+});
+
 test('permanece desmontado quando não está visível', async () => {
     const service = { buscarCatalogo: jest.fn().mockResolvedValue(catalogo) };
     await render(<DiaryFiltersSheet visivel={false} filtros={{}} service={service} />);

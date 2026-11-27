@@ -47,6 +47,8 @@ function DiaryFiltersSheet({
     visivel,
     filtros,
     service,
+    categoriasPermitidas,
+    exibirFiltroFases = true,
     aplicando = false,
     onAplicar,
     onFechar,
@@ -61,9 +63,9 @@ function DiaryFiltersSheet({
     const [expandidas, setExpandidas] = useState({});
     const [erroPeriodo, setErroPeriodo] = useState(null);
     const posicaoRolagem = useRef(0);
-    const possuiFiltrosAplicados = possuiFiltrosDiario(filtros);
-    const possuiPreenchimento = edicaoPossuiPreenchimento(edicao);
-    const aplicarDesativado = aplicando || !catalogo.catalogo || !possuiPreenchimento;
+    const compartilhado = categoriasPermitidas !== undefined;
+    const catalogoDisponivel =
+        compartilhado && (catalogo.carregando || catalogo.erro) ? null : catalogo.catalogo;
 
     useEffect(() => {
         if (!visivel) return;
@@ -75,14 +77,48 @@ function DiaryFiltersSheet({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chaveFiltros, visivel]);
 
-    const macrosAtivas = useMemo(
-        () =>
-            (catalogo.catalogo?.macrocategorias ?? []).filter(
+    const macrosAtivas = useMemo(() => {
+        const macros = catalogoDisponivel?.macrocategorias ?? [];
+        if (!compartilhado) {
+            return macros.filter(
                 (macro) =>
                     macro.ativa && macro.categorias.some((categoria) => categoria.ativaEfetiva)
-            ),
-        [catalogo.catalogo]
+            );
+        }
+
+        const permitidas = new Set(Array.isArray(categoriasPermitidas) ? categoriasPermitidas : []);
+        return macros
+            .filter((macro) => macro.ativa !== false)
+            .map((macro) => ({
+                id: macro.id,
+                nome: macro.nome,
+                ativa: true,
+                categorias: macro.categorias
+                    .filter(
+                        (categoria) =>
+                            permitidas.has(categoria.id) && categoria.ativaEfetiva !== false
+                    )
+                    .map(({ id, nome }) => ({ id, nome, ativaEfetiva: true }))
+            }))
+            .filter(({ categorias }) => categorias.length > 0);
+    }, [catalogoDisponivel, categoriasPermitidas, compartilhado]);
+    const categoriasVisiveis = new Set(
+        macrosAtivas.flatMap(({ categorias }) => categorias.map(({ id }) => id))
     );
+    const edicaoVisivel = {
+        ...edicao,
+        categorias: compartilhado
+            ? edicao.categorias.filter((id) => categoriasVisiveis.has(id))
+            : edicao.categorias,
+        fases: exibirFiltroFases ? edicao.fases : []
+    };
+    const catalogoAplicavel =
+        compartilhado && catalogoDisponivel
+            ? { macrocategorias: macrosAtivas }
+            : catalogoDisponivel;
+    const possuiFiltrosAplicados = possuiFiltrosDiario(filtros);
+    const possuiPreenchimento = edicaoPossuiPreenchimento(edicaoVisivel);
+    const aplicarDesativado = aplicando || !catalogoAplicavel || !possuiPreenchimento;
 
     const atualizarPosicaoRolagem = useCallback((evento) => {
         posicaoRolagem.current = Math.max(0, evento.nativeEvent.contentOffset.y);
@@ -93,16 +129,17 @@ function DiaryFiltersSheet({
         setEdicao(criarEdicao());
         setErroPeriodo(null);
         if (possuiFiltrosAplicados) {
-            onAplicar?.(FILTROS_DIARIO_VAZIOS, catalogo.catalogo);
+            onAplicar?.(FILTROS_DIARIO_VAZIOS, catalogoAplicavel);
         }
     }
 
     function aplicar() {
+        if (aplicarDesativado) return;
         Keyboard.dismiss();
-        const erro = validarPeriodoDiario(edicao);
+        const erro = validarPeriodoDiario(edicaoVisivel);
         setErroPeriodo(erro);
         if (erro) return;
-        onAplicar?.(criarFiltrosDaEdicao(edicao), catalogo.catalogo);
+        onAplicar?.(criarFiltrosDaEdicao(edicaoVisivel), catalogoAplicavel);
     }
 
     return (
@@ -127,12 +164,12 @@ function DiaryFiltersSheet({
                 estiloTitulo={{ color: coresDiario.interface.textoPrincipal }}
             >
                 <View style={estilos.areaConteudo}>
-                    {catalogo.carregando && !catalogo.catalogo ? (
+                    {catalogo.carregando && !catalogoDisponivel ? (
                         <View accessibilityLiveRegion="polite" style={estilos.estadoCentral}>
                             <ActivityIndicator color={coresDiario.interface.destaque} />
                             <Text style={estilos.textoEstado}>Carregando filtros do Diário...</Text>
                         </View>
-                    ) : catalogo.catalogo ? (
+                    ) : catalogoDisponivel ? (
                         <ScrollView
                             testID="rolagem-filtros-diario"
                             style={estilos.rolagem}
@@ -188,80 +225,87 @@ function DiaryFiltersSheet({
                                 ) : null}
                             </DiaryFilterSection>
 
-                            <DiaryFilterSection
-                                titulo="Filtro por Fases"
-                                descricao="Selecione as fases do ciclo que você deseja filtrar."
-                                estilos={estilos}
-                            >
-                                <View style={estilos.listaOpcoes}>
-                                    {FASES_FILTRO.map((fase) => (
-                                        <DiaryPhaseFilterOption
-                                            key={fase}
-                                            fase={fase}
-                                            ativo={edicao.fases.includes(fase)}
-                                            aoAlterar={() =>
-                                                setEdicao((atual) => ({
-                                                    ...atual,
-                                                    fases: alternarValorFiltro(atual.fases, fase)
-                                                }))
-                                            }
-                                            estilos={estilos}
-                                        />
-                                    ))}
-                                </View>
-                            </DiaryFilterSection>
-
-                            <DiaryFilterSection
-                                titulo="Filtro por Categoria"
-                                descricao="Selecione as categorias que você deseja filtrar."
-                                estilos={estilos}
-                            >
-                                <View style={estilos.listaOpcoes}>
-                                    {macrosAtivas.map((macro) => (
-                                        <DiaryCategoryFilterGroup
-                                            key={macro.id}
-                                            macro={macro}
-                                            selecionadas={edicao.categorias}
-                                            expandida={Boolean(expandidas[macro.id])}
-                                            aoExpandir={() =>
-                                                setExpandidas((atuais) => ({
-                                                    ...atuais,
-                                                    [macro.id]: !atuais[macro.id]
-                                                }))
-                                            }
-                                            aoAlternar={(categoria) =>
-                                                setEdicao((atual) => ({
-                                                    ...atual,
-                                                    categorias: alternarValorFiltro(
-                                                        atual.categorias,
-                                                        categoria
-                                                    )
-                                                }))
-                                            }
-                                            aoAlternarTodas={(categorias, ativa) =>
-                                                setEdicao((atual) => {
-                                                    const ids = categorias.map(({ id }) => id);
-                                                    return {
+                            {exibirFiltroFases ? (
+                                <DiaryFilterSection
+                                    titulo="Filtro por Fases"
+                                    descricao="Selecione as fases do ciclo que você deseja filtrar."
+                                    estilos={estilos}
+                                >
+                                    <View style={estilos.listaOpcoes}>
+                                        {FASES_FILTRO.map((fase) => (
+                                            <DiaryPhaseFilterOption
+                                                key={fase}
+                                                fase={fase}
+                                                ativo={edicao.fases.includes(fase)}
+                                                aoAlterar={() =>
+                                                    setEdicao((atual) => ({
                                                         ...atual,
-                                                        categorias: ativa
-                                                            ? [
-                                                                  ...new Set([
-                                                                      ...atual.categorias,
-                                                                      ...ids
-                                                                  ])
-                                                              ].sort()
-                                                            : atual.categorias.filter(
-                                                                  (categoria) =>
-                                                                      !ids.includes(categoria)
-                                                              )
-                                                    };
-                                                })
-                                            }
-                                            estilos={estilos}
-                                        />
-                                    ))}
-                                </View>
-                            </DiaryFilterSection>
+                                                        fases: alternarValorFiltro(
+                                                            atual.fases,
+                                                            fase
+                                                        )
+                                                    }))
+                                                }
+                                                estilos={estilos}
+                                            />
+                                        ))}
+                                    </View>
+                                </DiaryFilterSection>
+                            ) : null}
+
+                            {!compartilhado || macrosAtivas.length ? (
+                                <DiaryFilterSection
+                                    titulo="Filtro por Categoria"
+                                    descricao="Selecione as categorias que você deseja filtrar."
+                                    estilos={estilos}
+                                >
+                                    <View style={estilos.listaOpcoes}>
+                                        {macrosAtivas.map((macro) => (
+                                            <DiaryCategoryFilterGroup
+                                                key={macro.id}
+                                                macro={macro}
+                                                selecionadas={edicaoVisivel.categorias}
+                                                expandida={Boolean(expandidas[macro.id])}
+                                                aoExpandir={() =>
+                                                    setExpandidas((atuais) => ({
+                                                        ...atuais,
+                                                        [macro.id]: !atuais[macro.id]
+                                                    }))
+                                                }
+                                                aoAlternar={(categoria) =>
+                                                    setEdicao((atual) => ({
+                                                        ...atual,
+                                                        categorias: alternarValorFiltro(
+                                                            atual.categorias,
+                                                            categoria
+                                                        )
+                                                    }))
+                                                }
+                                                aoAlternarTodas={(categorias, ativa) =>
+                                                    setEdicao((atual) => {
+                                                        const ids = categorias.map(({ id }) => id);
+                                                        return {
+                                                            ...atual,
+                                                            categorias: ativa
+                                                                ? [
+                                                                      ...new Set([
+                                                                          ...atual.categorias,
+                                                                          ...ids
+                                                                      ])
+                                                                  ].sort()
+                                                                : atual.categorias.filter(
+                                                                      (categoria) =>
+                                                                          !ids.includes(categoria)
+                                                                  )
+                                                        };
+                                                    })
+                                                }
+                                                estilos={estilos}
+                                            />
+                                        ))}
+                                    </View>
+                                </DiaryFilterSection>
+                            ) : null}
                         </ScrollView>
                     ) : null}
                 </View>
@@ -272,7 +316,7 @@ function DiaryFiltersSheet({
                             texto="Limpar"
                             variante="branco"
                             aoPressionar={limpar}
-                            desativado={aplicando || !catalogo.catalogo}
+                            desativado={aplicando || !catalogoAplicavel}
                             estilo={estilos.botaoLimpar}
                             estiloTexto={estilos.textoLimpar}
                         />
