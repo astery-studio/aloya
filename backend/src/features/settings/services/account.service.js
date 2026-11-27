@@ -3,6 +3,7 @@ function criarAccountService({
     passwordService,
     parentalConsentService,
     dateUtils,
+    publicarSeguranca,
     now = () => new Date()
 }) {
     const selectConfiguracoes = {
@@ -193,6 +194,8 @@ function criarAccountService({
                                 emailConvidado: alteracoes.email
                             }
                         });
+                        await publicarSeguranca?.(tx, usuarioId, 'email.alterado',
+                            usuario.atualizadoEm.toISOString(), momentoAtual);
                     }
 
                     if (passouASerMenorDe16) {
@@ -332,6 +335,7 @@ function criarAccountService({
                     }
                 });
 
+                await publicarSeguranca?.(tx, usuarioId, 'senha.alterada', momentoAtual.toISOString(), momentoAtual);
                 return sessoes.count;
             }
         );

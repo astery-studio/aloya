@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import { env } from './env.js';
 import { prisma } from './prisma.js';
 import { criarNotificationPreferencesService } from '../../features/notifications/notificationPreferences.service.js';
+import { publicarSeguranca } from '../../features/notifications/securityPushEvents.js';
 import { criarCycleRegistrationModule } from '../../features/cycles/cycleRegistration.module.js';
 
 import * as dateUtils from '../utils/date.utils.js';
@@ -201,7 +202,8 @@ function criarContainer() {
         tokenService,
         passwordService,
         emailService,
-        baseUrl: env.passwordResetBaseUrl
+        baseUrl: env.passwordResetBaseUrl,
+        publicarSeguranca
     });
 
     const passwordRecoveryValidator = criarPasswordRecoveryValidator();
@@ -223,7 +225,8 @@ function criarContainer() {
         prisma,
         passwordService,
         parentalConsentService,
-        dateUtils
+        dateUtils,
+        publicarSeguranca
     });
 
     const accountDeletionService = criarAccountDeletionService({
