@@ -65,7 +65,6 @@ function DiaryScreen({
                     aoPressionar={aoAbrirFiltros}
                     rotuloAcessibilidade="Filtrar histórico do Diário"
                     variante="redeApoio"
-                    corIcone={tema.cores.interface.destaque}
                 />
             ) : null}
             {typeof aoGerenciarCategorias === 'function' ? (
@@ -74,7 +73,7 @@ function DiaryScreen({
                     aoPressionar={aoGerenciarCategorias}
                     rotuloAcessibilidade="Gerenciar categorias do Diário"
                     variante="redeApoio"
-                    corIcone={tema.cores.marca.primaria}
+                    corIcone={tema.escuro ? coresDiario.primaria : tema.cores.marca.primaria}
                 />
             ) : null}
         </>
@@ -159,6 +158,7 @@ function DiaryScreen({
             abaAtiva="diario"
             onSelecionarAba={onSelecionarAba}
             acoesHeader={acoesHeader}
+            corFundo={tema.escuro ? coresDiario.interface.fundo : undefined}
             corFundoNavegacao={coresDiario.interface.superficie}
         >
             <View testID="diary-main-container" style={estilos.tela}>

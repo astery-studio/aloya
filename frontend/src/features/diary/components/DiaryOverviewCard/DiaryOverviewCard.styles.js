@@ -11,7 +11,7 @@ function criarEstilos(tema) {
         cartao: {
             overflow: 'hidden',
             borderWidth: 1,
-            borderColor: cores.borda,
+            borderColor: tema.escuro ? cores.separador : cores.borda,
             borderRadius: tema.radius.grande,
             backgroundColor: cores.superficie
         },

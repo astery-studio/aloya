@@ -1,3 +1,5 @@
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
+
 const criarPaletaMacro = (icone, fundoIcone, fundoCategoria, fundoOpcao) =>
     Object.freeze({
         icone,
@@ -10,16 +12,16 @@ const criarPaletaMacro = (icone, fundoIcone, fundoCategoria, fundoOpcao) =>
     });
 
 const interfaceEscuraDiario = Object.freeze({
-    fundo: '#121212',
-    superficie: '#1E1E1E',
+    fundo: coresNoturnasConteudo.fundo,
+    superficie: coresNoturnasConteudo.superficie,
     superficieElevada: '#242424',
     textoPrincipal: '#E3E3E3',
-    textoSecundario: '#999999',
+    textoSecundario: coresNoturnasConteudo.textoSecundario,
     textoDesabilitado: 'rgba(255, 255, 255, 0.38)',
     borda: '#2F2F2F',
-    separador: 'rgba(255, 255, 255, 0.08)',
+    separador: coresNoturnasConteudo.borda,
     switchInativo: '#424242',
-    destaque: '#A5D6A7',
+    destaque: coresNoturnasConteudo.verde,
     destaqueSuave: 'rgba(165, 214, 167, 0.10)',
     textoSobreDestaque: '#121212'
 });
@@ -74,8 +76,8 @@ function obterCoresDiario(tema) {
     }
     return {
         interface: interfaceEscuraDiario,
-        primaria: '#C26E5F',
-        textoSobrePrimaria: '#121212',
+        primaria: coresNoturnasConteudo.coral,
+        textoSobrePrimaria: coresNoturnasConteudo.fundo,
         macrocategorias: macrocategoriasEscuras
     };
 }

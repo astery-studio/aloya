@@ -106,6 +106,27 @@ describe('DiaryOverviewCard', () => {
         }
     );
 
+    test('usa a paleta noturna da fase sem alterar a opacidade do contador', async () => {
+        await render(
+            <DiaryOverviewCard
+                fase="menstrual"
+                tituloFase="Fase Menstrual"
+                descricao="Descrição da fase."
+                diasRegistrados={2}
+            />,
+            { preferencia: 'escuro' }
+        );
+
+        expect(screen.getByTestId('diary-overview-card')).toHaveStyle({
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            backgroundColor: '#1E1E1E'
+        });
+        expect(screen.getByTestId('diary-overview-title')).toHaveStyle({ color: '#C26E5F' });
+        expect(screen.getByText('2 dias registrados')).toHaveStyle({
+            color: 'rgba(194, 110, 95, 0.80)'
+        });
+    });
+
     test('identifica a pessoa acompanhada e remove a fase quando a autorização muda', async () => {
         const resumo = {
             nomeTitular: 'Júlia',
