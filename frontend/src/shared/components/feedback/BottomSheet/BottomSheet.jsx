@@ -8,6 +8,7 @@ import {
     Modal,
     PanResponder,
     Platform,
+    Pressable,
     View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,6 +28,7 @@ function BottomSheet({
     corPainel,
     corAlca,
     estiloPainel,
+    fecharAoTocarFora = false,
     permitirDeslizarParaFechar = false,
     exibirAlcaArraste = true,
     podeIniciarDeslize = permitirInicioDeslize,
@@ -195,16 +197,21 @@ function BottomSheet({
                 style={estilos.tela}
                 behavior={ajustarAoTeclado && Platform.OS === 'ios' ? 'padding' : undefined}
             >
-                <Animated.View
-                    testID="bottom-sheet-fundo"
-                    pointerEvents="none"
-                    style={[
-                        estilos.fundo,
-                        {
-                            opacity: progresso
-                        }
-                    ]}
-                />
+                <Pressable
+                    testID="bottom-sheet-area-fundo"
+                    accessibilityRole={fecharAoTocarFora ? 'button' : undefined}
+                    accessibilityLabel={fecharAoTocarFora ? 'Fechar painel' : undefined}
+                    disabled={!fecharAoTocarFora || bloquearFechamento}
+                    onPress={solicitarFechamento}
+                    pointerEvents={fecharAoTocarFora ? 'auto' : 'none'}
+                    style={estilos.areaFundo}
+                >
+                    <Animated.View
+                        testID="bottom-sheet-fundo"
+                        pointerEvents="none"
+                        style={[estilos.fundo, { opacity: progresso }]}
+                    />
+                </Pressable>
 
                 <Animated.View
                     testID="bottom-sheet-painel"

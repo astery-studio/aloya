@@ -1,5 +1,5 @@
 import { Animated, Text } from 'react-native';
-import { act, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '../../../../src/shared/components/feedback/BottomSheet/BottomSheet';
@@ -83,6 +83,32 @@ describe('BottomSheet', () => {
         });
 
         expect(onFechar).toHaveBeenCalledTimes(1);
+    });
+
+    test('permite fechar pelo fundo quando essa interação está habilitada', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarBottomSheet({ onFechar, fecharAoTocarFora: true });
+
+        const fundo = screen.getByRole('button', { name: 'Fechar painel' });
+        await fireEvent.press(fundo);
+
+        expect(onFechar).toHaveBeenCalledTimes(1);
+    });
+
+    test('não fecha pelo fundo durante uma operação bloqueada', async () => {
+        const onFechar = jest.fn();
+
+        await renderizarBottomSheet({
+            onFechar,
+            fecharAoTocarFora: true,
+            bloquearFechamento: true
+        });
+
+        expect(screen.getByTestId('bottom-sheet-area-fundo')).toBeDisabled();
+        await fireEvent.press(screen.getByTestId('bottom-sheet-area-fundo'));
+
+        expect(onFechar).not.toHaveBeenCalled();
     });
 
     test('não fecha quando está bloqueado', async () => {

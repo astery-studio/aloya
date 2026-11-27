@@ -22,6 +22,7 @@ function DiaryReflectionSheet({
             visivel={visivel}
             onFechar={aoFechar}
             bloquearFechamento={salvando}
+            fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
             corPainel="#FFFFFF"
