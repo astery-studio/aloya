@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { DiaryFiltersSheet } from '../../../diary/components/DiaryFiltersSheet/DiaryFiltersSheet';
 import { DiaryRecordDetailsModal } from '../../../diary/components/DiaryRecordDetailsModal/DiaryRecordDetailsModal';
-import { listarDestaques } from '../../../diary/config/diaryOverviewText';
+import { criarDescricaoResumo } from '../../../diary/config/diaryOverviewText';
 import { useDiaryHistory } from '../../../diary/hooks/useDiaryHistory';
 import { DiaryScreen } from '../../../diary/screens/DiaryScreen';
 import { FILTROS_DIARIO_VAZIOS } from '../../../diary/utils/diaryFilters';
@@ -37,10 +37,6 @@ function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba }
     const adjacentes = obterRegistrosAdjacentes(historico.registros, registroId);
     const permiteFase = permissoes.includes('geral.fase_atual');
     const fase = permiteFase ? resumo.dados?.fase : null;
-    const destaques =
-        fase && resumo.dados?.informacoesSuficientes
-            ? listarDestaques(resumo.dados.destaques)
-            : null;
 
     function removerFiltro(id) {
         const [tipo, valor] = id.split(':');
@@ -64,7 +60,9 @@ function SharedDiaryScreen({ nomeTitular, permissoes, service, onSelecionarAba }
                     fase,
                     tituloFase: obterApresentacaoFase(fase)?.rotulo,
                     exibirFase: permiteFase,
-                    descricao: destaques ? `${nomeTitular} costuma registrar ${destaques}.` : null,
+                    descricao: fase
+                        ? criarDescricaoResumo({ fase, resumo: resumo.dados, nomeTitular })
+                        : null,
                     diasRegistrados:
                         resumo.dados?.diasRegistrados ??
                         new Set(historico.registros.map(({ data }) => data)).size,
