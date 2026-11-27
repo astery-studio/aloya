@@ -51,13 +51,27 @@ function DiaryOverviewCard({
     descricao,
     diasRegistrados,
     contagemParcial = false,
-    carregando = false
+    carregando = false,
+    nomeTitular,
+    exibirFase = !nomeTitular
 }) {
     const tema = useTheme();
     const coresDiario = obterCoresDiario(tema);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const apresentacao = obterApresentacaoFase(fase, tema);
     const apresentacaoResumo = obterApresentacaoResumoFase(fase);
+    const nome = typeof nomeTitular === 'string' ? nomeTitular.trim() : '';
+    const cabecalho = nome
+        ? `RESUMO DO DIÁRIO DE ${nome.toLocaleUpperCase('pt-BR')}`
+        : 'RESUMO DO DIÁRIO';
+    const faseVisivel = Boolean(
+        exibirFase &&
+        apresentacao &&
+        apresentacaoResumo &&
+        typeof tituloFase === 'string' &&
+        tituloFase.trim()
+    );
+    const descricaoValida = typeof descricao === 'string' ? descricao.trim() : '';
 
     if (carregando) {
         return (
@@ -66,7 +80,7 @@ function DiaryOverviewCard({
                 accessibilityLiveRegion="polite"
                 style={estilos.cartao}
             >
-                <Text style={estilos.cabecalho}>RESUMO DO DIÁRIO</Text>
+                <Text style={estilos.cabecalho}>{cabecalho}</Text>
                 <View style={estilos.carregando}>
                     <ActivityIndicator color={coresDiario.interface.destaque} />
                     <Text style={estilos.textoCarregando}>Carregando resumo do Diário...</Text>
@@ -76,12 +90,7 @@ function DiaryOverviewCard({
     }
 
     if (
-        !apresentacao ||
-        !apresentacaoResumo ||
-        typeof tituloFase !== 'string' ||
-        !tituloFase.trim() ||
-        typeof descricao !== 'string' ||
-        !descricao.trim() ||
+        (!nome && (!faseVisivel || !descricaoValida)) ||
         !Number.isSafeInteger(diasRegistrados) ||
         diasRegistrados < 0
     ) {
@@ -91,52 +100,73 @@ function DiaryOverviewCard({
     const textoDias = `${diasRegistrados}${contagemParcial ? '+' : ''} ${
         diasRegistrados === 1 && !contagemParcial ? 'dia registrado' : 'dias registrados'
     }`;
-    const descricaoAcessivel = descricao.trim().replace(/[.!?]+$/u, '');
+    const descricaoAcessivel = faseVisivel ? descricaoValida.replace(/[.!?]+$/u, '') : '';
+    const inicioFrase = nome ? `${nome} está na` : 'Você está na';
+    const partesAcessiveis = [
+        nome && `Resumo do Diário de ${nome}`,
+        faseVisivel && (nome ? `${inicioFrase} ${tituloFase.trim()}` : tituloFase.trim()),
+        descricaoAcessivel,
+        textoDias
+    ].filter(Boolean);
 
     return (
         <View
             testID="diary-overview-card"
             accessible
-            accessibilityLabel={`${tituloFase.trim()}. ${descricaoAcessivel}. ${textoDias}.`}
+            accessibilityLabel={`${partesAcessiveis.join('. ')}.`}
             style={estilos.cartao}
         >
             <Text testID="diary-overview-header" style={estilos.cabecalho}>
-                RESUMO DO DIÁRIO
+                {cabecalho}
             </Text>
-            <View testID="diary-overview-content" style={estilos.conteudo}>
-                <View
-                    testID="diary-overview-icon"
-                    style={estilos.areaIcone}
-                    importantForAccessibility="no-hide-descendants"
-                >
-                    <DiaryPhaseIcon fase={fase} size={48} cor={apresentacaoResumo.corIcone} />
-                </View>
-                <View style={estilos.textos}>
-                    <Text
-                        testID="diary-overview-title"
-                        style={[estilos.titulo, { color: apresentacaoResumo.corTexto }]}
+            {faseVisivel ? (
+                <View testID="diary-overview-content" style={estilos.conteudo}>
+                    <View
+                        testID="diary-overview-icon"
+                        style={estilos.areaIcone}
+                        importantForAccessibility="no-hide-descendants"
                     >
-                        Você está na{' '}
+                        <DiaryPhaseIcon fase={fase} size={48} cor={apresentacaoResumo.corIcone} />
+                    </View>
+                    <View style={estilos.textos}>
                         <Text
-                            testID="diary-overview-phase"
-                            style={[estilos.fase, { color: apresentacaoResumo.corTexto }]}
+                            testID="diary-overview-title"
+                            style={[estilos.titulo, { color: apresentacaoResumo.corTexto }]}
                         >
-                            {tituloFase.trim()}
+                            {inicioFrase}{' '}
+                            <Text
+                                testID="diary-overview-phase"
+                                style={[estilos.fase, { color: apresentacaoResumo.corTexto }]}
+                            >
+                                {tituloFase.trim()}
+                            </Text>
                         </Text>
-                    </Text>
-                    <Text style={estilos.descricao}>{descricao.trim()}</Text>
+                        {descricaoValida ? (
+                            <Text style={estilos.descricao}>{descricaoValida}</Text>
+                        ) : null}
+                    </View>
                 </View>
-            </View>
-            <View testID="diary-overview-footer" style={estilos.rodape}>
+            ) : null}
+            <View
+                testID="diary-overview-footer"
+                style={[estilos.rodape, !faseVisivel && estilos.rodapeSemFase]}
+            >
                 <View
                     testID="diary-overview-day-counter"
                     style={[
                         estilos.contadorDias,
-                        { backgroundColor: apresentacaoResumo.corFundoContador }
+                        faseVisivel
+                            ? { backgroundColor: apresentacaoResumo.corFundoContador }
+                            : estilos.contadorNeutro
                     ]}
                 >
                     <Text
-                        style={[estilos.quantidade, { color: apresentacaoResumo.corTextoContador }]}
+                        style={[
+                            estilos.quantidade,
+                            faseVisivel
+                                ? { color: apresentacaoResumo.corTextoContador }
+                                : estilos.quantidadeNeutra
+                        ]}
                     >
                         {textoDias}
                     </Text>
