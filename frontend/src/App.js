@@ -23,6 +23,7 @@ import { ChangePasswordScreen } from './features/settings/screens/ChangePassword
 import { ProfileSettingsScreen } from './features/settings/screens/ProfileSettingsScreen';
 import { SettingsScreen } from './features/settings/screens/SettingsScreen';
 import { NotificationPreferencesFlow } from './features/notifications/NotificationPreferencesFlow';
+import { useNativePush } from './features/notifications/useNativePush';
 import { ContraceptiveFlow } from './features/contraceptives/ContraceptiveFlow';
 import { ParentalConsentScreen } from './features/support-network/screens/ParentalConsentScreen/ParentalConsentScreen';
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
@@ -236,6 +237,17 @@ export default function App() {
     const sincronizacaoMenstrual = useMenstruationSync({
         fila: configuracao.servicos?.menstruationSyncQueue,
         ativo: estadoSessao === 'autenticada'
+    });
+
+    const navegarPush = useCallback((destino) => {
+        const destinos = ['ciclos', 'diario', 'anticoncepcionais', 'membros', 'configuracoes'];
+        if (destinos.includes(destino)) setTelaInterna(telasInternas[destino]);
+    }, []);
+
+    useNativePush({
+        ativo: estadoSessao === 'autenticada' && Boolean(perfil),
+        service: configuracao.servicos?.pushDeviceService,
+        navegar: navegarPush
     });
 
     useEffect(() => {
