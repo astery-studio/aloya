@@ -233,10 +233,19 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
     assert.deepEqual(JSON.parse(JSON.stringify(comPrevisao.previsao)), {
         periodos: [{ previsto: true, ovulacao: '2026-11-16' }]
     });
-    const { itens } = await data.anticoncepcionais(vinculo, {});
+    const acessoAnticoncepcionais = { titularId: 4, permissoes: ['geral.anticoncepcionais'] };
+    const { itens } = await data.anticoncepcionais(acessoAnticoncepcionais, {});
     assert.equal(Object.hasOwn(itens[0], 'intensidadeAlerta'), false);
     assert.deepEqual(itens[0].horarios, ['12:00']);
     assert.equal(itens[0].statusUltimoUso, 'confirmado');
+    const comAlerta = await data.anticoncepcionais(
+        {
+            ...acessoAnticoncepcionais,
+            permissoes: [...acessoAnticoncepcionais.permissoes, 'geral.alerta_anticoncepcional']
+        },
+        {}
+    );
+    assert.equal(comAlerta.itens[0].intensidadeAlerta, 'critico');
 });
 
 test('encaminha identidade da sessão e proíbe cache nas rotas de leitura', async () => {

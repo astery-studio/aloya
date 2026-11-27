@@ -79,7 +79,8 @@ function criarSharedSupportData({
         };
     }
 
-    async function anticoncepcionais({ titularId }, { fusoHorario }) {
+    async function anticoncepcionais({ titularId, permissoes }, { fusoHorario }) {
+        const podeVerAlerta = permissoes.includes('geral.alerta_anticoncepcional');
         const itens = await contraceptiveService.listar(titularId, {
             incluirRemovidos: true,
             fusoHorario
@@ -91,6 +92,7 @@ function criarSharedSupportData({
                 tipo: item.tipo,
                 ativo: item.ativo,
                 horarios: item.horarios,
+                ...(podeVerAlerta && { intensidadeAlerta: item.intensidadeAlerta }),
                 dataValidade: item.dataValidade,
                 validadeExpirada: item.validadeExpirada,
                 validadeRestante: item.validadeRestante,
