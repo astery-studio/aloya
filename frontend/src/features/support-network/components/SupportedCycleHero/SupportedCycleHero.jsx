@@ -29,13 +29,15 @@ function SupportedCycleHero({
 
     return (
         <View style={estilos.container}>
-            <Text accessibilityRole="header" style={estilos.titulo}>
-                Acompanhe com carinho
-            </Text>
-            <Text style={estilos.descricao}>
-                Conheça melhor cada momento do ciclo e descubra formas de oferecer apoio,
-                respeitando o ritmo e as necessidades de quem você acompanha.
-            </Text>
+            <View style={estilos.boasVindas}>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    Acompanhe com carinho
+                </Text>
+                <Text style={estilos.descricao}>
+                    Conheça melhor cada momento do ciclo e descubra formas de oferecer apoio,
+                    respeitando o ritmo e as necessidades de quem você acompanha.
+                </Text>
+            </View>
             <View style={estilos.areaArte}>
                 {possuiFase ? (
                     <CyclePhaseArtwork

@@ -6,21 +6,28 @@ function criarEstilos(tema) {
     const { textoPrincipal, textoSecundario } = tema.cores.interface;
 
     return StyleSheet.create({
-        container: { width: '100%', alignItems: 'center', paddingHorizontal: 24 },
+        container: { width: '100%', alignItems: 'center', paddingHorizontal: 16 },
+        boasVindas: { width: '100%', maxWidth: 358, alignItems: 'center', paddingTop: 34 },
         titulo: {
-            color: textoPrincipal,
+            width: '100%',
+            maxWidth: 310,
+            color: tema.escuro ? textoPrincipal : '#222222',
             fontFamily: fontFamilies.regular,
-            fontSize: 24,
-            lineHeight: 30,
+            fontSize: 25,
+            lineHeight: 26.25,
+            letterSpacing: -0.875,
+            includeFontPadding: false,
             textAlign: 'center'
         },
         descricao: {
-            maxWidth: 350,
-            marginTop: 12,
-            color: textoSecundario,
+            width: '100%',
+            maxWidth: 330,
+            paddingTop: 13,
+            color: tema.escuro ? textoSecundario : '#5C5C59',
             fontFamily: fontFamilies.regular,
             fontSize: 13,
-            lineHeight: 21,
+            lineHeight: 20.8,
+            includeFontPadding: false,
             textAlign: 'center'
         },
         areaArte: { alignItems: 'center', marginTop: 16, maxWidth: '100%' },
