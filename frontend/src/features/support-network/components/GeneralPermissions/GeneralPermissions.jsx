@@ -11,6 +11,7 @@ import { criarEstilos } from './GeneralPermissions.styles';
 function GeneralPermissions({
     aparenciaNovaCategoria = false,
     coresInterruptor,
+    opcoes = permissoesGerais,
     permissoesSelecionadas = [],
     aoAlterar,
     desabilitado = false,
@@ -45,7 +46,7 @@ function GeneralPermissions({
             </Text>
 
             <View style={estilos.lista}>
-                {permissoesGerais.map((permissao) => (
+                {opcoes.map((permissao) => (
                     <SwitchField
                         cores={coresInterruptor}
                         estilo={aparenciaNovaCategoria && estilos.cartao}
