@@ -18,6 +18,11 @@ export function NotificationGroupSettingsScreen({
             <View style={estilos.lista}>
                 <View style={estilos.secao}>
                     <Text accessibilityRole="header" style={estiloTitulo}>Configuração em grupo</Text>
+                    {ordemGrupo.length > 0 && (
+                        <Text style={[estilos.descricao, { color: cores.interface.textoSecundario }]}>
+                            Com o grupo ligado, você recebe os avisos que ativou em “Personalizar notificações”.
+                        </Text>
+                    )}
                     {ordemGrupo.map((grupoId) => {
                         const chave = `${categoriaId}.${grupoId}`;
                         return (
@@ -25,7 +30,7 @@ export function NotificationGroupSettingsScreen({
                                 key={chave}
                                 titulo={grupos[grupoId][0]}
                                 tituloSemLimite
-                                dicaAcessibilidade="Ativa ou desativa as notificações deste grupo"
+                                dicaAcessibilidade="Permite ou pausa os avisos escolhidos neste grupo"
                                 ativo={valores[chave] ?? true}
                                 desabilitado={ocupado}
                                 aoAlterar={(ativo) => onAlterar(chave, ativo)}
