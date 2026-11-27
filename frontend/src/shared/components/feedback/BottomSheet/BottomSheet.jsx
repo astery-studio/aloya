@@ -8,7 +8,7 @@ import {
     Modal,
     PanResponder,
     Platform,
-    Pressable,
+    TouchableWithoutFeedback,
     View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,7 +18,6 @@ import { deveFecharPorArraste, deveIniciarArraste } from './bottomSheetGesture';
 import { criarEstilos } from './BottomSheet.style';
 
 const permitirInicioDeslize = () => true;
-const FundoPressionavelAnimado = Animated.createAnimatedComponent(Pressable);
 
 function BottomSheet({
     visivel,
@@ -198,15 +197,18 @@ function BottomSheet({
                 style={estilos.tela}
                 behavior={ajustarAoTeclado && Platform.OS === 'ios' ? 'padding' : undefined}
             >
-                <FundoPressionavelAnimado
-                    testID="bottom-sheet-fundo"
+                <TouchableWithoutFeedback
                     accessibilityRole={fecharAoTocarFora ? 'button' : undefined}
                     accessibilityLabel={fecharAoTocarFora ? 'Fechar painel' : undefined}
                     disabled={!fecharAoTocarFora || bloquearFechamento}
                     onPress={solicitarFechamento}
-                    pointerEvents={fecharAoTocarFora ? 'auto' : 'none'}
-                    style={[estilos.fundo, { opacity: progresso }]}
-                />
+                >
+                    <Animated.View
+                        testID="bottom-sheet-fundo"
+                        pointerEvents={fecharAoTocarFora ? 'auto' : 'none'}
+                        style={[estilos.fundo, { opacity: progresso }]}
+                    />
+                </TouchableWithoutFeedback>
 
                 <Animated.View
                     testID="bottom-sheet-painel"

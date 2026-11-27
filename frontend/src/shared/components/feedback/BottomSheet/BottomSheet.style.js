@@ -9,10 +9,12 @@ function criarEstilos(tema) {
 
         fundo: {
             ...StyleSheet.absoluteFillObject,
+            zIndex: 0,
             backgroundColor: tema.cores.interface.sobreposicao
         },
 
         painel: {
+            zIndex: 1,
             maxHeight: '90%',
             overflow: 'hidden',
             paddingBottom: tema.espacamentos.grande,
