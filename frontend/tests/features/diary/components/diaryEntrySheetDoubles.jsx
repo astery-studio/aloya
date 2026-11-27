@@ -4,12 +4,13 @@ function MockBottomSheet({
     children,
     onFechar,
     bloquearFechamento,
+    fecharAoTocarFora,
     permitirDeslizarParaFechar,
     podeIniciarDeslize
 }) {
     return (
         <View>
-            <Text>{`bloqueado:${bloquearFechamento};deslize:${permitirDeslizarParaFechar}`}</Text>
+            <Text>{`bloqueado:${bloquearFechamento};fora:${fecharAoTocarFora};deslize:${permitirDeslizarParaFechar}`}</Text>
             <Pressable onPress={onFechar}>
                 <Text>Fechar painel</Text>
             </Pressable>
