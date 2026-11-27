@@ -15,7 +15,6 @@ export function NotificationsScreen({
     contato = false,
     onAbrirCategoria,
     onAbrirTeste,
-    onAbrirTesteContato,
     onVoltar
 }) {
     const { cores, typography } = useTheme();
@@ -40,13 +39,6 @@ export function NotificationsScreen({
                 ))}
                 {onAbrirTeste && (
                     <NavigationField label="Teste de notificações" labelSemLimite onPress={onAbrirTeste} />
-                )}
-                {onAbrirTesteContato && (
-                    <NavigationField
-                        label="Teste da tela da Rede de Apoio"
-                        labelSemLimite
-                        onPress={onAbrirTesteContato}
-                    />
                 )}
             </View>
         </SettingsLayout>
