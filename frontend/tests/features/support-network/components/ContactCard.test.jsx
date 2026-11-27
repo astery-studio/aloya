@@ -163,6 +163,19 @@ describe('ContactCard', () => {
         expect(aoAbrirResumo).toHaveBeenCalledWith(conviteRecebido);
     });
 
+    test.each([
+        [conviteRecebido.vinculo, 'Profissional'],
+        [{ tipo: 'individual', permissoes: ['geral.fase_atual'] }, 'Permissões Individuais']
+    ])('abre as permissões de um contato ativo enviado pela tag %j', async (vinculo, nome) => {
+        const contato = { ...conviteRecebido, status: 'ativo', vinculo };
+        const aoAbrirResumo = jest.fn();
+        await render(<ContactCard contato={contato} aoAbrirResumo={aoAbrirResumo} />);
+
+        await fireEvent.press(screen.getByRole('button', { name: nome }));
+
+        expect(aoAbrirResumo).toHaveBeenCalledWith(contato);
+    });
+
     test('mostra ações de um contato ativo enviado', async () => {
         const aoAcao = jest.fn();
 

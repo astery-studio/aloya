@@ -496,13 +496,7 @@ function ContactCard({
                 <View style={estilos.containerTagAtivo}>
                     <ContactPermissionBadge
                         vinculo={vinculo}
-                        aoPressionar={
-                            perspectivaSegura === 'recebido' &&
-                            vinculo.tipo === 'individual' &&
-                            typeof aoAbrirResumo === 'function'
-                                ? abrirResumo
-                                : undefined
-                        }
+                        aoPressionar={typeof aoAbrirResumo === 'function' ? abrirResumo : undefined}
                         desabilitado={bloqueado}
                     />
                 </View>
