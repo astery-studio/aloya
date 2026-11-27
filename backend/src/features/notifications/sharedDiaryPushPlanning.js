@@ -1,13 +1,6 @@
 import { permiteNotificacao } from './notificationEvents.service.js';
+import { grupoNotificacaoDiario } from './sharedNotificationPermissions.js';
 
-const deDiario = {
-    ciclo: 'ciclo',
-    corpo: 'corpo',
-    emocional: 'emocional',
-    energia: 'energia',
-    vida_intima: 'vidaIntima',
-    saude: 'saude'
-};
 export async function agendarDiarioCompartilhado({
     prisma,
     permissoes,
@@ -17,11 +10,12 @@ export async function agendarDiarioCompartilhado({
     segunda,
     resumo
 }) {
-    const diarioPermitido = permissoes.filter(
-        (item) =>
-            deDiario[item.split('.')[0]] &&
-            permiteNotificacao(preferencia, `redeApoio.diario.${deDiario[item.split('.')[0]]}`)
-    );
+    const diarioPermitido = permissoes
+        .map((permissao) => ({
+            grupo: grupoNotificacaoDiario(permissao),
+            categoria: permissao.split('.')[1]
+        }))
+        .filter(({ grupo }) => grupo && permiteNotificacao(preferencia, `redeApoio.diario.${grupo}`));
     if (!diarioPermitido.length) return;
     const preenchidas = await prisma.registroDiarioCategoria.findMany({
         where: {
@@ -30,9 +24,8 @@ export async function agendarDiarioCompartilhado({
         distinct: ['categoriaId'],
         select: { categoriaId: true }
     });
-    for (const permissao of diarioPermitido) {
-        const [macro, categoria] = permissao.split('.');
+    for (const { grupo, categoria } of diarioPermitido) {
         if (preenchidas.some(({ categoriaId }) => categoriaId === categoria))
-            resumo(`redeApoio.diario.${deDiario[macro]}`);
+            resumo(`redeApoio.diario.${grupo}`);
     }
 }
