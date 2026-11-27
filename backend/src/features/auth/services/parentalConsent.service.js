@@ -437,6 +437,8 @@ function criarParentalConsentService({
                 data: {
                     usuarioId: titular.id,
                     tipoOrigem: 'rede_apoio',
+                    evento: 'redeApoio.consentimento.confirmado',
+                    ocorrencia: instante.toISOString(),
                     origemId: consentimento.id,
                     dataHoraProgramada: instante,
                     statusEnvio: 'agendada'
