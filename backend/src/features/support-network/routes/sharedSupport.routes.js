@@ -40,6 +40,7 @@ function criarSharedSupportRoutes({
     rota('/calendario', data.calendario, 'geral.historico_ciclo');
     rota('/anticoncepcionais', data.anticoncepcionais, 'geral.anticoncepcionais');
     rota('/diario/catalogo', diary.catalogo);
+    rota('/diario/resumo', diary.resumo);
     rota('/diario', diary.listar);
     rota('/diario/:registroId', (acesso, _query, { registroId }) =>
         diary.buscar(acesso, registroId)

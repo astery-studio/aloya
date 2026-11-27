@@ -585,7 +585,12 @@ function criarContainer() {
                 cycleHistoryService,
                 contraceptiveService
             }),
-            diary: criarSharedSupportDiary({ prisma })
+            diary: criarSharedSupportDiary({
+                prisma,
+                currentCycleService: calendarModule.currentCycleService,
+                diaryOverviewService,
+                diaryDetailService
+            })
         },
         contactLinkController,
         supportContactRemovalController,

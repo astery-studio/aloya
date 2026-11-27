@@ -83,6 +83,12 @@ test('filtra categorias no banco e na resposta e rejeita ID ou filtro fora do ac
         prisma: {
             preferenciaMacrocategoriaDiario: { findMany: () => [] },
             preferenciaCategoriaDiario: { findMany: () => [] },
+            registroCiclo: {
+                findMany({ where }) {
+                    assert.equal(where.usuarioId, 4);
+                    return [{ dataInicio: new Date('2026-11-24') }];
+                }
+            },
             registroDiario: {
                 findMany({ where, include }) {
                     assert.equal(where.usuarioId, 4);
@@ -96,7 +102,8 @@ test('filtra categorias no banco e na resposta e rejeita ID ou filtro fora do ac
                     return where.id === 7 ? registro : null;
                 }
             }
-        }
+        },
+        diaryDetailService: { buscarContextoCiclo: async () => ({ numero: 2, dia: 3 }) }
     });
     const acesso = { titularId: 4, permissoes: ['corpo.pele'] };
     const { itens } = await diary.listar(acesso, {});
@@ -122,6 +129,58 @@ test('filtra categorias no banco e na resposta e rejeita ID ou filtro fora do ac
     await assert.rejects(diary.buscar(acesso, '9'), { status: 403 });
     await assert.rejects(diary.listar(acesso, { categorias: 'anotacao_livre' }), { status: 403 });
     await assert.rejects(diary.listar(acesso, { fases: 'lutea' }), { status: 403 });
+    const acessoAoCiclo = {
+        ...acesso,
+        permissoes: [...acesso.permissoes, 'geral.fase_atual', 'geral.historico_ciclo']
+    };
+    const { itens: comCiclo } = await diary.listar(acessoAoCiclo, {});
+    assert.equal(comCiclo[0].diaCiclo, 3);
+    assert.deepEqual((await diary.buscar(acessoAoCiclo, '7')).ciclo, { numero: 2, dia: 3 });
+});
+
+test('limita o resumo do Diário às categorias concedidas e à permissão de fase', async () => {
+    let consultasFase = 0;
+    const diary = criarSharedSupportDiary({
+        prisma: {
+            preferenciaMacrocategoriaDiario: { findMany: () => [] },
+            preferenciaCategoriaDiario: { findMany: () => [] }
+        },
+        currentCycleService: {
+            buscarEstadoAtual({ usuarioId }) {
+                assert.equal(usuarioId, 4);
+                consultasFase += 1;
+                return { faseAtual: 'FOLICULAR' };
+            }
+        },
+        diaryOverviewService: {
+            buscar(usuarioId, fase, categorias) {
+                assert.equal(usuarioId, 4);
+                assert.deepEqual([...categorias], ['pele']);
+                return {
+                    diasRegistrados: 4,
+                    destaques: fase ? [{ categoriaId: 'pele', valor: 'Oleosa' }] : [],
+                    informacoesSuficientes: Boolean(fase),
+                    sugestoesCheckIn: [{ categoriaId: 'anotacao_livre' }]
+                };
+            }
+        }
+    });
+
+    const acesso = { titularId: 4, permissoes: ['corpo.pele'] };
+    assert.deepEqual(await diary.resumo(acesso), {
+        fase: null,
+        diasRegistrados: 4,
+        destaques: [],
+        informacoesSuficientes: false
+    });
+    assert.equal(consultasFase, 0);
+    const resumo = await diary.resumo({
+        ...acesso,
+        permissoes: [...acesso.permissoes, 'geral.fase_atual']
+    });
+    assert.equal(resumo.fase, 'folicular');
+    assert.deepEqual(resumo.destaques, [{ categoriaId: 'pele', valor: 'Oleosa' }]);
+    assert.equal(Object.hasOwn(resumo, 'sugestoesCheckIn'), false);
 });
 
 test('separa calendário, dicas, fase e intensidade do alerta', async () => {

@@ -1,4 +1,4 @@
-import { formatarData, paraDataCalendario } from '../../cycles/utils/calendar.js';
+import { diferencaDias, formatarData, paraDataCalendario } from '../../cycles/utils/calendar.js';
 import { CATALOGO_DIARIO } from '../../diary/catalog/diary.catalog.js';
 import { apresentarDetalheRegistro } from '../../diary/presenters/diaryEntry.presenter.js';
 import { apresentarResumoRegistro } from '../../diary/presenters/diaryHistory.presenter.js';
@@ -17,7 +17,12 @@ const PREFIXOS = {
     saude_acompanhamento: 'saude'
 };
 
-function criarSharedSupportDiary({ prisma }) {
+function criarSharedSupportDiary({
+    prisma,
+    currentCycleService,
+    diaryOverviewService,
+    diaryDetailService
+}) {
     async function preparar({ titularId, permissoes }) {
         const concedidas = CATALOGO_DIARIO.flatMap((macro) =>
             macro.categorias
@@ -47,22 +52,32 @@ function criarSharedSupportDiary({ prisma }) {
         };
     }
 
-    function apresentar(registro, { visiveis, exibirFaseHistorica }) {
-        const { id, data, fase, categorias } = apresentarDetalheRegistro(registro, null, visiveis);
-        return { id, data, ...(exibirFaseHistorica ? { fase } : {}), categorias };
-    }
-
-    function apresentarResumo(registro, { visiveis, exibirFaseHistorica }) {
-        const { id, data, fase, principais, maisQuantidade, trechoAnotacao } =
-            apresentarResumoRegistro(registro, visiveis);
+    function apresentarResumo(registro, { visiveis, exibirFaseHistorica }, ciclos) {
+        const ciclo = ciclos.find(({ dataInicio }) => dataInicio <= registro.dataRegistro);
+        const dia = ciclo ? diferencaDias(ciclo.dataInicio, registro.dataRegistro) + 1 : null;
+        const { id, data, fase, diaCiclo, principais, maisQuantidade, trechoAnotacao } =
+            apresentarResumoRegistro(registro, visiveis, dia);
         return {
             id,
             data,
-            ...(exibirFaseHistorica ? { fase } : {}),
+            ...(exibirFaseHistorica ? { fase, diaCiclo } : {}),
             principais,
             maisQuantidade,
             trechoAnotacao
         };
+    }
+
+    async function resumo(acesso) {
+        const { visiveis } = await preparar(acesso);
+        const { titularId, permissoes } = acesso;
+        const fase = permissoes.includes('geral.fase_atual')
+            ? ((
+                  await currentCycleService.buscarEstadoAtual({ usuarioId: titularId })
+              ).faseAtual?.toLowerCase() ?? null)
+            : null;
+        const { diasRegistrados, destaques, informacoesSuficientes } =
+            await diaryOverviewService.buscar(titularId, fase, visiveis);
+        return { fase, diasRegistrados, destaques, informacoesSuficientes };
     }
 
     async function catalogo(acesso) {
@@ -107,8 +122,19 @@ function criarSharedSupportDiary({ prisma }) {
         });
         const pagina = registros.slice(0, limite);
         const ultimo = pagina.at(-1);
+        const ciclos =
+            exibirFaseHistorica && pagina.length
+                ? await prisma.registroCiclo.findMany({
+                      where: {
+                          usuarioId: acesso.titularId,
+                          dataInicio: { lte: pagina[0].dataRegistro }
+                      },
+                      orderBy: [{ dataInicio: 'desc' }, { id: 'desc' }],
+                      select: { dataInicio: true }
+                  })
+                : [];
         return {
-            itens: pagina.map((registro) => apresentarResumo(registro, contexto)),
+            itens: pagina.map((registro) => apresentarResumo(registro, contexto, ciclos)),
             proximoCursor:
                 registros.length > limite
                     ? codificarCursor(
@@ -131,10 +157,24 @@ function criarSharedSupportDiary({ prisma }) {
             include: { categorias }
         });
         if (!registro) negarAcessoCompartilhado();
-        return apresentar(registro, contexto);
+        const ciclo = contexto.exibirFaseHistorica
+            ? await diaryDetailService.buscarContextoCiclo(acesso.titularId, registro.dataRegistro)
+            : null;
+        const {
+            id,
+            data,
+            fase,
+            categorias: categoriasVisiveis
+        } = apresentarDetalheRegistro(registro, ciclo, contexto.visiveis);
+        return {
+            id,
+            data,
+            ...(contexto.exibirFaseHistorica ? { fase, ciclo } : {}),
+            categorias: categoriasVisiveis
+        };
     }
 
-    return { catalogo, listar, buscar };
+    return { catalogo, listar, buscar, resumo };
 }
 
 export { criarSharedSupportDiary };
