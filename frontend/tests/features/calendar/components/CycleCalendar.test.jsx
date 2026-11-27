@@ -15,6 +15,18 @@ function criarMes(chave, alteracoes = {}) {
 }
 
 describe('CycleCalendar', () => {
+    test('marca a menstruação compartilhada sem precisar do identificador do registro', async () => {
+        const resultado = await render(
+            <CycleCalendar
+                meses={[criarMes('2026-10', { diasMenstruacao: ['2026-10-04'] })]}
+                aoPressionarDia={jest.fn()}
+            />
+        );
+
+        expect(resultado.getByTestId('fundo-dia-2026-10-04')).toBeOnTheScreen();
+        expect(resultado.queryByRole('button', { name: /menstruação registrada/ })).toBeNull();
+    });
+
     test('mantém o primeiro mês no topo antes de qualquer interação', async () => {
         const resultado = await render(<CycleCalendar meses={[criarMes('2026-10')]} />);
 

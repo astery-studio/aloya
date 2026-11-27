@@ -1,8 +1,8 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 //Define a aparência dos chips de estado e permissão.
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
-import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos() {
     return StyleSheet.create({

@@ -18,7 +18,9 @@ function criarEstilos(tema) {
         },
         containerCompacto: {
             minHeight: 30,
-            padding: 2
+            paddingHorizontal: 2,
+            paddingTop: 2,
+            paddingBottom: 2
         },
         botaoSeta: {
             width: 44,

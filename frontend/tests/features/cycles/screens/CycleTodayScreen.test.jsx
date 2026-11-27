@@ -80,11 +80,12 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
     );
 });
 
-test('mantém o cabeçalho dentro da área rolável', async () => {
+test('mantém o cabeçalho fixo fora da área rolável', async () => {
     const { getByTestId } = await renderizar({ previsao });
     const rolagem = getByTestId('conteudo-rolavel');
 
-    expect(within(rolagem).getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
+    expect(screen.getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
+    expect(within(rolagem).queryByText('Aloya - 8 de Outubro')).not.toBeOnTheScreen();
 });
 
 test('mantém a faixa de datas no estado sem dados', async () => {
@@ -99,7 +100,7 @@ test('retorna da data selecionada para a data de referência', async () => {
     const aoSelecionarData = jest.fn();
     await renderizar({ previsao, dataSelecionada: '2026-10-10', aoSelecionarData });
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Voltar pra hoje' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar para hoje' }));
 
     expect(aoSelecionarData).toHaveBeenCalledWith('2026-10-08');
 });
@@ -228,21 +229,21 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
     expect(estilos.cabecalho).toMatchObject({
         width: '100%',
         paddingTop: 16,
-        paddingBottom: 16,
-        marginBottom: 8
+        paddingBottom: 16
     });
     expect(estilos.cabecalho.height).toBeUndefined();
     expect(estilos.titulo).toMatchObject({
         flex: 1,
         flexShrink: 1,
         fontFamily: 'DMSans_700Bold',
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: '700',
-        lineHeight: 36,
+        lineHeight: 27.5,
+        color: '#222222',
         textAlign: 'left'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
-    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 16 });
+    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingTop: 8, paddingBottom: 16 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });
 

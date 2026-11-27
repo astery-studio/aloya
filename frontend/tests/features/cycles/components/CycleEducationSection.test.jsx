@@ -17,6 +17,25 @@ test('alterna o conteúdo educativo das quatro fases', async () => {
     expect(screen.getByText(/não possuem duração fixa/)).toBeOnTheScreen();
 });
 
+test('na perspectiva do contato oferece as quatro fases e usa seleção educativa independente', async () => {
+    const { rerender } = await render(
+        <CycleEducationSection perspectiva="contato" faseSelecionada="lutea" />
+    );
+
+    expect(screen.getByText('Conhecimento sem expectativas')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Entenda cada fase' })).toBeOnTheScreen();
+    expect(screen.getByText(/sem criar expectativas/)).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Menstrual' })).toBeSelected();
+    expect(screen.getAllByRole('button')).toHaveLength(4);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Folicular' }));
+    await rerender(<CycleEducationSection perspectiva="contato" faseSelecionada="ovulatoria" />);
+
+    expect(screen.getByRole('button', { name: 'Folicular' })).toBeSelected();
+    expect(screen.getByText('Fase folicular')).toBeOnTheScreen();
+    expect(screen.getByText(/não possuem duração fixa/)).toBeOnTheScreen();
+});
+
 test.each([
     ['menstrual', DropIcon, 'fill', '#C85A44'],
     ['folicular', PlantIcon, 'regular', '#2C4C3B'],

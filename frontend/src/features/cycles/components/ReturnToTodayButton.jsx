@@ -1,47 +1,57 @@
 import { Pressable, Text, View } from 'react-native';
-import { RewindIcon } from 'phosphor-react-native/src/icons/Rewind';
-import { useHomeColors } from '../hooks/useHomeColors';
+import { fontFamilies } from '../../../shared/theme';
 
 function ReturnToTodayButton({ onPress }) {
-    const { cor } = useHomeColors();
     const estilos = {
         faixa: {
             width: '100%',
-            height: 38,
             flexDirection: 'row',
+            justifyContent: 'center',
             alignItems: 'center',
-            paddingVertical: 2,
-            paddingHorizontal: 16
+            paddingVertical: 6
         },
         botao: {
-            width: 135,
-            height: 34,
-            alignSelf: 'flex-start',
+            minHeight: 34,
             flexDirection: 'row',
+            justifyContent: 'center',
             alignItems: 'center',
             gap: 5,
             paddingHorizontal: 13,
             paddingVertical: 6,
-            borderWidth: 1,
-            borderColor: cor('#AAAAA5'),
-            borderStyle: 'dashed',
-            borderRadius: 999
+            borderRadius: 999,
+            backgroundColor: '#D68C3A',
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            elevation: 5
         },
-        texto: {
-            color: cor('#5C5C59'),
-            fontFamily: 'DMSans_400Regular',
-            fontSize: 13,
-            fontWeight: '400',
+        textoBase: {
+            color: '#FFFFFF',
+            fontSize: 10,
             includeFontPadding: false,
             lineHeight: 20
+        },
+        textoVoltar: {
+            fontFamily: fontFamilies.light,
+            fontWeight: '300'
+        },
+        textoHoje: {
+            fontFamily: fontFamilies.medium,
+            fontWeight: '500'
         }
     };
 
     return (
         <View testID="faixa-voltar-hoje" style={estilos.faixa}>
-            <Pressable accessibilityRole="button" onPress={onPress} style={estilos.botao}>
-                <RewindIcon size={13} color={cor('#5C5C59')} weight="regular" />
-                <Text style={estilos.texto}>Voltar pra hoje</Text>
+            <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Voltar para hoje"
+                onPress={onPress}
+                style={estilos.botao}
+            >
+                <Text style={[estilos.textoBase, estilos.textoVoltar]}>Voltar para:</Text>
+                <Text style={[estilos.textoBase, estilos.textoHoje]}>Hoje</Text>
             </Pressable>
         </View>
     );

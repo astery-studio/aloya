@@ -68,6 +68,7 @@ function apresentarDetalheRegistro(registro, ciclo = null, categoriasVisiveis = 
         id: registro.id,
         data: formatarData(registro.dataRegistro),
         fase: registro.faseCicloAssociada,
+        checkInRealizado: registro.checkInRealizado === true,
         ciclo,
         versao: registro.versao,
         categorias: categorias.map(apresentarCategoria),

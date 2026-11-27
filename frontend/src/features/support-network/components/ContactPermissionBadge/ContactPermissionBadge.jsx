@@ -1,6 +1,6 @@
 //Apresenta a origem das permissões concedidas ao contato.
 import { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { UserIcon, UsersIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -45,7 +45,7 @@ function normalizarVinculo(vinculo) {
     throw new TypeError('O tipo de vínculo do contato é inválido.');
 }
 
-function ContactPermissionBadge({ vinculo }) {
+function ContactPermissionBadge({ vinculo, aoPressionar, desabilitado = false }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(), []);
@@ -59,17 +59,23 @@ function ContactPermissionBadge({ vinculo }) {
     const Icone = categoria ? UsersIcon : UserIcon;
 
     const variante = variantes[vinculoNormalizado.tipo];
+    const interativo = typeof aoPressionar === 'function';
+    const Container = interativo ? Pressable : View;
 
     return (
-        <View
+        <Container
             testID="contact-permission-badge"
             accessible
-            accessibilityRole="text"
+            accessibilityRole={interativo ? 'button' : 'text'}
             accessibilityLabel={
-                categoria
-                    ? `Categoria de permissão: ${vinculoNormalizado.rotulo}`
-                    : 'Vínculo com permissões individuais'
+                interativo
+                    ? vinculoNormalizado.rotulo
+                    : categoria
+                      ? `Categoria de permissão: ${vinculoNormalizado.rotulo}`
+                      : 'Vínculo com permissões individuais'
             }
+            accessibilityHint={interativo ? 'Abre o resumo de permissões' : undefined}
+            {...(interativo ? { onPress: aoPressionar, disabled: desabilitado } : {})}
             style={[estilos.container, variante.container]}
         >
             <Icone
@@ -84,7 +90,7 @@ function ContactPermissionBadge({ vinculo }) {
             <Text numberOfLines={1} ellipsizeMode="tail" style={[estilos.texto, variante.conteudo]}>
                 {vinculoNormalizado.rotulo}
             </Text>
-        </View>
+        </Container>
     );
 }
 

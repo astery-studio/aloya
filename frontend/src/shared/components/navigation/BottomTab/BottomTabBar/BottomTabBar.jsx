@@ -45,7 +45,7 @@ const abas = Object.freeze([
     })
 ]);
 
-function BottomTabBar({ abaAtiva, onSelecionar }) {
+function BottomTabBar({ abaAtiva, onSelecionar, abasDisponiveis }) {
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -61,7 +61,12 @@ function BottomTabBar({ abaAtiva, onSelecionar }) {
                 icone={aba.icone}
                 label={aba.label}
                 ativo={aba.id === abaAtiva}
-                onPress={typeof onSelecionar === 'function' ? selecionarAba : undefined}
+                onPress={
+                    typeof onSelecionar === 'function' &&
+                    (!abasDisponiveis || abasDisponiveis.includes(aba.id))
+                        ? selecionarAba
+                        : undefined
+                }
             />
         );
     }

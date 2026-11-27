@@ -24,6 +24,7 @@ function CycleConfidenceSheet({ visivel, nivel, aoFechar }) {
         <BottomSheet
             visivel={visivel}
             onFechar={aoFechar}
+            fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
             corPainel={adaptarCor('#FFFFFF', 'backgroundColor')}

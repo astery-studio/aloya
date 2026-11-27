@@ -48,6 +48,7 @@ function validarRegistro(resposta) {
         !Number.isSafeInteger(resposta?.id) ||
         resposta.id <= 0 ||
         typeof resposta.data !== 'string' ||
+        typeof resposta.checkInRealizado !== 'boolean' ||
         !Array.isArray(resposta.categorias)
     ) {
         throw erroDeContrato(MENSAGEM_SALVAMENTO, 'RESPOSTA_REGISTRO_DIARIO_INVALIDA');
@@ -222,6 +223,7 @@ function validarDetalhe(resposta) {
         (resposta.fase === null || FASES.has(resposta.fase)) &&
         Number.isSafeInteger(resposta.versao) &&
         resposta.versao >= 0 &&
+        typeof resposta.checkInRealizado === 'boolean' &&
         cicloValido &&
         Array.isArray(resposta.categorias) &&
         resposta.categorias.every(validarCategoriaDetalhe);

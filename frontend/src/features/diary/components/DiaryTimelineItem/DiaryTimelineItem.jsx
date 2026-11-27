@@ -14,6 +14,7 @@ function DiaryTimelineItem({
     aoAbrir,
     aoEditar,
     aoExcluir,
+    somenteLeitura,
     estilos
 }) {
     const apresentacao = obterApresentacaoFaseRegistro(item.fase);
@@ -60,6 +61,7 @@ function DiaryTimelineItem({
                         aoAbrir={aoAbrir}
                         aoEditar={aoEditar}
                         aoExcluir={aoExcluir}
+                        somenteLeitura={somenteLeitura}
                         acaoEmAndamento={
                             String(acaoEmAndamentoId) === String(item.id) ? 'excluir' : null
                         }

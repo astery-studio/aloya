@@ -30,6 +30,7 @@ const detalhe = {
     id: 4,
     data: '2026-11-04',
     fase: 'menstrual',
+    checkInRealizado: true,
     ciclo: { dia: 21, numero: 3 },
     versao: 2,
     categorias: [

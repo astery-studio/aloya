@@ -1,10 +1,18 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { criarEstilos } from './CycleDateStrip.styles';
 
 const LIMITE_CARREGAMENTO = 32;
-const LARGURA_ITEM = 46 + 8;
+const LARGURA_DIA = 46;
+const ESPACAMENTO_ENTRE_DIAS = 8;
+const LARGURA_ITEM = LARGURA_DIA + ESPACAMENTO_ENTRE_DIAS;
+const PADDING_LATERAL_MINIMO = 8;
+
+function calcularPaddingLateral(larguraVisivel) {
+    if (!larguraVisivel) return PADDING_LATERAL_MINIMO;
+    return Math.max(PADDING_LATERAL_MINIMO, (larguraVisivel - LARGURA_DIA) / 2);
+}
 
 function CycleDateStrip({
     dias = [],
@@ -15,34 +23,51 @@ function CycleDateStrip({
     semCiclo = false
 }) {
     const tema = useTheme();
+    const { width: larguraVisivel } = useWindowDimensions();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const carregamentos = useRef({ anteriores: false, posteriores: false });
     const lista = useRef(null);
     const dataTocada = useRef(null);
     const selecaoPosicionada = useRef(null);
+    const animarRecuperacao = useRef(false);
+    const paddingLateral = calcularPaddingLateral(larguraVisivel);
+    const indiceInicial = dias.findIndex(({ data }) => data === dataSelecionada);
+    const deslocamentoInicial = useRef({
+        x: Math.max(0, indiceInicial * LARGURA_ITEM),
+        y: 0
+    });
 
     useEffect(() => {
         carregamentos.current = { anteriores: false, posteriores: false };
     }, [dias]);
 
     useEffect(() => {
+        if (!larguraVisivel) return;
+
         const anterior = selecaoPosicionada.current;
-        if (anterior && anterior.data === dataSelecionada && anterior.semCiclo === semCiclo) return;
+        if (
+            anterior &&
+            anterior.data === dataSelecionada &&
+            anterior.larguraVisivel === larguraVisivel
+        )
+            return;
 
         const indice = dias.findIndex(({ data }) => data === dataSelecionada);
         if (indice < 0) return;
 
-        selecaoPosicionada.current = { data: dataSelecionada, semCiclo };
+        const primeiraPosicao = !anterior;
+        selecaoPosicionada.current = { data: dataSelecionada, larguraVisivel };
         const tocouNoDia = dataTocada.current === dataSelecionada;
         dataTocada.current = null;
-        if (!tocouNoDia) {
+        if (!primeiraPosicao && !tocouNoDia) {
+            animarRecuperacao.current = true;
             lista.current?.scrollToIndex({
                 index: indice,
                 animated: true,
-                viewPosition: semCiclo ? 0 : 0.5
+                viewPosition: 0.5
             });
         }
-    }, [dataSelecionada, dias, semCiclo]);
+    }, [dataSelecionada, dias, larguraVisivel]);
 
     function carregarBordas({ nativeEvent }) {
         const { x } = nativeEvent.contentOffset;
@@ -63,9 +88,11 @@ function CycleDateStrip({
     }
 
     function recuperarRolagem({ index, averageItemLength }) {
+        const comprimentoItem = averageItemLength || LARGURA_ITEM;
+        const centroDisponivel = (larguraVisivel - LARGURA_DIA) / 2;
         lista.current?.scrollToOffset({
-            offset: Math.max(0, index * (averageItemLength || LARGURA_ITEM)),
-            animated: true
+            offset: Math.max(0, paddingLateral + index * comprimentoItem - centroDisponivel),
+            animated: animarRecuperacao.current
         });
     }
 
@@ -74,10 +101,11 @@ function CycleDateStrip({
             ref={lista}
             horizontal
             data={dias}
+            contentOffset={deslocamentoInicial.current}
             keyExtractor={(item) => item.data}
             getItemLayout={(_, index) => ({
                 length: LARGURA_ITEM,
-                offset: LARGURA_ITEM * index,
+                offset: paddingLateral + LARGURA_ITEM * index,
                 index
             })}
             initialNumToRender={16}
@@ -90,7 +118,7 @@ function CycleDateStrip({
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
             style={[estilos.container, semCiclo && estilos.containerSemCiclo]}
-            contentContainerStyle={estilos.faixa}
+            contentContainerStyle={[estilos.faixa, { paddingHorizontal: paddingLateral }]}
             accessibilityLabel="Datas do ciclo"
             renderItem={({ item }) => {
                 const selecionado = item.data === dataSelecionada;
@@ -169,4 +197,4 @@ function CycleDateStrip({
     );
 }
 
-export { CycleDateStrip };
+export { calcularPaddingLateral, CycleDateStrip };

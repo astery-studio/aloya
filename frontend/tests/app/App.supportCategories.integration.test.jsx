@@ -44,9 +44,25 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => ({
     CycleHistoryFlow: jest.fn(() => null)
 }));
 
-jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => ({
-    CycleTodayContainer: jest.fn(() => null)
-}));
+jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
+    const React = require('react');
+    const { Pressable, Text, View } = require('react-native');
+
+    return {
+        CycleTodayContainer: jest.fn(({ aoSelecionarAba }) =>
+            React.createElement(
+                View,
+                null,
+                React.createElement(Text, null, 'Home'),
+                React.createElement(Pressable, {
+                    accessibilityRole: 'button',
+                    accessibilityLabel: 'Abrir membros',
+                    onPress: () => aoSelecionarAba('membros')
+                })
+            )
+        )
+    };
+});
 
 jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => ({
     ContraceptiveFlow: jest.fn(() => null)
@@ -457,6 +473,11 @@ async function abrirMembros() {
     );
 }
 
+async function abrirMembrosComoContato() {
+    expect(await screen.findByRole('tab', { name: 'Início', selected: true })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
+}
+
 async function abrirCategorias() {
     await abrirMembros();
 
@@ -555,6 +576,8 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
+        await abrirMembrosComoContato();
+
         expect(await screen.findByText('Contatos recebidos')).toBeOnTheScreen();
         expect(screen.getByText('Convites recebidos conectados')).toBeOnTheScreen();
         expect(screen.queryByText('Tela de Membros')).toBeNull();
@@ -573,13 +596,16 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
+        await abrirMembrosComoContato();
+
         await fireEvent.press(
             await screen.findByRole('button', {
                 name: 'Contato tenta abrir ciclos'
             })
         );
 
-        expect(screen.getByText('Contatos recebidos')).toBeOnTheScreen();
+        expect(await screen.findByText('Ainda não há dados suficientes para exibir aqui.'))
+            .toBeOnTheScreen();
         expect(screen.queryByTestId('cycle-history-flow')).toBeNull();
     });
 
@@ -595,6 +621,8 @@ describe('fluxos da Rede de Apoio no App', () => {
         criarServicosApp.mockReturnValue(servicos);
 
         await render(<App />);
+
+        await abrirMembrosComoContato();
 
         await fireEvent.press(
             await screen.findByRole('button', {

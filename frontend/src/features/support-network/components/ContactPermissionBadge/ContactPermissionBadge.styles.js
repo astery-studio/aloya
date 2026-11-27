@@ -1,7 +1,7 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
-import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 const CORES_CLARAS = Object.freeze({
     categoria: Object.freeze({

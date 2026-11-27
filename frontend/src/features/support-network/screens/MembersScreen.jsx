@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 //Apresenta e gerencia a lista de contatos da Rede de Apoio.
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -22,7 +23,6 @@ import { SupportNetworkModeSelector } from '../components/SupportNetworkModeSele
 import { useSupportCategories } from '../hooks/useSupportCategories';
 import { useSupportContacts } from '../hooks/useSupportContacts';
 import { criarEstilos } from './MembersScreen.styles';
-import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 
 function criarFiltrosVazios() {
     return {

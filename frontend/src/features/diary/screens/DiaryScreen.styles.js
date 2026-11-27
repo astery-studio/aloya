@@ -69,6 +69,8 @@ function criarEstilos(tema) {
             textAlign: 'center'
         },
         cabecalhoLista: { gap: 0, paddingTop: 0 },
+        cabecalhoCompartilhado: { paddingTop: tema.espacamentos.medio },
+        atualizandoCompartilhado: { alignItems: 'center', marginBottom: tema.espacamentos.pequeno },
         divisor: {
             flexDirection: 'row',
             alignItems: 'center',

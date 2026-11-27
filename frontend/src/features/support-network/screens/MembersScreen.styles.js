@@ -1,8 +1,8 @@
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 //Define a estrutura visual da listagem da Rede de Apoio.
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../shared/theme';
-import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({

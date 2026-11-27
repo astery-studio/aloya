@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 //Apresenta identificação, vínculo, status e ações de um contato.
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -15,6 +16,7 @@ import {
     PaperPlaneTiltIcon,
     PencilSimpleIcon,
     TrashIcon,
+    UserIcon,
     XCircleIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
@@ -22,7 +24,6 @@ import { ContactAvatar } from '../ContactAvatar/ContactAvatar';
 import { ContactPermissionBadge } from '../ContactPermissionBadge/ContactPermissionBadge';
 import { ContactStatusBadge } from '../ContactStatusBadge/ContactStatusBadge';
 import { criarEstilos } from './ContactCard.styles';
-import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 const PERSPECTIVAS = Object.freeze(['enviado', 'recebido']);
 
@@ -148,6 +149,8 @@ function ContactCard({
     contato,
     perspectiva = 'enviado',
     aoAcao,
+    aoVisualizar,
+    emVisualizacao = false,
     aoAbrirResumo,
     acaoEmAndamento = null,
     desabilitado = false
@@ -491,7 +494,11 @@ function ContactCard({
                 </View>
             ) : estado === 'ativo' ? (
                 <View style={estilos.containerTagAtivo}>
-                    <ContactPermissionBadge vinculo={vinculo} />
+                    <ContactPermissionBadge
+                        vinculo={vinculo}
+                        aoPressionar={typeof aoAbrirResumo === 'function' ? abrirResumo : undefined}
+                        desabilitado={bloqueado}
+                    />
                 </View>
             ) : contatoEnviadoInativo ? (
                 <View style={estilos.containerTituloInativo}>
@@ -597,26 +604,51 @@ function ContactCard({
                 </View>
             ) : null}
 
-            <View
-                testID="contact-summary-button-container"
-                style={[
-                    estilos.containerBotaoResumo,
-                    estado === 'ativo' && estilos.containerBotaoResumoAtivo
-                ]}
-            >
-                <ButtonScreen
-                    texto="Resumo de Permissões"
-                    variante="laranja"
-                    icone={InfoIcon}
-                    tamanhoIcone={13}
-                    corConteudo={corConteudoBotao}
-                    aoPressionar={abrirResumo}
-                    rotuloAcessibilidade={`Abrir resumo de permissões de ${identificacao}`}
-                    desativado={bloqueado || typeof aoAbrirResumo !== 'function'}
-                    estilo={estilos.botaoResumo}
-                    estiloTexto={estilos.textoBotao}
-                />
-            </View>
+            {perspectivaSegura === 'recebido' && estado === 'ativo' && aoVisualizar ? (
+                <View style={[estilos.containerBotaoResumo, estilos.containerBotaoResumoAtivo]}>
+                    <ButtonScreen
+                        texto={
+                            emVisualizacao
+                                ? 'Parar de visualizar este Contato'
+                                : 'Mudar para visualizar este Contato'
+                        }
+                        variante="laranja"
+                        icone={UserIcon}
+                        tamanhoIcone={13}
+                        corConteudo={corConteudoBotao}
+                        aoPressionar={() => aoVisualizar(emVisualizacao ? null : contato)}
+                        rotuloAcessibilidade={
+                            emVisualizacao
+                                ? `Parar de visualizar dados de ${identificacao}`
+                                : `Visualizar dados de ${identificacao}`
+                        }
+                        desativado={bloqueado}
+                        estilo={estilos.botaoResumo}
+                        estiloTexto={estilos.textoBotao}
+                    />
+                </View>
+            ) : (
+                <View
+                    testID="contact-summary-button-container"
+                    style={[
+                        estilos.containerBotaoResumo,
+                        estado === 'ativo' && estilos.containerBotaoResumoAtivo
+                    ]}
+                >
+                    <ButtonScreen
+                        texto="Resumo de Permissões"
+                        variante="laranja"
+                        icone={InfoIcon}
+                        tamanhoIcone={13}
+                        corConteudo={corConteudoBotao}
+                        aoPressionar={abrirResumo}
+                        rotuloAcessibilidade={`Abrir resumo de permissões de ${identificacao}`}
+                        desativado={bloqueado || typeof aoAbrirResumo !== 'function'}
+                        estilo={estilos.botaoResumo}
+                        estiloTexto={estilos.textoBotao}
+                    />
+                </View>
+            )}
         </View>
     );
 }

@@ -38,6 +38,11 @@ import { ParentalConsentScreen } from './features/support-network/screens/Parent
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
 import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
 import { SupportNetworkScreen } from './features/support-network/screens/SupportNetworkScreen';
+import { SharedSupportFlow } from './features/support-network/screens/SharedSupportFlow/SharedSupportFlow';
+import {
+    lerVinculoVisualizado,
+    salvarVinculoVisualizado
+} from './features/support-network/services/sharedViewingStorage';
 import { ehMenorDe16 } from './features/support-network/utils/age';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
@@ -45,6 +50,7 @@ import { CycleEditFlow } from './features/cycles/CycleEditFlow';
 import { CycleHistoryFlow } from './features/cycles/CycleHistoryFlow';
 import { DiaryFlow } from './features/diary/DiaryFlow';
 import { DiaryCategoriesSheet } from './features/diary/components/DiaryCategoriesSheet/DiaryCategoriesSheet';
+import { EditDiaryEntrySheet } from './features/diary/components/EditDiaryEntrySheet/EditDiaryEntrySheet';
 import { NewDiaryEntrySheet } from './features/diary/components/NewDiaryEntrySheet/NewDiaryEntrySheet';
 import { CycleParametersScreen } from './features/cycles/screens/CycleParametersScreen';
 import { CycleTodayContainer } from './features/cycles/screens/CycleTodayContainer';
@@ -79,6 +85,15 @@ const telasInternas = Object.freeze({
     diario: 'diario',
     inicio: 'inicio'
 });
+
+const TELAS_COMPARTILHADAS = new Set([
+    'inicio',
+    'calendario',
+    'diario',
+    'ciclos',
+    'anticoncepcionais'
+]);
+const ABAS_ACOMPANHAMENTO = new Set(['membros', 'configuracoes', ...TELAS_COMPARTILHADAS]);
 
 // Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
@@ -189,7 +204,11 @@ export default function App() {
     const [documentoLegal, setDocumentoLegal] = useState(null);
     const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
-    const [telaInterna, setTelaInterna] = useState(telasInternas.configuracoes);
+    const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
+    const [vinculoVisualizadoId, setVinculoVisualizadoId] = useState(null);
+    const contaComVisualizacaoRestaurada = useRef(null);
+    const gravandoVisualizacao = useRef(false);
+    const [modoRede, setModoRede] = useState('apoio');
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -204,6 +223,8 @@ export default function App() {
     const [dataInicialCadastro, setDataInicialCadastro] = useState(null);
     const [dataInicialDiario, setDataInicialDiario] = useState(null);
     const [cadastroDiarioVisivel, setCadastroDiarioVisivel] = useState(false);
+    const [registroDiarioEdicao, setRegistroDiarioEdicao] = useState(null);
+    const [revisaoDiarioHome, setRevisaoDiarioHome] = useState(0);
     const [categoriasDiarioVisiveis, setCategoriasDiarioVisiveis] = useState(false);
     const [revisaoCategoriasDiario, setRevisaoCategoriasDiario] = useState(0);
 
@@ -295,22 +316,29 @@ export default function App() {
                 signal: controlador.signal
             });
 
-            if (requisicaoAtual.current === identificador) {
-                setPerfil(perfilRecebido);
+            if (requisicaoAtual.current !== identificador) return;
 
-                if (perfilRecebido.papel === 'contato_apoio') {
-                    setTelaInterna(telasInternas.membros);
-                }
+            if (perfilRecebido.id !== contaComVisualizacaoRestaurada.current) {
+                const vinculo = await lerVinculoVisualizado(perfilRecebido.id).catch(() => null);
+                if (requisicaoAtual.current !== identificador) return;
+                contaComVisualizacaoRestaurada.current = perfilRecebido.id;
+                setVinculoVisualizadoId(vinculo);
+                if (vinculo !== null) setModoRede('acompanhados');
             }
+
+            setPerfil(perfilRecebido);
         } catch (erro) {
-            if (erro?.name === 'AbortError') {
+            if (erro?.name === 'AbortError' || requisicaoAtual.current !== identificador) {
                 return;
             }
 
             if (erro?.status === 401) {
+                contaComVisualizacaoRestaurada.current = null;
+                setVinculoVisualizadoId(null);
+                setModoRede('apoio');
                 setPerfil(null);
 
-                setTelaInterna(telasInternas.configuracoes);
+                setTelaInterna(telasInternas.inicio);
 
                 setTelaPublica('login');
 
@@ -442,12 +470,16 @@ export default function App() {
     }
 
     function concluirAutenticacao() {
+        contaComVisualizacaoRestaurada.current = null;
         setMensagemLogin(null);
         setPerfil(null);
         setErroPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
+        setVinculoVisualizadoId(null);
+        setModoRede('apoio');
         setCadastroDiarioVisivel(false);
+        setRegistroDiarioEdicao(null);
         setCategoriasDiarioVisiveis(false);
         setDataInicialDiario(null);
 
@@ -456,17 +488,12 @@ export default function App() {
         carregarPerfil();
     }
 
-    function concluirCadastro(dadosCadastro = {}) {
+    function concluirCadastro() {
         concluirAutenticacao();
-
-        setTelaInterna(
-            dadosCadastro.tipoUsuario === 'contato_apoio'
-                ? telasInternas.membros
-                : telasInternas.inicio
-        );
     }
 
-    function finalizarSessao(resultado = {}) {
+    const finalizarSessao = useCallback((resultado = {}) => {
+        contaComVisualizacaoRestaurada.current = null;
         requisicaoAtual.current += 1;
 
         controladorPerfilAtual.current?.abort();
@@ -477,8 +504,13 @@ export default function App() {
         setErroPerfil(false);
         setCarregandoPerfil(false);
 
-        setTelaInterna(telasInternas.configuracoes);
+        setTelaInterna(telasInternas.inicio);
+        setVinculoVisualizadoId(null);
+        setModoRede('apoio');
         setCategoriasDiarioVisiveis(false);
+        setCadastroDiarioVisivel(false);
+        setRegistroDiarioEdicao(null);
+        setDataInicialDiario(null);
 
         setOrigemNovaCategoria(telasInternas.membros);
         setRascunhoNovoContato(null);
@@ -489,10 +521,37 @@ export default function App() {
         setMensagemLogin(resultado?.mensagem || null);
 
         setEstadoSessao('anonima');
+    }, []);
+
+    async function visualizarContato(contato) {
+        if (gravandoVisualizacao.current || !perfil?.id) return;
+        if (
+            contato !== null &&
+            (contato?.status !== 'ativo' || !Number.isSafeInteger(contato.id) || contato.id <= 0)
+        ) {
+            return;
+        }
+        const vinculo = contato?.id ?? null;
+        const requisicao = requisicaoAtual.current;
+        gravandoVisualizacao.current = true;
+        try {
+            await salvarVinculoVisualizado(perfil.id, vinculo);
+            if (requisicaoAtual.current !== requisicao) return;
+            setVinculoVisualizadoId(vinculo);
+            setModoRede('acompanhados');
+            if (vinculo !== null) setTelaInterna(telasInternas.inicio);
+        } catch {
+            if (requisicaoAtual.current === requisicao) {
+                Alert.alert('Não foi possível atualizar a visualização. Tente novamente.');
+            }
+        } finally {
+            gravandoVisualizacao.current = false;
+        }
     }
 
     function selecionarAba(aba) {
-        if (perfil?.papel === 'contato_apoio' && !['membros', 'configuracoes'].includes(aba)) {
+        if (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') {
+            if (ABAS_ACOMPANHAMENTO.has(aba)) setTelaInterna(aba);
             return;
         }
 
@@ -671,11 +730,25 @@ export default function App() {
                 />
             );
         }
+    } else if (
+        (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') &&
+        TELAS_COMPARTILHADAS.has(telaInterna)
+    ) {
+        conteudo = (
+            <SharedSupportFlow
+                key={vinculoVisualizadoId}
+                vinculoId={vinculoVisualizadoId}
+                tela={telaInterna}
+                service={configuracao.servicos.sharedSupportService}
+                onSelecionarAba={selecionarAba}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
     } else if (telaInterna === telasInternas.inicio) {
         conteudo = (
             <>
                 <CycleTodayContainer
-                    key={sincronizacaoMenstrual.revisao}
+                    key={`${sincronizacaoMenstrual.revisao}-${revisaoDiarioHome}`}
                     aoCadastrarMenstruacao={(data) => {
                         setDataInicialCadastro(data);
                         setRetornoCadastro(telasInternas.inicio);
@@ -689,6 +762,7 @@ export default function App() {
                         setDataInicialDiario(data);
                         setCadastroDiarioVisivel(true);
                     }}
+                    aoEditarDiario={setRegistroDiarioEdicao}
                     aoAbrirHistorico={() => setTelaInterna(telasInternas.ciclos)}
                     aoSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
@@ -701,6 +775,18 @@ export default function App() {
                     onFechar={() => {
                         setCadastroDiarioVisivel(false);
                         setDataInicialDiario(null);
+                    }}
+                    onSessaoExpirada={finalizarSessao}
+                />
+                <EditDiaryEntrySheet
+                    visivel={Boolean(registroDiarioEdicao)}
+                    registro={registroDiarioEdicao}
+                    service={configuracao.servicos.diaryService}
+                    calendarService={configuracao.servicos.calendarService}
+                    onFechar={() => setRegistroDiarioEdicao(null)}
+                    onSalvo={() => {
+                        setRegistroDiarioEdicao(null);
+                        setRevisaoDiarioHome((revisao) => revisao + 1);
                     }}
                     onSessaoExpirada={finalizarSessao}
                 />
@@ -752,13 +838,19 @@ export default function App() {
             perfil?.papel === 'contato_apoio' ? (
                 <ReceivedContactsScreen
                     service={configuracao.servicos.receivedContactsService}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
+                    onVisualizarContato={visualizarContato}
                     onSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />
             ) : (
                 <SupportNetworkScreen
+                    modoRede={modoRede}
+                    onSelecionarModoRede={setModoRede}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
                     parentalConsentService={configuracao.servicos.parentalConsentService}
                     receivedContactsService={configuracao.servicos.receivedContactsService}
+                    onVisualizarContato={visualizarContato}
                     service={configuracao.servicos.supportContactService}
                     categoriasService={configuracao.servicos.supportCategoryService}
                     onGerenciarResponsavel={() => {
@@ -835,8 +927,7 @@ export default function App() {
         conteudo = (
             <CycleHistoryFlow
                 service={configuracao.servicos.cycleHistoryService}
-                aoAbrirCalendario={() => setTelaInterna(telasInternas.calendario)}
-                onSelecionarAba={selecionarAba}
+                onVoltar={() => setTelaInterna(telasInternas.inicio)}
                 onSessaoExpirada={finalizarSessao}
             />
         );
@@ -854,6 +945,9 @@ export default function App() {
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = (
             <SettingsScreen
+                emAcompanhamento={
+                    vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio'
+                }
                 onAbrirPoliticasPrivacidade={
                     consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
                 }

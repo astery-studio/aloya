@@ -4,20 +4,6 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
-const coresConfiabilidadeEscuras = Object.freeze({
-    baixa: {
-        cor: '#EF9A9A',
-        fundo: 'rgba(239, 154, 154, 0.16)',
-        borda: 'rgba(239, 154, 154, 0.33)'
-    },
-    media: {
-        cor: '#FFE082',
-        fundo: 'rgba(255, 224, 130, 0.16)',
-        borda: 'rgba(255, 224, 130, 0.33)'
-    },
-    alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
-});
-
 function criarEstilos(tema) {
     return StyleSheet.create({
         container: {
@@ -39,6 +25,16 @@ function criarEstilos(tema) {
             height: 100
         },
 
+        comMetricasFlexivel: {
+            height: 'auto',
+            minHeight: 210.4
+        },
+
+        semMetricasFlexivel: {
+            height: 'auto',
+            minHeight: 100
+        },
+
         cabecalho: {
             width: '100%',
             height: 50.82,
@@ -50,6 +46,16 @@ function criarEstilos(tema) {
 
         cabecalhoCentralizado: {
             alignItems: 'center'
+        },
+
+        cabecalhoFlexivel: {
+            height: 'auto',
+            minHeight: 50.82,
+            paddingVertical: 10
+        },
+
+        tituloCentralizado: {
+            textAlign: 'center'
         },
 
         cabecalhoAlinhado: {
@@ -149,6 +155,10 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        rodapeCentralizado: {
+            justifyContent: 'center'
+        },
+
         caixaDaTag: {
             flexShrink: 0,
             alignSelf: 'center',
@@ -159,4 +169,4 @@ function criarEstilos(tema) {
 
 const estilos = criarEstilos(temaClaro);
 
-export { coresConfiabilidadeEscuras, criarEstilos, estilos };
+export { criarEstilos, estilos };

@@ -30,24 +30,37 @@ function DiaryHistoryHeader({
     aoLimparFiltros,
     mostrarConteudo = true,
     mostrarDivisor = true,
+    somenteLeitura = false,
     estilos,
     tema
 }) {
     const cores = obterCoresDiario(tema).interface;
     return (
-        <View style={estilos.cabecalhoLista}>
-            <View style={estilos.introducao}>
-                <Text style={estilos.descricao}>
-                    Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao longo do
-                    seu ciclo.
-                </Text>
-                {atualizando ? (
-                    <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
-                        <ActivityIndicator size="small" color={cores.destaque} />
-                        <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
-                    </View>
-                ) : null}
-            </View>
+        <View
+            testID="diary-history-header"
+            style={[
+                estilos.cabecalhoLista,
+                somenteLeitura && (mostrarConteudo || atualizando) && estilos.cabecalhoCompartilhado
+            ]}
+        >
+            {!somenteLeitura || atualizando ? (
+                <View
+                    style={somenteLeitura ? estilos.atualizandoCompartilhado : estilos.introducao}
+                >
+                    {!somenteLeitura ? (
+                        <Text style={estilos.descricao}>
+                            Conheça melhor seu corpo! Registre sintomas, emoções e descobertas ao
+                            longo do seu ciclo.
+                        </Text>
+                    ) : null}
+                    {atualizando ? (
+                        <View accessibilityLiveRegion="polite" style={estilos.atualizando}>
+                            <ActivityIndicator size="small" color={cores.destaque} />
+                            <Text style={estilos.textoAtualizando}>Atualizando Diário...</Text>
+                        </View>
+                    ) : null}
+                </View>
+            ) : null}
             {mostrarConteudo && filtrosAtivos ? (
                 <DiaryActiveFilters
                     filtros={filtros}

@@ -24,18 +24,21 @@ test('adiciona a reflexão ao registro existente como edição', async () => {
         id: 'registro-1',
         versao: 3,
         data: '2026-11-24',
-        categorias: [{ id: 'digestao', opcoes: ['gases'] }]
+        categorias: [
+            { id: 'digestao', opcoes: ['gases'] },
+            { id: 'anotacao_livre', texto: 'Anterior\n' }
+        ]
     };
-    const salvar = jest.fn();
+    const salvarComValores = jest.fn();
     const aoFechar = jest.fn();
     const service = {};
     mockUseDiaryCatalog.mockReturnValue({ catalogo: { categorias: [] } });
     mockUseDiaryRecordForDate.mockReturnValue({ record: registro, loading: false });
     mockUseDiaryEntryForm.mockReturnValue({
-        valores: { anotacao_livre: 'Preciso descansar' },
+        valores: { anotacao_livre: 'Anterior\n' },
         erros: {},
         alterarValor: jest.fn(),
-        salvar,
+        salvarComValores,
         salvando: false
     });
 
@@ -58,18 +61,27 @@ test('adiciona a reflexão ao registro existente como edição', async () => {
             onSalvo: aoFechar
         })
     );
+    await fireEvent.changeText(
+        screen.getByPlaceholderText('Escreva livremente...'),
+        'Preciso descansar'
+    );
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar no Diário' }));
-    expect(salvar).toHaveBeenCalledTimes(1);
+    expect(salvarComValores).toHaveBeenCalledWith({
+        anotacao_livre: expect.stringMatching(/^Anterior\n\d{2}:\d{2}: Preciso descansar\n$/u)
+    });
 });
 
-test('encaminha a digitação da reflexão para o campo de anotação livre', async () => {
-    const alterarValor = jest.fn();
+test('mantém somente o rascunho novo no campo da reflexão', async () => {
     mockUseDiaryCatalog.mockReturnValue({ catalogo: { categorias: [] } });
     mockUseDiaryRecordForDate.mockReturnValue({ record: null, loading: false });
-    mockUseDiaryEntryForm.mockReturnValue({ valores: {}, erros: {}, alterarValor });
+    mockUseDiaryEntryForm.mockReturnValue({
+        valores: {},
+        erros: {},
+        salvarComValores: jest.fn()
+    });
 
     await render(<CycleHomeSheets aberto="reflexao" data="2026-11-24" diaryService={{}} />);
     await fireEvent.changeText(screen.getByPlaceholderText('Escreva livremente...'), 'Uma nota');
 
-    expect(alterarValor).toHaveBeenCalledWith('anotacao_livre', 'Uma nota');
+    expect(screen.getByPlaceholderText('Escreva livremente...')).toHaveProp('value', 'Uma nota');
 });

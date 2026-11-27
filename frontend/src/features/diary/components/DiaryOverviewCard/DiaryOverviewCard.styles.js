@@ -71,6 +71,9 @@ function criarEstilos(tema) {
             borderTopWidth: 1,
             borderTopColor: cores.borda
         },
+        rodapeSemFase: { borderTopWidth: 0 },
+        contadorNeutro: { backgroundColor: cores.borda },
+        quantidadeNeutra: { color: cores.textoSecundario },
         contadorDias: {
             width: 266.59,
             maxWidth: '100%',

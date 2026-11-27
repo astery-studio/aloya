@@ -2,6 +2,7 @@ import { useHomeColors } from '../hooks/useHomeColors';
 import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { NotebookIcon } from '../../../shared/components/icons/AppIcons';
 import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { useDiaryOverview } from '../../diary/hooks/useDiaryOverview';
@@ -22,7 +23,7 @@ function CycleDiaryCheckIn({
 }) {
     const { estilos, escuro, cor } = useHomeColors(estilosClaros);
     const textoEstado = escuro ? { color: cor('#5C5C59') } : undefined;
-    const [saved, setSaved] = useState(false);
+    const [savedRecord, setSavedRecord] = useState(null);
     const catalog = useDiaryCatalog({
         ativo: Boolean(service),
         service,
@@ -37,8 +38,9 @@ function CycleDiaryCheckIn({
         modo: existing.record ? 'editar' : 'criar',
         dataInicial: date,
         registroInicial: existing.record,
-        onCriado: () => setSaved(true),
-        onSalvo: () => setSaved(true),
+        marcarCheckIn: true,
+        onCriado: setSavedRecord,
+        onSalvo: setSavedRecord,
         onSessaoExpirada: onSessionExpired
     });
     const registeredIds = useMemo(
@@ -48,7 +50,7 @@ function CycleDiaryCheckIn({
             ),
         [existing.record]
     );
-    useEffect(() => setSaved(false), [date]);
+    useEffect(() => setSavedRecord(null), [date]);
     if (!service) return null;
     const valid = catalog.catalogo
         ? prepararFormularioDiario({
@@ -61,6 +63,8 @@ function CycleDiaryCheckIn({
 
     const salvarDesativado = !valid || Boolean(existing.record && !form.alterado);
     const aplicarVisualDesativado = salvarDesativado && !escuro;
+    const registroDoCheckIn = savedRecord ?? existing.record;
+    const checkInRealizado = Boolean(savedRecord) || existing.record?.checkInRealizado === true;
 
     return (
         <View style={estilos.margem}>
@@ -70,7 +74,9 @@ function CycleDiaryCheckIn({
                     Como você está se sentindo hoje?
                 </Text>
                 <Text style={estilos.descricao}>
-                    Escolha quantos itens fizerem sentido para você.
+                    {checkInRealizado
+                        ? 'Você realizou seu check-in com sucesso. Verifique os detalhes no diário:'
+                        : 'Escolha quantos itens fizerem sentido para você.'}
                 </Text>
                 <View style={estilos.conteudo}>
                     {catalog.carregando || existing.loading ? (
@@ -87,13 +93,19 @@ function CycleDiaryCheckIn({
                             />
                         </>
                     ) : null}
-                    {saved ? (
-                        <>
-                            <Text style={textoEstado}>Check-in registrado no Diário.</Text>
-                            <ButtonScreen texto="Adicionar detalhes" aoPressionar={onOpenDiary} />
-                        </>
+                    {checkInRealizado && !existing.loading ? (
+                        <ButtonScreen
+                            texto="Diário"
+                            variante="verde"
+                            icone={NotebookIcon}
+                            tamanhoIcone={18}
+                            corConteudo={escuro ? cor('#FDF6F3') : '#FFFFFF'}
+                            aoPressionar={() => onOpenDiary?.(registroDoCheckIn)}
+                            estilo={[estilos.botao, escuro && { backgroundColor: cor('#2C4C3B') }]}
+                            estiloTexto={estilos.textoBotao}
+                        />
                     ) : null}
-                    {catalog.catalogo && !existing.loading && !saved ? (
+                    {catalog.catalogo && !existing.loading && !checkInRealizado ? (
                         <>
                             <CompactDiaryOptions
                                 catalogo={catalog.catalogo}
