@@ -46,7 +46,9 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center'
         },
         mes: {
-            paddingHorizontal: 8
+            paddingHorizontal: 8,
+            // Preserva a altura do mês usada pelo getItemLayout.
+            paddingBottom: 8.991
         },
         cabecalhoMes: {
             flexDirection: 'row',
@@ -73,12 +75,6 @@ function criarEstilosCalendario(tema) {
             fontStyle: 'normal',
             fontWeight: '400',
             lineHeight: 18
-        },
-        divisorMes: {
-            alignSelf: 'stretch',
-            height: 0.991,
-            marginTop: 8,
-            backgroundColor: tema.cores.interface.separador
         },
         semana: {
             position: 'relative',
@@ -151,19 +147,7 @@ function criarEstilosCalendario(tema) {
             position: 'absolute',
             top: 0,
             bottom: 0,
-            borderTopWidth: 2,
-            borderRightWidth: 2,
-            borderBottomWidth: 2,
-            borderLeftWidth: 2,
-            borderStyle: 'dashed',
-            borderRadius: 16,
             zIndex: 3
-        },
-        janelaFertilAtual: {
-            borderColor: tema.escuro ? '#9E9C96' : 'rgba(34, 34, 34, 0.70)'
-        },
-        janelaFertilPrevista: {
-            borderColor: tema.escuro ? 'rgba(158, 156, 150, 0.40)' : 'rgba(34, 34, 34, 0.42)'
         },
         pressionado: {
             opacity: 0.72
@@ -204,6 +188,10 @@ function criarEstilosCalendario(tema) {
         estilos,
         estilosTipos,
         estilosTiposPrevistos,
+        coresJanelaFertil: {
+            atual: tema.escuro ? '#9E9C96' : 'rgba(34, 34, 34, 0.70)',
+            prevista: tema.escuro ? 'rgba(158, 156, 150, 0.40)' : 'rgba(34, 34, 34, 0.42)'
+        },
         corCarregamento: tema.escuro ? tema.cores.interface.destaque : tema.cores.marca.primaria,
         corIconeMarcado: '#FFFFFF'
     });

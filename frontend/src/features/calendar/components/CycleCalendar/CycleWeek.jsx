@@ -1,9 +1,60 @@
 //Agrupa sete dias e desenha trechos contínuos da janela fértil.
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import Svg, { Rect } from 'react-native-svg';
 
 import { CycleDay } from './CycleDay';
 import { estilosTemaClaro } from './CycleCalendar.styles';
+
+const ESPESSURA_CONTORNO = 2;
+const RECUO_CONTORNO = ESPESSURA_CONTORNO / 2;
+
+function ContornoFertil({ trecho, estilosTema }) {
+    const { estilos, coresJanelaFertil } = estilosTema;
+    const [medidas, setMedidas] = useState(null);
+    const areaValida = medidas?.width > ESPESSURA_CONTORNO && medidas?.height > ESPESSURA_CONTORNO;
+
+    return (
+        <View
+            testID={`janela-fertil-${trecho.chave}`}
+            pointerEvents="none"
+            onLayout={({ nativeEvent: { layout } }) => {
+                setMedidas((atual) =>
+                    atual?.width === layout.width && atual?.height === layout.height
+                        ? atual
+                        : { width: layout.width, height: layout.height }
+                );
+            }}
+            style={[
+                estilos.trechoJanelaFertil,
+                {
+                    left: `${(trecho.inicio / 7) * 100}%`,
+                    width: `${(trecho.quantidade / 7) * 100}%`
+                }
+            ]}
+        >
+            {areaValida ? (
+                <Svg width="100%" height="100%">
+                    <Rect
+                        testID={`pontilhado-fertil-${trecho.chave}`}
+                        x={RECUO_CONTORNO}
+                        y={RECUO_CONTORNO}
+                        width={medidas.width - ESPESSURA_CONTORNO}
+                        height={medidas.height - ESPESSURA_CONTORNO}
+                        rx={15}
+                        fill="none"
+                        stroke={
+                            trecho.previsto ? coresJanelaFertil.prevista : coresJanelaFertil.atual
+                        }
+                        strokeWidth={ESPESSURA_CONTORNO}
+                        strokeDasharray="2 4"
+                        strokeLinecap="round"
+                    />
+                </Svg>
+            ) : null}
+        </View>
+    );
+}
 
 function obterTrechosFerteis(semana) {
     const trechos = [];
@@ -62,19 +113,7 @@ function CycleWeek({ semana, aoPressionarDia, estilosTema = estilosTemaClaro }) 
             ))}
 
             {trechosFerteis.map((trecho) => (
-                <View
-                    key={trecho.chave}
-                    testID={`janela-fertil-${trecho.chave}`}
-                    pointerEvents="none"
-                    style={[
-                        estilos.trechoJanelaFertil,
-                        trecho.previsto ? estilos.janelaFertilPrevista : estilos.janelaFertilAtual,
-                        {
-                            left: `${(trecho.inicio / 7) * 100}%`,
-                            width: `${(trecho.quantidade / 7) * 100}%`
-                        }
-                    ]}
-                />
+                <ContornoFertil key={trecho.chave} trecho={trecho} estilosTema={estilosTema} />
             ))}
         </View>
     );

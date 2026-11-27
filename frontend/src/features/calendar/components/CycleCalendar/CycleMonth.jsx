@@ -31,7 +31,6 @@ function CycleMonth({ mes, aoPressionarDia, estilosTema = estilosTemaClaro }) {
                     estilosTema={estilosTema}
                 />
             ))}
-            <View testID={`divisor-mes-${mes.chave}`} style={estilos.divisorMes} />
         </View>
     );
 }
