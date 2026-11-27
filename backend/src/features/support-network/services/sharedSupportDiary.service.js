@@ -1,6 +1,7 @@
 import { formatarData, paraDataCalendario } from '../../cycles/utils/calendar.js';
 import { CATALOGO_DIARIO } from '../../diary/catalog/diary.catalog.js';
 import { apresentarDetalheRegistro } from '../../diary/presenters/diaryEntry.presenter.js';
+import { apresentarResumoRegistro } from '../../diary/presenters/diaryHistory.presenter.js';
 import { obterCategoriasAtivas } from '../../diary/services/diaryActiveCategories.js';
 import { criarWhereHistorico } from '../../diary/services/diaryHistory.query.js';
 import { codificarCursor, decodificarCursor } from '../../diary/utils/diaryCursor.js';
@@ -51,6 +52,19 @@ function criarSharedSupportDiary({ prisma }) {
         return { id, data, ...(exibirFaseHistorica ? { fase } : {}), categorias };
     }
 
+    function apresentarResumo(registro, { visiveis, exibirFaseHistorica }) {
+        const { id, data, fase, principais, maisQuantidade, trechoAnotacao } =
+            apresentarResumoRegistro(registro, visiveis);
+        return {
+            id,
+            data,
+            ...(exibirFaseHistorica ? { fase } : {}),
+            principais,
+            maisQuantidade,
+            trechoAnotacao
+        };
+    }
+
     async function catalogo(acesso) {
         const { visiveis } = await preparar(acesso);
         const macrocategorias = CATALOGO_DIARIO.map(({ id, nome, categorias }) => ({
@@ -94,7 +108,7 @@ function criarSharedSupportDiary({ prisma }) {
         const pagina = registros.slice(0, limite);
         const ultimo = pagina.at(-1);
         return {
-            itens: pagina.map((registro) => apresentar(registro, contexto)),
+            itens: pagina.map((registro) => apresentarResumo(registro, contexto)),
             proximoCursor:
                 registros.length > limite
                     ? codificarCursor(

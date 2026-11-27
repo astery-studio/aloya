@@ -71,6 +71,9 @@ test('filtra categorias no banco e na resposta e rejeita ID ou filtro fora do ac
         atualizadoEm: data,
         categorias: ['pele', 'anotacao_livre'].map((categoriaId) => ({
             categoriaId,
+            categoriaNome: categoriaId === 'pele' ? 'Pele' : 'Anotação livre',
+            macrocategoriaNome: 'Corpo e Sintomas Físicos',
+            opcoes: categoriaId === 'pele' ? [{ opcaoId: 'espinhas', opcaoNome: 'Espinhas' }] : [],
             valorEscalado: null,
             valorDuracaoMinutos: null,
             valorTexto: categoriaId === 'anotacao_livre' ? 'Informação privada' : null
@@ -97,12 +100,21 @@ test('filtra categorias no banco e na resposta e rejeita ID ou filtro fora do ac
     });
     const acesso = { titularId: 4, permissoes: ['corpo.pele'] };
     const { itens } = await diary.listar(acesso, {});
-    assert.deepEqual(Object.keys(itens[0]), ['id', 'data', 'categorias']);
+    assert.deepEqual(Object.keys(itens[0]), [
+        'id',
+        'data',
+        'principais',
+        'maisQuantidade',
+        'trechoAnotacao'
+    ]);
     assert.deepEqual(
-        itens[0].categorias.map(({ id }) => id),
+        itens[0].principais.map(({ categoriaId }) => categoriaId),
         ['pele']
     );
-    assert.deepEqual(await diary.buscar(acesso, '7'), itens[0]);
+    assert.deepEqual(
+        (await diary.buscar(acesso, '7')).categorias.map(({ id }) => id),
+        ['pele']
+    );
     assert.deepEqual(
         (await diary.catalogo(acesso)).macrocategorias[0].categorias.map(({ id }) => id),
         ['pele']
