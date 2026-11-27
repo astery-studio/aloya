@@ -109,6 +109,8 @@ function CycleHistoryScreen({
     erro,
     erroCarregarMais,
     temMais = false,
+    somenteLeitura = false,
+    nomeTitular,
     aoTentarNovamente,
     aoCarregarMais,
     aoTentarCarregarMais,
@@ -130,6 +132,9 @@ function CycleHistoryScreen({
     const possuiErroCarregarMais =
         typeof erroCarregarMais === 'string' && erroCarregarMais.trim().length > 0;
     const estaVazio = ciclosSeguros.length === 0;
+    const mensagemErro = somenteLeitura
+        ? 'Não foi possível carregar histórico de ciclos. Tente novamente.'
+        : 'Não foi possível carregar seu histórico de ciclos. Tente novamente.';
     const podeCarregarMais =
         temMais &&
         !carregandoMais &&
@@ -138,6 +143,8 @@ function CycleHistoryScreen({
 
     const resumoDosCiclos = (
         <CycleSummaryCard
+            nomeTitular={nomeTitular}
+            exibirConfianca={!somenteLeitura}
             cicloMedioDias={resumoSeguro.cicloMedioDias}
             menstruacaoMediaDias={resumoSeguro.menstruacaoMediaDias}
             quantidadeCiclos={resumoSeguro.quantidadeCiclos}
@@ -150,6 +157,7 @@ function CycleHistoryScreen({
             <View style={estilos.itemDaLista}>
                 <CycleHistoryCard
                     ciclo={item}
+                    somenteLeitura={somenteLeitura}
                     aoEditar={aoEditarCiclo}
                     aoExcluir={aoExcluirCiclo}
                 />
@@ -162,7 +170,7 @@ function CycleHistoryScreen({
     if (carregando) {
         conteudo = (
             <View style={estilos.conteudoEstatico}>
-                {resumoDosCiclos}
+                {!somenteLeitura && resumoDosCiclos}
 
                 <View
                     testID="cycle-history-loading"
@@ -178,18 +186,18 @@ function CycleHistoryScreen({
     } else if (possuiErro) {
         conteudo = (
             <View style={estilos.conteudoEstatico}>
-                {resumoDosCiclos}
+                {!somenteLeitura && resumoDosCiclos}
 
                 <View
                     accessible
                     accessibilityRole="alert"
-                    accessibilityLabel="Ocorreu um erro. Não foi possível carregar seu histórico de ciclos. Tente novamente."
+                    accessibilityLabel={`Ocorreu um erro. ${mensagemErro}`}
                     style={estilos.estadoCentralizado}
                 >
                     <Text style={estilos.tituloDoEstado}>Ocorreu um erro</Text>
 
                     <Text style={[estilos.mensagemDoEstado, estilosErro.mensagem]}>
-                        Não foi possível carregar seu histórico de ciclos. Tente novamente.
+                        {mensagemErro}
                     </Text>
 
                     <View style={estilos.botaoDoEstado}>
@@ -207,13 +215,17 @@ function CycleHistoryScreen({
     } else if (estaVazio) {
         conteudo = (
             <View style={estilos.conteudoEstatico}>
-                {resumoDosCiclos}
+                {!somenteLeitura && resumoDosCiclos}
 
                 <View style={estilos.estadoCentralizado}>
-                    <Text style={estilos.tituloDoEstado}>Nenhum ciclo registrado</Text>
+                    <Text style={estilos.tituloDoEstado}>
+                        {somenteLeitura ? 'Nada para exibir' : 'Nenhum ciclo registrado'}
+                    </Text>
 
                     <Text style={estilos.mensagemDoEstado}>
-                        Comece registrando seu primeiro ciclo pelo calendário.
+                        {somenteLeitura
+                            ? 'Ainda não há dados suficientes para exibir aqui.'
+                            : 'Comece registrando seu primeiro ciclo pelo calendário.'}
                     </Text>
                 </View>
             </View>
