@@ -20,6 +20,7 @@ function responderComPreferencias(service, operacao, rotaContato = false) {
                     ? await service.atualizar(id, req.body, async (cliente, chave) => {
                           const permitidas = await buscarChaves(cliente);
                           if (!permitidas.includes(chave)) throw semAcesso();
+                          return permitidas;
                       })
                     : await service[operacao](id);
             const chaves = await buscarChaves();
