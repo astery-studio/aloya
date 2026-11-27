@@ -1,11 +1,13 @@
 const ciclo = {
     titulo: 'Ciclo e Previsões',
     grupos: {
-        menstrual: ['Ciclo Menstrual', [['proxima', 'Próxima menstruação'], ['confirmacao', 'Confirmação do início do ciclo']]],
+        menstrual: ['Ciclo Menstrual', [
+            ['proxima', 'Próxima menstruação'], ['confirmacao', 'Confirmação do início do ciclo'],
+            ['antecedenciaProximoCiclo', 'Quando notificar o próximo ciclo', 'antecedencia']
+        ]],
         fases: ['Mudanças de Fase', [
             ['menstrual', 'Início da fase menstrual'], ['folicular', 'Início da fase folicular'],
-            ['ovulatoria', 'Início da fase ovulatória'], ['lutea', 'Início da fase lútea'],
-            ['antecedenciaProximoCiclo', 'Quando notificar o próximo ciclo', 'antecedencia']
+            ['ovulatoria', 'Início da fase ovulatória'], ['lutea', 'Início da fase lútea']
         ]],
         dicas: ['Dicas de Autocuidado', [
             ['menstrual', 'Dicas da fase menstrual'], ['folicular', 'Dicas da fase folicular'],
@@ -65,6 +67,32 @@ const redeApoio = {
 };
 
 export const catalogoNotificacoes = { ciclo, anticoncepcional, redeApoio };
+
+const gruposPorMetodo = {
+    injetavel: 'injetavel',
+    adesivo: 'adesivo',
+    anel_vaginal: 'anel',
+    diu_hormonal: 'diu'
+};
+
+export function categoriaNotificacoesAnticoncepcional(metodos) {
+    const gruposVisiveis = new Set();
+    for (const { tipo, dataValidade } of metodos) {
+        if (Object.hasOwn(gruposPorMetodo, tipo)) gruposVisiveis.add(gruposPorMetodo[tipo]);
+        if (tipo !== 'diu_hormonal') {
+            gruposVisiveis.add('rotina');
+            gruposVisiveis.add('naoConfirmado');
+        }
+        if (tipo === 'diu_hormonal' || dataValidade) gruposVisiveis.add('validade');
+    }
+
+    return {
+        ...anticoncepcional,
+        grupos: Object.fromEntries(
+            Object.entries(anticoncepcional.grupos).filter(([grupo]) => gruposVisiveis.has(grupo))
+        )
+    };
+}
 
 export function categoriaNotificacoesContato(chavesDisponiveis) {
     const chaves = new Set(chavesDisponiveis);
