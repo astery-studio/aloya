@@ -7,10 +7,6 @@ function criarEstilos(tema) {
             justifyContent: 'flex-end'
         },
 
-        areaFundo: {
-            ...StyleSheet.absoluteFillObject
-        },
-
         fundo: {
             ...StyleSheet.absoluteFillObject,
             backgroundColor: tema.cores.interface.sobreposicao

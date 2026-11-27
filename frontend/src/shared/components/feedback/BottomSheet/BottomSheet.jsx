@@ -18,6 +18,7 @@ import { deveFecharPorArraste, deveIniciarArraste } from './bottomSheetGesture';
 import { criarEstilos } from './BottomSheet.style';
 
 const permitirInicioDeslize = () => true;
+const FundoPressionavelAnimado = Animated.createAnimatedComponent(Pressable);
 
 function BottomSheet({
     visivel,
@@ -197,21 +198,15 @@ function BottomSheet({
                 style={estilos.tela}
                 behavior={ajustarAoTeclado && Platform.OS === 'ios' ? 'padding' : undefined}
             >
-                <Pressable
-                    testID="bottom-sheet-area-fundo"
+                <FundoPressionavelAnimado
+                    testID="bottom-sheet-fundo"
                     accessibilityRole={fecharAoTocarFora ? 'button' : undefined}
                     accessibilityLabel={fecharAoTocarFora ? 'Fechar painel' : undefined}
                     disabled={!fecharAoTocarFora || bloquearFechamento}
                     onPress={solicitarFechamento}
                     pointerEvents={fecharAoTocarFora ? 'auto' : 'none'}
-                    style={estilos.areaFundo}
-                >
-                    <Animated.View
-                        testID="bottom-sheet-fundo"
-                        pointerEvents="none"
-                        style={[estilos.fundo, { opacity: progresso }]}
-                    />
-                </Pressable>
+                    style={[estilos.fundo, { opacity: progresso }]}
+                />
 
                 <Animated.View
                     testID="bottom-sheet-painel"
