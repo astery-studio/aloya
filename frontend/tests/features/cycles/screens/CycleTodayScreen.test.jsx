@@ -69,11 +69,12 @@ test('compõe a tela carregada com conteúdo e janela recebidos por prop', async
     );
 });
 
-test('mantém o cabeçalho dentro da área rolável', async () => {
+test('mantém o cabeçalho fixo fora da área rolável', async () => {
     const { getByTestId } = await renderizar({ previsao });
     const rolagem = getByTestId('conteudo-rolavel');
 
-    expect(within(rolagem).getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
+    expect(screen.getByText('Aloya - 8 de Outubro')).toBeOnTheScreen();
+    expect(within(rolagem).queryByText('Aloya - 8 de Outubro')).not.toBeOnTheScreen();
 });
 
 test('mantém a faixa de datas no estado sem dados', async () => {
@@ -217,8 +218,7 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
     expect(estilos.cabecalho).toMatchObject({
         width: '100%',
         paddingTop: 16,
-        paddingBottom: 16,
-        marginBottom: 8
+        paddingBottom: 16
     });
     expect(estilos.cabecalho.height).toBeUndefined();
     expect(estilos.titulo).toMatchObject({
@@ -232,7 +232,7 @@ test('reserva espaço responsivo para conteúdo e cabeçalho', () => {
         textAlign: 'left'
     });
     expect(estilos.textoCarregando.fontWeight).toBe('400');
-    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingBottom: 16 });
+    expect(estilos.rolagem).toMatchObject({ flexGrow: 1, paddingTop: 8, paddingBottom: 16 });
     expect(estilos.navegacaoSegura).toMatchObject({ flexShrink: 0 });
 });
 

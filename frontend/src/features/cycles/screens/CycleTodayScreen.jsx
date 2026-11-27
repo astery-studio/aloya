@@ -138,6 +138,19 @@ function CycleTodayScreen({
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
+            <View style={estilos.cabecalho}>
+                <Text accessibilityRole="header" style={estilos.titulo}>
+                    {formatarDataCabecalho(referencia)}
+                </Text>
+                <View style={estilos.acoesCabecalho}>
+                    <IconButton
+                        icone={ClockCounterClockwiseIcon}
+                        aoPressionar={aoAbrirHistorico}
+                        rotuloAcessibilidade="Abrir histórico do ciclo"
+                        variante="calendario"
+                    />
+                </View>
+            </View>
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}>
                     <ActivityIndicator size="large" color={corCarregamento} />
@@ -150,19 +163,6 @@ function CycleTodayScreen({
                     contentContainerStyle={estilos.rolagem}
                     showsVerticalScrollIndicator={false}
                 >
-                    <View style={estilos.cabecalho}>
-                        <Text accessibilityRole="header" style={estilos.titulo}>
-                            {formatarDataCabecalho(referencia)}
-                        </Text>
-                        <View style={estilos.acoesCabecalho}>
-                            <IconButton
-                                icone={ClockCounterClockwiseIcon}
-                                aoPressionar={aoAbrirHistorico}
-                                rotuloAcessibilidade="Abrir histórico do ciclo"
-                                variante="calendario"
-                            />
-                        </View>
-                    </View>
                     {dias.length ? (
                         <CycleDateStrip
                             dias={dias}

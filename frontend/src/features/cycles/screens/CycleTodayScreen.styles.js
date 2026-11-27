@@ -14,8 +14,7 @@ function criarEstilos(tema) {
             gap: espacamentos.medio,
             paddingHorizontal: espacamentos.medio,
             paddingTop: tema.espacamentosLayout.espacamentoSuperiorHeader,
-            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader,
-            marginBottom: tema.espacamentosLayout.headerParaConteudo
+            paddingBottom: tema.espacamentosLayout.espacamentoInferiorHeader
         },
         acoesCabecalho: { flexDirection: 'row', gap: espacamentos.pequeno },
         titulo: {
@@ -32,6 +31,7 @@ function criarEstilos(tema) {
         },
         rolagem: {
             flexGrow: 1,
+            paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: espacamentos.medio
         },
         carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
