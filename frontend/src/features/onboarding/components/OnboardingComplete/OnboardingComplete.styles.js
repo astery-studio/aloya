@@ -1,12 +1,12 @@
 /**
- * Define os estilos da mensagem final e da área reservada ao logotipo.
+ * Define os estilos da mensagem final e do logotipo.
  */
 import { StyleSheet } from 'react-native';
 import { fontFamilies, typography } from '../../../../shared/theme';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        conteudo: { alignItems: 'center', gap: 40, width: '100%' },
+        conteudo: { alignItems: 'center', gap: 20, width: '100%' },
         titulo: {
             ...typography.h1,
             color: tema.escuro ? '#E3E3E3' : tema.cores.interface.textoPrincipal,
@@ -19,10 +19,9 @@ function criarEstilos(tema) {
             fontWeight: '900'
         },
         logo: {
-            alignItems: 'center',
-            height: 80,
-            justifyContent: 'center',
-            width: 220
+            width: '100%',
+            maxWidth: 320,
+            aspectRatio: 1
         }
     });
 }
