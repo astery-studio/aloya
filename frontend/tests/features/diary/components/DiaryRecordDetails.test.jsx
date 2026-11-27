@@ -142,7 +142,7 @@ describe('DiaryRecordDetails', () => {
             borderRadius: 20
         });
         expect(screen.getByText('Editar')).toHaveStyle({
-            color: '#FFF',
+            color: '#FFFFFF',
             fontSize: 13,
             fontWeight: '600',
             lineHeight: 19.5,
