@@ -51,8 +51,34 @@ export function criarNotificationPreferencesService(prisma) {
         return buscarNoBanco(cliente, usuarioId);
     }
 
-    return {
-        buscar: (usuarioId) => buscarNoBanco(prisma, usuarioId),
-        atualizar: (usuarioId, entrada) => gravar(prisma, usuarioId, validarAlteracao(entrada))
-    };
+    async function atualizar(usuarioId, entrada) {
+        const alteracao = validarAlteracao(entrada);
+        if (alteracao.valor !== false || alteracao.chave === 'previaDetalhada') {
+            return gravar(prisma, usuarioId, alteracao);
+        }
+
+        const { chave } = alteracao;
+        const evento =
+            {
+                cicloPrevisoesAtivo: 'ciclo',
+                anticoncepcionalAtivo: 'anticoncepcional',
+                redeApoioAtiva: 'redeApoio',
+                lembreteDiarioAtivo: 'ciclo.diario.lembrete'
+            }[chave] ?? chave;
+        return prisma.$transaction(async (tx) => {
+            const preferencias = await gravar(tx, usuarioId, alteracao);
+            await tx.notificacao.updateMany({
+                where: {
+                    usuarioId,
+                    statusEnvio: 'agendada',
+                    dataHoraDisparo: null,
+                    OR: [{ evento }, { evento: { startsWith: `${evento}.` } }]
+                },
+                data: { statusEnvio: 'cancelada' }
+            });
+            return preferencias;
+        });
+    }
+
+    return { buscar: (usuarioId) => buscarNoBanco(prisma, usuarioId), atualizar };
 }
