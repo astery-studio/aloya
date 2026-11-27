@@ -1,5 +1,6 @@
 //Define o visual das variantes simples e composta da confiabilidade.
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
 import { fontFamilies } from '../../../theme';
 
@@ -76,19 +77,19 @@ function criarEstilos(tema) {
     const variantes = tema.escuro
         ? Object.freeze({
               alta: Object.freeze({
-                  cor: '#9FD6B6',
-                  fundo: 'rgba(159, 214, 182, 0.14)',
-                  borda: 'rgba(159, 214, 182, 0.45)'
+                  cor: coresNoturnasConteudo.verde,
+                  fundo: 'rgba(165, 214, 167, 0.14)',
+                  borda: 'rgba(165, 214, 167, 0.45)'
               }),
               media: Object.freeze({
-                  cor: '#F2B45F',
-                  fundo: 'rgba(242, 180, 95, 0.14)',
-                  borda: 'rgba(242, 180, 95, 0.45)'
+                  cor: '#D68C3A',
+                  fundo: 'rgba(214, 140, 58, 0.14)',
+                  borda: 'rgba(214, 140, 58, 0.45)'
               }),
               baixa: Object.freeze({
-                  cor: '#F08A75',
-                  fundo: 'rgba(240, 138, 117, 0.14)',
-                  borda: 'rgba(240, 138, 117, 0.45)'
+                  cor: coresNoturnasConteudo.coral,
+                  fundo: 'rgba(194, 110, 95, 0.14)',
+                  borda: 'rgba(194, 110, 95, 0.45)'
               })
           })
         : Object.freeze({
