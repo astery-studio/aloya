@@ -39,6 +39,8 @@ flowchart TD
 | `GET /api/preferencias-notificacao` | Preferências salvas e estado efetivo por evento |
 | `GET /api/preferencias-notificacao/padroes` | Padrões e grupos do catálogo |
 | `PATCH /api/preferencias-notificacao` | Atualização de um campo por `{ chave, valor }` |
+| `GET /api/preferencias-notificacao/contato` | Preferências da conta como contato e chaves disponíveis |
+| `PATCH /api/preferencias-notificacao/contato` | Atualiza um aviso ou grupo disponível para o contato |
 | `POST /api/preferencias-notificacao/restaurar` | Restaura os padrões da conta |
 | `POST /api/dispositivos-notificacao` | Registra `instalacao`, `token`, `plataforma` e `fuso` na sessão atual |
 | `GET /api/dispositivos-notificacao` | Lista dispositivos da conta, com identificador, plataforma e atualização |
@@ -46,6 +48,8 @@ flowchart TD
 | `GET /api/dispositivos-notificacao/destino/:id` | Resolve destino após conferir conta e autorização |
 
 O catálogo de tipos usa as chaves do catálogo de preferências. A versão é inicializada sem duplicação na tabela `CatalogoNotificacao` pelo worker ou na consulta de padrões. A preferência efetiva combina categoria, grupo e evento. Os desligamentos preservam valores individuais e cancelam itens persistidos identificados. Usuários têm somente acesso às próprias configurações e dispositivos.
+
+A visão de contato reúne as permissões dos vínculos ativos e os avisos de convites e alterações de acesso. A API devolve `chavesDisponiveis` junto das preferências, oculta avisos compartilhados sem permissão também na rota principal e responde com 403 quando a chave não está disponível. O worker confere preferência e permissão imediatamente antes de encaminhar ao provedor. Desligar um aviso cancela agendamentos e retentativas pendentes. Avisos já encaminhados ao provedor seguem o fluxo de entrega do aparelho.
 
 `Notificacao` guarda evento, ocorrência, origem, horário UTC e status da agenda. A combinação destinatário, evento e ocorrência é única. `DispositivoPush` vincula uma instalação e um token a uma conta e sessão. `EntregaPush` grava o vínculo vigente, tentativas, erro sanitizado, ticket e recibo. Uma troca de conta ou token gera um novo vínculo e invalida entregas pendentes do anterior. Uma sessão revogada bloqueia novas entregas.
 

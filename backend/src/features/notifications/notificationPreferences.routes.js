@@ -1,10 +1,28 @@
-import { camposExistentes, gruposNotificacao } from './notificationPreferenceFields.js';
+import { gruposNotificacao } from './notificationPreferenceFields.js';
 import { permiteNotificacao } from './notificationEvents.service.js';
+import {
+    buscarChavesDisponiveis,
+    filtrarChaves,
+    responderPadroes,
+    semAcesso
+} from './notificationPreferenceAccess.js';
 
-function responderComPreferencias(operacao) {
+function responderComPreferencias(service, operacao, rotaContato = false) {
     return async (req, res, next) => {
         try {
-            const preferencias = await operacao(req.usuario.id, req.body);
+            const { id, papel } = req.usuario;
+            if (papel === 'contato_apoio' && operacao === 'restaurar') throw semAcesso();
+
+            const buscarChaves = (cliente) =>
+                buscarChavesDisponiveis(service, req.usuario, rotaContato, cliente);
+            const preferencias =
+                operacao === 'atualizar'
+                    ? await service.atualizar(id, req.body, async (cliente, chave) => {
+                          const permitidas = await buscarChaves(cliente);
+                          if (!permitidas.includes(chave)) throw semAcesso();
+                      })
+                    : await service[operacao](id);
+            const chaves = await buscarChaves();
             const {
                 cicloPrevisoesAtivo,
                 anticoncepcionalAtivo,
@@ -27,7 +45,11 @@ function responderComPreferencias(operacao) {
                 )
             );
             efetivas.lembreteDiarioAtivo = permiteNotificacao(estado, 'ciclo.diario.lembrete');
-            return res.set('Cache-Control', 'no-store').json({ preferencias, efetivas });
+            return res.set('Cache-Control', 'no-store').json({
+                preferencias: filtrarChaves(preferencias, chaves),
+                efetivas: filtrarChaves(efetivas, chaves),
+                chavesDisponiveis: chaves
+            });
         } catch (erro) {
             return next(erro);
         }
@@ -36,14 +58,16 @@ function responderComPreferencias(operacao) {
 
 export function criarNotificationPreferencesRoutes({ Router, autenticar, rateLimit, service }) {
     const rotas = Router();
-    rotas.get('/', autenticar, responderComPreferencias(service.buscar));
-    rotas.get('/padroes', autenticar, async (_req, res) =>
-        res.set('Cache-Control', 'no-store').json({
-            ...(await service.buscarCatalogo()),
-            campos: Object.keys(camposExistentes)
-        })
+    rotas.get('/', autenticar, responderComPreferencias(service, 'buscar'));
+    rotas.get('/contato', autenticar, responderComPreferencias(service, 'buscar', true));
+    rotas.get('/padroes', autenticar, responderPadroes(service));
+    rotas.patch('/', autenticar, rateLimit, responderComPreferencias(service, 'atualizar'));
+    rotas.patch(
+        '/contato',
+        autenticar,
+        rateLimit,
+        responderComPreferencias(service, 'atualizar', true)
     );
-    rotas.patch('/', autenticar, rateLimit, responderComPreferencias(service.atualizar));
-    rotas.post('/restaurar', autenticar, rateLimit, responderComPreferencias(service.restaurar));
+    rotas.post('/restaurar', autenticar, rateLimit, responderComPreferencias(service, 'restaurar'));
     return rotas;
 }
