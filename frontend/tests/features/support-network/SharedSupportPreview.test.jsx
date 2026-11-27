@@ -22,6 +22,8 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Ver Histórico de Ciclos' }));
     expect(screen.getByText('RESUMO DOS CICLOS DE JÚLIA')).toBeOnTheScreen();
+    expect(screen.getAllByTestId('cycle-history-card')).toHaveLength(2);
+    await fireEvent(screen.getByTestId('cycle-history-list'), 'onEndReached');
     expect(screen.getAllByTestId('cycle-history-card')).toHaveLength(3);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
@@ -61,4 +63,21 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     await fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
     expect(screen.getByText('FILTRO APLICADO (1)')).toBeOnTheScreen();
     expect(screen.getAllByTestId('diary-entry-card')).toHaveLength(1);
+});
+
+test('mostra o histórico compartilhado vazio e permite recuperar de um erro', async () => {
+    await render(<SharedSupportPreview />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Histórico vazio' }));
+    expect(screen.getByText('Ainda não há dados suficientes para exibir aqui.')).toBeOnTheScreen();
+    expect(screen.queryByText('RESUMO DOS CICLOS DE JÚLIA')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Erro no histórico' }));
+    expect(
+        screen.getByText('Não foi possível carregar histórico de ciclos. Tente novamente.')
+    ).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar Novamente' }));
+    expect(screen.getByText('RESUMO DOS CICLOS DE JÚLIA')).toBeOnTheScreen();
 });

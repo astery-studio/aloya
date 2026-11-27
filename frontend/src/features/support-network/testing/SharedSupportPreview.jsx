@@ -11,8 +11,6 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { AppThemeRoot } from '../../../app/AppThemeRoot';
 import { ContraceptiveUsageCard } from '../../contraceptives/components/ContraceptiveUsageCard';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
-import { CycleHistoryCard } from '../../cycles/components/CycleHistoryCard/CycleHistoryCard';
-import { CycleSummaryCard } from '../../cycles/components/CycleSummaryCard/CycleSummaryCard';
 import { DiaryActiveFilters } from '../../diary/components/DiaryActiveFilters/DiaryActiveFilters';
 import { DiaryFiltersSheet } from '../../diary/components/DiaryFiltersSheet/DiaryFiltersSheet';
 import { DiaryTimelineDivider } from '../../diary/components/DiaryHistoryHeader/DiaryHistoryHeader';
@@ -35,6 +33,7 @@ import { SharedPermissionGate } from '../components/SharedPermissionGate/SharedP
 import { SupportedCycleHero } from '../components/SupportedCycleHero/SupportedCycleHero';
 import { SupportedPersonIndicator } from '../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { gruposPermissoes, permissoesGerais } from '../constants/permissionOptions';
+import { SharedCycleHistoryScreen } from '../screens/SharedCycleHistoryScreen/SharedCycleHistoryScreen';
 
 const NOME = 'Júlia';
 const PERMISSOES_DEMONSTRACAO = [
@@ -43,7 +42,6 @@ const PERMISSOES_DEMONSTRACAO = [
 ].map(({ id }) => id);
 const TITULOS = {
     inicio: 'Início',
-    historico: 'Histórico de Ciclos',
     diario: 'Diário',
     anticoncepcionais: 'Anticoncepcionais'
 };
@@ -119,12 +117,14 @@ const CENARIOS_CICLO = [
 ];
 const CICLOS = [
     {
+        id: '5',
         numero: 5,
         periodo: '04 Setembro até hoje',
         diasMenstruais: 4,
         status: 'emAndamento'
     },
     {
+        id: '4',
         numero: 4,
         periodo: '07 Agosto até 03 Setembro',
         diasMenstruais: 5,
@@ -132,6 +132,7 @@ const CICLOS = [
         status: 'concluido'
     },
     {
+        id: '3',
         numero: 3,
         periodo: '08 Julho até 06 Agosto',
         diasMenstruais: 6,
@@ -139,6 +140,35 @@ const CICLOS = [
         status: 'incerto'
     }
 ];
+
+function criarServicoHistoricoPrevia(cenario) {
+    let falharNaPrimeiraConsulta = cenario === 'erro';
+    const ciclos = cenario === 'vazio' ? [] : CICLOS;
+    const resumo = {
+        cicloMedioDias: 28,
+        menstruacaoMediaDias: 5,
+        quantidadeCiclos: ciclos.length
+    };
+
+    return {
+        async listarPagina({ cursor }) {
+            if (falharNaPrimeiraConsulta) {
+                falharNaPrimeiraConsulta = false;
+                throw new Error('Falha simulada na prévia');
+            }
+
+            const temMais = !cursor && ciclos.length > 2;
+
+            return {
+                ciclos: cursor ? ciclos.slice(2) : ciclos.slice(0, 2),
+                resumo,
+                quantidadeCiclos: ciclos.length,
+                paginacao: { temMais, proximoCursor: temMais ? '2' : null }
+            };
+        }
+    };
+}
+
 const REGISTROS_DIARIO = [
     {
         id: 1,
@@ -399,6 +429,7 @@ function DiarioPrevia({ permissoes, aviso, filtroAberto, aoFecharFiltro, aoVolta
 
 function ConteudoPrevia() {
     const [tela, setTela] = useState('inicio');
+    const [servicoHistorico, setServicoHistorico] = useState(null);
     const [filtroAberto, setFiltroAberto] = useState(false);
     const [cenario, setCenario] = useState(CENARIOS_CICLO[0]);
     const tema = useTheme();
@@ -409,17 +440,26 @@ function ConteudoPrevia() {
         </Text>
     );
 
+    function abrirHistorico(cenarioHistorico) {
+        setServicoHistorico(criarServicoHistoricoPrevia(cenarioHistorico));
+        setTela('historico');
+    }
+
+    if (tela === 'historico') {
+        return (
+            <SharedCycleHistoryScreen
+                nomeTitular={NOME}
+                service={servicoHistorico}
+                onVoltar={() => setTela('inicio')}
+            />
+        );
+    }
+
     return (
         <MainLayout
             titulo={TITULOS[tela]}
-            varianteHeader={
-                tela === 'historico' || tela === 'anticoncepcionais' ? 'comVoltar' : 'padrao'
-            }
-            onVoltar={
-                tela === 'historico' || tela === 'anticoncepcionais'
-                    ? () => setTela('inicio')
-                    : undefined
-            }
+            varianteHeader={tela === 'anticoncepcionais' ? 'comVoltar' : 'padrao'}
+            onVoltar={tela === 'anticoncepcionais' ? () => setTela('inicio') : undefined}
             acoesHeader={
                 tela === 'diario' ? (
                     <IconButton
@@ -518,8 +558,18 @@ function ConteudoPrevia() {
                                 <View style={estilos.inset}>
                                     <ButtonScreen
                                         texto="Ver Histórico de Ciclos"
-                                        aoPressionar={() => setTela('historico')}
+                                        aoPressionar={() => abrirHistorico('preenchido')}
                                     />
+                                    <View style={[estilos.cenarios, estilos.cenariosHistorico]}>
+                                        <ButtonScreen
+                                            texto="Histórico vazio"
+                                            aoPressionar={() => abrirHistorico('vazio')}
+                                        />
+                                        <ButtonScreen
+                                            texto="Erro no histórico"
+                                            aoPressionar={() => abrirHistorico('erro')}
+                                        />
+                                    </View>
                                 </View>
                             </SharedPermissionGate>
                             <SharedPermissionGate permissoes={permissoes} permissao="corpo.pele">
@@ -575,20 +625,6 @@ function ConteudoPrevia() {
                             ))}
                         </View>
                     ) : null}
-                    {tela === 'historico' ? (
-                        <View style={[estilos.inset, estilos.lista]}>
-                            <CycleSummaryCard
-                                nomeTitular={NOME}
-                                cicloMedioDias={28}
-                                menstruacaoMediaDias={5}
-                                quantidadeCiclos={5}
-                                exibirConfianca={false}
-                            />
-                            {CICLOS.map((ciclo) => (
-                                <CycleHistoryCard key={ciclo.numero} ciclo={ciclo} somenteLeitura />
-                            ))}
-                        </View>
-                    ) : null}
                 </ScrollView>
             )}
         </MainLayout>
@@ -615,6 +651,7 @@ const estilos = StyleSheet.create({
     aviso: { textAlign: 'center', paddingHorizontal: 16 },
     inset: { paddingHorizontal: 16 },
     cenarios: { gap: 8 },
+    cenariosHistorico: { marginTop: 8 },
     cenario: { borderWidth: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8 },
     lista: { gap: 12 }
 });
