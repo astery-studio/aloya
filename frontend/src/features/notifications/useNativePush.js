@@ -43,8 +43,8 @@ export function useNativePush({ ativo, service, navegar }) {
             const abrir = criarAberturaPush({ push, service, controller, navegar });
 
             assinaturas.push(
-                push.addPushTokenListener(() => {
-                    void sincronizar();
+                push.addPushTokenListener((tokenNativo) => {
+                    void sincronizar({ tokenNativo });
                 }),
                 push.addNotificationResponseReceivedListener((resposta) => {
                     void abrir(resposta).catch(() => {});
@@ -60,7 +60,7 @@ export function useNativePush({ ativo, service, navegar }) {
                 })
             );
 
-            void sincronizar(true);
+            void sincronizar({ solicitar: true });
             await abrir(await push.getLastNotificationResponseAsync());
         }
 
