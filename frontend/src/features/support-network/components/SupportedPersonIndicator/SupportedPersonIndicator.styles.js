@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
-    const cores = tema.cores.interface;
+    const cores = coresNoturnasConteudo;
 
     return StyleSheet.create({
         container: {
@@ -20,7 +21,7 @@ function criarEstilos(tema) {
             borderRadius: 999,
             borderWidth: 0.667,
             borderColor: tema.escuro ? cores.borda : '#E6E2D8',
-            backgroundColor: tema.escuro ? cores.superficie : 'rgba(255, 255, 255, 0.72)'
+            backgroundColor: tema.escuro ? 'rgba(30, 30, 30, 0.72)' : 'rgba(255, 255, 255, 0.72)'
         },
         rotulo: {
             flexShrink: 1,

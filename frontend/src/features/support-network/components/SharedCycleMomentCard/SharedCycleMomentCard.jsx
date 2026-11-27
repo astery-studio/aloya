@@ -1,8 +1,10 @@
 import { Pressable, Text, View } from 'react-native';
 import { CaretRightIcon } from '../../../../shared/components/icons/AppIcons';
-import { estilos } from './SharedCycleMomentCard.styles';
+import { useHomeColors } from '../../../cycles/hooks/useHomeColors';
+import { estilos as estilosClaros } from './SharedCycleMomentCard.styles';
 
 function SharedCycleMomentCard({ titulo, descricao, aoPressionar }) {
+    const { estilos, cor } = useHomeColors(estilosClaros);
     const interativo = typeof aoPressionar === 'function';
     const Card = interativo ? Pressable : View;
     const propsAcao = interativo
@@ -30,7 +32,7 @@ function SharedCycleMomentCard({ titulo, descricao, aoPressionar }) {
                         {descricao ? <Text style={estilos.descricao}>{descricao}</Text> : null}
                     </View>
                     {interativo ? (
-                        <CaretRightIcon size={22} color="#222222" style={estilos.icone} />
+                        <CaretRightIcon size={22} color={cor('#222222')} style={estilos.icone} />
                     ) : null}
                 </View>
             </Card>

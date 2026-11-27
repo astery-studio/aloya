@@ -16,13 +16,15 @@ const correspondencias = {
     '#A8A49C': paleta.textoSecundario,
     '#AAAAA5': paleta.textoSecundario,
     '#FDF6F3': paleta.fundo,
-    '#E6E2D8': paleta.borda
+    '#E6E2D8': paleta.borda,
+    '#ECDCC8': paleta.borda
 };
 
 const superficies = {
     '#FFFFFF': paleta.superficie,
     '#F7F5F0': paleta.fundo,
-    '#E8F0F3': 'rgba(144, 202, 249, 0.10)'
+    '#E8F0F3': 'rgba(144, 202, 249, 0.10)',
+    '#FDF0EC': 'rgba(194, 110, 95, 0.10)'
 };
 
 function canaisRgb(hex) {

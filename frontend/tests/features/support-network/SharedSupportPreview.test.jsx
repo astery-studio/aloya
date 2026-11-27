@@ -86,6 +86,35 @@ test('abre o sheet padrão da fase pela informação autorizada', async () => {
     expect(await screen.findByRole('header', { name: 'Por que “folicular”?' })).toBeOnTheScreen();
 });
 
+test('aplica a paleta noturna aos novos cards da Home acompanhada', async () => {
+    await render(
+        <SharedHomeScreen
+            nomeTitular="Júlia"
+            permissoes={['geral.fase_atual', 'geral.dicas']}
+            status="disponivel"
+            ciclo={{ possuiCiclos: true, faseAtual: 'FOLICULAR' }}
+        />,
+        { preferencia: 'escuro' }
+    );
+
+    expect(screen.getByTestId('main-layout')).toHaveStyle({ backgroundColor: '#121212' });
+    const momento = screen.getByRole('button', { name: /Momento do ciclo.*Informação autorizada/ });
+    expect(momento).toHaveStyle({
+        backgroundColor: '#1E1E1E',
+        borderColor: 'rgba(255, 255, 255, 0.08)'
+    });
+    expect(within(momento).getByText('Informação autorizada')).toHaveStyle({ color: '#A5D6A7' });
+    expect(screen.getByText('Acompanhando')).toHaveStyle({ color: '#999999' });
+    expect(screen.getByText('Cada corpo tem seu próprio ritmo.')).toHaveStyle({ color: '#E3E3E3' });
+
+    const opcao = screen.getByRole('button', { name: /Ofereça ajuda prática/ });
+    expect(within(opcao).getByText('Toque para explorar')).toHaveStyle({ color: '#999999' });
+    await fireEvent.press(opcao);
+    expect(screen.getByText(/ofereça ajuda com pequenas tarefas/)).toHaveStyle({
+        color: '#999999'
+    });
+});
+
 test('expande uma das três opções de cuidado respeitoso', async () => {
     await render(<SharedSupportPreview />);
 

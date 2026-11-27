@@ -1,4 +1,6 @@
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { CalendarScreenContainer } from '../../../calendar/screens/CalendarScreenContainer';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveTrackingScreen } from '../../../contraceptives/screens/ContraceptiveTrackingScreen';
@@ -63,6 +65,7 @@ function AnticoncepcionaisCompartilhados({ consultar, aoVoltar }) {
 }
 
 function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessaoExpirada }) {
+    const { escuro } = useTheme();
     const { acesso, consultas, recarregar } = useSharedSupportAccess({
         service,
         vinculoId,
@@ -134,6 +137,7 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
     return (
         <MainLayout
             titulo={TITULOS[tela]}
+            corFundo={escuro ? coresNoturnasConteudo.fundo : undefined}
             varianteHeader={subtela ? 'comVoltar' : 'padrao'}
             cabecalho={
                 homeSemContato ? (

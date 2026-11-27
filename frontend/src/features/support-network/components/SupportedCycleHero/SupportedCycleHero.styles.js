@@ -1,9 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
-    const { textoPrincipal, textoSecundario } = tema.cores.interface;
+    const { textoPrincipal, textoSecundario } = tema.escuro
+        ? coresNoturnasConteudo
+        : tema.cores.interface;
 
     return StyleSheet.create({
         container: { width: '100%', alignItems: 'center', paddingHorizontal: 16 },

@@ -2,7 +2,8 @@ import { PersonIcon } from 'phosphor-react-native/src/icons/Person';
 import { ShieldPlusIcon } from 'phosphor-react-native/src/icons/ShieldPlus';
 import { Text, View } from 'react-native';
 import { HeartIcon, QuestionIcon } from '../../../../shared/components/icons/AppIcons';
-import { estilos } from './SharedCareGestures.styles';
+import { useHomeColors } from '../../../cycles/hooks/useHomeColors';
+import { estilos as estilosClaros } from './SharedCareGestures.styles';
 
 const GESTOS = [
     ['Escutar', HeartIcon],
@@ -12,6 +13,7 @@ const GESTOS = [
 ];
 
 function SharedCareGestures() {
+    const { estilos, cor } = useHomeColors(estilosClaros);
     return (
         <View style={estilos.secao}>
             <Text style={estilos.rotulo}>Para qualquer momento</Text>
@@ -22,7 +24,7 @@ function SharedCareGestures() {
                 {GESTOS.map(([titulo, Icone]) => (
                     <View key={titulo} style={estilos.opcao}>
                         <View style={estilos.caixaIcone}>
-                            <Icone size={24} color="#C85A44" />
+                            <Icone size={24} color={cor('#C85A44')} />
                         </View>
                         <Text style={estilos.textoOpcao}>{titulo}</Text>
                     </View>
