@@ -473,6 +473,11 @@ async function abrirMembros() {
     );
 }
 
+async function abrirMembrosComoContato() {
+    expect(await screen.findByRole('tab', { name: 'Início', selected: true })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
+}
+
 async function abrirCategorias() {
     await abrirMembros();
 
@@ -571,8 +576,7 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
-        expect(await screen.findByText('Home')).toBeOnTheScreen();
-        await abrirMembros();
+        await abrirMembrosComoContato();
 
         expect(await screen.findByText('Contatos recebidos')).toBeOnTheScreen();
         expect(screen.getByText('Convites recebidos conectados')).toBeOnTheScreen();
@@ -592,8 +596,7 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
-        expect(await screen.findByText('Home')).toBeOnTheScreen();
-        await abrirMembros();
+        await abrirMembrosComoContato();
 
         await fireEvent.press(
             await screen.findByRole('button', {
@@ -601,7 +604,8 @@ describe('fluxos da Rede de Apoio no App', () => {
             })
         );
 
-        expect(screen.getByText('Contatos recebidos')).toBeOnTheScreen();
+        expect(await screen.findByText('Ainda não há dados suficientes para exibir aqui.'))
+            .toBeOnTheScreen();
         expect(screen.queryByTestId('cycle-history-flow')).toBeNull();
     });
 
@@ -618,8 +622,7 @@ describe('fluxos da Rede de Apoio no App', () => {
 
         await render(<App />);
 
-        expect(await screen.findByText('Home')).toBeOnTheScreen();
-        await abrirMembros();
+        await abrirMembrosComoContato();
 
         await fireEvent.press(
             await screen.findByRole('button', {
