@@ -1,16 +1,13 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
 import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
-import {
-    ClockCounterClockwiseIcon,
-    WarningCircleIcon
-} from '../../../shared/components/icons/AppIcons';
+import { WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleHomeContent } from '../components/home/CycleHomeContent';
+import { CycleHomeHeader } from '../components/home/CycleHomeHeader';
 import { NoCycleHomeContent } from '../components/home/NoCycleHomeContent';
 import { CycleHomeSheets } from '../components/sheets/CycleHomeSheets';
 import { ReturnToTodayButton } from '../components/ReturnToTodayButton';
@@ -18,7 +15,7 @@ import { conteudoPorFase } from '../constants/phaseContent';
 import { useCycleDateRange } from '../hooks/useCycleDateRange';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { criarCycleHomeViewModel } from '../utils/cycleHomeViewModel';
-import { formatarDataCabecalho, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
+import { obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleTodayScreen.styles';
 
 const CONFIGURACOES_ERRO = Object.freeze({
@@ -104,19 +101,7 @@ function CycleTodayScreen({
 
     return (
         <SafeAreaView edges={['top', 'left', 'right']} style={estilos.tela}>
-            <View style={estilos.cabecalho}>
-                <Text accessibilityRole="header" style={estilos.titulo}>
-                    {formatarDataCabecalho(referencia)}
-                </Text>
-                <View style={estilos.acoesCabecalho}>
-                    <IconButton
-                        icone={ClockCounterClockwiseIcon}
-                        aoPressionar={aoAbrirHistorico}
-                        rotuloAcessibilidade="Abrir histórico do ciclo"
-                        variante="calendario"
-                    />
-                </View>
-            </View>
+            <CycleHomeHeader data={referencia} aoAbrirHistorico={aoAbrirHistorico} />
             {carregando ? (
                 <View accessibilityLiveRegion="polite" style={estilos.carregando}>
                     <ActivityIndicator size="large" color={corCarregamento} />

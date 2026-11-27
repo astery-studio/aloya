@@ -110,15 +110,18 @@ function criarCicloPrevia({ id, dia }) {
         dataReferencia: hoje,
         faseAtual: id,
         diaDoCiclo: dia,
-        previsao: {
-            confiabilidadeMenstrual: { nivel: 'MEDIA' },
+        faixaCiclo: {
+            temPrevisao: true,
             duracaoCicloEstimada: 28,
             fasesEstimadas: {
                 menstrual: intervalo(1, 5),
                 folicularPosMenstrual: intervalo(6, 13),
                 ovulatoria: { data: data(14) },
                 lutea: intervalo(15, 28)
-            },
+            }
+        },
+        previsao: {
+            confiabilidadeMenstrual: { nivel: 'MEDIA' },
             proximoInicioEstimado: data(29),
             dataOvulacaoEstimada: data(14),
             janelaFertilEstimada: intervalo(9, 15)

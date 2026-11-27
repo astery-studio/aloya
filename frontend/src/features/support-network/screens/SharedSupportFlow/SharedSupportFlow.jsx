@@ -2,7 +2,7 @@ import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { CalendarScreenContainer } from '../../../calendar/screens/CalendarScreenContainer';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveTrackingScreen } from '../../../contraceptives/screens/ContraceptiveTrackingScreen';
-import { formatarDataCabecalho } from '../../../cycles/utils/cyclePresentation';
+import { CycleHomeHeader } from '../../../cycles/components/home/CycleHomeHeader';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
 import { useSharedContent } from '../../hooks/useSharedContent';
 import { useSharedSupportAccess } from '../../hooks/useSharedSupportAccess';
@@ -69,9 +69,6 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
     const historicoPermitido = permissoes.includes(PERMISSAO_HISTORICO);
     const diarioPermitido = temDiario(permissoes);
     const homeSemContato = tela === 'inicio' && vinculoId == null;
-    const titulo = homeSemContato
-        ? formatarDataCabecalho(obterHojeLocal()).replace(/ - (\d) de /u, ' - 0$1 de ')
-        : TITULOS[tela];
     const voltar = () => onSelecionarAba('inicio');
     const subtela = tela === 'ciclos' || tela === 'anticoncepcionais';
 
@@ -133,8 +130,17 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
 
     return (
         <MainLayout
-            titulo={titulo}
-            varianteHeader={subtela ? 'comVoltar' : homeSemContato ? 'inicio' : 'padrao'}
+            titulo={TITULOS[tela]}
+            varianteHeader={subtela ? 'comVoltar' : 'padrao'}
+            cabecalho={
+                homeSemContato ? (
+                    <CycleHomeHeader
+                        data={obterHojeLocal()}
+                        aplicarAreaSegura
+                        exibirHistorico={false}
+                    />
+                ) : undefined
+            }
             abaAtiva={tela}
             onVoltar={subtela ? voltar : undefined}
             exibirNavegacaoInferior={!subtela}

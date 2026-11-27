@@ -3,8 +3,10 @@ import { espacamentos, fontFamilies } from '../../../shared/theme';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
+    const backgroundColor = tema.escuro ? '#121212' : tema.cores.interface.fundo;
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo },
+        tela: { flex: 1, backgroundColor },
+        fundo: { backgroundColor },
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',

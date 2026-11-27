@@ -13,6 +13,7 @@ function MainLayout({
     varianteHeader = 'padrao',
     onVoltar,
     acoesHeader = null,
+    cabecalho: cabecalhoPersonalizado,
     abaAtiva,
     onSelecionarAba,
     abasDisponiveis,
@@ -35,7 +36,7 @@ function MainLayout({
             abasDisponiveis={abasDisponiveis}
         />
     );
-    const cabecalho = (
+    const cabecalho = cabecalhoPersonalizado ?? (
         <Header
             titulo={titulo}
             variante={varianteHeader}

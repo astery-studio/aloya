@@ -1,5 +1,11 @@
 import { fireEvent, screen, within } from '@testing-library/react-native';
 
+import { obterHojeLocal } from '../../../src/features/calendar/utils/cycleCalendar.utils';
+import {
+    adicionarDias,
+    formatarDataCabecalho
+} from '../../../src/features/cycles/utils/cyclePresentation';
+import { SharedHomeScreen } from '../../../src/features/support-network/screens/SharedSupportFlow/SharedHomeScreen';
 import { SharedSupportPreview } from '../../../src/features/support-network/testing/SharedSupportPreview';
 import { renderWithTheme as render } from '../../helpers/renderWithTheme';
 
@@ -10,6 +16,7 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
 
     expect(screen.getByLabelText('Acompanhando Júlia')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
+    expect(screen.getByText('Dia 9 do ciclo de Júlia')).toBeOnTheScreen();
     expect(screen.getAllByTestId('cycle-phase-frame-segment')).toHaveLength(28);
     expect(screen.getByRole('header', { name: 'Próximo ciclo' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Confiança média' })).toBeOnTheScreen();
@@ -22,6 +29,42 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
     expect(screen.queryByRole('header', { name: 'Fase Folicular' })).not.toBeOnTheScreen();
     expect(screen.queryByRole('header', { name: 'Próximo ciclo' })).not.toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
+});
+
+test('com acesso só à fase, permite navegar pelos dias do ciclo acompanhado', async () => {
+    const hoje = obterHojeLocal();
+    const amanha = adicionarDias(hoje, 1);
+    await render(
+        <SharedHomeScreen
+            nomeTitular="Júlia"
+            permissoes={['geral.fase_atual']}
+            status="disponivel"
+            ciclo={{
+                possuiCiclos: true,
+                faixaCiclo: {
+                    temPrevisao: true,
+                    duracaoCicloEstimada: 28,
+                    fasesEstimadas: {
+                        menstrual: {
+                            inicio: adicionarDias(hoje, -15),
+                            fim: adicionarDias(hoje, -11)
+                        },
+                        lutea: { inicio: hoje, fim: adicionarDias(hoje, 12) }
+                    }
+                }
+            }}
+        />
+    );
+
+    expect(screen.getByRole('header', { name: formatarDataCabecalho(hoje) })).toBeOnTheScreen();
+    expect(screen.getByText('Dia 16 do ciclo de Júlia')).toBeOnTheScreen();
+    expect(screen.queryByRole('header', { name: 'Próximo ciclo' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Ver Histórico de Ciclos' })).toBeNull();
+    await fireEvent.press(
+        screen.getByRole('button', { name: new RegExp(`dia ${Number(amanha.slice(-2))}$`) })
+    );
+    expect(screen.getByRole('header', { name: formatarDataCabecalho(amanha) })).toBeOnTheScreen();
+    expect(screen.getByText('Dia 17 do ciclo de Júlia')).toBeOnTheScreen();
 });
 
 test('abre o sheet padrão da fase pela informação autorizada', async () => {
@@ -178,7 +221,7 @@ test('troca a pessoa visualizada sem voltar ao ciclo da própria conta', async (
     }
     await fireEvent.press(screen.getByRole('tab', { name: 'Início' }));
     expect(screen.getByRole('tab', { name: 'Início', selected: true })).toBeOnTheScreen();
-    expect(screen.getByRole('header', { name: /^Aloya - \d{2} de / })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: /^Aloya - \d{1,2} de / })).toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
     expect(screen.getByText('Cada corpo tem seu próprio ritmo.')).toBeOnTheScreen();
     expect(screen.queryByText('Nada para exibir')).toBeNull();

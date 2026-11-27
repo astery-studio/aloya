@@ -1,15 +1,12 @@
-import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
-import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
-import { ClockCounterClockwiseIcon } from '../../../../shared/components/icons/AppIcons';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { CycleDateStrip } from '../../../cycles/components/CycleDateStrip';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 import { ReturnToTodayButton } from '../../../cycles/components/ReturnToTodayButton';
+import { CycleHomeHeader } from '../../../cycles/components/home/CycleHomeHeader';
 import { NOMES_DAS_FASES } from '../../../cycles/components/home/CyclePhaseHero';
 import { CORES_FASE } from '../../../cycles/components/home/CyclePhaseHero.styles';
 import { CyclePredictionSummary } from '../../../cycles/components/home/CyclePredictionSummary';
@@ -20,11 +17,7 @@ import { CyclePhaseEducationSheet } from '../../../cycles/components/sheets/Cycl
 import { conteudoPorFase } from '../../../cycles/constants/phaseContent';
 import { useCycleDateRange } from '../../../cycles/hooks/useCycleDateRange';
 import { criarCycleHomeViewModel } from '../../../cycles/utils/cycleHomeViewModel';
-import {
-    formatarDataCabecalho,
-    obterDiaCiclo,
-    obterFase
-} from '../../../cycles/utils/cyclePresentation';
+import { obterDiaCiclo, obterFase } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
 import { SharedCareGestures } from '../../components/SharedCareGestures/SharedCareGestures';
 import { SharedCycleCareSection } from '../../components/SharedCycleCareSection/SharedCycleCareSection';
@@ -43,67 +36,63 @@ function SharedHomeScreen({
     onSelecionarAba,
     ferramentasPrevia
 }) {
-    const { escuro } = useTheme();
     const [dataEscolhida, setDataEscolhida] = useState(null);
     const [faseDoSheet, setFaseDoSheet] = useState(null);
     const [confiabilidadeAberta, setConfiabilidadeAberta] = useState(false);
-    const hoje = ciclo?.dataReferencia ?? obterHojeLocal();
+    const hoje = obterHojeLocal();
     const data = dataEscolhida ?? hoje;
     const verFase = permissoes.includes('geral.fase_atual');
     const verHistorico = permissoes.includes('geral.historico_ciclo');
     const verDicas = permissoes.includes('geral.dicas');
     const verAnticoncepcionais = permissoes.includes('geral.anticoncepcionais');
     const previsao = verFase && verHistorico ? ciclo?.previsao : null;
-    const fases = previsao?.fasesEstimadas;
-    const duracao = previsao?.duracaoCicloEstimada;
-    const faseAtual = ciclo?.faseAtual?.toLowerCase();
+    const faixa = verFase ? ciclo?.faixaCiclo : null;
+    const fases = faixa?.fasesEstimadas;
+    const duracao = faixa?.duracaoCicloEstimada;
+    const faseAtual = fases ? undefined : ciclo?.faseAtual?.toLowerCase();
     const { dias, carregarDias } = useCycleDateRange({
         dataBase: hoje,
         fases,
         duracaoCiclo: duracao,
         faseAtual
     });
-    const fase = verFase && (data === hoje ? faseAtual : obterFase(data, fases, duracao));
+    const fase = verFase && ((data === hoje && faseAtual) || obterFase(data, fases, duracao));
     const corDaFase = CORES_FASE[fase] ?? CORES_FASE.desconhecida;
     const modelo = criarCycleHomeViewModel({ previsao, fase, dataSelecionada: data });
     const confiabilidade = modelo.nivelConfiabilidade ?? 'baixa';
-    const diaDaPrevisao = obterDiaCiclo(data, fases);
     const diaCiclo =
-        previsao && (data === hoje ? (ciclo?.diaDoCiclo ?? diaDaPrevisao) : diaDaPrevisao);
+        verFase &&
+        (obterDiaCiclo(data, fases) ?? (data === ciclo?.dataReferencia ? ciclo.diaDoCiclo : null));
     const dicas = fase && conteudoPorFase[fase];
     const semCiclo = ciclo?.possuiCiclos === false;
     const podeAbrirMomento = verDicas && Boolean(dicas) && !semCiclo;
 
     return (
         <MainLayout
-            titulo={formatarDataCabecalho(data).replace(/ - (\d) de /u, ' - 0$1 de ')}
-            varianteHeader="inicio"
             abaAtiva="inicio"
             onSelecionarAba={onSelecionarAba}
-            acoesHeader={
-                verHistorico ? (
-                    <IconButton
-                        icone={ClockCounterClockwiseIcon}
-                        variante="redeApoio"
-                        corIcone={escuro ? coresNoturnasConteudo.coral : '#C85A44'}
-                        rotuloAcessibilidade="Ver Histórico de Ciclos"
-                        aoPressionar={() => onSelecionarAba('ciclos')}
-                    />
-                ) : null
+            cabecalho={
+                <CycleHomeHeader
+                    data={data}
+                    aplicarAreaSegura
+                    exibirHistorico={verHistorico}
+                    rotuloHistorico="Ver Histórico de Ciclos"
+                    aoAbrirHistorico={() => onSelecionarAba('ciclos')}
+                />
             }
         >
             <ScrollView
                 contentContainerStyle={estilos.conteudo}
                 showsVerticalScrollIndicator={false}
             >
-                {verFase ? (
+                {verFase && status === 'disponivel' ? (
                     <CycleDateStrip
                         dias={dias}
                         dataSelecionada={data}
                         aoCarregarAnteriores={() => carregarDias('anteriores')}
                         aoCarregarPosteriores={() => carregarDias('posteriores')}
-                        aoSelecionarData={fases || semCiclo ? setDataEscolhida : undefined}
-                        semCiclo={!fases}
+                        aoSelecionarData={setDataEscolhida}
+                        semCiclo={!faixa?.temPrevisao}
                     />
                 ) : null}
                 {data !== hoje ? (
