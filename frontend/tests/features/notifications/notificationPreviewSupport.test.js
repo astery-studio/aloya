@@ -1,4 +1,4 @@
-import { conteudoDaPrevia } from '../../../src/features/notifications/notificationPreview';
+import { conteudoDaPrevia, listarPreviews } from '../../../src/features/notifications/notificationPreview';
 
 test('padroniza os avisos de uso pendente do anticoncepcional compartilhado', () => {
     for (const [fase, prazo] of [
