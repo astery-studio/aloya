@@ -97,11 +97,18 @@ test('usa o formulário real do Diário sem liberar registro vazio', async () =>
     });
 
     await act(async () => mockOnCreated());
-    expect(screen.getByText('Check-in registrado no Diário.')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Adicionar detalhes' })).toBeEnabled();
+    expect(
+        screen.getByText('Você realizou seu check-in com sucesso. Verifique os detalhes no diário:')
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Diário' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Diário' })).toHaveStyle({
+        width: '100%',
+        height: 36,
+        borderRadius: 10
+    });
 });
 
-test('edita silenciosamente o registro já existente para a data', async () => {
+test('permite complementar silenciosamente o registro já existente para a data', async () => {
     mockExistingRecord = { id: 9, data: '2026-10-08', versao: 2, categorias: [] };
     await render(<CycleDiaryCheckIn date="2026-10-08" service={{}} />);
 
@@ -109,7 +116,8 @@ test('edita silenciosamente o registro já existente para a data', async () => {
         modo: 'editar',
         registroInicial: mockExistingRecord
     });
-    expect(screen.queryByText(/Já existe um registro/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Você realizou seu check-in com sucesso/)).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Salvar no Diário' })).toBeDisabled();
 });
 
 test('não exibe o check-in quando o Diário está indisponível', async () => {
@@ -175,5 +183,7 @@ test('habilita a edição após alterar o dia e não repete itens registrados', 
     expect(salvar).toHaveBeenCalledTimes(1);
 
     await act(() => mockFormOptions.onSalvo());
-    expect(screen.getByText('Check-in registrado no Diário.')).toBeOnTheScreen();
+    expect(
+        screen.getByText('Você realizou seu check-in com sucesso. Verifique os detalhes no diário:')
+    ).toBeOnTheScreen();
 });
