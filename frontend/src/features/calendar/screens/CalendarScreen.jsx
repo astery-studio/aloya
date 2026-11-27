@@ -256,8 +256,8 @@ function CalendarScreen({
                         icone={InfoIcon}
                         aoPressionar={() => setLegendaVisivel(true)}
                         rotuloAcessibilidade="Abrir legenda do calendário"
-                        variante="redeApoio"
-                        corIcone={tema.cores.interface.destaque}
+                        variante="redeApoioSecundario"
+                        corIcone={tema.escuro ? undefined : tema.cores.interface.destaque}
                     />
                 }
             />

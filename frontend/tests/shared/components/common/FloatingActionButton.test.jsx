@@ -83,6 +83,14 @@ describe('FloatingActionButton', () => {
         expect(aoPressionar).toHaveBeenCalledTimes(1);
     });
 
+    test('aplica o fundo coral e o ícone escuro no tema noturno', async () => {
+        await renderizarFab({ carregando: true }, 'escuro');
+        expect(screen.getByTestId('floating-action-button')).toHaveStyle({
+            backgroundColor: '#C26E5F'
+        });
+        expect(screen.getByTestId('floating-action-button-loading')).toHaveProp('color', '#121212');
+    });
+
     test('reduz suavemente a escala durante o pressionamento', async () => {
         const estiloPressionado = { transform: [{ scale: 0.95 }] };
 

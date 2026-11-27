@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { coresNoturnasConteudo } from '../../../theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     const estilos = StyleSheet.create({
@@ -29,6 +30,15 @@ function criarEstilos(tema) {
                 }
             ]
         }
+    });
+
+    const botaoCabecalho = Object.freeze({
+        backgroundColor: tema.escuro
+            ? coresNoturnasConteudo.superficie
+            : tema.cores.interface.superficie,
+        borderWidth: 0.667,
+        borderColor: tema.escuro ? coresNoturnasConteudo.borda : tema.cores.interface.borda,
+        borderRadius: 16
     });
 
     const variantes = Object.freeze({
@@ -70,13 +80,14 @@ function criarEstilos(tema) {
         }),
 
         redeApoio: Object.freeze({
-            container: Object.freeze({
-                backgroundColor: tema.cores.interface.superficie,
-                borderWidth: 0.667,
-                borderColor: tema.cores.interface.borda,
-                borderRadius: 16
-            }),
-            icone: tema.cores.interface.destaque,
+            container: botaoCabecalho,
+            icone: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
+            tamanhoIcone: 32
+        }),
+
+        redeApoioSecundario: Object.freeze({
+            container: botaoCabecalho,
+            icone: tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria,
             tamanhoIcone: 32
         }),
 
