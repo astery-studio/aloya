@@ -21,11 +21,17 @@ jest.mock('../../../src/shared/components/feedback/SelectionSheet/SelectionSheet
     } };
 });
 
-test('guarda escolhas individuais ao alternar o grupo e recarrega antecedência zero', async () => {
+test('edita os mesmos avisos por grupo ou individualmente e recarrega antecedência zero', async () => {
     let valores = { antecedenciaProximoCiclo: 2 };
     const service = {
         buscar: jest.fn(async () => valores),
-        atualizar: jest.fn(async ({ chave, valor }) => (valores = { ...valores, [chave]: valor }))
+        atualizar: jest.fn(async ({ chave, valor }) => {
+            const alteracoes = chave === 'ciclo.menstrual'
+                ? { 'ciclo.menstrual.proxima': valor, 'ciclo.menstrual.confirmacao': valor }
+                : { [chave]: valor };
+            valores = { ...valores, ...alteracoes };
+            return valores;
+        })
     };
     const montar = () => render(
         <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 0, left: 0, right: 0 }}>
@@ -50,20 +56,20 @@ test('guarda escolhas individuais ao alternar o grupo e recarrega antecedência 
     await alternar('Ciclo Menstrual');
     expect(screen.getByRole('switch', { name: 'Ciclo Menstrual', checked: false })).toBeOnTheScreen();
     await tocar('Personalizar notificações');
-    expect(screen.getByText(/Grupo pausado/)).toBeOnTheScreen();
+    expect(screen.queryByText(/Grupo pausado/)).toBeNull();
     expect(screen.getByRole('switch', {
-        name: 'Próxima menstruação', checked: false, disabled: true
+        name: 'Próxima menstruação', checked: false, disabled: false
     })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Quando notificar o próximo ciclo', disabled: true }))
-        .toBeOnTheScreen();
-    const gravacoesAntes = service.atualizar.mock.calls.length;
     await alternar('Confirmação do início do ciclo');
-    await tocar('Quando notificar o próximo ciclo');
-    expect(service.atualizar).toHaveBeenCalledTimes(gravacoesAntes);
-    expect(screen.queryByRole('button', { name: 'Somente no dia' })).toBeNull();
-    expect(valores['ciclo.menstrual.proxima']).toBe(true);
+    expect(valores['ciclo.menstrual.proxima']).toBe(false);
     await tocar('Voltar');
+    expect(screen.getByRole('switch', { name: 'Ciclo Menstrual', checked: true })).toBeOnTheScreen();
     await alternar('Ciclo Menstrual');
+    await alternar('Ciclo Menstrual');
+    await tocar('Personalizar notificações');
+    expect(screen.getByRole('switch', { name: 'Confirmação do início do ciclo', checked: true }))
+        .toBeOnTheScreen();
+    await alternar('Confirmação do início do ciclo');
     await primeiraTela.unmount();
 
     await montar();
