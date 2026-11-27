@@ -35,32 +35,32 @@ export function NotificationIndividualSettingsScreen({
             <View style={estilos.lista}>
                 {Object.entries(grupos).map(([grupoId, [nome, linhas]]) => {
                     const grupoAtivo = valores[`${categoriaId}.${grupoId}`] ?? true;
-                    const desabilitado = ocupado || !grupoAtivo;
+                    const lembreteAtivo = valores.efetivas?.lembreteDiarioAtivo
+                        ?? (grupoAtivo && valores.lembreteDiarioAtivo === true);
 
                     return (
                         <View key={grupoId} style={estilos.secao}>
                             <Text accessibilityRole="header"
                                 style={[estilos.titulo, { color: cores.interface.textoSecundario }]}>{nome}</Text>
-                            {!grupoAtivo && (
-                                <Text style={[estilos.descricao, { color: cores.interface.textoSecundario }]}>
-                                    Grupo pausado. Ative o grupo para retomar seus avisos e editar suas escolhas.
-                                </Text>
-                            )}
                             {linhas.map(([id, label, tipo]) => {
+                                if (tipo === 'horario' && !lembreteAtivo) {
+                                    return null;
+                                }
                                 if (tipo === 'horario' || tipo === 'antecedencia') {
                                     return (
-                                        <NavigationField key={id} label={label} labelSemLimite desabilitado={desabilitado}
+                                        <NavigationField key={id} label={label} labelSemLimite desabilitado={ocupado}
                                             referencia={tipo === 'antecedencia' ? botaoAntecedencia : undefined}
                                             onPress={tipo === 'horario' ? onAbrirHorario
                                                 : () => definirAntecedenciaAberta(true)} />
                                     );
                                 }
                                 const chave = tipo === 'legado' ? id : `${categoriaId}.${grupoId}.${id}`;
+                                const ativo = valores.efetivas?.[chave] ?? (grupoAtivo && valores[chave] === true);
                                 return (
-                                    <SwitchField key={chave} titulo={label} ativo={grupoAtivo && valores[chave]}
+                                    <SwitchField key={chave} titulo={label} ativo={ativo}
                                         tituloSemLimite dicaAcessibilidade="Ativa ou desativa esta notificação"
                                         aoAlterar={(ativo) => onAlterar(chave, ativo)}
-                                        desabilitado={desabilitado} estilo={estilos.campo}
+                                        desabilitado={ocupado} estilo={estilos.campo}
                                         estiloTitulo={estilos.rotulo} />
                                 );
                             })}
