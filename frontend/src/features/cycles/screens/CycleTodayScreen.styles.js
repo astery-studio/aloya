@@ -1,10 +1,14 @@
 import { StyleSheet } from 'react-native';
 import { espacamentos, fontFamilies } from '../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { temaClaro } from '../../../shared/theme/themePalettes';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
-        tela: { flex: 1, backgroundColor: tema.escuro ? '#121212' : tema.cores.interface.fundo },
+        tela: {
+            flex: 1,
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.fundo : tema.cores.interface.fundo
+        },
         areaRolagem: { flex: 1 },
         cabecalho: {
             width: '100%',
@@ -23,7 +27,9 @@ function criarEstilos(tema) {
             minWidth: 0,
             flex: 1,
             flexShrink: 1,
-            color: tema.cores.interface.textoPrincipal
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoPrincipal
+                : tema.cores.interface.textoPrincipal
         },
         rolagem: {
             flexGrow: 1,
@@ -31,7 +37,9 @@ function criarEstilos(tema) {
         },
         carregando: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
         textoCarregando: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',

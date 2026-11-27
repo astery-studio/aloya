@@ -1,11 +1,13 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { NavigationField } from '../../../../shared/components/common/NavigationField/NavigationField';
 import { HeartIcon, PencilSimpleIcon } from '../../../../shared/components/icons/AppIcons';
-import { estilos } from './NoCycleDiarySection.styles';
+import { estilos as estilosClaros } from './NoCycleDiarySection.styles';
 
 const CORES_ICONE = Object.freeze({ caixa: 'transparent', icone: '#D68C3A' });
 
 function NoCycleDiarySection({ aoAbrirDiario, aoAbrirReflexao }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
     const acoes = [
         ['Como você está se sentindo?', HeartIcon, aoAbrirDiario],
         ['Gostaria de fazer uma anotação?', PencilSimpleIcon, aoAbrirReflexao]
@@ -29,7 +31,7 @@ function NoCycleDiarySection({ aoAbrirDiario, aoAbrirReflexao }) {
                         onPress={onPress}
                         coresIcone={CORES_ICONE}
                         tamanhoIcone={22}
-                        corSeta="#5C5C59"
+                        corSeta={adaptarCor('#5C5C59')}
                         estilo={estilos.acao}
                         estiloCaixaIcone={estilos.iconeAcao}
                         estiloTexto={estilos.textoAcao}

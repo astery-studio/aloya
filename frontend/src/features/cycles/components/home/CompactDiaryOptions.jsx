@@ -1,10 +1,11 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { ButtonSelection } from '../../../../shared/components/common/Button/ButtonSelection/ButtonSelection';
 import { DiaryOptionIcon } from '../../../diary/components/DiaryOptionIcon/DiaryOptionIcon';
 import { obterApresentacaoOpcao } from '../../../diary/config/diaryOptionPresentation';
 import { alternarOpcaoCategoria } from '../../../diary/utils/diaryFormValue';
 import { criarSugestoesCheckIn } from '../../utils/checkInSuggestions';
-import { estilos } from './CompactDiaryOptions.styles';
+import { estilos as estilosClaros } from './CompactDiaryOptions.styles';
 
 const GRUPOS_HOME = Object.freeze([
     {
@@ -66,6 +67,7 @@ function CompactDiaryOptions({
     aoAlterar,
     desabilitado
 }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
     const sugestoes = criarSugestoesCheckIn({ catalogo, fase, destaques, idsExcluidos });
     const grupos = GRUPOS_HOME.map((configuracao) => {
         const encontradas = sugestoes.filter(
@@ -108,8 +110,8 @@ function CompactDiaryOptions({
                                               }
                                             : undefined
                                     }
-                                    cor={cor}
-                                    fundo={fundo}
+                                    cor={adaptarCor(cor)}
+                                    fundo={adaptarCor(fundo, 'backgroundColor')}
                                     estiloTexto={estilos.textoOpcao}
                                     onPress={() =>
                                         aoAlterar(

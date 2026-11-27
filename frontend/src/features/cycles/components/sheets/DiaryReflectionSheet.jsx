@@ -1,9 +1,10 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import TextInput from '../../../../shared/components/forms/TextInput/TextInput';
-import { estilos } from './DiaryReflectionSheet.styles';
+import { estilos as estilosClaros } from './DiaryReflectionSheet.styles';
 
 const PERGUNTA = 'O que seu corpo está pedindo agora?';
 const LIMITE_REFLEXAO = 5000;
@@ -17,6 +18,7 @@ function DiaryReflectionSheet({
     salvando = false,
     erro
 }) {
+    const { estilos, cor: adaptarCor, escuro } = useHomeColors(estilosClaros);
     return (
         <BottomSheet
             visivel={visivel}
@@ -24,12 +26,12 @@ function DiaryReflectionSheet({
             bloquearFechamento={salvando}
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
-            corPainel="#FFFFFF"
+            corPainel={adaptarCor('#FFFFFF', 'backgroundColor')}
         >
             <View style={estilos.conteudo}>
                 <View style={estilos.cabecalho}>
                     <View style={estilos.icone}>
-                        <QuestionIcon color="#4A758E" size={28} weight="regular" />
+                        <QuestionIcon color={adaptarCor('#4A758E')} size={28} weight="regular" />
                     </View>
                     <Text style={estilos.rotulo}>Uma pergunta para hoje</Text>
                 </View>
@@ -59,6 +61,7 @@ function DiaryReflectionSheet({
                     </View>
                     <ButtonScreen
                         texto="Salvar no Diário"
+                        corConteudo={escuro && valor.trim() ? adaptarCor('#FDF6F3') : undefined}
                         aoPressionar={aoSalvar}
                         desativado={!valor.trim()}
                         carregando={salvando}

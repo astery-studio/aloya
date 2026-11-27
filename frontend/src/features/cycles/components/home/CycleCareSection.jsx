@@ -1,3 +1,4 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Pressable, Text, View } from 'react-native';
 import {
     CaretRightIcon,
@@ -6,7 +7,7 @@ import {
     WindIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { CONTEUDO_POR_FASE } from '../sheets/CyclePhaseEducationSheet.content';
-import { estilos } from './CycleCareSection.styles';
+import { estilos as estilosClaros } from './CycleCareSection.styles';
 
 const CUIDADOS = Object.freeze([
     {
@@ -47,6 +48,7 @@ function CycleCareSection({
     aoAbrirReflexao,
     aoAbrirEducacao
 }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
     const visualEducativo = CONTEUDO_POR_FASE[fase] ?? {
         Icone: NotebookIcon,
         cor: '#C85A44',
@@ -60,7 +62,9 @@ function CycleCareSection({
     };
     return (
         <View style={estilos.secao}>
-            <Text style={[estilos.etiqueta, { color: corDestaque }]}>Para o seu momento</Text>
+            <Text style={[estilos.etiqueta, { color: adaptarCor(corDestaque) }]}>
+                Para o seu momento
+            </Text>
             <Text accessibilityRole="header" style={estilos.tituloSecao}>
                 Cuidados para hoje
             </Text>
@@ -77,15 +81,24 @@ function CycleCareSection({
                             onPress={callbacks[id]}
                             style={estilos.card}
                         >
-                            <View style={[estilos.caixaIcone, { backgroundColor: visual.fundo }]}>
-                                <Icone size={24} color={visual.cor} weight={visual.weight} />
+                            <View
+                                style={[
+                                    estilos.caixaIcone,
+                                    { backgroundColor: adaptarCor(visual.fundo, 'backgroundColor') }
+                                ]}
+                            >
+                                <Icone
+                                    size={24}
+                                    color={adaptarCor(visual.cor)}
+                                    weight={visual.weight}
+                                />
                             </View>
                             <View style={estilos.textos}>
                                 <Text style={estilos.categoria}>{categoria}</Text>
                                 <Text style={estilos.titulo}>{titulo}</Text>
                                 <Text style={estilos.descricao}>{descricao}</Text>
                             </View>
-                            <CaretRightIcon size={20} color="#222222" />
+                            <CaretRightIcon size={20} color={adaptarCor('#222222')} />
                         </Pressable>
                     );
                 })}

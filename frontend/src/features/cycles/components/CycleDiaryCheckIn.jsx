@@ -1,7 +1,7 @@
+import { useHomeColors } from '../hooks/useHomeColors';
 import { useEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
-import { useTheme } from '../../../shared/hooks/useTheme';
 import { useDiaryCatalog } from '../../diary/hooks/useDiaryCatalog';
 import { useDiaryEntryForm } from '../../diary/hooks/useDiaryEntryForm';
 import { useDiaryOverview } from '../../diary/hooks/useDiaryOverview';
@@ -10,7 +10,7 @@ import { criarValoresIniciaisEdicao } from '../../diary/utils/diaryEditForm';
 import { prepararFormularioDiario } from '../../diary/utils/diaryForm';
 import { useDiaryRecordForDate } from '../hooks/useDiaryRecordForDate';
 import { CompactDiaryOptions } from './home/CompactDiaryOptions';
-import { estilos } from './CycleDiaryCheckIn.styles';
+import { estilos as estilosClaros } from './CycleDiaryCheckIn.styles';
 
 function CycleDiaryCheckIn({
     date,
@@ -20,7 +20,8 @@ function CycleDiaryCheckIn({
     onSessionExpired,
     corDestaque = '#C85A44'
 }) {
-    const tema = useTheme();
+    const { estilos, escuro, cor } = useHomeColors(estilosClaros);
+    const textoEstado = escuro ? { color: cor('#5C5C59') } : undefined;
     const [saved, setSaved] = useState(false);
     const catalog = useDiaryCatalog({
         ativo: Boolean(service),
@@ -59,12 +60,12 @@ function CycleDiaryCheckIn({
         : false;
 
     const salvarDesativado = !valid || Boolean(existing.record && !form.alterado);
-    const aplicarVisualDesativado = salvarDesativado && !tema.escuro;
+    const aplicarVisualDesativado = salvarDesativado && !escuro;
 
     return (
         <View style={estilos.margem}>
             <View style={estilos.cartao}>
-                <Text style={[estilos.rotulo, { color: corDestaque }]}>Check-in gentil</Text>
+                <Text style={[estilos.rotulo, { color: cor(corDestaque) }]}>Check-in gentil</Text>
                 <Text accessibilityRole="header" style={estilos.titulo}>
                     Como você está se sentindo hoje?
                 </Text>
@@ -73,11 +74,13 @@ function CycleDiaryCheckIn({
                 </Text>
                 <View style={estilos.conteudo}>
                     {catalog.carregando || existing.loading ? (
-                        <Text>Carregando seu check-in...</Text>
+                        <Text style={textoEstado}>Carregando seu check-in...</Text>
                     ) : null}
                     {catalog.erro ? (
                         <>
-                            <Text accessibilityRole="alert">{catalog.erro}</Text>
+                            <Text accessibilityRole="alert" style={textoEstado}>
+                                {catalog.erro}
+                            </Text>
                             <ButtonScreen
                                 texto="Tentar novamente"
                                 aoPressionar={catalog.recarregar}
@@ -86,7 +89,7 @@ function CycleDiaryCheckIn({
                     ) : null}
                     {saved ? (
                         <>
-                            <Text>Check-in registrado no Diário.</Text>
+                            <Text style={textoEstado}>Check-in registrado no Diário.</Text>
                             <ButtonScreen texto="Adicionar detalhes" aoPressionar={onOpenDiary} />
                         </>
                     ) : null}
@@ -102,7 +105,9 @@ function CycleDiaryCheckIn({
                                 desabilitado={form.salvando}
                             />
                             {form.erroSalvamento ? (
-                                <Text accessibilityRole="alert">{form.erroSalvamento}</Text>
+                                <Text accessibilityRole="alert" style={textoEstado}>
+                                    {form.erroSalvamento}
+                                </Text>
                             ) : null}
                             <ButtonScreen
                                 texto="Salvar no Diário"

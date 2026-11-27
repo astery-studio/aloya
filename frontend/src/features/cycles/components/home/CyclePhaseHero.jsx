@@ -1,6 +1,7 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { PhaseSymbolSlot } from '../PhaseSymbolSlot';
-import { CORES_FASE, estilos } from './CyclePhaseHero.styles';
+import { CORES_FASE, estilos as estilosClaros } from './CyclePhaseHero.styles';
 import { FertileHighlight } from './FertileHighlight';
 
 const NOMES_DAS_FASES = Object.freeze({
@@ -12,6 +13,7 @@ const NOMES_DAS_FASES = Object.freeze({
 });
 
 function CyclePhaseHero({ fase, diaCiclo, janelaFertilAtiva = false, symbol }) {
+    const { estilos } = useHomeColors(estilosClaros);
     const faseAtual = Object.hasOwn(NOMES_DAS_FASES, fase) ? fase : 'desconhecida';
 
     return (

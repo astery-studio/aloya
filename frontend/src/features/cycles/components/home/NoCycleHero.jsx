@@ -1,6 +1,7 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { PhaseSymbolSlot } from '../PhaseSymbolSlot';
-import { estilos } from './NoCycleHero.styles';
+import { estilos as estilosClaros } from './NoCycleHero.styles';
 
 const MENSAGENS = Object.freeze({
     primeiroUso: [
@@ -14,6 +15,7 @@ const MENSAGENS = Object.freeze({
 });
 
 function NoCycleHero({ motivoSemPrevisao }) {
+    const { estilos } = useHomeColors(estilosClaros);
     const mensagem = MENSAGENS[motivoSemPrevisao] ?? MENSAGENS.primeiroUso;
     return (
         <View style={estilos.container}>

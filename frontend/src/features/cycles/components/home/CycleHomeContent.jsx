@@ -1,3 +1,4 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { CycleDiaryCheckIn } from '../CycleDiaryCheckIn';
 import { CycleExpandableCard } from '../CycleExpandableCard';
@@ -7,9 +8,10 @@ import { CyclePhaseHero } from './CyclePhaseHero';
 import { CORES_FASE } from './CyclePhaseHero.styles';
 import { CyclePredictionSummary } from './CyclePredictionSummary';
 import { CycleQuickActions } from './CycleQuickActions';
-import { estilos } from './CycleHomeContent.styles';
+import { estilos as estilosClaros } from './CycleHomeContent.styles';
 
 function CycleHomeContent({ modelo, callbacks, diaryService, onSessaoExpirada }) {
+    const { estilos } = useHomeColors(estilosClaros);
     const { fase, diaCiclo, janelaFertilAtiva, previsao, conteudoDaFase, dataSelecionada } = modelo;
     const corDaFase = CORES_FASE[fase] ?? CORES_FASE.desconhecida;
     return (

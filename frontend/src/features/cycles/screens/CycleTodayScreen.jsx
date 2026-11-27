@@ -9,6 +9,7 @@ import {
 } from '../../../shared/components/icons/AppIcons';
 import { BottomTabBar } from '../../../shared/components/navigation/BottomTab/BottomTabBar/BottomTabBar';
 import { useTheme } from '../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { CycleDateStrip } from '../components/CycleDateStrip';
 import { CycleHomeContent } from '../components/home/CycleHomeContent';
 import { NoCycleHomeContent } from '../components/home/NoCycleHomeContent';
@@ -61,9 +62,7 @@ function CycleTodayScreen({
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
-    const corCarregamento = tema.escuro
-        ? tema.cores.interface.destaque
-        : tema.cores.marca.secundaria;
+    const corCarregamento = tema.escuro ? coresNoturnasConteudo.verde : tema.cores.marca.secundaria;
     const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const [sheetAberto, setSheetAberto] = useState(null);
     const dataBaseDaFaixa = previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();

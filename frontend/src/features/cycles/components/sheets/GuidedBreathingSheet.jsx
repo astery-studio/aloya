@@ -1,9 +1,10 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { useEffect, useState } from 'react';
 import { AccessibilityInfo, Animated, Text, View } from 'react-native';
 import { Circle, Defs, RadialGradient, Stop, Svg } from 'react-native-svg';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { useBreathingAnimation } from '../../hooks/useBreathingAnimation';
-import { estilos } from './GuidedBreathingSheet.styles';
+import { estilos as estilosClaros } from './GuidedBreathingSheet.styles';
 
 function GuidedBreathingSheet({
     visivel,
@@ -13,6 +14,7 @@ function GuidedBreathingSheet({
     duracaoExpiracao = 5000,
     escalaMaxima = 1.6
 }) {
+    const { estilos, cor: adaptarCor, escuro } = useHomeColors(estilosClaros);
     const [reduzirMovimentoDoSistema, setReduzirMovimentoDoSistema] = useState(false);
     const reduzirMovimento = movimentoReduzido ?? reduzirMovimentoDoSistema;
     const { escala, instrucao, opacidadeTexto } = useBreathingAnimation({
@@ -38,7 +40,7 @@ function GuidedBreathingSheet({
             onFechar={aoFechar}
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
-            corPainel="#FFFFFF"
+            corPainel={adaptarCor('#FFFFFF', 'backgroundColor')}
         >
             <View style={estilos.conteudo}>
                 <Text style={estilos.rotulo}>Pausa guiada</Text>
@@ -66,7 +68,7 @@ function GuidedBreathingSheet({
                                         ry="95.52%"
                                     >
                                         <Stop offset="0%" stopColor="#B8D3DC" />
-                                        <Stop offset="100%" stopColor="#4A758E" />
+                                        <Stop offset="100%" stopColor={adaptarCor('#4A758E')} />
                                     </RadialGradient>
                                 </Defs>
                                 <Circle
@@ -76,7 +78,13 @@ function GuidedBreathingSheet({
                                     fill="url(#respiracao)"
                                 />
                             </Svg>
-                            <Animated.Text style={[estilos.instrucao, { opacity: opacidadeTexto }]}>
+                            <Animated.Text
+                                style={[
+                                    estilos.instrucao,
+                                    escuro && { color: adaptarCor('#FDF6F3') },
+                                    { opacity: opacidadeTexto }
+                                ]}
+                            >
                                 {reduzirMovimento ? 'Respire' : instrucao}
                             </Animated.Text>
                         </View>

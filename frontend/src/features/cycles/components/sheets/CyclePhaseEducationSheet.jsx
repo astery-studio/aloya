@@ -1,10 +1,12 @@
+import { useHomeColors } from '../../hooks/useHomeColors';
 import { Text, View } from 'react-native';
 import { BottomSheet } from '../../../../shared/components/feedback/BottomSheet/BottomSheet';
 import { CycleEducationalDisclaimer } from '../home/CycleEducationalDisclaimer';
 import { AVISO_EDUCATIVO, CONTEUDO_POR_FASE } from './CyclePhaseEducationSheet.content';
-import { estilos } from './CyclePhaseEducationSheet.styles';
+import { estilos as estilosClaros } from './CyclePhaseEducationSheet.styles';
 
 function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
+    const { estilos, cor: adaptarCor } = useHomeColors(estilosClaros);
     const conteudo = CONTEUDO_POR_FASE[fase] ?? CONTEUDO_POR_FASE.menstrual;
     const { Icone } = conteudo;
     return (
@@ -13,12 +15,21 @@ function CyclePhaseEducationSheet({ visivel, fase, aoFechar }) {
             onFechar={aoFechar}
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
-            corPainel="#FFFFFF"
+            corPainel={adaptarCor('#FFFFFF', 'backgroundColor')}
         >
             <View style={estilos.conteudo}>
                 <View style={estilos.cabecalho}>
-                    <View style={[estilos.icone, { backgroundColor: conteudo.fundo }]}>
-                        <Icone size={28} color={conteudo.cor} weight={conteudo.weight} />
+                    <View
+                        style={[
+                            estilos.icone,
+                            { backgroundColor: adaptarCor(conteudo.fundo, 'backgroundColor') }
+                        ]}
+                    >
+                        <Icone
+                            size={28}
+                            color={adaptarCor(conteudo.cor)}
+                            weight={conteudo.weight}
+                        />
                     </View>
                     <Text style={estilos.rotulo}>Conheça seu ciclo</Text>
                 </View>
