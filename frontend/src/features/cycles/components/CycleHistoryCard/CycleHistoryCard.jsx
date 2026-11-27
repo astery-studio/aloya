@@ -50,7 +50,7 @@ function obterTextoDosDias(quantidade) {
     return quantidade === 1 ? '1 dia' : `${quantidade} dias`;
 }
 
-function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
+function CycleHistoryCard({ ciclo, aoEditar, aoExcluir, somenteLeitura = false }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const coresDoCiclo = {
@@ -83,9 +83,20 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
 
     return (
         <View testID="cycle-history-card" style={estilos.container}>
-            <View style={[estilos.cabecalho, estaEmAndamento && estilos.cabecalhoEmAndamento]}>
+            <View
+                style={[
+                    estilos.cabecalho,
+                    somenteLeitura && estilos.cabecalhoSomenteLeitura,
+                    estaEmAndamento && estilos.cabecalhoEmAndamento
+                ]}
+            >
                 <View style={estilos.linhaDoCabecalho}>
-                    <View style={estilos.identificacao}>
+                    <View
+                        style={[
+                            estilos.identificacao,
+                            somenteLeitura && estilos.identificacaoSomenteLeitura
+                        ]}
+                    >
                         <View
                             accessible
                             accessibilityRole="text"
@@ -96,40 +107,60 @@ function CycleHistoryCard({ ciclo, aoEditar, aoExcluir }) {
                         </View>
 
                         <View style={estilos.textos}>
-                            <Text numberOfLines={2} style={estilos.periodo}>
+                            <Text
+                                numberOfLines={2}
+                                style={[
+                                    estilos.periodo,
+                                    somenteLeitura && estilos.textoCentralizado
+                                ]}
+                            >
                                 {periodo}
                             </Text>
 
                             {estaEmAndamento ? (
-                                <Text style={estilos.status}>Em andamento</Text>
+                                <Text
+                                    style={[
+                                        estilos.status,
+                                        somenteLeitura && estilos.textoCentralizado
+                                    ]}
+                                >
+                                    Em andamento
+                                </Text>
                             ) : null}
                         </View>
                     </View>
 
-                    <View style={estilos.acoes}>
-                        <IconButton
-                            icone={PencilSimpleIcon}
-                            corIcone={tema.escuro ? '#999999' : undefined}
-                            aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
-                            rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
-                            variante="neutro"
-                        />
+                    {somenteLeitura ? null : (
+                        <View style={estilos.acoes}>
+                            <IconButton
+                                icone={PencilSimpleIcon}
+                                corIcone={tema.escuro ? '#999999' : undefined}
+                                aoPressionar={typeof aoEditar === 'function' ? editar : undefined}
+                                rotuloAcessibilidade={`Editar ${rotuloDoCiclo.toLowerCase()}`}
+                                variante="neutro"
+                            />
 
-                        <IconButton
-                            icone={TrashIcon}
-                            corIcone={tema.escuro ? '#999999' : undefined}
-                            aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
-                            rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
-                            variante="neutro"
-                        />
-                    </View>
+                            <IconButton
+                                icone={TrashIcon}
+                                corIcone={tema.escuro ? '#999999' : undefined}
+                                aoPressionar={typeof aoExcluir === 'function' ? excluir : undefined}
+                                rotuloAcessibilidade={`Excluir ${rotuloDoCiclo.toLowerCase()}`}
+                                variante="neutro"
+                            />
+                        </View>
+                    )}
                 </View>
             </View>
 
             <View style={estilos.separador} />
 
             <View style={estilos.conteudoInferior}>
-                <View style={estilos.indicadores}>
+                <View
+                    style={[
+                        estilos.indicadores,
+                        somenteLeitura && estilos.indicadoresSomenteLeitura
+                    ]}
+                >
                     <View
                         accessible
                         accessibilityRole="text"

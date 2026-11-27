@@ -3,6 +3,9 @@ import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
 
+const LARGURA_NUMERO = 28;
+const ESPACO_IDENTIFICACAO = 20;
+
 function criarEstilos(tema) {
     const corAviso = tema.escuro ? '#F2B45F' : '#B97D22';
     const corMenstruacao = tema.escuro ? '#EF9A9A' : tema.cores.marca.primaria;
@@ -27,6 +30,10 @@ function criarEstilos(tema) {
             paddingVertical: 12
         },
 
+        cabecalhoSomenteLeitura: {
+            minHeight: 60
+        },
+
         cabecalhoEmAndamento: {
             minHeight: 80
         },
@@ -43,11 +50,15 @@ function criarEstilos(tema) {
             minWidth: 0,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 20
+            gap: ESPACO_IDENTIFICACAO
+        },
+
+        identificacaoSomenteLeitura: {
+            paddingRight: LARGURA_NUMERO + ESPACO_IDENTIFICACAO
         },
 
         numero: {
-            width: 28,
+            width: LARGURA_NUMERO,
             height: 28,
             flexShrink: 0,
             alignItems: 'center',
@@ -95,6 +106,10 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
 
+        textoCentralizado: {
+            textAlign: 'center'
+        },
+
         acoes: {
             flexShrink: 0,
             flexDirection: 'row',
@@ -122,6 +137,10 @@ function criarEstilos(tema) {
             gap: 8,
             paddingHorizontal: 16,
             paddingBottom: 12
+        },
+
+        indicadoresSomenteLeitura: {
+            paddingHorizontal: 26
         },
 
         indicador: {
