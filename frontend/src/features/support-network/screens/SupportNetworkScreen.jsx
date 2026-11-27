@@ -6,6 +6,7 @@ import SimpleModal from '../../../shared/components/feedback/Modal/SimpleModal';
 import { EnvelopeIcon, WarningCircleIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 import { useParentalConsent } from '../hooks/useParentalConsent';
 import { MembersScreen } from './MembersScreen';
 import { ParentalConsentRestrictedScreen } from './ParentalConsentRestrictedScreen/ParentalConsentRestrictedScreen';
@@ -21,6 +22,8 @@ function SupportNetworkScreen({
     ...membersProps
 }) {
     const tema = useTheme();
+    const corFundo = tema.escuro ? coresNoturnasConteudo.fundo : undefined;
+    const corIconeEmail = tema.escuro ? coresNoturnasConteudo.coral : '#C85A44';
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const consentimento = useParentalConsent({
         service: parentalConsentService,
@@ -46,7 +49,12 @@ function SupportNetworkScreen({
 
     if (consentimento.carregando && !consentimento.status) {
         return (
-            <MainLayout titulo="Rede de Apoio" abaAtiva="membros" onSelecionarAba={onSelecionarAba}>
+            <MainLayout
+                titulo="Rede de Apoio"
+                abaAtiva="membros"
+                corFundo={corFundo}
+                onSelecionarAba={onSelecionarAba}
+            >
                 <View
                     accessibilityLabel="Verificando autorização da Rede de Apoio"
                     style={estilos.estado}
@@ -60,7 +68,12 @@ function SupportNetworkScreen({
 
     if (consentimento.erro && !consentimento.status) {
         return (
-            <MainLayout titulo="Rede de Apoio" abaAtiva="membros" onSelecionarAba={onSelecionarAba}>
+            <MainLayout
+                titulo="Rede de Apoio"
+                abaAtiva="membros"
+                corFundo={corFundo}
+                onSelecionarAba={onSelecionarAba}
+            >
                 <View style={estilos.estado}>
                     <Text style={estilos.textoEstado}>{consentimento.erro}</Text>
                     <ButtonScreen
@@ -114,7 +127,7 @@ function SupportNetworkScreen({
                 visivel={emailVisivel}
                 aoFechar={() => setEmailVisivel(false)}
                 icone={EnvelopeIcon}
-                corIcone="#C85A44"
+                corIcone={corIconeEmail}
                 fundoIcone="#F7EDE5"
                 titulo="E-mail enviado"
                 mensagem={
@@ -141,7 +154,7 @@ function SupportNetworkScreen({
                 visivel={reenvioConfirmado}
                 aoFechar={fecharConfirmacaoReenvio}
                 icone={EnvelopeIcon}
-                corIcone="#C85A44"
+                corIcone={corIconeEmail}
                 fundoIcone="#F7EDE5"
                 titulo="E-mail enviado"
                 mensagem={

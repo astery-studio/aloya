@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 const CORES_CLARAS = Object.freeze({
     pendente: Object.freeze({
@@ -27,14 +28,14 @@ const CORES_CLARAS = Object.freeze({
 
 const CORES_ESCURAS = Object.freeze({
     pendente: Object.freeze({
-        conteudo: '#F2B45F',
-        fundo: 'rgba(242, 180, 95, 0.16)',
-        borda: 'rgba(242, 180, 95, 0.42)'
+        conteudo: coresNoturnasConteudo.amarelo,
+        fundo: 'rgba(255, 224, 130, 0.16)',
+        borda: 'rgba(255, 224, 130, 0.42)'
     }),
     ativo: Object.freeze({
-        conteudo: '#9FD6B6',
-        fundo: 'rgba(159, 214, 182, 0.14)',
-        borda: 'rgba(159, 214, 182, 0.4)'
+        conteudo: coresNoturnasConteudo.verde,
+        fundo: 'rgba(165, 214, 167, 0.14)',
+        borda: 'rgba(165, 214, 167, 0.4)'
     }),
     inativo: Object.freeze({
         conteudo: '#C4C8C5',
@@ -42,9 +43,9 @@ const CORES_ESCURAS = Object.freeze({
         borda: 'rgba(196, 200, 197, 0.32)'
     }),
     recusado: Object.freeze({
-        conteudo: '#F08A75',
-        fundo: 'rgba(240, 138, 117, 0.14)',
-        borda: 'rgba(240, 138, 117, 0.4)'
+        conteudo: coresNoturnasConteudo.coral,
+        fundo: 'rgba(194, 110, 95, 0.14)',
+        borda: 'rgba(194, 110, 95, 0.4)'
     })
 });
 

@@ -10,6 +10,7 @@ import {
     UsersThreeIcon
 } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { criarEstilos } from './SupportCategorySelector.styles';
 
 function idCategoriaEhValido(id) {
@@ -219,7 +220,7 @@ function SupportCategorySelector({
                                 <CheckCircleIcon
                                     testID={`categoria-selecionada-${categoria.id}`}
                                     size={22}
-                                    color="#2C4C3B"
+                                    color={tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'}
                                     weight="fill"
                                 />
                             ) : (

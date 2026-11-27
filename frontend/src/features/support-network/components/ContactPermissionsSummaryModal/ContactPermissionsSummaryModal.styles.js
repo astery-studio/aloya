@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -39,7 +40,7 @@ function criarEstilos(tema) {
 
         tituloSecao: {
             width: '100%',
-            color: tema.escuro ? '#F08A75' : tema.cores.marca.primaria,
+            color: tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria,
             fontFamily: fontFamilies.bold,
             fontSize: 10,
             fontWeight: '700',
@@ -94,7 +95,7 @@ function criarEstilos(tema) {
             width: 11,
             height: 16,
             flexShrink: 0,
-            color: tema.escuro ? '#F08A75' : '#C85A44',
+            color: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44',
             fontFamily: fontFamilies.regular,
             fontSize: 11,
             fontStyle: 'normal',
@@ -104,7 +105,7 @@ function criarEstilos(tema) {
         },
 
         marcadorAlternado: {
-            color: tema.escuro ? '#9FD6B6' : '#2C4C3B'
+            color: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
         },
 
         textoItem: {
@@ -138,11 +139,11 @@ function criarEstilos(tema) {
 
         botao: {
             width: '100%',
-            backgroundColor: '#C85A44'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44'
         },
 
         textoBotao: {
-            color: '#FFFFFF'
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF'
         }
     });
 }

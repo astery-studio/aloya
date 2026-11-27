@@ -24,6 +24,7 @@ import {
     filtrosPossuemSelecao
 } from '../MembersScreen';
 import { criarEstilos } from './ReceivedContactsScreen.styles';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function obterNomeContato(contato) {
     const candidatos = [contato?.identificacao, contato?.nome, contato?.email];
@@ -174,7 +175,6 @@ function ReceivedContactsScreen({
             aoPressionar={() => definirFiltrosAbertos(true)}
             rotuloAcessibilidade="Filtrar contatos acompanhados"
             variante="redeApoio"
-            corIcone={tema.cores.interface.destaque}
         />
     );
 
@@ -186,6 +186,7 @@ function ReceivedContactsScreen({
                 acoesHeader={exibirSeletor ? acaoFiltro : null}
                 onVoltar={onVoltar}
                 abaAtiva="membros"
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="received-contacts-screen" style={estilos.tela}>

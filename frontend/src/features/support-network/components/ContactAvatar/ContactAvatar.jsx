@@ -13,6 +13,7 @@ import {
     SunIcon,
     UserIcon
 } from '../../../../shared/components/icons/AppIcons';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import {
     corContatoEhValida,
     iconeContatoEhValido,
@@ -49,12 +50,13 @@ function normalizarTamanho(tamanho) {
 }
 
 function ContactAvatar({ iconeId, corId, tamanho = 'medio', tamanhoIcone, rotuloAcessibilidade }) {
+    const { escuro } = useTheme();
     const iconeSeguro = iconeContatoEhValido(iconeId) ? iconeId : 'pessoa';
     const corSegura = corContatoEhValida(corId) ? corId : 'branco';
     const tamanhoSeguro = normalizarTamanho(tamanho);
 
     const Icone = ICONES_POR_ID[iconeSeguro];
-    const opcaoCor = obterOpcaoCorContato(corSegura);
+    const { cor, fundo, borda } = obterOpcaoCorContato(corSegura, escuro);
     const configuracaoTamanho = TAMANHOS[tamanhoSeguro];
     const tamanhoIconeSeguro =
         Number.isFinite(tamanhoIcone) && tamanhoIcone > 0
@@ -63,8 +65,8 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', tamanhoIcone, rotulo
     const corPequena =
         tamanhoSeguro === 'pequeno' && corSegura !== 'branco'
             ? {
-                  backgroundColor: `${opcaoCor.cor}33`,
-                  borderColor: opcaoCor.cor
+                  backgroundColor: `${cor}33`,
+                  borderColor: cor
               }
             : null;
 
@@ -85,8 +87,8 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', tamanhoIcone, rotulo
                 estilos.base,
                 configuracaoTamanho.estilo,
                 {
-                    backgroundColor: opcaoCor.fundo,
-                    borderColor: opcaoCor.borda
+                    backgroundColor: fundo,
+                    borderColor: borda
                 },
                 corPequena
             ]}
@@ -95,7 +97,7 @@ function ContactAvatar({ iconeId, corId, tamanho = 'medio', tamanhoIcone, rotulo
                 testID={`contact-avatar-icon-${iconeSeguro}`}
                 accessibilityLabel={undefined}
                 size={tamanhoIconeSeguro}
-                color={opcaoCor.cor}
+                color={cor}
                 weight="regular"
             />
         </View>

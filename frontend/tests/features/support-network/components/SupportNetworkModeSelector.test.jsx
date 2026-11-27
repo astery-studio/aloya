@@ -31,6 +31,23 @@ describe('SupportNetworkModeSelector', () => {
         expect(aoSelecionar).toHaveBeenCalledTimes(1);
     });
 
+    test('aplica a paleta noturna apenas à opção selecionada', async () => {
+        await render(
+            <SupportNetworkModeSelector selecionado="apoio" aoSelecionar={jest.fn()} />,
+            { preferencia: 'escuro' }
+        );
+
+        expect(screen.getByRole('tab', { name: 'Contatos de Apoio' })).toHaveStyle({
+            backgroundColor: '#C26E5F',
+            borderColor: '#121212'
+        });
+        expect(screen.getByText('Contatos de Apoio')).toHaveStyle({ color: '#121212' });
+        expect(screen.getByRole('tab', { name: 'Contatos Acompanhados' })).toHaveStyle({
+            backgroundColor: '#F0EDE7',
+            borderColor: '#E6E2D8'
+        });
+    });
+
     test('mantém os nomes completos e permite rolagem em telas estreitas', async () => {
         await render(<SupportNetworkModeSelector selecionado="apoio" aoSelecionar={jest.fn()} />);
 

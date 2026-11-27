@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -10,7 +11,7 @@ function criarEstilos(tema) {
             alignItems: 'center',
             justifyContent: 'center',
             paddingHorizontal: 24,
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.fundo : tema.cores.interface.fundo
         },
         cartao: {
             width: '100%',
@@ -18,9 +19,11 @@ function criarEstilos(tema) {
             alignSelf: 'center',
             overflow: 'hidden',
             borderWidth: 0.7,
-            borderColor: tema.escuro ? tema.cores.interface.borda : '#E6E2D8',
+            borderColor: tema.escuro ? coresNoturnasConteudo.borda : '#E6E2D8',
             borderRadius: 20,
-            backgroundColor: tema.cores.interface.superficie
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficie
         },
         cabecalhoCartao: {
             width: '100%',
@@ -29,7 +32,7 @@ function criarEstilos(tema) {
             paddingBottom: 20,
             alignItems: 'center',
             gap: 12,
-            backgroundColor: '#2C4C3B'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
         },
         caixaIcone: {
             width: 52,
@@ -40,7 +43,7 @@ function criarEstilos(tema) {
             backgroundColor: 'rgba(255, 255, 255, 0.12)'
         },
         rotuloRestrito: {
-            color: 'rgba(255, 255, 255, 0.70)',
+            color: tema.escuro ? 'rgba(18, 18, 18, 0.70)' : 'rgba(255, 255, 255, 0.70)',
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             fontWeight: '600',

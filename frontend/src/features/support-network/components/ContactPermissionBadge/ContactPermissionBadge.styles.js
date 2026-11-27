@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 const CORES_CLARAS = Object.freeze({
     categoria: Object.freeze({
@@ -19,8 +20,8 @@ const CORES_ESCURAS = Object.freeze({
         fundo: 'rgba(242, 180, 95, 0.20)'
     }),
     individual: Object.freeze({
-        conteudo: '#8FC4DF',
-        fundo: 'rgba(143, 196, 223, 0.20)'
+        conteudo: coresNoturnasConteudo.azul,
+        fundo: 'rgba(144, 202, 249, 0.20)'
     })
 });
 

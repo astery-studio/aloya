@@ -2,6 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos() {
     return StyleSheet.create({
@@ -43,26 +44,26 @@ function criarVariantes(tema) {
     return Object.freeze({
         estado: Object.freeze({
             container: Object.freeze({
-                backgroundColor: tema.escuro ? 'rgba(242, 180, 95, 0.14)' : '#F7F0E6'
+                backgroundColor: tema.escuro ? 'rgba(255, 224, 130, 0.14)' : '#F7F0E6'
             }),
 
             texto: Object.freeze({
-                color: tema.escuro ? '#F2B45F' : '#B07D2A'
+                color: tema.escuro ? coresNoturnasConteudo.amarelo : '#B07D2A'
             }),
 
-            corIndicador: tema.escuro ? '#F2B45F' : '#B07D2A'
+            corIndicador: tema.escuro ? coresNoturnasConteudo.amarelo : '#B07D2A'
         }),
 
         permissao: Object.freeze({
             container: Object.freeze({
-                backgroundColor: tema.escuro ? 'rgba(159, 214, 182, 0.14)' : '#EDF0EE'
+                backgroundColor: tema.escuro ? 'rgba(165, 214, 167, 0.14)' : '#EDF0EE'
             }),
 
             texto: Object.freeze({
-                color: tema.escuro ? '#9FD6B6' : '#2C4C3B'
+                color: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
             }),
 
-            corIndicador: tema.escuro ? '#9FD6B6' : '#2C4C3B'
+            corIndicador: tema.escuro ? coresNoturnasConteudo.verde : '#2C4C3B'
         })
     });
 }

@@ -22,6 +22,7 @@ import { SupportNetworkModeSelector } from '../components/SupportNetworkModeSele
 import { useSupportCategories } from '../hooks/useSupportCategories';
 import { useSupportContacts } from '../hooks/useSupportContacts';
 import { criarEstilos } from './MembersScreen.styles';
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 
 function criarFiltrosVazios() {
     return {
@@ -338,15 +339,13 @@ function MembersScreen({
                 aoPressionar={abrirFiltros}
                 rotuloAcessibilidade="Filtrar contatos"
                 variante="redeApoio"
-                corIcone={tema.cores.interface.destaque}
             />
 
             <IconButton
                 icone={UserCircleGearIcon}
                 aoPressionar={onAbrirCategorias}
                 rotuloAcessibilidade="Abrir categorias de permissão"
-                variante="redeApoio"
-                corIcone={tema.cores.marca.primaria}
+                variante="redeApoioSecundario"
             />
         </>
     );
@@ -358,6 +357,7 @@ function MembersScreen({
                 varianteHeader="redeApoio"
                 acoesHeader={acoesCabecalho}
                 abaAtiva="membros"
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="members-screen" style={estilos.container}>
@@ -444,7 +444,7 @@ function MembersScreen({
                 visivel={confirmacaoContato !== null}
                 aoFechar={fecharConfirmacao}
                 icone={WarningCircleIcon}
-                corIcone={tema.cores.marca.primaria}
+                corIcone={tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo={configuracaoConfirmacao?.titulo ?? ''}
                 mensagem={configuracaoConfirmacao?.mensagem ?? ''}
@@ -466,7 +466,7 @@ function MembersScreen({
                 visivel={estado.resultadoAcao !== null}
                 aoFechar={fecharResultado}
                 icone={estado.resultadoAcao?.tipo === 'reenviar' ? PaperPlaneTiltIcon : LockKeyIcon}
-                corIcone={tema.cores.marca.primaria}
+                corIcone={tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo={estado.resultadoAcao?.mensagem ?? ''}
                 acaoPrincipal={{

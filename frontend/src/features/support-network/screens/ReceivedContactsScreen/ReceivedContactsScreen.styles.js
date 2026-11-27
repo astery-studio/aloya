@@ -2,13 +2,14 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
         tela: {
             flex: 1,
             width: '100%',
-            backgroundColor: tema.cores.interface.fundo
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.fundo : tema.cores.interface.fundo
         },
 
         apresentacao: {
@@ -22,7 +23,9 @@ function criarEstilos(tema) {
 
         descricao: {
             width: '100%',
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.regular,
             fontSize: 15,
             fontWeight: '400',
@@ -35,12 +38,12 @@ function criarEstilos(tema) {
             maxWidth: 350.011,
             height: 35.99,
             borderWidth: 1,
-            borderColor: '#C85A44',
+            borderColor: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44',
             borderRadius: 10
         },
 
         textoBotaoLimpar: {
-            color: '#C85A44',
+            color: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44',
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             fontWeight: '600',

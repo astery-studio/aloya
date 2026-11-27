@@ -2,6 +2,7 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
@@ -52,7 +53,7 @@ function criarEstilos(tema) {
         erroEmail: {
             width: '100%',
             alignSelf: 'stretch',
-            color: '#C85A44',
+            color: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44',
             textAlign: 'left'
         },
 

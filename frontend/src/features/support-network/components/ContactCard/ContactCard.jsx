@@ -22,6 +22,7 @@ import { ContactAvatar } from '../ContactAvatar/ContactAvatar';
 import { ContactPermissionBadge } from '../ContactPermissionBadge/ContactPermissionBadge';
 import { ContactStatusBadge } from '../ContactStatusBadge/ContactStatusBadge';
 import { criarEstilos } from './ContactCard.styles';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 const PERSPECTIVAS = Object.freeze(['enviado', 'recebido']);
 
@@ -34,6 +35,13 @@ const CORES_INFORMACOES = Object.freeze({
     vinculo: '#C85A44',
     data: '#2C4C3B',
     aguardando: '#4A758E'
+});
+
+const CORES_INFORMACOES_ESCURAS = Object.freeze({
+    email: coresNoturnasConteudo.amarelo,
+    vinculo: coresNoturnasConteudo.coral,
+    data: coresNoturnasConteudo.verde,
+    aguardando: coresNoturnasConteudo.azul
 });
 
 function normalizarPerspectiva(perspectiva) {
@@ -110,6 +118,7 @@ function LinhaInformacao({ icone: Icone, corIcone, identificador, rotulo, valor,
 }
 
 function BotaoAcaoCabecalho({ icone: Icone, rotulo, aoPressionar, desabilitado, estilos }) {
+    const tema = useTheme();
     return (
         <Pressable
             onPress={aoPressionar}
@@ -126,7 +135,11 @@ function BotaoAcaoCabecalho({ icone: Icone, rotulo, aoPressionar, desabilitado, 
                 desabilitado && estilos.acaoDesabilitada
             ]}
         >
-            <Icone size={17.997} color="#5C5C59" weight="regular" />
+            <Icone
+                size={17.997}
+                color={tema.escuro ? coresNoturnasConteudo.textoSecundario : '#5C5C59'}
+                weight="regular"
+            />
         </Pressable>
     );
 }
@@ -142,6 +155,9 @@ function ContactCard({
     const tema = useTheme();
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
+    const coresInformacoes = tema.escuro ? CORES_INFORMACOES_ESCURAS : CORES_INFORMACOES;
+    const corAcao = tema.escuro ? coresNoturnasConteudo.textoSecundario : '#5C5C59';
+    const corConteudoBotao = tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF';
 
     const perspectivaSegura = normalizarPerspectiva(perspectiva);
 
@@ -245,7 +261,7 @@ function ContactCard({
                             <XCircleIcon
                                 testID="pending-cancel-icon"
                                 size={18}
-                                color="#5C5C59"
+                                color={corAcao}
                                 weight="regular"
                             />
                         </Pressable>
@@ -373,6 +389,7 @@ function ContactCard({
                             aoPressionar={() => executarAcao('remover')}
                             rotuloAcessibilidade={`Remover ${identificacao}`}
                             variante="perigo"
+                            corIcone={tema.escuro ? corAcao : undefined}
                             desativado={bloqueado}
                         />
                     </View>
@@ -388,7 +405,7 @@ function ContactCard({
                     {email ? (
                         <LinhaInformacao
                             icone={EnvelopeIcon}
-                            corIcone={CORES_INFORMACOES.email}
+                            corIcone={coresInformacoes.email}
                             identificador="email"
                             rotulo="E-mail"
                             valor={email}
@@ -399,7 +416,7 @@ function ContactCard({
                     {!contatoEnviadoAtivo ? (
                         <LinhaInformacao
                             icone={HandshakeIcon}
-                            corIcone={CORES_INFORMACOES.vinculo}
+                            corIcone={coresInformacoes.vinculo}
                             identificador="vinculo"
                             rotulo={
                                 conviteEnviadoPendente ||
@@ -415,7 +432,7 @@ function ContactCard({
 
                     <LinhaInformacao
                         icone={ClockIcon}
-                        corIcone={CORES_INFORMACOES.data}
+                        corIcone={coresInformacoes.data}
                         identificador="data"
                         rotulo={
                             contatoEnviadoAtivo
@@ -441,7 +458,7 @@ function ContactCard({
                     {rotuloEspera && !contatoEnviadoAtivo ? (
                         <LinhaInformacao
                             icone={HourglassLowIcon}
-                            corIcone={CORES_INFORMACOES.aguardando}
+                            corIcone={coresInformacoes.aguardando}
                             identificador="aguardando"
                             rotulo={
                                 conviteEnviadoPendente
@@ -499,7 +516,7 @@ function ContactCard({
                                 variante="verde"
                                 icone={CheckCircleIcon}
                                 tamanhoIcone={16}
-                                corConteudo="#FFFFFF"
+                                corConteudo={corConteudoBotao}
                                 aoPressionar={() => executarAcao('aceitar')}
                                 rotuloAcessibilidade={`Aceitar convite de ${identificacao}`}
                                 carregando={acaoEmAndamento === 'aceitar'}
@@ -515,7 +532,7 @@ function ContactCard({
                                 variante="verde"
                                 icone={XCircleIcon}
                                 tamanhoIcone={16}
-                                corConteudo="#FFFFFF"
+                                corConteudo={corConteudoBotao}
                                 aoPressionar={() => executarAcao('recusar')}
                                 rotuloAcessibilidade={`Recusar convite de ${identificacao}`}
                                 carregando={acaoEmAndamento === 'recusar'}
@@ -535,7 +552,7 @@ function ContactCard({
                         variante="verde"
                         icone={PaperPlaneTiltIcon}
                         tamanhoIcone={13}
-                        corConteudo="#FFFFFF"
+                        corConteudo={corConteudoBotao}
                         aoPressionar={() => executarAcao('reenviar')}
                         rotuloAcessibilidade={`Reenviar convite para ${identificacao}`}
                         carregando={acaoEmAndamento === 'reenviar'}
@@ -553,7 +570,7 @@ function ContactCard({
                         variante="verde"
                         icone={PaperPlaneTiltIcon}
                         tamanhoIcone={13}
-                        corConteudo="#FFFFFF"
+                        corConteudo={corConteudoBotao}
                         aoPressionar={() => executarAcao('convidar_novamente')}
                         rotuloAcessibilidade={`Convidar ${identificacao} novamente`}
                         desativado={bloqueado}
@@ -570,7 +587,7 @@ function ContactCard({
                         variante="verde"
                         icone={PaperPlaneTiltIcon}
                         tamanhoIcone={13}
-                        corConteudo="#FFFFFF"
+                        corConteudo={corConteudoBotao}
                         aoPressionar={() => executarAcao('convidar_novamente')}
                         rotuloAcessibilidade={`Reenviar convite para ${identificacao}`}
                         desativado={bloqueado}
@@ -592,7 +609,7 @@ function ContactCard({
                     variante="laranja"
                     icone={InfoIcon}
                     tamanhoIcone={13}
-                    corConteudo="#FFFFFF"
+                    corConteudo={corConteudoBotao}
                     aoPressionar={abrirResumo}
                     rotuloAcessibilidade={`Abrir resumo de permissões de ${identificacao}`}
                     desativado={bloqueado || typeof aoAbrirResumo !== 'function'}
