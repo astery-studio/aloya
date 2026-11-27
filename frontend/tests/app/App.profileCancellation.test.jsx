@@ -57,6 +57,20 @@ jest.mock('../../src/features/auth/screens/LoginScreen', () => ({
     default: jest.fn(() => null)
 }))
 
+jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
+    const React = require('react')
+    const {Pressable} = require('react-native')
+
+    return {
+        CycleTodayContainer: ({aoSelecionarAba}) =>
+            React.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Abrir configurações',
+                onPress: () => aoSelecionarAba('configuracoes')
+            })
+    }
+})
+
 jest.mock('../../src/features/settings/screens/SettingsScreen', () => {
     const React = require('react')
     const {
@@ -302,6 +316,12 @@ describe(
                 )
 
                 await renderApp(<App />)
+
+                await fireEvent.press(
+                    await screen.findByRole('button', {
+                        name: 'Abrir configurações'
+                    })
+                )
 
                 await waitFor(() => {
                     expect(

@@ -706,7 +706,7 @@ describe('App integrado', () => {
         await fireEvent.press(screen.getByRole('button', { name: 'Abrir perfil' }));
 
         expect(await screen.findByText('Perfil: Julia')).toBeOnTheScreen();
-        act(() => expect(voltarHardware()).toBe(true));
+        await act(() => expect(voltarHardware()).toBe(true));
 
         expect(await screen.findByText('Configurações')).toBeOnTheScreen();
     });
@@ -716,7 +716,7 @@ describe('App integrado', () => {
         await render(<App />);
         await screen.findByText('Ciclo hoje');
 
-        act(() => {
+        await act(() => {
             expect(voltarHardware()).toBe(true);
             expect(voltarHardware()).toBe(true);
         });

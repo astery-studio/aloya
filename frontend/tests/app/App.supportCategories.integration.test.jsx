@@ -44,9 +44,18 @@ jest.mock('../../src/features/cycles/CycleHistoryFlow', () => ({
     CycleHistoryFlow: jest.fn(() => null)
 }));
 
-jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => ({
-    CycleTodayContainer: jest.fn(() => null)
-}));
+jest.mock('../../src/features/cycles/screens/CycleTodayContainer', () => {
+    const React = require('react');
+    const { Pressable } = require('react-native');
+    return {
+        CycleTodayContainer: ({ aoSelecionarAba }) =>
+            React.createElement(Pressable, {
+                accessibilityRole: 'button',
+                accessibilityLabel: 'Abrir membros',
+                onPress: () => aoSelecionarAba('membros')
+            })
+    };
+});
 
 jest.mock('../../src/features/contraceptives/ContraceptiveFlow', () => ({
     ContraceptiveFlow: jest.fn(() => null)
