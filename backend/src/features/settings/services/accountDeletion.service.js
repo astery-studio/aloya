@@ -205,6 +205,7 @@ function criarAccountDeletionService({
                     usuarioId: contatoId,
                     tipoOrigem: 'rede_apoio',
                     origemId: null,
+                    evento: 'redeApoio.convites.contaExcluida',
                     dataHoraProgramada: momentoExclusao,
                     statusEnvio: 'agendada'
                 }))

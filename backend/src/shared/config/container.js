@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 
 import { env } from './env.js';
 import { prisma } from './prisma.js';
+import { criarNotificationPreferencesService } from '../../features/notifications/notificationPreferences.service.js';
 import { criarCycleRegistrationModule } from '../../features/cycles/cycleRegistration.module.js';
 
 import * as dateUtils from '../utils/date.utils.js';
@@ -238,6 +239,7 @@ function criarContainer() {
     });
 
     const contraceptiveService = criarContraceptiveService(prisma);
+    const notificationPreferencesService = criarNotificationPreferencesService(prisma);
     const contraceptiveUsageService = criarContraceptiveUsageService(prisma, {
         avaliarJanelaEficacia: criarAvaliadorJanelaEficacia(lerJanelasDeUso())
     });
@@ -402,6 +404,22 @@ function criarContainer() {
         limite: env.configuracoesContaRateLimitMaximo
     });
 
+    const notificationPreferencesRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: 120,
+        evento: 'limite_preferencias_notificacao',
+        codigo: 'LIMITE_PREFERENCIAS_NOTIFICACAO'
+    });
+
+    const pushDevicesRateLimit = criarConfiguracoesContaRateLimit({
+        rateLimit,
+        janelaMs: env.configuracoesContaRateLimitJanelaMs,
+        limite: env.configuracoesContaRateLimitMaximo,
+        evento: 'limite_alteracoes_dispositivos_notificacao',
+        codigo: 'LIMITE_DISPOSITIVOS_NOTIFICACAO'
+    });
+
     const diaryPreferencesRateLimit = criarDiaryPreferencesRateLimit({
         rateLimit,
         janelaMs: env.diarioPreferenciasRateLimitJanelaMs,
@@ -564,6 +582,7 @@ function criarContainer() {
         accountDeletionController,
         logoutController,
         contraceptiveController,
+        notificationPreferencesService,
         contraceptiveUsageController,
         calendarController: calendarModule.calendarController,
         cycleHistoryController,
@@ -601,6 +620,8 @@ function criarContainer() {
         emailRateLimit,
         contaLoginRateLimit,
         configuracoesContaRateLimit,
+        notificationPreferencesRateLimit,
+        pushDevicesRateLimit,
         diaryPreferencesRateLimit,
         permissionCategoryRateLimit,
         permissionCategoryUpdateRateLimit,

@@ -9,6 +9,7 @@ import {
 } from '../utils/calendar.js';
 import { calcularPrevisao } from '../utils/prediction.js';
 import { permiteHistorico, selecionarPeriodo } from '../utils/cycleRegistration.js';
+import { agendarEvento, permiteNotificacao } from '../../notifications/notificationEvents.service.js';
 
 function criarCycleRegistrationRepository({ prisma, thermalRecalculation } = {}) {
     if (typeof prisma?.$transaction !== 'function')
@@ -126,6 +127,8 @@ function criarCycleRegistrationRepository({ prisma, thermalRecalculation } = {})
                     parametros: usuario,
                     dataReferencia: formatarData(agora)
                 });
+                const ocorrencia = JSON.stringify([usuarioId, chave]);
+                const eventoCompartilhado = 'redeApoio.ciclo.registro';
                 const vinculos = await tx.vinculoRedeApoio.findMany({
                     where: {
                         titularId: usuarioId,
@@ -139,21 +142,23 @@ function criarCycleRegistrationRepository({ prisma, thermalRecalculation } = {})
                             ]
                         }
                     },
-                    include: { categoria: true }
+                    include: {
+                        categoria: true,
+                        contato: { select: { preferenciaNotificacao: true } }
+                    }
                 });
                 const contatos = [
-                    ...new Set(vinculos.filter(permiteHistorico).map((v) => v.contatoId))
+                    ...new Set(vinculos.filter((vinculo) =>
+                        permiteHistorico(vinculo) &&
+                        permiteNotificacao(vinculo.contato.preferenciaNotificacao, eventoCompartilhado)
+                    ).map((vinculo) => vinculo.contatoId))
                 ];
-                if (contatos.length)
-                    await tx.notificacao.createMany({
-                        data: contatos.map((contatoId) => ({
-                            usuarioId: contatoId,
-                            tipoOrigem: 'rede_apoio',
-                            origemId: ciclo.id,
-                            dataHoraProgramada: agora,
-                            statusEnvio: 'agendada'
-                        }))
+                for (const contatoId of contatos) {
+                    await agendarEvento(tx, {
+                        usuarioId: contatoId, evento: eventoCompartilhado, ocorrencia,
+                        tipoOrigem: 'rede_apoio', origemId: ciclo.id, dataHoraProgramada: agora
                     });
+                }
                 const atualizado = atualizados.find((item) => item.id === ciclo.id);
                 const resultado = {
                     mensagem: 'Registro de menstruação adicionado com sucesso.',
