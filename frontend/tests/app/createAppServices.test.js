@@ -317,6 +317,9 @@ describe('createAppServices', () => {
             contactLinkService,
             supportContactService,
             receivedContactsService,
+            sharedSupportService: {
+                consultar: expect.any(Function)
+            },
             parentalConsentService,
             cyclePredictionService,
             cycleParametersService,

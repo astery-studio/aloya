@@ -1,0 +1,197 @@
+import { ScrollView, StyleSheet } from 'react-native';
+
+import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
+import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
+import { CalendarScreenContainer } from '../../../calendar/screens/CalendarScreenContainer';
+import { ContraceptiveUsageCard } from '../../../contraceptives/components/ContraceptiveUsageCard';
+import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
+import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
+import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
+import { SupportedPersonIndicator } from '../../components/SupportedPersonIndicator/SupportedPersonIndicator';
+import { useSharedContent } from '../../hooks/useSharedContent';
+import { useSharedSupportAccess } from '../../hooks/useSharedSupportAccess';
+import { SharedCycleHistoryScreen } from '../SharedCycleHistoryScreen/SharedCycleHistoryScreen';
+import { SharedDiaryScreen } from '../SharedDiaryScreen/SharedDiaryScreen';
+
+const TITULOS = {
+    inicio: 'Início',
+    calendario: 'Calendário',
+    diario: 'Diário',
+    ciclos: 'Histórico de Ciclos',
+    anticoncepcionais: 'Anticoncepcionais'
+};
+
+const ABAS_BASE = ['membros', 'inicio', 'configuracoes'];
+const PERMISSAO_FASE = 'geral.fase_atual';
+const PERMISSAO_HISTORICO = 'geral.historico_ciclo';
+const PERMISSAO_ANTICONCEPCIONAIS = 'geral.anticoncepcionais';
+const PERMISSAO_DICAS = 'geral.dicas';
+
+function temDiario(permissoes) {
+    return permissoes.some((id) => !id.startsWith('geral.'));
+}
+
+function InicioCompartilhado({ acesso, consultas, onSelecionarAba }) {
+    const { nomeTitular, permissoes } = acesso;
+    const verFase = permissoes.includes(PERMISSAO_FASE);
+    const verDicas = permissoes.includes(PERMISSAO_DICAS);
+    const estadoFase = useSharedContent(verFase ? consultas.fase : null);
+    const fase = estadoFase.dados?.faseAtual?.toLowerCase();
+
+    return (
+        <ScrollView contentContainerStyle={estilos.conteudo}>
+            <SupportedPersonIndicator nome={nomeTitular} />
+            {verFase && estadoFase.status !== 'disponivel' ? (
+                <SharedContentState
+                    status={estadoFase.status}
+                    aoTentarNovamente={estadoFase.recarregar}
+                />
+            ) : (
+                <SupportedCycleHero
+                    nomeTitular={nomeTitular}
+                    fase={fase}
+                    possuiDadosCiclo={Boolean(fase)}
+                    exibirFase={verFase}
+                />
+            )}
+            {permissoes.includes(PERMISSAO_ANTICONCEPCIONAIS) ? (
+                <ButtonScreen
+                    texto="Ver Anticoncepcionais"
+                    aoPressionar={() => onSelecionarAba('anticoncepcionais')}
+                />
+            ) : null}
+            {permissoes.includes(PERMISSAO_HISTORICO) ? (
+                <ButtonScreen
+                    texto="Ver Histórico de Ciclos"
+                    aoPressionar={() => onSelecionarAba('ciclos')}
+                />
+            ) : null}
+            {verDicas ? <CycleEducationSection perspectiva="contato" /> : null}
+            {!permissoes.some((id) =>
+                [
+                    PERMISSAO_FASE,
+                    PERMISSAO_ANTICONCEPCIONAIS,
+                    PERMISSAO_HISTORICO,
+                    PERMISSAO_DICAS
+                ].includes(id)
+            ) ? (
+                <SharedContentState />
+            ) : null}
+        </ScrollView>
+    );
+}
+
+function AnticoncepcionaisCompartilhados({ consultar }) {
+    const estado = useSharedContent(consultar);
+
+    if (!estado.dados?.length) {
+        return (
+            <SharedContentState
+                status={estado.status === 'disponivel' ? 'vazio' : estado.status}
+                aoTentarNovamente={estado.recarregar}
+            />
+        );
+    }
+
+    return (
+        <ScrollView contentContainerStyle={estilos.conteudo}>
+            {estado.dados.map((item) => (
+                <ContraceptiveUsageCard key={item.id} anticoncepcional={item} somenteLeitura />
+            ))}
+        </ScrollView>
+    );
+}
+
+function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessaoExpirada }) {
+    const { acesso, consultas, recarregar } = useSharedSupportAccess({
+        service,
+        vinculoId,
+        onSessaoExpirada
+    });
+    const permissoes = acesso.permissoes ?? [];
+    const historicoPermitido = permissoes.includes(PERMISSAO_HISTORICO);
+    const diarioPermitido = temDiario(permissoes);
+    const abasDisponiveis = [
+        ...ABAS_BASE,
+        ...(historicoPermitido ? ['calendario'] : []),
+        ...(diarioPermitido ? ['diario'] : [])
+    ];
+    const navegacao = { onSelecionarAba, abasDisponiveis };
+    const titulo = TITULOS[tela];
+    const voltar = () => onSelecionarAba('inicio');
+    const subtela = tela === 'ciclos' || tela === 'anticoncepcionais';
+
+    if (acesso.status === 'disponivel') {
+        if (tela === 'calendario' && historicoPermitido) {
+            return (
+                <CalendarScreenContainer
+                    key={acesso.assinatura}
+                    somenteLeitura
+                    service={consultas.calendario}
+                    {...navegacao}
+                />
+            );
+        }
+        if (tela === 'ciclos' && historicoPermitido) {
+            return (
+                <SharedCycleHistoryScreen
+                    key={acesso.assinatura}
+                    nomeTitular={acesso.nomeTitular}
+                    service={consultas.historico}
+                    onVoltar={voltar}
+                />
+            );
+        }
+        if (tela === 'diario' && diarioPermitido) {
+            return (
+                <SharedDiaryScreen
+                    key={acesso.assinatura}
+                    nomeTitular={acesso.nomeTitular}
+                    permissoes={permissoes}
+                    service={consultas.diario}
+                    {...navegacao}
+                />
+            );
+        }
+    }
+
+    const conteudoDisponivel = acesso.status === 'disponivel';
+
+    return (
+        <MainLayout
+            titulo={titulo}
+            varianteHeader={subtela ? 'comVoltar' : 'padrao'}
+            abaAtiva={tela}
+            onVoltar={subtela ? voltar : undefined}
+            exibirNavegacaoInferior={!subtela}
+            {...navegacao}
+        >
+            {conteudoDisponivel && tela === 'inicio' ? (
+                <InicioCompartilhado
+                    key={acesso.assinatura}
+                    acesso={acesso}
+                    consultas={consultas}
+                    onSelecionarAba={onSelecionarAba}
+                />
+            ) : conteudoDisponivel &&
+              tela === 'anticoncepcionais' &&
+              permissoes.includes(PERMISSAO_ANTICONCEPCIONAIS) ? (
+                <AnticoncepcionaisCompartilhados
+                    key={acesso.assinatura}
+                    consultar={consultas.anticoncepcionais}
+                />
+            ) : (
+                <SharedContentState
+                    status={conteudoDisponivel ? 'vazio' : acesso.status}
+                    aoTentarNovamente={recarregar}
+                />
+            )}
+        </MainLayout>
+    );
+}
+
+const estilos = StyleSheet.create({
+    conteudo: { flexGrow: 1, gap: 16, paddingHorizontal: 16, paddingBottom: 24 }
+});
+
+export { SharedSupportFlow };

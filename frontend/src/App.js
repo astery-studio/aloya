@@ -36,6 +36,7 @@ import { ParentalConsentScreen } from './features/support-network/screens/Parent
 import { ContactFormScreen } from './features/support-network/screens/ContactFormScreen/ContactFormScreen';
 import { ReceivedContactsScreen } from './features/support-network/screens/ReceivedContactsScreen/ReceivedContactsScreen';
 import { SupportNetworkScreen } from './features/support-network/screens/SupportNetworkScreen';
+import { SharedSupportFlow } from './features/support-network/screens/SharedSupportFlow/SharedSupportFlow';
 import { ehMenorDe16 } from './features/support-network/utils/age';
 import { NewSupportCategoryScreen } from './features/support-network/screens/NewSupportCategoryScreen';
 import { SupportCategoriesScreen } from './features/support-network/screens/SupportCategoriesScreen';
@@ -76,6 +77,15 @@ const telasInternas = Object.freeze({
     diario: 'diario',
     inicio: 'inicio'
 });
+
+const TELAS_COMPARTILHADAS = new Set([
+    'inicio',
+    'calendario',
+    'diario',
+    'ciclos',
+    'anticoncepcionais'
+]);
+const ABAS_ACOMPANHAMENTO = new Set(['membros', 'configuracoes', ...TELAS_COMPARTILHADAS]);
 
 // Obtém a URL da API usando o endereço do Expo em desenvolvimento ou a variável de ambiente em produção.
 function obterBaseUrl() {
@@ -187,6 +197,7 @@ export default function App() {
     const consultarDocumentos = CONSULTA_LEGAL_DISPONIVEL ? setDocumentoLegal : undefined;
 
     const [telaInterna, setTelaInterna] = useState(telasInternas.inicio);
+    const [vinculoVisualizadoId, setVinculoVisualizadoId] = useState(null);
 
     const [origemNovaCategoria, setOrigemNovaCategoria] = useState(telasInternas.membros);
 
@@ -431,6 +442,7 @@ export default function App() {
         setErroPerfil(false);
 
         setTelaInterna(telasInternas.inicio);
+        setVinculoVisualizadoId(null);
         setCadastroDiarioVisivel(false);
         setRegistroDiarioEdicao(null);
         setCategoriasDiarioVisiveis(false);
@@ -445,7 +457,7 @@ export default function App() {
         concluirAutenticacao();
     }
 
-    function finalizarSessao(resultado = {}) {
+    const finalizarSessao = useCallback((resultado = {}) => {
         requisicaoAtual.current += 1;
 
         controladorPerfilAtual.current?.abort();
@@ -457,6 +469,7 @@ export default function App() {
         setCarregandoPerfil(false);
 
         setTelaInterna(telasInternas.inicio);
+        setVinculoVisualizadoId(null);
         setCategoriasDiarioVisiveis(false);
         setCadastroDiarioVisivel(false);
         setRegistroDiarioEdicao(null);
@@ -471,9 +484,21 @@ export default function App() {
         setMensagemLogin(resultado?.mensagem || null);
 
         setEstadoSessao('anonima');
+    }, []);
+
+    function visualizarContato(contato) {
+        if (contato?.status !== 'ativo' || !Number.isSafeInteger(contato.id) || contato.id <= 0) {
+            return;
+        }
+        setVinculoVisualizadoId(contato.id);
+        setTelaInterna(telasInternas.inicio);
     }
 
     function selecionarAba(aba) {
+        if (vinculoVisualizadoId !== null) {
+            if (ABAS_ACOMPANHAMENTO.has(aba)) setTelaInterna(aba);
+            return;
+        }
         if (perfil?.papel === 'contato_apoio' && !['membros', 'configuracoes'].includes(aba)) {
             return;
         }
@@ -653,6 +678,17 @@ export default function App() {
                 />
             );
         }
+    } else if (vinculoVisualizadoId !== null && TELAS_COMPARTILHADAS.has(telaInterna)) {
+        conteudo = (
+            <SharedSupportFlow
+                key={vinculoVisualizadoId}
+                vinculoId={vinculoVisualizadoId}
+                tela={telaInterna}
+                service={configuracao.servicos.sharedSupportService}
+                onSelecionarAba={selecionarAba}
+                onSessaoExpirada={finalizarSessao}
+            />
+        );
     } else if (telaInterna === telasInternas.inicio) {
         conteudo = (
             <>
@@ -744,9 +780,11 @@ export default function App() {
         );
     } else if (telaInterna === telasInternas.membros) {
         conteudo =
-            perfil?.papel === 'contato_apoio' ? (
+            perfil?.papel === 'contato_apoio' || vinculoVisualizadoId !== null ? (
                 <ReceivedContactsScreen
                     service={configuracao.servicos.receivedContactsService}
+                    vinculoVisualizadoId={vinculoVisualizadoId}
+                    onVisualizarContato={visualizarContato}
                     onSelecionarAba={selecionarAba}
                     onSessaoExpirada={finalizarSessao}
                 />
@@ -754,6 +792,7 @@ export default function App() {
                 <SupportNetworkScreen
                     parentalConsentService={configuracao.servicos.parentalConsentService}
                     receivedContactsService={configuracao.servicos.receivedContactsService}
+                    onVisualizarContato={visualizarContato}
                     service={configuracao.servicos.supportContactService}
                     categoriasService={configuracao.servicos.supportCategoryService}
                     onGerenciarResponsavel={() => {
@@ -846,6 +885,9 @@ export default function App() {
     } else if (telaInterna === telasInternas.configuracoes) {
         conteudo = (
             <SettingsScreen
+                emAcompanhamento={
+                    vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio'
+                }
                 onAbrirPoliticasPrivacidade={
                     consultarDocumentos ? () => consultarDocumentos('privacy') : undefined
                 }
