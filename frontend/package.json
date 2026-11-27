@@ -24,8 +24,8 @@
     "react-native-svg": "15.16.0"
   },
   "scripts": {
-    "start": "expo start --go",
-    "start:dev-client": "expo start --dev-client",
+    "start": "node --max-old-space-size=6144 ./node_modules/expo/bin/cli start --go --max-workers 2",
+    "start:dev-client": "node --max-old-space-size=6144 ./node_modules/expo/bin/cli start --dev-client --max-workers 2",
     "preview:hu013": "set \"EXPO_PUBLIC_PREVIEW_HU013=true\" && expo start --go --clear",
     "android": "expo start --go --android",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
