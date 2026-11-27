@@ -22,6 +22,7 @@ const TITULOS = {
 const PERMISSAO_FASE = 'geral.fase_atual';
 const PERMISSAO_HISTORICO = 'geral.historico_ciclo';
 const PERMISSAO_ANTICONCEPCIONAIS = 'geral.anticoncepcionais';
+const INTERVALO_ATUALIZACAO_CICLO_MS = 5000;
 
 function temDiario(permissoes) {
     return permissoes.some((id) => !id.startsWith('geral.'));
@@ -30,7 +31,9 @@ function temDiario(permissoes) {
 function InicioCompartilhado({ acesso, consultas, onSelecionarAba }) {
     const { nomeTitular, permissoes } = acesso;
     const verFase = permissoes.includes(PERMISSAO_FASE);
-    const estado = useSharedContent(verFase ? consultas.fase : null);
+    const estado = useSharedContent(verFase ? consultas.fase : null, {
+        intervaloAtualizacaoMs: INTERVALO_ATUALIZACAO_CICLO_MS
+    });
 
     return (
         <SharedHomeScreen
