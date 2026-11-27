@@ -10,6 +10,7 @@ export function permiteNotificacao(preferencia, evento) {
     const grupo = evento.slice(0, evento.lastIndexOf('.'));
     const categoria = evento.split('.')[0];
     const ajustes = preferencia?.ajustesPorEvento;
+
     return (
         preferencia?.[camposCategoria[categoria]] !== false &&
         (ajustes?.[grupo] ?? valoresIniciais[grupo]) === true &&
@@ -26,5 +27,6 @@ export async function agendarEvento(transacao, { usuarioId, evento, ocorrencia, 
         update: {},
         select: { id: true }
     });
+
     return resultado.id;
 }

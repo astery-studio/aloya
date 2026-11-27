@@ -18,6 +18,7 @@ const select = {
 
 function apresentar(registro) {
     if (!registro) return { ...valoresIniciais };
+
     const { ajustesPorEvento, ...legado } = registro;
     return { ...valoresIniciais, ...ajustesPorEvento, ...legado };
 }
@@ -50,11 +51,13 @@ export function criarNotificationPreferencesService(prisma) {
                 ajustes_por_evento = json_patch(preferencias_notificacao.ajustes_por_evento, excluded.ajustes_por_evento),
                 atualizado_em = excluded.atualizado_em
         `;
+
         return buscarNoBanco(cliente, usuarioId);
     }
 
     async function atualizar(usuarioId, entrada) {
         const alteracao = validarAlteracao(entrada);
+
         if (alteracao.valor !== false || alteracao.chave === 'previaDetalhada') {
             return gravar(prisma, usuarioId, alteracao);
         }
@@ -67,8 +70,10 @@ export function criarNotificationPreferencesService(prisma) {
                 redeApoioAtiva: 'redeApoio',
                 lembreteDiarioAtivo: 'ciclo.diario.lembrete'
             }[chave] ?? chave;
+
         return prisma.$transaction(async (tx) => {
             const preferencias = await gravar(tx, usuarioId, alteracao);
+
             await tx.notificacao.updateMany({
                 where: {
                     usuarioId,
@@ -78,6 +83,7 @@ export function criarNotificationPreferencesService(prisma) {
                 },
                 data: { statusEnvio: 'cancelada' }
             });
+
             return preferencias;
         });
     }
@@ -92,6 +98,7 @@ export function criarNotificationPreferencesService(prisma) {
                 where: { usuarioId },
                 data: { ...camposExistentes, ajustesPorEvento: {} }
             });
+
             await tx.notificacao.updateMany({
                 where: {
                     usuarioId,
@@ -101,6 +108,7 @@ export function criarNotificationPreferencesService(prisma) {
                 },
                 data: { statusEnvio: 'cancelada' }
             });
+
             return buscarNoBanco(tx, usuarioId);
         });
     }

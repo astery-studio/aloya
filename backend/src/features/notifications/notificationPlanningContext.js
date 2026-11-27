@@ -21,21 +21,26 @@ export async function criarContextoPlanejamento(
         orderBy: [{ atualizadoEm: 'desc' }, { id: 'asc' }],
         select: { fuso: true }
     });
+
     const fuso = dispositivo?.fuso ?? fusoAlternativo;
     if (!fuso) return null;
+
     const hoje = dataLocalNoFuso(agora, fuso);
     const amanha = somarDias(hoje, 1);
     const horizonte = somarDias(hoje, 7);
     const horario = preferencia?.horarioLembreteDiario ?? '20:00';
     const resultado = [];
+
     function porDia(
         evento,
         data,
         { origemId = null, horarioLocal = horario, ocorrencia = data, tipoOrigem, expira } = {}
     ) {
         if (!data || data < hoje || data > horizonte || !autoriza(evento)) return;
+
         const dataHoraProgramada = dataHoraNoFuso(data, horarioLocal, fuso);
         if (!dataHoraProgramada) return;
+
         const expiraEm =
             expira ??
             dataHoraNoFuso(somarDias(data, 1), '00:00', fuso) ??
@@ -50,5 +55,6 @@ export async function criarContextoPlanejamento(
             tipoOrigem: tipoOrigem ?? tipos[evento.split('.')[0]]
         });
     }
+
     return { hoje, amanha, horizonte, fuso, porDia, resultado };
 }
