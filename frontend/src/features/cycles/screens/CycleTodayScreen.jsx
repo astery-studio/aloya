@@ -15,14 +15,10 @@ import { NoCycleHomeContent } from '../components/home/NoCycleHomeContent';
 import { CycleHomeSheets } from '../components/sheets/CycleHomeSheets';
 import { ReturnToTodayButton } from '../components/ReturnToTodayButton';
 import { conteudoPorFase } from '../constants/phaseContent';
+import { useCycleDateRange } from '../hooks/useCycleDateRange';
 import { obterHojeLocal } from '../../calendar/utils/cycleCalendar.utils';
 import { criarCycleHomeViewModel } from '../utils/cycleHomeViewModel';
-import {
-    criarDiasDaFaixa,
-    formatarDataCabecalho,
-    obterDiaCiclo,
-    obterFase
-} from '../utils/cyclePresentation';
+import { formatarDataCabecalho, obterDiaCiclo, obterFase } from '../utils/cyclePresentation';
 import { criarEstilos } from './CycleTodayScreen.styles';
 
 const CONFIGURACOES_ERRO = Object.freeze({
@@ -35,8 +31,6 @@ const CONFIGURACOES_ERRO = Object.freeze({
         mensagem: 'Não foi possível sincronizar alguns registros. Verifique sua conexão.'
     })
 });
-const DIAS_POR_PAGINA = 14;
-const FAIXA_INICIAL = Object.freeze({ deslocamentoInicial: -3, quantidade: 16 });
 
 function CycleTodayScreen({
     ciclo,
@@ -66,7 +60,6 @@ function CycleTodayScreen({
     const corCarregamento = tema.escuro
         ? tema.cores.interface.destaque
         : tema.cores.marca.secundaria;
-    const [faixaDias, setFaixaDias] = useState({ dataBase: null, ...FAIXA_INICIAL });
     const [sheetAberto, setSheetAberto] = useState(null);
     const dataBaseDaFaixa =
         dataAtual || previsao?.dataReferencia || ciclo?.dataReferencia || obterHojeLocal();
@@ -75,40 +68,11 @@ function CycleTodayScreen({
     const fase = referencia
         ? obterFase(referencia, fases, previsao?.duracaoCicloEstimada)
         : 'desconhecida';
-    const faixaAtual =
-        faixaDias.dataBase === dataBaseDaFaixa
-            ? faixaDias
-            : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-    const { deslocamentoInicial, quantidade } = faixaAtual;
-    const duracaoCiclo = previsao?.duracaoCicloEstimada;
-    const dias = useMemo(
-        () =>
-            dataBaseDaFaixa
-                ? criarDiasDaFaixa(
-                      dataBaseDaFaixa,
-                      fases,
-                      deslocamentoInicial,
-                      quantidade,
-                      duracaoCiclo
-                  )
-                : [],
-        [dataBaseDaFaixa, fases, deslocamentoInicial, quantidade, duracaoCiclo]
-    );
-    const carregarDias = (direcao) =>
-        setFaixaDias((atual) => {
-            const base =
-                atual.dataBase === dataBaseDaFaixa
-                    ? atual
-                    : { dataBase: dataBaseDaFaixa, ...FAIXA_INICIAL };
-            return {
-                ...base,
-                deslocamentoInicial:
-                    direcao === 'anteriores'
-                        ? base.deslocamentoInicial - DIAS_POR_PAGINA
-                        : base.deslocamentoInicial,
-                quantidade: base.quantidade + DIAS_POR_PAGINA
-            };
-        });
+    const { dias, carregarDias } = useCycleDateRange({
+        dataBase: dataBaseDaFaixa,
+        fases,
+        duracaoCiclo: previsao?.duracaoCicloEstimada
+    });
     const home = criarCycleHomeViewModel({
         previsao,
         fase,
