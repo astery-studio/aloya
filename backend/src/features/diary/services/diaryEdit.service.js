@@ -49,6 +49,13 @@ function criarDiaryEditService({
                         'CONFLITO_DIARIO'
                     );
                 }
+                if (atual.checkInRealizado && dados.checkInRealizado) {
+                    throw new AppError(
+                        'O check-in desta data já foi realizado.',
+                        409,
+                        'CHECK_IN_DIARIO_DUPLICADO'
+                    );
+                }
                 const [preferenciasMacro, preferenciasCategoria] = await Promise.all([
                     tx.preferenciaMacrocategoriaDiario.findMany({ where: { usuarioId } }),
                     tx.preferenciaCategoriaDiario.findMany({ where: { usuarioId } })
@@ -66,7 +73,8 @@ function criarDiaryEditService({
                 const mudouConteudo =
                     assinaturaCategorias(dados.categorias, assinaturaNova) !==
                     assinaturaCategorias(categoriasAtuaisVisiveis, assinaturaAtual);
-                if (!mudouData && !mudouConteudo) {
+                const mudouCheckIn = dados.checkInRealizado && !atual.checkInRealizado;
+                if (!mudouData && !mudouConteudo && !mudouCheckIn) {
                     return { registro: atual, categoriasAtivas };
                 }
 
@@ -78,6 +86,7 @@ function criarDiaryEditService({
                     data: {
                         dataRegistro: paraDataCalendario(dados.data),
                         faseCicloAssociada: fase,
+                        ...(mudouCheckIn ? { checkInRealizado: true } : {}),
                         versao: { increment: 1 },
                         categorias: {
                             deleteMany: { categoriaId: { in: [...categoriasAtivas] } },
