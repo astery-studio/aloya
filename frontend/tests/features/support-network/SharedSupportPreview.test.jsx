@@ -11,7 +11,8 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
     expect(screen.getByLabelText('Acompanhando Júlia')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
     expect(screen.getAllByTestId('cycle-phase-frame-segment')).toHaveLength(28);
-    expect(screen.getByRole('header', { name: 'Próximo ciclo de Júlia' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Próximo ciclo' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Confiança média' })).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Como oferecer apoio hoje?' })).toBeOnTheScreen();
     expect(
         screen.getByRole('header', { name: 'Pequenos gestos, muito cuidado.' })
@@ -19,7 +20,7 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Prévia da arte: Sem ciclo' }));
     expect(screen.getByTestId('supported-cycle-artwork-empty')).toBeOnTheScreen();
     expect(screen.queryByRole('header', { name: 'Fase Folicular' })).not.toBeOnTheScreen();
-    expect(screen.queryByRole('header', { name: 'Próximo ciclo de Júlia' })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('header', { name: 'Próximo ciclo' })).not.toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
 });
 

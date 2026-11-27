@@ -29,7 +29,6 @@ function CyclePredictionSummary({
     confiabilidade,
     estimativaIncerta = false,
     aoAbrirConfiabilidade,
-    nomeTitular,
     corDestaque = '#C85A44'
 }) {
     const proximo = separarData(proximoInicio);
@@ -43,16 +42,14 @@ function CyclePredictionSummary({
                     <View style={estilos.textosCabecalho}>
                         <Text style={[textos.previsao, { color: corDestaque }]}>Previsão</Text>
                         <Text accessibilityRole="header" style={textos.titulo}>
-                            {nomeTitular ? `Próximo ciclo de ${nomeTitular}` : 'Próximo ciclo'}
+                            Próximo ciclo
                         </Text>
                     </View>
-                    {!nomeTitular ? (
-                        <ConfidenceBadge
-                            nivel={confiabilidade}
-                            onPress={aoAbrirConfiabilidade}
-                            exibirPrefixo={false}
-                        />
-                    ) : null}
+                    <ConfidenceBadge
+                        nivel={confiabilidade}
+                        onPress={aoAbrirConfiabilidade}
+                        exibirPrefixo={false}
+                    />
                 </View>
                 <View style={estilos.metricas}>
                     <View style={estilos.data}>
@@ -85,11 +82,7 @@ function CyclePredictionSummary({
                     </View>
                 </View>
                 <CycleEducationalDisclaimer
-                    texto={
-                        nomeTitular
-                            ? 'Esta é uma estimativa baseada no histórico compartilhado e não deve ser usada como método contraceptivo.'
-                            : AVISO_PREVISAO
-                    }
+                    texto={AVISO_PREVISAO}
                     variante="contraceptiva"
                     style={estilos.aviso}
                 />

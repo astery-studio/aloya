@@ -21,9 +21,11 @@ import { CORES_FASE } from '../../../cycles/components/home/CyclePhaseHero.style
 import { CyclePredictionSummary } from '../../../cycles/components/home/CyclePredictionSummary';
 import { CycleContraceptiveAction } from '../../../cycles/components/home/CycleQuickActions';
 import { estilos as estilosAcoes } from '../../../cycles/components/home/CycleQuickActions.styles';
+import { CycleConfidenceSheet } from '../../../cycles/components/sheets/CycleConfidenceSheet';
 import { CyclePhaseEducationSheet } from '../../../cycles/components/sheets/CyclePhaseEducationSheet';
 import { conteudoPorFase } from '../../../cycles/constants/phaseContent';
 import { useCycleDateRange } from '../../../cycles/hooks/useCycleDateRange';
+import { criarCycleHomeViewModel } from '../../../cycles/utils/cycleHomeViewModel';
 import {
     formatarDataCabecalho,
     obterDiaCiclo,
@@ -54,6 +56,7 @@ function SharedHomeScreen({
 }) {
     const [dataEscolhida, setDataEscolhida] = useState(null);
     const [faseDoSheet, setFaseDoSheet] = useState(null);
+    const [confiabilidadeAberta, setConfiabilidadeAberta] = useState(false);
     const hoje = ciclo?.dataReferencia ?? obterHojeLocal();
     const data = dataEscolhida ?? hoje;
     const verFase = permissoes.includes('geral.fase_atual');
@@ -72,6 +75,8 @@ function SharedHomeScreen({
     });
     const fase = verFase && (data === hoje ? faseAtual : obterFase(data, fases, duracao));
     const corDaFase = CORES_FASE[fase] ?? CORES_FASE.desconhecida;
+    const modelo = criarCycleHomeViewModel({ previsao, fase, dataSelecionada: data });
+    const confiabilidade = modelo.nivelConfiabilidade ?? 'baixa';
     const diaDaPrevisao = obterDiaCiclo(data, fases);
     const diaCiclo =
         previsao && (data === hoje ? (ciclo?.diaDoCiclo ?? diaDaPrevisao) : diaDaPrevisao);
@@ -173,7 +178,9 @@ function SharedHomeScreen({
                 ) : null}
                 {previsao?.proximoInicioEstimado ? (
                     <CyclePredictionSummary
-                        nomeTitular={nomeTitular}
+                        confiabilidade={confiabilidade}
+                        estimativaIncerta={modelo.previsaoIncerta}
+                        aoAbrirConfiabilidade={() => setConfiabilidadeAberta(true)}
                         corDestaque={corDaFase}
                         proximoInicio={previsao.proximoInicioEstimado}
                         ovulacaoEstimada={previsao.dataOvulacaoEstimada}
@@ -249,6 +256,13 @@ function SharedHomeScreen({
                 ) : null}
                 {ferramentasPrevia}
             </ScrollView>
+            {previsao?.proximoInicioEstimado ? (
+                <CycleConfidenceSheet
+                    visivel={confiabilidadeAberta}
+                    nivel={confiabilidade}
+                    aoFechar={() => setConfiabilidadeAberta(false)}
+                />
+            ) : null}
             {verFase && verDicas ? (
                 <CyclePhaseEducationSheet
                     visivel={Boolean(faseDoSheet)}

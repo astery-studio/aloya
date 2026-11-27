@@ -111,6 +111,7 @@ function criarCicloPrevia({ id, dia }) {
         faseAtual: id,
         diaDoCiclo: dia,
         previsao: {
+            confiabilidadeMenstrual: { nivel: 'MEDIA' },
             duracaoCicloEstimada: 28,
             fasesEstimadas: {
                 menstrual: intervalo(1, 5),
