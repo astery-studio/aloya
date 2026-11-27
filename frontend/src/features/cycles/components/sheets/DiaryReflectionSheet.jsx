@@ -73,6 +73,10 @@ function DiaryReflectionSheet({
                                 erro={erro}
                                 estilo={[estilos.entrada, valor && estilos.entradaPreenchida]}
                                 estiloEntrada={estilos.textoEntrada}
+                                {...(escuro && {
+                                    placeholderTextColor: adaptarCor('#5C5C59'),
+                                    selectionColor: adaptarCor('#2C4C3B')
+                                })}
                             />
                             <Text
                                 accessibilityLiveRegion="polite"

@@ -70,6 +70,16 @@ test('habilita a reflexão preenchida e delega o salvamento', async () => {
     expect(aoSalvar).toHaveBeenCalledTimes(1);
 });
 
+test('usa as cores noturnas no placeholder e na seleção da anotação', async () => {
+    await render(<DiaryReflectionSheet visivel valor="" aoFechar={jest.fn()} />, {
+        preferencia: 'escuro'
+    });
+
+    const campo = screen.getByPlaceholderText('Escreva livremente...');
+    expect(campo).toHaveProp('placeholderTextColor', '#999999');
+    expect(campo).toHaveProp('selectionColor', '#A5D6A7');
+});
+
 test('inicia o contador em zero e altera somente o limite disponível', async () => {
     await render(
         <DiaryReflectionSheet
