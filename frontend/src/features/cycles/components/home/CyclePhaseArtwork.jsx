@@ -16,7 +16,7 @@ const ROTULOS_DAS_FASES = Object.freeze({
     lutea: 'Ilustração da fase lútea'
 });
 
-function CyclePhaseArtwork({ fase, diaCiclo, duracaoCiclo }) {
+function CyclePhaseArtwork({ fase, diaCiclo, duracaoCiclo, exibirContornoSemDuracao }) {
     const imagem = IMAGENS_DAS_FASES[fase];
 
     if (!imagem) return null;
@@ -33,7 +33,12 @@ function CyclePhaseArtwork({ fase, diaCiclo, duracaoCiclo }) {
                 />
             </View>
             <View pointerEvents="none" style={estilos.moldura}>
-                <CyclePhaseFrame fase={fase} diaCiclo={diaCiclo} duracaoCiclo={duracaoCiclo} />
+                <CyclePhaseFrame
+                    fase={fase}
+                    diaCiclo={diaCiclo}
+                    duracaoCiclo={duracaoCiclo}
+                    exibirContornoSemDuracao={exibirContornoSemDuracao}
+                />
             </View>
         </View>
     );

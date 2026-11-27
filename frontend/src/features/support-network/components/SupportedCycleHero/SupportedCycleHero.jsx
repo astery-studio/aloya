@@ -42,6 +42,7 @@ function SupportedCycleHero({
                         fase={fase}
                         diaCiclo={diaCiclo}
                         duracaoCiclo={duracaoCiclo}
+                        exibirContornoSemDuracao
                     />
                 ) : (
                     <Image

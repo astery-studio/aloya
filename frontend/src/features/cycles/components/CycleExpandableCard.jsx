@@ -7,7 +7,6 @@ function CycleExpandableCard({
     titulo,
     title,
     rotulo,
-    selo,
     corRotulo,
     subtitulo,
     icone,
@@ -46,12 +45,9 @@ function CycleExpandableCard({
                     {icone}
                     <View style={estilos.textos}>
                         {rotulo ? (
-                            <View style={selo ? estilos.linhaRotulo : undefined}>
-                                <Text style={[estilos.rotulo, corRotulo && { color: corRotulo }]}>
-                                    {rotulo}
-                                </Text>
-                                {selo}
-                            </View>
+                            <Text style={[estilos.rotulo, corRotulo && { color: corRotulo }]}>
+                                {rotulo}
+                            </Text>
                         ) : null}
                         <Text
                             style={[

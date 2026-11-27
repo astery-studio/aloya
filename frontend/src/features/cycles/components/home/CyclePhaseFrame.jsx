@@ -1,4 +1,4 @@
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 const TAMANHO_MOLDURA = 260;
 const CENTRO_MOLDURA = TAMANHO_MOLDURA / 2;
@@ -59,10 +59,11 @@ function criarSegmentosDaMoldura({ fase, duracaoCiclo, diaCiclo }) {
     }));
 }
 
-function CyclePhaseFrame({ fase, duracaoCiclo, diaCiclo }) {
+function CyclePhaseFrame({ fase, duracaoCiclo, diaCiclo, exibirContornoSemDuracao = false }) {
     const segmentos = criarSegmentosDaMoldura({ fase, duracaoCiclo, diaCiclo });
 
-    if (!segmentos.length) return null;
+    const corContorno = exibirContornoSemDuracao && !segmentos.length && CORES_DAS_FASES[fase];
+    if (!segmentos.length && !corContorno) return null;
 
     return (
         <Svg
@@ -73,6 +74,15 @@ function CyclePhaseFrame({ fase, duracaoCiclo, diaCiclo }) {
             viewBox="0 0 260 260"
             fill="none"
         >
+            {corContorno ? (
+                <Circle
+                    cx={CENTRO_MOLDURA}
+                    cy={CENTRO_MOLDURA}
+                    r={RAIO_MOLDURA}
+                    stroke={corContorno}
+                    strokeWidth={2}
+                />
+            ) : null}
             {segmentos.map((segmento, indice) => (
                 <Path
                     key={indice}

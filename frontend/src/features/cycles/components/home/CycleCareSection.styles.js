@@ -42,6 +42,16 @@ const estilos = StyleSheet.create({
         borderRadius: 17
     },
     textos: { flex: 1 },
+    cardAlternavel: { flexDirection: 'column', alignItems: 'stretch', padding: 0, gap: 0 },
+    linhaCard: { minHeight: 84, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+    conteudoAlternavel: { paddingHorizontal: 16, paddingBottom: 16 },
+    linhaCategoria: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 6
+    },
     categoria: {
         color: '#847F76',
         fontFamily: fontFamilies.bold,

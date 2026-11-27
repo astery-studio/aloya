@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
 import {
     ClockCounterClockwiseIcon,
     HeartIcon,
-    PillIcon,
     QuestionIcon,
     ShieldCheckIcon,
     SparkleIcon
@@ -15,15 +13,21 @@ import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { CycleDateStrip } from '../../../cycles/components/CycleDateStrip';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
-import { CycleExpandableCard } from '../../../cycles/components/CycleExpandableCard';
+import { ReturnToTodayButton } from '../../../cycles/components/ReturnToTodayButton';
+import { estilos as estilosCuidados } from '../../../cycles/components/home/CycleCareSection.styles';
+import { CycleHomeCard } from '../../../cycles/components/home/CycleHomeCard';
 import { NOMES_DAS_FASES } from '../../../cycles/components/home/CyclePhaseHero';
 import { CORES_FASE } from '../../../cycles/components/home/CyclePhaseHero.styles';
 import { CyclePredictionSummary } from '../../../cycles/components/home/CyclePredictionSummary';
+import { CycleContraceptiveAction } from '../../../cycles/components/home/CycleQuickActions';
+import { estilos as estilosAcoes } from '../../../cycles/components/home/CycleQuickActions.styles';
+import { CyclePhaseEducationSheet } from '../../../cycles/components/sheets/CyclePhaseEducationSheet';
 import { conteudoPorFase } from '../../../cycles/constants/phaseContent';
+import { useCycleDateRange } from '../../../cycles/hooks/useCycleDateRange';
 import {
-    criarDiasDaFaixa,
     formatarDataCabecalho,
-    obterDiaCiclo
+    obterDiaCiclo,
+    obterFase
 } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
 import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
@@ -48,6 +52,7 @@ function SharedHomeScreen({
     ferramentasPrevia
 }) {
     const [dataEscolhida, setDataEscolhida] = useState(null);
+    const [faseDoSheet, setFaseDoSheet] = useState(null);
     const hoje = ciclo?.dataReferencia ?? obterHojeLocal();
     const data = dataEscolhida ?? hoje;
     const verFase = permissoes.includes('geral.fase_atual');
@@ -58,23 +63,20 @@ function SharedHomeScreen({
     const fases = previsao?.fasesEstimadas;
     const duracao = previsao?.duracaoCicloEstimada;
     const faseAtual = ciclo?.faseAtual?.toLowerCase();
-    const dias = criarDiasDaFaixa(hoje, fases, -7, 22, duracao).map((dia) =>
-        dia.data === hoje && faseAtual ? { ...dia, fase: faseAtual } : dia
-    );
-    const fase = verFase ? dias.find((dia) => dia.data === data)?.fase : null;
+    const { dias, carregarDias } = useCycleDateRange({
+        dataBase: hoje,
+        fases,
+        duracaoCiclo: duracao,
+        faseAtual
+    });
+    const fase = verFase && (data === hoje ? faseAtual : obterFase(data, fases, duracao));
     const corDaFase = CORES_FASE[fase] ?? CORES_FASE.desconhecida;
-    const diaNaFaixa = obterDiaCiclo(data, fases);
+    const diaDaPrevisao = obterDiaCiclo(data, fases);
     const diaCiclo =
-        verFase && verHistorico
-            ? data === hoje
-                ? ciclo?.diaDoCiclo
-                : diaNaFaixa && diaNaFaixa <= duracao
-                  ? diaNaFaixa
-                  : null
-            : null;
+        previsao && (data === hoje ? (ciclo?.diaDoCiclo ?? diaDaPrevisao) : diaDaPrevisao);
     const dicas = fase && conteudoPorFase[fase];
     const semCiclo = ciclo?.possuiCiclos === false;
-    const seloEducativo = <Text style={estilos.selo}>Informação educativa</Text>;
+    const podeAbrirMomento = verDicas && Boolean(dicas) && !semCiclo;
 
     const orientacoes = [
         [
@@ -120,13 +122,18 @@ function SharedHomeScreen({
                     <CycleDateStrip
                         dias={dias}
                         dataSelecionada={data}
-                        aoSelecionarData={
-                            fases || !ciclo?.possuiCiclos ? setDataEscolhida : undefined
-                        }
+                        aoCarregarAnteriores={() => carregarDias('anteriores')}
+                        aoCarregarPosteriores={() => carregarDias('posteriores')}
+                        aoSelecionarData={fases || semCiclo ? setDataEscolhida : undefined}
                         semCiclo={!fases}
                     />
                 ) : null}
-                <SupportedPersonIndicator nome={nomeTitular} />
+                {data !== hoje ? (
+                    <ReturnToTodayButton onPress={() => setDataEscolhida(null)} />
+                ) : null}
+                <View style={estilos.identificacao}>
+                    <SupportedPersonIndicator nome={nomeTitular} />
+                </View>
                 {verFase && (status === 'carregando' || status === 'erro') ? (
                     <SharedContentState status={status} aoTentarNovamente={aoTentarNovamente} />
                 ) : (
@@ -140,43 +147,41 @@ function SharedHomeScreen({
                     />
                 )}
                 {verAnticoncepcionais ? (
-                    <View style={estilos.margem}>
-                        <ButtonScreen
+                    <View style={estilosAcoes.secao}>
+                        <CycleContraceptiveAction
                             texto="Ver Anticoncepcionais"
-                            variante="verde"
-                            icone={PillIcon}
-                            estilo={estilos.botaoAnticoncepcionais}
+                            larguraTotal
                             aoPressionar={() => onSelecionarAba('anticoncepcionais')}
                         />
                     </View>
                 ) : null}
                 {verFase && status === 'disponivel' && (dicas || ciclo?.possuiCiclos === false) ? (
-                    <View style={estilos.margem}>
-                        {!semCiclo && verDicas ? (
-                            <CycleExpandableCard
-                                rotulo="Momento do ciclo"
-                                corRotulo={corDaFase}
-                                selo={seloEducativo}
-                                titulo={NOMES_DAS_FASES[fase]}
-                                subtitulo={
-                                    dicas.descricao.match(/^[^.]+\./u)?.[0] ?? dicas.descricao
-                                }
-                            >
-                                <Text style={estilos.descricao}>{dicas?.descricao}</Text>
-                            </CycleExpandableCard>
-                        ) : (
-                            <View style={estilos.gesto}>
-                                <View style={estilos.linhaRotulo}>
-                                    <Text style={estilos.rotulo}>MOMENTO DO CICLO</Text>
-                                    {verDicas ? seloEducativo : null}
-                                </View>
-                                <Text style={estilos.tituloMomento}>
-                                    {semCiclo
-                                        ? `${nomeTitular} não possui ciclo cadastrado`
-                                        : NOMES_DAS_FASES[fase]}
-                                </Text>
-                            </View>
-                        )}
+                    <View style={estilosCuidados.secao}>
+                        <CycleHomeCard
+                            categoria="Momento do ciclo"
+                            corCategoria={corDaFase}
+                            titulo={
+                                semCiclo
+                                    ? `${nomeTitular} não possui ciclo cadastrado`
+                                    : NOMES_DAS_FASES[fase]
+                            }
+                            descricao={
+                                podeAbrirMomento
+                                    ? (dicas.descricao.match(/^[^.]+\./u)?.[0] ?? dicas.descricao)
+                                    : undefined
+                            }
+                            selo={
+                                podeAbrirMomento ? (
+                                    <Text style={estilos.selo}>Informação autorizada</Text>
+                                ) : null
+                            }
+                            rotuloAcessibilidade={
+                                podeAbrirMomento
+                                    ? `Momento do ciclo. ${NOMES_DAS_FASES[fase]}. Informação autorizada`
+                                    : undefined
+                            }
+                            aoPressionar={podeAbrirMomento ? () => setFaseDoSheet(fase) : undefined}
+                        />
                     </View>
                 ) : null}
                 {previsao?.proximoInicioEstimado ? (
@@ -190,48 +195,59 @@ function SharedHomeScreen({
                 ) : null}
                 {verDicas ? (
                     <>
-                        <View style={[estilos.margem, estilos.secao]}>
-                            <Text style={estilos.rotulo}>CUIDADO RESPEITOSO</Text>
-                            <Text accessibilityRole="header" style={estilos.titulo}>
+                        <View style={estilosCuidados.secao}>
+                            <Text style={[estilosCuidados.etiqueta, { color: corDaFase }]}>
+                                Cuidado respeitoso
+                            </Text>
+                            <Text accessibilityRole="header" style={estilosCuidados.tituloSecao}>
                                 Como oferecer apoio hoje?
                             </Text>
-                            <Text style={estilos.descricao}>
+                            <Text style={estilosCuidados.descricao}>
                                 Pequenos gestos podem fazer diferença. Descubra sugestões para
                                 cuidar com respeito, atenção e gentileza.
                             </Text>
-                            {orientacoes.map(([titulo, texto, Icone]) => (
-                                <CycleExpandableCard
-                                    key={titulo}
-                                    titulo={titulo}
-                                    subtitulo="Toque para explorar"
-                                    icone={
-                                        <View style={estilos.caixaIcone}>
-                                            <Icone size={21} color="#C85A44" />
-                                        </View>
-                                    }
-                                >
-                                    <Text style={estilos.descricao}>{texto}</Text>
-                                </CycleExpandableCard>
-                            ))}
+                            <View style={estilosCuidados.lista}>
+                                {orientacoes.map(([titulo, texto, Icone]) => (
+                                    <CycleHomeCard
+                                        key={titulo}
+                                        titulo={titulo}
+                                        descricao="Toque para explorar"
+                                        icone={
+                                            <View style={estilos.caixaIcone}>
+                                                <Icone size={21} color="#C85A44" />
+                                            </View>
+                                        }
+                                    >
+                                        <Text style={estilosCuidados.descricao}>{texto}</Text>
+                                    </CycleHomeCard>
+                                ))}
+                            </View>
                         </View>
                         <CycleEducationSection
                             perspectiva="contato"
+                            corDestaque={corDaFase}
+                            estiloSecao={estilos.educacao}
                             rodape={
-                                <View style={estilos.secao}>
-                                    <Text style={estilos.rotulo}>PARA QUALQUER MOMENTO</Text>
-                                    <Text accessibilityRole="header" style={estilos.titulo}>
+                                <View style={estilos.rodape}>
+                                    <Text style={[estilosCuidados.etiqueta, { color: corDaFase }]}>
+                                        Para qualquer momento
+                                    </Text>
+                                    <Text
+                                        accessibilityRole="header"
+                                        style={estilosCuidados.tituloSecao}
+                                    >
                                         Pequenos gestos, muito cuidado.
                                     </Text>
                                     <View style={estilos.grade}>
                                         {GESTOS.map(([titulo, Icone]) => (
                                             <View
                                                 key={titulo}
-                                                style={[estilos.gesto, estilos.itemGrade]}
+                                                style={[estilosCuidados.card, estilos.itemGrade]}
                                             >
                                                 <View style={estilos.caixaIcone}>
                                                     <Icone size={18} color="#C85A44" />
                                                 </View>
-                                                <Text style={estilos.tituloGesto}>{titulo}</Text>
+                                                <Text style={estilosCuidados.titulo}>{titulo}</Text>
                                             </View>
                                         ))}
                                     </View>
@@ -246,6 +262,13 @@ function SharedHomeScreen({
                 ) : null}
                 {ferramentasPrevia}
             </ScrollView>
+            {verFase && verDicas ? (
+                <CyclePhaseEducationSheet
+                    visivel={Boolean(faseDoSheet)}
+                    fase={faseDoSheet ?? fase}
+                    aoFechar={() => setFaseDoSheet(null)}
+                />
+            ) : null}
         </MainLayout>
     );
 }

@@ -84,13 +84,15 @@ function CyclePredictionSummary({
                         />
                     </View>
                 </View>
-                {!nomeTitular ? (
-                    <CycleEducationalDisclaimer
-                        texto={AVISO_PREVISAO}
-                        variante="contraceptiva"
-                        style={estilos.aviso}
-                    />
-                ) : null}
+                <CycleEducationalDisclaimer
+                    texto={
+                        nomeTitular
+                            ? 'Esta é uma estimativa baseada no histórico compartilhado e não deve ser usada como método contraceptivo.'
+                            : AVISO_PREVISAO
+                    }
+                    variante="contraceptiva"
+                    style={estilos.aviso}
+                />
                 {estimativaIncerta ? (
                     <StatusBadge estado="estimativaIncerta" estilo={estilos.incerta} />
                 ) : null}

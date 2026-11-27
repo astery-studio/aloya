@@ -10,6 +10,7 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
 
     expect(screen.getByLabelText('Acompanhando Júlia')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
+    expect(screen.getAllByTestId('cycle-phase-frame-segment')).toHaveLength(28);
     expect(screen.getByRole('header', { name: 'Próximo ciclo de Júlia' })).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Como oferecer apoio hoje?' })).toBeOnTheScreen();
     expect(
@@ -20,6 +21,14 @@ test('mostra a Home acompanhada com ciclo e sem ciclo', async () => {
     expect(screen.queryByRole('header', { name: 'Fase Folicular' })).not.toBeOnTheScreen();
     expect(screen.queryByRole('header', { name: 'Próximo ciclo de Júlia' })).not.toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
+});
+
+test('abre o sheet padrão da fase pela informação autorizada', async () => {
+    await render(<SharedSupportPreview />);
+
+    const momento = screen.getByRole('button', { name: /Momento do ciclo.*Informação autorizada/ });
+    await fireEvent.press(momento);
+    expect(await screen.findByRole('header', { name: 'Por que “folicular”?' })).toBeOnTheScreen();
 });
 
 test('abre os anticoncepcionais em modo de visualização', async () => {

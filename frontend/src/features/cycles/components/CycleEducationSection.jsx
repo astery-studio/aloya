@@ -18,6 +18,8 @@ function CycleEducationSection({
     aoSelecionarFase,
     conteudos = CONTEUDOS_EDUCATIVOS,
     perspectiva = 'titular',
+    corDestaque,
+    estiloSecao,
     rodape
 }) {
     const [faseLocal, setFaseLocal] = useState('menstrual');
@@ -31,8 +33,8 @@ function CycleEducationSection({
         aoSelecionarFase?.(id);
     };
     return (
-        <View style={estilos.secao}>
-            <Text style={textos.etiqueta}>
+        <View style={[estilos.secao, estiloSecao]}>
+            <Text style={[textos.etiqueta, corDestaque && { color: corDestaque }]}>
                 {ehContato ? 'Conhecimento sem expectativas' : 'Conteúdo educativo'}
             </Text>
             <Text accessibilityRole="header" style={textos.titulo}>
@@ -73,7 +75,9 @@ function CycleEducationSection({
                 ))}
             </ScrollView>
             <View style={estilos.artigo}>
-                <Text style={[textos.visao, { color: selected.cor }]}>Visão educativa</Text>
+                <Text style={[textos.visao, { color: corDestaque ?? selected.cor }]}>
+                    Visão educativa
+                </Text>
                 <Text style={textos.tituloArtigo}>{selected.titulo}</Text>
                 <Text style={textos.descricao}>{selected.texto}</Text>
             </View>
