@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { aplicarMigrationsPush } from '../../../helpers/aplicarMigrationsPush.js';
 import crypto from 'node:crypto';
 import { once } from 'node:events';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -48,6 +49,7 @@ function criarBanco() {
     const banco = new Database(caminho);
     banco.exec('PRAGMA foreign_keys = ON');
     banco.exec(readFileSync(MIGRACAO_INICIAL, 'utf8'));
+    aplicarMigrationsPush(banco);
     banco.exec(readFileSync(MIGRACAO_NOMES, 'utf8'));
     banco.exec(readFileSync(MIGRACAO_APARENCIA_CONTATO, 'utf8'));
     banco.exec(`
