@@ -28,9 +28,10 @@ async function montar(service, contato = false, contraceptiveService = contracep
 }
 
 test('explica o limite de alterações e preserva a preferência pendente', async () => {
+    const preferencias = { ...iniciais, 'ciclo.menstrual.proxima': true };
     const atualizar = jest.fn().mockRejectedValueOnce({ status: 429 })
         .mockResolvedValue({ ...iniciais, 'ciclo.menstrual': false });
-    await montar({ buscar: jest.fn().mockResolvedValue(iniciais), atualizar });
+    await montar({ buscar: jest.fn().mockResolvedValue(preferencias), atualizar });
     await tocar('Ciclo e Previsões');
     await fireEvent.press(screen.getByRole('switch', { name: 'Ciclo Menstrual' }));
     expect(await screen.findByText('Muitas alterações seguidas')).toBeOnTheScreen();
@@ -180,6 +181,28 @@ test('mantém a categoria aberta e recupera as preferências após uma falha de 
 
     await act(async () => concluirLeitura(iniciais));
     expect(screen.getByRole('switch', { name: 'Diário' })).toBeOnTheScreen();
+}, 60_000);
+
+test('mostra o horário apenas enquanto o lembrete diário está ativo', async () => {
+    let valores = { ...iniciais, lembreteDiarioAtivo: false };
+    const atualizar = jest.fn(async ({ chave, valor }) => (valores = { ...valores, [chave]: valor }));
+    const alternar = (name) => fireEvent.press(screen.getByRole('switch', { name }));
+    const buscarHorario = () => screen.queryByRole('button', { name: 'Horário do lembrete diário' });
+    await montar({ buscar: jest.fn().mockResolvedValue(valores), atualizar });
+    await tocar('Ciclo e Previsões');
+    await tocar('Personalizar notificações');
+
+    expect(buscarHorario()).toBeNull();
+    await alternar('Lembrete diário');
+    expect(buscarHorario()).toBeOnTheScreen();
+    await alternar('Lembrete diário');
+    expect(buscarHorario()).toBeNull();
+    await alternar('Lembrete diário');
+    await tocar('Voltar');
+    await alternar('Diário');
+    await tocar('Personalizar notificações');
+    expect(buscarHorario()).toBeNull();
+    expect(valores.horarioLembreteDiario).toBe('20:00');
 }, 60_000);
 
 test('confirma o horário, preserva a alteração com erro e bloqueia repetição durante o envio', async () => {
