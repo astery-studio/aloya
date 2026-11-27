@@ -306,7 +306,7 @@ describe('DiaryRecordDetails', () => {
             fundo: 'rgba(74, 88, 153, 0.1)',
             texto: '#4A5899'
         });
-        expect(obterCoresCategoria('fluxo', '#123', 'Ciclo', temaEscuro).texto).toBe('#EF9A9A');
+        expect(obterCoresCategoria('fluxo', '#123', 'Ciclo', temaEscuro).texto).toBe('#C26E5F');
         expect(obterCoresCategoria('pele', '#123', 'Corpo', temaEscuro).texto).toBe('#A5D6A7');
         expect(obterCoresCategoria('humor', '#123', 'Emocional', temaEscuro).texto).toBe('#B59DDB');
         expect(obterCoresCategoria('sono', '#123', 'Energia', temaEscuro).texto).toBe('#FFE082');

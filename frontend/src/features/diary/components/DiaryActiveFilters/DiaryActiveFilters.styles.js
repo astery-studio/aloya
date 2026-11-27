@@ -4,7 +4,9 @@ import { fontFamilies } from '../../../../shared/theme';
 import { obterCoresDiario } from '../../config/diaryColors';
 
 function criarEstilos(tema) {
-    const cores = obterCoresDiario(tema).interface;
+    const diario = obterCoresDiario(tema);
+    const cores = diario.interface;
+    const coral = tema.escuro ? diario.primaria : '#C85A44';
     return StyleSheet.create({
         container: { width: '100%', gap: 14, paddingBottom: 20 },
         botaoLimpar: {
@@ -16,12 +18,12 @@ function criarEstilos(tema) {
             alignItems: 'center',
             gap: 8,
             borderWidth: 1,
-            borderColor: '#C85A44',
+            borderColor: coral,
             borderRadius: 10,
             backgroundColor: 'transparent'
         },
         textoLimpar: {
-            color: '#C85A44',
+            color: coral,
             fontFamily: fontFamilies.semibold,
             fontSize: 13,
             fontWeight: '600',
@@ -44,12 +46,12 @@ function criarEstilos(tema) {
             paddingHorizontal: 8,
             gap: 3,
             borderWidth: 0.7,
-            borderColor: '#C85A44',
+            borderColor: coral,
             borderRadius: 99,
             backgroundColor: 'transparent'
         },
         textoTag: {
-            color: '#C85A44',
+            color: coral,
             fontFamily: fontFamilies.semibold,
             fontSize: 11,
             fontWeight: '600',

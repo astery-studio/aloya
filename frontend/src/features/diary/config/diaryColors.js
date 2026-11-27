@@ -28,10 +28,10 @@ const interfaceEscuraDiario = Object.freeze({
 
 const macrocategoriasEscuras = Object.freeze({
     ciclo: criarPaletaMacro(
-        '#EF9A9A',
-        'rgba(239, 154, 154, 0.10)',
-        'rgba(239, 154, 154, 0.20)',
-        'rgba(239, 154, 154, 0.10)'
+        coresNoturnasConteudo.coral,
+        'rgba(194, 110, 95, 0.10)',
+        'rgba(194, 110, 95, 0.20)',
+        'rgba(194, 110, 95, 0.10)'
     ),
     corpo: criarPaletaMacro(
         '#A5D6A7',

@@ -28,7 +28,8 @@ test('aplica fielmente a paleta noturna do protótipo', () => {
         textoSecundario: '#999999'
     });
     expect(cores.macrocategorias).toBe(macrocategoriasEscuras);
-    expect(macrocategoriasEscuras.ciclo.icone).toBe('#EF9A9A');
+    expect(macrocategoriasEscuras.ciclo.icone).toBe('#C26E5F');
+    expect(macrocategoriasEscuras.ciclo.fundoCategoria).toBe('rgba(194, 110, 95, 0.20)');
     expect(macrocategoriasEscuras.corpo.icone).toBe('#A5D6A7');
     expect(macrocategoriasEscuras.emocional.icone).toBe('#B59DDB');
     expect(macrocategoriasEscuras.energia.icone).toBe('#FFE082');
