@@ -209,6 +209,9 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
                     id: 4,
                     horarios: ['12:00'],
                     intensidadeAlerta: 'critico',
+                    usosHoje: [
+                        { id: 'u1', horario: '12:00', status: 'pendente', prazoConfigurado: 10 }
+                    ],
                     historico: [],
                     statusUltimoUso: 'confirmado'
                 }
@@ -238,6 +241,9 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
     assert.equal(Object.hasOwn(itens[0], 'intensidadeAlerta'), false);
     assert.deepEqual(itens[0].horarios, ['12:00']);
     assert.equal(itens[0].statusUltimoUso, 'confirmado');
+    assert.equal(itens[0].usosHoje[0].horario, '12:00');
+    assert.equal(itens[0].usosHoje[0].status, 'pendente');
+    assert.equal(Object.hasOwn(itens[0].usosHoje[0], 'prazoConfigurado'), false);
     const comAlerta = await data.anticoncepcionais(
         {
             ...acessoAnticoncepcionais,

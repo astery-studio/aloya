@@ -98,6 +98,17 @@ function criarSharedSupportData({
                 validadeRestante: item.validadeRestante,
                 proximoUsoPrevisto: item.proximoUsoPrevisto,
                 statusUltimoUso: item.statusUltimoUso,
+                usosHoje: (item.usosHoje ?? []).map(
+                    ({ id, data, horario, status, confirmadoEm, foraDoPrazo, atrasado }) => ({
+                        id,
+                        data,
+                        horario,
+                        status,
+                        confirmadoEm,
+                        foraDoPrazo,
+                        atrasado
+                    })
+                ),
                 historico: item.historico
             }))
         };
