@@ -11,7 +11,7 @@ const categorias = [
     { id: 'redeApoio', label: 'Rede de Apoio', icone: UsersThreeIcon, paleta: 'corAzul' }
 ];
 
-export function NotificationsScreen({ onAbrirCategoria, onVoltar }) {
+export function NotificationsScreen({ onAbrirCategoria, onAbrirTeste, onVoltar }) {
     const { cores, typography } = useTheme();
     return (
         <SettingsLayout titulo="Notificações" onVoltar={onVoltar} respeitarEntalhe>
@@ -28,6 +28,9 @@ export function NotificationsScreen({ onAbrirCategoria, onVoltar }) {
                 {categorias.map(({ id, ...campo }) => (
                     <NavigationField key={id} {...campo} labelSemLimite onPress={() => onAbrirCategoria(id)} />
                 ))}
+                {onAbrirTeste && (
+                    <NavigationField label="Teste de notificações" labelSemLimite onPress={onAbrirTeste} />
+                )}
             </View>
         </SettingsLayout>
     );

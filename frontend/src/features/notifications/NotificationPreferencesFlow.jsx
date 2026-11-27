@@ -4,6 +4,7 @@ import { NotificationPreferencesLoading, NotificationSaveError } from './compone
 import { catalogoNotificacoes } from './notificationCatalog';
 import { NotificationGroupSettingsScreen } from './screens/NotificationGroupSettingsScreen';
 import { NotificationIndividualSettingsScreen } from './screens/NotificationIndividualSettingsScreen';
+import { NotificationPreviewScreen } from './screens/NotificationPreviewScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { NotificationTimeScreen } from './screens/NotificationTimeScreen';
 import { useNotificationPreferences } from './useNotificationPreferences';
@@ -16,7 +17,8 @@ export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirad
 
     const voltar = useCallback(() => {
         if (salvando) return;
-        if (!categoriaId) onVoltar();
+        if (pagina === 'teste') definirPagina('grupo');
+        else if (!categoriaId) onVoltar();
         else if (pagina === 'horario') definirPagina('individual');
         else if (pagina === 'individual') definirPagina('grupo');
         else definirCategoria(null);
@@ -41,7 +43,9 @@ export function NotificationPreferencesFlow({ service, onVoltar, onSessaoExpirad
         }
     }
 
-    if (!categoriaId) return <NotificationsScreen onAbrirCategoria={definirCategoria} onVoltar={voltar} />;
+    if (__DEV__ && pagina === 'teste') return <NotificationPreviewScreen onVoltar={voltar} />;
+    if (!categoriaId) return <NotificationsScreen onAbrirCategoria={definirCategoria}
+        onAbrirTeste={__DEV__ ? () => definirPagina('teste') : undefined} onVoltar={voltar} />;
     if (!valores) return <NotificationPreferencesLoading titulo={catalogoNotificacoes[categoriaId].titulo}
         erro={erroLeitura} onVoltar={voltar} onRecarregar={recarregar} />;
 

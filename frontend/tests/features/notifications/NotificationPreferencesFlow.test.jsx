@@ -36,6 +36,17 @@ test('abre as três categorias, percorre as seções e volta à origem', async (
     expect(onVoltar).toHaveBeenCalledTimes(1);
 });
 
+test('abre a tela temporária no desenvolvimento e volta para Notificações', async () => {
+    const onVoltar = await montar({ buscar: jest.fn().mockResolvedValue(iniciais) });
+    await tocar('Teste de notificações');
+    expect(screen.getByRole('header', { name: 'Teste de notificações' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Convite aceito' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Convite recusado' })).toBeOnTheScreen();
+    await tocar('Voltar');
+    expect(screen.getByRole('button', { name: 'Ciclo e Previsões' })).toBeOnTheScreen();
+    expect(onVoltar).not.toHaveBeenCalled();
+});
+
 test('confirma o horário, preserva a alteração com erro e bloqueia repetição durante o envio', async () => {
     let rejeitar;
     const atualizar = jest.fn()
