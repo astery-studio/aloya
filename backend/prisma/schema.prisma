@@ -150,11 +150,13 @@ enum StatusMensagem {
 
 enum TipoOrigemNotificacao {
   proximidade_ciclo
+  confirmacao_ciclo
   mudanca_fase
   lembrete_diario
   anticoncepcional
   resposta_suporte
   rede_apoio
+  seguranca
 }
 
 enum StatusEnvioNotificacao {
@@ -162,6 +164,7 @@ enum StatusEnvioNotificacao {
   enviada
   cancelada
   falha
+  expirada
 }
 
 // ============================================================
@@ -204,6 +207,7 @@ model Usuario {
   categoriasPermissao         CategoriaPermissao[]
   preferenciaNotificacao      PreferenciaNotificacao?
   notificacoes                Notificacao[]
+  dispositivosPush            DispositivoPush[]
   conversaSuporte             Conversa?
 
   vinculosComoTitular VinculoRedeApoio[] @relation("VinculoTitular")
@@ -707,9 +711,9 @@ model PreferenciaNotificacao {
   // O validator deve garantir rigorosamente o formato HH:mm.
   horarioLembreteDiario String @default("20:00") @map("horario_lembrete_diario")
 
-  antecedenciaProximoCiclo Int @default(2) @map("antecedencia_proximo_ciclo")
-  antecedenciaAvisoTroca   Int @default(7) @map("antecedencia_aviso_troca")
-  ajustesPorEvento Json @default("{}") @map("ajustes_por_evento")
+  antecedenciaProximoCiclo Int  @default(2) @map("antecedencia_proximo_ciclo")
+  antecedenciaAvisoTroca   Int  @default(7) @map("antecedencia_aviso_troca")
+  ajustesPorEvento         Json @default("{}") @map("ajustes_por_evento")
 
   criadoEm     DateTime @default(now()) @map("criado_em")
   atualizadoEm DateTime @updatedAt @map("atualizado_em")
@@ -725,7 +729,12 @@ model Notificacao {
   tipoOrigem TipoOrigemNotificacao @map("tipo_origem")
 
   // Referência polimórfica: a integridade deve ser validada pelo service.
-  origemId Int? @map("origem_id")
+  origemId       Int?          @map("origem_id")
+  evento         String?
+  ocorrencia     String?
+  expiraEm       DateTime?     @map("expira_em")
+  processandoAte DateTime?     @map("processando_ate")
+  entregas       EntregaPush[]
 
   dataHoraProgramada DateTime  @map("data_hora_programada")
   dataHoraDisparo    DateTime? @map("data_hora_disparo")
@@ -735,9 +744,56 @@ model Notificacao {
 
   criadoEm DateTime @default(now()) @map("criado_em")
 
+  @@unique([usuarioId, evento, ocorrencia])
   @@index([usuarioId, statusEnvio])
   @@index([statusEnvio, dataHoraProgramada])
   @@map("notificacoes")
+}
+
+model DispositivoPush {
+  id           String        @id
+  usuarioId    Int           @map("usuario_id")
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  sessaoId     Int           @map("sessao_id")
+  instalacao   String        @unique
+  token        String        @unique
+  plataforma   String
+  fuso         String
+  vinculo      String
+  invalidadoEm DateTime?     @map("invalidado_em")
+  atualizadoEm DateTime      @updatedAt @map("atualizado_em")
+  entregas     EntregaPush[]
+
+  @@index([usuarioId, invalidadoEm])
+  @@index([sessaoId])
+  @@map("dispositivos_push")
+}
+
+model EntregaPush {
+  id               Int             @id @default(autoincrement())
+  notificacaoId    Int             @map("notificacao_id")
+  notificacao      Notificacao     @relation(fields: [notificacaoId], references: [id], onDelete: Cascade)
+  dispositivoId    String          @map("dispositivo_id")
+  dispositivo      DispositivoPush @relation(fields: [dispositivoId], references: [id], onDelete: Cascade)
+  vinculo          String
+  status           String          @default("pendente")
+  tentativas       Int             @default(0)
+  proximaTentativa DateTime        @map("proxima_tentativa")
+  ticket           String?
+  aceitaEm         DateTime?       @map("aceita_em")
+  erro             String?
+  atualizadoEm     DateTime        @updatedAt @map("atualizado_em")
+
+  @@unique([notificacaoId, dispositivoId, vinculo])
+  @@index([status, proximaTentativa])
+  @@map("entregas_push")
+}
+
+model CatalogoNotificacao {
+  versao Int  @id
+  dados  Json
+
+  @@map("catalogos_notificacao")
 }
 
 // ============================================================
