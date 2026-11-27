@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { NotificationPreferencesFlow } from '../../../src/features/notifications/NotificationPreferencesFlow';
 import { ThemeProvider } from '../../../src/shared/theme/ThemeProvider';
 
@@ -27,9 +28,11 @@ test('guarda escolhas individuais ao alternar o grupo e recarrega antecedência 
         atualizar: jest.fn(async ({ chave, valor }) => (valores = { ...valores, [chave]: valor }))
     };
     const montar = () => render(
-        <ThemeProvider preferencia="claro" esquemaDoSistema="light">
-            <NotificationPreferencesFlow service={service} onVoltar={jest.fn()} />
-        </ThemeProvider>
+        <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+            <ThemeProvider preferencia="claro" esquemaDoSistema="light">
+                <NotificationPreferencesFlow service={service} onVoltar={jest.fn()} />
+            </ThemeProvider>
+        </SafeAreaInsetsContext.Provider>
     );
     const tocar = (nome) => fireEvent.press(screen.getByRole('button', { name: nome }));
     const alternar = (nome) => fireEvent.press(screen.getByRole('switch', { name: nome }));
