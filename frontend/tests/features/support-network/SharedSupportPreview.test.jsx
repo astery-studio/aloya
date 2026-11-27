@@ -42,6 +42,15 @@ test('abre o sheet padrão da fase pela informação autorizada', async () => {
     expect(await screen.findByRole('header', { name: 'Por que “folicular”?' })).toBeOnTheScreen();
 });
 
+test('expande uma das três opções de cuidado respeitoso', async () => {
+    await render(<SharedSupportPreview />);
+
+    const opcao = screen.getByRole('button', { name: /Ofereça ajuda prática/ });
+    expect(opcao).toHaveStyle({ minHeight: 78, paddingHorizontal: 14, gap: 11 });
+    await fireEvent.press(opcao);
+    expect(screen.getByText(/ofereça ajuda com pequenas tarefas/)).toBeOnTheScreen();
+});
+
 test('abre os anticoncepcionais em modo de visualização', async () => {
     await render(<SharedSupportPreview />);
     await fireEvent.press(screen.getByRole('button', { name: 'Ver Anticoncepcionais' }));

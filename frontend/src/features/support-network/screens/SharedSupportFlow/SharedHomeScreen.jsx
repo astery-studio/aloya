@@ -15,7 +15,6 @@ import { CycleDateStrip } from '../../../cycles/components/CycleDateStrip';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 import { ReturnToTodayButton } from '../../../cycles/components/ReturnToTodayButton';
 import { estilos as estilosCuidados } from '../../../cycles/components/home/CycleCareSection.styles';
-import { CycleHomeCard } from '../../../cycles/components/home/CycleHomeCard';
 import { NOMES_DAS_FASES } from '../../../cycles/components/home/CyclePhaseHero';
 import { CORES_FASE } from '../../../cycles/components/home/CyclePhaseHero.styles';
 import { CyclePredictionSummary } from '../../../cycles/components/home/CyclePredictionSummary';
@@ -32,6 +31,7 @@ import {
     obterFase
 } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
+import { SharedCycleCareSection } from '../../components/SharedCycleCareSection/SharedCycleCareSection';
 import { SharedCycleMomentCard } from '../../components/SharedCycleMomentCard/SharedCycleMomentCard';
 import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
 import { SupportedPersonIndicator } from '../../components/SupportedPersonIndicator/SupportedPersonIndicator';
@@ -83,24 +83,6 @@ function SharedHomeScreen({
     const dicas = fase && conteudoPorFase[fase];
     const semCiclo = ciclo?.possuiCiclos === false;
     const podeAbrirMomento = verDicas && Boolean(dicas) && !semCiclo;
-
-    const orientacoes = [
-        [
-            `Pergunte como ${nomeTitular} está`,
-            'Cada menstruação é diferente. Perguntar como a pessoa está se sentindo é uma boa forma de entender se ela precisa de alguma coisa.',
-            QuestionIcon
-        ],
-        [
-            'Ofereça ajuda prática',
-            'Se houver desconforto ou cansaço, ofereça ajuda com pequenas tarefas.',
-            HeartIcon
-        ],
-        [
-            'Respeite o ritmo',
-            'Algumas pessoas preferem descansar, outras mantêm sua rotina normalmente. O mais importante é respeitar suas escolhas.',
-            ShieldCheckIcon
-        ]
-    ];
 
     return (
         <MainLayout
@@ -189,34 +171,7 @@ function SharedHomeScreen({
                 ) : null}
                 {verDicas ? (
                     <>
-                        <View style={estilosCuidados.secao}>
-                            <Text style={[estilosCuidados.etiqueta, { color: corDaFase }]}>
-                                Cuidado respeitoso
-                            </Text>
-                            <Text accessibilityRole="header" style={estilosCuidados.tituloSecao}>
-                                Como oferecer apoio hoje?
-                            </Text>
-                            <Text style={estilosCuidados.descricao}>
-                                Pequenos gestos podem fazer diferença. Descubra sugestões para
-                                cuidar com respeito, atenção e gentileza.
-                            </Text>
-                            <View style={estilosCuidados.lista}>
-                                {orientacoes.map(([titulo, texto, Icone]) => (
-                                    <CycleHomeCard
-                                        key={titulo}
-                                        titulo={titulo}
-                                        descricao="Toque para explorar"
-                                        icone={
-                                            <View style={estilos.caixaIcone}>
-                                                <Icone size={21} color="#C85A44" />
-                                            </View>
-                                        }
-                                    >
-                                        <Text style={estilosCuidados.descricao}>{texto}</Text>
-                                    </CycleHomeCard>
-                                ))}
-                            </View>
-                        </View>
+                        <SharedCycleCareSection nomeTitular={nomeTitular} />
                         <CycleEducationSection
                             perspectiva="contato"
                             corDestaque={corDaFase}
