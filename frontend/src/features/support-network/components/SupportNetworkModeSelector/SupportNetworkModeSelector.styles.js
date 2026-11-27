@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
@@ -46,7 +47,8 @@ function criarEstilos(tema) {
             borderRadius: 99
         },
         botaoSelecionado: {
-            backgroundColor: '#C85A44'
+            backgroundColor: tema.escuro ? coresNoturnasConteudo.coral : '#C85A44',
+            borderColor: tema.escuro ? coresNoturnasConteudo.fundo : '#E6E2D8'
         },
         botaoNaoSelecionado: {
             backgroundColor: '#F0EDE7'
@@ -63,7 +65,7 @@ function criarEstilos(tema) {
             includeFontPadding: false
         },
         textoSelecionado: {
-            color: '#FFFFFF'
+            color: tema.escuro ? coresNoturnasConteudo.fundo : '#FFFFFF'
         },
         textoNaoSelecionado: {
             color: tema.cores.interface.textoSecundario

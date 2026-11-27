@@ -90,6 +90,9 @@ function criarEstilos(tema) {
             height: 56,
             borderRadius: 12
         },
+        estadoCompartilhado: {
+            paddingBottom: 0
+        },
         textoDestaque: {
             fontFamily: fontFamilies.bold,
             fontWeight: '700'

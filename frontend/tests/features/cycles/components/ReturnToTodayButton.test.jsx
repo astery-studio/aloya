@@ -6,26 +6,39 @@ test('retorna para a data de referência pela ação acessível', async () => {
     const onPress = jest.fn();
     await render(<ReturnToTodayButton onPress={onPress} />);
 
-    const botao = screen.getByRole('button', { name: 'Voltar pra hoje' });
+    const botao = screen.getByRole('button', { name: 'Voltar para hoje' });
     expect(screen.getByTestId('faixa-voltar-hoje')).toHaveStyle({
         width: '100%',
-        height: 38,
-        paddingVertical: 2,
-        paddingHorizontal: 16
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 6
     });
     expect(botao).toHaveStyle({
-        width: 135,
-        height: 34,
-        alignSelf: 'flex-start',
-        borderColor: '#AAAAA5',
-        borderStyle: 'dashed',
-        borderRadius: 999
+        minHeight: 34,
+        justifyContent: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 13,
+        gap: 5,
+        borderRadius: 999,
+        backgroundColor: '#D68C3A',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        elevation: 5
     });
-    expect(screen.getByTestId('phosphor-react-native-rewind-regular')).toBeOnTheScreen();
-    expect(screen.getByText('Voltar pra hoje')).toHaveStyle({
-        color: '#5C5C59',
-        fontSize: 13,
-        fontWeight: '400',
+    expect(botao).not.toHaveStyle({ borderWidth: 1 });
+    expect(screen.queryByTestId('phosphor-react-native-rewind-regular')).not.toBeOnTheScreen();
+    expect(screen.getByText('Voltar para:')).toHaveStyle({
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: '300',
+        lineHeight: 20
+    });
+    expect(screen.getByText('Hoje')).toHaveStyle({
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: '500',
         lineHeight: 20
     });
     await fireEvent.press(botao);

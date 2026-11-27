@@ -7,6 +7,28 @@ function MenstruationIcon(props) {
     return <DropIcon {...props} weight="fill" />;
 }
 
+function CycleContraceptiveAction({
+    aoPressionar,
+    texto = 'Anticoncepcional',
+    larguraTotal = false
+}) {
+    return (
+        <ButtonScreen
+            texto={texto}
+            icone={PillIcon}
+            tamanhoIcone={20}
+            aoPressionar={aoPressionar}
+            variante="verde"
+            estilo={[
+                estilos.secundaria,
+                estilos.anticoncepcional,
+                larguraTotal && estilos.larguraTotal
+            ]}
+            estiloTexto={estilos.texto}
+        />
+    );
+}
+
 function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAnticoncepcional }) {
     return (
         <View style={estilos.secao}>
@@ -28,18 +50,10 @@ function CycleQuickActions({ aoCadastrarMenstruacao, aoAbrirDiario, aoAbrirAntic
                     estilo={estilos.secundaria}
                     estiloTexto={estilos.texto}
                 />
-                <ButtonScreen
-                    texto="Anticoncepcional"
-                    icone={PillIcon}
-                    tamanhoIcone={20}
-                    aoPressionar={aoAbrirAnticoncepcional}
-                    variante="verde"
-                    estilo={[estilos.secundaria, estilos.anticoncepcional]}
-                    estiloTexto={estilos.texto}
-                />
+                <CycleContraceptiveAction aoPressionar={aoAbrirAnticoncepcional} />
             </View>
         </View>
     );
 }
 
-export { CycleQuickActions };
+export { CycleContraceptiveAction, CycleQuickActions };

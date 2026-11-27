@@ -106,7 +106,8 @@ describe('CalendarScreenContainer', () => {
 
         expect(mockUseCalendar).toHaveBeenCalledWith({
             service,
-            onSessaoExpirada
+            onSessaoExpirada,
+            somenteLeitura: false
         });
         expect(screen.getByText('Confiança: media')).toBeOnTheScreen();
         expect(screen.getByText('Meses: 1')).toBeOnTheScreen();

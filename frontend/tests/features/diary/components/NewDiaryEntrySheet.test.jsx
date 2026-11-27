@@ -86,7 +86,7 @@ test('liga o painel aos estados do catálogo e formulário', async () => {
     await act(async () => sucesso.acaoPrincipal.aoPressionar());
     expect(onCriado).toHaveBeenCalledWith({ id: 1 });
     expect(onFechar).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('bloqueado:false;deslize:true')).toBeOnTheScreen();
+    expect(screen.getByText('bloqueado:false;fora:true;deslize:true')).toBeOnTheScreen();
     expect(screen.getByText('Catálogo:2')).toBeOnTheScreen();
     await fireEvent.press(screen.getByTestId('alterar-rolagem-sheet'));
     await fireEvent.press(screen.getByTestId('verificar-deslize-sheet'));

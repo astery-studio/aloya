@@ -74,7 +74,7 @@ describe('requisições do serviço do Diário', () => {
 
     test('cria o registro com o corpo informado', async () => {
         const dados = { data: '2026-11-09', fusoHorario: 'America/Sao_Paulo', categorias: [] };
-        const registro = { id: 1, data: dados.data, categorias: [] };
+        const registro = { id: 1, data: dados.data, checkInRealizado: false, categorias: [] };
         const requisicaoAutenticada = jest.fn().mockResolvedValue(registro);
         const service = criarDiaryService({ requisicaoAutenticada });
 
@@ -88,7 +88,7 @@ describe('requisições do serviço do Diário', () => {
 
     test('edita o registro com PUT e a versão no If-Match', async () => {
         const dados = { data: '2026-11-08', fusoHorario: 'America/Sao_Paulo', categorias: [] };
-        const registro = { id: 4, data: dados.data, categorias: [] };
+        const registro = { id: 4, data: dados.data, checkInRealizado: false, categorias: [] };
         const requisicaoAutenticada = jest.fn().mockResolvedValue(registro);
         const service = criarDiaryService({ requisicaoAutenticada });
 
@@ -103,7 +103,7 @@ describe('requisições do serviço do Diário', () => {
 
     test('encaminha o sinal opcional ao editar o registro', async () => {
         const dados = { data: '2026-11-08', fusoHorario: 'America/Sao_Paulo', categorias: [] };
-        const registro = { id: 4, data: dados.data, categorias: [] };
+        const registro = { id: 4, data: dados.data, checkInRealizado: false, categorias: [] };
         const signal = new AbortController().signal;
         const requisicaoAutenticada = jest.fn().mockResolvedValue(registro);
         const service = criarDiaryService({ requisicaoAutenticada });

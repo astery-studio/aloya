@@ -21,6 +21,7 @@ import { criarThemePreferenceService } from '../features/settings/services/theme
 import { criarContactInvitationService } from '../features/support-network/services/contactInvitationService';
 import { criarContactLinkService } from '../features/support-network/services/contactLinkService';
 import { criarReceivedContactsService } from '../features/support-network/services/receivedContactsService';
+import { criarSharedSupportService } from '../features/support-network/services/sharedSupportService';
 import { criarParentalConsentService } from '../features/support-network/services/parentalConsentService';
 import { criarSupportCategoryService } from '../features/support-network/services/supportCategoryService';
 import { criarSupportContactService } from '../features/support-network/services/supportContactService';
@@ -187,6 +188,7 @@ function criarServicosApp({
         contactLinkService,
         supportContactService,
         receivedContactsService,
+        sharedSupportService: criarSharedSupportService({ requisicaoAutenticada }),
         parentalConsentService,
         cyclePredictionService,
         cycleParametersService,

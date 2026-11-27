@@ -13,8 +13,11 @@ function MainLayout({
     varianteHeader = 'padrao',
     onVoltar,
     acoesHeader = null,
+    cabecalho: cabecalhoPersonalizado,
     abaAtiva,
     onSelecionarAba,
+    abasDisponiveis,
+    exibirNavegacaoInferior = true,
     usarAreaSeguraInferior = true,
     children,
     corFundo,
@@ -26,8 +29,14 @@ function MainLayout({
 
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
 
-    const navegacaoInferior = <BottomTabBar abaAtiva={abaAtiva} onSelecionar={onSelecionarAba} />;
-    const cabecalho = (
+    const navegacaoInferior = (
+        <BottomTabBar
+            abaAtiva={abaAtiva}
+            onSelecionar={onSelecionarAba}
+            abasDisponiveis={abasDisponiveis}
+        />
+    );
+    const cabecalho = cabecalhoPersonalizado ?? (
         <Header
             titulo={titulo}
             variante={varianteHeader}
@@ -67,7 +76,7 @@ function MainLayout({
                 {children}
             </View>
 
-            {usarAreaSeguraInferior ? (
+            {exibirNavegacaoInferior && usarAreaSeguraInferior ? (
                 <SafeAreaView
                     testID="navegacao-segura-main-layout"
                     edges={['bottom']}
@@ -78,9 +87,9 @@ function MainLayout({
                 >
                     {navegacaoInferior}
                 </SafeAreaView>
-            ) : (
+            ) : exibirNavegacaoInferior ? (
                 navegacaoInferior
-            )}
+            ) : null}
         </View>
     );
 }

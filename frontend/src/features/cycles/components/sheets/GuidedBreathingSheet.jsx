@@ -36,6 +36,7 @@ function GuidedBreathingSheet({
         <BottomSheet
             visivel={visivel}
             onFechar={aoFechar}
+            fecharAoTocarFora
             permitirDeslizarParaFechar
             estiloPainel={estilos.painel}
             corPainel="#FFFFFF"

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { fireEvent, screen } from '@testing-library/react-native';
-import { CycleDateStrip } from '../../../../src/features/cycles/components/CycleDateStrip';
+import {
+    calcularPaddingLateral,
+    CycleDateStrip
+} from '../../../../src/features/cycles/components/CycleDateStrip';
 import { renderWithTheme as render } from '../../../helpers/renderWithTheme';
 
 const dias = [
@@ -12,6 +15,15 @@ function montar(propriedades = {}) {
     return render(<CycleDateStrip dias={dias} dataSelecionada="2026-10-05" {...propriedades} />);
 }
 
+test.each([
+    [390, 172],
+    [402, 178],
+    [46, 8],
+    [0, 8]
+])('calcula o espaço lateral que centraliza um dia em uma faixa de %ipx', (largura, esperado) => {
+    expect(calcularPaddingLateral(largura)).toBe(esperado);
+});
+
 test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
     await montar();
 
@@ -19,6 +31,7 @@ test('renderiza a faixa horizontal sem indicador de rolagem', async () => {
     expect(faixa.props.horizontal).toBe(true);
     expect(faixa.props.showsHorizontalScrollIndicator).toBe(false);
     expect(faixa.props.windowSize).toBe(5);
+    expect(faixa.props.contentOffset).toEqual({ x: 54, y: 0 });
     expect(faixa.props.maintainVisibleContentPosition).toEqual({ minIndexForVisible: 1 });
     expect(faixa.props.onScrollToIndexFailed).toEqual(expect.any(Function));
     expect(screen.getAllByRole('button')).toHaveLength(2);

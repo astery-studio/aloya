@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../shared/theme/coresNoturnasConteudo';
 //Apresenta e gerencia a lista de contatos da Rede de Apoio.
 import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -338,7 +339,6 @@ function MembersScreen({
                 aoPressionar={abrirFiltros}
                 rotuloAcessibilidade="Filtrar contatos"
                 variante="redeApoio"
-                corIcone={tema.cores.interface.destaque}
             />
 
             <IconButton
@@ -346,7 +346,7 @@ function MembersScreen({
                 aoPressionar={onAbrirCategorias}
                 rotuloAcessibilidade="Abrir categorias de permissão"
                 variante="redeApoio"
-                corIcone={tema.cores.marca.primaria}
+                corIcone={tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria}
             />
         </>
     );
@@ -358,6 +358,7 @@ function MembersScreen({
                 varianteHeader="redeApoio"
                 acoesHeader={acoesCabecalho}
                 abaAtiva="membros"
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
                 onSelecionarAba={onSelecionarAba}
             >
                 <View testID="members-screen" style={estilos.container}>
@@ -444,7 +445,7 @@ function MembersScreen({
                 visivel={confirmacaoContato !== null}
                 aoFechar={fecharConfirmacao}
                 icone={WarningCircleIcon}
-                corIcone={tema.cores.marca.primaria}
+                corIcone={tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo={configuracaoConfirmacao?.titulo ?? ''}
                 mensagem={configuracaoConfirmacao?.mensagem ?? ''}
@@ -466,7 +467,7 @@ function MembersScreen({
                 visivel={estado.resultadoAcao !== null}
                 aoFechar={fecharResultado}
                 icone={estado.resultadoAcao?.tipo === 'reenviar' ? PaperPlaneTiltIcon : LockKeyIcon}
-                corIcone={tema.cores.marca.primaria}
+                corIcone={tema.escuro ? coresNoturnasConteudo.coral : tema.cores.marca.primaria}
                 fundoIcone={tema.cores.icones.configuracoes.laranja.caixa}
                 titulo={estado.resultadoAcao?.mensagem ?? ''}
                 acaoPrincipal={{

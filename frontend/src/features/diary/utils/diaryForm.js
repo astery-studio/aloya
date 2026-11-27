@@ -29,7 +29,13 @@ function contarMacrocategoriasPreenchidas(catalogo, valores = {}) {
     ).length;
 }
 
-function prepararFormularioDiario({ catalogo, valores = {}, data, hoje }) {
+function prepararFormularioDiario({
+    catalogo,
+    valores = {},
+    data,
+    hoje,
+    checkInRealizado = false
+}) {
     const erros = {};
     const categorias = [];
 
@@ -53,7 +59,8 @@ function prepararFormularioDiario({ catalogo, valores = {}, data, hoje }) {
         dados: {
             data,
             fusoHorario: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            categorias
+            categorias,
+            ...(checkInRealizado ? { checkInRealizado: true } : {})
         }
     };
 }

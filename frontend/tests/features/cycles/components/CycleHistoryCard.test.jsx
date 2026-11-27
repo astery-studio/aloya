@@ -22,6 +22,7 @@ describe('CycleHistoryCard', () => {
         expect(screen.getByText('07 Ago até 03 Set')).toBeOnTheScreen();
         expect(screen.getByText('5 dias')).toBeOnTheScreen();
         expect(screen.getByText('27 dias')).toBeOnTheScreen();
+        expect(screen.getByTestId('cycle-history-indicators')).toHaveStyle({ flexWrap: 'wrap' });
         expect(screen.queryByText('Em andamento')).not.toBeOnTheScreen();
         expect(screen.queryByText('Estimativa incerta')).not.toBeOnTheScreen();
     });
@@ -45,6 +46,28 @@ describe('CycleHistoryCard', () => {
         expect(screen.getByText('04 Set até hoje')).toBeOnTheScreen();
         expect(screen.getByText('Em andamento')).toBeOnTheScreen();
         expect(screen.getByLabelText('Duração do ciclo ainda não disponível')).toBeOnTheScreen();
+    });
+
+    test('centraliza o período e oculta as ações no modo somente leitura', async () => {
+        await render(
+            <CycleHistoryCard
+                ciclo={cicloConcluido}
+                somenteLeitura
+                aoEditar={jest.fn()}
+                aoExcluir={jest.fn()}
+            />
+        );
+
+        expect(screen.getByText(cicloConcluido.periodo)).toHaveStyle({ textAlign: 'center' });
+        expect(screen.getByTestId('cycle-history-indicators')).toHaveStyle({
+            flexDirection: 'row',
+            flexWrap: 'nowrap'
+        });
+        const estiloTag = { flexBasis: 0, flexGrow: 1, flexShrink: 1 };
+        expect(screen.getByLabelText('5 dias de menstruação')).toHaveStyle(estiloTag);
+        expect(screen.getByLabelText('27 dias de ciclo')).toHaveStyle(estiloTag);
+        expect(screen.queryByRole('button', { name: 'Editar ciclo 04' })).not.toBeOnTheScreen();
+        expect(screen.queryByRole('button', { name: 'Excluir ciclo 04' })).not.toBeOnTheScreen();
     });
 
     test('mostra o aviso quando a estimativa é incerta', async () => {

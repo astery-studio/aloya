@@ -4,7 +4,14 @@ import ButtonScreen from '../../../../shared/components/common/Button/ButtonScre
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
 import { obterCoresDiario } from '../../config/diaryColors';
 
-function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, estilos, tema }) {
+function DiaryHistoryStateView({
+    tipo,
+    cabecalho,
+    aoTentarNovamente,
+    estilos,
+    tema,
+    somenteLeitura
+}) {
     const cores = obterCoresDiario(tema).interface;
     let estado;
 
@@ -25,7 +32,11 @@ function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, estilos, te
                 <EmptyState
                     variante="erro"
                     titulo="Ocorreu um erro"
-                    mensagem="Não foi possível carregar seu histórico do Diário. Tente novamente."
+                    mensagem={
+                        somenteLeitura
+                            ? 'Não foi possível carregar o histórico do Diário. Tente novamente.'
+                            : 'Não foi possível carregar seu histórico do Diário. Tente novamente.'
+                    }
                     acao={
                         <ButtonScreen
                             texto="Tentar Novamente"
@@ -48,18 +59,22 @@ function DiaryHistoryStateView({ tipo, cabecalho, aoTentarNovamente, estilos, te
         estado = (
             <View style={estilos.estadoCentralizado}>
                 <EmptyState
-                    titulo="Nenhum registro visível"
+                    titulo={somenteLeitura ? 'Nada para exibir' : 'Nenhum registro visível'}
                     mensagem={
-                        <>
-                            Você ainda pode não ter registros ou as categorias usadas neles podem
-                            estar desativadas. Ative-as em{' '}
-                            <Text style={estilos.opcaoEstadoVazio}>
-                                &quot;Gerenciar categorias&quot;
-                            </Text>{' '}
-                            ou use o{' '}
-                            <Text style={estilos.opcaoEstadoVazio}>botão de adicionar</Text> para
-                            começar.
-                        </>
+                        somenteLeitura ? (
+                            'Ainda não há dados suficientes para exibir aqui.'
+                        ) : (
+                            <>
+                                Você ainda pode não ter registros ou as categorias usadas neles
+                                podem estar desativadas. Ative-as em{' '}
+                                <Text style={estilos.opcaoEstadoVazio}>
+                                    &quot;Gerenciar categorias&quot;
+                                </Text>{' '}
+                                ou use o{' '}
+                                <Text style={estilos.opcaoEstadoVazio}>botão de adicionar</Text>{' '}
+                                para começar.
+                            </>
+                        )
                     }
                 />
             </View>

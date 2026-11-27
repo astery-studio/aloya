@@ -139,5 +139,73 @@ test('preserva categoria inativa no banco e a oculta da resposta de edição', a
         dadosAtualizacao.categorias.deleteMany.categoriaId.in.includes('sintomas_emocionais'),
         false
     );
-    assert.deepEqual(resultado.categorias.map(({ id }) => id), ['anotacao_livre']);
+    assert.deepEqual(
+        resultado.categorias.map(({ id }) => id),
+        ['anotacao_livre']
+    );
+});
+
+test('marca o check-in na edição e impede uma segunda conclusão', async () => {
+    const atual = {
+        id: 10,
+        usuarioId: 7,
+        dataRegistro: new Date('2026-11-08T00:00:00.000Z'),
+        faseCicloAssociada: 'folicular',
+        checkInRealizado: false,
+        versao: 2,
+        criadoEm: new Date('2026-11-08T12:00:00.000Z'),
+        atualizadoEm: new Date('2026-11-08T12:00:00.000Z'),
+        categorias: [
+            {
+                categoriaId: 'anotacao_livre',
+                macrocategoriaNome: 'Saúde e Acompanhamento',
+                categoriaNome: 'Anotação livre',
+                valorEscalado: null,
+                casasDecimais: null,
+                valorDuracaoMinutos: null,
+                valorTexto: 'Antes',
+                opcoes: [],
+                medicaoTemperatura: null
+            }
+        ]
+    };
+    let persistido = atual;
+    let dadosAtualizacao;
+    const tx = {
+        registroDiario: {
+            findFirst: async () => persistido,
+            update: async ({ data }) => {
+                dadosAtualizacao = data;
+                persistido = {
+                    ...persistido,
+                    checkInRealizado: data.checkInRealizado ?? persistido.checkInRealizado,
+                    versao: persistido.versao + 1
+                };
+                return persistido;
+            }
+        },
+        preferenciaMacrocategoriaDiario: { findMany: async () => [] },
+        preferenciaCategoriaDiario: { findMany: async () => [] }
+    };
+    const service = criarDiaryEditService({
+        prisma: { $transaction: async (operacao) => operacao(tx) },
+        bootstrap: { garantir: async () => undefined },
+        phaseService: { resolver: async () => 'folicular' },
+        thermalRecalculation: { recalcularPorDatas: async () => undefined },
+        agora: () => new Date('2026-11-08T15:00:00.000Z')
+    });
+    const dados = validarCriacaoRegistro({
+        data: '2026-11-08',
+        fusoHorario: 'UTC',
+        checkInRealizado: true,
+        categorias: [{ categoriaId: 'anotacao_livre', texto: 'Antes' }]
+    });
+
+    const resultado = await service.editar(7, 10, 2, dados);
+
+    assert.equal(dadosAtualizacao.checkInRealizado, true);
+    assert.equal(resultado.checkInRealizado, true);
+    await assert.rejects(() => service.editar(7, 10, 3, dados), {
+        codigo: 'CHECK_IN_DIARIO_DUPLICADO'
+    });
 });

@@ -22,6 +22,8 @@ function DiaryRecordDetailsModal({
     aoExcluir,
     aoFechar,
     aoOcultar,
+    nomeTitular,
+    somenteLeitura,
     excluindo = false
 }) {
     const tema = useTheme();
@@ -55,6 +57,8 @@ function DiaryRecordDetailsModal({
                     aoEditar={aoEditar}
                     aoExcluir={aoExcluir}
                     aoFechar={aoFechar}
+                    nomeTitular={nomeTitular}
+                    somenteLeitura={somenteLeitura}
                     acaoEmAndamento={excluindo ? 'excluir' : null}
                 />
             ) : null}

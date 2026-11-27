@@ -8,6 +8,7 @@ import {
     Modal,
     PanResponder,
     Platform,
+    Pressable,
     View
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -30,6 +31,7 @@ function BottomSheet({
     corPainel,
     corAlca,
     estiloPainel,
+    fecharAoTocarFora = false,
     permitirDeslizarParaFechar = false,
     exibirAlcaArraste = true,
     podeIniciarDeslize = permitirInicioDeslize,
@@ -212,6 +214,16 @@ function BottomSheet({
                                 opacity: progresso
                             }
                         ]}
+                    />
+
+                    <Pressable
+                        testID="bottom-sheet-area-fundo"
+                        accessibilityRole={fecharAoTocarFora ? 'button' : undefined}
+                        accessibilityLabel={fecharAoTocarFora ? 'Fechar painel' : undefined}
+                        disabled={!fecharAoTocarFora || bloquearFechamento}
+                        onPress={solicitarFechamento}
+                        pointerEvents={fecharAoTocarFora ? 'auto' : 'none'}
+                        style={estilos.areaExterna}
                     />
 
                     <PainelSeguroAnimado
