@@ -33,33 +33,40 @@ export function NotificationIndividualSettingsScreen({
     return (
         <SettingsLayout titulo={titulo} onVoltar={onVoltar} respeitarEntalhe>
             <View style={estilos.lista}>
-                {Object.entries(grupos).map(([grupoId, [nome, linhas]]) => (
-                    <View key={grupoId} style={estilos.secao}>
-                        <Text accessibilityRole="header"
-                            style={[estilos.titulo, { color: cores.interface.textoSecundario }]}>{nome}</Text>
-                        {valores[`${categoriaId}.${grupoId}`] === false && (
-                            <Text style={{ color: cores.interface.textoSecundario }}>
-                                Grupo desligado. Suas escolhas individuais estão preservadas.
-                            </Text>
-                        )}
-                        {linhas.map(([id, label, tipo]) => {
-                            if (tipo === 'horario' || tipo === 'antecedencia') {
-                                return <NavigationField key={id} label={label} labelSemLimite desabilitado={ocupado}
-                                    referencia={tipo === 'antecedencia' ? botaoAntecedencia : undefined}
-                                    onPress={tipo === 'horario' ? onAbrirHorario
-                                        : () => definirAntecedenciaAberta(true)} />;
-                            }
-                            const chave = tipo === 'legado' ? id : `${categoriaId}.${grupoId}.${id}`;
-                            return (
-                                <SwitchField key={chave} titulo={label} ativo={valores[chave]}
-                                    tituloSemLimite dicaAcessibilidade="Ativa ou desativa esta notificação"
-                                    aoAlterar={(ativo) => onAlterar(chave, ativo)}
-                                    desabilitado={ocupado} estilo={estilos.campo}
-                                    estiloTitulo={estilos.rotulo} />
-                            );
-                        })}
-                    </View>
-                ))}
+                {Object.entries(grupos).map(([grupoId, [nome, linhas]]) => {
+                    const grupoAtivo = valores[`${categoriaId}.${grupoId}`] ?? true;
+                    const desabilitado = ocupado || !grupoAtivo;
+
+                    return (
+                        <View key={grupoId} style={estilos.secao}>
+                            <Text accessibilityRole="header"
+                                style={[estilos.titulo, { color: cores.interface.textoSecundario }]}>{nome}</Text>
+                            {!grupoAtivo && (
+                                <Text style={[estilos.descricao, { color: cores.interface.textoSecundario }]}>
+                                    Grupo pausado. Ative o grupo para retomar seus avisos e editar suas escolhas.
+                                </Text>
+                            )}
+                            {linhas.map(([id, label, tipo]) => {
+                                if (tipo === 'horario' || tipo === 'antecedencia') {
+                                    return (
+                                        <NavigationField key={id} label={label} labelSemLimite desabilitado={desabilitado}
+                                            referencia={tipo === 'antecedencia' ? botaoAntecedencia : undefined}
+                                            onPress={tipo === 'horario' ? onAbrirHorario
+                                                : () => definirAntecedenciaAberta(true)} />
+                                    );
+                                }
+                                const chave = tipo === 'legado' ? id : `${categoriaId}.${grupoId}.${id}`;
+                                return (
+                                    <SwitchField key={chave} titulo={label} ativo={grupoAtivo && valores[chave]}
+                                        tituloSemLimite dicaAcessibilidade="Ativa ou desativa esta notificação"
+                                        aoAlterar={(ativo) => onAlterar(chave, ativo)}
+                                        desabilitado={desabilitado} estilo={estilos.campo}
+                                        estiloTitulo={estilos.rotulo} />
+                                );
+                            })}
+                        </View>
+                    );
+                })}
             </View>
             <SelectionSheet
                 visivel={antecedenciaAberta}
