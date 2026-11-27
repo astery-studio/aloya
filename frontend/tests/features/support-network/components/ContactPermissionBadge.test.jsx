@@ -130,11 +130,11 @@ describe('ContactPermissionBadge', () => {
         );
 
         expect(screen.getByTestId('contact-permission-badge')).toHaveStyle({
-            backgroundColor: 'rgba(143, 196, 223, 0.20)'
+            backgroundColor: 'rgba(144, 202, 249, 0.20)'
         });
 
         expect(screen.getByText('Permissões Individuais')).toHaveStyle({
-            color: '#8FC4DF'
+            color: '#90CAF9'
         });
     });
 

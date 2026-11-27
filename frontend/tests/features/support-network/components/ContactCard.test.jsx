@@ -521,8 +521,8 @@ describe('ContactCard', () => {
         );
 
         expect(screen.getByTestId('contact-card')).toHaveStyle({
-            backgroundColor: '#232926',
-            borderColor: '#4A514D'
+            backgroundColor: '#1E1E1E',
+            borderColor: 'rgba(255, 255, 255, 0.08)'
         });
     });
 

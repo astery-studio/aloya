@@ -354,7 +354,7 @@ describe('ContactPermissionsSummaryModal', () => {
         );
 
         expect(screen.getByText('PERMISSÕES GERAIS')).toHaveStyle({
-            color: '#F08A75'
+            color: '#C26E5F'
         });
     });
 });

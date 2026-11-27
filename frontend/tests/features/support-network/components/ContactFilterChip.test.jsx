@@ -204,16 +204,16 @@ describe('ContactFilterChip', () => {
         });
 
         expect(filtro).toHaveStyle({
-            backgroundColor: 'rgba(159, 214, 182, 0.14)'
+            backgroundColor: 'rgba(165, 214, 167, 0.14)'
         });
 
         expect(screen.getByText('Permissões Individuais')).toHaveStyle({
-            color: '#9FD6B6'
+            color: '#A5D6A7'
         });
 
         expect(
             screen.getByTestId('contact-filter-indicator-permissao-Permissões Individuais')
-        ).toHaveProp('color', '#9FD6B6');
+        ).toHaveProp('color', '#A5D6A7');
     });
 
     test('normaliza espaços do rótulo', () => {

@@ -1,3 +1,4 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 // Coordena a consulta e a resposta aos convites recebidos da Rede de Apoio.
 import { useCallback, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -177,7 +178,6 @@ function ReceivedContactsScreen({
             aoPressionar={() => definirFiltrosAbertos(true)}
             rotuloAcessibilidade="Filtrar contatos acompanhados"
             variante="redeApoio"
-            corIcone={tema.cores.interface.destaque}
         />
     );
 
@@ -195,6 +195,7 @@ function ReceivedContactsScreen({
                 acoesHeader={exibirSeletor || onVisualizarContato ? acaoFiltro : null}
                 onVoltar={onVoltar}
                 abaAtiva="membros"
+                corFundo={tema.escuro ? coresNoturnasConteudo.fundo : undefined}
                 abasDisponiveis={abasDisponiveis}
                 onSelecionarAba={onSelecionarAba}
             >

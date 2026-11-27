@@ -1,3 +1,5 @@
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
+import { useTheme } from '../../../../shared/hooks/useTheme';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
@@ -41,6 +43,7 @@ function SharedHomeScreen({
     onSelecionarAba,
     ferramentasPrevia
 }) {
+    const { escuro } = useTheme();
     const [dataEscolhida, setDataEscolhida] = useState(null);
     const [faseDoSheet, setFaseDoSheet] = useState(null);
     const [confiabilidadeAberta, setConfiabilidadeAberta] = useState(false);
@@ -82,7 +85,7 @@ function SharedHomeScreen({
                     <IconButton
                         icone={ClockCounterClockwiseIcon}
                         variante="redeApoio"
-                        corIcone="#C85A44"
+                        corIcone={escuro ? coresNoturnasConteudo.coral : '#C85A44'}
                         rotuloAcessibilidade="Ver Histórico de Ciclos"
                         aoPressionar={() => onSelecionarAba('ciclos')}
                     />
