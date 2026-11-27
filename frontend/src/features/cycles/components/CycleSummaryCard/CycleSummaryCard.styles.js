@@ -25,6 +25,16 @@ function criarEstilos(tema) {
             height: 100
         },
 
+        comMetricasFlexivel: {
+            height: 'auto',
+            minHeight: 210.4
+        },
+
+        semMetricasFlexivel: {
+            height: 'auto',
+            minHeight: 100
+        },
+
         cabecalho: {
             width: '100%',
             height: 50.82,
@@ -36,6 +46,16 @@ function criarEstilos(tema) {
 
         cabecalhoCentralizado: {
             alignItems: 'center'
+        },
+
+        cabecalhoFlexivel: {
+            height: 'auto',
+            minHeight: 50.82,
+            paddingVertical: 10
+        },
+
+        tituloCentralizado: {
+            textAlign: 'center'
         },
 
         cabecalhoAlinhado: {
@@ -133,6 +153,10 @@ function criarEstilos(tema) {
             fontWeight: '400',
             lineHeight: 19.5,
             includeFontPadding: false
+        },
+
+        rodapeCentralizado: {
+            justifyContent: 'center'
         },
 
         caixaDaTag: {

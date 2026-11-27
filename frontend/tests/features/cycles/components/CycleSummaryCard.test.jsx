@@ -42,6 +42,29 @@ describe('CycleSummaryCard', () => {
         expect(screen.getByTestId('confidence-sheet')).toBeOnTheScreen();
     });
 
+    test('mostra o resumo do titular apoiado sem precisar receber a confiabilidade', async () => {
+        await render(
+            <CycleSummaryCard
+                nomeTitular="Júlia"
+                exibirConfianca={false}
+                cicloMedioDias={28}
+                menstruacaoMediaDias={5}
+                quantidadeCiclos={5}
+            />
+        );
+
+        expect(
+            screen.getByRole('header', { name: 'RESUMO DOS CICLOS DE JÚLIA' })
+        ).toBeOnTheScreen();
+        expect(screen.getByLabelText('Ciclo médio: 28 dias')).toBeOnTheScreen();
+        expect(screen.getByLabelText('Menstruação média: 5 dias')).toBeOnTheScreen();
+        expect(screen.getByText('5 ciclos registrados').parent).toHaveStyle({
+            justifyContent: 'center'
+        });
+        expect(screen.queryByRole('button', { name: /confiança/i })).not.toBeOnTheScreen();
+        expect(screen.queryByTestId('confidence-sheet')).not.toBeOnTheScreen();
+    });
+
     test('mantém somente quantidade e confiança quando não existem ciclos', async () => {
         await render(<CycleSummaryCard quantidadeCiclos={0} confianca="baixa" />);
 

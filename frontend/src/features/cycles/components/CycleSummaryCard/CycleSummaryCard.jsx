@@ -29,12 +29,19 @@ function obterTextoDosCiclos(quantidade) {
     return quantidade === 1 ? '1 ciclo registrado' : `${quantidade} ciclos registrados`;
 }
 
-function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCiclos, confianca }) {
+function CycleSummaryCard({
+    cicloMedioDias,
+    menstruacaoMediaDias,
+    quantidadeCiclos,
+    confianca,
+    nomeTitular,
+    exibirConfianca = true
+}) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const [confiabilidadeVisivel, setConfiabilidadeVisivel] = useState(false);
 
-    if (!confiancasPermitidas.includes(confianca)) {
+    if (exibirConfianca && !confiancasPermitidas.includes(confianca)) {
         throw new Error(`Confiança do resumo de ciclos inválida: ${confianca}`);
     }
 
@@ -43,20 +50,33 @@ function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCicl
     const menstruacaoMediaSegura = normalizarMetrica(menstruacaoMediaDias);
     const temMetricas =
         quantidadeSegura > 0 && cicloMedioSeguro !== null && menstruacaoMediaSegura !== null;
+    const nome = nomeTitular?.trim();
+    const titulo = nome
+        ? `RESUMO DOS CICLOS DE ${nome.toLocaleUpperCase('pt-BR')}`
+        : 'RESUMO DOS SEUS CICLOS';
 
     return (
         <View
             testID="cycle-summary-card"
-            style={[estilos.container, temMetricas ? estilos.comMetricas : estilos.semMetricas]}
+            style={[
+                estilos.container,
+                temMetricas ? estilos.comMetricas : estilos.semMetricas,
+                nome && (temMetricas ? estilos.comMetricasFlexivel : estilos.semMetricasFlexivel)
+            ]}
         >
             <View
                 style={[
                     estilos.cabecalho,
-                    temMetricas ? estilos.cabecalhoCentralizado : estilos.cabecalhoAlinhado
+                    temMetricas || nome ? estilos.cabecalhoCentralizado : estilos.cabecalhoAlinhado,
+                    nome && estilos.cabecalhoFlexivel
                 ]}
             >
-                <Text accessibilityRole="header" numberOfLines={1} style={estilos.titulo}>
-                    RESUMO DOS SEUS CICLOS
+                <Text
+                    accessibilityRole="header"
+                    numberOfLines={nome ? undefined : 1}
+                    style={[estilos.titulo, nome && estilos.tituloCentralizado]}
+                >
+                    {titulo}
                 </Text>
             </View>
 
@@ -102,24 +122,28 @@ function CycleSummaryCard({ cicloMedioDias, menstruacaoMediaDias, quantidadeCicl
                 </View>
             ) : null}
 
-            <View style={estilos.rodape}>
+            <View style={[estilos.rodape, !exibirConfianca && estilos.rodapeCentralizado]}>
                 <Text numberOfLines={1} style={estilos.quantidade}>
                     {obterTextoDosCiclos(quantidadeSegura)}
                 </Text>
 
-                <View style={estilos.caixaDaTag}>
-                    <ConfidenceBadge
-                        nivel={confianca}
-                        variante="simples"
-                        onPress={() => setConfiabilidadeVisivel(true)}
-                    />
-                </View>
+                {exibirConfianca ? (
+                    <View style={estilos.caixaDaTag}>
+                        <ConfidenceBadge
+                            nivel={confianca}
+                            variante="simples"
+                            onPress={() => setConfiabilidadeVisivel(true)}
+                        />
+                    </View>
+                ) : null}
             </View>
-            <CycleConfidenceSheet
-                visivel={confiabilidadeVisivel}
-                nivel={confianca}
-                aoFechar={() => setConfiabilidadeVisivel(false)}
-            />
+            {exibirConfianca ? (
+                <CycleConfidenceSheet
+                    visivel={confiabilidadeVisivel}
+                    nivel={confianca}
+                    aoFechar={() => setConfiabilidadeVisivel(false)}
+                />
+            ) : null}
         </View>
     );
 }
