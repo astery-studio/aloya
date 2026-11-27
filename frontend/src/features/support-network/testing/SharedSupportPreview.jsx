@@ -39,6 +39,7 @@ const ANTICONCEPCIONAIS_PREVIA = [
         id: 'yaz',
         nome: 'Yaz',
         tipo: 'pilula',
+        intensidadeAlerta: 'moderado',
         horarios: ['08:00', '20:00'],
         statusUltimoUso: 'pendente',
         usosHoje: [{ id: 'yaz-manha', horario: '08:00', atrasado: true, status: 'pendente' }],
@@ -58,6 +59,7 @@ const ANTICONCEPCIONAIS_PREVIA = [
         id: 'evra',
         nome: 'Evra',
         tipo: 'adesivo',
+        intensidadeAlerta: 'leve',
         horarios: ['09:30'],
         statusUltimoUso: 'pendente',
         historico: [
@@ -68,6 +70,7 @@ const ANTICONCEPCIONAIS_PREVIA = [
         id: 'mirena',
         nome: 'Mirena',
         tipo: 'diu_hormonal',
+        intensidadeAlerta: 'leve',
         statusUltimoUso: 'confirmado',
         dataValidade: '2029-03-14',
         validadeRestante: '30 meses restantes'

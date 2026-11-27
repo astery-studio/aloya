@@ -35,7 +35,7 @@ test('exibe os dados, horários e ações do cartão', async () => {
     expect(aoRemover).toHaveBeenCalledTimes(1);
 });
 
-test('no modo somente leitura mostra horários e último uso sem ações ou intensidade', async () => {
+test('no modo somente leitura mostra horários, último uso e nível de alerta autorizado', async () => {
     await render(
         <ContraceptiveUsageCard
             somenteLeitura
@@ -57,12 +57,24 @@ test('no modo somente leitura mostra horários e último uso sem ações ou inte
     expect(screen.getByText('08:00')).toBeOnTheScreen();
     expect(screen.getByText('20:00')).toBeOnTheScreen();
     expect(screen.getByText('Confirmado fora do prazo')).toBeOnTheScreen();
-    expect(screen.queryByText('Alerta Moderado')).not.toBeOnTheScreen();
+    expect(screen.getByText('Alerta Moderado')).toBeOnTheScreen();
     expect(
         screen.queryByRole('button', { name: /Editar|Remover|Marcar Uso/i })
     ).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Histórico de uso' }));
     expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
+});
+
+test('no modo somente leitura não presume um nível de alerta ausente', async () => {
+    await render(
+        <ContraceptiveUsageCard
+            somenteLeitura
+            anticoncepcional={{ id: '1', nome: 'Yaz', tipo: 'pilula', statusUltimoUso: 'pendente' }}
+        />
+    );
+
+    expect(screen.getByText('Pendente de Uso')).toBeOnTheScreen();
+    expect(screen.queryByText(/^Alerta (Leve|Moderado|Crítico)$/)).not.toBeOnTheScreen();
 });
 
 test('marca e reverte o uso quando a persistência falha', async () => {

@@ -246,7 +246,8 @@ function ContraceptiveUsageCard({
             ? 'pendenteDeUso'
             : BADGES_ULTIMO_USO[estadoUltimoNormalizado]
         : estadoUsoEditavel;
-    const alerta = somenteLeitura ? null : estadoAlerta(anticoncepcional.intensidadeAlerta);
+    const { intensidadeAlerta } = anticoncepcional;
+    const alerta = somenteLeitura && !intensidadeAlerta ? null : estadoAlerta(intensidadeAlerta);
     const estadosBadge = [estadoUso, alerta].filter(Boolean);
     const larguraMinimaBadge = estadosBadge.length ? larguraMinimaDosBadges(estadosBadge) : 0;
     const permiteHistorico = ['pilula', 'injetavel', 'adesivo', 'anel_vaginal'].includes(
