@@ -24,10 +24,11 @@ function ContraceptiveFlow({
     onVoltar,
     onSessaoExpirada,
     inicio = false,
+    iniciarCadastro = false,
     onSelecionarAba
 }) {
     const tema = useTheme();
-    const [tela, setTela] = useState(inicio ? 'inicio' : 'lista');
+    const [tela, setTela] = useState(iniciarCadastro ? 'cadastroInicial' : inicio ? 'inicio' : 'lista');
     const [itens, setItens] = useState([]);
     const [mensagem, setMensagem] = useState(null);
     const [carregando, setCarregando] = useState(true);
@@ -369,9 +370,9 @@ function ContraceptiveFlow({
 
     return (
         <>
-            {tela === 'cadastro' ? (
+            {tela === 'cadastro' || tela === 'cadastroInicial' ? (
                 <NewContraceptiveScreen
-                    onVoltar={() => setTela('lista')}
+                    onVoltar={tela === 'cadastroInicial' ? onVoltar : () => setTela('lista')}
                     onCadastrar={cadastrar}
                     salvando={salvando}
                 />
