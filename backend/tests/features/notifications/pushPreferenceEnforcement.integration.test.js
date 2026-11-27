@@ -23,7 +23,7 @@ test('desligar o grupo cancela o aviso já em fila e a retentativa sem chamar o 
     assert.equal(await prisma.entregaPush.count({ where: { status: 'pendente' } }), 1);
 
     await preferencias.atualizar(2, { chave: 'redeApoio.dicas', valor: false });
-    assert.equal((await preferencias.buscar(2))[evento], true);
+    assert.equal((await preferencias.buscar(2))[evento], false);
     assert.equal(await prisma.entregaPush.count({ where: { status: 'cancelada' } }), 1);
     relogio = new Date(+agora + 3 * 60000);
     await worker.processar();
