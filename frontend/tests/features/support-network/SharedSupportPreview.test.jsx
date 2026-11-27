@@ -22,4 +22,7 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     await fireEvent.press(screen.getByRole('button', { name: 'Ver Diário' }));
     expect(screen.getByText('RESUMO DO DIÁRIO DE JÚLIA')).toBeOnTheScreen();
     expect(screen.getByText('Fase Folicular')).toBeOnTheScreen();
+    expect(screen.getAllByTestId('diary-entry-card')).toHaveLength(2);
+    expect(screen.getByText('Hoje tirei um tempo para descansar.')).toBeOnTheScreen();
+    expect(screen.queryByTestId('diary-entry-header-actions')).not.toBeOnTheScreen();
 });
