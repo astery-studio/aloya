@@ -79,9 +79,9 @@ function criarEstilos(tema) {
             justifyContent: 'center',
             alignItems: 'center',
             borderWidth: 0.705,
-            borderColor: '#5C5C59',
+            borderColor: tema.escuro ? coresNoturnasConteudo.textoSecundario : '#5C5C59',
             borderRadius: 10,
-            backgroundColor: 'rgba(92, 92, 89, 0.20)'
+            backgroundColor: tema.escuro ? 'rgba(153, 153, 153, 0.20)' : 'rgba(92, 92, 89, 0.20)'
         },
 
         containerNomePendente: {

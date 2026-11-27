@@ -2,12 +2,14 @@
 import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../../shared/theme';
+import { coresNoturnasConteudo } from '../../../../shared/theme/coresNoturnasConteudo';
 
 function criarEstilos(tema) {
     return StyleSheet.create({
         modal: {
             width: '100%',
             maxWidth: 342,
+            ...(tema.escuro && { backgroundColor: coresNoturnasConteudo.superficie }),
             borderRadius: 24
         },
 
@@ -24,7 +26,9 @@ function criarEstilos(tema) {
         },
 
         tituloSecao: {
-            color: tema.cores.interface.textoSecundario,
+            color: tema.escuro
+                ? coresNoturnasConteudo.textoSecundario
+                : tema.cores.interface.textoSecundario,
             fontFamily: fontFamilies.bold,
             fontSize: 11,
             fontStyle: 'normal',
@@ -61,13 +65,15 @@ function criarEstilos(tema) {
             width: '100%',
             height: 56,
             borderWidth: 1.41,
-            borderColor: tema.cores.interface.destaque,
+            borderColor: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             borderRadius: 12,
-            backgroundColor: tema.cores.interface.superficieElevada
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.superficie
+                : tema.cores.interface.superficieElevada
         },
 
         textoBotaoLimpar: {
-            color: tema.cores.interface.destaque,
+            color: tema.escuro ? coresNoturnasConteudo.verde : tema.cores.interface.destaque,
             fontFamily: fontFamilies.regular,
             fontSize: 18,
             fontWeight: '400',
@@ -78,11 +84,15 @@ function criarEstilos(tema) {
             width: '100%',
             height: 56,
             borderRadius: 12,
-            backgroundColor: tema.cores.interface.destaque
+            backgroundColor: tema.escuro
+                ? coresNoturnasConteudo.verde
+                : tema.cores.interface.destaque
         },
 
         textoBotaoAplicar: {
-            color: tema.cores.interface.textoSobreDestaque,
+            color: tema.escuro
+                ? coresNoturnasConteudo.fundo
+                : tema.cores.interface.textoSobreDestaque,
             fontFamily: fontFamilies.regular,
             fontSize: 18,
             fontWeight: '400',
