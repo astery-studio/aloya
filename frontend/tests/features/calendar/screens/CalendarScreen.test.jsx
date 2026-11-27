@@ -176,9 +176,12 @@ describe('CalendarScreen', () => {
                 confianca="alta"
                 aoCadastrarMenstruacao={jest.fn()}
                 aoEditarCiclo={jest.fn()}
-            />
+            />,
+            { preferencia: 'escuro' }
         );
 
+        expect(screen.getByTestId('calendar-screen')).toHaveStyle({ backgroundColor: '#121212' });
+        expect(screen.getByTestId('header-container')).toHaveStyle({ backgroundColor: '#121212' });
         expect(screen.getByTestId('cycle-calendar')).toBeOnTheScreen();
         expect(screen.queryByTestId('calendar-add-fab')).not.toBeOnTheScreen();
         expect(screen.queryByTestId('confidence-badge')).not.toBeOnTheScreen();

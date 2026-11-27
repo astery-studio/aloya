@@ -3,11 +3,14 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
-function criarEstilosCalendario(tema) {
+function criarEstilosCalendario(
+    tema,
+    corFundo = tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+) {
     const estilos = StyleSheet.create({
         calendario: {
             flex: 1,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         cabecalhoSemana: {
             flexDirection: 'row',
@@ -16,7 +19,7 @@ function criarEstilosCalendario(tema) {
             borderTopWidth: StyleSheet.hairlineWidth,
             borderBottomWidth: StyleSheet.hairlineWidth,
             borderColor: tema.cores.interface.borda,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo,
+            backgroundColor: corFundo,
             zIndex: 4
         },
         nomeDiaSemana: {

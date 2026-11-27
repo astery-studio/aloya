@@ -17,11 +17,11 @@ const coresConfiabilidadeEscuras = Object.freeze({
     alta: { cor: '#A5D6A7', fundo: 'rgba(165, 214, 167, 0.14)', borda: 'rgba(165, 214, 167, 0.33)' }
 });
 
-function criarEstilos(tema) {
+function criarEstilos(tema, corFundo = tema.escuro ? '#1C1B19' : tema.cores.interface.fundo) {
     return StyleSheet.create({
         tela: {
             flex: 1,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         corpo: {
             flex: 1,
@@ -34,7 +34,7 @@ function criarEstilos(tema) {
             flex: 1,
             minHeight: 0,
             paddingTop: tema.espacamentosLayout.headerParaConteudo,
-            backgroundColor: tema.escuro ? '#1C1B19' : tema.cores.interface.fundo
+            backgroundColor: corFundo
         },
         areaCalendario: {
             flex: 1,
