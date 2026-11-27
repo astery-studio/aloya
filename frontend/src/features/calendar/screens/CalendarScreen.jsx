@@ -117,6 +117,8 @@ function obterStatusSincronizacaoPrioritario(status) {
 function CalendarScreen({
     meses = [],
     confianca,
+    somenteLeitura = false,
+    permitePrevisoes = true,
     carregando = false,
     carregandoAnteriores = false,
     carregandoPosteriores = false,
@@ -129,7 +131,8 @@ function CalendarScreen({
     statusSincronizacao,
     erroSincronizacao,
     aoTentarSincronizar,
-    onSelecionarAba
+    onSelecionarAba,
+    abasDisponiveis
 }) {
     const tema = useTheme();
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
@@ -146,11 +149,17 @@ function CalendarScreen({
     const possuiCiclos = mesesValidos.some(
         (mes) => mes?.possuiCiclos === true || mes?.calendario?.possuiCiclos === true
     );
-    const estadoVazio = !carregando && !existeErro && mesesValidos.length > 0 && !possuiCiclos;
+    const estadoVazio = !carregando && !existeErro && !possuiCiclos;
     const statusSincronizacaoPrioritario = obterStatusSincronizacaoPrioritario(statusSincronizacao);
-    const mostrarStatusSincronizacao = !existeErro && Boolean(statusSincronizacaoPrioritario);
-    const mostrarAvisoCicloVazio = estadoVazio && !mostrarStatusSincronizacao;
-    const mostrarFab = !carregando && !existeErro && typeof aoCadastrarMenstruacao === 'function';
+    const mostrarStatusSincronizacao =
+        !somenteLeitura && !existeErro && Boolean(statusSincronizacaoPrioritario);
+    const mostrarAvisoCicloVazio =
+        !somenteLeitura && estadoVazio && mesesValidos.length > 0 && !mostrarStatusSincronizacao;
+    const mostrarFab =
+        !somenteLeitura &&
+        !carregando &&
+        !existeErro &&
+        typeof aoCadastrarMenstruacao === 'function';
 
     const animarEntradaAviso = useCallback(() => {
         opacidadeAviso.stopAnimation();
@@ -236,7 +245,7 @@ function CalendarScreen({
                 titulo="Calendário"
                 variante="redeApoio"
                 complementoTitulo={
-                    confiancaValida && !existeErro ? (
+                    !somenteLeitura && confiancaValida && !existeErro ? (
                         <ConfidenceBadge
                             nivel={confiancaValida}
                             variante="simples"
@@ -265,7 +274,13 @@ function CalendarScreen({
             <View testID="calendar-body" style={estilos.corpo}>
                 <View style={estilos.conteudo}>
                     {existeErro ? (
-                        <View testID="calendar-error-state" style={estilos.estadoCentral}>
+                        <View
+                            testID="calendar-error-state"
+                            style={[
+                                estilos.estadoCentral,
+                                somenteLeitura && estilos.estadoCompartilhado
+                            ]}
+                        >
                             <EmptyState
                                 titulo="Ocorreu um erro"
                                 mensagem={MENSAGEM_ERRO_CALENDARIO}
@@ -280,6 +295,16 @@ function CalendarScreen({
                                 }
                             />
                         </View>
+                    ) : somenteLeitura && estadoVazio ? (
+                        <View
+                            testID="calendar-empty-state"
+                            style={[estilos.estadoCentral, estilos.estadoCompartilhado]}
+                        >
+                            <EmptyState
+                                titulo="Nada para exibir"
+                                mensagem="Ainda não há dados suficientes para exibir aqui."
+                            />
+                        </View>
                     ) : (
                         <View style={estilos.areaCalendario}>
                             <CycleCalendar
@@ -289,7 +314,7 @@ function CalendarScreen({
                                 carregandoPosteriores={carregandoPosteriores}
                                 aoCarregarAnteriores={aoCarregarAnteriores}
                                 aoCarregarPosteriores={aoCarregarPosteriores}
-                                aoPressionarDia={aoEditarCiclo}
+                                aoPressionarDia={somenteLeitura ? undefined : aoEditarCiclo}
                             />
 
                             {mostrarStatusSincronizacao ? (
@@ -357,20 +382,30 @@ function CalendarScreen({
                 edges={['bottom']}
                 style={estilos.navegacaoSegura}
             >
-                <BottomTabBar abaAtiva="calendario" onSelecionar={onSelecionarAba} />
+                <BottomTabBar
+                    abaAtiva="calendario"
+                    onSelecionar={onSelecionarAba}
+                    abasDisponiveis={abasDisponiveis}
+                />
             </SafeAreaView>
 
             <CycleLegendSheet
                 visivel={legendaVisivel}
-                itens={ITENS_LEGENDA}
+                itens={
+                    permitePrevisoes
+                        ? ITENS_LEGENDA
+                        : ITENS_LEGENDA.filter(({ id }) => id === 'menstruacao-real')
+                }
                 aoFechar={() => setLegendaVisivel(false)}
             />
 
-            <CycleConfidenceSheet
-                visivel={confiancaVisivel}
-                nivel={confiancaValida}
-                aoFechar={() => setConfiancaVisivel(false)}
-            />
+            {somenteLeitura ? null : (
+                <CycleConfidenceSheet
+                    visivel={confiancaVisivel}
+                    nivel={confiancaValida}
+                    aoFechar={() => setConfiancaVisivel(false)}
+                />
+            )}
         </View>
     );
 }

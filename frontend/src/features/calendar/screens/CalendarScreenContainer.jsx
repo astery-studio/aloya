@@ -6,20 +6,24 @@ import { obterChaveMes, useCalendar } from '../hooks/useCalendar';
 function CalendarScreenContainer({
     service,
     onSessaoExpirada,
+    somenteLeitura = false,
     aoCadastrarMenstruacao,
     aoEditarCiclo,
     statusSincronizacao,
     erroSincronizacao,
     aoTentarSincronizar,
-    onSelecionarAba
+    onSelecionarAba,
+    abasDisponiveis
 }) {
-    const estado = useCalendar({ service, onSessaoExpirada });
+    const estado = useCalendar({ service, onSessaoExpirada, somenteLeitura });
     const chaveMesAtual = useMemo(() => obterChaveMes(), []);
     const calendarioAtual = estado.meses.find((mes) => mes.mes === chaveMesAtual);
     const confianca = calendarioAtual?.previsao?.nivelConfianca ?? null;
 
     return (
         <CalendarScreen
+            somenteLeitura={somenteLeitura}
+            permitePrevisoes={!somenteLeitura || estado.permitePrevisoes}
             statusSincronizacao={statusSincronizacao}
             erroSincronizacao={erroSincronizacao}
             aoTentarSincronizar={aoTentarSincronizar}
@@ -35,6 +39,7 @@ function CalendarScreenContainer({
             aoCadastrarMenstruacao={aoCadastrarMenstruacao}
             aoEditarCiclo={aoEditarCiclo}
             onSelecionarAba={onSelecionarAba}
+            abasDisponiveis={abasDisponiveis}
         />
     );
 }
