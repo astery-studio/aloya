@@ -46,16 +46,12 @@ function SharedNavigationPreview({ revogado = false }) {
     const [vinculoId, setVinculoId] = useState(revogado ? 1 : null);
     const [tela, setTela] = useState(revogado ? 'inicio' : 'membros');
     const servicos = useMemo(() => criarServicosDaPrevia(revogado), [revogado]);
-    const abasDisponiveis = vinculoId
-        ? ['membros', 'configuracoes', 'inicio']
-        : ['membros', 'configuracoes'];
 
     if (tela === 'membros') {
         return (
             <ReceivedContactsScreen
                 service={servicos.recebidos}
                 vinculoVisualizadoId={vinculoId}
-                abasDisponiveis={abasDisponiveis}
                 onSelecionarAba={setTela}
                 onVisualizarContato={({ id }) => {
                     setVinculoId(id);
@@ -66,16 +62,8 @@ function SharedNavigationPreview({ revogado = false }) {
     }
 
     if (tela === 'configuracoes') {
-        return (
-            <SettingsScreen
-                emAcompanhamento
-                abasDisponiveis={abasDisponiveis}
-                onSelecionarAba={setTela}
-            />
-        );
+        return <SettingsScreen emAcompanhamento onSelecionarAba={setTela} />;
     }
-
-    if (vinculoId === null) return null;
 
     return (
         <SharedSupportFlow

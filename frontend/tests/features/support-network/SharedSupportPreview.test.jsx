@@ -124,6 +124,18 @@ test('troca a pessoa visualizada sem voltar ao ciclo da própria conta', async (
     await render(<SharedSupportPreview />);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Testar troca de pessoa' }));
+    for (const aba of ['Calendário', 'Diário']) {
+        await fireEvent.press(screen.getByRole('tab', { name: aba }));
+        expect(screen.getByRole('tab', { name: aba, selected: true })).toBeOnTheScreen();
+        expect(screen.getByText('Nada para exibir')).toBeOnTheScreen();
+    }
+    await fireEvent.press(screen.getByRole('tab', { name: 'Início' }));
+    expect(screen.getByRole('tab', { name: 'Início', selected: true })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: /^Aloya - \d{2} de / })).toBeOnTheScreen();
+    expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
+    expect(screen.getByText('Cada corpo tem seu próprio ritmo.')).toBeOnTheScreen();
+    expect(screen.queryByText('Nada para exibir')).toBeNull();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Visualizar dados de Júlia' }));
     expect(await screen.findByLabelText('Acompanhando Júlia')).toBeOnTheScreen();
     expect(await screen.findByRole('header', { name: 'Fase Folicular' })).toBeOnTheScreen();
@@ -145,6 +157,10 @@ test('mostra o acesso revogado como vazio e permite escolher outro contato', asy
     await fireEvent.press(screen.getByRole('button', { name: 'Testar acesso revogado' }));
     expect(await screen.findByText('Nada para exibir')).toBeOnTheScreen();
     expect(screen.queryByLabelText('Acompanhando Júlia')).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('tab', { name: 'Calendário' }));
+    expect(await screen.findByText('Nada para exibir')).toBeOnTheScreen();
+    expect(screen.getByRole('tab', { name: 'Calendário', selected: true })).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('tab', { name: 'Contatos' }));
     expect(screen.queryByRole('button', { name: 'Visualizar dados de Júlia' })).toBeNull();

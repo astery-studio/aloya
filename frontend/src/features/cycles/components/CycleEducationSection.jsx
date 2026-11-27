@@ -17,7 +17,8 @@ function CycleEducationSection({
     faseSelecionada,
     aoSelecionarFase,
     conteudos = CONTEUDOS_EDUCATIVOS,
-    perspectiva = 'titular'
+    perspectiva = 'titular',
+    rodape
 }) {
     const [faseLocal, setFaseLocal] = useState('menstrual');
     const ehContato = perspectiva === 'contato';
@@ -76,10 +77,12 @@ function CycleEducationSection({
                 <Text style={textos.tituloArtigo}>{selected.titulo}</Text>
                 <Text style={textos.descricao}>{selected.texto}</Text>
             </View>
-            <CycleEducationalDisclaimer
-                texto="As fases podem se sobrepor biologicamente e não possuem duração fixa para todas as pessoas."
-                style={estilos.aviso}
-            />
+            {rodape ?? (
+                <CycleEducationalDisclaimer
+                    texto="As fases podem se sobrepor biologicamente e não possuem duração fixa para todas as pessoas."
+                    style={estilos.aviso}
+                />
+            )}
         </View>
     );
 }

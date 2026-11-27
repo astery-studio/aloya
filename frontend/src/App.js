@@ -495,11 +495,8 @@ export default function App() {
     }
 
     function selecionarAba(aba) {
-        if (vinculoVisualizadoId !== null) {
+        if (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') {
             if (ABAS_ACOMPANHAMENTO.has(aba)) setTelaInterna(aba);
-            return;
-        }
-        if (perfil?.papel === 'contato_apoio' && !['membros', 'configuracoes'].includes(aba)) {
             return;
         }
 
@@ -678,7 +675,10 @@ export default function App() {
                 />
             );
         }
-    } else if (vinculoVisualizadoId !== null && TELAS_COMPARTILHADAS.has(telaInterna)) {
+    } else if (
+        (vinculoVisualizadoId !== null || perfil?.papel === 'contato_apoio') &&
+        TELAS_COMPARTILHADAS.has(telaInterna)
+    ) {
         conteudo = (
             <SharedSupportFlow
                 key={vinculoVisualizadoId}

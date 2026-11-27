@@ -3,8 +3,10 @@ import { ScrollView, StyleSheet } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { CalendarScreenContainer } from '../../../calendar/screens/CalendarScreenContainer';
+import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { ContraceptiveUsageCard } from '../../../contraceptives/components/ContraceptiveUsageCard';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
+import { formatarDataCabecalho } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
 import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
 import { SupportedPersonIndicator } from '../../components/SupportedPersonIndicator/SupportedPersonIndicator';
@@ -12,6 +14,7 @@ import { useSharedContent } from '../../hooks/useSharedContent';
 import { useSharedSupportAccess } from '../../hooks/useSharedSupportAccess';
 import { SharedCycleHistoryScreen } from '../SharedCycleHistoryScreen/SharedCycleHistoryScreen';
 import { SharedDiaryScreen } from '../SharedDiaryScreen/SharedDiaryScreen';
+import { SharedHomeWithoutContact } from './SharedHomeWithoutContact';
 
 const TITULOS = {
     inicio: 'Início',
@@ -21,7 +24,6 @@ const TITULOS = {
     anticoncepcionais: 'Anticoncepcionais'
 };
 
-const ABAS_BASE = ['membros', 'inicio', 'configuracoes'];
 const PERMISSAO_FASE = 'geral.fase_atual';
 const PERMISSAO_HISTORICO = 'geral.historico_ciclo';
 const PERMISSAO_ANTICONCEPCIONAIS = 'geral.anticoncepcionais';
@@ -111,13 +113,10 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
     const permissoes = acesso.permissoes ?? [];
     const historicoPermitido = permissoes.includes(PERMISSAO_HISTORICO);
     const diarioPermitido = temDiario(permissoes);
-    const abasDisponiveis = [
-        ...ABAS_BASE,
-        ...(historicoPermitido ? ['calendario'] : []),
-        ...(diarioPermitido ? ['diario'] : [])
-    ];
-    const navegacao = { onSelecionarAba, abasDisponiveis };
-    const titulo = TITULOS[tela];
+    const homeSemContato = tela === 'inicio' && vinculoId == null;
+    const titulo = homeSemContato
+        ? formatarDataCabecalho(obterHojeLocal()).replace(/ - (\d) de /u, ' - 0$1 de ')
+        : TITULOS[tela];
     const voltar = () => onSelecionarAba('inicio');
     const subtela = tela === 'ciclos' || tela === 'anticoncepcionais';
 
@@ -128,7 +127,7 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
                     key={acesso.assinatura}
                     somenteLeitura
                     service={consultas.calendario}
-                    {...navegacao}
+                    onSelecionarAba={onSelecionarAba}
                 />
             );
         }
@@ -149,7 +148,7 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
                     nomeTitular={acesso.nomeTitular}
                     permissoes={permissoes}
                     service={consultas.diario}
-                    {...navegacao}
+                    onSelecionarAba={onSelecionarAba}
                 />
             );
         }
@@ -160,13 +159,15 @@ function SharedSupportFlow({ tela, vinculoId, service, onSelecionarAba, onSessao
     return (
         <MainLayout
             titulo={titulo}
-            varianteHeader={subtela ? 'comVoltar' : 'padrao'}
+            varianteHeader={subtela ? 'comVoltar' : homeSemContato ? 'inicio' : 'padrao'}
             abaAtiva={tela}
             onVoltar={subtela ? voltar : undefined}
             exibirNavegacaoInferior={!subtela}
-            {...navegacao}
+            onSelecionarAba={onSelecionarAba}
         >
-            {conteudoDisponivel && tela === 'inicio' ? (
+            {homeSemContato ? (
+                <SharedHomeWithoutContact />
+            ) : conteudoDisponivel && tela === 'inicio' ? (
                 <InicioCompartilhado
                     key={acesso.assinatura}
                     acesso={acesso}

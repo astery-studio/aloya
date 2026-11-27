@@ -3,6 +3,14 @@ import { AppState } from 'react-native';
 
 import { useSharedSupportAccess } from '../../../../src/features/support-network/hooks/useSharedSupportAccess';
 
+test('retorna o estado vazio sem consultar a API quando nenhum vínculo foi selecionado', async () => {
+    const service = { consultar: jest.fn() };
+    const { result } = await renderHook(() => useSharedSupportAccess({ service, vinculoId: null }));
+
+    expect(result.current.acesso).toEqual({ status: 'vazio' });
+    expect(service.consultar).not.toHaveBeenCalled();
+});
+
 test('retira o conteúdo compartilhado ao revalidar um vínculo revogado, sem encerrar a sessão', async () => {
     let retomar;
     const assinatura = jest

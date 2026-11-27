@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 import { criarConsultasCompartilhadas } from '../services/sharedSupportService';
 
 const INTERVALO_ACESSO_MS = 5000;
+const ACESSO_VAZIO = Object.freeze({ status: 'vazio' });
 
 function chavePermissoes(permissoes) {
     return [...permissoes].sort().join(',');
@@ -15,6 +16,8 @@ function useSharedSupportAccess({ service, vinculoId, onSessaoExpirada }) {
     const [tentativa, setTentativa] = useState(0);
 
     useEffect(() => {
+        if (vinculoId == null) return undefined;
+
         let controle;
         let ativo = true;
 
@@ -100,7 +103,7 @@ function useSharedSupportAccess({ service, vinculoId, onSessaoExpirada }) {
     const consultas = useMemo(() => criarConsultasCompartilhadas(consultar), [consultar]);
 
     return {
-        acesso,
+        acesso: vinculoId == null ? ACESSO_VAZIO : acesso,
         consultas,
         recarregar: () => setTentativa((anterior) => anterior + 1)
     };
