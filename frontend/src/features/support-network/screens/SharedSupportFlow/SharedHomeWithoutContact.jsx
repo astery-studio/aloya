@@ -5,17 +5,6 @@ import { useTheme } from '../../../../shared/hooks/useTheme';
 import { fontFamilies } from '../../../../shared/theme';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 
-const tipografiaTitulo = { fontSize: 16, lineHeight: 24 };
-const tipografiaDescricao = { fontSize: 9, lineHeight: 13.95 };
-const espacoEntreTextos = 7;
-// As duas linhas já contribuem com metade de sua entrelinha para o espaço visível.
-const entrelinhaAdjacente =
-    (tipografiaTitulo.lineHeight -
-        tipografiaTitulo.fontSize +
-        tipografiaDescricao.lineHeight -
-        tipografiaDescricao.fontSize) /
-    2;
-
 function SharedHomeNotice() {
     const { cores, escuro } = useTheme();
     const { superficie, borda, textoPrincipal, textoSecundario } = cores.interface;
@@ -83,19 +72,22 @@ const estilos = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    textos: { flex: 1, minWidth: 0, gap: espacoEntreTextos - entrelinhaAdjacente },
+    textos: { flex: 1, minWidth: 0 },
     titulo: {
         color: '#222222',
         fontFamily: fontFamilies.regular,
-        ...tipografiaTitulo,
+        fontSize: 16,
         letterSpacing: -0.32,
         includeFontPadding: false
     },
     descricao: {
         maxWidth: 261.667,
+        // Compensa a folga antes da primeira linha sem apertar as demais.
+        marginTop: -2,
         color: '#5C5C59',
         fontFamily: fontFamilies.regular,
-        ...tipografiaDescricao,
+        fontSize: 9,
+        lineHeight: 13.95,
         includeFontPadding: false
     }
 });
