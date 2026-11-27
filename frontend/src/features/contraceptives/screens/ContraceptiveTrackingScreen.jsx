@@ -96,7 +96,10 @@ function ContraceptiveTrackingScreen({
     somenteLeitura = false
 }) {
     const tema = useTheme();
-    const estilosAcompanhamento = useMemo(() => criarEstilosAcompanhamento(tema), [tema]);
+    const estilosAcompanhamento = useMemo(
+        () => criarEstilosAcompanhamento(tema, somenteLeitura),
+        [tema, somenteLeitura]
+    );
     const [usosAtualizados, setUsosAtualizados] = useState({});
     const itens = anticoncepcionais.map((item) => {
         const atualizacao = usosAtualizados[item.id];

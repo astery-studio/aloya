@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { HeartIcon } from '../../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../../shared/hooks/useTheme';
-import { fontFamilies } from '../../../../shared/theme';
+import { espacamentosLayout, fontFamilies } from '../../../../shared/theme';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 
 function SharedHomeNotice() {
@@ -31,13 +31,18 @@ function SharedHomeNotice() {
 function SharedHomeWithoutContact() {
     return (
         <ScrollView contentContainerStyle={estilos.conteudo} showsVerticalScrollIndicator={false}>
-            <CycleEducationSection perspectiva="contato" rodape={<SharedHomeNotice />} />
+            <CycleEducationSection
+                perspectiva="contato"
+                estiloSecao={estilos.educacao}
+                rodape={<SharedHomeNotice />}
+            />
         </ScrollView>
     );
 }
 
 const estilos = StyleSheet.create({
     conteudo: { paddingTop: 28, paddingBottom: 24 },
+    educacao: { paddingHorizontal: espacamentosLayout.margemHorizontalTela },
     aviso: {
         marginTop: 32,
         padding: 18,

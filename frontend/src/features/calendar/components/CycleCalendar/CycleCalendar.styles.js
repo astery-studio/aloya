@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { fontFamilies } from '../../../../shared/theme';
 import { temaClaro } from '../../../../shared/theme/themePalettes';
 
-function criarEstilosCalendario(tema) {
+function criarEstilosCalendario(tema, margemHorizontal = tema.espacamentos.pequeno) {
     const estilos = StyleSheet.create({
         calendario: {
             flex: 1,
@@ -11,7 +11,7 @@ function criarEstilosCalendario(tema) {
         },
         cabecalhoSemana: {
             flexDirection: 'row',
-            paddingHorizontal: 8,
+            paddingHorizontal: margemHorizontal,
             paddingVertical: 10,
             borderTopWidth: StyleSheet.hairlineWidth,
             borderBottomWidth: StyleSheet.hairlineWidth,
@@ -46,7 +46,7 @@ function criarEstilosCalendario(tema) {
             justifyContent: 'center'
         },
         mes: {
-            paddingHorizontal: 8
+            paddingHorizontal: margemHorizontal
         },
         cabecalhoMes: {
             flexDirection: 'row',

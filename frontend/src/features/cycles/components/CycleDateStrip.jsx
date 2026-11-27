@@ -20,10 +20,12 @@ function CycleDateStrip({
     aoSelecionarData,
     aoCarregarAnteriores,
     aoCarregarPosteriores,
-    semCiclo = false
+    semCiclo = false,
+    margemHorizontal = 0
 }) {
     const tema = useTheme();
-    const { width: larguraVisivel } = useWindowDimensions();
+    const { width } = useWindowDimensions();
+    const larguraVisivel = Math.max(0, width - 2 * margemHorizontal);
     const estilos = useMemo(() => criarEstilos(tema), [tema]);
     const carregamentos = useRef({ anteriores: false, posteriores: false });
     const lista = useRef(null);
@@ -117,7 +119,15 @@ function CycleDateStrip({
             onMomentumScrollEnd={carregarBordas}
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
-            style={[estilos.container, semCiclo && estilos.containerSemCiclo]}
+            style={[
+                estilos.container,
+                semCiclo && estilos.containerSemCiclo,
+                margemHorizontal > 0 && {
+                    width: larguraVisivel,
+                    alignSelf: 'center',
+                    paddingHorizontal: 0
+                }
+            ]}
             contentContainerStyle={[estilos.faixa, { paddingHorizontal: paddingLateral }]}
             accessibilityLabel="Datas do ciclo"
             renderItem={({ item }) => {

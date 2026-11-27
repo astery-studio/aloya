@@ -60,6 +60,7 @@ function criarEstilos(tema) {
             paddingHorizontal: espacamentosLayout.margemHorizontalTela,
             paddingBottom: 96
         },
+        filtroVazioCompartilhado: { paddingHorizontal: 0 },
         mensagemFiltroVazio: {
             maxWidth: 310,
             color: cores.textoSecundario,

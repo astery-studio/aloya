@@ -5,7 +5,7 @@ import { fontFamilies } from '../../../../shared/theme';
 function criarEstilos(tema) {
     return StyleSheet.create({
         conteudoLista: {
-            paddingHorizontal: 20,
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
             paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: 28
         },
@@ -18,7 +18,7 @@ function criarEstilos(tema) {
             width: '100%',
             flex: 1,
             minHeight: 0,
-            paddingHorizontal: 20,
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
             paddingTop: tema.espacamentosLayout.headerParaConteudo
         },
 

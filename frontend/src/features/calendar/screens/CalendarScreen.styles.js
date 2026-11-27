@@ -91,6 +91,7 @@ function criarEstilos(tema) {
             borderRadius: 12
         },
         estadoCompartilhado: {
+            paddingHorizontal: tema.espacamentosLayout.margemHorizontalTela,
             paddingBottom: 0
         },
         textoDestaque: {

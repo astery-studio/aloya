@@ -309,6 +309,11 @@ function CalendarScreen({
                         <View style={estilos.areaCalendario}>
                             <CycleCalendar
                                 meses={mesesValidos}
+                                margemHorizontal={
+                                    somenteLeitura
+                                        ? tema.espacamentosLayout.margemHorizontalTela
+                                        : undefined
+                                }
                                 carregando={carregando}
                                 carregandoAnteriores={carregandoAnteriores}
                                 carregandoPosteriores={carregandoPosteriores}

@@ -31,10 +31,14 @@ function CycleCalendar({
     carregandoPosteriores = false,
     aoCarregarAnteriores,
     aoCarregarPosteriores,
-    aoPressionarDia
+    aoPressionarDia,
+    margemHorizontal
 }) {
     const tema = useTheme();
-    const estilosTema = useMemo(() => criarEstilosCalendario(tema), [tema]);
+    const estilosTema = useMemo(
+        () => criarEstilosCalendario(tema, margemHorizontal),
+        [tema, margemHorizontal]
+    );
     const { estilos } = estilosTema;
     const listaRef = useRef(null);
     const [hoje] = useState(obterHojeLocal);

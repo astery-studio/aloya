@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import ButtonScreen from '../../../../shared/components/common/Button/ButtonScreen';
 import { EmptyState } from '../../../../shared/components/feedback/EmptyState/EmptyState';
 import { useTheme } from '../../../../shared/hooks/useTheme';
+import { espacamentosLayout } from '../../../../shared/theme';
 
 function SharedContentState({ status = 'vazio', aoTentarNovamente, mensagemErro }) {
     const tema = useTheme();
@@ -41,7 +42,11 @@ function SharedContentState({ status = 'vazio', aoTentarNovamente, mensagemErro 
 }
 
 const estilos = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', paddingHorizontal: 20 }
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingHorizontal: espacamentosLayout.margemHorizontalTela
+    }
 });
 
 export { SharedContentState };

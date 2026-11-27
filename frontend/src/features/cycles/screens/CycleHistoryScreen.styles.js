@@ -3,12 +3,13 @@ import { StyleSheet } from 'react-native';
 
 import { fontFamilies } from '../../../shared/theme';
 
-function criarEstilos(tema) {
+function criarEstilos(tema, somenteLeitura = false) {
+    const margemHorizontal = somenteLeitura ? tema.espacamentosLayout.margemHorizontalTela : 22;
     return StyleSheet.create({
         conteudoEstatico: {
             flex: 1,
             minHeight: 0,
-            paddingHorizontal: 22,
+            paddingHorizontal: margemHorizontal,
             paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.grande
         },
@@ -51,7 +52,7 @@ function criarEstilos(tema) {
         },
 
         conteudoDaLista: {
-            paddingHorizontal: 22,
+            paddingHorizontal: margemHorizontal,
             paddingTop: tema.espacamentosLayout.headerParaConteudo,
             paddingBottom: tema.espacamentos.grande
         },
