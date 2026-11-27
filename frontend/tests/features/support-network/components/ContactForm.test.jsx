@@ -138,6 +138,8 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
         carregando,
         icone: Icone,
         tamanhoIcone,
+        corConteudo,
+        estilo,
         estiloTexto
     }) {
         return React.createElement(
@@ -150,9 +152,10 @@ jest.mock('../../../../src/shared/components/common/Button/ButtonScreen', () => 
                     busy: carregando
                 },
                 disabled: desativado || carregando,
-                onPress: aoPressionar
+                onPress: aoPressionar,
+                style: estilo
             },
-            Icone ? React.createElement(Icone, { size: tamanhoIcone }) : null,
+            Icone ? React.createElement(Icone, { size: tamanhoIcone, color: corConteudo }) : null,
             React.createElement(Text, { style: estiloTexto }, texto)
         );
     };
