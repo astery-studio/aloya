@@ -580,6 +580,7 @@ function criarContainer() {
             access: criarSharedSupportAccess({ prisma }),
             data: criarSharedSupportData({
                 prisma,
+                calendarService: calendarModule.calendarService,
                 currentCycleService: calendarModule.currentCycleService,
                 cycleHistoryService,
                 contraceptiveService

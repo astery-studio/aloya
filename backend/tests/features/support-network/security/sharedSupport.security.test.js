@@ -114,13 +114,19 @@ test('filtra categorias no banco e na resposta e rejeita ID ou filtro fora do ac
 
 test('separa calendário, dicas, fase e intensidade do alerta', async () => {
     const data = criarSharedSupportData({
-        prisma: {
-            diaMenstruacao: {
-                findMany({ where, select }) {
-                    assert.deepEqual(where.registroCiclo, { usuarioId: 4 });
-                    assert.deepEqual(select, { data: true });
-                    return [{ data: new Date('2026-11-02') }];
-                }
+        calendarService: {
+            buscarMes(consulta) {
+                assert.deepEqual(consulta, { usuarioId: 4, mes: '2026-11' });
+                return {
+                    mes: '2026-11',
+                    possuiCiclos: true,
+                    diasMenstruacao: [{ data: '2026-11-02', registroCicloId: 19 }],
+                    previsao: {
+                        nivelConfianca: 'alta',
+                        versaoAlgoritmo: 'privada',
+                        periodos: [{ previsto: true, ovulacao: '2026-11-16', registroCicloId: 19 }]
+                    }
+                };
             }
         },
         currentCycleService: {
@@ -140,9 +146,21 @@ test('separa calendário, dicas, fase e intensidade do alerta', async () => {
     });
     assert.deepEqual(await data.fase(vinculo), { faseAtual: 'LUTEA' });
     assert.deepEqual(data.dicas().fases, ['menstrual', 'folicular', 'ovulatoria', 'lutea']);
-    assert.deepEqual(await data.calendario(vinculo, { mes: '2026-11' }), {
+    const historicoAutorizado = { titularId: 4, permissoes: ['geral.historico_ciclo'] };
+    assert.deepEqual(await data.calendario(historicoAutorizado, { mes: '2026-11' }), {
         mes: '2026-11',
-        diasMenstruacao: ['2026-11-02']
+        possuiCiclos: true,
+        diasMenstruacao: ['2026-11-02'],
+        permitePrevisoes: false,
+        previsao: null
+    });
+    const comPrevisao = await data.calendario(
+        { titularId: 4, permissoes: ['geral.historico_ciclo', 'geral.fase_atual'] },
+        { mes: '2026-11' }
+    );
+    assert.equal(comPrevisao.permitePrevisoes, true);
+    assert.deepEqual(JSON.parse(JSON.stringify(comPrevisao.previsao)), {
+        periodos: [{ previsto: true, ovulacao: '2026-11-16' }]
     });
     const { itens } = await data.anticoncepcionais(vinculo, {});
     assert.equal(Object.hasOwn(itens[0], 'intensidadeAlerta'), false);

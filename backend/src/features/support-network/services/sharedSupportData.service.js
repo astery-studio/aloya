@@ -1,11 +1,9 @@
-import { criarIntervaloMensal } from '../../calendar/utils/calendar.period.js';
-import { validarMesCalendario } from '../../calendar/validators/calendar.validator.js';
-import { formatarData } from '../../cycles/utils/calendar.js';
 import { validarConsultaHistorico } from '../../cycles/validators/cycleHistory.validator.js';
 import { lerIdCompartilhado, negarAcessoCompartilhado } from './sharedSupportAccess.service.js';
 
 function criarSharedSupportData({
     prisma,
+    calendarService,
     currentCycleService,
     cycleHistoryService,
     contraceptiveService
@@ -45,20 +43,39 @@ function criarSharedSupportData({
         return { ...resultado, resumo: { cicloMedioDias, menstruacaoMediaDias, quantidadeCiclos } };
     }
 
-    async function calendario({ titularId }, { mes }) {
-        const mesValidado = validarMesCalendario(mes);
-        const { inicioMes, fimMesExclusivo } = criarIntervaloMensal(mesValidado);
-        const dias = await prisma.diaMenstruacao.findMany({
-            where: {
-                registroCiclo: { usuarioId: titularId },
-                data: { gte: inicioMes, lt: fimMesExclusivo }
-            },
-            orderBy: [{ data: 'asc' }, { registroCicloId: 'asc' }],
-            select: { data: true }
-        });
+    async function calendario({ titularId, permissoes }, { mes }) {
+        const calendario = await calendarService.buscarMes({ usuarioId: titularId, mes });
+        const permitePrevisoes = permissoes.includes('geral.fase_atual');
+        const periodos = permitePrevisoes ? calendario.previsao?.periodos : null;
+
         return {
-            mes: mesValidado.chave,
-            diasMenstruacao: [...new Set(dias.map(({ data }) => formatarData(data)))]
+            mes: calendario.mes,
+            possuiCiclos: calendario.possuiCiclos,
+            diasMenstruacao: calendario.diasMenstruacao.map(({ data }) => data),
+            permitePrevisoes,
+            previsao: periodos
+                ? {
+                      periodos: periodos.map(
+                          ({
+                              previsto,
+                              faseMenstrual,
+                              faseFolicular,
+                              ovulacao,
+                              faseLutea,
+                              janelaFertil,
+                              menstruacaoPrevista
+                          }) => ({
+                              previsto,
+                              faseMenstrual,
+                              faseFolicular,
+                              ovulacao,
+                              faseLutea,
+                              janelaFertil,
+                              menstruacaoPrevista
+                          })
+                      )
+                  }
+                : null
         };
     }
 
