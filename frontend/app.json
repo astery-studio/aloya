@@ -28,6 +28,14 @@
       "expo-secure-store",
       "expo-status-bar",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#CC7867",
+          "defaultChannel": "ciclo"
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {
