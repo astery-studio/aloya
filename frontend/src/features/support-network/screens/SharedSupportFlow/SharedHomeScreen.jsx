@@ -1,20 +1,13 @@
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { IconButton } from '../../../../shared/components/common/IconButton/IconButton';
-import {
-    ClockCounterClockwiseIcon,
-    HeartIcon,
-    QuestionIcon,
-    ShieldCheckIcon,
-    SparkleIcon
-} from '../../../../shared/components/icons/AppIcons';
+import { ClockCounterClockwiseIcon } from '../../../../shared/components/icons/AppIcons';
 import { MainLayout } from '../../../../shared/layouts/MainLayout/MainLayout';
 import { obterHojeLocal } from '../../../calendar/utils/cycleCalendar.utils';
 import { CycleDateStrip } from '../../../cycles/components/CycleDateStrip';
 import { CycleEducationSection } from '../../../cycles/components/CycleEducationSection';
 import { ReturnToTodayButton } from '../../../cycles/components/ReturnToTodayButton';
-import { estilos as estilosCuidados } from '../../../cycles/components/home/CycleCareSection.styles';
 import { NOMES_DAS_FASES } from '../../../cycles/components/home/CyclePhaseHero';
 import { CORES_FASE } from '../../../cycles/components/home/CyclePhaseHero.styles';
 import { CyclePredictionSummary } from '../../../cycles/components/home/CyclePredictionSummary';
@@ -31,19 +24,13 @@ import {
     obterFase
 } from '../../../cycles/utils/cyclePresentation';
 import { SharedContentState } from '../../components/SharedContentState/SharedContentState';
+import { SharedCareGestures } from '../../components/SharedCareGestures/SharedCareGestures';
 import { SharedCycleCareSection } from '../../components/SharedCycleCareSection/SharedCycleCareSection';
 import { SharedCycleMomentCard } from '../../components/SharedCycleMomentCard/SharedCycleMomentCard';
 import { SupportedCycleHero } from '../../components/SupportedCycleHero/SupportedCycleHero';
 import { SupportedPersonIndicator } from '../../components/SupportedPersonIndicator/SupportedPersonIndicator';
 import { SharedHomeNotice } from './SharedHomeWithoutContact';
 import { estilos } from './SharedHomeScreen.styles';
-
-const GESTOS = [
-    ['Escutar', HeartIcon],
-    ['Perguntar', QuestionIcon],
-    ['Respeitar', ShieldCheckIcon],
-    ['Ajudar', SparkleIcon]
-];
 
 function SharedHomeScreen({
     nomeTitular,
@@ -177,31 +164,10 @@ function SharedHomeScreen({
                             corDestaque={corDaFase}
                             estiloSecao={estilos.educacao}
                             rodape={
-                                <View style={estilos.rodape}>
-                                    <Text style={[estilosCuidados.etiqueta, { color: corDaFase }]}>
-                                        Para qualquer momento
-                                    </Text>
-                                    <Text
-                                        accessibilityRole="header"
-                                        style={estilosCuidados.tituloSecao}
-                                    >
-                                        Pequenos gestos, muito cuidado.
-                                    </Text>
-                                    <View style={estilos.grade}>
-                                        {GESTOS.map(([titulo, Icone]) => (
-                                            <View
-                                                key={titulo}
-                                                style={[estilosCuidados.card, estilos.itemGrade]}
-                                            >
-                                                <View style={estilos.caixaIcone}>
-                                                    <Icone size={18} color="#C85A44" />
-                                                </View>
-                                                <Text style={estilosCuidados.titulo}>{titulo}</Text>
-                                            </View>
-                                        ))}
-                                    </View>
+                                <>
+                                    <SharedCareGestures />
                                     <SharedHomeNotice />
-                                </View>
+                                </>
                             }
                         />
                     </>
