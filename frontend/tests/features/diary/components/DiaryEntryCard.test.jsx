@@ -50,7 +50,8 @@ describe('DiaryEntryCard', () => {
                 aoAbrir={aoAbrir}
                 aoEditar={jest.fn()}
                 aoExcluir={jest.fn()}
-            />
+            />,
+            { preferencia: 'escuro' }
         );
 
         expect(screen.getByTestId('diary-entry-phase-section')).toBeOnTheScreen();
@@ -63,6 +64,10 @@ describe('DiaryEntryCard', () => {
         expect(screen.getByTestId('diary-entry-card')).toBeOnTheScreen();
         expect(screen.getByText('Intestino')).toBeOnTheScreen();
         expect(screen.queryByTestId('diary-entry-phase-section')).not.toBeOnTheScreen();
+        expect(screen.getByTestId('diary-entry-icon')).toHaveStyle({
+            borderColor: '#999999',
+            backgroundColor: '#121212'
+        });
         expect(
             screen.queryByRole('button', { name: /Editar registro|Excluir registro/ })
         ).not.toBeOnTheScreen();
