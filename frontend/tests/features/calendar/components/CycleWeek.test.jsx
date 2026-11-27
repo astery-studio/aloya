@@ -1,12 +1,15 @@
 //Testa semanas, interação dos dias e continuidade da janela fértil.
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { processColor, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import {
     CycleWeek,
     obterTrechosFerteis
 } from '../../../../src/features/calendar/components/CycleCalendar/CycleWeek';
-import { criarEstilosCalendario } from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar.styles';
+import {
+    criarEstilosCalendario,
+    estilos
+} from '../../../../src/features/calendar/components/CycleCalendar/CycleCalendar.styles';
 import { temaEscuro } from '../../../../src/shared/theme/themePalettes';
 
 function criarDia(numero, alteracoes = {}) {
@@ -23,14 +26,6 @@ function criarDia(numero, alteracoes = {}) {
         fimSegmento: false,
         ...alteracoes
     };
-}
-
-async function medirContorno(chave, width) {
-    await fireEvent(screen.getByTestId(`janela-fertil-${chave}`), 'layout', {
-        nativeEvent: { layout: { width, height: 54 } }
-    });
-
-    return screen.getByTestId(`pontilhado-fertil-${chave}`);
 }
 
 describe('CycleWeek', () => {
@@ -71,11 +66,12 @@ describe('CycleWeek', () => {
 
         expect(parseFloat(estiloContorno.left)).toBeCloseTo(100 / 7, 10);
         expect(parseFloat(estiloContorno.width)).toBeCloseTo(300 / 7, 10);
-        expect(contorno).toHaveProp('pointerEvents', 'none');
-
-        const pontilhado = await medirContorno('2026-10-02-2026-10-04', 150);
-        expect(pontilhado).toHaveProp('strokeDasharray', ['2', '4']);
-        expect(Number(pontilhado.props.width)).toBe(148);
+        expect(contorno).toHaveStyle({ borderWidth: 2, borderStyle: 'dashed', borderRadius: 16 });
+        expect(estiloContorno).not.toHaveProperty('borderTopWidth');
+        expect(estiloContorno).not.toHaveProperty('borderRightWidth');
+        expect(estiloContorno).not.toHaveProperty('borderBottomWidth');
+        expect(estiloContorno).not.toHaveProperty('borderLeftWidth');
+        expect(contorno).toHaveStyle(estilos.janelaFertilAtual);
     });
 
     test('separa a janela fértil atual da parte futura prevista', async () => {
@@ -99,16 +95,13 @@ describe('CycleWeek', () => {
 
         await render(<CycleWeek semana={semana} />);
 
-        const atual = await medirContorno('2026-10-02-2026-10-03', 100);
-        const previsto = await medirContorno('2026-10-04-2026-10-05', 100);
-        expect(atual).toHaveProp('stroke', {
-            type: 0,
-            payload: processColor('rgba(34, 34, 34, 0.70)')
-        });
-        expect(previsto).toHaveProp('stroke', {
-            type: 0,
-            payload: processColor('rgba(34, 34, 34, 0.42)')
-        });
+        expect(screen.getByTestId('janela-fertil-2026-10-02-2026-10-03')).toHaveStyle(
+            estilos.janelaFertilAtual
+        );
+
+        expect(screen.getByTestId('janela-fertil-2026-10-04-2026-10-05')).toHaveStyle(
+            estilos.janelaFertilPrevista
+        );
     });
 
     test('não desenha contorno quando a semana não possui janela fértil', async () => {
@@ -183,10 +176,8 @@ describe('CycleWeek', () => {
 
         await render(<CycleWeek semana={semana} estilosTema={estilosTemaEscuro} />);
 
-        const pontilhado = await medirContorno('2026-10-02-2026-10-04', 150);
-        expect(pontilhado).toHaveProp('stroke', {
-            type: 0,
-            payload: processColor('#9E9C96')
+        expect(screen.getByTestId('janela-fertil-2026-10-02-2026-10-04')).toHaveStyle({
+            borderColor: '#9E9C96'
         });
     });
 });

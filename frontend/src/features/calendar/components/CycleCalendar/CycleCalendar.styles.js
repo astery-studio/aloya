@@ -147,7 +147,17 @@ function criarEstilosCalendario(tema) {
             position: 'absolute',
             top: 0,
             bottom: 0,
+            // O Android aplica o tracejado a um contorno arredondado com largura e cor uniformes.
+            borderWidth: 2,
+            borderStyle: 'dashed',
+            borderRadius: 16,
             zIndex: 3
+        },
+        janelaFertilAtual: {
+            borderColor: tema.escuro ? '#9E9C96' : 'rgba(34, 34, 34, 0.70)'
+        },
+        janelaFertilPrevista: {
+            borderColor: tema.escuro ? 'rgba(158, 156, 150, 0.40)' : 'rgba(34, 34, 34, 0.42)'
         },
         pressionado: {
             opacity: 0.72
@@ -188,10 +198,6 @@ function criarEstilosCalendario(tema) {
         estilos,
         estilosTipos,
         estilosTiposPrevistos,
-        coresJanelaFertil: {
-            atual: tema.escuro ? '#9E9C96' : 'rgba(34, 34, 34, 0.70)',
-            prevista: tema.escuro ? 'rgba(158, 156, 150, 0.40)' : 'rgba(34, 34, 34, 0.42)'
-        },
         corCarregamento: tema.escuro ? tema.cores.interface.destaque : tema.cores.marca.primaria,
         corIconeMarcado: '#FFFFFF'
     });
