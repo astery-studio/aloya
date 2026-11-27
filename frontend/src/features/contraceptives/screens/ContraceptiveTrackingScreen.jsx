@@ -145,7 +145,7 @@ function ContraceptiveTrackingScreen({
                 </View>
             ) : (
                 <View style={estilosAcompanhamento.corpo}>
-                    {quantidadePendentes ? (
+                    {!somenteLeitura && quantidadePendentes > 0 ? (
                         <View style={estilosAcompanhamento.areaBanner}>
                             <PendingUsesBanner quantidade={quantidadePendentes} />
                         </View>

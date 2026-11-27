@@ -63,6 +63,8 @@ function criarEstilosCartao(tema) {
             backgroundColor: tema.escuro ? '#2C2C2C' : interfaceTema.superficieElevada
         },
         identificacao: { flex: 1, minWidth: 0 },
+        identificacaoSomenteLeitura: { paddingRight: 36 + 10 },
+        textoCentralizado: { textAlign: 'center' },
         nome: {
             color: interfaceTema.textoPrincipal,
             fontFamily: fontFamilies.bold,
@@ -130,6 +132,7 @@ function criarEstilosCartao(tema) {
             borderTopWidth: 0.70489,
             borderTopColor: interfaceTema.separador
         },
+        linhaUsoSomenteLeitura: { justifyContent: 'center' },
         horarioComIcone: {
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -145,6 +148,7 @@ function criarEstilosCartao(tema) {
             lineHeight: 21
         },
         horarioConfirmado: { flex: 1, minWidth: 0, gap: 2 },
+        horarioConfirmadoSomenteLeitura: { alignItems: 'center' },
         confirmadoAs: {
             marginLeft: 17,
             color: interfaceTema.textoSecundario,
@@ -154,6 +158,7 @@ function criarEstilosCartao(tema) {
             lineHeight: 16
         },
         horaConfirmacao: { fontFamily: fontFamilies.semibold, fontWeight: '600' },
+        confirmacaoSomenteLeitura: { marginLeft: 0, textAlign: 'center' },
         espacoBotaoUso: {
             height: 35.99,
             flexShrink: 0,

@@ -77,7 +77,7 @@ test('não duplica o cartão que possui doses com estados diferentes', () => {
     expect(criarSecoes([item])).toEqual([{ titulo: 'NÃO USADOS', data: [item] }]);
 });
 
-test('usa as seções e o aviso do titular no acompanhamento compartilhado', async () => {
+test('no acompanhamento, mantém as seções e centraliza o card sem o aviso de pendências', async () => {
     await renderizar(
         <ContraceptiveTrackingScreen
             somenteLeitura
@@ -96,11 +96,15 @@ test('usa as seções e o aviso do titular no acompanhamento compartilhado', asy
         />
     );
 
-    expect(screen.getByText('1 uso pendente hoje')).toBeOnTheScreen();
+    expect(screen.queryByText('1 uso pendente hoje')).toBeNull();
     expect(screen.getByRole('header', { name: 'NÃO USADOS' })).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'USADOS' })).toBeOnTheScreen();
     expect(screen.getByText('Alerta Moderado')).toBeOnTheScreen();
     expect(screen.getByText('08:00')).toBeOnTheScreen();
+    expect(screen.getByText('Yaz')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByText('Pílula')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByText('PRÓXIMOS HORÁRIOS')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByText('08:00').parent.parent).toHaveStyle({ justifyContent: 'center' });
     expect(screen.getByText('Atrasado')).toBeOnTheScreen();
     expect(
         screen.queryByRole('button', { name: /Editar|Remover|Marcar Uso|Cadastrar novo/ })

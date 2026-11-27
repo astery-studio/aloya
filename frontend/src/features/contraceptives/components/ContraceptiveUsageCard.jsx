@@ -304,9 +304,28 @@ function ContraceptiveUsageCard({
                             }
                         />
                     </View>
-                    <View style={estilosCartao.identificacao}>
-                        <Text style={estilosCartao.nome}>{anticoncepcional.nome}</Text>
-                        <Text style={estilosCartao.tipo}>{tipo}</Text>
+                    <View
+                        style={[
+                            estilosCartao.identificacao,
+                            somenteLeitura && estilosCartao.identificacaoSomenteLeitura
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                estilosCartao.nome,
+                                somenteLeitura && estilosCartao.textoCentralizado
+                            ]}
+                        >
+                            {anticoncepcional.nome}
+                        </Text>
+                        <Text
+                            style={[
+                                estilosCartao.tipo,
+                                somenteLeitura && estilosCartao.textoCentralizado
+                            ]}
+                        >
+                            {tipo}
+                        </Text>
                     </View>
                     {!removido && !somenteLeitura ? (
                         <View style={estilosCartao.acoes}>
@@ -397,7 +416,8 @@ function ContraceptiveUsageCard({
                         <Text
                             style={[
                                 estilosCartao.rotuloSecao,
-                                estilosCartao.rotuloProximosHorarios
+                                estilosCartao.rotuloProximosHorarios,
+                                somenteLeitura && estilosCartao.textoCentralizado
                             ]}
                         >
                             PRÓXIMOS HORÁRIOS
@@ -409,6 +429,7 @@ function ContraceptiveUsageCard({
                                     key={uso.id}
                                     style={[
                                         estilosCartao.linhaUso,
+                                        somenteLeitura && estilosCartao.linhaUsoSomenteLeitura,
                                         indice > 0 && estilosCartao.linhaUsoSeparada
                                     ]}
                                 >
@@ -451,7 +472,13 @@ function ContraceptiveUsageCard({
                                     indice > 0 && estilosCartao.linhaUsoSeparada
                                 ]}
                             >
-                                <View style={estilosCartao.horarioConfirmado}>
+                                <View
+                                    style={[
+                                        estilosCartao.horarioConfirmado,
+                                        somenteLeitura &&
+                                            estilosCartao.horarioConfirmadoSomenteLeitura
+                                    ]}
+                                >
                                     <View style={estilosCartao.horarioComIcone}>
                                         <ClockIcon
                                             size={11}
@@ -460,7 +487,13 @@ function ContraceptiveUsageCard({
                                         <Text style={estilosCartao.horario}>{uso.horario}</Text>
                                     </View>
                                     {uso.horarioConfirmacao ? (
-                                        <Text style={estilosCartao.confirmadoAs}>
+                                        <Text
+                                            style={[
+                                                estilosCartao.confirmadoAs,
+                                                somenteLeitura &&
+                                                    estilosCartao.confirmacaoSomenteLeitura
+                                            ]}
+                                        >
                                             Confirmado às{' '}
                                             <Text style={estilosCartao.horaConfirmacao}>
                                                 {uso.horarioConfirmacao}
