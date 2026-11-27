@@ -34,4 +34,25 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     expect(screen.getByText('Espinhas')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'OK' }));
     expect(screen.queryByRole('header', { name: 'Diário de Júlia' })).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Filtrar histórico do Diário' }));
+    await fireEvent.press(
+        await screen.findByRole('switch', { name: 'Filtrar por Fase Folicular' })
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
+    expect(screen.getByText('FILTRO APLICADO (0)')).toBeOnTheScreen();
+    expect(
+        screen.getByText('Nenhum registro encontrado para os filtros aplicados.')
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Limpar filtros' }));
+    expect(screen.getAllByTestId('diary-entry-card')).toHaveLength(2);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Filtrar histórico do Diário' }));
+    await fireEvent.press(
+        await screen.findByRole('button', { name: 'Expandir Corpo e Sintomas Físicos' })
+    );
+    await fireEvent.press(screen.getByRole('switch', { name: 'Filtrar por Pele' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Aplicar Filtro' }));
+    expect(screen.getByText('FILTRO APLICADO (1)')).toBeOnTheScreen();
+    expect(screen.getAllByTestId('diary-entry-card')).toHaveLength(1);
 });

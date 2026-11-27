@@ -12,13 +12,22 @@ import { AppThemeRoot } from '../../../app/AppThemeRoot';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
 import { CycleHistoryCard } from '../../cycles/components/CycleHistoryCard/CycleHistoryCard';
 import { CycleSummaryCard } from '../../cycles/components/CycleSummaryCard/CycleSummaryCard';
+import { DiaryActiveFilters } from '../../diary/components/DiaryActiveFilters/DiaryActiveFilters';
+import { DiaryFiltersSheet } from '../../diary/components/DiaryFiltersSheet/DiaryFiltersSheet';
 import { DiaryTimelineDivider } from '../../diary/components/DiaryHistoryHeader/DiaryHistoryHeader';
 import { DiaryOverviewCard } from '../../diary/components/DiaryOverviewCard/DiaryOverviewCard';
 import { DiaryRecordDetailsModal } from '../../diary/components/DiaryRecordDetailsModal/DiaryRecordDetailsModal';
 import { DiaryTimeline } from '../../diary/components/DiaryTimeline/DiaryTimeline';
 import { criarEstilos as criarEstilosDiario } from '../../diary/screens/DiaryScreen.styles';
+import {
+    FILTROS_DIARIO_VAZIOS,
+    normalizarFiltrosDiario,
+    possuiFiltrosDiario
+} from '../../diary/utils/diaryFilters';
 import { obterRegistrosAdjacentes } from '../../diary/utils/diaryRecordNavigation';
 import ButtonScreen from '../../../shared/components/common/Button/ButtonScreen/ButtonScreen';
+import { IconButton } from '../../../shared/components/common/IconButton/IconButton';
+import { FunnelIcon } from '../../../shared/components/icons/AppIcons';
 import { useTheme } from '../../../shared/hooks/useTheme';
 import { MainLayout } from '../../../shared/layouts/MainLayout/MainLayout';
 import { SharedPermissionGate } from '../components/SharedPermissionGate/SharedPermissionGate';
@@ -32,6 +41,30 @@ const PERMISSOES_DEMONSTRACAO = [
     ...gruposPermissoes.flatMap(({ permissoes }) => permissoes)
 ].map(({ id }) => id);
 const TITULOS = { inicio: 'Início', historico: 'Histórico de Ciclos', diario: 'Diário' };
+const MACROS_DIARIO = {
+    ciclo: 'ciclo_sangramento',
+    corpo: 'corpo_sintomas_fisicos',
+    emocional: 'emocional',
+    energia: 'energia_sono',
+    vidaIntima: 'vida_intima_social',
+    saude: 'saude_acompanhamento'
+};
+const CATALOGO_PREVIA = {
+    macrocategorias: gruposPermissoes.map(({ id, titulo, permissoes }) => ({
+        id: MACROS_DIARIO[id],
+        nome: titulo,
+        categorias: permissoes.map(({ id: permissao, titulo: nome }) => ({
+            id: permissao.split('.')[1],
+            nome
+        }))
+    }))
+};
+const SERVICO_FILTROS_PREVIA = { buscarCatalogo: async () => CATALOGO_PREVIA };
+const ROTULOS_CATEGORIAS = Object.fromEntries(
+    CATALOGO_PREVIA.macrocategorias.flatMap(({ categorias }) =>
+        categorias.map(({ id, nome }) => [id, nome])
+    )
+);
 const CENARIOS_CICLO = [
     { id: 'folicular', rotulo: 'Folicular', dia: 9 },
     { id: 'menstrual', rotulo: 'Menstrual', dia: 3 },
@@ -202,35 +235,105 @@ const DETALHES_DIARIO = {
     }
 };
 
-function DiarioPrevia({ permissoes, aviso }) {
+function DiarioPrevia({ permissoes, aviso, filtroAberto, aoFecharFiltro, aoVoltar }) {
     const tema = useTheme();
     const [registroAberto, setRegistroAberto] = useState(null);
-    const adjacentes = obterRegistrosAdjacentes(REGISTROS_DIARIO, registroAberto?.id);
+    const [filtros, setFiltros] = useState(FILTROS_DIARIO_VAZIOS);
+    const estilosDiario = criarEstilosDiario(tema);
+    const filtrosAtivos = possuiFiltrosDiario(filtros);
+    const registros = REGISTROS_DIARIO.filter(
+        ({ id, data, fase }) =>
+            (!filtros.dataInicio || data >= filtros.dataInicio) &&
+            (!filtros.dataFim || data <= filtros.dataFim) &&
+            (!filtros.fases.length || filtros.fases.includes(fase)) &&
+            (!filtros.categorias.length ||
+                DETALHES_DIARIO[id].categorias.some((categoria) =>
+                    filtros.categorias.includes(categoria.id)
+                ))
+    );
+    const adjacentes = obterRegistrosAdjacentes(registros, registroAberto?.id);
     const detalhe = registroAberto
         ? { ...registroAberto, ...DETALHES_DIARIO[registroAberto.id] }
         : null;
 
+    function removerFiltro(id) {
+        const [tipo, valor] = id.split(':');
+        if (tipo === 'categoria') {
+            setFiltros((atuais) => ({
+                ...atuais,
+                categorias: atuais.categorias.filter((item) => item !== valor)
+            }));
+        } else if (tipo === 'fase') {
+            setFiltros((atuais) => ({
+                ...atuais,
+                fases: atuais.fases.filter((item) => item !== valor)
+            }));
+        } else if (tipo === 'dataInicio' || tipo === 'dataFim') {
+            setFiltros((atuais) => ({ ...atuais, [tipo]: null }));
+        }
+    }
+
     return (
         <>
             <DiaryTimeline
-                registros={REGISTROS_DIARIO}
+                registros={registros}
                 somenteLeitura
                 aoAbrir={setRegistroAberto}
                 contentContainerStyle={estilos.inset}
                 ListHeaderComponent={
                     <View style={estilos.lista}>
                         {aviso}
-                        <DiaryOverviewCard
-                            nomeTitular={NOME}
-                            fase="folicular"
-                            tituloFase="Fase Folicular"
-                            descricao="Júlia costuma registrar aumento de energia, secreção clara de ovo e humor motivado."
-                            diasRegistrados={4}
-                            exibirFase={permissoes.includes('geral.fase_atual')}
-                        />
-                        <DiaryTimelineDivider estilos={criarEstilosDiario(tema)} />
+                        <Pressable accessibilityRole="button" onPress={aoVoltar}>
+                            <Text style={{ color: tema.cores.interface.destaque }}>
+                                Voltar à prévia do Início
+                            </Text>
+                        </Pressable>
+                        {filtrosAtivos ? (
+                            <DiaryActiveFilters
+                                filtros={filtros}
+                                rotulosCategorias={ROTULOS_CATEGORIAS}
+                                quantidadeResultados={registros.length}
+                                aoLimpar={() => setFiltros(FILTROS_DIARIO_VAZIOS)}
+                                aoRemover={removerFiltro}
+                            />
+                        ) : (
+                            <DiaryOverviewCard
+                                nomeTitular={NOME}
+                                fase="folicular"
+                                tituloFase="Fase Folicular"
+                                descricao="Júlia costuma registrar aumento de energia, secreção clara de ovo e humor motivado."
+                                diasRegistrados={4}
+                                exibirFase={permissoes.includes('geral.fase_atual')}
+                            />
+                        )}
+                        {filtrosAtivos ? null : <DiaryTimelineDivider estilos={estilosDiario} />}
+                        {filtrosAtivos && !registros.length ? (
+                            <Text
+                                accessibilityLiveRegion="polite"
+                                style={estilosDiario.mensagemFiltroVazio}
+                            >
+                                Nenhum registro encontrado para os filtros aplicados.
+                            </Text>
+                        ) : null}
                     </View>
                 }
+            />
+            <DiaryFiltersSheet
+                visivel={filtroAberto}
+                filtros={filtros}
+                service={SERVICO_FILTROS_PREVIA}
+                categoriasPermitidas={permissoes
+                    .filter((id) => !id.startsWith('geral.'))
+                    .map((id) => id.split('.')[1])}
+                exibirFiltroFases={
+                    permissoes.includes('geral.fase_atual') &&
+                    permissoes.includes('geral.historico_ciclo')
+                }
+                onFechar={aoFecharFiltro}
+                onAplicar={(aplicados) => {
+                    setFiltros(normalizarFiltrosDiario(aplicados));
+                    aoFecharFiltro();
+                }}
             />
             <DiaryRecordDetailsModal
                 visivel={Boolean(detalhe)}
@@ -251,6 +354,7 @@ function DiarioPrevia({ permissoes, aviso }) {
 
 function ConteudoPrevia() {
     const [tela, setTela] = useState('inicio');
+    const [filtroAberto, setFiltroAberto] = useState(false);
     const [cenario, setCenario] = useState(CENARIOS_CICLO[0]);
     const tema = useTheme();
     const permissoes = PERMISSOES_DEMONSTRACAO;
@@ -263,12 +367,29 @@ function ConteudoPrevia() {
     return (
         <MainLayout
             titulo={TITULOS[tela]}
-            varianteHeader={tela === 'inicio' ? 'padrao' : 'comVoltar'}
-            onVoltar={tela === 'inicio' ? undefined : () => setTela('inicio')}
+            varianteHeader={tela === 'historico' ? 'comVoltar' : 'padrao'}
+            onVoltar={tela === 'historico' ? () => setTela('inicio') : undefined}
+            acoesHeader={
+                tela === 'diario' ? (
+                    <IconButton
+                        icone={FunnelIcon}
+                        variante="redeApoio"
+                        corIcone={tema.cores.interface.destaque}
+                        rotuloAcessibilidade="Filtrar histórico do Diário"
+                        aoPressionar={() => setFiltroAberto(true)}
+                    />
+                ) : null
+            }
             exibirNavegacaoInferior={false}
         >
             {tela === 'diario' ? (
-                <DiarioPrevia permissoes={permissoes} aviso={aviso} />
+                <DiarioPrevia
+                    permissoes={permissoes}
+                    aviso={aviso}
+                    filtroAberto={filtroAberto}
+                    aoFecharFiltro={() => setFiltroAberto(false)}
+                    aoVoltar={() => setTela('inicio')}
+                />
             ) : (
                 <ScrollView contentContainerStyle={estilos.conteudo}>
                     {aviso}
