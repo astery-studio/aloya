@@ -86,6 +86,8 @@ test('notificação não detalha permissões adicionadas ou removidas', async ()
 
     assert.deepEqual(Object.keys(estado.notificacao.data).sort(), [
         'dataHoraProgramada',
+        'evento',
+        'ocorrencia',
         'origemId',
         'statusEnvio',
         'tipoOrigem',

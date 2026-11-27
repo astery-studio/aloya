@@ -328,12 +328,15 @@ function criarContactLinkService({ prisma, now = () => new Date() } = {}) {
             }
 
             if (vinculoAlterado) {
+                const instante = now();
                 await tx.notificacao.create({
                     data: {
                         usuarioId: atual.contatoId,
                         tipoOrigem: 'rede_apoio',
+                        evento: 'redeApoio.convites.acessoAtualizado',
+                        ocorrencia: `${atual.id}:${versao.toISOString()}`,
                         origemId: atual.id,
-                        dataHoraProgramada: now(),
+                        dataHoraProgramada: instante,
                         statusEnvio: 'agendada'
                     }
                 });

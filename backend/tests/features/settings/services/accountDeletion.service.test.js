@@ -292,6 +292,7 @@ test(
                 usuarioId: 2,
                 tipoOrigem: 'rede_apoio',
                 origemId: null,
+                evento: 'redeApoio.convites.contaExcluida',
                 dataHoraProgramada: momentoExclusao,
                 statusEnvio: 'agendada'
             }
