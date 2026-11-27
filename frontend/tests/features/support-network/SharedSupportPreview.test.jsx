@@ -14,6 +14,12 @@ test('permite conferir os componentes já implementados com dados fictícios', a
     expect(screen.getByTestId('supported-cycle-artwork-empty')).toBeOnTheScreen();
     expect(screen.queryByRole('header', { name: 'Fase Folicular' })).not.toBeOnTheScreen();
     expect(screen.getByText('Entenda cada fase')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver Anticoncepcionais' }));
+    expect(screen.getByText('Yaz')).toBeOnTheScreen();
+    expect(screen.getByText('Mirena')).toBeOnTheScreen();
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Histórico de uso' })[0]);
+    expect(screen.getByText('Setembro 2026')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Ver Histórico de Ciclos' }));
     expect(screen.getByText('RESUMO DOS CICLOS DE JÚLIA')).toBeOnTheScreen();
     expect(screen.getAllByTestId('cycle-history-card')).toHaveLength(3);

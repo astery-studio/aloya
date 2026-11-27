@@ -9,6 +9,7 @@ import {
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AppThemeRoot } from '../../../app/AppThemeRoot';
+import { ContraceptiveUsageCard } from '../../contraceptives/components/ContraceptiveUsageCard';
 import { CycleEducationSection } from '../../cycles/components/CycleEducationSection';
 import { CycleHistoryCard } from '../../cycles/components/CycleHistoryCard/CycleHistoryCard';
 import { CycleSummaryCard } from '../../cycles/components/CycleSummaryCard/CycleSummaryCard';
@@ -40,7 +41,51 @@ const PERMISSOES_DEMONSTRACAO = [
     ...permissoesGerais,
     ...gruposPermissoes.flatMap(({ permissoes }) => permissoes)
 ].map(({ id }) => id);
-const TITULOS = { inicio: 'Início', historico: 'Histórico de Ciclos', diario: 'Diário' };
+const TITULOS = {
+    inicio: 'Início',
+    historico: 'Histórico de Ciclos',
+    diario: 'Diário',
+    anticoncepcionais: 'Anticoncepcionais'
+};
+const ANTICONCEPCIONAIS_PREVIA = [
+    {
+        id: 'yaz',
+        nome: 'Yaz',
+        tipo: 'pilula',
+        horarios: ['08:00', '20:00'],
+        statusUltimoUso: 'pendente',
+        usosHoje: [{ id: 'yaz-manha', horario: '08:00', atrasado: true, status: 'pendente' }],
+        historico: [
+            { id: 'yaz-06', data: '2026-09-06', horarioProgramado: '08:00', estado: 'confirmado' },
+            {
+                id: 'yaz-05',
+                data: '2026-09-05',
+                horarioProgramado: '08:00',
+                estado: 'naoConfirmado'
+            },
+            { id: 'yaz-04', data: '2026-09-04', horarioProgramado: '08:00', estado: 'confirmado' },
+            { id: 'yaz-03', data: '2026-09-03', horarioProgramado: '08:00', estado: 'foraDoPrazo' }
+        ]
+    },
+    {
+        id: 'evra',
+        nome: 'Evra',
+        tipo: 'adesivo',
+        horarios: ['09:30'],
+        statusUltimoUso: 'pendente',
+        historico: [
+            { id: 'evra-01', data: '2026-09-01', horarioProgramado: '09:30', estado: 'confirmado' }
+        ]
+    },
+    {
+        id: 'mirena',
+        nome: 'Mirena',
+        tipo: 'diu_hormonal',
+        statusUltimoUso: 'confirmado',
+        dataValidade: '2029-03-14',
+        validadeRestante: '30 meses restantes'
+    }
+];
 const MACROS_DIARIO = {
     ciclo: 'ciclo_sangramento',
     corpo: 'corpo_sintomas_fisicos',
@@ -367,8 +412,14 @@ function ConteudoPrevia() {
     return (
         <MainLayout
             titulo={TITULOS[tela]}
-            varianteHeader={tela === 'historico' ? 'comVoltar' : 'padrao'}
-            onVoltar={tela === 'historico' ? () => setTela('inicio') : undefined}
+            varianteHeader={
+                tela === 'historico' || tela === 'anticoncepcionais' ? 'comVoltar' : 'padrao'
+            }
+            onVoltar={
+                tela === 'historico' || tela === 'anticoncepcionais'
+                    ? () => setTela('inicio')
+                    : undefined
+            }
             acoesHeader={
                 tela === 'diario' ? (
                     <IconButton
@@ -450,6 +501,18 @@ function ConteudoPrevia() {
                             />
                             <SharedPermissionGate
                                 permissoes={permissoes}
+                                permissao="geral.anticoncepcionais"
+                            >
+                                <View style={estilos.inset}>
+                                    <ButtonScreen
+                                        texto="Ver Anticoncepcionais"
+                                        variante="verde"
+                                        aoPressionar={() => setTela('anticoncepcionais')}
+                                    />
+                                </View>
+                            </SharedPermissionGate>
+                            <SharedPermissionGate
+                                permissoes={permissoes}
                                 permissao="geral.historico_ciclo"
                             >
                                 <View style={estilos.inset}>
@@ -471,6 +534,46 @@ function ConteudoPrevia() {
                                 <CycleEducationSection perspectiva="contato" />
                             </SharedPermissionGate>
                         </>
+                    ) : null}
+                    {tela === 'anticoncepcionais' ? (
+                        <View style={[estilos.inset, estilos.lista]}>
+                            <Text
+                                accessibilityRole="header"
+                                style={[
+                                    estilos.aviso,
+                                    { color: tema.cores.interface.textoSecundario }
+                                ]}
+                            >
+                                NÃO USADOS
+                            </Text>
+                            {ANTICONCEPCIONAIS_PREVIA.filter(
+                                (item) => item.statusUltimoUso === 'pendente'
+                            ).map((item) => (
+                                <ContraceptiveUsageCard
+                                    key={item.id}
+                                    anticoncepcional={item}
+                                    somenteLeitura
+                                />
+                            ))}
+                            <Text
+                                accessibilityRole="header"
+                                style={[
+                                    estilos.aviso,
+                                    { color: tema.cores.interface.textoSecundario }
+                                ]}
+                            >
+                                USADOS
+                            </Text>
+                            {ANTICONCEPCIONAIS_PREVIA.filter(
+                                (item) => item.statusUltimoUso !== 'pendente'
+                            ).map((item) => (
+                                <ContraceptiveUsageCard
+                                    key={item.id}
+                                    anticoncepcional={item}
+                                    somenteLeitura
+                                />
+                            ))}
+                        </View>
                     ) : null}
                     {tela === 'historico' ? (
                         <View style={[estilos.inset, estilos.lista]}>
